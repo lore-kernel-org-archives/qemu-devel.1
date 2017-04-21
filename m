@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d1UgF-0001wd-R0
+	(envelope-from <kraxel@redhat.com>) id 1d1UgF-0001wf-RI
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d1UgD-0001FS-93
+	(envelope-from <kraxel@redhat.com>) id 1d1UgC-0001Eg-Jc
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:20404)
+Received: from mx1.redhat.com ([209.132.183.28]:41634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d1UgC-0001ED-W3
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:41 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d1UgC-0001EG-AL
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:40 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E1D66335EAF
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:16:38 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 21 Apr 2017 11:16:25 +0200
-Message-Id: <20170421091632.30900-3-kraxel@redhat.com>
+Date: Fri, 21 Apr 2017 11:16:27 +0200
+Message-Id: <20170421091632.30900-5-kraxel@redhat.com>
 In-Reply-To: <20170421091632.30900-1-kraxel@redhat.com>
 References: <20170421091632.30900-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/9] memory: add support getting and using a
- dirty bitmap copy.
+Subject: [Qemu-devel] [PATCH 4/9] vga: make display updates thread safe.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,238 +30,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This patch adds support for getting and using a local copy of the dirty
-bitmap.
+The vga code clears the dirty bits *after* reading the framebuffer
+memory.  So if the guest framebuffer updates hits the race window
+between vga reading the framebuffer and vga clearing the dirty bits
+vga will miss that update
 
-memory_region_snapshot_and_clear_dirty() will create a snapshot of the
-dirty bitmap for the specified range, clear the dirty bitmap and return
-the copy.  The returned bitmap can be a bit larger than requested, the
-range is expanded so the code can copy unsigned longs from the bitmap
-and avoid atomic bit update operations.
+Fix it by using the new memory_region_copy_and_clear_dirty()
+memory_region_copy_get_dirty() functions.  That way we clear the
+dirty bitmap before reading the framebuffer.  Any guest display
+updates happening in parallel will be properly tracked in the
+dirty bitmap then and the next display refresh will pick them up.
 
-memory_region_snapshot_get_dirty() will return the dirty status of
-pages, pretty much like memory_region_get_dirty(), but using the copy
-returned by memory_region_copy_and_clear_dirty().
+Problem triggers with mttcg only.  Before mttcg was merged tcg
+never ran in parallel to vga emulation.  Using kvm will hide the
+problem too, due to qemu operating on a userspace copy of the
+kernel's dirty bitmap.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/exec/memory.h   | 47 +++++++++++++++++++++++++++++++
- include/exec/ram_addr.h |  7 +++++
- include/qemu/typedefs.h |  1 +
- exec.c                  | 75 +++++++++++++++++++++++++++++++++++++++++++++++++
- memory.c                | 17 +++++++++++
- 5 files changed, 147 insertions(+)
+ hw/display/vga.c | 36 +++++++++++++++++-------------------
+ 1 file changed, 17 insertions(+), 19 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index f20b191793..1e15e79d00 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -871,6 +871,53 @@ void memory_region_set_dirty(MemoryRegion *mr, hwaddr addr,
-  */
- bool memory_region_test_and_clear_dirty(MemoryRegion *mr, hwaddr addr,
-                                         hwaddr size, unsigned client);
-+
-+/**
-+ * memory_region_snapshot_and_clear_dirty: Get a snapshot of the dirty
-+ *                                         bitmap and clear it.
-+ *
-+ * Creates a snapshot of the dirty bitmap, clears the dirty bitmap and
-+ * returns the snapshot.  The snapshot can then be used to query dirty
-+ * status, using memory_region_snapshot_get_dirty.  Unlike
-+ * memory_region_test_and_clear_dirty this allows to query the same
-+ * page multiple times, which is especially useful for display updates
-+ * where the scanlines often are not page aligned.
-+ *
-+ * The dirty bitmap region which gets copyed into the snapshot (and
-+ * cleared afterwards) can be larger than requested.  The boundaries
-+ * are rounded up/down so complete bitmap longs (covering 64 pages on
-+ * 64bit hosts) can be copied over into the bitmap snapshot.  Which
-+ * isn't a problem for display updates as the extra pages are outside
-+ * the visible area, and in case the visible area changes a full
-+ * display redraw is due anyway.  Should other use cases for this
-+ * function emerge we might have to revisit this implementation
-+ * detail.
-+ *
-+ * Use g_free to release DirtyBitmapSnapshot.
-+ *
-+ * @mr: the memory region being queried.
-+ * @addr: the address (relative to the start of the region) being queried.
-+ * @size: the size of the range being queried.
-+ * @client: the user of the logging information; typically %DIRTY_MEMORY_VGA.
-+ */
-+DirtyBitmapSnapshot *memory_region_snapshot_and_clear_dirty(MemoryRegion *mr,
-+                                                            hwaddr addr,
-+                                                            hwaddr size,
-+                                                            unsigned client);
-+
-+/**
-+ * memory_region_snapshot_get_dirty: Check whether a range of bytes is dirty
-+ *                                   in the specified dirty bitmap snapshot.
-+ *
-+ * @mr: the memory region being queried.
-+ * @snap: the dirty bitmap snapshot
-+ * @addr: the address (relative to the start of the region) being queried.
-+ * @size: the size of the range being queried.
-+ */
-+bool memory_region_snapshot_get_dirty(MemoryRegion *mr,
-+                                      DirtyBitmapSnapshot *snap,
-+                                      hwaddr addr, hwaddr size);
-+
- /**
-  * memory_region_sync_dirty_bitmap: Synchronize a region's dirty bitmap with
-  *                                  any external TLBs (e.g. kvm)
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index b05dc84ab9..2b63d7f59e 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -343,6 +343,13 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
-                                               ram_addr_t length,
-                                               unsigned client);
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 3991b88aac..b2516c8d21 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1465,7 +1465,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+     DisplaySurface *surface = qemu_console_surface(s->con);
+     int y1, y, update, linesize, y_start, double_scan, mask, depth;
+     int width, height, shift_control, line_offset, bwidth, bits;
+-    ram_addr_t page0, page1, page_min, page_max;
++    ram_addr_t page0, page1;
++    DirtyBitmapSnapshot *snap = NULL;
+     int disp_width, multi_scan, multi_run;
+     uint8_t *d;
+     uint32_t v, addr1, addr;
+@@ -1480,9 +1481,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
  
-+DirtyBitmapSnapshot *cpu_physical_memory_snapshot_and_clear_dirty
-+    (ram_addr_t start, ram_addr_t length, unsigned client);
-+
-+bool cpu_physical_memory_snapshot_get_dirty(DirtyBitmapSnapshot *snap,
-+                                            ram_addr_t start,
-+                                            ram_addr_t length);
-+
- static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
-                                                          ram_addr_t length)
- {
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index e95f28cfec..f08d327aec 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -23,6 +23,7 @@ typedef struct CPUAddressSpace CPUAddressSpace;
- typedef struct CPUState CPUState;
- typedef struct DeviceListener DeviceListener;
- typedef struct DeviceState DeviceState;
-+typedef struct DirtyBitmapSnapshot DirtyBitmapSnapshot;
- typedef struct DisplayChangeListener DisplayChangeListener;
- typedef struct DisplayState DisplayState;
- typedef struct DisplaySurface DisplaySurface;
-diff --git a/exec.c b/exec.c
-index c97ef4a8da..a8894d5ba2 100644
---- a/exec.c
-+++ b/exec.c
-@@ -223,6 +223,12 @@ struct CPUAddressSpace {
-     MemoryListener tcg_as_listener;
- };
+     full_update |= update_basic_params(s);
  
-+struct DirtyBitmapSnapshot {
-+    ram_addr_t start;
-+    ram_addr_t end;
-+    unsigned long dirty[];
-+};
-+
- #endif
+-    if (!full_update)
+-        vga_sync_dirty_bitmap(s);
+-
+     s->get_resolution(s, &width, &height);
+     disp_width = width;
  
- #if !defined(CONFIG_USER_ONLY)
-@@ -1061,6 +1067,75 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
-     return dirty;
- }
- 
-+DirtyBitmapSnapshot *cpu_physical_memory_snapshot_and_clear_dirty
-+     (ram_addr_t start, ram_addr_t length, unsigned client)
-+{
-+    DirtyMemoryBlocks *blocks;
-+    unsigned long align = 1UL << (TARGET_PAGE_BITS + BITS_PER_LEVEL);
-+    ram_addr_t first = QEMU_ALIGN_DOWN(start, align);
-+    ram_addr_t last  = QEMU_ALIGN_UP(start + length, align);
-+    DirtyBitmapSnapshot *snap;
-+    unsigned long page, end, dest;
+@@ -1625,11 +1623,17 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+     addr1 = (s->start_addr * 4);
+     bwidth = (width * bits + 7) / 8;
+     y_start = -1;
+-    page_min = -1;
+-    page_max = 0;
+     d = surface_data(surface);
+     linesize = surface_stride(surface);
+     y1 = 0;
 +
-+    snap = g_malloc0(sizeof(*snap) +
-+                     ((last - first) >> (TARGET_PAGE_BITS + 3)));
-+    snap->start = first;
-+    snap->end   = last;
-+
-+    page = first >> TARGET_PAGE_BITS;
-+    end  = last  >> TARGET_PAGE_BITS;
-+    dest = 0;
-+
-+    rcu_read_lock();
-+
-+    blocks = atomic_rcu_read(&ram_list.dirty_memory[client]);
-+
-+    while (page < end) {
-+        unsigned long idx = page / DIRTY_MEMORY_BLOCK_SIZE;
-+        unsigned long offset = page % DIRTY_MEMORY_BLOCK_SIZE;
-+        unsigned long num = MIN(end - page, DIRTY_MEMORY_BLOCK_SIZE - offset);
-+
-+        assert(QEMU_IS_ALIGNED(offset, (1 << BITS_PER_LEVEL)));
-+        assert(QEMU_IS_ALIGNED(num,    (1 << BITS_PER_LEVEL)));
-+        offset >>= BITS_PER_LEVEL;
-+
-+        bitmap_copy_and_clear_atomic(snap->dirty + dest,
-+                                     blocks->blocks[idx] + offset,
-+                                     num);
-+        page += num;
-+        dest += num >> BITS_PER_LEVEL;
++    if (!full_update) {
++        vga_sync_dirty_bitmap(s);
++        snap = memory_region_snapshot_and_clear_dirty(&s->vram, addr1,
++                                                      bwidth * height,
++                                                      DIRTY_MEMORY_VGA);
 +    }
 +
-+    rcu_read_unlock();
-+
-+    if (tcg_enabled()) {
-+        tlb_reset_dirty_range_all(start, length);
-+    }
-+
-+    return snap;
-+}
-+
-+bool cpu_physical_memory_snapshot_get_dirty(DirtyBitmapSnapshot *snap,
-+                                            ram_addr_t start,
-+                                            ram_addr_t length)
-+{
-+    unsigned long page, end;
-+
-+    assert(start >= snap->start);
-+    assert(start + length <= snap->end);
-+
-+    end = TARGET_PAGE_ALIGN(start + length - snap->start) >> TARGET_PAGE_BITS;
-+    page = (start - snap->start) >> TARGET_PAGE_BITS;
-+
-+    while (page < end) {
-+        if (test_bit(page, snap->dirty)) {
-+            return true;
+     for(y = 0; y < height; y++) {
+         addr = addr1;
+         if (!(s->cr[VGA_CRTC_MODE] & 1)) {
+@@ -1644,17 +1648,17 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+         update = full_update;
+         page0 = addr;
+         page1 = addr + bwidth - 1;
+-        update |= memory_region_get_dirty(&s->vram, page0, page1 - page0,
+-                                          DIRTY_MEMORY_VGA);
++        if (full_update) {
++            update = 1;
++        } else {
++            update = memory_region_snapshot_get_dirty(&s->vram, snap,
++                                                      page0, page1 - page0);
 +        }
-+        page++;
-+    }
-+    return false;
-+}
-+
- /* Called from RCU critical section */
- hwaddr memory_region_section_get_iotlb(CPUState *cpu,
-                                        MemoryRegionSection *section,
-diff --git a/memory.c b/memory.c
-index 4c95aaf39c..8a0648551f 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1716,6 +1716,23 @@ bool memory_region_test_and_clear_dirty(MemoryRegion *mr, hwaddr addr,
-                 memory_region_get_ram_addr(mr) + addr, size, client);
+         /* explicit invalidation for the hardware cursor (cirrus only) */
+         update |= vga_scanline_invalidated(s, y);
+         if (update) {
+             if (y_start < 0)
+                 y_start = y;
+-            if (page0 < page_min)
+-                page_min = page0;
+-            if (page1 > page_max)
+-                page_max = page1;
+             if (!(is_buffer_shared(surface))) {
+                 vga_draw_line(s, d, s->vram_ptr + addr, width);
+                 if (s->cursor_draw_line)
+@@ -1687,13 +1691,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+         dpy_gfx_update(s->con, 0, y_start,
+                        disp_width, y - y_start);
+     }
+-    /* reset modified pages */
+-    if (page_max >= page_min) {
+-        memory_region_reset_dirty(&s->vram,
+-                                  page_min,
+-                                  page_max - page_min,
+-                                  DIRTY_MEMORY_VGA);
+-    }
++    g_free(snap);
+     memset(s->invalidated_y_table, 0, sizeof(s->invalidated_y_table));
  }
  
-+DirtyBitmapSnapshot *memory_region_snapshot_and_clear_dirty(MemoryRegion *mr,
-+                                                            hwaddr addr,
-+                                                            hwaddr size,
-+                                                            unsigned client)
-+{
-+    assert(mr->ram_block);
-+    return cpu_physical_memory_snapshot_and_clear_dirty(
-+                memory_region_get_ram_addr(mr) + addr, size, client);
-+}
-+
-+bool memory_region_snapshot_get_dirty(MemoryRegion *mr, DirtyBitmapSnapshot *snap,
-+                                      hwaddr addr, hwaddr size)
-+{
-+    assert(mr->ram_block);
-+    return cpu_physical_memory_snapshot_get_dirty(snap,
-+                memory_region_get_ram_addr(mr) + addr, size);
-+}
- 
- void memory_region_sync_dirty_bitmap(MemoryRegion *mr)
- {
 -- 
 2.9.3
