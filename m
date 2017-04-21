@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1XB9-0001Zv-P2
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:56:49 -0400
+	(envelope-from <quintela@redhat.com>) id 1d1XBG-0001cf-0w
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1XB5-0006tR-TU
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:56:47 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3489
-	helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1XB5-0006rU-AL
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:56:43 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 21 Apr 2017 11:56:22 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA23898F@DGGEMA505-MBS.china.huawei.com>
-References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
-	<1492392806-53720-4-git-send-email-longpeng2@huawei.com>
-In-Reply-To: <1492392806-53720-4-git-send-email-longpeng2@huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 03/18] crypto: cipher:
- introduce qcrypto_cipher_ctx_new for nettle-backend
+	(envelope-from <quintela@redhat.com>) id 1d1XBE-00071T-SG
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:56:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d1XBE-000718-MI
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:56:52 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98823C067C0A
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 11:56:51 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Fri, 21 Apr 2017 13:55:43 +0200
+Message-Id: <20170421115646.15544-3-quintela@redhat.com>
+In-Reply-To: <20170421115646.15544-1-quintela@redhat.com>
+References: <20170421115646.15544-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 02/65] ram: Rename flush_page_queue() to
+ migration_page_queue_free()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: longpeng <longpeng2@huawei.com>, "berrange@redhat.com" <berrange@redhat.com>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com
 
+It reflects better what it does.
 
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ include/migration/migration.h | 2 +-
+ migration/migration.c         | 2 +-
+ migration/ram.c               | 5 +++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-> -----Original Message-----
-> From: longpeng
-> Sent: Monday, April 17, 2017 9:33 AM
-> To: berrange@redhat.com
-> Cc: Gonglei (Arei); Huangweidong (C); armbru@redhat.com;
-> eblake@redhat.com; mst@redhat.com; qemu-devel@nongnu.org; longpeng
-> Subject: [PATCH v2 for-2.10 03/18] crypto: cipher: introduce
-> qcrypto_cipher_ctx_new for nettle-backend
->=20
-> Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
-> nettle-backend impls.
->=20
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
->  crypto/cipher-nettle.c | 41 +++++++++++++++++++++++++++++------------
->  1 file changed, 29 insertions(+), 12 deletions(-)
->=20
-
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-
-
-> diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
-> index e04e3a1..e6d6e6c 100644
-> --- a/crypto/cipher-nettle.c
-> +++ b/crypto/cipher-nettle.c
-> @@ -262,12 +262,12 @@ static void
-> nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
->  }
->=20
->=20
-> -QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-> -                                  QCryptoCipherMode mode,
-> -                                  const uint8_t *key, size_t nkey,
-> -                                  Error **errp)
-> +static QCryptoCipherNettle
-> *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
-> +
-> QCryptoCipherMode mode,
-> +                                                   const uint8_t
-> *key,
-> +                                                   size_t nkey,
-> +                                                   Error **errp)
->  {
-> -    QCryptoCipher *cipher;
->      QCryptoCipherNettle *ctx;
->      uint8_t *rfbkey;
->=20
-> @@ -287,12 +287,7 @@ QCryptoCipher
-> *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
->          return NULL;
->      }
->=20
-> -    cipher =3D g_new0(QCryptoCipher, 1);
-> -    cipher->alg =3D alg;
-> -    cipher->mode =3D mode;
-> -
->      ctx =3D g_new0(QCryptoCipherNettle, 1);
-> -    cipher->opaque =3D ctx;
->=20
->      switch (alg) {
->      case QCRYPTO_CIPHER_ALG_DES_RFB:
-> @@ -436,10 +431,10 @@ QCryptoCipher
-> *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
->=20
->      ctx->iv =3D g_new0(uint8_t, ctx->blocksize);
->=20
-> -    return cipher;
-> +    return ctx;
->=20
->   error:
-> -    qcrypto_cipher_free(cipher);
-> +    nettle_cipher_free_ctx(ctx);
->      return NULL;
->  }
->=20
-> @@ -561,3 +556,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
->      memcpy(ctx->iv, iv, niv);
->      return 0;
->  }
-> +
-> +
-> +QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-> +                                  QCryptoCipherMode mode,
-> +                                  const uint8_t *key, size_t nkey,
-> +                                  Error **errp)
-> +{
-> +    QCryptoCipher *cipher;
-> +    QCryptoCipherNettle *ctx;
-> +
-> +    ctx =3D qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
-> +    if (!ctx) {
-> +        return NULL;
-> +    }
-> +
-> +    cipher =3D g_new0(QCryptoCipher, 1);
-> +    cipher->alg =3D alg;
-> +    cipher->mode =3D mode;
-> +    cipher->opaque =3D ctx;
-> +
-> +    return cipher;
-> +}
-> --
-> 1.8.3.1
->=20
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 5720c88..24487be 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -377,7 +377,7 @@ void savevm_skip_configuration(void);
+ int global_state_store(void);
+ void global_state_store_running(void);
+ 
+-void flush_page_queue(MigrationState *ms);
++void migration_page_queue_free(MigrationState *ms);
+ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+                          ram_addr_t start, ram_addr_t len);
+ uint64_t ram_pagesize_summary(void);
+diff --git a/migration/migration.c b/migration/migration.c
+index ad4036f..4bee05d 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -955,7 +955,7 @@ static void migrate_fd_cleanup(void *opaque)
+     qemu_bh_delete(s->cleanup_bh);
+     s->cleanup_bh = NULL;
+ 
+-    flush_page_queue(s);
++    migration_page_queue_free(s);
+ 
+     if (s->to_dst_file) {
+         trace_migrate_fd_cleanup();
+diff --git a/migration/ram.c b/migration/ram.c
+index 652abe4..356f8ce 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1186,14 +1186,15 @@ static bool get_queued_page(MigrationState *ms, PageSearchStatus *pss,
+ }
+ 
+ /**
+- * flush_page_queue: flush any remaining pages in the ram request queue
++ * migration_page_queue_free: drop any remaining pages in the ram
++ * request queue
+  *
+  * It should be empty at the end anyway, but in error cases there may
+  * be some left.  in case that there is any page left, we drop it.
+  *
+  * @ms: current migration state
+  */
+-void flush_page_queue(MigrationState *ms)
++void migration_page_queue_free(MigrationState *ms)
+ {
+     struct MigrationSrcPageRequest *mspr, *next_mspr;
+     /* This queue generally should be empty - but in the case of a failed
+-- 
+2.9.3
