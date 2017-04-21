@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d1RIr-0005F3-F6
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:40:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1d1RJa-0005sf-2T
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d1RIm-0004Rg-MP
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:40:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d1RIm-0004R7-Ey
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:40:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 684959C0BA
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 05:40:15 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1d1RJZ-0004e9-6r
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:41:06 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 21 Apr 2017 07:40:12 +0200
-Message-Id: <1492753213-26516-4-git-send-email-armbru@redhat.com>
-In-Reply-To: <1492753213-26516-1-git-send-email-armbru@redhat.com>
-References: <1492753213-26516-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 3/4] versatile: remove
+References: <20170414083717.13641-1-lvivier@redhat.com>
+Date: Fri, 21 Apr 2017 07:40:55 +0200
+In-Reply-To: <20170414083717.13641-1-lvivier@redhat.com> (Laurent Vivier's
+	message of "Fri, 14 Apr 2017 10:37:13 +0200")
+Message-ID: <87tw5i1fo8.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] qdev: remove all remaining
  cannot_destroy_with_object_finalize_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,111 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Antony Pavlov <antonynpavlov@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+Laurent Vivier <lvivier@redhat.com> writes:
 
-cannot_destroy_with_object_finalize_yet was added by 4c315c2
-("qdev: Protect device-list-properties against broken devices")
-because "realview_pci" and "versatile_pci" were hanging
-during "device-list-properties" cleanup (an infinite loop in
-bus_unparent()).
+> This series removes all the remaining uses of
+> cannot_destroy_with_object_finalize_yet to finally remove
+> the flag itself.
+>
+> The ARM patch has already been sent alone and reviewed by Markus.
+> I have tested the ppc one on ppc64 machine with KVM and using
+> QDM device-list-properties command.
+>
+> For the versatile one, the flag allowed to workaround a problem
+> in the bus unparent function: the bus unparent is trying to
+> unparent all the children of the bus. To do that, it has a list
+> of the children of the bus, and calls object_unparent() for each
+> child, and object_unparent() calls object_property_del_child() if
+> obj->parent is not NULL.  As qdev_set_parent_bus() set only
+> parent_bus and the list of children, parent is NULL and the child
+> is never deleted.  We can avoid the problem by moving the
+> qdev_set_parent_bus() to the realize part.
+>
+> I've tested all the changes with "make check" (including
+> device-introspect-test). I've booted a versatilepb machine
+> with a 3.16.0-4 debian installer kernel.
 
-We have this problem because the child is not removed from
-the list of the PCI bus children because it has no defined parent:
-qdev_set_parent_bus() set the device parent_bus pointer to bus, and
-adds the device in the bus children list, but doesn't update the
-device parent pointer.
-
-To fix the problem, move all the involved parts to the realize function.
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20170414083717.13641-4-lvivier@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Peter Maydell <peter.maydell@linaro.org>
-[Commit message tweaked]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/pci-host/versatile.c | 35 ++++++++++++-----------------------
- 1 file changed, 12 insertions(+), 23 deletions(-)
-
-diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
-index 467cbb9..27fde46 100644
---- a/hw/pci-host/versatile.c
-+++ b/hw/pci-host/versatile.c
-@@ -380,20 +380,8 @@ static void pci_vpb_reset(DeviceState *d)
- 
- static void pci_vpb_init(Object *obj)
- {
--    PCIHostState *h = PCI_HOST_BRIDGE(obj);
-     PCIVPBState *s = PCI_VPB(obj);
- 
--    memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 1ULL << 32);
--    memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 1ULL << 32);
--
--    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), DEVICE(obj), "pci",
--                        &s->pci_mem_space, &s->pci_io_space,
--                        PCI_DEVFN(11, 0), TYPE_PCI_BUS);
--    h->bus = &s->pci_bus;
--
--    object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_VERSATILE_PCI_HOST);
--    qdev_set_parent_bus(DEVICE(&s->pci_dev), BUS(&s->pci_bus));
--
-     /* Window sizes for VersatilePB; realview_pci's init will override */
-     s->mem_win_size[0] = 0x0c000000;
-     s->mem_win_size[1] = 0x10000000;
-@@ -403,10 +391,22 @@ static void pci_vpb_init(Object *obj)
- static void pci_vpb_realize(DeviceState *dev, Error **errp)
- {
-     PCIVPBState *s = PCI_VPB(dev);
-+    PCIHostState *h = PCI_HOST_BRIDGE(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     pci_map_irq_fn mapfn;
-     int i;
- 
-+    memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 1ULL << 32);
-+    memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 1ULL << 32);
-+
-+    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), dev, "pci",
-+                        &s->pci_mem_space, &s->pci_io_space,
-+                        PCI_DEVFN(11, 0), TYPE_PCI_BUS);
-+    h->bus = &s->pci_bus;
-+
-+    object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_VERSATILE_PCI_HOST);
-+    qdev_set_parent_bus(DEVICE(&s->pci_dev), BUS(&s->pci_bus));
-+
-     for (i = 0; i < 4; i++) {
-         sysbus_init_irq(sbd, &s->irq[i]);
-     }
-@@ -503,8 +503,6 @@ static void pci_vpb_class_init(ObjectClass *klass, void *data)
-     dc->reset = pci_vpb_reset;
-     dc->vmsd = &pci_vpb_vmstate;
-     dc->props = pci_vpb_properties;
--    /* Reason: object_unref() hangs */
--    dc->cannot_destroy_with_object_finalize_yet = true;
- }
- 
- static const TypeInfo pci_vpb_info = {
-@@ -526,19 +524,10 @@ static void pci_realview_init(Object *obj)
-     s->mem_win_size[2] = 0x08000000;
- }
- 
--static void pci_realview_class_init(ObjectClass *class, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(class);
--
--    /* Reason: object_unref() hangs */
--    dc->cannot_destroy_with_object_finalize_yet = true;
--}
--
- static const TypeInfo pci_realview_info = {
-     .name          = "realview_pci",
-     .parent        = TYPE_VERSATILE_PCI,
-     .instance_init = pci_realview_init,
--    .class_init    = pci_realview_class_init,
- };
- 
- static void versatile_pci_register_types(void)
--- 
-2.7.4
+Applied to my tree, thanks!
