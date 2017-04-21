@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d1VG2-0005pa-SK
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:44 -0400
+	(envelope-from <stefanha@redhat.com>) id 1d1VG5-0005rG-Na
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d1VG1-0002Ve-2m
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42606)
+	(envelope-from <stefanha@redhat.com>) id 1d1VG4-0002WK-Iz
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d1VG0-0002VY-Pq
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:41 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d1VG4-0002W5-9z
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:53:44 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 21 Apr 2017 10:53:32 +0100
-Message-Id: <20170421095334.26692-2-stefanha@redhat.com>
+Date: Fri, 21 Apr 2017 10:53:33 +0100
+Message-Id: <20170421095334.26692-3-stefanha@redhat.com>
 In-Reply-To: <20170421095334.26692-1-stefanha@redhat.com>
 References: <20170421095334.26692-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 1/3] configure: eliminate Python
- dependency for --help
+Subject: [Qemu-devel] [PULL for-2.9 2/3] trace: Put all trace.o into
+ libqemuutil.a
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +25,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Xu, Anthony" <anthony.xu@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The ./configure script should produce --help output even if Python is
-not installed.
+From: "Xu, Anthony" <anthony.xu@intel.com>
 
-Listing trace backends is simple: show the names of all Python modules
-in scripts/tracetool/backend/ whose source code contains 'PUBLIC =
-True'.
+Currently all trace.o are linked into qemu-system, qemu-img,
+qemu-nbd, qemu-io etc., even the corresponding components
+are not included.
+Put all trace.o into libqemuutil.a that the linker would only pull in .o
+files containing symbols that are actually referenced by the
+program.
 
-Perform the backend enumeration in shell instead of Python so that we
-can move the Python check until after ./configure --help.
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20170328134418.3426-1-stefanha@redhat.com
+Signed-off -by: Anthony Xu <anthony.xu@intel.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- configure | 35 +++++++++++++++++++----------------
- 1 file changed, 19 insertions(+), 16 deletions(-)
+ Makefile               | 6 +++---
+ Makefile.target        | 5 ++---
+ tests/Makefile.include | 2 +-
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/configure b/configure
-index be4d326..6db3044 100755
---- a/configure
-+++ b/configure
-@@ -1191,21 +1191,6 @@ for opt do
-   esac
- done
+diff --git a/Makefile b/Makefile
+index 6c359b2..31d41a7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -346,7 +346,7 @@ dtc/%:
+ 	mkdir -p $@
  
--if ! has $python; then
--  error_exit "Python not found. Use --python=/path/to/python"
--fi
--
--# Note that if the Python conditional here evaluates True we will exit
--# with status 1 which is a shell 'false' value.
--if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
--  error_exit "Cannot use '$python', Python 2.6 or later is required." \
--      "Note that Python 3 or later is not yet supported." \
--      "Use --python=/path/to/python to specify a supported Python."
--fi
--
--# Suppress writing compiled files
--python="$python -B"
--
- case "$cpu" in
-     ppc)
-            CPU_CFLAGS="-m32"
-@@ -1280,6 +1265,9 @@ for config in $mak_wilds; do
-     default_target_list="${default_target_list} $(basename "$config" .mak)"
- done
+ $(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-obj-y) \
+-	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY)) $(trace-obj-y)
++	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
  
-+# Enumerate public trace backends for --help output
-+trace_backend_list=$(echo $(grep -le '^PUBLIC = True$' scripts/tracetool/backend/*.py | sed -e 's/^.*\/\(.*\)\.py$/\1/'))
-+
- if test x"$show_help" = x"yes" ; then
- cat << EOF
+ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
+ # Only keep -O and -g cflags
+@@ -366,11 +366,11 @@ Makefile: $(version-obj-y)
+ # Build libraries
  
-@@ -1333,7 +1321,7 @@ Advanced options (experts only):
-                            set block driver read-only whitelist
-                            (affects only QEMU, not qemu-img)
-   --enable-trace-backends=B Set trace backend
--                           Available backends: $($python $source_path/scripts/tracetool.py --list-backends)
-+                           Available backends: $trace_backend_list
-   --with-trace-file=NAME   Full PATH,NAME of file to store traces
-                            Default:trace-<pid>
-   --disable-slirp          disable SLIRP userspace network connectivity
-@@ -1433,6 +1421,21 @@ EOF
- exit 0
- fi
+ libqemustub.a: $(stub-obj-y)
+-libqemuutil.a: $(util-obj-y)
++libqemuutil.a: $(util-obj-y) $(trace-obj-y)
  
-+if ! has $python; then
-+  error_exit "Python not found. Use --python=/path/to/python"
-+fi
-+
-+# Note that if the Python conditional here evaluates True we will exit
-+# with status 1 which is a shell 'false' value.
-+if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
-+  error_exit "Cannot use '$python', Python 2.6 or later is required." \
-+      "Note that Python 3 or later is not yet supported." \
-+      "Use --python=/path/to/python to specify a supported Python."
-+fi
-+
-+# Suppress writing compiled files
-+python="$python -B"
-+
- # Now we have handled --enable-tcg-interpreter and know we're not just
- # printing the help message, bail out if the host CPU isn't supported.
- if test "$ARCH" = "unknown"; then
+ ######################################################################
+ 
+-COMMON_LDADDS = $(trace-obj-y) libqemuutil.a libqemustub.a
++COMMON_LDADDS = libqemuutil.a libqemustub.a
+ 
+ qemu-img.o: qemu-img-cmds.h
+ 
+diff --git a/Makefile.target b/Makefile.target
+index 7df2b8c..e62021d 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -188,8 +188,7 @@ dummy := $(call unnest-vars,.., \
+                qom-obj-y \
+                io-obj-y \
+                common-obj-y \
+-               common-obj-m \
+-               trace-obj-y)
++               common-obj-m)
+ target-obj-y := $(target-obj-y-save)
+ all-obj-y += $(common-obj-y)
+ all-obj-y += $(target-obj-y)
+@@ -201,7 +200,7 @@ all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
+ 
+ $(QEMU_PROG_BUILD): config-devices.mak
+ 
+-COMMON_LDADDS = $(trace-obj-y) ../libqemuutil.a ../libqemustub.a
++COMMON_LDADDS = ../libqemuutil.a ../libqemustub.a
+ 
+ # build either PROG or PROGW
+ $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f3de81f..579ec07 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -519,7 +519,7 @@ QEMU_CFLAGS += -I$(SRC_PATH)/tests
+ 
+ 
+ # Deps that are common to various different sets of tests below
+-test-util-obj-y = $(trace-obj-y) libqemuutil.a libqemustub.a
++test-util-obj-y = libqemuutil.a libqemustub.a
+ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
+ 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
 -- 
 2.9.3
