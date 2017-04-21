@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1W1N-0004Ck-1O
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:38 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1d1W1N-0004Cm-3R
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1W1J-0008WP-Lz
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:36 -0400
-Message-Id: <79d575f8d4747336cdf94d94d549f536e6bab15e.1492770667.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1d1W1L-000077-8E
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:42:37 -0400
+Message-Id: <636f37978052c74ffa1160d7e15dc6bb6c40ca26.1492770667.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1492770667.git.balaton@eik.bme.hu>
 References: <cover.1492770667.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Fri, 21 Apr 2017 12:31:07 +0200
-Subject: [Qemu-devel] [PATCH v6 02/13] sm501: Use defined constants instead
- of literal values where available
+Subject: [Qemu-devel] [PATCH v6 11/13] sm501: Add some more missing registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,90 +22,232 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
+This is to allow clients to initialise these without failing as long
+as no 2D engine function is called that would use the written value.
+Saved values are not used yet (may get used when more of 2D engine is
+added sometimes) and clients normally only write to most of these
+registers, nothing is known to ever read them but they are documented
+as read/write so also implement read for these.
+
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
 
-v3: Fix initial value of misc_control register as Peter Maydell suggested
-    Also use M_BYTE constant from cutils.h
+v2: Fixed mask of video_control register for a read only bit
+    Changed IRQ status register to write ignored as IRQ is not implemented
+v3: Squashed read implementation into this patch
+v4: Add reset for all 2D engine registers (although these are
+    documented to be 0 on reset, a comment in U-Boot source suggests that
+    they are really undefined so the previous version might have been enough)
 
- hw/display/sm501.c          | 29 +++++++++++++++++++----------
- hw/display/sm501_template.h |  2 +-
- 2 files changed, 20 insertions(+), 11 deletions(-)
+ hw/display/sm501.c | 126 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 125 insertions(+), 1 deletion(-)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 4f40dee..6b72964 100644
+index 8abac8f..851c7c8 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -23,6 +23,7 @@
-  */
+@@ -512,6 +512,8 @@ typedef struct SM501State {
+     uint32_t dc_panel_hwc_color_1_2;
+     uint32_t dc_panel_hwc_color_3;
  
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -446,12 +447,12 @@
++    uint32_t dc_video_control;
++
+     uint32_t dc_crt_control;
+     uint32_t dc_crt_fb_addr;
+     uint32_t dc_crt_fb_offset;
+@@ -531,13 +533,20 @@ typedef struct SM501State {
+     uint32_t twoD_control;
+     uint32_t twoD_pitch;
+     uint32_t twoD_foreground;
++    uint32_t twoD_background;
+     uint32_t twoD_stretch;
++    uint32_t twoD_color_compare;
+     uint32_t twoD_color_compare_mask;
+     uint32_t twoD_mask;
++    uint32_t twoD_clip_tl;
++    uint32_t twoD_clip_br;
++    uint32_t twoD_mono_pattern_low;
++    uint32_t twoD_mono_pattern_high;
+     uint32_t twoD_window_width;
+     uint32_t twoD_source_base;
+     uint32_t twoD_destination_base;
+-
++    uint32_t twoD_alpha;
++    uint32_t twoD_wrap;
+ } SM501State;
  
- /* SM501 local memory size taken from "linux/drivers/mfd/sm501.c" */
- static const uint32_t sm501_mem_local_size[] = {
--    [0] = 4 * 1024 * 1024,
--    [1] = 8 * 1024 * 1024,
--    [2] = 16 * 1024 * 1024,
--    [3] = 32 * 1024 * 1024,
--    [4] = 64 * 1024 * 1024,
--    [5] = 2 * 1024 * 1024,
-+    [0] = 4 * M_BYTE,
-+    [1] = 8 * M_BYTE,
-+    [2] = 16 * M_BYTE,
-+    [3] = 32 * M_BYTE,
-+    [4] = 64 * M_BYTE,
-+    [5] = 2 * M_BYTE,
- };
- #define get_local_mem_size(s) sm501_mem_local_size[(s)->local_mem_size_index]
+ static uint32_t get_local_mem_size_index(uint32_t size)
+@@ -946,6 +955,10 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
+         ret = s->dc_panel_v_sync;
+         break;
  
-@@ -555,7 +556,7 @@ static uint32_t get_local_mem_size_index(uint32_t size)
- static inline int is_hwc_enabled(SM501State *state, int crt)
- {
-     uint32_t addr = crt ? state->dc_crt_hwc_addr : state->dc_panel_hwc_addr;
--    return addr & 0x80000000;
-+    return addr & SM501_HWC_EN;
++    case SM501_DC_VIDEO_CONTROL:
++        ret = s->dc_video_control;
++        break;
++
+     case SM501_DC_CRT_CONTROL:
+         ret = s->dc_crt_control;
+         break;
+@@ -1061,6 +1074,10 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
+         s->dc_panel_hwc_color_3 = value & 0x0000FFFF;
+         break;
+ 
++    case SM501_DC_VIDEO_CONTROL:
++        s->dc_video_control = value & 0x00037FFF;
++        break;
++
+     case SM501_DC_CRT_CONTROL:
+         s->dc_crt_control = value & 0x0003FFFF;
+         break;
+@@ -1133,9 +1150,69 @@ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
+     SM501_DPRINTF("sm501 2d engine regs : read addr=%x\n", (int)addr);
+ 
+     switch (addr) {
++    case SM501_2D_SOURCE:
++        ret = s->twoD_source;
++        break;
++    case SM501_2D_DESTINATION:
++        ret = s->twoD_destination;
++        break;
++    case SM501_2D_DIMENSION:
++        ret = s->twoD_dimension;
++        break;
++    case SM501_2D_CONTROL:
++        ret = s->twoD_control;
++        break;
++    case SM501_2D_PITCH:
++        ret = s->twoD_pitch;
++        break;
++    case SM501_2D_FOREGROUND:
++        ret = s->twoD_foreground;
++        break;
++    case SM501_2D_BACKGROUND:
++        ret = s->twoD_background;
++        break;
++    case SM501_2D_STRETCH:
++        ret = s->twoD_stretch;
++        break;
++    case SM501_2D_COLOR_COMPARE:
++        ret = s->twoD_color_compare;
++        break;
++    case SM501_2D_COLOR_COMPARE_MASK:
++        ret = s->twoD_color_compare_mask;
++        break;
++    case SM501_2D_MASK:
++        ret = s->twoD_mask;
++        break;
++    case SM501_2D_CLIP_TL:
++        ret = s->twoD_clip_tl;
++        break;
++    case SM501_2D_CLIP_BR:
++        ret = s->twoD_clip_br;
++        break;
++    case SM501_2D_MONO_PATTERN_LOW:
++        ret = s->twoD_mono_pattern_low;
++        break;
++    case SM501_2D_MONO_PATTERN_HIGH:
++        ret = s->twoD_mono_pattern_high;
++        break;
++    case SM501_2D_WINDOW_WIDTH:
++        ret = s->twoD_window_width;
++        break;
+     case SM501_2D_SOURCE_BASE:
+         ret = s->twoD_source_base;
+         break;
++    case SM501_2D_DESTINATION_BASE:
++        ret = s->twoD_destination_base;
++        break;
++    case SM501_2D_ALPHA:
++        ret = s->twoD_alpha;
++        break;
++    case SM501_2D_WRAP:
++        ret = s->twoD_wrap;
++        break;
++    case SM501_2D_STATUS:
++        ret = 0; /* Should return interrupt status */
++        break;
+     default:
+         printf("sm501 disp ctrl : not implemented register read."
+                " addr=%x\n", (int)addr);
+@@ -1178,15 +1255,33 @@ static void sm501_2d_engine_write(void *opaque, hwaddr addr,
+     case SM501_2D_FOREGROUND:
+         s->twoD_foreground = value;
+         break;
++    case SM501_2D_BACKGROUND:
++        s->twoD_background = value;
++        break;
+     case SM501_2D_STRETCH:
+         s->twoD_stretch = value;
+         break;
++    case SM501_2D_COLOR_COMPARE:
++        s->twoD_color_compare = value;
++        break;
+     case SM501_2D_COLOR_COMPARE_MASK:
+         s->twoD_color_compare_mask = value;
+         break;
+     case SM501_2D_MASK:
+         s->twoD_mask = value;
+         break;
++    case SM501_2D_CLIP_TL:
++        s->twoD_clip_tl = value;
++        break;
++    case SM501_2D_CLIP_BR:
++        s->twoD_clip_br = value;
++        break;
++    case SM501_2D_MONO_PATTERN_LOW:
++        s->twoD_mono_pattern_low = value;
++        break;
++    case SM501_2D_MONO_PATTERN_HIGH:
++        s->twoD_mono_pattern_high = value;
++        break;
+     case SM501_2D_WINDOW_WIDTH:
+         s->twoD_window_width = value;
+         break;
+@@ -1196,6 +1291,15 @@ static void sm501_2d_engine_write(void *opaque, hwaddr addr,
+     case SM501_2D_DESTINATION_BASE:
+         s->twoD_destination_base = value;
+         break;
++    case SM501_2D_ALPHA:
++        s->twoD_alpha = value;
++        break;
++    case SM501_2D_WRAP:
++        s->twoD_wrap = value;
++        break;
++    case SM501_2D_STATUS:
++        /* ignored, writing 0 should clear interrupt status */
++        break;
+     default:
+         printf("sm501 2d engine : not implemented register write."
+                " addr=%x, val=%x\n", (int)addr, (unsigned)value);
+@@ -1454,8 +1558,28 @@ static void sm501_reset(SM501State *s)
+     s->misc_timing = 0;
+     s->power_mode_control = 0;
+     s->dc_panel_control = 0x00010000; /* FIFO level 3 */
++    s->dc_video_control = 0;
+     s->dc_crt_control = 0x00010000;
++    s->twoD_source = 0;
++    s->twoD_destination = 0;
++    s->twoD_dimension = 0;
+     s->twoD_control = 0;
++    s->twoD_pitch = 0;
++    s->twoD_foreground = 0;
++    s->twoD_background = 0;
++    s->twoD_stretch = 0;
++    s->twoD_color_compare = 0;
++    s->twoD_color_compare_mask = 0;
++    s->twoD_mask = 0;
++    s->twoD_clip_tl = 0;
++    s->twoD_clip_br = 0;
++    s->twoD_mono_pattern_low = 0;
++    s->twoD_mono_pattern_high = 0;
++    s->twoD_window_width = 0;
++    s->twoD_source_base = 0;
++    s->twoD_destination_base = 0;
++    s->twoD_alpha = 0;
++    s->twoD_wrap = 0;
  }
  
- /**
-@@ -1411,9 +1412,17 @@ void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
-     s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
-     SM501_DPRINTF("local mem size=%x. index=%d\n", get_local_mem_size(s),
-                   s->local_mem_size_index);
--    s->system_control = 0x00100000;
--    s->misc_control = 0x00001000; /* assumes SH, active=low */
--    s->dc_panel_control = 0x00010000;
-+    s->system_control = 0x00100000; /* 2D engine FIFO empty */
-+    /* Bits 17 (SH), 7 (CDR), 6:5 (Test), 2:0 (Bus) are all supposed
-+     * to be determined at reset by GPIO lines which set config bits.
-+     * We hardwire them:
-+     *  SH = 0 : Hitachi Ready Polarity == Active Low
-+     *  CDR = 0 : do not reset clock divider
-+     *  TEST = 0 : Normal mode (not testing the silicon)
-+     *  BUS = 0 : Hitachi SH3/SH4
-+     */
-+    s->misc_control = SM501_MISC_DAC_POWER;
-+    s->dc_panel_control = 0x00010000; /* FIFO level 3 */
-     s->dc_crt_control = 0x00010000;
- 
-     /* allocate local memory */
-diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
-index aeeac5d..16e500b 100644
---- a/hw/display/sm501_template.h
-+++ b/hw/display/sm501_template.h
-@@ -108,7 +108,7 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
-     /* get hardware cursor pattern */
-     uint32_t cursor_addr = get_hwc_address(s, crt);
-     assert(0 <= c_y && c_y < SM501_HWC_HEIGHT);
--    cursor_addr += 64 * c_y / 4;  /* 4 pixels per byte */
-+    cursor_addr += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
-     cursor_addr += s->base;
- 
-     /* get cursor position */
+ static void sm501_init(SM501State *s, DeviceState *dev,
 -- 
 2.7.4
