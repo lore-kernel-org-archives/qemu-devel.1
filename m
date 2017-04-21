@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1PgI-0005iA-5U
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:56:27 -0400
+	(envelope-from <famz@redhat.com>) id 1d1PgP-0005nt-Gi
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1PgH-0003hj-D1
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:56:26 -0400
+	(envelope-from <famz@redhat.com>) id 1d1PgN-0003ju-CW
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:56:33 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 11:55:49 +0800
-Message-Id: <20170421035606.448-4-famz@redhat.com>
+Date: Fri, 21 Apr 2017 11:55:51 +0800
+Message-Id: <20170421035606.448-6-famz@redhat.com>
 In-Reply-To: <20170421035606.448-1-famz@redhat.com>
 References: <20170421035606.448-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v14 03/20] block: Respect "force-shared-write"
- in perm propagating
+Subject: [Qemu-devel] [PATCH v14 05/20] qemu-img: Update documentation for
+ --share-rw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +25,115 @@ Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.c
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block.c | 31 +++++++++++++++++++++++--------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+ qemu-img-cmds.hx | 48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/block.c b/block.c
-index f5c4e97..6acf618 100644
---- a/block.c
-+++ b/block.c
-@@ -1422,6 +1422,21 @@ static int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
- static void bdrv_child_abort_perm_update(BdrvChild *c);
- static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared);
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 8ac7822..1b00bb8 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -10,15 +10,15 @@ STEXI
+ ETEXI
  
-+static void bdrv_child_perm(BlockDriverState *bs, BdrvChild *c,
-+                            const BdrvChildRole *role,
-+                            uint64_t parent_perm, uint64_t parent_shared,
-+                            uint64_t *nperm, uint64_t *nshared)
-+{
-+    if (bs->drv && bs->drv->bdrv_child_perm) {
-+        bs->drv->bdrv_child_perm(bs, c, role,
-+                                 parent_perm, parent_shared,
-+                                 nperm, nshared);
-+    }
-+    if (bs->force_shared_write) {
-+        *nshared |= BLK_PERM_WRITE;
-+    }
-+}
-+
- /*
-  * Check whether permissions on this node can be changed in a way that
-  * @cumulative_perms and @cumulative_shared_perms are the new cumulative
-@@ -1466,9 +1481,9 @@ static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
-     /* Check all children */
-     QLIST_FOREACH(c, &bs->children, next) {
-         uint64_t cur_perm, cur_shared;
--        drv->bdrv_child_perm(bs, c, c->role,
--                             cumulative_perms, cumulative_shared_perms,
--                             &cur_perm, &cur_shared);
-+        bdrv_child_perm(bs, c, c->role,
-+                        cumulative_perms, cumulative_shared_perms,
-+                        &cur_perm, &cur_shared);
-         ret = bdrv_child_check_perm(c, cur_perm, cur_shared, ignore_children,
-                                     errp);
-         if (ret < 0) {
-@@ -1528,9 +1543,9 @@ static void bdrv_set_perm(BlockDriverState *bs, uint64_t cumulative_perms,
-     /* Update all children */
-     QLIST_FOREACH(c, &bs->children, next) {
-         uint64_t cur_perm, cur_shared;
--        drv->bdrv_child_perm(bs, c, c->role,
--                             cumulative_perms, cumulative_shared_perms,
--                             &cur_perm, &cur_shared);
-+        bdrv_child_perm(bs, c, c->role,
-+                        cumulative_perms, cumulative_shared_perms,
-+                        &cur_perm, &cur_shared);
-         bdrv_child_set_perm(c, cur_perm, cur_shared);
-     }
- }
-@@ -1865,8 +1880,8 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+ DEF("bench", img_bench,
+-    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] filename")
++    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] [--share-rw] filename")
+ STEXI
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [--share-rw] @var{filename}
+ ETEXI
  
-     assert(parent_bs->drv);
-     assert(bdrv_get_aio_context(parent_bs) == bdrv_get_aio_context(child_bs));
--    parent_bs->drv->bdrv_child_perm(parent_bs, NULL, child_role,
--                                    perm, shared_perm, &perm, &shared_perm);
-+    bdrv_child_perm(parent_bs, NULL, child_role,
-+                    perm, shared_perm, &perm, &shared_perm);
+ DEF("check", img_check,
+-    "check [-q] [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] filename")
++    "check [-q] [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] [--share-rw] filename")
+ STEXI
+-@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] @var{filename}
++@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [--share-rw] @var{filename}
+ ETEXI
  
-     child = bdrv_root_attach_child(child_bs, child_name, child_role,
-                                    perm, shared_perm, parent_bs, errp);
+ DEF("create", img_create,
+@@ -28,62 +28,62 @@ STEXI
+ ETEXI
+ 
+ DEF("commit", img_commit,
+-    "commit [-q] [--object objectdef] [--image-opts] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
++    "commit [-q] [--object objectdef] [--image-opts] [-f fmt] [-t cache] [-b base] [-d] [-p] [--share-rw] filename")
+ STEXI
+-@item commit [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] @var{filename}
++@item commit [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] [--share-rw] @var{filename}
+ ETEXI
+ 
+ DEF("compare", img_compare,
+-    "compare [--object objectdef] [--image-opts] [-f fmt] [-F fmt] [-T src_cache] [-p] [-q] [-s] filename1 filename2")
++    "compare [--object objectdef] [--image-opts] [-f fmt] [-F fmt] [-T src_cache] [-p] [-q] [-s] [--share-rw] filename1 filename2")
+ STEXI
+-@item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] @var{filename1} @var{filename2}
++@item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] [--share-rw] @var{filename1} @var{filename2}
+ ETEXI
+ 
+ DEF("convert", img_convert,
+-    "convert [--object objectdef] [--image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
++    "convert [--object objectdef] [--image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--share-rw] filename [filename2 [...]] output_filename")
+ STEXI
+-@item convert [--object @var{objectdef}] [--image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
++@item convert [--object @var{objectdef}] [--image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] [--share-rw] @var{filename} [@var{filename2} [...]] @var{output_filename}
+ ETEXI
+ 
+ DEF("dd", img_dd,
+-    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
++    "dd [--image-opts] [--share-rw] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
+ STEXI
+-@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
++@item dd [--image-opts] [--share-rw] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
+ ETEXI
+ 
+ DEF("info", img_info,
+-    "info [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--backing-chain] filename")
++    "info [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--backing-chain] [--share-rw] filename")
+ STEXI
+-@item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] @var{filename}
++@item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] [--share-rw] @var{filename}
+ ETEXI
+ 
+ DEF("map", img_map,
+-    "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] filename")
++    "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--share-rw] filename")
+ STEXI
+-@item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] @var{filename}
++@item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--share-rw] @var{filename}
+ ETEXI
+ 
+ DEF("snapshot", img_snapshot,
+-    "snapshot [--object objectdef] [--image-opts] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
++    "snapshot [--object objectdef] [--image-opts] [--share-rw] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
+ STEXI
+-@item snapshot [--object @var{objectdef}] [--image-opts] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
++@item snapshot [--object @var{objectdef}] [--image-opts] [--share-rw] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
+ ETEXI
+ 
+ DEF("rebase", img_rebase,
+-    "rebase [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-T src_cache] [-p] [-u] -b backing_file [-F backing_fmt] filename")
++    "rebase [--object objectdef] [--image-opts] [--share-rw] [-q] [-f fmt] [-t cache] [-T src_cache] [-p] [-u] -b backing_file [-F backing_fmt] filename")
+ STEXI
+-@item rebase [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
++@item rebase [--object @var{objectdef}] [--image-opts] [--share-rw] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
+ ETEXI
+ 
+ DEF("resize", img_resize,
+-    "resize [--object objectdef] [--image-opts] [-q] filename [+ | -]size")
++    "resize [--object objectdef] [--image-opts] [--share-rw] [-q] filename [+ | -]size")
+ STEXI
+-@item resize [--object @var{objectdef}] [--image-opts] [-q] @var{filename} [+ | -]@var{size}
++@item resize [--object @var{objectdef}] [--image-opts] [--share-rw] [-q] @var{filename} [+ | -]@var{size}
+ ETEXI
+ 
+ DEF("amend", img_amend,
+-    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cache] -o options filename")
++    "amend [--object objectdef] [--image-opts] [--share-rw] [-p] [-q] [-f fmt] [-t cache] -o options filename")
+ STEXI
+-@item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
++@item amend [--object @var{objectdef}] [--image-opts] [--share-rw] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
+ @end table
+ ETEXI
 -- 
 2.9.3
