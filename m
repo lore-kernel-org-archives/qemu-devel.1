@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exf-0003wD-1H
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:24 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d1exk-000432-Kw
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exc-0002gO-BB
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:22 -0400
-Received: from mail.kernel.org ([198.145.29.136]:42780)
+	(envelope-from <sstabellini@kernel.org>) id 1d1exj-0002hv-Jj
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:28 -0400
+Received: from mail.kernel.org ([198.145.29.136]:42940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d1exc-0002gE-2j
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:20 -0400
+	id 1d1exj-0002hl-BG
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:27 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Fri, 21 Apr 2017 13:14:49 -0700
-Message-Id: <1492805702-19690-8-git-send-email-sstabellini@kernel.org>
+Date: Fri, 21 Apr 2017 13:14:53 -0700
+Message-Id: <1492805702-19690-12-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1492805702-19690-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
 	<1492805702-19690-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL 08/21] xen: additionally restrict
- xenforeignmemory operations
+Subject: [Qemu-devel] [PULL 12/21] xen/9pfs: introduce Xen 9pfs backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,194 +26,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Paul Durrant <paul.durrant@citrix.com>
+Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-From: Paul Durrant <paul.durrant@citrix.com>
+Introduce the Xen 9pfs backend: add struct XenDevOps to register as a
+Xen backend and add struct V9fsTransport to register as v9fs transport.
 
-Commit f0f272baf3a7 "xen: use libxendevice model to restrict operations"
-added a command-line option (-xen-domid-restrict) to limit operations
-using the libxendevicemodel API to a specified domid. The commit also
-noted that the restriction would be extended to cover operations issued
-via other xen libraries by subsequent patches.
+All functions are empty stubs for now.
 
-My recent Xen patch [1] added a call to the xenforeignmemory API to allow
-it to be restricted. This patch now makes use of that new call when the
--xen-domid-restrict option is passed.
-
-[1] http://xenbits.xen.org/gitweb/?p=xen.git;a=commit;h=5823d6eb
-
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+CC: anthony.perard@citrix.com
+CC: jgross@suse.com
+CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+CC: Greg Kurz <groug@kaod.org>
 ---
- include/hw/xen/xen_common.h | 134 ++++++++++++++++++++++++++------------------
- 1 file changed, 78 insertions(+), 56 deletions(-)
+ hw/9pfs/xen-9p-backend.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 99 insertions(+)
+ create mode 100644 hw/9pfs/xen-9p-backend.c
 
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 0fcbba8..e00ddd7 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -26,6 +26,58 @@ extern xc_interface *xen_xc;
-  * We don't support Xen prior to 4.2.0.
-  */
- 
-+/* Xen 4.2 through 4.6 */
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+new file mode 100644
+index 0000000..b90ac31
+--- /dev/null
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -0,0 +1,99 @@
++/*
++ * Xen 9p backend
++ *
++ * Copyright Aporeto 2017
++ *
++ * Authors:
++ *  Stefano Stabellini <stefano@aporeto.com>
++ *
++ */
 +
-+typedef xc_interface xenforeignmemory_handle;
-+typedef xc_evtchn xenevtchn_handle;
-+typedef xc_gnttab xengnttab_handle;
++#include "qemu/osdep.h"
 +
-+#define xenevtchn_open(l, f) xc_evtchn_open(l, f);
-+#define xenevtchn_close(h) xc_evtchn_close(h)
-+#define xenevtchn_fd(h) xc_evtchn_fd(h)
-+#define xenevtchn_pending(h) xc_evtchn_pending(h)
-+#define xenevtchn_notify(h, p) xc_evtchn_notify(h, p)
-+#define xenevtchn_bind_interdomain(h, d, p) xc_evtchn_bind_interdomain(h, d, p)
-+#define xenevtchn_unmask(h, p) xc_evtchn_unmask(h, p)
-+#define xenevtchn_unbind(h, p) xc_evtchn_unbind(h, p)
++#include "hw/hw.h"
++#include "hw/9pfs/9p.h"
++#include "hw/xen/xen_backend.h"
++#include "hw/xen/io/ring.h"
++#include "qemu/config-file.h"
++#include "fsdev/qemu-fsdev.h"
++#include <xen/io/protocols.h>
 +
-+#define xengnttab_open(l, f) xc_gnttab_open(l, f)
-+#define xengnttab_close(h) xc_gnttab_close(h)
-+#define xengnttab_set_max_grants(h, n) xc_gnttab_set_max_grants(h, n)
-+#define xengnttab_map_grant_ref(h, d, r, p) xc_gnttab_map_grant_ref(h, d, r, p)
-+#define xengnttab_unmap(h, a, n) xc_gnttab_munmap(h, a, n)
-+#define xengnttab_map_grant_refs(h, c, d, r, p) \
-+    xc_gnttab_map_grant_refs(h, c, d, r, p)
-+#define xengnttab_map_domain_grant_refs(h, c, d, r, p) \
-+    xc_gnttab_map_domain_grant_refs(h, c, d, r, p)
++DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);
 +
-+#define xenforeignmemory_open(l, f) xen_xc
-+#define xenforeignmemory_close(h)
++typedef struct Xen9pfsDev {
++    struct XenDevice xendev;  /* must be first */
++} Xen9pfsDev;
 +
-+static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
-+                                         int prot, size_t pages,
-+                                         const xen_pfn_t arr[/*pages*/],
-+                                         int err[/*pages*/])
++static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
++                                     size_t offset,
++                                     const char *fmt,
++                                     va_list ap)
 +{
-+    if (err)
-+        return xc_map_foreign_bulk(h, dom, prot, arr, err, pages);
-+    else
-+        return xc_map_foreign_pages(h, dom, prot, arr, pages);
++    return 0;
 +}
 +
-+#define xenforeignmemory_unmap(h, p, s) munmap(p, s * XC_PAGE_SIZE)
-+
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40701 */
-+
-+#include <xenevtchn.h>
-+#include <xengnttab.h>
-+#include <xenforeignmemory.h>
-+
-+#endif
-+
-+extern xenforeignmemory_handle *xen_fmem;
-+
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
- 
- typedef xc_interface xendevicemodel_handle;
-@@ -158,6 +210,13 @@ static inline int xendevicemodel_restrict(
-     return -1;
- }
- 
-+static inline int xenforeignmemory_restrict(
-+    xenforeignmemory_handle *fmem, domid_t domid)
++static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
++                                       size_t offset,
++                                       const char *fmt,
++                                       va_list ap)
 +{
-+    errno = ENOTTY;
++    return 0;
++}
++
++static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
++                                           struct iovec **piov,
++                                           unsigned int *pniov)
++{
++}
++
++static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
++                                          struct iovec **piov,
++                                          unsigned int *pniov,
++                                          size_t size)
++{
++}
++
++static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
++{
++}
++
++static const struct V9fsTransport xen_9p_transport = {
++    .pdu_vmarshal = xen_9pfs_pdu_vmarshal,
++    .pdu_vunmarshal = xen_9pfs_pdu_vunmarshal,
++    .init_in_iov_from_pdu = xen_9pfs_init_in_iov_from_pdu,
++    .init_out_iov_from_pdu = xen_9pfs_init_out_iov_from_pdu,
++    .push_and_notify = xen_9pfs_push_and_notify,
++};
++
++static int xen_9pfs_init(struct XenDevice *xendev)
++{
++    return 0;
++}
++
++static int xen_9pfs_free(struct XenDevice *xendev)
++{
 +    return -1;
 +}
 +
- #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
- 
- #undef XC_WANT_COMPAT_DEVICEMODEL_API
-@@ -215,69 +274,32 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
- 
- static inline int xen_restrict(domid_t domid)
- {
--    int rc = xendevicemodel_restrict(xen_dmod, domid);
-+    int rc;
- 
--    trace_xen_domid_restrict(errno);
-+    /* Attempt to restrict devicemodel operations */
-+    rc = xendevicemodel_restrict(xen_dmod, domid);
-+    trace_xen_domid_restrict(rc ? errno : 0);
- 
--    if (errno == ENOTTY) {
--        return 0;
-+    if (rc < 0) {
-+        /*
-+         * If errno is ENOTTY then restriction is not implemented so
-+         * there's no point in trying to restrict other types of
-+         * operation, but it should not be treated as a failure.
-+         */
-+        if (errno == ENOTTY) {
-+            return 0;
-+        }
++static int xen_9pfs_connect(struct XenDevice *xendev)
++{
++    return 0;
++}
 +
-+        return rc;
-     }
- 
--    return rc;
--}
--
--/* Xen 4.2 through 4.6 */
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
--
--typedef xc_interface xenforeignmemory_handle;
--typedef xc_evtchn xenevtchn_handle;
--typedef xc_gnttab xengnttab_handle;
--
--#define xenevtchn_open(l, f) xc_evtchn_open(l, f);
--#define xenevtchn_close(h) xc_evtchn_close(h)
--#define xenevtchn_fd(h) xc_evtchn_fd(h)
--#define xenevtchn_pending(h) xc_evtchn_pending(h)
--#define xenevtchn_notify(h, p) xc_evtchn_notify(h, p)
--#define xenevtchn_bind_interdomain(h, d, p) xc_evtchn_bind_interdomain(h, d, p)
--#define xenevtchn_unmask(h, p) xc_evtchn_unmask(h, p)
--#define xenevtchn_unbind(h, p) xc_evtchn_unbind(h, p)
--
--#define xengnttab_open(l, f) xc_gnttab_open(l, f)
--#define xengnttab_close(h) xc_gnttab_close(h)
--#define xengnttab_set_max_grants(h, n) xc_gnttab_set_max_grants(h, n)
--#define xengnttab_map_grant_ref(h, d, r, p) xc_gnttab_map_grant_ref(h, d, r, p)
--#define xengnttab_unmap(h, a, n) xc_gnttab_munmap(h, a, n)
--#define xengnttab_map_grant_refs(h, c, d, r, p) \
--    xc_gnttab_map_grant_refs(h, c, d, r, p)
--#define xengnttab_map_domain_grant_refs(h, c, d, r, p) \
--    xc_gnttab_map_domain_grant_refs(h, c, d, r, p)
--
--#define xenforeignmemory_open(l, f) xen_xc
--#define xenforeignmemory_close(h)
-+    /* Restrict foreignmemory operations */
-+    rc = xenforeignmemory_restrict(xen_fmem, domid);
-+    trace_xen_domid_restrict(rc ? errno : 0);
- 
--static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
--                                         int prot, size_t pages,
--                                         const xen_pfn_t arr[/*pages*/],
--                                         int err[/*pages*/])
--{
--    if (err)
--        return xc_map_foreign_bulk(h, dom, prot, arr, err, pages);
--    else
--        return xc_map_foreign_pages(h, dom, prot, arr, pages);
-+    return rc;
- }
- 
--#define xenforeignmemory_unmap(h, p, s) munmap(p, s * XC_PAGE_SIZE)
--
--#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40701 */
--
--#include <xenevtchn.h>
--#include <xengnttab.h>
--#include <xenforeignmemory.h>
--
--#endif
--
--extern xenforeignmemory_handle *xen_fmem;
--
- void destroy_hvm_domain(bool reboot);
- 
- /* shutdown/destroy current domain because of an error */
++static void xen_9pfs_alloc(struct XenDevice *xendev)
++{
++}
++
++static void xen_9pfs_disconnect(struct XenDevice *xendev)
++{
++}
++
++struct XenDevOps xen_9pfs_ops = {
++    .size       = sizeof(Xen9pfsDev),
++    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
++    .alloc      = xen_9pfs_alloc,
++    .init       = xen_9pfs_init,
++    .initialise = xen_9pfs_connect,
++    .disconnect = xen_9pfs_disconnect,
++    .free       = xen_9pfs_free,
++};
 -- 
 1.9.1
