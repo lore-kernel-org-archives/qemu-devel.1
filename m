@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Xeq-0002HR-Dg
+	(envelope-from <famz@redhat.com>) id 1d1Xeq-0002HQ-Db
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Xen-0000fN-98
+	(envelope-from <famz@redhat.com>) id 1d1Xep-0000h3-1Z
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33478)
+Received: from mx1.redhat.com ([209.132.183.28]:51080)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d1Xen-0000et-0z
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:25 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d1Xeo-0000fZ-PM
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:26 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E5086840B
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:27:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C1B80C00C0EB
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:27:25 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 20:27:01 +0800
-Message-Id: <20170421122710.15373-6-famz@redhat.com>
+Date: Fri, 21 Apr 2017 20:27:02 +0800
+Message-Id: <20170421122710.15373-7-famz@redhat.com>
 In-Reply-To: <20170421122710.15373-1-famz@redhat.com>
 References: <20170421122710.15373-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/14] block: Make errp the last parameter of
- bdrv_img_create
+Subject: [Qemu-devel] [PATCH 06/14] crypto: Make errp the last parameter of
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,126 +33,207 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>
 
+Move opaque to 2nd instead of the 2nd to last, so that compilers help
+check with the convertion.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block.c                  |  4 ++--
- blockdev.c               | 10 +++++-----
- include/block/block.h    |  2 +-
- qemu-img.c               |  2 +-
- tests/test-replication.c |  8 ++++----
- 5 files changed, 13 insertions(+), 13 deletions(-)
+ block/crypto.c            | 12 ++++++------
+ crypto/block-luks.c       | 21 +++++++++------------
+ include/crypto/block.h    | 12 ++++++------
+ tests/test-crypto-block.c | 12 ++++++------
+ 4 files changed, 27 insertions(+), 30 deletions(-)
 
-diff --git a/block.c b/block.c
-index 1fbbb8d..7eda9a4 100644
---- a/block.c
-+++ b/block.c
-@@ -4161,8 +4161,8 @@ bool bdrv_op_blocker_is_empty(BlockDriverState *bs)
+diff --git a/block/crypto.c b/block/crypto.c
+index 4a20388..34549b2 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -56,11 +56,11 @@ static int block_crypto_probe_generic(QCryptoBlockFormat format,
  
- void bdrv_img_create(const char *filename, const char *fmt,
-                      const char *base_filename, const char *base_fmt,
--                     char *options, uint64_t img_size, int flags,
--                     Error **errp, bool quiet)
-+                     char *options, uint64_t img_size, int flags, bool quiet,
-+                     Error **errp)
+ 
+ static ssize_t block_crypto_read_func(QCryptoBlock *block,
++                                      void *opaque,
+                                       size_t offset,
+                                       uint8_t *buf,
+                                       size_t buflen,
+-                                      Error **errp,
+-                                      void *opaque)
++                                      Error **errp)
  {
-     QemuOptsList *create_opts = NULL;
-     QemuOpts *opts = NULL;
-diff --git a/blockdev.c b/blockdev.c
-index 4927914..94726ed 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1728,7 +1728,7 @@ static void external_snapshot_prepare(BlkActionState *common,
-             bdrv_img_create(new_image_file, format,
-                             state->old_bs->filename,
-                             state->old_bs->drv->format_name,
--                            NULL, size, flags, &local_err, false);
-+                            NULL, size, flags, false, &local_err);
-             if (local_err) {
-                 error_propagate(errp, local_err);
-                 return;
-@@ -3237,10 +3237,10 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-         if (source) {
-             bdrv_img_create(backup->target, backup->format, source->filename,
-                             source->drv->format_name, NULL,
--                            size, flags, &local_err, false);
-+                            size, flags, false, &local_err);
-         } else {
-             bdrv_img_create(backup->target, backup->format, NULL, NULL, NULL,
--                            size, flags, &local_err, false);
-+                            size, flags, false, &local_err);
-         }
+     BlockDriverState *bs = opaque;
+     ssize_t ret;
+@@ -83,11 +83,11 @@ struct BlockCryptoCreateData {
+ 
+ 
+ static ssize_t block_crypto_write_func(QCryptoBlock *block,
++                                       void *opaque,
+                                        size_t offset,
+                                        const uint8_t *buf,
+                                        size_t buflen,
+-                                       Error **errp,
+-                                       void *opaque)
++                                       Error **errp)
+ {
+     struct BlockCryptoCreateData *data = opaque;
+     ssize_t ret;
+@@ -102,9 +102,9 @@ static ssize_t block_crypto_write_func(QCryptoBlock *block,
+ 
+ 
+ static ssize_t block_crypto_init_func(QCryptoBlock *block,
++                                      void *opaque,
+                                       size_t headerlen,
+-                                      Error **errp,
+-                                      void *opaque)
++                                      Error **errp)
+ {
+     struct BlockCryptoCreateData *data = opaque;
+     int ret;
+diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+index 4530f82..d5a31bb 100644
+--- a/crypto/block-luks.c
++++ b/crypto/block-luks.c
+@@ -473,10 +473,10 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
+      * then encrypted.
+      */
+     rv = readfunc(block,
++                  opaque,
+                   slot->key_offset * QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
+                   splitkey, splitkeylen,
+-                  errp,
+-                  opaque);
++                  errp);
+     if (rv < 0) {
+         goto cleanup;
      }
+@@ -676,11 +676,10 @@ qcrypto_block_luks_open(QCryptoBlock *block,
  
-@@ -3531,7 +3531,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-         /* create new image w/o backing file */
-         assert(format);
-         bdrv_img_create(arg->target, format,
--                        NULL, NULL, NULL, size, flags, &local_err, false);
-+                        NULL, NULL, NULL, size, flags, false, &local_err);
-     } else {
-         switch (arg->mode) {
-         case NEW_IMAGE_MODE_EXISTING:
-@@ -3541,7 +3541,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-             bdrv_img_create(arg->target, format,
-                             source->filename,
-                             source->drv->format_name,
--                            NULL, size, flags, &local_err, false);
-+                            NULL, size, flags, false, &local_err);
-             break;
-         default:
-             abort();
-diff --git a/include/block/block.h b/include/block/block.h
-index 5ddc0cf..466de49 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -509,7 +509,7 @@ int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
- void bdrv_img_create(const char *filename, const char *fmt,
-                      const char *base_filename, const char *base_fmt,
-                      char *options, uint64_t img_size, int flags,
--                     Error **errp, bool quiet);
-+                     bool quiet, Error **errp);
- 
- /* Returns the alignment in bytes that is required so that no bounce buffer
-  * is required throughout the stack */
-diff --git a/qemu-img.c b/qemu-img.c
-index b220cf7..2c09053 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -516,7 +516,7 @@ static int img_create(int argc, char **argv)
-     }
- 
-     bdrv_img_create(filename, fmt, base_filename, base_fmt,
--                    options, img_size, 0, &local_err, quiet);
-+                    options, img_size, 0, quiet, &local_err);
-     if (local_err) {
-         error_reportf_err(local_err, "%s: ", filename);
+     /* Read the entire LUKS header, minus the key material from
+      * the underlying device */
+-    rv = readfunc(block, 0,
++    rv = readfunc(block, opaque, 0,
+                   (uint8_t *)&luks->header,
+                   sizeof(luks->header),
+-                  errp,
+-                  opaque);
++                  errp);
+     if (rv < 0) {
+         ret = rv;
          goto fail;
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index fac2da3..3016c6f 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -144,18 +144,18 @@ static void prepare_imgs(void)
+@@ -1246,7 +1245,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+         QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
  
-     /* Primary */
-     bdrv_img_create(p_local_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
--                    BDRV_O_RDWR, &local_err, true);
-+                    BDRV_O_RDWR, true, &local_err);
-     g_assert(!local_err);
+     /* Reserve header space to match payload offset */
+-    initfunc(block, block->payload_offset, &local_err, opaque);
++    initfunc(block, opaque, block->payload_offset, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto error;
+@@ -1268,11 +1267,10 @@ qcrypto_block_luks_create(QCryptoBlock *block,
  
-     /* Secondary */
-     bdrv_img_create(s_local_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
--                    BDRV_O_RDWR, &local_err, true);
-+                    BDRV_O_RDWR, true, &local_err);
-     g_assert(!local_err);
-     bdrv_img_create(s_active_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
--                    BDRV_O_RDWR, &local_err, true);
-+                    BDRV_O_RDWR, true, &local_err);
-     g_assert(!local_err);
-     bdrv_img_create(s_hidden_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
--                    BDRV_O_RDWR, &local_err, true);
-+                    BDRV_O_RDWR, true, &local_err);
-     g_assert(!local_err);
- }
+ 
+     /* Write out the partition header and key slot headers */
+-    writefunc(block, 0,
++    writefunc(block, opaque, 0,
+               (const uint8_t *)&luks->header,
+               sizeof(luks->header),
+-              &local_err,
+-              opaque);
++              &local_err);
+ 
+     /* Delay checking local_err until we've byte-swapped */
+ 
+@@ -1297,12 +1295,11 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+ 
+     /* Write out the master key material, starting at the
+      * sector immediately following the partition header. */
+-    if (writefunc(block,
++    if (writefunc(block, opaque,
+                   luks->header.key_slots[0].key_offset *
+                   QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
+                   splitkey, splitkeylen,
+-                  errp,
+-                  opaque) != splitkeylen) {
++                  errp) != splitkeylen) {
+         goto error;
+     }
+ 
+diff --git a/include/crypto/block.h b/include/crypto/block.h
+index b6971de..4a053a3 100644
+--- a/include/crypto/block.h
++++ b/include/crypto/block.h
+@@ -30,23 +30,23 @@ typedef struct QCryptoBlock QCryptoBlock;
+  * and QCryptoBlockOpenOptions in qapi/crypto.json */
+ 
+ typedef ssize_t (*QCryptoBlockReadFunc)(QCryptoBlock *block,
++                                        void *opaque,
+                                         size_t offset,
+                                         uint8_t *buf,
+                                         size_t buflen,
+-                                        Error **errp,
+-                                        void *opaque);
++                                        Error **errp);
+ 
+ typedef ssize_t (*QCryptoBlockInitFunc)(QCryptoBlock *block,
++                                        void *opaque,
+                                         size_t headerlen,
+-                                        Error **errp,
+-                                        void *opaque);
++                                        Error **errp);
+ 
+ typedef ssize_t (*QCryptoBlockWriteFunc)(QCryptoBlock *block,
++                                         void *opaque,
+                                          size_t offset,
+                                          const uint8_t *buf,
+                                          size_t buflen,
+-                                         Error **errp,
+-                                         void *opaque);
++                                         Error **errp);
+ 
+ /**
+  * qcrypto_block_has_format:
+diff --git a/tests/test-crypto-block.c b/tests/test-crypto-block.c
+index 1957a86..85e6603 100644
+--- a/tests/test-crypto-block.c
++++ b/tests/test-crypto-block.c
+@@ -187,11 +187,11 @@ static struct QCryptoBlockTestData {
+ 
+ 
+ static ssize_t test_block_read_func(QCryptoBlock *block,
++                                    void *opaque,
+                                     size_t offset,
+                                     uint8_t *buf,
+                                     size_t buflen,
+-                                    Error **errp,
+-                                    void *opaque)
++                                    Error **errp)
+ {
+     Buffer *header = opaque;
+ 
+@@ -204,9 +204,9 @@ static ssize_t test_block_read_func(QCryptoBlock *block,
+ 
+ 
+ static ssize_t test_block_init_func(QCryptoBlock *block,
++                                    void *opaque,
+                                     size_t headerlen,
+-                                    Error **errp,
+-                                    void *opaque)
++                                    Error **errp)
+ {
+     Buffer *header = opaque;
+ 
+@@ -219,11 +219,11 @@ static ssize_t test_block_init_func(QCryptoBlock *block,
+ 
+ 
+ static ssize_t test_block_write_func(QCryptoBlock *block,
++                                     void *opaque,
+                                      size_t offset,
+                                      const uint8_t *buf,
+                                      size_t buflen,
+-                                     Error **errp,
+-                                     void *opaque)
++                                     Error **errp)
+ {
+     Buffer *header = opaque;
  
 -- 
 2.9.3
