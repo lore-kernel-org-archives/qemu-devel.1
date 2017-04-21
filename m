@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1ZHy-0005UM-FF
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:11:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1d1ZaE-0000ah-AH
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1ZHv-0001BY-63
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:11:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d1ZHu-0001BO-V5
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:11:55 -0400
-References: <20170421094316.19361-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d71b7150-f71c-4a15-8938-e042bcb6bd40@redhat.com>
-Date: Fri, 21 Apr 2017 09:11:50 -0500
+	(envelope-from <bounces@canonical.com>) id 1d1ZaB-0006YN-6Z
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:30:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55643)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d1ZaB-0006Y5-0S
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:30:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d1Za9-0002jJ-1Z
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 14:30:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F1D762E80CB
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 14:30:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170421094316.19361-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CI6eU25aRL5eK6axX7RSfVl5VogikIECT"
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/6] Block patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 21 Apr 2017 14:23:19 -0000
+From: flumm <dominik.csapak@gmail.com>
+Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1685242] [NEW] ovmf hangs at efi with virtio-net
+ memory hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +36,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CI6eU25aRL5eK6axX7RSfVl5VogikIECT
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <d71b7150-f71c-4a15-8938-e042bcb6bd40@redhat.com>
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/6] Block patches
-References: <20170421094316.19361-1-stefanha@redhat.com>
-In-Reply-To: <20170421094316.19361-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-On 04/21/2017 04:43 AM, Stefan Hajnoczi wrote:
-> The following changes since commit fa54abb8c298f892639ffc4bc2f61448ac3b=
-e4a1:
->=20
+with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
+and it has a virtio-net devices
 
-Assuming the subject line is stale and you mean 2.10
+the ovmf images where compiled from https://github.com/tianocore/edk2
+(current master)
 
+reproducer:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+qemu-system-x86_64 -drive
+'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
+'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga std
+-netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
+-display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
 
+interestingly, it works when you do the following:
 
---CI6eU25aRL5eK6axX7RSfVl5VogikIECT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+- omit the virtio-net-pci device
+- use seabios
+- use less maxmem, e.g. 512G
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+qemu was compiled from source (v2.9.0) with following options:
 
-iQEcBAEBCAAGBQJY+hMmAAoJEKeha0olJ0NqPBQH/Rysba0naMMRBGDrkikRAb/a
-2s7eENKGy3tWfrIdRBPXR+5NvqkYnpD5Ohg+Ahmhw4nwNhxhP0b+hSH+eqcMCOii
-5zkL1ELBs8q1AaX12LDPyfQVqJRj2i5wWOgyPJDYl5Fm1VXgZd9Fyb06juXsayeK
-fnSeuJ0D+xwtMLdZnukVFtuUDLt9Zf8tSJqIbtiYUVJqp0IoTaZhInB35PomTphC
-V+0HhxR7S4LjyQ2+YXsBMVdSRBDNc0tkGYaBq5rGhWvm/uKn/uh+TUR8XyO77iyO
-GgWUyYLoZmiJqEHdvxUvI+mjIkAIHhQglzqeM+Ks0vG0w4b/9YXcn/yrPPMU3SA=
-=51xc
------END PGP SIGNATURE-----
+./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls --=
+enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-smar=
+tcard --audio-drv-list=3D"alsa" --enable
+-spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gtk =
+--enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-vi=
+rtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest-a=
+gent-msi
 
---CI6eU25aRL5eK6axX7RSfVl5VogikIECT--
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1685242
+
+Title:
+  ovmf hangs at efi with virtio-net memory hotplug
+
+Status in QEMU:
+  New
+
+Bug description:
+  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
+  and it has a virtio-net devices
+
+  the ovmf images where compiled from https://github.com/tianocore/edk2
+  (current master)
+
+  reproducer:
+
+  qemu-system-x86_64 -drive
+  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
+  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
+std
+  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
+  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
+
+  interestingly, it works when you do the following:
+
+  - omit the virtio-net-pci device
+  - use seabios
+  - use less maxmem, e.g. 512G
+
+  qemu was compiled from source (v2.9.0) with following options:
+
+  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
+--enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
+artcard --audio-drv-list=3D"alsa" --enable
+  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
+k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
+virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
+-agent-msi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
