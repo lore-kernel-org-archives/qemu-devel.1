@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exx-0004Q7-HW
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:43 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d1exa-0003oz-31
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exv-0002l0-KN
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:41 -0400
-Received: from mail.kernel.org ([198.145.29.136]:43212)
+	(envelope-from <sstabellini@kernel.org>) id 1d1exY-0002fp-Mm
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:18 -0400
+Received: from mail.kernel.org ([198.145.29.136]:42712)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d1exv-0002kw-Bw
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:39 -0400
+	id 1d1exY-0002fl-Ee
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:16 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Fri, 21 Apr 2017 13:15:00 -0700
-Message-Id: <1492805702-19690-19-git-send-email-sstabellini@kernel.org>
+Date: Fri, 21 Apr 2017 13:14:47 -0700
+Message-Id: <1492805702-19690-6-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1492805702-19690-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
 	<1492805702-19690-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL 19/21] move xen-common.c to hw/xen/
+Subject: [Qemu-devel] [PULL 06/21] xen: use 5 digit xen versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,451 +26,217 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Anthony Xu <anthony.xu@intel.com>
+Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Juergen Gross <jgross@suse.com>
 
-From: Anthony Xu <anthony.xu@intel.com>
+From: Juergen Gross <jgross@suse.com>
 
-move xen-common.c to hw/xen/
+Today qemu is using e.g. the value 480 for Xen version 4.8.0. As some
+Xen version tests are using ">" relations this scheme will lead to
+problems when Xen version 4.10.0 is being reached.
 
-Signed-off -by: Anthony Xu <anthony.xu@intel.com>
+Instead of the 3 digit schem use a 5 digit scheme (e.g. 40800 for
+version 4.8.0).
+
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- Makefile.target      |   2 -
- hw/xen/Makefile.objs |   2 +-
- hw/xen/xen-common.c  | 169 +++++++++++++++++++++++++++++++++++++++++++++++++++
- stubs/Makefile.objs  |   1 +
- stubs/xen-common.c   |  14 +++++
- xen-common-stub.c    |  14 -----
- xen-common.c         | 169 ---------------------------------------------------
- 7 files changed, 185 insertions(+), 186 deletions(-)
- create mode 100644 hw/xen/xen-common.c
- create mode 100644 stubs/xen-common.c
- delete mode 100644 xen-common-stub.c
- delete mode 100644 xen-common.c
+ configure                   | 16 ++++++++--------
+ hw/block/xen_disk.c         |  2 +-
+ include/hw/xen/xen_common.h | 22 +++++++++++-----------
+ 3 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 7df2b8c..48c027f 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -150,9 +150,7 @@ obj-y += migration/ram.o migration/savevm.o
- LIBS := $(libs_softmmu) $(LIBS)
+diff --git a/configure b/configure
+index e333547..271bea8 100755
+--- a/configure
++++ b/configure
+@@ -2014,7 +2014,7 @@ EOF
+       compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
+     then
+     xen_stable_libs="-lxendevicemodel $xen_stable_libs"
+-    xen_ctrl_version=490
++    xen_ctrl_version=40900
+     xen=yes
+   elif
+       cat > $TMPC <<EOF &&
+@@ -2069,7 +2069,7 @@ int main(void) {
+ EOF
+       compile_prog "" "$xen_libs $xen_stable_libs"
+     then
+-    xen_ctrl_version=480
++    xen_ctrl_version=40800
+     xen=yes
+   elif
+       cat > $TMPC <<EOF &&
+@@ -2120,7 +2120,7 @@ int main(void) {
+ EOF
+       compile_prog "" "$xen_libs $xen_stable_libs"
+     then
+-    xen_ctrl_version=471
++    xen_ctrl_version=40701
+     xen=yes
+   elif
+       cat > $TMPC <<EOF &&
+@@ -2135,7 +2135,7 @@ int main(void) {
+ EOF
+       compile_prog "" "$xen_libs"
+     then
+-    xen_ctrl_version=470
++    xen_ctrl_version=40700
+     xen=yes
  
- # xen support
--obj-$(CONFIG_XEN) += xen-common.o
- obj-$(CONFIG_XEN_I386) += xen-hvm.o xen-mapcache.o
--obj-$(call lnot,$(CONFIG_XEN)) += xen-common-stub.o
- obj-$(call lnot,$(CONFIG_XEN_I386)) += xen-hvm-stub.o
+   # Xen 4.6
+@@ -2163,7 +2163,7 @@ int main(void) {
+ EOF
+       compile_prog "" "$xen_libs"
+     then
+-    xen_ctrl_version=460
++    xen_ctrl_version=40600
+     xen=yes
  
- # Hardware support
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index 4be3ec9..64a70bc 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -1,5 +1,5 @@
- # xen backend driver support
--common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o
-+common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o xen-common.o
+   # Xen 4.5
+@@ -2190,7 +2190,7 @@ int main(void) {
+ EOF
+       compile_prog "" "$xen_libs"
+     then
+-    xen_ctrl_version=450
++    xen_ctrl_version=40500
+     xen=yes
  
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-new file mode 100644
-index 0000000..ae76150
---- /dev/null
-+++ b/hw/xen/xen-common.c
-@@ -0,0 +1,169 @@
-+/*
-+ * Copyright (C) 2014       Citrix Systems UK Ltd.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ * Contributions after 2012-01-13 are licensed under the terms of the
-+ * GNU GPL, version 2 or (at your option) any later version.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/xen/xen_backend.h"
-+#include "qmp-commands.h"
-+#include "sysemu/char.h"
-+#include "sysemu/accel.h"
-+#include "migration/migration.h"
-+
-+//#define DEBUG_XEN
-+
-+#ifdef DEBUG_XEN
-+#define DPRINTF(fmt, ...) \
-+    do { fprintf(stderr, "xen: " fmt, ## __VA_ARGS__); } while (0)
-+#else
-+#define DPRINTF(fmt, ...) \
-+    do { } while (0)
-+#endif
-+
-+xc_interface *xen_xc;
-+xenforeignmemory_handle *xen_fmem;
-+xendevicemodel_handle *xen_dmod;
-+
-+static int store_dev_info(int domid, Chardev *cs, const char *string)
-+{
-+    struct xs_handle *xs = NULL;
-+    char *path = NULL;
-+    char *newpath = NULL;
-+    char *pts = NULL;
-+    int ret = -1;
-+
-+    /* Only continue if we're talking to a pty. */
-+    if (strncmp(cs->filename, "pty:", 4)) {
-+        return 0;
-+    }
-+    pts = cs->filename + 4;
-+
-+    /* We now have everything we need to set the xenstore entry. */
-+    xs = xs_open(0);
-+    if (xs == NULL) {
-+        fprintf(stderr, "Could not contact XenStore\n");
-+        goto out;
-+    }
-+
-+    path = xs_get_domain_path(xs, domid);
-+    if (path == NULL) {
-+        fprintf(stderr, "xs_get_domain_path() error\n");
-+        goto out;
-+    }
-+    newpath = realloc(path, (strlen(path) + strlen(string) +
-+                strlen("/tty") + 1));
-+    if (newpath == NULL) {
-+        fprintf(stderr, "realloc error\n");
-+        goto out;
-+    }
-+    path = newpath;
-+
-+    strcat(path, string);
-+    strcat(path, "/tty");
-+    if (!xs_write(xs, XBT_NULL, path, pts, strlen(pts))) {
-+        fprintf(stderr, "xs_write for '%s' fail", string);
-+        goto out;
-+    }
-+    ret = 0;
-+
-+out:
-+    free(path);
-+    xs_close(xs);
-+
-+    return ret;
-+}
-+
-+void xenstore_store_pv_console_info(int i, Chardev *chr)
-+{
-+    if (i == 0) {
-+        store_dev_info(xen_domid, chr, "/console");
-+    } else {
-+        char buf[32];
-+        snprintf(buf, sizeof(buf), "/device/console/%d", i);
-+        store_dev_info(xen_domid, chr, buf);
-+    }
-+}
-+
-+
-+static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
-+{
-+    char path[50];
-+
-+    if (xs == NULL) {
-+        fprintf(stderr, "xenstore connection not initialized\n");
-+        exit(1);
-+    }
-+
-+    snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
-+    if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
-+        fprintf(stderr, "error recording dm state\n");
-+        exit(1);
-+    }
-+}
-+
-+
-+static void xen_change_state_handler(void *opaque, int running,
-+                                     RunState state)
-+{
-+    if (running) {
-+        /* record state running */
-+        xenstore_record_dm_state(xenstore, "running");
-+    }
-+}
-+
-+static int xen_init(MachineState *ms)
-+{
-+    xen_xc = xc_interface_open(0, 0, 0);
-+    if (xen_xc == NULL) {
-+        xen_pv_printf(NULL, 0, "can't open xen interface\n");
-+        return -1;
-+    }
-+    xen_fmem = xenforeignmemory_open(0, 0);
-+    if (xen_fmem == NULL) {
-+        xen_pv_printf(NULL, 0, "can't open xen fmem interface\n");
-+        xc_interface_close(xen_xc);
-+        return -1;
-+    }
-+    xen_dmod = xendevicemodel_open(0, 0);
-+    if (xen_dmod == NULL) {
-+        xen_pv_printf(NULL, 0, "can't open xen devicemodel interface\n");
-+        xenforeignmemory_close(xen_fmem);
-+        xc_interface_close(xen_xc);
-+        return -1;
-+    }
-+    qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
-+
-+    global_state_set_optional();
-+    savevm_skip_configuration();
-+    savevm_skip_section_footers();
-+
-+    return 0;
-+}
-+
-+static void xen_accel_class_init(ObjectClass *oc, void *data)
-+{
-+    AccelClass *ac = ACCEL_CLASS(oc);
-+    ac->name = "Xen";
-+    ac->init_machine = xen_init;
-+    ac->allowed = &xen_allowed;
-+}
-+
-+#define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
-+
-+static const TypeInfo xen_accel_type = {
-+    .name = TYPE_XEN_ACCEL,
-+    .parent = TYPE_ACCEL,
-+    .class_init = xen_accel_class_init,
-+};
-+
-+static void xen_type_init(void)
-+{
-+    type_register_static(&xen_accel_type);
-+}
-+
-+type_init(xen_type_init);
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 224f04b..6c80613 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -37,3 +37,4 @@ stub-obj-y += target-monitor-defs.o
- stub-obj-y += target-get-monitor-def.o
- stub-obj-y += pc_madt_cpu_entry.o
- stub-obj-y += vmgenid.o
-+stub-obj-y += xen-common.o
-diff --git a/stubs/xen-common.c b/stubs/xen-common.c
-new file mode 100644
-index 0000000..09fce2d
---- /dev/null
-+++ b/stubs/xen-common.c
-@@ -0,0 +1,14 @@
-+/*
-+ * Copyright (C) 2014       Citrix Systems UK Ltd.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "hw/xen/xen.h"
-+
-+void xenstore_store_pv_console_info(int i, Chardev *chr)
-+{
-+}
-diff --git a/xen-common-stub.c b/xen-common-stub.c
-deleted file mode 100644
-index 09fce2d..0000000
---- a/xen-common-stub.c
-+++ /dev/null
-@@ -1,14 +0,0 @@
--/*
-- * Copyright (C) 2014       Citrix Systems UK Ltd.
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- */
--
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "hw/xen/xen.h"
--
--void xenstore_store_pv_console_info(int i, Chardev *chr)
--{
--}
-diff --git a/xen-common.c b/xen-common.c
-deleted file mode 100644
-index ae76150..0000000
---- a/xen-common.c
-+++ /dev/null
-@@ -1,169 +0,0 @@
--/*
-- * Copyright (C) 2014       Citrix Systems UK Ltd.
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2.  See
-- * the COPYING file in the top-level directory.
-- *
-- * Contributions after 2012-01-13 are licensed under the terms of the
-- * GNU GPL, version 2 or (at your option) any later version.
-- */
--
--#include "qemu/osdep.h"
--#include "hw/xen/xen_backend.h"
--#include "qmp-commands.h"
--#include "sysemu/char.h"
--#include "sysemu/accel.h"
--#include "migration/migration.h"
--
--//#define DEBUG_XEN
--
--#ifdef DEBUG_XEN
--#define DPRINTF(fmt, ...) \
--    do { fprintf(stderr, "xen: " fmt, ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...) \
--    do { } while (0)
--#endif
--
--xc_interface *xen_xc;
--xenforeignmemory_handle *xen_fmem;
--xendevicemodel_handle *xen_dmod;
--
--static int store_dev_info(int domid, Chardev *cs, const char *string)
--{
--    struct xs_handle *xs = NULL;
--    char *path = NULL;
--    char *newpath = NULL;
--    char *pts = NULL;
--    int ret = -1;
--
--    /* Only continue if we're talking to a pty. */
--    if (strncmp(cs->filename, "pty:", 4)) {
--        return 0;
--    }
--    pts = cs->filename + 4;
--
--    /* We now have everything we need to set the xenstore entry. */
--    xs = xs_open(0);
--    if (xs == NULL) {
--        fprintf(stderr, "Could not contact XenStore\n");
--        goto out;
--    }
--
--    path = xs_get_domain_path(xs, domid);
--    if (path == NULL) {
--        fprintf(stderr, "xs_get_domain_path() error\n");
--        goto out;
--    }
--    newpath = realloc(path, (strlen(path) + strlen(string) +
--                strlen("/tty") + 1));
--    if (newpath == NULL) {
--        fprintf(stderr, "realloc error\n");
--        goto out;
--    }
--    path = newpath;
--
--    strcat(path, string);
--    strcat(path, "/tty");
--    if (!xs_write(xs, XBT_NULL, path, pts, strlen(pts))) {
--        fprintf(stderr, "xs_write for '%s' fail", string);
--        goto out;
--    }
--    ret = 0;
--
--out:
--    free(path);
--    xs_close(xs);
--
--    return ret;
--}
--
--void xenstore_store_pv_console_info(int i, Chardev *chr)
--{
--    if (i == 0) {
--        store_dev_info(xen_domid, chr, "/console");
--    } else {
--        char buf[32];
--        snprintf(buf, sizeof(buf), "/device/console/%d", i);
--        store_dev_info(xen_domid, chr, buf);
--    }
--}
--
--
--static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
--{
--    char path[50];
--
--    if (xs == NULL) {
--        fprintf(stderr, "xenstore connection not initialized\n");
--        exit(1);
--    }
--
--    snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
--    if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
--        fprintf(stderr, "error recording dm state\n");
--        exit(1);
--    }
--}
--
--
--static void xen_change_state_handler(void *opaque, int running,
--                                     RunState state)
--{
--    if (running) {
--        /* record state running */
--        xenstore_record_dm_state(xenstore, "running");
--    }
--}
--
--static int xen_init(MachineState *ms)
--{
--    xen_xc = xc_interface_open(0, 0, 0);
--    if (xen_xc == NULL) {
--        xen_pv_printf(NULL, 0, "can't open xen interface\n");
--        return -1;
--    }
--    xen_fmem = xenforeignmemory_open(0, 0);
--    if (xen_fmem == NULL) {
--        xen_pv_printf(NULL, 0, "can't open xen fmem interface\n");
--        xc_interface_close(xen_xc);
--        return -1;
--    }
--    xen_dmod = xendevicemodel_open(0, 0);
--    if (xen_dmod == NULL) {
--        xen_pv_printf(NULL, 0, "can't open xen devicemodel interface\n");
--        xenforeignmemory_close(xen_fmem);
--        xc_interface_close(xen_xc);
--        return -1;
--    }
--    qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
--
--    global_state_set_optional();
--    savevm_skip_configuration();
--    savevm_skip_section_footers();
--
--    return 0;
--}
--
--static void xen_accel_class_init(ObjectClass *oc, void *data)
--{
--    AccelClass *ac = ACCEL_CLASS(oc);
--    ac->name = "Xen";
--    ac->init_machine = xen_init;
--    ac->allowed = &xen_allowed;
--}
--
--#define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
--
--static const TypeInfo xen_accel_type = {
--    .name = TYPE_XEN_ACCEL,
--    .parent = TYPE_ACCEL,
--    .class_init = xen_accel_class_init,
--};
--
--static void xen_type_init(void)
--{
--    type_register_static(&xen_accel_type);
--}
--
--type_init(xen_type_init);
+   elif
+@@ -2215,7 +2215,7 @@ int main(void) {
+ EOF
+       compile_prog "" "$xen_libs"
+     then
+-    xen_ctrl_version=420
++    xen_ctrl_version=40200
+     xen=yes
+ 
+   else
+@@ -2227,7 +2227,7 @@ EOF
+   fi
+ 
+   if test "$xen" = yes; then
+-    if test $xen_ctrl_version -ge 471  ; then
++    if test $xen_ctrl_version -ge 40701  ; then
+       libs_softmmu="$xen_stable_libs $libs_softmmu"
+     fi
+     libs_softmmu="$xen_libs $libs_softmmu"
+diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+index 456a2d5..27df048 100644
+--- a/hw/block/xen_disk.c
++++ b/hw/block/xen_disk.c
+@@ -492,7 +492,7 @@ static int ioreq_map(struct ioreq *ioreq)
+     return 0;
+ }
+ 
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 480
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40800
+ 
+ static void ioreq_free_copy_buffers(struct ioreq *ioreq)
+ {
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index b1f5f53..fa990a0 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -26,7 +26,7 @@ extern xc_interface *xen_xc;
+  * We don't support Xen prior to 4.2.0.
+  */
+ 
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+ 
+ typedef xc_interface xendevicemodel_handle;
+ 
+@@ -36,7 +36,7 @@ static inline xendevicemodel_handle *xendevicemodel_open(
+     return xen_xc;
+ }
+ 
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 450
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40500
+ 
+ static inline int xendevicemodel_create_ioreq_server(
+     xendevicemodel_handle *dmod, domid_t domid, int handle_bufioreq,
+@@ -99,7 +99,7 @@ static inline int xendevicemodel_set_ioreq_server_state(
+     return xc_hvm_set_ioreq_server_state(dmod, domid, id, enabled);
+ }
+ 
+-#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 450 */
++#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40500 */
+ 
+ static inline int xendevicemodel_set_pci_intx_level(
+     xendevicemodel_handle *dmod, domid_t domid, uint16_t segment,
+@@ -151,7 +151,7 @@ static inline int xendevicemodel_set_mem_type(
+     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+ }
+ 
+-#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 490 */
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+ 
+ #undef XC_WANT_COMPAT_DEVICEMODEL_API
+ #include <xendevicemodel.h>
+@@ -207,7 +207,7 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+ }
+ 
+ /* Xen 4.2 through 4.6 */
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 471
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+ 
+ typedef xc_interface xenforeignmemory_handle;
+ typedef xc_evtchn xenevtchn_handle;
+@@ -248,7 +248,7 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+ 
+ #define xenforeignmemory_unmap(h, p, s) munmap(p, s * XC_PAGE_SIZE)
+ 
+-#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 471 */
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40701 */
+ 
+ #include <xenevtchn.h>
+ #include <xengnttab.h>
+@@ -284,7 +284,7 @@ static inline int xen_get_vmport_regs_pfn(xc_interface *xc, domid_t dom,
+ #endif
+ 
+ /* Xen before 4.6 */
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 460
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40600
+ 
+ #ifndef HVM_IOREQSRV_BUFIOREQ_ATOMIC
+ #define HVM_IOREQSRV_BUFIOREQ_ATOMIC 2
+@@ -330,7 +330,7 @@ static inline int xen_get_default_ioreq_server_info(domid_t dom,
+ }
+ 
+ /* Xen before 4.5 */
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 450
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40500
+ 
+ #ifndef HVM_PARAM_BUFIOREQ_EVTCHN
+ #define HVM_PARAM_BUFIOREQ_EVTCHN 26
+@@ -569,7 +569,7 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
+ 
+ #endif
+ 
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 460
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40600
+ static inline int xen_xc_domain_add_to_physmap(xc_interface *xch, uint32_t domid,
+                                                unsigned int space,
+                                                unsigned long idx,
+@@ -592,7 +592,7 @@ static inline int xen_xc_domain_add_to_physmap(xc_interface *xch, uint32_t domid
+ #endif
+ 
+ #ifdef CONFIG_XEN_PV_DOMAIN_BUILD
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 470
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40700
+ static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
+                                     xen_domain_handle_t handle, uint32_t flags,
+                                     uint32_t *pdomid)
+@@ -611,7 +611,7 @@ static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
+ 
+ /* Xen before 4.8 */
+ 
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 480
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40800
+ 
+ 
+ typedef void *xengnttab_grant_copy_segment_t;
 -- 
 1.9.1
