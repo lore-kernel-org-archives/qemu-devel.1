@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exn-00045J-88
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:32 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d1exV-0003ln-BU
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exl-0002iN-Fg
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:31 -0400
-Received: from mail.kernel.org ([198.145.29.136]:42968)
+	(envelope-from <sstabellini@kernel.org>) id 1d1exS-0002eA-2G
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:13 -0400
+Received: from mail.kernel.org ([198.145.29.136]:42570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d1exl-0002iB-7W
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:29 -0400
+	id 1d1exR-0002da-NA
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:09 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Fri, 21 Apr 2017 13:14:54 -0700
-Message-Id: <1492805702-19690-13-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <1492805702-19690-1-git-send-email-sstabellini@kernel.org>
+Date: Fri, 21 Apr 2017 13:14:42 -0700
+Message-Id: <1492805702-19690-1-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
 References: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
-	<1492805702-19690-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL 13/21] xen/9pfs: connect to the frontend
+Subject: [Qemu-devel] [PULL 01/21] xen: make use of xen_xc implicit in
+ xen_common.h inlines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,240 +26,454 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Paul Durrant <paul.durrant@citrix.com>
 
-Write the limits of the backend to xenstore. Connect to the frontend.
-Upon connection, allocate the rings according to the protocol
-specification.
+From: Paul Durrant <paul.durrant@citrix.com>
 
-Initialize a QEMUBH to schedule work upon receiving an event channel
-notification from the frontend.
+Doing this will make the transition to using the new libxendevicemodel
+interface less intrusive on the callers of these functions, since using
+the new library will require a change of handle.
 
-Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-CC: anthony.perard@citrix.com
-CC: jgross@suse.com
-CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-CC: Greg Kurz <groug@kaod.org>
+NOTE: The patch also moves the 'externs' for xen_xc and xen_fmem from
+      xen_backend.h to xen_common.h, and the declarations from
+      xen_backend.c to xen-common.c, which is where they belong.
+
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/9pfs/xen-9p-backend.c | 182 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 181 insertions(+), 1 deletion(-)
+ hw/xen/xen_backend.c         |  2 -
+ include/hw/xen/xen_backend.h |  2 -
+ include/hw/xen/xen_common.h  | 90 +++++++++++++++++++++++---------------------
+ xen-common.c                 |  3 ++
+ xen-hvm.c                    | 20 +++++-----
+ 5 files changed, 60 insertions(+), 57 deletions(-)
 
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index b90ac31..bfc6eca 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -20,8 +20,41 @@
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 6c21c37..d34c49e 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -43,8 +43,6 @@ BusState *xen_sysbus;
+ /* ------------------------------------------------------------- */
  
- DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);
+ /* public */
+-xc_interface *xen_xc = NULL;
+-xenforeignmemory_handle *xen_fmem = NULL;
+ struct xs_handle *xenstore = NULL;
+ const char *xen_protocol;
  
-+#define VERSIONS "1"
-+#define MAX_RINGS 8
-+#define MAX_RING_ORDER 8
-+
-+typedef struct Xen9pfsRing {
-+    struct Xen9pfsDev *priv;
-+
-+    int ref;
-+    xenevtchn_handle   *evtchndev;
-+    int evtchn;
-+    int local_port;
-+    int ring_order;
-+    struct xen_9pfs_data_intf *intf;
-+    unsigned char *data;
-+    struct xen_9pfs_data ring;
-+
-+    struct iovec *sg;
-+    QEMUBH *bh;
-+
-+    /* local copies, so that we can read/write PDU data directly from
-+     * the ring */
-+    RING_IDX out_cons, out_size, in_cons;
-+    bool inprogress;
-+} Xen9pfsRing;
-+
- typedef struct Xen9pfsDev {
-     struct XenDevice xendev;  /* must be first */
-+    V9fsState state;
-+    char *path;
-+    char *security_model;
-+    char *tag;
-+    char *id;
-+
-+    int num_rings;
-+    Xen9pfsRing *rings;
- } Xen9pfsDev;
+diff --git a/include/hw/xen/xen_backend.h b/include/hw/xen/xen_backend.h
+index 4f4799a..30811a1 100644
+--- a/include/hw/xen/xen_backend.h
++++ b/include/hw/xen/xen_backend.h
+@@ -14,8 +14,6 @@
+     OBJECT_CHECK(XenDevice, (obj), TYPE_XENBACKEND)
  
- static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
-@@ -70,22 +103,169 @@ static int xen_9pfs_init(struct XenDevice *xendev)
-     return 0;
- }
+ /* variables */
+-extern xc_interface *xen_xc;
+-extern xenforeignmemory_handle *xen_fmem;
+ extern struct xs_handle *xenstore;
+ extern const char *xen_protocol;
+ extern DeviceState *xen_sysdev;
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index dce76ee..1e08b98 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -20,6 +20,8 @@
+ #include "qemu/queue.h"
+ #include "hw/xen/trace.h"
  
-+static void xen_9pfs_bh(void *opaque)
-+{
-+}
++extern xc_interface *xen_xc;
 +
-+static void xen_9pfs_evtchn_event(void *opaque)
-+{
-+}
+ /*
+  * We don't support Xen prior to 4.2.0.
+  */
+@@ -73,6 +75,8 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+ 
+ #endif
+ 
++extern xenforeignmemory_handle *xen_fmem;
 +
- static int xen_9pfs_free(struct XenDevice *xendev)
+ void destroy_hvm_domain(bool reboot);
+ 
+ /* shutdown/destroy current domain because of an error */
+@@ -107,8 +111,7 @@ static inline int xen_get_vmport_regs_pfn(xc_interface *xc, domid_t dom,
+ 
+ #endif
+ 
+-static inline int xen_get_default_ioreq_server_info(xc_interface *xc,
+-                                                    domid_t dom,
++static inline int xen_get_default_ioreq_server_info(domid_t dom,
+                                                     xen_pfn_t *ioreq_pfn,
+                                                     xen_pfn_t *bufioreq_pfn,
+                                                     evtchn_port_t
+@@ -117,7 +120,7 @@ static inline int xen_get_default_ioreq_server_info(xc_interface *xc,
+     unsigned long param;
+     int rc;
+ 
+-    rc = xc_get_hvm_param(xc, dom, HVM_PARAM_IOREQ_PFN, &param);
++    rc = xc_get_hvm_param(xen_xc, dom, HVM_PARAM_IOREQ_PFN, &param);
+     if (rc < 0) {
+         fprintf(stderr, "failed to get HVM_PARAM_IOREQ_PFN\n");
+         return -1;
+@@ -125,7 +128,7 @@ static inline int xen_get_default_ioreq_server_info(xc_interface *xc,
+ 
+     *ioreq_pfn = param;
+ 
+-    rc = xc_get_hvm_param(xc, dom, HVM_PARAM_BUFIOREQ_PFN, &param);
++    rc = xc_get_hvm_param(xen_xc, dom, HVM_PARAM_BUFIOREQ_PFN, &param);
+     if (rc < 0) {
+         fprintf(stderr, "failed to get HVM_PARAM_BUFIOREQ_PFN\n");
+         return -1;
+@@ -133,7 +136,7 @@ static inline int xen_get_default_ioreq_server_info(xc_interface *xc,
+ 
+     *bufioreq_pfn = param;
+ 
+-    rc = xc_get_hvm_param(xc, dom, HVM_PARAM_BUFIOREQ_EVTCHN,
++    rc = xc_get_hvm_param(xen_xc, dom, HVM_PARAM_BUFIOREQ_EVTCHN,
+                           &param);
+     if (rc < 0) {
+         fprintf(stderr, "failed to get HVM_PARAM_BUFIOREQ_EVTCHN\n");
+@@ -156,63 +159,64 @@ static inline int xen_get_default_ioreq_server_info(xc_interface *xc,
+ 
+ typedef uint16_t ioservid_t;
+ 
+-static inline void xen_map_memory_section(xc_interface *xc, domid_t dom,
++static inline void xen_map_memory_section(domid_t dom,
+                                           ioservid_t ioservid,
+                                           MemoryRegionSection *section)
  {
--    return -1;
-+    int i;
-+    Xen9pfsDev *xen_9pdev = container_of(xendev, Xen9pfsDev, xendev);
-+
-+    g_free(xen_9pdev->id);
-+    g_free(xen_9pdev->tag);
-+    g_free(xen_9pdev->path);
-+    g_free(xen_9pdev->security_model);
-+
-+    for (i = 0; i < xen_9pdev->num_rings; i++) {
-+        if (xen_9pdev->rings[i].data != NULL) {
-+            xengnttab_unmap(xen_9pdev->xendev.gnttabdev,
-+                    xen_9pdev->rings[i].data,
-+                    (1 << xen_9pdev->rings[i].ring_order));
-+        }
-+        if (xen_9pdev->rings[i].intf != NULL) {
-+            xengnttab_unmap(xen_9pdev->xendev.gnttabdev,
-+                    xen_9pdev->rings[i].intf,
-+                    1);
-+        }
-+        if (xen_9pdev->rings[i].evtchndev > 0) {
-+            qemu_set_fd_handler(xenevtchn_fd(xen_9pdev->rings[i].evtchndev),
-+                    NULL, NULL, NULL);
-+            xenevtchn_unbind(xen_9pdev->rings[i].evtchndev,
-+                             xen_9pdev->rings[i].local_port);
-+        }
-+        if (xen_9pdev->rings[i].bh != NULL) {
-+            qemu_bh_delete(xen_9pdev->rings[i].bh);
-+        }
-+    }
-+    g_free(xen_9pdev->rings);
-+    return 0;
  }
  
- static int xen_9pfs_connect(struct XenDevice *xendev)
+-static inline void xen_unmap_memory_section(xc_interface *xc, domid_t dom,
++static inline void xen_unmap_memory_section(domid_t dom,
+                                             ioservid_t ioservid,
+                                             MemoryRegionSection *section)
  {
-+    int i;
-+    Xen9pfsDev *xen_9pdev = container_of(xendev, Xen9pfsDev, xendev);
-+    V9fsState *s = &xen_9pdev->state;
-+    QemuOpts *fsdev;
-+
-+    if (xenstore_read_fe_int(&xen_9pdev->xendev, "num-rings",
-+                             &xen_9pdev->num_rings) == -1 ||
-+        xen_9pdev->num_rings > MAX_RINGS || xen_9pdev->num_rings < 1) {
-+        return -1;
-+    }
-+
-+    xen_9pdev->rings = g_malloc0(xen_9pdev->num_rings * sizeof(Xen9pfsRing));
-+    for (i = 0; i < xen_9pdev->num_rings; i++) {
-+        char *str;
-+        int ring_order;
-+
-+        xen_9pdev->rings[i].priv = xen_9pdev;
-+        xen_9pdev->rings[i].evtchn = -1;
-+        xen_9pdev->rings[i].local_port = -1;
-+
-+        str = g_strdup_printf("ring-ref%u", i);
-+        if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
-+                                 &xen_9pdev->rings[i].ref) == -1) {
-+            goto out;
-+        }
-+        g_free(str);
-+        str = g_strdup_printf("event-channel-%u", i);
-+        if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
-+                                 &xen_9pdev->rings[i].evtchn) == -1) {
-+            goto out;
-+        }
-+        g_free(str);
-+
-+        xen_9pdev->rings[i].intf =  xengnttab_map_grant_ref(
-+                xen_9pdev->xendev.gnttabdev,
-+                xen_9pdev->xendev.dom,
-+                xen_9pdev->rings[i].ref,
-+                PROT_READ | PROT_WRITE);
-+        if (!xen_9pdev->rings[i].intf) {
-+            goto out;
-+        }
-+        ring_order = xen_9pdev->rings[i].intf->ring_order;
-+        if (ring_order > MAX_RING_ORDER) {
-+            goto out;
-+        }
-+        xen_9pdev->rings[i].ring_order = ring_order;
-+        xen_9pdev->rings[i].data = xengnttab_map_domain_grant_refs(
-+                xen_9pdev->xendev.gnttabdev,
-+                (1 << ring_order),
-+                xen_9pdev->xendev.dom,
-+                xen_9pdev->rings[i].intf->ref,
-+                PROT_READ | PROT_WRITE);
-+        if (!xen_9pdev->rings[i].data) {
-+            goto out;
-+        }
-+        xen_9pdev->rings[i].ring.in = xen_9pdev->rings[i].data;
-+        xen_9pdev->rings[i].ring.out = xen_9pdev->rings[i].data +
-+                                       XEN_FLEX_RING_SIZE(ring_order);
-+
-+        xen_9pdev->rings[i].bh = qemu_bh_new(xen_9pfs_bh, &xen_9pdev->rings[i]);
-+        xen_9pdev->rings[i].out_cons = 0;
-+        xen_9pdev->rings[i].out_size = 0;
-+        xen_9pdev->rings[i].inprogress = false;
-+
-+
-+        xen_9pdev->rings[i].evtchndev = xenevtchn_open(NULL, 0);
-+        if (xen_9pdev->rings[i].evtchndev == NULL) {
-+            goto out;
-+        }
-+        fcntl(xenevtchn_fd(xen_9pdev->rings[i].evtchndev), F_SETFD, FD_CLOEXEC);
-+        xen_9pdev->rings[i].local_port = xenevtchn_bind_interdomain
-+                                            (xen_9pdev->rings[i].evtchndev,
-+                                             xendev->dom,
-+                                             xen_9pdev->rings[i].evtchn);
-+        if (xen_9pdev->rings[i].local_port == -1) {
-+            xen_pv_printf(xendev, 0,
-+                          "xenevtchn_bind_interdomain failed port=%d\n",
-+                          xen_9pdev->rings[i].evtchn);
-+            goto out;
-+        }
-+        xen_pv_printf(xendev, 2, "bind evtchn port %d\n", xendev->local_port);
-+        qemu_set_fd_handler(xenevtchn_fd(xen_9pdev->rings[i].evtchndev),
-+                xen_9pfs_evtchn_event, NULL, &xen_9pdev->rings[i]);
-+    }
-+
-+    xen_9pdev->security_model = xenstore_read_be_str(xendev, "security_model");
-+    xen_9pdev->path = xenstore_read_be_str(xendev, "path");
-+    xen_9pdev->id = s->fsconf.fsdev_id =
-+        g_strdup_printf("xen9p%d", xendev->dev);
-+    xen_9pdev->tag = s->fsconf.tag = xenstore_read_fe_str(xendev, "tag");
-+    v9fs_register_transport(s, &xen_9p_transport);
-+    fsdev = qemu_opts_create(qemu_find_opts("fsdev"),
-+            s->fsconf.tag,
-+            1, NULL);
-+    qemu_opt_set(fsdev, "fsdriver", "local", NULL);
-+    qemu_opt_set(fsdev, "path", xen_9pdev->path, NULL);
-+    qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
-+    qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
-+    qemu_fsdev_add(fsdev);
-+    v9fs_device_realize_common(s, NULL);
-+
-     return 0;
-+
-+out:
-+    xen_9pfs_free(xendev);
-+    return -1;
  }
  
- static void xen_9pfs_alloc(struct XenDevice *xendev)
+-static inline void xen_map_io_section(xc_interface *xc, domid_t dom,
++static inline void xen_map_io_section(domid_t dom,
+                                       ioservid_t ioservid,
+                                       MemoryRegionSection *section)
  {
-+    xenstore_write_be_str(xendev, "versions", VERSIONS);
-+    xenstore_write_be_int(xendev, "max-rings", MAX_RINGS);
-+    xenstore_write_be_int(xendev, "max-ring-page-order", MAX_RING_ORDER);
  }
  
- static void xen_9pfs_disconnect(struct XenDevice *xendev)
+-static inline void xen_unmap_io_section(xc_interface *xc, domid_t dom,
++static inline void xen_unmap_io_section(domid_t dom,
+                                         ioservid_t ioservid,
+                                         MemoryRegionSection *section)
  {
-+    /* Dynamic hotplug of PV filesystems at runtime is not supported. */
  }
  
- struct XenDevOps xen_9pfs_ops = {
+-static inline void xen_map_pcidev(xc_interface *xc, domid_t dom,
++static inline void xen_map_pcidev(domid_t dom,
+                                   ioservid_t ioservid,
+                                   PCIDevice *pci_dev)
+ {
+ }
+ 
+-static inline void xen_unmap_pcidev(xc_interface *xc, domid_t dom,
++static inline void xen_unmap_pcidev(domid_t dom,
+                                     ioservid_t ioservid,
+                                     PCIDevice *pci_dev)
+ {
+ }
+ 
+-static inline void xen_create_ioreq_server(xc_interface *xc, domid_t dom,
++static inline void xen_create_ioreq_server(domid_t dom,
+                                            ioservid_t *ioservid)
+ {
+ }
+ 
+-static inline void xen_destroy_ioreq_server(xc_interface *xc, domid_t dom,
++static inline void xen_destroy_ioreq_server(domid_t dom,
+                                             ioservid_t ioservid)
+ {
+ }
+ 
+-static inline int xen_get_ioreq_server_info(xc_interface *xc, domid_t dom,
++static inline int xen_get_ioreq_server_info(domid_t dom,
+                                             ioservid_t ioservid,
+                                             xen_pfn_t *ioreq_pfn,
+                                             xen_pfn_t *bufioreq_pfn,
+                                             evtchn_port_t *bufioreq_evtchn)
+ {
+-    return xen_get_default_ioreq_server_info(xc, dom, ioreq_pfn, bufioreq_pfn,
++    return xen_get_default_ioreq_server_info(dom, ioreq_pfn,
++                                             bufioreq_pfn,
+                                              bufioreq_evtchn);
+ }
+ 
+-static inline int xen_set_ioreq_server_state(xc_interface *xc, domid_t dom,
++static inline int xen_set_ioreq_server_state(domid_t dom,
+                                              ioservid_t ioservid,
+                                              bool enable)
+ {
+@@ -224,7 +228,7 @@ static inline int xen_set_ioreq_server_state(xc_interface *xc, domid_t dom,
+ 
+ static bool use_default_ioreq_server;
+ 
+-static inline void xen_map_memory_section(xc_interface *xc, domid_t dom,
++static inline void xen_map_memory_section(domid_t dom,
+                                           ioservid_t ioservid,
+                                           MemoryRegionSection *section)
+ {
+@@ -237,11 +241,11 @@ static inline void xen_map_memory_section(xc_interface *xc, domid_t dom,
+     }
+ 
+     trace_xen_map_mmio_range(ioservid, start_addr, end_addr);
+-    xc_hvm_map_io_range_to_ioreq_server(xc, dom, ioservid, 1,
++    xc_hvm_map_io_range_to_ioreq_server(xen_xc, dom, ioservid, 1,
+                                         start_addr, end_addr);
+ }
+ 
+-static inline void xen_unmap_memory_section(xc_interface *xc, domid_t dom,
++static inline void xen_unmap_memory_section(domid_t dom,
+                                             ioservid_t ioservid,
+                                             MemoryRegionSection *section)
+ {
+@@ -253,13 +257,12 @@ static inline void xen_unmap_memory_section(xc_interface *xc, domid_t dom,
+         return;
+     }
+ 
+-
+     trace_xen_unmap_mmio_range(ioservid, start_addr, end_addr);
+-    xc_hvm_unmap_io_range_from_ioreq_server(xc, dom, ioservid, 1,
+-                                            start_addr, end_addr);
++    xc_hvm_unmap_io_range_from_ioreq_server(xen_xc, dom, ioservid,
++                                            1, start_addr, end_addr);
+ }
+ 
+-static inline void xen_map_io_section(xc_interface *xc, domid_t dom,
++static inline void xen_map_io_section(domid_t dom,
+                                       ioservid_t ioservid,
+                                       MemoryRegionSection *section)
+ {
+@@ -271,13 +274,12 @@ static inline void xen_map_io_section(xc_interface *xc, domid_t dom,
+         return;
+     }
+ 
+-
+     trace_xen_map_portio_range(ioservid, start_addr, end_addr);
+-    xc_hvm_map_io_range_to_ioreq_server(xc, dom, ioservid, 0,
++    xc_hvm_map_io_range_to_ioreq_server(xen_xc, dom, ioservid, 0,
+                                         start_addr, end_addr);
+ }
+ 
+-static inline void xen_unmap_io_section(xc_interface *xc, domid_t dom,
++static inline void xen_unmap_io_section(domid_t dom,
+                                         ioservid_t ioservid,
+                                         MemoryRegionSection *section)
+ {
+@@ -290,11 +292,11 @@ static inline void xen_unmap_io_section(xc_interface *xc, domid_t dom,
+     }
+ 
+     trace_xen_unmap_portio_range(ioservid, start_addr, end_addr);
+-    xc_hvm_unmap_io_range_from_ioreq_server(xc, dom, ioservid, 0,
+-                                            start_addr, end_addr);
++    xc_hvm_unmap_io_range_from_ioreq_server(xen_xc, dom, ioservid,
++                                            0, start_addr, end_addr);
+ }
+ 
+-static inline void xen_map_pcidev(xc_interface *xc, domid_t dom,
++static inline void xen_map_pcidev(domid_t dom,
+                                   ioservid_t ioservid,
+                                   PCIDevice *pci_dev)
+ {
+@@ -304,13 +306,13 @@ static inline void xen_map_pcidev(xc_interface *xc, domid_t dom,
+ 
+     trace_xen_map_pcidev(ioservid, pci_bus_num(pci_dev->bus),
+                          PCI_SLOT(pci_dev->devfn), PCI_FUNC(pci_dev->devfn));
+-    xc_hvm_map_pcidev_to_ioreq_server(xc, dom, ioservid,
+-                                      0, pci_bus_num(pci_dev->bus),
++    xc_hvm_map_pcidev_to_ioreq_server(xen_xc, dom, ioservid, 0,
++                                      pci_bus_num(pci_dev->bus),
+                                       PCI_SLOT(pci_dev->devfn),
+                                       PCI_FUNC(pci_dev->devfn));
+ }
+ 
+-static inline void xen_unmap_pcidev(xc_interface *xc, domid_t dom,
++static inline void xen_unmap_pcidev(domid_t dom,
+                                     ioservid_t ioservid,
+                                     PCIDevice *pci_dev)
+ {
+@@ -320,16 +322,17 @@ static inline void xen_unmap_pcidev(xc_interface *xc, domid_t dom,
+ 
+     trace_xen_unmap_pcidev(ioservid, pci_bus_num(pci_dev->bus),
+                            PCI_SLOT(pci_dev->devfn), PCI_FUNC(pci_dev->devfn));
+-    xc_hvm_unmap_pcidev_from_ioreq_server(xc, dom, ioservid,
+-                                          0, pci_bus_num(pci_dev->bus),
++    xc_hvm_unmap_pcidev_from_ioreq_server(xen_xc, dom, ioservid, 0,
++                                          pci_bus_num(pci_dev->bus),
+                                           PCI_SLOT(pci_dev->devfn),
+                                           PCI_FUNC(pci_dev->devfn));
+ }
+ 
+-static inline void xen_create_ioreq_server(xc_interface *xc, domid_t dom,
++static inline void xen_create_ioreq_server(domid_t dom,
+                                            ioservid_t *ioservid)
+ {
+-    int rc = xc_hvm_create_ioreq_server(xc, dom, HVM_IOREQSRV_BUFIOREQ_ATOMIC,
++    int rc = xc_hvm_create_ioreq_server(xen_xc, dom,
++                                        HVM_IOREQSRV_BUFIOREQ_ATOMIC,
+                                         ioservid);
+ 
+     if (rc == 0) {
+@@ -342,7 +345,7 @@ static inline void xen_create_ioreq_server(xc_interface *xc, domid_t dom,
+     trace_xen_default_ioreq_server();
+ }
+ 
+-static inline void xen_destroy_ioreq_server(xc_interface *xc, domid_t dom,
++static inline void xen_destroy_ioreq_server(domid_t dom,
+                                             ioservid_t ioservid)
+ {
+     if (use_default_ioreq_server) {
+@@ -350,27 +353,27 @@ static inline void xen_destroy_ioreq_server(xc_interface *xc, domid_t dom,
+     }
+ 
+     trace_xen_ioreq_server_destroy(ioservid);
+-    xc_hvm_destroy_ioreq_server(xc, dom, ioservid);
++    xc_hvm_destroy_ioreq_server(xen_xc, dom, ioservid);
+ }
+ 
+-static inline int xen_get_ioreq_server_info(xc_interface *xc, domid_t dom,
++static inline int xen_get_ioreq_server_info(domid_t dom,
+                                             ioservid_t ioservid,
+                                             xen_pfn_t *ioreq_pfn,
+                                             xen_pfn_t *bufioreq_pfn,
+                                             evtchn_port_t *bufioreq_evtchn)
+ {
+     if (use_default_ioreq_server) {
+-        return xen_get_default_ioreq_server_info(xc, dom, ioreq_pfn,
++        return xen_get_default_ioreq_server_info(dom, ioreq_pfn,
+                                                  bufioreq_pfn,
+                                                  bufioreq_evtchn);
+     }
+ 
+-    return xc_hvm_get_ioreq_server_info(xc, dom, ioservid,
++    return xc_hvm_get_ioreq_server_info(xen_xc, dom, ioservid,
+                                         ioreq_pfn, bufioreq_pfn,
+                                         bufioreq_evtchn);
+ }
+ 
+-static inline int xen_set_ioreq_server_state(xc_interface *xc, domid_t dom,
++static inline int xen_set_ioreq_server_state(domid_t dom,
+                                              ioservid_t ioservid,
+                                              bool enable)
+ {
+@@ -379,7 +382,8 @@ static inline int xen_set_ioreq_server_state(xc_interface *xc, domid_t dom,
+     }
+ 
+     trace_xen_ioreq_server_state(ioservid, enable);
+-    return xc_hvm_set_ioreq_server_state(xc, dom, ioservid, enable);
++    return xc_hvm_set_ioreq_server_state(xen_xc, dom, ioservid,
++                                         enable);
+ }
+ 
+ #endif
+diff --git a/xen-common.c b/xen-common.c
+index fd2c928..703e7a5 100644
+--- a/xen-common.c
++++ b/xen-common.c
+@@ -25,6 +25,9 @@
+     do { } while (0)
+ #endif
+ 
++xc_interface *xen_xc;
++xenforeignmemory_handle *xen_fmem;
++
+ static int store_dev_info(int domid, Chardev *cs, const char *string)
+ {
+     struct xs_handle *xs = NULL;
+diff --git a/xen-hvm.c b/xen-hvm.c
+index 5043beb..dbb8c66 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -454,10 +454,10 @@ static void xen_set_memory(struct MemoryListener *listener,
+         return;
+     } else {
+         if (add) {
+-            xen_map_memory_section(xen_xc, xen_domid, state->ioservid,
++            xen_map_memory_section(xen_domid, state->ioservid,
+                                    section);
+         } else {
+-            xen_unmap_memory_section(xen_xc, xen_domid, state->ioservid,
++            xen_unmap_memory_section(xen_domid, state->ioservid,
+                                      section);
+         }
+     }
+@@ -521,7 +521,7 @@ static void xen_io_add(MemoryListener *listener,
+ 
+     memory_region_ref(mr);
+ 
+-    xen_map_io_section(xen_xc, xen_domid, state->ioservid, section);
++    xen_map_io_section(xen_domid, state->ioservid, section);
+ }
+ 
+ static void xen_io_del(MemoryListener *listener,
+@@ -534,7 +534,7 @@ static void xen_io_del(MemoryListener *listener,
+         return;
+     }
+ 
+-    xen_unmap_io_section(xen_xc, xen_domid, state->ioservid, section);
++    xen_unmap_io_section(xen_domid, state->ioservid, section);
+ 
+     memory_region_unref(mr);
+ }
+@@ -547,7 +547,7 @@ static void xen_device_realize(DeviceListener *listener,
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         PCIDevice *pci_dev = PCI_DEVICE(dev);
+ 
+-        xen_map_pcidev(xen_xc, xen_domid, state->ioservid, pci_dev);
++        xen_map_pcidev(xen_domid, state->ioservid, pci_dev);
+     }
+ }
+ 
+@@ -559,7 +559,7 @@ static void xen_device_unrealize(DeviceListener *listener,
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         PCIDevice *pci_dev = PCI_DEVICE(dev);
+ 
+-        xen_unmap_pcidev(xen_xc, xen_domid, state->ioservid, pci_dev);
++        xen_unmap_pcidev(xen_domid, state->ioservid, pci_dev);
+     }
+ }
+ 
+@@ -1139,7 +1139,7 @@ static void xen_hvm_change_state_handler(void *opaque, int running,
+         xen_main_loop_prepare(state);
+     }
+ 
+-    xen_set_ioreq_server_state(xen_xc, xen_domid,
++    xen_set_ioreq_server_state(xen_domid,
+                                state->ioservid,
+                                (rstate == RUN_STATE_RUNNING));
+ }
+@@ -1227,7 +1227,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
+ 
+-    xen_create_ioreq_server(xen_xc, xen_domid, &state->ioservid);
++    xen_create_ioreq_server(xen_domid, &state->ioservid);
+ 
+     state->exit.notify = xen_exit_notifier;
+     qemu_add_exit_notifier(&state->exit);
+@@ -1238,7 +1238,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     state->wakeup.notify = xen_wakeup_notifier;
+     qemu_register_wakeup_notifier(&state->wakeup);
+ 
+-    rc = xen_get_ioreq_server_info(xen_xc, xen_domid, state->ioservid,
++    rc = xen_get_ioreq_server_info(xen_domid, state->ioservid,
+                                    &ioreq_pfn, &bufioreq_pfn,
+                                    &bufioreq_evtchn);
+     if (rc < 0) {
+@@ -1288,7 +1288,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     /* Note: cpus is empty at this point in init */
+     state->cpu_by_vcpu_id = g_malloc0(max_cpus * sizeof(CPUState *));
+ 
+-    rc = xen_set_ioreq_server_state(xen_xc, xen_domid, state->ioservid, true);
++    rc = xen_set_ioreq_server_state(xen_domid, state->ioservid, true);
+     if (rc < 0) {
+         error_report("failed to enable ioreq server info: error %d handle=%p",
+                      errno, xen_xc);
 -- 
 1.9.1
