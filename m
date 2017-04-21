@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXe-0001WA-TL
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:37:22 -0400
+	(envelope-from <kchamart@redhat.com>) id 1d1qcl-0006j1-Lu
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:42:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXd-00049K-IY
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:37:18 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3851
-	helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXc-00046R-Tx
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:37:17 -0400
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Sat, 22 Apr 2017 16:35:16 +0800
-Message-ID: <1492850128-17472-7-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
-References: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <kchamart@redhat.com>) id 1d1qcf-0006Kw-Ui
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:42:31 -0400
+Date: Fri, 21 Apr 2017 22:41:23 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170421204123.bdftoeuko6lwox3x@eukaryote>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v2 06/18] COLO: Add block replication
- into colo process
+Content-Type: multipart/mixed; boundary="y4bj7kkphpiih5ns"
+Content-Disposition: inline
+Subject: [Qemu-devel] [QEMU-2.8] Source QEMU crashes with: "bdrv_co_pwritev:
+ Assertion `!(bs->open_flags & BDRV_O_INACTIVE)' failed"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,184 +21,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: quintela@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max
-	Reitz <mreitz@redhat.com>, Xie Changlong <xiechanglong.d@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-Make sure master start block replication after slave's block
-replication started.
 
-Besides, we need to activate VM's blocks before goes into
-COLO state.
+--y4bj7kkphpiih5ns
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Xie Changlong <xiechanglong.d@gmail.com>
----
- migration/colo.c      | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- migration/migration.c | 16 ++++++++++++++++
- 2 files changed, 66 insertions(+)
+I have seen a bunch of reports about this assertion error (on source
+QEMU).  [At least I recall Greg Kurz mentioning this a week or so ago on
+#qemu, OFTC.]
 
-diff --git a/migration/colo.c b/migration/colo.c
-index c4fc865..9949293 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -23,6 +23,9 @@
- #include "qmp-commands.h"
- #include "net/colo-compare.h"
- #include "net/colo.h"
-+#include "qapi-event.h"
-+#include "block/block.h"
-+#include "replication.h"
- 
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-@@ -57,6 +60,7 @@ static void secondary_vm_do_failover(void)
- {
-     int old_state;
-     MigrationIncomingState *mis = migration_incoming_get_current();
-+    Error *local_err = NULL;
- 
-     /* Can not do failover during the process of VM's loading VMstate, Or
-      * it will break the secondary VM.
-@@ -74,6 +78,11 @@ static void secondary_vm_do_failover(void)
-     migrate_set_state(&mis->state, MIGRATION_STATUS_COLO,
-                       MIGRATION_STATUS_COMPLETED);
- 
-+    replication_stop_all(true, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+
-     if (!autostart) {
-         error_report("\"-S\" qemu option will be ignored in secondary side");
-         /* recover runstate to normal migration finish state */
-@@ -111,6 +120,7 @@ static void primary_vm_do_failover(void)
- {
-     MigrationState *s = migrate_get_current();
-     int old_state;
-+    Error *local_err = NULL;
- 
-     migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
-                       MIGRATION_STATUS_COMPLETED);
-@@ -134,6 +144,13 @@ static void primary_vm_do_failover(void)
-                      FailoverStatus_lookup[old_state]);
-         return;
-     }
-+
-+    replication_stop_all(true, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        local_err = NULL;
-+    }
-+
-     /* Notify COLO thread that failover work is finished */
-     qemu_sem_post(&s->colo_exit_sem);
- }
-@@ -345,6 +362,15 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-     s->params.shared = 0;
-     qemu_savevm_state_header(fb);
-     qemu_savevm_state_begin(fb, &s->params);
-+
-+    /* We call this API although this may do nothing on primary side. */
-+    qemu_mutex_lock_iothread();
-+    replication_do_checkpoint_all(&local_err);
-+    qemu_mutex_unlock_iothread();
-+    if (local_err) {
-+        goto out;
-+    }
-+
-     qemu_mutex_lock_iothread();
-     qemu_savevm_state_complete_precopy(fb, false);
-     qemu_mutex_unlock_iothread();
-@@ -451,6 +477,12 @@ static void colo_process_checkpoint(MigrationState *s)
-     object_unref(OBJECT(bioc));
- 
-     qemu_mutex_lock_iothread();
-+    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
-+    if (local_err) {
-+        qemu_mutex_unlock_iothread();
-+        goto out;
-+    }
-+
-     vm_start();
-     qemu_mutex_unlock_iothread();
-     trace_colo_vm_state_change("stop", "run");
-@@ -554,6 +586,7 @@ static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
-     case COLO_MESSAGE_GUEST_SHUTDOWN:
-         qemu_mutex_lock_iothread();
-         vm_stop_force_state(RUN_STATE_COLO);
-+        replication_stop_all(false, NULL);
-         qemu_system_shutdown_request_core();
-         qemu_mutex_unlock_iothread();
-         /*
-@@ -602,6 +635,11 @@ void *colo_process_incoming_thread(void *opaque)
-     object_unref(OBJECT(bioc));
- 
-     qemu_mutex_lock_iothread();
-+    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
-+    if (local_err) {
-+        qemu_mutex_unlock_iothread();
-+        goto out;
-+    }
-     vm_start();
-     trace_colo_vm_state_change("stop", "run");
-     qemu_mutex_unlock_iothread();
-@@ -682,6 +720,18 @@ void *colo_process_incoming_thread(void *opaque)
-             goto out;
-         }
- 
-+        replication_get_error_all(&local_err);
-+        if (local_err) {
-+            qemu_mutex_unlock_iothread();
-+            goto out;
-+        }
-+        /* discard colo disk buffer */
-+        replication_do_checkpoint_all(&local_err);
-+        if (local_err) {
-+            qemu_mutex_unlock_iothread();
-+            goto out;
-+        }
-+
-         vmstate_loading = false;
-         vm_start();
-         trace_colo_vm_state_change("stop", "run");
-diff --git a/migration/migration.c b/migration/migration.c
-index 2ade2aa..755ea54 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -394,6 +394,7 @@ static void process_incoming_migration_co(void *opaque)
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyState ps;
-     int ret;
-+    Error *local_err = NULL;
- 
-     mis->from_src_file = f;
-     mis->largest_page_size = qemu_ram_pagesize_largest();
-@@ -425,6 +426,21 @@ static void process_incoming_migration_co(void *opaque)
- 
-     /* we get COLO info, and know if we are in COLO mode */
-     if (!ret && migration_incoming_enable_colo()) {
-+        /* Make sure all file formats flush their mutable metadata */
-+        bdrv_invalidate_cache_all(&local_err);
-+        if (local_err) {
-+            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-+                    MIGRATION_STATUS_FAILED);
-+            error_report_err(local_err);
-+            migrate_decompress_threads_join();
-+            exit(EXIT_FAILURE);
-+        }
-+        /* If we get an error here, just exit qemu. */
-+        blk_resume_after_migration(&local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            exit(EXIT_FAILURE);
-+        }
-         mis->migration_incoming_co = qemu_coroutine_self();
-         qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
-              colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
+I just noticed this crash in upstream OpenStack CI environment.  This
+seems to occur (only intermittently, though) during live migration
+without shared-storage.
+
+[I've attached the complete source and destination QEMU command-line in
+a separate plain text file.]
+
+But here are the errors from source and destination QEMU:
+
+Source QEMU:
+-----------------------------------------------------------------------
+[...]
+2017-04-21 13:54:08.505+0000: initiating migration
+qemu-system-x86_64: /build/qemu-5OJ39u/qemu-2.8+dfsg/block/io.c:1514: bdrv_co_pwritev: Assertion `!(bs->open_flags & BDRV_O_INACTIVE)' failed.
+2017-04-21 13:54:08.791+0000: shutting down, reason=crashed
+-----------------------------------------------------------------------
+
+Destination QEMU:
+-----------------------------------------------------------------------
+[...]
+/build/qemu-5OJ39u/qemu-2.8+dfsg/nbd/server.c:nbd_receive_request():L710: read failed
+2017-04-21 13:54:08.792+0000: shutting down, reason=failed
+2017-04-21T13:54:08.793259Z qemu-system-x86_64: terminating on signal 15 from pid 12160 (/usr/sbin/libvirtd)
+-----------------------------------------------------------------------
+
+Any hints as how to how to deal with this in QEMU 2.8?
+
+FWIW, the upstream OpenStack CI only very recently moved to QEMU 2.8, so
+it is unlikely that the CI env will move to the just-released 2.9
+anytime soon.  (But there's work in progress to create a CI job that
+tests with QEMU 2.9.)
+
 -- 
-1.8.3.1
+/kashyap
+
+--y4bj7kkphpiih5ns
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="QEMU-command-line-for-source-and-dest-bdrv_co_pwritev.txt"
+Content-Transfer-Encoding: quoted-printable
+
+Source QEMU:
+-----------------------------------------------------------------------
+
+2017-04-21 13:54:03.632+0000: starting up libvirt version: 2.5.0, package: =
+3ubuntu5~cloud0 (Openstack Ubuntu Testing Bot <openstack-testing-bot@ubuntu=
+=2Ecom> Tue, 21 Mar 2017 21:54:49 +0000), qemu version: 2.8.0(Debian 1:2.8+=
+dfsg-3ubuntu2~cloud0), hostname: ubuntu-xenial-2-node-osic-cloud1-s3500-852=
+7282-539390
+LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/=
+bin QEMU_AUDIO_DRV=3Dnone /usr/bin/qemu-system-x86_64 -name guest=3Dinstanc=
+e-00000001,debug-threads=3Don -S -object secret,id=3DmasterKey0,format=3Dra=
+w,file=3D/var/lib/libvirt/qemu/domain-1-instance-00000001/master-key.aes -m=
+achine pc-i440fx-zesty,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff -m 64 -r=
+ealtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid 9bf9f268=
+-5242-4b1d-8fe6-ee348b2b8d3e -smbios 'type=3D1,manufacturer=3DOpenStack Fou=
+ndation,product=3DOpenStack Nova,version=3D15.0.4,serial=3D84d813aa-3d3e-42=
+50-bcac-cb0c61adf1ef,uuid=3D9bf9f268-5242-4b1d-8fe6-ee348b2b8d3e,family=3DV=
+irtual Machine' -display none -no-user-config -nodefaults -chardev socket,i=
+d=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-1-instance-00000001/mon=
+itor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcont=
+rol -rtc base=3Dutc -no-shutdown -boot strict=3Don -kernel /opt/stack/data/=
+nova/instances/9bf9f268-5242-4b1d-8fe6-ee348b2b8d3e/kernel -initrd /opt/sta=
+ck/data/nova/instances/9bf9f268-5242-4b1d-8fe6-ee348b2b8d3e/ramdisk -append=
+ 'root=3D/dev/vda console=3Dtty0 console=3DttyS0 no_timer_check' -device pi=
+ix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/opt/stack/d=
+ata/nova/instances/9bf9f268-5242-4b1d-8fe6-ee348b2b8d3e/disk,format=3Dqcow2=
+,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Dnone -device virtio-blk-pci,scsi=
+=3Doff,bus=3Dpci.0,addr=3D0x2,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,=
+bootindex=3D1 -add-fd set=3D0,fd=3D29 -chardev pty,id=3Dcharserial0,logfile=
+=3D/dev/fdset/0,logappend=3Don -device isa-serial,chardev=3Dcharserial0,id=
+=3Dserial0 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x3 =
+-msg timestamp=3Don
+char device redirected to /dev/pts/0 (label charserial0)
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
+2017-04-21 13:54:08.505+0000: initiating migration
+qemu-system-x86_64: /build/qemu-5OJ39u/qemu-2.8+dfsg/block/io.c:1514: bdrv_=
+co_pwritev: Assertion `!(bs->open_flags & BDRV_O_INACTIVE)' failed.
+2017-04-21 13:54:08.791+0000: shutting down, reason=3Dcrashed
+
+-----------------------------------------------------------------------
+
+Destination QEMU:
+-----------------------------------------------------------------------
+2017-04-21 13:54:08.142+0000: starting up libvirt version: 2.5.0, package: =
+3ubuntu5~cloud0 (Openstack Ubuntu Testing Bot <openstack-testing-bot@ubuntu=
+=2Ecom> Tue, 21 Mar 2017 21:54:49 +0000), qemu version: 2.8.0(Debian 1:2.8+=
+dfsg-3ubuntu2~cloud0), hostname: ubuntu-xenial-2-node-osic-cloud1-s3500-852=
+7282
+LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/=
+bin QEMU_AUDIO_DRV=3Dnone /usr/bin/qemu-system-x86_64 -name guest=3Dinstanc=
+e-00000001,debug-threads=3Don -S -object secret,id=3DmasterKey0,format=3Dra=
+w,file=3D/var/lib/libvirt/qemu/domain-2-instance-00000001/master-key.aes -m=
+achine pc-i440fx-zesty,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff -m 64 -r=
+ealtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid 9bf9f268=
+-5242-4b1d-8fe6-ee348b2b8d3e -smbios 'type=3D1,manufacturer=3DOpenStack Fou=
+ndation,product=3DOpenStack Nova,version=3D15.0.4,serial=3D84d813aa-3d3e-42=
+50-bcac-cb0c61adf1ef,uuid=3D9bf9f268-5242-4b1d-8fe6-ee348b2b8d3e,family=3DV=
+irtual Machine' -display none -no-user-config -nodefaults -chardev socket,i=
+d=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-2-instance-00000001/mon=
+itor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcont=
+rol -rtc base=3Dutc -no-shutdown -boot strict=3Don -kernel /opt/stack/data/=
+nova/instances/9bf9f268-5242-4b1d-8fe6-ee348b2b8d3e/kernel -initrd /opt/sta=
+ck/data/nova/instances/9bf9f268-5242-4b1d-8fe6-ee348b2b8d3e/ramdisk -append=
+ 'root=3D/dev/vda console=3Dtty0 console=3DttyS0 no_timer_check' -device pi=
+ix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/opt/stack/d=
+ata/nova/instances/9bf9f268-5242-4b1d-8fe6-ee348b2b8d3e/disk,format=3Dqcow2=
+,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Dnone -device virtio-blk-pci,scsi=
+=3Doff,bus=3Dpci.0,addr=3D0x2,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,=
+bootindex=3D1 -add-fd set=3D0,fd=3D35 -chardev pty,id=3Dcharserial0,logfile=
+=3D/dev/fdset/0,logappend=3Don -device isa-serial,chardev=3Dcharserial0,id=
+=3Dserial0 -incoming defer -device virtio-balloon-pci,id=3Dballoon0,bus=3Dp=
+ci.0,addr=3D0x3 -msg timestamp=3Don
+char device redirected to /dev/pts/1 (label charserial0)
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
+/build/qemu-5OJ39u/qemu-2.8+dfsg/nbd/server.c:nbd_receive_request():L710: r=
+ead failed
+2017-04-21 13:54:08.792+0000: shutting down, reason=3Dfailed
+2017-04-21T13:54:08.793259Z qemu-system-x86_64: terminating on signal 15 fr=
+om pid 12160 (/usr/sbin/libvirtd)
+-----------------------------------------------------------------------
+
+
+--y4bj7kkphpiih5ns--
