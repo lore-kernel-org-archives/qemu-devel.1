@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1d1Rrr-000577-Do
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:16:32 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1SPp-0001TK-5O
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1d1Rrp-0007wS-1Z
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:16:30 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:47413)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <li.ping288@zte.com.cn>) id 1d1Rrm-0007nh-PF
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:16:28 -0400
-From: Ping Li <li.ping288@zte.com.cn>
-Date: Sat, 22 Apr 2017 06:34:32 +0800
-Message-Id: <1492814072-4276-1-git-send-email-li.ping288@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] Block layer core: Fix qemu-img 'amend'
- subcommand failure of adjusting backing file in different path
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1SPm-0001KG-2y
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:51:37 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3384
+	helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1SPl-0001FG-7y
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:51:34 -0400
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-13-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170407171840.GE2623@work-vm> <58EB41C0.5060203@huawei.com>
+	<20170420090908.GE2094@work-vm>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58F9ABC0.2060701@huawei.com>
+Date: Fri, 21 Apr 2017 14:50:40 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170420090908.GE2094@work-vm>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/15] savevm: split the process of
+ different stages for loadvm/savevm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,77 +31,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Ping Li <li.ping288@zte.com.cn>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Juan Quintela <quintela@redhat.com>
 
-Currently, qemu-img 'amend' subcommand would fail to adjust image's backing file
-which was moved into different path.
-For example, parent.qcow2, the backing file of leaf.qcow2, first is at /home/a/,
-then moved into /home/b/. Originally this command,
- "qemu-img amend -f qcow2 -o backing_fmt=qcow2,backing_file=/home/b/parent.qcow2 leaf.qcow2",
- would fail because qemu-img failed to open the old backing file of leaf.qcow2.
-Give the 'amend' subcommand a '-u' option to not open the old backing file
- while openning leaf.qcow2.
+On 2017/4/20 17:09, Dr. David Alan Gilbert wrote:
+> * Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
+>> On 2017/4/8 1:18, Dr. David Alan Gilbert wrote:
+>>> * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+>>>> There are several stages during loadvm/savevm process. In different stage,
+>>>> migration incoming processes different types of sections.
+>>>> We want to control these stages more accuracy, it will benefit COLO
+>>>> performance, we don't have to save type of QEMU_VM_SECTION_START
+>>>> sections everytime while do checkpoint, besides, we want to separate
+>>>> the process of saving/loading memory and devices state.
+>>>>
+>>>> So we add three new helper functions: qemu_loadvm_state_begin(),
+>>>> qemu_load_device_state() and qemu_savevm_live_state() to achieve
+>>>> different process during migration.
+>>>>
+>>>> Besides, we make qemu_loadvm_state_main() and qemu_save_device_state()
+>>>> public.
+>>>>
+>>>> Cc: Juan Quintela <quintela@redhat.com>
+>>>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>>>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>>>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> ---
+>>>>    include/sysemu/sysemu.h |  6 ++++++
+>>>>    migration/savevm.c      | 55 ++++++++++++++++++++++++++++++++++++++++++-------
+>>>>    2 files changed, 54 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+>>>> index 7ed665a..95cae41 100644
+>>>> --- a/include/sysemu/sysemu.h
+>>>> +++ b/include/sysemu/sysemu.h
+>>>> @@ -132,7 +132,13 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
+>>>>                                               uint64_t *start_list,
+>>>>                                               uint64_t *length_list);
+>>>> +void qemu_savevm_live_state(QEMUFile *f);
+>>>> +int qemu_save_device_state(QEMUFile *f);
+>>>> +
+>>>>    int qemu_loadvm_state(QEMUFile *f);
+>>>> +int qemu_loadvm_state_begin(QEMUFile *f);
+>>>> +int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+>>>> +int qemu_load_device_state(QEMUFile *f);
+>>>>    extern int autostart;
+>>>> diff --git a/migration/savevm.c b/migration/savevm.c
+>>>> index 9c2d239..dac478b 100644
+>>>> --- a/migration/savevm.c
+>>>> +++ b/migration/savevm.c
+>>>> @@ -54,6 +54,7 @@
+>>>>    #include "qemu/cutils.h"
+>>>>    #include "io/channel-buffer.h"
+>>>>    #include "io/channel-file.h"
+>>>> +#include "migration/colo.h"
+>>>>    #ifndef ETH_P_RARP
+>>>>    #define ETH_P_RARP 0x8035
+>>>> @@ -1279,13 +1280,21 @@ done:
+>>>>        return ret;
+>>>>    }
+>>>> -static int qemu_save_device_state(QEMUFile *f)
+>>>> +void qemu_savevm_live_state(QEMUFile *f)
+>>>>    {
+>>>> -    SaveStateEntry *se;
+>>>> +    /* save QEMU_VM_SECTION_END section */
+>>>> +    qemu_savevm_state_complete_precopy(f, true);
+>>>> +    qemu_put_byte(f, QEMU_VM_EOF);
+>>>> +}
+>>>> -    qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
+>>>> -    qemu_put_be32(f, QEMU_VM_FILE_VERSION);
+>>>> +int qemu_save_device_state(QEMUFile *f)
+>>>> +{
+>>>> +    SaveStateEntry *se;
+>>>> +    if (!migration_in_colo_state()) {
+>>>> +        qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
+>>>> +        qemu_put_be32(f, QEMU_VM_FILE_VERSION);
+>>>> +    }
+>>> Note that got split out into qemu_savevm_state_header() at some point.
+>> Do you mean i should use the wrapper qemu_savevm_state_heade() here ?
+> Yes, I think so; best to keep the code that writes the file headers in one place.
 
-Signed-off-by: Li Ping<li.ping288@zte.com.cn>
----
- qemu-img.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+OK, Will fix in next version, thanks.
 
-diff --git a/qemu-img.c b/qemu-img.c
-index b220cf7..a32e9d6 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -145,9 +145,10 @@ static void QEMU_NORETURN help(void)
-            "  'snapshot_id_or_name' is deprecated, use 'snapshot_param'\n"
-            "    instead\n"
-            "  '-c' indicates that target image must be compressed (qcow format only)\n"
--           "  '-u' enables unsafe rebasing. It is assumed that old and new backing file\n"
--           "       match exactly. The image doesn't need a working backing file before\n"
--           "       rebasing in this case (useful for renaming the backing file)\n"
-+           "  '-u' enables unsafe rebasing or amending. It is assumed that old and new\n"
-+           "       backing file match exactly. For rebasing, the image doesn't need a working\n"
-+           "       backing file before rebasing in this case(useful for renaming the backing file).\n"
-+           "       For amending, it doesn't open backing file(useful for moving images)\n"
-            "  '-h' with or without a command shows this help and lists the supported formats\n"
-            "  '-p' show progress of command (only certain commands)\n"
-            "  '-q' use Quiet mode - do not print any output (except errors)\n"
-@@ -3538,7 +3539,7 @@ static int img_amend(int argc, char **argv)
-     QemuOptsList *create_opts = NULL;
-     QemuOpts *opts = NULL;
-     const char *fmt = NULL, *filename, *cache;
--    int flags;
-+    int flags = 0;
-     bool writethrough;
-     bool quiet = false, progress = false;
-     BlockBackend *blk = NULL;
-@@ -3553,7 +3554,7 @@ static int img_amend(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, ":ho:f:t:pq",
-+        c = getopt_long(argc, argv, ":ho:f:t:pqu",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-@@ -3595,6 +3596,9 @@ static int img_amend(int argc, char **argv)
-         case 'q':
-             quiet = true;
-             break;
-+        case 'u':
-+            flags |= BDRV_O_NO_BACKING;
-+            break;
-         case OPTION_OBJECT:
-             opts = qemu_opts_parse_noisily(&qemu_object_opts,
-                                            optarg, true);
-@@ -3639,7 +3643,7 @@ static int img_amend(int argc, char **argv)
-         goto out;
-     }
- 
--    flags = BDRV_O_RDWR;
-+    flags |= BDRV_O_RDWR;
-     ret = bdrv_parse_cache_mode(cache, &flags, &writethrough);
-     if (ret < 0) {
-         error_report("Invalid cache option: %s", cache);
--- 
-1.8.3.1
+> Dave
+>
+>>> Dave
+>>>
+>>>>        cpu_synchronize_all_states();
+>>>>        QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>>>> @@ -1336,8 +1345,6 @@ enum LoadVMExitCodes {
+>>>>        LOADVM_QUIT     =  1,
+>>>>    };
+>>>> -static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+>>>> -
+>>>>    /* ------ incoming postcopy messages ------ */
+>>>>    /* 'advise' arrives before any transfers just to tell us that a postcopy
+>>>>     * *might* happen - it might be skipped if precopy transferred everything
+>>>> @@ -1942,7 +1949,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>>>>        return 0;
+>>>>    }
+>>>> -static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+>>>> +int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+>>>>    {
+>>>>        uint8_t section_type;
+>>>>        int ret = 0;
+>>>> @@ -2080,6 +2087,40 @@ int qemu_loadvm_state(QEMUFile *f)
+>>>>        return ret;
+>>>>    }
+>>>> +int qemu_loadvm_state_begin(QEMUFile *f)
+>>>> +{
+>>>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>>>> +    Error *local_err = NULL;
+>>>> +    int ret;
+>>>> +
+>>>> +    if (qemu_savevm_state_blocked(&local_err)) {
+>>>> +        error_report_err(local_err);
+>>>> +        return -EINVAL;
+>>>> +    }
+>>>> +    /* Load QEMU_VM_SECTION_START section */
+>>>> +    ret = qemu_loadvm_state_main(f, mis);
+>>>> +    if (ret < 0) {
+>>>> +        error_report("Failed to loadvm begin work: %d", ret);
+>>>> +    }
+>>>> +    return ret;
+>>>> +}
+>>>> +
+>>>> +int qemu_load_device_state(QEMUFile *f)
+>>>> +{
+>>>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>>>> +    int ret;
+>>>> +
+>>>> +    /* Load QEMU_VM_SECTION_FULL section */
+>>>> +    ret = qemu_loadvm_state_main(f, mis);
+>>>> +    if (ret < 0) {
+>>>> +        error_report("Failed to load device state: %d", ret);
+>>>> +        return ret;
+>>>> +    }
+>>>> +
+>>>> +    cpu_synchronize_all_post_init();
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>>    int save_vmstate(Monitor *mon, const char *name)
+>>>>    {
+>>>>        BlockDriverState *bs, *bs1;
+>>>> -- 
+>>>> 1.8.3.1
+>>>>
+>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+>>> .
+>>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> .
+>
