@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Xf2-0002Tz-8i
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:41 -0400
+	(envelope-from <famz@redhat.com>) id 1d1Xf5-0002XK-LP
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Xf1-0000qg-FD
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53742)
+	(envelope-from <famz@redhat.com>) id 1d1Xf4-0000th-Lo
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43704)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d1Xf1-0000qW-8r
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:39 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d1Xf4-0000s8-F9
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:42 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 48C1F8E3FA
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:27:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6D719341562
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:27:41 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 20:27:09 +0800
-Message-Id: <20170421122710.15373-14-famz@redhat.com>
+Date: Fri, 21 Apr 2017 20:27:10 +0800
+Message-Id: <20170421122710.15373-15-famz@redhat.com>
 In-Reply-To: <20170421122710.15373-1-famz@redhat.com>
 References: <20170421122710.15373-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/14] qga: Make errp the last parameter of
- qga_vss_fsfreeze
+Subject: [Qemu-devel] [PATCH 14/14] error: Apply error_propagate_null.cocci
+ again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +35,55 @@ Cc: Markus Armbruster <armbru@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- qga/commands-win32.c | 4 ++--
- qga/vss-win32.c      | 2 +-
- qga/vss-win32.h      | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ hw/i386/pc.c          | 4 +---
+ hw/s390x/virtio-ccw.c | 4 +---
+ hw/usb/bus.c          | 4 +---
+ 3 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 19d72b2..04026ee 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -768,7 +768,7 @@ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
-     /* cannot risk guest agent blocking itself on a write in this state */
-     ga_set_frozen(ga_state);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index d24388e..f3b372a 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1104,9 +1104,7 @@ static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
+     object_property_set_bool(cpu, true, "realized", &local_err);
  
--    qga_vss_fsfreeze(&i, &local_err, true);
-+    qga_vss_fsfreeze(&i, true, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto error;
-@@ -807,7 +807,7 @@ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
-         return 0;
-     }
- 
--    qga_vss_fsfreeze(&i, errp, false);
-+    qga_vss_fsfreeze(&i, false, errp);
- 
-     ga_unset_frozen(ga_state);
-     return i;
-diff --git a/qga/vss-win32.c b/qga/vss-win32.c
-index 9a0e463..a80933c 100644
---- a/qga/vss-win32.c
-+++ b/qga/vss-win32.c
-@@ -145,7 +145,7 @@ void ga_uninstall_vss_provider(void)
+     object_unref(cpu);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-    }
++    error_propagate(errp, local_err);
  }
  
- /* Call VSS requester and freeze/thaw filesystems and applications */
--void qga_vss_fsfreeze(int *nr_volume, Error **errp, bool freeze)
-+void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
- {
-     const char *func_name = freeze ? "requester_freeze" : "requester_thaw";
-     QGAVSSRequesterFunc func;
-diff --git a/qga/vss-win32.h b/qga/vss-win32.h
-index 4d1d150..51d303a 100644
---- a/qga/vss-win32.h
-+++ b/qga/vss-win32.h
-@@ -21,6 +21,6 @@ bool vss_initialized(void);
- int ga_install_vss_provider(void);
- void ga_uninstall_vss_provider(void);
+ void pc_hot_add_cpu(const int64_t id, Error **errp)
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 00b3bde..ba4979c 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1757,9 +1757,7 @@ static void vhost_vsock_ccw_realize(VirtioCcwDevice *ccw_dev, Error **errp)
  
--void qga_vss_fsfreeze(int *nr_volume, Error **errp, bool freeze);
-+void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp);
+     qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
+     object_property_set_bool(OBJECT(vdev), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-    }
++    error_propagate(errp, err);
+ }
  
- #endif
+ static void vhost_vsock_ccw_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index 24f1608..5939b27 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -762,9 +762,7 @@ static void usb_set_attached(Object *obj, bool value, Error **errp)
+ 
+     if (value) {
+         usb_device_attach(dev, &err);
+-        if (err) {
+-            error_propagate(errp, err);
+-        }
++        error_propagate(errp, err);
+     } else {
+         usb_device_detach(dev);
+     }
 -- 
 2.9.3
