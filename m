@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d1Ptg-0000go-KW
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:10:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d1Q4R-0002w8-7P
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d1Ptc-0001Eg-1f
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:10:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24414)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d1Ptb-0001EV-Ob
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:10:11 -0400
-References: <1492482020-29745-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1492482020-29745-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<77fcaf8a-4352-feca-358e-379ff4006d18@redhat.com>
-	<67940fb7-9a96-255a-e316-a0ade3bb0397@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <c0bdd81e-4519-ca2e-19f5-5c7413bb80a8@redhat.com>
-Date: Fri, 21 Apr 2017 12:10:04 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d1Q4N-0005Di-AC
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:21:23 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d1Q4N-0005Da-5E
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 00:21:19 -0400
+Received: by mail-qt0-x241.google.com with SMTP id t52so10534771qtb.3
+	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 21:21:18 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20170420193616.36780-1-lepton@google.com>
+Message-ID: <b31b761d-71e1-c322-5b42-a29cd8882b75@amsat.org>
+Date: Fri, 21 Apr 2017 01:21:14 -0300
 MIME-Version: 1.0
-In-Reply-To: <67940fb7-9a96-255a-e316-a0ade3bb0397@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2 1/2] COLO-compare: Optimize tcp compare
- for option field
+In-Reply-To: <20170420193616.36780-1-lepton@google.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] Fix wrong mss bug.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, bian naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Tao Wu <ytht.net@gmail.com>, qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Tao Wu <lepton@google.com>
 
+Hi Tao,
 
+On 04/20/2017 04:36 PM, Tao Wu wrote:
+> This bug was introduced by https://github.com/qemu/qemu/commit/98c6305
 
-On 2017=E5=B9=B404=E6=9C=8821=E6=97=A5 11:48, Zhang Chen wrote:
+Nice catch...
+
+In 98c6305 Guillaume probably missed parentheses :S
+- mss = min(IF_MTU, IF_MRU) - sizeof(struct tcpiphdr);
++ mss = min(IF_MTU, IF_MRU) - sizeof(struct tcphdr) + sizeof(struct ip);
+
+This would have been ok:
+mss = min(IF_MTU, IF_MRU) - (sizeof(struct tcphdr) + sizeof(struct ip));
+
+"The MSS value to be sent in an MSS option should be equal to the 
+effective MTU minus the fixed IP and TCP headers." (RFC6691)
+
+> Signed-off-by: Tao Wu <lepton@google.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  slirp/tcp_input.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
->
-> On 04/20/2017 02:43 PM, Jason Wang wrote:
->>
->>
->> On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 10:20, Zhang Chen wrote:
->>> In this patch we support packet that have tcp options field.
->>> Add tcp options field check, If the packet have options
->>> field we just skip it and compare tcp payload,
->>> Avoid unnecessary checkpoint, optimize performance.
->>>
->>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>> ---
->>>   net/colo-compare.c | 27 ++++++++++++++++++++++++++-
->>>   1 file changed, 26 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/net/colo-compare.c b/net/colo-compare.c
->>> index aada04e..049f6f8 100644
->>> --- a/net/colo-compare.c
->>> +++ b/net/colo-compare.c
->>> @@ -248,7 +248,32 @@ static int colo_packet_compare_tcp(Packet=20
->>> *spkt, Packet *ppkt)
->>>           spkt->ip->ip_sum =3D ppkt->ip->ip_sum;
->>>       }
->>>   -    if (ptcp->th_sum =3D=3D stcp->th_sum) {
->>> +    /*
->>> +     * Check tcp header length for tcp option field.
->>> +     * th_off > 5 means this tcp packet have options field.
->>> +     * The tcp options maybe always different.
->>> +     * for example:
->>> +     * From RFC 7323.
->>> +     * TCP Timestamps option (TSopt):
->>> +     * Kind: 8
->>> +     *
->>> +     * Length: 10 bytes
->>> +     *
->>> +     * +-------+-------+---------------------+---------------------+
->>> +     *    |Kind=3D8 |  10   |   TS Value (TSval)  |TS Echo Reply=20
->>> (TSecr)|
->>> +     * +-------+-------+---------------------+---------------------+
->>> +     *       1       1              4                     4
->>> +     *
->>> +     * In this case the primary guest's timestamp always different=20
->>> with
->>> +     * the secondary guest's timestamp. COLO just focus on payload,
->>> +     * so we just need skip this field.h
->>
->> Probably a good explanation why we can skip this kind of header. But=20
->> it does not explain why we can skip all the rest?
->
-> I found tcp options have many kind number to express different meaning,
-> Here I just give an example for the different options situation,
-> and this field not the COLO-proxy focus on, COLO just concern the=20
-> payload.
-> Maybe we will optimize in the feature. Currently we want to make COLO=20
-> full-function
-> running in qemu upstream.
-
-I see, but the questions are:
-
-- If we see packets with different options (except for the case you=20
-explain above), does it mean primary and secondary run out of sync?
-- What will happen if we compare and ask for synchronization if we find=20
-options are not exactly the same?
-
-Thanks
-
->
-> Thanks
-> Zhang Chen
->
->>
->> Thanks
->>
->>> +     */
->>> +    if (ptcp->th_off > 5) {
->>> +        ptrdiff_t tcp_offset;
->>> +        tcp_offset =3D ppkt->transport_header - (uint8_t *)ppkt->dat=
-a
->>> +                     + (ptcp->th_off * 4);
->>> +        res =3D colo_packet_compare_common(ppkt, spkt, tcp_offset);
->>> +    } else if (ptcp->th_sum =3D=3D stcp->th_sum) {
->>>           res =3D colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
->>>       } else {
->>>           res =3D -1;
->>
->>
->>
->> .
->>
+> diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+> index edb98f06f3..07bcbdb2dd 100644
+> --- a/slirp/tcp_input.c
+> +++ b/slirp/tcp_input.c
+> @@ -1587,11 +1587,11 @@ tcp_mss(struct tcpcb *tp, u_int offer)
+>  	switch (so->so_ffamily) {
+>  	case AF_INET:
+>              mss = MIN(IF_MTU, IF_MRU) - sizeof(struct tcphdr)
+> -	                              + sizeof(struct ip);
+> +	                              - sizeof(struct ip);
+>  	    break;
+>  	case AF_INET6:
+>              mss = MIN(IF_MTU, IF_MRU) - sizeof(struct tcphdr)
+> -	                              + sizeof(struct ip6);
+> +	                              - sizeof(struct ip6);
+>  	    break;
+>  	default:
+>  	    g_assert_not_reached();
 >
