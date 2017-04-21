@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1d1kPu-0001a2-ON
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 22:04:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1d1lU8-0002iZ-LX
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 23:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1d1kPr-0005p1-DU
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 22:04:54 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3495
-	helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1d1kPq-0005ob-Pt
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 22:04:51 -0400
-Message-ID: <58FABA1A.6040309@huawei.com>
-Date: Sat, 22 Apr 2017 10:04:10 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
+	(envelope-from <eblake@redhat.com>) id 1d1lU5-0008Os-Gk
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 23:13:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49816)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d1lU5-0008GO-7D
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 23:13:17 -0400
+References: <20170421035606.448-1-famz@redhat.com>
+	<20170421035606.448-6-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b4d67c71-ee5b-a698-69e8-c2ed5bb56e3c@redhat.com>
+Date: Fri, 21 Apr 2017 10:37:54 -0500
 MIME-Version: 1.0
-References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
-	<1492392806-53720-14-git-send-email-longpeng2@huawei.com>
-	<33183CC9F5247A488A2544077AF19020DA238C15@DGGEMA505-MBS.china.huawei.com>
-	<58FAB39A.9080400@huawei.com>
-	<33183CC9F5247A488A2544077AF19020DA2392E2@DGGEMA505-MBS.china.huawei.com>
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA2392E2@DGGEMA505-MBS.china.huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 13/18] crypto: cipher: add
- afalg-backend cipher support
+In-Reply-To: <20170421035606.448-6-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bDJSk2Mj1g8JIuaQHR1XdStTQB2pjKEd4"
+Subject: Re: [Qemu-devel] [PATCH v14 05/20] qemu-img: Update documentation
+ for --share-rw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: "berrange@redhat.com" <berrange@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bDJSk2Mj1g8JIuaQHR1XdStTQB2pjKEd4
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <b4d67c71-ee5b-a698-69e8-c2ed5bb56e3c@redhat.com>
+Subject: Re: [PATCH v14 05/20] qemu-img: Update documentation for --share-rw
+References: <20170421035606.448-1-famz@redhat.com>
+ <20170421035606.448-6-famz@redhat.com>
+In-Reply-To: <20170421035606.448-6-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/20/2017 10:55 PM, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  qemu-img-cmds.hx | 48 ++++++++++++++++++++++++------------------------=
+
+>  1 file changed, 24 insertions(+), 24 deletions(-)
+>=20
+> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+> index 8ac7822..1b00bb8 100644
+> --- a/qemu-img-cmds.hx
+> +++ b/qemu-img-cmds.hx
+> @@ -10,15 +10,15 @@ STEXI
+>  ETEXI
+> =20
+>  DEF("bench", img_bench,
+> -    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_in=
+terval] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buff=
+er_size] [-S step_size] [-t cache] [-w] filename")
+> +    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_in=
+terval] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buff=
+er_size] [-S step_size] [-t cache] [-w] [--share-rw] filename")
+
+General comment - it seems that we favor the short-option spelling where
+one exists; should all of these updates mention -U instead of --share-rw?=
 
 
+Also, why did you rename it from --unsafe-reads in an earlier revision?
+After all, if I'm understanding this flag correctly, what you are asking
+for is the ability to read the image in spite of other simultaneous
+writers that may make your reads inconsistent.
 
-On 2017/4/22 9:51, Gonglei (Arei) wrote:
-
->>
->>
->> On 2017/4/21 20:59, Gonglei (Arei) wrote:
->>
->>>
->>>> -----Original Message-----
->>>> From: longpeng
->>>> Sent: Monday, April 17, 2017 9:33 AM
->>>> To: berrange@redhat.com
->>>> Cc: Gonglei (Arei); Huangweidong (C); armbru@redhat.com;
->>>> eblake@redhat.com; mst@redhat.com; qemu-devel@nongnu.org;
->> longpeng
->>>> Subject: [PATCH v2 for-2.10 13/18] crypto: cipher: add afalg-backend cipher
->>>> support
->>>>
->>>> Adds afalg-backend cipher support: introduces some private APIs
->>>> firstly, and then intergrates them into qcrypto_cipher_afalg_driver.
->>>>
->>>> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
->>>> ---
-
->>>> +    char *name;
->>>> +
->>>> +    name = qcrypto_afalg_cipher_format_name(alg, mode, errp);
->>>> +    if (!name) {
->>>> +        return NULL;
->>>> +    }
->>>> +
->>>> +    afalg = qcrypto_afalg_comm_alloc(AFALG_TYPE_CIPHER, name, errp);
->>>> +    if (!afalg) {
->>>> +        goto error;
->>>
->>> Leak memory pointed by name.
->>>
->>
->>
->> It won't.
->>
->> If failed, the control flow is error->cleanup->return, and 'name' will be freed
->> in 'cleanup'.
->>
->> If this method success, then the control flow is cleanup->return, 'name' will
->> also be freed.
->>
-> I see. I suggest you can store the name pointer in afalg, then its easily to free
-> it in qcrypto_afalg_comm_free(), and we can get enough information about
-> the alg/mode if needed.
-> 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-All right, thanks. :)
+--bDJSk2Mj1g8JIuaQHR1XdStTQB2pjKEd4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> Thanks,
-> -Gonglei
-> 
-> .
-> 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
+iQEcBAEBCAAGBQJY+idSAAoJEKeha0olJ0NqYEkH/3j8/qu5iDAF7TP3JT8xwm3t
+l4xjYZimRsRl83i3JltgzQjBwQKeh5ibxMRcMapW4jfnYPsneBp/1YeKz3zyIdkE
+7Ta8zfELIPoF1FxZMWyF1OJ84p+BMDgM5ynKTjS1FMz5jVFqPokOa3zhQBpafiqT
+7RW2IPW2qMH7GCxygAl1W8uf5Th1lEUPWViZhC8eMSJ/Mm4zD2OqrTfpolAP1BKO
+woHRY7EDxMUDGEJHi/uo1IODCfpvsfM3rIPTx7pg0olARNf/mZ65tpN4xEn/puWD
++OHi0i/272lRzjOB34KJrv4lMqR8ZuxMpLjhrEgn5yzefsU9QBdq+/imKiF7aQc=
+=I7VD
+-----END PGP SIGNATURE-----
 
--- 
-Regards,
-Longpeng(Mike)
+--bDJSk2Mj1g8JIuaQHR1XdStTQB2pjKEd4--
