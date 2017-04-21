@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1MIY-0003cB-De
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 20:19:43 -0400
+	(envelope-from <famz@redhat.com>) id 1d1MMb-0004bO-AP
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 20:23:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1MIX-0003jZ-EU
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 20:19:42 -0400
-Date: Fri, 21 Apr 2017 08:19:32 +0800
+	(envelope-from <famz@redhat.com>) id 1d1MMa-0005QZ-Di
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 20:23:53 -0400
+Date: Fri, 21 Apr 2017 08:23:44 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170421001932.GO24486@lemon.lan>
-References: <20170420040003.31074-1-famz@redhat.com>
-	<20170420153016.GI3227@redhat.com>
-	<20170420203250.GI4747@noname.redhat.com>
+Message-ID: <20170421002344.GP24486@lemon.lan>
+References: <1492719341-11476-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170420203250.GI4747@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] sheepdog: Set error when connection fails
+In-Reply-To: <1492719341-11476-1-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Remove PERL_PROG and BC_PROG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +23,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>
+Cc: qemu-block@nongnu.org, ymankad@redhat.com, qemu-devel@nongnu.org
 
-On Thu, 04/20 22:32, Kevin Wolf wrote:
-> Am 20.04.2017 um 17:30 hat Daniel P. Berrange geschrieben:
-> > On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
-> > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > ---
-> > >  block/sheepdog.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/block/sheepdog.c b/block/sheepdog.c
-> > > index fb9203e..7e889ee 100644
-> > > --- a/block/sheepdog.c
-> > > +++ b/block/sheepdog.c
-> > > @@ -608,6 +608,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
-> > >          qemu_set_nonblock(fd);
-> > >      } else {
-> > >          fd = -EIO;
-> > > +        error_setg(errp, "Failed to connect to sheepdog server");
-> > >      }
-> > 
-> > This doesn't make much sense to me. The lines just above the
-> > diff context have this:
-> > 
-> >     fd = socket_connect(s->addr, errp, NULL, NULL);
-
-Oops! :(
-
-> > 
-> > socket_connect should have already reported an error on "errp"
-> > in the scenario that 'fd == -1'.
+On Thu, 04/20 22:15, Kevin Wolf wrote:
+> We test for the presence of perl and bc and save their path in the
+> variables PERL_PROG and BC_PROG, but never actually make use of them.
+> Remove the checks and assignments so qemu-iotests can run even when
+> bc isn't installed.
 > 
-> By the way, am I the only one who thinks that having errp anywhere else
-> than as the last argument is bad style? I can easily see myself missing
-> that this functions sets it because the last argument is NULL.
+> Reported-by: Yash Mankad <ymankad@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/common.config | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
+> index 55527aa..1222e43 100644
+> --- a/tests/qemu-iotests/common.config
+> +++ b/tests/qemu-iotests/common.config
+> @@ -75,18 +75,12 @@ _fatal()
+>      exit 1
+>  }
+>  
+> -export PERL_PROG="`set_prog_path perl`"
+> -[ "$PERL_PROG" = "" ] && _fatal "perl not found"
+> -
 
-Hmm, exactly.. Socket code does this here and there, and it's hard to read.
+Then we should drop _readlink which is unused and uses perl too. Whether in this
+patch together or in a separate patch doesn't matter much, so:
 
-Fam
+>  export AWK_PROG="`set_prog_path awk`"
+>  [ "$AWK_PROG" = "" ] && _fatal "awk not found"
+>  
+>  export SED_PROG="`set_prog_path sed`"
+>  [ "$SED_PROG" = "" ] && _fatal "sed not found"
+>  
+> -export BC_PROG="`set_prog_path bc`"
+> -[ "$BC_PROG" = "" ] && _fatal "bc not found"
+> -
+
+The bc part is nice!
+
+>  export PS_ALL_FLAGS="-ef"
+>  
+>  if [ -z "$QEMU_PROG" ]; then
+> -- 
+> 1.8.3.1
+> 
+> 
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
