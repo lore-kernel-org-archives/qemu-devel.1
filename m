@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1d1VRG-0002v0-SY
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:05:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1VRN-0002xn-PA
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1d1VRC-0006h1-Tj
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:05:18 -0400
-Received: from mx2.suse.de ([195.135.220.15]:32801 helo=mx1.suse.de)
+	(envelope-from <pbonzini@redhat.com>) id 1d1VRJ-0006hr-Ny
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:05:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42652)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1d1VRC-0006gb-Mr
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:05:14 -0400
-References: <1491911135-216950-1-git-send-email-agraf@suse.de>
-	<CALMp9eT220btgiw7S-0cLswr1j=-OCuMwOAWuWS51EmNYYRuJw@mail.gmail.com>
-	<4622E361-52AB-40F2-9915-45C48F0DBCD2@suse.de>
-	<CALMp9eR7AWETNZA1pSBXW2BWcrJXPk-Y1hbNvwu2Vq7Dkf6AjA@mail.gmail.com>
-	<204f274d-697d-f9c6-8719-9bf91105f8b9@suse.de>
-	<20170412185249-mutt-send-email-mst@kernel.org>
-	<f1046a02-d42d-0b0b-47e0-f1055788a13b@redhat.com>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <03f26e4b-6355-602a-f817-2c1ab38de199@suse.de>
-Date: Fri, 21 Apr 2017 12:05:10 +0200
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d1VRJ-0006hk-F5
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:05:21 -0400
+References: <1492564532-91680-1-git-send-email-zhang.zhanghailiang@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <29b7830b-7ca4-e5a7-af9e-c1e3ffd2d978@redhat.com>
+Date: Fri, 21 Apr 2017 12:05:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <f1046a02-d42d-0b0b-47e0-f1055788a13b@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6] kvm: better MWAIT emulation for guests
+In-Reply-To: <1492564532-91680-1-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] char: Fix removing wrong GSource that
+ be found by fd_in_tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +27,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, LKML <linux-kernel@vger.kernel.org>, "Gabriel L. Somlo" <gsomlo@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Joerg Roedel <joro@8bytes.org>, linux-doc@vger.kernel.org, qemu-devel@nongnu.org
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, marcandre.lureau@redhat.com
+Cc: qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com
 
 
 
-On 21.04.17 12:02, Paolo Bonzini wrote:
->
->
-> On 12/04/2017 18:29, Michael S. Tsirkin wrote:
->> I don't really agree we do not need the PV flag. mwait on kvm is
->> different from mwait on bare metal in that you are heavily penalized by
->> scheduler for polling unless you configure the host just so.
->> HLT lets you give up the host CPU if you know you won't need
->> it for a long time.
->>
->> So while many people can get by with monitor cpuid (those that isolate
->> host CPUs) and it's a valuable option to have, I think a PV flag is also
->> a valuable option and can be set for more configurations.
->>
->> Guest has an idle driver calling mwait on short waits and halt on longer
->> ones.  I'm in fact testing an idle driver using such a PV flag and will
->> post when ready (after vacation ~3 weeks from now probably).
->
-> For now I think I'm removing the PV flag, making this just an
-> optimization of commit 87c00572ba05aa8c ("kvm: x86: emulate
-> monitor and mwait instructions as nop").
->
-> We can add it for 4.13 together with the idle driver.
+On 19/04/2017 03:15, zhanghailiang wrote:
+> We use fd_in_tag to find a GSource, fd_in_tag is return value of
+> g_source_attach(GSource *source, GMainContext *context), the return
+> value is unique only in the same context, so we may get the same
+> values with different 'context' parameters.
+>=20
+> It is no problem to find the right fd_in_tag by using
+>  g_main_context_find_source_by_id(GMainContext *context, guint source_i=
+d)
+> while there is only one default main context.
+>=20
+> But colo-compare tries to create/use its own context, and if we pass wr=
+ong
+> 'context' parameter with right fd_in_tag, we will find a wrong GSource =
+to handle.
+> We tried to fix the related codes in commit b43decb015a6efeb9e3cdbdb80f=
+6547ad7248a4c,
+> but it didn't fix the bug completely, because we still have some codes =
+didn't pass
+> *right* context parameter for remove_fd_in_watch().
+>=20
+> Let's fix it by record the GSource directly instead of fd_in_tag.
+>=20
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+> v3:
+>  - Use the full hash (Marc-Andr=C3=A9 Lureau)
+>  - Use a simply name 'gsource' instead of 'chr_gsource' (Marc-Andr=C3=A9=
+ Lureau)
+> ---
+>  chardev/char-fd.c     |  8 ++++----
+>  chardev/char-io.c     | 23 ++++++++---------------
+>  chardev/char-io.h     |  4 ++--
+>  chardev/char-pty.c    |  6 +++---
+>  chardev/char-socket.c |  8 ++++----
+>  chardev/char-udp.c    |  8 ++++----
+>  chardev/char.c        |  2 +-
+>  include/sysemu/char.h |  2 +-
+>  8 files changed, 27 insertions(+), 34 deletions(-)
+>=20
+> diff --git a/chardev/char-fd.c b/chardev/char-fd.c
+> index 548dd4c..0b182c5 100644
+> --- a/chardev/char-fd.c
+> +++ b/chardev/char-fd.c
+> @@ -58,7 +58,7 @@ static gboolean fd_chr_read(QIOChannel *chan, GIOCond=
+ition cond, void *opaque)
+>      ret =3D qio_channel_read(
+>          chan, (gchar *)buf, len, NULL);
+>      if (ret =3D=3D 0) {
+> -        remove_fd_in_watch(chr, NULL);
+> +        remove_fd_in_watch(chr);
+>          qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+>          return FALSE;
+>      }
+> @@ -89,9 +89,9 @@ static void fd_chr_update_read_handler(Chardev *chr,
+>  {
+>      FDChardev *s =3D FD_CHARDEV(chr);
+> =20
+> -    remove_fd_in_watch(chr, NULL);
+> +    remove_fd_in_watch(chr);
+>      if (s->ioc_in) {
+> -        chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc_in,
+> +        chr->gsource =3D io_add_watch_poll(chr, s->ioc_in,
+>                                             fd_chr_read_poll,
+>                                             fd_chr_read, chr,
+>                                             context);
+> @@ -103,7 +103,7 @@ static void char_fd_finalize(Object *obj)
+>      Chardev *chr =3D CHARDEV(obj);
+>      FDChardev *s =3D FD_CHARDEV(obj);
+> =20
+> -    remove_fd_in_watch(chr, NULL);
+> +    remove_fd_in_watch(chr);
+>      if (s->ioc_in) {
+>          object_unref(OBJECT(s->ioc_in));
+>      }
+> diff --git a/chardev/char-io.c b/chardev/char-io.c
+> index b4bb094..b5708ee 100644
+> --- a/chardev/char-io.c
+> +++ b/chardev/char-io.c
+> @@ -98,7 +98,7 @@ static GSourceFuncs io_watch_poll_funcs =3D {
+>      .finalize =3D io_watch_poll_finalize,
+>  };
+> =20
+> -guint io_add_watch_poll(Chardev *chr,
+> +GSource *io_add_watch_poll(Chardev *chr,
+>                          QIOChannel *ioc,
+>                          IOCanReadHandler *fd_can_read,
+>                          QIOChannelFunc fd_read,
+> @@ -106,7 +106,6 @@ guint io_add_watch_poll(Chardev *chr,
+>                          GMainContext *context)
+>  {
+>      IOWatchPoll *iwp;
+> -    int tag;
+>      char *name;
+> =20
+>      iwp =3D (IOWatchPoll *) g_source_new(&io_watch_poll_funcs,
+> @@ -122,21 +121,15 @@ guint io_add_watch_poll(Chardev *chr,
+>      g_source_set_name((GSource *)iwp, name);
+>      g_free(name);
+> =20
+> -    tag =3D g_source_attach(&iwp->parent, context);
+> +    g_source_attach(&iwp->parent, context);
+>      g_source_unref(&iwp->parent);
+> -    return tag;
+> +    return (GSource *)iwp;
+>  }
+> =20
+> -static void io_remove_watch_poll(guint tag, GMainContext *context)
+> +static void io_remove_watch_poll(GSource *source)
+>  {
+> -    GSource *source;
+>      IOWatchPoll *iwp;
+> =20
+> -    g_return_if_fail(tag > 0);
+> -
+> -    source =3D g_main_context_find_source_by_id(context, tag);
+> -    g_return_if_fail(source !=3D NULL);
+> -
+>      iwp =3D io_watch_poll_from_source(source);
+>      if (iwp->src) {
+>          g_source_destroy(iwp->src);
+> @@ -146,11 +139,11 @@ static void io_remove_watch_poll(guint tag, GMain=
+Context *context)
+>      g_source_destroy(&iwp->parent);
+>  }
+> =20
+> -void remove_fd_in_watch(Chardev *chr, GMainContext *context)
+> +void remove_fd_in_watch(Chardev *chr)
+>  {
+> -    if (chr->fd_in_tag) {
+> -        io_remove_watch_poll(chr->fd_in_tag, context);
+> -        chr->fd_in_tag =3D 0;
+> +    if (chr->gsource) {
+> +        io_remove_watch_poll(chr->gsource);
+> +        chr->gsource =3D NULL;
+>      }
+>  }
+> =20
+> diff --git a/chardev/char-io.h b/chardev/char-io.h
+> index 842be56..55973a7 100644
+> --- a/chardev/char-io.h
+> +++ b/chardev/char-io.h
+> @@ -29,14 +29,14 @@
+>  #include "sysemu/char.h"
+> =20
+>  /* Can only be used for read */
+> -guint io_add_watch_poll(Chardev *chr,
+> +GSource *io_add_watch_poll(Chardev *chr,
+>                          QIOChannel *ioc,
+>                          IOCanReadHandler *fd_can_read,
+>                          QIOChannelFunc fd_read,
+>                          gpointer user_data,
+>                          GMainContext *context);
+> =20
+> -void remove_fd_in_watch(Chardev *chr, GMainContext *context);
+> +void remove_fd_in_watch(Chardev *chr);
+> =20
+>  int io_channel_send(QIOChannel *ioc, const void *buf, size_t len);
+> =20
+> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+> index a6337be..581ab34 100644
+> --- a/chardev/char-pty.c
+> +++ b/chardev/char-pty.c
+> @@ -199,7 +199,7 @@ static void pty_chr_state(Chardev *chr, int connect=
+ed)
+>              g_source_remove(s->open_tag);
+>              s->open_tag =3D 0;
+>          }
+> -        remove_fd_in_watch(chr, NULL);
+> +        remove_fd_in_watch(chr);
+>          s->connected =3D 0;
+>          /* (re-)connect poll interval for idle guests: once per second=
+.
+>           * We check more frequently in case the guests sends data to
+> @@ -215,8 +215,8 @@ static void pty_chr_state(Chardev *chr, int connect=
+ed)
+>              s->connected =3D 1;
+>              s->open_tag =3D g_idle_add(qemu_chr_be_generic_open_func, =
+chr);
+>          }
+> -        if (!chr->fd_in_tag) {
+> -            chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc,
+> +        if (!chr->gsource) {
+> +            chr->gsource =3D io_add_watch_poll(chr, s->ioc,
+>                                                 pty_chr_read_poll,
+>                                                 pty_chr_read,
+>                                                 chr, NULL);
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 36ab0d6..d8de051 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -327,7 +327,7 @@ static void tcp_chr_free_connection(Chardev *chr)
+>      }
+> =20
+>      tcp_set_msgfds(chr, NULL, 0);
+> -    remove_fd_in_watch(chr, NULL);
+> +    remove_fd_in_watch(chr);
+>      object_unref(OBJECT(s->sioc));
+>      s->sioc =3D NULL;
+>      object_unref(OBJECT(s->ioc));
+> @@ -484,7 +484,7 @@ static void tcp_chr_connect(void *opaque)
+> =20
+>      s->connected =3D 1;
+>      if (s->ioc) {
+> -        chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc,
+> +        chr->gsource =3D io_add_watch_poll(chr, s->ioc,
+>                                             tcp_chr_read_poll,
+>                                             tcp_chr_read,
+>                                             chr, NULL);
+> @@ -501,9 +501,9 @@ static void tcp_chr_update_read_handler(Chardev *ch=
+r,
+>          return;
+>      }
+> =20
+> -    remove_fd_in_watch(chr, NULL);
+> +    remove_fd_in_watch(chr);
+>      if (s->ioc) {
+> -        chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc,
+> +        chr->gsource =3D io_add_watch_poll(chr, s->ioc,
+>                                             tcp_chr_read_poll,
+>                                             tcp_chr_read, chr,
+>                                             context);
+> diff --git a/chardev/char-udp.c b/chardev/char-udp.c
+> index 804bd22..12240e5 100644
+> --- a/chardev/char-udp.c
+> +++ b/chardev/char-udp.c
+> @@ -81,7 +81,7 @@ static gboolean udp_chr_read(QIOChannel *chan, GIOCon=
+dition cond, void *opaque)
+>      ret =3D qio_channel_read(
+>          s->ioc, (char *)s->buf, sizeof(s->buf), NULL);
+>      if (ret <=3D 0) {
+> -        remove_fd_in_watch(chr, NULL);
+> +        remove_fd_in_watch(chr);
+>          return FALSE;
+>      }
+>      s->bufcnt =3D ret;
+> @@ -101,9 +101,9 @@ static void udp_chr_update_read_handler(Chardev *ch=
+r,
+>  {
+>      UdpChardev *s =3D UDP_CHARDEV(chr);
+> =20
+> -    remove_fd_in_watch(chr, NULL);
+> +    remove_fd_in_watch(chr);
+>      if (s->ioc) {
+> -        chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc,
+> +        chr->gsource =3D io_add_watch_poll(chr, s->ioc,
+>                                             udp_chr_read_poll,
+>                                             udp_chr_read, chr,
+>                                             context);
+> @@ -115,7 +115,7 @@ static void char_udp_finalize(Object *obj)
+>      Chardev *chr =3D CHARDEV(obj);
+>      UdpChardev *s =3D UDP_CHARDEV(obj);
+> =20
+> -    remove_fd_in_watch(chr, NULL);
+> +    remove_fd_in_watch(chr);
+>      if (s->ioc) {
+>          object_unref(OBJECT(s->ioc));
+>      }
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 3df1163..54cd5f4 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -560,7 +560,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+>      cc =3D CHARDEV_GET_CLASS(s);
+>      if (!opaque && !fd_can_read && !fd_read && !fd_event) {
+>          fe_open =3D 0;
+> -        remove_fd_in_watch(s, context);
+> +        remove_fd_in_watch(s);
+>      } else {
+>          fe_open =3D 1;
+>      }
+> diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+> index 450881d..84f5c23 100644
+> --- a/include/sysemu/char.h
+> +++ b/include/sysemu/char.h
+> @@ -93,7 +93,7 @@ struct Chardev {
+>      char *filename;
+>      int logfd;
+>      int be_open;
+> -    guint fd_in_tag;
+> +    GSource *gsource;
+>      DECLARE_BITMAP(features, QEMU_CHAR_FEATURE_LAST);
+>      QTAILQ_ENTRY(Chardev) next;
+>  };
+>=20
 
-I think that's a perfectly reasonable approach, yes. We can always add 
-the PV flag with the driver.
+Queued for 2.10, thanks.
 
-Thanks a lot!
-
-
-Alex
+Paolo
