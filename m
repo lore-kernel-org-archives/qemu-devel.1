@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d1LI5-0003YR-IC
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 19:15:10 -0400
+	(envelope-from <famz@redhat.com>) id 1d1MIY-0003cB-De
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 20:19:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d1LI2-0006QZ-DU
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 19:15:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36470
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d1LI2-0006QD-6a
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 19:15:06 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3KNE85e037120
-	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 19:15:05 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29xvy2ar77-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 20 Apr 2017 19:15:05 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 20 Apr 2017 19:15:04 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <famz@redhat.com>) id 1d1MIX-0003jZ-EU
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 20:19:42 -0400
+Date: Fri, 21 Apr 2017 08:19:32 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170421001932.GO24486@lemon.lan>
+References: <20170420040003.31074-1-famz@redhat.com>
+	<20170420153016.GI3227@redhat.com>
+	<20170420203250.GI4747@noname.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Thu, 20 Apr 2017 18:14:54 -0500
-Message-Id: <149273009469.5829.1877204641747528305@loki>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.8.1.1 CVE update released
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170420203250.GI4747@noname.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] sheepdog: Set error when connection fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,32 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>
 
-Hi everyone,
+On Thu, 04/20 22:32, Kevin Wolf wrote:
+> Am 20.04.2017 um 17:30 hat Daniel P. Berrange geschrieben:
+> > On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > ---
+> > >  block/sheepdog.c | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > > 
+> > > diff --git a/block/sheepdog.c b/block/sheepdog.c
+> > > index fb9203e..7e889ee 100644
+> > > --- a/block/sheepdog.c
+> > > +++ b/block/sheepdog.c
+> > > @@ -608,6 +608,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+> > >          qemu_set_nonblock(fd);
+> > >      } else {
+> > >          fd = -EIO;
+> > > +        error_setg(errp, "Failed to connect to sheepdog server");
+> > >      }
+> > 
+> > This doesn't make much sense to me. The lines just above the
+> > diff context have this:
+> > 
+> >     fd = socket_connect(s->addr, errp, NULL, NULL);
 
-A security update to the QEMU 2.8 series is now available at:
+Oops! :(
 
-  http://wiki.qemu.org/download/qemu-2.8.1.1.tar.xz
-  http://wiki.qemu.org/download/qemu-2.8.1.1.tar.xz.sig
+> > 
+> > socket_connect should have already reported an error on "errp"
+> > in the scenario that 'fd == -1'.
+> 
+> By the way, am I the only one who thinks that having errp anywhere else
+> than as the last argument is bad style? I can easily see myself missing
+> that this functions sets it because the last argument is NULL.
 
-v2.8.1.1 is now tagged in the official qemu.git repository,
-and the stable-2.8 branch has been updated accordingly:
+Hmm, exactly.. Socket code does this here and there, and it's hard to read.
 
-  http://git.qemu.org/?p=3Dqemu.git;a=3Dshortlog;h=3Drefs/heads/stable-2.8
-
-This release includes security fixes for:
-
-  virtfs/virtio-9p shared directories (CVE-2017-7471)  =
-
-
-Please see the changelogs and relevant CVEs for more information, and
-update accordingly.
-
-Thank you to everyone involved!
-
-CHANGELOG:
-
-d1b725e: Update version for 2.8.1.1 release (Michael Roth)
-96bae14: 9pfs: local: set the path of the export root to "." (Greg Kurz)
+Fam
