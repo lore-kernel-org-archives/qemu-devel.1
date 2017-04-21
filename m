@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d1YYr-0002Ol-E5
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:25:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1d1YbQ-00049i-1Z
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d1YYq-00031n-E2
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:25:21 -0400
-Date: Fri, 21 Apr 2017 15:25:09 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170421132509.GD4318@noname.redhat.com>
-References: <20170421035606.448-1-famz@redhat.com>
-	<20170421035606.448-5-famz@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d1YbP-0004FO-6x
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 09:28:00 -0400
+References: <1492761662-5644-1-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1f5db49f-0791-44a8-8482-59068eb65b2d@redhat.com>
+Date: Fri, 21 Apr 2017 08:27:48 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170421035606.448-5-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v14 04/20] qemu-img: Add --share-rw option
- to subcommands
+In-Reply-To: <1492761662-5644-1-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ARog1q0nGwipaawcbfOHbceTwPLWp7LrB"
+Subject: Re: [Qemu-devel] [PATCH] qemu_iotests: Remove _readlink()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,126 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Am 21.04.2017 um 05:55 hat Fam Zheng geschrieben:
-> Similar to share-rw qdev property, this will force the opened images to
-> allow shared write permission of other programs.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ARog1q0nGwipaawcbfOHbceTwPLWp7LrB
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <1f5db49f-0791-44a8-8482-59068eb65b2d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu_iotests: Remove _readlink()
+References: <1492761662-5644-1-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1492761662-5644-1-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-General observation: We were considering to make share-rw require
-read-only. Some of the commands converted here always open the image
-read-write, so if we go ahead with the restriction, will the option
-become useless in many of the subcommands?
+On 04/21/2017 03:01 AM, Kevin Wolf wrote:
+> It is unused.
 
->  qemu-img.c | 155 +++++++++++++++++++++++++++++++++++++++++++++++--------------
->  1 file changed, 119 insertions(+), 36 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index ed24371..df88a79 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -28,6 +28,7 @@
->  #include "qapi/qobject-output-visitor.h"
->  #include "qapi/qmp/qerror.h"
->  #include "qapi/qmp/qjson.h"
-> +#include "qapi/qmp/qbool.h"
->  #include "qemu/cutils.h"
->  #include "qemu/config-file.h"
->  #include "qemu/option.h"
-> @@ -283,12 +284,15 @@ static int img_open_password(BlockBackend *blk, const char *filename,
->  
->  static BlockBackend *img_open_opts(const char *optstr,
->                                     QemuOpts *opts, int flags, bool writethrough,
-> -                                   bool quiet)
-> +                                   bool quiet, bool share_rw)
->  {
->      QDict *options;
->      Error *local_err = NULL;
->      BlockBackend *blk;
->      options = qemu_opts_to_qdict(opts, NULL);
-> +    if (share_rw) {
-> +        qdict_put(options, BDRV_OPT_FORCE_SHARED_WRITE, qbool_from_bool(true));
-> +    }
+Might be worth also mentioning that it was the file's only client of
+perl, so removing it also makes it easier to justify removing a check
+for $PERL.
 
-It's interesting that you chose a conditional qdict_put for true rather
-than an unconditional one for share_rw here. The difference becomes
-visible when someone sets both -U and share-rw=off; we need to decide
-which one should take precedence.
+>=20
+> Suggestetd-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/common.config | 18 ------------------
+>  1 file changed, 18 deletions(-)
 
-Generally, we always give explicit options the precedence, so if we were
-to follow suit here, we would set share-rw here only if the option isn't
-already set. For strings, we have qdict_set_default_str() to achieve
-this, for bools we probably need a new function (or does Eric's series
-which introduces qdict_put_bool() also introduce a similar function,
-like some qdict_set_default_bool?)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
->      blk = blk_new_open(NULL, NULL, options, flags, &local_err);
->      if (!blk) {
->          error_reportf_err(local_err, "Could not open '%s': ", optstr);
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> @@ -2985,6 +3035,7 @@ static int img_rebase(int argc, char **argv)
->      int c, flags, src_flags, ret;
->      bool writethrough, src_writethrough;
->      int unsafe = 0;
-> +    bool share_rw = 0;
 
-Not false?
+--ARog1q0nGwipaawcbfOHbceTwPLWp7LrB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->      int progress = 0;
->      bool quiet = false;
->      Error *local_err = NULL;
-> @@ -3001,9 +3052,10 @@ static int img_rebase(int argc, char **argv)
->              {"help", no_argument, 0, 'h'},
->              {"object", required_argument, 0, OPTION_OBJECT},
->              {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-> +            {"share-rw", no_argument, 0, 'U'},
->              {0, 0, 0, 0}
->          };
-> -        c = getopt_long(argc, argv, ":hf:F:b:upt:T:q",
-> +        c = getopt_long(argc, argv, ":hf:F:b:upt:T:qU",
->                          long_options, NULL);
->          if (c == -1) {
->              break;
-> @@ -3053,6 +3105,9 @@ static int img_rebase(int argc, char **argv)
->          case OPTION_IMAGE_OPTS:
->              image_opts = true;
->              break;
-> +        case 'U':
-> +            share_rw = true;
-> +            break;
->          }
->      }
->  
-> @@ -3101,7 +3156,8 @@ static int img_rebase(int argc, char **argv)
->       * Ignore the old backing file for unsafe rebase in case we want to correct
->       * the reference to a renamed or moved backing file.
->       */
-> -    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet);
-> +    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
-> +                   share_rw);
->      if (!blk) {
->          ret = -1;
->          goto out;
-> @@ -3126,6 +3182,9 @@ static int img_rebase(int argc, char **argv)
->              qdict_put(options, "driver", qstring_from_str(bs->backing_format));
->          }
->  
-> +        if (share_rw) {
-> +            qdict_put(options, BDRV_OPT_FORCE_SHARED_WRITE, qbool_from_bool(true));
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-This is longer than 80 lines and wrapping wouldn't make it unreadable. I
-think there are more similar instances in this series (even though you
-replied to the patchew mail that they are intentional).
+iQEcBAEBCAAGBQJY+gjUAAoJEKeha0olJ0NqJqAH/itIFEclCGqXeXI3xfvlWH3u
+2bTPeYXyhT9UC+wFhC9codx8j17FOQaVAVMvwyuwbgwA46Acphk9sLq3yhngwK9g
++klLFIKphv1NocnGIJZU0AbQ9ku2fkQFLk7xpjyHxcCv2E+bBc9AAUMm2iG4L1O4
+i2E4TYT2pf9k3GPZZRpJW+qwpojqJefcE3hNZ9zNO8tqo0BItZmOy1Gb0cPD5ebY
+AXHC2pVy9KNyVHx5cFO9DUaD9rxeaj5mmWvLM9P+QI0ssbtQcLfXKEAF/suFoLLj
+G1X/YcoUzNOP9w3TM1O2npF4u67Gc5awkTOzsniefZkObJNennGgUaBx6zR+NkE=
+=ga33
+-----END PGP SIGNATURE-----
 
-> +        }
->          bdrv_get_backing_filename(bs, backing_name, sizeof(backing_name));
->          blk_old_backing = blk_new_open(backing_name, NULL,
->                                         options, src_flags, &local_err);
-
-Why don't you apply share_rw to blk_new_backing, which is opened a few
-lines down from here?
-
-Kevin
+--ARog1q0nGwipaawcbfOHbceTwPLWp7LrB--
