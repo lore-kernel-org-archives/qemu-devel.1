@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1XPR-0005c1-0P
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:11:34 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1XTn-00017s-Qv
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1XPN-0003L4-NO
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:11:32 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3388
-	helo=dggrg03-dlp.huawei.com)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1XTk-0004so-IL
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:16:03 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3450
+	helo=dggrg02-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1XPM-0003Js-IU
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:11:29 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1XTj-0004sG-U7
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:16:00 -0400
 From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 21 Apr 2017 12:11:06 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA238A2E@DGGEMA505-MBS.china.huawei.com>
+Date: Fri, 21 Apr 2017 12:15:40 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA238A62@DGGEMA505-MBS.china.huawei.com>
 References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
-	<1492392806-53720-8-git-send-email-longpeng2@huawei.com>
-In-Reply-To: <1492392806-53720-8-git-send-email-longpeng2@huawei.com>
+	<1492392806-53720-9-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1492392806-53720-9-git-send-email-longpeng2@huawei.com>
 Content-Language: zh-CN
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 07/18] crypto: hmac: move
- crypto/hmac.h into include/crypto/
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 08/18] crypto: hmac: introduce
+ qcrypto_hmac_ctx_new for gcrypt-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,369 +40,98 @@ Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "armbru@redhat.com" <armbru@r
 > To: berrange@redhat.com
 > Cc: Gonglei (Arei); Huangweidong (C); armbru@redhat.com;
 > eblake@redhat.com; mst@redhat.com; qemu-devel@nongnu.org; longpeng
-> Subject: [PATCH v2 for-2.10 07/18] crypto: hmac: move crypto/hmac.h into
-> include/crypto/
+> Subject: [PATCH v2 for-2.10 08/18] crypto: hmac: introduce
+> qcrypto_hmac_ctx_new for gcrypt-backend
 >=20
-> Moves crypto/hmac.h into include/crypto/, likes cipher.h and hash.h
+> 1) Fix a handle-leak problem in qcrypto_hmac_new(), doesn't free
+>    ctx->handle if gcry_mac_setkey fails.
+>=20
+> 2) Extracts qcrypto_hmac_ctx_new() from qcrypto_hmac_new() for
+>    gcrypt-backend impls.
 >=20
 > Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 > ---
->  crypto/hmac.h         | 166 --------------------------------------------=
-------
->  include/crypto/hmac.h | 166
-> ++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 166 insertions(+), 166 deletions(-)
->  delete mode 100644 crypto/hmac.h
->  create mode 100644 include/crypto/hmac.h
+>  crypto/hmac-gcrypt.c | 35 +++++++++++++++++++++++++----------
+>  1 file changed, 25 insertions(+), 10 deletions(-)
 >=20
 
 Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 
 
-> diff --git a/crypto/hmac.h b/crypto/hmac.h
-> deleted file mode 100644
-> index 0d3acd7..0000000
-> --- a/crypto/hmac.h
-> +++ /dev/null
-> @@ -1,166 +0,0 @@
-> -/*
-> - * QEMU Crypto hmac algorithms
-> - *
-> - * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
-> - *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or
-> - * (at your option) any later version.  See the COPYING file in the
-> - * top-level directory.
-> - *
-> - */
-> -
-> -#ifndef QCRYPTO_HMAC_H
-> -#define QCRYPTO_HMAC_H
-> -
-> -#include "qapi-types.h"
-> -
-> -typedef struct QCryptoHmac QCryptoHmac;
-> -struct QCryptoHmac {
-> -    QCryptoHashAlgorithm alg;
-> -    void *opaque;
-> -};
-> -
-> -/**
-> - * qcrypto_hmac_supports:
-> - * @alg: the hmac algorithm
-> - *
-> - * Determine if @alg hmac algorithm is supported by
-> - * the current configured build
-> - *
-> - * Returns:
-> - *  true if the algorithm is supported, false otherwise
-> - */
-> -bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg);
-> -
-> -/**
-> - * qcrypto_hmac_new:
-> - * @alg: the hmac algorithm
-> - * @key: the key bytes
-> - * @nkey: the length of @key
-> - * @errp: pointer to a NULL-initialized error object
-> - *
-> - * Creates a new hmac object with the algorithm @alg
-> - *
-> - * The @key parameter provides the bytes representing
-> - * the secret key to use. The @nkey parameter specifies
-> - * the length of @key in bytes
-> - *
-> - * Note: must use qcrypto_hmac_free() to release the
-> - * returned hmac object when no longer required
-> - *
-> - * Returns:
-> - *  a new hmac object, or NULL on error
-> - */
+> diff --git a/crypto/hmac-gcrypt.c b/crypto/hmac-gcrypt.c
+> index 21189e6..42489f3 100644
+> --- a/crypto/hmac-gcrypt.c
+> +++ b/crypto/hmac-gcrypt.c
+> @@ -42,11 +42,11 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm
+> alg)
+>      return false;
+>  }
+>=20
 > -QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
 > -                              const uint8_t *key, size_t nkey,
-> -                              Error **errp);
+> -                              Error **errp)
+> +static QCryptoHmacGcrypt *
+> +qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
+> +                     const uint8_t *key, size_t nkey,
+> +                     Error **errp)
+>  {
+> -    QCryptoHmac *hmac;
+>      QCryptoHmacGcrypt *ctx;
+>      gcry_error_t err;
+>=20
+> @@ -56,9 +56,6 @@ QCryptoHmac
+> *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+>          return NULL;
+>      }
+>=20
+> -    hmac =3D g_new0(QCryptoHmac, 1);
+> -    hmac->alg =3D alg;
 > -
-> -/**
-> - * qcrypto_hmac_free:
-> - * @hmac: the hmac object
-> - *
-> - * Release the memory associated with @hmac that was
-> - * previously allocated by qcrypto_hmac_new()
-> - */
-> -void qcrypto_hmac_free(QCryptoHmac *hmac);
-> -
-> -/**
-> - * qcrypto_hmac_bytesv:
-> - * @hmac: the hmac object
-> - * @iov: the array of memory regions to hmac
-> - * @niov: the length of @iov
-> - * @result: pointer to hold output hmac
-> - * @resultlen: pointer to hold length of @result
-> - * @errp: pointer to a NULL-initialized error object
-> - *
-> - * Computes the hmac across all the memory regions
-> - * present in @iov. The @result pointer will be
-> - * filled with raw bytes representing the computed
-> - * hmac, which will have length @resultlen. The
-> - * memory pointer in @result must be released
-> - * with a call to g_free() when no longer required.
-> - *
-> - * Returns:
-> - *  0 on success, -1 on error
-> - */
-> -int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-> -                        const struct iovec *iov,
-> -                        size_t niov,
-> -                        uint8_t **result,
-> -                        size_t *resultlen,
-> -                        Error **errp);
-> -
-> -/**
-> - * qcrypto_hmac_bytes:
-> - * @hmac: the hmac object
-> - * @buf: the memory region to hmac
-> - * @len: the length of @buf
-> - * @result: pointer to hold output hmac
-> - * @resultlen: pointer to hold length of @result
-> - * @errp: pointer to a NULL-initialized error object
-> - *
-> - * Computes the hmac across all the memory region
-> - * @buf of length @len. The @result pointer will be
-> - * filled with raw bytes representing the computed
-> - * hmac, which will have length @resultlen. The
-> - * memory pointer in @result must be released
-> - * with a call to g_free() when no longer required.
-> - *
-> - * Returns:
-> - *  0 on success, -1 on error
-> - */
-> -int qcrypto_hmac_bytes(QCryptoHmac *hmac,
-> -                       const char *buf,
-> -                       size_t len,
-> -                       uint8_t **result,
-> -                       size_t *resultlen,
-> -                       Error **errp);
-> -
-> -/**
-> - * qcrypto_hmac_digestv:
-> - * @hmac: the hmac object
-> - * @iov: the array of memory regions to hmac
-> - * @niov: the length of @iov
-> - * @digest: pointer to hold output hmac
-> - * @errp: pointer to a NULL-initialized error object
-> - *
-> - * Computes the hmac across all the memory regions
-> - * present in @iov. The @digest pointer will be
-> - * filled with the printable hex digest of the computed
-> - * hmac, which will be terminated by '\0'. The
-> - * memory pointer in @digest must be released
-> - * with a call to g_free() when no longer required.
-> - *
-> - * Returns:
-> - *  0 on success, -1 on error
-> - */
-> -int qcrypto_hmac_digestv(QCryptoHmac *hmac,
-> -                         const struct iovec *iov,
-> -                         size_t niov,
-> -                         char **digest,
-> -                         Error **errp);
-> -
-> -/**
-> - * qcrypto_hmac_digest:
-> - * @hmac: the hmac object
-> - * @buf: the memory region to hmac
-> - * @len: the length of @buf
-> - * @digest: pointer to hold output hmac
-> - * @errp: pointer to a NULL-initialized error object
-> - *
-> - * Computes the hmac across all the memory region
-> - * @buf of length @len. The @digest pointer will be
-> - * filled with the printable hex digest of the computed
-> - * hmac, which will be terminated by '\0'. The
-> - * memory pointer in @digest must be released
-> - * with a call to g_free() when no longer required.
-> - *
-> - * Returns: 0 on success, -1 on error
-> - */
-> -int qcrypto_hmac_digest(QCryptoHmac *hmac,
-> -                        const char *buf,
-> -                        size_t len,
-> -                        char **digest,
-> -                        Error **errp);
-> -
-> -#endif
-> diff --git a/include/crypto/hmac.h b/include/crypto/hmac.h
-> new file mode 100644
-> index 0000000..0d3acd7
-> --- /dev/null
-> +++ b/include/crypto/hmac.h
-> @@ -0,0 +1,166 @@
-> +/*
-> + * QEMU Crypto hmac algorithms
-> + *
-> + * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> + * (at your option) any later version.  See the COPYING file in the
-> + * top-level directory.
-> + *
-> + */
+>      ctx =3D g_new0(QCryptoHmacGcrypt, 1);
+>=20
+>      err =3D gcry_mac_open(&ctx->handle, qcrypto_hmac_alg_map[alg],
+> @@ -73,15 +70,14 @@ QCryptoHmac
+> *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+>      if (err !=3D 0) {
+>          error_setg(errp, "Cannot set key: %s",
+>                     gcry_strerror(err));
+> +        gcry_mac_close(ctx->handle);
+>          goto error;
+>      }
+>=20
+> -    hmac->opaque =3D ctx;
+> -    return hmac;
+> +    return ctx;
+>=20
+>  error:
+>      g_free(ctx);
+> -    g_free(hmac);
+>      return NULL;
+>  }
+>=20
+> @@ -150,3 +146,22 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+>=20
+>      return 0;
+>  }
 > +
-> +#ifndef QCRYPTO_HMAC_H
-> +#define QCRYPTO_HMAC_H
-> +
-> +#include "qapi-types.h"
-> +
-> +typedef struct QCryptoHmac QCryptoHmac;
-> +struct QCryptoHmac {
-> +    QCryptoHashAlgorithm alg;
-> +    void *opaque;
-> +};
-> +
-> +/**
-> + * qcrypto_hmac_supports:
-> + * @alg: the hmac algorithm
-> + *
-> + * Determine if @alg hmac algorithm is supported by
-> + * the current configured build
-> + *
-> + * Returns:
-> + *  true if the algorithm is supported, false otherwise
-> + */
-> +bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg);
-> +
-> +/**
-> + * qcrypto_hmac_new:
-> + * @alg: the hmac algorithm
-> + * @key: the key bytes
-> + * @nkey: the length of @key
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Creates a new hmac object with the algorithm @alg
-> + *
-> + * The @key parameter provides the bytes representing
-> + * the secret key to use. The @nkey parameter specifies
-> + * the length of @key in bytes
-> + *
-> + * Note: must use qcrypto_hmac_free() to release the
-> + * returned hmac object when no longer required
-> + *
-> + * Returns:
-> + *  a new hmac object, or NULL on error
-> + */
 > +QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
 > +                              const uint8_t *key, size_t nkey,
-> +                              Error **errp);
+> +                              Error **errp)
+> +{
+> +    QCryptoHmac *hmac;
+> +    QCryptoHmacGcrypt *ctx;
 > +
-> +/**
-> + * qcrypto_hmac_free:
-> + * @hmac: the hmac object
-> + *
-> + * Release the memory associated with @hmac that was
-> + * previously allocated by qcrypto_hmac_new()
-> + */
-> +void qcrypto_hmac_free(QCryptoHmac *hmac);
+> +    ctx =3D qcrypto_hmac_ctx_new(alg, key, nkey, errp);
+> +    if (ctx =3D=3D NULL) {
+> +        return NULL;
+> +    }
 > +
-> +/**
-> + * qcrypto_hmac_bytesv:
-> + * @hmac: the hmac object
-> + * @iov: the array of memory regions to hmac
-> + * @niov: the length of @iov
-> + * @result: pointer to hold output hmac
-> + * @resultlen: pointer to hold length of @result
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Computes the hmac across all the memory regions
-> + * present in @iov. The @result pointer will be
-> + * filled with raw bytes representing the computed
-> + * hmac, which will have length @resultlen. The
-> + * memory pointer in @result must be released
-> + * with a call to g_free() when no longer required.
-> + *
-> + * Returns:
-> + *  0 on success, -1 on error
-> + */
-> +int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-> +                        const struct iovec *iov,
-> +                        size_t niov,
-> +                        uint8_t **result,
-> +                        size_t *resultlen,
-> +                        Error **errp);
+> +    hmac =3D g_new0(QCryptoHmac, 1);
+> +    hmac->alg =3D alg;
+> +    hmac->opaque =3D ctx;
 > +
-> +/**
-> + * qcrypto_hmac_bytes:
-> + * @hmac: the hmac object
-> + * @buf: the memory region to hmac
-> + * @len: the length of @buf
-> + * @result: pointer to hold output hmac
-> + * @resultlen: pointer to hold length of @result
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Computes the hmac across all the memory region
-> + * @buf of length @len. The @result pointer will be
-> + * filled with raw bytes representing the computed
-> + * hmac, which will have length @resultlen. The
-> + * memory pointer in @result must be released
-> + * with a call to g_free() when no longer required.
-> + *
-> + * Returns:
-> + *  0 on success, -1 on error
-> + */
-> +int qcrypto_hmac_bytes(QCryptoHmac *hmac,
-> +                       const char *buf,
-> +                       size_t len,
-> +                       uint8_t **result,
-> +                       size_t *resultlen,
-> +                       Error **errp);
-> +
-> +/**
-> + * qcrypto_hmac_digestv:
-> + * @hmac: the hmac object
-> + * @iov: the array of memory regions to hmac
-> + * @niov: the length of @iov
-> + * @digest: pointer to hold output hmac
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Computes the hmac across all the memory regions
-> + * present in @iov. The @digest pointer will be
-> + * filled with the printable hex digest of the computed
-> + * hmac, which will be terminated by '\0'. The
-> + * memory pointer in @digest must be released
-> + * with a call to g_free() when no longer required.
-> + *
-> + * Returns:
-> + *  0 on success, -1 on error
-> + */
-> +int qcrypto_hmac_digestv(QCryptoHmac *hmac,
-> +                         const struct iovec *iov,
-> +                         size_t niov,
-> +                         char **digest,
-> +                         Error **errp);
-> +
-> +/**
-> + * qcrypto_hmac_digest:
-> + * @hmac: the hmac object
-> + * @buf: the memory region to hmac
-> + * @len: the length of @buf
-> + * @digest: pointer to hold output hmac
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Computes the hmac across all the memory region
-> + * @buf of length @len. The @digest pointer will be
-> + * filled with the printable hex digest of the computed
-> + * hmac, which will be terminated by '\0'. The
-> + * memory pointer in @digest must be released
-> + * with a call to g_free() when no longer required.
-> + *
-> + * Returns: 0 on success, -1 on error
-> + */
-> +int qcrypto_hmac_digest(QCryptoHmac *hmac,
-> +                        const char *buf,
-> +                        size_t len,
-> +                        char **digest,
-> +                        Error **errp);
-> +
-> +#endif
+> +    return hmac;
+> +}
 > --
 > 1.8.3.1
 >=20
