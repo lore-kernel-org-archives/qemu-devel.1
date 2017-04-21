@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37445)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1d1Uhb-0002yX-GP
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:18:08 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37719)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1d1Uip-0003qU-Na
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1d1UhY-0001r1-DI
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:18:07 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:38142 helo=mx01.kamp.de)
+	(envelope-from <quintela@redhat.com>) id 1d1Uim-00029N-Jb
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:19:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1d1UhY-0001qZ-4v
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:18:04 -0400
-References: <1492511251-16720-1-git-send-email-den@openvz.org>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <8f297f9f-8aa2-bca8-d99e-dc9fc767abf2@kamp.de>
-Date: Fri, 21 Apr 2017 11:18:01 +0200
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d1Uim-00029H-DN
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:19:20 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170412135312.1686-2-lvivier@redhat.com> (Laurent Vivier's
+	message of "Wed, 12 Apr 2017 15:53:11 +0200")
+References: <20170412135312.1686-1-lvivier@redhat.com>
+	<20170412135312.1686-2-lvivier@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Fri, 21 Apr 2017 11:19:14 +0200
+Message-ID: <87tw5idsod.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <1492511251-16720-1-git-send-email-den@openvz.org>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu-img: wait for convert coroutines
- to complete
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] migration: don't close a file
+ descriptor while it can be in use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-stable@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-Am 18.04.2017 um 12:27 schrieb Denis V. Lunev:
-> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Laurent Vivier <lvivier@redhat.com> wrote:
+> If we close the QEMUFile descriptor in process_incoming_migration_co()
+> while it has been stopped by an error, the postcopy_ram_listen_thread()
+> can try to continue to use it. And as the memory has been freed
+> it is working with an invalid pointer and crashes.
 >
-> We should wait for other coroutines on error path, i.e. one of coroutines
-> terminates with i/o error, before cleaning the common structures. In the
-> other case we would crash in a lot of different places. This behaviour
-> was introduced by commit 2d9187bc65.
+> Fix this by releasing the memory after having managed the error
+> case (which, in fact, calls exit())
 >
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Peter Lieven <pl@kamp.de>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-Cc: qemu-stable@nongnu.org
-
-This should go into 2.9.1
-
-Peter
+Reviewed-by: Juan Quintela <quintela@redhat.com>
