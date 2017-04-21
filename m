@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1aWD-0001SA-0N
+	(envelope-from <balaton@eik.bme.hu>) id 1d1aWC-0001S6-OB
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1d1aW9-0007pL-5e
+	(envelope-from <balaton@eik.bme.hu>) id 1d1aW8-0007oS-1C
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:30:44 -0400
-Message-Id: <8b9605a569f8bf54074e15903620b18cd9967c89.1492787889.git.balaton@eik.bme.hu>
+Message-Id: <79dab21bc6ec4d563aabf265c3bab40e2e95aae8.1492787889.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1492787889.git.balaton@eik.bme.hu>
 References: <cover.1492787889.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Fri, 21 Apr 2017 17:18:09 +0200
-Subject: [Qemu-devel] [PATCH v7 07/13] sm501: Fix device endianness
+Subject: [Qemu-devel] [PATCH v7 05/13] sm501: Get rid of base address in
+ draw_hwc_line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,106 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-We only emulate the sysbus device in its default LE mode and PCI is LE
-as well so specify this for registers and framebuffer memory.
-
-Note that though the Linux kernel driver has code which claims to
-handle both big and little endian, it is obviously bogus for 16 bit
-and cannot be trusted as a source of information on the framebuffer
-pixel format. This is our best guess about device behaviour based on
-the specs and testing with MorphOS that is known to work on real HW.
+Do not use the base address to access data in local memory. This is in
+preparation to allow chip connected via PCI where base address depends
+on where the BAR is mapped so it will be unknown.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Tested-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
-
-v2: Split off small clean up to other patch
-v4: Set serial part to little endian as well
-v5: Make framebuffer always LE as suggested by Peter Maydell
-v6: Extended commit message
-
- hw/display/sm501.c          |  8 ++++----
- hw/display/sm501_template.h | 19 ++++++-------------
- 2 files changed, 10 insertions(+), 17 deletions(-)
+ hw/display/sm501.c          | 6 ++----
+ hw/display/sm501_template.h | 8 ++++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index c92a5fa..a628ef1 100644
+index 571a7e6..09c023d 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -850,7 +850,7 @@ static const MemoryRegionOps sm501_system_config_ops = {
-         .min_access_size = 4,
-         .max_access_size = 4,
-     },
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
- };
+@@ -461,7 +461,6 @@ typedef struct SM501State {
+     QemuConsole *con;
  
- static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
-@@ -1086,7 +1086,7 @@ static const MemoryRegionOps sm501_disp_ctrl_ops = {
-         .min_access_size = 4,
-         .max_access_size = 4,
-     },
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
- static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
-@@ -1174,7 +1174,7 @@ static const MemoryRegionOps sm501_2d_engine_ops = {
-         .min_access_size = 4,
-         .max_access_size = 4,
-     },
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
- /* draw line functions for all console modes */
-@@ -1510,7 +1510,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-     if (s->chr_state) {
-         serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
-                        NULL, /* TODO : chain irq to IRL */
--                       115200, s->chr_state, DEVICE_NATIVE_ENDIAN);
-+                       115200, s->chr_state, DEVICE_LITTLE_ENDIAN);
-     }
+     /* status & internal resources */
+-    hwaddr base;
+     uint32_t local_mem_size_index;
+     uint8_t *local_mem;
+     MemoryRegion local_mem_region;
+@@ -1432,10 +1431,9 @@ static void sm501_reset(SM501State *s)
+     s->twoD_control = 0;
  }
  
+-static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
++static void sm501_init(SM501State *s, DeviceState *dev,
+                        uint32_t local_mem_bytes)
+ {
+-    s->base = base;
+     s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
+     SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
+                   s->local_mem_size_index);
+@@ -1489,7 +1487,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     DeviceState *usb_dev;
+ 
+-    sm501_init(&s->state, dev, s->base, s->vram_size);
++    sm501_init(&s->state, dev, s->vram_size);
+     if (get_local_mem_size(&s->state) != s->vram_size) {
+         error_setg(errp, "Invalid VRAM size, nearest valid size is %" PRIu32,
+                    get_local_mem_size(&s->state));
 diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
-index 832ee61..54807bd 100644
+index 16e500b..832ee61 100644
 --- a/hw/display/sm501_template.h
 +++ b/hw/display/sm501_template.h
-@@ -64,10 +64,10 @@ static void glue(draw_line16_, PIXEL_NAME)(
-     uint8_t r, g, b;
+@@ -103,13 +103,13 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
+                  uint8_t *palette, int c_y, uint8_t *d, int width)
+ {
+     int x, i;
+-    uint8_t bitset = 0;
++    uint8_t *pixval, bitset = 0;
  
-     do {
--        rgb565 = lduw_p(s);
--        r = ((rgb565 >> 11) & 0x1f) << 3;
--        g = ((rgb565 >>  5) & 0x3f) << 2;
--        b = ((rgb565 >>  0) & 0x1f) << 3;
-+        rgb565 = lduw_le_p(s);
-+        r = (rgb565 >> 8) & 0xf8;
-+        g = (rgb565 >> 3) & 0xfc;
-+        b = (rgb565 << 3) & 0xf8;
-         *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
-         s += 2;
-         d += BPP;
-@@ -80,16 +80,9 @@ static void glue(draw_line32_, PIXEL_NAME)(
-     uint8_t r, g, b;
+     /* get hardware cursor pattern */
+     uint32_t cursor_addr = get_hwc_address(s, crt);
+     assert(0 <= c_y && c_y < SM501_HWC_HEIGHT);
+     cursor_addr += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
+-    cursor_addr += s->base;
++    pixval = s->local_mem + cursor_addr;
  
-     do {
--        ldub_p(s);
--#if defined(TARGET_WORDS_BIGENDIAN)
--        r = s[1];
--        g = s[2];
--        b = s[3];
--#else
--        b = s[0];
--        g = s[1];
-         r = s[2];
--#endif
-+        g = s[1];
-+        b = s[0];
-         *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
-         s += 4;
-         d += BPP;
+     /* get cursor position */
+     x = get_hwc_x(s, crt);
+@@ -120,8 +120,8 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
+ 
+         /* get pixel value */
+         if (i % 4 == 0) {
+-            bitset = ldub_phys(&address_space_memory, cursor_addr);
+-            cursor_addr++;
++            bitset = ldub_p(pixval);
++            pixval++;
+         }
+         v = bitset & 3;
+         bitset >>= 2;
 -- 
 2.7.4
