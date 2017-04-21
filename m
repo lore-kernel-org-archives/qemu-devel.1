@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d1VJy-0008Kg-Aa
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:57:47 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1d1VKU-0000AH-7j
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:58:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d1VJu-0003Yd-Cy
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:57:46 -0400
-From: jemmy858585@gmail.com
-Date: Fri, 21 Apr 2017 17:57:34 +0800
-Message-Id: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v2] qemu-img: use blk_co_pwrite_zeroes for zero
- sectors when compressed
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1d1VKQ-0003sm-CQ
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:58:18 -0400
+Received: from mail-db5eur01on0106.outbound.protection.outlook.com
+	([104.47.2.106]:26817
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
+	id 1d1VKP-0003sZ-Pw
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:58:14 -0400
+References: <1492511251-16720-1-git-send-email-den@openvz.org>
+	<8f297f9f-8aa2-bca8-d99e-dc9fc767abf2@kamp.de>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <8d45e88c-f19e-65fc-937e-d1547b50c63c@virtuozzo.com>
+Date: Fri, 21 Apr 2017 12:43:35 +0300
+MIME-Version: 1.0
+In-Reply-To: <8f297f9f-8aa2-bca8-d99e-dc9fc767abf2@kamp.de>
+Content-Type: text/plain; charset="iso-8859-15"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] qemu-img: wait for convert coroutines
+ to complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,95 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Peter Lieven <pl@kamp.de>, "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-stable@nongnu.org
 
-From: Lidong Chen <lidongchen@tencent.com>
+On 04/21/2017 12:18 PM, Peter Lieven wrote:
+> Am 18.04.2017 um 12:27 schrieb Denis V. Lunev:
+>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>
+>> We should wait for other coroutines on error path, i.e. one of coroutines
+>> terminates with i/o error, before cleaning the common structures. In the
+>> other case we would crash in a lot of different places. This behaviour
+>> was introduced by commit 2d9187bc65.
+>>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Peter Lieven <pl@kamp.de>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>
+> Cc: qemu-stable@nongnu.org
+>
+> This should go into 2.9.1
+>
+> Peter
+>
 
-when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
-blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
-the time when converts the qcow2 image with lots of zero.
+Actually I'm afraid the patch is incorrect.. The erroneous coroutine 
+bails out without reentering its possible dependent coroutine so it (and 
+the following dependents) will never finish.
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
-v2 changelog:
-    unify the compressed and non-compressed code paths
----
- qemu-img.c | 41 +++++++++++------------------------------
- 1 file changed, 11 insertions(+), 30 deletions(-)
+I'll send out the 2nd version soon
 
-diff --git a/qemu-img.c b/qemu-img.c
-index b220cf7..60c9adf 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1661,6 +1661,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
- 
-     while (nb_sectors > 0) {
-         int n = nb_sectors;
-+        BdrvRequestFlags flags = s->compressed ? BDRV_REQ_WRITE_COMPRESSED : 0;
-+
-         switch (status) {
-         case BLK_BACKING_FILE:
-             /* If we have a backing file, leave clusters unallocated that are
-@@ -1670,43 +1672,21 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
-             break;
- 
-         case BLK_DATA:
--            /* We must always write compressed clusters as a whole, so don't
--             * try to find zeroed parts in the buffer. We can only save the
--             * write if the buffer is completely zeroed and we're allowed to
--             * keep the target sparse. */
--            if (s->compressed) {
--                if (s->has_zero_init && s->min_sparse &&
--                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
--                {
--                    assert(!s->target_has_backing);
--                    break;
--                }
--
--                iov.iov_base = buf;
--                iov.iov_len = n << BDRV_SECTOR_BITS;
--                qemu_iovec_init_external(&qiov, &iov, 1);
--
--                ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
--                                     n << BDRV_SECTOR_BITS, &qiov,
--                                     BDRV_REQ_WRITE_COMPRESSED);
--                if (ret < 0) {
--                    return ret;
--                }
--                break;
--            }
--
--            /* If there is real non-zero data or we're told to keep the target
--             * fully allocated (-S 0), we must write it. Otherwise we can treat
-+            /* If we're told to keep the target fully allocated (-S 0) or there
-+             * is real non-zero data, we must write it. Otherwise we can treat
-              * it as zero sectors. */
-             if (!s->min_sparse ||
--                is_allocated_sectors_min(buf, n, &n, s->min_sparse))
--            {
-+                (!s->compressed &&
-+                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) ||
-+                (s->compressed &&
-+                 !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))) {
-+
-                 iov.iov_base = buf;
-                 iov.iov_len = n << BDRV_SECTOR_BITS;
-                 qemu_iovec_init_external(&qiov, &iov, 1);
- 
-                 ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
--                                     n << BDRV_SECTOR_BITS, &qiov, 0);
-+                                     n << BDRV_SECTOR_BITS, &qiov, flags);
-                 if (ret < 0) {
-                     return ret;
-                 }
-@@ -1716,6 +1696,7 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
- 
-         case BLK_ZERO:
-             if (s->has_zero_init) {
-+                assert(!s->target_has_backing);
-                 break;
-             }
-             ret = blk_co_pwrite_zeroes(s->target,
--- 
-1.8.3.1
+/Anton
