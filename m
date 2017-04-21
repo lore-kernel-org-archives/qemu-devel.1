@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d1ZkO-00037X-UB
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:41:22 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1d1ZtG-0005d8-Ly
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d1ZkK-0001It-5N
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:41:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d1ZkJ-0001Ic-VZ
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:41:16 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d1ZkI-0004oG-Pe
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 14:41:14 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ACD422E80C4
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 14:41:14 +0000 (UTC)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1d1ZtF-0004Ob-RJ
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:50:30 -0400
+References: <1492769076-64466-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<98514b87-d2a3-254d-f03e-0c6d3cd73ff6@kamp.de>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <88259101-7040-f057-5ed4-76bd36f2b1a0@virtuozzo.com>
+Date: Fri, 21 Apr 2017 15:19:24 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Apr 2017 14:35:01 -0000
-From: flumm <dominik.csapak@gmail.com>
-Reply-To: Bug 1685242 <1685242@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170421142319.16919.35932.malonedeb@wampee.canonical.com>
-Message-Id: <20170421143501.904.13996.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1685242] Re: ovmf hangs at efi with virtio-net
- memory hotplug
+In-Reply-To: <98514b87-d2a3-254d-f03e-0c6d3cd73ff6@kamp.de>
+Content-Type: text/plain; charset="iso-8859-15"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu-img: wait for convert
+ coroutines to complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,57 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: den@virtuozzo.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-i forgot:
+On 04/21/2017 01:44 PM, Peter Lieven wrote:
+> Am 21.04.2017 um 12:04 schrieb Anton Nefedov:
+>> On error path (like i/o error in one of the coroutines), it's required to
+>>   - wait for coroutines completion before cleaning the common structures
+>>   - reenter dependent coroutines so they ever finish
+>>
+>> Introduced in 2d9187bc65.
+>>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> ---
+>> [..]
+>>
+>
+>
+> And what if we error out in the read path? Wouldn't be something like this easier?
+>
+>
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 22f559a..4ff1085 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1903,6 +1903,16 @@ static int convert_do_copy(ImgConvertState *s)
+>          main_loop_wait(false);
+>      }
+>
+> +    /* on error path we need to enter all coroutines that are still
+> +     * running before cleaning up common structures */
+> +    if (s->ret) {
+> +        for (i = 0; i < s->num_coroutines; i++) {
+> +             if (s->co[i]) {
+> +                 qemu_coroutine_enter(s->co[i]);
+> +             }
+> +        }
+> +    }
+> +
+>      if (s->compressed && !s->ret) {
+>          /* signal EOF to align */
+>          ret = blk_pwrite_compressed(s->target, 0, NULL, 0);
+>
+>
+> Peter
+>
 
-it also works with
+seemed a bit too daring to me to re-enter every coroutine potentially 
+including the ones that yielded waiting for I/O completion.
+If that's ok - that is for sure easier :)
 
--machine pc-i440fx-2.6
+Or maybe some intermediate variant, as you suggest but only enter the 
+"wait_sector" coroutines (and main_loop_wait for the rest)?
+Or do not even re-enter them, like just
 
--- =
+-    while (s->ret == -EINPROGRESS) {
++    while (s->running_coroutines != s->waiting_coroutines) {
+          main_loop_wait(false);
+      }
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1685242
 
-Title:
-  ovmf hangs at efi with virtio-net memory hotplug
-
-Status in QEMU:
-  New
-
-Bug description:
-  with qemu 2.9 it hangs at the efi stage when memory-hotplug is enabled
-  and it has a virtio-net devices
-
-  the ovmf images where compiled from https://github.com/tianocore/edk2
-  (current master)
-
-  reproducer:
-
-  qemu-system-x86_64 -drive
-  'if=3Dpflash,unit=3D0,format=3Draw,readonly,file=3D./OVMF_CODE.fd' -drive
-  'if=3Dpflash,unit=3D1,format=3Draw,file=3D./my_OVMF_VARS.fd' -smp 1 -vga =
-std
-  -netdev 'type=3Dtap,id=3Dmynet' -device 'virtio-net-pci,netdev=3Dmynet'
-  -display sdl -nodefaults -m 'size=3D1G,slots=3D256,maxmem=3D1024G'
-
-  interestingly, it works when you do the following:
-
-  - omit the virtio-net-pci device
-  - use seabios
-  - use less maxmem, e.g. 512G
-
-  qemu was compiled from source (v2.9.0) with following options:
-
-  ./configure --target-list=3Dx86_64-softmmu --disable-xen --enable-gnutls =
---enable-sdl --enable-linux-aio --enable-rbd --enable-libiscsi --disable-sm=
-artcard --audio-drv-list=3D"alsa" --enable
-  -spice --enable-usb-redir --enable-glusterfs --enable-libusb --disable-gt=
-k --enable-xfsctl --enable-numa --disable-strip --enable-jemalloc --enable-=
-virtfs --disable-libnfs --disable-fdt --disable-guest-agent --disable-guest=
--agent-msi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1685242/+subscriptions
+/Anton
