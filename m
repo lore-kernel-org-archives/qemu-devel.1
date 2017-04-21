@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d1Upk-0000rY-Au
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:26:33 -0400
+	(envelope-from <quintela@redhat.com>) id 1d1Uuh-0003dg-RK
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:31:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d1Uph-0004Hn-89
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:26:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39416)
+	(envelope-from <quintela@redhat.com>) id 1d1Uue-0005fM-Kx
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:31:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d1Uph-0004H5-1u
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:26:29 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d1Uue-0005fI-ET
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:31:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 713998C54F
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:31:35 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <c52557bd-8621-6fdb-6fd2-2dfdc662d520@amsat.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed,
-	19 Apr 2017 19:17:50 -0300")
-References: <20170419205923.8808-1-quintela@redhat.com>
-	<20170419205923.8808-50-quintela@redhat.com>
-	<c52557bd-8621-6fdb-6fd2-2dfdc662d520@amsat.org>
+In-Reply-To: <1491034725-23968-2-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Sat, 1 Apr 2017 16:18:42 +0800")
+References: <1491034725-23968-1-git-send-email-peterx@redhat.com>
+	<1491034725-23968-2-git-send-email-peterx@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Fri, 21 Apr 2017 11:26:26 +0200
-Message-ID: <87lgqudscd.fsf@secure.mitica>
+Date: Fri, 21 Apr 2017 11:31:32 +0200
+Message-ID: <87h91ids3v.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 49/59] ram: Remember last_page instead of
- last_offset
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] migration: set current_active_state
+ once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +35,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "\\ Dr . David Alan Gilbert \\ " <dgilbert@redhat.com>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-> Hi Juan,
+Peter Xu <peterx@redhat.com> wrote:
+> We set it right above this one. No need to set it twice.
 >
-> On 04/19/2017 05:59 PM, Juan Quintela wrote:
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->
-> I think you missed Dave's Reviewed-by (he sent April 7)
->
-> "Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>"
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-thanks
+Reviewed-by: Juan Quintela <quintela@redhat.com>
