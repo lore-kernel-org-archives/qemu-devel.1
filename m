@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mr.katebzadeh@gmail.com>) id 1d1aTk-0000i1-FY
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:28:13 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1d1aWC-0001S8-UT
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mr.katebzadeh@gmail.com>) id 1d1aTf-0007C7-FH
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:28:12 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36865)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mr.katebzadeh@gmail.com>)
-	id 1d1aTf-0007Bx-58
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:28:07 -0400
-Received: by mail-wm0-x231.google.com with SMTP id m123so20097202wma.0
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 08:28:07 -0700 (PDT)
-From: Siavash Katebzadeh <mr.katebzadeh@gmail.com>
-Message-Id: <0854947D-A949-4218-B3F4-89EB1143BCA3@gmail.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Fri, 21 Apr 2017 19:58:02 +0430
-In-Reply-To: <e538350e-e710-ea4d-ba69-8bc54c5af6a2@ilande.co.uk>
-References: <AA896828-A1B7-4060-9537-F738C1E2012C@gmail.com>
-	<e538350e-e710-ea4d-ba69-8bc54c5af6a2@ilande.co.uk>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Help needed: Sparc 64, kernel panic
+	(envelope-from <balaton@eik.bme.hu>) id 1d1aW8-0007oy-NV
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:30:44 -0400
+Message-Id: <647d292c6f5abba8b2a614687229949b5dcb864e.1492787889.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1492787889.git.balaton@eik.bme.hu>
+References: <cover.1492787889.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Fri, 21 Apr 2017 17:18:09 +0200
+Subject: [Qemu-devel] [PATCH v7 06/13] sm501: Add emulation of chip
+ connected via PCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +20,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-My mistake.
-Yes I Already tried qemu-2.9.0.rc5. Same error happens.
+Only the display controller part is created automatically on PCI
 
-Regards,
-Siavash.=20
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Tested-by: Aurelien Jarno <aurelien@aurel32.net>
+---
 
-> On Apr 21, 2017, at 19:36, Mark Cave-Ayland =
-<mark.cave-ayland@ilande.co.uk> wrote:
->=20
-> On 21/04/17 15:56, Siavash Katebzadeh wrote:
->=20
->> My command line is:
->>=20
->> ./qemu-system-sparc64 \
->> -L pc-bios -m 720 \
->> -kernel ${KERNEL_PATH}/${KERNEL} \
->> -initrd ${KERNEL_PATH}/${INITRD} \
->> -drive file=3D${QCOW2_PATH}/${QCOW2},if=3Dvirtio,index=3D0 \
->> -rtc base=3D'2006-06-17T16:01:21',clock=3Dvm \
->> -net none -append 'modprobe.blacklist=3Dpata_cmd64x root=3D/dev/vda1' =
-\
->> -d in_asm -D ./out_file_timing \
->> -nographic
->>=20
->> And here is my environment:
->>=20
->> Guest OS: Debian-7.8.0
->> Guest Kernel: 3.2.0-4-sparc64 (Virtio modules are added manually)
->> Host OS: Ubuntu 14.04
->> CPU: Intel(R) Xeon(R) CPU E5-2650 0 @ 2.00GHz
->>=20
->> This error happens when I=E2=80=99m using qemu-2.8.0-rc0 or later.
->=20
-> Please make sure that you CC the qemu-devel list, particularly as I
-> won't be around for several days. There have been several fixes in 2.9
-> that could be related to this - do you still see the same issue with =
-the
-> latest 2.9 release?
->=20
->=20
-> ATB,
->=20
-> Mark.
+v2: Split off removing dependency on base address to separate patch
+v3: Added reset function and PCI ID constant definitions in pci_ids.h
+v4: Return error for invalid VRAM size, set bit in misc_control for PCI bus
+
+ hw/display/sm501.c       | 65 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/pci/pci_ids.h |  3 +++
+ 2 files changed, 68 insertions(+)
+
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 09c023d..c92a5fa 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -32,6 +32,7 @@
+ #include "ui/console.h"
+ #include "hw/devices.h"
+ #include "hw/sysbus.h"
++#include "hw/pci/pci.h"
+ #include "qemu/range.h"
+ #include "ui/pixel_ops.h"
+ #include "exec/address-spaces.h"
+@@ -1547,9 +1548,73 @@ static const TypeInfo sm501_sysbus_info = {
+     .class_init    = sm501_sysbus_class_init,
+ };
+ 
++#define TYPE_PCI_SM501 "sm501"
++#define PCI_SM501(obj) OBJECT_CHECK(SM501PCIState, (obj), TYPE_PCI_SM501)
++
++typedef struct {
++    /*< private >*/
++    PCIDevice parent_obj;
++    /*< public >*/
++    SM501State state;
++    uint32_t vram_size;
++} SM501PCIState;
++
++static void sm501_realize_pci(PCIDevice *dev, Error **errp)
++{
++    SM501PCIState *s = PCI_SM501(dev);
++
++    sm501_init(&s->state, DEVICE(dev), s->vram_size);
++    if (get_local_mem_size(&s->state) != s->vram_size) {
++        error_setg(errp, "Invalid VRAM size, nearest valid size is %" PRIu32,
++                   get_local_mem_size(&s->state));
++        return;
++    }
++    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
++                     &s->state.local_mem_region);
++    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_MEMORY,
++                     &s->state.mmio_region);
++}
++
++static Property sm501_pci_properties[] = {
++    DEFINE_PROP_UINT32("vram-size", SM501PCIState, vram_size, 64 * M_BYTE),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void sm501_reset_pci(DeviceState *dev)
++{
++    SM501PCIState *s = PCI_SM501(dev);
++    sm501_reset(&s->state);
++    /* Bits 2:0 of misc_control register is 001 for PCI */
++    s->state.misc_control |= 1;
++}
++
++static void sm501_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->realize = sm501_realize_pci;
++    k->vendor_id = PCI_VENDOR_ID_SILICON_MOTION;
++    k->device_id = PCI_DEVICE_ID_SM501;
++    k->class_id = PCI_CLASS_DISPLAY_OTHER;
++    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
++    dc->desc = "SM501 Display Controller";
++    dc->props = sm501_pci_properties;
++    dc->reset = sm501_reset_pci;
++    dc->hotpluggable = false;
++}
++
++static const TypeInfo sm501_pci_info = {
++    .name          = TYPE_PCI_SM501,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(SM501PCIState),
++    .class_init    = sm501_pci_class_init,
++};
++
+ static void sm501_register_types(void)
+ {
+     type_register_static(&sm501_sysbus_info);
++    type_register_static(&sm501_pci_info);
+ }
+ 
+ type_init(sm501_register_types)
+diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
+index d22ad8d..3752ddc 100644
+--- a/include/hw/pci/pci_ids.h
++++ b/include/hw/pci/pci_ids.h
+@@ -207,6 +207,9 @@
+ 
+ #define PCI_VENDOR_ID_MARVELL            0x11ab
+ 
++#define PCI_VENDOR_ID_SILICON_MOTION     0x126f
++#define PCI_DEVICE_ID_SM501              0x0501
++
+ #define PCI_VENDOR_ID_ENSONIQ            0x1274
+ #define PCI_DEVICE_ID_ENSONIQ_ES1370     0x5000
+ 
+-- 
+2.7.4
