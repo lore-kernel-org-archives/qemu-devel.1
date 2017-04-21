@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d1WUR-0001UE-Ci
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:12:40 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1d1X37-0007e2-I3
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d1WUO-00020Q-7E
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:12:39 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 21 Apr 2017 12:12:20 +0100
-Message-Id: <20170421111220.32673-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration: setup bi-directional I/O channel
- for exec: protocol
+	(envelope-from <aurelien@aurel32.net>) id 1d1X32-0004zf-Lw
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:48:29 -0400
+Date: Fri, 21 Apr 2017 13:48:03 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170421114803.cgvn3st26uxrcwt6@aurel32.net>
+References: <cover.1492770667.git.balaton@eik.bme.hu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1492770667.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v6 00/13] Improvements for SM501 display
+ controller emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,44 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>
 
-Historically the migration data channel has only needed to be
-unidirectional. Thus the 'exec:' protocol was requesting an
-I/O channel with O_RDONLY on incoming side, and O_WRONLY on
-the outgoing side.
+On 2017-04-21 12:31, BALATON Zoltan wrote:
+> This version just adds some more explanation to patch #7 and
+> Reviewed/Acked by tags for the last patches.
+> 
+> BALATON Zoltan (13):
+>   sm501: Fixed code style and a few typos in comments
+>   sm501: Use defined constants instead of literal values where available
+>   sm501: Add missing arbitration control register
+>   sm501: QOMify
+>   sm501: Get rid of base address in draw_hwc_line
+>   sm501: Add emulation of chip connected via PCI
+>   sm501: Fix device endianness
+>   sm501: Fix hardware cursor
+>   sm501: Misc clean ups
+>   sm501: Add support for panel layer
+>   sm501: Add some more missing registers
+>   sm501: Add vmstate descriptor
+>   ppc: Add SM501 device in ppc softmmu targets default configs
+> 
+>  default-configs/ppc-softmmu.mak    |    1 +
+>  default-configs/ppc64-softmmu.mak  |    1 +
+>  default-configs/ppcemb-softmmu.mak |    1 +
+>  hw/display/sm501.c                 | 1784 ++++++++++++++++++++++--------------
+>  hw/display/sm501_template.h        |   90 +-
+>  hw/sh4/r2d.c                       |   11 +-
+>  include/hw/devices.h               |    5 -
+>  include/hw/pci/pci_ids.h           |    3 +
+>  8 files changed, 1150 insertions(+), 746 deletions(-)
 
-This is fine for classic migration, but if you then try to run
-TLS over it, this fails because the TLS handshake requires a
-bi-directional channel.
+I have tested this patchset on an SH4 machine and I haven't found any
+regression.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- migration/exec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Tested-by: Aurelien Jarno <aurelien@aurel32.net>
 
-diff --git a/migration/exec.c b/migration/exec.c
-index 9157721..aba9089 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -32,7 +32,7 @@ void exec_start_outgoing_migration(MigrationState *s, const char *command, Error
- 
-     trace_migration_exec_outgoing(command);
-     ioc = QIO_CHANNEL(qio_channel_command_new_spawn(argv,
--                                                    O_WRONLY,
-+                                                    O_RDWR,
-                                                     errp));
-     if (!ioc) {
-         return;
-@@ -59,7 +59,7 @@ void exec_start_incoming_migration(const char *command, Error **errp)
- 
-     trace_migration_exec_incoming(command);
-     ioc = QIO_CHANNEL(qio_channel_command_new_spawn(argv,
--                                                    O_RDONLY,
-+                                                    O_RDWR,
-                                                     errp));
-     if (!ioc) {
-         return;
 -- 
-2.9.3
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
