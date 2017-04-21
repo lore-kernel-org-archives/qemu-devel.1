@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d1X37-0007e3-I9
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:48:30 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d1XAQ-000154-6k
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d1X35-00051T-Ut
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:48:29 -0400
-Date: Fri, 21 Apr 2017 13:48:11 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170421114811.hcqgwfuqrapzvzk4@aurel32.net>
-References: <cover.1492770667.git.balaton@eik.bme.hu>
-	<ebcd276cb56c012e196f7ed0ff0e548963fd6014.1492770667.git.balaton@eik.bme.hu>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d1XAM-0006Yd-5Q
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:56:02 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:50992
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1d1XAL-0006YT-UJ
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:55:58 -0400
+References: <F7CD9F9D-2450-46BB-A914-BCA3418975D2@gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <c48c0539-fdfa-e4b1-e5a8-7ee16607b260@ilande.co.uk>
+Date: Fri, 21 Apr 2017 12:55:25 +0100
 MIME-Version: 1.0
+In-Reply-To: <F7CD9F9D-2450-46BB-A914-BCA3418975D2@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <ebcd276cb56c012e196f7ed0ff0e548963fd6014.1492770667.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v6 08/13] sm501: Fix hardware cursor
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Help needed: Sparc 64, kernel panic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Siavash Katebzadeh <mr.katebzadeh@gmail.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, Artyom Tarasenko <atar4qemu@gmail.com>, hossein.ajallooiean@epfl.ch
 
-On 2017-04-21 12:31, BALATON Zoltan wrote:
-> Rework HWC handling to simplify it and fix cursor not updating on
-> screen as needed. Previously cursor was not updated because checking
-> for changes in a line overrode the update flag set for the cursor but
-> fixing this is not enough because the cursor should also be updated if
-> its shape or location changes. Introduce hwc_invalidate() function to
-> handle that similar to other display controller models.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->=20
-> v3: simplify return expression in get_bpp
->=20
->  hw/display/sm501.c          | 169 +++++++++++++++++++++++++-------------=
-------
->  hw/display/sm501_template.h |  25 +++----
->  2 files changed, 107 insertions(+), 87 deletions(-)
->=20
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index a628ef1..dc806a3 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -1339,14 +1362,16 @@ static void sm501_draw_crt(SM501State *s)
->      /* draw each line according to conditions */
->      memory_region_sync_dirty_bitmap(&s->local_mem_region);
->      for (y =3D 0; y < height; y++) {
-> -        int update_hwc =3D draw_hwc_line ? within_hwc_y_range(s, y, 1) :=
- 0;
-> -        int update =3D full_update || update_hwc;
-> +        int update, update_hwc;
->          ram_addr_t page0 =3D offset;
->          ram_addr_t page1 =3D offset + width * src_bpp - 1;
-> =20
-> +        /* check if hardware cursor is enabled and we're within its rang=
-e */
-> +        update_hwc =3D draw_hwc_line && c_y <=3D y && y < c_y + SM501_HW=
-C_HEIGHT;
-> +        update =3D full_update || update_hwc;
->          /* check dirty flags for each line */
-> -        update =3D memory_region_get_dirty(&s->local_mem_region, page0,
-> -                                         page1 - page0, DIRTY_MEMORY_VGA=
-);
-> +        update |=3D memory_region_get_dirty(&s->local_mem_region, page0,
-> +                                          page1 - page0, DIRTY_MEMORY_VG=
-A);
-> =20
->          /* draw line and change status */
->          if (update) {
-> @@ -1358,7 +1383,7 @@ static void sm501_draw_crt(SM501State *s)
-> =20
->              /* draw hardware cursor */
->              if (update_hwc) {
-> -                draw_hwc_line(s, 1, hwc_palette, y - get_hwc_y(s, 1), d,=
- width);
-> +                draw_hwc_line(d, hwc_src, width, hwc_palette, c_x, y - c=
-_y);
->              }
-> =20
->              if (y_start < 0) {
+On 21/04/17 12:37, Siavash Katebzadeh wrote:
 
-The above change causes a warning with at least GCC 6 and GCC 7, which
-causes a build failure when using -Werror:
+> Hi,
+> 
+> I can reproduce this panic using debian-7.8.0 image. I’m getting this segmentation fault:
+> 
+> [   24.846406] busybox[1]: segfault at f78a000c ip 00000000f77ab0ac (rpc 00000000f77ab090) sp 00000000ffd95a50 error 30001 in libc.so.6[f76f0000+174000]
+> 
+> I found out the commit with 7268adebfda6548b8ae6865dc8337f116a5d266d hash is broken.
+> Could you please take a look at this commit? Thanks.
+>   
+> Regards,
+> Siavash.
 
-|   CC      sh4-softmmu/hw/display/sm501.o
-| /home/aurel32/git/qemu/hw/display/sm501.c: In function =E2=80=98sm501_upd=
-ate_display=E2=80=99:
-| /home/aurel32/git/qemu/hw/display/sm501.c:1504:17: warning: =E2=80=98hwc_=
-src=E2=80=99 may be used uninitialized in this function [-Wmaybe-uninitiali=
-zed]
-|                  draw_hwc_line(d, hwc_src, width, hwc_palette, c_x, y - c=
-_y);
-|                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~
-| /home/aurel32/git/qemu/hw/display/sm501.c:1488:59: warning: =E2=80=98c_y=
-=E2=80=99 may be used uninitialized in this function [-Wmaybe-uninitialized]
-|          update_hwc =3D draw_hwc_line && c_y <=3D y && y < c_y + SM501_HW=
-C_HEIGHT;
-|                                                            ^
-| /home/aurel32/git/qemu/hw/display/sm501.c:1504:17: warning: =E2=80=98c_x=
-=E2=80=99 may be used uninitialized in this function [-Wmaybe-uninitialized]
-|                  draw_hwc_line(d, hwc_src, width, hwc_palette, c_x, y - c=
-_y);
-|                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~
+I've just tried locally with git master and I can't reproduce this at
+all? I'm booting like this:
 
-GCC fails to notice that hwc_src, c_x and c_y are always defined if
-draw_hwc_line is not NULL. This is obviously not a bug in the code, but
-it might be a good idea to put a workaround for example by defining
-default values for those variables.
+./qemu-system-sparc64 -cdrom debian-7.8.0-sparc-netinst.iso -nographic
+-boot d
 
-Aurelien
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+and I get all the way to the installer. If I drop to a busybox shell
+then I don't see any errors? Please can you give the full command line
+and information about your host OS and architecture.
+
+
+ATB,
+
+Mark.
