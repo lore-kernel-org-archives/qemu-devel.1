@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d1TBe-00016g-8S
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:41:03 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d1TBZ-00012b-GS
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d1TBb-0000fz-3F
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:41:02 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44274
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d1TBW-0000eX-Cp
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:40:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44155
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d1TBa-0000fn-QD
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:40:58 -0400
+	id 1d1TBW-0000eK-6n
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 03:40:54 -0400
 Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3L7cZm3008221
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 03:40:58 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29xucaxkp7-1
+	v3L7cY1D008201
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 03:40:53 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29xucaxkkb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 03:40:58 -0400
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 03:40:53 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 21 Apr 2017 08:40:55 +0100
+	Fri, 21 Apr 2017 08:40:51 +0100
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Fri, 21 Apr 2017 09:40:37 +0200
+Date: Fri, 21 Apr 2017 09:40:32 +0200
 In-Reply-To: <20170421074038.774-1-cornelia.huck@de.ibm.com>
 References: <20170421074038.774-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170421074038.774-11-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 10/11] s390x: register I/O adapters per ISC
- during init
+Message-Id: <20170421074038.774-6-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 05/11] s390x/css: provide introspection for
+ virtual subchannel and device busid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,271 +40,195 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Fei Li <sherrylf@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-From: Fei Li <sherrylf@linux.vnet.ibm.com>
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-The I/O adapters should exist as soon as the bus/infrastructure
-exists, and not only when the guest is actually trying to do something
-with them. While the lazy allocation was not wrong, allocating at init
-time is cleaner, both for the architecture and the code. Let's adjust
-this by having each device type (currently for PCI and virtio-ccw)
-register the adapters for each ISC (as now we don't know which ISC the
-guest will use) as soon as it initializes.
+Expose the busids of the virtual I/O subchannel and the virtual CCW
+device to ease debugging. This is needed because:
+1. subchannel id are assigned dynamically, and cannot be set from
+   outside.
+2. device busid could possibly be auto generated.
 
-Use a two-dimensional array io_adapters[type][isc] to store adapters
-in ChannelSubSys, so that we can conveniently get the adapter id by
-the helper function css_get_adapter_id(type, isc).
+An example of using HMP to retrieve the property values of a
+virtio-balloon-ccw device looks like:
 
-Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
+[root@localhost ~]# lscss -d 0.0.0004
+Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs
+----------------------------------------------------------------------
+0.0.0004 0.0.0003  0000/00 3832/05 yes  80  80  ff   00000000 00000000
+
+(qemu) info qtree
+... ...
+      dev: virtio-balloon-ccw, id "balloon0"
+        devno = "<unset>"
+        ioeventfd = true
+        max_revision = 2 (0x2)
+        dev_id = "fe.0.0004"
+        subch_id = "fe.0.0003"
+... ...
+
+After migration, if we have the same device that shows up on a
+different subchannel, we must re-fill the subch_id of the ccw
+device with the new schid, or the subch_id will have an old wrong
+schid value. So this also re-fills the subch_id after migration.
+
+While we are at it, also neaten the related error handling a bit.
+
+Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/s390x/css-bridge.c    |  3 ++
- hw/s390x/css.c           | 85 ++++++++++++++++++++++++++++++------------------
- hw/s390x/s390-pci-bus.c  |  3 ++
- hw/s390x/s390-pci-inst.c | 10 +++---
- hw/s390x/virtio-ccw.c    | 13 ++++----
- include/hw/s390x/css.h   |  7 ++--
- 6 files changed, 74 insertions(+), 47 deletions(-)
+ hw/s390x/ccw-device.c | 39 +++++++++++++++++++++++++++++++++++++++
+ hw/s390x/ccw-device.h |  7 +++++++
+ hw/s390x/virtio-ccw.c | 27 +++++++++++++++++++++------
+ 3 files changed, 67 insertions(+), 6 deletions(-)
 
-diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
-index 9a7f7ee60c..b54ac01d37 100644
---- a/hw/s390x/css-bridge.c
-+++ b/hw/s390x/css-bridge.c
-@@ -107,6 +107,9 @@ VirtualCssBus *virtual_css_bus_init(void)
-     /* Enable hotplugging */
-     qbus_set_hotplug_handler(bus, dev, &error_abort);
+diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
+index 28ea20440e..8fe3cf49ef 100644
+--- a/hw/s390x/ccw-device.c
++++ b/hw/s390x/ccw-device.c
+@@ -11,11 +11,50 @@
+ #include "qemu/osdep.h"
+ #include "ccw-device.h"
  
-+    css_register_io_adapters(CSS_IO_ADAPTER_VIRTIO, true, false,
-+                             &error_abort);
++static void ccw_device_refill_ids(CcwDevice *dev)
++{
++    SubchDev *sch = dev->sch;
 +
-     return cbus;
-  }
- 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 1b242c1fb7..c03bb20bc9 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -47,7 +47,6 @@ typedef struct IoAdapter {
-     uint32_t id;
-     uint8_t type;
-     uint8_t isc;
--    QTAILQ_ENTRY(IoAdapter) sibling;
- } IoAdapter;
- 
- typedef struct ChannelSubSys {
-@@ -61,7 +60,7 @@ typedef struct ChannelSubSys {
-     uint64_t chnmon_area;
-     CssImage *css[MAX_CSSID + 1];
-     uint8_t default_cssid;
--    QTAILQ_HEAD(, IoAdapter) io_adapters;
-+    IoAdapter *io_adapters[CSS_IO_ADAPTER_TYPE_NUMS][MAX_ISC + 1];
-     QTAILQ_HEAD(, IndAddr) indicator_addresses;
- } ChannelSubSys;
- 
-@@ -72,7 +71,6 @@ static ChannelSubSys channel_subsys = {
-     .do_crw_mchk = true,
-     .crws_lost = false,
-     .chnmon_active = false,
--    .io_adapters = QTAILQ_HEAD_INITIALIZER(channel_subsys.io_adapters),
-     .indicator_addresses =
-         QTAILQ_HEAD_INITIALIZER(channel_subsys.indicator_addresses),
- };
-@@ -155,44 +153,67 @@ int css_create_css_image(uint8_t cssid, bool default_image)
-     return 0;
- }
- 
--int css_register_io_adapter(CssIoAdapterType type, uint8_t isc, bool swap,
--                            bool maskable, uint32_t *id)
-+uint32_t css_get_adapter_id(CssIoAdapterType type, uint8_t isc)
- {
-+    if (type >= CSS_IO_ADAPTER_TYPE_NUMS || isc > MAX_ISC ||
-+        !channel_subsys.io_adapters[type][isc]) {
-+        return -1;
-+    }
++    assert(sch);
 +
-+    return channel_subsys.io_adapters[type][isc]->id;
++    dev->dev_id.cssid = sch->cssid;
++    dev->dev_id.ssid = sch->ssid;
++    dev->dev_id.devid = sch->devno;
++    dev->dev_id.valid = true;
++
++    dev->subch_id.cssid = sch->cssid;
++    dev->subch_id.ssid = sch->ssid;
++    dev->subch_id.devid = sch->schid;
++    dev->subch_id.valid = true;
 +}
 +
-+/**
-+ * css_register_io_adapters: Register I/O adapters per ISC during init
-+ *
-+ * @swap: an indication if byte swap is needed.
-+ * @maskable: an indication if the adapter is subject to the mask operation.
-+ * @errp: location to store error information.
-+ */
-+void css_register_io_adapters(CssIoAdapterType type, bool swap, bool maskable,
-+                              Error **errp)
++static void ccw_device_realize(CcwDevice *dev, Error **errp)
 +{
-+    uint32_t id;
-+    int ret, isc;
-     IoAdapter *adapter;
--    bool found = false;
--    int ret;
-     S390FLICState *fs = s390_get_flic();
-     S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
- 
--    *id = 0;
--    QTAILQ_FOREACH(adapter, &channel_subsys.io_adapters, sibling) {
--        if ((adapter->type == type) && (adapter->isc == isc)) {
--            *id = adapter->id;
--            found = true;
--            ret = 0;
-+    /*
-+     * Disallow multiple registrations for the same device type.
-+     * Report an error if registering for an already registered type.
-+     */
-+    if (channel_subsys.io_adapters[type][0]) {
-+        error_setg(errp, "Adapters for type %d already registered", type);
-+    }
++    ccw_device_refill_ids(dev);
++}
 +
-+    for (isc = 0; isc <= MAX_ISC; isc++) {
-+        id = (type << 3) | isc;
-+        ret = fsc->register_io_adapter(fs, id, isc, swap, maskable);
-+        if (ret == 0) {
-+            adapter = g_new0(IoAdapter, 1);
-+            adapter->id = id;
-+            adapter->isc = isc;
-+            adapter->type = type;
-+            channel_subsys.io_adapters[type][isc] = adapter;
-+        } else {
-+            error_setg_errno(errp, -ret, "Unexpected error %d when "
-+                             "registering adapter %d", ret, id);
-             break;
-         }
--        if (adapter->id >= *id) {
--            *id = adapter->id + 1;
--        }
--    }
--    if (found) {
--        goto out;
-     }
--    adapter = g_new0(IoAdapter, 1);
--    ret = fsc->register_io_adapter(fs, *id, isc, swap, maskable);
--    if (ret == 0) {
--        adapter->id = *id;
--        adapter->isc = isc;
--        adapter->type = type;
--        QTAILQ_INSERT_TAIL(&channel_subsys.io_adapters, adapter, sibling);
--    } else {
--        g_free(adapter);
--        fprintf(stderr, "Unexpected error %d when registering adapter %d\n",
--                ret, *id);
++static Property ccw_device_properties[] = {
++    DEFINE_PROP_CSS_DEV_ID_RO("dev_id", CcwDevice, dev_id),
++    DEFINE_PROP_CSS_DEV_ID_RO("subch_id", CcwDevice, subch_id),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-+    /*
-+     * No need to free registered adapters in kvm: kvm will clean up
-+     * when the machine goes away.
-+     */
-+    if (ret) {
-+        for (isc--; isc >= 0; isc--) {
-+            g_free(channel_subsys.io_adapters[type][isc]);
-+            channel_subsys.io_adapters[type][isc] = NULL;
-+        }
-     }
--out:
--    return ret;
++static void ccw_device_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    CCWDeviceClass *k = CCW_DEVICE_CLASS(klass);
 +
- }
- 
- static void css_clear_io_interrupt(uint16_t subchannel_id,
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 1570f2d12a..a8a1bab50a 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -581,6 +581,9 @@ static int s390_pcihost_init(SysBusDevice *dev)
-     s->bus_no = 0;
-     QTAILQ_INIT(&s->pending_sei);
-     QTAILQ_INIT(&s->zpci_devs);
++    k->realize = ccw_device_realize;
++    k->refill_ids = ccw_device_refill_ids;
++    dc->props = ccw_device_properties;
++}
 +
-+    css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false, &error_abort);
-+
-     return 0;
- }
+ static const TypeInfo ccw_device_info = {
+     .name = TYPE_CCW_DEVICE,
+     .parent = TYPE_DEVICE,
+     .instance_size = sizeof(CcwDevice),
+     .class_size = sizeof(CCWDeviceClass),
++    .class_init = ccw_device_class_init,
+     .abstract = true,
+ };
  
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 93980d6b1f..314a9cbad4 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -733,12 +733,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
- static int reg_irqs(CPUS390XState *env, S390PCIBusDevice *pbdev, ZpciFib fib)
- {
-     int ret, len;
-+    uint8_t isc = FIB_DATA_ISC(ldl_p(&fib.data));
+diff --git a/hw/s390x/ccw-device.h b/hw/s390x/ccw-device.h
+index 59ba01b6c5..48700fe23a 100644
+--- a/hw/s390x/ccw-device.h
++++ b/hw/s390x/ccw-device.h
+@@ -19,12 +19,19 @@ typedef struct CcwDevice {
+     DeviceState parent_obj;
+     SubchDev *sch;
+     /* <cssid>.<ssid>.<device number> */
++    /* The user-set busid of the virtual ccw device. */
+     CssDevId bus_id;
++    /* The actual busid of the virtual ccw device. */
++    CssDevId dev_id;
++    /* The actual busid of the virtual subchannel. */
++    CssDevId subch_id;
+ } CcwDevice;
  
--    ret = css_register_io_adapter(CSS_IO_ADAPTER_PCI,
--                                  FIB_DATA_ISC(ldl_p(&fib.data)), true, false,
--                                  &pbdev->routes.adapter.adapter_id);
--    assert(ret == 0);
--
-+    pbdev->routes.adapter.adapter_id = css_get_adapter_id(
-+                                       CSS_IO_ADAPTER_PCI, isc);
-     pbdev->summary_ind = get_indicator(ldq_p(&fib.aisb), sizeof(uint64_t));
-     len = BITS_TO_LONGS(FIB_DATA_NOI(ldl_p(&fib.data))) * sizeof(unsigned long);
-     pbdev->indicator = get_indicator(ldq_p(&fib.aibv), len);
-@@ -757,7 +755,7 @@ static int reg_irqs(CPUS390XState *env, S390PCIBusDevice *pbdev, ZpciFib fib)
-     pbdev->routes.adapter.summary_offset = FIB_DATA_AISBO(ldl_p(&fib.data));
-     pbdev->routes.adapter.ind_addr = ldq_p(&fib.aibv);
-     pbdev->routes.adapter.ind_offset = FIB_DATA_AIBVO(ldl_p(&fib.data));
--    pbdev->isc = FIB_DATA_ISC(ldl_p(&fib.data));
-+    pbdev->isc = isc;
-     pbdev->noi = FIB_DATA_NOI(ldl_p(&fib.data));
-     pbdev->sum = FIB_DATA_SUM(ldl_p(&fib.data));
+ typedef struct CCWDeviceClass {
+     DeviceClass parent_class;
+     void (*unplug)(HotplugHandler *, DeviceState *, Error **);
++    void (*realize)(CcwDevice *, Error **);
++    void (*refill_ids)(CcwDevice *);
+ } CCWDeviceClass;
  
+ static inline CcwDevice *to_ccw_dev_fast(DeviceState *d)
 diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index b728439d40..f376381b9c 100644
+index 00b3bde4e9..b71ea94118 100644
 --- a/hw/s390x/virtio-ccw.c
 +++ b/hw/s390x/virtio-ccw.c
-@@ -616,10 +616,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-                 dev->routes.adapter.ind_offset = ind_bit;
-                 dev->routes.adapter.summary_offset = 7;
-                 cpu_physical_memory_unmap(thinint, hw_len, 0, hw_len);
--                ret = css_register_io_adapter(CSS_IO_ADAPTER_VIRTIO,
--                                              dev->thinint_isc, true, false,
--                                              &dev->routes.adapter.adapter_id);
--                assert(ret == 0);
-+                dev->routes.adapter.adapter_id = css_get_adapter_id(
-+                                                 CSS_IO_ADAPTER_VIRTIO,
-+                                                 dev->thinint_isc);
-                 sch->thinint_active = ((dev->indicators != NULL) &&
-                                        (dev->summary_indicator != NULL));
-                 sch->curr_status.scsw.count = ccw.count - len;
-@@ -1308,9 +1307,9 @@ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
-     dev->thinint_isc = qemu_get_byte(f);
-     dev->revision = qemu_get_be32(f);
-     if (s->thinint_active) {
--        return css_register_io_adapter(CSS_IO_ADAPTER_VIRTIO,
--                                       dev->thinint_isc, true, false,
--                                       &dev->routes.adapter.adapter_id);
-+        dev->routes.adapter.adapter_id = css_get_adapter_id(
-+                                         CSS_IO_ADAPTER_VIRTIO,
-+                                         dev->thinint_isc);
+@@ -680,6 +680,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+ {
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
++    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+     SubchDev *sch = css_create_virtual_sch(ccw_dev->bus_id, errp);
+     Error *err = NULL;
+ 
+@@ -689,8 +690,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+     if (!virtio_ccw_rev_max(dev) && dev->force_revision_1) {
+         error_setg(&err, "Invalid value of property max_rev "
+                    "(is %d expected >= 1)", virtio_ccw_rev_max(dev));
+-        error_propagate(errp, err);
+-        return;
++        goto out_err;
      }
  
-     return 0;
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index cdc73fe0aa..f1f0d7f07a 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -23,6 +23,8 @@
- #define MAX_CSSID 255
- #define MAX_CHPID 255
+     sch->driver_data = dev;
+@@ -713,13 +713,23 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
  
-+#define MAX_ISC 7
+     if (k->realize) {
+         k->realize(dev, &err);
++        if (err) {
++            goto out_err;
++        }
+     }
 +
- #define MAX_CIWS 62
++    ck->realize(ccw_dev, &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+-        ccw_dev->sch = NULL;
+-        g_free(sch);
++        goto out_err;
+     }
++
++    return;
++
++out_err:
++    error_propagate(errp, err);
++    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
++    ccw_dev->sch = NULL;
++    g_free(sch);
+ }
  
- #define VIRTUAL_CSSID 0xfe
-@@ -130,8 +132,9 @@ typedef enum {
-     CSS_IO_ADAPTER_TYPE_NUMS,
- } CssIoAdapterType;
+ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+@@ -1261,12 +1271,17 @@ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
+ {
+     VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+     CcwDevice *ccw_dev = CCW_DEVICE(d);
++    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+     SubchDev *s = ccw_dev->sch;
+     VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+     int len;
  
--int css_register_io_adapter(CssIoAdapterType type, uint8_t isc, bool swap,
--                            bool maskable, uint32_t *id);
-+uint32_t css_get_adapter_id(CssIoAdapterType type, uint8_t isc);
-+void css_register_io_adapters(CssIoAdapterType type, bool swap, bool maskable,
-+                              Error **errp);
- 
- #ifndef CONFIG_USER_ONLY
- SubchDev *css_find_subch(uint8_t m, uint8_t cssid, uint8_t ssid,
+     s->driver_data = dev;
+     subch_device_load(s, f);
++    /* Re-fill subch_id after loading the subchannel states.*/
++    if (ck->refill_ids) {
++        ck->refill_ids(ccw_dev);
++    }
+     len = qemu_get_be32(f);
+     if (len != 0) {
+         dev->indicators = get_indicator(qemu_get_be64(f), len);
 -- 
 2.11.0
