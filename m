@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d1XmF-0000gm-Qh
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:35:08 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1Xnq-00020g-K4
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:36:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d1XmB-0003EA-Qv
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:35:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33334)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d1XmB-0003Ds-Lo
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:35:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d1Xm9-00056W-Es
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:35:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5A0992E80BF
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:35:01 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1Xnn-0003xO-DD
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:36:46 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3452
+	helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1Xnm-0003wT-Ge
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:36:43 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 21 Apr 2017 12:36:17 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA238B4D@DGGEMA505-MBS.china.huawei.com>
+References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
+	<1492392806-53720-13-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1492392806-53720-13-git-send-email-longpeng2@huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Apr 2017 12:24:45 -0000
-From: Andreas Gustafsson <gson@gson.org>
-Reply-To: Bug 1481272 <1481272@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150804095638.25012.1470.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170421122445.16547.49920.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1481272] Re: main-loop: WARNING: I/O thread spun
- for 1000 iterations
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 12/18] crypto: introduce some
+ common functions for af_alg backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +30,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: longpeng <longpeng2@huawei.com>, "berrange@redhat.com" <berrange@redhat.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-http://gnats.netbsd.org/52184 looks like it may be related.
 
--- =
+> -----Original Message-----
+> From: longpeng
+> Sent: Monday, April 17, 2017 9:33 AM
+> To: berrange@redhat.com
+> Cc: Gonglei (Arei); Huangweidong (C); armbru@redhat.com;
+> eblake@redhat.com; mst@redhat.com; qemu-devel@nongnu.org; longpeng
+> Subject: [PATCH v2 for-2.10 12/18] crypto: introduce some common function=
+s
+> for af_alg backend
+>=20
+> The AF_ALG socket family is the userspace interface for linux
+> crypto API, this patch adds af_alg family support and some common
+> functions for af_alg backend. It'll be used by afalg-backend crypto
+> latter.
+>=20
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> ---
+>  configure            |  21 ++++++++++
+>  crypto/Makefile.objs |   1 +
+>  crypto/afalg.c       | 115
+> +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  crypto/afalgpriv.h   |  54 ++++++++++++++++++++++++
+>  4 files changed, 191 insertions(+)
+>  create mode 100644 crypto/afalg.c
+>  create mode 100644 crypto/afalgpriv.h
+>=20
+> diff --git a/configure b/configure
+> index be4d326..088e2de 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4741,6 +4741,23 @@ if compile_prog "" "" ; then
+>      have_af_vsock=3Dyes
+>  fi
+>=20
+> +##########################################
+> +# check for usable AF_ALG environment
+> +hava_af_alg=3Dno
+> +cat > $TMPC << EOF
+> +#include <errno.h>
+> +#include <sys/types.h>
+> +#include <sys/socket.h>
+> +int main(void) {
+> +    int sock;
+> +    sock =3D socket(AF_ALG, SOCK_SEQPACKET, 0);
+> +    return sock;
+> +}
+> +EOF
+> +if compile_prog "" "" ; then
+> +    have_af_alg=3Dyes
+> +fi
+> +
+>  #################################################
+>  # Sparc implicitly links with --relax, which is
+>  # incompatible with -r, so --no-relax should be
+> @@ -5771,6 +5788,10 @@ if test "$have_af_vsock" =3D "yes" ; then
+>    echo "CONFIG_AF_VSOCK=3Dy" >> $config_host_mak
+>  fi
+>=20
+> +if test "$have_af_alg" =3D "yes" ; then
+> +  echo "CONFIG_AF_ALG=3Dy" >> $config_host_mak
+> +fi
+> +
+>  if test "$have_sysmacros" =3D "yes" ; then
+>    echo "CONFIG_SYSMACROS=3Dy" >> $config_host_mak
+>  fi
+> diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+> index 1f749f2..2be5a3a 100644
+> --- a/crypto/Makefile.objs
+> +++ b/crypto/Makefile.objs
+> @@ -10,6 +10,7 @@ crypto-obj-$(if $(CONFIG_NETTLE),n,$(if
+> $(CONFIG_GCRYPT_HMAC),n,y)) +=3D hmac-glib
+>  crypto-obj-y +=3D aes.o
+>  crypto-obj-y +=3D desrfb.o
+>  crypto-obj-y +=3D cipher.o
+> +crypto-obj-$(CONFIG_AF_ALG) +=3D afalg.o
+>  crypto-obj-y +=3D tlscreds.o
+>  crypto-obj-y +=3D tlscredsanon.o
+>  crypto-obj-y +=3D tlscredsx509.o
+> diff --git a/crypto/afalg.c b/crypto/afalg.c
+> new file mode 100644
+> index 0000000..72d668e
+> --- /dev/null
+> +++ b/crypto/afalg.c
+> @@ -0,0 +1,115 @@
+> +/*
+> + * QEMU Crypto af_alg support
+> + *
+> + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
+> + *
+> + * Authors:
+> + *    Longpeng(Mike) <longpeng2@huawei.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.  See the COPYING file in the
+> + * top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+> +#include "qemu/sockets.h"
+> +#include "qapi/error.h"
+> +#include "afalgpriv.h"
+> +
+> +static bool
+> +qcrypto_afalg_build_saddr(const char *type, const char *name,
+> +                          struct sockaddr_alg *salg, Error **errp)
+> +{
+> +    memset(salg, 0, sizeof(*salg));
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1481272
+Why not initialize it in its caller?
 
-Title:
-  main-loop: WARNING: I/O thread spun for 1000 iterations
+> +    salg->salg_family =3D AF_ALG;
+> +
+> +    if (qemu_strnlen(type, SALG_TYPE_LEN_MAX) =3D=3D SALG_TYPE_LEN_MAX)
+> {
+> +        error_setg(errp, "Afalg type(%s) is larger than %d bytes",
+> +                   type, SALG_TYPE_LEN_MAX);
+> +        return false;
+> +    }
+> +
+> +    if (qemu_strnlen(name, SALG_NAME_LEN_MAX) =3D=3D
+> SALG_NAME_LEN_MAX) {
+> +        error_setg(errp, "Afalg name(%s) is larger than %d bytes",
+> +                   name, SALG_NAME_LEN_MAX);
+> +        return false;
+> +    }
+> +
+> +    pstrcpy((char *)salg->salg_type, SALG_TYPE_LEN_MAX, type);
+> +    pstrcpy((char *)salg->salg_name, SALG_NAME_LEN_MAX, name);
+> +
+> +    return true;
+> +}
+> +
+> +static int
+> +qcrypto_afalg_socket_bind(const char *type, const char *name,
+> +                          Error **errp)
+> +{
+> +    int sbind;
+> +    struct sockaddr_alg salg;
+> +
+> +    if (!qcrypto_afalg_build_saddr(type, name, &salg, errp)) {
+> +        return -1;
+> +    }
+> +
+> +    sbind =3D qemu_socket(AF_ALG, SOCK_SEQPACKET, 0);
+> +    if (sbind < 0) {
+> +        error_setg_errno(errp, errno, "Failed to create socket");
+> +        return -1;
+> +    }
+> +
+> +    if (bind(sbind, (const struct sockaddr *)&salg, sizeof(salg)) !=3D 0=
+) {
+> +        error_setg_errno(errp, errno, "Failed to bind socket");
+> +        closesocket(sbind);
+> +        return -1;
+> +    }
+> +
+> +    return sbind;
+> +}
+> +
+> +QCryptoAFAlg *
+> +qcrypto_afalg_comm_alloc(const char *type, const char *name,
+> +                         Error **errp)
+> +{
+> +    QCryptoAFAlg *afalg =3D NULL;
 
-Status in QEMU:
-  New
+A superfluous initialization.
 
-Bug description:
-  I compile the latest qemu to launch a VM but the monitor output the
-  "main-loop: WARNING: I/O thread spun for 1000 iterations".
+> +
+> +    afalg =3D g_new0(QCryptoAFAlg, 1);
+> +    /* initilize crypto API socket */
+> +    afalg->opfd =3D -1;
+> +    afalg->tfmfd =3D qcrypto_afalg_socket_bind(type, name, errp);
+> +    if (afalg->tfmfd =3D=3D -1) {
+> +        goto error;
+> +    }
+> +
+> +    afalg->opfd =3D qemu_accept(afalg->tfmfd, NULL, 0);
+> +    if (afalg->opfd =3D=3D -1) {
+> +        error_setg_errno(errp, errno, "Failed to accept socket");
+> +        goto error;
+> +    }
+> +
+> +    return afalg;
+> +
+> +error:
+> +    qcrypto_afalg_comm_free(afalg);
+> +    return NULL;
+> +}
+> +
+> +void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg)
+> +{
+> +    if (afalg) {
+> +        if (afalg->msg) {
+> +            g_free(afalg->msg->msg_control);
+> +            g_free(afalg->msg);
+> +        }
+> +
+> +        if (afalg->tfmfd !=3D -1) {
+> +            closesocket(afalg->tfmfd);
+> +        }
+> +
+> +        if (afalg->opfd !=3D -1) {
+> +            closesocket(afalg->opfd);
+> +        }
+> +
+> +        g_free(afalg);
+> +    }
+> +}
+> diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
+> new file mode 100644
+> index 0000000..155130b
+> --- /dev/null
+> +++ b/crypto/afalgpriv.h
+> @@ -0,0 +1,54 @@
+> +/*
+> + * QEMU Crypto af_alg support
+> + *
+> + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
+> + *
+> + * Authors:
+> + *    Longpeng(Mike) <longpeng2@huawei.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.  See the COPYING file in the
+> + * top-level directory.
+> + */
+> +
+> +#ifndef QCRYPTO_AFALGPRIV_H
+> +#define QCRYPTO_AFALGPRIV_H
+> +
+> +#include <linux/if_alg.h>
+> +
+> +#define SALG_TYPE_LEN_MAX 14
+> +#define SALG_NAME_LEN_MAX 64
+> +
+> +typedef struct QCryptoAFAlg QCryptoAFAlg;
+> +
+> +struct QCryptoAFAlg {
+> +    int tfmfd;
+> +    int opfd;
+> +    struct msghdr *msg;
+> +    struct cmsghdr *cmsg;
+> +};
+> +
+> +/**
+> + * qcrypto_afalg_comm_alloc:
+> + * @type: the type of crypto opeartion
+> + * @name: the name of crypto opeartion
 
-  # /usr/local/bin/qemu-system-x86_64 -name rhel6 -S -no-kvm -m 1024M -real=
-time mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid c9dd2a5c-40=
-f2-fd3d-3c54-9cd84f8b9174 -rtc base=3Dutc  -drive file=3D/home/samba-share/=
-ubuntu.img,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone -d=
-evice virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=
-=3Ddisk,serial=3D425618d4-871f-4021-bc5d-bcd7f1b5ca9c,bootindex=3D0 -vnc :1=
- -boot menu=3Don -monitor stdio
-  QEMU 2.3.93 monitor - type 'help' for more information
-  (qemu) c
-  (qemu) main-loop: WARNING: I/O thread spun for 1000 iterations           =
-    <-----------------------
+s/opeartion/operation/g
 
-  qemu]# git branch -v
-  * master               e95edef Merge remote-tracking branch 'remotes/ssta=
-bellini/tags/xen-migration-2.4-tag' into staging
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1481272/+subscriptions
+> + *
+> + * Allocate a QCryptoAFAlg object and bind itself to
+> + * a AF_ALG socket.
+> + *
+> + * Returns:
+> + *  a new QCryptoAFAlg object, or NULL in error.
+> + */
+> +QCryptoAFAlg *
+> +qcrypto_afalg_comm_alloc(const char *type, const char *name,
+> +                         Error **errp);
+> +
+> +/**
+> + * afalg_comm_free:
+> + * @afalg: the QCryptoAFAlg object
+> + *
+> + * Free the @afalg.
+> + */
+> +void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg);
+> +
+> +#endif
+> --
+> 1.8.3.1
+>=20
