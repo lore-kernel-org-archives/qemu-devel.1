@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d1UgF-0001we-Qq
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:45 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d1UgF-0001wW-Oi
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d1UgC-0001EV-EP
+	(envelope-from <kraxel@redhat.com>) id 1d1UgD-0001Eu-1e
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34378)
+Received: from mx1.redhat.com ([209.132.183.28]:53384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d1UgC-0001Dp-7J
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d1UgC-0001EK-SZ
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:40 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 81B74CDF98
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:16:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E0E737575A
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:16:39 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 21 Apr 2017 11:16:26 +0200
-Message-Id: <20170421091632.30900-4-kraxel@redhat.com>
+Date: Fri, 21 Apr 2017 11:16:28 +0200
+Message-Id: <20170421091632.30900-6-kraxel@redhat.com>
 In-Reply-To: <20170421091632.30900-1-kraxel@redhat.com>
 References: <20170421091632.30900-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/9] vga: add vga_scanline_invalidated helper
+Subject: [Qemu-devel] [PATCH 5/9] framebuffer: make display updates thread
+ safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +33,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Add vga_scanline_invalidated helper to check whenever a scanline was
-invalidated.  Add a sanity check to fix OOB read access for display
-heights larger than 2048.
-
-Only cirrus uses this, for hardware cursor rendering, so having this
-work properly for the first 2048 scanlines only shouldn't be a problem
-as the cirrus can't handle large resolutions anyway.  Also changing the
-invalidated_y_table size would break live migration.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/vga.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ hw/display/framebuffer.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index 69c3e1d674..3991b88aac 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1434,6 +1434,14 @@ void vga_invalidate_scanlines(VGACommonState *s, int y1, int y2)
-     }
- }
- 
-+static bool vga_scanline_invalidated(VGACommonState *s, int y)
-+{
-+    if (y >= VGA_MAX_HEIGHT) {
-+        return false;
-+    }
-+    return s->invalidated_y_table[y >> 5] & (1 << (y & 0x1f));
-+}
-+
- void vga_sync_dirty_bitmap(VGACommonState *s)
+diff --git a/hw/display/framebuffer.c b/hw/display/framebuffer.c
+index 25aa46c8c7..d7310d25f2 100644
+--- a/hw/display/framebuffer.c
++++ b/hw/display/framebuffer.c
+@@ -67,7 +67,7 @@ void framebuffer_update_display(
+     int *first_row, /* Input and output.  */
+     int *last_row /* Output only */)
  {
-     memory_region_sync_dirty_bitmap(&s->vram);
-@@ -1638,8 +1646,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-         page1 = addr + bwidth - 1;
-         update |= memory_region_get_dirty(&s->vram, page0, page1 - page0,
-                                           DIRTY_MEMORY_VGA);
--        /* explicit invalidation for the hardware cursor */
--        update |= (s->invalidated_y_table[y >> 5] >> (y & 0x1f)) & 1;
-+        /* explicit invalidation for the hardware cursor (cirrus only) */
-+        update |= vga_scanline_invalidated(s, y);
-         if (update) {
-             if (y_start < 0)
-                 y_start = y;
-@@ -1686,7 +1694,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-                                   page_max - page_min,
-                                   DIRTY_MEMORY_VGA);
-     }
--    memset(s->invalidated_y_table, 0, ((height + 31) >> 5) * 4);
-+    memset(s->invalidated_y_table, 0, sizeof(s->invalidated_y_table));
- }
+-    hwaddr src_len;
++    DirtyBitmapSnapshot *snap;
+     uint8_t *dest;
+     uint8_t *src;
+     int first, last = 0;
+@@ -78,7 +78,6 @@ void framebuffer_update_display(
  
- static void vga_draw_blank(VGACommonState *s, int full_update)
+     i = *first_row;
+     *first_row = -1;
+-    src_len = (hwaddr)src_width * rows;
+ 
+     mem = mem_section->mr;
+     if (!mem) {
+@@ -102,9 +101,10 @@ void framebuffer_update_display(
+     src += i * src_width;
+     dest += i * dest_row_pitch;
+ 
++    snap = memory_region_snapshot_and_clear_dirty(mem, addr, src_width * rows,
++                                                  DIRTY_MEMORY_VGA);
+     for (; i < rows; i++) {
+-        dirty = memory_region_get_dirty(mem, addr, src_width,
+-                                             DIRTY_MEMORY_VGA);
++        dirty = memory_region_snapshot_get_dirty(mem, snap, addr, src_width);
+         if (dirty || invalidate) {
+             fn(opaque, dest, src, cols, dest_col_pitch);
+             if (first == -1)
+@@ -115,11 +115,10 @@ void framebuffer_update_display(
+         src += src_width;
+         dest += dest_row_pitch;
+     }
++    g_free(snap);
+     if (first < 0) {
+         return;
+     }
+-    memory_region_reset_dirty(mem, mem_section->offset_within_region, src_len,
+-                              DIRTY_MEMORY_VGA);
+     *first_row = first;
+     *last_row = last;
+ }
 -- 
 2.9.3
