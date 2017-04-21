@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d1Uk6-0004qQ-65
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:20:42 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d1Ulm-00062K-LM
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d1Uk3-0002P2-2p
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:20:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35722)
+	(envelope-from <kraxel@redhat.com>) id 1d1Ulj-0003AO-HZ
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:22:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d1Uk2-0002Ot-Sy
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:20:39 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170412135312.1686-3-lvivier@redhat.com> (Laurent Vivier's
-	message of "Wed, 12 Apr 2017 15:53:12 +0200")
-References: <20170412135312.1686-1-lvivier@redhat.com>
-	<20170412135312.1686-3-lvivier@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Fri, 21 Apr 2017 11:20:32 +0200
-Message-ID: <87pog6dsm7.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d1Ulj-0003AH-Bp
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:22:23 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D309711E7
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:22:22 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 21 Apr 2017 11:22:14 +0200
+Message-Id: <20170421092214.8176-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-rng: stop virtqueue while
- the CPU is stopped
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] virtio-gpu: add xres and yres properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Laurent Vivier <lvivier@redhat.com> wrote:
-> If we modify the virtio-rng virqueue while the
-> vmstate is already migrated we can have some
-> inconsistencies between the virtqueue state and
-> the memory content.
->
-> To avoid this, stop the virtqueue while the CPU
-> is stopped.
->
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
+So the default resolution is configurable.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/hw/virtio/virtio-gpu.h | 2 ++
+ hw/display/virtio-gpu.c        | 6 ++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gp=
+u.h
+index f3a98a3261..f3ffdceca4 100644
+--- a/include/hw/virtio/virtio-gpu.h
++++ b/include/hw/virtio/virtio-gpu.h
+@@ -72,6 +72,8 @@ struct virtio_gpu_conf {
+     uint64_t max_hostmem;
+     uint32_t max_outputs;
+     uint32_t flags;
++    uint32_t xres;
++    uint32_t yres;
+ };
+=20
+ struct virtio_gpu_ctrl_command {
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 9b530ab5b0..01bceb44da 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -1170,8 +1170,8 @@ static void virtio_gpu_device_realize(DeviceState *=
+qdev, Error **errp)
+     virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
+                 g->config_size);
+=20
+-    g->req_state[0].width =3D 1024;
+-    g->req_state[0].height =3D 768;
++    g->req_state[0].width =3D g->conf.xres;
++    g->req_state[0].height =3D g->conf.yres;
+=20
+     if (virtio_gpu_virgl_enabled(g->conf)) {
+         /* use larger control queue in 3d mode */
+@@ -1291,6 +1291,8 @@ static Property virtio_gpu_properties[] =3D {
+     DEFINE_PROP_BIT("stats", VirtIOGPU, conf.flags,
+                     VIRTIO_GPU_FLAG_STATS_ENABLED, false),
+ #endif
++    DEFINE_PROP_UINT32("xres", VirtIOGPU, conf.xres, 1024),
++    DEFINE_PROP_UINT32("yres", VirtIOGPU, conf.yres, 768),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+--=20
+2.9.3
