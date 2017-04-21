@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exs-0004Id-Nh
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:37 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d1exb-0003qp-Ma
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d1exr-0002k2-Hl
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:36 -0400
-Received: from mail.kernel.org ([198.145.29.136]:43142)
+	(envelope-from <sstabellini@kernel.org>) id 1d1exa-0002g7-BY
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:19 -0400
+Received: from mail.kernel.org ([198.145.29.136]:42750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d1exr-0002jr-Bm
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:35 -0400
+	id 1d1exa-0002fy-33
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 16:15:18 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Fri, 21 Apr 2017 13:14:58 -0700
-Message-Id: <1492805702-19690-17-git-send-email-sstabellini@kernel.org>
+Date: Fri, 21 Apr 2017 13:14:48 -0700
+Message-Id: <1492805702-19690-7-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1492805702-19690-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
 	<1492805702-19690-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL 17/21] xen/9pfs: build and register Xen 9pfs
- backend
+Subject: [Qemu-devel] [PULL 07/21] xen: use libxendevice model to restrict
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +27,161 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Paul Durrant <paul.durrant@citrix.com>
 
-Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-CC: anthony.perard@citrix.com
-CC: jgross@suse.com
-CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-CC: Greg Kurz <groug@kaod.org>
+From: Paul Durrant <paul.durrant@citrix.com>
+
+This patch adds a command-line option (-xen-domid-restrict) which will
+use the new libxendevicemodel API to restrict devicemodel [1] operations
+to the specified domid. (Such operations are not applicable to the xenpv
+machine type).
+
+This patch also adds a tracepoint to allow successful enabling of the
+restriction to be monitored.
+
+[1] I.e. operations issued by libxendevicemodel. Operation issued by other
+    xen libraries (e.g. libxenforeignmemory) are currently still unrestricted
+    but this will be rectified by subsequent patches.
+
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/9pfs/Makefile.objs        | 1 +
- hw/xen/xen_backend.c         | 3 +++
- include/hw/xen/xen_backend.h | 3 +++
- 3 files changed, 7 insertions(+)
+ hw/xen/trace-events         |  1 +
+ include/hw/xen/xen.h        |  1 +
+ include/hw/xen/xen_common.h | 20 ++++++++++++++++++++
+ qemu-options.hx             |  7 +++++++
+ vl.c                        |  8 ++++++++
+ xen-hvm.c                   |  8 ++++++++
+ 6 files changed, 45 insertions(+)
 
-diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-index 32197e6..cab5e94 100644
---- a/hw/9pfs/Makefile.objs
-+++ b/hw/9pfs/Makefile.objs
-@@ -5,5 +5,6 @@ common-obj-y += coth.o cofs.o codir.o cofile.o
- common-obj-y += coxattr.o 9p-synth.o
- common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
- common-obj-y += 9p-proxy.o
-+common-obj-$(CONFIG_XEN) += xen-9p-backend.o
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index c4fb6f1..5615dce 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -11,3 +11,4 @@ xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %
+ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+ xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
++xen_domid_restrict(int err) "err: %u"
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index 2b1733b..7efcdaa 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -21,6 +21,7 @@ enum xen_mode {
  
- obj-y += virtio-9p-device.o
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index d34c49e..c85f163 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -583,6 +583,9 @@ void xen_be_register_common(void)
-     xen_be_register("console", &xen_console_ops);
-     xen_be_register("vkbd", &xen_kbdmouse_ops);
-     xen_be_register("qdisk", &xen_blkdev_ops);
-+#ifdef CONFIG_VIRTFS
-+    xen_be_register("9pfs", &xen_9pfs_ops);
-+#endif
- #ifdef CONFIG_USB_LIBUSB
-     xen_be_register("qusb", &xen_usb_ops);
- #endif
-diff --git a/include/hw/xen/xen_backend.h b/include/hw/xen/xen_backend.h
-index 30811a1..852c2ea 100644
---- a/include/hw/xen/xen_backend.h
-+++ b/include/hw/xen/xen_backend.h
-@@ -47,6 +47,9 @@ extern struct XenDevOps xen_console_ops;      /* xen_console.c     */
- extern struct XenDevOps xen_kbdmouse_ops;     /* xen_framebuffer.c */
- extern struct XenDevOps xen_framebuffer_ops;  /* xen_framebuffer.c */
- extern struct XenDevOps xen_blkdev_ops;       /* xen_disk.c        */
-+#ifdef CONFIG_VIRTFS
-+extern struct XenDevOps xen_9pfs_ops;       /* xen-9p-backend.c        */
-+#endif
- extern struct XenDevOps xen_netdev_ops;       /* xen_nic.c         */
- #ifdef CONFIG_USB_LIBUSB
- extern struct XenDevOps xen_usb_ops;          /* xen-usb.c         */
+ extern uint32_t xen_domid;
+ extern enum xen_mode xen_mode;
++extern bool xen_domid_restrict;
+ 
+ extern bool xen_allowed;
+ 
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index fa990a0..0fcbba8 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -151,6 +151,13 @@ static inline int xendevicemodel_set_mem_type(
+     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+ }
+ 
++static inline int xendevicemodel_restrict(
++    xendevicemodel_handle *dmod, domid_t domid)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+ 
+ #undef XC_WANT_COMPAT_DEVICEMODEL_API
+@@ -206,6 +213,19 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+     return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
+ }
+ 
++static inline int xen_restrict(domid_t domid)
++{
++    int rc = xendevicemodel_restrict(xen_dmod, domid);
++
++    trace_xen_domid_restrict(errno);
++
++    if (errno == ENOTTY) {
++        return 0;
++    }
++
++    return rc;
++}
++
+ /* Xen 4.2 through 4.6 */
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 99af8ed..2043371 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3354,6 +3354,11 @@ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
+     "-xen-attach     attach to existing xen domain\n"
+     "                xend will use this when starting QEMU\n",
+     QEMU_ARCH_ALL)
++DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
++    "-xen-domid-restrict     restrict set of available xen operations\n"
++    "                        to specified domain id. (Does not affect\n"
++    "                        xenpv machine type).\n",
++    QEMU_ARCH_ALL)
+ STEXI
+ @item -xen-domid @var{id}
+ @findex -xen-domid
+@@ -3366,6 +3371,8 @@ Warning: should not be used when xend is in use (XEN only).
+ @findex -xen-attach
+ Attach to existing xen domain.
+ xend will use this when starting QEMU (XEN only).
++@findex -xen-domid-restrict
++Restrict set of available xen operations to specified domain id (XEN only).
+ ETEXI
+ 
+ DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
+diff --git a/vl.c b/vl.c
+index 0b4ed52..f46e070 100644
+--- a/vl.c
++++ b/vl.c
+@@ -205,6 +205,7 @@ static NotifierList machine_init_done_notifiers =
+ bool xen_allowed;
+ uint32_t xen_domid;
+ enum xen_mode xen_mode = XEN_EMULATE;
++bool xen_domid_restrict;
+ 
+ static int has_defaults = 1;
+ static int default_serial = 1;
+@@ -3933,6 +3934,13 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 xen_mode = XEN_ATTACH;
+                 break;
++            case QEMU_OPTION_xen_domid_restrict:
++                if (!(xen_available())) {
++                    error_report("Option not supported for this target");
++                    exit(1);
++                }
++                xen_domid_restrict = true;
++                break;
+             case QEMU_OPTION_trace:
+                 g_free(trace_file);
+                 trace_file = trace_opt_parse(optarg);
+diff --git a/xen-hvm.c b/xen-hvm.c
+index 4b928cf..335e263 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -1226,6 +1226,14 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
+ 
++    if (xen_domid_restrict) {
++        rc = xen_restrict(xen_domid);
++        if (rc < 0) {
++            error_report("failed to restrict: error %d", errno);
++            goto err;
++        }
++    }
++
+     xen_create_ioreq_server(xen_domid, &state->ioservid);
+ 
+     state->exit.notify = xen_exit_notifier;
 -- 
 1.9.1
