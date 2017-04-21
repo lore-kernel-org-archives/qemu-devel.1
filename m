@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d1XBS-0001nc-3x
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:07 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d1XBO-0007Dz-78
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1XBQ-0001lq-KM
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d1XBO-0007DM-0x
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:02 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E447571096
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 11:57:00 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Fri, 21 Apr 2017 13:55:50 +0200
-Message-Id: <20170421115646.15544-10-quintela@redhat.com>
-In-Reply-To: <20170421115646.15544-1-quintela@redhat.com>
-References: <20170421115646.15544-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 09/65] ram: Change byte_xfer_{prev,
- now} type to uint64_t
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1XBM-0007Co-Mr
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:04 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3387
+	helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1XBL-00078C-PJ
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:00 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 21 Apr 2017 11:56:42 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA2389A2@DGGEMA505-MBS.china.huawei.com>
+References: <1492392806-53720-1-git-send-email-longpeng2@huawei.com>
+	<1492392806-53720-5-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1492392806-53720-5-git-send-email-longpeng2@huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 04/18] crypto: cipher:
+ introduce qcrypto_cipher_ctx_new for builtin-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +30,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+To: longpeng <longpeng2@huawei.com>, "berrange@redhat.com" <berrange@redhat.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
----
- migration/ram.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index aeef563..d13674f 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -158,7 +158,7 @@ struct RAMState {
-     /* last time we did a full bitmap_sync */
-     int64_t time_last_bitmap_sync;
-     /* bytes transferred at start_time */
--    int64_t bytes_xfer_prev;
-+    uint64_t bytes_xfer_prev;
- };
- typedef struct RAMState RAMState;
- 
-@@ -660,7 +660,7 @@ static void migration_bitmap_sync(RAMState *rs)
-     RAMBlock *block;
-     MigrationState *s = migrate_get_current();
-     int64_t end_time;
--    int64_t bytes_xfer_now;
-+    uint64_t bytes_xfer_now;
- 
-     rs->bitmap_sync_count++;
- 
--- 
-2.9.3
+
+> -----Original Message-----
+> From: longpeng
+> Sent: Monday, April 17, 2017 9:33 AM
+> To: berrange@redhat.com
+> Cc: Gonglei (Arei); Huangweidong (C); armbru@redhat.com;
+> eblake@redhat.com; mst@redhat.com; qemu-devel@nongnu.org; longpeng
+> Subject: [PATCH v2 for-2.10 04/18] crypto: cipher: introduce
+> qcrypto_cipher_ctx_new for builtin-backend
+>=20
+> Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
+> builtin-backend impls.
+>=20
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> ---
+>  crypto/cipher-builtin.c | 101 ++++++++++++++++++++++++++----------------=
+------
+>  1 file changed, 55 insertions(+), 46 deletions(-)
+>=20
+
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+
+
+> diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
+> index b4bc2b9..8cf47d1 100644
+> --- a/crypto/cipher-builtin.c
+> +++ b/crypto/cipher-builtin.c
+> @@ -235,23 +235,24 @@ static int qcrypto_cipher_setiv_aes(QCryptoCipher
+> *cipher,
+>=20
+>=20
+>=20
+> -static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
+> -                                   const uint8_t *key, size_t nkey,
+> -                                   Error **errp)
+> +static QCryptoCipherBuiltin *
+> +qcrypto_cipher_init_aes(QCryptoCipherMode mode,
+> +                        const uint8_t *key, size_t nkey,
+> +                        Error **errp)
+>  {
+>      QCryptoCipherBuiltin *ctxt;
+>=20
+> -    if (cipher->mode !=3D QCRYPTO_CIPHER_MODE_CBC &&
+> -        cipher->mode !=3D QCRYPTO_CIPHER_MODE_ECB &&
+> -        cipher->mode !=3D QCRYPTO_CIPHER_MODE_XTS) {
+> +    if (mode !=3D QCRYPTO_CIPHER_MODE_CBC &&
+> +        mode !=3D QCRYPTO_CIPHER_MODE_ECB &&
+> +        mode !=3D QCRYPTO_CIPHER_MODE_XTS) {
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[cipher->mode]);
+> -        return -1;
+> +                   QCryptoCipherMode_lookup[mode]);
+> +        return NULL;
+>      }
+>=20
+>      ctxt =3D g_new0(QCryptoCipherBuiltin, 1);
+>=20
+> -    if (cipher->mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+> +    if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
+>          if (AES_set_encrypt_key(key, nkey * 4, &ctxt->state.aes.key.enc)=
+ !=3D
+> 0) {
+>              error_setg(errp, "Failed to set encryption key");
+>              goto error;
+> @@ -291,13 +292,11 @@ static int qcrypto_cipher_init_aes(QCryptoCipher
+> *cipher,
+>      ctxt->encrypt =3D qcrypto_cipher_encrypt_aes;
+>      ctxt->decrypt =3D qcrypto_cipher_decrypt_aes;
+>=20
+> -    cipher->opaque =3D ctxt;
+> -
+> -    return 0;
+> +    return ctxt;
+>=20
+>   error:
+>      g_free(ctxt);
+> -    return -1;
+> +    return NULL;
+>  }
+>=20
+>=20
+> @@ -370,16 +369,17 @@ static int
+> qcrypto_cipher_setiv_des_rfb(QCryptoCipher *cipher,
+>  }
+>=20
+>=20
+> -static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
+> -                                       const uint8_t *key, size_t
+> nkey,
+> -                                       Error **errp)
+> +static QCryptoCipherBuiltin *
+> +qcrypto_cipher_init_des_rfb(QCryptoCipherMode mode,
+> +                            const uint8_t *key, size_t nkey,
+> +                            Error **errp)
+>  {
+>      QCryptoCipherBuiltin *ctxt;
+>=20
+> -    if (cipher->mode !=3D QCRYPTO_CIPHER_MODE_ECB) {
+> +    if (mode !=3D QCRYPTO_CIPHER_MODE_ECB) {
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[cipher->mode]);
+> -        return -1;
+> +                   QCryptoCipherMode_lookup[mode]);
+> +        return NULL;
+>      }
+>=20
+>      ctxt =3D g_new0(QCryptoCipherBuiltin, 1);
+> @@ -394,9 +394,7 @@ static int qcrypto_cipher_init_des_rfb(QCryptoCipher
+> *cipher,
+>      ctxt->encrypt =3D qcrypto_cipher_encrypt_des_rfb;
+>      ctxt->decrypt =3D qcrypto_cipher_decrypt_des_rfb;
+>=20
+> -    cipher->opaque =3D ctxt;
+> -
+> -    return 0;
+> +    return ctxt;
+>  }
+>=20
+>=20
+> @@ -426,12 +424,13 @@ bool
+> qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
+>  }
+>=20
+>=20
+> -QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+> -                                  QCryptoCipherMode mode,
+> -                                  const uint8_t *key, size_t nkey,
+> -                                  Error **errp)
+> +static QCryptoCipherBuiltin
+> *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
+> +
+> QCryptoCipherMode mode,
+> +                                                    const uint8_t
+> *key,
+> +                                                    size_t nkey,
+> +                                                    Error **errp)
+>  {
+> -    QCryptoCipher *cipher;
+> +    QCryptoCipherBuiltin *ctxt;
+>=20
+>      switch (mode) {
+>      case QCRYPTO_CIPHER_MODE_ECB:
+> @@ -444,39 +443,27 @@ QCryptoCipher
+> *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+>          return NULL;
+>      }
+>=20
+> -    cipher =3D g_new0(QCryptoCipher, 1);
+> -    cipher->alg =3D alg;
+> -    cipher->mode =3D mode;
+> -
+>      if (!qcrypto_cipher_validate_key_length(alg, mode, nkey, errp)) {
+> -        goto error;
+> +        return NULL;
+>      }
+>=20
+> -    switch (cipher->alg) {
+> +    switch (alg) {
+>      case QCRYPTO_CIPHER_ALG_DES_RFB:
+> -        if (qcrypto_cipher_init_des_rfb(cipher, key, nkey, errp) < 0) {
+> -            goto error;
+> -        }
+> +        ctxt =3D qcrypto_cipher_init_des_rfb(mode, key, nkey, errp);
+>          break;
+>      case QCRYPTO_CIPHER_ALG_AES_128:
+>      case QCRYPTO_CIPHER_ALG_AES_192:
+>      case QCRYPTO_CIPHER_ALG_AES_256:
+> -        if (qcrypto_cipher_init_aes(cipher, key, nkey, errp) < 0) {
+> -            goto error;
+> -        }
+> +        ctxt =3D qcrypto_cipher_init_aes(mode, key, nkey, errp);
+>          break;
+>      default:
+>          error_setg(errp,
+>                     "Unsupported cipher algorithm %s",
+> -                   QCryptoCipherAlgorithm_lookup[cipher->alg]);
+> -        goto error;
+> +                   QCryptoCipherAlgorithm_lookup[alg]);
+> +        return NULL;
+>      }
+>=20
+> -    return cipher;
+> -
+> - error:
+> -    g_free(cipher);
+> -    return NULL;
+> +    return ctxt;
+>  }
+>=20
+>  void qcrypto_cipher_free(QCryptoCipher *cipher)
+> @@ -537,3 +524,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+>=20
+>      return ctxt->setiv(cipher, iv, niv, errp);
+>  }
+> +
+> +
+> +QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+> +                                  QCryptoCipherMode mode,
+> +                                  const uint8_t *key, size_t nkey,
+> +                                  Error **errp)
+> +{
+> +    QCryptoCipher *cipher;
+> +    QCryptoCipherBuiltin *ctxt;
+> +
+> +    ctxt =3D qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+> +    if (ctxt =3D=3D NULL) {
+> +        return NULL;
+> +    }
+> +
+> +    cipher =3D g_new0(QCryptoCipher, 1);
+> +    cipher->alg =3D alg;
+> +    cipher->mode =3D mode;
+> +    cipher->opaque =3D ctxt;
+> +
+> +    return cipher;
+> +}
+> --
+> 1.8.3.1
+>=20
