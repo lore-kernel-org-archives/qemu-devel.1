@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d1OGB-0008RF-H4
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 22:25:25 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d1OmN-00047n-EW
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 22:58:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d1OG7-0001qR-50
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 22:25:23 -0400
-Resent-Message-Id: <E1d1OG7-0001qR-50@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d1OG6-0001q6-Sk
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 22:25:19 -0400
-In-Reply-To: <20170420202745.149601-1-lepton@google.com>
-Message-ID: <149274150681.45.13947934975578154787@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <jemmy858585@gmail.com>) id 1d1OmM-0005FT-89
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 22:58:39 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 20 Apr 2017 19:25:07 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] Fix wrong length in IP header in
- tcp_respond.
+In-Reply-To: <20170420100045.GB4747@noname.redhat.com>
+References: <1492677526-4739-1-git-send-email-lidongchen@tencent.com>
+	<20170420100045.GB4747@noname.redhat.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Fri, 21 Apr 2017 10:58:36 +0800
+Message-ID: <CAOGPPbcWmuysTJzuYS9vA2m6QBBmTnP9PLC-qXdU0u83hvj6=A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: use blk_co_pwrite_zeroes for
+ zero sectors when compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +23,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ytht.net@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, lepton@google.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, mreitz@redhat.com, qemu block <qemu-block@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNDIwMjAyNzQ1LjE0OTYwMS0xLWxlcHRvbkBnb29nbGUuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIEZpeCB3cm9uZyBsZW5ndGggaW4gSVAgaGVhZGVyIGlu
-IHRjcF9yZXNwb25kLgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
-RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
-bGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIk
-KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
-czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
-LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
-IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
-ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxNzA0MTQwODM3MTcuMTM2NDEt
-MS1sdml2aWVyQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDQxNDA4MzcxNy4xMzY0MS0xLWx2
-aXZpZXJAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmIzMTA1YmUg
-Rml4IHdyb25nIGxlbmd0aCBpbiBJUCBoZWFkZXIgaW4gdGNwX3Jlc3BvbmQuCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IEZpeCB3cm9uZyBsZW5ndGggaW4gSVAgaGVh
-ZGVyIGluIHRjcF9yZXNwb25kLi4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMyNDogRklMRTogc2xpcnAvdGNwX3N1YnIuYzoyMDc6CiteSSAgICBpcC0+aXBfbGVu
-ID0gbS0+bV9sZW47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-MzM6IEZJTEU6IHNsaXJwL3RjcF9zdWJyLmM6MjI3OgorXkkgICAgaXA2LT5pcF9wbCA9IHRjcGlw
-aF9zYXZlLnRpX2xlbjskCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Thu, Apr 20, 2017 at 6:00 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+> Am 20.04.2017 um 10:38 hat jemmy858585@gmail.com geschrieben:
+>> From: Lidong Chen <lidongchen@tencent.com>
+>>
+>> when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
+>> blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
+>> the time when converts the qcow2 image with lots of zero.
+>>
+>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>
+> Good catch, using blk_co_pwrite_zeroes() makes sense even for compressed
+> images.
+>
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index b220cf7..0256539 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -1675,13 +1675,20 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+>>               * write if the buffer is completely zeroed and we're allowed to
+>>               * keep the target sparse. */
+>>              if (s->compressed) {
+>> -                if (s->has_zero_init && s->min_sparse &&
+>> -                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
+>> -                {
+>> -                    assert(!s->target_has_backing);
+>> -                    break;
+>> +                if (buffer_is_zero(buf, n * BDRV_SECTOR_SIZE)) {
+>> +                    if (s->has_zero_init && s->min_sparse) {
+>> +                        assert(!s->target_has_backing);
+>> +                        break;
+>> +                    } else {
+>> +                        ret = blk_co_pwrite_zeroes(s->target,
+>> +                                           sector_num << BDRV_SECTOR_BITS,
+>> +                                           n << BDRV_SECTOR_BITS, 0);
+>> +                        if (ret < 0) {
+>> +                            return ret;
+>> +                        }
+>> +                        break;
+>> +                    }
+>>                  }
+>
+> If s->min_sparse == 0, we may neither skip the write not use
+> blk_co_pwrite_zeroes(), because this requires actual full allocation
+> with explicit zero sectors.
+>
+> Of course, if you fix this, what you end up with here is a duplicate of
+> the code path for non-compressed images. The remaining difference seems
+> to be the BDRV_REQ_WRITE_COMPRESSED flag and buffer_is_zero() vs.
+> is_allocated_sectors_min() (because uncompressed clusters can be written
+> partially, but compressed clusters can't).
+
+I have a try to unify the code.
+
+I don't understand why use  is_allocated_sectors_min when don't compressed.
+the s->min_sparse is 8 default, which is smaller than cluster_sectors.
+
+if a cluster which data is  8 sector zero and 8 sector non-zero
+repeated, it will call
+blk_co_pwritev and blk_co_pwrite_zeroes many times for a cluster.
+
+why not compare the zero by cluster_sectors size?
+
+>
+> So I suppose that instead of just fixing the above bug, we could actually
+> mostly unify the two code paths, if you want to have a try at it.
+>
+> Kevin
