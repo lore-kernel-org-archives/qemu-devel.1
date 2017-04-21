@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d1VSf-0003e7-69
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d1VSt-0003p1-6V
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d1VSe-0006tO-3A
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:45 -0400
-Date: Fri, 21 Apr 2017 11:06:29 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170421100629.GN27925@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170420040003.31074-1-famz@redhat.com>
-	<20170420153016.GI3227@redhat.com>
-	<20170420203250.GI4747@noname.redhat.com>
-	<87pog61fjr.fsf@dusky.pond.sub.org>
-	<20170421083137.GD27925@redhat.com>
-	<20170421085034.GD8342@lemon.lan>
+	(envelope-from <pbonzini@redhat.com>) id 1d1VSp-0006ut-W1
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d1VSp-0006ue-Pj
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 06:06:55 -0400
+References: <1491911135-216950-1-git-send-email-agraf@suse.de>
+	<CALMp9eT220btgiw7S-0cLswr1j=-OCuMwOAWuWS51EmNYYRuJw@mail.gmail.com>
+	<4622E361-52AB-40F2-9915-45C48F0DBCD2@suse.de>
+	<CALMp9eR7AWETNZA1pSBXW2BWcrJXPk-Y1hbNvwu2Vq7Dkf6AjA@mail.gmail.com>
+	<204f274d-697d-f9c6-8719-9bf91105f8b9@suse.de>
+	<20170412185249-mutt-send-email-mst@kernel.org>
+	<f1046a02-d42d-0b0b-47e0-f1055788a13b@redhat.com>
+	<03f26e4b-6355-602a-f817-2c1ab38de199@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <78ccf88c-9316-d922-8d8d-99442e6ce618@redhat.com>
+Date: Fri, 21 Apr 2017 12:06:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170421085034.GD8342@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH] sheepdog: Set error when connection fails
+In-Reply-To: <03f26e4b-6355-602a-f817-2c1ab38de199@suse.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6] kvm: better MWAIT emulation for guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, sheepdog@lists.wpkg.org, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>
-
-On Fri, Apr 21, 2017 at 04:50:34PM +0800, Fam Zheng wrote:
-> On Fri, 04/21 09:31, Daniel P. Berrange wrote:
-> > On Fri, Apr 21, 2017 at 07:43:36AM +0200, Markus Armbruster wrote:
-> > > Kevin Wolf <kwolf@redhat.com> writes:
-> > > 
-> > > > Am 20.04.2017 um 17:30 hat Daniel P. Berrange geschrieben:
-> > > >> On Thu, Apr 20, 2017 at 12:00:03PM +0800, Fam Zheng wrote:
-> > > >> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > >> > ---
-> > > >> >  block/sheepdog.c | 1 +
-> > > >> >  1 file changed, 1 insertion(+)
-> > > >> > 
-> > > >> > diff --git a/block/sheepdog.c b/block/sheepdog.c
-> > > >> > index fb9203e..7e889ee 100644
-> > > >> > --- a/block/sheepdog.c
-> > > >> > +++ b/block/sheepdog.c
-> > > >> > @@ -608,6 +608,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
-> > > >> >          qemu_set_nonblock(fd);
-> > > >> >      } else {
-> > > >> >          fd = -EIO;
-> > > >> > +        error_setg(errp, "Failed to connect to sheepdog server");
-> > > >> >      }
-> > > >> 
-> > > >> This doesn't make much sense to me. The lines just above the
-> > > >> diff context have this:
-> > > >> 
-> > > >>     fd = socket_connect(s->addr, errp, NULL, NULL);
-> > > >> 
-> > > >> socket_connect should have already reported an error on "errp"
-> > > >> in the scenario that 'fd == -1'.
-> > > >
-> > > > By the way, am I the only one who thinks that having errp anywhere else
-> > > > than as the last argument is bad style? I can easily see myself missing
-> > > > that this functions sets it because the last argument is NULL.
-> > > 
-> > > Yes, it's bad style because it's suprising.  Worth fixing.
-> > 
-> > In fact we can simply delete the last two arguments to socket_connect()
-> > entirely. Most code is now switched over to use QIOChannel APIs, so we
-> > don't have anything which uses the non-blocking connect feature of
-> > socket_connect() anymore.
-> 
-> There is one caller that passes non-NULL last two parameters, which seems
-> non-trivial to convert:
-> 
-> static int net_socket_connect_init(NetClientState *peer,
->                                    const char *model,
->                                    const char *name,
->                                    const char *host_str)
-> {
->     socket_connect_data *c = g_new0(socket_connect_data, 1);
->     int fd = -1;
->     Error *local_error = NULL;
-> 
->     c->peer = peer;
->     c->model = g_strdup(model);
->     c->name = g_strdup(name);
->     c->saddr = socket_parse(host_str, &local_error);
->     if (c->saddr == NULL) {
->         goto err;
->     }
-> 
->     fd = socket_connect(c->saddr, net_socket_connected, c, &local_error);
->     if (fd < 0) {
->         goto err;
->     }
-> 
->     return 0;
-> 
-> err:
->     error_report_err(local_error);
->     socket_connect_data_free(c);
->     return -1;
-> }
-
-Oh i missed that in my grep. I think it could probably be converted to
-QIOChannel though, at least for the initial connection setup. Then
-just steal the FD from the QIOChannel object for direct usage thereafter
-or something like that.
+To: Alexander Graf <agraf@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, LKML <linux-kernel@vger.kernel.org>, "Gabriel L. Somlo" <gsomlo@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, Joerg Roedel <joro@8bytes.org>, linux-doc@vger.kernel.org, qemu-devel@nongnu.org
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+On 21/04/2017 12:05, Alexander Graf wrote:
+> 
+> 
+> On 21.04.17 12:02, Paolo Bonzini wrote:
+>>
+>>
+>> On 12/04/2017 18:29, Michael S. Tsirkin wrote:
+>>> I don't really agree we do not need the PV flag. mwait on kvm is
+>>> different from mwait on bare metal in that you are heavily penalized by
+>>> scheduler for polling unless you configure the host just so.
+>>> HLT lets you give up the host CPU if you know you won't need
+>>> it for a long time.
+>>>
+>>> So while many people can get by with monitor cpuid (those that isolate
+>>> host CPUs) and it's a valuable option to have, I think a PV flag is also
+>>> a valuable option and can be set for more configurations.
+>>>
+>>> Guest has an idle driver calling mwait on short waits and halt on longer
+>>> ones.  I'm in fact testing an idle driver using such a PV flag and will
+>>> post when ready (after vacation ~3 weeks from now probably).
+>>
+>> For now I think I'm removing the PV flag, making this just an
+>> optimization of commit 87c00572ba05aa8c ("kvm: x86: emulate
+>> monitor and mwait instructions as nop").
+>>
+>> We can add it for 4.13 together with the idle driver.
+> 
+> I think that's a perfectly reasonable approach, yes. We can always add
+> the PV flag with the driver.
+> 
+> Thanks a lot!
+
+Queuing the patch for 4.12.
+
+Paolo
