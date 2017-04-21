@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1RlY-0003a6-67
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:10:01 -0400
+	(envelope-from <li.ping288@zte.com.cn>) id 1d1Rrr-000577-Do
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:16:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1RlU-0005UJ-RE
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:10:00 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3383
-	helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d1RlT-0005T9-Qz
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:09:56 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 21 Apr 2017 06:09:33 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA238353@DGGEMA505-MBS.china.huawei.com>
-References: <1492074674-124192-1-git-send-email-arei.gonglei@huawei.com>
-In-Reply-To: <1492074674-124192-1-git-send-email-arei.gonglei@huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: [Qemu-devel] Require for English style review (was RE: [PATCH v17
- 0/2] virtio-crypto: virtio crypto device specification)
+	(envelope-from <li.ping288@zte.com.cn>) id 1d1Rrp-0007wS-1Z
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:16:30 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:47413)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <li.ping288@zte.com.cn>) id 1d1Rrm-0007nh-PF
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 02:16:28 -0400
+From: Ping Li <li.ping288@zte.com.cn>
+Date: Sat, 22 Apr 2017 06:34:32 +0800
+Message-Id: <1492814072-4276-1-git-send-email-li.ping288@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] Block layer core: Fix qemu-img 'amend'
+ subcommand failure of adjusting backing file in different path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +22,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "agraf@suse.de" <agraf@suse.de>, "jasowang@redhat.com" <jasowang@redhat.com>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Wubin (H)" <wu.wubin@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, Zhbzg <zhbzg@huawei.com>, "Chenshanxi (Eety Chen, Euler)" <eety.chen@huawei.com>, "Zhanghuimin (Amy)" <amy.zhanghuimin@huawei.com>, Maoningning <maoningning@huawei.com>
+To: kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Ping Li <li.ping288@zte.com.cn>
 
-Hi all,
+Currently, qemu-img 'amend' subcommand would fail to adjust image's backing file
+which was moved into different path.
+For example, parent.qcow2, the backing file of leaf.qcow2, first is at /home/a/,
+then moved into /home/b/. Originally this command,
+ "qemu-img amend -f qcow2 -o backing_fmt=qcow2,backing_file=/home/b/parent.qcow2 leaf.qcow2",
+ would fail because qemu-img failed to open the old backing file of leaf.qcow2.
+Give the 'amend' subcommand a '-u' option to not open the old backing file
+ while openning leaf.qcow2.
 
-As a non-native English speaker,
-I sincerely hope you give me more suggestions about English
-style and/or grammar for the spec.
+Signed-off-by: Li Ping<li.ping288@zte.com.cn>
+---
+ qemu-img.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-
-Thanks in advance!
-
--Gonglei
-
-
-> -----Original Message-----
-> From: Gonglei (Arei)
-> Sent: Thursday, April 13, 2017 5:11 PM
-> To: qemu-devel@nongnu.org; virtio-dev@lists.oasis-open.org
-> Cc: Luonengjun; mst@redhat.com; cornelia.huck@de.ibm.com;
-> stefanha@redhat.com; denglingli@chinamobile.com; Jani Kokkonen;
-> Ola.Liljedahl@arm.com; Varun.Sethi@freescale.com; xin.zeng@intel.com;
-> brian.a.keating@intel.com; liang.j.ma@intel.com; john.griffin@intel.com;
-> Huangweidong (C); mike.caraman@nxp.com; agraf@suse.de;
-> jasowang@redhat.com; nmorey@kalray.eu; vincent.jardin@6wind.com; Wubin
-> (H); arei.gonglei@hotmail.com; pasic@linux.vnet.ibm.com; Zhbzg; Chenshanx=
-i
-> (Eety Chen, Euler); Zhanghuimin (Amy); Maoningning; Gonglei (Arei)
-> Subject: [PATCH v17 0/2] virtio-crypto: virtio crypto device specificatio=
-n
->=20
-> Thanks to Stefan, Michael, Halil, Cornelia for reviewing. The v17 has som=
-e
-> big changes, so I don't add Stefan's R-by until I get a response for the
-> new version :)
->=20
-> v17 -> v16:
->  - Some grammar fixes [Stefan, Halil, Michael]
->  - add a section named "Supported crypto services" in order to explain bi=
-t
->    numbers and valuse clearly. [Halil, Cornelia]
->  - avoid word reptition [Halil]
->  - rename non-session mode to stateless mode [Halil]
->  - change descriptions for all elements in struct virtio_crypto_config [H=
-alil]
->  - add Halil as a reviewer in the ackonwledgement part, thanks for his wo=
-rk.
->  - other fixes here and there.
->=20
-> Changes since v15:
->  - use feature bits for non-session mode in order to keep compatibility w=
-ith
->    pre-existing code. [Halil & Michael]
->  - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all
-> other
->    non-session mode feature bits.
->  - fix some typos. [Stefan]
->  - introduce struct virtio_crypto_op_data_req_mux to support both session
->    and non-session based crypto operations and keep compatibility with
->    pre-existing code.
->=20
-> Changes since v14:
->  - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
->  - correct a sentence about dataqueue and controlq in the first paragraph=
-.
-> [Halil]
->  - change a MAY to MUST about max_dataqueues. [Halil]
->  - add non-session mode support
->    a) add four features for different crypto services to identify wheathe=
-r
-> support session mode.
->    b) rewrite some
->=20
-> For pervious versions of virtio crypto spec, Pls see:
->=20
-> [v14]:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
->=20
-> [v13]:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
->=20
-> For more information, please see:
->  http://qemu-project.org/Features/VirtioCrypto
->=20
-> Please help to review, thanks.
->=20
-> Gonglei (2):
->   virtio-crypto: Add virtio crypto device specification
->   virtio-crypto: Add conformance clauses
->=20
->  acknowledgements.tex |    1 +
->  conformance.tex      |   29 ++
->  content.tex          |    2 +
->  virtio-crypto.tex    | 1305
-> ++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 1337 insertions(+)
->  create mode 100644 virtio-crypto.tex
->=20
-> --
-> 1.7.12.4
->=20
+diff --git a/qemu-img.c b/qemu-img.c
+index b220cf7..a32e9d6 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -145,9 +145,10 @@ static void QEMU_NORETURN help(void)
+            "  'snapshot_id_or_name' is deprecated, use 'snapshot_param'\n"
+            "    instead\n"
+            "  '-c' indicates that target image must be compressed (qcow format only)\n"
+-           "  '-u' enables unsafe rebasing. It is assumed that old and new backing file\n"
+-           "       match exactly. The image doesn't need a working backing file before\n"
+-           "       rebasing in this case (useful for renaming the backing file)\n"
++           "  '-u' enables unsafe rebasing or amending. It is assumed that old and new\n"
++           "       backing file match exactly. For rebasing, the image doesn't need a working\n"
++           "       backing file before rebasing in this case(useful for renaming the backing file).\n"
++           "       For amending, it doesn't open backing file(useful for moving images)\n"
+            "  '-h' with or without a command shows this help and lists the supported formats\n"
+            "  '-p' show progress of command (only certain commands)\n"
+            "  '-q' use Quiet mode - do not print any output (except errors)\n"
+@@ -3538,7 +3539,7 @@ static int img_amend(int argc, char **argv)
+     QemuOptsList *create_opts = NULL;
+     QemuOpts *opts = NULL;
+     const char *fmt = NULL, *filename, *cache;
+-    int flags;
++    int flags = 0;
+     bool writethrough;
+     bool quiet = false, progress = false;
+     BlockBackend *blk = NULL;
+@@ -3553,7 +3554,7 @@ static int img_amend(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":ho:f:t:pq",
++        c = getopt_long(argc, argv, ":ho:f:t:pqu",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -3595,6 +3596,9 @@ static int img_amend(int argc, char **argv)
+         case 'q':
+             quiet = true;
+             break;
++        case 'u':
++            flags |= BDRV_O_NO_BACKING;
++            break;
+         case OPTION_OBJECT:
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+                                            optarg, true);
+@@ -3639,7 +3643,7 @@ static int img_amend(int argc, char **argv)
+         goto out;
+     }
+ 
+-    flags = BDRV_O_RDWR;
++    flags |= BDRV_O_RDWR;
+     ret = bdrv_parse_cache_mode(cache, &flags, &writethrough);
+     if (ret < 0) {
+         error_report("Invalid cache option: %s", cache);
+-- 
+1.8.3.1
