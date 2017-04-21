@@ -1,14 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d1TVK-0000tW-IW
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:01:23 -0400
+	(envelope-from <prvs=277ba7b8b=anshul.makkar@citrix.com>)
+	id 1d1TX5-0001Ws-2g
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:03:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d1TVJ-0000Yp-IJ
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:01:22 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 21 Apr 2017 10:01:02 +0200
-Message-Id: <1492761662-5644-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH] qemu_iotests: Remove _readlink()
+	(envelope-from <prvs=277ba7b8b=anshul.makkar@citrix.com>)
+	id 1d1TX1-00010G-4K
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:03:11 -0400
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:8560
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=277ba7b8b=anshul.makkar@citrix.com>)
+	id 1d1TX0-0000za-Ip
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 04:03:07 -0400
+From: Anshul Makkar <anshul.makkar@citrix.com>
+Date: Fri, 21 Apr 2017 08:03:01 +0000
+Message-ID: <2484ff2a1cfc4415aa2ace3218ec4c75@AMSPEX02CL03.citrite.net>
+References: <152817b5-89cf-14fe-d83a-bb5c8d748c90@citrix.com>
+	<OF3C1CFB9D.4BFF82AD-ON00258106.00671A8D-00258106.00672723@notes.na.collabserv.com>
+In-Reply-To: <OF3C1CFB9D.4BFF82AD-ON00258106.00671A8D-00258106.00672723@notes.na.collabserv.com>
+Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] CUSE-TPM : Win 10 reports TPM device doesn't have
+ sufficient resources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,44 +33,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Stefan Berger <stefanb@us.ibm.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-It is unused.
-
-Suggestetd-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/common.config | 18 ------------------
- 1 file changed, 18 deletions(-)
-
-diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
-index 1222e43..66f4e0b 100644
---- a/tests/qemu-iotests/common.config
-+++ b/tests/qemu-iotests/common.config
-@@ -204,23 +204,5 @@ fi
- 
- export SAMPLE_IMG_DIR
- 
--_readlink()
--{
--    if [ $# -ne 1 ]; then
--        echo "Usage: _readlink filename" 1>&2
--        exit 1
--    fi
--
--    perl -e "\$in=\"$1\";" -e '
--    $lnk = readlink($in);
--    if ($lnk =~ m!^/.*!) {
--        print "$lnk\n";
--    }
--    else {
--        chomp($dir = `dirname $in`);
--        print "$dir/$lnk\n";
--    }'
--}
--
- # make sure this script returns success
- true
--- 
-1.8.3.1
+WWVzLCB2Mi44LjArdHBtIGJyYW5jaCB3b3JrZWQuIFRoYW5rcyBTdGVmYW4uDQoNCkFuc2h1bA0K
+DQpGcm9tOiBTdGVmYW4gQmVyZ2VyIFttYWlsdG86c3RlZmFuYkB1cy5pYm0uY29tXQ0KU2VudDog
+MTggQXByaWwgMjAxNyAxOTo0Nw0KVG86IEFuc2h1bCBNYWtrYXIgPGFuc2h1bC5tYWtrYXJAY2l0
+cml4LmNvbT4NCkNjOiBxZW11LWRldmVsQG5vbmdudS5vcmcNClN1YmplY3Q6IFJlOiBDVVNFLVRQ
+TSA6IFdpbiAxMCByZXBvcnRzIFRQTSBkZXZpY2UgZG9lc24ndCBoYXZlIHN1ZmZpY2llbnQgcmVz
+b3VyY2VzDQoNCllvdSBtYXkgd2FudCB0byB0cnkgaXQgZnJvbSB0aGlzIHZlcnNpb246IGh0dHBz
+Oi8vZ2l0aHViLmNvbS9zdGVmYW5iZXJnZXIvcWVtdS10cG0vdHJlZS92Mi44LjArdHBtDQoNCg0K
+LS0tLS0gT3JpZ2luYWwgbWVzc2FnZSAtLS0tLQ0KRnJvbTogYW5zaHVsIG1ha2thciA8YW5zaHVs
+Lm1ha2thckBjaXRyaXguY29tPG1haWx0bzphbnNodWwubWFra2FyQGNpdHJpeC5jb20+Pg0KVG86
+IDxxZW11LWRldmVsQG5vbmdudS5vcmc8bWFpbHRvOnFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4+DQpD
+YzogU3RlZmFuIEJlcmdlci9XYXRzb24vSUJNQElCTVVTDQpTdWJqZWN0OiBDVVNFLVRQTSA6IFdp
+biAxMCByZXBvcnRzIFRQTSBkZXZpY2UgZG9lc24ndCBoYXZlIHN1ZmZpY2llbnQgcmVzb3VyY2Vz
+DQpEYXRlOiBUdWUsIEFwciAxOCwgMjAxNyAxOjQyIFBNDQoNCg0KSGksDQoNCg0KDQpJIGFtIHVz
+aW5nIENVU0UtVFBNIGJhc2VkIG9uDQoNCmh0dHBzOi8vZ2l0aHViLmNvbS9zdGVmYW5iZXJnZXIv
+cWVtdS10cG0gYnJhbmNoOiAyLjQuMSt0cG0NCg0KDQoNCmh0dHBzOi8vZ2l0aHViLmNvbS9zdGVm
+YW5iZXJnZXIvc3d0cG0NCg0KDQoNCmh0dHBzOi8vZ2l0aHViLmNvbS90czQ2OC9zZWFiaW9zLXRw
+bQ0KDQoNCg0KSSBhbSBmYWNpbmcgYW4gaXNzdWUgd2hlcmUgV0luZG93cyAxMCBndWVzdCBkZXZp
+Y2UgbWFuYWdlciByZXBvcnRzIFRQTSBzdGF0dXMgYXMgQA0KVGhlIGRldmljZSBzdGF0dXMgaXMg
+IlRoZSBkZXZpY2UgY2Fubm90IGZpbmQgZW5vdWdoIGZyZWUgcmVzb3VyY2VzIGl0IGNhbiB1c2Ug
+KENvZGUgMTIpIiMNCg0KT24gYnJvd3NpbmcgSSBmb3VuZCB0aGlzIHBhZ2UgIEBodHRwczovL2J1
+Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTEyODE0MTMiIHRoYXQgcmVwb3J0cyBl
+eGFjdGx5IHRoZSBzYW1lIHByb2JsZW0gYW5kIHRoZSByZXNvbHV0aW9uIHBhdGNoIEAgaHR0cHM6
+Ly9idWd6aWxsYS5yZWRoYXQuY29tL2F0dGFjaG1lbnQuY2dpP2lkPTExMzcxNjbigIsgLg0KDQoN
+Cg0KSSBhcHBsaWVkIHRoZSBwYXRjaCBvbiB0aGUgY29kZSBhbmQgdmVyaWZpZWQgd2l0aCBkZWJ1
+ZyB0cmFjZSB0aGF0IHRoZSBwYXRjaCBjb2RlIGRvZXMgZXhlY3V0ZXMuDQoNCg0KDQpCdXQsIEkg
+YW0gc3RpbGwgb2JzZXJ2aW5nIHRoZSBzYW1lIGlzc3VlIG9uIFdpbiAxMCBndWVzdCBhbmQgb24g
+dXNpbmcgQUNQSWR1bXAgdXRpbGl0eSBpbiBXaW5kb3dzIGd1ZXN0IEkgY2FuIHN0aWxsIHNlZSAi
+SVJRIDUgYW5kIElSUU5vRmxhZ3MiIGluIHRoZSBzc2R0LmRzbCBjb2RlLg0KIERldmljZSAoSVNB
+LlRQTSkNCiAgICAgICAgICAgIHsNCiAgICAgICAgICAgICAgICBOYW1lIChfSElELCBFaXNhSWQg
+KCJQTlAwQzMxIikpICAvLyBfSElEOiBIYXJkd2FyZSBJRA0KICAgICAgICAgICAgICAgIE5hbWUg
+KF9TVEEsIDB4MEYpICAvLyBfU1RBOiBTdGF0dXMNCiAgICAgICAgICAgICAgICBOYW1lIChfQ1JT
+LCBSZXNvdXJjZVRlbXBsYXRlICgpICAvLyBfQ1JTOiBDdXJyZW50IFJlc291cmNlIFNldHRpbmdz
+DQogICAgICAgICAgICAgICAgew0KICAgICAgICAgICAgICAgICAgICBNZW1vcnkzMkZpeGVkIChS
+ZWFkV3JpdGUsDQogICAgICAgICAgICAgICAgICAgICAgICAweEZFRDQwMDAwLCAgICAgICAgIC8v
+IEFkZHJlc3MgQmFzZQ0KICAgICAgICAgICAgICAgICAgICAgICAgMHgwMDAwNTAwMCwgICAgICAg
+ICAvLyBBZGRyZXNzIExlbmd0aA0KICAgICAgICAgICAgICAgICAgICAgICAgKQ0KICAgICAgICAg
+ICAgICAgICAgICBJUlFOb0ZsYWdzICgpDQogICAgICAgICAgICAgICAgICAgICAgICB7NX0NCiAg
+ICAgICAgICAgICAgICB9KQ0KDQoNCg0KDQoNCkkgYW0gYml0IGNvbmZ1c2VkLCBmcm9tIG15IHVu
+ZGVyc3RhbmRpbmcsIGl0cyB0aGUgUUVNVSB0aGF0IGJ1aWxkcyB0aGUgU1NEVCB0YWJsZSBhbmQg
+SSBjYW4gYWxzbyB2ZXJpZnkgaXQgZnJvbSB0aGUgbG9ncy4gQnV0IHNvbWVob3cgZ3Vlc3QgaXMg
+Z2V0dGluZyB0aGUgb2xkIEFDUEkgdmFsdWVzIGZvciBUUE0gd2hpY2ggaXMgbm90IGFjY2VwdGFi
+bGUgdG8gV2luZG93cy4NCg0KSnVzdCB0byBiZSBzdXJlLCBJIGFsc28gdmVyaWZpZWQgdGhlIFNl
+YUJJT1MgY29kZSBhbmQgY291bGRuJ3QgZmluZCBhbnkgbGluayB0byB0aGlzIHRhYmxlLg0KDQoN
+Cg0KSGVyZSBpcyB0aGUgcGF0Y2ggdGhhdCBJIGFwcGxpZWQgYmFzZWQgb24gdGhlIGxpbmsgYWJv
+dmU6DQoNCg0KaWYgKG1pc2MtPnRwbV92ZXJzaW9uICE9IFRQTV9WRVJTSU9OX1VOU1BFQykgew0K
+ICAgICAgICAgICAgIEFDUElfQlVJTERfRFBSSU5URigiVFBNOiBhZGQgTU1JT1xuIik7DQogICAg
+ICAgICAgICAgZGV2ID0gYW1sX2RldmljZSgiVFBNIik7DQogICAgICAgICAgICAgYW1sX2FwcGVu
+ZChkZXYsIGFtbF9uYW1lX2RlY2woIl9ISUQiLCBhbWxfZWlzYWlkKCJQTlAwQzMxIikpKTsNCiAg
+ICAgICAgICAgICBhbWxfYXBwZW5kKGRldiwgYW1sX25hbWVfZGVjbCgiX1NUQSIsIGFtbF9pbnQo
+MHhGKSkpOw0KICAgICAgICAgICAgIGNycyA9IGFtbF9yZXNvdXJjZV90ZW1wbGF0ZSgpOw0KICAg
+ICAgICAgICAgIGFtbF9hcHBlbmQoY3JzLCBhbWxfbWVtb3J5MzJfZml4ZWQoVFBNX1RJU19BRERS
+X0JBU0UsDQogICAgICAgICAgICAgICAgICAgICAgICBUUE1fVElTX0FERFJfU0laRSwgQU1MX1JF
+QURfV1JJVEUpKTsNCiAgICAgICAgICAgICBhbWxfYXBwZW5kKGRldiwgYW1sX25hbWVfZGVjbCgi
+X0NSUyIsIGNycykpOw0KICAgICAgICAgICAgIGFtbF9hcHBlbmQoc2Jfc2NvcGUsIGRldik7DQog
+ICAgICAgICB9DQphbWxfYXBwZW5kKHNzZHQsIHNiX3Njb3BlKTsNCg0KbG9ncyBvbmNlIEkgc3Rh
+cnQgcWVtdToNCg0KQ1BJX0JVSUxEOiBpbml0IEFDUEkgdGFibGVzDQpBQ1BJX0JVSUxEOiBUUE06
+IGFkZCBNTUlPDQpBQ1BJX0JVSUxEOiBpbml0IEFDUEkgdGFibGVzDQpBQ1BJX0JVSUxEOiBUUE06
+IGFkZCBNTUlPDQoNCnRwbV90aXM6ICByZWFkLjQoMDAwMDBmMDApID0gMDAwMTEwMTQNCnRwbV90
+aXM6IHdyaXRlLjEoMDAwMDAwMDgpID0gMDAwMDAwMDANCnRwbV90aXM6ICByZWFkLjEoMDAwMDAw
+MDApID0gMDAwMDAwODENCg0KQ29tbWFuZHMgdG8gc3RhcnQgdlRQTToNCnN3dHBtX2N1c2UgLU0g
+MjYwIC1tIDEgLW4gdnRwbTANCg0KcWVtdS1zeXN0ZW0teDg2XzY0IC1lbmFibGUta3ZtIC1tIDEw
+MjQgLWJvb3QgZCAtYmlvcyBiaW9zLmJpbiAtYm9vdCBtZW51PW9uIC10cG1kZXYgY3VzZS10cG0s
+aWQ9dHBtMCxwYXRoPS9kZXYvdnRwbTAgLWRldmljZSB0cG0tdGlzLHRwbWRldj10cG0wIHdpbi5p
+bWcNCg0KUGxlYXNlIHN1Z2dlc3QgaWYgSSBhbSBtaXNzaW5nIGFueXRoaW5nIC4NCg0KVGhhbmtz
+DQpBbnNodWwgTWFra2FyDQoNCg0K
