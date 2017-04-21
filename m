@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d1b8H-0004O8-CN
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:10:06 -0400
+	(envelope-from <Chris.Friesen@windriver.com>) id 1d1bOi-0000An-BP
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:27:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d1b8G-0004xP-Dc
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:10:05 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:35236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d1b8G-0004xJ-6j
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:10:04 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id z52so16194007wrc.2
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:10:04 -0700 (PDT)
+	(envelope-from <Chris.Friesen@windriver.com>) id 1d1bOe-00023U-6K
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:27:04 -0400
+Received: from mail1.windriver.com ([147.11.146.13]:43692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
+	id 1d1bOd-00023G-TJ
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 12:27:00 -0400
+Message-ID: <58FA32CC.2060104@windriver.com>
+Date: Fri, 21 Apr 2017 10:26:52 -0600
+From: Chris Friesen <chris.friesen@windriver.com>
 MIME-Version: 1.0
-In-Reply-To: <20170421115646.15544-1-quintela@redhat.com>
-References: <20170421115646.15544-1-quintela@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Apr 2017 17:09:42 +0100
-Message-ID: <CAFEAcA_mEhJyT12Sb1uS4MW+p=VyJcB5yhsW3qv8bpp4spKC1g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/65] Migration pull request
+References: <58F92229.1080402@windriver.com>
+	<a09762ce-092f-6fb1-6cc3-08a94a3c3dd1@redhat.com>
+In-Reply-To: <a09762ce-092f-6fb1-6cc3-08a94a3c3dd1@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] question about block size and virtual disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On 21 April 2017 at 12:55, Juan Quintela <quintela@redhat.com> wrote:
-> Hi
->
-> This pull includes:
->
-> - fixes from (peter xu)
-> - page-size parameter for info migrate (chao)
-> - Fix for virtio-rng migration with postcopy (laurent)
-> - RAMState series cleanup (me)
->
-> Please apply.
->
->
-> The following changes since commit fa54abb8c298f892639ffc4bc2f61448ac3be4a1:
->
->   Drop QEMU_GNUC_PREREQ() checks for gcc older than 4.1 (2017-04-20 18:33:33 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/juanquintela/qemu.git tags/migration/20170421
->
-> for you to fetch changes up to 2c02468c9b1750aaa5fbeee49cdb55f101608c6a:
->
->   hmp: info migrate_parameters format tunes (2017-04-21 12:25:41 +0200)
->
-> ----------------------------------------------------------------
-> migration/next for 20170421
->
+On 04/20/2017 03:21 PM, Eric Blake wrote:
+> On 04/20/2017 04:03 PM, Chris Friesen wrote:
 
-Applied, thanks.
+>> Also, does the 4KB block size get "passed-through" to the guest somehow
+>> so that the guest knows it needs to use 4KB blocks, or does that need to
+>> be explicitly specified via virtio-blk-pci.logical_block_size and/or
+>> virtio-blk-pci.physical_block_size parameters?  (Assuming I'm using
+>> virtio-blk-pci.)
+>
+> Again, qemu should be passing the advertisement of host properties down
+> to the guest insofar as possible (so a good guest will see that the
+> hardware is 4k only and will not try to make 512-byte requests), but at
+> the same time, qemu should handle guests that are so old that they are
+> blissfully unaware of the hardware advertisements and send 512-byte
+> requests anyway.  Of course, such guests are penalized with
+> read-modify-write delays when submitting 512-byte IO.  But explicitly
+> stating available parameters is always the wisest course of action, if
+> you don't want to rely on defaults changing underneath you.
 
--- PMM
+I did an experiment with qemu-kvm-ev-2.6.0-28.el7_3.6.1, using -drive 
+cache=none,aio=native and an LVM volume as the storage.
+
+The guest saw the logical/physical block size as 512B, even though on the host 
+both were 4KB.
+
+Unless something is being lost in the LVM layer (which is possible) it appears 
+that qemu defaults to 512B block size unless explicitly told otherwise.
+
+Chris
