@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Xel-0002CU-0a
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:24 -0400
+	(envelope-from <famz@redhat.com>) id 1d1Xeq-0002HR-Dg
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Xek-0000dw-Af
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34332)
+	(envelope-from <famz@redhat.com>) id 1d1Xen-0000fN-98
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d1Xek-0000dj-4W
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:22 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d1Xen-0000et-0z
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 08:27:25 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 24AFC6AAC8
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:27:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E5086840B
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 12:27:24 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 20:27:00 +0800
-Message-Id: <20170421122710.15373-5-famz@redhat.com>
+Date: Fri, 21 Apr 2017 20:27:01 +0800
+Message-Id: <20170421122710.15373-6-famz@redhat.com>
 In-Reply-To: <20170421122710.15373-1-famz@redhat.com>
 References: <20170421122710.15373-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/14] socket: Make errp the last parameter of
- vsock_connect_saddr
+Subject: [Qemu-devel] [PATCH 05/14] block: Make errp the last parameter of
+ bdrv_img_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,46 +35,124 @@ Cc: Markus Armbruster <armbru@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- util/qemu-sockets.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block.c                  |  4 ++--
+ blockdev.c               | 10 +++++-----
+ include/block/block.h    |  2 +-
+ qemu-img.c               |  2 +-
+ tests/test-replication.c |  8 ++++----
+ 5 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 0fe5f13..8188d9a 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -728,9 +728,10 @@ static int vsock_connect_addr(const struct sockaddr_vm *svm, bool *in_progress,
-     return sock;
+diff --git a/block.c b/block.c
+index 1fbbb8d..7eda9a4 100644
+--- a/block.c
++++ b/block.c
+@@ -4161,8 +4161,8 @@ bool bdrv_op_blocker_is_empty(BlockDriverState *bs)
+ 
+ void bdrv_img_create(const char *filename, const char *fmt,
+                      const char *base_filename, const char *base_fmt,
+-                     char *options, uint64_t img_size, int flags,
+-                     Error **errp, bool quiet)
++                     char *options, uint64_t img_size, int flags, bool quiet,
++                     Error **errp)
+ {
+     QemuOptsList *create_opts = NULL;
+     QemuOpts *opts = NULL;
+diff --git a/blockdev.c b/blockdev.c
+index 4927914..94726ed 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1728,7 +1728,7 @@ static void external_snapshot_prepare(BlkActionState *common,
+             bdrv_img_create(new_image_file, format,
+                             state->old_bs->filename,
+                             state->old_bs->drv->format_name,
+-                            NULL, size, flags, &local_err, false);
++                            NULL, size, flags, false, &local_err);
+             if (local_err) {
+                 error_propagate(errp, local_err);
+                 return;
+@@ -3237,10 +3237,10 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+         if (source) {
+             bdrv_img_create(backup->target, backup->format, source->filename,
+                             source->drv->format_name, NULL,
+-                            size, flags, &local_err, false);
++                            size, flags, false, &local_err);
+         } else {
+             bdrv_img_create(backup->target, backup->format, NULL, NULL, NULL,
+-                            size, flags, &local_err, false);
++                            size, flags, false, &local_err);
+         }
+     }
+ 
+@@ -3531,7 +3531,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+         /* create new image w/o backing file */
+         assert(format);
+         bdrv_img_create(arg->target, format,
+-                        NULL, NULL, NULL, size, flags, &local_err, false);
++                        NULL, NULL, NULL, size, flags, false, &local_err);
+     } else {
+         switch (arg->mode) {
+         case NEW_IMAGE_MODE_EXISTING:
+@@ -3541,7 +3541,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+             bdrv_img_create(arg->target, format,
+                             source->filename,
+                             source->drv->format_name,
+-                            NULL, size, flags, &local_err, false);
++                            NULL, size, flags, false, &local_err);
+             break;
+         default:
+             abort();
+diff --git a/include/block/block.h b/include/block/block.h
+index 5ddc0cf..466de49 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -509,7 +509,7 @@ int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
+ void bdrv_img_create(const char *filename, const char *fmt,
+                      const char *base_filename, const char *base_fmt,
+                      char *options, uint64_t img_size, int flags,
+-                     Error **errp, bool quiet);
++                     bool quiet, Error **errp);
+ 
+ /* Returns the alignment in bytes that is required so that no bounce buffer
+  * is required throughout the stack */
+diff --git a/qemu-img.c b/qemu-img.c
+index b220cf7..2c09053 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -516,7 +516,7 @@ static int img_create(int argc, char **argv)
+     }
+ 
+     bdrv_img_create(filename, fmt, base_filename, base_fmt,
+-                    options, img_size, 0, &local_err, quiet);
++                    options, img_size, 0, quiet, &local_err);
+     if (local_err) {
+         error_reportf_err(local_err, "%s: ", filename);
+         goto fail;
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index fac2da3..3016c6f 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -144,18 +144,18 @@ static void prepare_imgs(void)
+ 
+     /* Primary */
+     bdrv_img_create(p_local_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
+-                    BDRV_O_RDWR, &local_err, true);
++                    BDRV_O_RDWR, true, &local_err);
+     g_assert(!local_err);
+ 
+     /* Secondary */
+     bdrv_img_create(s_local_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
+-                    BDRV_O_RDWR, &local_err, true);
++                    BDRV_O_RDWR, true, &local_err);
+     g_assert(!local_err);
+     bdrv_img_create(s_active_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
+-                    BDRV_O_RDWR, &local_err, true);
++                    BDRV_O_RDWR, true, &local_err);
+     g_assert(!local_err);
+     bdrv_img_create(s_hidden_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
+-                    BDRV_O_RDWR, &local_err, true);
++                    BDRV_O_RDWR, true, &local_err);
+     g_assert(!local_err);
  }
  
--static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp,
-+static int vsock_connect_saddr(VsockSocketAddress *vaddr,
-                                NonBlockingConnectHandler *callback,
--                               void *opaque)
-+                               void *opaque,
-+                               Error **errp)
- {
-     struct sockaddr_vm svm;
-     int sock = -1;
-@@ -819,9 +820,9 @@ static void vsock_unsupported(Error **errp)
-     error_setg(errp, "socket family AF_VSOCK unsupported");
- }
- 
--static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp,
-+static int vsock_connect_saddr(VsockSocketAddress *vaddr,
-                                NonBlockingConnectHandler *callback,
--                               void *opaque)
-+                               void *opaque, Error **errp)
- {
-     vsock_unsupported(errp);
-     return -1;
-@@ -1100,7 +1101,7 @@ int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
-         break;
- 
-     case SOCKET_ADDRESS_KIND_VSOCK:
--        fd = vsock_connect_saddr(addr->u.vsock.data, errp, callback, opaque);
-+        fd = vsock_connect_saddr(addr->u.vsock.data, callback, opaque, errp);
-         break;
- 
-     default:
 -- 
 2.9.3
