@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Pgq-0006GK-FJ
-	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:01 -0400
+	(envelope-from <famz@redhat.com>) id 1d1Pgq-0006GN-Fi
+	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d1Pgn-00040X-JW
+	(envelope-from <famz@redhat.com>) id 1d1Pgn-00040Q-DA
 	for qemu-devel@nongnu.org; Thu, 20 Apr 2017 23:57:00 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 21 Apr 2017 11:56:00 +0800
-Message-Id: <20170421035606.448-15-famz@redhat.com>
+Date: Fri, 21 Apr 2017 11:55:59 +0800
+Message-Id: <20170421035606.448-14-famz@redhat.com>
 In-Reply-To: <20170421035606.448-1-famz@redhat.com>
 References: <20170421035606.448-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v14 14/20] tests: Use null-co:// instead of
- /dev/null as the dummy image
+Subject: [Qemu-devel] [PATCH v14 13/20] iotests: 172: Use separate images
+ for multiple devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,103 +23,378 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- tests/drive_del-test.c    | 2 +-
- tests/nvme-test.c         | 2 +-
- tests/usb-hcd-uhci-test.c | 2 +-
- tests/usb-hcd-xhci-test.c | 2 +-
- tests/virtio-blk-test.c   | 2 +-
- tests/virtio-scsi-test.c  | 4 ++--
- 6 files changed, 7 insertions(+), 7 deletions(-)
+To avoid image lock failures.
 
-diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
-index 121b9c9..2175139 100644
---- a/tests/drive_del-test.c
-+++ b/tests/drive_del-test.c
-@@ -92,7 +92,7 @@ static void test_after_failed_device_add(void)
- static void test_drive_del_device_del(void)
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/qemu-iotests/172     | 55 +++++++++++++++++++++++++---------------------
+ tests/qemu-iotests/172.out | 50 +++++++++++++++++++++--------------------
+ 2 files changed, 56 insertions(+), 49 deletions(-)
+
+diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
+index 1b7d3a1..826d6fe 100755
+--- a/tests/qemu-iotests/172
++++ b/tests/qemu-iotests/172
+@@ -30,6 +30,8 @@ status=1	# failure is the default!
+ _cleanup()
  {
-     /* Start with a drive used by a device that unplugs instantaneously */
--    qtest_start("-drive if=none,id=drive0,file=/dev/null,format=raw"
-+    qtest_start("-drive if=none,id=drive0,file=null-co://,format=raw"
-                 " -device virtio-scsi-pci"
-                 " -device scsi-hd,drive=drive0,id=dev0");
+ 	_cleanup_test_img
++    rm -f "$TEST_IMG.2"
++    rm -f "$TEST_IMG.3"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-diff --git a/tests/nvme-test.c b/tests/nvme-test.c
-index c8bece4..7674a44 100644
---- a/tests/nvme-test.c
-+++ b/tests/nvme-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/nvme/nop", nop);
+@@ -86,6 +88,9 @@ size=720k
  
--    qtest_start("-drive id=drv0,if=none,file=/dev/null,format=raw "
-+    qtest_start("-drive id=drv0,if=none,file=null-co://,format=raw "
-                 "-device nvme,drive=drv0,serial=foo");
-     ret = g_test_run();
+ _make_test_img $size
  
-diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
-index f25bae5..5b500fe 100644
---- a/tests/usb-hcd-uhci-test.c
-+++ b/tests/usb-hcd-uhci-test.c
-@@ -79,7 +79,7 @@ int main(int argc, char **argv)
- {
-     const char *arch = qtest_get_arch();
-     const char *cmd = "-device piix3-usb-uhci,id=uhci,addr=1d.0"
--                      " -drive id=drive0,if=none,file=/dev/null,format=raw"
-+                      " -drive id=drive0,if=none,file=null-co://,format=raw"
-                       " -device usb-tablet,bus=uhci.0,port=1";
-     int ret;
++TEST_IMG="$TEST_IMG.2" _make_test_img $size
++TEST_IMG="$TEST_IMG.3" _make_test_img $size
++
+ # Default drive semantics:
+ #
+ # By default you get a single empty floppy drive. You can override it with
+@@ -105,7 +110,7 @@ echo === Using -fda/-fdb options ===
  
-diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
-index 22513e9..031764d 100644
---- a/tests/usb-hcd-xhci-test.c
-+++ b/tests/usb-hcd-xhci-test.c
-@@ -89,7 +89,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/xhci/pci/hotplug/usb-uas", test_usb_uas_hotplug);
+ check_floppy_qtree -fda "$TEST_IMG"
+ check_floppy_qtree -fdb "$TEST_IMG"
+-check_floppy_qtree -fda "$TEST_IMG" -fdb "$TEST_IMG"
++check_floppy_qtree -fda "$TEST_IMG" -fdb "$TEST_IMG.2"
  
-     qtest_start("-device nec-usb-xhci,id=xhci"
--                " -drive id=drive0,if=none,file=/dev/null,format=raw");
-+                " -drive id=drive0,if=none,file=null-co://,format=raw");
-     ret = g_test_run();
-     qtest_end();
  
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 1eee95d..fd2078c 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -63,7 +63,7 @@ static QOSState *pci_test_start(void)
-     const char *arch = qtest_get_arch();
-     char *tmp_path;
-     const char *cmd = "-drive if=none,id=drive0,file=%s,format=raw "
--                      "-drive if=none,id=drive1,file=/dev/null,format=raw "
-+                      "-drive if=none,id=drive1,file=null-co://,format=raw "
-                       "-device virtio-blk-pci,id=drv0,drive=drive0,"
-                       "addr=%x.%x";
+ echo
+@@ -114,7 +119,7 @@ echo === Using -drive options ===
  
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 0eabd56..5e2ff14 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -35,7 +35,7 @@ typedef struct {
- static QOSState *qvirtio_scsi_start(const char *extra_opts)
- {
-     const char *arch = qtest_get_arch();
--    const char *cmd = "-drive id=drv0,if=none,file=/dev/null,format=raw "
-+    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
-                       "-device virtio-scsi-pci,id=vs0 "
-                       "-device scsi-hd,bus=vs0.0,drive=drv0 %s";
+ check_floppy_qtree -drive if=floppy,file="$TEST_IMG"
+ check_floppy_qtree -drive if=floppy,file="$TEST_IMG",index=1
+-check_floppy_qtree -drive if=floppy,file="$TEST_IMG" -drive if=floppy,file="$TEST_IMG",index=1
++check_floppy_qtree -drive if=floppy,file="$TEST_IMG" -drive if=floppy,file="$TEST_IMG.2",index=1
  
-@@ -195,7 +195,7 @@ static void hotplug(void)
-     QDict *response;
-     QOSState *qs;
+ echo
+ echo
+@@ -122,7 +127,7 @@ echo === Using -drive if=none and -global ===
  
--    qs = qvirtio_scsi_start("-drive id=drv1,if=none,file=/dev/null,format=raw");
-+    qs = qvirtio_scsi_start("-drive id=drv1,if=none,file=null-co://,format=raw");
-     response = qmp("{\"execute\": \"device_add\","
-                    " \"arguments\": {"
-                    "   \"driver\": \"scsi-hd\","
+ check_floppy_qtree -drive if=none,file="$TEST_IMG" -global isa-fdc.driveA=none0
+ check_floppy_qtree -drive if=none,file="$TEST_IMG" -global isa-fdc.driveB=none0
+-check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" \
++check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" \
+                    -global isa-fdc.driveA=none0 -global isa-fdc.driveB=none1
+ 
+ echo
+@@ -131,7 +136,7 @@ echo === Using -drive if=none and -device ===
+ 
+ check_floppy_qtree -drive if=none,file="$TEST_IMG" -device floppy,drive=none0
+ check_floppy_qtree -drive if=none,file="$TEST_IMG" -device floppy,drive=none0,unit=1
+-check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" \
++check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" \
+                    -device floppy,drive=none0 -device floppy,drive=none1,unit=1
+ 
+ echo
+@@ -139,58 +144,58 @@ echo
+ echo === Mixing -fdX and -global ===
+ 
+ # Working
+-check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG" -global isa-fdc.driveB=none0
+-check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG" -global isa-fdc.driveA=none0
++check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveB=none0
++check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveA=none0
+ 
+ # Conflicting (-fdX wins)
+-check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG" -global isa-fdc.driveA=none0
+-check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG" -global isa-fdc.driveB=none0
++check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveA=none0
++check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveB=none0
+ 
+ echo
+ echo
+ echo === Mixing -fdX and -device ===
+ 
+ # Working
+-check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0
+-check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0,unit=1
++check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0
++check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0,unit=1
+ 
+-check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0
+-check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0,unit=0
++check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0
++check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0,unit=0
+ 
+ # Conflicting
+-check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0,unit=0
+-check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0,unit=1
++check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0,unit=0
++check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0,unit=1
+ 
+ echo
+ echo
+ echo === Mixing -drive and -device ===
+ 
+ # Working
+-check_floppy_qtree -drive if=floppy,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0
+-check_floppy_qtree -drive if=floppy,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0,unit=1
++check_floppy_qtree -drive if=floppy,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0
++check_floppy_qtree -drive if=floppy,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0,unit=1
+ 
+ # Conflicting
+-check_floppy_qtree -drive if=floppy,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" -device floppy,drive=none0,unit=0
++check_floppy_qtree -drive if=floppy,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -device floppy,drive=none0,unit=0
+ 
+ echo
+ echo
+ echo === Mixing -global and -device ===
+ 
+ # Working
+-check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" \
++check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" \
+                    -global isa-fdc.driveA=none0 -device floppy,drive=none1
+-check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" \
++check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" \
+                    -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=1
+ 
+-check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" \
++check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" \
+                    -global isa-fdc.driveB=none0 -device floppy,drive=none1
+-check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" \
++check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" \
+                    -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=0
+ 
+ # Conflicting
+-check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" \
++check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" \
+                    -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=0
+-check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG" \
++check_floppy_qtree -drive if=none,file="$TEST_IMG" -drive if=none,file="$TEST_IMG.2" \
+                    -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=1
+ 
+ echo
+@@ -199,8 +204,8 @@ echo === Too many floppy drives ===
+ 
+ # Working
+ check_floppy_qtree -drive if=floppy,file="$TEST_IMG" \
+-                   -drive if=none,file="$TEST_IMG" \
+-                   -drive if=none,file="$TEST_IMG" \
++                   -drive if=none,file="$TEST_IMG.2" \
++                   -drive if=none,file="$TEST_IMG.3" \
+                    -global isa-fdc.driveB=none0 \
+                    -device floppy,drive=none1
+ 
+diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
+index 54b5329..2732966 100644
+--- a/tests/qemu-iotests/172.out
++++ b/tests/qemu-iotests/172.out
+@@ -1,5 +1,7 @@
+ QA output created by 172
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=737280
++Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=737280
++Formatting 'TEST_DIR/t.IMGFMT.3', fmt=IMGFMT size=737280
+ 
+ 
+ === Default ===
+@@ -99,7 +101,7 @@ Testing: -fdb TEST_DIR/t.qcow2
+                 share-rw = false
+                 drive-type = "288"
+ 
+-Testing: -fda TEST_DIR/t.qcow2 -fdb TEST_DIR/t.qcow2
++Testing: -fda TEST_DIR/t.qcow2 -fdb TEST_DIR/t.qcow2.2
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -205,7 +207,7 @@ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2,index=1
+                 share-rw = false
+                 drive-type = "288"
+ 
+-Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=floppy,file=TEST_DIR/t.qcow2,index=1
++Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=floppy,file=TEST_DIR/t.qcow2.2,index=1
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -300,7 +302,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0 -global isa-fdc.driveB=none1
++Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -global isa-fdc.driveB=none1
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -395,7 +397,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=1
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0 -device floppy,drive=none1,unit=1
++Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0 -device floppy,drive=none1,unit=1
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -436,7 +438,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
+ 
+ === Mixing -fdX and -global ===
+ 
+-Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0
++Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -474,7 +476,7 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0
++Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -512,7 +514,7 @@ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0
++Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -539,7 +541,7 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0
++Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -569,7 +571,7 @@ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-
+ 
+ === Mixing -fdX and -device ===
+ 
+-Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0
++Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -607,7 +609,7 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device flop
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=1
++Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=1
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -645,7 +647,7 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device flop
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0
++Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -683,7 +685,7 @@ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device flop
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=0
++Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -721,18 +723,18 @@ Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device flop
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=0
++Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=0
+ QEMU_PROG: -device floppy,drive=none0,unit=0: Floppy unit 0 is in use
+ QEMU_PROG: -device floppy,drive=none0,unit=0: Device initialization failed.
+ 
+-Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=1
++Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=1
+ QEMU_PROG: -device floppy,drive=none0,unit=1: Floppy unit 1 is in use
+ QEMU_PROG: -device floppy,drive=none0,unit=1: Device initialization failed.
+ 
+ 
+ === Mixing -drive and -device ===
+ 
+-Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0
++Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -770,7 +772,7 @@ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.q
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=1
++Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=1
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -808,14 +810,14 @@ Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.q
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,unit=0
++Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -device floppy,drive=none0,unit=0
+ QEMU_PROG: -device floppy,drive=none0,unit=0: Floppy unit 0 is in use
+ QEMU_PROG: -device floppy,drive=none0,unit=0: Device initialization failed.
+ 
+ 
+ === Mixing -global and -device ===
+ 
+-Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0 -device floppy,drive=none1
++Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -853,7 +855,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=1
++Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=1
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -891,7 +893,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0 -device floppy,drive=none1
++Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -929,7 +931,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=0
++Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=0
+ 
+           dev: isa-fdc, id ""
+             iobase = 1008 (0x3f0)
+@@ -967,18 +969,18 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
+                 share-rw = false
+                 drive-type = "144"
+ 
+-Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=0
++Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0 -device floppy,drive=none1,unit=0
+ QEMU_PROG: -device floppy,drive=none1,unit=0: Floppy unit 0 is in use
+ QEMU_PROG: -device floppy,drive=none1,unit=0: Device initialization failed.
+ 
+-Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=1
++Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0 -device floppy,drive=none1,unit=1
+ QEMU_PROG: -device floppy,drive=none1,unit=1: Floppy unit 1 is in use
+ QEMU_PROG: -device floppy,drive=none1,unit=1: Device initialization failed.
+ 
+ 
+ === Too many floppy drives ===
+ 
+-Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2 -global isa-fdc.driveB=none0 -device floppy,drive=none1
++Testing: -drive if=floppy,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -drive if=none,file=TEST_DIR/t.qcow2.3 -global isa-fdc.driveB=none0 -device floppy,drive=none1
+ QEMU_PROG: -device floppy,drive=none1: Can't create floppy unit 2, bus supports only 2 units
+ QEMU_PROG: -device floppy,drive=none1: Device initialization failed.
+ 
 -- 
 2.9.3
