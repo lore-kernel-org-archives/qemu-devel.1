@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d1afz-0003lq-1j
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:40:52 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d1agm-00056t-Gg
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d1afv-0002qB-1i
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:40:51 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:53679)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d1agi-00036I-H3
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:41:40 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:44722)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d1afu-0002md-Bj
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:40:46 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d1agh-00033S-M4
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 11:41:36 -0400
 From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Date: Fri, 21 Apr 2017 23:40:20 +0800
-Message-Id: <1492789220-15901-1-git-send-email-lu.zhipeng@zte.com.cn>
+Date: Fri, 21 Apr 2017 23:41:43 +0800
+Message-Id: <1492789303-16008-1-git-send-email-lu.zhipeng@zte.com.cn>
 Subject: [Qemu-devel] [PATCH v3] qga: Add support network interface
  statistics in
 List-Id: <qemu-devel.nongnu.org>
@@ -23,13 +23,13 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mdroth@linux.vnet.ibm.com
-Cc: eblake@redhat.com, qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>, ZhiPeng Lu <lu.zhieng@zte.com.cn>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: eblake@redhat.com, qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>, "Daniel P. Berrange" <berrange@redhat.com>
 
 we can get the network interface statistics inside a virtual machine by
 guest-network-get-interfaces command. it is very useful for us to monitor
 and analyze network traffic.
 
-Signed-off-by: ZhiPeng Lu <lu.zhieng@zte.com.cn>
+Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
  qga/commands-posix.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++-
