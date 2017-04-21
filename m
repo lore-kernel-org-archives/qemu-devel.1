@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d1RIr-0005F1-0s
+	(envelope-from <armbru@redhat.com>) id 1d1RIr-0005F3-F6
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:40:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d1RIm-0004Rk-Mu
+	(envelope-from <armbru@redhat.com>) id 1d1RIm-0004Rg-MP
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:40:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34566)
+Received: from mx1.redhat.com ([209.132.183.28]:41272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d1RIm-0004R6-EX
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d1RIm-0004R7-Ey
 	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 01:40:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6671865D14
+	by mx1.redhat.com (Postfix) with ESMTPS id 684959C0BA
 	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 05:40:15 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 21 Apr 2017 07:40:10 +0200
-Message-Id: <1492753213-26516-2-git-send-email-armbru@redhat.com>
+Date: Fri, 21 Apr 2017 07:40:12 +0200
+Message-Id: <1492753213-26516-4-git-send-email-armbru@redhat.com>
 In-Reply-To: <1492753213-26516-1-git-send-email-armbru@redhat.com>
 References: <1492753213-26516-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] arm: remove remaining
+Subject: [Qemu-devel] [PULL 3/4] versatile: remove
  cannot_destroy_with_object_finalize_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,144 +35,106 @@ Cc: Laurent Vivier <lvivier@redhat.com>
 
 From: Laurent Vivier <lvivier@redhat.com>
 
-With commit ce5b1bbf624b ("exec: move cpu_exec_init() calls to
-realize functions"), we can now remove all the
-remaining cannot_destroy_with_object_finalize_yet as
-unsafe references have been moved to cpu_exec_realizefn().
-(tested with QOM command provided by commit 4c315c27).
+cannot_destroy_with_object_finalize_yet was added by 4c315c2
+("qdev: Protect device-list-properties against broken devices")
+because "realview_pci" and "versatile_pci" were hanging
+during "device-list-properties" cleanup (an infinite loop in
+bus_unparent()).
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
+We have this problem because the child is not removed from
+the list of the PCI bus children because it has no defined parent:
+qdev_set_parent_bus() set the device parent_bus pointer to bus, and
+adds the device in the bus children list, but doesn't update the
+device parent pointer.
+
+To fix the problem, move all the involved parts to the realize function.
+
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20170414083717.13641-4-lvivier@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170414083717.13641-2-lvivier@redhat.com>
-Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 Acked-by: Peter Maydell <peter.maydell@linaro.org>
+[Commit message tweaked]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/arm/allwinner-a10.c | 6 ------
- hw/arm/bcm2836.c       | 6 ------
- hw/arm/digic.c         | 6 ------
- hw/arm/fsl-imx25.c     | 5 -----
- hw/arm/fsl-imx31.c     | 5 -----
- hw/arm/fsl-imx6.c      | 5 -----
- hw/arm/xlnx-zynqmp.c   | 6 ------
- 7 files changed, 39 deletions(-)
+ hw/pci-host/versatile.c | 35 ++++++++++++-----------------------
+ 1 file changed, 12 insertions(+), 23 deletions(-)
 
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index ca15d1c..f62a9a3 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -118,12 +118,6 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
+diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
+index 467cbb9..27fde46 100644
+--- a/hw/pci-host/versatile.c
++++ b/hw/pci-host/versatile.c
+@@ -380,20 +380,8 @@ static void pci_vpb_reset(DeviceState *d)
  
-     dc->realize = aw_a10_realize;
+ static void pci_vpb_init(Object *obj)
+ {
+-    PCIHostState *h = PCI_HOST_BRIDGE(obj);
+     PCIVPBState *s = PCI_VPB(obj);
+ 
+-    memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 1ULL << 32);
+-    memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 1ULL << 32);
 -
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
- }
- 
- static const TypeInfo aw_a10_type_info = {
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 8451190..8c43291 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -160,12 +160,6 @@ static void bcm2836_class_init(ObjectClass *oc, void *data)
- 
-     dc->props = bcm2836_props;
-     dc->realize = bcm2836_realize;
+-    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), DEVICE(obj), "pci",
+-                        &s->pci_mem_space, &s->pci_io_space,
+-                        PCI_DEVFN(11, 0), TYPE_PCI_BUS);
+-    h->bus = &s->pci_bus;
 -
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
- }
- 
- static const TypeInfo bcm2836_type_info = {
-diff --git a/hw/arm/digic.c b/hw/arm/digic.c
-index d60ea39..94f3263 100644
---- a/hw/arm/digic.c
-+++ b/hw/arm/digic.c
-@@ -101,12 +101,6 @@ static void digic_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     dc->realize = digic_realize;
+-    object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_VERSATILE_PCI_HOST);
+-    qdev_set_parent_bus(DEVICE(&s->pci_dev), BUS(&s->pci_bus));
 -
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
+     /* Window sizes for VersatilePB; realview_pci's init will override */
+     s->mem_win_size[0] = 0x0c000000;
+     s->mem_win_size[1] = 0x10000000;
+@@ -403,10 +391,22 @@ static void pci_vpb_init(Object *obj)
+ static void pci_vpb_realize(DeviceState *dev, Error **errp)
+ {
+     PCIVPBState *s = PCI_VPB(dev);
++    PCIHostState *h = PCI_HOST_BRIDGE(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     pci_map_irq_fn mapfn;
+     int i;
+ 
++    memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 1ULL << 32);
++    memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 1ULL << 32);
++
++    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), dev, "pci",
++                        &s->pci_mem_space, &s->pci_io_space,
++                        PCI_DEVFN(11, 0), TYPE_PCI_BUS);
++    h->bus = &s->pci_bus;
++
++    object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_VERSATILE_PCI_HOST);
++    qdev_set_parent_bus(DEVICE(&s->pci_dev), BUS(&s->pci_bus));
++
+     for (i = 0; i < 4; i++) {
+         sysbus_init_irq(sbd, &s->irq[i]);
+     }
+@@ -503,8 +503,6 @@ static void pci_vpb_class_init(ObjectClass *klass, void *data)
+     dc->reset = pci_vpb_reset;
+     dc->vmsd = &pci_vpb_vmstate;
+     dc->props = pci_vpb_properties;
+-    /* Reason: object_unref() hangs */
 -    dc->cannot_destroy_with_object_finalize_yet = true;
  }
  
- static const TypeInfo digic_type_info = {
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index 2126f73..9056f27 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -290,11 +290,6 @@ static void fsl_imx25_class_init(ObjectClass *oc, void *data)
- 
-     dc->realize = fsl_imx25_realize;
- 
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
-     dc->desc = "i.MX25 SOC";
+ static const TypeInfo pci_vpb_info = {
+@@ -526,19 +524,10 @@ static void pci_realview_init(Object *obj)
+     s->mem_win_size[2] = 0x08000000;
  }
  
-diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-index dd1c713..d7e2d83 100644
---- a/hw/arm/fsl-imx31.c
-+++ b/hw/arm/fsl-imx31.c
-@@ -262,11 +262,6 @@ static void fsl_imx31_class_init(ObjectClass *oc, void *data)
- 
-     dc->realize = fsl_imx31_realize;
- 
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
-     dc->desc = "i.MX31 SOC";
- }
- 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 76dd8a4..6969e73 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -442,11 +442,6 @@ static void fsl_imx6_class_init(ObjectClass *oc, void *data)
- 
-     dc->realize = fsl_imx6_realize;
- 
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
--    dc->cannot_destroy_with_object_finalize_yet = true;
-     dc->desc = "i.MX6 SOC";
- }
- 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index bc4e66b..4f67158 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -439,12 +439,6 @@ static void xlnx_zynqmp_class_init(ObjectClass *oc, void *data)
- 
-     dc->props = xlnx_zynqmp_props;
-     dc->realize = xlnx_zynqmp_realize;
+-static void pci_realview_class_init(ObjectClass *class, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(class);
 -
--    /*
--     * Reason: creates an ARM CPU, thus use after free(), see
--     * arm_cpu_class_init()
--     */
+-    /* Reason: object_unref() hangs */
 -    dc->cannot_destroy_with_object_finalize_yet = true;
- }
+-}
+-
+ static const TypeInfo pci_realview_info = {
+     .name          = "realview_pci",
+     .parent        = TYPE_VERSATILE_PCI,
+     .instance_init = pci_realview_init,
+-    .class_init    = pci_realview_class_init,
+ };
  
- static const TypeInfo xlnx_zynqmp_type_info = {
+ static void versatile_pci_register_types(void)
 -- 
 2.7.4
