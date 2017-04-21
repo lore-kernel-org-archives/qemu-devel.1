@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d1mg9-0001yb-9M
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:29:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1d1mk9-0003YV-LY
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d1mg4-0006QB-D4
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:29:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55433)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d1mg4-0006Q5-7c
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:29:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d1mg2-0004Va-3h
-	for <qemu-devel@nongnu.org>; Sat, 22 Apr 2017 04:29:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 06C3D2E80C0
-	for <qemu-devel@nongnu.org>; Sat, 22 Apr 2017 04:29:42 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1d1mk4-0007Yy-QZ
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:33:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d1mk4-0007Yq-KL
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:33:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 67F9BAC07A
+	for <qemu-devel@nongnu.org>; Sat, 22 Apr 2017 03:54:12 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170421122710.15373-1-famz@redhat.com>
+Date: Fri, 21 Apr 2017 16:57:23 +0200
+In-Reply-To: <20170421122710.15373-1-famz@redhat.com> (Fam Zheng's message of
+	"Fri, 21 Apr 2017 20:26:56 +0800")
+Message-ID: <87o9vpyfjg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 22 Apr 2017 04:17:25 -0000
-From: Launchpad Bug Tracker <1278166@bugs.launchpad.net>
-Reply-To: Bug 1278166 <1278166@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140209195952.1859.2806.malonedeb@soybean.canonical.com>
-Message-Id: <20170422041725.6766.39014.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1278166] Re: Last commit to exec.c causes BSOD
- installing WinXP on i386-softmmu
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 00/14] Trivial cleanups around error
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,33 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Fam Zheng <famz@redhat.com> writes:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+> These are patches to:
+>
+> 1) reorder the function parameters so that Error **errp comes
+> last.
+>
+> Error pointer in the middle of a function parameter list is very uncommon, and
+> does caused mistakes, thus is not a good style. Change to the usual way.
+>
+> 2) apply the error_propagate_null.cocci semantics patch again.
 
--- =
+Thanks for taking on this grunt work.  Can take it through my tree.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1278166
-
-Title:
-  Last commit to exec.c causes BSOD installing WinXP on i386-softmmu
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  The last commit to exec.c (360e607b88a23d378f6efaa769c76d26f538234d),
-  causes a BSOD when trying to install a 32bit Windows XP SP-3 image
-  using the pure emulation version of i386-softmmu. A checkout of the
-  previous version of the file (commited in
-  0169c511554cb0014a00290b0d3d26c31a49818f) solves the problem.
-  Nevertheless, this last commit was intented to solve a BSOD when Xen
-  was used as a hypervisor.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1278166/+subscriptions
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
