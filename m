@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1d1ZtG-0005d8-Ly
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:50:31 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d1Zvp-0006y2-DO
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:53:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1d1ZtF-0004Ob-RJ
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:50:30 -0400
-References: <1492769076-64466-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<98514b87-d2a3-254d-f03e-0c6d3cd73ff6@kamp.de>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <88259101-7040-f057-5ed4-76bd36f2b1a0@virtuozzo.com>
-Date: Fri, 21 Apr 2017 15:19:24 +0300
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d1Zvo-0005Zl-LO
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 10:53:09 -0400
 MIME-Version: 1.0
-In-Reply-To: <98514b87-d2a3-254d-f03e-0c6d3cd73ff6@kamp.de>
-Content-Type: text/plain; charset="iso-8859-15"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu-img: wait for convert
- coroutines to complete
+In-Reply-To: <20170419130044.GB12781@lemon.lan>
+References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
+	<1491057878-27868-6-git-send-email-ashijeetacharya@gmail.com>
+	<20170419130044.GB12781@lemon.lan>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Fri, 21 Apr 2017 20:23:07 +0530
+Message-ID: <CAC2QTZbH_LYaEYr_p6wKbek8X0PFfoAJp=tC9dCBryyC_R6_Ow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] vmdk: Set maximum bytes allocated
+ in one cycle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On 04/21/2017 01:44 PM, Peter Lieven wrote:
-> Am 21.04.2017 um 12:04 schrieb Anton Nefedov:
->> On error path (like i/o error in one of the coroutines), it's required to
->>   - wait for coroutines completion before cleaning the common structures
->>   - reenter dependent coroutines so they ever finish
+On Wed, Apr 19, 2017 at 6:30 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Sat, 04/01 20:14, Ashijeet Acharya wrote:
+>> Set the maximum bytes allowed to get allocated at once to be not more
+>> than the extent size boundary to handle writes at two separate extents
+>> appropriately.
 >>
->> Introduced in 2d9187bc65.
->>
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 >> ---
->> [..]
+>>  block/vmdk.c | 13 +++++++++++--
+>>  1 file changed, 11 insertions(+), 2 deletions(-)
 >>
+>> diff --git a/block/vmdk.c b/block/vmdk.c
+>> index a8babd7..9456ddd 100644
+>> --- a/block/vmdk.c
+>> +++ b/block/vmdk.c
+>> @@ -1767,6 +1767,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>>      int64_t offset_in_cluster, n_bytes;
+>>      uint64_t cluster_offset;
+>>      uint64_t bytes_done = 0;
+>> +    uint64_t extent_size;
+>>      VmdkMetaData m_data;
+>>      uint32_t total_alloc_clusters = 0;
+>>
+>> @@ -1782,9 +1783,17 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>>          if (!extent) {
+>>              return -EIO;
+>>          }
+>> +        extent_size = extent->end_sector * BDRV_SECTOR_SIZE;
 >
->
-> And what if we error out in the read path? Wouldn't be something like this easier?
->
->
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 22f559a..4ff1085 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1903,6 +1903,16 @@ static int convert_do_copy(ImgConvertState *s)
->          main_loop_wait(false);
->      }
->
-> +    /* on error path we need to enter all coroutines that are still
-> +     * running before cleaning up common structures */
-> +    if (s->ret) {
-> +        for (i = 0; i < s->num_coroutines; i++) {
-> +             if (s->co[i]) {
-> +                 qemu_coroutine_enter(s->co[i]);
-> +             }
-> +        }
-> +    }
-> +
->      if (s->compressed && !s->ret) {
->          /* signal EOF to align */
->          ret = blk_pwrite_compressed(s->target, 0, NULL, 0);
->
->
-> Peter
->
+> Maybe extent_end to be more accurate?
 
-seemed a bit too daring to me to re-enter every coroutine potentially 
-including the ones that yielded waiting for I/O completion.
-If that's ok - that is for sure easier :)
+Done
 
-Or maybe some intermediate variant, as you suggest but only enter the 
-"wait_sector" coroutines (and main_loop_wait for the rest)?
-Or do not even re-enter them, like just
+>> +
+>>          offset_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
+>> -        n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
+>> -                             - offset_in_cluster);
+>> +
+>> +        /* truncate n_bytes to first cluster because we need to perform COW */
+>
+> Makes sense, but shouldn't this be squashed into patch patch 3? Because it looks
+> like it is fixing an intermediate bug.
 
--    while (s->ret == -EINPROGRESS) {
-+    while (s->running_coroutines != s->waiting_coroutines) {
-          main_loop_wait(false);
-      }
+Did you mean that I should merge this whole patch into patch 3? Maybe
+moving it before patch 3 rather than squashing it make more sense?
 
-
-/Anton
+Ashijeet
