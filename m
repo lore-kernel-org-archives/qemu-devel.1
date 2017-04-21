@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d1UgF-0001wW-Oi
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:44 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d1UgI-0001yA-KI
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d1UgD-0001Eu-1e
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d1UgC-0001EK-SZ
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E0E737575A
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 09:16:39 +0000 (UTC)
+	(envelope-from <kraxel@redhat.com>) id 1d1UgH-0001Ir-AS
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 05:16:46 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 21 Apr 2017 11:16:28 +0200
-Message-Id: <20170421091632.30900-6-kraxel@redhat.com>
+Date: Fri, 21 Apr 2017 11:16:29 +0200
+Message-Id: <20170421091632.30900-7-kraxel@redhat.com>
 In-Reply-To: <20170421091632.30900-1-kraxel@redhat.com>
 References: <20170421091632.30900-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/9] framebuffer: make display updates thread
- safe
+Subject: [Qemu-devel] [PATCH 6/9] exynos: make display updates thread safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +20,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "open list:Exynos" <qemu-arm@nongnu.org>
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/framebuffer.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ hw/display/exynos4210_fimd.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/hw/display/framebuffer.c b/hw/display/framebuffer.c
-index 25aa46c8c7..d7310d25f2 100644
---- a/hw/display/framebuffer.c
-+++ b/hw/display/framebuffer.c
-@@ -67,7 +67,7 @@ void framebuffer_update_display(
-     int *first_row, /* Input and output.  */
-     int *last_row /* Output only */)
- {
--    hwaddr src_len;
+diff --git a/hw/display/exynos4210_fimd.c b/hw/display/exynos4210_fimd.c
+index e5be713406..fd0b2bec65 100644
+--- a/hw/display/exynos4210_fimd.c
++++ b/hw/display/exynos4210_fimd.c
+@@ -1263,6 +1263,7 @@ static void exynos4210_fimd_update(void *opaque)
+     Exynos4210fimdState *s = (Exynos4210fimdState *)opaque;
+     DisplaySurface *surface;
+     Exynos4210fimdWindow *w;
 +    DirtyBitmapSnapshot *snap;
-     uint8_t *dest;
-     uint8_t *src;
-     int first, last = 0;
-@@ -78,7 +78,6 @@ void framebuffer_update_display(
+     int i, line;
+     hwaddr fb_line_addr, inc_size;
+     int scrn_height;
+@@ -1291,10 +1292,12 @@ static void exynos4210_fimd_update(void *opaque)
+             memory_region_sync_dirty_bitmap(w->mem_section.mr);
+             host_fb_addr = w->host_fb_addr;
+             fb_line_addr = w->mem_section.offset_within_region;
++            snap = memory_region_snapshot_and_clear_dirty(w->mem_section.mr,
++                    fb_line_addr, inc_size * scrn_height, DIRTY_MEMORY_VGA);
  
-     i = *first_row;
-     *first_row = -1;
--    src_len = (hwaddr)src_width * rows;
+             for (line = 0; line < scrn_height; line++) {
+-                is_dirty = memory_region_get_dirty(w->mem_section.mr,
+-                            fb_line_addr, scrn_width, DIRTY_MEMORY_VGA);
++                is_dirty = memory_region_snapshot_get_dirty(w->mem_section.mr,
++                            snap, fb_line_addr, scrn_width);
  
-     mem = mem_section->mr;
-     if (!mem) {
-@@ -102,9 +101,10 @@ void framebuffer_update_display(
-     src += i * src_width;
-     dest += i * dest_row_pitch;
- 
-+    snap = memory_region_snapshot_and_clear_dirty(mem, addr, src_width * rows,
-+                                                  DIRTY_MEMORY_VGA);
-     for (; i < rows; i++) {
--        dirty = memory_region_get_dirty(mem, addr, src_width,
--                                             DIRTY_MEMORY_VGA);
-+        dirty = memory_region_snapshot_get_dirty(mem, snap, addr, src_width);
-         if (dirty || invalidate) {
-             fn(opaque, dest, src, cols, dest_col_pitch);
-             if (first == -1)
-@@ -115,11 +115,10 @@ void framebuffer_update_display(
-         src += src_width;
-         dest += dest_row_pitch;
+                 if (s->invalidate || is_dirty) {
+                     if (first_line == -1) {
+@@ -1309,9 +1312,7 @@ static void exynos4210_fimd_update(void *opaque)
+                 fb_line_addr += inc_size;
+                 is_dirty = false;
+             }
+-            memory_region_reset_dirty(w->mem_section.mr,
+-                w->mem_section.offset_within_region,
+-                w->fb_len, DIRTY_MEMORY_VGA);
++            g_free(snap);
+             blend = true;
+         }
      }
-+    g_free(snap);
-     if (first < 0) {
-         return;
-     }
--    memory_region_reset_dirty(mem, mem_section->offset_within_region, src_len,
--                              DIRTY_MEMORY_VGA);
-     *first_row = first;
-     *last_row = last;
- }
 -- 
 2.9.3
