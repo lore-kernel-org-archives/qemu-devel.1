@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d1XBj-00027i-UP
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:24 -0400
+	(envelope-from <quintela@redhat.com>) id 1d1XBm-0002B7-QR
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d1XBg-0007P4-9B
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35996)
+	(envelope-from <quintela@redhat.com>) id 1d1XBl-0007Qz-QN
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d1XBg-0007Oo-3R
-	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:20 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d1XBl-0007Qd-HP
+	for qemu-devel@nongnu.org; Fri, 21 Apr 2017 07:57:25 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0482041A5E
-	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 11:57:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 774B367BDC
+	for <qemu-devel@nongnu.org>; Fri, 21 Apr 2017 11:57:24 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Fri, 21 Apr 2017 13:56:03 +0200
-Message-Id: <20170421115646.15544-23-quintela@redhat.com>
+Date: Fri, 21 Apr 2017 13:56:06 +0200
+Message-Id: <20170421115646.15544-26-quintela@redhat.com>
 In-Reply-To: <20170421115646.15544-1-quintela@redhat.com>
 References: <20170421115646.15544-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 22/65] ram: Move xbzrle_cache_miss into RAMState
+Subject: [Qemu-devel] [PULL 25/65] ram: Move migration_dirty_pages to
+ RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +34,131 @@ To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ migration/ram.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index cf6681c..b70db68 100644
+index 88392e4..71f8ef3 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -177,6 +177,8 @@ struct RAMState {
-     uint64_t xbzrle_bytes;
-     /* xbzrle transmmited pages */
-     uint64_t xbzrle_pages;
-+    /* xbzrle number of cache miss */
-+    uint64_t xbzrle_cache_miss;
+@@ -183,6 +183,8 @@ struct RAMState {
+     double xbzrle_cache_miss_rate;
+     /* xbzrle number of overflows */
+     uint64_t xbzrle_overflows;
++    /* number of dirty bits in the bitmap */
++    uint64_t migration_dirty_pages;
  };
  typedef struct RAMState RAMState;
  
-@@ -184,7 +186,6 @@ static RAMState ram_state;
- 
- /* accounting for migration statistics */
- typedef struct AccountingInfo {
--    uint64_t xbzrle_cache_miss;
-     double xbzrle_cache_miss_rate;
-     uint64_t xbzrle_overflows;
- } AccountingInfo;
-@@ -218,7 +219,7 @@ uint64_t xbzrle_mig_pages_transferred(void)
- 
- uint64_t xbzrle_mig_pages_cache_miss(void)
- {
--    return acct_info.xbzrle_cache_miss;
-+    return ram_state.xbzrle_cache_miss;
+@@ -223,8 +225,12 @@ uint64_t xbzrle_mig_pages_overflow(void)
+     return ram_state.xbzrle_overflows;
  }
  
- double xbzrle_mig_cache_miss_rate(void)
-@@ -498,7 +499,7 @@ static int save_xbzrle_page(RAMState *rs, QEMUFile *f, uint8_t **current_data,
-     uint8_t *prev_cached_page;
++static ram_addr_t ram_save_remaining(void)
++{
++    return ram_state.migration_dirty_pages;
++}
++
+ static QemuMutex migration_bitmap_mutex;
+-static uint64_t migration_dirty_pages;
  
-     if (!cache_is_cached(XBZRLE.cache, current_addr, rs->bitmap_sync_count)) {
--        acct_info.xbzrle_cache_miss++;
-+        rs->xbzrle_cache_miss++;
-         if (!last_stage) {
-             if (cache_insert(XBZRLE.cache, current_addr, *current_data,
-                              rs->bitmap_sync_count) == -1) {
-@@ -699,12 +700,12 @@ static void migration_bitmap_sync(RAMState *rs)
-         if (migrate_use_xbzrle()) {
-             if (rs->iterations_prev != rs->iterations) {
-                 acct_info.xbzrle_cache_miss_rate =
--                   (double)(acct_info.xbzrle_cache_miss -
-+                   (double)(rs->xbzrle_cache_miss -
-                             rs->xbzrle_cache_miss_prev) /
-                    (rs->iterations - rs->iterations_prev);
+ /* used by the search for pages to send */
+ struct PageSearchStatus {
+@@ -582,7 +588,7 @@ ram_addr_t migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
+     return (next - base) << TARGET_PAGE_BITS;
+ }
+ 
+-static inline bool migration_bitmap_clear_dirty(ram_addr_t addr)
++static inline bool migration_bitmap_clear_dirty(RAMState *rs, ram_addr_t addr)
+ {
+     bool ret;
+     int nr = addr >> TARGET_PAGE_BITS;
+@@ -591,7 +597,7 @@ static inline bool migration_bitmap_clear_dirty(ram_addr_t addr)
+     ret = test_and_clear_bit(nr, bitmap);
+ 
+     if (ret) {
+-        migration_dirty_pages--;
++        rs->migration_dirty_pages--;
+     }
+     return ret;
+ }
+@@ -601,8 +607,9 @@ static void migration_bitmap_sync_range(RAMState *rs, ram_addr_t start,
+ {
+     unsigned long *bitmap;
+     bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
+-    migration_dirty_pages += cpu_physical_memory_sync_dirty_bitmap(bitmap,
+-                             start, length, &rs->num_dirty_pages_period);
++    rs->migration_dirty_pages +=
++        cpu_physical_memory_sync_dirty_bitmap(bitmap, start, length,
++                                              &rs->num_dirty_pages_period);
+ }
+ 
+ static void migration_bitmap_sync_init(RAMState *rs)
+@@ -1304,7 +1311,7 @@ static int ram_save_target_page(RAMState *rs, MigrationState *ms, QEMUFile *f,
+     int res = 0;
+ 
+     /* Check the pages is dirty and if it is send it */
+-    if (migration_bitmap_clear_dirty(dirty_ram_abs)) {
++    if (migration_bitmap_clear_dirty(rs, dirty_ram_abs)) {
+         unsigned long *unsentmap;
+         if (compression_switch && migrate_use_compression()) {
+             res = ram_save_compressed_page(rs, ms, f, pss,
+@@ -1454,11 +1461,6 @@ void acct_update_position(QEMUFile *f, size_t size, bool zero)
+     }
+ }
+ 
+-static ram_addr_t ram_save_remaining(void)
+-{
+-    return migration_dirty_pages;
+-}
+-
+ uint64_t ram_bytes_remaining(void)
+ {
+     return ram_save_remaining() * TARGET_PAGE_SIZE;
+@@ -1532,6 +1534,7 @@ static void ram_state_reset(RAMState *rs)
+ 
+ void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
+ {
++    RAMState *rs = &ram_state;
+     /* called in qemu main thread, so there is
+      * no writing race against this migration_bitmap
+      */
+@@ -1557,7 +1560,7 @@ void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
+ 
+         atomic_rcu_set(&migration_bitmap_rcu, bitmap);
+         qemu_mutex_unlock(&migration_bitmap_mutex);
+-        migration_dirty_pages += new - old;
++        rs->migration_dirty_pages += new - old;
+         call_rcu(old_bitmap, migration_bitmap_free, rcu);
+     }
+ }
+@@ -1730,6 +1733,7 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+                                           RAMBlock *block,
+                                           PostcopyDiscardState *pds)
+ {
++    RAMState *rs = &ram_state;
+     unsigned long *bitmap;
+     unsigned long *unsentmap;
+     unsigned int host_ratio = block->page_size / TARGET_PAGE_SIZE;
+@@ -1827,7 +1831,7 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+                  * Remark them as dirty, updating the count for any pages
+                  * that weren't previously dirty.
+                  */
+-                migration_dirty_pages += !test_and_set_bit(page, bitmap);
++                rs->migration_dirty_pages += !test_and_set_bit(page, bitmap);
              }
-             rs->iterations_prev = rs->iterations;
--            rs->xbzrle_cache_miss_prev = acct_info.xbzrle_cache_miss;
-+            rs->xbzrle_cache_miss_prev = rs->xbzrle_cache_miss;
          }
-         s->dirty_pages_rate = rs->num_dirty_pages_period * 1000
-             / (end_time - rs->time_last_bitmap_sync);
-@@ -2001,6 +2002,7 @@ static int ram_save_init_globals(RAMState *rs)
-     rs->iterations = 0;
-     rs->xbzrle_bytes = 0;
-     rs->xbzrle_pages = 0;
-+    rs->xbzrle_cache_miss = 0;
-     migration_bitmap_sync_init(rs);
-     qemu_mutex_init(&migration_bitmap_mutex);
  
+@@ -2053,7 +2057,7 @@ static int ram_save_init_globals(RAMState *rs)
+      * Count the total number of pages used by ram blocks not including any
+      * gaps due to alignment or unplugs.
+      */
+-    migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
++    rs->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
+ 
+     memory_global_dirty_log_start();
+     migration_bitmap_sync(rs);
 -- 
 2.9.3
