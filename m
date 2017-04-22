@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d1phL-00074g-G9
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:43:19 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNR-0001jE-0g
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d1phK-0000t3-4t
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:43:15 -0400
-Resent-Message-Id: <E1d1phK-0000t3-4t@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21365)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d1phJ-0000sH-Tk
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:43:14 -0400
-In-Reply-To: <1492845627-4384-1-git-send-email-longpeng2@huawei.com>
-Message-ID: <149284697871.51.15388546249040284197@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNN-0000gx-KS
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:45 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3397
+	helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNM-0000g4-OT
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:41 -0400
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Sat, 22 Apr 2017 16:25:49 +0800
+Message-ID: <1492849558-17540-10-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
+References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 22 Apr 2017 00:42:59 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 00/18] crypto: add afalg-backend support
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 09/18] COLO: Flush memory data from ram cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +26,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: longpeng2@huawei.com
-Cc: famz@redhat.com, berrange@redhat.com, arei.gonglei@huawei.com, weidong.huang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com
+To: qemu-devel@nongnu.org, gilbert@redhat.com
+Cc: quintela@redhat.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-Mjg0NTYyNy00Mzg0LTEtZ2l0LXNlbmQtZW1haWwtbG9uZ3BlbmcyQGh1YXdlaS5jb20KVHlwZTog
-c2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMDAvMThdIGNyeXB0bzogYWRk
-IGFmYWxnLWJhY2tlbmQgc3VwcG9ydAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
-b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
-biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
-bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
-dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
-ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
-dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKNjYxZjQyMyB0ZXN0czogY3J5cHRvOiBhZGQgaG1hYyBzcGVlZCBiZW5jaG1hcmsgc3VwcG9y
-dAo1MTcxNDk0IHRlc3RzOiBjcnlwdG86IGFkZCBoYXNoIHNwZWVkIGJlbmNobWFyayBzdXBwb3J0
-CjEzYzNlMDMgdGVzdHM6IGNyeXB0bzogYWRkIGNpcGhlciBzcGVlZCBiZW5jaG1hcmsgc3VwcG9y
-dAo5NjFhNDAxIGNyeXB0bzogaG1hYzogYWRkIGFmX2FsZyBobWFjIHN1cHBvcnQKMDYzMjg2YiBj
-cnlwdG86IGhhc2g6IGFkZCBhZmFsZy1iYWNrZW5kIGhhc2ggc3VwcG9ydApiNTM1NWM0IGNyeXB0
-bzogY2lwaGVyOiBhZGQgYWZhbGctYmFja2VuZCBjaXBoZXIgc3VwcG9ydAoyZDIzNTBiIGNyeXB0
-bzogaW50cm9kdWNlIHNvbWUgY29tbW9uIGZ1bmN0aW9ucyBmb3IgYWZfYWxnIGJhY2tlbmQKY2Q5
-NTRmYSBjcnlwdG86IGhtYWM6IGFkZCBobWFjIGRyaXZlciBmcmFtZXdvcmsKYTFmZDAwYiBjcnlw
-dG86IGhtYWM6IGludHJvZHVjZSBxY3J5cHRvX2htYWNfY3R4X25ldyBmb3IgZ2xpYi1iYWNrZW5k
-CjlkYjYzMDEgY3J5cHRvOiBobWFjOiBpbnRyb2R1Y2UgcWNyeXB0b19obWFjX2N0eF9uZXcgZm9y
-IG5ldHRsZS1iYWNrZW5kCmYxZWQ5YjcgY3J5cHRvOiBobWFjOiBpbnRyb2R1Y2UgcWNyeXB0b19o
-bWFjX2N0eF9uZXcgZm9yIGdjcnlwdC1iYWNrZW5kCmMwMjRjNTAgY3J5cHRvOiBobWFjOiBtb3Zl
-IGNyeXB0by9obWFjLmggaW50byBpbmNsdWRlL2NyeXB0by8KNmM5YWZiNiBjcnlwdG86IGhhc2g6
-IGFkZCBoYXNoIGRyaXZlciBmcmFtZXdvcmsKZTNlOWJjMCBjcnlwdG86IGNpcGhlcjogYWRkIGNp
-cGhlciBkcml2ZXIgZnJhbWV3b3JrCmRmMGNhZTMgY3J5cHRvOiBjaXBoZXI6IGludHJvZHVjZSBx
-Y3J5cHRvX2NpcGhlcl9jdHhfbmV3IGZvciBidWlsdGluLWJhY2tlbmQKNDRiYmIxOCBjcnlwdG86
-IGNpcGhlcjogaW50cm9kdWNlIHFjcnlwdG9fY2lwaGVyX2N0eF9uZXcgZm9yIG5ldHRsZS1iYWNr
-ZW5kCjgwODk0NjggY3J5cHRvOiBjaXBoZXI6IGludHJvZHVjZSBxY3J5cHRvX2NpcGhlcl9jdHhf
-bmV3IGZvciBnY3J5cHQtYmFja2VuZAo3YjQ2NTQxIGNyeXB0bzogY2lwaGVyOiBpbnRyb2R1Y2Ug
-Y29udGV4dCBmcmVlIGZ1bmN0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzE4OiBjcnlwdG86IGNpcGhlcjogaW50cm9kdWNlIGNvbnRleHQgZnJlZSBmdW5jdGlvbi4u
-LgpDaGVja2luZyBQQVRDSCAyLzE4OiBjcnlwdG86IGNpcGhlcjogaW50cm9kdWNlIHFjcnlwdG9f
-Y2lwaGVyX2N0eF9uZXcgZm9yIGdjcnlwdC1iYWNrZW5kLi4uCkNoZWNraW5nIFBBVENIIDMvMTg6
-IGNyeXB0bzogY2lwaGVyOiBpbnRyb2R1Y2UgcWNyeXB0b19jaXBoZXJfY3R4X25ldyBmb3IgbmV0
-dGxlLWJhY2tlbmQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xODogY3J5cHRvOiBjaXBoZXI6IGludHJv
-ZHVjZSBxY3J5cHRvX2NpcGhlcl9jdHhfbmV3IGZvciBidWlsdGluLWJhY2tlbmQuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNS8xODogY3J5cHRvOiBjaXBoZXI6IGFkZCBjaXBoZXIgZHJpdmVyIGZyYW1ld29y
-ay4uLgpDaGVja2luZyBQQVRDSCA2LzE4OiBjcnlwdG86IGhhc2g6IGFkZCBoYXNoIGRyaXZlciBm
-cmFtZXdvcmsuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xODogY3J5cHRvOiBobWFjOiBtb3ZlIGNyeXB0
-by9obWFjLmggaW50byBpbmNsdWRlL2NyeXB0by8uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xODogY3J5
-cHRvOiBobWFjOiBpbnRyb2R1Y2UgcWNyeXB0b19obWFjX2N0eF9uZXcgZm9yIGdjcnlwdC1iYWNr
-ZW5kLi4uCkNoZWNraW5nIFBBVENIIDkvMTg6IGNyeXB0bzogaG1hYzogaW50cm9kdWNlIHFjcnlw
-dG9faG1hY19jdHhfbmV3IGZvciBuZXR0bGUtYmFja2VuZC4uLgpDaGVja2luZyBQQVRDSCAxMC8x
-ODogY3J5cHRvOiBobWFjOiBpbnRyb2R1Y2UgcWNyeXB0b19obWFjX2N0eF9uZXcgZm9yIGdsaWIt
-YmFja2VuZC4uLgpDaGVja2luZyBQQVRDSCAxMS8xODogY3J5cHRvOiBobWFjOiBhZGQgaG1hYyBk
-cml2ZXIgZnJhbWV3b3JrLi4uCkNoZWNraW5nIFBBVENIIDEyLzE4OiBjcnlwdG86IGludHJvZHVj
-ZSBzb21lIGNvbW1vbiBmdW5jdGlvbnMgZm9yIGFmX2FsZyBiYWNrZW5kLi4uCkVSUk9SOiBnX2Zy
-ZWUoTlVMTCkgaXMgc2FmZSB0aGlzIGNoZWNrIGlzIHByb2JhYmx5IG5vdCByZXF1aXJlZAojMTc1
-OiBGSUxFOiBjcnlwdG8vYWZhbGcuYzoxMDU6CisgICAgICAgIGlmIChhZmFsZy0+bmFtZSkgewor
-ICAgICAgICAgICAgZ19mcmVlKGFmYWxnLT5uYW1lKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMjE3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCkNoZWNraW5nIFBBVENIIDEzLzE4OiBjcnlwdG86IGNpcGhlcjogYWRkIGFmYWxnLWJh
-Y2tlbmQgY2lwaGVyIHN1cHBvcnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTg6IGNyeXB0bzogaGFz
-aDogYWRkIGFmYWxnLWJhY2tlbmQgaGFzaCBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDE1LzE4
-OiBjcnlwdG86IGhtYWM6IGFkZCBhZl9hbGcgaG1hYyBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENI
-IDE2LzE4OiB0ZXN0czogY3J5cHRvOiBhZGQgY2lwaGVyIHNwZWVkIGJlbmNobWFyayBzdXBwb3J0
-Li4uCkNoZWNraW5nIFBBVENIIDE3LzE4OiB0ZXN0czogY3J5cHRvOiBhZGQgaGFzaCBzcGVlZCBi
-ZW5jaG1hcmsgc3VwcG9ydC4uLgpDaGVja2luZyBQQVRDSCAxOC8xODogdGVzdHM6IGNyeXB0bzog
-YWRkIGhtYWMgc3BlZWQgYmVuY2htYXJrIHN1cHBvcnQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+During the time of VM's running, PVM may dirty some pages, we will transfer
+PVM's dirty pages to SVM and store them into SVM's RAM cache at next checkpoint
+time. So, the content of SVM's RAM cache will always be same with PVM's memory
+after checkpoint.
+
+Instead of flushing all content of PVM's RAM cache into SVM's MEMORY,
+we do this in a more efficient way:
+Only flush any page that dirtied by PVM since last checkpoint.
+In this way, we can ensure SVM's memory same with PVM's.
+
+Besides, we must ensure flush RAM cache before load device state.
+
+Cc: Juan Quintela <quintela@redhat.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ include/migration/migration.h |  1 +
+ migration/ram.c               | 40 ++++++++++++++++++++++++++++++++++++++++
+ migration/trace-events        |  2 ++
+ 3 files changed, 43 insertions(+)
+
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index ba765eb..2aa7654 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -364,4 +364,5 @@ PostcopyState postcopy_state_set(PostcopyState new_state);
+ /* ram cache */
+ int colo_init_ram_cache(void);
+ void colo_release_ram_cache(void);
++void colo_flush_ram_cache(void);
+ #endif
+diff --git a/migration/ram.c b/migration/ram.c
+index 0653a24..df10d4b 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2602,6 +2602,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
+     /* ADVISE is earlier, it shows the source has the postcopy capability on */
+     bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
++    bool need_flush = false;
+ 
+     seq_iter++;
+ 
+@@ -2636,6 +2637,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+             /* After going into COLO, we should load the Page into colo_cache */
+             if (migration_incoming_in_colo_state()) {
+                 host = colo_cache_from_block_offset(block, addr);
++                need_flush = true;
+             } else {
+                 host = host_from_ram_block_offset(block, addr);
+             }
+@@ -2742,6 +2744,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     wait_for_decompress_done();
+     rcu_read_unlock();
+     trace_ram_load_complete(ret, seq_iter);
++
++    if (!ret  && ram_cache_enable && need_flush) {
++        colo_flush_ram_cache();
++    }
+     return ret;
+ }
+ 
+@@ -2810,6 +2816,40 @@ void colo_release_ram_cache(void)
+     rcu_read_unlock();
+ }
+ 
++/*
++ * Flush content of RAM cache into SVM's memory.
++ * Only flush the pages that be dirtied by PVM or SVM or both.
++ */
++void colo_flush_ram_cache(void)
++{
++    RAMBlock *block = NULL;
++    void *dst_host;
++    void *src_host;
++    unsigned long offset = 0;
++
++    trace_colo_flush_ram_cache_begin(ram_state.migration_dirty_pages);
++    rcu_read_lock();
++    block = QLIST_FIRST_RCU(&ram_list.blocks);
++
++    while (block) {
++        offset = migration_bitmap_find_dirty(&ram_state, block, offset);
++        migration_bitmap_clear_dirty(&ram_state, block, offset);
++
++        if (offset << TARGET_PAGE_BITS >= block->used_length) {
++            offset = 0;
++            block = QLIST_NEXT_RCU(block, next);
++        } else {
++            dst_host = block->host + (offset << TARGET_PAGE_BITS);
++            src_host = block->colo_cache + (offset << TARGET_PAGE_BITS);
++            memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
++        }
++    }
++
++    rcu_read_unlock();
++    trace_colo_flush_ram_cache_end();
++    assert(ram_state.migration_dirty_pages == 0);
++}
++
+ static SaveVMHandlers savevm_ram_handlers = {
+     .save_live_setup = ram_save_setup,
+     .save_live_iterate = ram_save_iterate,
+diff --git a/migration/trace-events b/migration/trace-events
+index b8f01a2..93f4337 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -72,6 +72,8 @@ ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %"
+ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
+ ram_postcopy_send_discard_bitmap(void) ""
+ ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: %zx len: %zx"
++colo_flush_ram_cache_begin(uint64_t dirty_pages) "dirty_pages %" PRIu64
++colo_flush_ram_cache_end(void) ""
+ 
+ # migration/migration.c
+ await_return_path_close_on_source_close(void) ""
+-- 
+1.8.3.1
