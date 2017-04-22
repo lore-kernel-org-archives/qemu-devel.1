@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1mPo-0005I0-Ro
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:12:58 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d1mQK-0005gY-Np
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d1mPn-0002OY-PS
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:12:56 -0400
-References: <20170411011718.9152-1-eblake@redhat.com>
-	<20170411011718.9152-2-eblake@redhat.com>
-	<20170412094909.GC4955@noname.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f6d49036-c222-ac33-65b6-25f2b6d0ac55@redhat.com>
-Date: Fri, 21 Apr 2017 13:42:23 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d1mQI-0002Rm-US
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:13:28 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170412094909.GC4955@noname.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="60VUiomCPn0pX1dkBKOSbxRjMdAkWHf5B"
-Subject: Re: [Qemu-devel] [PATCH v9 01/13] qcow2: Unallocate unmapped zero
- clusters if no backing file
+In-Reply-To: <20170421081504.GA8342@lemon.lan>
+References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
+	<1491057878-27868-7-git-send-email-ashijeetacharya@gmail.com>
+	<20170421081504.GA8342@lemon.lan>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Sat, 22 Apr 2017 09:43:25 +0530
+Message-ID: <CAC2QTZYDtm6iqvWzNn=NOkoMq8FfGkD9Din5Rs0VaRbJGZ1otA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] vmdk: Update metadata for multiple
+ clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,130 +24,347 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---60VUiomCPn0pX1dkBKOSbxRjMdAkWHf5B
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
-Message-ID: <f6d49036-c222-ac33-65b6-25f2b6d0ac55@redhat.com>
-Subject: Re: [PATCH v9 01/13] qcow2: Unallocate unmapped zero clusters if no
- backing file
-References: <20170411011718.9152-1-eblake@redhat.com>
- <20170411011718.9152-2-eblake@redhat.com>
- <20170412094909.GC4955@noname.str.redhat.com>
-In-Reply-To: <20170412094909.GC4955@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Apr 21, 2017 at 1:45 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Sat, 04/01 20:14, Ashijeet Acharya wrote:
+>> Include a next pointer in VmdkMetaData struct to point to the previous
+>> allocated L2 table. Modify vmdk_L2update to start updating metadata for
+>> allocation of multiple clusters at once.
+>>
+>> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+>
+> This is the metadata part of the coalesed allocation. I think patch 3 is
+> functionally incomplete without these changes, and is perhaps broken because
+> metadata is not handled correctly.
+>
+> Such an "intermediate functional regression" is not good in a series, which we
+> need to avoid.
 
-On 04/12/2017 04:49 AM, Kevin Wolf wrote:
->> Furthermore, this matches the behavior of discard_single_l2(), in
->> favoring an unallocated cluster over a zero cluster when full
->> discard is requested.
->=20
-> The only use for "full discard" is qcow2_make_empty(). It explicitly
-> requests that the backing file becomes visible again. This is a
-> completely different case.
+I have moved this patch right after patch 3 because merging both will
+result in an unnecessary huge patch. Will that work?
+>
+>> ---
+>>  block/vmdk.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
+>>  1 file changed, 111 insertions(+), 25 deletions(-)
+>>
+>> diff --git a/block/vmdk.c b/block/vmdk.c
+>> index 9456ddd..c7675db 100644
+>> --- a/block/vmdk.c
+>> +++ b/block/vmdk.c
+>> @@ -137,6 +137,8 @@ typedef struct VmdkMetaData {
+>>      int valid;
+>>      uint32_t *l2_cache_entry;
+>>      uint32_t nb_clusters;
+>> +    uint32_t offset;
+>> +    struct VmdkMetaData *next;
+>>  } VmdkMetaData;
+>>
+>>  typedef struct VmdkGrainMarker {
+>> @@ -263,6 +265,12 @@ static inline uint64_t size_to_clusters(VmdkExtent *extent, uint64_t size)
+>>      return (DIV_ROUND_UP(size + round_off_size, BDRV_SECTOR_SIZE * 128) - 1);
+>>  }
+>>
+>> +static inline int64_t vmdk_align_offset(int64_t offset, int n)
+>> +{
+>> +    offset = (offset + n - 1) & ~(n - 1);
+>> +    return offset;
+>> +}
+>> +
+>>  static uint32_t vmdk_read_cid(BlockDriverState *bs, int parent)
+>>  {
+>>      char *desc;
+>> @@ -1037,29 +1045,88 @@ static void vmdk_refresh_limits(BlockDriverState *bs, Error **errp)
+>>      }
+>>  }
+>>
+>> -static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+>> -                         uint32_t offset)
+>> +static int vmdk_alloc_cluster_link_l2(VmdkExtent *extent,
+>> +                                      VmdkMetaData *m_data, bool zeroed)
+>>  {
+>> -    offset = cpu_to_le32(offset);
+>> +    int i;
+>> +    uint32_t offset, temp_offset;
+>> +    int *l2_table_array;
+>> +    int l2_array_size;
+>> +
+>> +    if (zeroed) {
+>> +        temp_offset = VMDK_GTE_ZEROED;
+>> +    } else {
+>> +        temp_offset = m_data->offset;
+>> +    }
+>> +
+>> +    temp_offset = cpu_to_le32(temp_offset);
+>> +
+>> +    l2_array_size = sizeof(uint32_t) * m_data->nb_clusters;
+>> +    l2_table_array = qemu_try_blockalign(extent->file->bs,
+>> +                                    vmdk_align_offset(l2_array_size, 512));
+>
+> Indentation is off.
+>
+> Use QEMU_ALIGN_UP, instead of vmdk_align_offset.
+>
+> 512 is a magic number, use BDRV_SECTOR_SIZE.
 
-No, let's look at that code - I'm not referring to the
-qcow2_make_empty() case, but to the bdrv_pdiscard() case:
+Done
 
+>
+>> +    if (l2_table_array == NULL) {
+>> +        return VMDK_ERROR;
+>> +    }
+>> +    memset(l2_table_array, 0, vmdk_align_offset(l2_array_size, 512));
+>> +
+>>      /* update L2 table */
+>> +    offset = temp_offset;
+>> +    for (i = 0; i < m_data->nb_clusters; i++) {
+>> +        l2_table_array[i] = offset;
+>> +        if (!zeroed) {
+>> +            offset += 128;
+>
+> Something is going wrong here with endianness on BE host, I believe.
 
-        /*
-         * If full_discard is false, make sure that a discarded area
-reads back
-         * as zeroes for v3 images (we cannot do it for v2 without actual=
-ly
-         * writing a zero-filled buffer). We can skip the operation if th=
-e
-         * cluster is already marked as zero, or if it's unallocated and =
-we
-         * don't have a backing file.
-         *
-         * TODO We might want to use bdrv_get_block_status(bs) here, but
-we're
-         * holding s->lock, so that doesn't work today.
-         *
-         * If full_discard is true, the sector should not read back as
-zeroes,
-         * but rather fall through to the backing file.
-         */
-        switch (qcow2_get_cluster_type(old_l2_entry)) {
-            case QCOW2_CLUSTER_UNALLOCATED:
-                if (full_discard || !bs->backing) {
-                    continue;
-                }
-                break;
+I have changed temp_offset to LE above, wouldn't that be enough. I am not sure.
 
+>
+>> +        }
+>> +    }
+>> +
+>>      if (bdrv_pwrite_sync(extent->file,
+>> -                ((int64_t)m_data->l2_offset * 512)
+>> -                    + (m_data->l2_index * sizeof(offset)),
+>> -                &offset, sizeof(offset)) < 0) {
+>> +            ((int64_t)m_data->l2_offset * 512)
+>> +                + ((m_data->l2_index) * sizeof(offset)),
+>> +                         l2_table_array, l2_array_size) < 0) {
+>
+> You can fix the indentation while changing these lines. If not, don't change it,
+> or at least don't make it uglier.
 
-That says: if our cluster is currently unallocated, and we have no
-backing file, then LEAVE it unallocated (rather than marking it
-QCOW2_CLUSTER_ZERO), even through bdrv_pdiscard.
+I have aligned it, if it still looks ugly in v4, I will revert.
 
-Meanwhile, the next lines:
+>
+>>          return VMDK_ERROR;
+>>      }
+>> +
+>>      /* update backup L2 table */
+>>      if (extent->l1_backup_table_offset != 0) {
+>>          m_data->l2_offset = extent->l1_backup_table[m_data->l1_index];
+>>          if (bdrv_pwrite_sync(extent->file,
+>>                      ((int64_t)m_data->l2_offset * 512)
+>> -                        + (m_data->l2_index * sizeof(offset)),
+>> -                    &offset, sizeof(offset)) < 0) {
+>> +                        + ((m_data->l2_index) * sizeof(offset)),
+>> +                                l2_table_array, l2_array_size) < 0) {
+>
+> Same here.
+>
+>>              return VMDK_ERROR;
+>>          }
+>>      }
+>> +
+>> +    offset = temp_offset;
+>>      if (m_data->l2_cache_entry) {
+>> -        *m_data->l2_cache_entry = offset;
+>> +        for (i = 0; i < m_data->nb_clusters; i++) {
+>> +            *m_data->l2_cache_entry = offset;
+>> +            m_data->l2_cache_entry++;
+>> +
+>> +            if (!zeroed) {
+>> +                offset += 128;
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    qemu_vfree(l2_table_array);
+>> +    return VMDK_OK;
+>> +}
+>> +
+>> +static int vmdk_L2update(VmdkExtent *extent, VmdkMetaData *m_data,
+>> +                         bool zeroed)
+>> +{
+>> +    int ret;
+>> +
+>> +    while (m_data->next != NULL) {
+>> +        VmdkMetaData *next;
+>> +
+>> +        ret = vmdk_alloc_cluster_link_l2(extent, m_data, zeroed);
+>> +        if (ret < 0) {
+>> +            return ret;
+>> +        }
+>> +
+>> +        next = m_data->next;
+>> +        m_data = next;
+>
+> Why not simply "m_data = m_data->next" and drop "next" variable?
+>>      }
+>>
+>>      return VMDK_OK;
+>> @@ -1271,7 +1338,7 @@ exit:
+>>   */
+>>  static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>>                          uint64_t offset, uint64_t *cluster_offset,
+>> -                        int64_t *bytes, VmdkMetaData *m_data,
+>> +                        int64_t *bytes, VmdkMetaData **m_data,
+>>                          bool allocate, uint32_t *total_alloc_clusters)
+>>  {
+>>      int l1_index, l2_offset, l2_index;
+>> @@ -1280,6 +1347,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>>      uint32_t nb_clusters;
+>>      bool zeroed = false;
+>>      uint64_t skip_start_bytes, skip_end_bytes;
+>> +    VmdkMetaData *old_m_data;
+>>      int ret;
+>>
+>>      ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
+>> @@ -1330,13 +1398,21 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>>          if (ret < 0) {
+>>              return ret;
+>>          }
+>> -        if (m_data) {
+>> -            m_data->valid = 1;
+>> -            m_data->l1_index = l1_index;
+>> -            m_data->l2_index = l2_index;
+>> -            m_data->l2_offset = l2_offset;
+>> -            m_data->l2_cache_entry = &l2_table[l2_index];
+>> -            m_data->nb_clusters = nb_clusters;
+>> +
+>> +        if (*m_data) {
+>> +            old_m_data = *m_data;
+>> +            *m_data = g_malloc0(sizeof(**m_data));
+>> +
+>> +            **m_data = (VmdkMetaData) {
+>> +                .valid            =    1,
+>> +                .l1_index         =    l1_index,
+>> +                .l2_index         =    l2_index,
+>> +                .l2_offset        =    l2_offset,
+>> +                .l2_cache_entry   =    &l2_table[l2_index],
+>> +                .nb_clusters      =    nb_clusters,
+>> +                .offset           =    cluster_sector,
+>> +                .next             =    old_m_data,
+>> +            };
+>
+> I think if the new m_data can be merged into the old, there is no need to
+> allocate a new one.
 
-            case QCOW2_CLUSTER_ZERO:
-                if (!full_discard) {
-                    continue;
-                }
+Do you mean that if the clusters lie in the same l2 table, then merge
+them? I think this case only appears when I leave out the first and
+last cluster for COW. If I misunderstood, sorry!
+I think I will post v4 without attending this issue and we can discuss
+this when you are available after the weekend.
 
-state that if we are doing bdrv_pdiscard(), and the cluster already
-reads as zeroes, then minimize the churn by not changing the cluster
-(and that in turn means we do NOT lose a preallocation).
+>
+>>          }
+>>      }
+>>      *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
+>> @@ -1365,7 +1441,7 @@ static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>>   */
+>>  static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
+>>                                       VmdkExtent *extent,
+>> -                                     VmdkMetaData *m_data, uint64_t offset,
+>> +                                     VmdkMetaData **m_data, uint64_t offset,
+>>                                       bool allocate, uint64_t *cluster_offset,
+>>                                       int64_t bytes,
+>>                                       uint32_t *total_alloc_clusters)
+>> @@ -1385,8 +1461,8 @@ static int vmdk_alloc_cluster_offset(BlockDriverState *bs,
+>>      new_cluster_offset = 0;
+>>      *cluster_offset = 0;
+>>      n_bytes = 0;
+>> -    if (m_data) {
+>> -        m_data->valid = 0;
+>> +    if (*m_data) {
+>> +        (*m_data)->valid = 0;
+>>      }
+>>
+>>      /* due to L2 table margins all bytes may not get allocated at once */
+>> @@ -1768,9 +1844,11 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>>      uint64_t cluster_offset;
+>>      uint64_t bytes_done = 0;
+>>      uint64_t extent_size;
+>> -    VmdkMetaData m_data;
+>> +    VmdkMetaData *m_data;
+>>      uint32_t total_alloc_clusters = 0;
+>>
+>> +    m_data = g_malloc0(sizeof(*m_data));
+>> +
+[scroll till here] [1] So this allocation will need to move....[2]
 
->=20
-> In other words, in order to stay consistent between discard and
-> write_zeroes from a guest POV, we need to leave this code alone.
+>>      if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
+>>          error_report("Wrong offset: offset=0x%" PRIx64
+>>                       " total_sectors=0x%" PRIx64,
+>> @@ -1779,6 +1857,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>>      }
+>>
+>>      while (bytes > 0) {
 
-Again, my argument is that if we have no backing file, and the cluster
-is previously unallocated, then leaving it unallocated is equivalent to
-changing it to QCOW2_CLUSTER_ZERO.  There is no difference to the guest
-POV by this change.
+....[2] here. Thus we will need to allocate it again every time we
+enter here otherwise the very next line m_data->next=NULL will
+segfault.
 
->=20
->> Meanwhile, version 2 qcow2 files (compat=3D0.10) lack support for an
->> explicit zero cluster.  This minor tweak therefore allows us to turn
->> write zeroes with unmap into an actual unallocation on those files,
->> where they used to return -ENOTSUP and cause an allocation due to
->> the fallback to explicitly written zeroes.
->=20
-> Okay, this is true.
->=20
-> But I doubt that making write_zeroes more efficient on v2 images withou=
-t
-> a backing file is really worth any extra complexity at this point...
+So maybe its good to free it separately?
+I will retain it this way for v4 and change it otherwise if you still
+say so after my reasoning in v5.
 
-My argument is that it is not much complexity, and that making this
-change coupled with the new qemu-iotest 179 in patch 2/13 (which fails
-without this change) enabled me to test qemu-io -c 'w -z -u' (which
-nothing else was testing) and ensure that I'm not regression when the
-rest of the series further tweaks things to be byte-based.
+>> +        m_data->next = NULL;
+>>          extent = find_extent(s, offset >> BDRV_SECTOR_BITS, extent);
+>>          if (!extent) {
+>>              return -EIO;
+>> @@ -1825,7 +1904,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>>                                          total_alloc_clusters;
+>>                  if (!zero_dry_run) {
+>>                      /* update L2 tables */
+>> -                    if (vmdk_L2update(extent, &m_data, VMDK_GTE_ZEROED)
+>> +                    if (vmdk_L2update(extent, m_data, zeroed)
+>>                              != VMDK_OK) {
+>>                          return -EIO;
+>>                      }
+>> @@ -1839,10 +1918,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>>              if (ret) {
+>>                  return ret;
+>>              }
+>> -            if (m_data.valid) {
+>> +            if (m_data->valid) {
+>>                  /* update L2 tables */
+>> -                if (vmdk_L2update(extent, &m_data,
+>> -                                  cluster_offset >> BDRV_SECTOR_BITS)
+>> +                if (vmdk_L2update(extent, m_data, zeroed)
+>>                          != VMDK_OK) {
+>>                      return -EIO;
+>>                  }
+>> @@ -1852,6 +1930,13 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>>          offset += n_bytes;
+>>          bytes_done += n_bytes;
+>>
+>> +        while (m_data->next != NULL) {
+>> +            VmdkMetaData *next;
+>> +            next = m_data->next;
+>> +            g_free(m_data);
+>> +            m_data = next;
+>> +        }
+>> +
+>>          /* update CID on the first write every time the virtual disk is
+>>           * opened */
+>>          if (!s->cid_updated) {
+>> @@ -1862,6 +1947,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>>              s->cid_updated = true;
+>>          }
+>>      }
+>> +    g_free(m_data);
+>
+> This is weird, you free all but the last m_data with a while loop, a few lines
+> above, and this one with a separate g_free().
+>
+> Please use one loop:
+>
+>     for (p = m_data; p; p = next) {
+>         next = p->next;
+>         g_free(p);
+>     }
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I have a good (maybe good enough) reason for it, if I free it in the
+while loop above, then I will need to allocate it again when we enter
+the superior while(bytes>0) loop, otherwise we will segfault for
+everything from that point onwards....[scroll up __^] [1]
 
-
---60VUiomCPn0pX1dkBKOSbxRjMdAkWHf5B
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY+lKPAAoJEKeha0olJ0Nq5JYH+wd596m38LaYfoVZNsoEA0X4
-DdgWb3PcuIVPys0Rj+5Wb65HnGer/NJdDY6FpdM8G0Wt3AjaxjxGxoM+NOctyLzN
-VzdK9dyrkTAFSm2rqc+iFGRR/d7zOKv0IjWHWJSBHI/EebcvMM5nzX2y6/r0hM4r
-1y2PxxF2M0+nFbUW3LEF8h2AeOz5VI8o4fum5HfkYTMIZZdz1hDmQbcX03vkOdz6
-zVWfNmnZOg1fUhLWcQ79lp52+/lyGsin4gLvjlBuvtYmJANWxi+MKbTi8npuCb/t
-dTVBrNVAIrTUqx3wB8ISxns0p4MOJxUCs4ANJxhg9XIjkocmfSGbJNpX2GO3ofo=
-=wGq8
------END PGP SIGNATURE-----
-
---60VUiomCPn0pX1dkBKOSbxRjMdAkWHf5B--
+Ashijeet
