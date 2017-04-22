@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXC-00011F-Ea
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXC-00011C-EG
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXA-0003rz-Av
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXA-0003s8-Er
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:50 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3409
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3410
 	helo=dggrg03-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qX9-0003qn-Mi
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qX9-0003qs-QW
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:48 -0400
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Sat, 22 Apr 2017 16:35:17 +0800
-Message-ID: <1492850128-17472-8-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Sat, 22 Apr 2017 16:35:15 +0800
+Message-ID: <1492850128-17472-6-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v2 07/18] COLO: Load dirty pages into
- SVM's RAM cache firstly
+Subject: [Qemu-devel] [PATCH RESEND v2 05/18] COLO: Handle shutdown command
+ for VM in COLO state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,180 +28,203 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: quintela@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: quintela@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Li
+	Zhijian <lizhijian@cn.fujitsu.com>
 
-We should not load PVM's state directly into SVM, because there maybe some
-errors happen when SVM is receving data, which will break SVM.
+If VM is in COLO FT state, we need to do some extra works before
+starting normal shutdown process.
 
-We need to ensure receving all data before load the state into SVM. We use
-an extra memory to cache these data (PVM's ram). The ram cache in secondary side
-is initially the same as SVM/PVM's memory. And in the process of checkpoint,
-we cache the dirty pages of PVM into this ram cache firstly, so this ram cache
-always the same as PVM's memory at every checkpoint, then we flush this cached ram
-to SVM after we receive all PVM's state.
+Secondary VM will ignore the shutdown command if users issue it directly
+to Secondary VM. COLO will capture shutdown command and after
+shutdown request from user.
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
-v2:
-- Move colo_init_ram_cache() and colo_release_ram_cache() out of
-  incoming thread since both of them need the global lock, if we keep
-  colo_release_ram_cache() in incoming thread, there are potential
-  dead-lock.
-- Remove bool ram_cache_enable flag, use migration_incoming_in_state() instead.
-- Remove the Reviewd-by tag because of the above changes.
----
- include/exec/ram_addr.h       |  1 +
- include/migration/migration.h |  4 +++
- migration/migration.c         |  6 ++++
- migration/ram.c               | 71 ++++++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 81 insertions(+), 1 deletion(-)
+ include/migration/colo.h |  1 +
+ include/sysemu/sysemu.h  |  3 +++
+ migration/colo.c         | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ qapi-schema.json         |  4 +++-
+ vl.c                     | 19 ++++++++++++++++---
+ 5 files changed, 68 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index c9ddcd0..0b3d77c 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -27,6 +27,7 @@ struct RAMBlock {
-     struct rcu_head rcu;
-     struct MemoryRegion *mr;
-     uint8_t *host;
-+    uint8_t *colo_cache; /* For colo, VM's ram cache */
-     ram_addr_t offset;
-     ram_addr_t used_length;
-     ram_addr_t max_length;
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index ba1a16c..ba765eb 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -360,4 +360,8 @@ uint64_t ram_pagesize_summary(void);
- PostcopyState postcopy_state_get(void);
- /* Set the state and return the old state */
- PostcopyState postcopy_state_set(PostcopyState new_state);
-+
-+/* ram cache */
-+int colo_init_ram_cache(void);
-+void colo_release_ram_cache(void);
- #endif
-diff --git a/migration/migration.c b/migration/migration.c
-index 755ea54..7419404 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -441,6 +441,10 @@ static void process_incoming_migration_co(void *opaque)
-             error_report_err(local_err);
-             exit(EXIT_FAILURE);
-         }
-+        if (colo_init_ram_cache() < 0) {
-+            error_report("Init ram cache failed");
-+            exit(EXIT_FAILURE);
-+        }
-         mis->migration_incoming_co = qemu_coroutine_self();
-         qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
-              colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
-@@ -449,6 +453,8 @@ static void process_incoming_migration_co(void *opaque)
+diff --git a/include/migration/colo.h b/include/migration/colo.h
+index 2bbff9e..aadd040 100644
+--- a/include/migration/colo.h
++++ b/include/migration/colo.h
+@@ -37,4 +37,5 @@ COLOMode get_colo_mode(void);
+ void colo_do_failover(MigrationState *s);
  
-         /* Wait checkpoint incoming thread exit before free resource */
-         qemu_thread_join(&mis->colo_incoming_thread);
-+        /* We hold the global iothread lock, so it is safe here */
-+        colo_release_ram_cache();
+ void colo_checkpoint_notify(void *opaque);
++bool colo_handle_shutdown(void);
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 16175f7..8054f53 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -49,6 +49,8 @@ typedef enum WakeupReason {
+     QEMU_WAKEUP_REASON_OTHER,
+ } WakeupReason;
+ 
++extern int colo_shutdown_requested;
++
+ void qemu_system_reset_request(void);
+ void qemu_system_suspend_request(void);
+ void qemu_register_suspend_notifier(Notifier *notifier);
+@@ -56,6 +58,7 @@ void qemu_system_wakeup_request(WakeupReason reason);
+ void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
+ void qemu_register_wakeup_notifier(Notifier *notifier);
+ void qemu_system_shutdown_request(void);
++void qemu_system_shutdown_request_core(void);
+ void qemu_system_powerdown_request(void);
+ void qemu_register_powerdown_notifier(Notifier *notifier);
+ void qemu_system_debug_request(void);
+diff --git a/migration/colo.c b/migration/colo.c
+index a3344ce..c4fc865 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -384,6 +384,21 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+         goto out;
      }
  
-     if (ret < 0) {
-diff --git a/migration/ram.c b/migration/ram.c
-index f48664e..05d1b06 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2265,6 +2265,20 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
-     return block->host + offset;
++    if (colo_shutdown_requested) {
++        colo_send_message(s->to_dst_file, COLO_MESSAGE_GUEST_SHUTDOWN,
++                          &local_err);
++        if (local_err) {
++            error_free(local_err);
++            /* Go on the shutdown process and throw the error message */
++            error_report("Failed to send shutdown message to SVM");
++        }
++        qemu_fflush(s->to_dst_file);
++        colo_shutdown_requested = 0;
++        qemu_system_shutdown_request_core();
++        /* Fix me: Just let the colo thread exit ? */
++        qemu_thread_exit(0);
++    }
++
+     ret = 0;
+ 
+     qemu_mutex_lock_iothread();
+@@ -449,7 +464,9 @@ static void colo_process_checkpoint(MigrationState *s)
+             goto out;
+         }
+ 
+-        qemu_sem_wait(&s->colo_checkpoint_sem);
++        if (!colo_shutdown_requested) {
++            qemu_sem_wait(&s->colo_checkpoint_sem);
++        }
+ 
+         ret = colo_do_checkpoint_transaction(s, bioc, fb);
+         if (ret < 0) {
+@@ -534,6 +551,16 @@ static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
+     case COLO_MESSAGE_CHECKPOINT_REQUEST:
+         *checkpoint_request = 1;
+         break;
++    case COLO_MESSAGE_GUEST_SHUTDOWN:
++        qemu_mutex_lock_iothread();
++        vm_stop_force_state(RUN_STATE_COLO);
++        qemu_system_shutdown_request_core();
++        qemu_mutex_unlock_iothread();
++        /*
++         * The main thread will be exit and terminate the whole
++         * process, do need some cleanup ?
++         */
++        qemu_thread_exit(0);
+     default:
+         *checkpoint_request = 0;
+         error_setg(errp, "Got unknown COLO message: %d", msg);
+@@ -696,3 +723,20 @@ out:
+ 
+     return NULL;
+ }
++
++bool colo_handle_shutdown(void)
++{
++    /*
++     * If VM is in COLO-FT mode, we need do some significant work before
++     * respond to the shutdown request. Besides, Secondary VM will ignore
++     * the shutdown request from users.
++     */
++    if (migration_incoming_in_colo_state()) {
++        return true;
++    }
++    if (migration_in_colo_state()) {
++        colo_shutdown_requested = 1;
++        return true;
++    }
++    return false;
++}
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 01b087f..4b3e1b7 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1187,12 +1187,14 @@
+ #
+ # @vmstate-loaded: VM's state has been loaded by SVM.
+ #
++# @guest-shutdown: shutdown requested from PVM to SVM. (Since 2.9)
++#
+ # Since: 2.8
+ ##
+ { 'enum': 'COLOMessage',
+   'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-reply',
+             'vmstate-send', 'vmstate-size', 'vmstate-received',
+-            'vmstate-loaded' ] }
++            'vmstate-loaded', 'guest-shutdown' ] }
+ 
+ ##
+ # @COLOMode:
+diff --git a/vl.c b/vl.c
+index 0b4ed52..72638c9 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1611,6 +1611,8 @@ static NotifierList wakeup_notifiers =
+     NOTIFIER_LIST_INITIALIZER(wakeup_notifiers);
+ static uint32_t wakeup_reason_mask = ~(1 << QEMU_WAKEUP_REASON_NONE);
+ 
++int colo_shutdown_requested;
++
+ int qemu_shutdown_requested_get(void)
+ {
+     return shutdown_requested;
+@@ -1737,7 +1739,10 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
+ void qemu_system_reset_request(void)
+ {
+     if (no_reboot) {
+-        shutdown_requested = 1;
++        qemu_system_shutdown_request();
++        if (!shutdown_requested) {/* colo handle it ? */
++            return;
++        }
+     } else {
+         reset_requested = 1;
+     }
+@@ -1810,14 +1815,22 @@ void qemu_system_killed(int signal, pid_t pid)
+     qemu_notify_event();
  }
  
-+static inline void *colo_cache_from_block_offset(RAMBlock *block,
-+                                                 ram_addr_t offset)
-+{
-+    if (!offset_in_ramblock(block, offset)) {
-+        return NULL;
-+    }
-+    if (!block->colo_cache) {
-+        error_report("%s: colo_cache is NULL in block :%s",
-+                     __func__, block->idstr);
-+        return NULL;
-+    }
-+    return block->colo_cache + offset;
-+}
-+
- /**
-  * ram_handle_compressed: handle the zero page case
-  *
-@@ -2605,7 +2619,12 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-                      RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
-             RAMBlock *block = ram_block_from_stream(f, flags);
- 
--            host = host_from_ram_block_offset(block, addr);
-+            /* After going into COLO, we should load the Page into colo_cache */
-+            if (migration_incoming_in_colo_state()) {
-+                host = colo_cache_from_block_offset(block, addr);
-+            } else {
-+                host = host_from_ram_block_offset(block, addr);
-+            }
-             if (!host) {
-                 error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
-                 ret = -EINVAL;
-@@ -2712,6 +2731,56 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     return ret;
+-void qemu_system_shutdown_request(void)
++void qemu_system_shutdown_request_core(void)
+ {
+-    trace_qemu_system_shutdown_request();
+     replay_shutdown_request();
+     shutdown_requested = 1;
+     qemu_notify_event();
  }
  
-+/*
-+ * colo cache: this is for secondary VM, we cache the whole
-+ * memory of the secondary VM, it is need to hold the global lock
-+ * to call this helper.
-+ */
-+int colo_init_ram_cache(void)
++void qemu_system_shutdown_request(void)
 +{
-+    RAMBlock *block;
-+
-+    rcu_read_lock();
-+    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+        block->colo_cache = qemu_anon_ram_alloc(block->used_length, NULL);
-+        if (!block->colo_cache) {
-+            error_report("%s: Can't alloc memory for COLO cache of block %s,"
-+                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
-+                         block->used_length);
-+            goto out_locked;
-+        }
-+        memcpy(block->colo_cache, block->host, block->used_length);
++    trace_qemu_system_shutdown_request();
++    if (colo_handle_shutdown()) {
++        return;
 +    }
-+    rcu_read_unlock();
-+    return 0;
-+
-+out_locked:
-+    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+        if (block->colo_cache) {
-+            qemu_anon_ram_free(block->colo_cache, block->used_length);
-+            block->colo_cache = NULL;
-+        }
-+    }
-+
-+    rcu_read_unlock();
-+    return -errno;
++    qemu_system_shutdown_request_core();
 +}
 +
-+/* It is need to hold the global lock to call this helper */
-+void colo_release_ram_cache(void)
-+{
-+    RAMBlock *block;
-+
-+    rcu_read_lock();
-+    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+        if (block->colo_cache) {
-+            qemu_anon_ram_free(block->colo_cache, block->used_length);
-+            block->colo_cache = NULL;
-+        }
-+    }
-+    rcu_read_unlock();
-+}
-+
- static SaveVMHandlers savevm_ram_handlers = {
-     .save_live_setup = ram_save_setup,
-     .save_live_iterate = ram_save_iterate,
+ static void qemu_system_powerdown(void)
+ {
+     qapi_event_send_powerdown(&error_abort);
 -- 
 1.8.3.1
