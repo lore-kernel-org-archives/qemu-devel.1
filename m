@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1d1pMF-0003lA-59
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:21:28 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1d1pM5-0003aJ-Jn
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:21:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1d1pMB-0003s1-SE
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:21:27 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3505
+	(envelope-from <longpeng2@huawei.com>) id 1d1pM2-0003lu-In
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:21:17 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3499
 	helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1d1pMB-0003qI-2G
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:21:23 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1d1pM1-0003jN-Nj
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 03:21:14 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Sat, 22 Apr 2017 15:20:27 +0800
-Message-ID: <1492845627-4384-19-git-send-email-longpeng2@huawei.com>
+Date: Sat, 22 Apr 2017 15:20:15 +0800
+Message-ID: <1492845627-4384-7-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1492845627-4384-1-git-send-email-longpeng2@huawei.com>
 References: <1492845627-4384-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 18/18] tests: crypto: add hmac speed
- benchmark support
+Subject: [Qemu-devel] [PATCH v3 06/18] crypto: hash: add hash driver
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +30,185 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: berrange@redhat.com
 Cc: arei.gonglei@huawei.com, longpeng.mike@gmail.com, qemu-devel@nongnu.org, weidong.huang@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-This patch add a hmac speed benchmark, it helps us to
-measure the performance by using "make check-speed" or
-using "./tests/benchmark-crypto-hmac" directly.
+1) makes the public APIs in hash-nettle/gcrypt/glib static,
+   and rename them with "nettle/gcrypt/glib" prefix.
 
+2) introduces hash framework, including QCryptoHashDriver
+   and new public APIs.
+
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- tests/Makefile.include        |  2 +
- tests/benchmark-crypto-hmac.c | 96 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 98 insertions(+)
- create mode 100644 tests/benchmark-crypto-hmac.c
+ crypto/hash-gcrypt.c | 19 +++++++++++++------
+ crypto/hash-glib.c   | 19 +++++++++++++------
+ crypto/hash-nettle.c | 19 +++++++++++++------
+ crypto/hash.c        | 13 +++++++++++++
+ crypto/hashpriv.h    | 31 +++++++++++++++++++++++++++++++
+ 5 files changed, 83 insertions(+), 18 deletions(-)
+ create mode 100644 crypto/hashpriv.h
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 045d16f..7b170be 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -101,6 +101,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
- check-speed-y += tests/benchmark-crypto-hash$(EXESUF)
- check-unit-y += tests/test-crypto-hmac$(EXESUF)
-+check-speed-y += tests/benchmark-crypto-hmac$(EXESUF)
- check-unit-y += tests/test-crypto-cipher$(EXESUF)
- check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
- check-unit-y += tests/test-crypto-secret$(EXESUF)
-@@ -631,6 +632,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
- tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
- tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
-+tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
- tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
- tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
-diff --git a/tests/benchmark-crypto-hmac.c b/tests/benchmark-crypto-hmac.c
+diff --git a/crypto/hash-gcrypt.c b/crypto/hash-gcrypt.c
+index 7690690..972beaa 100644
+--- a/crypto/hash-gcrypt.c
++++ b/crypto/hash-gcrypt.c
+@@ -22,6 +22,7 @@
+ #include <gcrypt.h>
+ #include "qapi/error.h"
+ #include "crypto/hash.h"
++#include "hashpriv.h"
+ 
+ 
+ static int qcrypto_hash_alg_map[QCRYPTO_HASH_ALG__MAX] = {
+@@ -44,12 +45,13 @@ gboolean qcrypto_hash_supports(QCryptoHashAlgorithm alg)
+ }
+ 
+ 
+-int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
+-                        const struct iovec *iov,
+-                        size_t niov,
+-                        uint8_t **result,
+-                        size_t *resultlen,
+-                        Error **errp)
++static int
++qcrypto_gcrypt_hash_bytesv(QCryptoHashAlgorithm alg,
++                           const struct iovec *iov,
++                           size_t niov,
++                           uint8_t **result,
++                           size_t *resultlen,
++                           Error **errp)
+ {
+     int i, ret;
+     gcry_md_hd_t md;
+@@ -107,3 +109,8 @@ int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
+     gcry_md_close(md);
+     return -1;
+ }
++
++
++QCryptoHashDriver qcrypto_hash_lib_driver = {
++    .hash_bytesv = qcrypto_gcrypt_hash_bytesv,
++};
+diff --git a/crypto/hash-glib.c b/crypto/hash-glib.c
+index ec99ac9..fb16ac0 100644
+--- a/crypto/hash-glib.c
++++ b/crypto/hash-glib.c
+@@ -21,6 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "crypto/hash.h"
++#include "hashpriv.h"
+ 
+ 
+ static int qcrypto_hash_alg_map[QCRYPTO_HASH_ALG__MAX] = {
+@@ -47,12 +48,13 @@ gboolean qcrypto_hash_supports(QCryptoHashAlgorithm alg)
+ }
+ 
+ 
+-int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
+-                        const struct iovec *iov,
+-                        size_t niov,
+-                        uint8_t **result,
+-                        size_t *resultlen,
+-                        Error **errp)
++static int
++qcrypto_glib_hash_bytesv(QCryptoHashAlgorithm alg,
++                            const struct iovec *iov,
++                            size_t niov,
++                            uint8_t **result,
++                            size_t *resultlen,
++                            Error **errp)
+ {
+     int i, ret;
+     GChecksum *cs;
+@@ -95,3 +97,8 @@ int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
+     g_checksum_free(cs);
+     return -1;
+ }
++
++
++QCryptoHashDriver qcrypto_hash_lib_driver = {
++    .hash_bytesv = qcrypto_glib_hash_bytesv,
++};
+diff --git a/crypto/hash-nettle.c b/crypto/hash-nettle.c
+index 6a206dc..96f186f 100644
+--- a/crypto/hash-nettle.c
++++ b/crypto/hash-nettle.c
+@@ -21,6 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "crypto/hash.h"
++#include "hashpriv.h"
+ #include <nettle/md5.h>
+ #include <nettle/sha.h>
+ #include <nettle/ripemd160.h>
+@@ -103,12 +104,13 @@ gboolean qcrypto_hash_supports(QCryptoHashAlgorithm alg)
+ }
+ 
+ 
+-int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
+-                        const struct iovec *iov,
+-                        size_t niov,
+-                        uint8_t **result,
+-                        size_t *resultlen,
+-                        Error **errp)
++static int
++qcrypto_nettle_hash_bytesv(QCryptoHashAlgorithm alg,
++                           const struct iovec *iov,
++                           size_t niov,
++                           uint8_t **result,
++                           size_t *resultlen,
++                           Error **errp)
+ {
+     int i;
+     union qcrypto_hash_ctx ctx;
+@@ -152,3 +154,8 @@ int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
+ 
+     return 0;
+ }
++
++
++QCryptoHashDriver qcrypto_hash_lib_driver = {
++    .hash_bytesv = qcrypto_nettle_hash_bytesv,
++};
+diff --git a/crypto/hash.c b/crypto/hash.c
+index 0f1ceac..c43fd87 100644
+--- a/crypto/hash.c
++++ b/crypto/hash.c
+@@ -21,6 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "crypto/hash.h"
++#include "hashpriv.h"
+ 
+ static size_t qcrypto_hash_alg_size[QCRYPTO_HASH_ALG__MAX] = {
+     [QCRYPTO_HASH_ALG_MD5] = 16,
+@@ -38,6 +39,18 @@ size_t qcrypto_hash_digest_len(QCryptoHashAlgorithm alg)
+     return qcrypto_hash_alg_size[alg];
+ }
+ 
++int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
++                        const struct iovec *iov,
++                        size_t niov,
++                        uint8_t **result,
++                        size_t *resultlen,
++                        Error **errp)
++{
++    return qcrypto_hash_lib_driver.hash_bytesv(alg, iov, niov,
++                                               result, resultlen,
++                                               errp);
++}
++
+ 
+ int qcrypto_hash_bytes(QCryptoHashAlgorithm alg,
+                        const char *buf,
+diff --git a/crypto/hashpriv.h b/crypto/hashpriv.h
 new file mode 100644
-index 0000000..be2f2a5
+index 0000000..5e505e0
 --- /dev/null
-+++ b/tests/benchmark-crypto-hmac.c
-@@ -0,0 +1,96 @@
++++ b/crypto/hashpriv.h
+@@ -0,0 +1,31 @@
 +/*
-+ * QEMU Crypto hmac speed benchmark
++ * QEMU Crypto hash driver supports
 + *
 + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
 + *
@@ -78,90 +218,25 @@ index 0000000..be2f2a5
 + * This work is licensed under the terms of the GNU GPL, version 2 or
 + * (at your option) any later version.  See the COPYING file in the
 + * top-level directory.
++ *
 + */
-+#include "qemu/osdep.h"
-+#include "crypto/init.h"
-+#include "crypto/hmac.h"
 +
-+#define KEY "monkey monkey monkey monkey"
++#ifndef QCRYPTO_HASHPRIV_H
++#define QCRYPTO_HASHPRIV_H
 +
-+static void test_hmac_speed(const void *opaque)
-+{
-+    size_t chunk_size = (size_t)opaque;
-+    QCryptoHmac *hmac = NULL;
-+    uint8_t *in = NULL, *out = NULL;
-+    size_t out_len = 0;
-+    double total = 0.0;
-+    struct iovec iov;
-+    Error *err = NULL;
-+    int ret;
++typedef struct QCryptoHashDriver QCryptoHashDriver;
 +
-+    if (!qcrypto_hmac_supports(QCRYPTO_HASH_ALG_SHA256)) {
-+        return;
-+    }
++struct QCryptoHashDriver {
++    int (*hash_bytesv)(QCryptoHashAlgorithm alg,
++                       const struct iovec *iov,
++                       size_t niov,
++                       uint8_t **result,
++                       size_t *resultlen,
++                       Error **errp);
++};
 +
-+    hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256, (const uint8_t *)KEY,
-+                            strlen(KEY), &err);
-+    g_assert(err == NULL);
-+    g_assert(hmac != NULL);
++extern QCryptoHashDriver qcrypto_hash_lib_driver;
 +
-+    in = g_new0(uint8_t, chunk_size);
-+    memset(in, g_test_rand_int(), chunk_size);
-+
-+    iov.iov_base = (char *)in;
-+    iov.iov_len = chunk_size;
-+
-+    g_test_timer_start();
-+    do {
-+        ret = qcrypto_hmac_bytesv(hmac, &iov, 1, &out, &out_len, &err);
-+        g_assert(ret == 0);
-+        g_assert(err == NULL);
-+
-+#if !defined(CONFIG_NETTLE) && !defined(CONFIG_GCRYPT)
-+        /*
-+         * qcrypto_hmac_bytesv() uses g_checksum_get_digest() to get the
-+         * digest. Once this function has been called, the #GChecksum is
-+         * closed and can no longer be updated with g_checksum_update().
-+         * So...we must free glib-backend hmac object and renew one here.
-+         */
-+        qcrypto_hmac_free(hmac);
-+        hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
 +#endif
-+        total += chunk_size;
-+    } while (g_test_timer_elapsed() < 5.0);
-+
-+    total /= 1024 * 1024; /* to MB */
-+
-+    g_print("[drv:%s]", qcrypto_hmac_using_afalg_drv(hmac) ?
-+            "afalg" : "libs");
-+    g_print("hmac(sha256): ");
-+    g_print("Testing chunk_size %ld bytes ", chunk_size);
-+    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
-+    g_print("%.2f MB/sec\n", total / g_test_timer_last());
-+
-+    qcrypto_hmac_free(hmac);
-+    g_free(out);
-+    g_free(in);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    size_t i;
-+    char name[64];
-+
-+    g_test_init(&argc, &argv, NULL);
-+    g_assert(qcrypto_init(NULL) == 0);
-+
-+    for (i = 512; i <= (64 * 1204); i *= 2) {
-+        memset(name, 0 , sizeof(name));
-+        snprintf(name, sizeof(name), "/crypto/hmac/speed-%lu", i);
-+        g_test_add_data_func(name, (void *)i, test_hmac_speed);
-+    }
-+
-+    return g_test_run();
-+}
 -- 
 1.8.3.1
