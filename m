@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNR-0001jJ-2u
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNR-0001jK-37
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNO-0000hG-3i
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNO-0000hc-UK
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:45 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3467
-	helo=dggrg02-dlp.huawei.com)
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3399
+	helo=dggrg03-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNN-0000gb-94
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNO-0000gp-2J
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:42 -0400
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Sat, 22 Apr 2017 16:25:52 +0800
-Message-ID: <1492849558-17540-13-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Sat, 22 Apr 2017 16:25:44 +0800
+Message-ID: <1492849558-17540-5-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 12/18] savevm: split the process of
- different stages for loadvm/savevm
+Subject: [Qemu-devel] [PATCH v2 04/18] COLO: integrate colo compare with
+ colo frame
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,149 +28,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, gilbert@redhat.com
-Cc: quintela@redhat.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: quintela@redhat.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
 
-There are several stages during loadvm/savevm process. In different stage,
-migration incoming processes different types of sections.
-We want to control these stages more accuracy, it will benefit COLO
-performance, we don't have to save type of QEMU_VM_SECTION_START
-sections everytime while do checkpoint, besides, we want to separate
-the process of saving/loading memory and devices state.
+For COLO FT, both the PVM and SVM run at the same time,
+only sync the state while it needs.
 
-So we add three new helper functions: qemu_loadvm_state_begin(),
-qemu_load_device_state() and qemu_savevm_live_state() to achieve
-different process during migration.
+So here, let SVM runs while not doing checkpoint, change
+DEFAULT_MIGRATE_X_CHECKPOINT_DELAY to 200*100.
 
-Besides, we make qemu_loadvm_state_main() and qemu_save_device_state()
-public, and simplify the codes of qemu_save_device_state() by calling the
-wrapper qemu_savevm_state_header().
+Besides, we forgot to release colo_checkpoint_semd and
+colo_delay_timer, fix them here.
 
-Cc: Juan Quintela <quintela@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
-v2:
- - Use the wrapper qemu_savevm_state_header() to simplify the codes
-  of qemu_save_device_state() (Dave's suggestion)
----
- include/sysemu/sysemu.h |  6 ++++++
- migration/savevm.c      | 54 ++++++++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 53 insertions(+), 7 deletions(-)
+ migration/colo.c      | 42 ++++++++++++++++++++++++++++++++++++++++--
+ migration/migration.c |  2 +-
+ 2 files changed, 41 insertions(+), 3 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 8054f53..0255c4e 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -132,7 +132,13 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
-                                            uint64_t *start_list,
-                                            uint64_t *length_list);
+diff --git a/migration/colo.c b/migration/colo.c
+index c19eb3f..a3344ce 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -21,8 +21,11 @@
+ #include "migration/failover.h"
+ #include "replication.h"
+ #include "qmp-commands.h"
++#include "net/colo-compare.h"
++#include "net/colo.h"
  
-+void qemu_savevm_live_state(QEMUFile *f);
-+int qemu_save_device_state(QEMUFile *f);
+ static bool vmstate_loading;
++static Notifier packets_compare_notifier;
+ 
+ #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+ 
+@@ -332,6 +335,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+         goto out;
+     }
+ 
++    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
++    if (local_err) {
++        goto out;
++    }
 +
- int qemu_loadvm_state(QEMUFile *f);
-+int qemu_loadvm_state_begin(QEMUFile *f);
-+int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
-+int qemu_load_device_state(QEMUFile *f);
- 
- extern int autostart;
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index f87cd8d..8c2ce0b 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -54,6 +54,7 @@
- #include "qemu/cutils.h"
- #include "io/channel-buffer.h"
- #include "io/channel-file.h"
-+#include "migration/colo.h"
- 
- #ifndef ETH_P_RARP
- #define ETH_P_RARP 0x8035
-@@ -1285,13 +1286,20 @@ done:
+     /* Disable block migration */
+     s->params.blk = 0;
+     s->params.shared = 0;
+@@ -390,6 +398,11 @@ out:
      return ret;
  }
  
--static int qemu_save_device_state(QEMUFile *f)
-+void qemu_savevm_live_state(QEMUFile *f)
- {
--    SaveStateEntry *se;
-+    /* save QEMU_VM_SECTION_END section */
-+    qemu_savevm_state_complete_precopy(f, true);
-+    qemu_put_byte(f, QEMU_VM_EOF);
-+}
- 
--    qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
--    qemu_put_be32(f, QEMU_VM_FILE_VERSION);
-+int qemu_save_device_state(QEMUFile *f)
++static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
 +{
-+    SaveStateEntry *se;
++    colo_checkpoint_notify(data);
++}
++
+ static void colo_process_checkpoint(MigrationState *s)
+ {
+     QIOChannelBuffer *bioc;
+@@ -406,6 +419,9 @@ static void colo_process_checkpoint(MigrationState *s)
+         goto out;
+     }
  
-+    if (!migration_in_colo_state()) {
-+        qemu_savevm_state_header(f);
-+    }
-     cpu_synchronize_all_states();
++    packets_compare_notifier.notify = colo_compare_notify_checkpoint;
++    colo_compare_register_notifier(&packets_compare_notifier);
++
+     /*
+      * Wait for Secondary finish loading VM states and enter COLO
+      * restore.
+@@ -451,11 +467,21 @@ out:
+         qemu_fclose(fb);
+     }
  
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-@@ -1342,8 +1350,6 @@ enum LoadVMExitCodes {
-     LOADVM_QUIT     =  1,
- };
- 
--static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+-    timer_del(s->colo_delay_timer);
 -
- /* ------ incoming postcopy messages ------ */
- /* 'advise' arrives before any transfers just to tell us that a postcopy
-  * *might* happen - it might be skipped if precopy transferred everything
-@@ -1957,7 +1963,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
-     return 0;
- }
+     /* Hope this not to be too long to wait here */
+     qemu_sem_wait(&s->colo_exit_sem);
+     qemu_sem_destroy(&s->colo_exit_sem);
++
++    /*
++     * It is safe to unregister notifier after failover finished.
++     * Besides, colo_delay_timer and colo_checkpoint_sem can't be
++     * released befor unregister notifier, or there will be use-after-free
++     * error.
++     */
++    colo_compare_unregister_notifier(&packets_compare_notifier);
++    timer_del(s->colo_delay_timer);
++    timer_free(s->colo_delay_timer);
++    qemu_sem_destroy(&s->colo_checkpoint_sem);
++
+     /*
+      * Must be called after failover BH is completed,
+      * Or the failover BH may shutdown the wrong fd that
+@@ -548,6 +574,11 @@ void *colo_process_incoming_thread(void *opaque)
+     fb = qemu_fopen_channel_input(QIO_CHANNEL(bioc));
+     object_unref(OBJECT(bioc));
  
--static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
-+int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
- {
-     uint8_t section_type;
-     int ret = 0;
-@@ -2095,6 +2101,40 @@ int qemu_loadvm_state(QEMUFile *f)
-     return ret;
- }
++    qemu_mutex_lock_iothread();
++    vm_start();
++    trace_colo_vm_state_change("stop", "run");
++    qemu_mutex_unlock_iothread();
++
+     colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_READY,
+                       &local_err);
+     if (local_err) {
+@@ -567,6 +598,11 @@ void *colo_process_incoming_thread(void *opaque)
+             goto out;
+         }
  
-+int qemu_loadvm_state_begin(QEMUFile *f)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    Error *local_err = NULL;
-+    int ret;
++        qemu_mutex_lock_iothread();
++        vm_stop_force_state(RUN_STATE_COLO);
++        trace_colo_vm_state_change("run", "stop");
++        qemu_mutex_unlock_iothread();
 +
-+    if (qemu_savevm_state_blocked(&local_err)) {
-+        error_report_err(local_err);
-+        return -EINVAL;
-+    }
-+    /* Load QEMU_VM_SECTION_START section */
-+    ret = qemu_loadvm_state_main(f, mis);
-+    if (ret < 0) {
-+        error_report("Failed to loadvm begin work: %d", ret);
-+    }
-+    return ret;
-+}
-+
-+int qemu_load_device_state(QEMUFile *f)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    int ret;
-+
-+    /* Load QEMU_VM_SECTION_FULL section */
-+    ret = qemu_loadvm_state_main(f, mis);
-+    if (ret < 0) {
-+        error_report("Failed to load device state: %d", ret);
-+        return ret;
-+    }
-+
-+    cpu_synchronize_all_post_init();
-+    return 0;
-+}
-+
- int save_vmstate(Monitor *mon, const char *name)
- {
-     BlockDriverState *bs, *bs1;
+         /* FIXME: This is unnecessary for periodic checkpoint mode */
+         colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
+                      &local_err);
+@@ -620,6 +656,8 @@ void *colo_process_incoming_thread(void *opaque)
+         }
+ 
+         vmstate_loading = false;
++        vm_start();
++        trace_colo_vm_state_change("stop", "run");
+         qemu_mutex_unlock_iothread();
+ 
+         if (failover_get_state() == FAILOVER_STATUS_RELAUNCH) {
+diff --git a/migration/migration.c b/migration/migration.c
+index 353f272..2ade2aa 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -70,7 +70,7 @@
+ /* The delay time (in ms) between two COLO checkpoints
+  * Note: Please change this default value to 10000 when we support hybrid mode.
+  */
+-#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
++#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+ 
+ static NotifierList migration_state_notifiers =
+     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
 -- 
 1.8.3.1
