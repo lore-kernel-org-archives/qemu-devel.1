@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXC-00011C-EG
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:52 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXF-00013d-NP
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXA-0003s8-Er
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:50 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3410
-	helo=dggrg03-dlp.huawei.com)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXD-0003tz-C0
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:53 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3512
+	helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qX9-0003qs-QW
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:48 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXC-0003s5-Gc
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:36:51 -0400
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Sat, 22 Apr 2017 16:35:15 +0800
-Message-ID: <1492850128-17472-6-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Sat, 22 Apr 2017 16:35:23 +0800
+Message-ID: <1492850128-17472-14-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v2 05/18] COLO: Handle shutdown command
- for VM in COLO state
+Subject: [Qemu-devel] [PATCH RESEND v2 13/18] COLO: Separate the process of
+ saving/loading ram and device state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,203 +28,165 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: quintela@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Li
-	Zhijian <lizhijian@cn.fujitsu.com>
+Cc: quintela@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-If VM is in COLO FT state, we need to do some extra works before
-starting normal shutdown process.
+We separate the process of saving/loading ram and device state when do
+checkpoint. We add new helpers for save/load ram/device. With this change,
+we can directly transfer RAM from primary side to secondary side without
+using channel-buffer as assistant, which also reduce the size of extra memory
+was used during checkpoint.
 
-Secondary VM will ignore the shutdown command if users issue it directly
-to Secondary VM. COLO will capture shutdown command and after
-shutdown request from user.
+Besides, we move the colo_flush_ram_cache to the proper position after the
+above change.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/colo.h |  1 +
- include/sysemu/sysemu.h  |  3 +++
- migration/colo.c         | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- qapi-schema.json         |  4 +++-
- vl.c                     | 19 ++++++++++++++++---
- 5 files changed, 68 insertions(+), 5 deletions(-)
+ migration/colo.c   | 49 +++++++++++++++++++++++++++++++++++++++----------
+ migration/ram.c    |  5 -----
+ migration/savevm.c |  4 ++++
+ 3 files changed, 43 insertions(+), 15 deletions(-)
 
-diff --git a/include/migration/colo.h b/include/migration/colo.h
-index 2bbff9e..aadd040 100644
---- a/include/migration/colo.h
-+++ b/include/migration/colo.h
-@@ -37,4 +37,5 @@ COLOMode get_colo_mode(void);
- void colo_do_failover(MigrationState *s);
- 
- void colo_checkpoint_notify(void *opaque);
-+bool colo_handle_shutdown(void);
- #endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 16175f7..8054f53 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -49,6 +49,8 @@ typedef enum WakeupReason {
-     QEMU_WAKEUP_REASON_OTHER,
- } WakeupReason;
- 
-+extern int colo_shutdown_requested;
-+
- void qemu_system_reset_request(void);
- void qemu_system_suspend_request(void);
- void qemu_register_suspend_notifier(Notifier *notifier);
-@@ -56,6 +58,7 @@ void qemu_system_wakeup_request(WakeupReason reason);
- void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
- void qemu_register_wakeup_notifier(Notifier *notifier);
- void qemu_system_shutdown_request(void);
-+void qemu_system_shutdown_request_core(void);
- void qemu_system_powerdown_request(void);
- void qemu_register_powerdown_notifier(Notifier *notifier);
- void qemu_system_debug_request(void);
 diff --git a/migration/colo.c b/migration/colo.c
-index a3344ce..c4fc865 100644
+index e62da93..8e27a4c 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -384,6 +384,21 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+@@ -357,11 +357,20 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
          goto out;
      }
  
-+    if (colo_shutdown_requested) {
-+        colo_send_message(s->to_dst_file, COLO_MESSAGE_GUEST_SHUTDOWN,
-+                          &local_err);
-+        if (local_err) {
-+            error_free(local_err);
-+            /* Go on the shutdown process and throw the error message */
-+            error_report("Failed to send shutdown message to SVM");
-+        }
-+        qemu_fflush(s->to_dst_file);
-+        colo_shutdown_requested = 0;
-+        qemu_system_shutdown_request_core();
-+        /* Fix me: Just let the colo thread exit ? */
-+        qemu_thread_exit(0);
++    colo_send_message(s->to_dst_file, COLO_MESSAGE_VMSTATE_SEND, &local_err);
++    if (local_err) {
++        goto out;
 +    }
 +
-     ret = 0;
+     /* Disable block migration */
+     s->params.blk = 0;
+     s->params.shared = 0;
+-    qemu_savevm_state_header(fb);
+-    qemu_savevm_state_begin(fb, &s->params);
++    qemu_savevm_state_begin(s->to_dst_file, &s->params);
++    ret = qemu_file_get_error(s->to_dst_file);
++    if (ret < 0) {
++        error_report("Save VM state begin error");
++        goto out;
++    }
+ 
+     /* We call this API although this may do nothing on primary side. */
+     qemu_mutex_lock_iothread();
+@@ -372,15 +381,21 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+     }
  
      qemu_mutex_lock_iothread();
-@@ -449,7 +464,9 @@ static void colo_process_checkpoint(MigrationState *s)
+-    qemu_savevm_state_complete_precopy(fb, false);
++    /*
++     * Only save VM's live state, which not including device state.
++     * TODO: We may need a timeout mechanism to prevent COLO process
++     * to be blocked here.
++     */
++    qemu_savevm_live_state(s->to_dst_file);
++    /* Note: device state is saved into buffer */
++    ret = qemu_save_device_state(fb);
+     qemu_mutex_unlock_iothread();
+-
+-    qemu_fflush(fb);
+-
+-    colo_send_message(s->to_dst_file, COLO_MESSAGE_VMSTATE_SEND, &local_err);
+-    if (local_err) {
++    if (ret < 0) {
++        error_report("Save device state error");
+         goto out;
+     }
++    qemu_fflush(fb);
++
+     /*
+      * We need the size of the VMstate data in Secondary side,
+      * With which we can decide how much data should be read.
+@@ -621,6 +636,7 @@ void *colo_process_incoming_thread(void *opaque)
+     uint64_t total_size;
+     uint64_t value;
+     Error *local_err = NULL;
++    int ret;
+ 
+     qemu_sem_init(&mis->colo_incoming_sem, 0);
+ 
+@@ -693,6 +709,17 @@ void *colo_process_incoming_thread(void *opaque)
              goto out;
          }
  
--        qemu_sem_wait(&s->colo_checkpoint_sem);
-+        if (!colo_shutdown_requested) {
-+            qemu_sem_wait(&s->colo_checkpoint_sem);
++        ret = qemu_loadvm_state_begin(mis->from_src_file);
++        if (ret < 0) {
++            error_report("Load vm state begin error, ret=%d", ret);
++            goto out;
 +        }
++        ret = qemu_loadvm_state_main(mis->from_src_file, mis);
++        if (ret < 0) {
++            error_report("Load VM's live state (ram) error");
++            goto out;
++        }
++
+         value = colo_receive_message_value(mis->from_src_file,
+                                  COLO_MESSAGE_VMSTATE_SIZE, &local_err);
+         if (local_err) {
+@@ -726,8 +753,10 @@ void *colo_process_incoming_thread(void *opaque)
+         qemu_mutex_lock_iothread();
+         qemu_system_reset(VMRESET_SILENT);
+         vmstate_loading = true;
+-        if (qemu_loadvm_state(fb) < 0) {
+-            error_report("COLO: loadvm failed");
++        colo_flush_ram_cache();
++        ret = qemu_load_device_state(fb);
++        if (ret < 0) {
++            error_report("COLO: load device state failed");
+             qemu_mutex_unlock_iothread();
+             goto out;
+         }
+diff --git a/migration/ram.c b/migration/ram.c
+index df10d4b..f171a82 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2602,7 +2602,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
+     /* ADVISE is earlier, it shows the source has the postcopy capability on */
+     bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
+-    bool need_flush = false;
  
-         ret = colo_do_checkpoint_transaction(s, bioc, fb);
-         if (ret < 0) {
-@@ -534,6 +551,16 @@ static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
-     case COLO_MESSAGE_CHECKPOINT_REQUEST:
-         *checkpoint_request = 1;
-         break;
-+    case COLO_MESSAGE_GUEST_SHUTDOWN:
-+        qemu_mutex_lock_iothread();
-+        vm_stop_force_state(RUN_STATE_COLO);
-+        qemu_system_shutdown_request_core();
-+        qemu_mutex_unlock_iothread();
-+        /*
-+         * The main thread will be exit and terminate the whole
-+         * process, do need some cleanup ?
-+         */
-+        qemu_thread_exit(0);
-     default:
-         *checkpoint_request = 0;
-         error_setg(errp, "Got unknown COLO message: %d", msg);
-@@ -696,3 +723,20 @@ out:
+     seq_iter++;
  
-     return NULL;
+@@ -2637,7 +2636,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+             /* After going into COLO, we should load the Page into colo_cache */
+             if (migration_incoming_in_colo_state()) {
+                 host = colo_cache_from_block_offset(block, addr);
+-                need_flush = true;
+             } else {
+                 host = host_from_ram_block_offset(block, addr);
+             }
+@@ -2745,9 +2743,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     rcu_read_unlock();
+     trace_ram_load_complete(ret, seq_iter);
+ 
+-    if (!ret  && ram_cache_enable && need_flush) {
+-        colo_flush_ram_cache();
+-    }
+     return ret;
  }
-+
-+bool colo_handle_shutdown(void)
-+{
-+    /*
-+     * If VM is in COLO-FT mode, we need do some significant work before
-+     * respond to the shutdown request. Besides, Secondary VM will ignore
-+     * the shutdown request from users.
-+     */
-+    if (migration_incoming_in_colo_state()) {
-+        return true;
-+    }
-+    if (migration_in_colo_state()) {
-+        colo_shutdown_requested = 1;
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 01b087f..4b3e1b7 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -1187,12 +1187,14 @@
- #
- # @vmstate-loaded: VM's state has been loaded by SVM.
- #
-+# @guest-shutdown: shutdown requested from PVM to SVM. (Since 2.9)
-+#
- # Since: 2.8
- ##
- { 'enum': 'COLOMessage',
-   'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-reply',
-             'vmstate-send', 'vmstate-size', 'vmstate-received',
--            'vmstate-loaded' ] }
-+            'vmstate-loaded', 'guest-shutdown' ] }
  
- ##
- # @COLOMode:
-diff --git a/vl.c b/vl.c
-index 0b4ed52..72638c9 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1611,6 +1611,8 @@ static NotifierList wakeup_notifiers =
-     NOTIFIER_LIST_INITIALIZER(wakeup_notifiers);
- static uint32_t wakeup_reason_mask = ~(1 << QEMU_WAKEUP_REASON_NONE);
- 
-+int colo_shutdown_requested;
-+
- int qemu_shutdown_requested_get(void)
- {
-     return shutdown_requested;
-@@ -1737,7 +1739,10 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
- void qemu_system_reset_request(void)
- {
-     if (no_reboot) {
--        shutdown_requested = 1;
-+        qemu_system_shutdown_request();
-+        if (!shutdown_requested) {/* colo handle it ? */
-+            return;
-+        }
-     } else {
-         reset_requested = 1;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 8c2ce0b..60d346c 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1003,6 +1003,10 @@ void qemu_savevm_state_begin(QEMUFile *f,
+             break;
+         }
      }
-@@ -1810,14 +1815,22 @@ void qemu_system_killed(int signal, pid_t pid)
-     qemu_notify_event();
- }
- 
--void qemu_system_shutdown_request(void)
-+void qemu_system_shutdown_request_core(void)
- {
--    trace_qemu_system_shutdown_request();
-     replay_shutdown_request();
-     shutdown_requested = 1;
-     qemu_notify_event();
- }
- 
-+void qemu_system_shutdown_request(void)
-+{
-+    trace_qemu_system_shutdown_request();
-+    if (colo_handle_shutdown()) {
-+        return;
++    if (migration_in_colo_state()) {
++        qemu_put_byte(f, QEMU_VM_EOF);
++        qemu_fflush(f);
 +    }
-+    qemu_system_shutdown_request_core();
-+}
-+
- static void qemu_system_powerdown(void)
- {
-     qapi_event_send_powerdown(&error_abort);
+ }
+ 
+ /*
 -- 
 1.8.3.1
