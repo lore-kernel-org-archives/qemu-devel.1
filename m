@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNZ-0001qj-TD
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:55 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNb-0001t2-RH
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNW-0000jo-PZ
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:53 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3402
-	helo=dggrg03-dlp.huawei.com)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNa-0000m4-Sx
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:55 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3507
+	helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNV-0000jG-T2
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:50 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNa-0000jw-9A
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:54 -0400
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Sat, 22 Apr 2017 16:25:41 +0800
-Message-ID: <1492849558-17540-2-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Sat, 22 Apr 2017 16:25:56 +0800
+Message-ID: <1492849558-17540-17-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 01/18] net/colo: Add notifier/callback
- related helpers for filter
+Subject: [Qemu-devel] [PATCH v2 16/18] filter: Add handle_event method for
+ NetFilterClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,172 +30,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, gilbert@redhat.com
 Cc: quintela@redhat.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
 
-We will use this notifier to help COLO to notify filter object
-to do something, like do checkpoint, or process failover event.
+Filter needs to process the event of checkpoint/failover or
+other event passed by COLO frame.
 
 Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 ---
- net/colo.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- net/colo.h |  19 +++++++++++
- 2 files changed, 124 insertions(+)
+ include/net/filter.h |  5 +++++
+ net/filter.c         | 16 ++++++++++++++++
+ net/net.c            | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
 
-diff --git a/net/colo.c b/net/colo.c
-index 8cc166b..8aef670 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "trace.h"
- #include "net/colo.h"
-+#include "qapi/error.h"
+diff --git a/include/net/filter.h b/include/net/filter.h
+index 0c4a2ea..df4510d 100644
+--- a/include/net/filter.h
++++ b/include/net/filter.h
+@@ -37,6 +37,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc,
  
- uint32_t connection_key_hash(const void *opaque)
+ typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp);
+ 
++typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error **errp);
++
+ typedef struct NetFilterClass {
+     ObjectClass parent_class;
+ 
+@@ -44,6 +46,7 @@ typedef struct NetFilterClass {
+     FilterSetup *setup;
+     FilterCleanup *cleanup;
+     FilterStatusChanged *status_changed;
++    FilterHandleEvent *handle_event;
+     /* mandatory */
+     FilterReceiveIOV *receive_iov;
+ } NetFilterClass;
+@@ -76,4 +79,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState *sender,
+                                     int iovcnt,
+                                     void *opaque);
+ 
++void colo_notify_filters_event(int event, Error **errp);
++
+ #endif /* QEMU_NET_FILTER_H */
+diff --git a/net/filter.c b/net/filter.c
+index 1dfd2ca..993b35e 100644
+--- a/net/filter.c
++++ b/net/filter.c
+@@ -17,6 +17,7 @@
+ #include "net/vhost_net.h"
+ #include "qom/object_interfaces.h"
+ #include "qemu/iov.h"
++#include "net/colo.h"
+ 
+ static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
  {
-@@ -209,3 +210,107 @@ Connection *connection_get(GHashTable *connection_track_table,
- 
-     return conn;
+@@ -245,11 +246,26 @@ static void netfilter_finalize(Object *obj)
+     g_free(nf->netdev_id);
  }
-+
-+static gboolean
-+filter_notify_prepare(GSource *source, gint *timeout)
+ 
++static void dummy_handle_event(NetFilterState *nf, int event, Error **errp)
 +{
-+    *timeout = -1;
-+
-+    return FALSE;
++    switch (event) {
++    case COLO_CHECKPOINT:
++        break;
++    case COLO_FAILOVER:
++        object_property_set_str(OBJECT(nf), "off", "status", errp);
++        break;
++    default:
++        break;
++    }
 +}
 +
-+static gboolean
-+filter_notify_check(GSource *source)
+ static void netfilter_class_init(ObjectClass *oc, void *data)
+ {
+     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    NetFilterClass *nfc = NETFILTER_CLASS(oc);
+ 
+     ucc->complete = netfilter_complete;
++    nfc->handle_event = dummy_handle_event;
+ }
+ 
+ static const TypeInfo netfilter_info = {
+diff --git a/net/net.c b/net/net.c
+index 0ac3b9e..1373f63 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1373,6 +1373,34 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
++void colo_notify_filters_event(int event, Error **errp)
 +{
-+    FilterNotifier *notify = (FilterNotifier *)source;
++    NetClientState *nc, *peer;
++    NetClientDriver type;
++    NetFilterState *nf;
++    NetFilterClass *nfc = NULL;
++    Error *local_err = NULL;
 +
-+    return notify->pfd.revents & (G_IO_IN | G_IO_HUP | G_IO_ERR);
-+}
-+
-+static gboolean
-+filter_notify_dispatch(GSource *source,
-+                       GSourceFunc callback,
-+                       gpointer user_data)
-+{
-+    FilterNotifier *notify = (FilterNotifier *)source;
-+    int revents;
-+    uint64_t value;
-+    int ret;
-+
-+    revents = notify->pfd.revents & notify->pfd.events;
-+    if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
-+        ret = filter_notifier_get(notify, &value);
-+        if (notify->cb && !ret) {
-+            notify->cb(notify, value);
++    QTAILQ_FOREACH(nc, &net_clients, next) {
++        peer = nc->peer;
++        type = nc->info->type;
++        if (!peer || type != NET_CLIENT_DRIVER_NIC) {
++            continue;
++        }
++        QTAILQ_FOREACH(nf, &nc->filters, next) {
++            nfc =  NETFILTER_GET_CLASS(OBJECT(nf));
++            if (!nfc->handle_event) {
++                continue;
++            }
++            nfc->handle_event(nf, event, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                return;
++            }
 +        }
 +    }
-+    return TRUE;
 +}
 +
-+static void
-+filter_notify_finalize(GSource *source)
-+{
-+    FilterNotifier *notify = (FilterNotifier *)source;
-+
-+    event_notifier_cleanup(&notify->event);
-+}
-+
-+static GSourceFuncs notifier_source_funcs = {
-+    filter_notify_prepare,
-+    filter_notify_check,
-+    filter_notify_dispatch,
-+    filter_notify_finalize,
-+};
-+
-+FilterNotifier *filter_notifier_new(FilterNotifierCallback *cb,
-+                    void *opaque, Error **errp)
-+{
-+    FilterNotifier *notify;
-+    int ret;
-+
-+    notify = (FilterNotifier *)g_source_new(&notifier_source_funcs,
-+                sizeof(FilterNotifier));
-+    ret = event_notifier_init(&notify->event, false);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Failed to initialize event notifier");
-+        goto fail;
-+    }
-+    notify->pfd.fd = event_notifier_get_fd(&notify->event);
-+    notify->pfd.events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-+    notify->cb = cb;
-+    notify->opaque = opaque;
-+    g_source_add_poll(&notify->source, &notify->pfd);
-+
-+    return notify;
-+
-+fail:
-+    g_source_destroy(&notify->source);
-+    return NULL;
-+}
-+
-+int filter_notifier_set(FilterNotifier *notify, uint64_t value)
-+{
-+    ssize_t ret;
-+
-+    do {
-+        ret = write(notify->event.wfd, &value, sizeof(value));
-+    } while (ret < 0 && errno == EINTR);
-+
-+    /* EAGAIN is fine, a read must be pending.  */
-+    if (ret < 0 && errno != EAGAIN) {
-+        return -errno;
-+    }
-+    return 0;
-+}
-+
-+int filter_notifier_get(FilterNotifier *notify, uint64_t *value)
-+{
-+    ssize_t len;
-+
-+    /* Drain the notify pipe.  For eventfd, only 8 bytes will be read.  */
-+    do {
-+        len = read(notify->event.rfd, value, sizeof(*value));
-+    } while ((len == -1 && errno == EINTR));
-+
-+    return len != sizeof(*value) ? -1 : 0;
-+}
-diff --git a/net/colo.h b/net/colo.h
-index cd9027f..b586db3 100644
---- a/net/colo.h
-+++ b/net/colo.h
-@@ -19,6 +19,7 @@
- #include "qemu/jhash.h"
- #include "qemu/timer.h"
- #include "slirp/tcp.h"
-+#include "qemu/event_notifier.h"
- 
- #define HASHTABLE_MAX_SIZE 16384
- 
-@@ -89,4 +90,22 @@ void connection_hashtable_reset(GHashTable *connection_track_table);
- Packet *packet_new(const void *data, int size);
- void packet_destroy(void *opaque, void *user_data);
- 
-+typedef void FilterNotifierCallback(void *opaque, int value);
-+typedef struct FilterNotifier {
-+    GSource source;
-+    EventNotifier event;
-+    GPollFD pfd;
-+    FilterNotifierCallback *cb;
-+    void *opaque;
-+} FilterNotifier;
-+
-+FilterNotifier *filter_notifier_new(FilterNotifierCallback *cb,
-+                    void *opaque, Error **errp);
-+int filter_notifier_set(FilterNotifier *notify, uint64_t value);
-+int filter_notifier_get(FilterNotifier *notify, uint64_t *value);
-+
-+enum {
-+    COLO_CHECKPOINT = 2,
-+    COLO_FAILOVER,
-+};
- #endif /* QEMU_COLO_PROXY_H */
+ void qmp_set_link(const char *name, bool up, Error **errp)
+ {
+     NetClientState *ncs[MAX_QUEUE_NUM];
 -- 
 1.8.3.1
