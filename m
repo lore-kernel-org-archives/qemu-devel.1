@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d1nMh-0000ST-UD
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 01:13:49 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1oWa-0003nh-TH
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 02:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d1nMc-0000Xh-UC
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 01:13:47 -0400
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Sat, 22 Apr 2017 10:43:41 +0530
-Message-Id: <1492838021-10538-9-git-send-email-ashijeetacharya@gmail.com>
-In-Reply-To: <1492838021-10538-1-git-send-email-ashijeetacharya@gmail.com>
-References: <1492838021-10538-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 8/8] vmdk: Make vmdk_get_cluster_offset()
- return cluster offset only
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1oWX-0004lM-PI
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 02:28:04 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3392
+	helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d1oWX-0004iM-5k
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 02:28:01 -0400
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Sat, 22 Apr 2017 14:23:49 +0800
+Message-ID: <1492842231-223720-1-git-send-email-arei.gonglei@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v18 0/2] virtio-crypto: virtio crypto device
+ specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,127 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: luonengjun@huawei.com, mst@redhat.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, mike.caraman@nxp.com, agraf@suse.de, jasowang@redhat.com, nmorey@kalray.eu, vincent.jardin@6wind.com, wu.wubin@huawei.com, arei.gonglei@hotmail.com, pasic@linux.vnet.ibm.com, linqiangmin@huawei.com, zhbzg@huawei.com, eety.chen@huawei.com, amy.zhanghuimin@huawei.com, lixiao91@huawei.com, Gonglei <arei.gonglei@huawei.com>
 
-vmdk_alloc_clusters() introduced earlier now handles the task of
-allocating clusters and performing COW when needed. Thus we can change
-vmdk_get_cluster_offset() to stick to the sole purpose of returning
-cluster offset using sector number. Update the changes at all call
-sites.
+As a non-native English speaker, I sincerely hope you
+give me more suggestions about English style and/or
+grammar for the spec. Thanks!
 
-Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
----
- block/vmdk.c | 56 ++++++++++++--------------------------------------------
- 1 file changed, 12 insertions(+), 44 deletions(-)
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index e52c373..be08bde 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1486,25 +1486,16 @@ static int vmdk_alloc_clusters(BlockDriverState *bs,
-  * For flat extents, the start offset as parsed from the description file is
-  * returned.
-  *
-- * For sparse extents, look up in L1, L2 table. If allocate is true, return an
-- * offset for a new cluster and update L2 cache. If there is a backing file,
-- * COW is done before returning; otherwise, zeroes are written to the allocated
-- * cluster. Both COW and zero writing skips the sector range
-- * [@skip_start_sector, @skip_end_sector) passed in by caller, because caller
-- * has new data to write there.
-+ * For sparse extents, look up the L1, L2 table.
-  *
-  * Returns: VMDK_OK if cluster exists and mapped in the image.
-- *          VMDK_UNALLOC if cluster is not mapped and @allocate is false.
-- *          VMDK_ERROR if failed.
-+ *          VMDK_UNALLOC if cluster is not mapped.
-+ *          VMDK_ERROR if failed
-  */
- static int vmdk_get_cluster_offset(BlockDriverState *bs,
-                                    VmdkExtent *extent,
--                                   VmdkMetaData *m_data,
-                                    uint64_t offset,
--                                   bool allocate,
--                                   uint64_t *cluster_offset,
--                                   uint64_t skip_start_bytes,
--                                   uint64_t skip_end_bytes)
-+                                   uint64_t *cluster_offset)
- {
-     int l1_index, l2_offset, l2_index;
-     uint32_t *l2_table;
-@@ -1529,31 +1520,9 @@ static int vmdk_get_cluster_offset(BlockDriverState *bs,
-     }
- 
-     if (!cluster_sector || zeroed) {
--        if (!allocate) {
--            return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
--        }
--
--        cluster_sector = extent->next_cluster_sector;
--        extent->next_cluster_sector += extent->cluster_sectors;
--
--        /* First of all we write grain itself, to avoid race condition
--         * that may to corrupt the image.
--         * This problem may occur because of insufficient space on host disk
--         * or inappropriate VM shutdown.
--         */
--        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
--                                offset, skip_start_bytes, skip_end_bytes);
--        if (ret) {
--            return ret;
--        }
--        if (m_data) {
--            m_data->valid = 1;
--            m_data->l1_index = l1_index;
--            m_data->l2_index = l2_index;
--            m_data->l2_offset = l2_offset;
--            m_data->l2_cache_entry = &l2_table[l2_index];
--        }
-+        return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
-     }
-+
-     *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
-     return VMDK_OK;
- }
-@@ -1596,9 +1565,7 @@ static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
-         return 0;
-     }
-     qemu_co_mutex_lock(&s->lock);
--    ret = vmdk_get_cluster_offset(bs, extent, NULL,
--                                  sector_num * 512, false, &offset,
--                                  0, 0);
-+    ret = vmdk_get_cluster_offset(bs, extent, sector_num * 512, &offset);
-     qemu_co_mutex_unlock(&s->lock);
- 
-     index_in_cluster = vmdk_find_index_in_cluster(extent, sector_num);
-@@ -1789,13 +1756,14 @@ vmdk_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-             ret = -EIO;
-             goto fail;
-         }
--        ret = vmdk_get_cluster_offset(bs, extent, NULL,
--                                      offset, false, &cluster_offset, 0, 0);
-+
-         offset_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
- 
-         n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
-                              - offset_in_cluster);
- 
-+        ret = vmdk_get_cluster_offset(bs, extent, offset, &cluster_offset);
-+
-         if (ret != VMDK_OK) {
-             /* if not allocated, try to read from parent image, if exist */
-             if (bs->backing && ret != VMDK_ZEROED) {
-@@ -2542,9 +2510,9 @@ static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
-                     sector_num);
-             break;
-         }
--        ret = vmdk_get_cluster_offset(bs, extent, NULL,
-+        ret = vmdk_get_cluster_offset(bs, extent,
-                                       sector_num << BDRV_SECTOR_BITS,
--                                      false, &cluster_offset, 0, 0);
-+                                      &cluster_offset);
-         if (ret == VMDK_ERROR) {
-             fprintf(stderr,
-                     "ERROR: could not get cluster_offset for sector %"
+v18 -> v17:
+ - fix many English grammar problems suggested by Stefan, Thanks a lot!
+
+v17 -> v16:
+ - Some grammar fixes [Stefan, Halil, Michael]
+ - add a section named "Supported crypto services" in order to explain bit
+   numbers and valuse clearly. [Halil, Cornelia]
+ - avoid word reptition [Halil]
+ - rename non-session mode to stateless mode [Halil]
+ - change descriptions for all elements in struct virtio_crypto_config [Halil]
+ - add Halil as a reviewer in the ackonwledgement part, thanks for his work.
+ - other fixes here and there.
+
+Changes since v15:
+ - use feature bits for non-session mode in order to keep compatibility with
+   pre-existing code. [Halil & Michael]
+ - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all other
+   non-session mode feature bits.
+ - fix some typos. [Stefan]
+ - introduce struct virtio_crypto_op_data_req_mux to support both session
+   and non-session based crypto operations and keep compatibility with
+   pre-existing code.
+
+Changes since v14:
+ - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
+ - correct a sentence about dataqueue and controlq in the first paragraph. [Halil]
+ - change a MAY to MUST about max_dataqueues. [Halil]
+ - add non-session mode support
+   a) add four features for different crypto services to identify wheather support session mode.
+   b) rewrite some
+
+For pervious versions of virtio crypto spec, Pls see:
+
+[v14]:
+https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
+
+[v13]:
+https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
+
+For more information, please see:
+ http://qemu-project.org/Features/VirtioCrypto
+
+
+Gonglei (2):
+  virtio-crypto: Add virtio crypto device specification
+  virtio-crypto: Add conformance clauses
+
+ acknowledgements.tex |    2 +
+ conformance.tex      |   29 ++
+ content.tex          |    2 +
+ virtio-crypto.tex    | 1309 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 1342 insertions(+)
+ create mode 100644 virtio-crypto.tex
+
 -- 
-2.6.2
+1.7.12.4
