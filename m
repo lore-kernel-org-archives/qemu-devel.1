@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNZ-0001qi-T1
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNZ-0001qj-TD
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNY-0000k0-EU
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNW-0000jo-PZ
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:53 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3403
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3402
 	helo=dggrg03-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNX-0000jT-I5
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:52 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNV-0000jG-T2
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:50 -0400
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Sat, 22 Apr 2017 16:25:42 +0800
-Message-ID: <1492849558-17540-3-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Sat, 22 Apr 2017 16:25:41 +0800
+Message-ID: <1492849558-17540-2-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 02/18] colo-compare: implement the process
- of checkpoint
+Subject: [Qemu-devel] [PATCH v2 01/18] net/colo: Add notifier/callback
+ related helpers for filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,184 +30,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, gilbert@redhat.com
 Cc: quintela@redhat.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
 
-While do checkpoint, we need to flush all the unhandled packets,
-By using the filter notifier mechanism, we can easily to notify
-every compare object to do this process, which runs inside
-of compare threads as a coroutine.
+We will use this notifier to help COLO to notify filter object
+to do something, like do checkpoint, or process failover event.
 
 Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 ---
- net/colo-compare.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- net/colo-compare.h |  6 +++++
- 2 files changed, 84 insertions(+)
- create mode 100644 net/colo-compare.h
+ net/colo.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ net/colo.h |  19 +++++++++++
+ 2 files changed, 124 insertions(+)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 97bf0e5..3adccfb 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -29,17 +29,24 @@
- #include "qemu/sockets.h"
- #include "qapi-visit.h"
+diff --git a/net/colo.c b/net/colo.c
+index 8cc166b..8aef670 100644
+--- a/net/colo.c
++++ b/net/colo.c
+@@ -15,6 +15,7 @@
+ #include "qemu/osdep.h"
+ #include "trace.h"
  #include "net/colo.h"
-+#include "net/colo-compare.h"
++#include "qapi/error.h"
  
- #define TYPE_COLO_COMPARE "colo-compare"
- #define COLO_COMPARE(obj) \
-     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
+ uint32_t connection_key_hash(const void *opaque)
+ {
+@@ -209,3 +210,107 @@ Connection *connection_get(GHashTable *connection_track_table,
  
-+static QTAILQ_HEAD(, CompareState) net_compares =
-+       QTAILQ_HEAD_INITIALIZER(net_compares);
-+
- #define COMPARE_READ_LEN_MAX NET_BUFSIZE
- #define MAX_QUEUE_SIZE 1024
- 
- /* TODO: Should be configurable */
- #define REGULAR_PACKET_CHECK_MS 3000
- 
-+static QemuMutex event_mtx = { .lock = PTHREAD_MUTEX_INITIALIZER };
-+static QemuCond event_complete_cond = { .cond = PTHREAD_COND_INITIALIZER };
-+static int event_unhandled_count;
- /*
-   + CompareState ++
-   |               |
-@@ -87,6 +94,10 @@ typedef struct CompareState {
- 
-     GMainContext *worker_context;
-     GMainLoop *compare_loop;
-+    /* Used for COLO to notify compare to do something */
-+    FilterNotifier *notifier;
-+
-+    QTAILQ_ENTRY(CompareState) next;
- } CompareState;
- 
- typedef struct CompareClass {
-@@ -417,6 +428,11 @@ static void colo_compare_connection(void *opaque, void *user_data)
-     while (!g_queue_is_empty(&conn->primary_list) &&
-            !g_queue_is_empty(&conn->secondary_list)) {
-         pkt = g_queue_pop_tail(&conn->primary_list);
-+        if (!pkt) {
-+            error_report("colo-compare pop pkt failed");
-+            return;
-+        }
-+
-         switch (conn->ip_proto) {
-         case IPPROTO_TCP:
-             result = g_queue_find_custom(&conn->secondary_list,
-@@ -538,6 +554,53 @@ static gboolean check_old_packet_regular(void *opaque)
-     return TRUE;
+     return conn;
  }
- 
-+/* Public API, Used for COLO frame to notify compare event */
-+void colo_notify_compares_event(void *opaque, int event, Error **errp)
++
++static gboolean
++filter_notify_prepare(GSource *source, gint *timeout)
 +{
-+    CompareState *s;
++    *timeout = -1;
++
++    return FALSE;
++}
++
++static gboolean
++filter_notify_check(GSource *source)
++{
++    FilterNotifier *notify = (FilterNotifier *)source;
++
++    return notify->pfd.revents & (G_IO_IN | G_IO_HUP | G_IO_ERR);
++}
++
++static gboolean
++filter_notify_dispatch(GSource *source,
++                       GSourceFunc callback,
++                       gpointer user_data)
++{
++    FilterNotifier *notify = (FilterNotifier *)source;
++    int revents;
++    uint64_t value;
 +    int ret;
 +
-+    qemu_mutex_lock(&event_mtx);
-+    QTAILQ_FOREACH(s, &net_compares, next) {
-+        ret = filter_notifier_set(s->notifier, event);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Failed to write value to eventfd");
-+            goto fail;
++    revents = notify->pfd.revents & notify->pfd.events;
++    if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
++        ret = filter_notifier_get(notify, &value);
++        if (notify->cb && !ret) {
++            notify->cb(notify, value);
 +        }
-+        event_unhandled_count++;
 +    }
-+    /* Wait all compare threads to finish handling this event */
-+    while (event_unhandled_count > 0) {
-+        qemu_cond_wait(&event_complete_cond, &event_mtx);
++    return TRUE;
++}
++
++static void
++filter_notify_finalize(GSource *source)
++{
++    FilterNotifier *notify = (FilterNotifier *)source;
++
++    event_notifier_cleanup(&notify->event);
++}
++
++static GSourceFuncs notifier_source_funcs = {
++    filter_notify_prepare,
++    filter_notify_check,
++    filter_notify_dispatch,
++    filter_notify_finalize,
++};
++
++FilterNotifier *filter_notifier_new(FilterNotifierCallback *cb,
++                    void *opaque, Error **errp)
++{
++    FilterNotifier *notify;
++    int ret;
++
++    notify = (FilterNotifier *)g_source_new(&notifier_source_funcs,
++                sizeof(FilterNotifier));
++    ret = event_notifier_init(&notify->event, false);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to initialize event notifier");
++        goto fail;
 +    }
++    notify->pfd.fd = event_notifier_get_fd(&notify->event);
++    notify->pfd.events = G_IO_IN | G_IO_HUP | G_IO_ERR;
++    notify->cb = cb;
++    notify->opaque = opaque;
++    g_source_add_poll(&notify->source, &notify->pfd);
++
++    return notify;
 +
 +fail:
-+    qemu_mutex_unlock(&event_mtx);
++    g_source_destroy(&notify->source);
++    return NULL;
 +}
 +
-+static void colo_flush_packets(void *opaque, void *user_data);
-+
-+static void colo_compare_handle_event(void *opaque, int event)
++int filter_notifier_set(FilterNotifier *notify, uint64_t value)
 +{
-+    FilterNotifier *notify = opaque;
-+    CompareState *s = notify->opaque;
++    ssize_t ret;
 +
-+    switch (event) {
-+    case COLO_CHECKPOINT:
-+        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
-+        break;
-+    case COLO_FAILOVER:
-+        break;
-+    default:
-+        break;
++    do {
++        ret = write(notify->event.wfd, &value, sizeof(value));
++    } while (ret < 0 && errno == EINTR);
++
++    /* EAGAIN is fine, a read must be pending.  */
++    if (ret < 0 && errno != EAGAIN) {
++        return -errno;
 +    }
-+    qemu_mutex_lock(&event_mtx);
-+    assert(event_unhandled_count > 0);
-+    event_unhandled_count--;
-+    qemu_cond_broadcast(&event_complete_cond);
-+    qemu_mutex_unlock(&event_mtx);
++    return 0;
 +}
 +
- static void *colo_compare_thread(void *opaque)
- {
-     CompareState *s = opaque;
-@@ -558,10 +621,15 @@ static void *colo_compare_thread(void *opaque)
-                           (GSourceFunc)check_old_packet_regular, s, NULL);
-     g_source_attach(timeout_source, s->worker_context);
- 
-+    s->notifier = filter_notifier_new(colo_compare_handle_event, s, NULL);
-+    g_source_attach(&s->notifier->source, s->worker_context);
++int filter_notifier_get(FilterNotifier *notify, uint64_t *value)
++{
++    ssize_t len;
 +
-     qemu_sem_post(&s->thread_ready);
- 
-     g_main_loop_run(s->compare_loop);
- 
-+    g_source_destroy(&s->notifier->source);
-+    g_source_unref(&s->notifier->source);
-     g_source_destroy(timeout_source);
-     g_source_unref(timeout_source);
- 
-@@ -706,6 +774,8 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
-     net_socket_rs_init(&s->pri_rs, compare_pri_rs_finalize);
-     net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize);
- 
-+    QTAILQ_INSERT_TAIL(&net_compares, s, next);
++    /* Drain the notify pipe.  For eventfd, only 8 bytes will be read.  */
++    do {
++        len = read(notify->event.rfd, value, sizeof(*value));
++    } while ((len == -1 && errno == EINTR));
 +
-     g_queue_init(&s->conn_list);
++    return len != sizeof(*value) ? -1 : 0;
++}
+diff --git a/net/colo.h b/net/colo.h
+index cd9027f..b586db3 100644
+--- a/net/colo.h
++++ b/net/colo.h
+@@ -19,6 +19,7 @@
+ #include "qemu/jhash.h"
+ #include "qemu/timer.h"
+ #include "slirp/tcp.h"
++#include "qemu/event_notifier.h"
  
-     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
-@@ -765,6 +835,7 @@ static void colo_compare_init(Object *obj)
- static void colo_compare_finalize(Object *obj)
- {
-     CompareState *s = COLO_COMPARE(obj);
-+    CompareState *tmp = NULL;
+ #define HASHTABLE_MAX_SIZE 16384
  
-     qemu_chr_fe_set_handlers(&s->chr_pri_in, NULL, NULL, NULL, NULL,
-                              s->worker_context, true);
-@@ -777,6 +848,13 @@ static void colo_compare_finalize(Object *obj)
-     }
-     qemu_thread_join(&s->thread);
+@@ -89,4 +90,22 @@ void connection_hashtable_reset(GHashTable *connection_track_table);
+ Packet *packet_new(const void *data, int size);
+ void packet_destroy(void *opaque, void *user_data);
  
-+    QTAILQ_FOREACH(tmp, &net_compares, next) {
-+        if (!strcmp(tmp->outdev, s->outdev)) {
-+            QTAILQ_REMOVE(&net_compares, s, next);
-+            break;
-+        }
-+    }
++typedef void FilterNotifierCallback(void *opaque, int value);
++typedef struct FilterNotifier {
++    GSource source;
++    EventNotifier event;
++    GPollFD pfd;
++    FilterNotifierCallback *cb;
++    void *opaque;
++} FilterNotifier;
 +
-     /* Release all unhandled packets after compare thead exited */
-     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
- 
-diff --git a/net/colo-compare.h b/net/colo-compare.h
-new file mode 100644
-index 0000000..c9c62f5
---- /dev/null
-+++ b/net/colo-compare.h
-@@ -0,0 +1,6 @@
-+#ifndef QEMU_COLO_COMPARE_H
-+#define QEMU_COLO_COMPARE_H
++FilterNotifier *filter_notifier_new(FilterNotifierCallback *cb,
++                    void *opaque, Error **errp);
++int filter_notifier_set(FilterNotifier *notify, uint64_t value);
++int filter_notifier_get(FilterNotifier *notify, uint64_t *value);
 +
-+void colo_notify_compares_event(void *opaque, int event, Error **errp);
-+
-+#endif /* QEMU_COLO_COMPARE_H */
++enum {
++    COLO_CHECKPOINT = 2,
++    COLO_FAILOVER,
++};
+ #endif /* QEMU_COLO_PROXY_H */
 -- 
 1.8.3.1
