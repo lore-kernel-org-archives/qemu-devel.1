@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXZ-0001QJ-IV
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXZ-0001QK-Iw
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXW-00042t-G6
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXX-000458-C5
 	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:37:13 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3849
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3850
 	helo=dggrg03-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXV-00041y-T6
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:37:10 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qXW-00042H-O1
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:37:11 -0400
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Sat, 22 Apr 2017 16:35:26 +0800
-Message-ID: <1492850128-17472-17-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Sat, 22 Apr 2017 16:35:18 +0800
+Message-ID: <1492850128-17472-9-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND v2 16/18] filter: Add handle_event
- method for NetFilterClass
+Subject: [Qemu-devel] [PATCH RESEND v2 08/18] ram/COLO: Record the dirty
+ pages that SVM received
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +28,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: quintela@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
+Cc: quintela@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Filter needs to process the event of checkpoint/failover or
-other event passed by COLO frame.
+We record the address of the dirty pages that received,
+it will help flushing pages that cached into SVM.
 
-Cc: Jason Wang <jasowang@redhat.com>
+Here, it is a trick, we record dirty pages by re-using migration
+dirty bitmap. In the later patch, we will start the dirty log
+for SVM, just like migration, in this way, we can record both
+the dirty pages caused by PVM and SVM, we only flush those dirty
+pages from RAM cache while do checkpoint.
+
+Cc: Juan Quintela <quintela@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/net/filter.h |  5 +++++
- net/filter.c         | 16 ++++++++++++++++
- net/net.c            | 28 ++++++++++++++++++++++++++++
- 3 files changed, 49 insertions(+)
+ migration/ram.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/include/net/filter.h b/include/net/filter.h
-index 0c4a2ea..df4510d 100644
---- a/include/net/filter.h
-+++ b/include/net/filter.h
-@@ -37,6 +37,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc,
- 
- typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp);
- 
-+typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error **errp);
-+
- typedef struct NetFilterClass {
-     ObjectClass parent_class;
- 
-@@ -44,6 +46,7 @@ typedef struct NetFilterClass {
-     FilterSetup *setup;
-     FilterCleanup *cleanup;
-     FilterStatusChanged *status_changed;
-+    FilterHandleEvent *handle_event;
-     /* mandatory */
-     FilterReceiveIOV *receive_iov;
- } NetFilterClass;
-@@ -76,4 +79,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState *sender,
-                                     int iovcnt,
-                                     void *opaque);
- 
-+void colo_notify_filters_event(int event, Error **errp);
-+
- #endif /* QEMU_NET_FILTER_H */
-diff --git a/net/filter.c b/net/filter.c
-index 1dfd2ca..993b35e 100644
---- a/net/filter.c
-+++ b/net/filter.c
-@@ -17,6 +17,7 @@
- #include "net/vhost_net.h"
- #include "qom/object_interfaces.h"
- #include "qemu/iov.h"
-+#include "net/colo.h"
- 
- static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
+diff --git a/migration/ram.c b/migration/ram.c
+index 05d1b06..0653a24 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2268,6 +2268,9 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
+ static inline void *colo_cache_from_block_offset(RAMBlock *block,
+                                                  ram_addr_t offset)
  {
-@@ -245,11 +246,26 @@ static void netfilter_finalize(Object *obj)
-     g_free(nf->netdev_id);
- }
- 
-+static void dummy_handle_event(NetFilterState *nf, int event, Error **errp)
-+{
-+    switch (event) {
-+    case COLO_CHECKPOINT:
-+        break;
-+    case COLO_FAILOVER:
-+        object_property_set_str(OBJECT(nf), "off", "status", errp);
-+        break;
-+    default:
-+        break;
-+    }
-+}
++    unsigned long *bitmap;
++    long k;
 +
- static void netfilter_class_init(ObjectClass *oc, void *data)
- {
-     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+    NetFilterClass *nfc = NETFILTER_CLASS(oc);
- 
-     ucc->complete = netfilter_complete;
-+    nfc->handle_event = dummy_handle_event;
- }
- 
- static const TypeInfo netfilter_info = {
-diff --git a/net/net.c b/net/net.c
-index 0ac3b9e..1373f63 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1373,6 +1373,34 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
+     if (!offset_in_ramblock(block, offset)) {
+         return NULL;
      }
+@@ -2276,6 +2279,17 @@ static inline void *colo_cache_from_block_offset(RAMBlock *block,
+                      __func__, block->idstr);
+         return NULL;
+     }
++
++    k = (memory_region_get_ram_addr(block->mr) + offset) >> TARGET_PAGE_BITS;
++    bitmap = atomic_rcu_read(&ram_state.ram_bitmap)->bmap;
++    /*
++    * During colo checkpoint, we need bitmap of these migrated pages.
++    * It help us to decide which pages in ram cache should be flushed
++    * into VM's RAM later.
++    */
++    if (!test_and_set_bit(k, bitmap)) {
++        ram_state.migration_dirty_pages++;
++    }
+     return block->colo_cache + offset;
  }
  
-+void colo_notify_filters_event(int event, Error **errp)
-+{
-+    NetClientState *nc, *peer;
-+    NetClientDriver type;
-+    NetFilterState *nf;
-+    NetFilterClass *nfc = NULL;
-+    Error *local_err = NULL;
+@@ -2752,6 +2766,15 @@ int colo_init_ram_cache(void)
+         memcpy(block->colo_cache, block->host, block->used_length);
+     }
+     rcu_read_unlock();
++    /*
++    * Record the dirty pages that sent by PVM, we use this dirty bitmap together
++    * with to decide which page in cache should be flushed into SVM's RAM. Here
++    * we use the same name 'ram_bitmap' as for migration.
++    */
++    ram_state.ram_bitmap = g_new0(RAMBitmap, 1);
++    ram_state.ram_bitmap->bmap = bitmap_new(last_ram_page());
++    ram_state.migration_dirty_pages = 0;
 +
-+    QTAILQ_FOREACH(nc, &net_clients, next) {
-+        peer = nc->peer;
-+        type = nc->info->type;
-+        if (!peer || type != NET_CLIENT_DRIVER_NIC) {
-+            continue;
-+        }
-+        QTAILQ_FOREACH(nf, &nc->filters, next) {
-+            nfc =  NETFILTER_GET_CLASS(OBJECT(nf));
-+            if (!nfc->handle_event) {
-+                continue;
-+            }
-+            nfc->handle_event(nf, event, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                return;
-+            }
-+        }
-+    }
-+}
-+
- void qmp_set_link(const char *name, bool up, Error **errp)
+     return 0;
+ 
+ out_locked:
+@@ -2770,6 +2793,12 @@ out_locked:
+ void colo_release_ram_cache(void)
  {
-     NetClientState *ncs[MAX_QUEUE_NUM];
+     RAMBlock *block;
++    RAMBitmap *bitmap = ram_state.ram_bitmap;
++
++    atomic_rcu_set(&ram_state.ram_bitmap, NULL);
++    if (bitmap) {
++        call_rcu(bitmap, migration_bitmap_free, rcu);
++    }
+ 
+     rcu_read_lock();
+     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
 -- 
 1.8.3.1
