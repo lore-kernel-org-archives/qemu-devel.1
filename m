@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d1uKq-0000aH-Do
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 08:40:21 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d1wvB-00089F-U5
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 11:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d1uKn-0002mt-Bn
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 08:40:20 -0400
-Received: from hera.aquilenet.fr ([2a01:474::1]:33038)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d1uKn-0002mD-4h
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 08:40:17 -0400
-Date: Sat, 22 Apr 2017 14:36:35 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170422123635.4kepoxqjtut6qmyd@var.youpi.perso.aquilenet.fr>
-References: <VI1PR0601MB2479DE114384C023CA45C41E9C040@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170416080930.luq2l4p3e36vovkj@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479E581256475D80164322A9C070@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<cd2a810c-d717-4666-4a95-b185c02d83df@weilnetz.de>
+	(envelope-from <rth7680@gmail.com>) id 1d1wv8-0000In-Hz
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 11:26:01 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d1wv8-0000IM-5A
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 11:25:58 -0400
+Received: by mail-wm0-x242.google.com with SMTP id z129so9775437wmb.1
+	for <qemu-devel@nongnu.org>; Sat, 22 Apr 2017 08:25:57 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <cover.1492384862.git.shorne@gmail.com>
+	<fb69c137317a365dcb549dfef1ecd2fbff48e92c.1492384862.git.shorne@gmail.com>
+	<6914f9b7-ece1-973d-2210-871b71319ae0@twiddle.net>
+	<20170418142055.GB2599@lianli.shorne-pla.net>
+	<20170422100942.GA4797@lianli.shorne-pla.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <ab4f029c-8264-7d35-b0e0-9b35a8e80d9d@twiddle.net>
+Date: Sat, 22 Apr 2017 17:25:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cd2a810c-d717-4666-4a95-b185c02d83df@weilnetz.de>
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+In-Reply-To: <20170422100942.GA4797@lianli.shorne-pla.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/7] target/openrisc: add shutdown logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: FONNEMANN Mark <mark.fonnemann@hexagon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Stafford Horne <shorne@gmail.com>
+Cc: qemu-devel@nongnu.org, openrisc@lists.librecores.org, agraf@suse.de, wbx@openadk.org
 
-Stefan Weil, on ven. 21 avril 2017 21:58:18 +0200, wrote:
-> Am 17.04.2017 um 00:10 schrieb FONNEMANN Mark:
-> > I hadn't seen the original report on the list, sorry. There is too much traffic on qemu-devel for me to manage to catch these :/
-> > 
-> > This problem was fixed by
-> > e42f869b ("slirp: Make RA build more flexible") and a2f80fdf ("slirp: Send RDNSS in RA only if host has an IPv6 DNS server") which will be included in qemu 2.9.
-> > 
-> > Samuel
-> 
-> See report on http://stackoverflow.com/questions/43308310/dns-server-not-working-in-qemu-usermode-networking.
-> 
-> Mark, did you also get that problem with QEMU running on a Linux host,
-> or is it specific for QEMU running on Windows?
+On 04/22/2017 12:09 PM, Stafford Horne wrote:
+> I discussed a bit on #qemu and Alexander Graf suggested to properly define
+> shutdown semantics for openrisc. Some examples were shown from ppc, s390
+> and arm.
 
-Ah, I hadn't noticed the report was about windows. The abovementioned
-fix should still be fine for windows: there, get_dns6_addr just always
-returns -1, and thus the RDNSS option is never added.
+Yes, properly defining this in the spec goes a long way toward fixing the 
+underlying problem.
 
-So I don't know what to do on my side, more investigation is needed
-there.
+It's probably worth thinking about a wait-state condition as well, so that qemu 
+can avoid staying pegged at 100% host cpu for an idle guest cpu.
 
-Samuel
+>    ppc - platform
+>    http://git.qemu.org/?p=qemu.git;a=blob;f=hw/ppc/e500.c;hb=HEAD#l936
+>    Registers hardware device mpc8xxx_gpio which handles shutdown via gpio
+
+That's one possibility.  Another is to define an SPR.
+
+
+r~
