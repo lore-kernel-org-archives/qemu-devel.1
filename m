@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d1mdi-000104-9o
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:27:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1d1mg9-0001yb-9M
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d1mdh-0005rh-Gt
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:27:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1d1mg4-0006QB-D4
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:29:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55433)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d1mg4-0006Q5-7c
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 00:29:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d1mg2-0004Va-3h
+	for <qemu-devel@nongnu.org>; Sat, 22 Apr 2017 04:29:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 06C3D2E80C0
+	for <qemu-devel@nongnu.org>; Sat, 22 Apr 2017 04:29:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAC2QTZbH_LYaEYr_p6wKbek8X0PFfoAJp=tC9dCBryyC_R6_Ow@mail.gmail.com>
-References: <1491057878-27868-1-git-send-email-ashijeetacharya@gmail.com>
-	<1491057878-27868-6-git-send-email-ashijeetacharya@gmail.com>
-	<20170419130044.GB12781@lemon.lan>
-	<CAC2QTZbH_LYaEYr_p6wKbek8X0PFfoAJp=tC9dCBryyC_R6_Ow@mail.gmail.com>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Sat, 22 Apr 2017 09:57:16 +0530
-Message-ID: <CAC2QTZZmh5aUdNVF=b7J+1eFNarjT=sRWV8Jctq_tW+_w30WKQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] vmdk: Set maximum bytes allocated
- in one cycle
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 22 Apr 2017 04:17:25 -0000
+From: Launchpad Bug Tracker <1278166@bugs.launchpad.net>
+Reply-To: Bug 1278166 <1278166@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140209195952.1859.2806.malonedeb@soybean.canonical.com>
+Message-Id: <20170422041725.6766.39014.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1278166] Re: Last commit to exec.c causes BSOD
+ installing WinXP on i386-softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +37,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Fri, Apr 21, 2017 at 8:23 PM, Ashijeet Acharya
-<ashijeetacharya@gmail.com> wrote:
-> On Wed, Apr 19, 2017 at 6:30 PM, Fam Zheng <famz@redhat.com> wrote:
->> On Sat, 04/01 20:14, Ashijeet Acharya wrote:
->>> Set the maximum bytes allowed to get allocated at once to be not more
->>> than the extent size boundary to handle writes at two separate extents
->>> appropriately.
->>>
->>> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
->>> ---
->>>  block/vmdk.c | 13 +++++++++++--
->>>  1 file changed, 11 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/block/vmdk.c b/block/vmdk.c
->>> index a8babd7..9456ddd 100644
->>> --- a/block/vmdk.c
->>> +++ b/block/vmdk.c
->>> @@ -1767,6 +1767,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->>>      int64_t offset_in_cluster, n_bytes;
->>>      uint64_t cluster_offset;
->>>      uint64_t bytes_done = 0;
->>> +    uint64_t extent_size;
->>>      VmdkMetaData m_data;
->>>      uint32_t total_alloc_clusters = 0;
->>>
->>> @@ -1782,9 +1783,17 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
->>>          if (!extent) {
->>>              return -EIO;
->>>          }
->>> +        extent_size = extent->end_sector * BDRV_SECTOR_SIZE;
->>
->> Maybe extent_end to be more accurate?
->
-> Done
->
->>> +
->>>          offset_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
->>> -        n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
->>> -                             - offset_in_cluster);
->>> +
->>> +        /* truncate n_bytes to first cluster because we need to perform COW */
->>
->> Makes sense, but shouldn't this be squashed into patch patch 3? Because it looks
->> like it is fixing an intermediate bug.
->
-> Did you mean that I should merge this whole patch into patch 3? Maybe
-> moving it before patch 3 rather than squashing it make more sense?
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Instead I have moved it before patch 3 in v4
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Ashijeet
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1278166
+
+Title:
+  Last commit to exec.c causes BSOD installing WinXP on i386-softmmu
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  The last commit to exec.c (360e607b88a23d378f6efaa769c76d26f538234d),
+  causes a BSOD when trying to install a 32bit Windows XP SP-3 image
+  using the pure emulation version of i386-softmmu. A checkout of the
+  previous version of the file (commited in
+  0169c511554cb0014a00290b0d3d26c31a49818f) solves the problem.
+  Nevertheless, this last commit was intented to solve a BSOD when Xen
+  was used as a hypervisor.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1278166/+subscriptions
