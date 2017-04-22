@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNR-0001jI-2V
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:46 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNW-0001n5-Kq
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNN-0000h8-SJ
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:45 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3466
-	helo=dggrg02-dlp.huawei.com)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNT-0000jA-IU
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:50 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3506
+	helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNN-0000ga-8n
-	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:41 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d1qNS-0000hz-UA
+	for qemu-devel@nongnu.org; Sat, 22 Apr 2017 04:26:47 -0400
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Sat, 22 Apr 2017 16:25:54 +0800
-Message-ID: <1492849558-17540-15-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Sat, 22 Apr 2017 16:25:55 +0800
+Message-ID: <1492849558-17540-16-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 14/18] COLO: Split qemu_savevm_state_begin
- out of checkpoint process
+Subject: [Qemu-devel] [PATCH v2 15/18] COLO: flush host dirty ram from cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +29,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, gilbert@redhat.com
 Cc: quintela@redhat.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-It is unnecessary to call qemu_savevm_state_begin() in every checkpoint process.
-It mainly sets up devices and does the first device state pass. These data will
-not change during the later checkpoint process. So, we split it out of
-colo_do_checkpoint_transaction(), in this way, we can reduce these data
-transferring in the subsequent checkpoint.
+Don't need to flush all VM's ram from cache, only
+flush the dirty pages since last checkpoint
 
 Cc: Juan Quintela <quintela@redhat.com>
-Sgned-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- migration/colo.c | 51 ++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 36 insertions(+), 15 deletions(-)
+v2:
+ - stop dirty log after exit from COLO state. (Dave)
+---
+ migration/ram.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 8e27a4c..66bb5b2 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -362,16 +362,6 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-         goto out;
+diff --git a/migration/ram.c b/migration/ram.c
+index f171a82..7bf3515 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2775,6 +2775,7 @@ int colo_init_ram_cache(void)
+     ram_state.ram_bitmap = g_new0(RAMBitmap, 1);
+     ram_state.ram_bitmap->bmap = bitmap_new(last_ram_page());
+     ram_state.migration_dirty_pages = 0;
++    memory_global_dirty_log_start();
+ 
+     return 0;
+ 
+@@ -2798,6 +2799,7 @@ void colo_release_ram_cache(void)
+ 
+     atomic_rcu_set(&ram_state.ram_bitmap, NULL);
+     if (bitmap) {
++        memory_global_dirty_log_stop();
+         call_rcu(bitmap, migration_bitmap_free, rcu);
      }
  
--    /* Disable block migration */
--    s->params.blk = 0;
--    s->params.shared = 0;
--    qemu_savevm_state_begin(s->to_dst_file, &s->params);
--    ret = qemu_file_get_error(s->to_dst_file);
--    if (ret < 0) {
--        error_report("Save VM state begin error");
--        goto out;
--    }
--
-     /* We call this API although this may do nothing on primary side. */
-     qemu_mutex_lock_iothread();
-     replication_do_checkpoint_all(&local_err);
-@@ -459,6 +449,21 @@ static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
-     colo_checkpoint_notify(data);
- }
+@@ -2822,6 +2824,16 @@ void colo_flush_ram_cache(void)
+     void *src_host;
+     unsigned long offset = 0;
  
-+static int colo_prepare_before_save(MigrationState *s)
-+{
-+    int ret;
-+
-+    /* Disable block migration */
-+    s->params.blk = 0;
-+    s->params.shared = 0;
-+    qemu_savevm_state_begin(s->to_dst_file, &s->params);
-+    ret = qemu_file_get_error(s->to_dst_file);
-+    if (ret < 0) {
-+        error_report("Save VM state begin error");
++    memory_global_dirty_log_sync();
++    qemu_mutex_lock(&ram_state.bitmap_mutex);
++    rcu_read_lock();
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        migration_bitmap_sync_range(&ram_state, block, block->offset,
++                                    block->used_length);
 +    }
-+    return ret;
-+}
++    rcu_read_unlock();
++    qemu_mutex_unlock(&ram_state.bitmap_mutex);
 +
- static void colo_process_checkpoint(MigrationState *s)
- {
-     QIOChannelBuffer *bioc;
-@@ -478,6 +483,11 @@ static void colo_process_checkpoint(MigrationState *s)
-     packets_compare_notifier.notify = colo_compare_notify_checkpoint;
-     colo_compare_register_notifier(&packets_compare_notifier);
- 
-+    ret = colo_prepare_before_save(s);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-     /*
-      * Wait for Secondary finish loading VM states and enter COLO
-      * restore.
-@@ -628,6 +638,17 @@ static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
-     }
- }
- 
-+static int colo_prepare_before_load(QEMUFile *f)
-+{
-+    int ret;
-+
-+    ret = qemu_loadvm_state_begin(f);
-+    if (ret < 0) {
-+        error_report("Load VM state begin error, ret = %d", ret);
-+    }
-+    return ret;
-+}
-+
- void *colo_process_incoming_thread(void *opaque)
- {
-     MigrationIncomingState *mis = opaque;
-@@ -662,6 +683,11 @@ void *colo_process_incoming_thread(void *opaque)
-     fb = qemu_fopen_channel_input(QIO_CHANNEL(bioc));
-     object_unref(OBJECT(bioc));
- 
-+    ret = colo_prepare_before_load(mis->from_src_file);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-     qemu_mutex_lock_iothread();
-     replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
-     if (local_err) {
-@@ -709,11 +735,6 @@ void *colo_process_incoming_thread(void *opaque)
-             goto out;
-         }
- 
--        ret = qemu_loadvm_state_begin(mis->from_src_file);
--        if (ret < 0) {
--            error_report("Load vm state begin error, ret=%d", ret);
--            goto out;
--        }
-         ret = qemu_loadvm_state_main(mis->from_src_file, mis);
-         if (ret < 0) {
-             error_report("Load VM's live state (ram) error");
+     trace_colo_flush_ram_cache_begin(ram_state.migration_dirty_pages);
+     rcu_read_lock();
+     block = QLIST_FIRST_RCU(&ram_list.blocks);
 -- 
 1.8.3.1
