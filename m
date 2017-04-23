@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d2ECa-0000aI-En
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 05:53:09 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d2Ec4-0004kh-2H
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 06:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d2ECZ-0005zV-3o
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 05:53:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d2Ec2-00074g-U8
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 06:19:28 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37706)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d2Ec2-00074P-N1
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 06:19:26 -0400
+Received: by mail-wm0-x234.google.com with SMTP id m123so46219893wma.0
+	for <qemu-devel@nongnu.org>; Sun, 23 Apr 2017 03:19:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
-References: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Sun, 23 Apr 2017 17:53:05 +0800
-Message-ID: <CAOGPPbdM0SuG4HePS_pOimPNQwyqvOcuCV++R3EB10jdWOUg=A@mail.gmail.com>
+In-Reply-To: <e1b08f20-77e6-83c8-85e6-b73c645c44c1@gmx.com>
+References: <e1b08f20-77e6-83c8-85e6-b73c645c44c1@gmx.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 23 Apr 2017 11:19:04 +0100
+Message-ID: <CAFEAcA-ycgLSU9aX1Ywd1Pky2bquqefJbsRpNvo4DuaXOyL3SQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: use blk_co_pwrite_zeroes for
- zero sectors when compressed
+Subject: Re: [Qemu-devel] NetBSD maintenance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,108 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, mreitz@redhat.com, qemu block <qemu-block@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
+To: Kamil Rytarowski <n54@gmx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-I test four test case for this patch.
-1.qcow2 image with lots of zero cluster, and convert with compress
-2.qcow2 image with lots of zero cluster, and convert with no compress
-3.qcow2 image with lots of non-zero clusters, and convert with compress
-4.qcow2 image with lots of non-zero clusters, and convert with no compress
-all test case pass.
+On 23 April 2017 at 00:27, Kamil Rytarowski <n54@gmx.com> wrote:
+> I noted a call for NetBSD maintainers in the 2.9.0 release notes.
+>
+> I'm willing to attach a NetBSD machine to CI cluster and volunteer basic
+> maintenance. I'm mostly interested in NetBSD as host & as guest as this
+> is my daily and work driver on my desktop and development machines.
 
-the qcow2 image with lots of zero clusters, the time reduce obviously.
-and have no bad effort in other cases.
+Thanks for the offer of assistance. At the moment I have a
+NetBSD VM set up so I can run the usual make/make check
+tests that I run on other hosts. So the most immediate
+requirement is for somebody to investigate and send patches
+for the bugs which mean it doesn't build at all.
+My initial investigation suggests that at least one bug is that
+ivshmem-server uses shm_open but doesn't link -lrt, so
+some fixes to the build machinery are needed.
 
+> As of today NetBSD patches for qemu are maintained in pkgsrc. There are
+> also at least DragonFly and SunOS (SmartOS) diffs available.
+> https://github.com/NetBSD/pkgsrc/tree/trunk/emulators/qemu/patches
 
-On Fri, Apr 21, 2017 at 5:57 PM,  <jemmy858585@gmail.com> wrote:
-> From: Lidong Chen <lidongchen@tencent.com>
+Accumulating patches downstream like this is I think
+a big part of the problem -- if QEMU has bugs on NetBSD
+then we need NetBSD users to report the problems and
+provide us with fixes. Otherwise you get what's happened:
+we try to build NetBSD with upstream QEMU, find it doesn't
+even compile, and conclude that obviously nobody's using
+QEMU on NetBSD because nobody's complained that it doesn't
+work, so we might as well drop it.
+
+(I recall hitting that "ssp/unistd.h defines macros for read, etc"
+bug a few years back when I last tried NetBSD as a host;
+it looks like it's fixed in the headers on newer NetBSD, though,
+so maybe those patches could just be dropped if we're lucky.)
+
+> Qemu is one of the core tools in NetBSD development and it's used in our
+> release engineering infrastructure:
 >
-> when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
-> blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
-> the time when converts the qcow2 image with lots of zero.
->
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> ---
-> v2 changelog:
->     unify the compressed and non-compressed code paths
-> ---
->  qemu-img.c | 41 +++++++++++------------------------------
->  1 file changed, 11 insertions(+), 30 deletions(-)
->
-> diff --git a/qemu-img.c b/qemu-img.c
-> index b220cf7..60c9adf 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1661,6 +1661,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
->
->      while (nb_sectors > 0) {
->          int n = nb_sectors;
-> +        BdrvRequestFlags flags = s->compressed ? BDRV_REQ_WRITE_COMPRESSED : 0;
-> +
->          switch (status) {
->          case BLK_BACKING_FILE:
->              /* If we have a backing file, leave clusters unallocated that are
-> @@ -1670,43 +1672,21 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
->              break;
->
->          case BLK_DATA:
-> -            /* We must always write compressed clusters as a whole, so don't
-> -             * try to find zeroed parts in the buffer. We can only save the
-> -             * write if the buffer is completely zeroed and we're allowed to
-> -             * keep the target sparse. */
-> -            if (s->compressed) {
-> -                if (s->has_zero_init && s->min_sparse &&
-> -                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
-> -                {
-> -                    assert(!s->target_has_backing);
-> -                    break;
-> -                }
-> -
-> -                iov.iov_base = buf;
-> -                iov.iov_len = n << BDRV_SECTOR_BITS;
-> -                qemu_iovec_init_external(&qiov, &iov, 1);
-> -
-> -                ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
-> -                                     n << BDRV_SECTOR_BITS, &qiov,
-> -                                     BDRV_REQ_WRITE_COMPRESSED);
-> -                if (ret < 0) {
-> -                    return ret;
-> -                }
-> -                break;
-> -            }
-> -
-> -            /* If there is real non-zero data or we're told to keep the target
-> -             * fully allocated (-S 0), we must write it. Otherwise we can treat
-> +            /* If we're told to keep the target fully allocated (-S 0) or there
-> +             * is real non-zero data, we must write it. Otherwise we can treat
->               * it as zero sectors. */
->              if (!s->min_sparse ||
-> -                is_allocated_sectors_min(buf, n, &n, s->min_sparse))
-> -            {
-> +                (!s->compressed &&
-> +                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) ||
-> +                (s->compressed &&
-> +                 !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))) {
-> +
->                  iov.iov_base = buf;
->                  iov.iov_len = n << BDRV_SECTOR_BITS;
->                  qemu_iovec_init_external(&qiov, &iov, 1);
->
->                  ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
-> -                                     n << BDRV_SECTOR_BITS, &qiov, 0);
-> +                                     n << BDRV_SECTOR_BITS, &qiov, flags);
->                  if (ret < 0) {
->                      return ret;
->                  }
-> @@ -1716,6 +1696,7 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
->
->          case BLK_ZERO:
->              if (s->has_zero_init) {
-> +                assert(!s->target_has_backing);
->                  break;
->              }
->              ret = blk_co_pwrite_zeroes(s->target,
-> --
-> 1.8.3.1
->
+> http://releng.netbsd.org/test-results.html
+
+Do you use/test the bsd-user code, or just system emulation?
+I know the FreeBSD folks have extensive patches to the usermode
+code, but does it work OK on NetBSD hosts, or is it just unused?
+
+> I will start with upstreaming local diffs and move on to running tests.
+
+Thanks, I think that is the right place to start.
+
+-- PMM
