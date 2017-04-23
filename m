@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1d2Elo-0006OA-R9
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 06:29:33 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d2H1U-0000yP-Jh
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 08:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1d2Ell-0002Fb-OF
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 06:29:32 -0400
-References: <20170323113156.9277-1-marcandre.lureau@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <504762ea-025a-3c12-6674-93d074407de5@msgid.tls.msk.ru>
-Date: Sun, 23 Apr 2017 13:29:27 +0300
+	(envelope-from <jemmy858585@gmail.com>) id 1d2H1T-0001uc-5j
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 08:53:52 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170323113156.9277-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: tftp, copy sockaddr_size
+In-Reply-To: <CAOGPPbcw=WeLoFw-Vf7RrDhTQp5i8QNhoobXgaudZu=RNcyEJg@mail.gmail.com>
+References: <1492677526-4739-1-git-send-email-lidongchen@tencent.com>
+	<20170420100045.GB4747@noname.redhat.com>
+	<CAOGPPbcWmuysTJzuYS9vA2m6QBBmTnP9PLC-qXdU0u83hvj6=A@mail.gmail.com>
+	<CAOGPPbcw=WeLoFw-Vf7RrDhTQp5i8QNhoobXgaudZu=RNcyEJg@mail.gmail.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Sun, 23 Apr 2017 20:53:49 +0800
+Message-ID: <CAOGPPbdSYsbV0whMn6+=c0YwanpA+B8cD5=Bt7RYWe1msHZjRQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: use blk_co_pwrite_zeroes for
+ zero sectors when compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,14 +25,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, mreitz@redhat.com, qemu block <qemu-block@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
 
-23.03.2017 14:31, Marc-Andr=C3=A9 Lureau wrote:
-..
-> The sockaddr_storage pointer is the sockaddr_in6 lhost on the
-> stack. Copy only the source addr size.
+On Fri, Apr 21, 2017 at 1:37 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+> On Fri, Apr 21, 2017 at 10:58 AM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+>> On Thu, Apr 20, 2017 at 6:00 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+>>> Am 20.04.2017 um 10:38 hat jemmy858585@gmail.com geschrieben:
+>>>> From: Lidong Chen <lidongchen@tencent.com>
+>>>>
+>>>> when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
+>>>> blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
+>>>> the time when converts the qcow2 image with lots of zero.
+>>>>
+>>>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>>>
+>>> Good catch, using blk_co_pwrite_zeroes() makes sense even for compressed
+>>> images.
+>>>
+>>>> diff --git a/qemu-img.c b/qemu-img.c
+>>>> index b220cf7..0256539 100644
+>>>> --- a/qemu-img.c
+>>>> +++ b/qemu-img.c
+>>>> @@ -1675,13 +1675,20 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+>>>>               * write if the buffer is completely zeroed and we're allowed to
+>>>>               * keep the target sparse. */
+>>>>              if (s->compressed) {
+>>>> -                if (s->has_zero_init && s->min_sparse &&
+>>>> -                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
+>>>> -                {
+>>>> -                    assert(!s->target_has_backing);
+>>>> -                    break;
+>>>> +                if (buffer_is_zero(buf, n * BDRV_SECTOR_SIZE)) {
+>>>> +                    if (s->has_zero_init && s->min_sparse) {
+>>>> +                        assert(!s->target_has_backing);
+>>>> +                        break;
+>>>> +                    } else {
+>>>> +                        ret = blk_co_pwrite_zeroes(s->target,
+>>>> +                                           sector_num << BDRV_SECTOR_BITS,
+>>>> +                                           n << BDRV_SECTOR_BITS, 0);
+>>>> +                        if (ret < 0) {
+>>>> +                            return ret;
+>>>> +                        }
+>>>> +                        break;
+>>>> +                    }
+>>>>                  }
+>>>
+>>> If s->min_sparse == 0, we may neither skip the write not use
+>>> blk_co_pwrite_zeroes(), because this requires actual full allocation
+>>> with explicit zero sectors.
+>>>
+>>> Of course, if you fix this, what you end up with here is a duplicate of
+>>> the code path for non-compressed images. The remaining difference seems
+>>> to be the BDRV_REQ_WRITE_COMPRESSED flag and buffer_is_zero() vs.
+>>> is_allocated_sectors_min() (because uncompressed clusters can be written
+>>> partially, but compressed clusters can't).
+>>
+>> I have a try to unify the code.
+>>
+>> I don't understand why use  is_allocated_sectors_min when don't compressed.
+>> the s->min_sparse is 8 default, which is smaller than cluster_sectors.
+>>
+>> if a cluster which data is  8 sector zero and 8 sector non-zero
+>> repeated, it will call
+>> blk_co_pwritev and blk_co_pwrite_zeroes many times for a cluster.
+>>
+>> why not compare the zero by cluster_sectors size?
+>
+> I write this code, run in guest os.
+>
+> #include <stdio.h>
+> #include <stdlib.h>
+> #include <string.h>
+>
+> int main()
+> {
+>     char *zero;
+>     char *nonzero;
+>     FILE* fp = fopen("./test.dat", "ab");
+>
+>     zero = malloc(sizeof(char)*512*8);
+>     nonzero = malloc(sizeof(char)*512*8);
+>
+>     memset(zero, 0, sizeof(char)*512*8);
+>     memset(nonzero, 1, sizeof(char)*512*8);
+>
+>     while (1) {
+>         fwrite(zero, sizeof(char)*512*8, 1, fp);
+>         fwrite(nonzero, sizeof(char)*512*8, 1, fp);
+>     }
+>     fclose(fp);
+> }
+>
+> qemu-img info /mnt/img2016111016860868.qcow2
+> image: /mnt/img2016111016860868.qcow2
+> file format: qcow2
+> virtual size: 20G (21474836480 bytes)
+> disk size: 19G (20061552640 bytes)
+> cluster_size: 65536
+> backing file: /baseimage/img2016042213665396/img2016042213665396.qcow2
+>
+> use -S 65536 option.
+>
+> time /root/kvm/bin/qemu-img convert -p -B
+> /baseimage/img2016042213665396/img2016042213665396.qcow2 -O qcow2
+> /mnt/img2016111016860868.qcow2 /mnt/img2017041611162809_zip_new.qcow2
+> -S 65536
+>     (100.00/100%)
+>
+> real    0m32.203s
+> user    0m5.165s
+> sys     0m27.887s
+>
+> time /root/kvm/bin/qemu-img convert -p -B
+> /baseimage/img2016042213665396/img2016042213665396.qcow2 -O qcow2
+> /mnt/img2016111016860868.qcow2 /mnt/img2017041611162809_zip_new.qcow2
+>     (100.00/100%)
+>
+> real    1m38.665s
+> user    0m45.418s
+> sys     1m7.518s
+>
+> should we set cluster_sectors as the default value of s->min_sparse?
 
-Applied to -trivial, thanks!
+change the default value of s->min_sparse will break the API.
+qemu-img --help describe that the default value is 4k.
 
-/mjt
+  '-S' indicates the consecutive number of bytes (defaults to 4k) that must
+       contain only zeros for qemu-img to create a sparse image during
+       conversion. If the number of bytes is 0, the source will not be
+scanned for
+       unallocated or zero sectors, and the destination image will always be
+       fully allocated
+
+>
+>>
+>>>
+>>> So I suppose that instead of just fixing the above bug, we could actually
+>>> mostly unify the two code paths, if you want to have a try at it.
+>>>
+>>> Kevin
