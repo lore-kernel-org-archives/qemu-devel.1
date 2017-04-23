@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d2QBw-0000PN-2d
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 18:41:17 -0400
+	(envelope-from <shorne@gmail.com>) id 1d2QBx-0000PT-Kl
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 18:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d2QBt-0000Ir-0U
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 18:41:16 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:33714)
+	(envelope-from <shorne@gmail.com>) id 1d2QBw-0000MF-Fy
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 18:41:17 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:35128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d2QBs-0000IY-Qt
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 18:41:12 -0400
-Received: by mail-io0-x244.google.com with SMTP id k87so43164346ioi.0
-	for <qemu-devel@nongnu.org>; Sun, 23 Apr 2017 15:41:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d2QBw-0000M1-Br
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 18:41:16 -0400
+Received: by mail-it0-x243.google.com with SMTP id e132so11952980ite.2
+	for <qemu-devel@nongnu.org>; Sun, 23 Apr 2017 15:41:16 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Mon, 24 Apr 2017 07:40:48 +0900
-Message-Id: <cover.1492986468.git.shorne@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 0/9] Openrisc misc features / fixes
+Date: Mon, 24 Apr 2017 07:40:49 +0900
+Message-Id: <356a2db3c6f84e8e79e5afa3913514184bff5f50.1492986468.git.shorne@gmail.com>
+In-Reply-To: <cover.1492986468.git.shorne@gmail.com>
+References: <cover.1492986468.git.shorne@gmail.com>
+In-Reply-To: <cover.1492986468.git.shorne@gmail.com>
+References: <cover.1492986468.git.shorne@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 1/9] target/openrisc: Implement EVBAR
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +31,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: QEMU Development <qemu-devel@nongnu.org>
 Cc: Openrisc <openrisc@lists.librecores.org>, "Tim \\'mithro\\' Ansell" <mithro@mithis.com>, Stafford Horne <shorne@gmail.com>
 
-Hello,
+From: Tim 'mithro' Ansell <mithro@mithis.com>
 
-I have got a few response on the last series and have fixed them up.  Also
-I have dropped the shutdown patch.
+Exception Vector Base Address Register (EVBAR) - This optional register
+can be used to apply an offset to the exception vector addresses.
 
-These patches I added while working on upcoming openrisc smp support.  This
-does not allow for SMP openrisc on qemu "yet" but it does help to allow
-booting of an SMP kernel on the uni-processor qemu system which I was using
-as a sanity check before testing on fpga hardware.
+The significant bits (31-12) of the vector offset address for each
+exception depend on the setting of the Supervision Register (SR)'s EPH
+bit and the Exception Vector Base Address Register (EVBAR).
 
-Changes Since v1:
+Its presence is indicated by the EVBARP bit in the CPU Configuration
+Register (CPUCFGR).
 
- o Added Tim's patches to this series (since the vmstate patch depends on
-   in)
- o Changed vmstate patch to bump version numbers + support evbar saving
- o Changed Shadow Register patch to use accessor functions
- o Added reviewed-by's
- o Added a patch to remote the `features` field and enums
- o Dropped shutdown on `l.nop 1` patch
+Signed-off-by: Tim 'mithro' Ansell <mithro@mithis.com>
+Signed-off-by: Stafford Horne <shorne@gmail.com>
+---
+ target/openrisc/cpu.c        | 2 ++
+ target/openrisc/cpu.h        | 7 +++++++
+ target/openrisc/interrupt.c  | 6 +++++-
+ target/openrisc/sys_helper.c | 7 +++++++
+ 4 files changed, 21 insertions(+), 1 deletion(-)
 
--Stafford
-
-Stafford Horne (7):
-  target/openrisc: Fixes for memory debugging
-  target/openrisc: add numcores and coreid support
-  migration: Add VMSTATE_UINTTL_2DARRAY()
-  target/openrisc: implement shadow registers
-  migration: Add VMSTATE_STRUCT_2DARRAY()
-  target/openrisc: Implement full vmstate serialization
-  target/openrisc: Remove duplicate features property
-
-Tim 'mithro' Ansell (2):
-  target/openrisc: Implement EVBAR register
-  target/openrisc: Implement EPH bit
-
- include/migration/cpu.h             |  7 ++++
- include/migration/vmstate.h         | 15 ++++++++
- linux-user/elfload.c                |  2 +-
- linux-user/main.c                   | 18 ++++-----
- linux-user/openrisc/target_cpu.h    |  6 +--
- linux-user/openrisc/target_signal.h |  2 +-
- linux-user/signal.c                 | 16 ++++----
- target/openrisc/cpu.c               | 13 ++-----
- target/openrisc/cpu.h               | 36 ++++++++++--------
- target/openrisc/gdbstub.c           |  4 +-
- target/openrisc/interrupt.c         |  9 ++++-
- target/openrisc/machine.c           | 75 +++++++++++++++++++++++++++++++++++--
- target/openrisc/mmu.c               | 23 ++++++++++--
- target/openrisc/sys_helper.c        | 22 +++++++++++
- target/openrisc/translate.c         |  5 ++-
- 15 files changed, 194 insertions(+), 59 deletions(-)
-
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index 7fd2b9a..1524ed9 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -134,6 +134,7 @@ static void or1200_initfn(Object *obj)
+ 
+     set_feature(cpu, OPENRISC_FEATURE_OB32S);
+     set_feature(cpu, OPENRISC_FEATURE_OF32S);
++    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
+ }
+ 
+ static void openrisc_any_initfn(Object *obj)
+@@ -141,6 +142,7 @@ static void openrisc_any_initfn(Object *obj)
+     OpenRISCCPU *cpu = OPENRISC_CPU(obj);
+ 
+     set_feature(cpu, OPENRISC_FEATURE_OB32S);
++    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
+ }
+ 
+ typedef struct OpenRISCCPUInfo {
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 418a0e6..1958b72 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -111,6 +111,11 @@ enum {
+     CPUCFGR_OF32S = (1 << 7),
+     CPUCFGR_OF64S = (1 << 8),
+     CPUCFGR_OV64S = (1 << 9),
++    /* CPUCFGR_ND = (1 << 10), */
++    /* CPUCFGR_AVRP = (1 << 11), */
++    CPUCFGR_EVBARP = (1 << 12),
++    /* CPUCFGR_ISRP = (1 << 13), */
++    /* CPUCFGR_AECSRP = (1 << 14), */
+ };
+ 
+ /* DMMU configure register */
+@@ -200,6 +205,7 @@ enum {
+     OPENRISC_FEATURE_OF32S = (1 << 7),
+     OPENRISC_FEATURE_OF64S = (1 << 8),
+     OPENRISC_FEATURE_OV64S = (1 << 9),
++    OPENRISC_FEATURE_EVBAR = (1 << 12),
+ };
+ 
+ /* Tick Timer Mode Register */
+@@ -289,6 +295,7 @@ typedef struct CPUOpenRISCState {
+     uint32_t dmmucfgr;        /* DMMU configure register */
+     uint32_t immucfgr;        /* IMMU configure register */
+     uint32_t esr;             /* Exception supervisor register */
++    uint32_t evbar;           /* Exception vector base address register */
+     uint32_t fpcsr;           /* Float register */
+     float_status fp_status;
+ 
+diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+index a2eec6f..78f0ba9 100644
+--- a/target/openrisc/interrupt.c
++++ b/target/openrisc/interrupt.c
+@@ -65,7 +65,11 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     env->lock_addr = -1;
+ 
+     if (cs->exception_index > 0 && cs->exception_index < EXCP_NR) {
+-        env->pc = (cs->exception_index << 8);
++        hwaddr vect_pc = cs->exception_index << 8;
++        if (env->cpucfgr & CPUCFGR_EVBARP) {
++            vect_pc |= env->evbar;
++        }
++        env->pc = vect_pc;
+     } else {
+         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
+     }
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index 60c3193..6ba8162 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -39,6 +39,10 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
+         env->vr = rb;
+         break;
+ 
++    case TO_SPR(0, 11): /* EVBAR */
++        env->evbar = rb;
++        break;
++
+     case TO_SPR(0, 16): /* NPC */
+         cpu_restore_state(cs, GETPC());
+         /* ??? Mirror or1ksim in not trashing delayed branch state
+@@ -206,6 +210,9 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
+     case TO_SPR(0, 4): /* IMMUCFGR */
+         return env->immucfgr;
+ 
++    case TO_SPR(0, 11): /* EVBAR */
++        return env->evbar;
++
+     case TO_SPR(0, 16): /* NPC (equals PC) */
+         cpu_restore_state(cs, GETPC());
+         return env->pc;
 -- 
 2.9.3
