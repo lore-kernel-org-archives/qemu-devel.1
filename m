@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d2IZt-0007Jy-1w
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:33:30 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d2IZu-0007K4-D4
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:33:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d2IZp-0003Ir-UO
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:33:29 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d2IZt-0003LU-EF
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:33:30 -0400
 From: jemmy858585@gmail.com
-Date: Sun, 23 Apr 2017 22:33:16 +0800
-Message-Id: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH 1/2] qemu-img: make sure contain the
- consecutive number of zero bytes
+Date: Sun, 23 Apr 2017 22:33:17 +0800
+Message-Id: <1492957997-28587-2-git-send-email-lidongchen@tencent.com>
+In-Reply-To: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
+References: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
+Subject: [Qemu-devel] [PATCH 2/2] qemu-img: fix some spelling errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +24,27 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Lidong Chen <lid
 
 From: Lidong Chen <lidongchen@tencent.com>
 
-is_allocated_sectors_min don't guarantee to contain the
-consecutive number of zero bytes. this patch fixes this bug.
+Fix some spelling errors in is_allocated_sectors comment.
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 ---
- qemu-img.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ qemu-img.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index b220cf7..df6d165 100644
+index df6d165..0b3349c 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -1060,9 +1060,9 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+@@ -1033,8 +1033,8 @@ done:
  }
  
  /*
-- * Like is_allocated_sectors, but if the buffer starts with a used sector,
-- * up to 'min' consecutive sectors containing zeros are ignored. This avoids
-- * breaking up write requests for only small sparse areas.
-+ * Like is_allocated_sectors, but up to 'min' consecutive sectors
-+ * containing zeros are ignored. This avoids breaking up write requests
-+ * for only small sparse areas.
-  */
- static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
-     int min)
-@@ -1071,11 +1071,12 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
-     int num_checked, num_used;
- 
-     if (n < min) {
--        min = n;
-+        *pnum = n;
-+        return 1;
-     }
- 
-     ret = is_allocated_sectors(buf, n, pnum);
--    if (!ret) {
-+    if (!ret && *pnum >= min) {
-         return ret;
-     }
- 
+- * Returns true iff the first sector pointed to by 'buf' contains at least
+- * a non-NUL byte.
++ * Returns true if the first sector pointed to by 'buf' contains at least
++ * a non-NULL byte.
+  *
+  * 'pnum' is set to the number of sectors (including and immediately following
+  * the first one) that are known to be in the same allocated/unallocated state.
 -- 
 1.8.3.1
