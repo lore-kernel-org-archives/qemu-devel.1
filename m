@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d2IJy-0004S8-0V
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:17:03 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d2IZt-0007Jy-1w
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:33:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d2IJt-0007Bs-Ri
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:17:01 -0400
-Resent-Message-Id: <E1d2IJt-0007Bs-Ri@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21480)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d2IJt-0007BX-Iq
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:16:57 -0400
-In-Reply-To: <1492956615-2395-1-git-send-email-vip-ak47@yandex.ru>
-Message-ID: <149295699921.63.4807406566542557041@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 23 Apr 2017 07:16:39 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] Video and sound capture to a videofile
- through ffmpeg
+	(envelope-from <jemmy858585@gmail.com>) id 1d2IZp-0003Ir-UO
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 10:33:29 -0400
+From: jemmy858585@gmail.com
+Date: Sun, 23 Apr 2017 22:33:16 +0800
+Message-Id: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
+Subject: [Qemu-devel] [PATCH 1/2] qemu-img: make sure contain the
+ consecutive number of zero bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +18,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vip-ak47@yandex.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
-IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
-IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
-CgpNZXNzYWdlLWlkOiAxNDkyOTU2NjE1LTIzOTUtMS1naXQtc2VuZC1lbWFpbC12aXAtYWs0N0B5
-YW5kZXgucnUKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIFZpZGVv
-IGFuZCBzb3VuZCBjYXB0dXJlIHRvIGEgdmlkZW9maWxlIHRocm91Z2ggZmZtcGVnCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnNldCAtZQpnaXQgc3VibW9kdWxlIHVwZGF0
-ZSAtLWluaXQgZHRjCiMgTGV0IGRvY2tlciB0ZXN0cyBkdW1wIGVudmlyb25tZW50IGluZm8KZXhw
-b3J0IFNIT1dfRU5WPTEKZXhwb3J0IEo9OAptYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczYK
-bWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEKbWFrZSBkb2NrZXItdGVzdC1idWlsZEBtaW4t
-Z2xpYgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXBy
-b2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0OTI5NTY2MTUtMjM5NS0x
-LWdpdC1zZW5kLWVtYWlsLXZpcC1hazQ3QHlhbmRleC5ydSAtPiBwYXRjaGV3LzE0OTI5NTY2MTUt
-MjM5NS0xLWdpdC1zZW5kLWVtYWlsLXZpcC1hazQ3QHlhbmRleC5ydQpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjIzZGNhOGYgVmlkZW8gYW5kIHNvdW5kIGNhcHR1cmUgdG8gYSB2aWRl
-b2ZpbGUgdGhyb3VnaCBmZm1wZWcKCj09PSBPVVRQVVQgQkVHSU4gPT09ClN1Ym1vZHVsZSAnZHRj
-JyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
-aCAnZHRjJwpDbG9uaW5nIGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xYXVkdzhi
-Mi9zcmMvZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzU1OGNkODFi
-ZGQ0MzI3NjliNTliZmYwMTI0MGM0NGY4MmNmYjFhOWQnCiAgQlVJTEQgICBjZW50b3M2Cm1ha2Vb
-MV06IEVudGVyaW5nIGRpcmVjdG9yeSAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTFhdWR3
-OGIyL3NyYycKICBBUkNISVZFIHFlbXUudGd6CiAgQVJDSElWRSBkdGMudGd6CiAgQ09QWSAgICBS
-VU5ORVIKICAgIFJVTiB0ZXN0LXF1aWNrIGluIHFlbXU6Y2VudG9zNiAKUGFja2FnZXMgaW5zdGFs
-bGVkOgpTREwtZGV2ZWwtMS4yLjE0LTcuZWw2XzcuMS54ODZfNjQKY2NhY2hlLTMuMS42LTIuZWw2
-Lng4Nl82NAplcGVsLXJlbGVhc2UtNi04Lm5vYXJjaApnY2MtNC40LjctMTcuZWw2Lng4Nl82NApn
-aXQtMS43LjEtNC5lbDZfNy4xLng4Nl82NApnbGliMi1kZXZlbC0yLjI4LjgtNS5lbDYueDg2XzY0
-CmxpYmZkdC1kZXZlbC0xLjQuMC0xLmVsNi54ODZfNjQKbWFrZS0zLjgxLTIzLmVsNi54ODZfNjQK
-cGFja2FnZSBnKysgaXMgbm90IGluc3RhbGxlZApwaXhtYW4tZGV2ZWwtMC4zMi44LTEuZWw2Lng4
-Nl82NAp0YXItMS4yMy0xNS5lbDZfOC54ODZfNjQKemxpYi1kZXZlbC0xLjIuMy0yOS5lbDYueDg2
-XzY0CgpFbnZpcm9ubWVudCB2YXJpYWJsZXM6ClBBQ0tBR0VTPWxpYmZkdC1kZXZlbCBjY2FjaGUg
-ICAgIHRhciBnaXQgbWFrZSBnY2MgZysrICAgICB6bGliLWRldmVsIGdsaWIyLWRldmVsIFNETC1k
-ZXZlbCBwaXhtYW4tZGV2ZWwgICAgIGVwZWwtcmVsZWFzZQpIT1NUTkFNRT1hMzYxY2UzZjllOGIK
-VEVSTT14dGVybQpNQUtFRkxBR1M9IC1qOApISVNUU0laRT0xMDAwCko9OApVU0VSPXJvb3QKQ0NB
-Q0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUKRVhUUkFfQ09ORklHVVJFX09QVFM9ClY9ClNIT1dfRU5W
-PTEKTUFJTD0vdmFyL3Nwb29sL21haWwvcm9vdApQQVRIPS91c3IvbGliL2NjYWNoZTovdXNyL2xp
-YjY0L2NjYWNoZTovdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3Iv
-YmluOi9zYmluOi9iaW4KUFdEPS8KTEFORz1lbl9VUy5VVEYtOApUQVJHRVRfTElTVD0KSElTVENP
-TlRST0w9aWdub3JlZHVwcwpTSExWTD0xCkhPTUU9L3Jvb3QKVEVTVF9ESVI9L3RtcC9xZW11LXRl
-c3QKTE9HTkFNRT1yb290CkxFU1NPUEVOPXx8L3Vzci9iaW4vbGVzc3BpcGUuc2ggJXMKRkVBVFVS
-RVM9IGR0YwpERUJVRz0KR19CUk9LRU5fRklMRU5BTUVTPTEKQ0NBQ0hFX0hBU0hESVI9Cl89L3Vz
-ci9iaW4vZW52CgpDb25maWd1cmUgb3B0aW9uczoKLS1lbmFibGUtd2Vycm9yIC0tdGFyZ2V0LWxp
-c3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2NC1zb2Z0bW11IC0tcHJlZml4PS92YXIvdG1wL3FlbXUt
-YnVpbGQvaW5zdGFsbApncmVwOiBzY3JpcHRzL3RyYWNldG9vbC9iYWNrZW5kLyoucHk6IE5vIHN1
-Y2ggZmlsZSBvciBkaXJlY3RvcnkKTm8gQysrIGNvbXBpbGVyIGF2YWlsYWJsZTsgZGlzYWJsaW5n
-IEMrKyBzcGVjaWZpYyBvcHRpb25hbCBjb2RlCgpFUlJPUjogbGliYXYgY2hlY2sgZmFpbGVkCiAg
-ICAgICBNYWtlIHN1cmUgdG8gaGF2ZSB0aGUgbGliYXYgbGlicyBhbmQgaGVhZGVycyBpbnN0YWxs
-ZWQuCgp0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxMTg6IHJlY2lwZSBmb3IgdGFyZ2V0
-ICdkb2NrZXItcnVuJyBmYWlsZWQKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1h
-a2VbMV06IExlYXZpbmcgZGlyZWN0b3J5ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMWF1
-ZHc4YjIvc3JjJwp0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxNDk6IHJlY2lwZSBmb3Ig
-dGFyZ2V0ICdkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zNicgZmFpbGVkCm1ha2U6ICoqKiBb
-ZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczZdIEVycm9yIDIKPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+From: Lidong Chen <lidongchen@tencent.com>
+
+is_allocated_sectors_min don't guarantee to contain the
+consecutive number of zero bytes. this patch fixes this bug.
+
+Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+---
+ qemu-img.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/qemu-img.c b/qemu-img.c
+index b220cf7..df6d165 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1060,9 +1060,9 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+ }
+ 
+ /*
+- * Like is_allocated_sectors, but if the buffer starts with a used sector,
+- * up to 'min' consecutive sectors containing zeros are ignored. This avoids
+- * breaking up write requests for only small sparse areas.
++ * Like is_allocated_sectors, but up to 'min' consecutive sectors
++ * containing zeros are ignored. This avoids breaking up write requests
++ * for only small sparse areas.
+  */
+ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+     int min)
+@@ -1071,11 +1071,12 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+     int num_checked, num_used;
+ 
+     if (n < min) {
+-        min = n;
++        *pnum = n;
++        return 1;
+     }
+ 
+     ret = is_allocated_sectors(buf, n, pnum);
+-    if (!ret) {
++    if (!ret && *pnum >= min) {
+         return ret;
+     }
+ 
+-- 
+1.8.3.1
