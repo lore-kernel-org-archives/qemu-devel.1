@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1d2L7L-0008Sf-EN
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 13:16:12 -0400
+	(envelope-from <agraf@suse.de>) id 1d2LAD-0000nG-62
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 13:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1d2L7I-0003FG-AJ
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 13:16:11 -0400
-References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
-	<20170311132256.22951-4-marcandre.lureau@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <db21dce3-9613-02eb-64f8-9ff888e5f03d@msgid.tls.msk.ru>
-Date: Sun, 23 Apr 2017 20:16:04 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170311132256.22951-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <agraf@suse.de>) id 1d2LAA-0003sA-1w
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 13:19:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:38999 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1d2LA9-0003s5-RR
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 13:19:05 -0400
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (1.0)
+From: Alexander Graf <agraf@suse.de>
+In-Reply-To: <20170423160854.3478-1-aurelien@aurel32.net>
+Date: Sun, 23 Apr 2017 19:19:02 +0200
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/21] object: fix potential leak in getters
+Message-Id: <1DFAD716-AE63-46E6-86E4-31032DFDA0BC@suse.de>
+References: <20170423160854.3478-1-aurelien@aurel32.net>
+Subject: Re: [Qemu-devel] [PATCH] s390x/misc_helper.c: wrap
+ s390_virtio_hypercall in BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, armbru@redhat.com, anderson@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-11.03.2017 16:22, Marc-Andr=C3=A9 Lureau wrote:
-> If the property is not of the requested type, the getters will leak a
-> QObject.
 
-I'm not really sure it's -trivial material.
 
-Not applying 01/23 either.
+> Am 23.04.2017 um 18:08 schrieb Aurelien Jarno <aurelien@aurel32.net>:
+>=20
+> s390_virtio_hypercall can trigger IO events and interrupts, most notably
+> when using virtio-ccw devices.
+>=20
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> ---
+> roms/qemu-palcode          | 2 +-
+> roms/seabios               | 2 +-
+> target/s390x/misc_helper.c | 2 ++
+> 3 files changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/roms/qemu-palcode b/roms/qemu-palcode
+> index f3c7e44c70..c87a92639b 160000
+> --- a/roms/qemu-palcode
+> +++ b/roms/qemu-palcode
+> @@ -1 +1 @@
+> -Subproject commit f3c7e44c70254975df2a00af39701eafbac4d471
+> +Subproject commit c87a92639b28ac42bc8f6c67443543b405dc479b
+> diff --git a/roms/seabios b/roms/seabios
+> index 5f4c7b13cd..e2fc41e24e 160000
+> --- a/roms/seabios
+> +++ b/roms/seabios
+> @@ -1 +1 @@
+> -Subproject commit 5f4c7b13cdf9c450eb55645f4362ea58fa61b79b
+> +Subproject commit e2fc41e24ee0ada60fc511d60b15a41b294538be
 
-Should whole series be applied to the same tree perhaps?
+I guess you didn't mean to send those hunks?
 
-Thanks,
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index 4946b56ab3..aec737d707 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -307,7 +307,9 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uin=
+t32_t r3, uint32_t num)
+>     switch (num) {
+>     case 0x500:
+>         /* KVM hypercall */
+> +        qemu_mutex_lock_iothread();
+>         r =3D s390_virtio_hypercall(env);
+> +        qemu_mutex_unlock_iothread();
 
-/mjt
+That change however looks good to me. So without the subprj commits,
+
+Reviewed-by: Alexander Graf <agraf@suse.de>
+
+Alex
+
+>         break;
+>     case 0x44:
+>         /* yield */
+> --=20
+> 2.11.0
+>=20
