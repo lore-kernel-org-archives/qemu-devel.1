@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42339)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1d2iXr-00030k-Bh
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:17:08 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42642)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <borntraeger@de.ibm.com>) id 1d2iYM-0003HL-Gs
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:17:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1d2iXo-0002uY-6S
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:17:07 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:36261 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1d2iXn-0002sv-Sk
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:17:04 -0400
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (1.0)
-From: Peter Lieven <pl@kamp.de>
-In-Reply-To: <15b32f67-fbce-fe9e-5a5f-ed25eae49941@virtuozzo.com>
-Date: Mon, 24 Apr 2017 20:16:56 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F7BA9764-937B-438A-B606-677DBF7379A6@kamp.de>
-References: <1492769076-64466-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<98514b87-d2a3-254d-f03e-0c6d3cd73ff6@kamp.de>
-	<88259101-7040-f057-5ed4-76bd36f2b1a0@virtuozzo.com>
-	<c9b0f997-efbd-92f2-2fba-57d6daad2ee7@kamp.de>
-	<15b32f67-fbce-fe9e-5a5f-ed25eae49941@virtuozzo.com>
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH v2 1/1] qemu-img: wait for
- convert coroutines to complete
+	(envelope-from <borntraeger@de.ibm.com>) id 1d2iYJ-0003HZ-9j
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:17:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1d2iYJ-0003GP-08
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:17:35 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3OIE98E027699
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 14:17:33 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a1k2haubh-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 14:17:33 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 24 Apr 2017 12:17:32 -0600
+References: <70ef6f1f-27f4-133f-ab33-03a30f19867b@de.ibm.com>
+	<20170424105344.GF2362@work-vm>
+	<75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
+	<20170424143516.GD2075@work-vm>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 24 Apr 2017 20:17:26 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170424143516.GD2075@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
+Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,128 +43,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, qemu-stable@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+
+On 04/24/2017 04:35 PM, Dr. David Alan Gilbert wrote:
+> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+>> On 04/24/2017 12:53 PM, Dr. David Alan Gilbert wrote:
+>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+>>>> David, Juan,
+>>>>
+>>>> I can trigger a hang of postcopy migration (when I do it early) so
+>>>> that both sides are in paused state. Looks like one thread is still
+>>>> loading vmstates for virtio and this load accesses guest memory and
+>>>> triggers a userfault.
+>>>
+>>> It's perfectly legal for the destination to cause a userfault as it
+>>> loads the virtio queue - the virtio queue should be being loaded by
+>>> the main thread from the buffer while the 'listening' thread is
+>>> waiting for the incoming page data.
+>>>
+>>> Can you turn on the following tracing please: destination: 
+>>> postcopy_ram_fault_thread_request postcopy_place_page 
+>>> postcopy_place_page_zero
+>>>
+>>> source: migrate_handle_rp_req_pages ram_save_queue_pages
+>>>
+>>> You should see: virtio does the access userfault generates a fault 
+>>> postcopy_ram_fault_thread_request sends the request to the source
+>>>
+>>> the source sees migrate_handle_rp_req_pages queues it with
+>>> ram_save_queue_pages
+>>>
+>>> the destination sees the page arrive and postcopy_place_page or
+>>> postcopy_place_page_zero
+>>>
+>>> some of that might disappear if the page was already on it's way.
+>>
+>>
+>> the last event on the source are
+>> [..]
+>> 58412@1493037953.747988:postcopy_place_page host=0x3ff92246000
+>> 58412@1493037953.747992:postcopy_place_page host=0x3ff92247000
+> 
+> How do you see those on the source???
+
+It was the previous migrate (I did it in a loop forth and back)
+The problem happens on the migrate back.
+> 
+>> 58412@1493037956.804210:migrate_handle_rp_req_pages in s390.ram at 41d9000 len 1000
+>> 58412@1493037956.804216:ram_save_queue_pages s390.ram: start: 41d9000 len: 100
+>>
+> 
+> Is that a typo? I'm expecting those two 'len' fields to be the same?
+
+Yes, its a cut'n' paste "miss the last byte"
 
 
+> 
+>> On the target a see lots of
+>>
+>> 39741@1493037958.833710:postcopy_place_page_zero host=0x3ff9befa000
+>> 39741@1493037958.833716:postcopy_place_page host=0x3ff9befb000
+>> 39741@1493037958.833759:postcopy_place_page host=0x3ff9befc000
+>> 39741@1493037958.833818:postcopy_place_page host=0x3ff9befd000
+>> 39741@1493037958.833819:postcopy_place_page_zero host=0x3ff9befe000
+>> 39741@1493037958.833822:postcopy_place_page host=0x3ff9beff000
+>>
+>> So we have about 2 seconds of traffic going on after that request,
+>> I assume its precopy related.
+>>
+>> Looking back on the target history there was
+>> 39741@1493037956.804337:postcopy_ram_fault_thread_request Request for HVA=3ff618d9000 rb=s390.ram offset=41d9000
+>>
+>> In fact it seems to be the first and only request:
+>>
+>> # cat /tmp/test0.trace | grep -v postcopy_place_page
+>>
+>> 39741@1493037956.804337:postcopy_ram_fault_thread_request Request for HVA=3ff618d9000 rb=s390.ram offset=41d9000
+> 
+> OK, does the HVA there correspond to the address that your virtio device is blocking on?
 
-> Am 24.04.2017 um 18:27 schrieb Anton Nefedov <anton.nefedov@virtuozzo.com>=
-:
->=20
->> On 04/21/2017 03:37 PM, Peter Lieven wrote:
->>> Am 21.04.2017 um 14:19 schrieb Anton Nefedov:
->>>> On 04/21/2017 01:44 PM, Peter Lieven wrote:
->>>>> Am 21.04.2017 um 12:04 schrieb Anton Nefedov:
->>>>> On error path (like i/o error in one of the coroutines), it's required=
- to
->>>>>  - wait for coroutines completion before cleaning the common structure=
-s
->>>>>  - reenter dependent coroutines so they ever finish
->>>>>=20
->>>>> Introduced in 2d9187bc65.
->>>>>=20
->>>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>>>> ---
->>>>> [..]
->>>>>=20
->>>>=20
->>>>=20
->>>> And what if we error out in the read path? Wouldn't be something like t=
-his easier?
->>>>=20
->>>>=20
->>>> diff --git a/qemu-img.c b/qemu-img.c
->>>> index 22f559a..4ff1085 100644
->>>> --- a/qemu-img.c
->>>> +++ b/qemu-img.c
->>>> @@ -1903,6 +1903,16 @@ static int convert_do_copy(ImgConvertState *s)
->>>>         main_loop_wait(false);
->>>>     }
->>>>=20
->>>> +    /* on error path we need to enter all coroutines that are still
->>>> +     * running before cleaning up common structures */
->>>> +    if (s->ret) {
->>>> +        for (i =3D 0; i < s->num_coroutines; i++) {
->>>> +             if (s->co[i]) {
->>>> +                 qemu_coroutine_enter(s->co[i]);
->>>> +             }
->>>> +        }
->>>> +    }
->>>> +
->>>>     if (s->compressed && !s->ret) {
->>>>         /* signal EOF to align */
->>>>         ret =3D blk_pwrite_compressed(s->target, 0, NULL, 0);
->>>>=20
->>>>=20
->>>> Peter
->>>>=20
->>>=20
->>> seemed a bit too daring to me to re-enter every coroutine potentially in=
-cluding the ones that yielded waiting for I/O completion.
->>> If that's ok - that is for sure easier :)
->>=20
->> I think we should enter every coroutine that is still running and have it=
- terminate correctly. It was my mistake that I have not
->> done this in the original patch. Can you check if the above fixes your te=
-st cases that triggered the bug?
->>=20
->=20
-> hi, sorry I'm late with the answer
->=20
-> this segfaults in bdrv_close(). Looks like it tries to finish some i/o whi=
-ch coroutine we have already entered and terminated?
->=20
-> (gdb) run
-> Starting program: /vz/anefedov/qemu-build/us/./qemu-img convert -O qcow2 .=
-/harddisk.hdd.c ./harddisk.hdd
-> [Thread debugging using libthread_db enabled]
-> Using host libthread_db library "/lib64/libthread_db.so.1".
-> [New Thread 0x7fffeac2d700 (LWP 436020)]
-> [New Thread 0x7fffe4ed6700 (LWP 436021)]
-> qemu-img: error while reading sector 20480: Input/output error
-> qemu-img: error while writing sector 19712: Operation now in progress
->=20
-> Program received signal SIGSEGV, Segmentation fault.
-> aio_co_wake (co=3D0x0) at /mnt/code/us-qemu/util/async.c:454
-> 454         ctx =3D atomic_read(&co->ctx);
-> (gdb) bt
-> #0  aio_co_wake (co=3D0x0) at /mnt/code/us-qemu/util/async.c:454
-> /* [Anton]: thread_pool_co_cb () here */
-> #1  0x0000555555634629 in thread_pool_completion_bh (opaque=3D0x555555cfe0=
-20) at /mnt/code/us-qemu/util/thread-pool.c:189
-> #2  0x0000555555633b31 in aio_bh_call (bh=3D0x555555cfe0f0) at /mnt/code/u=
-s-qemu/util/async.c:90
-> #3  aio_bh_poll (ctx=3Dctx@entry=3D0x555555cee6d0) at /mnt/code/us-qemu/ut=
-il/async.c:118
-> #4  0x0000555555636f14 in aio_poll (ctx=3Dctx@entry=3D0x555555cee6d0, bloc=
-king=3D<optimized out>) at /mnt/code/us-qemu/util/aio-posix.c:682
-> #5  0x00005555555c52d4 in bdrv_drain_recurse (bs=3Dbs@entry=3D0x555555d225=
-60) at /mnt/code/us-qemu/block/io.c:164
-> #6  0x00005555555c5aed in bdrv_drained_begin (bs=3Dbs@entry=3D0x555555d225=
-60) at /mnt/code/us-qemu/block/io.c:248
-> #7  0x0000555555581443 in bdrv_close (bs=3D0x555555d22560) at /mnt/code/us=
--qemu/block.c:2909
-> #8  bdrv_delete (bs=3D0x555555d22560) at /mnt/code/us-qemu/block.c:3100
-> #9  bdrv_unref (bs=3D0x555555d22560) at /mnt/code/us-qemu/block.c:4087
-> #10 0x00005555555baf44 in blk_remove_bs (blk=3Dblk@entry=3D0x555555d22380)=
- at /mnt/code/us-qemu/block/block-backend.c:552
-> #11 0x00005555555bb173 in blk_delete (blk=3D0x555555d22380) at /mnt/code/u=
-s-qemu/block/block-backend.c:238
-> #12 blk_unref (blk=3Dblk@entry=3D0x555555d22380) at /mnt/code/us-qemu/bloc=
-k/block-backend.c:282
-> #13 0x000055555557a22c in img_convert (argc=3D<optimized out>, argv=3D<opt=
-imized out>) at /mnt/code/us-qemu/qemu-img.c:2359
-> #14 0x0000555555574189 in main (argc=3D5, argv=3D0x7fffffffe4a0) at /mnt/c=
-ode/us-qemu/qemu-img.c:4464
->=20
->=20
->> Peter
->>=20
->=20
-> /Anton
->=20
+yes it is the same page.
 
-it seems that this is a bit tricky, can you share how your test case works?
 
-thanks,
-peter=
+> (or at least the start of the page)
+> Do you see a postcopy_place_page with a host= the same HVA ?
+
+no
+
+> 
+> From the source backtrace, I think the source thinks it's sent everything
+> and is waiting for the return-path-thread to close.
+> 
+> Dave
+> 
+>>>
+>>> Dave
+>>>
+>>>> Thread 1 (Thread 0x3ffa2f45f00 (LWP 21122)): #0  0x0000000001017130
+>>>> in lduw_he_p (ptr=0x3ff498d9002) at
+>>>> /root/qemu/include/qemu/bswap.h:317 <---- according to the host
+>>>> kernel this threads hangs in handle_userfault. #1
+>>>> 0x0000000001017342 in lduw_le_p (ptr=0x3ff498d9002) at
+>>>> /root/qemu/include/qemu/bswap.h:359 #2  0x0000000001025840 in
+>>>> address_space_lduw_internal_cached (cache=0x283491d0, addr=2,
+>>>> attrs=..., result=0x0, endian=DEVICE_LITTLE_ENDIAN) at
+>>>> /root/qemu/memory_ldst.inc.c:284 #3  0x00000000010259a6 in
+>>>> address_space_lduw_le_cached (cache=0x283491d0, addr=2, attrs=...,
+>>>> result=0x0) at /root/qemu/memory_ldst.inc.c:315 #4
+>>>> 0x0000000001025ad6 in lduw_le_phys_cached (cache=0x283491d0,
+>>>> addr=2) at /root/qemu/memory_ldst.inc.c:334 #5  0x0000000001116c10
+>>>> in virtio_lduw_phys_cached (vdev=0x28275090, cache=0x283491d0,
+>>>> pa=2) at /root/qemu/include/hw/virtio/virtio-access.h:166 #6
+>>>> 0x0000000001117940 in vring_used_idx (vq=0x3ffa2e1c090) at
+>>>> /root/qemu/hw/virtio/virtio.c:263 #7  0x000000000111daea in
+>>>> virtio_load (vdev=0x28275090, f=0x28353600, version_id=2) at
+>>>> /root/qemu/hw/virtio/virtio.c:2168 #8  0x000000000111d0cc in
+>>>> virtio_device_get (f=0x28353600, opaque=0x28275090, size=0,
+>>>> field=0x16adf38 <__compound_literal.0>) at
+>>>> /root/qemu/hw/virtio/virtio.c:1975 #9  0x00000000012a7f50 in
+>>>> vmstate_load_state (f=0x28353600, vmsd=0x14db480
+>>>> <vmstate_virtio_blk>, opaque=0x28275090, version_id=2) at
+>>>> /root/qemu/migration/vmstate.c:128 #10 0x00000000010cbc08 in
+>>>> vmstate_load (f=0x28353600, se=0x28279e60, version_id=2) at
+>>>> /root/qemu/migration/savevm.c:732 #11 0x00000000010ced6e in
+>>>> qemu_loadvm_section_start_full (f=0x28353600, mis=0x17169a8
+>>>> <mis_current>) at /root/qemu/migration/savevm.c:1890 #12
+>>>> 0x00000000010cf00c in qemu_loadvm_state_main (f=0x28353600,
+>>>> mis=0x17169a8 <mis_current>) at /root/qemu/migration/savevm.c:1947 
+>>>> #13 0x00000000010ce5bc in loadvm_handle_cmd_packaged (mis=0x17169a8
+>>>> <mis_current>) at /root/qemu/migration/savevm.c:1707 #14
+>>>> 0x00000000010ce87e in loadvm_process_command (f=0x282c7d20) at
+>>>> /root/qemu/migration/savevm.c:1770 #15 0x00000000010cf056 in
+>>>> qemu_loadvm_state_main (f=0x282c7d20, mis=0x17169a8 <mis_current>)
+>>>> at /root/qemu/migration/savevm.c:1960 #16 0x00000000010cf2b6 in
+>>>> qemu_loadvm_state (f=0x282c7d20) at
+>>>> /root/qemu/migration/savevm.c:2020 #17 0x000000000129d234 in
+>>>> process_incoming_migration_co (opaque=0x282c7d20) at
+>>>> /root/qemu/migration/migration.c:404 #18 0x00000000014b6ca2 in
+>>>> coroutine_trampoline (i0=0, i1=674533168) at
+>>>> /root/qemu/util/coroutine-ucontext.c:79 #19 0x000003ff8de530ea in
+>>>> __makecontext_ret () from target:/lib64/libc.so.6
+>>>>
+>>>> Thread 8 (Thread 0x3ff40b38910 (LWP 21165)): #0  0x000003ff8df04336
+>>>> in syscall () from target:/lib64/libc.so.6 #1  0x00000000014933ce
+>>>> in qemu_futex_wait (f=0x17169b0 <mis_current+8>, val=4294967295) at
+>>>> /root/qemu/include/qemu/futex.h:26 #2  0x00000000014935d0 in
+>>>> qemu_event_wait (ev=0x17169b0 <mis_current+8>) at
+>>>> /root/qemu/util/qemu-thread-posix.c:399 #3  0x00000000010ce094 in
+>>>> postcopy_ram_listen_thread (opaque=0x282c7d20) at
+>>>> /root/qemu/migration/savevm.c:1532 #4  0x000003ff8e007bc4 in
+>>>> start_thread () from target:/lib64/libpthread.so.0 #5
+>>>> 0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+>>>>
+>>>> Thread 7 (Thread 0x3ff41338910 (LWP 21164)): #0  0x000003ff8defd72c
+>>>> in ?? () from target:/lib64/libc.so.6 #1  0x00000000012af920 in
+>>>> postcopy_ram_fault_thread (opaque=0x17169a8 <mis_current>) at
+>>>> /root/qemu/migration/postcopy-ram.c:437 #2  0x000003ff8e007bc4 in
+>>>> start_thread () from target:/lib64/libpthread.so.0 #3
+>>>> 0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+>>>>
+>>>> Thread 6 (Thread 0x3ff41b38910 (LWP 21163)): #0  0x000003ff8e00d450
+>>>> in pthread_cond_wait@@GLIBC_2.3.2 () from
+>>>> target:/lib64/libpthread.so.0 #1  0x0000000001492d66 in
+>>>> qemu_cond_wait (cond=0x28302408, mutex=0x283023e0) at
+>>>> /root/qemu/util/qemu-thread-posix.c:133 #2  0x00000000010c6080 in
+>>>> do_data_decompress (opaque=0x283023d8) at
+>>>> /root/qemu/migration/ram.c:2277 #3  0x000003ff8e007bc4 in
+>>>> start_thread () from target:/lib64/libpthread.so.0 #4
+>>>> 0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+>>>>
+>>>> Thread 5 (Thread 0x3ff42338910 (LWP 21162)): #0  0x000003ff8e00d450
+>>>> in pthread_cond_wait@@GLIBC_2.3.2 () from
+>>>> target:/lib64/libpthread.so.0 #1  0x0000000001492d66 in
+>>>> qemu_cond_wait (cond=0x28302390, mutex=0x28302368) at
+>>>> /root/qemu/util/qemu-thread-posix.c:133 #2  0x00000000010c6080 in
+>>>> do_data_decompress (opaque=0x28302360) at
+>>>> /root/qemu/migration/ram.c:2277 #3  0x000003ff8e007bc4 in
+>>>> start_thread () from target:/lib64/libpthread.so.0 #4
+>>>> 0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+>>>>
+>>>> Thread 4 (Thread 0x3ff89287910 (LWP 21148)): #0  0x000003ff8e010abc
+>>>> in __lll_lock_wait () from target:/lib64/libpthread.so.0 #1
+>>>> 0x000003ff8e00bcb6 in __pthread_mutex_cond_lock () from
+>>>> target:/lib64/libpthread.so.0 #2  0x000003ff8e00d4ee in
+>>>> pthread_cond_wait@@GLIBC_2.3.2 () from
+>>>> target:/lib64/libpthread.so.0 #3  0x0000000001492d66 in
+>>>> qemu_cond_wait (cond=0x2831eb00, mutex=0x1711688
+>>>> <qemu_global_mutex>) at /root/qemu/util/qemu-thread-posix.c:133 #4
+>>>> 0x000000000107720e in qemu_kvm_wait_io_event (cpu=0x282e09b0) at
+>>>> /root/qemu/cpus.c:1085 #5  0x00000000010773aa in
+>>>> qemu_kvm_cpu_thread_fn (arg=0x282e09b0) at /root/qemu/cpus.c:1123 
+>>>> #6  0x000003ff8e007bc4 in start_thread () from
+>>>> target:/lib64/libpthread.so.0 #7  0x000003ff8df0a9f2 in
+>>>> thread_start () from target:/lib64/libc.so.6
+>>>>
+>>>> Thread 3 (Thread 0x3ff8a7ff910 (LWP 21145)): #0  0x000003ff8defd832
+>>>> in ppoll () from target:/lib64/libc.so.6 #1  0x000000000148b092 in
+>>>> qemu_poll_ns (fds=0x3ff840008c0, nfds=1, timeout=-1) at
+>>>> /root/qemu/util/qemu-timer.c:322 #2  0x000000000148f46a in aio_poll
+>>>> (ctx=0x2827e7b0, blocking=true) at /root/qemu/util/aio-posix.c:622 
+>>>> #3  0x00000000011a78f6 in iothread_run (opaque=0x2827d740) at
+>>>> /root/qemu/iothread.c:59 #4  0x000003ff8e007bc4 in start_thread ()
+>>>> from target:/lib64/libpthread.so.0 #5  0x000003ff8df0a9f2 in
+>>>> thread_start () from target:/lib64/libc.so.6
+>>>>
+>>>> Thread 2 (Thread 0x3ff8afff910 (LWP 21142)): #0  0x000003ff8df04336
+>>>> in syscall () from target:/lib64/libc.so.6 #1  0x00000000014933ce
+>>>> in qemu_futex_wait (f=0x1b2b9b4 <rcu_call_ready_event>,
+>>>> val=4294967295) at /root/qemu/include/qemu/futex.h:26 #2
+>>>> 0x00000000014935d0 in qemu_event_wait (ev=0x1b2b9b4
+>>>> <rcu_call_ready_event>) at /root/qemu/util/qemu-thread-posix.c:399 
+>>>> #3  0x00000000014b3e40 in call_rcu_thread (opaque=0x0) at
+>>>> /root/qemu/util/rcu.c:249 #4  0x000003ff8e007bc4 in start_thread ()
+>>>> from target:/lib64/libpthread.so.0 #5  0x000003ff8df0a9f2 in
+>>>> thread_start () from target:/lib64/libc.so.6
+>>>>
+>>>>
+>>>> Looks like that this <qemu:arg value='-drive'/> <qemu:arg
+>>>> value='driver=null-aio,id=null1,if=none,size=100G'/> <qemu:arg
+>>>> value='-device'/> <qemu:arg
+>>>> value='virtio-blk-ccw,scsi=off,drive=null1,serial=null1,num-queues=4'/>
+>>>>
+>>>>
+>>>> is necessary to trigger the hang, with nun-qeues=1 everything seems to work fine, so it might
+>>>> be a virtio issue after all?
+>>>>
