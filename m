@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d2jm3-000354-CP
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:35:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d2jnn-00049X-MQ
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d2jlz-00047d-B6
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:35:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44988)
+	(envelope-from <ehabkost@redhat.com>) id 1d2jnj-0005VC-Oj
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:37:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d2jlz-00046g-1S
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:35:47 -0400
-Date: Mon, 24 Apr 2017 16:35:43 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d2jnj-0005UR-Fn
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:37:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6A8814E338
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 19:37:34 +0000 (UTC)
+Date: Mon, 24 Apr 2017 16:37:31 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170424193543.GD3482@thinpad.lan.raisama.net>
-References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
-	<d5282601-a396-4493-3de5-395e25a69bb1@redhat.com>
+Message-ID: <20170424193731.GE3482@thinpad.lan.raisama.net>
+References: <20170424185817.41002-1-imammedo@redhat.com>
+	<20170424191317.GA3482@thinpad.lan.raisama.net>
+	<20170424213233.2d19bdab@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d5282601-a396-4493-3de5-395e25a69bb1@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/7] Move accel, KVM, Xen,
- qtest files to accel/ subdir
+In-Reply-To: <20170424213233.2d19bdab@Igors-MacBook-Pro.local>
+Subject: Re: [Qemu-devel] [PATCH] pc/fwcfg: unbreak migration from qemu-2.5
+ and qemu-2.6 during firmware boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +35,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, kvm@vger.kernel.org, xen-devel@lists.xensource.com, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, dgilbert@redhat.com, lersek@redhat.com
 
-On Mon, Apr 24, 2017 at 12:40:07PM +0200, Thomas Huth wrote:
-> On 20.12.2016 18:43, Eduardo Habkost wrote:
-> > This moves the KVM and Xen files to the an accel/ subdir.
-> > 
-> > Instead of moving the *-stubs.c file to accel/ as-is, I tried to
-> > move most of the stub code to libqemustub.a. This way the obj-y
-> > logic for accel/ is simpler: obj-y includes accel/ only if
-> > CONFIG_SOFTMMU is set.
-> > 
-> > The Xen stubs could be moved completely to stubs/, but some of
-> > the KVM stubs depend on cpu.h. So most of the kvm-stub.c code was
-> > moved to stubs/kvm.c, but some of that code was kept in
-> > accel/kvm-stub.c.
-> > 
-> > About TCG:
-> > ----------
-> > 
-> > It is not obvious to me which TCG-related files could be moved to
-> > accel/, so this series don't move any of them yet.
-> > 
-> > About other CONFIG_SOFTMMU top-level files:
-> > -------------------------------------------
-> > 
-> > I would like to know what we should do with the top-level
-> > CONFIG_SOFTMMU-only files that don't belong to hw/. Some
-> > candidates: arch_init.c cpus.c monitor.c gdbstub.c balloon.c
-> > ioport.c bootdevice.c memory.c cputlb.c memory_mapping.c dump.c.
-> > 
-> > Maybe a sysemu/ subdir? In that case, should we still create an
-> > accel/ subdir, or move xen-*, kvm-* and friends to sysemu/ too?
-> > 
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: kvm@vger.kernel.org
-> > Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: xen-devel@lists.xensource.com
-> > 
-> > Eduardo Habkost (7):
-> >   xen: Move xen-*-stub.c to stubs/
-> >   xen: Move xen files to accel/
-> >   kvm: Move some kvm-stub.c code to stubs/kvm.c
-> >   kvm: Include kvm-stub.o only on CONFIG_SOFTMMU
-> >   kvm: Move kvm*.c files to accel/
-> >   accel: Move accel.c to accel/
-> >   accel: Move qtest.c to accel/
-> > 
-> >  Makefile.objs                          |  2 +-
-> >  Makefile.target                        | 10 ++----
-> >  accel.c => accel/accel.c               |  0
-> >  kvm-all.c => accel/kvm-common.c        |  0
-> >  kvm-stub.c => accel/kvm-stub.c         | 51 --------------------------
-> >  qtest.c => accel/qtest.c               |  0
-> >  xen-common.c => accel/xen-common.c     |  0
-> >  xen-hvm.c => accel/xen-hvm.c           |  0
-> >  xen-mapcache.c => accel/xen-mapcache.c |  0
-> >  stubs/kvm.c                            | 65 ++++++++++++++++++++++++++++++++++
-> >  xen-hvm-stub.c => stubs/xen-hvm.c      |  0
-> >  xen-common-stub.c => stubs/xen.c       |  0
-> >  MAINTAINERS                            |  4 +--
-> >  accel/Makefile.objs                    |  9 +++++
-> >  stubs/Makefile.objs                    |  2 ++
-> >  15 files changed, 80 insertions(+), 63 deletions(-)
-> >  rename accel.c => accel/accel.c (100%)
-> >  rename kvm-all.c => accel/kvm-common.c (100%)
-> >  rename kvm-stub.c => accel/kvm-stub.c (71%)
-> >  rename qtest.c => accel/qtest.c (100%)
-> >  rename xen-common.c => accel/xen-common.c (100%)
-> >  rename xen-hvm.c => accel/xen-hvm.c (100%)
-> >  rename xen-mapcache.c => accel/xen-mapcache.c (100%)
-> >  rename xen-hvm-stub.c => stubs/xen-hvm.c (100%)
-> >  rename xen-common-stub.c => stubs/xen.c (100%)
-> >  create mode 100644 accel/Makefile.objs
+On Mon, Apr 24, 2017 at 09:32:33PM +0200, Igor Mammedov wrote:
+> On Mon, 24 Apr 2017 16:13:17 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> Now that the development tree is open again ... any chance that we could
-> get this series into 2.10 ?
+> > On Mon, Apr 24, 2017 at 08:58:17PM +0200, Igor Mammedov wrote:
+> > [...]
+> > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > > index f3b372a18f..3f2d96da64 100644
+> > > --- a/hw/i386/pc.c
+> > > +++ b/hw/i386/pc.c
+> > > @@ -1047,7 +1047,7 @@ static void load_linux(PCMachineState *pcms,
+> > >      fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
+> > >      fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
+> > >  
+> > > -    if (fw_cfg_dma_enabled(fw_cfg)) {
+> > > +    if (!pcmc->linuxboot_dma_disabled && fw_cfg_dma_enabled(fw_cfg)) {
+> > 
+> > Why not name the flag just "linuxboot_dma", set it to true by
+> > default at pc_machine_class_init(), and avoid the double
+> > negative?
+> to avoid setting it to true somewhere else, so less thing could go wrong
+> but is you prefer *_enable variant I can switch to it.
 
-I remember there were some suggestions about the code movements,
-especially about the files being moved inside stubs/. I never
-took the time to make a v2 implementing those suggestions, so if
-anybody wants to volunteer to address the feedback on this RFC
-and redo the series, please be my guest.  :)
+I would prefer to. We already have other compat flags initialized
+inside pc_machine_class_init(), so this would fit nicely there.
+
+> 
+> > 
+> > [...]
+> > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > index f278b3ae89..ff6f13b61b 100644
+> > > --- a/include/hw/i386/pc.h
+> > > +++ b/include/hw/i386/pc.h
+> > > @@ -151,6 +151,8 @@ struct PCMachineClass {
+> > >      bool save_tsc_khz;
+> > >      /* generate legacy CPU hotplug AML */
+> > >      bool legacy_cpu_hotplug;
+> > > +
+> > 
+> > A one-line description of the consequences of setting/clearing
+> > the flag would be nice.
+> will fix in v2
+
+Thanks!
+
+> 
+> > 
+> > > +    bool linuxboot_dma_disabled;
+> > >  };
+> > >  
+> > >  #define TYPE_PC_MACHINE "generic-pc-machine"
+> > > @@ -432,10 +434,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+> > >  #define PC_COMPAT_2_6 \
+> > >      HW_COMPAT_2_6 \
+> > >      {\
+> > > -        .driver   = "fw_cfg_io",\
+> > > -        .property = "dma_enabled",\
+> > > -        .value    = "off",\
+> > > -    },{\
+> > >          .driver   = TYPE_X86_CPU,\
+> > >          .property = "cpuid-0xb",\
+> > >          .value    = "off",\
+> > > -- 
+> > > 2.11.0 (Apple Git-81)
+> > > 
+> > 
+> 
 
 -- 
 Eduardo
