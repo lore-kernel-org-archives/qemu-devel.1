@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2dZ9-00015S-Nk
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:58:11 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1d2ddc-0002fy-U1
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2dZ5-0003Fm-5j
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:58:07 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3520
-	helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2dZ4-0003ES-AA
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:58:03 -0400
-From: Zhuangyanying <ann.zhuangyanying@huawei.com>
-Date: Mon, 24 Apr 2017 12:57:30 +0000
-Message-ID: <EC9759BC1E3E98429B5DE9A03DF86D8B59D10917@DGGEML503-MBX.china.huawei.com>
-References: <EC9759BC1E3E98429B5DE9A03DF86D8B59D1084B@DGGEML503-MBX.china.huawei.com>
-	<20170424092320.GC2362@work-vm> <20170424095235.GH20809@redhat.com>
-	<20170424102716.GE2362@work-vm> <20170424103428.GI20809@redhat.com>
-In-Reply-To: <20170424103428.GI20809@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <borntraeger@de.ibm.com>) id 1d2ddW-0004qk-6h
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:02:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58376
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1d2ddW-0004qa-0J
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:02:38 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3OD1S7E035256
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 09:02:37 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a0ajd6a1u-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 09:02:36 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 24 Apr 2017 09:02:36 -0400
+References: <70ef6f1f-27f4-133f-ab33-03a30f19867b@de.ibm.com>
+	<20170424105344.GF2362@work-vm>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 24 Apr 2017 15:02:31 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [BUG] Migrate failes between boards with different
- PMC counts
+In-Reply-To: <20170424105344.GF2362@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
+Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +42,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGFuaWVsIFAuIEJlcnJh
-bmdlIFttYWlsdG86YmVycmFuZ2VAcmVkaGF0LmNvbV0NCj4gU2VudDogTW9uZGF5LCBBcHJpbCAy
-NCwgMjAxNyA2OjM0IFBNDQo+IFRvOiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0DQo+IENjOiBaaHVh
-bmd5YW55aW5nOyBaaGFuZ2hhaWxpYW5nOyB3YW5neGluIChVKTsgcWVtdS1kZXZlbEBub25nbnUu
-b3JnOw0KPiBHb25nbGVpIChBcmVpKTsgSHVhbmd6aGljaGFvOyBwYm9uemluaUByZWRoYXQuY29t
-DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW0JVR10gTWlncmF0ZSBmYWlsZXMgYmV0d2Vl
-biBib2FyZHMgd2l0aCBkaWZmZXJlbnQNCj4gUE1DIGNvdW50cw0KPiANCj4gT24gTW9uLCBBcHIg
-MjQsIDIwMTcgYXQgMTE6Mjc6MTZBTSArMDEwMCwgRHIuIERhdmlkIEFsYW4gR2lsYmVydCB3cm90
-ZToNCj4gPiAqIERhbmllbCBQLiBCZXJyYW5nZSAoYmVycmFuZ2VAcmVkaGF0LmNvbSkgd3JvdGU6
-DQo+ID4gPiBPbiBNb24sIEFwciAyNCwgMjAxNyBhdCAxMDoyMzoyMUFNICswMTAwLCBEci4gRGF2
-aWQgQWxhbiBHaWxiZXJ0IHdyb3RlOg0KPiA+ID4gPiAqIFpodWFuZ3lhbnlpbmcgKGFubi56aHVh
-bmd5YW55aW5nQGh1YXdlaS5jb20pIHdyb3RlOg0KPiA+ID4gPiA+IEhpIGFsbCwNCj4gPiA+ID4g
-Pg0KPiA+ID4gPiA+IFJlY2VudGx5LCBJIGZvdW5kIG1pZ3JhdGlvbiBmYWlsZWQgd2hlbiBlbmFi
-bGUgdlBNVS4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IG1pZ3JhdGUgdlBNVSBzdGF0ZSB3YXMgaW50
-cm9kdWNlZCBpbiBsaW51eC0zLjEwICsgcWVtdS0xLjcuDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBB
-cyBsb25nIGFzIGVuYWJsZSB2UE1VLCBxZW11IHdpbGwgc2F2ZSAvIGxvYWQgdGhlDQo+ID4gPiA+
-ID4gdm1zdGF0ZV9tc3JfYXJjaGl0ZWN0dXJhbF9wbXUobXNyX2dsb2JhbF9jdHJsKSByZWdpc3Rl
-ciBkdXJpbmcgdGhlDQo+IG1pZ3JhdGlvbi4NCj4gPiA+ID4gPiBCdXQgZ2xvYmFsX2N0cmwgZ2Vu
-ZXJhdGVkIGJhc2VkIG9uIGNwdWlkKDB4QSksIHRoZSBudW1iZXIgb2YNCj4gPiA+ID4gPiBnZW5l
-cmFsLXB1cnBvc2UgcGVyZm9ybWFuY2UgbW9uaXRvcmluZyBjb3VudGVycyhQTUMpIGNhbiB2YXJ5
-DQo+ID4gPiA+ID4gYWNjb3JkaW5nIHRvIEludGVsIFNETi4gVGhlIG51bWJlciBvZiBQTUMgcHJl
-c2VudGVkIHRvIHZtLCBkb2VzDQo+ID4gPiA+ID4gbm90IHN1cHBvcnQgY29uZmlndXJhdGlvbiBj
-dXJyZW50bHksIGl0IGRlcGVuZCBvbiBob3N0IGNwdWlkLCBhbmQgZW5hYmxlDQo+IGFsbCBwbWMg
-ZGVmYXVsdGx5IGF0IEtWTS4gSXQgY2F1c2UgbWlncmF0aW9uIHRvIGZhaWwgYmV0d2VlbiBib2Fy
-ZHMgd2l0aA0KPiBkaWZmZXJlbnQgUE1DIGNvdW50cy4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IFRo
-ZSByZXR1cm4gdmFsdWUgb2YgY3B1aWQgKDB4QSkgaXMgZGlmZmVyZW50IGR1ciB0byBjcHUsIGFj
-Y29yZGluZyB0byBJbnRlbA0KPiBTRE7vvIwxOC0xMCBWb2wuIDNCOg0KPiA+ID4gPiA+DQo+ID4g
-PiA+ID4gTm90ZTogVGhlIG51bWJlciBvZiBnZW5lcmFsLXB1cnBvc2UgcGVyZm9ybWFuY2UgbW9u
-aXRvcmluZw0KPiA+ID4gPiA+IGNvdW50ZXJzIChpLmUuIE4gaW4gRmlndXJlIDE4LTkpIGNhbiB2
-YXJ5IGFjcm9zcyBwcm9jZXNzb3INCj4gPiA+ID4gPiBnZW5lcmF0aW9ucyB3aXRoaW4gYSBwcm9j
-ZXNzb3IgZmFtaWx5LCBhY3Jvc3MgcHJvY2Vzc29yDQo+ID4gPiA+ID4gZmFtaWxpZXMsIG9yIGNv
-dWxkIGJlIGRpZmZlcmVudCBkZXBlbmRpbmcgb24gdGhlIGNvbmZpZ3VyYXRpb24NCj4gPiA+ID4g
-PiBjaG9zZW4gYXQgYm9vdCB0aW1lIGluIHRoZSBCSU9TIHJlZ2FyZGluZyBJbnRlbCBIeXBlciBU
-aHJlYWRpbmcNCj4gPiA+ID4gPiBUZWNobm9sb2d5LCAoZS5nLiBOPTIgZm9yIDQ1IG5tIEludGVs
-IEF0b20gcHJvY2Vzc29yczsgTiA9NCBmb3INCj4gcHJvY2Vzc29ycyBiYXNlZCBvbiB0aGUgTmVo
-YWxlbSBtaWNyb2FyY2hpdGVjdHVyZTsgZm9yIHByb2Nlc3NvcnMgYmFzZWQgb24NCj4gdGhlIFNh
-bmR5IEJyaWRnZSBtaWNyb2FyY2hpdGVjdHVyZSwgTiA9IDQgaWYgSW50ZWwgSHlwZXIgVGhyZWFk
-aW5nIFRlY2hub2xvZ3kNCj4gaXMgYWN0aXZlIGFuZCBOPTggaWYgbm90IGFjdGl2ZSkuDQo+ID4g
-PiA+ID4NCj4gPiA+ID4gPiBBbHNvIEkgZm91bmQsIE49OCBpZiBIVCBpcyBub3QgYWN0aXZlIGJh
-c2VkIG9uIHRoZSBicm9hZHdlbGzvvIwsDQo+ID4gPiA+ID4gc3VjaCBhcyBDUFUgRTctODg5MCB2
-NCBAIDIuMjBHSHoNCj4gPiA+ID4gPg0KPiA+ID4gPiA+ICMgLi94ODZfNjQtc29mdG1tdS9xZW11
-LXN5c3RlbS14ODZfNjQgLS1lbmFibGUta3ZtIC1zbXAgNCAtbQ0KPiA+ID4gPiA+IDQwOTYgLWhk
-YQ0KPiA+ID4gPiA+IC9kYXRhL3p5eS90ZXN0X3FlbXUuaW1nLnNsZXMxMnNwMSAtdm5jIDo5OSAt
-Y3B1IGt2bTY0LHBtdT10cnVlDQo+ID4gPiA+ID4gLWluY29taW5nIHRjcDo6ODg4OCBDb21wbGV0
-ZWQgMTAwICUNCj4gPiA+ID4gPiBxZW11LXN5c3RlbS14ODZfNjQ6IGVycm9yOiBmYWlsZWQgdG8g
-c2V0IE1TUiAweDM4ZiB0bw0KPiA+ID4gPiA+IDB4NzAwMDAwMGZmDQo+ID4gPiA+ID4gcWVtdS1z
-eXN0ZW0teDg2XzY0OiAvZGF0YS96eXkvZ2l0L3Rlc3QvcWVtdS90YXJnZXQvaTM4Ni9rdm0uYzox
-ODMzOg0KPiBrdm1fcHV0X21zcnM6DQo+ID4gPiA+ID4gQXNzZXJ0aW9uIGByZXQgPT0gY3B1LT5r
-dm1fbXNyX2J1Zi0+bm1zcnMnIGZhaWxlZC4NCj4gPiA+ID4gPiBBYm9ydGVkDQo+ID4gPiA+ID4N
-Cj4gPiA+ID4gPiBTbyBtYWtlIG51bWJlciBvZiBwbWMgY29uZmlndXJhYmxlIHRvIHZtID8gQW55
-IGJldHRlciBpZGVhID8NCj4gPiA+ID4NCj4gPiA+ID4gQ29pbmNpZGVudGFsbHkgd2UgaGl0IGEg
-c2ltaWxhciBwcm9ibGVtIGEgZmV3IGRheXMgYWdvIHdpdGggLWNwdQ0KPiA+ID4gPiBob3N0ICAt
-IGl0IHRvb2sgbWUgcXVpdGUgYSB3aGlsZSB0byBzcG90IHRoZSBkaWZmZXJlbmNlIGJldHdlZW4N
-Cj4gPiA+ID4gdGhlIG1hY2hpbmVzIHdhcyB0aGUgc291cmNlIGhhZCBoeXBlcnRocmVhZGluZyBk
-aXNhYmxlZC4NCj4gPiA+ID4NCj4gPiA+ID4gQW4gb3B0aW9uIHRvIHNldCB0aGUgbnVtYmVyIG9m
-IGNvdW50ZXJzIG1ha2VzIHNlbnNlIHRvIG1lOyBidXQgSQ0KPiA+ID4gPiB3b25kZXIgaG93IG1h
-bnkgb3RoZXIgb3B0aW9ucyB3ZSBuZWVkIGFzIHdlbGwuICBBbHNvLCBJJ20gbm90IHN1cmUNCj4g
-PiA+ID4gdGhlcmUncyBhbnkgZWFzeSB3YXkgZm9yIGxpYnZpcnQgZXRjIHRvIGZpZ3VyZSBvdXQg
-aG93IG1hbnkNCj4gPiA+ID4gY291bnRlcnMgYSBob3N0IHN1cHBvcnRzIC0gaXQncyBub3QgaW4g
-L3Byb2MvY3B1aW5mby4NCj4gPiA+DQo+ID4gPiBXZSBhY3R1YWxseSB0cnkgdG8gYXZvaWQgL3By
-b2MvY3B1aW5mbyB3aGVyZWV2ZXIgcG9zc2libGUuIFdlIGRvDQo+ID4gPiBkaXJlY3QgQ1BVSUQg
-YXNtIGluc3RydWN0aW9ucyB0byBpZGVudGlmeSBmZWF0dXJlcywgYW5kIHByZWZlciB0bw0KPiA+
-ID4gdXNlIC9zeXMvZGV2aWNlcy9zeXN0ZW0vY3B1IGlmIHRoYXQgaGFzIHN1aXRhYmxlIGRhdGEN
-Cj4gPiA+DQo+ID4gPiBXaGVyZSBkbyB0aGUgUE1DIGNvdW50cyBjb21lIGZyb20gb3JpZ2luYWxs
-eSA/IENQVUlEIG9yIHNvbWV0aGluZw0KPiBlbHNlID8NCj4gPg0KPiA+IFllcywgdGhleSdyZSBi
-aXRzIDguLjE1IG9mIENQVUlEIGxlYWYgMHhhDQo+IA0KPiBPaywgdGhhdCdzIGVhc3kgZW5vdWdo
-IGZvciBsaWJ2aXJ0IHRvIGRldGVjdCB0aGVuLiBNb3JlIGEgcXVlc3Rpb24gb2Ygd2hhdCBsaWJ2
-aXJ0DQo+IHNob3VsZCB0aGVuIGRvIHRoaXMgd2l0aCB0aGUgaW5mby4uLi4NCj4gDQoNCkRvIHlv
-dSBtZWFuIHRvIGRvIGEgdmFsaWRhdGlvbiBhdCB0aGUgYmVnaW5pbmcgb2YgbWlncmF0aW9uPyBp
-biBxZW11TWlncmF0aW9uQmFrZUNvb2tpZSgpICYgcWVtdU1pZ3JhdGlvbkVhdENvb2tpZSgpLCBp
-ZiB0aGUgUE1DIG51bWJlcnMgYXJlIG5vdCBlcXVhbCwganVzdCBxdWl0IG1pZ3JhdGlvbj8NCkl0
-IG1heWJlIGEgZ29vZCBlbm91Z2ggZmlyc3QgZWRpdGlvbi4NCkJ1dCBmb3IgYSBmdXJ0aGVyIGJl
-dHRlciBlZGl0aW9uLCBtYXliZSBpdCdzIGJldHRlciB0byBzdXBwb3J0IEhldGVyb2dlbmVvdXMg
-bWlncmF0aW9uIEkgdGhpbmssIHNvIHdlIG1pZ2h0IG5lZWQgdG8gbWFrZSBQTUMgbnVtYmVyIGNv
-bmZpZ3JhYmxlLCB0aGVuIHdlIG5lZWQgdG8gbW9kaWZ5IEtWTS9xZW11IGFzIHdlbGwuDQoNClJl
-Z2FyZHMsDQotWmh1YW5nIFlhbnlpbmcNCg==
+On 04/24/2017 12:53 PM, Dr. David Alan Gilbert wrote:
+> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+>> David, Juan,
+>> 
+>> I can trigger a hang of postcopy migration (when I do it early) so
+>> that both sides are in paused state. Looks like one thread is still
+>> loading vmstates for virtio and this load accesses guest memory and
+>> triggers a userfault.
+> 
+> It's perfectly legal for the destination to cause a userfault as it
+> loads the virtio queue - the virtio queue should be being loaded by
+> the main thread from the buffer while the 'listening' thread is
+> waiting for the incoming page data.
+> 
+> Can you turn on the following tracing please: destination: 
+> postcopy_ram_fault_thread_request postcopy_place_page 
+> postcopy_place_page_zero
+> 
+> source: migrate_handle_rp_req_pages ram_save_queue_pages
+> 
+> You should see: virtio does the access userfault generates a fault 
+> postcopy_ram_fault_thread_request sends the request to the source
+> 
+> the source sees migrate_handle_rp_req_pages queues it with
+> ram_save_queue_pages
+> 
+> the destination sees the page arrive and postcopy_place_page or
+> postcopy_place_page_zero
+> 
+> some of that might disappear if the page was already on it's way.
+
+
+the last event on the source are
+[..]
+58412@1493037953.747988:postcopy_place_page host=0x3ff92246000
+58412@1493037953.747992:postcopy_place_page host=0x3ff92247000
+58412@1493037956.804210:migrate_handle_rp_req_pages in s390.ram at 41d9000 len 1000
+58412@1493037956.804216:ram_save_queue_pages s390.ram: start: 41d9000 len: 100
+
+
+On the target a see lots of
+
+39741@1493037958.833710:postcopy_place_page_zero host=0x3ff9befa000
+39741@1493037958.833716:postcopy_place_page host=0x3ff9befb000
+39741@1493037958.833759:postcopy_place_page host=0x3ff9befc000
+39741@1493037958.833818:postcopy_place_page host=0x3ff9befd000
+39741@1493037958.833819:postcopy_place_page_zero host=0x3ff9befe000
+39741@1493037958.833822:postcopy_place_page host=0x3ff9beff000
+
+So we have about 2 seconds of traffic going on after that request,
+I assume its precopy related.
+
+Looking back on the target history there was
+39741@1493037956.804337:postcopy_ram_fault_thread_request Request for HVA=3ff618d9000 rb=s390.ram offset=41d9000
+
+In fact it seems to be the first and only request:
+
+# cat /tmp/test0.trace | grep -v postcopy_place_page
+
+39741@1493037956.804337:postcopy_ram_fault_thread_request Request for HVA=3ff618d9000 rb=s390.ram offset=41d9000
+
+> 
+> Dave
+> 
+>> Thread 1 (Thread 0x3ffa2f45f00 (LWP 21122)): #0  0x0000000001017130
+>> in lduw_he_p (ptr=0x3ff498d9002) at
+>> /root/qemu/include/qemu/bswap.h:317 <---- according to the host
+>> kernel this threads hangs in handle_userfault. #1
+>> 0x0000000001017342 in lduw_le_p (ptr=0x3ff498d9002) at
+>> /root/qemu/include/qemu/bswap.h:359 #2  0x0000000001025840 in
+>> address_space_lduw_internal_cached (cache=0x283491d0, addr=2,
+>> attrs=..., result=0x0, endian=DEVICE_LITTLE_ENDIAN) at
+>> /root/qemu/memory_ldst.inc.c:284 #3  0x00000000010259a6 in
+>> address_space_lduw_le_cached (cache=0x283491d0, addr=2, attrs=...,
+>> result=0x0) at /root/qemu/memory_ldst.inc.c:315 #4
+>> 0x0000000001025ad6 in lduw_le_phys_cached (cache=0x283491d0,
+>> addr=2) at /root/qemu/memory_ldst.inc.c:334 #5  0x0000000001116c10
+>> in virtio_lduw_phys_cached (vdev=0x28275090, cache=0x283491d0,
+>> pa=2) at /root/qemu/include/hw/virtio/virtio-access.h:166 #6
+>> 0x0000000001117940 in vring_used_idx (vq=0x3ffa2e1c090) at
+>> /root/qemu/hw/virtio/virtio.c:263 #7  0x000000000111daea in
+>> virtio_load (vdev=0x28275090, f=0x28353600, version_id=2) at
+>> /root/qemu/hw/virtio/virtio.c:2168 #8  0x000000000111d0cc in
+>> virtio_device_get (f=0x28353600, opaque=0x28275090, size=0,
+>> field=0x16adf38 <__compound_literal.0>) at
+>> /root/qemu/hw/virtio/virtio.c:1975 #9  0x00000000012a7f50 in
+>> vmstate_load_state (f=0x28353600, vmsd=0x14db480
+>> <vmstate_virtio_blk>, opaque=0x28275090, version_id=2) at
+>> /root/qemu/migration/vmstate.c:128 #10 0x00000000010cbc08 in
+>> vmstate_load (f=0x28353600, se=0x28279e60, version_id=2) at
+>> /root/qemu/migration/savevm.c:732 #11 0x00000000010ced6e in
+>> qemu_loadvm_section_start_full (f=0x28353600, mis=0x17169a8
+>> <mis_current>) at /root/qemu/migration/savevm.c:1890 #12
+>> 0x00000000010cf00c in qemu_loadvm_state_main (f=0x28353600,
+>> mis=0x17169a8 <mis_current>) at /root/qemu/migration/savevm.c:1947 
+>> #13 0x00000000010ce5bc in loadvm_handle_cmd_packaged (mis=0x17169a8
+>> <mis_current>) at /root/qemu/migration/savevm.c:1707 #14
+>> 0x00000000010ce87e in loadvm_process_command (f=0x282c7d20) at
+>> /root/qemu/migration/savevm.c:1770 #15 0x00000000010cf056 in
+>> qemu_loadvm_state_main (f=0x282c7d20, mis=0x17169a8 <mis_current>)
+>> at /root/qemu/migration/savevm.c:1960 #16 0x00000000010cf2b6 in
+>> qemu_loadvm_state (f=0x282c7d20) at
+>> /root/qemu/migration/savevm.c:2020 #17 0x000000000129d234 in
+>> process_incoming_migration_co (opaque=0x282c7d20) at
+>> /root/qemu/migration/migration.c:404 #18 0x00000000014b6ca2 in
+>> coroutine_trampoline (i0=0, i1=674533168) at
+>> /root/qemu/util/coroutine-ucontext.c:79 #19 0x000003ff8de530ea in
+>> __makecontext_ret () from target:/lib64/libc.so.6
+>> 
+>> Thread 8 (Thread 0x3ff40b38910 (LWP 21165)): #0  0x000003ff8df04336
+>> in syscall () from target:/lib64/libc.so.6 #1  0x00000000014933ce
+>> in qemu_futex_wait (f=0x17169b0 <mis_current+8>, val=4294967295) at
+>> /root/qemu/include/qemu/futex.h:26 #2  0x00000000014935d0 in
+>> qemu_event_wait (ev=0x17169b0 <mis_current+8>) at
+>> /root/qemu/util/qemu-thread-posix.c:399 #3  0x00000000010ce094 in
+>> postcopy_ram_listen_thread (opaque=0x282c7d20) at
+>> /root/qemu/migration/savevm.c:1532 #4  0x000003ff8e007bc4 in
+>> start_thread () from target:/lib64/libpthread.so.0 #5
+>> 0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+>> 
+>> Thread 7 (Thread 0x3ff41338910 (LWP 21164)): #0  0x000003ff8defd72c
+>> in ?? () from target:/lib64/libc.so.6 #1  0x00000000012af920 in
+>> postcopy_ram_fault_thread (opaque=0x17169a8 <mis_current>) at
+>> /root/qemu/migration/postcopy-ram.c:437 #2  0x000003ff8e007bc4 in
+>> start_thread () from target:/lib64/libpthread.so.0 #3
+>> 0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+>> 
+>> Thread 6 (Thread 0x3ff41b38910 (LWP 21163)): #0  0x000003ff8e00d450
+>> in pthread_cond_wait@@GLIBC_2.3.2 () from
+>> target:/lib64/libpthread.so.0 #1  0x0000000001492d66 in
+>> qemu_cond_wait (cond=0x28302408, mutex=0x283023e0) at
+>> /root/qemu/util/qemu-thread-posix.c:133 #2  0x00000000010c6080 in
+>> do_data_decompress (opaque=0x283023d8) at
+>> /root/qemu/migration/ram.c:2277 #3  0x000003ff8e007bc4 in
+>> start_thread () from target:/lib64/libpthread.so.0 #4
+>> 0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+>> 
+>> Thread 5 (Thread 0x3ff42338910 (LWP 21162)): #0  0x000003ff8e00d450
+>> in pthread_cond_wait@@GLIBC_2.3.2 () from
+>> target:/lib64/libpthread.so.0 #1  0x0000000001492d66 in
+>> qemu_cond_wait (cond=0x28302390, mutex=0x28302368) at
+>> /root/qemu/util/qemu-thread-posix.c:133 #2  0x00000000010c6080 in
+>> do_data_decompress (opaque=0x28302360) at
+>> /root/qemu/migration/ram.c:2277 #3  0x000003ff8e007bc4 in
+>> start_thread () from target:/lib64/libpthread.so.0 #4
+>> 0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+>> 
+>> Thread 4 (Thread 0x3ff89287910 (LWP 21148)): #0  0x000003ff8e010abc
+>> in __lll_lock_wait () from target:/lib64/libpthread.so.0 #1
+>> 0x000003ff8e00bcb6 in __pthread_mutex_cond_lock () from
+>> target:/lib64/libpthread.so.0 #2  0x000003ff8e00d4ee in
+>> pthread_cond_wait@@GLIBC_2.3.2 () from
+>> target:/lib64/libpthread.so.0 #3  0x0000000001492d66 in
+>> qemu_cond_wait (cond=0x2831eb00, mutex=0x1711688
+>> <qemu_global_mutex>) at /root/qemu/util/qemu-thread-posix.c:133 #4
+>> 0x000000000107720e in qemu_kvm_wait_io_event (cpu=0x282e09b0) at
+>> /root/qemu/cpus.c:1085 #5  0x00000000010773aa in
+>> qemu_kvm_cpu_thread_fn (arg=0x282e09b0) at /root/qemu/cpus.c:1123 
+>> #6  0x000003ff8e007bc4 in start_thread () from
+>> target:/lib64/libpthread.so.0 #7  0x000003ff8df0a9f2 in
+>> thread_start () from target:/lib64/libc.so.6
+>> 
+>> Thread 3 (Thread 0x3ff8a7ff910 (LWP 21145)): #0  0x000003ff8defd832
+>> in ppoll () from target:/lib64/libc.so.6 #1  0x000000000148b092 in
+>> qemu_poll_ns (fds=0x3ff840008c0, nfds=1, timeout=-1) at
+>> /root/qemu/util/qemu-timer.c:322 #2  0x000000000148f46a in aio_poll
+>> (ctx=0x2827e7b0, blocking=true) at /root/qemu/util/aio-posix.c:622 
+>> #3  0x00000000011a78f6 in iothread_run (opaque=0x2827d740) at
+>> /root/qemu/iothread.c:59 #4  0x000003ff8e007bc4 in start_thread ()
+>> from target:/lib64/libpthread.so.0 #5  0x000003ff8df0a9f2 in
+>> thread_start () from target:/lib64/libc.so.6
+>> 
+>> Thread 2 (Thread 0x3ff8afff910 (LWP 21142)): #0  0x000003ff8df04336
+>> in syscall () from target:/lib64/libc.so.6 #1  0x00000000014933ce
+>> in qemu_futex_wait (f=0x1b2b9b4 <rcu_call_ready_event>,
+>> val=4294967295) at /root/qemu/include/qemu/futex.h:26 #2
+>> 0x00000000014935d0 in qemu_event_wait (ev=0x1b2b9b4
+>> <rcu_call_ready_event>) at /root/qemu/util/qemu-thread-posix.c:399 
+>> #3  0x00000000014b3e40 in call_rcu_thread (opaque=0x0) at
+>> /root/qemu/util/rcu.c:249 #4  0x000003ff8e007bc4 in start_thread ()
+>> from target:/lib64/libpthread.so.0 #5  0x000003ff8df0a9f2 in
+>> thread_start () from target:/lib64/libc.so.6
+>> 
+>> 
+>> Looks like that this <qemu:arg value='-drive'/> <qemu:arg
+>> value='driver=null-aio,id=null1,if=none,size=100G'/> <qemu:arg
+>> value='-device'/> <qemu:arg
+>> value='virtio-blk-ccw,scsi=off,drive=null1,serial=null1,num-queues=4'/>
+>>
+>>
+>> is necessary to trigger the hang, with nun-qeues=1 everything seems to work fine, so it might
+>> be a virtio issue after all?
+>> 
+>> Any idea?
+>> 
+> -- Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
