@@ -1,28 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2bKJ-0006Rh-6U
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:34:40 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d2bOa-0007FT-BK
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:39:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2bKG-00068M-2E
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:34:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45908)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d2bKF-00066l-Pz
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:34:36 -0400
-Date: Mon, 24 Apr 2017 11:34:28 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170424103428.GI20809@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <EC9759BC1E3E98429B5DE9A03DF86D8B59D1084B@DGGEML503-MBX.china.huawei.com>
-	<20170424092320.GC2362@work-vm> <20170424095235.GH20809@redhat.com>
-	<20170424102716.GE2362@work-vm>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d2bOX-0007iy-5q
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:39:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51507
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d2bOW-0007iR-VA
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:39:01 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3OAYfAt177944
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 06:38:59 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a0mpuqrbj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 06:38:59 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 24 Apr 2017 11:38:57 +0100
+Date: Mon, 24 Apr 2017 12:38:50 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170407111851.20680-2-cornelia.huck@de.ibm.com>
+References: <20170407111851.20680-1-cornelia.huck@de.ibm.com>
+	<20170407111851.20680-2-cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170424102716.GE2362@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [BUG] Migrate failes between boards with different
- PMC counts
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170424123850.7709a1de.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/8] chardev: Basic support for
+ TN3270
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +43,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Zhuangyanying <ann.zhuangyanying@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, pbonzini@redhat.com, marcandre.lureau@redhat.com, Jing Liu <liujbjl@linux.vnet.ibm.com>, Yang Chen <bjcyang@linux.vnet.ibm.com>
 
-On Mon, Apr 24, 2017 at 11:27:16AM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Mon, Apr 24, 2017 at 10:23:21AM +0100, Dr. David Alan Gilbert wrot=
-e:
-> > > * Zhuangyanying (ann.zhuangyanying@huawei.com) wrote:
-> > > > Hi all,
-> > > >=20
-> > > > Recently, I found migration failed when enable vPMU.
-> > > >=20
-> > > > migrate vPMU state was introduced in linux-3.10 + qemu-1.7.
-> > > >=20
-> > > > As long as enable vPMU, qemu will save / load the
-> > > > vmstate_msr_architectural_pmu(msr_global_ctrl) register during th=
-e migration.
-> > > > But global_ctrl generated based on cpuid(0xA), the number of gene=
-ral-purpose performance
-> > > > monitoring counters(PMC) can vary according to Intel SDN. The num=
-ber of PMC presented
-> > > > to vm, does not support configuration currently, it depend on hos=
-t cpuid, and enable all pmc
-> > > > defaultly at KVM. It cause migration to fail between boards with =
-different PMC counts.
-> > > >=20
-> > > > The return value of cpuid (0xA) is different dur to cpu, accordin=
-g to Intel SDN=EF=BC=8C18-10 Vol. 3B:
-> > > >=20
-> > > > Note: The number of general-purpose performance monitoring counte=
-rs (i.e. N in Figure 18-9)
-> > > > can vary across processor generations within a processor family, =
-across processor families, or
-> > > > could be different depending on the configuration chosen at boot =
-time in the BIOS regarding
-> > > > Intel Hyper Threading Technology, (e.g. N=3D2 for 45 nm Intel Ato=
-m processors; N =3D4 for processors
-> > > > based on the Nehalem microarchitecture; for processors based on t=
-he Sandy Bridge
-> > > > microarchitecture, N =3D 4 if Intel Hyper Threading Technology is=
- active and N=3D8 if not active).
-> > > >=20
-> > > > Also I found, N=3D8 if HT is not active based on the broadwell=EF=
-=BC=8C,
-> > > > such as CPU E7-8890 v4 @ 2.20GHz  =20
-> > > >=20
-> > > > # ./x86_64-softmmu/qemu-system-x86_64 --enable-kvm -smp 4 -m 4096=
- -hda
-> > > > /data/zyy/test_qemu.img.sles12sp1 -vnc :99 -cpu kvm64,pmu=3Dtrue =
--incoming tcp::8888
-> > > > Completed 100 %
-> > > > qemu-system-x86_64: error: failed to set MSR 0x38f to 0x7000000ff
-> > > > qemu-system-x86_64: /data/zyy/git/test/qemu/target/i386/kvm.c:183=
-3: kvm_put_msrs:=20
-> > > > Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-> > > > Aborted
-> > > >=20
-> > > > So make number of pmc configurable to vm ? Any better idea ?
-> > >=20
-> > > Coincidentally we hit a similar problem a few days ago with -cpu ho=
-st  - it took me
-> > > quite a while to spot the difference between the machines was the s=
-ource
-> > > had hyperthreading disabled.
-> > >=20
-> > > An option to set the number of counters makes sense to me; but I wo=
-nder
-> > > how many other options we need as well.  Also, I'm not sure there's=
- any
-> > > easy way for libvirt etc to figure out how many counters a host sup=
-ports -
-> > > it's not in /proc/cpuinfo.
-> >=20
-> > We actually try to avoid /proc/cpuinfo whereever possible. We do dire=
-ct
-> > CPUID asm instructions to identify features, and prefer to use
-> > /sys/devices/system/cpu if that has suitable data
-> >=20
-> > Where do the PMC counts come from originally ? CPUID or something els=
-e ?
->=20
-> Yes, they're bits 8..15 of CPUID leaf 0xa
+On Fri,  7 Apr 2017 13:18:44 +0200
+Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
 
-Ok, that's easy enough for libvirt to detect then. More a question of wha=
-t
-libvirt should then do this with the info....
+> From: Jing Liu <liujbjl@linux.vnet.ibm.com>
+> 
+> This introduces basic support for TN3270, which needs to negotiate
+> three Telnet options during handshake:
+>   - End of Record
+>   - Binary Transmission
+>   - Terminal-Type
+> 
+> As a basic implementation, this simply ignores NOP and Interrupt
+> Process(IP) commands. More work should be done for them later.
+> 
+> For more details, please refer to RFC 854 and 1576.
+> 
+> Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+> Signed-off-by: Yang Chen <bjcyang@linux.vnet.ibm.com>
+> Reviewed-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> Acked-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> ---
+>  chardev/char-socket.c | 76 +++++++++++++++++++++++++++++++++++++--------------
+>  chardev/char.c        | 11 ++++++--
+>  include/sysemu/char.h |  8 ++++++
+>  qapi-schema.json      |  3 ++
+>  4 files changed, 76 insertions(+), 22 deletions(-)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+ping for some acks for the telnet changes
+
+> 
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 36ab0d633a..175fb8c3ec 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -55,6 +55,7 @@ typedef struct {
+>      SocketAddress *addr;
+>      bool is_listen;
+>      bool is_telnet;
+> +    bool is_tn3270;
+> 
+>      guint reconnect_timer;
+>      int64_t reconnect_time;
+> @@ -141,19 +142,25 @@ static int tcp_chr_read_poll(void *opaque)
+>      return s->max_size;
+>  }
+> 
+> -#define IAC 255
+> -#define IAC_BREAK 243
+>  static void tcp_chr_process_IAC_bytes(Chardev *chr,
+>                                        SocketChardev *s,
+>                                        uint8_t *buf, int *size)
+>  {
+> -    /* Handle any telnet client's basic IAC options to satisfy char by
+> -     * char mode with no echo.  All IAC options will be removed from
+> -     * the buf and the do_telnetopt variable will be used to track the
+> -     * state of the width of the IAC information.
+> +    /* Handle any telnet or tn3270 client's basic IAC options.
+> +     * For telnet options, it satisfies char by char mode with no echo.
+> +     * For tn3270 options, it satisfies binary mode with EOR.
+> +     * All IAC options will be removed from the buf and the do_opt
+> +     * pointer will be used to track the state of the width of the
+> +     * IAC information.
+>       *
+> -     * IAC commands come in sets of 3 bytes with the exception of the
+> -     * "IAC BREAK" command and the double IAC.
+> +     * RFC854: "All TELNET commands consist of at least a two byte sequence.
+> +     * The commands dealing with option negotiation are three byte sequences,
+> +     * the third byte being the code for the option referenced."
+> +     * "IAC BREAK", "IAC IP", "IAC NOP" and the double IAC are two bytes.
+> +     * "IAC SB", "IAC SE" and "IAC EOR" are saved to split up data boundary
+> +     * for tn3270.
+> +     * NOP, Break and Interrupt Process(IP) might be encountered during a TN3270
+> +     * session, and NOP and IP need to be done later.
+>       */
+> 
+>      int i;
+> @@ -174,6 +181,18 @@ static void tcp_chr_process_IAC_bytes(Chardev *chr,
+>                      /* Handle IAC break commands by sending a serial break */
+>                      qemu_chr_be_event(chr, CHR_EVENT_BREAK);
+>                      s->do_telnetopt++;
+> +                } else if (s->is_tn3270 && ((unsigned char)buf[i] == IAC_EOR
+> +                           || (unsigned char)buf[i] == IAC_SB
+> +                           || (unsigned char)buf[i] == IAC_SE)
+> +                           && s->do_telnetopt == 2) {
+> +                    buf[j++] = IAC;
+> +                    buf[j++] = buf[i];
+> +                    s->do_telnetopt++;
+> +                } else if (s->is_tn3270 && ((unsigned char)buf[i] == IAC_IP
+> +                           || (unsigned char)buf[i] == IAC_NOP)
+> +                           && s->do_telnetopt == 2) {
+> +                    /* TODO: IP and NOP need to be implemented later. */
+> +                    s->do_telnetopt++;
+>                  }
+>                  s->do_telnetopt++;
+>              }
+> @@ -512,7 +531,7 @@ static void tcp_chr_update_read_handler(Chardev *chr,
+> 
+>  typedef struct {
+>      Chardev *chr;
+> -    char buf[12];
+> +    char buf[21];
+>      size_t buflen;
+>  } TCPChardevTelnetInit;
+> 
+> @@ -550,9 +569,6 @@ static void tcp_chr_telnet_init(Chardev *chr)
+>      TCPChardevTelnetInit *init = g_new0(TCPChardevTelnetInit, 1);
+>      size_t n = 0;
+> 
+> -    init->chr = chr;
+> -    init->buflen = 12;
+> -
+>  #define IACSET(x, a, b, c)                      \
+>      do {                                        \
+>          x[n++] = a;                             \
+> @@ -560,12 +576,26 @@ static void tcp_chr_telnet_init(Chardev *chr)
+>          x[n++] = c;                             \
+>      } while (0)
+> 
+> -    /* Prep the telnet negotion to put telnet in binary,
+> -     * no echo, single char mode */
+> -    IACSET(init->buf, 0xff, 0xfb, 0x01);  /* IAC WILL ECHO */
+> -    IACSET(init->buf, 0xff, 0xfb, 0x03);  /* IAC WILL Suppress go ahead */
+> -    IACSET(init->buf, 0xff, 0xfb, 0x00);  /* IAC WILL Binary */
+> -    IACSET(init->buf, 0xff, 0xfd, 0x00);  /* IAC DO Binary */
+> +    init->chr = chr;
+> +    if (!s->is_tn3270) {
+> +        init->buflen = 12;
+> +        /* Prep the telnet negotion to put telnet in binary,
+> +         * no echo, single char mode */
+> +        IACSET(init->buf, 0xff, 0xfb, 0x01);  /* IAC WILL ECHO */
+> +        IACSET(init->buf, 0xff, 0xfb, 0x03);  /* IAC WILL Suppress go ahead */
+> +        IACSET(init->buf, 0xff, 0xfb, 0x00);  /* IAC WILL Binary */
+> +        IACSET(init->buf, 0xff, 0xfd, 0x00);  /* IAC DO Binary */
+> +    } else {
+> +        init->buflen = 21;
+> +        /* Prep the TN3270 negotion based on RFC1576 */
+> +        IACSET(init->buf, 0xff, 0xfd, 0x19);  /* IAC DO EOR */
+> +        IACSET(init->buf, 0xff, 0xfb, 0x19);  /* IAC WILL EOR */
+> +        IACSET(init->buf, 0xff, 0xfd, 0x00);  /* IAC DO BINARY */
+> +        IACSET(init->buf, 0xff, 0xfb, 0x00);  /* IAC WILL BINARY */
+> +        IACSET(init->buf, 0xff, 0xfd, 0x18);  /* IAC DO TERMINAL TYPE */
+> +        IACSET(init->buf, 0xff, 0xfa, 0x18);  /* IAC SB TERMINAL TYPE */
+> +        IACSET(init->buf, 0x01, 0xff, 0xf0);  /* SEND IAC SE */
+> +    }
+> 
+>  #undef IACSET
+> 
+> @@ -585,7 +615,8 @@ static void tcp_chr_tls_handshake(QIOTask *task,
+>      if (qio_task_propagate_error(task, NULL)) {
+>          tcp_chr_disconnect(chr);
+>      } else {
+> -        if (s->do_telnetopt) {
+> +        /* tn3270 does not support TLS yet */
+> +        if (s->do_telnetopt && !s->is_tn3270) {
+>              tcp_chr_telnet_init(chr);
+>          } else {
+>              tcp_chr_connect(chr);
+> @@ -824,12 +855,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>      bool do_nodelay     = sock->has_nodelay ? sock->nodelay : false;
+>      bool is_listen      = sock->has_server  ? sock->server  : true;
+>      bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
+> +    bool is_tn3270      = sock->has_tn3270  ? sock->tn3270  : false;
+>      bool is_waitconnect = sock->has_wait    ? sock->wait    : false;
+>      int64_t reconnect   = sock->has_reconnect ? sock->reconnect : 0;
+>      QIOChannelSocket *sioc = NULL;
+> 
+>      s->is_listen = is_listen;
+>      s->is_telnet = is_telnet;
+> +    s->is_tn3270 = is_tn3270;
+>      s->do_nodelay = do_nodelay;
+>      if (sock->tls_creds) {
+>          Object *creds;
+> @@ -879,7 +912,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>                                           addr, is_listen, is_telnet);
+> 
+>      if (is_listen) {
+> -        if (is_telnet) {
+> +        if (is_telnet || is_tn3270) {
+>              s->do_telnetopt = 1;
+>          }
+>      } else if (reconnect > 0) {
+> @@ -933,6 +966,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+>      bool is_listen      = qemu_opt_get_bool(opts, "server", false);
+>      bool is_waitconnect = is_listen && qemu_opt_get_bool(opts, "wait", true);
+>      bool is_telnet      = qemu_opt_get_bool(opts, "telnet", false);
+> +    bool is_tn3270      = qemu_opt_get_bool(opts, "tn3270", false);
+>      bool do_nodelay     = !qemu_opt_get_bool(opts, "delay", true);
+>      int64_t reconnect   = qemu_opt_get_number(opts, "reconnect", 0);
+>      const char *path = qemu_opt_get(opts, "path");
+> @@ -968,6 +1002,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+>      sock->server = is_listen;
+>      sock->has_telnet = true;
+>      sock->telnet = is_telnet;
+> +    sock->has_tn3270 = true;
+> +    sock->tn3270 = is_tn3270;
+>      sock->has_wait = true;
+>      sock->wait = is_waitconnect;
+>      sock->has_reconnect = true;
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 3df116350b..309734f2b7 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -696,7 +696,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename)
+>          return opts;
+>      }
+>      if (strstart(filename, "tcp:", &p) ||
+> -        strstart(filename, "telnet:", &p)) {
+> +        strstart(filename, "telnet:", &p) ||
+> +        strstart(filename, "tn3270:", &p)) {
+>          if (sscanf(p, "%64[^:]:%32[^,]%n", host, port, &pos) < 2) {
+>              host[0] = 0;
+>              if (sscanf(p, ":%32[^,]%n", port, &pos) < 1)
+> @@ -712,8 +713,11 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename)
+>                  goto fail;
+>              }
+>          }
+> -        if (strstart(filename, "telnet:", &p))
+> +        if (strstart(filename, "telnet:", &p)) {
+>              qemu_opt_set(opts, "telnet", "on", &error_abort);
+> +        } else if (strstart(filename, "tn3270:", &p)) {
+> +            qemu_opt_set(opts, "tn3270", "on", &error_abort);
+> +        }
+>          return opts;
+>      }
+>      if (strstart(filename, "udp:", &p)) {
+> @@ -1177,6 +1181,9 @@ QemuOptsList qemu_chardev_opts = {
+>              .name = "telnet",
+>              .type = QEMU_OPT_BOOL,
+>          },{
+> +            .name = "tn3270",
+> +            .type = QEMU_OPT_BOOL,
+> +        },{
+>              .name = "tls-creds",
+>              .type = QEMU_OPT_STRING,
+>          },{
+> diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+> index 450881d42c..f6d5cd0c9b 100644
+> --- a/include/sysemu/char.h
+> +++ b/include/sysemu/char.h
+> @@ -7,6 +7,14 @@
+>  #include "qemu/bitmap.h"
+>  #include "qom/object.h"
+> 
+> +#define IAC_EOR 239
+> +#define IAC_SE 240
+> +#define IAC_NOP 241
+> +#define IAC_BREAK 243
+> +#define IAC_IP 244
+> +#define IAC_SB 250
+> +#define IAC 255
+> +
+>  /* character device */
+> 
+>  typedef enum {
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 250e4dc49b..f0302958ce 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -4874,6 +4874,8 @@
+>  # @nodelay: set TCP_NODELAY socket option (default: false)
+>  # @telnet: enable telnet protocol on server
+>  #          sockets (default: false)
+> +# @tn3270: enable tn3270 protocol on server
+> +#          sockets (default: false) (Since: 2.10)
+>  # @reconnect: For a client socket, if a socket is disconnected,
+>  #          then attempt a reconnect after the given number of seconds.
+>  #          Setting this to zero disables this function. (default: 0)
+> @@ -4887,6 +4889,7 @@
+>                                       '*wait'      : 'bool',
+>                                       '*nodelay'   : 'bool',
+>                                       '*telnet'    : 'bool',
+> +                                     '*tn3270'    : 'bool',
+>                                       '*reconnect' : 'int' },
+>    'base': 'ChardevCommon' }
+> 
