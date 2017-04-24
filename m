@@ -1,42 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d2ezM-0007Es-7x
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:29:17 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1d2f3F-0000zp-F0
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:33:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d2ezJ-0001v6-Hk
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:29:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45755
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1d2ezJ-0001u2-BM
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:29:13 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3OET4M0139345
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 10:29:11 -0400
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a1g8qb1fg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 10:29:10 -0400
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Mon, 24 Apr 2017 11:29:09 -0300
-Received: from d24av03.br.ibm.com (d24av03.br.ibm.com [9.8.31.95])
-	by d24relay03.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v3OET5Y426214558
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 11:29:06 -0300
-Received: from d24av03.br.ibm.com (localhost [127.0.0.1])
-	by d24av03.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v3OET6qr015628
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 11:29:06 -0300
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Mon, 24 Apr 2017 11:28:46 -0300
-Message-Id: <1493044126-21488-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] trace: add qemu mutex lock and unlock trace
- events
+	(envelope-from <mjt@tls.msk.ru>) id 1d2f3B-0003OZ-6G
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:33:17 -0400
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Mon, 24 Apr 2017 17:32:54 +0300
+Message-Id: <20170424143254.20569-1-mjt@msgid.tls.msk.ru>
+Subject: [Qemu-devel] [PATCH] virtfs: allow a device id to be specified in
+ the -virtfs option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,83 +18,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org, Chris Webb <chris@arachsys.com>
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-These trace events were very useful to help me to understand and find a
-reordering issue in vfio, for example:
+From: Chris Webb <chris@arachsys.com>
 
-qemu_mutex_lock locked mutex 0x10905ad8
-  vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2020c, 4)
-qemu_mutex_unlock unlocked mutex 0x10905ad8
-qemu_mutex_lock locked mutex 0x10905ad8
-  vfio_region_write  (0001:03:00.0:region1+0xc4, 0xa0000, 4)
-qemu_mutex_unlock unlocked mutex 0x10905ad8
+When using a virtfs root filesystem, the mount_tag needs to be set to
+/dev/root. This can be done long-hand as
 
-that also helped to see desired result after the fix:
+  -fsdev local,id=root,path=/path/to/rootfs,...
+  -device virtio-9p-pci,fsdev=root,mount_tag=/dev/root
 
-qemu_mutex_lock locked mutex 0x10905ad8
-  vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2000c, 4)
-  vfio_region_write  (0001:03:00.0:region1+0xc4, 0xb0000, 4)
-qemu_mutex_unlock unlocked mutex 0x10905ad8
+but the -virtfs shortcut cannot be used as it hard-codes the device identifier
+to match the mount_tag, and device identifiers may not contain '/':
 
-So it could be a good idea to have these traces implemented. It's worth
-mentioning that they should be surgically enabled during the debugging,
-otherwise it'd flood the trace logs with lock/unlock messages.
+  $ qemu-system-x86_64 -virtfs local,path=/foo,mount_tag=/dev/root,security_model=passthrough
+  qemu-system-x86_64: -virtfs local,path=/foo,mount_tag=/dev/root,security_model=passthrough: duplicate fsdev id: /dev/root
 
-How to use it:
-trace-event qemu_mutex_lock on|off
-trace-event qemu_mutex_unlock on|off
-or
-trace-event qemu_mutex* on|off
+To support this case using -virtfs, we allow the device identifier to be
+specified explicitly when the mount_tag is not suitable:
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+  -virtfs local,id=root,path=/path/to/rootfs,mount_tag=/dev/root,...
+
+Signed-off-by: Chris Webb <chris@arachsys.com>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- util/qemu-thread-posix.c | 5 +++++
- util/trace-events        | 4 ++++
- 2 files changed, 9 insertions(+)
+mjt: ported to current code, simplified a bit using ?:
+operator.
 
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 73e3a0e..909c2ac 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -14,6 +14,7 @@
- #include "qemu/thread.h"
- #include "qemu/atomic.h"
- #include "qemu/notify.h"
-+#include "trace.h"
+This is a patch from 2011,
+https://lists.gnu.org/archive/html/qemu-devel/2011-11/msg03083.html
+
+ qemu-options.hx | 2 +-
+ vl.c            | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/qemu-options.hx b/qemu-options.hx
+index d7da182df4..968161ab25 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -863,7 +863,7 @@ ETEXI
  
- static bool name_threads;
+ DEF("virtfs", HAS_ARG, QEMU_OPTION_virtfs,
+     "-virtfs local,path=path,mount_tag=tag,security_model=[mapped-xattr|mapped-file|passthrough|none]\n"
+-    "        [,writeout=immediate][,readonly][,socket=socket|sock_fd=sock_fd]\n",
++    "        [,id=id][,writeout=immediate][,readonly][,socket=socket|sock_fd=sock_fd]\n",
+     QEMU_ARCH_ALL)
  
-@@ -60,6 +61,8 @@ void qemu_mutex_lock(QemuMutex *mutex)
-     err = pthread_mutex_lock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
-+
-+    trace_qemu_mutex_lock((void *)&mutex->lock);
- }
- 
- int qemu_mutex_trylock(QemuMutex *mutex)
-@@ -74,6 +77,8 @@ void qemu_mutex_unlock(QemuMutex *mutex)
-     err = pthread_mutex_unlock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
-+
-+    trace_qemu_mutex_unlock((void *)&mutex->lock);
- }
- 
- void qemu_rec_mutex_init(QemuRecMutex *mutex)
-diff --git a/util/trace-events b/util/trace-events
-index b44ef4f..65c33fe 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -55,3 +55,7 @@ lockcnt_futex_wait_prepare(const void *lockcnt, int expected, int new) "lockcnt
- lockcnt_futex_wait(const void *lockcnt, int val) "lockcnt %p waiting on %d"
- lockcnt_futex_wait_resume(const void *lockcnt, int new) "lockcnt %p after wait: %d"
- lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter"
-+
-+# util/qemu-thread-posix.c
-+qemu_mutex_lock(void *qemu_global_mutex) "locked mutex %p"
-+qemu_mutex_unlock(void *qemu_global_mutex) "unlocked mutex %p"
+ STEXI
+diff --git a/vl.c b/vl.c
+index 0b4ed5241c..d1da43ee4c 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3521,10 +3521,11 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 fsdev = qemu_opts_create(qemu_find_opts("fsdev"),
++                                         qemu_opts_id(opts) ?:
+                                          qemu_opt_get(opts, "mount_tag"),
+                                          1, NULL);
+                 if (!fsdev) {
+-                    error_report("duplicate fsdev id: %s",
++                    error_report("duplicate or invalid fsdev id: %s",
+                                  qemu_opt_get(opts, "mount_tag"));
+                     exit(1);
+                 }
+@@ -3562,7 +3563,7 @@ int main(int argc, char **argv, char **envp)
+                                           &error_abort);
+                 qemu_opt_set(device, "driver", "virtio-9p-pci", &error_abort);
+                 qemu_opt_set(device, "fsdev",
+-                             qemu_opt_get(opts, "mount_tag"), &error_abort);
++                             qemu_opts_id(fsdev), &error_abort);
+                 qemu_opt_set(device, "mount_tag",
+                              qemu_opt_get(opts, "mount_tag"), &error_abort);
+                 break;
 -- 
-2.7.4
+2.11.0
