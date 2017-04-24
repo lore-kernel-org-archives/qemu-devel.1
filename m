@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d2d8p-0000yz-0Y
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:30:55 -0400
+	(envelope-from <famz@redhat.com>) id 1d2dEs-00028s-TE
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d2d8o-00043A-7j
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:30:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d2d8o-00042y-0M
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:30:54 -0400
-Message-ID: <1493037051.19018.32.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 24 Apr 2017 14:30:51 +0200
-In-Reply-To: <CAFEAcA9P9EECgmqubfN+71cYxsB5bbTddooyBfpM7=C2-6iTXw@mail.gmail.com>
-References: <20170421091632.30900-1-kraxel@redhat.com>
-	<20170421091632.30900-10-kraxel@redhat.com>
-	<alpine.BSF.2.20.1704211236100.58688@zero.eik.bme.hu>
-	<CAFEAcA9P9EECgmqubfN+71cYxsB5bbTddooyBfpM7=C2-6iTXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 9/9] sm501: make display updates thread safe
+	(envelope-from <famz@redhat.com>) id 1d2dEs-0005r4-52
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:37:10 -0400
+Date: Mon, 24 Apr 2017 20:36:59 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170424123659.GI14416@lemon.lan>
+References: <1492050868-16200-1-git-send-email-lidongchen@tencent.com>
+	<20170414060015.GA12191@lemon>
+	<CAOGPPbeUkBskJfFX9=Of62pDrt6U-KAjbFZ-r=yVNNeb+ceAuA@mail.gmail.com>
+	<20170417034925.GC6717@lemon.lan>
+	<CAOGPPbd_Y6m42EpuedngTWfGzt+MDvOwbPSmwp-OG5hVpMNBkA@mail.gmail.com>
+	<CAOGPPbc44H-oaY2Smm5kgNNbaP44C3rksi9_=0ocAXAnGdWdCg@mail.gmail.com>
+	<CAOGPPbfx_FoOwHMa96w_EioAApDs08_=saFRGr-5XdOrj60HNw@mail.gmail.com>
+	<20170424120906.GG14416@lemon.lan>
+	<20170424121933.GH14416@lemon.lan>
+	<CAOGPPbfQBy0szAxDeynehtPkXUUjdpgQpfb155XtUdF07UCGxQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOGPPbfQBy0szAxDeynehtPkXUUjdpgQpfb155XtUdF07UCGxQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6] migration/block: use blk_pwrite_zeroes
+ for each zero cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +32,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, QEMU Developers <qemu-devel@nongnu.org>
+To: 858585 jemmy <jemmy858585@gmail.com>
+Cc: qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Dave Gilbert <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Lidong Chen <lidongchen@tencent.com>
 
-On Mo, 2017-04-24 at 13:09 +0100, Peter Maydell wrote:
-> On 21 April 2017 at 11:42, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> > On Fri, 21 Apr 2017, Gerd Hoffmann wrote:
-> >>
-> >> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> >> ---
-> >> hw/display/sm501.c | 23 ++++++-----------------
-> >> 1 file changed, 6 insertions(+), 17 deletions(-)
-> >
-> >
-> > Hold on with this please too. I have a series pending that changes this=
-.
->=20
-> Gerd: I've now applied Zoltan's patchset to git master, so you'll
-> want to rebase your changes on it.
+On Mon, 04/24 20:26, 858585 jemmy wrote:
+> > 2) qcow2 with cluster_size = 512 is probably too uncommon to be optimized for.
+> if culster_size is very small, should disable metadata check default?
+> 
 
-Pull request for the first batch is just out of the door, without sm501
-+ tcx + cg3 to avoid conflicts.  They will follow with the next batch,
-which then should also able to revert the temporary workaround.
+No, I don't think it's worth the inconsistent behavior. People who want
+performance shouldn't use 512 bytes anyway.
 
-cheers,
-  Gerd
+Fam
