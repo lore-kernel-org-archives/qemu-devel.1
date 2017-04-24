@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIE-0001Zz-8z
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:59 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIG-0001cM-Nb
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIC-0003SH-QG
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:58 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIF-0003UW-AL
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:00 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:59:02 +1000
-Message-Id: <20170424015927.8933-23-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:59:21 +1000
+Message-Id: <20170424015927.8933-42-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/47] ppc/pnv: extend the machine with a
- XICSFabric interface
+Subject: [Qemu-devel] [PULL 41/47] ppc/pnv: populate device tree for IPMI BT
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +28,79 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-A XICSFabric QOM interface is used by the XICS layer to manipulate the
-ICP and ICS objects. Let's define the associated handlers for the
-PowerNV machine. All handlers should be defined even if there is no
-ICS under the PowerNV machine yet.
+When an ipmi-bt device [1] is defined on the ISA bus, we need to
+populate the device tree with the object properties. Such devices are
+created with the command line options :
+
+   -device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg03168.html
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ hw/ppc/pnv.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index aad7917..0a0cfe3 100644
+index dfa21e4..977e126 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -34,6 +34,7 @@
- #include "qemu/cutils.h"
- #include "qapi/visitor.h"
-=20
-+#include "hw/ppc/xics.h"
- #include "hw/ppc/pnv_xscom.h"
-=20
- #include "hw/isa/isa.h"
-@@ -738,6 +739,29 @@ static const TypeInfo pnv_chip_info =3D {
-     .abstract      =3D true,
- };
-=20
-+static PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
-+{
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+        CPUPPCState *env =3D &cpu->env;
-+
-+        if (env->spr_cb[SPR_PIR].default_value =3D=3D pir) {
-+            return cpu;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static ICPState *pnv_icp_get(XICSFabric *xi, int pir)
-+{
-+    PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
-+
-+    return cpu ? ICP(cpu->intc) : NULL;
-+}
-+
- static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
-                               void *opaque, Error **errp)
- {
-@@ -788,6 +812,7 @@ static void powernv_machine_class_props_init(ObjectCl=
-ass *oc)
- static void powernv_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-+    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
-=20
-     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
-     mc->init =3D ppc_powernv_init;
-@@ -798,6 +823,7 @@ static void powernv_machine_class_init(ObjectClass *o=
-c, void *data)
-     mc->no_parallel =3D 1;
-     mc->default_boot_order =3D NULL;
-     mc->default_ram_size =3D 1 * G_BYTE;
-+    xic->icp_get =3D pnv_icp_get;
-=20
-     powernv_machine_class_props_init(oc);
+@@ -354,6 +354,39 @@ static void powernv_populate_serial(ISADevice *d, vo=
+id *fdt, int lpc_off)
+     _FDT((fdt_setprop_string(fdt, node, "device_type", "serial")));
  }
-@@ -808,6 +834,10 @@ static const TypeInfo powernv_machine_info =3D {
-     .instance_size =3D sizeof(PnvMachineState),
-     .instance_init =3D powernv_machine_initfn,
-     .class_init    =3D powernv_machine_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_XICS_FABRIC },
-+        { },
-+    },
- };
 =20
- static void powernv_machine_register_types(void)
++static void powernv_populate_ipmi_bt(ISADevice *d, void *fdt, int lpc_of=
+f)
++{
++    const char compatible[] =3D "bt\0ipmi-bt";
++    uint32_t io_base;
++    uint32_t io_regs[] =3D {
++        cpu_to_be32(1),
++        0, /* 'io_base' retrieved from the 'ioport' property of 'isa-ipm=
+i-bt' */
++        cpu_to_be32(3)
++    };
++    uint32_t irq;
++    char *name;
++    int node;
++
++    io_base =3D object_property_get_int(OBJECT(d), "ioport", &error_fata=
+l);
++    io_regs[1] =3D cpu_to_be32(io_base);
++
++    irq =3D object_property_get_int(OBJECT(d), "irq", &error_fatal);
++
++    name =3D g_strdup_printf("%s@i%x", qdev_fw_name(DEVICE(d)), io_base)=
+;
++    node =3D fdt_add_subnode(fdt, lpc_off, name);
++    _FDT(node);
++    g_free(name);
++
++    fdt_setprop(fdt, node, "reg", io_regs, sizeof(io_regs));
++    fdt_setprop(fdt, node, "compatible", compatible, sizeof(compatible))=
+;
++
++    /* Mark it as reserved to avoid Linux trying to claim it */
++    _FDT((fdt_setprop_string(fdt, node, "status", "reserved")));
++    _FDT((fdt_setprop_cell(fdt, node, "interrupts", irq)));
++    _FDT((fdt_setprop_cell(fdt, node, "interrupt-parent",
++                           fdt_get_phandle(fdt, lpc_off))));
++}
++
+ typedef struct ForeachPopulateArgs {
+     void *fdt;
+     int offset;
+@@ -368,6 +401,8 @@ static int powernv_populate_isa_device(DeviceState *d=
+ev, void *opaque)
+         powernv_populate_rtc(d, args->fdt, args->offset);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_ISA_SERIAL)) {
+         powernv_populate_serial(d, args->fdt, args->offset);
++    } else if (object_dynamic_cast(OBJECT(dev), "isa-ipmi-bt")) {
++        powernv_populate_ipmi_bt(d, args->fdt, args->offset);
+     } else {
+         error_report("unknown isa device %s@i%x", qdev_fw_name(dev),
+                      d->ioport_id);
 --=20
 2.9.3
