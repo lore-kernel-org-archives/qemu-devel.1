@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d2Ra7-0008Gt-E4
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 20:10:20 -0400
+	(envelope-from <alarson@ddci.com>) id 1d2S0x-0002Ko-AP
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 20:38:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d2Ra3-0001fW-DQ
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 20:10:19 -0400
-Resent-Message-Id: <E1d2Ra3-0001fW-DQ@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21389)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d2Ra3-0001cO-2o
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 20:10:15 -0400
-In-Reply-To: <cover.1492986468.git.shorne@gmail.com>
-Message-ID: <149299259912.69.3083061025771244064@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <alarson@ddci.com>) id 1d2S0u-0001Ko-5x
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 20:38:03 -0400
+In-Reply-To: <20170423231722.GA14558@umbus.fritz.box>
+References: <201704212158.v3LLwNYl031738@linux03a.ddci.com>
+	<20170423231722.GA14558@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 23 Apr 2017 17:09:59 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] Openrisc misc features / fixes
+From: alarson@ddci.com
+Message-ID: <OF7D33B8CD.4B2CD628-ON8625810C.00022270-8625810C.000378AB@ddci.com>
+Date: Sun, 23 Apr 2017 19:37:55 -0500
+Content-Type: text/plain; charset="US-ASCII"
+Subject: Re: [Qemu-devel] Subject: [PATCH] target-ppc: Add global timer
+ group A to open-pic.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: shorne@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, openrisc@lists.librecores.org, mithro@mithis.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogY292
-ZXIuMTQ5Mjk4NjQ2OC5naXQuc2hvcm5lQGdtYWlsLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0g
-W1BBVENIIHYyIDAvOV0gT3BlbnJpc2MgbWlzYyBmZWF0dXJlcyAvIGZpeGVzClR5cGU6IHNlcmll
-cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
-b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNl
-ZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
-b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
-aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
-JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
-aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
-ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTI1MTk1ZCB0YXJnZXQvb3Bl
-bnJpc2M6IFJlbW92ZSBkdXBsaWNhdGUgZmVhdHVyZXMgcHJvcGVydHkKN2VkNTBiZCB0YXJnZXQv
-b3BlbnJpc2M6IEltcGxlbWVudCBmdWxsIHZtc3RhdGUgc2VyaWFsaXphdGlvbgo0OWQwMTI3IG1p
-Z3JhdGlvbjogQWRkIFZNU1RBVEVfU1RSVUNUXzJEQVJSQVkoKQoyN2M0N2E5IHRhcmdldC9vcGVu
-cmlzYzogaW1wbGVtZW50IHNoYWRvdyByZWdpc3RlcnMKN2NmNjE1MSBtaWdyYXRpb246IEFkZCBW
-TVNUQVRFX1VJTlRUTF8yREFSUkFZKCkKNjQ5ODYzZiB0YXJnZXQvb3BlbnJpc2M6IGFkZCBudW1j
-b3JlcyBhbmQgY29yZWlkIHN1cHBvcnQKZGFiOTZhYiB0YXJnZXQvb3BlbnJpc2M6IEZpeGVzIGZv
-ciBtZW1vcnkgZGVidWdnaW5nCjlmZTBiZDkgdGFyZ2V0L29wZW5yaXNjOiBJbXBsZW1lbnQgRVBI
-IGJpdAo0MjMxNGE5IHRhcmdldC9vcGVucmlzYzogSW1wbGVtZW50IEVWQkFSIHJlZ2lzdGVyCgo9
-PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IHRhcmdldC9vcGVucmlzYzog
-SW1wbGVtZW50IEVWQkFSIHJlZ2lzdGVyLi4uCkNoZWNraW5nIFBBVENIIDIvOTogdGFyZ2V0L29w
-ZW5yaXNjOiBJbXBsZW1lbnQgRVBIIGJpdC4uLgpDaGVja2luZyBQQVRDSCAzLzk6IHRhcmdldC9v
-cGVucmlzYzogRml4ZXMgZm9yIG1lbW9yeSBkZWJ1Z2dpbmcuLi4KV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzQ1OiBGSUxFOiB0YXJnZXQvb3BlbnJpc2MvbW11LmM6MjMyOgorICAg
-ICAgICBtaXNzID0gY3B1X29wZW5yaXNjX2dldF9waHlzX2FkZHIoY3B1LCAmcGh5c19hZGRyLCAm
-cHJvdCwgYWRkciwgTU1VX0lOU1RfRkVUQ0gpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
-LCAzOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CkNoZWNraW5nIFBBVENIIDQvOTogdGFyZ2V0L29wZW5yaXNjOiBhZGQgbnVtY29yZXMgYW5kIGNv
-cmVpZCBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDUvOTogbWlncmF0aW9uOiBBZGQgVk1TVEFU
-RV9VSU5UVExfMkRBUlJBWSgpLi4uCkNoZWNraW5nIFBBVENIIDYvOTogdGFyZ2V0L29wZW5yaXNj
-OiBpbXBsZW1lbnQgc2hhZG93IHJlZ2lzdGVycy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojMTM1OiBGSUxFOiBsaW51eC11c2VyL3NpZ25hbC5jOjQ0OTI6CisgICAgX19wdXRf
-dXNlcihzYXNfc3NfZmxhZ3MoY3B1X2dldF9ncHIoZW52LCAxKSksICZmcmFtZS0+dWMudHVjX3N0
-YWNrLnNzX2ZsYWdzKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjMwIGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFU
-Q0ggNy85OiBtaWdyYXRpb246IEFkZCBWTVNUQVRFX1NUUlVDVF8yREFSUkFZKCkuLi4KRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyMDogRklMRTogaW5jbHVkZS9taWdyYXRpb24vdm1z
-dGF0ZS5oOjUwMzoKKyNkZWZpbmUgVk1TVEFURV9TVFJVQ1RfMkRBUlJBWV9URVNUKF9maWVsZCwg
-X3N0YXRlLCBfbjEsIF9uMiwgX3Rlc3QsIF92ZXJzaW9uLCBfdm1zZCwgX3R5cGUpIHsgXAoKRVJS
-T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnfCcgKGN0eDpWeFYpCiMyNzogRklMRTog
-aW5jbHVkZS9taWdyYXRpb24vdm1zdGF0ZS5oOjUxMDoKKyAgICAuZmxhZ3MgICAgICAgID0gVk1T
-X1NUUlVDVHxWTVNfQVJSQVksICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojMzg6IEZJTEU6IGluY2x1ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDo3NjE6CisjZGVm
-aW5lIFZNU1RBVEVfU1RSVUNUXzJEQVJSQVkoX2ZpZWxkLCBfc3RhdGUsIF9uMSwgX24yLCBfdmVy
-c2lvbiwgX3Ztc2QsIF90eXBlKSBcCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDI3IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDgvOTogdGFyZ2V0L29wZW5yaXNjOiBJbXBsZW1lbnQgZnVsbCB2bXN0YXRlIHNl
-cmlhbGl6YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggOS85OiB0YXJnZXQvb3BlbnJpc2M6IFJlbW92
-ZSBkdXBsaWNhdGUgZmVhdHVyZXMgcHJvcGVydHkuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+David Gibson <david@gibson.dropbear.id.au> wrote on 04/23/2017 06:17:22 
+PM:
+
+> From: David Gibson <david@gibson.dropbear.id.au>
+> To: Aaron Larson <alarson@ddci.com>
+> Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+> Date: 04/23/2017 06:54 PM
+> Subject: Re: Subject: [PATCH] target-ppc: Add global timer group A to 
+open-pic.
+> 
+> On Fri, Apr 21, 2017 at 02:58:23PM -0700, Aaron Larson wrote:
+> > Add global timer group A to open-pic.  This patch is still somewhat
+> > dubious because I'm not sure how to determine what QEMU wants for the
+> > timer frequency.  Suggestions solicited.
+> 
+> This commit message really needs some more context.  What's a "global
+> time group A" a and why do we want it?
+
+The open-pic spec includes two sets/groups of timers, groups A and B,
+4 timers in each group.  Previously in QEMU the timer group A
+registers were implemented but they did not "count" or generate any
+interrupts.  The patch makes the timers to do both (count and generate
+interrupts).
+
+About a year ago I mentioned that we had implemented this and offered
+to submit a patch, which seemed to be acceptable.  Sadly, when I
+reviewed the implementation it had several egregious errors that I
+didn't know how to fix until recently.
+
+Quite frankly I didn't expect the patch to be accepted in its current
+form for the reason mentioned in the above commit log and was hoping
+for some guidance.  If this is no longer a desirable patch, I can
+certainly continue to maintain it locally for our use.\
+
+Aaron.
