@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d2a6I-0002Ic-Sc
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:16:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1d2a7T-0002sM-8s
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d2a6E-0003hk-8z
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:16:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39978)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d2a6E-0003ha-2A
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:16:02 -0400
-References: <20170420204301.154912-1-lepton@google.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <42f99074-9330-c974-e884-f0a62e63c697@redhat.com>
-Date: Mon, 24 Apr 2017 11:15:56 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170420204301.154912-1-lepton@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] slirp: don't zero ti_i since we
- acccess it later.
+	(envelope-from <berrange@redhat.com>) id 1d2a7S-00047D-1Z
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:17:19 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon, 24 Apr 2017 10:16:55 +0100
+Message-Id: <20170424091659.26708-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/4] Improve convert and dd commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +17,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Wu <ytht.net@gmail.com>, qemu-devel@nongnu.org
-Cc: Tao Wu <lepton@google.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 20.04.2017 22:43, Tao Wu wrote:
-> The current code looks buggy, we zero ti_i while we access
-> ti_dst/ti_src later.
-> 
-> Signed-off-by: Tao Wu <lepton@google.com>
-> ---
->  slirp/tcp_subr.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-> index dc8b4bbb50..398d6b30d3 100644
-> --- a/slirp/tcp_subr.c
-> +++ b/slirp/tcp_subr.c
-> @@ -148,7 +148,6 @@ tcp_respond(struct tcpcb *tp, struct tcpiphdr *ti, struct mbuf *m,
->  		m->m_data += IF_MAXLINKHDR;
->  		*mtod(m, struct tcpiphdr *) = *ti;
->  		ti = mtod(m, struct tcpiphdr *);
-> -		memset(&ti->ti, 0, sizeof(ti->ti));
->  		flags = TH_ACK;
->  	} else {
->  		/*
+Update to
 
-When providing patches, please make sure to put the subsystem maintainer
-on CC: (see MAINTAINERS file) - or your patch will likely be lost in the
-high traffic of the qemu-devel mailing list.
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05699.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00728.html
+  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg04391.html
 
- Thanks,
-  Thomas
+This series is in response to Max pointing out that you cannot
+use 'convert' for an encrypted target image.
+
+The 'convert' and 'dd' commands need to first create the image
+and then open it. The bdrv_create() method takes a set of options
+for creating the image, which let us provide a key-secret for the
+encryption key. When the commands then open the new image, they
+don't provide any options, so the image is unable to be opened
+due to lack of encryption key. It is also not possible to use
+the --image-opts argument to provide structured options in the
+target image name - it must be a plain filename to satisfy the
+bdrv_create() API contract.
+
+This series addresses these problems to some extent
+
+ - Adds a new --target-image-opts flag which is used to say
+   that the target filename is using structured options.
+   It is *only* permitted to use this when -n is also set.
+   ie the target image must be pre-created so convert/dd
+   don't need to run bdrv_create().
+
+ - When --target-image-opts is not used, add special case
+   code that identifies options passed to bdrv_create()
+   named "*key-secret" and adds them to the options used
+   to open the new image
+
+In future it is desirable to make --target-image-opts work even when -n is
+*not* given. This requires considerable work to create a new bdrv_create()
+API impl.
+
+The first patch fixes a bug in the 'dd' command while the second adds support
+for the missing '--object' arg to 'dd', allowing it to reference secrets when
+opening files.  The last two patches implement the new features described above
+for the 'convert' command.
+
+Changed in v5:
+
+ - Fix return value (Max)
+ - Misc doc changes (Max)
+ - Use error_abort (Max)
+
+Changed in v4:
+
+ - Refactor img_open_new_file in terms of img_open_file (Kevin)
+
+Changed in v3:
+
+ - Drop all patches affecting the 'dd' command except for the clear bug fix
+   and the --object support. They can be re-considered once dd is rewritten
+   to run ontop of convert.
+ - Use consistent return/goto style in dd command (Max)
+ - Fix error reporting when using compressed image and skip-create (Max)
+ - Unconditionally create QDict when open files (Max)
+
+Changed in v2:
+
+ - Replace dd -n flag with support for conv=nocreat,notrunc
+ - Misc typos (Eric, Fam)
+
+
+Daniel P. Berrange (4):
+  qemu-img: add support for --object with 'dd' command
+  qemu-img: fix --image-opts usage with dd command
+  qemu-img: introduce --target-image-opts for 'convert' command
+  qemu-img: copy *key-secret opts when opening newly created files
+
+ qemu-img-cmds.hx |   4 +-
+ qemu-img.c       | 148 ++++++++++++++++++++++++++++++++++++++++++++-----------
+ qemu-img.texi    |  12 ++++-
+ 3 files changed, 130 insertions(+), 34 deletions(-)
+
+-- 
+2.9.3
