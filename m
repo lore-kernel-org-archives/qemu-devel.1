@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d2jWw-0001Vn-37
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:15 -0400
+	(envelope-from <jcody@redhat.com>) id 1d2jWx-0001WO-2M
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d2jWv-0002ek-37
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:14 -0400
+	(envelope-from <jcody@redhat.com>) id 1d2jWv-0002fa-Rp
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:15 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 24 Apr 2017 15:19:50 -0400
-Message-Id: <20170424192002.18622-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL v2 00/12] Block patches
+Date: Mon, 24 Apr 2017 15:19:54 -0400
+Message-Id: <20170424192002.18622-5-jcody@redhat.com>
+In-Reply-To: <20170424192002.18622-1-jcody@redhat.com>
+References: <20170424192002.18622-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL v2 04/12] block: add bdrv_set_read_only() helper
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,74 +23,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-The following changes since commit 4c55b1d0bad8a703f0499fe62e3761a0cd288da3:
+We have a helper wrapper for checking for the BDS read_only flag,
+add a helper wrapper to set the read_only flag as well.
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2017-04-24' into staging (2017-04-24 14:49:48 +0100)
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 9b18972d05f5fa2ac16c014f0af98d680553048d.1491597120.git.jcody@redhat.com
+---
+ block.c               | 5 +++++
+ block/bochs.c         | 2 +-
+ block/cloop.c         | 2 +-
+ block/dmg.c           | 2 +-
+ block/rbd.c           | 2 +-
+ block/vvfat.c         | 4 ++--
+ include/block/block.h | 1 +
+ 7 files changed, 12 insertions(+), 6 deletions(-)
 
-are available in the git repository at:
-
-  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
-
-for you to fetch changes up to ecfa185400ade2abc9915efa924cbad1e15a21a4:
-
-  qemu-iotests: _cleanup_qemu must be called on exit (2017-04-24 15:09:33 -0400)
-
-----------------------------------------------------------------
-Pull v2, with 32-bit errors fixed.  I don't have OS X to test compile on,
-but I think it is safe to assume the cause of the compile error was the same.
-----------------------------------------------------------------
-
-Ashish Mittal (2):
-  block/vxhs.c: Add support for a new block device type called "vxhs"
-  block/vxhs.c: Add qemu-iotests for new block device type "vxhs"
-
-Jeff Cody (10):
-  qemu-iotests: exclude vxhs from image creation via protocol
-  block: add bdrv_set_read_only() helper function
-  block: do not set BDS read_only if copy_on_read enabled
-  block: honor BDRV_O_ALLOW_RDWR when clearing bs->read_only
-  block: code movement
-  block: introduce bdrv_can_set_read_only()
-  block: use bdrv_can_set_read_only() during reopen
-  block/rbd - update variable names to more apt names
-  block/rbd: Add support for reopen()
-  qemu-iotests: _cleanup_qemu must be called on exit
-
- block.c                          |  56 +++-
- block/Makefile.objs              |   2 +
- block/bochs.c                    |   5 +-
- block/cloop.c                    |   5 +-
- block/dmg.c                      |   6 +-
- block/rbd.c                      |  65 +++--
- block/trace-events               |  17 ++
- block/vvfat.c                    |  19 +-
- block/vxhs.c                     | 575 +++++++++++++++++++++++++++++++++++++++
- configure                        |  39 +++
- include/block/block.h            |   2 +
- qapi/block-core.json             |  23 +-
- tests/qemu-iotests/017           |   1 +
- tests/qemu-iotests/020           |   1 +
- tests/qemu-iotests/028           |   1 +
- tests/qemu-iotests/029           |   1 +
- tests/qemu-iotests/073           |   1 +
- tests/qemu-iotests/094           |  11 +-
- tests/qemu-iotests/102           |   5 +-
- tests/qemu-iotests/109           |   1 +
- tests/qemu-iotests/114           |   1 +
- tests/qemu-iotests/117           |   1 +
- tests/qemu-iotests/130           |   2 +
- tests/qemu-iotests/134           |   1 +
- tests/qemu-iotests/140           |   1 +
- tests/qemu-iotests/141           |   1 +
- tests/qemu-iotests/143           |   1 +
- tests/qemu-iotests/156           |   2 +
- tests/qemu-iotests/158           |   1 +
- tests/qemu-iotests/common        |   6 +
- tests/qemu-iotests/common.config |  13 +
- tests/qemu-iotests/common.filter |   1 +
- tests/qemu-iotests/common.rc     |  19 ++
- 33 files changed, 844 insertions(+), 42 deletions(-)
- create mode 100644 block/vxhs.c
-
+diff --git a/block.c b/block.c
+index 7eda9a4..6f21145 100644
+--- a/block.c
++++ b/block.c
+@@ -192,6 +192,11 @@ void path_combine(char *dest, int dest_size,
+     }
+ }
+ 
++void bdrv_set_read_only(BlockDriverState *bs, bool read_only)
++{
++    bs->read_only = read_only;
++}
++
+ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+                                                   const char *backing,
+                                                   char *dest, size_t sz,
+diff --git a/block/bochs.c b/block/bochs.c
+index 516da56..bdc2831 100644
+--- a/block/bochs.c
++++ b/block/bochs.c
+@@ -110,7 +110,7 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EINVAL;
+     }
+ 
+-    bs->read_only = true; /* no write support yet */
++    bdrv_set_read_only(bs, true); /* no write support yet */
+ 
+     ret = bdrv_pread(bs->file, 0, &bochs, sizeof(bochs));
+     if (ret < 0) {
+diff --git a/block/cloop.c b/block/cloop.c
+index a6c7b9d..11f17c8 100644
+--- a/block/cloop.c
++++ b/block/cloop.c
+@@ -72,7 +72,7 @@ static int cloop_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EINVAL;
+     }
+ 
+-    bs->read_only = true;
++    bdrv_set_read_only(bs, true);
+ 
+     /* read header */
+     ret = bdrv_pread(bs->file, 128, &s->block_size, 4);
+diff --git a/block/dmg.c b/block/dmg.c
+index a7d25fc..27ce4a6 100644
+--- a/block/dmg.c
++++ b/block/dmg.c
+@@ -420,7 +420,7 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     block_module_load_one("dmg-bz2");
+-    bs->read_only = true;
++    bdrv_set_read_only(bs, true);
+ 
+     s->n_chunks = 0;
+     s->offsets = s->lengths = s->sectors = s->sectorcounts = NULL;
+diff --git a/block/rbd.c b/block/rbd.c
+index 1ceeeb5..6ad2904 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -641,7 +641,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+         goto failed_open;
+     }
+ 
+-    bs->read_only = (s->snap != NULL);
++    bdrv_set_read_only(bs, (s->snap != NULL));
+ 
+     qemu_opts_del(opts);
+     return 0;
+diff --git a/block/vvfat.c b/block/vvfat.c
+index af5153d..d4ce6d7 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1157,7 +1157,7 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+     s->current_cluster=0xffffffff;
+ 
+     /* read only is the default for safety */
+-    bs->read_only = true;
++    bdrv_set_read_only(bs, true);
+     s->qcow = NULL;
+     s->qcow_filename = NULL;
+     s->fat2 = NULL;
+@@ -1173,7 +1173,7 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+         if (ret < 0) {
+             goto fail;
+         }
+-        bs->read_only = false;
++        bdrv_set_read_only(bs, false);
+     }
+ 
+     bs->total_sectors = cyls * heads * secs;
+diff --git a/include/block/block.h b/include/block/block.h
+index 466de49..99d49f2 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -434,6 +434,7 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
+                             int64_t sector_num, int nb_sectors, int *pnum);
+ 
+ bool bdrv_is_read_only(BlockDriverState *bs);
++void bdrv_set_read_only(BlockDriverState *bs, bool read_only);
+ bool bdrv_is_sg(BlockDriverState *bs);
+ bool bdrv_is_inserted(BlockDriverState *bs);
+ int bdrv_media_changed(BlockDriverState *bs);
 -- 
 2.9.3
