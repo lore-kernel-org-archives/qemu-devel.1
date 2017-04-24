@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2THx-0001Fr-VX
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:43 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2THw-0003HX-Js
+	(envelope-from <dgibson@ozlabs.org>) id 1d2THx-0001Fi-6D
 	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:42 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1d2THv-0003HI-Nn
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:41 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:58:43 +1000
-Message-Id: <20170424015927.8933-4-david@gibson.dropbear.id.au>
-In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
-References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:58:40 +1000
+Message-Id: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/47] ppc/spapr: QOM'ify sPAPRRTCState
+Subject: [Qemu-devel] [PULL 00/47] ppc-for-2.10 queue 20170424
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,246 +23,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+The following changes since commit 32c7e0ab755745e961f1772e95cac381cc6876=
+9d:
 
-Also use an 'sPAPRRTCState' attribute under the sPAPR machine to hold
-the RTC object. Overall, these changes remove an unnecessary and
-implicit dependency on SysBus.
+  Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170=
+421' into staging (2017-04-21 15:59:27 +0100)
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c         | 16 ++++++++--------
- hw/ppc/spapr_events.c  |  2 +-
- hw/ppc/spapr_rtc.c     | 41 +++++++----------------------------------
- include/hw/ppc/spapr.h | 21 ++++++++++++++++-----
- include/hw/ppc/xics.h  |  2 +-
- 5 files changed, 33 insertions(+), 49 deletions(-)
+are available in the git repository at:
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index de5db75..3edc3dd 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1333,13 +1333,13 @@ static void spapr_create_nvram(sPAPRMachineState =
-*spapr)
-=20
- static void spapr_rtc_create(sPAPRMachineState *spapr)
- {
--    DeviceState *dev =3D qdev_create(NULL, TYPE_SPAPR_RTC);
--
--    qdev_init_nofail(dev);
--    spapr->rtc =3D dev;
--
--    object_property_add_alias(qdev_get_machine(), "rtc-time",
--                              OBJECT(spapr->rtc), "date", NULL);
-+    object_initialize(&spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC);
-+    object_property_add_child(OBJECT(spapr), "rtc", OBJECT(&spapr->rtc),
-+                              &error_fatal);
-+    object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
-+                              &error_fatal);
-+    object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spapr->=
-rtc),
-+                              "date", &error_fatal);
- }
-=20
- /* Returns whether we want to use VGA or not */
-@@ -1377,7 +1377,7 @@ static int spapr_post_load(void *opaque, int versio=
-n_id)
-      * So when migrating from those versions, poke the incoming offset
-      * value into the RTC device */
-     if (version_id < 3) {
--        err =3D spapr_rtc_import_offset(spapr->rtc, spapr->rtc_offset);
-+        err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
-     }
-=20
-     return err;
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 24a5758..f0b28d8 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -422,7 +422,7 @@ static void spapr_init_maina(struct rtas_event_log_v6=
-_maina *maina,
-     maina->hdr.section_id =3D cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MAINA);
-     maina->hdr.section_length =3D cpu_to_be16(sizeof(*maina));
-     /* FIXME: section version, subtype and creator id? */
--    spapr_rtc_read(spapr->rtc, &tm, NULL);
-+    spapr_rtc_read(&spapr->rtc, &tm, NULL);
-     year =3D tm.tm_year + 1900;
-     maina->creation_date =3D cpu_to_be32((to_bcd(year / 100) << 24)
-                                        | (to_bcd(year % 100) << 16)
-diff --git a/hw/ppc/spapr_rtc.c b/hw/ppc/spapr_rtc.c
-index 3a17ac4..00a4e4c 100644
---- a/hw/ppc/spapr_rtc.c
-+++ b/hw/ppc/spapr_rtc.c
-@@ -33,19 +33,8 @@
- #include "qapi-event.h"
- #include "qemu/cutils.h"
-=20
--#define SPAPR_RTC(obj) \
--    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
--
--typedef struct sPAPRRTCState sPAPRRTCState;
--struct sPAPRRTCState {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    int64_t ns_offset;
--};
--
--void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns)
-+void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns)
- {
--    sPAPRRTCState *rtc =3D SPAPR_RTC(dev);
-     int64_t host_ns =3D qemu_clock_get_ns(rtc_clock);
-     int64_t guest_ns;
-     time_t guest_s;
-@@ -63,16 +52,12 @@ void spapr_rtc_read(DeviceState *dev, struct tm *tm, =
-uint32_t *ns)
-     }
- }
-=20
--int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset)
-+int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset)
- {
--    sPAPRRTCState *rtc;
--
--    if (!dev) {
-+    if (!rtc) {
-         return -ENODEV;
-     }
-=20
--    rtc =3D SPAPR_RTC(dev);
--
-     rtc->ns_offset =3D legacy_offset * NANOSECONDS_PER_SECOND;
-=20
-     return 0;
-@@ -91,12 +76,7 @@ static void rtas_get_time_of_day(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-         return;
-     }
-=20
--    if (!spapr->rtc) {
--        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--        return;
--    }
--
--    spapr_rtc_read(spapr->rtc, &tm, &ns);
-+    spapr_rtc_read(&spapr->rtc, &tm, &ns);
-=20
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-     rtas_st(rets, 1, tm.tm_year + 1900);
-@@ -113,7 +93,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-                                  target_ulong args,
-                                  uint32_t nret, target_ulong rets)
- {
--    sPAPRRTCState *rtc;
-+    sPAPRRTCState *rtc =3D &spapr->rtc;
-     struct tm tm;
-     time_t new_s;
-     int64_t host_ns;
-@@ -123,11 +103,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sP=
-APRMachineState *spapr,
-         return;
-     }
-=20
--    if (!spapr->rtc) {
--        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--        return;
--    }
--
-     tm.tm_year =3D rtas_ld(args, 0) - 1900;
-     tm.tm_mon =3D rtas_ld(args, 1) - 1;
-     tm.tm_mday =3D rtas_ld(args, 2);
-@@ -144,8 +119,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-     /* Generate a monitor event for the change */
-     qapi_event_send_rtc_change(qemu_timedate_diff(&tm), &error_abort);
-=20
--    rtc =3D SPAPR_RTC(spapr->rtc);
--
-     host_ns =3D qemu_clock_get_ns(rtc_clock);
-=20
-     rtc->ns_offset =3D (new_s * NANOSECONDS_PER_SECOND) - host_ns;
-@@ -155,7 +128,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-=20
- static void spapr_rtc_qom_date(Object *obj, struct tm *current_tm, Error=
- **errp)
- {
--    spapr_rtc_read(DEVICE(obj), current_tm, NULL);
-+    spapr_rtc_read(SPAPR_RTC(obj), current_tm, NULL);
- }
-=20
- static void spapr_rtc_realize(DeviceState *dev, Error **errp)
-@@ -200,7 +173,7 @@ static void spapr_rtc_class_init(ObjectClass *oc, voi=
-d *data)
-=20
- static const TypeInfo spapr_rtc_info =3D {
-     .name          =3D TYPE_SPAPR_RTC,
--    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .parent        =3D TYPE_DEVICE,
-     .instance_size =3D sizeof(sPAPRRTCState),
-     .class_init    =3D spapr_rtc_class_init,
- };
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 808aac8..ba9e689 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -20,6 +20,18 @@ typedef struct sPAPREventSource sPAPREventSource;
-=20
- #define SPAPR_TIMEBASE_FREQ     512000000ULL
-=20
-+#define TYPE_SPAPR_RTC "spapr-rtc"
-+
-+#define SPAPR_RTC(obj)                                  \
-+    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
-+
-+typedef struct sPAPRRTCState sPAPRRTCState;
-+struct sPAPRRTCState {
-+    /*< private >*/
-+    DeviceState parent_obj;
-+    int64_t ns_offset;
-+};
-+
- typedef struct sPAPRMachineClass sPAPRMachineClass;
-=20
- #define TYPE_SPAPR_MACHINE      "spapr-machine"
-@@ -58,7 +70,7 @@ struct sPAPRMachineState {
-     QLIST_HEAD(, sPAPRPHBState) phbs;
-     struct sPAPRNVRAM *nvram;
-     ICSState *ics;
--    DeviceState *rtc;
-+    sPAPRRTCState rtc;
-=20
-     void *htab;
-     uint32_t htab_shift;
-@@ -629,11 +641,10 @@ struct sPAPRConfigureConnectorState {
-=20
- void spapr_ccs_reset_hook(void *opaque);
-=20
--#define TYPE_SPAPR_RTC "spapr-rtc"
--#define TYPE_SPAPR_RNG "spapr-rng"
-+void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
-+int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
-=20
--void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns);
--int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset);
-+#define TYPE_SPAPR_RNG "spapr-rng"
-=20
- int spapr_rng_populate_dt(void *fdt);
-=20
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 9a5e715..ce23018 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -28,7 +28,7 @@
- #ifndef XICS_H
- #define XICS_H
-=20
--#include "hw/sysbus.h"
-+#include "hw/qdev.h"
-=20
- #define XICS_IPI        0x2
- #define XICS_BUID       0x1
---=20
-2.9.3
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170424
+
+for you to fetch changes up to 4cab48942a1c5353f0a314fab1aa85a5f0a61461:
+
+  target/ppc: Style fixes (2017-04-24 08:56:19 +1000)
+
+----------------------------------------------------------------
+ppc patch queue 2017-04-24
+
+Here's my first pull request for qemu-2.10, consisting of assorted
+patches which have accumulated while qemu-2.9 stabilized.  Highlights
+are:
+    * Rework / cleanup of the XICS interrupt controller
+    * Substantial improvement to the 'powernv' machine type
+        - Includes an MMIO XICS version
+    * POWER9 support improvements
+        - POWER9 guests with KVM
+	- Partial support for POWER9 guests with TCG
+    * IOMMU and VFIO improvements
+    * Assorted minor changes
+
+There are several IPMI patches here that aren't usually in my area of
+maintenance, but there isn't a regular maintainer and these patches
+are for the benefit of the powernv machine type.
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (4):
+      target-ppc: kvm: make use of KVM_CREATE_SPAPR_TCE_64
+      target-ppc/kvm: Enable in-kernel TCE acceleration for multi-tce
+      spapr_pci: Warn when RAM page size is not enabled in IOMMU page mas=
+k
+      spapr_pci: Removed unused include
+
+Anton Blanchard (1):
+      target/ppc: Fix size of struct PPCElfPrstatus
+
+Benjamin Herrenschmidt (2):
+      ppc/pnv: Add OCC model stub with interrupt support
+      ppc/pnv: Add support for POWER8+ LPC Controller
+
+Bernhard Kaindl (1):
+      e500,book3s: mfspr 259: Register mapped/aliased SPRG3 user read
+
+Bharata B Rao (1):
+      spapr-cpu-core: Release ICPState object during CPU unrealization
+
+C=C3=A9dric Le Goater (25):
+      ppc/spapr: QOM'ify sPAPRRTCState
+      ppc/xics: introduce an 'intc' backlink under PowerPCCPU
+      spapr: move the IRQ server number mapping under the machine
+      spapr: allocate the ICPState object from under sPAPRCPUCore
+      ppc/xics: add a realize() handler to ICPStateClass
+      ppc/pnv: add a PnvICPState object
+      ppc/pnv: extend the machine with a XICSFabric interface
+      ppc/pnv: extend the machine with a InterruptStatsProvider interface
+      ppc/pnv: create the ICP object under PnvCore
+      ppc/pnv: add a helper to calculate MMIO addresses registers
+      ppc/pnv: add memory regions for the ICP registers
+      ppc/pnv: Add cut down PSI bridge model and hookup external interrup=
+t
+      ppc: add IPMI support
+      ipmi: use a file to load SDRs
+      ipmi: provide support for FRUs
+      ipmi: introduce an ipmi_bmc_sdr_find() API
+      ipmi: introduce an ipmi_bmc_gen_event() API
+      spapr: remove the 'nr_servers' field from the machine
+      ppc/pnv: enable only one LPC bus
+      ppc/pnv: scan ISA bus to populate device tree
+      ppc/pnv: populate device tree for RTC devices
+      ppc/pnv: populate device tree for serial devices
+      ppc/pnv: populate device tree for IPMI BT devices
+      ppc/pnv: add initial IPMI sensors for the BMC simulator
+      ppc/pnv: generate an OEM SEL event on shutdown
+
+David Gibson (2):
+      pseries: Add pseries-2.10 machine type
+      target/ppc: Style fixes
+
+Sam Bobroff (6):
+      target/ppc: Improve accuracy of guest HTM availability on P8s
+      spapr: Add ibm,processor-radix-AP-encodings to the device tree
+      target-ppc: support KVM_CAP_PPC_MMU_RADIX, KVM_CAP_PPC_MMU_HASH_V3
+      spapr: move spapr_populate_pa_features()
+      spapr: Enable ISA 3.0 MMU mode selection via CAS
+      spapr: Workaround for broken radix guests
+
+Suraj Jitindar Singh (4):
+      target/ppc: Add new H-CALL shells for in memory table translation
+      target/ppc: Implement H_REGISTER_PROCESS_TABLE H_CALL
+      target/ppc: Add ibm,processor-radix-AP-encodings for TCG
+      target/ppc: Flush TLB on write to PIDR
+
+Thomas Huth (1):
+      hw/ppc/pnv: Classify the "PowerNV Chip" devices as CPU devices
+
+ default-configs/ppc64-softmmu.mak |   4 +
+ hw/intc/Makefile.objs             |   1 +
+ hw/intc/xics.c                    |  22 +-
+ hw/intc/xics_pnv.c                | 192 +++++++++++++
+ hw/intc/xics_spapr.c              |  25 +-
+ hw/ipmi/ipmi_bmc_sim.c            | 191 ++++++++++++-
+ hw/ppc/Makefile.objs              |   2 +-
+ hw/ppc/pnv.c                      | 411 ++++++++++++++++++++++++---
+ hw/ppc/pnv_bmc.c                  | 122 ++++++++
+ hw/ppc/pnv_core.c                 |  27 +-
+ hw/ppc/pnv_lpc.c                  | 106 ++++++-
+ hw/ppc/pnv_occ.c                  | 136 +++++++++
+ hw/ppc/pnv_psi.c                  | 571 ++++++++++++++++++++++++++++++++=
+++++++
+ hw/ppc/spapr.c                    | 371 +++++++++++++++----------
+ hw/ppc/spapr_cpu_core.c           |  17 +-
+ hw/ppc/spapr_events.c             |   2 +-
+ hw/ppc/spapr_hcall.c              | 174 +++++++++++-
+ hw/ppc/spapr_iommu.c              |   8 +-
+ hw/ppc/spapr_pci.c                |   8 +-
+ hw/ppc/spapr_rtc.c                |  41 +--
+ include/hw/ipmi/ipmi.h            |   4 +
+ include/hw/ppc/pnv.h              |  57 +++-
+ include/hw/ppc/pnv_lpc.h          |   8 +
+ include/hw/ppc/pnv_occ.h          |  38 +++
+ include/hw/ppc/pnv_psi.h          |  67 +++++
+ include/hw/ppc/pnv_xscom.h        |   6 +
+ include/hw/ppc/spapr.h            |  30 +-
+ include/hw/ppc/spapr_ovec.h       |   8 +
+ include/hw/ppc/xics.h             |  19 +-
+ include/sysemu/kvm.h              |   1 +
+ qemu-options.hx                   |  15 +-
+ target/ppc/arch_dump.c            |   2 +-
+ target/ppc/cpu-qom.h              |   1 +
+ target/ppc/cpu.h                  |   5 +
+ target/ppc/helper.h               |   1 +
+ target/ppc/kvm.c                  | 144 +++++++++-
+ target/ppc/kvm_ppc.h              |  40 ++-
+ target/ppc/misc_helper.c          |   8 +
+ target/ppc/translate_init.c       | 410 ++++++++++++++-------------
+ 39 files changed, 2803 insertions(+), 492 deletions(-)
+ create mode 100644 hw/intc/xics_pnv.c
+ create mode 100644 hw/ppc/pnv_bmc.c
+ create mode 100644 hw/ppc/pnv_occ.c
+ create mode 100644 hw/ppc/pnv_psi.c
+ create mode 100644 include/hw/ppc/pnv_occ.h
+ create mode 100644 include/hw/ppc/pnv_psi.h
