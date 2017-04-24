@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2eNI-00075Q-4r
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:49:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d2eQ9-0007ru-AM
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:52:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2eNG-0003n1-Qd
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:49:56 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38135)
+	(envelope-from <peter.maydell@linaro.org>) id 1d2eQ8-0005F8-5P
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:52:53 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36262)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d2eNE-0003mf-2M
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:49:52 -0400
-Received: by mail-wm0-x232.google.com with SMTP id r190so68443506wme.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 06:49:51 -0700 (PDT)
+	id 1d2eQ7-0005El-VS
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:52:52 -0400
+Received: by mail-wm0-x231.google.com with SMTP id u65so23739313wmu.1
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 06:52:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
-References: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <20170424133624.GP20809@redhat.com>
+References: <trinity-b0e235ed-b74e-40f5-b249-c73867fd5ee9-1493036276162@3capp-webde-bs07>
+	<20170424125016.GM20809@redhat.com>
+	<CAFEAcA_p7rWmuRZ20PHBPfXoKswz95PtOjG866kaC2ooKx70PQ@mail.gmail.com>
+	<20170424133624.GP20809@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Apr 2017 14:49:30 +0100
-Message-ID: <CAFEAcA_9Du7_=-q2uGBKYporAQ+v8G9nGJNrcwJ1FCZ=OO8Hrw@mail.gmail.com>
+Date: Mon, 24 Apr 2017 14:52:30 +0100
+Message-ID: <CAFEAcA_LrsgToPR842redVqG7VnntTdg2ANgkDpnFAWiEqQVVw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/8] Net patches
+Subject: Re: [Qemu-devel] error: qcrypto_random_bytes() tried to read from
+ /dev/[u]random, even on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: GM.Ijewski@web.de, QEMU Developers <qemu-devel@nongnu.org>
 
-On 24 April 2017 at 06:15, Jason Wang <jasowang@redhat.com> wrote:
-> The following changes since commit 32c7e0ab755745e961f1772e95cac381cc68769d:
->
->   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170421' into staging (2017-04-21 15:59:27 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to 049f6d8237dd0b14dee02e4c22b20114c43cecff:
->
->   COLO-compare: Optimize tcp compare trace event (2017-04-24 11:30:36 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
+On 24 April 2017 at 14:36, Daniel P. Berrange <berrange@redhat.com> wrote:
+> FYI, both gnutls and openssl use these CryptAcquireContext/CryptGenRandom
+> methods, so I'd prefer to stick with that.
 
-Hi. Clang picks up what looks like a typo:
+They probably need the full crypto API anyway, though...
 
-/Users/pm215/src/qemu-for-merges/hw/net/ftgmac100.c:809:33: error: use
-of logical '&&' with constant operand
-[-Werror,-Wconstant-logical-operand]
-    if (size < 64 && !(s->maccr && FTGMAC100_MACCR_RX_RUNT)) {
-                                ^  ~~~~~~~~~~~~~~~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/hw/net/ftgmac100.c:809:33: note: use
-'&' for a bitwise operation
-    if (size < 64 && !(s->maccr && FTGMAC100_MACCR_RX_RUNT)) {
-                                ^~
-                                &
-/Users/pm215/src/qemu-for-merges/hw/net/ftgmac100.c:809:33: note:
-remove constant to silence this warning
-    if (size < 64 && !(s->maccr && FTGMAC100_MACCR_RX_RUNT)) {
-                               ~^~~~~~~~~~~~~~~~~~~~~~~~~~
-1 error generated.
+> It seems we merely need to set CRYPT_SILENT in the flags to prevent any
+> chance of interactive prompts.
+>
+> https://msdn.microsoft.com/en-us/library/windows/desktop/aa379886(v=vs.85).aspx
 
+How about CRYPT_VERIFYCONTEXT? The docs say "in most cases this flag
+should be set".
+
+This kind of discussion puts me off the Crypt* APIs though -- they're
+a complicated API that can easily be misused. "Please just fill
+this buffer with randomness" is a simple API that's hard to call
+wrongly...
 
 thanks
 -- PMM
