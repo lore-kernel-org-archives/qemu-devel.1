@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d2cDp-0001oj-Aq
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:32:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d2cR7-00044Z-6i
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d2cDk-0002ct-Af
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:32:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d2cDk-0002cD-1a
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:31:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0961380478
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 11:31:55 +0000 (UTC)
-Date: Mon, 24 Apr 2017 12:31:48 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170424113147.GA2075@work-vm>
-References: <1490860207-8302-1-git-send-email-thuth@redhat.com>
-	<1490860207-8302-2-git-send-email-thuth@redhat.com>
-	<c341bda5-8e1d-2717-3606-51ef1611d1a8@redhat.com>
-	<678cd353-56cb-3dac-3f91-966cb5abeb34@redhat.com>
-	<55a17a77-9ab4-519a-b917-695fd33fd4be@redhat.com>
-	<87fuhfcnov.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1d2cR3-0006Q0-69
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:45:45 -0400
+Date: Mon, 24 Apr 2017 13:45:27 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170424114527.GE4739@noname.redhat.com>
+References: <20170406150148.zwjpozqtale44jfh@perseus.local>
+	<da7174ff-38c1-07fd-96b6-fa9280524002@redhat.com>
+	<382b0707-233d-ab05-e054-3da43617460d@redhat.com>
+	<1877dc76-87e0-650c-d76a-44e6e7754a2b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="A6N2fC+uXW/VQSAv"
 Content-Disposition: inline
-In-Reply-To: <87fuhfcnov.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] libqtest: Ignore QMP events when
- parsing the response for HMP commands
+In-Reply-To: <1877dc76-87e0-650c-d76a-44e6e7754a2b@redhat.com>
+Subject: Re: [Qemu-devel] proposed qcow2 extension: cluster reservations
+ [was: [RFC] Proposed qcow2 extension: subcluster allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,111 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
-> > On 04/04/2017 03:31 AM, Thomas Huth wrote:
-> >> On 03.04.2017 21:09, John Snow wrote:
-> >>>
-> >>>
-> >>> On 03/30/2017 03:50 AM, Thomas Huth wrote:
-> >>>> When running certain HMP commands (like "device_del") via QMP, we
-> >>>> can sometimes get a QMP event in the response first, so that the
-> >>>> "g_assert(ret)" statement in qtest_hmp() triggers and the test
-> >>>> fails. Fix this by ignoring such QMP events while looking for the
-> >>>> real return value from QMP.
-> >>>>
-> >>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>>> ---
-> >>>>  tests/libqtest.c | 6 ++++++
-> >>>>  1 file changed, 6 insertions(+)
-> >>>>
-> >>>> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> >>>> index a5c3d2b..c9b2d76 100644
-> >>>> --- a/tests/libqtest.c
-> >>>> +++ b/tests/libqtest.c
-> >>>> @@ -580,6 +580,12 @@ char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
-> >>>>                       " 'arguments': {'command-line': %s}}",
-> >>>>                       cmd);
-> >>>>      ret = g_strdup(qdict_get_try_str(resp, "return"));
-> >>>> +    while (ret == NULL && qdict_get_try_str(resp, "event")) {
-> >>>> +        /* Ignore asynchronous QMP events */
-> >>>> +        QDECREF(resp);
-> >>>> +        resp = qtest_qmp_receive(s);
-> >>>> +        ret = g_strdup(qdict_get_try_str(resp, "return"));
-> >>>> +    }
-> >>>>      g_assert(ret);
-> >>>>      QDECREF(resp);
-> >>>>      g_free(cmd);
-> >>>>
-> >>>
-> >>> You've probably been asked this, but can you just shove the QMP response
-> >>> you don't want into the event queue for consumption by other calls?
-> >> 
-> >> Well, this is the qtest_hmpv() function, so I assume that the caller
-> >> just wants to execute a HMP command and does not really care about QMP
-> >> events. If you care about QMP events, you should use the qmp functions
-> >> instead.
-> >> 
-> >>  Thomas
-> >> 
-> >
-> > I don't think it's obvious that using HMP functions should cause the QMP
-> > stream to become faulty, though.
-> 
-> qtest_hmpv() is a helper function.  It tries to be convenient for the
-> common case.  In particular, it receives, checks and consumes the QMP
-> reply.  Before the patch, it screws up when QMP events arrive before the
-> reply.  The patch fixes it by also consuming the events.  Makes sense.
-> 
-> The non-obviousness should be addressed in the function comment.
-> 
-> > If someone uses an HMP function and then tries to wait on a QMP event to
-> > confirm that some key condition has occurred (pausing or resuming, for
-> > instance) it would not be immediately apparent from the user's POV that
-> > this function just eats replies because it was convenient to do so.
-> 
-> Code that needs to see events can't use this helper function.  It needs
-> to use more primitive functions instead.
-> 
-> > I guess the event queue only exists in python though, so it's not as
-> > trivial as I was thinking it would be...
-> 
-> More sophisticated handling of QMP events in libqtest is out of scope
-> for this patch.  I'm not passing judgement on whether it would be
-> useful :)
-> 
-> With the function comment updated to mention QMP events get consumed:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-OK, I've added that comment to qtest_hmp and qtest_hmpv when I've
-just queued it.
-(and removed an extra 'v')
+--A6N2fC+uXW/VQSAv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- /**
-- * qtest_hmpv:
-+ * qtest_hmp:
-  * @s: #QTestState instance to operate on.
-  * @fmt...: HMP command to send to QEMU
-  *
-  * Send HMP command to QEMU via QMP's human-monitor-command.
-+ * QMP events are discarded.
-  *
-  * Returns: the command's output.  The caller should g_free() it.
-  */
-@@ -149,6 +150,7 @@ char *qtest_hmp(QTestState *s, const char *fmt, ...);
-  * @ap: HMP command arguments
-  *
-  * Send HMP command to QEMU via QMP's human-monitor-command.
-+ * QMP events are discarded.
-  *
-  * Returns: the command's output.  The caller should g_free() it.
-  */
+Am 22.04.2017 um 19:56 hat Max Reitz geschrieben:
+> On 21.04.2017 23:09, Eric Blake wrote:
+> > And meanwhile, it looks like I have some patches to propose (and
+> > qemu-iotests to write) if I can help fix the bugs I've pointed out.
+>=20
+> You mean these?
+> https://github.com/XanClic/qemu/commits/random-qcow2-stuff-v1
+>=20
+> ;-)
+>=20
+> I'll send them once I've written tests.
 
-Dave
+You were quicker with writing the patches than I could reply that I
+already started a patch to reuse preallocated zero clusters, but never
+got around to finish it:
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+http://repo.or.cz/qemu/kevin.git/commitdiff/60b9f813bb258978455944b4ace1ab5=
+d93b5e7d4
+
+I seem to remember that it still had a problem (and probably also the
+refcount > 0 bug that Eric mentioned), but maybe you can reuse at least
+the test case from there.
+
+Kevin
+
+--A6N2fC+uXW/VQSAv
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJY/eVXAAoJEH8JsnLIjy/WucMP/i7fwuIuR2bt/G+M41LSEPoo
+cSVR4orSzgiFD/ErwmToKQexLw28EViL9heCxbAU1yAekZQvAa8IcKZt/h+JqfzE
+WQaroFVbL5dw4rYZgfRu4A80cMUHGBXo/huBHS/gMp2v48InppKNpNLO+HEOtyIX
+J+FQ/QGxiRxkzhwB9GJPbiwBRltHjr9hLsS/BF/zktVkj65Bj8w2p4agl3eRC494
+bbKCRqrOj+75+0CQEzO2B3kj8PU2Vn+BrJSfuhLbaqy57OHC8P9/G9/12oVSxQua
+qhsabyoD4RwKjMF4F3Un4TqUVAxKkoJZzVNRUoNuXtl2Rz26jhc/jF7GH+p8d7Lj
+ZBpr17Bbxd2kbWTuEcEDWB/y8Gyk1UDso8GxJqAZpUAmcVNaCe5UOIe4wZUD/72s
+HU+7AZrgRkGcDHzRMKFpSrwzrG1Z9JysKUcMSzSHHLz82igFC22YE+Oerqj/OXrp
+2OfN0z7mtbPOyMm3Pfgu8Q7idxFfapRUNS3mlqXP/P746sDUp62G9jT75VbFTW0i
+6Jvpgxu57DrFLCBqW2lnpvLFhh9wxLu7mOeyVg2AA5QydT/JBAOdT3B15pAuTKQc
+uLZYTIhj57PQ5/Wkxa2Dnm3NNeZVFfdP5eNsHxN09WUHQsSYdzzrb1cgi6J/ZqWX
+rbCjzK3d8lwdfOsb8nN1
+=e6rR
+-----END PGP SIGNATURE-----
+
+--A6N2fC+uXW/VQSAv--
