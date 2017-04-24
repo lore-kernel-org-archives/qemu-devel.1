@@ -1,47 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d2hLS-0001gi-17
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:00:15 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d2hV8-0003mP-Mh
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:10:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d2hLO-00045S-47
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:00:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1d2hLN-00044t-Rg
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:00:10 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3OGx50L001472
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 13:00:08 -0400
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a1j763cpx-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 13:00:07 -0400
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Mon, 24 Apr 2017 14:00:05 -0300
-Received: from d24av03.br.ibm.com (d24av03.br.ibm.com [9.8.31.95])
-	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v3OH03RM46268498
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 14:00:03 -0300
-Received: from d24av03.br.ibm.com (localhost [127.0.0.1])
-	by d24av03.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v3OH04mt021509
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 14:00:04 -0300
-Date: Mon, 24 Apr 2017 13:59:51 -0300
-From: joserz@linux.vnet.ibm.com
-References: <1493044126-21488-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<20170424144552.GA6511@lemon.lan>
+	(envelope-from <dgilbert@redhat.com>) id 1d2hV4-0007cu-Gl
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:10:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53880)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d2hV4-0007cN-72
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:10:10 -0400
+Date: Mon, 24 Apr 2017 18:10:02 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170424171001.GL2362@work-vm>
+References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170414131739eucas1p27a3eed795ae545efff380d7c5f8358c3@eucas1p2.samsung.com>
+	<1492175840-5021-4-git-send-email-a.perevalov@samsung.com>
+	<20170421102453.GD2908@work-vm>
+	<20170421152212.GB5101@aperevalov-ubuntu>
+	<20170424081229.GB31384@pxdev.xzpeter.org>
+	<20170424083849.GA27768@aperevalov-ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170424144552.GA6511@lemon.lan>
-Message-Id: <20170424165950.GA10437@pacoca>
-Subject: Re: [Qemu-devel] [PATCH] trace: add qemu mutex lock and unlock
- trace events
+In-Reply-To: <20170424083849.GA27768@aperevalov-ubuntu>
+Subject: Re: [Qemu-devel] [PATCH 3/6] migration: add UFFD_FEATURE_THREAD_ID
+ feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,101 +33,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com
+To: Alexey <a.perevalov@samsung.com>
+Cc: Peter Xu <peterx@redhat.com>, i.maximets@samsung.com, aarcange@redhat.com, qemu-devel@nongnu.org
 
-On Mon, Apr 24, 2017 at 10:45:52PM +0800, Fam Zheng wrote:
-> On Mon, 04/24 11:28, Jose Ricardo Ziviani wrote:
-> > These trace events were very useful to help me to understand and find a
-> > reordering issue in vfio, for example:
+* Alexey (a.perevalov@samsung.com) wrote:
+> On Mon, Apr 24, 2017 at 04:12:29PM +0800, Peter Xu wrote:
+> > On Fri, Apr 21, 2017 at 06:22:12PM +0300, Alexey wrote:
+> > > On Fri, Apr 21, 2017 at 11:24:54AM +0100, Dr. David Alan Gilbert wrote:
+> > > > * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> > > > > Userfaultfd mechanism is able to provide process thread id,
+> > > > > in case when client request it with UFDD_API ioctl.
+> > > > > 
+> > > > > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > > > 
+> > > > There seem to be two parts to this:
+> > > >   a) Adding the mis parameter to ufd_version_check
+> > > >   b) Asking for the feature
+> > > > 
+> > > > Please split it into two patches.
+> > > > 
+> > > > Also....
+> > > > 
+> > > > > ---
+> > > > >  include/migration/postcopy-ram.h |  2 +-
+> > > > >  migration/migration.c            |  2 +-
+> > > > >  migration/postcopy-ram.c         | 12 ++++++------
+> > > > >  migration/savevm.c               |  2 +-
+> > > > >  4 files changed, 9 insertions(+), 9 deletions(-)
+> > > > > 
+> > > > > diff --git a/include/migration/postcopy-ram.h b/include/migration/postcopy-ram.h
+> > > > > index 8e036b9..809f6db 100644
+> > > > > --- a/include/migration/postcopy-ram.h
+> > > > > +++ b/include/migration/postcopy-ram.h
+> > > > > @@ -14,7 +14,7 @@
+> > > > >  #define QEMU_POSTCOPY_RAM_H
+> > > > >  
+> > > > >  /* Return true if the host supports everything we need to do postcopy-ram */
+> > > > > -bool postcopy_ram_supported_by_host(void);
+> > > > > +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
+> > > > >  
+> > > > >  /*
+> > > > >   * Make all of RAM sensitive to accesses to areas that haven't yet been written
+> > > > > diff --git a/migration/migration.c b/migration/migration.c
+> > > > > index ad4036f..79f6425 100644
+> > > > > --- a/migration/migration.c
+> > > > > +++ b/migration/migration.c
+> > > > > @@ -802,7 +802,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+> > > > >           * special support.
+> > > > >           */
+> > > > >          if (!old_postcopy_cap && runstate_check(RUN_STATE_INMIGRATE) &&
+> > > > > -            !postcopy_ram_supported_by_host()) {
+> > > > > +            !postcopy_ram_supported_by_host(NULL)) {
+> > > > >              /* postcopy_ram_supported_by_host will have emitted a more
+> > > > >               * detailed message
+> > > > >               */
+> > > > > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > > > > index dc80dbb..70f0480 100644
+> > > > > --- a/migration/postcopy-ram.c
+> > > > > +++ b/migration/postcopy-ram.c
+> > > > > @@ -60,13 +60,13 @@ struct PostcopyDiscardState {
+> > > > >  #include <sys/eventfd.h>
+> > > > >  #include <linux/userfaultfd.h>
+> > > > >  
+> > > > > -static bool ufd_version_check(int ufd)
+> > > > > +static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+> > > > >  {
+> > > > >      struct uffdio_api api_struct;
+> > > > >      uint64_t ioctl_mask;
+> > > > >  
+> > > > >      api_struct.api = UFFD_API;
+> > > > > -    api_struct.features = 0;
+> > > > > +    api_struct.features = UFFD_FEATURE_THREAD_ID;
+> > > > >      if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> > > > >          error_report("postcopy_ram_supported_by_host: UFFDIO_API failed: %s",
+> > > > >                       strerror(errno));
+> > > > 
+> > > > You're not actually using the 'mis' here - what I'd expected was
+> > > > something that was going to check if the UFFDIO_API return said that it really
+> > > > had the feature, and if so store a flag in the MIS somewhere.
+> > > > 
+> > > > Also, I'm not sure it's right to set 'api_struct.features' on the input - what
+> > > > happens if this is run on an old kernel - we don't want postcopy to fail on
+> > > > an old kernel without your feature.
+> > > > I'm not 100% sure of the interface, but I think the way it works is you set
+> > > > features = 0 before the call, and then check the api_struct.features in the
+> > > > return - in the same way that I check for UFFD_FEATURE_MISSING_HUGETLBFS.
+> > > > 
+> > > We need to ask kernel about that feature,
+> > > right,
+> > > kernel returns back available features
+> > > uffdio_api.features = UFFD_API_FEATURES
+> > > but it also stores requested features
 > > 
-> > qemu_mutex_lock locked mutex 0x10905ad8
-> >   vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2020c, 4)
-> > qemu_mutex_unlock unlocked mutex 0x10905ad8
-> > qemu_mutex_lock locked mutex 0x10905ad8
-> >   vfio_region_write  (0001:03:00.0:region1+0xc4, 0xa0000, 4)
-> > qemu_mutex_unlock unlocked mutex 0x10905ad8
+> > I feel like this does not against Dave's comment, maybe we just need
+> > to send the UFFDIO_API twice? Like:
+> yes, ioctl with UFFDIO_API will fail on old kernel if we will request
+> e.g. UFFD_FEATURE_THREAD_ID or other new feature.
+> 
+> So in general way need a per feature request, for better error handling.
+
+No, we don't need to - I think the way the kernel works is that you pass
+features = 0 in, and it sets api_struct.features on the way out;
+so if you always pass 0 in, you can then just check the features that
+it returns.
+
+Dave
+
+> 
 > > 
-> > that also helped to see desired result after the fix:
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index 85fd8d7..fd0905f 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -64,6 +64,7 @@ static bool ufd_version_check(int ufd)
+> >  {
+> >      struct uffdio_api api_struct;
+> >      uint64_t ioctl_mask;
+> > +    uint64_t features = 0;
 > > 
-> > qemu_mutex_lock locked mutex 0x10905ad8
-> >   vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2000c, 4)
-> >   vfio_region_write  (0001:03:00.0:region1+0xc4, 0xb0000, 4)
-> > qemu_mutex_unlock unlocked mutex 0x10905ad8
-> > 
-> > So it could be a good idea to have these traces implemented. It's worth
-> > mentioning that they should be surgically enabled during the debugging,
-> > otherwise it'd flood the trace logs with lock/unlock messages.
-> > 
-> > How to use it:
-> > trace-event qemu_mutex_lock on|off
-> > trace-event qemu_mutex_unlock on|off
-> > or
-> > trace-event qemu_mutex* on|off
-> > 
-> > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> > ---
-> >  util/qemu-thread-posix.c | 5 +++++
-> >  util/trace-events        | 4 ++++
-> >  2 files changed, 9 insertions(+)
-> > 
-> > diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-> > index 73e3a0e..909c2ac 100644
-> > --- a/util/qemu-thread-posix.c
-> > +++ b/util/qemu-thread-posix.c
-> > @@ -14,6 +14,7 @@
-> >  #include "qemu/thread.h"
-> >  #include "qemu/atomic.h"
-> >  #include "qemu/notify.h"
-> > +#include "trace.h"
-> >  
-> >  static bool name_threads;
-> >  
-> > @@ -60,6 +61,8 @@ void qemu_mutex_lock(QemuMutex *mutex)
-> >      err = pthread_mutex_lock(&mutex->lock);
-> >      if (err)
-> >          error_exit(err, __func__);
+> >      api_struct.api = UFFD_API;
+> >      api_struct.features = 0;
+> > @@ -92,6 +93,27 @@ static bool ufd_version_check(int ufd)
+> >              return false;
+> >          }
+> >      }
 > > +
-> > +    trace_qemu_mutex_lock((void *)&mutex->lock);
-> 
-> You don't need these casts as the parameter type is void * which accepts any
-> pointers.
-
-OK
-
-> 
+> > +#ifdef UFFD_FEATURE_THREAD_ID
+> > +    if (api_struct.features & UFFD_FEATURE_THREAD_ID) {
+> > +        features |= UFFD_FEATURE_THREAD_ID;
+> > +    }
+> > +#endif
+> > +
+> > +    if (features) {
+> > +        /*
+> > +         * If there are new features to be enabled from userspace,
+> > +         * trigger another UFFDIO_API ioctl.
+> > +         */
+> > +        api_struct.api = UFFD_API;
+> > +        api_struct.features = features;
+> > +        if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> > +            error_report("UFFDIO_API failed to setup features: 0x%"PRIx64,
+> > +                         features);
+> > +            return false;
+> > +        }
+> > +    }
+> > +
+> >      return true;
 > >  }
-> >  
-> >  int qemu_mutex_trylock(QemuMutex *mutex)
-> > @@ -74,6 +77,8 @@ void qemu_mutex_unlock(QemuMutex *mutex)
-> >      err = pthread_mutex_unlock(&mutex->lock);
-> >      if (err)
-> >          error_exit(err, __func__);
-> > +
-> > +    trace_qemu_mutex_unlock((void *)&mutex->lock);
-> >  }
-> >  
-> >  void qemu_rec_mutex_init(QemuRecMutex *mutex)
-> > diff --git a/util/trace-events b/util/trace-events
-> > index b44ef4f..65c33fe 100644
-> > --- a/util/trace-events
-> > +++ b/util/trace-events
-> > @@ -55,3 +55,7 @@ lockcnt_futex_wait_prepare(const void *lockcnt, int expected, int new) "lockcnt
-> >  lockcnt_futex_wait(const void *lockcnt, int val) "lockcnt %p waiting on %d"
-> >  lockcnt_futex_wait_resume(const void *lockcnt, int new) "lockcnt %p after wait: %d"
-> >  lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter"
-> > +
-> > +# util/qemu-thread-posix.c
-> > +qemu_mutex_lock(void *qemu_global_mutex) "locked mutex %p"
-> > +qemu_mutex_unlock(void *qemu_global_mutex) "unlocked mutex %p"
+> > 
+> > > /* only enable the requested features for this uffd context */
+> > >  ctx->features = uffd_ctx_features(features);
+> > > 
+> > > so, at the time when process thread id is going to be sent
+> > > kernel checks if it was requested
+> > > +       if (features & UFFD_FEATURE_THREAD_ID)
+> > > +               msg.arg.pagefault.ptid = task_pid_vnr(current);
+> > 
+> > (I am slightly curious about why we need this if block, after all
+> >  userspace should know whether the ptid field would be valid from the
+> >  first UFFDIO_API ioctl, right?)
+> If I correctly understand you question ) that condition was suggested,
+> due to page faulting is performance critical part (in general, not only postcopy
+> case ), that's why it should be enabled from userspace, 
+> only for statistics/debug purpose.
+> Also looks like David want to see that feature on QEMU as not always
+> feature too.
 > 
-> Parameter name is slightly misleading, maybe s/qemu_global_mutex/lock/ for both
-> lines?
-
-Great! I'll change it and send a v2.
-
-Thank for your review!
-
+> > 
+> > Thanks,
+> > 
+> > > 
+> > > from patch message:
+> > > 
+> > >  Process's thread id is being provided when user requeste it
+> > > by setting UFFD_FEATURE_THREAD_ID bit into uffdio_api.features.
+> > > 
+> > > UFFD_FEATURE_MISSING_HUGETLBFS - look like default, unconditional
+> > > behavior (I didn't find any usage of that define in kernel).
+> > 
+> > -- 
+> > Peter Xu
+> > 
 > 
-> Fam
+> -- 
 > 
+> BR
+> Alexey
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
