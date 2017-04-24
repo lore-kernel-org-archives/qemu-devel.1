@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d2jnn-00049X-MQ
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:37:40 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d2k5p-0006pc-V8
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d2jnj-0005VC-Oj
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:37:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50148)
+	(envelope-from <imammedo@redhat.com>) id 1d2k5m-0000Rf-R7
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:56:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d2jnj-0005UR-Fn
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:37:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d2k5m-0000R6-Hh
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:56:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6A8814E338
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 19:37:34 +0000 (UTC)
-Date: Mon, 24 Apr 2017 16:37:31 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170424193731.GE3482@thinpad.lan.raisama.net>
+	by mx1.redhat.com (Postfix) with ESMTPS id 5F0E83B714
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 19:56:13 +0000 (UTC)
+Date: Mon, 24 Apr 2017 21:56:04 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170424215604.65daf761@Igors-MacBook-Pro.local>
+In-Reply-To: <20170424193731.GE3482@thinpad.lan.raisama.net>
 References: <20170424185817.41002-1-imammedo@redhat.com>
 	<20170424191317.GA3482@thinpad.lan.raisama.net>
 	<20170424213233.2d19bdab@Igors-MacBook-Pro.local>
+	<20170424193731.GE3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170424213233.2d19bdab@Igors-MacBook-Pro.local>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] pc/fwcfg: unbreak migration from qemu-2.5
  and qemu-2.6 during firmware boot
 List-Id: <qemu-devel.nongnu.org>
@@ -35,76 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, dgilbert@redhat.com, lersek@redhat.com
 
-On Mon, Apr 24, 2017 at 09:32:33PM +0200, Igor Mammedov wrote:
-> On Mon, 24 Apr 2017 16:13:17 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Mon, 24 Apr 2017 16:37:31 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Mon, Apr 24, 2017 at 09:32:33PM +0200, Igor Mammedov wrote:
+> > On Mon, 24 Apr 2017 16:13:17 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > 
+> > > On Mon, Apr 24, 2017 at 08:58:17PM +0200, Igor Mammedov wrote:
+> > > [...]
+> > > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > > > index f3b372a18f..3f2d96da64 100644
+> > > > --- a/hw/i386/pc.c
+> > > > +++ b/hw/i386/pc.c
+> > > > @@ -1047,7 +1047,7 @@ static void load_linux(PCMachineState *pcms,
+> > > >      fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
+> > > >      fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
+> > > >  
+> > > > -    if (fw_cfg_dma_enabled(fw_cfg)) {
+> > > > +    if (!pcmc->linuxboot_dma_disabled && fw_cfg_dma_enabled(fw_cfg)) {
+> > > 
+> > > Why not name the flag just "linuxboot_dma", set it to true by
+> > > default at pc_machine_class_init(), and avoid the double
+> > > negative?
+> > to avoid setting it to true somewhere else, so less thing could go wrong
+> > but is you prefer *_enable variant I can switch to it.
 > 
-> > On Mon, Apr 24, 2017 at 08:58:17PM +0200, Igor Mammedov wrote:
-> > [...]
-> > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > > index f3b372a18f..3f2d96da64 100644
-> > > --- a/hw/i386/pc.c
-> > > +++ b/hw/i386/pc.c
-> > > @@ -1047,7 +1047,7 @@ static void load_linux(PCMachineState *pcms,
-> > >      fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
-> > >      fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
-> > >  
-> > > -    if (fw_cfg_dma_enabled(fw_cfg)) {
-> > > +    if (!pcmc->linuxboot_dma_disabled && fw_cfg_dma_enabled(fw_cfg)) {
-> > 
-> > Why not name the flag just "linuxboot_dma", set it to true by
-> > default at pc_machine_class_init(), and avoid the double
-> > negative?
-> to avoid setting it to true somewhere else, so less thing could go wrong
-> but is you prefer *_enable variant I can switch to it.
-
-I would prefer to. We already have other compat flags initialized
-inside pc_machine_class_init(), so this would fit nicely there.
-
-> 
-> > 
-> > [...]
-> > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > > index f278b3ae89..ff6f13b61b 100644
-> > > --- a/include/hw/i386/pc.h
-> > > +++ b/include/hw/i386/pc.h
-> > > @@ -151,6 +151,8 @@ struct PCMachineClass {
-> > >      bool save_tsc_khz;
-> > >      /* generate legacy CPU hotplug AML */
-> > >      bool legacy_cpu_hotplug;
-> > > +
-> > 
-> > A one-line description of the consequences of setting/clearing
-> > the flag would be nice.
-> will fix in v2
-
-Thanks!
+> I would prefer to. We already have other compat flags initialized
+> inside pc_machine_class_init(), so this would fit nicely there.
+how about 'use_linuxboot_mmio' instead, it will remove negation
+and let me not to touch pc_machine_class_init()?
 
 > 
 > > 
-> > > +    bool linuxboot_dma_disabled;
-> > >  };
-> > >  
-> > >  #define TYPE_PC_MACHINE "generic-pc-machine"
-> > > @@ -432,10 +434,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> > >  #define PC_COMPAT_2_6 \
-> > >      HW_COMPAT_2_6 \
-> > >      {\
-> > > -        .driver   = "fw_cfg_io",\
-> > > -        .property = "dma_enabled",\
-> > > -        .value    = "off",\
-> > > -    },{\
-> > >          .driver   = TYPE_X86_CPU,\
-> > >          .property = "cpuid-0xb",\
-> > >          .value    = "off",\
-> > > -- 
-> > > 2.11.0 (Apple Git-81)
+> > > 
+> > > [...]
+> > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > > index f278b3ae89..ff6f13b61b 100644
+> > > > --- a/include/hw/i386/pc.h
+> > > > +++ b/include/hw/i386/pc.h
+> > > > @@ -151,6 +151,8 @@ struct PCMachineClass {
+> > > >      bool save_tsc_khz;
+> > > >      /* generate legacy CPU hotplug AML */
+> > > >      bool legacy_cpu_hotplug;
+> > > > +
+> > > 
+> > > A one-line description of the consequences of setting/clearing
+> > > the flag would be nice.
+> > will fix in v2
+> 
+> Thanks!
+> 
+> > 
+> > > 
+> > > > +    bool linuxboot_dma_disabled;
+> > > >  };
+> > > >  
+> > > >  #define TYPE_PC_MACHINE "generic-pc-machine"
+> > > > @@ -432,10 +434,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+> > > >  #define PC_COMPAT_2_6 \
+> > > >      HW_COMPAT_2_6 \
+> > > >      {\
+> > > > -        .driver   = "fw_cfg_io",\
+> > > > -        .property = "dma_enabled",\
+> > > > -        .value    = "off",\
+> > > > -    },{\
+> > > >          .driver   = TYPE_X86_CPU,\
+> > > >          .property = "cpuid-0xb",\
+> > > >          .value    = "off",\
+> > > > -- 
+> > > > 2.11.0 (Apple Git-81)
+> > > > 
 > > > 
 > > 
 > 
-
--- 
-Eduardo
