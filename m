@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d2fKf-0007tW-F3
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:51:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d2fys-0007EI-Mr
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:32:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d2fKc-0000uA-Dw
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:51:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49388)
+	(envelope-from <dgilbert@redhat.com>) id 1d2fyq-00082O-LA
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:32:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d2fKc-0000tu-4J
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:51:14 -0400
-References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3333f034-0fd2-875f-fbfc-a2c0eda1f09a@redhat.com>
-Date: Mon, 24 Apr 2017 09:51:11 -0500
-MIME-Version: 1.0
-In-Reply-To: <1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nxNraKcIoi73L6G5Op01gvkVF8TpaBEtO"
-Subject: Re: [Qemu-devel] [PATCH v2 05/18] COLO: Handle shutdown command for
- VM in COLO state
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d2fyq-00081V-C6
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:32:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5893E7F6C5
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 15:32:47 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Mon, 24 Apr 2017 16:32:41 +0100
+Message-Id: <20170424153244.2600-2-dgilbert@redhat.com>
+In-Reply-To: <20170424153244.2600-1-dgilbert@redhat.com>
+References: <20170424153244.2600-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 1/4] hmp: gpa2hva and gpa2hpa hostaddr command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +29,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
-Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, quintela@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, thuth@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nxNraKcIoi73L6G5Op01gvkVF8TpaBEtO
-From: Eric Blake <eblake@redhat.com>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
-Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com,
- zhangchen.fnst@cn.fujitsu.com, quintela@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3333f034-0fd2-875f-fbfc-a2c0eda1f09a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 05/18] COLO: Handle shutdown command for
- VM in COLO state
-References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
- <1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-On 04/22/2017 03:25 AM, zhanghailiang wrote:
-> If VM is in COLO FT state, we need to do some extra works before
-> starting normal shutdown process.
->=20
-> Secondary VM will ignore the shutdown command if users issue it directl=
-y
-> to Secondary VM. COLO will capture shutdown command and after
-> shutdown request from user.
->=20
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
+These commands are useful when testing machine-check passthrough.
+gpa2hva is useful to inject a MADV_HWPOISON madvise from gdb, while
+gpa2hpa is useful to inject an error with the mce-inject kernel
+module.
 
-> +++ b/qapi-schema.json
-> @@ -1187,12 +1187,14 @@
->  #
->  # @vmstate-loaded: VM's state has been loaded by SVM.
->  #
-> +# @guest-shutdown: shutdown requested from PVM to SVM. (Since 2.9)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1490021158-4469-1-git-send-email-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20170420133058.12911-1-pbonzini@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hmp-commands.hx |  32 ++++++++++++++++++
+ monitor.c       | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 133 insertions(+)
 
-You missed 2.9. Please fix this to state 2.10.
-
-> +#
->  # Since: 2.8
->  ##
->  { 'enum': 'COLOMessage',
->    'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-repl=
-y',
->              'vmstate-send', 'vmstate-size', 'vmstate-received',
-> -            'vmstate-loaded' ] }
-> +            'vmstate-loaded', 'guest-shutdown' ] }
-> =20
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---nxNraKcIoi73L6G5Op01gvkVF8TpaBEtO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY/hDfAAoJEKeha0olJ0Nqr38IAIfPIeavkRDA+E0cokYmoRiK
-nqRjxY7ZT89lzgYGnrqxEKVVChlctqV69r5hO1KTAqavewIQBYOn/Bvk/r8hkmVc
-uwiCTcikW/Ed/QhE5MPkLZSVRv2wPsMZ8wA4ukYXn8JQR9kUUpFbj9CGcxJf036D
-FV9UvCS79vUniDobGofxFCAa652EGgGYnwT97nEh24EHGOUAZ57VdcapDHc5243J
-71HOlO5dArPw9C5Q13qxs0kxw3w2+t0+XCrMSPaHg9/y/pDm7nhAVGsqfCPTNsNH
-7eUrODMra/jeWCsQGfJfoF/bxPskHfJQozqBs/if/Qt6NYWr6ya4wy0nRmXzS5o=
-=DvrW
------END PGP SIGNATURE-----
-
---nxNraKcIoi73L6G5Op01gvkVF8TpaBEtO--
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 88192817b2..0aca984261 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -526,6 +526,38 @@ Dump 80 16 bit values at the start of the video memory.
+ ETEXI
+ 
+     {
++        .name       = "gpa2hva",
++        .args_type  = "addr:l",
++        .params     = "addr",
++        .help       = "print the host virtual address corresponding to a guest physical address",
++        .cmd        = hmp_gpa2hva,
++    },
++
++STEXI
++@item gpa2hva @var{addr}
++@findex gpa2hva
++Print the host virtual address at which the guest's physical address @var{addr}
++is mapped.
++ETEXI
++
++#ifdef CONFIG_LINUX
++    {
++        .name       = "gpa2hpa",
++        .args_type  = "addr:l",
++        .params     = "addr",
++        .help       = "print the host physical address corresponding to a guest physical address",
++        .cmd        = hmp_gpa2hpa,
++    },
++#endif
++
++STEXI
++@item gpa2hpa @var{addr}
++@findex gpa2hpa
++Print the host physical address at which the guest's physical address @var{addr}
++is mapped.
++ETEXI
++
++    {
+         .name       = "p|print",
+         .args_type  = "fmt:/,val:l",
+         .params     = "/fmt expr",
+diff --git a/monitor.c b/monitor.c
+index be282ecb80..a27dc8003f 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1421,6 +1421,107 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
+     memory_dump(mon, count, format, size, addr, 1);
+ }
+ 
++static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
++{
++    MemoryRegionSection mrs = memory_region_find(get_system_memory(),
++                                                 addr, 1);
++
++    if (!mrs.mr) {
++        error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
++        return NULL;
++    }
++
++    if (!memory_region_is_ram(mrs.mr) && !memory_region_is_romd(mrs.mr)) {
++        error_setg(errp, "Memory at address 0x%" HWADDR_PRIx "is not RAM", addr);
++        memory_region_unref(mrs.mr);
++        return NULL;
++    }
++
++    *p_mr = mrs.mr;
++    return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
++}
++
++static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
++{
++    hwaddr addr = qdict_get_int(qdict, "addr");
++    Error *local_err = NULL;
++    MemoryRegion *mr = NULL;
++    void *ptr;
++
++    ptr = gpa2hva(&mr, addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return;
++    }
++
++    monitor_printf(mon, "Host virtual address for 0x%" HWADDR_PRIx
++                   " (%s) is %p\n",
++                   addr, mr->name, ptr);
++
++    memory_region_unref(mr);
++}
++
++#ifdef CONFIG_LINUX
++static uint64_t vtop(void *ptr, Error **errp)
++{
++    uint64_t pinfo;
++    uint64_t ret = -1;
++    uintptr_t addr = (uintptr_t) ptr;
++    uintptr_t pagesize = getpagesize();
++    off_t offset = addr / pagesize * sizeof(pinfo);
++    int fd;
++
++    fd = open("/proc/self/pagemap", O_RDONLY);
++    if (fd == -1) {
++        error_setg_errno(errp, errno, "Cannot open /proc/self/pagemap");
++        return -1;
++    }
++
++    /* Force copy-on-write if necessary.  */
++    atomic_add((uint8_t *)ptr, 0);
++
++    if (pread(fd, &pinfo, sizeof(pinfo), offset) != sizeof(pinfo)) {
++        error_setg_errno(errp, errno, "Cannot read pagemap");
++        goto out;
++    }
++    if ((pinfo & (1ull << 63)) == 0) {
++        error_setg(errp, "Page not present");
++        goto out;
++    }
++    ret = ((pinfo & 0x007fffffffffffffull) * pagesize) | (addr & (pagesize - 1));
++
++out:
++    close(fd);
++    return ret;
++}
++
++static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
++{
++    hwaddr addr = qdict_get_int(qdict, "addr");
++    Error *local_err = NULL;
++    MemoryRegion *mr = NULL;
++    void *ptr;
++    uint64_t physaddr;
++
++    ptr = gpa2hva(&mr, addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return;
++    }
++
++    physaddr = vtop(ptr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++    } else {
++        monitor_printf(mon, "Host physical address for 0x%" HWADDR_PRIx
++                       " (%s) is 0x%" PRIx64 "\n",
++                       addr, mr->name, (uint64_t) physaddr);
++    }
++
++    memory_region_unref(mr);
++}
++#endif
++
+ static void do_print(Monitor *mon, const QDict *qdict)
+ {
+     int format = qdict_get_int(qdict, "format");
+-- 
+2.12.2
