@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d2YbR-0005Hs-3r
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:40:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1d2Yco-00065i-AZ
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:41:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d2YbQ-0001Kg-9e
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:40:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1d2Ycl-0001cY-63
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:41:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35750)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d2Ycl-0001cM-0C
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:41:31 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d2Yci-00059h-HJ
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:41:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 351992E80E7
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:41:27 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAOGPPbd_Y6m42EpuedngTWfGzt+MDvOwbPSmwp-OG5hVpMNBkA@mail.gmail.com>
-References: <1492050868-16200-1-git-send-email-lidongchen@tencent.com>
-	<20170414060015.GA12191@lemon>
-	<CAOGPPbeUkBskJfFX9=Of62pDrt6U-KAjbFZ-r=yVNNeb+ceAuA@mail.gmail.com>
-	<20170417034925.GC6717@lemon.lan>
-	<CAOGPPbd_Y6m42EpuedngTWfGzt+MDvOwbPSmwp-OG5hVpMNBkA@mail.gmail.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Mon, 24 Apr 2017 15:40:05 +0800
-Message-ID: <CAOGPPbc44H-oaY2Smm5kgNNbaP44C3rksi9_=0ocAXAnGdWdCg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v6] migration/block: use blk_pwrite_zeroes
- for each zero cluster
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Apr 2017 07:35:34 -0000
+From: Thomas Huth <1655702@bugs.launchpad.net>
+Reply-To: Bug 1655702 <1655702@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170111162323.27094.66518.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170424073536.16029.13273.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1655702] Re: qemu/hw/char/exynos4210_uart.c:
+ possible pointless local variable ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Apr 17, 2017 at 12:00 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
-> On Mon, Apr 17, 2017 at 11:49 AM, Fam Zheng <famz@redhat.com> wrote:
->> On Fri, 04/14 14:30, 858585 jemmy wrote:
->>> Do you know some other format which have very small cluster size?
->>
->> 64k is the default cluster size for qcow2 but it can be configured at image
->> creation time, as 512 bytes, for example:
->>
->>     $ qemu-img create -f qcow2 test.qcow2 -o cluster_size=512 1G
->
-> Thanks, i will test the performance again.
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
-I find the performance reduce when cluster size is 512.
-I will optimize the performance and submit a patch later.
-Thanks.
+-- =
 
->>
->> Fam
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1655702
+
+Title:
+  qemu/hw/char/exynos4210_uart.c: possible pointless local variable ?
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  $ fgrep frame_size qemu/hw/char/exynos4210_uart.c
+      int speed, parity, data_bits, stop_bits, frame_size;
+      frame_size =3D 1; /* start bit */
+          frame_size++; /* parity bit */
+      frame_size +=3D data_bits + stop_bits;
+  $
+
+  Suggest either use it or delete it.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1655702/+subscriptions
