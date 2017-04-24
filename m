@@ -1,22 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d2dfp-0003ZR-DS
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:05:03 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1d2dm8-0004VV-Ee
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:11:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d2dfl-0005YQ-5N
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:05:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1d2dfk-0005XK-Rb
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:04:57 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 24 Apr 2017 17:03:55 +0400
-Message-Id: <20170424130355.31324-1-marcandre.lureau@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1d2dm3-0007Yk-BI
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:11:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60783)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1d2dm3-0007Y8-18
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:11:27 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3OD8wiJ013950
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 09:11:25 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a038r2vdc-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 09:11:25 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 24 Apr 2017 07:11:23 -0600
+References: <70ef6f1f-27f4-133f-ab33-03a30f19867b@de.ibm.com>
+	<20170424105344.GF2362@work-vm>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 24 Apr 2017 15:11:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] RFC: vmcoreinfo device
+In-Reply-To: <20170424105344.GF2362@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <8559a6bc-ef35-47c2-78a4-aec960169765@de.ibm.com>
+Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,610 +41,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, lersek@redhat.com, anderson@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-The VM coreinfo (vmcoreinfo) device is an emulated device which
-exposes a 4k memory range to the guest to store various informations
-useful to debug the guest OS. (it is greatly inspired by the VMGENID
-device implementation)
+On 04/24/2017 12:53 PM, Dr. David Alan Gilbert wrote:
 
-This is an early-boot alternative to the qemu-ga VMDUMP_INFO event
-proposed in "[PATCH 00/21] WIP: dump: add kaslr support".
+FWIW, the sending side calltrace looks like:
 
-If deemed more appropriate, we can consider writing to fw_cfg directly
-instead of guest memory, now that qemu 2.9 supports it again.
+> 
+Thread 8 (Thread 0x3ff509aa910 (LWP 58594)):
+#0  0x000003ff9d588ca4 in pthread_join () from target:/lib64/libpthread.so.0
+#1  0x0000000001493d4a in qemu_thread_join (thread=0x16c7e78 <current_migration+216>) at /root/qemu/util/qemu-thread-posix.c:504
+#2  0x00000000012a0d0e in await_return_path_close_on_source (ms=0x16c7da0 <current_migration>) at /root/qemu/migration/migration.c:1641
+#3  0x00000000012a1312 in migration_completion (s=0x16c7da0 <current_migration>, current_active_state=5, old_vm_running=0x3ff509a7789, start_time=0x3ff509a7790)
+    at /root/qemu/migration/migration.c:1860
+#4  0x00000000012a17b2 in migration_thread (opaque=0x16c7da0 <current_migration>) at /root/qemu/migration/migration.c:1987
+#5  0x000003ff9d587bc4 in start_thread () from target:/lib64/libpthread.so.0
+#6  0x000003ff9d48a9f2 in thread_start () from target:/lib64/libc.so.6
 
-The proof-of-concept kernel module:
-https://github.com/elmarco/vmgenid-test/blob/master/qemuvmci-test.c
+Thread 7 (Thread 0x3ff4bfff910 (LWP 58593)):
+#0  0x000003ff9d5915b6 in recvmsg () from target:/lib64/libpthread.so.0
+#1  0x000000000141771a in qio_channel_socket_readv (ioc=0xc9986b0, iov=0x3ff4bffc170, niov=1, fds=0x0, nfds=0x0, errp=0x0) at /root/qemu/io/channel-socket.c:476
+#2  0x0000000001411668 in qio_channel_readv_full (ioc=0xc9986b0, iov=0x3ff4bffc170, niov=1, fds=0x0, nfds=0x0, errp=0x0) at /root/qemu/io/channel.c:64
+#3  0x000000000141190a in qio_channel_read (ioc=0xc9986b0, buf=0xca23888 "", buflen=32768, errp=0x0) at /root/qemu/io/channel.c:112
+#4  0x00000000012ad384 in channel_get_buffer (opaque=0xc9986b0, buf=0xca23888 "", pos=49, size=32768) at /root/qemu/migration/qemu-file-channel.c:78
+#5  0x00000000012abb64 in qemu_fill_buffer (f=0xca23850) at /root/qemu/migration/qemu-file.c:295
+#6  0x00000000012ac7b2 in qemu_peek_byte (f=0xca23850, offset=0) at /root/qemu/migration/qemu-file.c:555
+#7  0x00000000012ac82e in qemu_get_byte (f=0xca23850) at /root/qemu/migration/qemu-file.c:568
+#8  0x00000000012acbfa in qemu_get_be16 (f=0xca23850) at /root/qemu/migration/qemu-file.c:640
+#9  0x00000000012a0756 in source_return_path_thread (opaque=0x16c7da0 <current_migration>) at /root/qemu/migration/migration.c:1512
+#10 0x000003ff9d587bc4 in start_thread () from target:/lib64/libpthread.so.0
+#11 0x000003ff9d48a9f2 in thread_start () from target:/lib64/libc.so.6
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/hw/acpi/aml-build.h        |   1 +
- include/hw/acpi/vmcoreinfo.h       |  36 +++++++
- include/hw/compat.h                |   4 +
- hw/acpi/aml-build.c                |   2 +
- hw/acpi/vmcoreinfo.c               | 207 +++++++++++++++++++++++++++++++=
-++++++
- hw/i386/acpi-build.c               |  14 +++
- default-configs/i386-softmmu.mak   |   1 +
- default-configs/x86_64-softmmu.mak |   1 +
- docs/specs/vmcoreinfo.txt          | 138 +++++++++++++++++++++++++
- hw/acpi/Makefile.objs              |   1 +
- 10 files changed, 405 insertions(+)
- create mode 100644 include/hw/acpi/vmcoreinfo.h
- create mode 100644 hw/acpi/vmcoreinfo.c
- create mode 100644 docs/specs/vmcoreinfo.txt
+Thread 6 (Thread 0x3ff511aa910 (LWP 58454)):
+#0  0x000003ff9d58d450 in pthread_cond_wait@@GLIBC_2.3.2 () from target:/lib64/libpthread.so.0
+#1  0x0000000001492fce in qemu_cond_wait (cond=0xc9ca238, mutex=0xc9ca210) at /root/qemu/util/qemu-thread-posix.c:133
+#2  0x00000000010c6080 in do_data_decompress (opaque=0xc9ca208) at /root/qemu/migration/ram.c:2277
+#3  0x000003ff9d587bc4 in start_thread () from target:/lib64/libpthread.so.0
+#4  0x000003ff9d48a9f2 in thread_start () from target:/lib64/libc.so.6
 
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index 00c21f160c..fd479115e1 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -211,6 +211,7 @@ struct AcpiBuildTables {
-     GArray *rsdp;
-     GArray *tcpalog;
-     GArray *vmgenid;
-+    GArray *vmcoreinfo;
-     BIOSLinker *linker;
- } AcpiBuildTables;
-=20
-diff --git a/include/hw/acpi/vmcoreinfo.h b/include/hw/acpi/vmcoreinfo.h
-new file mode 100644
-index 0000000000..63196aeee0
---- /dev/null
-+++ b/include/hw/acpi/vmcoreinfo.h
-@@ -0,0 +1,36 @@
-+#ifndef ACPI_VMCOREINFO_H
-+#define ACPI_VMCOREINFO_H
-+
-+#include "hw/acpi/bios-linker-loader.h"
-+#include "hw/qdev.h"
-+
-+#define VMCOREINFO_DEVICE           "vmcoreinfo"
-+#define VMCOREINFO_FW_CFG_FILE      "etc/vmcoreinfo"
-+#define VMCOREINFO_ADDR_FW_CFG_FILE "etc/vmcoreinfo-addr"
-+
-+#define VMCOREINFO_FW_CFG_SIZE      4096 /* Occupy a page of memory */
-+#define VMCOREINFO_OFFSET           40   /* allow space for
-+                                          * OVMF SDT Header Probe Supres=
-sor
-+                                          */
-+
-+#define VMCOREINFO(obj) OBJECT_CHECK(VmcoreinfoState, (obj), VMCOREINFO_=
-DEVICE)
-+
-+typedef struct VmcoreinfoState {
-+    DeviceClass parent_obj;
-+    uint8_t vmcoreinfo_addr_le[8];   /* Address of memory region */
-+    bool write_pointer_available;
-+} VmcoreinfoState;
-+
-+/* returns NULL unless there is exactly one device */
-+static inline Object *find_vmcoreinfo_dev(void)
-+{
-+    return object_resolve_path_type("", VMCOREINFO_DEVICE, NULL);
-+}
-+
-+void vmcoreinfo_build_acpi(VmcoreinfoState *vis, GArray *table_data,
-+                           GArray *vmci, BIOSLinker *linker);
-+void vmcoreinfo_add_fw_cfg(VmcoreinfoState *vis, FWCfgState *s, GArray *=
-vmci);
-+bool vmcoreinfo_get(VmcoreinfoState *vis, uint64_t *paddr, uint32_t *siz=
-e,
-+                    Error **errp);
-+
-+#endif
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 5d5be91daf..d0c9b71902 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -135,6 +135,10 @@
-         .driver   =3D "vmgenid",\
-         .property =3D "x-write-pointer-available",\
-         .value    =3D "off",\
-+    },{\
-+        .driver   =3D "vmcoreinfo",\
-+        .property =3D "x-write-pointer-available",\
-+        .value    =3D "off",\
-     },
-=20
- #define HW_COMPAT_2_3 \
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index c6f2032dec..cd639586a4 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1560,6 +1560,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables=
-)
-     tables->table_data =3D g_array_new(false, true /* clear */, 1);
-     tables->tcpalog =3D g_array_new(false, true /* clear */, 1);
-     tables->vmgenid =3D g_array_new(false, true /* clear */, 1);
-+    tables->vmcoreinfo =3D g_array_new(false, true /* clear */, 1);
-     tables->linker =3D bios_linker_loader_init();
- }
-=20
-@@ -1570,6 +1571,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tab=
-les, bool mfre)
-     g_array_free(tables->table_data, true);
-     g_array_free(tables->tcpalog, mfre);
-     g_array_free(tables->vmgenid, mfre);
-+    g_array_free(tables->vmcoreinfo, mfre);
- }
-=20
- /* Build rsdt table */
-diff --git a/hw/acpi/vmcoreinfo.c b/hw/acpi/vmcoreinfo.c
-new file mode 100644
-index 0000000000..dec4feac1e
---- /dev/null
-+++ b/hw/acpi/vmcoreinfo.c
-@@ -0,0 +1,207 @@
-+/*
-+ *  Virtual Machine coreinfo device
-+ *  (based on Virtual Machine Generation ID Device)
-+ *
-+ *  Copyright (C) 2017 Red Hat, Inc.
-+ *  Copyright (C) 2017 Skyport Systems.
-+ *
-+ *  Authors: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *           Ben Warren <ben@skyportsystems.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/aml-build.h"
-+#include "hw/acpi/vmcoreinfo.h"
-+#include "hw/nvram/fw_cfg.h"
-+#include "sysemu/sysemu.h"
-+#include "qapi/error.h"
-+
-+void vmcoreinfo_build_acpi(VmcoreinfoState *vis, GArray *table_data,
-+                           GArray *vmci, BIOSLinker *linker)
-+{
-+    Aml *ssdt, *dev, *scope, *method, *addr, *if_ctx;
-+    uint32_t vgia_offset;
-+
-+    g_array_set_size(vmci, VMCOREINFO_FW_CFG_SIZE);
-+
-+    /* Put this in a separate SSDT table */
-+    ssdt =3D init_aml_allocator();
-+
-+    /* Reserve space for header */
-+    acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
-+
-+    /* Storage address */
-+    vgia_offset =3D table_data->len +
-+        build_append_named_dword(ssdt->buf, "VCIA");
-+    scope =3D aml_scope("\\_SB");
-+    dev =3D aml_device("VMCI");
-+    aml_append(dev, aml_name_decl("_HID", aml_string("QEMUVMCI")));
-+
-+    /* Simple status method to check that address is linked and non-zero=
- */
-+    method =3D aml_method("_STA", 0, AML_NOTSERIALIZED);
-+    addr =3D aml_local(0);
-+    aml_append(method, aml_store(aml_int(0xf), addr));
-+    if_ctx =3D aml_if(aml_equal(aml_name("VCIA"), aml_int(0)));
-+    aml_append(if_ctx, aml_store(aml_int(0), addr));
-+    aml_append(method, if_ctx);
-+    aml_append(method, aml_return(addr));
-+    aml_append(dev, method);
-+
-+    /* the ADDR method returns two 32-bit words representing the lower a=
-nd
-+     * upper halves of the physical address of the vmcoreinfo area
-+     */
-+    method =3D aml_method("ADDR", 0, AML_NOTSERIALIZED);
-+
-+    addr =3D aml_local(0);
-+    aml_append(method, aml_store(aml_package(2), addr));
-+
-+    aml_append(method, aml_store(aml_add(aml_name("VCIA"),
-+                                         aml_int(VMCOREINFO_OFFSET), NUL=
-L),
-+                                 aml_index(addr, aml_int(0))));
-+    aml_append(method, aml_store(aml_int(0), aml_index(addr, aml_int(1))=
-));
-+    aml_append(method, aml_return(addr));
-+
-+    aml_append(dev, method);
-+    aml_append(scope, dev);
-+    aml_append(ssdt, scope);
-+
-+    g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
-+
-+    /* Allocate guest memory */
-+    bios_linker_loader_alloc(linker, VMCOREINFO_FW_CFG_FILE, vmci, 4096,
-+                             false /* page boundary, high memory */);
-+
-+    /* Patch address of vmcoreinfo fw_cfg blob into the ADDR fw_cfg
-+     * blob so QEMU can read the info from there.  The address is
-+     * expected to be < 4GB, but write 64 bits anyway.
-+     * The address that is patched in is offset in order to implement
-+     * the "OVMF SDT Header probe suppressor"
-+     * see docs/specs/vmcoreinfo.txt for more details.
-+     */
-+    bios_linker_loader_write_pointer(linker,
-+        VMCOREINFO_ADDR_FW_CFG_FILE, 0, sizeof(uint64_t),
-+        VMCOREINFO_FW_CFG_FILE, VMCOREINFO_OFFSET);
-+
-+    /* Patch address of vmcoreinfo into the AML so OSPM can retrieve
-+     * and read it.  Note that while we provide storage for 64 bits, onl=
-y
-+     * the least-signficant 32 get patched into AML.
-+     */
-+    bios_linker_loader_add_pointer(linker,
-+        ACPI_BUILD_TABLE_FILE, vgia_offset, sizeof(uint32_t),
-+        VMCOREINFO_FW_CFG_FILE, 0);
-+
-+    build_header(linker, table_data,
-+        (void *)(table_data->data + table_data->len - ssdt->buf->len),
-+        "SSDT", ssdt->buf->len, 1, NULL, "VMCOREIN");
-+    free_aml_allocator();
-+}
-+
-+void vmcoreinfo_add_fw_cfg(VmcoreinfoState *vis, FWCfgState *s, GArray *=
-vmci)
-+{
-+    /* Create a read-only fw_cfg file for vmcoreinfo allocation */
-+    /* XXX: linker could learn to allocate without backing fw_cfg? */
-+    fw_cfg_add_file(s, VMCOREINFO_FW_CFG_FILE, vmci->data,
-+                    VMCOREINFO_FW_CFG_SIZE);
-+    /* Create a read-write fw_cfg file for Address */
-+    fw_cfg_add_file_callback(s, VMCOREINFO_ADDR_FW_CFG_FILE, NULL, NULL,
-+                             vis->vmcoreinfo_addr_le,
-+                             ARRAY_SIZE(vis->vmcoreinfo_addr_le), false)=
-;
-+}
-+
-+bool vmcoreinfo_get(VmcoreinfoState *vis,
-+                    uint64_t *paddr, uint32_t *size,
-+                    Error **errp)
-+{
-+    uint32_t vmcoreinfo_addr;
-+    uint32_t version;
-+
-+    assert(vis);
-+    assert(paddr);
-+    assert(size);
-+
-+    memcpy(&vmcoreinfo_addr, vis->vmcoreinfo_addr_le, sizeof(vmcoreinfo_=
-addr));
-+    vmcoreinfo_addr =3D le32_to_cpu(vmcoreinfo_addr);
-+    if (!vmcoreinfo_addr) {
-+        error_setg(errp, "BIOS has not yet written the address of %s",
-+                   VMCOREINFO_DEVICE);
-+        return false;
-+    }
-+
-+    cpu_physical_memory_read(vmcoreinfo_addr, &version, sizeof(version))=
-;
-+    if (version !=3D 0) {
-+        error_setg(errp, "Unknown %s memory version", VMCOREINFO_DEVICE)=
-;
-+        return false;
-+    }
-+
-+    cpu_physical_memory_read(vmcoreinfo_addr + 4, paddr, sizeof(paddr));
-+    *paddr =3D le64_to_cpu(*paddr);
-+    cpu_physical_memory_read(vmcoreinfo_addr + 12, size, sizeof(size));
-+    *size =3D le32_to_cpu(*size);
-+
-+    return true;
-+}
-+
-+static const VMStateDescription vmstate_vmcoreinfo =3D {
-+    .name =3D "vmcoreinfo",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT8_ARRAY(vmcoreinfo_addr_le, VmcoreinfoState, sizeof(=
-uint64_t)),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static Property vmcoreinfo_properties[] =3D {
-+    DEFINE_PROP_BOOL("x-write-pointer-available", VmcoreinfoState,
-+                     write_pointer_available, true),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void vmcoreinfo_realize(DeviceState *dev, Error **errp)
-+{
-+    VmcoreinfoState *vms =3D VMCOREINFO(dev);
-+
-+    if (!vms->write_pointer_available) {
-+        error_setg(errp, "%s requires DMA write support in fw_cfg, "
-+                   "which this machine type does not provide",
-+                   VMCOREINFO_DEVICE);
-+        return;
-+    }
-+
-+    /* Given that this function is executing, there is at least one VMCO=
-REINFO
-+     * device. Check if there are several.
-+     */
-+    if (!find_vmcoreinfo_dev()) {
-+        error_setg(errp, "at most one %s device is permitted",
-+                   VMCOREINFO_DEVICE);
-+        return;
-+    }
-+}
-+
-+static void vmcoreinfo_device_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->vmsd =3D &vmstate_vmcoreinfo;
-+    dc->realize =3D vmcoreinfo_realize;
-+    dc->hotpluggable =3D false;
-+    dc->props =3D vmcoreinfo_properties;
-+}
-+
-+static const TypeInfo vmcoreinfo_device_info =3D {
-+    .name          =3D VMCOREINFO_DEVICE,
-+    .parent        =3D TYPE_DEVICE,
-+    .instance_size =3D sizeof(VmcoreinfoState),
-+    .class_init    =3D vmcoreinfo_device_class_init,
-+};
-+
-+static void vmcoreinfo_register_types(void)
-+{
-+    type_register_static(&vmcoreinfo_device_info);
-+}
-+
-+type_init(vmcoreinfo_register_types)
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 2073108577..97f04401c4 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -43,6 +43,7 @@
- #include "sysemu/tpm.h"
- #include "hw/acpi/tpm.h"
- #include "hw/acpi/vmgenid.h"
-+#include "hw/acpi/vmcoreinfo.h"
- #include "sysemu/tpm_backend.h"
- #include "hw/timer/mc146818rtc_regs.h"
- #include "sysemu/numa.h"
-@@ -2612,6 +2613,7 @@ void acpi_build(AcpiBuildTables *tables, MachineSta=
-te *machine)
-     GArray *tables_blob =3D tables->table_data;
-     AcpiSlicOem slic_oem =3D { .id =3D NULL, .table_id =3D NULL };
-     Object *vmgenid_dev;
-+    Object *vmcoreinfo_dev;
-=20
-     acpi_get_pm_info(&pm);
-     acpi_get_misc_info(&misc);
-@@ -2661,6 +2663,12 @@ void acpi_build(AcpiBuildTables *tables, MachineSt=
-ate *machine)
-         vmgenid_build_acpi(VMGENID(vmgenid_dev), tables_blob,
-                            tables->vmgenid, tables->linker);
-     }
-+    vmcoreinfo_dev =3D find_vmcoreinfo_dev();
-+    if (vmcoreinfo_dev) {
-+        acpi_add_table(table_offsets, tables_blob);
-+        vmcoreinfo_build_acpi(VMCOREINFO(vmcoreinfo_dev), tables_blob,
-+                              tables->vmcoreinfo, tables->linker);
-+    }
-=20
-     if (misc.has_hpet) {
-         acpi_add_table(table_offsets, tables_blob);
-@@ -2833,6 +2841,7 @@ void acpi_setup(void)
-     AcpiBuildTables tables;
-     AcpiBuildState *build_state;
-     Object *vmgenid_dev;
-+    Object *vmcoreinfo_dev;
-=20
-     if (!pcms->fw_cfg) {
-         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
-@@ -2874,6 +2883,11 @@ void acpi_setup(void)
-         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
-                            tables.vmgenid);
-     }
-+    vmcoreinfo_dev =3D find_vmcoreinfo_dev();
-+    if (vmcoreinfo_dev) {
-+        vmcoreinfo_add_fw_cfg(VMCOREINFO(vmcoreinfo_dev), pcms->fw_cfg,
-+                              tables.vmcoreinfo);
-+    }
-=20
-     if (!pcmc->rsdp_in_ram) {
-         /*
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-soft=
-mmu.mak
-index 029e95202a..5b0acdb715 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -60,3 +60,4 @@ CONFIG_SMBIOS=3Dy
- CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
- CONFIG_PXB=3Dy
- CONFIG_ACPI_VMGENID=3Dy
-+CONFIG_ACPI_VMCOREINFO=3Dy
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-=
-softmmu.mak
-index d1d7432f74..71033e26fa 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -60,3 +60,4 @@ CONFIG_SMBIOS=3Dy
- CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
- CONFIG_PXB=3Dy
- CONFIG_ACPI_VMGENID=3Dy
-+CONFIG_ACPI_VMCOREINFO=3Dy
-diff --git a/docs/specs/vmcoreinfo.txt b/docs/specs/vmcoreinfo.txt
-new file mode 100644
-index 0000000000..70d9716fe0
---- /dev/null
-+++ b/docs/specs/vmcoreinfo.txt
-@@ -0,0 +1,138 @@
-+VIRTUAL MACHINE COREINFO DEVICE
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-+
-+Copyright (C) 2017 Red Hat, Inc.
-+
-+This work is licensed under the terms of the GNU GPL, version 2 or later=
-.
-+See the COPYING file in the top-level directory.
-+
-+=3D=3D=3D
-+
-+The VM coreinfo (vmcoreinfo) device is an emulated device which
-+exposes a 4k memory range to the guest to store various informations
-+useful to debug the guest OS.
-+
-+QEMU Implementation
-+-------------------
-+
-+The vmcoreinfo device is put in its own ACPI descriptor table, in a
-+Secondary System Description Table, or SSDT.
-+
-+The following is a dump of the contents from a running system:
-+
-+# iasl -p ./SSDT -d /sys/firmware/acpi/tables/SSDT
-+/*
-+ * Intel ACPI Component Architecture
-+ * AML/ASL+ Disassembler version 20160831-64
-+ * Copyright (c) 2000 - 2016 Intel Corporation
-+ *
-+ * Disassembling to symbolic ASL+ operators
-+ *
-+ * Disassembly of /sys/firmware/acpi/tables/SSDT, Mon Apr 24 15:59:53 20=
-17
-+ *
-+ * Original Table Header:
-+ *     Signature        "SSDT"
-+ *     Length           0x00000086 (134)
-+ *     Revision         0x01
-+ *     Checksum         0x5C
-+ *     OEM ID           "BOCHS "
-+ *     OEM Table ID     "VMCOREIN"
-+ *     OEM Revision     0x00000001 (1)
-+ *     Compiler ID      "BXPC"
-+ *     Compiler Version 0x00000001 (1)
-+ */
-+DefinitionBlock ("", "SSDT", 1, "BOCHS ", "VMCOREIN", 0x00000001)
-+{
-+    Name (VCIA, 0x3FFFF000)
-+    Scope (\_SB)
-+    {
-+        Device (VMCI)
-+        {
-+            Name (_HID, "QEMUVMCI")  // _HID: Hardware ID
-+            Method (_STA, 0, NotSerialized)  // _STA: Status
-+            {
-+                Local0 =3D 0x0F
-+                If (VCIA =3D=3D Zero)
-+                {
-+                    Local0 =3D Zero
-+                }
-+
-+                Return (Local0)
-+            }
-+
-+            Method (ADDR, 0, NotSerialized)
-+            {
-+                Local0 =3D Package (0x02) {}
-+                Local0 [Zero] =3D (VCIA + 0x28)
-+                Local0 [One] =3D Zero
-+                Return (Local0)
-+            }
-+        }
-+    }
-+}
-+
-+
-+Design Details:
-+---------------
-+
-+QEMU must be able to read the contents of the device memory,
-+specifically when starting a memory dump.  In order to do this, QEMU
-+must know the address that has been allocated.
-+
-+The mechanism chosen for this memory sharing is writeable fw_cfg blobs.
-+These are data object that are visible to both QEMU and guests, and are
-+addressable as sequential files.
-+
-+More information about fw_cfg can be found in "docs/specs/fw_cfg.txt"
-+
-+Two fw_cfg blobs are used in this case:
-+
-+/etc/vmcoreinfo      - used to allocate memory range, read-only to the g=
-uest
-+/etc/vmcoreinfo-addr - contains the address of the allocated range
-+                     - writeable by the guest
-+
-+
-+QEMU sends the following commands to the guest at startup:
-+
-+1. Allocate memory for vmcoreinfo fw_cfg blob.
-+2. Write the address of vmcoreinfo into the SSDT (VCIA ACPI variable as
-+   shown above in the iasl dump).  Note that this change is not propagat=
-ed
-+   back to QEMU.
-+3. Write the address of vmcoreinfo back to QEMU's copy of vmcoreinfo-add=
-r
-+   via the fw_cfg DMA interface.
-+
-+After step 3, QEMU is able to read the contents of vmcoreinfo.
-+
-+The value of VCIA is persisted via the VMState mechanism.
-+
-+
-+Storage Format:
-+---------------
-+
-+The content is expected to use little-endian format.
-+
-+In order to implement an OVMF "SDT Header Probe Suppressor", the content=
-s of
-+the vmcoreinfo blob has 40 bytes of padding:
-+
-++-----------------------------------+
-+| SSDT with OEM Table ID =3D VMCOREIN |
-++-----------------------------------+
-+| ...                               |       TOP OF PAGE
-+| VCIA dword object ----------------|-----> +---------------------------=
-+
-+| ...                               |       | fw-allocated array for    =
-|
-+| _STA method referring to VCIA     |       | "etc/vmcoreinfo"          =
-|
-+| ...                               |       +---------------------------=
-+
-+| ADDR method referring to VCIA     |       |  0: OVMF SDT Header probe =
-|
-+| ...                               |       |     suppressor            =
-|
-++-----------------------------------+       | 40: uint32 version field  =
-|
-+                                            | 44: info contents         =
-|
-+                                            |     ....                  =
-|
-+                                            +---------------------------=
-+
-+                                            END OF PAGE
-+
-+Version 0 content:
-+
-+ uint64 paddr:
-+  Physical address of the Linux vmcoreinfo ELF note.
-+ uint32 size:
-+  Size of the vmcoreinfo ELF note.
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 11c35bcb44..9623078f95 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) +=3D memory_hotp=
-lug.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
- common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
-+common-obj-$(CONFIG_ACPI_VMCOREINFO) +=3D vmcoreinfo.o
- common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
-=20
- common-obj-y +=3D acpi_interface.o
---=20
-2.12.0.191.gc5d8de91d
+Thread 5 (Thread 0x3ff519aa910 (LWP 58453)):
+#0  0x000003ff9d58d450 in pthread_cond_wait@@GLIBC_2.3.2 () from target:/lib64/libpthread.so.0
+#1  0x0000000001492fce in qemu_cond_wait (cond=0xc9ca1c0, mutex=0xc9ca198) at /root/qemu/util/qemu-thread-posix.c:133
+#2  0x00000000010c6080 in do_data_decompress (opaque=0xc9ca190) at /root/qemu/migration/ram.c:2277
+#3  0x000003ff9d587bc4 in start_thread () from target:/lib64/libpthread.so.0
+#4  0x000003ff9d48a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 4 (Thread 0x3ff98807910 (LWP 58440)):
+#0  0x000003ff9d58d450 in pthread_cond_wait@@GLIBC_2.3.2 () from target:/lib64/libpthread.so.0
+#1  0x0000000001492fce in qemu_cond_wait (cond=0xc9e6930, mutex=0x17116b0 <qemu_global_mutex>) at /root/qemu/util/qemu-thread-posix.c:133
+#2  0x000000000107720e in qemu_kvm_wait_io_event (cpu=0xc9a87d0) at /root/qemu/cpus.c:1085
+#3  0x00000000010773aa in qemu_kvm_cpu_thread_fn (arg=0xc9a87d0) at /root/qemu/cpus.c:1123
+#4  0x000003ff9d587bc4 in start_thread () from target:/lib64/libpthread.so.0
+#5  0x000003ff9d48a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 3 (Thread 0x3ff99d7f910 (LWP 58437)):
+#0  0x000003ff9d47d832 in ppoll () from target:/lib64/libc.so.6
+#1  0x000000000148b2fa in qemu_poll_ns (fds=0x3ff940008c0, nfds=1, timeout=-1) at /root/qemu/util/qemu-timer.c:322
+#2  0x000000000148f6d2 in aio_poll (ctx=0xc9473c0, blocking=true) at /root/qemu/util/aio-posix.c:622
+#3  0x00000000011a7b5e in iothread_run (opaque=0xc947230) at /root/qemu/iothread.c:59
+#4  0x000003ff9d587bc4 in start_thread () from target:/lib64/libpthread.so.0
+#5  0x000003ff9d48a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 2 (Thread 0x3ff9a57f910 (LWP 58434)):
+#0  0x000003ff9d484336 in syscall () from target:/lib64/libc.so.6
+---Type <return> to continue, or q <return> to quit---
+#1  0x0000000001493636 in qemu_futex_wait (f=0x1b2b9dc <rcu_call_ready_event>, val=4294967295) at /root/qemu/include/qemu/futex.h:26
+#2  0x0000000001493838 in qemu_event_wait (ev=0x1b2b9dc <rcu_call_ready_event>) at /root/qemu/util/qemu-thread-posix.c:399
+#3  0x00000000014b40a8 in call_rcu_thread (opaque=0x0) at /root/qemu/util/rcu.c:249
+#4  0x000003ff9d587bc4 in start_thread () from target:/lib64/libpthread.so.0
+#5  0x000003ff9d48a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 1 (Thread 0x3ffb24c5f00 (LWP 58412)):
+#0  0x000003ff9d47d832 in ppoll () from target:/lib64/libc.so.6
+#1  0x000000000148b414 in qemu_poll_ns (fds=0xc98f6e0, nfds=6, timeout=999000000) at /root/qemu/util/qemu-timer.c:334
+#2  0x000000000148ccca in os_host_main_loop_wait (timeout=999000000) at /root/qemu/util/main-loop.c:255
+#3  0x000000000148ce0a in main_loop_wait (nonblocking=0) at /root/qemu/util/main-loop.c:517
+#4  0x00000000011b3cfa in main_loop () at /root/qemu/vl.c:1898
+#5  0x00000000011bc3fc in main (argc=91, argv=0x3ffdc87eed8, envp=0x3ffdc87f1b8) at /root/qemu/vl.c:4709
