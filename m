@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2jNc-0005yV-KD
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:10:38 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d2jOg-0006TY-S4
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2jNZ-0004zS-7v
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:10:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44936)
+	(envelope-from <sstabellini@kernel.org>) id 1d2jOd-0005c3-H1
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:11:42 -0400
+Received: from mail.kernel.org ([198.145.29.136]:43756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2jNY-0004yi-U0
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:10:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0814C80465
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 19:10:31 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
-	<87o9yv890z.fsf@dusky.pond.sub.org>
-Date: Mon, 24 Apr 2017 21:10:22 +0200
-In-Reply-To: <87o9yv890z.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Wed, 25 Jan 2017 16:16:28 +0100")
-Message-ID: <87lgqpei5d.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1d2jOd-0005bD-80
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:11:39 -0400
+Date: Mon, 24 Apr 2017 12:11:32 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <d5282601-a396-4493-3de5-395e25a69bb1@redhat.com>
+Message-ID: <alpine.DEB.2.10.1704241210340.16723@sstabellini-ThinkPad-X260>
+References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
+	<d5282601-a396-4493-3de5-395e25a69bb1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/25] qmp: add async command type
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [RFC 0/7] Move accel, KVM, Xen,
+ qtest files to accel/ subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,330 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, kvm@vger.kernel.org, xen-devel@lists.xensource.com, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
 
-With 2.9 out of the way, how can we make progress on this one?
+On Mon, 24 Apr 2017, Thomas Huth wrote:
+> On 20.12.2016 18:43, Eduardo Habkost wrote:
+> > This moves the KVM and Xen files to the an accel/ subdir.
+> > 
+> > Instead of moving the *-stubs.c file to accel/ as-is, I tried to
+> > move most of the stub code to libqemustub.a. This way the obj-y
+> > logic for accel/ is simpler: obj-y includes accel/ only if
+> > CONFIG_SOFTMMU is set.
+> > 
+> > The Xen stubs could be moved completely to stubs/, but some of
+> > the KVM stubs depend on cpu.h. So most of the kvm-stub.c code was
+> > moved to stubs/kvm.c, but some of that code was kept in
+> > accel/kvm-stub.c.
+> > 
+> > About TCG:
+> > ----------
+> > 
+> > It is not obvious to me which TCG-related files could be moved to
+> > accel/, so this series don't move any of them yet.
+> > 
+> > About other CONFIG_SOFTMMU top-level files:
+> > -------------------------------------------
+> > 
+> > I would like to know what we should do with the top-level
+> > CONFIG_SOFTMMU-only files that don't belong to hw/. Some
+> > candidates: arch_init.c cpus.c monitor.c gdbstub.c balloon.c
+> > ioport.c bootdevice.c memory.c cputlb.c memory_mapping.c dump.c.
+> > 
+> > Maybe a sysemu/ subdir? In that case, should we still create an
+> > accel/ subdir, or move xen-*, kvm-* and friends to sysemu/ too?
+> > 
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: kvm@vger.kernel.org
+> > Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > Cc: xen-devel@lists.xensource.com
+> > 
+> > Eduardo Habkost (7):
+> >   xen: Move xen-*-stub.c to stubs/
+> >   xen: Move xen files to accel/
+> >   kvm: Move some kvm-stub.c code to stubs/kvm.c
+> >   kvm: Include kvm-stub.o only on CONFIG_SOFTMMU
+> >   kvm: Move kvm*.c files to accel/
+> >   accel: Move accel.c to accel/
+> >   accel: Move qtest.c to accel/
+> > 
+> >  Makefile.objs                          |  2 +-
+> >  Makefile.target                        | 10 ++----
+> >  accel.c => accel/accel.c               |  0
+> >  kvm-all.c => accel/kvm-common.c        |  0
+> >  kvm-stub.c => accel/kvm-stub.c         | 51 --------------------------
+> >  qtest.c => accel/qtest.c               |  0
+> >  xen-common.c => accel/xen-common.c     |  0
+> >  xen-hvm.c => accel/xen-hvm.c           |  0
+> >  xen-mapcache.c => accel/xen-mapcache.c |  0
+> >  stubs/kvm.c                            | 65 ++++++++++++++++++++++++++++++++++
+> >  xen-hvm-stub.c => stubs/xen-hvm.c      |  0
+> >  xen-common-stub.c => stubs/xen.c       |  0
+> >  MAINTAINERS                            |  4 +--
+> >  accel/Makefile.objs                    |  9 +++++
+> >  stubs/Makefile.objs                    |  2 ++
+> >  15 files changed, 80 insertions(+), 63 deletions(-)
+> >  rename accel.c => accel/accel.c (100%)
+> >  rename kvm-all.c => accel/kvm-common.c (100%)
+> >  rename kvm-stub.c => accel/kvm-stub.c (71%)
+> >  rename qtest.c => accel/qtest.c (100%)
+> >  rename xen-common.c => accel/xen-common.c (100%)
+> >  rename xen-hvm.c => accel/xen-hvm.c (100%)
+> >  rename xen-mapcache.c => accel/xen-mapcache.c (100%)
+> >  rename xen-hvm-stub.c => stubs/xen-hvm.c (100%)
+> >  rename xen-common-stub.c => stubs/xen.c (100%)
+> >  create mode 100644 accel/Makefile.objs
+> 
+> Now that the development tree is open again ... any chance that we could
+> get this series into 2.10 ?
 
-I can see two ways to get asynchronous QMP commands accepted:
-
-1. We break QMP compatibility in QEMU 3.0 and convert all long-running
-   tasks from "synchronous command + event" to "asynchronous command".
-
-   This is design option 1 quoted below.  *If* we decide to leave
-   compatibility behind for 3.0, *and* we decide we like the
-   asynchronous sufficiently better to put in the work, we can do it.
-
-   I guess there's nothing to do here until we decide on breaking
-   compatibility in 3.0.
-
-2. We don't break QMP compatibility, but we add asynchronous commands
-   anyway, because we decide that's how we want to do "jobs".
-
-   This is design option 3 quoted below.  As I said, I dislike its lack
-   of orthogonality.  But if asynchronous commands help us get jobs
-   done, I can bury my dislike.
-
-   I feel this is something you should investigate with John Snow.
-   Going through a middleman (me) makes no sense.  So I'm going to dump
-   my thoughts, then get out of the way.
-
-   You need to take care not to get bogged down in the jobs project's
-   complexity.  This is really only how to package up jobs for QMP.
-
-   With synchronous commands, the job-creating command creates a job,
-   jobs state changes trigger events, and job termination is just
-   another state change.  Job control commands interact with the job.
-=20
-   Events obviously need to carry a job ID.  We can either require the
-   user to pass it as argument to the job-creating command (hopefully
-   unique), or have the job-creating command pick one (a unique one) and
-   return it.
-
-   With asynchronous commands, we could make the asynchronous command
-   the job.  The only difference is that job termination triggers the
-   command response.  When termination is of no interest to anyone but
-   the job's creator, the termination event can be omitted then.
-
-   Instead of a job ID, we could use the (user-specified and hopefully
-   unique) command ID that ties the command response to the command.
-   Perhaps throw in a monitor ID.
-
-   To be honest, I'm not sure asynchronous commands buy us much here.
-   But my view is from 10,000 feet, and John might have different ideas.
-
-Rejecting asynchronous QMP commands is of course design option 2 quoted
-below.
-
-
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Cc'ing block job people.
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
->> Hi,
->>
->> One of initial design goals of QMP was to have "asynchronous command
->> completion" (http://wiki.qemu.org/Features/QAPI). Unfortunately, that
->> goal was not fully achieved, and some broken bits left were removed
->> progressively until commit 65207c59d that removed async command
->> support.
->
-> Correct.
->
-> QMP's initial design stipulated that commands are asynchronous.  The
-> initial implementation made them all synchronous, with very few
-> exceptions (buggy ones, to boot).  Naturally, clients relied on the
-> actual rather than the theoretical behavior, i.e. on getting command
-> replies synchronously, in order.
->
->> Note that qmp events are asynchronous messages, and must be handled
->> appropriately by the client: dispatch both reply and events after a
->> command is sent for example.
->
-> Yes.
->
->> The benefits of async commands that can be trade-off depending on the
->> requirements are:
->>
->> 1) allow the command handler to re-enter the main loop if the command
->> cannot be handled synchronously, or if it is long-lasting. This is
->> currently not possible and make some bugs such as rhbz#1230527 tricky
->> (see below) to solve.  Furthermore, many QMP commands do IO and could
->> be considered 'slow' and blocking today.
->>
->> 2) allow concurrent commands and events. This mainly implies hanlding
->> concurrency in qemu and out-of-order replies for the client. As noted
->> earlier, a good qmp client already has to handle dispatching of
->> received messages (reply and events).
->
-> We need to distingish two kinds of concurrency.  One, execution of QMP
-> commands concurrently with other activities in QEMU, including other QMP
-> monitors.  Two, executing multiple QMP commands concurrently in the same
-> monitor, which obviously requires all but one of them to be
-> asynchronous.
->
->> The traditional approach to solving the above in qemu is the following
->> scheme:
->> -> { "execute": "do-foo" }
->> <- { "return": {} }
->> <- { "event": "FOO_DONE" }
->
-> ... where the event may carry additional data, such as the command's
-> true result.
->
->> It has several flaws:
->> - FOO_DONE event has no semantic link with do-foo in the qapi
->>   schema. It is not simple to generalize that pattern when writing
->>   qmp clients. It makes documentation and usage harder.
->> - the FOO_DONE event has no clear association with the command that
->>   triggered it: commands/events have to come up with additional
->>   specific association schemes (ids, path etc)
->
-> Valid points.  Emulating asynchronous commands with a synchronous
-> command + event isn't quite as simple to specify as a native
-> asynchronous command could be.
->
->> - FOO_DONE is broadcasted to all clients, but they may have no way to
->>   interprete it or interest in it, or worse it may conflict with their
->>   own commands.
->
-> The part about "no interest" is valid in cases where the event signals
-> completion of a job without side effects, because then only the job's
-> initiator cares (the event has to carry a result for this to make
-> sense).  But when the job has side effects, other clients may want to
-> know, and broadcast is probably the right thing to do.
->
-> We deliberately broadcast events even though some clients may not care
-> about some of them.  It's the stupidest solution that could possibly
-> work.  Has never been a problem; clients simply ignore events they don't
-> need.  If it becomes a problem, we can provide a mechanism to subscribe
-> to events.  Adds some interface complexity to save a bit of bandwidth.
->
-> The part about "conflict due to broadcast" is weak.  To create a
-> conflict, the interface has to be misdesigned so that events can't be
-> reliably connected back to their commands.  But then the conflict could
-> just as well happen between commands issued by a single client.  I think
-> the valid point here is that synchronous command + event offers an
-> additional opportunity for screwing up at the command design level.
-> Perhaps we should do something about it; more on that below.
->
->> - the arguably useless empty reply return
->
-> Valid point, but really, really minor.
->
->> For some cases, it makes sense to use that scheme, or a more complete
->> one: to have an "handler" associated with an on-going operation, that
->> can be queried, modified, cancelled etc (block jobs etc).
->
-> Block jobs provide ways to query status and properties, modify
-> properties, pause, resume, cancel, and initiate synchronous completion.
->
-> I suspect that we could use some of these "job control" features for
-> pretty much any long-running activity.
->
-> Migration is such an activity, but uses its own job control interfaces.
->
-> We hope to unify both under a more generic "job" abstraction.
->
->>                                                           Also, some
->> operations have a global side-effect, in which case that cmd+event
->> scheme is right, as all clients are listening for global events.
->
-> Yes.
->
->> However, for the simple case where a client want to perform a "local
->> context" operation (dump, query etc), QAPI can easily do better
->> without resorting to this pattern: it can send the reply when the
->> operation is done. That would make QAPI schema, usage and
->> documentation more obvious.
->
-> On the other hand, it creates a second, independent way to do
-> asynchronous.
->
-> Let me review the design space.
->
-> 1. Commands are asynchronous
->
->    We still need events to broadcast state changes of interest.
->
->    Commands that complete "quickly" will probably behave synchronously
->    anyway, because messing with threads or coroutines would be
->    inefficient and needlessly complex then.
->
->    Risk: clients that erroneously rely on synchronous behavior can work
->    in simple testing, yet break in entertaining ways under load, or when
->    a "quick" command becomes "slow" later on.  Not an argument against
->    this design, I'm merely pointing out an opportunity to screw up.  It
->    could make evolving de facto synchronous commands into asynchronous
->    ones impractical, though.
->
->    We still need job control.  A natural way to do it is to provide job
->    control for *any* asynchronous command, i.e. there's no separate
->    concept of "jobs", there are just commands that haven't completed,
->    yet.  Job control commands simply fail when the asynchronous command
->    they target doesn't support them.  I figure only select commands
->    support cancellation, for instance.
->
->    Of course, we could also do job control the way we do it now, with a
->    separate "job" concept.  You can't evolve a mere command into a job
->    then: if you start with a mere command, and it later turns out that
->    it can run for a very long time, and you need to be able to cancel
->    it, you have to start over: create a new command that creates a job.
->
->    While this feels like a perfectly sensible design to me, we can't
->    have it without a massive compatibility break.  Or can we?
->
-> 2. Commands are synchronous
->
->    This is what we have now.
->
->    Commands that may not complete "quickly" need to be split into a
->    command to kick off the job, and an event to signal completion and
->    transmit the result.
->
->    If we misjudge "quickly", we have to start over with a new command.
->    With 1., we can change the old command from synchronous to
->    asynchronous instead, but that risks breaking clients, which may
->    force us to start over anyway.
->
->    We currently lack a generic way to connect events back to their
->    commands, and instead leave the problem to each command/event pair to
->    solve.
->
->    A special case of the command+event pattern is "block jobs".  We'd
->    like to evolve them into general job abstraction.  Perhaps any
->    (non-deprecated) command/event combo could be an instance of this job
->    abstraction.  Such a job abstraction should certainly provide an
->    unambiguous connection between event and command.
->
-> 3. Both
->
->    Existing commands stay synchronous for compatibility.  New commands
->    that complete "quickly" are synchronous.  New commands that may not
->    complete "quickly" become asynchronous if job control isn't needed,
->    else they start jobs.  Having a single job abstraction for them would
->    be nice.
->
->    If we misjudge "quickly" or "no need for job control", we have to
->    start over with a new command.
->
->    I hope this is a fair description of what you're proposing, please
->    correct misunderstandings.
->
->    While I accept your assertion that the commands we can make
->    asynchronous would be a bit simpler than their synchronous command +
->    event equivalent, I'm afraid adding them to what we have now merely
->    moves the complexity around: three kinds of commands (quick,
->    command+event, async) instead of two.  Whether that's a net win is
->    unclear.  I doubt it.
->
-> I'm pretty confident adding a suitable jobs abstraction can make 2. work
-> reasonably well.
->
-> I can't quite see how we can get from here to 1., but perhaps you can
-> show us.
->
-> I strongly dislike the lack of orthogonality in 3.
->
->> The following series implements an async solution, by introducing a
->> context associated with a command, it can:
->> - defer the return
->> - return only to the caller (no broadcasted event)
->> - return with the 'id' associated with the call (as originally intended)
->
-> Context: 'id' is passed by the client with the command.
->
-> As you mentioned elsewhere in this thread, 'id' could conceivably
-> ambiguous with multiple QMP monitors.  One way to disambiguate is
-> including a monitor-id that uniquely identifies the monitor where 'id'
-> comes from.
->
->> - optionnally allow cancellation when the client is gone
->> - track on-going qapi command(s) per client
->
-> Inching towards job control...
->
->> 1) existing qemu commands can be gradually replaced by async:true
->> variants when needed, and by carefully reviewing the concurrency
->> aspects.
->
-> It's a behavioral change that can conceivably break clients, so
-> "reviewing the concurrency aspects" includes reviewing all clients, I'm
-> afraid.  I'm not saying it's impossible, but I'm not exactly looking
-> forward to it.
->
->>          The async:true commands marshaller helpers are splitted in
->> half, the calling and return functions. The command is called with a
->> QmpReturn context, that can return immediately or later, using the
->> generated return helper.
->>
->> 2) allow concurrent commands when 'async' is negotiated. If the client
->> doesn't support 'async', then the monitor is suspended during command
->> execution (events are still sent). Effectively, async commands behave
->> like normal commands from client POV in this case, giving full
->> backward compatibility.
->
-> Aha.  Okay, that makes it more practical.  Converting to async can break
-> a client even when it claims to support async, but I guess it's less
-> likely.
->
->> The screendump command is converted to an async:true version to solve
->> rhbz#1230527. The command shows basic cancellation (this could be
->> extended if needed). HMP remains sync, but it would be worth to make
->> it possible to call async:true qapi commands.
->>
->> The last patch cleans up qmp_dispatch usage to have consistant checks
->> between qga & qemu, and simplify QmpClient/parser_feed usage.
->
-> I'm afraid I lack the time to review your actual patches in a reasonable
-> time frame; I really need to hunker down and deliver the QemuOpts / QAPI
-> work I promised for 2.9, or else my block friends will be sad, Dan
-> Berrange will be sad, and my manager will be sad, too.  This is
-> unfortunate.  More so since your proposal has been pending for so long.
-> My sincere apologies.
->
-> Let's at least use the time to discuss the design, in particular how it
-> relates to the work on evolving block jobs into a generic jobs
-> abstraction.
+FYI I took Anothony Xu's patches to move the xen files under hw/xen/ and
+hw/i386/xen, see the last 3 patches of
+alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260. 
