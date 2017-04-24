@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIF-0001bi-Ig
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIC-0001X1-1x
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TID-0003Sl-Bh
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:59 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIA-0003Qj-KD
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:56 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:59:01 +1000
-Message-Id: <20170424015927.8933-22-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:59:06 +1000
+Message-Id: <20170424015927.8933-27-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/47] ppc/pnv: add a PnvICPState object
+Subject: [Qemu-devel] [PULL 26/47] ppc/pnv: add memory regions for the ICP
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,274 +28,186 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This provides a new ICPState object for the PowerNV machine (POWER8).
-Access to the Interrupt Management area is done though a memory
-region. It contains the registers of the Interrupt Control Presenters
-of each thread which are used to accept, return, forward interrupts in
-the system.
+This provides to a PowerNV chip (POWER8) access to the Interrupt
+Management area, which contains the registers of the Interrupt Control
+Presenters of each thread. These are used to accept, return, forward
+interrupts in the system.
+
+This area is modeled with a per-chip container memory region holding
+all the ICP registers. Each thread of a chip is then associated with
+its ICP registers using a memory subregion indexed by its PIR number
+in the overall region.
+
+The device tree is populated accordingly.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/Makefile.objs |   1 +
- hw/intc/xics_pnv.c    | 192 ++++++++++++++++++++++++++++++++++++++++++++=
+ hw/ppc/pnv.c         | 81 ++++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- include/hw/ppc/xics.h |  12 ++++
- 3 files changed, 205 insertions(+)
- create mode 100644 hw/intc/xics_pnv.c
+ include/hw/ppc/pnv.h | 19 ++++++++++++
+ 2 files changed, 100 insertions(+)
 
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index adedd0d..78426a7 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -35,6 +35,7 @@ obj-$(CONFIG_SH4) +=3D sh_intc.o
- obj-$(CONFIG_XICS) +=3D xics.o
- obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
- obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
-+obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
- obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
- obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
- obj-$(CONFIG_S390_FLIC_KVM) +=3D s390_flic_kvm.o
-diff --git a/hw/intc/xics_pnv.c b/hw/intc/xics_pnv.c
-new file mode 100644
-index 0000000..12ae605
---- /dev/null
-+++ b/hw/intc/xics_pnv.c
-@@ -0,0 +1,192 @@
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 2add2ad..1fa90d6 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -218,6 +218,43 @@ static void powernv_create_core_node(PnvChip *chip, =
+PnvCore *pc, void *fdt)
+                        servers_prop, sizeof(servers_prop))));
+ }
+=20
++static void powernv_populate_icp(PnvChip *chip, void *fdt, uint32_t pir,
++                                 uint32_t nr_threads)
++{
++    uint64_t addr =3D PNV_ICP_BASE(chip) | (pir << 12);
++    char *name;
++    const char compat[] =3D "IBM,power8-icp\0IBM,ppc-xicp";
++    uint32_t irange[2], i, rsize;
++    uint64_t *reg;
++    int offset;
++
++    irange[0] =3D cpu_to_be32(pir);
++    irange[1] =3D cpu_to_be32(nr_threads);
++
++    rsize =3D sizeof(uint64_t) * 2 * nr_threads;
++    reg =3D g_malloc(rsize);
++    for (i =3D 0; i < nr_threads; i++) {
++        reg[i * 2] =3D cpu_to_be64(addr | ((pir + i) * 0x1000));
++        reg[i * 2 + 1] =3D cpu_to_be64(0x1000);
++    }
++
++    name =3D g_strdup_printf("interrupt-controller@%"PRIX64, addr);
++    offset =3D fdt_add_subnode(fdt, 0, name);
++    _FDT(offset);
++    g_free(name);
++
++    _FDT((fdt_setprop(fdt, offset, "compatible", compat, sizeof(compat))=
+));
++    _FDT((fdt_setprop(fdt, offset, "reg", reg, rsize)));
++    _FDT((fdt_setprop_string(fdt, offset, "device_type",
++                              "PowerPC-External-Interrupt-Presentation")=
+));
++    _FDT((fdt_setprop(fdt, offset, "interrupt-controller", NULL, 0)));
++    _FDT((fdt_setprop(fdt, offset, "ibm,interrupt-server-ranges",
++                       irange, sizeof(irange))));
++    _FDT((fdt_setprop_cell(fdt, offset, "#interrupt-cells", 1)));
++    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0)));
++    g_free(reg);
++}
++
+ static void powernv_populate_chip(PnvChip *chip, void *fdt)
+ {
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+@@ -231,6 +268,10 @@ static void powernv_populate_chip(PnvChip *chip, voi=
+d *fdt)
+         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
+=20
+         powernv_create_core_node(chip, pnv_core, fdt);
++
++        /* Interrupt Control Presenters (ICP). One per core. */
++        powernv_populate_icp(chip, fdt, pnv_core->pir,
++                             CPU_CORE(pnv_core)->nr_threads);
+     }
+=20
+     if (chip->ram_size) {
+@@ -643,6 +684,38 @@ static void pnv_chip_init(Object *obj)
+     object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
+ }
+=20
++static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
++{
++    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
++    char *typename =3D pnv_core_typename(pcc->cpu_model);
++    size_t typesize =3D object_type_get_instance_size(typename);
++    int i, j;
++    char *name;
++    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
++
++    name =3D g_strdup_printf("icp-%x", chip->chip_id);
++    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZE=
+);
++    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
++    g_free(name);
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
++
++    /* Map the ICP registers for each thread */
++    for (i =3D 0; i < chip->nr_cores; i++) {
++        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
++        int core_hwid =3D CPU_CORE(pnv_core)->core_id;
++
++        for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
++            uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
++            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
++
++            memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp=
+->mmio);
++        }
++    }
++
++    g_free(typename);
++}
++
+ static void pnv_chip_realize(DeviceState *dev, Error **errp)
+ {
+     PnvChip *chip =3D PNV_CHIP(dev);
+@@ -713,6 +786,14 @@ static void pnv_chip_realize(DeviceState *dev, Error=
+ **errp)
+     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
+                              &error_fatal);
+     pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xscom_r=
+egs);
++
++    /* Interrupt Management Area. This is the memory region holding
++     * all the Interrupt Control Presenter (ICP) registers */
++    pnv_chip_icp_realize(chip, &error);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
+ }
+=20
+ static Property pnv_chip_properties[] =3D {
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 5693ba1..96231c1 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -54,6 +54,7 @@ typedef struct PnvChip {
+     MemoryRegion xscom_mmio;
+     MemoryRegion xscom;
+     AddressSpace xscom_as;
++    MemoryRegion icp_mmio;
+=20
+     PnvLpcController lpc;
+ } PnvChip;
+@@ -136,4 +137,22 @@ typedef struct PnvMachineState {
+ #define PNV_XSCOM_BASE(chip)                                            =
+\
+     (chip->xscom_base + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZE)
+=20
 +/*
-+ * QEMU PowerPC PowerNV Interrupt Control Presenter (ICP) model
++ * XSCOM 0x20109CA defines the ICP BAR:
 + *
-+ * Copyright (c) 2017, IBM Corporation.
++ * 0:29   : bits 14 to 43 of address to define 1 MB region.
++ * 30     : 1 to enable ICP to receive loads/stores against its BAR regi=
+on
++ * 31:63  : Constant 0
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public License
-+ * as published by the Free Software Foundation; either version 2 of
-+ * the License, or (at your option) any later version.
++ * Usually defined as :
 + *
-+ * This library is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
++ *      0xffffe00200000000 -> 0x0003ffff80000000
++ *      0xffffe00600000000 -> 0x0003ffff80100000
++ *      0xffffe02200000000 -> 0x0003ffff80800000
++ *      0xffffe02600000000 -> 0x0003ffff80900000
 + */
++#define PNV_ICP_SIZE         0x0000000000100000ull
++#define PNV_ICP_BASE(chip)                                              =
+\
++    (0x0003ffff80000000ull + (uint64_t) PNV_CHIP_INDEX(chip) * PNV_ICP_S=
+IZE)
 +
-+#include "qemu/osdep.h"
-+#include "sysemu/sysemu.h"
-+#include "qapi/error.h"
-+#include "qemu/log.h"
-+#include "hw/ppc/xics.h"
-+
-+#define ICP_XIRR_POLL    0 /* 1 byte (CPRR) or 4 bytes */
-+#define ICP_XIRR         4 /* 1 byte (CPRR) or 4 bytes */
-+#define ICP_MFRR        12 /* 1 byte access only */
-+
-+#define ICP_LINKA       16 /* unused */
-+#define ICP_LINKB       20 /* unused */
-+#define ICP_LINKC       24 /* unused */
-+
-+static uint64_t pnv_icp_read(void *opaque, hwaddr addr, unsigned width)
-+{
-+    ICPState *icp =3D ICP(opaque);
-+    PnvICPState *picp =3D PNV_ICP(opaque);
-+    bool byte0 =3D (width =3D=3D 1 && (addr & 0x3) =3D=3D 0);
-+    uint64_t val =3D 0xffffffff;
-+
-+    switch (addr & 0xffc) {
-+    case ICP_XIRR_POLL:
-+        val =3D icp_ipoll(icp, NULL);
-+        if (byte0) {
-+            val >>=3D 24;
-+        } else if (width !=3D 4) {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_XIRR:
-+        if (byte0) {
-+            val =3D icp_ipoll(icp, NULL) >> 24;
-+        } else if (width =3D=3D 4) {
-+            val =3D icp_accept(icp);
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_MFRR:
-+        if (byte0) {
-+            val =3D icp->mfrr;
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_LINKA:
-+        if (width =3D=3D 4) {
-+            val =3D picp->links[0];
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_LINKB:
-+        if (width =3D=3D 4) {
-+            val =3D picp->links[1];
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_LINKC:
-+        if (width =3D=3D 4) {
-+            val =3D picp->links[2];
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    default:
-+bad_access:
-+        qemu_log_mask(LOG_GUEST_ERROR, "XICS: Bad ICP access 0x%"
-+                      HWADDR_PRIx"/%d\n", addr, width);
-+    }
-+
-+    return val;
-+}
-+
-+static void pnv_icp_write(void *opaque, hwaddr addr, uint64_t val,
-+                              unsigned width)
-+{
-+    ICPState *icp =3D ICP(opaque);
-+    PnvICPState *picp =3D PNV_ICP(opaque);
-+    bool byte0 =3D (width =3D=3D 1 && (addr & 0x3) =3D=3D 0);
-+
-+    switch (addr & 0xffc) {
-+    case ICP_XIRR:
-+        if (byte0) {
-+            icp_set_cppr(icp, val);
-+        } else if (width =3D=3D 4) {
-+            icp_eoi(icp, val);
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_MFRR:
-+        if (byte0) {
-+            icp_set_mfrr(icp, val);
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_LINKA:
-+        if (width =3D=3D 4) {
-+            picp->links[0] =3D val;
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_LINKB:
-+        if (width =3D=3D 4) {
-+            picp->links[1] =3D val;
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    case ICP_LINKC:
-+        if (width =3D=3D 4) {
-+            picp->links[2] =3D val;
-+        } else {
-+            goto bad_access;
-+        }
-+        break;
-+    default:
-+bad_access:
-+        qemu_log_mask(LOG_GUEST_ERROR, "XICS: Bad ICP access 0x%"
-+                      HWADDR_PRIx"/%d\n", addr, width);
-+    }
-+}
-+
-+static const MemoryRegionOps pnv_icp_ops =3D {
-+    .read =3D pnv_icp_read,
-+    .write =3D pnv_icp_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 4,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 4,
-+    },
-+};
-+
-+static void pnv_icp_realize(DeviceState *dev, Error **errp)
-+{
-+    PnvICPState *icp =3D PNV_ICP(dev);
-+
-+    memory_region_init_io(&icp->mmio, OBJECT(dev), &pnv_icp_ops,
-+                          icp, "icp-thread", 0x1000);
-+}
-+
-+static void pnv_icp_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    ICPStateClass *icpc =3D ICP_CLASS(klass);
-+
-+    icpc->realize =3D pnv_icp_realize;
-+    dc->desc =3D "PowerNV ICP";
-+}
-+
-+static const TypeInfo pnv_icp_info =3D {
-+    .name          =3D TYPE_PNV_ICP,
-+    .parent        =3D TYPE_ICP,
-+    .instance_size =3D sizeof(PnvICPState),
-+    .class_init    =3D pnv_icp_class_init,
-+    .class_size    =3D sizeof(ICPStateClass),
-+};
-+
-+static void pnv_icp_register_types(void)
-+{
-+    type_register_static(&pnv_icp_info);
-+}
-+
-+type_init(pnv_icp_register_types)
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 731e177..c215dc7 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -41,10 +41,12 @@
-  */
- typedef struct ICPStateClass ICPStateClass;
- typedef struct ICPState ICPState;
-+typedef struct PnvICPState PnvICPState;
- typedef struct ICSStateClass ICSStateClass;
- typedef struct ICSState ICSState;
- typedef struct ICSIRQState ICSIRQState;
- typedef struct XICSFabric XICSFabric;
-+typedef struct PowerPCCPU PowerPCCPU;
-=20
- #define TYPE_ICP "icp"
- #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
-@@ -52,6 +54,9 @@ typedef struct XICSFabric XICSFabric;
- #define TYPE_KVM_ICP "icp-kvm"
- #define KVM_ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_KVM_ICP)
-=20
-+#define TYPE_PNV_ICP "pnv-icp"
-+#define PNV_ICP(obj) OBJECT_CHECK(PnvICPState, (obj), TYPE_PNV_ICP)
-+
- #define ICP_CLASS(klass) \
-      OBJECT_CLASS_CHECK(ICPStateClass, (klass), TYPE_ICP)
- #define ICP_GET_CLASS(obj) \
-@@ -81,6 +86,13 @@ struct ICPState {
-     XICSFabric *xics;
- };
-=20
-+struct PnvICPState {
-+    ICPState parent_obj;
-+
-+    MemoryRegion mmio;
-+    uint32_t links[3];
-+};
-+
- #define TYPE_ICS_BASE "ics-base"
- #define ICS_BASE(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_BASE)
-=20
+ #endif /* _PPC_PNV_H */
 --=20
 2.9.3
