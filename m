@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1d2mjn-0000l5-Ds
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:45:48 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1d2mqx-0002gC-GS
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1d2mjm-0003rs-8N
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:45:43 -0400
-References: <1492769076-64466-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<98514b87-d2a3-254d-f03e-0c6d3cd73ff6@kamp.de>
-	<88259101-7040-f057-5ed4-76bd36f2b1a0@virtuozzo.com>
-	<c9b0f997-efbd-92f2-2fba-57d6daad2ee7@kamp.de>
-	<15b32f67-fbce-fe9e-5a5f-ed25eae49941@virtuozzo.com>
-	<F7BA9764-937B-438A-B606-677DBF7379A6@kamp.de>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <59ebc5d3-5921-9d3c-1436-caecd1e23a60@virtuozzo.com>
-Date: Mon, 24 Apr 2017 23:13:05 +0300
+	(envelope-from <alex.williamson@redhat.com>) id 1d2mqs-0007K0-JW
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:53:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1d2mqs-0007JF-9h
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:53:02 -0400
+Date: Mon, 24 Apr 2017 16:52:58 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170424165258.151954f4@w520.home>
+In-Reply-To: <20170412052115.101657-7-bjsdjshi@linux.vnet.ibm.com>
+References: <20170412052115.101657-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170412052115.101657-7-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <F7BA9764-937B-438A-B606-677DBF7379A6@kamp.de>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH v2 1/1] qemu-img: wait for
- convert coroutines to complete
+Subject: Re: [Qemu-devel] [PATCH v5 06/13] s390x/css: device support for
+ s390-ccw passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,129 +29,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, qemu-stable@nongnu.org
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com
 
+On Wed, 12 Apr 2017 07:21:08 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-On 24/04/2017 21:16, Peter Lieven wrote:
->
->
->> Am 24.04.2017 um 18:27 schrieb Anton Nefedov <anton.nefedov@virtuozzo.com>:
->>
->>> On 04/21/2017 03:37 PM, Peter Lieven wrote:
->>>> Am 21.04.2017 um 14:19 schrieb Anton Nefedov:
->>>>> On 04/21/2017 01:44 PM, Peter Lieven wrote:
->>>>>> Am 21.04.2017 um 12:04 schrieb Anton Nefedov:
->>>>>> On error path (like i/o error in one of the coroutines), it's required to
->>>>>>  - wait for coroutines completion before cleaning the common structures
->>>>>>  - reenter dependent coroutines so they ever finish
->>>>>>
->>>>>> Introduced in 2d9187bc65.
->>>>>>
->>>>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>>>>> ---
->>>>>> [..]
->>>>>>
->>>>>
->>>>>
->>>>> And what if we error out in the read path? Wouldn't be something like this easier?
->>>>>
->>>>>
->>>>> diff --git a/qemu-img.c b/qemu-img.c
->>>>> index 22f559a..4ff1085 100644
->>>>> --- a/qemu-img.c
->>>>> +++ b/qemu-img.c
->>>>> @@ -1903,6 +1903,16 @@ static int convert_do_copy(ImgConvertState *s)
->>>>>         main_loop_wait(false);
->>>>>     }
->>>>>
->>>>> +    /* on error path we need to enter all coroutines that are still
->>>>> +     * running before cleaning up common structures */
->>>>> +    if (s->ret) {
->>>>> +        for (i = 0; i < s->num_coroutines; i++) {
->>>>> +             if (s->co[i]) {
->>>>> +                 qemu_coroutine_enter(s->co[i]);
->>>>> +             }
->>>>> +        }
->>>>> +    }
->>>>> +
->>>>>     if (s->compressed && !s->ret) {
->>>>>         /* signal EOF to align */
->>>>>         ret = blk_pwrite_compressed(s->target, 0, NULL, 0);
->>>>>
->>>>>
->>>>> Peter
->>>>>
->>>>
->>>> seemed a bit too daring to me to re-enter every coroutine potentially including the ones that yielded waiting for I/O completion.
->>>> If that's ok - that is for sure easier :)
->>>
->>> I think we should enter every coroutine that is still running and have it terminate correctly. It was my mistake that I have not
->>> done this in the original patch. Can you check if the above fixes your test cases that triggered the bug?
->>>
->>
->> hi, sorry I'm late with the answer
->>
->> this segfaults in bdrv_close(). Looks like it tries to finish some i/o which coroutine we have already entered and terminated?
->>
->> (gdb) run
->> Starting program: /vz/anefedov/qemu-build/us/./qemu-img convert -O qcow2 ./harddisk.hdd.c ./harddisk.hdd
->> [Thread debugging using libthread_db enabled]
->> Using host libthread_db library "/lib64/libthread_db.so.1".
->> [New Thread 0x7fffeac2d700 (LWP 436020)]
->> [New Thread 0x7fffe4ed6700 (LWP 436021)]
->> qemu-img: error while reading sector 20480: Input/output error
->> qemu-img: error while writing sector 19712: Operation now in progress
->>
->> Program received signal SIGSEGV, Segmentation fault.
->> aio_co_wake (co=0x0) at /mnt/code/us-qemu/util/async.c:454
->> 454         ctx = atomic_read(&co->ctx);
->> (gdb) bt
->> #0  aio_co_wake (co=0x0) at /mnt/code/us-qemu/util/async.c:454
->> /* [Anton]: thread_pool_co_cb () here */
->> #1  0x0000555555634629 in thread_pool_completion_bh (opaque=0x555555cfe020) at /mnt/code/us-qemu/util/thread-pool.c:189
->> #2  0x0000555555633b31 in aio_bh_call (bh=0x555555cfe0f0) at /mnt/code/us-qemu/util/async.c:90
->> #3  aio_bh_poll (ctx=ctx@entry=0x555555cee6d0) at /mnt/code/us-qemu/util/async.c:118
->> #4  0x0000555555636f14 in aio_poll (ctx=ctx@entry=0x555555cee6d0, blocking=<optimized out>) at /mnt/code/us-qemu/util/aio-posix.c:682
->> #5  0x00005555555c52d4 in bdrv_drain_recurse (bs=bs@entry=0x555555d22560) at /mnt/code/us-qemu/block/io.c:164
->> #6  0x00005555555c5aed in bdrv_drained_begin (bs=bs@entry=0x555555d22560) at /mnt/code/us-qemu/block/io.c:248
->> #7  0x0000555555581443 in bdrv_close (bs=0x555555d22560) at /mnt/code/us-qemu/block.c:2909
->> #8  bdrv_delete (bs=0x555555d22560) at /mnt/code/us-qemu/block.c:3100
->> #9  bdrv_unref (bs=0x555555d22560) at /mnt/code/us-qemu/block.c:4087
->> #10 0x00005555555baf44 in blk_remove_bs (blk=blk@entry=0x555555d22380) at /mnt/code/us-qemu/block/block-backend.c:552
->> #11 0x00005555555bb173 in blk_delete (blk=0x555555d22380) at /mnt/code/us-qemu/block/block-backend.c:238
->> #12 blk_unref (blk=blk@entry=0x555555d22380) at /mnt/code/us-qemu/block/block-backend.c:282
->> #13 0x000055555557a22c in img_convert (argc=<optimized out>, argv=<optimized out>) at /mnt/code/us-qemu/qemu-img.c:2359
->> #14 0x0000555555574189 in main (argc=5, argv=0x7fffffffe4a0) at /mnt/code/us-qemu/qemu-img.c:4464
->>
->>
->>> Peter
->>>
->>
->> /Anton
->>
->
-> it seems that this is a bit tricky, can you share how your test case works?
->
-> thanks,
-> peter
->
+> In order to support subchannels pass-through, we introduce a s390
+> subchannel device called "s390-ccw" to hold the real subchannel info.
+> The s390-ccw devices inherit from the abstract CcwDevice which connect
+> to the existing virtual-css-bus.
+> 
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/Makefile.objs |   1 +
+>  hw/s390x/s390-ccw.c    | 134 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-ccw.h    |  38 ++++++++++++++
+>  3 files changed, 173 insertions(+)
+>  create mode 100644 hw/s390x/s390-ccw.c
+>  create mode 100644 hw/s390x/s390-ccw.h
+> 
+> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+> index 41ac4ec..72a3d37 100644
+> --- a/hw/s390x/Makefile.objs
+> +++ b/hw/s390x/Makefile.objs
+> @@ -13,3 +13,4 @@ obj-y += ccw-device.o
+>  obj-y += s390-pci-bus.o s390-pci-inst.o
+>  obj-y += s390-skeys.o
+>  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+> +obj-y += s390-ccw.o
+> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+> new file mode 100644
+> index 0000000..f3d5ed1
+> --- /dev/null
+> +++ b/hw/s390x/s390-ccw.c
+> @@ -0,0 +1,134 @@
+> +/*
+> + * s390 CCW Assignment Support
+> + *
+> + * Copyright 2017 IBM Corp
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2
+> + * or (at your option) any later version. See the COPYING file in the
+> + * top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "libgen.h"
+> +#include "hw/s390x/css.h"
+> +#include "hw/s390x/css-bridge.h"
+> +#include "s390-ccw.h"
+> +
+> +static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
+> +                                  char *sysfsdev,
+> +                                  Error **errp)
+> +{
+> +    char dev_path[PATH_MAX], *tmp;
+> +    unsigned int cssid, ssid, devid;
+> +
+> +    if (!sysfsdev) {
+> +        error_setg(errp, "No host device provided");
+> +        error_append_hint(errp, "Use -vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
 
-how I tested today was basically
+nit, the leading '-' here seems strange, either you're describing
+'-device vfio-ccw,...', or only the 'vfio-ccw,...' part.  Maybe I
+notice this because sometimes I do accidentally type -vfio-pci instead
+of -device vfio-pci.  Thanks,
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 4425aaa..3d2d506 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1788,6 +1788,10 @@ static void coroutine_fn convert_co_do_copy(void 
-*opaque)
+Alex
 
-          if (status == BLK_DATA) {
-              ret = convert_co_read(s, sector_num, n, buf);
-+            const uint64_t fsector = 10*1024*1024/512;
-+            if (sector_num <= fsector && fsector < sector_num+n) {
-+                ret = -EIO;
-+            }
-              if (ret < 0) {
-                  error_report("error while reading sector %" PRId64
-                               ": %s", sector_num, strerror(-ret));
+> +        return;
+> +    }
+> +
+> +    if (!realpath(sysfsdev, dev_path)) {
+> +        error_setg(errp, "Host device '%s' not found", sysfsdev);
+> +        return;
+> +    }
+> +
+> +    cdev->mdevid = g_strdup(basename(dev_path));
+> +
+> +    tmp = basename(dirname(dev_path));
+> +    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
+> +
+> +    cdev->hostid.cssid = cssid;
+> +    cdev->hostid.ssid = ssid;
+> +    cdev->hostid.devid = devid;
+> +    cdev->hostid.valid = true;
+> +}
+> +
+> +static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
+> +{
+> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+> +    DeviceState *parent = DEVICE(ccw_dev);
+> +    BusState *qbus = qdev_get_parent_bus(parent);
+> +    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
+> +    SubchDev *sch;
+> +    int ret;
+> +    Error *err = NULL;
+> +
+> +    s390_ccw_get_dev_info(cdev, sysfsdev, errp);
+> +    if (*errp) {
+> +        return;
+> +    }
+> +
+> +    sch = css_create_sch(ccw_dev->devno, false, cbus->squash_mcss, errp);
+> +    if (!sch) {
+> +        return;
+> +    }
+> +    sch->driver_data = cdev;
+> +
+> +    ccw_dev->sch = sch;
+> +    ret = css_sch_build_schib(sch, &cdev->hostid);
+> +    if (ret) {
+> +        error_setg(&err, "%s: Failed to build initial schib: %d",
+> +                   __func__, ret);
+> +        goto out_err;
+> +    }
+> +
+> +    ck->realize(ccw_dev, &err);
+> +    if (err) {
+> +        goto out_err;
+> +    }
+> +
+> +    css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid,
+> +                          parent->hotplugged, 1);
+> +    return;
+> +
+> +out_err:
+> +    error_propagate(errp, err);
+> +    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+> +    ccw_dev->sch = NULL;
+> +    g_free(sch);
+> +}
+> +
+> +static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
+> +{
+> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+> +    SubchDev *sch = ccw_dev->sch;
+> +
+> +    if (sch) {
+> +        css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+> +        g_free(sch);
+> +        ccw_dev->sch = NULL;
+> +    }
+> +
+> +    g_free(cdev->mdevid);
+> +}
+> +
+> +static void s390_ccw_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_CLASS(klass);
+> +
+> +    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
+> +    cdc->realize = s390_ccw_realize;
+> +    cdc->unrealize = s390_ccw_unrealize;
+> +}
+> +
+> +static const TypeInfo s390_ccw_info = {
+> +    .name          = TYPE_S390_CCW,
+> +    .parent        = TYPE_CCW_DEVICE,
+> +    .instance_size = sizeof(S390CCWDevice),
+> +    .class_size    = sizeof(S390CCWDeviceClass),
+> +    .class_init    = s390_ccw_class_init,
+> +    .abstract      = true,
+> +};
+> +
+> +static void register_s390_ccw_type(void)
+> +{
+> +    type_register_static(&s390_ccw_info);
+> +}
+> +
+> +type_init(register_s390_ccw_type)
+> diff --git a/hw/s390x/s390-ccw.h b/hw/s390x/s390-ccw.h
+> new file mode 100644
+> index 0000000..b58d8e9
+> --- /dev/null
+> +++ b/hw/s390x/s390-ccw.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * s390 CCW Assignment Support
+> + *
+> + * Copyright 2017 IBM Corp.
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#ifndef HW_S390_CCW_H
+> +#define HW_S390_CCW_H
+> +
+> +#include "hw/s390x/ccw-device.h"
+> +
+> +#define TYPE_S390_CCW "s390-ccw"
+> +#define S390_CCW_DEVICE(obj) \
+> +    OBJECT_CHECK(S390CCWDevice, (obj), TYPE_S390_CCW)
+> +#define S390_CCW_DEVICE_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(S390CCWDeviceClass, (klass), TYPE_S390_CCW)
+> +#define S390_CCW_DEVICE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(S390CCWDeviceClass, (obj), TYPE_S390_CCW)
+> +
+> +typedef struct S390CCWDevice {
+> +    CcwDevice parent_obj;
+> +    CssDevId hostid;
+> +    char *mdevid;
+> +} S390CCWDevice;
+> +
+> +typedef struct S390CCWDeviceClass {
+> +    CCWDeviceClass parent_class;
+> +    void (*realize)(S390CCWDevice *dev, char *sysfsdev, Error **errp);
+> +    void (*unrealize)(S390CCWDevice *dev, Error **errp);
+> +} S390CCWDeviceClass;
+> +
+> +#endif
