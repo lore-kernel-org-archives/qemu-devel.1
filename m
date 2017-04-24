@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d2mAP-0000yg-N5
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:09:11 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1d2mhu-00005W-O2
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d2mAM-0008Io-Bz
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:09:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49071
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1d2mAM-0008IK-4h
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:09:06 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3OM3uTX112468
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 18:09:05 -0400
-Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a1nx698th-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 18:09:05 -0400
-Received: from localhost
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 24 Apr 2017 19:09:03 -0300
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Mon, 24 Apr 2017 19:08:27 -0300
-In-Reply-To: <20170424220828.1472-1-danielhb@linux.vnet.ibm.com>
-References: <20170424220828.1472-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20170424220828.1472-4-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 3/4] migration: spapr: migrate ccs_list in
- spapr state
+	(envelope-from <alex.williamson@redhat.com>) id 1d2mhr-0003FF-Ik
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:43:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52198)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1d2mhr-0003Eo-98
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:43:43 -0400
+Date: Mon, 24 Apr 2017 16:43:38 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170424164338.0250f3fa@w520.home>
+In-Reply-To: <20170412052115.101657-8-bjsdjshi@linux.vnet.ibm.com>
+References: <20170412052115.101657-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170412052115.101657-8-bjsdjshi@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 07/13] vfio/ccw: vfio based subchannel
+ passthrough driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,99 +29,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com
 
-From: Jianjun Duan <duanj@linux.vnet.ibm.com>
+On Wed, 12 Apr 2017 07:21:09 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-ccs_list in spapr state maintains the device tree related
-information on the rtas side for hotplugged devices. In racing
-situations between hotplug events and migration operation, a rtas
-hotplug event could be migrated from the source guest to target
-guest, or the source guest could have not yet finished fetching
-the device tree when migration is started, the target will try
-to finish fetching the device tree. By migrating ccs_list, the
-target can fetch the device tree properly.
+> From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> 
+> We use the IOMMU_TYPE1 of VFIO to realize the subchannels
+> passthrough, implement a vfio based subchannels passthrough
+> driver called "vfio-ccw".
+> 
+> Support qemu parameters in the style of:
+> "-device vfio-ccw,sysfsdev=$mdev_file_path,devno=xx.x.xxxx'
+> 
+> Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  default-configs/s390x-softmmu.mak |   1 +
+>  hw/vfio/Makefile.objs             |   1 +
+>  hw/vfio/ccw.c                     | 207 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/vfio/vfio-common.h     |   1 +
+>  4 files changed, 210 insertions(+)
+>  create mode 100644 hw/vfio/ccw.c
+> 
+> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+> index 36e15de..5576b0a 100644
+> --- a/default-configs/s390x-softmmu.mak
+> +++ b/default-configs/s390x-softmmu.mak
+> @@ -4,4 +4,5 @@ CONFIG_VIRTIO=y
+>  CONFIG_SCLPCONSOLE=y
+>  CONFIG_S390_FLIC=y
+>  CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
+> +CONFIG_VFIO_CCW=$(CONFIG_LINUX)
+>  CONFIG_WDT_DIAG288=y
+> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+> index 05e7fbb..c3ab909 100644
+> --- a/hw/vfio/Makefile.objs
+> +++ b/hw/vfio/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  ifeq ($(CONFIG_LINUX), y)
+>  obj-$(CONFIG_SOFTMMU) += common.o
+>  obj-$(CONFIG_PCI) += pci.o pci-quirks.o
+> +obj-$(CONFIG_VFIO_CCW) += ccw.o
+>  obj-$(CONFIG_SOFTMMU) += platform.o
+>  obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+>  obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> new file mode 100644
+> index 0000000..c491bee
+> --- /dev/null
+> +++ b/hw/vfio/ccw.c
+> @@ -0,0 +1,207 @@
+> +/*
+> + * vfio based subchannel assignment support
+> + *
+> + * Copyright 2017 IBM Corp.
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or(at
+> + * your option) any version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#include <linux/vfio.h>
+> +#include <sys/ioctl.h>
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/vfio/vfio.h"
+> +#include "hw/vfio/vfio-common.h"
+> +#include "hw/s390x/s390-ccw.h"
+> +#include "hw/s390x/ccw-device.h"
+> +
+> +#define TYPE_VFIO_CCW "vfio-ccw"
+> +typedef struct VFIOCCWDevice {
+> +    S390CCWDevice cdev;
+> +    VFIODevice vdev;
+> +} VFIOCCWDevice;
+> +
+> +static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+> +{
+> +    vdev->needs_reset = false;
+> +}
+> +
+> +/*
+> + * We don't need vfio_hot_reset_multi and vfio_eoi operationis for
+> + * vfio_ccw device now.
+> + */
+> +struct VFIODeviceOps vfio_ccw_ops = {
+> +    .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
+> +};
+> +
+> +static void vfio_ccw_reset(DeviceState *dev)
+> +{
+> +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
+> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> +
+> +    ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
+> +}
+> +
+> +static void vfio_put_device(VFIOCCWDevice *vcdev)
+> +{
+> +    g_free(vcdev->vdev.name);
+> +    vfio_put_base_device(&vcdev->vdev);
+> +}
+> +
+> +static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, char **path,
+> +                                     Error **errp)
+> +{
+> +    struct stat st;
+> +    int groupid;
+> +    GError *gerror = NULL;
+> +
+> +    /* Check that host subchannel exists. */
+> +    path[0] = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x",
+> +                              cdev->hostid.cssid,
+> +                              cdev->hostid.ssid,
+> +                              cdev->hostid.devid);
+> +    if (stat(path[0], &st) < 0) {
+> +        error_setg(errp, "vfio: no such host subchannel %s", path[0]);
+> +        return NULL;
+> +    }
+> +
+> +    /* Check that mediated device exists. */
+> +    path[1] = g_strdup_printf("%s/%s", path[0], cdev->mdevid);
+> +    if (stat(path[0], &st) < 0) {
+> +        error_setg(errp, "vfio: no such mediated device %s", path[1]);
+> +        return NULL;
+> +    }
 
-In theory there would be other alternatives besides migrating the
-css_list to fix this. For example, we could add a flag that indicates
-whether a device is in the middle of the configure_connector during the
-migration process, in the post_load we can detect if this flag
-is active and then return an error informing the guest to restart the
-hotplug process. However, the DRC state can still be modified outside of
-hotplug. Using:
+Isn't this all a bit circular since we build the S390CCWDevice based on
+the sysfsdev mdev path?
 
-   drmgr -c pci -s <drc_index> -r
-   drmgr -c pci -s <drc_index> -a
+> +
+> +    /* Get the iommu_group patch as the interim variable. */
+> +    path[2] = g_strconcat(path[1], "/iommu_group", NULL);
+> +
+> +    /* Get the link file path of the device iommu_group. */
+> +    path[3] = g_file_read_link(path[2], &gerror);
+> +    if (!path[3]) {
+> +        error_setg(errp, "vfio: error no iommu_group for subchannel");
+> +        return NULL;
+> +    }
+> +
+> +    /* Get the device groupid. */
+> +    if (sscanf(basename(path[3]), "%d", &groupid) != 1) {
+> +        error_setg(errp, "vfio: error reading %s:%m", path[3]);
+> +        return NULL;
+> +    }
+> +
+> +    return vfio_get_group(groupid, &address_space_memory, errp);
+> +}
+> +
+> +static void vfio_ccw_put_group(VFIOGroup *group, char **path)
+> +{
+> +    g_free(path);
+> +    vfio_put_group(group);
+> +}
+> +
+> +static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+> +{
+> +    VFIODevice *vbasedev;
+> +    VFIOGroup *group;
+> +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
+> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
+> +    char *path[4] = {NULL, NULL, NULL, NULL};
 
-it is possible to return a device to firmware and then later take it
-back and reconfigure it. This is not a common case but it's not prohibited,
-and performing a migration between these 2 operations would fail because
-the default coldplug state on target assumes a configured state in
-the source*. Migrating ccs_list is one solution that cover this
-case as well.
+I don't understand what's happening with 'path' throughout this
+function.  vfio_ccw_get_group() allocates strings into this array, we
+only seem to use one in an error path below, it's only freed on an error
+path and I don't see it getting linked to the VFIOCCWDevice, so it
+seems to be leaked, and even the g_free() above looks quite a bit
+suspicious.
 
-ccs_list is put in a subsection in the spapr state VMSD to make
-sure migration across different versions is not broken.
+> +
+> +    /* Call the class init function for subchannel. */
+> +    if (cdc->realize) {
+> +        cdc->realize(cdev, vcdev->vdev.sysfsdev, errp);
+> +        if (*errp) {
+> +            return;
+> +        }
+> +    }
+> +
+> +    group = vfio_ccw_get_group(cdev, path, errp);
+> +    if (!group) {
+> +        goto out_group_err;
+> +    }
+> +
+> +    vcdev->vdev.ops = &vfio_ccw_ops;
+> +    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
+> +    vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
+> +                                       cdev->hostid.ssid, cdev->hostid.devid);
+> +    QLIST_FOREACH(vbasedev, &group->device_list, next) {
+> +        if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
+> +            error_setg(errp, "vfio: subchannel %s has already been attached",
+> +                       basename(path[0]));
+> +            goto out_device_err;
+> +        }
+> +    }
+> +
+> +    if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, errp)) {
+> +        goto out_device_err;
+> +    }
+> +
+> +    return;
+> +
+> +out_device_err:
+> +    vfio_ccw_put_group(group, path);
+> +out_group_err:
+> +    if (cdc->unrealize) {
+> +        cdc->unrealize(cdev, errp);
+> +    }
+> +}
+> +
+> +static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
+> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
+> +    VFIOGroup *group = vcdev->vdev.group;
+> +
+> +    if (cdc->unrealize) {
+> +        cdc->unrealize(cdev, errp);
+> +    }
+> +
+> +    vfio_put_device(vcdev);
+> +    vfio_put_group(group);
+> +}
 
-* see http://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg01763.html
-for more information on this discussion.
+Doesn't seem to matter here, but I would have expected the
+cdc->unrealize to occur at the end to unwind the order of the realize
+function.
 
-Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
- hw/ppc/spapr.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 35db949..22f351c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1388,6 +1388,37 @@ static bool version_before_3(void *opaque, int version_id)
-     return version_id < 3;
- }
- 
-+static bool spapr_ccs_list_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
-+    return !QTAILQ_EMPTY(&spapr->ccs_list);
-+}
-+
-+static const VMStateDescription vmstate_spapr_ccs = {
-+    .name = "spaprconfigureconnectorstate",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(drc_index, sPAPRConfigureConnectorState),
-+        VMSTATE_INT32(fdt_offset, sPAPRConfigureConnectorState),
-+        VMSTATE_INT32(fdt_depth, sPAPRConfigureConnectorState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_spapr_ccs_list = {
-+    .name = "spaprccslist",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_ccs_list_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_QTAILQ_V(ccs_list, sPAPRMachineState, 1,
-+                         vmstate_spapr_ccs, sPAPRConfigureConnectorState,
-+                         next),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static bool spapr_ov5_cas_needed(void *opaque)
- {
-     sPAPRMachineState *spapr = opaque;
-@@ -1486,6 +1517,7 @@ static const VMStateDescription vmstate_spapr = {
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-+        &vmstate_spapr_ccs_list,
-         NULL
-     }
- };
--- 
-2.9.3
+> +
+> +static Property vfio_ccw_properties[] = {
+> +    DEFINE_PROP_STRING("sysfsdev", VFIOCCWDevice, vdev.sysfsdev),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static const VMStateDescription vfio_ccw_vmstate = {
+> +    .name = TYPE_VFIO_CCW,
+> +    .unmigratable = 1,
+> +};
+> +
+> +static void vfio_ccw_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->props = vfio_ccw_properties;
+> +    dc->vmsd = &vfio_ccw_vmstate;
+> +    dc->desc = "VFIO-based subchannel assignment";
+> +    dc->realize = vfio_ccw_realize;
+> +    dc->unrealize = vfio_ccw_unrealize;
+> +    dc->reset = vfio_ccw_reset;
+> +}
+> +
+> +static const TypeInfo vfio_ccw_info = {
+> +    .name = TYPE_VFIO_CCW,
+> +    .parent = TYPE_S390_CCW,
+> +    .instance_size = sizeof(VFIOCCWDevice),
+> +    .class_init = vfio_ccw_class_init,
+> +};
+> +
+> +static void register_vfio_ccw_type(void)
+> +{
+> +    type_register_static(&vfio_ccw_info);
+> +}
+> +
+> +type_init(register_vfio_ccw_type)
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index c582de1..9521013 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -45,6 +45,7 @@
+>  enum {
+>      VFIO_DEVICE_TYPE_PCI = 0,
+>      VFIO_DEVICE_TYPE_PLATFORM = 1,
+> +    VFIO_DEVICE_TYPE_CCW = 2,
+>  };
+>  
+>  typedef struct VFIOMmap {
