@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d2YNx-0003Q2-5j
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:26:14 -0400
+	(envelope-from <armbru@redhat.com>) id 1d2YOm-0003vR-TE
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d2YNs-0006Py-Lr
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:26:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33004)
+	(envelope-from <armbru@redhat.com>) id 1d2YOl-0006v1-OU
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d2YNs-0006PR-EA
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:26:08 -0400
-Date: Mon, 24 Apr 2017 15:26:04 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170424072604.GE316@lemon.lan>
-References: <e1b08f20-77e6-83c8-85e6-b73c645c44c1@gmx.com>
-	<CAFEAcA-ycgLSU9aX1Ywd1Pky2bquqefJbsRpNvo4DuaXOyL3SQ@mail.gmail.com>
-	<3c22d799-1f28-a220-59d7-4218307748e5@gmx.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3c22d799-1f28-a220-59d7-4218307748e5@gmx.com>
-Subject: Re: [Qemu-devel] NetBSD maintenance
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOl-0006ug-IK
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:03 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 91564C059757
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:27:02 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 24 Apr 2017 09:26:46 +0200
+Message-Id: <1493018820-23445-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1493018820-23445-1-git-send-email-armbru@redhat.com>
+References: <1493018820-23445-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 01/15] util/error: Fix leak in error_vprepend()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>
 
-On Mon, 04/24 00:45, Kamil Rytarowski wrote:
-> I will have a look and try to build qemu from git (master branch).
-> 
-> I also find it surprising that there was a call for CI machines and
-> there is no infrastructure for it.
+From: Max Reitz <mreitz@redhat.com>
 
-There are. We use travis and patchew. I don't know a lot about NetBSD testing
-with travis, but patchew has x86_64 and s390x machines that test patches, and
-welcomes more OSes/architectures:
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20170413160952.29918-1-mreitz@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ util/error.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-http://patchew.org/QEMU/20170423223216.17856-1-aurelien@aurel32.net/
-
-If qemu master can be build on NetBDS, I can create a VM for this on my x86_64
-machine, or you can generously contribute one, which is even better. :)
-
-Fam
+diff --git a/util/error.c b/util/error.c
+index 9c40b1f..020b86b 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -134,6 +134,7 @@ void error_vprepend(Error **errp, const char *fmt, va_list ap)
+     newmsg = g_string_new(NULL);
+     g_string_vprintf(newmsg, fmt, ap);
+     g_string_append(newmsg, (*errp)->msg);
++    g_free((*errp)->msg);
+     (*errp)->msg = g_string_free(newmsg, 0);
+ }
+ 
+-- 
+2.7.4
