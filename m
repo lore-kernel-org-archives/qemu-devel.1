@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOs-0003zb-24
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:11 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d2YbR-0005Hs-3r
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:40:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOq-0006xm-K1
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOq-0006xL-Ai
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51398C04B94B
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:27:07 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 24 Apr 2017 09:26:57 +0200
-Message-Id: <1493018820-23445-13-git-send-email-armbru@redhat.com>
-In-Reply-To: <1493018820-23445-1-git-send-email-armbru@redhat.com>
-References: <1493018820-23445-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 12/15] scsi: Make errp the last parameter of
- virtio_scsi_common_realize
+	(envelope-from <jemmy858585@gmail.com>) id 1d2YbQ-0001Kg-9e
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:40:09 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAOGPPbd_Y6m42EpuedngTWfGzt+MDvOwbPSmwp-OG5hVpMNBkA@mail.gmail.com>
+References: <1492050868-16200-1-git-send-email-lidongchen@tencent.com>
+	<20170414060015.GA12191@lemon>
+	<CAOGPPbeUkBskJfFX9=Of62pDrt6U-KAjbFZ-r=yVNNeb+ceAuA@mail.gmail.com>
+	<20170417034925.GC6717@lemon.lan>
+	<CAOGPPbd_Y6m42EpuedngTWfGzt+MDvOwbPSmwp-OG5hVpMNBkA@mail.gmail.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Mon, 24 Apr 2017 15:40:05 +0800
+Message-ID: <CAOGPPbc44H-oaY2Smm5kgNNbaP44C3rksi9_=0ocAXAnGdWdCg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v6] migration/block: use blk_pwrite_zeroes
+ for each zero cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
 
-From: Fam Zheng <famz@redhat.com>
+On Mon, Apr 17, 2017 at 12:00 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+> On Mon, Apr 17, 2017 at 11:49 AM, Fam Zheng <famz@redhat.com> wrote:
+>> On Fri, 04/14 14:30, 858585 jemmy wrote:
+>>> Do you know some other format which have very small cluster size?
+>>
+>> 64k is the default cluster size for qcow2 but it can be configured at image
+>> creation time, as 512 bytes, for example:
+>>
+>>     $ qemu-img create -f qcow2 test.qcow2 -o cluster_size=512 1G
+>
+> Thanks, i will test the performance again.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170421122710.15373-12-famz@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/scsi/vhost-scsi.c            |  6 ++++--
- hw/scsi/virtio-scsi.c           | 11 +++++++----
- include/hw/virtio/virtio-scsi.h |  8 +++++---
- 3 files changed, 16 insertions(+), 9 deletions(-)
+I find the performance reduce when cluster size is 512.
+I will optimize the performance and submit a patch later.
+Thanks.
 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index c491ece..f53bc17 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -233,9 +233,11 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-         }
-     }
- 
--    virtio_scsi_common_realize(dev, &err, vhost_dummy_handle_output,
-+    virtio_scsi_common_realize(dev,
-                                vhost_dummy_handle_output,
--                               vhost_dummy_handle_output);
-+                               vhost_dummy_handle_output,
-+                               vhost_dummy_handle_output,
-+                               &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-         goto close_fd;
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index bd62d08..46a3e3f 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -841,10 +841,11 @@ static struct SCSIBusInfo virtio_scsi_scsi_info = {
-     .load_request = virtio_scsi_load_request,
- };
- 
--void virtio_scsi_common_realize(DeviceState *dev, Error **errp,
-+void virtio_scsi_common_realize(DeviceState *dev,
-                                 VirtIOHandleOutput ctrl,
-                                 VirtIOHandleOutput evt,
--                                VirtIOHandleOutput cmd)
-+                                VirtIOHandleOutput cmd,
-+                                Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(dev);
-@@ -878,9 +879,11 @@ static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
-     VirtIOSCSI *s = VIRTIO_SCSI(dev);
-     Error *err = NULL;
- 
--    virtio_scsi_common_realize(dev, &err, virtio_scsi_handle_ctrl,
-+    virtio_scsi_common_realize(dev,
-+                               virtio_scsi_handle_ctrl,
-                                virtio_scsi_handle_event,
--                               virtio_scsi_handle_cmd);
-+                               virtio_scsi_handle_cmd,
-+                               &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-         return;
-diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-index 8ae0aca..8c8453c 100644
---- a/include/hw/virtio/virtio-scsi.h
-+++ b/include/hw/virtio/virtio-scsi.h
-@@ -135,9 +135,11 @@ static inline void virtio_scsi_release(VirtIOSCSI *s)
-     }
- }
- 
--void virtio_scsi_common_realize(DeviceState *dev, Error **errp,
--                                VirtIOHandleOutput ctrl, VirtIOHandleOutput evt,
--                                VirtIOHandleOutput cmd);
-+void virtio_scsi_common_realize(DeviceState *dev,
-+                                VirtIOHandleOutput ctrl,
-+                                VirtIOHandleOutput evt,
-+                                VirtIOHandleOutput cmd,
-+                                Error **errp);
- 
- void virtio_scsi_common_unrealize(DeviceState *dev, Error **errp);
- bool virtio_scsi_handle_event_vq(VirtIOSCSI *s, VirtQueue *vq);
--- 
-2.7.4
+>>
+>> Fam
