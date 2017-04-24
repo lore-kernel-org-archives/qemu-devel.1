@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d2YuU-0004wp-2m
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:59:51 -0400
+	(envelope-from <kchamart@redhat.com>) id 1d2Yui-000568-QF
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d2YuR-0006ZJ-1u
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:59:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38964)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d2YuQ-0006Z1-Rs
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:59:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d2YuO-0005j9-SN
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:59:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CFD322E80C4
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:59:44 +0000 (UTC)
+	(envelope-from <kchamart@redhat.com>) id 1d2Yuh-0006d5-RN
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:04 -0400
+Date: Mon, 24 Apr 2017 09:59:55 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170424075955.5s72guumt35dhmlb@eukaryote>
+References: <20170421204123.bdftoeuko6lwox3x@eukaryote>
+	<58FB2125.7020603@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 24 Apr 2017 07:48:44 -0000
-From: Thomas Huth <1020309@bugs.launchpad.net>
-Reply-To: Bug 1020309 <1020309@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120702214947.7655.69447.malonedeb@gac.canonical.com>
-Message-Id: <20170424074844.20034.17480.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1020309] Re: qemu-system-ppc: no keyboard after
- savevm/loadvm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58FB2125.7020603@huawei.com>
+Subject: Re: [Qemu-devel] [QEMU-2.8] Source QEMU crashes with:
+ "bdrv_co_pwritev: Assertion `!(bs->open_flags & BDRV_O_INACTIVE)' failed"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, qemu-block@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com
 
-OK, thanks for testing it again! So I'm setting the state to "Fix
-released" now.
+On Sat, Apr 22, 2017 at 05:23:49PM +0800, Hailiang Zhang wrote:
+> Hi,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+Hi Hailiang,
 
--- =
+> I think the bellow patch can fix your problme.
+> [PATCH 2/4] qmp-cont: invalidate on RUN_STATE_PRELAUNCH
+> https://patchwork.kernel.org/patch/9591885/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1020309
+Hmm, the above patch ("qmp-cont: invalidate on RUN_STATE_PRELAUNCH") is
+not merged in Git, as it's stalled on design discussion between Kevin
+Wolf and Vladimir.
 
-Title:
-  qemu-system-ppc: no keyboard after savevm/loadvm
+And the below patch, from you, seems to be not submitted upstream (2.8
+stable tree, perhaps).  Do you intend to do so?
 
-Status in QEMU:
-  Fix Released
+> Actually, we encounter the same problem in our test, we fix it with the follow patch:
+> 
+>      From 0e4d6d706afd9909b5fd71536b45c58af60892f8 Mon Sep 17 00:00:00 2001
+>      From: zhanghailiang<zhang.zhanghailiang@huawei.com>
+>      Date: Tue, 21 Mar 2017 09:44:36 +0800
+>      Subject: [PATCH] migration: Re-activate blocks whenever migration been
+>       cancelled
+> 
+>      In commit 1d2acc3162d9c7772510c973f446353fbdd1f9a8, we try to fix the bug
+>      'bdrv_co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed'
+>      which occured in migration cancelling process.
+> 
+>      But it seems that we didn't cover all the cases, we caught such a case which
+>      slipped from the old fixup in our test: if libvirtd cancelled the migration
+>      process for a shutting down VM, it will send 'system_reset' command first,
+>      and then 'cont' command behind, after VM resumes to run, it will trigger the above
+>      error reports, because we didn't regain the control of blocks for VM.
+> 
+>      Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
+>      Signed-off-by: Hongyang Yang<yanghongyang@huawei.com>
+>      ---
+>       block.c                       | 12 +++++++++++-
+>       include/block/block.h         |  1 +
+>       include/migration/migration.h |  3 ---
+>       migration/migration.c         |  7 +------
+>       qmp.c                         |  4 +---
+>       5 files changed, 14 insertions(+), 13 deletions(-)
 
-Bug description:
-  Here the steps to reproduce:
+[...]
 
-  1. qemu-img create -f qcow2 test.qcow2 100M
-  2. qemu-system-ppc -m 1024 -hda test.qcow2
-  3. change to the console via Ctrl-Alt-2 and save a snapshot: "savevm test"
-  4. quit
-  5. start again and go to the console
-  6. load the snapshot via "loadvm test"
-  7. change back to the guest display (Ctrl-Alt-1)
-  8. try to type something =3D> no keyboard
-  9. the same via console, e.g. "sendkey 1" has no effect
-
-  I tried the following branches from git:
-  master, stable-1.0, stable-0.15 =
-
-  =3D> all behave the same
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1020309/+subscriptions
+-- 
+/kashyap
