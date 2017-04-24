@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d2UN4-0000zv-W6
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 23:09:04 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d2UfE-0003c4-Sm
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 23:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d2UN3-0005pu-2X
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 23:09:02 -0400
-Resent-Message-Id: <E1d2UN3-0005pu-2X@eggs.gnu.org>
-In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
-Message-ID: <149300330317.69.15437780800942889841@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <jasowang@redhat.com>) id 1d2UfB-0003Yo-Nb
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 23:27:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2UfB-0003Yg-EF
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 23:27:45 -0400
+References: <1492482020-29745-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1492482020-29745-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<77fcaf8a-4352-feca-358e-379ff4006d18@redhat.com>
+	<67940fb7-9a96-255a-e316-a0ade3bb0397@cn.fujitsu.com>
+	<c0bdd81e-4519-ca2e-19f5-5c7413bb80a8@redhat.com>
+	<9487b624-0047-239e-392d-5b98b3fa9f4d@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <bc3fbe8d-c8da-65a1-ae7e-d406e1e78328@redhat.com>
+Date: Mon, 24 Apr 2017 11:27:36 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 23 Apr 2017 20:08:23 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/47] ppc-for-2.10 queue 20170424
+In-Reply-To: <9487b624-0047-239e-392d-5b98b3fa9f4d@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V2 1/2] COLO-compare: Optimize tcp compare
+ for option field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,141 +32,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, qemu-ppc@nongnu.org, clg@kaod.org
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, bian naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA0MjQwMTU5MjcuODkzMy0xLWRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdQpTdWJqZWN0OiBb
-UWVtdS1kZXZlbF0gW1BVTEwgMDAvNDddIHBwYy1mb3ItMi4xMCBxdWV1ZSAyMDE3MDQyNApUeXBl
-OiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk0YmVhNmEgdGFy
-Z2V0L3BwYzogU3R5bGUgZml4ZXMKZDIzZWFjMCBlNTAwLCBib29rM3M6IG1mc3ByIDI1OTogUmVn
-aXN0ZXIgbWFwcGVkL2FsaWFzZWQgU1BSRzMgdXNlciByZWFkCjNhNWJkOTYgdGFyZ2V0L3BwYzog
-Rmx1c2ggVExCIG9uIHdyaXRlIHRvIFBJRFIKMzI0MGUzMyBzcGFwci1jcHUtY29yZTogUmVsZWFz
-ZSBJQ1BTdGF0ZSBvYmplY3QgZHVyaW5nIENQVSB1bnJlYWxpemF0aW9uCmVhNjM0MWQgcHBjL3Bu
-djogZ2VuZXJhdGUgYW4gT0VNIFNFTCBldmVudCBvbiBzaHV0ZG93bgoxMzBjZjFmIHBwYy9wbnY6
-IGFkZCBpbml0aWFsIElQTUkgc2Vuc29ycyBmb3IgdGhlIEJNQyBzaW11bGF0b3IKN2UyNGIzMiBw
-cGMvcG52OiBwb3B1bGF0ZSBkZXZpY2UgdHJlZSBmb3IgSVBNSSBCVCBkZXZpY2VzCjY1NzU3MTcg
-cHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9yIHNlcmlhbCBkZXZpY2VzCjgzNmQ1NjIg
-cHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9yIFJUQyBkZXZpY2VzCmRjYTgyMzEgcHBj
-L3Budjogc2NhbiBJU0EgYnVzIHRvIHBvcHVsYXRlIGRldmljZSB0cmVlCjRkNjMxYjcgcHBjL3Bu
-djogZW5hYmxlIG9ubHkgb25lIExQQyBidXMKYWYyMjM3MiBwcGMvcG52OiBBZGQgc3VwcG9ydCBm
-b3IgUE9XRVI4KyBMUEMgQ29udHJvbGxlcgoyZDc5YjQwIHNwYXByOiByZW1vdmUgdGhlICducl9z
-ZXJ2ZXJzJyBmaWVsZCBmcm9tIHRoZSBtYWNoaW5lCjhmYTNjMDkgdGFyZ2V0L3BwYzogRml4IHNp
-emUgb2Ygc3RydWN0IFBQQ0VsZlByc3RhdHVzCjIxMmY0ZDcgaXBtaTogaW50cm9kdWNlIGFuIGlw
-bWlfYm1jX2dlbl9ldmVudCgpIEFQSQoyNDBkYTAyIGlwbWk6IGludHJvZHVjZSBhbiBpcG1pX2Jt
-Y19zZHJfZmluZCgpIEFQSQozNjA3ZWY3IGlwbWk6IHByb3ZpZGUgc3VwcG9ydCBmb3IgRlJVcwph
-YTg3M2EyIGlwbWk6IHVzZSBhIGZpbGUgdG8gbG9hZCBTRFJzCmVmMWNlNjIgcHBjOiBhZGQgSVBN
-SSBzdXBwb3J0CjFhOGZmZmQgcHBjL3BudjogQWRkIE9DQyBtb2RlbCBzdHViIHdpdGggaW50ZXJy
-dXB0IHN1cHBvcnQKODI4YmNmYSBwcGMvcG52OiBBZGQgY3V0IGRvd24gUFNJIGJyaWRnZSBtb2Rl
-bCBhbmQgaG9va3VwIGV4dGVybmFsIGludGVycnVwdAphYzgzOTJhIHBwYy9wbnY6IGFkZCBtZW1v
-cnkgcmVnaW9ucyBmb3IgdGhlIElDUCByZWdpc3RlcnMKZDkwY2E5NSBwcGMvcG52OiBhZGQgYSBo
-ZWxwZXIgdG8gY2FsY3VsYXRlIE1NSU8gYWRkcmVzc2VzIHJlZ2lzdGVycwphNWE2MTRiIHBwYy9w
-bnY6IGNyZWF0ZSB0aGUgSUNQIG9iamVjdCB1bmRlciBQbnZDb3JlCjVmNDNiNWUgcHBjL3Budjog
-ZXh0ZW5kIHRoZSBtYWNoaW5lIHdpdGggYSBJbnRlcnJ1cHRTdGF0c1Byb3ZpZGVyIGludGVyZmFj
-ZQowNGRmZWNmIHBwYy9wbnY6IGV4dGVuZCB0aGUgbWFjaGluZSB3aXRoIGEgWElDU0ZhYnJpYyBp
-bnRlcmZhY2UKNWI5NGEwZiBwcGMvcG52OiBhZGQgYSBQbnZJQ1BTdGF0ZSBvYmplY3QKOTZjNjQ1
-ZSBwcGMveGljczogYWRkIGEgcmVhbGl6ZSgpIGhhbmRsZXIgdG8gSUNQU3RhdGVDbGFzcwo0NTY5
-NjE1IHNwYXByOiBhbGxvY2F0ZSB0aGUgSUNQU3RhdGUgb2JqZWN0IGZyb20gdW5kZXIgc1BBUFJD
-UFVDb3JlCjgyNTdkMWUgc3BhcHI6IG1vdmUgdGhlIElSUSBzZXJ2ZXIgbnVtYmVyIG1hcHBpbmcg
-dW5kZXIgdGhlIG1hY2hpbmUKNTZkNmY5MSBwcGMveGljczogaW50cm9kdWNlIGFuICdpbnRjJyBi
-YWNrbGluayB1bmRlciBQb3dlclBDQ1BVCmYwMjRhOWEgdGFyZ2V0L3BwYzogQWRkIGlibSwgcHJv
-Y2Vzc29yLXJhZGl4LUFQLWVuY29kaW5ncyBmb3IgVENHCmEwZDhkZjMgc3BhcHJfcGNpOiBSZW1v
-dmVkIHVudXNlZCBpbmNsdWRlCjdjYzc5NTIgc3BhcHJfcGNpOiBXYXJuIHdoZW4gUkFNIHBhZ2Ug
-c2l6ZSBpcyBub3QgZW5hYmxlZCBpbiBJT01NVSBwYWdlIG1hc2sKMjA5MzEyMSB0YXJnZXQtcHBj
-L2t2bTogRW5hYmxlIGluLWtlcm5lbCBUQ0UgYWNjZWxlcmF0aW9uIGZvciBtdWx0aS10Y2UKMjY1
-MzhlZSBzcGFwcjogV29ya2Fyb3VuZCBmb3IgYnJva2VuIHJhZGl4IGd1ZXN0cwpkMmRhNDIwIHNw
-YXByOiBFbmFibGUgSVNBIDMuMCBNTVUgbW9kZSBzZWxlY3Rpb24gdmlhIENBUwo1MGZlMDhkIHNw
-YXByOiBtb3ZlIHNwYXByX3BvcHVsYXRlX3BhX2ZlYXR1cmVzKCkKZDY2N2YyMSB0YXJnZXQvcHBj
-OiBJbXBsZW1lbnQgSF9SRUdJU1RFUl9QUk9DRVNTX1RBQkxFIEhfQ0FMTAoxMjljMTk5IHRhcmdl
-dC9wcGM6IEFkZCBuZXcgSC1DQUxMIHNoZWxscyBmb3IgaW4gbWVtb3J5IHRhYmxlIHRyYW5zbGF0
-aW9uCmQwMzMyODUgdGFyZ2V0LXBwYzogc3VwcG9ydCBLVk1fQ0FQX1BQQ19NTVVfUkFESVgsIEtW
-TV9DQVBfUFBDX01NVV9IQVNIX1YzCjM4YzM5NWIgc3BhcHI6IEFkZCBpYm0sIHByb2Nlc3Nvci1y
-YWRpeC1BUC1lbmNvZGluZ3MgdG8gdGhlIGRldmljZSB0cmVlCjRmZTIzMmMgdGFyZ2V0LXBwYzog
-a3ZtOiBtYWtlIHVzZSBvZiBLVk1fQ1JFQVRFX1NQQVBSX1RDRV82NAo5MGY4N2FkIGh3L3BwYy9w
-bnY6IENsYXNzaWZ5IHRoZSAiUG93ZXJOViBDaGlwIiBkZXZpY2VzIGFzIENQVSBkZXZpY2VzCmM5
-ODgzN2EgcHBjL3NwYXByOiBRT00naWZ5IHNQQVBSUlRDU3RhdGUKMWJjMzdhNyBwc2VyaWVzOiBB
-ZGQgcHNlcmllcy0yLjEwIG1hY2hpbmUgdHlwZQo0MGE3MjZlIHRhcmdldC9wcGM6IEltcHJvdmUg
-YWNjdXJhY3kgb2YgZ3Vlc3QgSFRNIGF2YWlsYWJpbGl0eSBvbiBQOHMKCj09PSBPVVRQVVQgQkVH
-SU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDc6IHRhcmdldC9wcGM6IEltcHJvdmUgYWNjdXJhY3kg
-b2YgZ3Vlc3QgSFRNIGF2YWlsYWJpbGl0eSBvbiBQOHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80Nzog
-cHNlcmllczogQWRkIHBzZXJpZXMtMi4xMCBtYWNoaW5lIHR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0gg
-My80NzogcHBjL3NwYXByOiBRT00naWZ5IHNQQVBSUlRDU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NC80NzogaHcvcHBjL3BudjogQ2xhc3NpZnkgdGhlICJQb3dlck5WIENoaXAiIGRldmljZXMgYXMg
-Q1BVIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS80NzogdGFyZ2V0LXBwYzoga3ZtOiBtYWtl
-IHVzZSBvZiBLVk1fQ1JFQVRFX1NQQVBSX1RDRV82NC4uLgpDaGVja2luZyBQQVRDSCA2LzQ3OiBz
-cGFwcjogQWRkIGlibSwgcHJvY2Vzc29yLXJhZGl4LUFQLWVuY29kaW5ncyB0byB0aGUgZGV2aWNl
-IHRyZWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy80NzogdGFyZ2V0LXBwYzogc3VwcG9ydCBLVk1fQ0FQ
-X1BQQ19NTVVfUkFESVgsIEtWTV9DQVBfUFBDX01NVV9IQVNIX1YzLi4uCkNoZWNraW5nIFBBVENI
-IDgvNDc6IHRhcmdldC9wcGM6IEFkZCBuZXcgSC1DQUxMIHNoZWxscyBmb3IgaW4gbWVtb3J5IHRh
-YmxlIHRyYW5zbGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDkvNDc6IHRhcmdldC9wcGM6IEltcGxl
-bWVudCBIX1JFR0lTVEVSX1BST0NFU1NfVEFCTEUgSF9DQUxMLi4uCkNoZWNraW5nIFBBVENIIDEw
-LzQ3OiBzcGFwcjogbW92ZSBzcGFwcl9wb3B1bGF0ZV9wYV9mZWF0dXJlcygpLi4uCkNoZWNraW5n
-IFBBVENIIDExLzQ3OiBzcGFwcjogRW5hYmxlIElTQSAzLjAgTU1VIG1vZGUgc2VsZWN0aW9uIHZp
-YSBDQVMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNDc6IHNwYXByOiBXb3JrYXJvdW5kIGZvciBicm9r
-ZW4gcmFkaXggZ3Vlc3RzLi4uCkNoZWNraW5nIFBBVENIIDEzLzQ3OiB0YXJnZXQtcHBjL2t2bTog
-RW5hYmxlIGluLWtlcm5lbCBUQ0UgYWNjZWxlcmF0aW9uIGZvciBtdWx0aS10Y2UuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTQvNDc6IHNwYXByX3BjaTogV2FybiB3aGVuIFJBTSBwYWdlIHNpemUgaXMgbm90
-IGVuYWJsZWQgaW4gSU9NTVUgcGFnZSBtYXNrLi4uCkNoZWNraW5nIFBBVENIIDE1LzQ3OiBzcGFw
-cl9wY2k6IFJlbW92ZWQgdW51c2VkIGluY2x1ZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvNDc6IHRh
-cmdldC9wcGM6IEFkZCBpYm0sIHByb2Nlc3Nvci1yYWRpeC1BUC1lbmNvZGluZ3MgZm9yIFRDRy4u
-LgpDaGVja2luZyBQQVRDSCAxNy80NzogcHBjL3hpY3M6IGludHJvZHVjZSBhbiAnaW50YycgYmFj
-a2xpbmsgdW5kZXIgUG93ZXJQQ0NQVS4uLgpDaGVja2luZyBQQVRDSCAxOC80Nzogc3BhcHI6IG1v
-dmUgdGhlIElSUSBzZXJ2ZXIgbnVtYmVyIG1hcHBpbmcgdW5kZXIgdGhlIG1hY2hpbmUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTkvNDc6IHNwYXByOiBhbGxvY2F0ZSB0aGUgSUNQU3RhdGUgb2JqZWN0IGZy
-b20gdW5kZXIgc1BBUFJDUFVDb3JlLi4uCkNoZWNraW5nIFBBVENIIDIwLzQ3OiBwcGMveGljczog
-YWRkIGEgcmVhbGl6ZSgpIGhhbmRsZXIgdG8gSUNQU3RhdGVDbGFzcy4uLgpDaGVja2luZyBQQVRD
-SCAyMS80NzogcHBjL3BudjogYWRkIGEgUG52SUNQU3RhdGUgb2JqZWN0Li4uCkNoZWNraW5nIFBB
-VENIIDIyLzQ3OiBwcGMvcG52OiBleHRlbmQgdGhlIG1hY2hpbmUgd2l0aCBhIFhJQ1NGYWJyaWMg
-aW50ZXJmYWNlLi4uCkNoZWNraW5nIFBBVENIIDIzLzQ3OiBwcGMvcG52OiBleHRlbmQgdGhlIG1h
-Y2hpbmUgd2l0aCBhIEludGVycnVwdFN0YXRzUHJvdmlkZXIgaW50ZXJmYWNlLi4uCkNoZWNraW5n
-IFBBVENIIDI0LzQ3OiBwcGMvcG52OiBjcmVhdGUgdGhlIElDUCBvYmplY3QgdW5kZXIgUG52Q29y
-ZS4uLgpDaGVja2luZyBQQVRDSCAyNS80NzogcHBjL3BudjogYWRkIGEgaGVscGVyIHRvIGNhbGN1
-bGF0ZSBNTUlPIGFkZHJlc3NlcyByZWdpc3RlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjYvNDc6IHBw
-Yy9wbnY6IGFkZCBtZW1vcnkgcmVnaW9ucyBmb3IgdGhlIElDUCByZWdpc3RlcnMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjcvNDc6IHBwYy9wbnY6IEFkZCBjdXQgZG93biBQU0kgYnJpZGdlIG1vZGVsIGFu
-ZCBob29rdXAgZXh0ZXJuYWwgaW50ZXJydXB0Li4uCkNoZWNraW5nIFBBVENIIDI4LzQ3OiBwcGMv
-cG52OiBBZGQgT0NDIG1vZGVsIHN0dWIgd2l0aCBpbnRlcnJ1cHQgc3VwcG9ydC4uLgpDaGVja2lu
-ZyBQQVRDSCAyOS80NzogcHBjOiBhZGQgSVBNSSBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDMw
-LzQ3OiBpcG1pOiB1c2UgYSBmaWxlIHRvIGxvYWQgU0RScy4uLgpDaGVja2luZyBQQVRDSCAzMS80
-NzogaXBtaTogcHJvdmlkZSBzdXBwb3J0IGZvciBGUlVzLi4uCkNoZWNraW5nIFBBVENIIDMyLzQ3
-OiBpcG1pOiBpbnRyb2R1Y2UgYW4gaXBtaV9ibWNfc2RyX2ZpbmQoKSBBUEkuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMzMvNDc6IGlwbWk6IGludHJvZHVjZSBhbiBpcG1pX2JtY19nZW5fZXZlbnQoKSBBUEku
-Li4KQ2hlY2tpbmcgUEFUQ0ggMzQvNDc6IHRhcmdldC9wcGM6IEZpeCBzaXplIG9mIHN0cnVjdCBQ
-UENFbGZQcnN0YXR1cy4uLgpDaGVja2luZyBQQVRDSCAzNS80Nzogc3BhcHI6IHJlbW92ZSB0aGUg
-J25yX3NlcnZlcnMnIGZpZWxkIGZyb20gdGhlIG1hY2hpbmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYv
-NDc6IHBwYy9wbnY6IEFkZCBzdXBwb3J0IGZvciBQT1dFUjgrIExQQyBDb250cm9sbGVyLi4uCkNo
-ZWNraW5nIFBBVENIIDM3LzQ3OiBwcGMvcG52OiBlbmFibGUgb25seSBvbmUgTFBDIGJ1cy4uLgpD
-aGVja2luZyBQQVRDSCAzOC80NzogcHBjL3Budjogc2NhbiBJU0EgYnVzIHRvIHBvcHVsYXRlIGRl
-dmljZSB0cmVlLi4uCkNoZWNraW5nIFBBVENIIDM5LzQ3OiBwcGMvcG52OiBwb3B1bGF0ZSBkZXZp
-Y2UgdHJlZSBmb3IgUlRDIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNDAvNDc6IHBwYy9wbnY6
-IHBvcHVsYXRlIGRldmljZSB0cmVlIGZvciBzZXJpYWwgZGV2aWNlcy4uLgpDaGVja2luZyBQQVRD
-SCA0MS80NzogcHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9yIElQTUkgQlQgZGV2aWNl
-cy4uLgpDaGVja2luZyBQQVRDSCA0Mi80NzogcHBjL3BudjogYWRkIGluaXRpYWwgSVBNSSBzZW5z
-b3JzIGZvciB0aGUgQk1DIHNpbXVsYXRvci4uLgpDaGVja2luZyBQQVRDSCA0My80NzogcHBjL3Bu
-djogZ2VuZXJhdGUgYW4gT0VNIFNFTCBldmVudCBvbiBzaHV0ZG93bi4uLgpDaGVja2luZyBQQVRD
-SCA0NC80Nzogc3BhcHItY3B1LWNvcmU6IFJlbGVhc2UgSUNQU3RhdGUgb2JqZWN0IGR1cmluZyBD
-UFUgdW5yZWFsaXphdGlvbi4uLgpDaGVja2luZyBQQVRDSCA0NS80NzogdGFyZ2V0L3BwYzogRmx1
-c2ggVExCIG9uIHdyaXRlIHRvIFBJRFIuLi4KQ2hlY2tpbmcgUEFUQ0ggNDYvNDc6IGU1MDAsIGJv
-b2szczogbWZzcHIgMjU5OiBSZWdpc3RlciBtYXBwZWQvYWxpYXNlZCBTUFJHMyB1c2VyIHJlYWQu
-Li4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVu
-IHBhcmVudGhlc2lzICcoJwojNTE6IEZJTEU6IHRhcmdldC9wcGMvdHJhbnNsYXRlX2luaXQuYzox
-NjQzOgorc3RhdGljIHZvaWQgZ2VuX3Nwcl91c3ByZzMgKENQVVBQQ1N0YXRlICplbnYpCgp0b3Rh
-bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQ3LzQ3OiB0YXJnZXQvcHBj
-OiBTdHlsZSBmaXhlcy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+On 2017=E5=B9=B404=E6=9C=8821=E6=97=A5 16:22, Zhang Chen wrote:
+>
+>
+> On 04/21/2017 12:10 PM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B404=E6=9C=8821=E6=97=A5 11:48, Zhang Chen wrote:
+>>>
+>>>
+>>> On 04/20/2017 02:43 PM, Jason Wang wrote:
+>>>>
+>>>>
+>>>> On 2017=E5=B9=B404=E6=9C=8818=E6=97=A5 10:20, Zhang Chen wrote:
+>>>>> In this patch we support packet that have tcp options field.
+>>>>> Add tcp options field check, If the packet have options
+>>>>> field we just skip it and compare tcp payload,
+>>>>> Avoid unnecessary checkpoint, optimize performance.
+>>>>>
+>>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>>>> ---
+>>>>>   net/colo-compare.c | 27 ++++++++++++++++++++++++++-
+>>>>>   1 file changed, 26 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>>>>> index aada04e..049f6f8 100644
+>>>>> --- a/net/colo-compare.c
+>>>>> +++ b/net/colo-compare.c
+>>>>> @@ -248,7 +248,32 @@ static int colo_packet_compare_tcp(Packet=20
+>>>>> *spkt, Packet *ppkt)
+>>>>>           spkt->ip->ip_sum =3D ppkt->ip->ip_sum;
+>>>>>       }
+>>>>>   -    if (ptcp->th_sum =3D=3D stcp->th_sum) {
+>>>>> +    /*
+>>>>> +     * Check tcp header length for tcp option field.
+>>>>> +     * th_off > 5 means this tcp packet have options field.
+>>>>> +     * The tcp options maybe always different.
+>>>>> +     * for example:
+>>>>> +     * From RFC 7323.
+>>>>> +     * TCP Timestamps option (TSopt):
+>>>>> +     * Kind: 8
+>>>>> +     *
+>>>>> +     * Length: 10 bytes
+>>>>> +     *
+>>>>> +     * +-------+-------+---------------------+--------------------=
+-+
+>>>>> +     *    |Kind=3D8 |  10   |   TS Value (TSval)  |TS Echo Reply=20
+>>>>> (TSecr)|
+>>>>> +     * +-------+-------+---------------------+--------------------=
+-+
+>>>>> +     *       1       1              4 4
+>>>>> +     *
+>>>>> +     * In this case the primary guest's timestamp always=20
+>>>>> different with
+>>>>> +     * the secondary guest's timestamp. COLO just focus on payload=
+,
+>>>>> +     * so we just need skip this field.h
+>>>>
+>>>> Probably a good explanation why we can skip this kind of header.=20
+>>>> But it does not explain why we can skip all the rest?
+>>>
+>>> I found tcp options have many kind number to express different meanin=
+g,
+>>> Here I just give an example for the different options situation,
+>>> and this field not the COLO-proxy focus on, COLO just concern the=20
+>>> payload.
+>>> Maybe we will optimize in the feature. Currently we want to make=20
+>>> COLO full-function
+>>> running in qemu upstream.
+>>
+>> I see, but the questions are:
+>>
+>> - If we see packets with different options (except for the case you=20
+>> explain above), does it mean primary and secondary run out of sync?
+>> - What will happen if we compare and ask for synchronization if we=20
+>> find options are not exactly the same?
+>>
+>
+>
+> The tcp options begin from the first SYN packet, if client connect to=20
+> guest, the primary guest and secondary guest
+> just give a responses to the client's options, so I think the=20
+> different options part mostly from guest's running
+> statues(like the timestamp), and if kind number are not same, the=20
+> payload more likely not same too. finally, after
+> next checkpoint, all things will be same. If guest connect to client,=20
+> primary guest send a packet and secondary not,
+> It will trigger old packet scan to do checkpoint.
+>
+> Thanks
+> Zhang Chen
+
+Ok this sounds more or less a question of whether or not we want to be=20
+more relaxed.
+
+Thanks
+
+>
+>
+>> Thanks
+>>
+>>>
+>>> Thanks
+>>> Zhang Chen
+>>>
+>>>>
+>>>> Thanks
+>>>>
+>>>>> +     */
+>>>>> +    if (ptcp->th_off > 5) {
+>>>>> +        ptrdiff_t tcp_offset;
+>>>>> +        tcp_offset =3D ppkt->transport_header - (uint8_t *)ppkt->d=
+ata
+>>>>> +                     + (ptcp->th_off * 4);
+>>>>> +        res =3D colo_packet_compare_common(ppkt, spkt, tcp_offset)=
+;
+>>>>> +    } else if (ptcp->th_sum =3D=3D stcp->th_sum) {
+>>>>>           res =3D colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
+>>>>>       } else {
+>>>>>           res =3D -1;
+>>>>
+>>>>
+>>>>
+>>>> .
+>>>>
+>>>
+>>
+>>
+>>
+>> .
+>>
+>
