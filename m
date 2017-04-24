@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2eQ9-0007ru-AM
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:52:59 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d2eT1-0000Do-Pr
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2eQ8-0005F8-5P
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:52:53 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d2eQ7-0005El-VS
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:52:52 -0400
-Received: by mail-wm0-x231.google.com with SMTP id u65so23739313wmu.1
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 06:52:51 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170424133624.GP20809@redhat.com>
-References: <trinity-b0e235ed-b74e-40f5-b249-c73867fd5ee9-1493036276162@3capp-webde-bs07>
-	<20170424125016.GM20809@redhat.com>
-	<CAFEAcA_p7rWmuRZ20PHBPfXoKswz95PtOjG866kaC2ooKx70PQ@mail.gmail.com>
-	<20170424133624.GP20809@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Apr 2017 14:52:30 +0100
-Message-ID: <CAFEAcA_LrsgToPR842redVqG7VnntTdg2ANgkDpnFAWiEqQVVw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] error: qcrypto_random_bytes() tried to read from
- /dev/[u]random, even on windows
+	(envelope-from <jemmy858585@gmail.com>) id 1d2eSz-0006Bi-7R
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:55:51 -0400
+From: jemmy858585@gmail.com
+Date: Mon, 24 Apr 2017 21:55:40 +0800
+Message-Id: <1493042140-25551-1-git-send-email-lidongchen@tencent.com>
+Subject: [Qemu-devel] [PATCH] migration/block: optimize the performance by
+ coalescing the same write type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +18,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: GM.Ijewski@web.de, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-On 24 April 2017 at 14:36, Daniel P. Berrange <berrange@redhat.com> wrote:
-> FYI, both gnutls and openssl use these CryptAcquireContext/CryptGenRandom
-> methods, so I'd prefer to stick with that.
+From: Lidong Chen <lidongchen@tencent.com>
 
-They probably need the full crypto API anyway, though...
+This patch optimizes the performance by coalescing the same write type.
+When the zero/non-zero state changes, perform the write for the accumulated
+cluster count.
 
-> It seems we merely need to set CRYPT_SILENT in the flags to prevent any
-> chance of interactive prompts.
->
-> https://msdn.microsoft.com/en-us/library/windows/desktop/aa379886(v=vs.85).aspx
+Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+---
+    Thanks Fam Zheng and Stefan's advice.
+---
+ migration/block.c | 66 +++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 49 insertions(+), 17 deletions(-)
 
-How about CRYPT_VERIFYCONTEXT? The docs say "in most cases this flag
-should be set".
-
-This kind of discussion puts me off the Crypt* APIs though -- they're
-a complicated API that can easily be misused. "Please just fill
-this buffer with randomness" is a simple API that's hard to call
-wrongly...
-
-thanks
--- PMM
+diff --git a/migration/block.c b/migration/block.c
+index 060087f..e9c5e21 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -40,6 +40,8 @@
+ 
+ #define MAX_INFLIGHT_IO 512
+ 
++#define MIN_CLUSTER_SIZE 8192
++
+ //#define DEBUG_BLK_MIGRATION
+ 
+ #ifdef DEBUG_BLK_MIGRATION
+@@ -923,10 +925,11 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+                 }
+ 
+                 ret = bdrv_get_info(blk_bs(blk), &bdi);
+-                if (ret == 0 && bdi.cluster_size > 0 &&
+-                    bdi.cluster_size <= BLOCK_SIZE &&
+-                    BLOCK_SIZE % bdi.cluster_size == 0) {
++                if (ret == 0 && bdi.cluster_size > 0) {
+                     cluster_size = bdi.cluster_size;
++                    while (cluster_size < MIN_CLUSTER_SIZE) {
++                        cluster_size *= 2;
++                    }
+                 } else {
+                     cluster_size = BLOCK_SIZE;
+                 }
+@@ -943,29 +946,58 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+                                         nr_sectors * BDRV_SECTOR_SIZE,
+                                         BDRV_REQ_MAY_UNMAP);
+             } else {
+-                int i;
+-                int64_t cur_addr;
+-                uint8_t *cur_buf;
++                int64_t cur_addr = addr * BDRV_SECTOR_SIZE;
++                uint8_t *cur_buf = NULL;
++                int64_t last_addr = addr * BDRV_SECTOR_SIZE;
++                uint8_t *last_buf = NULL;
++                int64_t end_addr = addr * BDRV_SECTOR_SIZE + BLOCK_SIZE;
+ 
+                 buf = g_malloc(BLOCK_SIZE);
+                 qemu_get_buffer(f, buf, BLOCK_SIZE);
+-                for (i = 0; i < BLOCK_SIZE / cluster_size; i++) {
+-                    cur_addr = addr * BDRV_SECTOR_SIZE + i * cluster_size;
+-                    cur_buf = buf + i * cluster_size;
+-
+-                    if ((!block_mig_state.zero_blocks ||
+-                        cluster_size < BLOCK_SIZE) &&
+-                        buffer_is_zero(cur_buf, cluster_size)) {
+-                        ret = blk_pwrite_zeroes(blk, cur_addr,
+-                                                cluster_size,
++                cur_buf = buf;
++                last_buf = buf;
++
++                while (last_addr < end_addr) {
++                    int is_zero = 0;
++                    int buf_size = MIN(end_addr - cur_addr, cluster_size);
++
++                    /* If the "zero blocks" migration capability is enabled
++                     * and the buf_size == BLOCK_SIZE, then the source QEMU
++                     * process has already scanned for zeroes. CPU is wasted
++                     * scanning for zeroes in the destination QEMU process.
++                     */
++                    if (block_mig_state.zero_blocks &&
++                        buf_size == BLOCK_SIZE) {
++                        is_zero = 0;
++                    } else {
++                        is_zero = buffer_is_zero(cur_buf, buf_size);
++                    }
++
++                    cur_addr += buf_size;
++                    cur_buf += buf_size;
++                    while (cur_addr < end_addr) {
++                        buf_size = MIN(end_addr - cur_addr, cluster_size);
++                        if (is_zero != buffer_is_zero(cur_buf, buf_size)) {
++                            break;
++                        }
++                        cur_addr += buf_size;
++                        cur_buf += buf_size;
++                    }
++
++                    if (is_zero) {
++                        ret = blk_pwrite_zeroes(blk, last_addr,
++                                                cur_addr - last_addr,
+                                                 BDRV_REQ_MAY_UNMAP);
+                     } else {
+-                        ret = blk_pwrite(blk, cur_addr, cur_buf,
+-                                         cluster_size, 0);
++                        ret = blk_pwrite(blk, last_addr, last_buf,
++                                         cur_addr - last_addr, 0);
+                     }
+                     if (ret < 0) {
+                         break;
+                     }
++
++                    last_addr = cur_addr;
++                    last_buf = cur_buf;
+                 }
+                 g_free(buf);
+             }
+-- 
+1.8.3.1
