@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2h1d-0001nk-Qf
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:39:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d2h4f-0003Fe-JA
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:42:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2h1a-0004zi-NW
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:39:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32945)
+	(envelope-from <dgilbert@redhat.com>) id 1d2h4c-0005ao-GP
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:42:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36968)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d2h1a-0004zd-HR
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:39:42 -0400
-Date: Mon, 24 Apr 2017 17:39:36 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170424163936.GE7705@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170424125016.GM20809@redhat.com>
-	<CAFEAcA_p7rWmuRZ20PHBPfXoKswz95PtOjG866kaC2ooKx70PQ@mail.gmail.com>
-	<20170424133624.GP20809@redhat.com>
-	<CAFEAcA_LrsgToPR842redVqG7VnntTdg2ANgkDpnFAWiEqQVVw@mail.gmail.com>
-	<20170424135749.GR20809@redhat.com>
-	<CAFEAcA8YyeQ3NOGQkr8xVZ9S5F7RmdeDwcRkLGSyNci3hf4OCw@mail.gmail.com>
-	<20170424154117.GB7705@redhat.com>
-	<CAFEAcA8noBf9VCZ+n24NMqVKGZC9D7KKMhLoacNyEA=WJ39uAg@mail.gmail.com>
-	<20170424155255.GD7705@redhat.com>
-	<f92490f5-a09c-0f11-4ea5-f09969f78870@web.de>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d2h4c-0005ak-9S
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:42:50 -0400
+Date: Mon, 24 Apr 2017 17:42:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170424164244.GJ2362@work-vm>
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f92490f5-a09c-0f11-4ea5-f09969f78870@web.de>
-Subject: Re: [Qemu-devel] error: qcrypto_random_bytes() tried to read from
- /dev/[u]random, even on windows
+In-Reply-To: <7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,28 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Martin Ijewski <gm.ijewski@web.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Yang Hongyang <yanghongyang@huawei.com>
+Cc: quintela@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Huangzhichao <huangzhichao@huawei.com>, wangxinxin.wang@huawei.com, pbonzini@redhat.com, "Gonglei (Arei)" <arei.gonglei@huawei.com>
 
-On Mon, Apr 24, 2017 at 06:33:26PM +0200, Geert Martin Ijewski wrote:
-> > We can have the existing qcrypto_init() call a qcrypto_random_init()
-> > method to do the one-time initialization task, since that's already
-> > required to run early in order to initialize gnutls when we use it.
+* Yang Hongyang (yanghongyang@huawei.com) wrote:
 > 
-> Wouldn't it make sense to also move the unix initalization to that function?
+> 
+> On 2017/4/24 20:06, Juan Quintela wrote:
+> > Yang Hongyang <yanghongyang@huawei.com> wrote:
+> >> Hi all,
+> >>
+> >> We found dirty log switch costs more then 13 seconds while migrating
+> >> a 4T memory guest, and dirty log switch is currently protected by QEMU
+> >> BQL. This causes guest freeze for a long time when switching dirty log on,
+> >> and the migration downtime is unacceptable.
+> >> Are there any chance to optimize the time cost for dirty log switch operation?
+> >> Or move the time consuming operation out of the QEMU BQL?
+> > 
+> > Hi
+> > 
+> > Could you specify what do you mean by dirty log switch?
+> > The one inside kvm?
+> > The merge between kvm one and migration bitmap?
+> 
+> The call of the following functions:
+> memory_global_dirty_log_start/stop();
 
-Yep, we can do that.
+I suppose there's a few questions;
+  a) Do we actually need the BQL - and if so why
+  b) What actually takes 13s?  It's probably worth figuring
+out where it goes,  the whole bitmap is only 1GB isn't it
+even on a 4TB machine, and even the simplest way to fill
+that takes way less than 13s.
 
-> And what about deinitalization? Though because that handle needs to stay
-> valid throughout the whole lifetime of QEMU anyway, that probably can be
-> ignored and taken care of by the OS
+Dave
 
-Correct, there's no need for any de-init if we have a global handle, as it
-is needed until QEMU exits.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> 
+> > 
+> > Thanks, Juan.
+> > 
+> 
+> -- 
+> Thanks,
+> Yang
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
