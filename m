@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1d2dnW-0005Lw-SN
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:12:59 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d2dre-0006md-Ab
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1d2dnS-000819-Px
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:12:58 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3521
-	helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1d2dnS-0007xu-Dq
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:12:54 -0400
-From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
-Message-ID: <58FDF9BD.2030100@huawei.com>
-Date: Mon, 24 Apr 2017 21:12:29 +0800
+	(envelope-from <jemmy858585@gmail.com>) id 1d2drc-0001BK-V8
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:17:14 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH] pci: deassert intx when pci device
- unrealize
+In-Reply-To: <CAOGPPbdM0SuG4HePS_pOimPNQwyqvOcuCV++R3EB10jdWOUg=A@mail.gmail.com>
+References: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
+	<CAOGPPbdM0SuG4HePS_pOimPNQwyqvOcuCV++R3EB10jdWOUg=A@mail.gmail.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Mon, 24 Apr 2017 21:17:11 +0800
+Message-ID: <CAOGPPbcu2WGndbZojRW39XBuEz3zjgXHOr3b=wzq5-kHM42HpA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: use blk_co_pwrite_zeroes for
+ zero sectors when compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +23,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel@redhat.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wangxinxin.wang@huawei.com >> wangxin (U)" <wangxinxin.wang@huawei.com>
+To: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, mreitz@redhat.com
+Cc: qemu block <qemu-block@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
 
-If a pci device is not reset by VM (by writing into config space)
-and unplugged by VM, after that when VM reboots, qemu may assert:
-pcibus_reset: Assertion `bus->irq_count[i] == 0' failed
+Hi Everyone:
+    Any suggestion about this patch?
+    Thanks.
 
-Signed-off-by: herongguang <herongguang.he@huawei.com>
----
-
-Is there need to call pci_do_device_reset()?
-
----
-  hw/pci/pci.c | 1 +
-  1 file changed, 1 insertion(+)
-
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 259483b..afe6397 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1078,6 +1078,7 @@ static void pci_qdev_unrealize(DeviceState *dev, Error **errp)
-
-      pci_unregister_io_regions(pci_dev);
-      pci_del_option_rom(pci_dev);
-+    pci_device_deassert_intx(pci_dev);
-
-      if (pc->exit) {
-          pc->exit(pci_dev);
---
-1.7.12.4
+On Sun, Apr 23, 2017 at 5:53 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+> I test four test case for this patch.
+> 1.qcow2 image with lots of zero cluster, and convert with compress
+> 2.qcow2 image with lots of zero cluster, and convert with no compress
+> 3.qcow2 image with lots of non-zero clusters, and convert with compress
+> 4.qcow2 image with lots of non-zero clusters, and convert with no compress
+> all test case pass.
+>
+> the qcow2 image with lots of zero clusters, the time reduce obviously.
+> and have no bad effort in other cases.
+>
+>
+> On Fri, Apr 21, 2017 at 5:57 PM,  <jemmy858585@gmail.com> wrote:
+>> From: Lidong Chen <lidongchen@tencent.com>
+>>
+>> when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
+>> blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
+>> the time when converts the qcow2 image with lots of zero.
+>>
+>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> ---
+>> v2 changelog:
+>>     unify the compressed and non-compressed code paths
+>> ---
+>>  qemu-img.c | 41 +++++++++++------------------------------
+>>  1 file changed, 11 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index b220cf7..60c9adf 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -1661,6 +1661,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+>>
+>>      while (nb_sectors > 0) {
+>>          int n = nb_sectors;
+>> +        BdrvRequestFlags flags = s->compressed ? BDRV_REQ_WRITE_COMPRESSED : 0;
+>> +
+>>          switch (status) {
+>>          case BLK_BACKING_FILE:
+>>              /* If we have a backing file, leave clusters unallocated that are
+>> @@ -1670,43 +1672,21 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+>>              break;
+>>
+>>          case BLK_DATA:
+>> -            /* We must always write compressed clusters as a whole, so don't
+>> -             * try to find zeroed parts in the buffer. We can only save the
+>> -             * write if the buffer is completely zeroed and we're allowed to
+>> -             * keep the target sparse. */
+>> -            if (s->compressed) {
+>> -                if (s->has_zero_init && s->min_sparse &&
+>> -                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
+>> -                {
+>> -                    assert(!s->target_has_backing);
+>> -                    break;
+>> -                }
+>> -
+>> -                iov.iov_base = buf;
+>> -                iov.iov_len = n << BDRV_SECTOR_BITS;
+>> -                qemu_iovec_init_external(&qiov, &iov, 1);
+>> -
+>> -                ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
+>> -                                     n << BDRV_SECTOR_BITS, &qiov,
+>> -                                     BDRV_REQ_WRITE_COMPRESSED);
+>> -                if (ret < 0) {
+>> -                    return ret;
+>> -                }
+>> -                break;
+>> -            }
+>> -
+>> -            /* If there is real non-zero data or we're told to keep the target
+>> -             * fully allocated (-S 0), we must write it. Otherwise we can treat
+>> +            /* If we're told to keep the target fully allocated (-S 0) or there
+>> +             * is real non-zero data, we must write it. Otherwise we can treat
+>>               * it as zero sectors. */
+>>              if (!s->min_sparse ||
+>> -                is_allocated_sectors_min(buf, n, &n, s->min_sparse))
+>> -            {
+>> +                (!s->compressed &&
+>> +                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) ||
+>> +                (s->compressed &&
+>> +                 !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))) {
+>> +
+>>                  iov.iov_base = buf;
+>>                  iov.iov_len = n << BDRV_SECTOR_BITS;
+>>                  qemu_iovec_init_external(&qiov, &iov, 1);
+>>
+>>                  ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
+>> -                                     n << BDRV_SECTOR_BITS, &qiov, 0);
+>> +                                     n << BDRV_SECTOR_BITS, &qiov, flags);
+>>                  if (ret < 0) {
+>>                      return ret;
+>>                  }
+>> @@ -1716,6 +1696,7 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+>>
+>>          case BLK_ZERO:
+>>              if (s->has_zero_init) {
+>> +                assert(!s->target_has_backing);
+>>                  break;
+>>              }
+>>              ret = blk_co_pwrite_zeroes(s->target,
+>> --
+>> 1.8.3.1
+>>
