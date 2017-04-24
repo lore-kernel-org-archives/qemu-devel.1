@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2dRh-0007gy-VT
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:50:26 -0400
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2dZ9-00015S-Nk
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2dRe-0001To-RV
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:50:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d2dRe-0001Th-I6
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:50:22 -0400
-Date: Mon, 24 Apr 2017 13:50:16 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170424125016.GM20809@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <trinity-b0e235ed-b74e-40f5-b249-c73867fd5ee9-1493036276162@3capp-webde-bs07>
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2dZ5-0003Fm-5j
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:58:07 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3520
+	helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2dZ4-0003ES-AA
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:58:03 -0400
+From: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Date: Mon, 24 Apr 2017 12:57:30 +0000
+Message-ID: <EC9759BC1E3E98429B5DE9A03DF86D8B59D10917@DGGEML503-MBX.china.huawei.com>
+References: <EC9759BC1E3E98429B5DE9A03DF86D8B59D1084B@DGGEML503-MBX.china.huawei.com>
+	<20170424092320.GC2362@work-vm> <20170424095235.GH20809@redhat.com>
+	<20170424102716.GE2362@work-vm> <20170424103428.GI20809@redhat.com>
+In-Reply-To: <20170424103428.GI20809@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <trinity-b0e235ed-b74e-40f5-b249-c73867fd5ee9-1493036276162@3capp-webde-bs07>
-Subject: Re: [Qemu-devel] error: qcrypto_random_bytes() tried to read from
- /dev/[u]random, even on windows
+Subject: Re: [Qemu-devel] [BUG] Migrate failes between boards with different
+ PMC counts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +31,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: GM.Ijewski@web.de
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
 
-For subject line, better to describe the change made, rather than
-the problem.
-
-On Mon, Apr 24, 2017 at 02:17:56PM +0200, GM.Ijewski@web.de wrote:
-> Now it calls CryptGenRandom() if is it compiled for windows.
->  
-> It might be possible to save the cryptographic provider in between
-> invocations, e.g. by making it static -- I have no idea how computationally
-> intensive that operation actually is.
-
-I'd think most people should really just enable gnutls during build. This just
-has to provide a fallback that's good enough to be functional. If someone really
-cares about performance of this fallback, they can send patches later....
-
->
-> Signed-off-by: Geert Martin Ijewski <gm.ijewski@web.de>
->  
-> diff --git a/crypto/random-platform.c b/crypto/random-platform.c
-> index 82b755a..7aa0476 100644
-> --- a/crypto/random-platform.c
-> +++ b/crypto/random-platform.c
-> @@ -26,6 +26,7 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
->                           size_t buflen G_GNUC_UNUSED,
->                           Error **errp)
->  {
-> +#ifndef _WIN32
->      int fd;
->      int ret = -1;
->      int got;
-> @@ -61,4 +62,26 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
->   cleanup:
->      close(fd);
->      return ret;
-> +#else
-> +    HCRYPTPROV   hCryptProv;
-> +
-> +    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, 0)) {
-> +        if (NTE_BAD_KEYSET == GetLastError()) {
-> +            if (!CryptAcquireContext(&hCryptProv, NULL, NULL,
-> +                                     PROV_RSA_FULL, CRYPT_NEWKEYSET)) {
-> +                error_setg_errno(errp, GetLastError(),
-> +                         "Unable to create cryptographic provider");
-
-You forgot to "return -1' here
-
-> +            }
-> +        }
-
-You need to have an 'else' branch here that reports an error too,
-in cae the first CryptAcquireContext returns err != NTE_BSD_KEYSET.
-
-> +    }
-> +
-> +    if (!CryptGenRandom(hCryptProv, buflen, buf)) {
-> +        error_setg_errno(errp, GetLastError(),
-> +                         "Unable to read random bytes");
-> +        return -1;
-> +    }
-> +
-> +    CryptReleaseContext(hCryptProv, 0);
-> +    return 0;
-> +#endif
->  }
-> diff --git a/include/sysemu/os-win32.h b/include/sysemu/os-win32.h
-> index ff18b23..4a5d908 100644
-> --- a/include/sysemu/os-win32.h
-> +++ b/include/sysemu/os-win32.h
-> @@ -29,6 +29,7 @@
->  #include <winsock2.h>
->  #include <windows.h>
->  #include <ws2tcpip.h>
-> +#include <Wincrypt.h>
-
-It would be preferrable to put this in random-platform.c to avoid
-polluting the global namespace
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGFuaWVsIFAuIEJlcnJh
+bmdlIFttYWlsdG86YmVycmFuZ2VAcmVkaGF0LmNvbV0NCj4gU2VudDogTW9uZGF5LCBBcHJpbCAy
+NCwgMjAxNyA2OjM0IFBNDQo+IFRvOiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0DQo+IENjOiBaaHVh
+bmd5YW55aW5nOyBaaGFuZ2hhaWxpYW5nOyB3YW5neGluIChVKTsgcWVtdS1kZXZlbEBub25nbnUu
+b3JnOw0KPiBHb25nbGVpIChBcmVpKTsgSHVhbmd6aGljaGFvOyBwYm9uemluaUByZWRoYXQuY29t
+DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW0JVR10gTWlncmF0ZSBmYWlsZXMgYmV0d2Vl
+biBib2FyZHMgd2l0aCBkaWZmZXJlbnQNCj4gUE1DIGNvdW50cw0KPiANCj4gT24gTW9uLCBBcHIg
+MjQsIDIwMTcgYXQgMTE6Mjc6MTZBTSArMDEwMCwgRHIuIERhdmlkIEFsYW4gR2lsYmVydCB3cm90
+ZToNCj4gPiAqIERhbmllbCBQLiBCZXJyYW5nZSAoYmVycmFuZ2VAcmVkaGF0LmNvbSkgd3JvdGU6
+DQo+ID4gPiBPbiBNb24sIEFwciAyNCwgMjAxNyBhdCAxMDoyMzoyMUFNICswMTAwLCBEci4gRGF2
+aWQgQWxhbiBHaWxiZXJ0IHdyb3RlOg0KPiA+ID4gPiAqIFpodWFuZ3lhbnlpbmcgKGFubi56aHVh
+bmd5YW55aW5nQGh1YXdlaS5jb20pIHdyb3RlOg0KPiA+ID4gPiA+IEhpIGFsbCwNCj4gPiA+ID4g
+Pg0KPiA+ID4gPiA+IFJlY2VudGx5LCBJIGZvdW5kIG1pZ3JhdGlvbiBmYWlsZWQgd2hlbiBlbmFi
+bGUgdlBNVS4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IG1pZ3JhdGUgdlBNVSBzdGF0ZSB3YXMgaW50
+cm9kdWNlZCBpbiBsaW51eC0zLjEwICsgcWVtdS0xLjcuDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBB
+cyBsb25nIGFzIGVuYWJsZSB2UE1VLCBxZW11IHdpbGwgc2F2ZSAvIGxvYWQgdGhlDQo+ID4gPiA+
+ID4gdm1zdGF0ZV9tc3JfYXJjaGl0ZWN0dXJhbF9wbXUobXNyX2dsb2JhbF9jdHJsKSByZWdpc3Rl
+ciBkdXJpbmcgdGhlDQo+IG1pZ3JhdGlvbi4NCj4gPiA+ID4gPiBCdXQgZ2xvYmFsX2N0cmwgZ2Vu
+ZXJhdGVkIGJhc2VkIG9uIGNwdWlkKDB4QSksIHRoZSBudW1iZXIgb2YNCj4gPiA+ID4gPiBnZW5l
+cmFsLXB1cnBvc2UgcGVyZm9ybWFuY2UgbW9uaXRvcmluZyBjb3VudGVycyhQTUMpIGNhbiB2YXJ5
+DQo+ID4gPiA+ID4gYWNjb3JkaW5nIHRvIEludGVsIFNETi4gVGhlIG51bWJlciBvZiBQTUMgcHJl
+c2VudGVkIHRvIHZtLCBkb2VzDQo+ID4gPiA+ID4gbm90IHN1cHBvcnQgY29uZmlndXJhdGlvbiBj
+dXJyZW50bHksIGl0IGRlcGVuZCBvbiBob3N0IGNwdWlkLCBhbmQgZW5hYmxlDQo+IGFsbCBwbWMg
+ZGVmYXVsdGx5IGF0IEtWTS4gSXQgY2F1c2UgbWlncmF0aW9uIHRvIGZhaWwgYmV0d2VlbiBib2Fy
+ZHMgd2l0aA0KPiBkaWZmZXJlbnQgUE1DIGNvdW50cy4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IFRo
+ZSByZXR1cm4gdmFsdWUgb2YgY3B1aWQgKDB4QSkgaXMgZGlmZmVyZW50IGR1ciB0byBjcHUsIGFj
+Y29yZGluZyB0byBJbnRlbA0KPiBTRE7vvIwxOC0xMCBWb2wuIDNCOg0KPiA+ID4gPiA+DQo+ID4g
+PiA+ID4gTm90ZTogVGhlIG51bWJlciBvZiBnZW5lcmFsLXB1cnBvc2UgcGVyZm9ybWFuY2UgbW9u
+aXRvcmluZw0KPiA+ID4gPiA+IGNvdW50ZXJzIChpLmUuIE4gaW4gRmlndXJlIDE4LTkpIGNhbiB2
+YXJ5IGFjcm9zcyBwcm9jZXNzb3INCj4gPiA+ID4gPiBnZW5lcmF0aW9ucyB3aXRoaW4gYSBwcm9j
+ZXNzb3IgZmFtaWx5LCBhY3Jvc3MgcHJvY2Vzc29yDQo+ID4gPiA+ID4gZmFtaWxpZXMsIG9yIGNv
+dWxkIGJlIGRpZmZlcmVudCBkZXBlbmRpbmcgb24gdGhlIGNvbmZpZ3VyYXRpb24NCj4gPiA+ID4g
+PiBjaG9zZW4gYXQgYm9vdCB0aW1lIGluIHRoZSBCSU9TIHJlZ2FyZGluZyBJbnRlbCBIeXBlciBU
+aHJlYWRpbmcNCj4gPiA+ID4gPiBUZWNobm9sb2d5LCAoZS5nLiBOPTIgZm9yIDQ1IG5tIEludGVs
+IEF0b20gcHJvY2Vzc29yczsgTiA9NCBmb3INCj4gcHJvY2Vzc29ycyBiYXNlZCBvbiB0aGUgTmVo
+YWxlbSBtaWNyb2FyY2hpdGVjdHVyZTsgZm9yIHByb2Nlc3NvcnMgYmFzZWQgb24NCj4gdGhlIFNh
+bmR5IEJyaWRnZSBtaWNyb2FyY2hpdGVjdHVyZSwgTiA9IDQgaWYgSW50ZWwgSHlwZXIgVGhyZWFk
+aW5nIFRlY2hub2xvZ3kNCj4gaXMgYWN0aXZlIGFuZCBOPTggaWYgbm90IGFjdGl2ZSkuDQo+ID4g
+PiA+ID4NCj4gPiA+ID4gPiBBbHNvIEkgZm91bmQsIE49OCBpZiBIVCBpcyBub3QgYWN0aXZlIGJh
+c2VkIG9uIHRoZSBicm9hZHdlbGzvvIwsDQo+ID4gPiA+ID4gc3VjaCBhcyBDUFUgRTctODg5MCB2
+NCBAIDIuMjBHSHoNCj4gPiA+ID4gPg0KPiA+ID4gPiA+ICMgLi94ODZfNjQtc29mdG1tdS9xZW11
+LXN5c3RlbS14ODZfNjQgLS1lbmFibGUta3ZtIC1zbXAgNCAtbQ0KPiA+ID4gPiA+IDQwOTYgLWhk
+YQ0KPiA+ID4gPiA+IC9kYXRhL3p5eS90ZXN0X3FlbXUuaW1nLnNsZXMxMnNwMSAtdm5jIDo5OSAt
+Y3B1IGt2bTY0LHBtdT10cnVlDQo+ID4gPiA+ID4gLWluY29taW5nIHRjcDo6ODg4OCBDb21wbGV0
+ZWQgMTAwICUNCj4gPiA+ID4gPiBxZW11LXN5c3RlbS14ODZfNjQ6IGVycm9yOiBmYWlsZWQgdG8g
+c2V0IE1TUiAweDM4ZiB0bw0KPiA+ID4gPiA+IDB4NzAwMDAwMGZmDQo+ID4gPiA+ID4gcWVtdS1z
+eXN0ZW0teDg2XzY0OiAvZGF0YS96eXkvZ2l0L3Rlc3QvcWVtdS90YXJnZXQvaTM4Ni9rdm0uYzox
+ODMzOg0KPiBrdm1fcHV0X21zcnM6DQo+ID4gPiA+ID4gQXNzZXJ0aW9uIGByZXQgPT0gY3B1LT5r
+dm1fbXNyX2J1Zi0+bm1zcnMnIGZhaWxlZC4NCj4gPiA+ID4gPiBBYm9ydGVkDQo+ID4gPiA+ID4N
+Cj4gPiA+ID4gPiBTbyBtYWtlIG51bWJlciBvZiBwbWMgY29uZmlndXJhYmxlIHRvIHZtID8gQW55
+IGJldHRlciBpZGVhID8NCj4gPiA+ID4NCj4gPiA+ID4gQ29pbmNpZGVudGFsbHkgd2UgaGl0IGEg
+c2ltaWxhciBwcm9ibGVtIGEgZmV3IGRheXMgYWdvIHdpdGggLWNwdQ0KPiA+ID4gPiBob3N0ICAt
+IGl0IHRvb2sgbWUgcXVpdGUgYSB3aGlsZSB0byBzcG90IHRoZSBkaWZmZXJlbmNlIGJldHdlZW4N
+Cj4gPiA+ID4gdGhlIG1hY2hpbmVzIHdhcyB0aGUgc291cmNlIGhhZCBoeXBlcnRocmVhZGluZyBk
+aXNhYmxlZC4NCj4gPiA+ID4NCj4gPiA+ID4gQW4gb3B0aW9uIHRvIHNldCB0aGUgbnVtYmVyIG9m
+IGNvdW50ZXJzIG1ha2VzIHNlbnNlIHRvIG1lOyBidXQgSQ0KPiA+ID4gPiB3b25kZXIgaG93IG1h
+bnkgb3RoZXIgb3B0aW9ucyB3ZSBuZWVkIGFzIHdlbGwuICBBbHNvLCBJJ20gbm90IHN1cmUNCj4g
+PiA+ID4gdGhlcmUncyBhbnkgZWFzeSB3YXkgZm9yIGxpYnZpcnQgZXRjIHRvIGZpZ3VyZSBvdXQg
+aG93IG1hbnkNCj4gPiA+ID4gY291bnRlcnMgYSBob3N0IHN1cHBvcnRzIC0gaXQncyBub3QgaW4g
+L3Byb2MvY3B1aW5mby4NCj4gPiA+DQo+ID4gPiBXZSBhY3R1YWxseSB0cnkgdG8gYXZvaWQgL3By
+b2MvY3B1aW5mbyB3aGVyZWV2ZXIgcG9zc2libGUuIFdlIGRvDQo+ID4gPiBkaXJlY3QgQ1BVSUQg
+YXNtIGluc3RydWN0aW9ucyB0byBpZGVudGlmeSBmZWF0dXJlcywgYW5kIHByZWZlciB0bw0KPiA+
+ID4gdXNlIC9zeXMvZGV2aWNlcy9zeXN0ZW0vY3B1IGlmIHRoYXQgaGFzIHN1aXRhYmxlIGRhdGEN
+Cj4gPiA+DQo+ID4gPiBXaGVyZSBkbyB0aGUgUE1DIGNvdW50cyBjb21lIGZyb20gb3JpZ2luYWxs
+eSA/IENQVUlEIG9yIHNvbWV0aGluZw0KPiBlbHNlID8NCj4gPg0KPiA+IFllcywgdGhleSdyZSBi
+aXRzIDguLjE1IG9mIENQVUlEIGxlYWYgMHhhDQo+IA0KPiBPaywgdGhhdCdzIGVhc3kgZW5vdWdo
+IGZvciBsaWJ2aXJ0IHRvIGRldGVjdCB0aGVuLiBNb3JlIGEgcXVlc3Rpb24gb2Ygd2hhdCBsaWJ2
+aXJ0DQo+IHNob3VsZCB0aGVuIGRvIHRoaXMgd2l0aCB0aGUgaW5mby4uLi4NCj4gDQoNCkRvIHlv
+dSBtZWFuIHRvIGRvIGEgdmFsaWRhdGlvbiBhdCB0aGUgYmVnaW5pbmcgb2YgbWlncmF0aW9uPyBp
+biBxZW11TWlncmF0aW9uQmFrZUNvb2tpZSgpICYgcWVtdU1pZ3JhdGlvbkVhdENvb2tpZSgpLCBp
+ZiB0aGUgUE1DIG51bWJlcnMgYXJlIG5vdCBlcXVhbCwganVzdCBxdWl0IG1pZ3JhdGlvbj8NCkl0
+IG1heWJlIGEgZ29vZCBlbm91Z2ggZmlyc3QgZWRpdGlvbi4NCkJ1dCBmb3IgYSBmdXJ0aGVyIGJl
+dHRlciBlZGl0aW9uLCBtYXliZSBpdCdzIGJldHRlciB0byBzdXBwb3J0IEhldGVyb2dlbmVvdXMg
+bWlncmF0aW9uIEkgdGhpbmssIHNvIHdlIG1pZ2h0IG5lZWQgdG8gbWFrZSBQTUMgbnVtYmVyIGNv
+bmZpZ3JhYmxlLCB0aGVuIHdlIG5lZWQgdG8gbW9kaWZ5IEtWTS9xZW11IGFzIHdlbGwuDQoNClJl
+Z2FyZHMsDQotWmh1YW5nIFlhbnlpbmcNCg==
