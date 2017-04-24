@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOo-0003wZ-Km
+	(envelope-from <armbru@redhat.com>) id 1d2YOo-0003wi-Os
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOn-0006vr-O1
+	(envelope-from <armbru@redhat.com>) id 1d2YOn-0006vy-QO
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52152)
+Received: from mx1.redhat.com ([209.132.183.28]:58392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOn-0006vJ-I0
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOn-0006vO-KJ
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:05 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8487E23E6CF
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A8C9BDD7C
 	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:27:04 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 24 Apr 2017 09:26:55 +0200
-Message-Id: <1493018820-23445-11-git-send-email-armbru@redhat.com>
+Date: Mon, 24 Apr 2017 09:26:49 +0200
+Message-Id: <1493018820-23445-5-git-send-email-armbru@redhat.com>
 In-Reply-To: <1493018820-23445-1-git-send-email-armbru@redhat.com>
 References: <1493018820-23445-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 10/15] nfs: Make errp the last parameter of
- nfs_client_open
+Subject: [Qemu-devel] [PULL 04/15] socket: Make errp the last parameter of
+ unix_connect_saddr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +36,59 @@ Cc: Fam Zheng <famz@redhat.com>
 From: Fam Zheng <famz@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170421122710.15373-10-famz@redhat.com>
+Message-Id: <20170421122710.15373-4-famz@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/nfs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ util/qemu-sockets.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index 0816678..6541dec 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -497,7 +497,7 @@ out:
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 8e11349..0fe5f13 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -911,8 +911,9 @@ err:
+     return -1;
+ }
  
- 
- static int64_t nfs_client_open(NFSClient *client, QDict *options,
--                               int flags, Error **errp, int open_flags)
-+                               int flags, int open_flags, Error **errp)
+-static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp,
+-                              NonBlockingConnectHandler *callback, void *opaque)
++static int unix_connect_saddr(UnixSocketAddress *saddr,
++                              NonBlockingConnectHandler *callback, void *opaque,
++                              Error **errp)
  {
-     int ret = -EINVAL;
-     QemuOpts *opts = NULL;
-@@ -663,7 +663,7 @@ static int nfs_file_open(BlockDriverState *bs, QDict *options, int flags,
+     struct sockaddr_un un;
+     ConnectState *connect_state = NULL;
+@@ -979,8 +980,9 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+     return -1;
+ }
  
-     ret = nfs_client_open(client, options,
-                           (flags & BDRV_O_RDWR) ? O_RDWR : O_RDONLY,
--                          errp, bs->open_flags);
-+                          bs->open_flags, errp);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -705,7 +705,7 @@ static int nfs_file_create(const char *url, QemuOpts *opts, Error **errp)
-         goto out;
-     }
+-static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp,
+-                              NonBlockingConnectHandler *callback, void *opaque)
++static int unix_connect_saddr(UnixSocketAddress *saddr,
++                              NonBlockingConnectHandler *callback, void *opaque,
++                              Error **errp)
+ {
+     error_setg(errp, "unix sockets are not available on windows");
+     errno = ENOTSUP;
+@@ -1026,7 +1028,7 @@ int unix_connect(const char *path, Error **errp)
  
--    ret = nfs_client_open(client, options, O_CREAT, errp, 0);
-+    ret = nfs_client_open(client, options, O_CREAT, 0, errp);
-     if (ret < 0) {
-         goto out;
-     }
+     saddr = g_new0(UnixSocketAddress, 1);
+     saddr->path = g_strdup(path);
+-    sock = unix_connect_saddr(saddr, errp, NULL, NULL);
++    sock = unix_connect_saddr(saddr, NULL, NULL, errp);
+     qapi_free_UnixSocketAddress(saddr);
+     return sock;
+ }
+@@ -1086,7 +1088,7 @@ int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
+         break;
+ 
+     case SOCKET_ADDRESS_KIND_UNIX:
+-        fd = unix_connect_saddr(addr->u.q_unix.data, errp, callback, opaque);
++        fd = unix_connect_saddr(addr->u.q_unix.data, callback, opaque, errp);
+         break;
+ 
+     case SOCKET_ADDRESS_KIND_FD:
 -- 
 2.7.4
