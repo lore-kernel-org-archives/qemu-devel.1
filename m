@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d2a2y-0001OF-7r
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:12:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1d2a6I-0002Ic-Sc
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d2a2u-0002oA-8l
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:12:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55003)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d2a2u-0002mt-2k
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:12:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d2a2r-000474-R7
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 09:12:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C92492F621B
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 09:12:08 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1d2a6E-0003hk-8z
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:16:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d2a6E-0003ha-2A
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:16:02 -0400
+References: <20170420204301.154912-1-lepton@google.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <42f99074-9330-c974-e884-f0a62e63c697@redhat.com>
+Date: Mon, 24 Apr 2017 11:15:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 24 Apr 2017 08:57:36 -0000
-From: Thomas Huth <1684239@bugs.launchpad.net>
-Reply-To: Bug 1684239 <1684239@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170419174535.1860.64403.malonedeb@wampee.canonical.com>
-Message-Id: <20170424085736.6278.52611.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1684239] Re: vvfat core dump when enabling RW
+In-Reply-To: <20170420204301.154912-1-lepton@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] slirp: don't zero ti_i since we
+ acccess it later.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Tao Wu <ytht.net@gmail.com>, qemu-devel@nongnu.org
+Cc: Tao Wu <lepton@google.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-Moving to QEMU-Ubuntu since you're not using upstream QEMU (and the bug
-should have been fixed there as pointed out by Herv=C3=A9 on the qemu-devel
-mailing list).
+On 20.04.2017 22:43, Tao Wu wrote:
+> The current code looks buggy, we zero ti_i while we access
+> ti_dst/ti_src later.
+> 
+> Signed-off-by: Tao Wu <lepton@google.com>
+> ---
+>  slirp/tcp_subr.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+> index dc8b4bbb50..398d6b30d3 100644
+> --- a/slirp/tcp_subr.c
+> +++ b/slirp/tcp_subr.c
+> @@ -148,7 +148,6 @@ tcp_respond(struct tcpcb *tp, struct tcpiphdr *ti, struct mbuf *m,
+>  		m->m_data += IF_MAXLINKHDR;
+>  		*mtod(m, struct tcpiphdr *) = *ti;
+>  		ti = mtod(m, struct tcpiphdr *);
+> -		memset(&ti->ti, 0, sizeof(ti->ti));
+>  		flags = TH_ACK;
+>  	} else {
+>  		/*
 
-** Project changed: qemu =3D> qemu (Ubuntu)
+When providing patches, please make sure to put the subsystem maintainer
+on CC: (see MAINTAINERS file) - or your patch will likely be lost in the
+high traffic of the qemu-devel mailing list.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1684239
-
-Title:
-  vvfat core dump when enabling RW
-
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  Hi guys,
-
-  I'm getting this qemu crash message:
-  >>> qemu-system-x86_64: /build/qemu-TziMIO/qemu-2.5+dfsg/block/vvfat.c:22=
-90: commit_direntries: Assertion `!strncmp(s->directory.pointer, "QEMU", 4)=
-' failed.
-  >>> Aborted (core dumped)
-  when launching qemu with this options for a VVFAT drive:
-  >>> -drive file=3Dfat:rw:./ROOT,if=3Dvirtio
-  (same happens when using cache=3Dnone and/or if=3Dide)
-
-  "uname -a" system info is:
-  >>> Linux RJZ-WRK-LNX 4.4.0-72-generic #93-Ubuntu SMP Fri Mar 31 14:07:41=
- UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
-  and "qemu --version" is:
-  >>> QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.10), Copyrig=
-ht (c) 2003-2008 Fabrice Bellard
-
-  Not sure what logs to attach but I'll be glad to upload whatever
-  needed.
-
-  Thanks in advance for you help,
-  Rolando
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1684239/+subscriptions
+ Thanks,
+  Thomas
