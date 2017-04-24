@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d2YvG-0005bb-Hh
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1d2YvZ-0005of-9r
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:01:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d2Yv6-0006vR-ON
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d2Yv6-0006uO-ID
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:28 -0400
-References: <VI1PR0601MB2479AC08F717F15FCE287FC99C020@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2ea59451-5508-8c80-16c9-66eeeb0cfe1c@redhat.com>
-Date: Mon, 24 Apr 2017 10:00:22 +0200
+	(envelope-from <bounces@canonical.com>) id 1d2YvX-000729-SP
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39107)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d2YvX-00071w-MJ
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d2YvV-0005mv-PV
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 08:00:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 543082E80D0
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 08:00:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <VI1PR0601MB2479AC08F717F15FCE287FC99C020@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+Date: Mon, 24 Apr 2017 07:51:27 -0000
+From: Thomas Huth <1681404@bugs.launchpad.net>
+Reply-To: Bug 1681404 <1681404@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170410105209.1613.42620.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170424075127.1447.39199.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1681404] Re: hw/ppc: Aborted (core dumped)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +36,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: FONNEMANN Mark <mark.fonnemann@hexagon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
 
-On 13.04.2017 22:17, FONNEMANN Mark wrote:
-> Hello-
->=20
-> I posted this question on stack overflow and got no response. Stefan re=
-commended asking the question here.
->=20
-> I=E2=80=99ve included a summary of the problem here in this email but m=
-ore details can be found here:
->=20
-> http://stackoverflow.com/questions/43308310/dns-server-not-working-in-q=
-emu-usermode-networking?noredirect=3D1#comment73706410_43308310
->=20
-> Basically, I can access the internet using static IP addresses but name=
-server resolution is not working. I can ping the router 10.0.2.2 address =
-and my 10.0.2.15 address but not the 10.0.2.3 address of the DNS server o=
-r the 10.0.2.4 of the SMB server both of which I need for my project.
->=20
-> Any suggestions?
->=20
-> p.s. I tried 2.9rc3 and it failed as well.
+** Tags added: ppc
 
-IIRC there have been some DNS related fixes shortly before the final 2.9
-release ... so does it work if you use the final 2.9.0 version instead?
+-- =
 
- Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681404
+
+Title:
+  hw/ppc: Aborted (core dumped)
+
+Status in QEMU:
+  New
+
+Bug description:
+  Reproducable:
+  $ ./ppc64-softmmu/qemu-system-ppc64 -S -machine ppce500,accel=3Dtcg -devi=
+ce spapr-pci-host-bridge
+
+  =
+
+  qemu/hw/ppc/spapr_pci.c:1567:spapr_phb_realize: Object 0x55bda99744a0 is =
+not an instance of type spapr-machine
+  Aborted (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681404/+subscriptions
