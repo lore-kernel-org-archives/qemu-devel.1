@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d2cR7-00044Z-6i
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:45:46 -0400
+	(envelope-from <yanghongyang@huawei.com>) id 1d2cSH-0004ZX-6d
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d2cR3-0006Q0-69
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:45:45 -0400
-Date: Mon, 24 Apr 2017 13:45:27 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170424114527.GE4739@noname.redhat.com>
-References: <20170406150148.zwjpozqtale44jfh@perseus.local>
-	<da7174ff-38c1-07fd-96b6-fa9280524002@redhat.com>
-	<382b0707-233d-ab05-e054-3da43617460d@redhat.com>
-	<1877dc76-87e0-650c-d76a-44e6e7754a2b@redhat.com>
+	(envelope-from <yanghongyang@huawei.com>) id 1d2cSD-0006mo-7Z
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:46:57 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3519
+	helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <yanghongyang@huawei.com>) id 1d2cSC-0006kD-Rw
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:46:53 -0400
+From: Yang Hongyang <yanghongyang@huawei.com>
+Message-ID: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+Date: Mon, 24 Apr 2017 19:46:19 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="A6N2fC+uXW/VQSAv"
-Content-Disposition: inline
-In-Reply-To: <1877dc76-87e0-650c-d76a-44e6e7754a2b@redhat.com>
-Subject: Re: [Qemu-devel] proposed qcow2 extension: cluster reservations
- [was: [RFC] Proposed qcow2 extension: subcluster allocation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +25,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Huangzhichao <huangzhichao@huawei.com>, wangxinxin.wang@huawei.com, "quintela@redhat.com" <quintela@redhat.com>, pbonzini@redhat.com, "Gonglei (Arei)" <arei.gonglei@huawei.com>
 
+Hi all,
 
---A6N2fC+uXW/VQSAv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We found dirty log switch costs more then 13 seconds while migrating
+a 4T memory guest, and dirty log switch is currently protected by QEMU
+BQL. This causes guest freeze for a long time when switching dirty log on,
+and the migration downtime is unacceptable.
+Are there any chance to optimize the time cost for dirty log switch operation?
+Or move the time consuming operation out of the QEMU BQL?
 
-Am 22.04.2017 um 19:56 hat Max Reitz geschrieben:
-> On 21.04.2017 23:09, Eric Blake wrote:
-> > And meanwhile, it looks like I have some patches to propose (and
-> > qemu-iotests to write) if I can help fix the bugs I've pointed out.
->=20
-> You mean these?
-> https://github.com/XanClic/qemu/commits/random-qcow2-stuff-v1
->=20
-> ;-)
->=20
-> I'll send them once I've written tests.
-
-You were quicker with writing the patches than I could reply that I
-already started a patch to reuse preallocated zero clusters, but never
-got around to finish it:
-
-http://repo.or.cz/qemu/kevin.git/commitdiff/60b9f813bb258978455944b4ace1ab5=
-d93b5e7d4
-
-I seem to remember that it still had a problem (and probably also the
-refcount > 0 bug that Eric mentioned), but maybe you can reuse at least
-the test case from there.
-
-Kevin
-
---A6N2fC+uXW/VQSAv
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJY/eVXAAoJEH8JsnLIjy/WucMP/i7fwuIuR2bt/G+M41LSEPoo
-cSVR4orSzgiFD/ErwmToKQexLw28EViL9heCxbAU1yAekZQvAa8IcKZt/h+JqfzE
-WQaroFVbL5dw4rYZgfRu4A80cMUHGBXo/huBHS/gMp2v48InppKNpNLO+HEOtyIX
-J+FQ/QGxiRxkzhwB9GJPbiwBRltHjr9hLsS/BF/zktVkj65Bj8w2p4agl3eRC494
-bbKCRqrOj+75+0CQEzO2B3kj8PU2Vn+BrJSfuhLbaqy57OHC8P9/G9/12oVSxQua
-qhsabyoD4RwKjMF4F3Un4TqUVAxKkoJZzVNRUoNuXtl2Rz26jhc/jF7GH+p8d7Lj
-ZBpr17Bbxd2kbWTuEcEDWB/y8Gyk1UDso8GxJqAZpUAmcVNaCe5UOIe4wZUD/72s
-HU+7AZrgRkGcDHzRMKFpSrwzrG1Z9JysKUcMSzSHHLz82igFC22YE+Oerqj/OXrp
-2OfN0z7mtbPOyMm3Pfgu8Q7idxFfapRUNS3mlqXP/P746sDUp62G9jT75VbFTW0i
-6Jvpgxu57DrFLCBqW2lnpvLFhh9wxLu7mOeyVg2AA5QydT/JBAOdT3B15pAuTKQc
-uLZYTIhj57PQ5/Wkxa2Dnm3NNeZVFfdP5eNsHxN09WUHQsSYdzzrb1cgi6J/ZqWX
-rbCjzK3d8lwdfOsb8nN1
-=e6rR
------END PGP SIGNATURE-----
-
---A6N2fC+uXW/VQSAv--
+-- 
+Thanks,
+Yang
