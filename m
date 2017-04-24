@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TII-0001di-L8
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIL-0001gz-Tk
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIG-0003Vh-Vu
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIK-0003Zo-OZ
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:05 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:59:22 +1000
-Message-Id: <20170424015927.8933-43-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:59:17 +1000
+Message-Id: <20170424015927.8933-38-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 42/47] ppc/pnv: add initial IPMI sensors for the
- BMC simulator
+Subject: [Qemu-devel] [PULL 37/47] ppc/pnv: enable only one LPC bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,218 +27,92 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Skiboot, the firmware for the PowerNV platform, expects the BMC to
-provide some specific IPMI sensors. These sensors are exposed in the
-device tree and their values are updated by the firmware at boot time.
+The default LPC bus of a multichip system is on chip 0. It's
+recognized by the firmware (skiboot) using a "primary" property in the
+device tree.
 
-Sensors of interest are :
-
-	"FW Boot Progress"
-	"Boot Count"
-
-As such a device is defined on the command line, we can only detect
-its presence at reset time.
+We introduce a pnv_chip_lpc_offset() routine to locate the LPC node of
+a chip and set the property directly from the machine level.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/Makefile.objs |  2 +-
- hw/ppc/pnv.c         | 21 ++++++++++++++
- hw/ppc/pnv_bmc.c     | 81 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/ppc/pnv.h |  9 ++++++
- 4 files changed, 112 insertions(+), 1 deletion(-)
- create mode 100644 hw/ppc/pnv_bmc.c
+ hw/ppc/pnv.c     | 22 ++++++++++++++++++++++
+ hw/ppc/pnv_lpc.c |  9 ---------
+ 2 files changed, 22 insertions(+), 9 deletions(-)
 
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index ef67ea8..7efc686 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -6,7 +6,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o sp=
-apr_rtas.o
- obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng=
-.o
- obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
- # IBM PowerNV
--obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
-i.o pnv_occ.o
-+obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
-i.o pnv_occ.o pnv_bmc.o
- ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
- obj-y +=3D spapr_pci_vfio.o
- endif
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 977e126..685eb12 100644
+index 27589b9..9468e99 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -35,6 +35,7 @@
- #include "qapi/visitor.h"
- #include "monitor/monitor.h"
- #include "hw/intc/intc.h"
-+#include "hw/ipmi/ipmi.h"
-=20
- #include "hw/ppc/xics.h"
- #include "hw/ppc/pnv_xscom.h"
-@@ -476,16 +477,36 @@ static void *powernv_create_fdt(MachineState *machi=
-ne)
-     /* Populate ISA devices on chip 0 */
-     lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
-     powernv_populate_isa(pnv->isa_bus, fdt, lpc_offset);
-+
-+    if (pnv->bmc) {
-+        pnv_bmc_populate_sensors(pnv->bmc, fdt);
-+    }
-+
-     return fdt;
+@@ -255,6 +255,18 @@ static void powernv_populate_icp(PnvChip *chip, void=
+ *fdt, uint32_t pir,
+     g_free(reg);
  }
 =20
- static void ppc_powernv_reset(void)
- {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
-     void *fdt;
-+    Object *obj;
-=20
-     qemu_devices_reset();
-=20
-+    /* OpenPOWER systems have a BMC, which can be defined on the
-+     * command line with:
-+     *
-+     *   -device ipmi-bmc-sim,id=3Dbmc0
-+     *
-+     * This is the internal simulator but it could also be an external
-+     * BMC.
-+     */
-+    obj =3D object_resolve_path_type("", TYPE_IPMI_BMC, NULL);
-+    if (obj) {
-+        pnv->bmc =3D IPMI_BMC(obj);
-+    }
-+
-     fdt =3D powernv_create_fdt(machine);
-=20
-     /* Pack resulting tree */
-diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-new file mode 100644
-index 0000000..a0820dc
---- /dev/null
-+++ b/hw/ppc/pnv_bmc.c
-@@ -0,0 +1,81 @@
-+/*
-+ * QEMU PowerNV, BMC related functions
-+ *
-+ * Copyright (c) 2016-2017, IBM Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License, version 2, as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "sysemu/sysemu.h"
-+#include "target/ppc/cpu.h"
-+#include "qapi/error.h"
-+#include "qemu/log.h"
-+#include "hw/ipmi/ipmi.h"
-+#include "hw/ppc/fdt.h"
-+
-+#include "hw/ppc/pnv.h"
-+
-+#include <libfdt.h>
-+
-+/* TODO: include definition in ipmi.h */
-+#define IPMI_SDR_FULL_TYPE 1
-+
-+void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
++static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
 +{
++    char *name;
 +    int offset;
-+    int i;
-+    const struct ipmi_sdr_compact *sdr;
-+    uint16_t nextrec;
 +
-+    offset =3D fdt_add_subnode(fdt, 0, "/bmc");
-+    _FDT(offset);
-+
-+    _FDT((fdt_setprop_string(fdt, offset, "name", "bmc")));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
-+
-+    offset =3D fdt_add_subnode(fdt, offset, "sensors");
-+    _FDT(offset);
-+
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
-+
-+    for (i =3D 0; !ipmi_bmc_sdr_find(bmc, i, &sdr, &nextrec); i++) {
-+        int off;
-+        char *name;
-+
-+        if (sdr->header.rec_type !=3D IPMI_SDR_COMPACT_TYPE &&
-+            sdr->header.rec_type !=3D IPMI_SDR_FULL_TYPE) {
-+            continue;
-+        }
-+
-+        name =3D g_strdup_printf("sensor@%x", sdr->sensor_owner_number);
-+        off =3D fdt_add_subnode(fdt, offset, name);
-+        _FDT(off);
-+        g_free(name);
-+
-+        _FDT((fdt_setprop_cell(fdt, off, "reg", sdr->sensor_owner_number=
-)));
-+        _FDT((fdt_setprop_string(fdt, off, "name", "sensor")));
-+        _FDT((fdt_setprop_string(fdt, off, "compatible", "ibm,ipmi-senso=
-r")));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-sensor-reading-type",
-+                               sdr->reading_type)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-entity-id",
-+                               sdr->entity_id)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-entity-instance",
-+                               sdr->entity_instance)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-sensor-type",
-+                               sdr->sensor_type)));
-+    }
++    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
++                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
+C_BASE);
++    offset =3D fdt_path_offset(fdt, name);
++    g_free(name);
++    return offset;
 +}
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index b45a0d9..02f6cf5 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -118,6 +118,8 @@ typedef struct PnvChipClass {
- #define POWERNV_MACHINE(obj) \
-     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
-=20
-+typedef struct IPMIBmc IPMIBmc;
 +
- typedef struct PnvMachineState {
-     /*< private >*/
-     MachineState parent_obj;
-@@ -130,12 +132,19 @@ typedef struct PnvMachineState {
+ static void powernv_populate_chip(PnvChip *chip, void *fdt)
+ {
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+@@ -264,6 +276,16 @@ static void powernv_populate_chip(PnvChip *chip, voi=
+d *fdt)
 =20
-     ISABus       *isa_bus;
-     uint32_t     cpld_irqstate;
+     pnv_xscom_populate(chip, fdt, 0);
+=20
++    /* The default LPC bus of a multichip system is on chip 0. It's
++     * recognized by the firmware (skiboot) using a "primary"
++     * property.
++     */
++    if (chip->chip_id =3D=3D 0x0) {
++        int lpc_offset =3D pnv_chip_lpc_offset(chip, fdt);
 +
-+    IPMIBmc      *bmc;
- } PnvMachineState;
-=20
- #define PNV_FDT_ADDR          0x01000000
- #define PNV_TIMEBASE_FREQ     512000000ULL
-=20
- /*
-+ * BMC helpers
-+ */
-+void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
++        _FDT((fdt_setprop(fdt, lpc_offset, "primary", NULL, 0)));
++    }
 +
-+/*
-  * POWER8 MMIO base addresses
-  */
- #define PNV_XSCOM_SIZE        0x800000000ull
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
+=20
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index 5d20c15..f03a80a 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -92,14 +92,6 @@ enum {
+ #define LPC_HC_REGS_OPB_SIZE    0x00001000
+=20
+=20
+-/*
+- * TODO: the "primary" cell should only be added on chip 0. This is
+- * how skiboot chooses the default LPC controller on multichip
+- * systems.
+- *
+- * It would be easly done if we can change the populate() interface to
+- * replace the PnvXScomInterface parameter by a PnvChip one
+- */
+ static int pnv_lpc_populate(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+ {
+     const char compat[] =3D "ibm,power8-lpc\0ibm,lpc";
+@@ -119,7 +111,6 @@ static int pnv_lpc_populate(PnvXScomInterface *dev, v=
+oid *fdt, int xscom_offset)
+     _FDT((fdt_setprop(fdt, offset, "reg", reg, sizeof(reg))));
+     _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 2)));
+     _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 1)));
+-    _FDT((fdt_setprop(fdt, offset, "primary", NULL, 0)));
+     _FDT((fdt_setprop(fdt, offset, "compatible", compat, sizeof(compat))=
+));
+     return 0;
+ }
 --=20
 2.9.3
