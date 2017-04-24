@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2gDQ-0006IG-VO
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:47:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1d2gDa-0006RK-CT
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:48:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2gDQ-0005LE-5s
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:47:53 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:32771)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d2gDP-0005L4-VX
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:47:52 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id w50so70889191wrc.0
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 08:47:51 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1d2gDZ-0005NU-Cc
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:48:02 -0400
+References: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
+	<1492957997-28587-2-git-send-email-lidongchen@tencent.com>
+	<7c616dbd-f83f-1643-d211-f5be8d8b2dc4@redhat.com>
+	<7bb35794-6a50-c92f-fee7-e8f9cc55a1d0@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f9ce81bc-72d5-d436-5cb6-58c9dbb10aa4@redhat.com>
+Date: Mon, 24 Apr 2017 10:47:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170424121708.31953-1-kraxel@redhat.com>
-References: <20170424121708.31953-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Apr 2017 16:47:30 +0100
-Message-ID: <CAFEAcA88VKJQws1hrNei4H8PUQXC9TDbzQfoz+LOBaMsUytvJg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/13] vga patch queue
+In-Reply-To: <7bb35794-6a50-c92f-fee7-e8f9cc55a1d0@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AqWPufBVRxdT1g0LgOFmHGddIEALGICVo"
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: fix some spelling errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +26,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, jemmy858585@gmail.com, Lidong Chen <lidongchen@tencent.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-On 24 April 2017 at 13:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
->   Hi,
->
-> Here comes the vga patch queue.  It brings the first batch of display
-> update race fixes, xres+yres properties for qxl and virtio, also some
-> cleanups piled up during the 2.9 freeze.
->
-> please pull,
->   Gerd
->
-> The following changes since commit 32c7e0ab755745e961f1772e95cac381cc68769d:
->
->   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170421' into staging (2017-04-21 15:59:27 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/pull-vga-20170424-1
->
-> for you to fetch changes up to 729abb6a920e80c3866f60d1638f08f2eba98a9a:
->
->   virtio-gpu: add xres and yres properties (2017-04-24 10:12:28 +0200)
->
-> ----------------------------------------------------------------
-> fix display update races, part one.
-> add xres + yres properties to qxl and virtio.
-> misc fixes and cleanups.
->
-> ----------------------------------------------------------------
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AqWPufBVRxdT1g0LgOFmHGddIEALGICVo
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ jemmy858585@gmail.com, Lidong Chen <lidongchen@tencent.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
+ qemu-block@nongnu.org
+Message-ID: <f9ce81bc-72d5-d436-5cb6-58c9dbb10aa4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: fix some spelling errors
+References: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
+ <1492957997-28587-2-git-send-email-lidongchen@tencent.com>
+ <7c616dbd-f83f-1643-d211-f5be8d8b2dc4@redhat.com>
+ <7bb35794-6a50-c92f-fee7-e8f9cc55a1d0@amsat.org>
+In-Reply-To: <7bb35794-6a50-c92f-fee7-e8f9cc55a1d0@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 04/24/2017 10:37 AM, Philippe Mathieu-Daud=C3=A9 wrote:
 
--- PMM
+>>>  /*
+>>> - * Returns true iff the first sector pointed to by 'buf' contains at=
+
+>>> least
+>>> - * a non-NUL byte.
+>>> + * Returns true if the first sector pointed to by 'buf' contains at
+>>> least
+>>> + * a non-NULL byte.
+>>
+>> NACK to both changes.  'iff' is an English word that is shorthand for
+>> "if and only if".  "NUL" means the one-byte character, while "NULL"
+>> means the 8-byte (or 4-byte, on 32-bit platform) pointer value.
+>=20
+> I agree with Lidong shorthands are not obvious from non-native speaker.=
+
+>=20
+> What about this?
+>=20
+>  * Returns true if (and only if) the first sector pointed to by 'buf'
+> contains
+
+That might be okay.
+
+>  * at least a non-null character.
+
+But that still doesn't make sense.  The character name is NUL, and
+non-NULL refers to something that is a pointer, not a character.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--AqWPufBVRxdT1g0LgOFmHGddIEALGICVo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY/h4rAAoJEKeha0olJ0NqgkgH/3yu/GC2qMBvdztoMtGiHcSi
+SCYYriy97HkW0TwS/MkB7cA4vvsJ7n6rtDwRlecq928WYmFJNX4BlW5XpSZ2qZpU
+0yj4QWucLMvXdVbPxYL/RDRQeQbLSWdzpBBZgaI8GJRQB66XOEgtbAERYxUxLGGk
+gCIR70Ogm/ZSzmGS5hwEaMmDgZUtaMy/aCVwN2+oqJvcMRulB/BB+EVixx8KBmSi
+3bmunbAzE/OatbzekASPnIsciH0GO0veLNTCOVZxOQmlUtqNQgSdxWvucfPcfI1i
+q48/fTYy9eFL87v+aO/JZl4RERXXLnm3LNBnRFyQk+SjKznfdgc9V5vCRYpKRpA=
+=9PBk
+-----END PGP SIGNATURE-----
+
+--AqWPufBVRxdT1g0LgOFmHGddIEALGICVo--
