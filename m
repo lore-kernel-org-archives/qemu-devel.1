@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <he.chen@linux.intel.com>) id 1d2ZjE-0002sM-Td
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:52:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1d2Zmq-0004Kv-IN
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:56:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <he.chen@linux.intel.com>) id 1d2ZjB-0005jQ-S2
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:52:17 -0400
-Received: from mga04.intel.com ([192.55.52.120]:31751)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <he.chen@linux.intel.com>)
-	id 1d2ZjB-0005fT-IO
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:52:13 -0400
-Date: Mon, 24 Apr 2017 16:52:48 +0800
-From: He Chen <he.chen@linux.intel.com>
-Message-ID: <20170424085248.GA16098@he>
-References: <1492759935-23933-1-git-send-email-he.chen@linux.intel.com>
-	<20170421115301.4475eff6@nial.brq.redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1d2Zmn-0006TU-Aa
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:56:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49238)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d2Zmm-0006TK-Va
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:55:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d2Zmj-0001kj-LT
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 08:55:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 355832E8194
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 08:55:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170421115301.4475eff6@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7] Allow setting NUMA distance for
- different NUMA nodes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Apr 2017 08:47:51 -0000
+From: Thomas Huth <1667401@bugs.launchpad.net>
+Reply-To: Bug 1667401 <1667401@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170223171549.3964.19524.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170424084752.16599.41992.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1667401] Re: qemu-ppc segfaults(SIGSEGV) on
+ pthread_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +37,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Apr 21, 2017 at 11:53:01AM +0200, Igor Mammedov wrote:
-> On Fri, 21 Apr 2017 15:32:15 +0800
-> He Chen <he.chen@linux.intel.com> wrote:
-> 
-...
-> > +static void validate_numa_distance(void)
-> > +{
-> > +    int src, dst;
-> > +    bool is_asymmetrical = false;
-> > +
-> > +    for (src = 0; src < nb_numa_nodes; src++) {
-> > +        for (dst = 0; dst < nb_numa_nodes; dst++) {
->                 ^^^ checks inside this loop are symmetric,
->                 is there any reason it wouldn't work wit previous variant 'dst = src'?
-> 
-I am sorry I don't have a clear understanding about what you suggested
-here. You mean we should check whether the table is symmetric in this
-loop?
-Regarding 'dst = src', it represents local distance, user would
-omit setting it and we will fix it in complete_init_numa_distance. Did I
-mistake something? Could you please explain in more detail? Thanks.
-> > +            if (numa_info[src].present && numa_info[dst].present) {
-> we don't support sparse nodes, so this condition is always true
-> and not needed as earlier code assures that all nodes upto nb_numa_nodes
-> are present, greep for "numa: Node ID missing: %d"
-> so you can remove this check in this func and in complete_init_numa_distance()
-> 
-> > +                if (numa_info[src].distance[dst] == 0 &&
-> > +                    numa_info[dst].distance[src] == 0) {
-> > +                    if (src != dst) {
-> > +                        error_report("The distance between node %d and %d is missing, "
-> > +                                     "please provide all unique node pair distances.",
-> > +                                     src, dst);
-> s/all unique node .../ at least one distance value between each nodes should be provided/
-> 
-> or something like this
-> 
-> > +                        exit(EXIT_FAILURE);
-> > +                    }
-> > +                }
-> > +
-> > +                if (((numa_info[src].distance[dst] != 0) &&
-> > +                    (numa_info[dst].distance[src] != 0)) &&
-> > +                    (numa_info[src].distance[dst] !=
-> > +                    numa_info[dst].distance[src])) {
-> > +                    is_asymmetrical = true;
-> > +                }
-> > +            }
-> > +        }
-> > +    }
-> > +
-> > +    if (is_asymmetrical) {
-> > +        for (src = 0; src < nb_numa_nodes; src++) {
-> > +            for (dst = 0; dst < nb_numa_nodes; dst++) {
-> > +                if (numa_info[src].present && numa_info[dst].present) {
-> > +                    if ((src != dst) && (numa_info[src].distance[dst] == 0)) {
-> > +                        error_report("At least one asymmetrical pair of "
-> > +                                "distances is given, please provide distances "
-> > +                                "for both directions of all node pairs.");
-> > +                        exit(EXIT_FAILURE);
-> > +                    }
-> > +                }
-> > +            }
-> > +        }
-> > +    }
-> > +}
-> > +
-> > +static void complete_init_numa_distance(void)
-> > +{
-> > +    int src, dst;
-> > +
-> > +    /* fixup NUMA distance by symmetric policy because if it is an
-> > +     * asymmtric distance table, it should be a complete table and there
-> > +     * would not be any missing distance except local node, which is
-> > +     * verified by validate_numa_distance above.
-> > +     */
-> > +    for (src = 0; src < nb_numa_nodes; src++) {
-> > +        for (dst = 0; dst < nb_numa_nodes; dst++) {
-> > +            if (numa_info[src].present && numa_info[dst].present) {
-> > +                if (numa_info[src].distance[dst] == 0) {
-> > +                    if (src == dst) {
-> > +                        numa_info[src].distance[dst] = NUMA_DISTANCE_MIN;
-> > +                    } else {
-> > +                        numa_info[src].distance[dst] = numa_info[dst].distance[src];
-> > +                    }
-> > +                }
-> > +            }
-> > +        }
-> > +    }
-> > +}
-...
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1667401
+
+Title:
+  qemu-ppc segfaults(SIGSEGV) on pthread_create
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  qemu-ppc running on x86-64 hardware leads to a segfault when running the
+  attached program (test.c). It simply creates a pthread, joins it and exit=
+s.
+
+  It was compiled as follows on a Debian testing system:
+  > powerpc-linux-gnuspe-gcc-6 -static -Wall -g -o test -pthread test.c
+
+  Sample execution (expected output is "Hello - World!"):
+  > qemu-ppc -cpu e500 ./test
+  [...output...]
+  Hello - qemu-ppc: /build/qemu-_M2UL5/qemu-2.8+dfsg/translate-all.c:175: t=
+b_lock: Assertion `!have_tb_lock' failed.
+  qemu-ppc: /build/qemu-_M2UL5/qemu-2.8+dfsg/translate-all.c:175: tb_lock: =
+Assertion `!have_tb_lock' failed.
+  [1]    25747 segmentation fault  qemu-ppc -cpu e500 test
+  [...end output...]
+
+  The same behavior is observed when running on a PPC 604:
+
+  > powerpc-linux-gnu-gcc -Wall -g -o test -pthread test.c
+  > qemu-ppc ./test
+  [... as above ...]
+
+  Version information:
+  powerpc-linux-gnu-gcc -v =3D> gcc version 6.3.0 20170124 (Debian 6.3.0-5)
+  qemu-ppc -version =3D> qemu-ppc version 2.8.0(Debian 1:2.8+dfsg-2)
+
+  The same experiment was conducted again using qemu from the git repositor=
+y (commit: 796b288f7be875045670f963ce99991b3c8e96ac):
+  ~/tools/qemu/build/ppc-linux-user/qemu-ppc -version =3D> qemu-ppc version=
+ 2.8.50 (v2.8.0-1417-g796b288f7b-dirty)
+  [...output...]
+  Hello - qemu-ppc: [...redacted...]/tools/qemu/translate-all.c:175: tb_loc=
+k: Assertion `!have_tb_lock' failed.
+  qemu-ppc: [...redacted...]/tools/qemu/translate-all.c:175: tb_lock: Asser=
+tion `!have_tb_lock' failed.
+  [1]    25996 segmentation fault  ~/tools/qemu/build/ppc-linux-user/qemu-p=
+pc -cpu e500 test
+  [...end output...]
+
+  =
+
+  Executing with -strace option yields a surprising entry (see second clone=
+() syscall below):
+  [...]
+  26007 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLON=
+E_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_stack=
+=3D0xf67fde60,parent_tidptr=3D0xf67fe368,tls=3D0xf68057d0,child_tidptr=3D0x=
+f67fe368) =3D 26009
+  26007 clone(0,child_stack=3D0xf67fde60,parent_tidptr=3D0xf67fe368,tls=3D0=
+xf68057d0,child_tidptr=3D0xf67fe368) =3D -1 errno=3D22 (Invalid argument)
+
+  =
+
+  test.c works just fine if the pthread_create & pthread_join calls are rem=
+oved
+  (i.e. when compiled with -DNO_PTHREAD_CREATE).
+
+  At first glance, the issue seems specific to PPC because compiling and ru=
+nning
+  for x86_64 using qemu-x86_64 works fine.
+
+  =
+
+  Additional info:
+  > lddtree =3Dqemu-ppc
+  qemu-ppc =3D> /usr/bin/qemu-ppc (interpreter =3D> /lib64/ld-linux-x86-64.=
+so.2)
+      libgmodule-2.0.so.0 =3D> /usr/lib/x86_64-linux-gnu/libgmodule-2.0.so.0
+          libdl.so.2 =3D> /lib/x86_64-linux-gnu/libdl.so.2
+              ld-linux-x86-64.so.2 =3D> /lib64/ld-linux-x86-64.so.2
+      libglib-2.0.so.0 =3D> /lib/x86_64-linux-gnu/libglib-2.0.so.0
+          libpcre.so.3 =3D> /lib/x86_64-linux-gnu/libpcre.so.3
+      librt.so.1 =3D> /lib/x86_64-linux-gnu/librt.so.1
+      libm.so.6 =3D> /lib/x86_64-linux-gnu/libm.so.6
+      libgcc_s.so.1 =3D> /lib/x86_64-linux-gnu/libgcc_s.so.1
+      libpthread.so.0 =3D> /lib/x86_64-linux-gnu/libpthread.so.0
+      libc.so.6 =3D> /lib/x86_64-linux-gnu/libc.so.6
+
+  > /lib/x86_64-linux-gnu/libc.so.6
+  GNU C Library (Debian GLIBC 2.24-9) stable release version 2.24, by Rolan=
+d McGrath et al.
+
+  > uname -a
+  Linux [...redacted...] 4.9.0-1-amd64 #1 SMP Debian 4.9.6-3 (2017-01-28) x=
+86_64 GNU/Linux
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1667401/+subscriptions
