@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIO-0001jV-IU
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:09 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TI9-0001UC-PI
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIN-0003bl-4P
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TI8-0003PJ-FW
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:53 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:59:11 +1000
-Message-Id: <20170424015927.8933-32-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:58:57 +1000
+Message-Id: <20170424015927.8933-18-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 31/47] ipmi: provide support for FRUs
+Subject: [Qemu-devel] [PULL 17/47] ppc/xics: introduce an 'intc' backlink
+ under PowerPCCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,249 +28,184 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This patch provides a simple FRU support for the BMC simulator. FRUs
-are loaded from a file which name is specified in the object
-properties, each entry having a fixed size, also specified in the
-properties. If the file is unknown or not accessible for some reason,
-a unique entry of 1024 bytes is created as a default. Just enough to
-start some simulation.
+Today, the ICPState array of the sPAPR machine is indexed with
+'cpu_index' of the CPUState. This numbering of CPUs is internal to
+QEMU and the guest only knows about what is exposed in the device
+tree, that is the 'cpu_dt_id'. This is why sPAPR uses the helper
+xics_get_cpu_index_by_dt_id() to do the mapping in a couple of places.
 
-These commands complies with the IPMI spec : "34. FRU Inventory Device
-Commands".
+To provide a more generic XICS layer, we need to abstract the IRQ
+'server' number and remove any assumption made on its nature. It
+should not be used as a 'cpu_index' for lookups like xics_cpu_setup()
+and xics_cpu_destroy() do.
+
+To reach that goal, we choose to introduce a generic 'intc' backlink
+under PowerPCCPU, and let the machine core init routine do the
+ICPState lookup. The resulting object is passed on to xics_cpu_setup()
+which does the store under PowerPCCPU. The IRQ 'server' number in XICS
+is now generic. sPAPR uses 'cpu_dt_id' and PowerNV will use 'PIR'
+number.
+
+This also has the benefit of simplifying the sPAPR hcall routines
+which do not need to do any ICPState lookups anymore.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Acked-by: Corey Minyard <cminyard@mvista.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ipmi/ipmi_bmc_sim.c | 128 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
- qemu-options.hx        |   8 +++-
- 2 files changed, 134 insertions(+), 2 deletions(-)
+ hw/intc/xics.c          |  6 +++---
+ hw/intc/xics_spapr.c    | 20 +++++---------------
+ hw/ppc/spapr_cpu_core.c |  4 +++-
+ include/hw/ppc/xics.h   |  2 +-
+ target/ppc/cpu.h        |  1 +
+ 5 files changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index 1142c0c..eae7b2d 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -80,6 +80,9 @@
- #define IPMI_CMD_ENTER_SDR_REP_UPD_MODE   0x2A
- #define IPMI_CMD_EXIT_SDR_REP_UPD_MODE    0x2B
- #define IPMI_CMD_RUN_INIT_AGENT           0x2C
-+#define IPMI_CMD_GET_FRU_AREA_INFO        0x10
-+#define IPMI_CMD_READ_FRU_DATA            0x11
-+#define IPMI_CMD_WRITE_FRU_DATA           0x12
- #define IPMI_CMD_GET_SEL_INFO             0x40
- #define IPMI_CMD_GET_SEL_ALLOC_INFO       0x41
- #define IPMI_CMD_RESERVE_SEL              0x42
-@@ -122,6 +125,13 @@ typedef struct IPMISdr {
-     uint8_t overflow;
- } IPMISdr;
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index e740989..56fe70c 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -52,7 +52,7 @@ int xics_get_cpu_index_by_dt_id(int cpu_dt_id)
+ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
+ {
+     CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
++    ICPState *icp =3D ICP(cpu->intc);
 =20
-+typedef struct IPMIFru {
-+    char *filename;
-+    unsigned int nentries;
-+    uint16_t areasize;
-+    uint8_t *data;
-+} IPMIFru;
-+
- typedef struct IPMISensor {
-     uint8_t status;
-     uint8_t reading;
-@@ -213,6 +223,7 @@ struct IPMIBmcSim {
-=20
-     IPMISel sel;
-     IPMISdr sdr;
-+    IPMIFru fru;
-     IPMISensor sensors[MAX_SENSORS];
-     char *sdr_filename;
-=20
-@@ -1317,6 +1328,91 @@ static void get_sel_info(IPMIBmcSim *ibs,
-     rsp_buffer_push(rsp, (ibs->sel.overflow << 7) | 0x02);
+     assert(icp);
+     assert(cs =3D=3D icp->cs);
+@@ -61,15 +61,15 @@ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu=
+)
+     icp->cs =3D NULL;
  }
 =20
-+static void get_fru_area_info(IPMIBmcSim *ibs,
-+                         uint8_t *cmd, unsigned int cmd_len,
-+                         RspBuffer *rsp)
-+{
-+    uint8_t fruid;
-+    uint16_t fru_entry_size;
-+
-+    fruid =3D cmd[2];
-+
-+    if (fruid >=3D ibs->fru.nentries) {
-+        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
-+        return;
-+    }
-+
-+    fru_entry_size =3D ibs->fru.areasize;
-+
-+    rsp_buffer_push(rsp, fru_entry_size & 0xff);
-+    rsp_buffer_push(rsp, fru_entry_size >> 8 & 0xff);
-+    rsp_buffer_push(rsp, 0x0);
-+}
-+
-+static void read_fru_data(IPMIBmcSim *ibs,
-+                         uint8_t *cmd, unsigned int cmd_len,
-+                         RspBuffer *rsp)
-+{
-+    uint8_t fruid;
-+    uint16_t offset;
-+    int i;
-+    uint8_t *fru_entry;
-+    unsigned int count;
-+
-+    fruid =3D cmd[2];
-+    offset =3D (cmd[3] | cmd[4] << 8);
-+
-+    if (fruid >=3D ibs->fru.nentries) {
-+        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
-+        return;
-+    }
-+
-+    if (offset >=3D ibs->fru.areasize - 1) {
-+        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
-+        return;
-+    }
-+
-+    fru_entry =3D &ibs->fru.data[fruid * ibs->fru.areasize];
-+
-+    count =3D MIN(cmd[5], ibs->fru.areasize - offset);
-+
-+    rsp_buffer_push(rsp, count & 0xff);
-+    for (i =3D 0; i < count; i++) {
-+        rsp_buffer_push(rsp, fru_entry[offset + i]);
-+    }
-+}
-+
-+static void write_fru_data(IPMIBmcSim *ibs,
-+                         uint8_t *cmd, unsigned int cmd_len,
-+                         RspBuffer *rsp)
-+{
-+    uint8_t fruid;
-+    uint16_t offset;
-+    uint8_t *fru_entry;
-+    unsigned int count;
-+
-+    fruid =3D cmd[2];
-+    offset =3D (cmd[3] | cmd[4] << 8);
-+
-+    if (fruid >=3D ibs->fru.nentries) {
-+        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
-+        return;
-+    }
-+
-+    if (offset >=3D ibs->fru.areasize - 1) {
-+        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
-+        return;
-+    }
-+
-+    fru_entry =3D &ibs->fru.data[fruid * ibs->fru.areasize];
-+
-+    count =3D MIN(cmd_len - 5, ibs->fru.areasize - offset);
-+
-+    memcpy(fru_entry + offset, cmd + 5, count);
-+
-+    rsp_buffer_push(rsp, count & 0xff);
-+}
-+
- static void reserve_sel(IPMIBmcSim *ibs,
-                         uint8_t *cmd, unsigned int cmd_len,
-                         RspBuffer *rsp)
-@@ -1653,6 +1749,9 @@ static const IPMINetfn app_netfn =3D {
- };
-=20
- static const IPMICmdHandler storage_cmds[] =3D {
-+    [IPMI_CMD_GET_FRU_AREA_INFO] =3D { get_fru_area_info, 3 },
-+    [IPMI_CMD_READ_FRU_DATA] =3D { read_fru_data, 5 },
-+    [IPMI_CMD_WRITE_FRU_DATA] =3D { write_fru_data, 5 },
-     [IPMI_CMD_GET_SDR_REP_INFO] =3D { get_sdr_rep_info },
-     [IPMI_CMD_RESERVE_SDR_REP] =3D { reserve_sdr_rep },
-     [IPMI_CMD_GET_SDR] =3D { get_sdr, 8 },
-@@ -1755,6 +1854,31 @@ static const VMStateDescription vmstate_ipmi_sim =3D=
+-void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu)
++void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
  {
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+-    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
+     ICPStateClass *icpc;
+=20
+     assert(icp);
+=20
++    cpu->intc =3D OBJECT(icp);
+     icp->cs =3D cs;
+=20
+     icpc =3D ICP_GET_CLASS(icp);
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 84d24b2..58f100d 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -43,11 +43,9 @@
+ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     target_ulong cppr =3D args[0];
+=20
+-    icp_set_cppr(icp, cppr);
++    icp_set_cppr(ICP(cpu->intc), cppr);
+     return H_SUCCESS;
+ }
+=20
+@@ -69,9 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
+State *spapr,
+ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+-    uint32_t xirr =3D icp_accept(icp);
++    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
+=20
+     args[0] =3D xirr;
+     return H_SUCCESS;
+@@ -80,9 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
+eState *spapr,
+ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                              target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+-    uint32_t xirr =3D icp_accept(icp);
++    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
+=20
+     args[0] =3D xirr;
+     args[1] =3D cpu_get_host_ticks();
+@@ -92,21 +86,17 @@ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMa=
+chineState *spapr,
+ static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                           target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     target_ulong xirr =3D args[0];
+=20
+-    icp_eoi(icp, xirr);
++    icp_eoi(ICP(cpu->intc), xirr);
+     return H_SUCCESS;
+ }
+=20
+ static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                             target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     uint32_t mfrr;
+-    uint32_t xirr =3D icp_ipoll(icp, &mfrr);
++    uint32_t xirr =3D icp_ipoll(ICP(cpu->intc), &mfrr);
+=20
+     args[0] =3D xirr;
+     args[1] =3D mfrr;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 6883f09..7db61bd 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -63,6 +63,8 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+                            Error **errp)
+ {
+     CPUPPCState *env =3D &cpu->env;
++    XICSFabric *xi =3D XICS_FABRIC(spapr);
++    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
+=20
+     /* Set time-base frequency to 512 MHz */
+     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+@@ -80,7 +82,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+         }
      }
- };
 =20
-+static void ipmi_fru_init(IPMIFru *fru)
-+{
-+    int fsize;
-+    int size =3D 0;
-+
-+    fsize =3D get_image_size(fru->filename);
-+    if (fsize > 0) {
-+        size =3D QEMU_ALIGN_UP(fsize, fru->areasize);
-+        fru->data =3D g_malloc0(size);
-+        if (load_image_size(fru->filename, fru->data, fsize) !=3D fsize)=
- {
-+            error_report("Could not load file '%s'", fru->filename);
-+            g_free(fru->data);
-+            fru->data =3D NULL;
-+        }
-+    }
-+
-+    if (!fru->data) {
-+        /* give one default FRU */
-+        size =3D fru->areasize;
-+        fru->data =3D g_malloc0(size);
-+    }
-+
-+    fru->nentries =3D size / fru->areasize;
-+}
-+
- static void ipmi_sim_realize(DeviceState *dev, Error **errp)
- {
-     IPMIBmc *b =3D IPMI_BMC(dev);
-@@ -1776,6 +1900,8 @@ static void ipmi_sim_realize(DeviceState *dev, Erro=
-r **errp)
+-    xics_cpu_setup(XICS_FABRIC(spapr), cpu);
++    xics_cpu_setup(xi, cpu, icp);
 =20
-     ipmi_sdr_init(ibs);
+     qemu_register_reset(spapr_cpu_reset, cpu);
+     spapr_cpu_reset(cpu);
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index ce23018..b97d30b 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -168,7 +168,7 @@ void spapr_dt_xics(int nr_servers, void *fdt, uint32_=
+t phandle);
 =20
-+    ipmi_fru_init(&ibs->fru);
-+
-     ibs->acpi_power_state[0] =3D 0;
-     ibs->acpi_power_state[1] =3D 0;
+ qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
+ ICPState *xics_icp_get(XICSFabric *xi, int server);
+-void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu);
++void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
+ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
 =20
-@@ -1794,6 +1920,8 @@ static void ipmi_sim_realize(DeviceState *dev, Erro=
-r **errp)
- }
+ /* Internal XICS interfaces */
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index cacdd0a..e0ff041 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1200,6 +1200,7 @@ struct PowerPCCPU {
+     uint32_t max_compat;
+     uint32_t compat_pvr;
+     PPCVirtualHypervisor *vhyp;
++    Object *intc;
 =20
- static Property ipmi_sim_properties[] =3D {
-+    DEFINE_PROP_UINT16("fruareasize", IPMIBmcSim, fru.areasize, 1024),
-+    DEFINE_PROP_STRING("frudatafile", IPMIBmcSim, fru.filename),
-     DEFINE_PROP_STRING("sdrfile", IPMIBmcSim, sdr_filename),
-     DEFINE_PROP_END_OF_LIST(),
- };
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 366b088..39770c1 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -425,7 +425,7 @@ possible drivers and properties, use @code{-device he=
-lp} and
- @code{-device @var{driver},help}.
-=20
- Some drivers are:
--@item -device ipmi-bmc-sim,id=3D@var{id}[,slave_addr=3D@var{val}][,sdrfi=
-le=3D@var{file}]
-+@item -device ipmi-bmc-sim,id=3D@var{id}[,slave_addr=3D@var{val}][,sdrfi=
-le=3D@var{file}][,furareasize=3D@var{val}][,furdatafile=3D@var{file}]
-=20
- Add an IPMI BMC.  This is a simulation of a hardware management
- interface processor that normally sits on a system.  It provides
-@@ -443,7 +443,11 @@ The BMC to connect to, one of ipmi-bmc-sim or ipmi-b=
-mc-extern above.
- @item slave_addr=3D@var{val}
- Define slave address to use for the BMC.  The default is 0x20.
- @item sdrfile=3D@var{file}
--file containing raw Sensor Data Records (SDR) data.  The default is none=
-.
-+file containing raw Sensor Data Records (SDR) data. The default is none.
-+@item fruareasize=3D@var{val}
-+size of a Field Replaceable Unit (FRU) area.  The default is 1024.
-+@item frudatafile=3D@var{file}
-+file containing raw Field Replaceable Unit (FRU) inventory data. The def=
-ault is none.
- @end table
-=20
- @item -device ipmi-bmc-extern,id=3D@var{id},chardev=3D@var{id}[,slave_ad=
-dr=3D@var{val}]
+     /* Fields related to migration compatibility hacks */
+     bool pre_2_8_migration;
 --=20
 2.9.3
