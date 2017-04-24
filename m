@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d2g3y-0002L2-Oj
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:38:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1d2g7D-0003ZC-3X
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:41:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d2g3x-0001kS-Sa
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:38:06 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
-	<1492957997-28587-2-git-send-email-lidongchen@tencent.com>
-	<7c616dbd-f83f-1643-d211-f5be8d8b2dc4@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7bb35794-6a50-c92f-fee7-e8f9cc55a1d0@amsat.org>
-Date: Mon, 24 Apr 2017 12:37:56 -0300
+	(envelope-from <berrange@redhat.com>) id 1d2g79-0002ud-W1
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:41:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40620)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d2g79-0002tu-Pn
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 11:41:23 -0400
+Date: Mon, 24 Apr 2017 16:41:17 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170424154117.GB7705@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <trinity-b0e235ed-b74e-40f5-b249-c73867fd5ee9-1493036276162@3capp-webde-bs07>
+	<20170424125016.GM20809@redhat.com>
+	<CAFEAcA_p7rWmuRZ20PHBPfXoKswz95PtOjG866kaC2ooKx70PQ@mail.gmail.com>
+	<20170424133624.GP20809@redhat.com>
+	<CAFEAcA_LrsgToPR842redVqG7VnntTdg2ANgkDpnFAWiEqQVVw@mail.gmail.com>
+	<20170424135749.GR20809@redhat.com>
+	<CAFEAcA8YyeQ3NOGQkr8xVZ9S5F7RmdeDwcRkLGSyNci3hf4OCw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <7c616dbd-f83f-1643-d211-f5be8d8b2dc4@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: fix some spelling errors
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8YyeQ3NOGQkr8xVZ9S5F7RmdeDwcRkLGSyNci3hf4OCw@mail.gmail.com>
+Subject: Re: [Qemu-devel] error: qcrypto_random_bytes() tried to read from
+ /dev/[u]random, even on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, jemmy858585@gmail.com, Lidong Chen <lidongchen@tencent.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: GM.Ijewski@web.de, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Eric,
+On Mon, Apr 24, 2017 at 03:05:40PM +0100, Peter Maydell wrote:
+> On 24 April 2017 at 14:57, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > This is the extent of gnutls's code in this area
+> >
+> > https://gitlab.com/gnutls/gnutls/blob/master/lib/nettle/sysrng-windows.c
+> >
+> > Our API has the same usage scenario as this, hence my preference to mirror
+> > what gnutls & other crypto libraries are using.
+> 
+> I see that only calls CryptAcquireContext once, not twice.
+> I also think we should do what that code does and use a static
+> variable to avoid calling CryptAcquireContext repeatedly.
 
-On 04/24/2017 11:40 AM, Eric Blake wrote:
-> On 04/23/2017 09:33 AM, jemmy858585@gmail.com wrote:
->> From: Lidong Chen <lidongchen@tencent.com>
->>
->> Fix some spelling errors in is_allocated_sectors comment.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> ---
->>  qemu-img.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/qemu-img.c b/qemu-img.c
->> index df6d165..0b3349c 100644
->> --- a/qemu-img.c
->> +++ b/qemu-img.c
->> @@ -1033,8 +1033,8 @@ done:
->>  }
->>
->>  /*
->> - * Returns true iff the first sector pointed to by 'buf' contains at least
->> - * a non-NUL byte.
->> + * Returns true if the first sector pointed to by 'buf' contains at least
->> + * a non-NULL byte.
->
-> NACK to both changes.  'iff' is an English word that is shorthand for
-> "if and only if".  "NUL" means the one-byte character, while "NULL"
-> means the 8-byte (or 4-byte, on 32-bit platform) pointer value.
+Ok, fair enough.
 
-I agree with Lidong shorthands are not obvious from non-native speaker.
+We can have the existing qcrypto_init() call a qcrypto_random_init()
+method to do the one-time initialization task, since that's already
+required to run early in order to initialize gnutls when we use it. 
 
-What about this?
+> If we want to follow gnutls we should just borrow that code
+> (tweaking the function names etc as appropriate) and credit it:
+> gnutls is LGPL2.1 so no problem doing that.
 
-  * Returns true if (and only if) the first sector pointed to by 'buf' 
-contains
-  * at least a non-null character.
+Yep
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
