@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d2hmn-0001ID-0Q
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:28:32 -0400
+	(envelope-from <alistair23@gmail.com>) id 1d2i2X-00046C-HX
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d2hmh-0007cy-Ts
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:28:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d2hmh-0007c5-K9
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:28:23 -0400
-Date: Mon, 24 Apr 2017 20:28:20 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170424202145-mutt-send-email-mst@kernel.org>
-References: <1491980930-32184-1-git-send-email-clg@kaod.org>
+	(envelope-from <alistair23@gmail.com>) id 1d2i2W-0007vm-C3
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:44:45 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1491980930-32184-1-git-send-email-clg@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] ipmi: add SET_SENSOR_READING command
+In-Reply-To: <CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
+References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
+	<1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
+	<CAKmqyKMW-aTdzvTH5sir1BPx6U9XtgiZZ7TVigooXLFMY=UEQg@mail.gmail.com>
+	<CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 24 Apr 2017 10:44:12 -0700
+Message-ID: <CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 1/4] msf2: Add Smartfusion2
+ System timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,291 +25,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Corey Minyard <cminyard@mvista.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
+To: sundeep subbaraya <sundeep.lkml@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Wed, Apr 12, 2017 at 09:08:50AM +0200, C=C3=A9dric Le Goater wrote:
-> SET_SENSOR_READING is a complex IPMI command (see IPMI spec 35.17)
-> which enables the host software to set the reading value and the event
-> status of sensors supporting it.
->=20
-> Below is a proposal for all the operations (reading, assert, deassert,
-> event data) with the following limitations :
->=20
->  - No event are generated for threshold-based sensors.=20
->  - The case in which the BMC needs to generate its own events is not
->    supported.
->   =20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>> +
+>>> +    isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
+>>> +    ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+>>> +
+>>> +    qemu_set_irq(st->irq, (ier && isr));
+>>> +}
+>>> +
+>>> +static uint64_t
+>>> +timer_read(void *opaque, hwaddr addr, unsigned int size)
+>>> +{
+>>> +    struct timerblock *t = opaque;
+>>> +    struct msf2_timer *st;
+>>> +    uint32_t r = 0;
+>>> +    unsigned int timer;
+>>> +    int isr;
+>>> +    int ier;
+>>> +
+>>> +    addr >>= 2;
+>>> +    timer = timer_from_addr(addr);
+>>> +    st = &t->timers[timer];
+>>> +
+>>> +    if (timer) {
+>>> +        addr -= 6;
+>>> +    }
+>>
+>> Isn't this timer logic just checking if (addr >> 2) == R_MAX and if it
+>> is set (addr >> 2) back to zero? This seems an overly complex way to
+>> check that.
+> I did not get you clearly. Do you want me to write like this:
+> unsigned int timer = 0;
+>
+> addr >>= 2;
+> if (addr >= R_MAX) {
+>     timer = 1;
+>     addr =  addr - R_MAX;
+> }
 
-Need to look at how guests will behave if they start on
-a new QEMU and migrate to old one.
-Any input? Do we need a flag to behave like 2.9 did if
-we want compatibility?
+Yeah, I think this is clearer then what you had earlier.
 
-> ---
->=20
->  Corey,
->=20
->  There is some progress but I didn't add a check on the value before
->  generating events because we would not generate an event when only
->  the event bytes change.=20
->=20
->  Changes since v1:
-> =20
->  - created copies of the reading and the assertion bits before
->    committing the values
->  - added some TODOs
->  - handled inconsistent Event Data Bytes operation
-> =20
->  hw/ipmi/ipmi_bmc_sim.c |  213 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->  1 file changed, 213 insertions(+)
->=20
-> Index: qemu-powernv-2.9.git/hw/ipmi/ipmi_bmc_sim.c
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- qemu-powernv-2.9.git.orig/hw/ipmi/ipmi_bmc_sim.c
-> +++ qemu-powernv-2.9.git/hw/ipmi/ipmi_bmc_sim.c
-> @@ -45,6 +45,7 @@
->  #define IPMI_CMD_GET_SENSOR_READING       0x2d
->  #define IPMI_CMD_SET_SENSOR_TYPE          0x2e
->  #define IPMI_CMD_GET_SENSOR_TYPE          0x2f
-> +#define IPMI_CMD_SET_SENSOR_READING       0x30
-> =20
->  /* #define IPMI_NETFN_APP             0x06 In ipmi.h */
-> =20
-> @@ -1739,6 +1740,217 @@ static void get_sensor_type(IPMIBmcSim *
->      rsp_buffer_push(rsp, sens->evt_reading_type_code);
->  }
-> =20
-> +/*
-> + * bytes   parameter
-> + *    1    sensor number
-> + *    2    operation (see below for bits meaning)
-> + *    3    sensor reading
-> + *  4:5    assertion states (optional)
-> + *  6:7    deassertion states (optional)
-> + *  8:10   event data 1,2,3 (optional)
-> + */
-> +static void set_sensor_reading(IPMIBmcSim *ibs,
-> +                               uint8_t *cmd, unsigned int cmd_len,
-> +                               RspBuffer *rsp)
-> +{
-> +    IPMISensor *sens;
-> +    uint8_t evd1 =3D 0;
-> +    uint8_t evd2 =3D 0;
-> +    uint8_t evd3 =3D 0;
-> +    uint8_t new_reading =3D 0;
-> +    uint16_t new_assert_states =3D 0;
-> +    uint16_t new_deassert_states =3D 0;
-> +    bool change_reading =3D false;
-> +    bool change_assert =3D false;
-> +    bool change_deassert =3D false;
-> +    enum {
-> +        SENSOR_GEN_EVENT_NONE,
-> +        SENSOR_GEN_EVENT_DATA,
-> +        SENSOR_GEN_EVENT_BMC,
-> +    } do_gen_event =3D SENSOR_GEN_EVENT_NONE;
-> +
-> +    if ((cmd[2] >=3D MAX_SENSORS) ||
-> +            !IPMI_SENSOR_GET_PRESENT(ibs->sensors + cmd[2])) {
-> +        rsp_buffer_set_error(rsp, IPMI_CC_REQ_ENTRY_NOT_PRESENT);
-> +        return;
-> +    }
-> +
-> +    sens =3D ibs->sensors + cmd[2];
-> +
-> +    /* [1:0] Sensor Reading operation */
-> +    switch ((cmd[3]) & 0x3) {
-> +    case 0: /* Do not change */
-> +        break;
-> +    case 1: /* write given value to sensor reading byte */
-> +        new_reading =3D cmd[4];
-> +        if (sens->reading !=3D new_reading) {
-> +            change_reading =3D true;
-> +        }
-> +        break;
-> +    case 2:
-> +    case 3:
-> +        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
-> +        return;
-> +    }
-> +
-> +    /* [3:2] Deassertion bits operation */
-> +    switch ((cmd[3] >> 2) & 0x3) {
-> +    case 0: /* Do not change */
-> +        break;
-> +    case 1: /* write given value */
-> +        if (cmd_len > 7) {
-> +            new_deassert_states =3D cmd[7];
-> +            change_deassert =3D true;
-> +        }
-> +        if (cmd_len > 8) {
-> +            new_deassert_states |=3D (cmd[8] << 8);
-> +        }
-> +        break;
-> +
-> +    case 2: /* mask on */
-> +        if (cmd_len > 7) {
-> +            new_deassert_states =3D (sens->deassert_states | cmd[7]);
-> +            change_deassert =3D true;
-> +        }
-> +        if (cmd_len > 8) {
-> +            new_deassert_states |=3D (sens->deassert_states | (cmd[8] =
-<< 8));
-> +        }
-> +        break;
-> +
-> +    case 3: /* mask off */
-> +        if (cmd_len > 7) {
-> +            new_deassert_states =3D (sens->deassert_states & cmd[7]);
-> +            change_deassert =3D true;
-> +        }
-> +        if (cmd_len > 8) {
-> +            new_deassert_states |=3D (sens->deassert_states & (cmd[8] =
-<< 8));
-> +        }
-> +        break;
-> +    }
-> +
-> +    if (change_deassert && (new_deassert_states =3D=3D sens->deassert_=
-states)) {
-> +        change_deassert =3D false;
-> +    }
-> +
-> +    /* [5:4] Assertion bits operation */
-> +    switch ((cmd[3] >> 4) & 0x3) {
-> +    case 0: /* Do not change */
-> +        break;
-> +    case 1: /* write given value */
-> +        if (cmd_len > 5) {
-> +            new_assert_states =3D cmd[5];
-> +            change_assert =3D true;
-> +        }
-> +        if (cmd_len > 6) {
-> +            new_assert_states |=3D (cmd[6] << 8);
-> +        }
-> +        break;
-> +
-> +    case 2: /* mask on */
-> +        if (cmd_len > 5) {
-> +            new_assert_states =3D (sens->assert_states | cmd[5]);
-> +            change_assert =3D true;
-> +        }
-> +        if (cmd_len > 6) {
-> +            new_assert_states |=3D (sens->assert_states | (cmd[6] << 8=
-));
-> +        }
-> +        break;
-> +
-> +    case 3: /* mask off */
-> +        if (cmd_len > 5) {
-> +            new_assert_states =3D (sens->assert_states & cmd[5]);
-> +            change_assert =3D true;
-> +        }
-> +        if (cmd_len > 6) {
-> +            new_assert_states |=3D (sens->assert_states & (cmd[6] << 8=
-));
-> +        }
-> +        break;
-> +    }
-> +
-> +    if (change_assert && (new_assert_states =3D=3D sens->assert_states=
-)) {
-> +        change_assert =3D false;
-> +    }
-> +
-> +    if (cmd_len > 9) {
-> +        evd1 =3D cmd[9];
-> +    }
-> +    if (cmd_len > 10) {
-> +        evd2 =3D cmd[10];
-> +    }
-> +    if (cmd_len > 11) {
-> +        evd3 =3D cmd[11];
-> +    }
-> +
-> +    /* [7:6] Event Data Bytes operation */
-> +    switch ((cmd[3] >> 6) & 0x3) {
-> +    case 0: /* Don=E2=80=99t use Event Data bytes from this command. B=
-MC will
-> +             * generate it's own Event Data bytes based on its sensor
-> +             * implementation.  */
-> +        evd1 =3D evd2 =3D evd3 =3D 0x0;
-> +        do_gen_event =3D SENSOR_GEN_EVENT_BMC;
-> +        break;
-> +    case 1: /* Write given values to event data bytes including bits
-> +             * [3:0] Event Data 1. */
-> +        do_gen_event =3D SENSOR_GEN_EVENT_DATA;
-> +        break;
-> +    case 2: /* Write given values to event data bytes excluding bits
-> +             * [3:0] Event Data 1. */
-> +        evd1 &=3D 0xf0;
-> +        do_gen_event =3D SENSOR_GEN_EVENT_DATA;
-> +        break;
-> +    case 3:
-> +        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
-> +        return;
-> +    }
-> +
-> +    /* Event Data Bytes operation and parameter are inconsistent. The
-> +     * Specs are not clear on that topic but generating an error seems
-> +     * correct. */
-> +    if (do_gen_event =3D=3D SENSOR_GEN_EVENT_DATA && cmd_len < 10) {
-> +        rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
-> +        return;
-> +    }
-> +
-> +    /* commit values */
-> +    if (change_reading) {
-> +        sens->reading =3D new_reading;
-> +    }
-> +
-> +    if (change_assert) {
-> +        sens->assert_states =3D new_assert_states;
-> +    }
-> +
-> +    if (change_deassert) {
-> +        sens->deassert_states =3D new_deassert_states;
-> +    }
-> +
-> +    /* TODO: handle threshold sensor */
-> +    if (!IPMI_SENSOR_IS_DISCRETE(sens)) {
-> +        return;
-> +    }
-> +
-> +    switch (do_gen_event) {
-> +    case SENSOR_GEN_EVENT_DATA: {
-> +        unsigned int bit =3D evd1 & 0xf;
-> +        uint16_t mask =3D (1 << bit);
-> +
-> +        if (sens->assert_states & mask & sens->assert_enable) {
-> +            gen_event(ibs, cmd[2], 0, evd1, evd2, evd3);
-> +        }
-> +
-> +        if (sens->deassert_states & mask & sens->deassert_enable) {
-> +            gen_event(ibs, cmd[2], 1, evd1, evd2, evd3);
-> +        }
-> +    }
-> +        break;
-> +    case SENSOR_GEN_EVENT_BMC:
-> +        /* TODO: generate event and event data bytes depending on the
-> +         * sensor */
-> +        break;
-> +    case SENSOR_GEN_EVENT_NONE:
-> +        break;
-> +    }
-> +}
-> =20
->  static const IPMICmdHandler chassis_cmds[] =3D {
->      [IPMI_CMD_GET_CHASSIS_CAPABILITIES] =3D { chassis_capabilities },
-> @@ -1759,6 +1971,7 @@ static const IPMICmdHandler sensor_event
->      [IPMI_CMD_GET_SENSOR_READING] =3D { get_sensor_reading, 3 },
->      [IPMI_CMD_SET_SENSOR_TYPE] =3D { set_sensor_type, 5 },
->      [IPMI_CMD_GET_SENSOR_TYPE] =3D { get_sensor_type, 3 },
-> +    [IPMI_CMD_SET_SENSOR_READING] =3D { set_sensor_reading, 5 },
->  };
->  static const IPMINetfn sensor_event_netfn =3D {
->      .cmd_nums =3D ARRAY_SIZE(sensor_event_cmds),
+Although why do you have to subtract R_MAX, shouldn't it just be an
+error if accessing values larger then R_MAX?
+
+>
+>>
+>>> +
+>>> +    switch (addr) {
+>>> +    case R_VAL:
+>>> +        r = ptimer_get_count(st->ptimer);
+>>> +        D(qemu_log("msf2_timer t=%d read counter=%x\n", timer, r));
+>>> +        break;
+>>> +
+>>> +    case R_MIS:
+>>> +        isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
+>>> +        ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+>>> +        r = ier && isr;
+>>> +        break;
+>>> +
+>>> +    default:
+>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>> +            r = st->regs[addr];
+>>> +        }
+>>> +        break;
+>>> +    }
+>>> +    D(fprintf(stderr, "%s timer=%d %x=%x\n", __func__, timer, addr * 4, r));
+>>> +    return r;
+>>> +}
+>>> +
+>>> +static void timer_update(struct msf2_timer *st)
+>>> +{
+>>> +    uint64_t count;
+>>> +
+>>> +    D(fprintf(stderr, "%s timer=%d\n", __func__, st->nr));
+>>> +
+>>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ENBL)) {
+>>> +        ptimer_stop(st->ptimer);
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    count = st->regs[R_LOADVAL];
+>>> +    ptimer_set_limit(st->ptimer, count, 1);
+>>> +    ptimer_run(st->ptimer, 1);
+>>> +}
+>>
+>> The update function should be above the read/write functions.
+>>
+> Ok I will change
+>
+>>> +
+>>> +static void
+>>> +timer_write(void *opaque, hwaddr addr,
+>>> +            uint64_t val64, unsigned int size)
+>>> +{
+>>> +    struct timerblock *t = opaque;
+>>> +    struct msf2_timer *st;
+>>> +    unsigned int timer;
+>>> +    uint32_t value = val64;
+>>> +
+>>> +    addr >>= 2;
+>>> +    timer = timer_from_addr(addr);
+>>> +    st = &t->timers[timer];
+>>> +    D(fprintf(stderr, "%s addr=%x val=%x (timer=%d)\n",
+>>> +             __func__, addr * 4, value, timer));
+>>> +
+>>> +    if (timer) {
+>>> +        addr -= 6;
+>>> +    }
+>>
+>> Same comment from the read function.
+>>
+>>> +
+>>> +    switch (addr) {
+>>> +    case R_CTRL:
+>>> +        st->regs[R_CTRL] = value;
+>>> +        timer_update(st);
+>>> +        break;
+>>> +
+>>> +    case R_RIS:
+>>> +        if (value & TIMER_RIS_ACK) {
+>>> +            st->regs[R_RIS] &= ~TIMER_RIS_ACK;
+>>> +        }
+>>> +        break;
+>>> +
+>>> +    case R_LOADVAL:
+>>> +        st->regs[R_LOADVAL] = value;
+>>> +        if (st->regs[R_CTRL] & TIMER_CTRL_ENBL) {
+>>> +            timer_update(st);
+>>> +        }
+>>> +        break;
+>>> +
+>>> +    case R_BGLOADVAL:
+>>> +        st->regs[R_BGLOADVAL] = value;
+>>> +        st->regs[R_LOADVAL] = value;
+>>> +        break;
+>>> +
+>>> +    case R_VAL:
+>>> +    case R_MIS:
+>>> +        break;
+>>> +
+>>> +    default:
+>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>> +            st->regs[addr] = value;
+>>> +        }
+>>> +        break;
+>>> +    }
+>>> +    timer_update_irq(st);
+>>> +}
+>>> +
+>>> +static const MemoryRegionOps timer_ops = {
+>>> +    .read = timer_read,
+>>> +    .write = timer_write,
+>>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>>> +    .valid = {
+>>> +        .min_access_size = 4,
+>>> +        .max_access_size = 4
+>>> +    }
+>>> +};
+>>> +
+>>> +static void timer_hit(void *opaque)
+>>> +{
+>>> +    struct msf2_timer *st = opaque;
+>>> +    D(fprintf(stderr, "%s %d\n", __func__, st->nr));
+>>> +    st->regs[R_RIS] |= TIMER_RIS_ACK;
+>>> +
+>>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ONESHOT)) {
+>>> +        timer_update(st);
+>>> +    }
+>>> +    timer_update_irq(st);
+>>> +}
+>>> +
+>>> +static void msf2_timer_realize(DeviceState *dev, Error **errp)
+>>> +{
+>>> +    struct timerblock *t = MSF2_TIMER(dev);
+>>> +    unsigned int i;
+>>> +
+>>> +    /* Init all the ptimers.  */
+>>> +    t->timers = g_malloc0((sizeof t->timers[0]) * NUM_TIMERS);
+>>> +    for (i = 0; i < NUM_TIMERS; i++) {
+>>> +        struct msf2_timer *st = &t->timers[i];
+>>> +
+>>> +        st->parent = t;
+>>> +        st->nr = i;
+>>> +        st->bh = qemu_bh_new(timer_hit, st);
+>>> +        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
+>>> +        ptimer_set_freq(st->ptimer, t->freq_hz);
+>>> +        sysbus_init_irq(SYS_BUS_DEVICE(dev), &st->irq);
+>>> +    }
+>>> +
+>>> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, "msf2-timer",
+>>> +                          R_MAX * 4 * NUM_TIMERS);
+>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &t->mmio);
+>>
+>> This should be in the devices init() function.
+>
+> I referred Xilinx soft IP models for writing these models and used
+> same boilerplate code.
+> I am not clear about realize and init functions yet. Can you please
+> give a brief about them.
+
+Basically the simple explanation is that init is called when the
+object is created and realize is called when the object is realized.
+
+Generally for devices it will go something like this:
+ 1. init
+ 2. Set properties
+ 3. Connect things
+ 4. realize
+ 5. Map to memory
+
+> Don't we need to use realize function for new models?
+
+AFAIK we still put things like: sysbus_init_irq(),
+memory_region_init_io() and sysbus_init_mmio() in the init function.
+
+I don't think we are at a stage yet to not use init functions.
+
+Thanks,
+
+Alistair
+
+>
+> Thanks,
+> Sundeep
+>>
+>> Thanks,
+>>
+>> Alistair
+>>
+>>> +}
+>>> +
+>>> +static Property msf2_timer_properties[] = {
+>>> +    DEFINE_PROP_UINT32("clock-frequency", struct timerblock, freq_hz,
+>>> +                                                                83 * 1000000),
+>>> +    DEFINE_PROP_END_OF_LIST(),
+>>> +};
+>>> +
+>>> +static void msf2_timer_class_init(ObjectClass *klass, void *data)
+>>> +{
+>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>> +
+>>> +    dc->realize = msf2_timer_realize;
+>>> +    dc->props = msf2_timer_properties;
+>>> +}
+>>> +
+>>> +static const TypeInfo msf2_timer_info = {
+>>> +    .name          = TYPE_MSF2_TIMER,
+>>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>>> +    .instance_size = sizeof(struct timerblock),
+>>> +    .class_init    = msf2_timer_class_init,
+>>> +};
+>>> +
+>>> +static void msf2_timer_register_types(void)
+>>> +{
+>>> +    type_register_static(&msf2_timer_info);
+>>> +}
+>>> +
+>>> +type_init(msf2_timer_register_types)
+>>> --
+>>> 2.5.0
+>>>
+>>>
