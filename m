@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d2eDR-00058l-Ar
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:39:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d2eNI-00075Q-4r
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d2eDQ-0000aO-Fc
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:39:45 -0400
-Date: Mon, 24 Apr 2017 15:39:33 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170424133933.GF4739@noname.redhat.com>
-References: <20170421035606.448-1-famz@redhat.com>
-	<20170421035606.448-20-famz@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1d2eNG-0003n1-Qd
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:49:56 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38135)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d2eNE-0003mf-2M
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:49:52 -0400
+Received: by mail-wm0-x232.google.com with SMTP id r190so68443506wme.1
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 06:49:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170421035606.448-20-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v14 19/20] file-posix: Add image locking in
- perm operations
+In-Reply-To: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
+References: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 24 Apr 2017 14:49:30 +0100
+Message-ID: <CAFEAcA_9Du7_=-q2uGBKYporAQ+v8G9nGJNrcwJ1FCZ=OO8Hrw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/8] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Am 21.04.2017 um 05:56 hat Fam Zheng geschrieben:
-> virtlockd in libvirt locks the first byte, so we start looking at the
-> file bytes from 0x10.
-> 
-> The complication is in the transactional interface.  To make the reopen
-> logic managable, and allow better reuse, the code is internally
-> organized with a table from old mode to the new one.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/file-posix.c | 739 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 736 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 2114720..c307493 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -129,8 +129,54 @@ do { \
->  
->  #define MAX_BLOCKSIZE	4096
->  
-> +/* Posix file locking bytes. Libvirt takes byte 0, we start from byte 0x10,
-> + * leaving a few more bytes for its future use. */
-> +#define RAW_LOCK_BYTE_MIN             0x10
-> +#define RAW_LOCK_BYTE_NO_OTHER_WRITER 0x10
-> +#define RAW_LOCK_BYTE_WRITE           0x11
-> +#ifdef F_OFD_SETLK
-> +#define RAW_LOCK_SUPPORTED 1
-> +#else
-> +#define RAW_LOCK_SUPPORTED 0
-> +#endif
-> +
-> +/*
-> + ** reader that can tolerate writers: Don't do anything
-> + *
-> + ** reader that can't tolerate writers: Take shared lock on byte 0x10. Test
-> + *  byte 0x11 is unlocked.
-> + *
-> + ** shared writer: Take shared lock on byte 0x11. Test byte 0x10 is unlocked.
-> + *
-> + ** exclusive writer: Take exclusive locks on both bytes.
-> + */
+On 24 April 2017 at 06:15, Jason Wang <jasowang@redhat.com> wrote:
+> The following changes since commit 32c7e0ab755745e961f1772e95cac381cc68769d:
+>
+>   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170421' into staging (2017-04-21 15:59:27 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 049f6d8237dd0b14dee02e4c22b20114c43cecff:
+>
+>   COLO-compare: Optimize tcp compare trace event (2017-04-24 11:30:36 +0800)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
-There are few things that made this patch basically degenerate into a
-ton of special cases, the most important of them being that we thought
-that we'd need acquire exclusive locks to avoid races and that read-only
-file descriptors can't take an exclusive lock and therefore can't test
-whether anyone else is holding a shared lock on the file descriptor.
+Hi. Clang picks up what looks like a typo:
 
-After looking a bit more into this and discussing it on IRC with Fam who
-found the last missing puzzle piece, it turned out that while it's true
-that F_OFD_SETLK for an exclusive lock doesn't work for read-only FDs,
-in fact F_OFD_GETLK (which tests if a lock could be set) does work, so
-we can use it to check whether anyone else is holding a shared lock.
+/Users/pm215/src/qemu-for-merges/hw/net/ftgmac100.c:809:33: error: use
+of logical '&&' with constant operand
+[-Werror,-Wconstant-logical-operand]
+    if (size < 64 && !(s->maccr && FTGMAC100_MACCR_RX_RUNT)) {
+                                ^  ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/pm215/src/qemu-for-merges/hw/net/ftgmac100.c:809:33: note: use
+'&' for a bitwise operation
+    if (size < 64 && !(s->maccr && FTGMAC100_MACCR_RX_RUNT)) {
+                                ^~
+                                &
+/Users/pm215/src/qemu-for-merges/hw/net/ftgmac100.c:809:33: note:
+remove constant to silence this warning
+    if (size < 64 && !(s->maccr && FTGMAC100_MACCR_RX_RUNT)) {
+                               ~^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
 
-We also never need to actually acquire any exclusive locks, just
-acquiring shared locks everywhere and testing whether we could set
-exclusive locks is enough for our needs. Both of these operations work
-fine with read-only FDs.
 
-With these observations, it should be easy to even map _all_ 64 bits of
-perm and ~shared to file locks. I think the algorithm looks roughly like
-this:
-
-1. Acquire shared @perm locks for (old_perm | new_perm)
-2. Acquire shared @~shared locks for (~old_shared | ~new_shared)
-3. Test that nobody else holds @perm locks for ~new_shared
-4. Test that nobody else holds @~shared locks for new_perm
-5. Drop @perm locks for (old_perm & ~new_perm)
-6. Drop @~shared locks for (~old_shared & new_shared)
-
-Having one universal algorithm for all state transitions allows us to
-greatly simplify the code in this patch.
-
-Kevin
+thanks
+-- PMM
