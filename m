@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TI9-0001UC-PI
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIF-0001bM-C2
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TI8-0003PJ-FW
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:53 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIE-0003Tf-1w
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:59 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:58:57 +1000
-Message-Id: <20170424015927.8933-18-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:59:12 +1000
+Message-Id: <20170424015927.8933-33-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/47] ppc/xics: introduce an 'intc' backlink
- under PowerPCCPU
+Subject: [Qemu-devel] [PULL 32/47] ipmi: introduce an ipmi_bmc_sdr_find() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,184 +27,63 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Today, the ICPState array of the sPAPR machine is indexed with
-'cpu_index' of the CPUState. This numbering of CPUs is internal to
-QEMU and the guest only knows about what is exposed in the device
-tree, that is the 'cpu_dt_id'. This is why sPAPR uses the helper
-xics_get_cpu_index_by_dt_id() to do the mapping in a couple of places.
+This patch exposes a new IPMI routine to query a sdr entry from the
+sdr table maintained by the IPMI BMC simulator. The API is very
+similar to the internal sdr_find_entry() routine and should be used
+the same way to query one or all sdrs.
 
-To provide a more generic XICS layer, we need to abstract the IRQ
-'server' number and remove any assumption made on its nature. It
-should not be used as a 'cpu_index' for lookups like xics_cpu_setup()
-and xics_cpu_destroy() do.
-
-To reach that goal, we choose to introduce a generic 'intc' backlink
-under PowerPCCPU, and let the machine core init routine do the
-ICPState lookup. The resulting object is passed on to xics_cpu_setup()
-which does the store under PowerPCCPU. The IRQ 'server' number in XICS
-is now generic. sPAPR uses 'cpu_dt_id' and PowerNV will use 'PIR'
-number.
-
-This also has the benefit of simplifying the sPAPR hcall routines
-which do not need to do any ICPState lookups anymore.
+A typical use would be to loop on the sdrs to build nodes of a device
+tree.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Acked-by: Corey Minyard <cminyard@mvista.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c          |  6 +++---
- hw/intc/xics_spapr.c    | 20 +++++---------------
- hw/ppc/spapr_cpu_core.c |  4 +++-
- include/hw/ppc/xics.h   |  2 +-
- target/ppc/cpu.h        |  1 +
- 5 files changed, 13 insertions(+), 20 deletions(-)
+ hw/ipmi/ipmi_bmc_sim.c | 16 ++++++++++++++++
+ include/hw/ipmi/ipmi.h |  2 ++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index e740989..56fe70c 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -52,7 +52,7 @@ int xics_get_cpu_index_by_dt_id(int cpu_dt_id)
- void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
- {
-     CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
-+    ICPState *icp =3D ICP(cpu->intc);
-=20
-     assert(icp);
-     assert(cs =3D=3D icp->cs);
-@@ -61,15 +61,15 @@ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu=
-)
-     icp->cs =3D NULL;
+diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+index eae7b2d..8185a84 100644
+--- a/hw/ipmi/ipmi_bmc_sim.c
++++ b/hw/ipmi/ipmi_bmc_sim.c
+@@ -416,6 +416,22 @@ static int sdr_find_entry(IPMISdr *sdr, uint16_t rec=
+id,
+     return 1;
  }
 =20
--void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu)
-+void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
++int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
++                      const struct ipmi_sdr_compact **sdr, uint16_t *nex=
+trec)
++
++{
++    IPMIBmcSim *ibs =3D IPMI_BMC_SIMULATOR(b);
++    unsigned int pos;
++
++    pos =3D 0;
++    if (sdr_find_entry(&ibs->sdr, recid, &pos, nextrec)) {
++        return -1;
++    }
++
++    *sdr =3D (const struct ipmi_sdr_compact *) &ibs->sdr.sdr[pos];
++    return 0;
++}
++
+ static void sel_inc_reservation(IPMISel *sel)
  {
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
--    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
-     ICPStateClass *icpc;
+     sel->reservation++;
+diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
+index 91b83b5..0d36cfc 100644
+--- a/include/hw/ipmi/ipmi.h
++++ b/include/hw/ipmi/ipmi.h
+@@ -259,4 +259,6 @@ struct ipmi_sdr_compact {
 =20
-     assert(icp);
+ typedef uint8_t ipmi_sdr_compact_buffer[sizeof(struct ipmi_sdr_compact)]=
+;
 =20
-+    cpu->intc =3D OBJECT(icp);
-     icp->cs =3D cs;
-=20
-     icpc =3D ICP_GET_CLASS(icp);
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 84d24b2..58f100d 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -43,11 +43,9 @@
- static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
-     target_ulong cppr =3D args[0];
-=20
--    icp_set_cppr(icp, cppr);
-+    icp_set_cppr(ICP(cpu->intc), cppr);
-     return H_SUCCESS;
- }
-=20
-@@ -69,9 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
- static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
--    uint32_t xirr =3D icp_accept(icp);
-+    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
-=20
-     args[0] =3D xirr;
-     return H_SUCCESS;
-@@ -80,9 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
- static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                              target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
--    uint32_t xirr =3D icp_accept(icp);
-+    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
-=20
-     args[0] =3D xirr;
-     args[1] =3D cpu_get_host_ticks();
-@@ -92,21 +86,17 @@ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMa=
-chineState *spapr,
- static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                           target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
-     target_ulong xirr =3D args[0];
-=20
--    icp_eoi(icp, xirr);
-+    icp_eoi(ICP(cpu->intc), xirr);
-     return H_SUCCESS;
- }
-=20
- static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                             target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
-     uint32_t mfrr;
--    uint32_t xirr =3D icp_ipoll(icp, &mfrr);
-+    uint32_t xirr =3D icp_ipoll(ICP(cpu->intc), &mfrr);
-=20
-     args[0] =3D xirr;
-     args[1] =3D mfrr;
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 6883f09..7db61bd 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -63,6 +63,8 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
-werPCCPU *cpu,
-                            Error **errp)
- {
-     CPUPPCState *env =3D &cpu->env;
-+    XICSFabric *xi =3D XICS_FABRIC(spapr);
-+    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
-=20
-     /* Set time-base frequency to 512 MHz */
-     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
-@@ -80,7 +82,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
-werPCCPU *cpu,
-         }
-     }
-=20
--    xics_cpu_setup(XICS_FABRIC(spapr), cpu);
-+    xics_cpu_setup(xi, cpu, icp);
-=20
-     qemu_register_reset(spapr_cpu_reset, cpu);
-     spapr_cpu_reset(cpu);
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index ce23018..b97d30b 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -168,7 +168,7 @@ void spapr_dt_xics(int nr_servers, void *fdt, uint32_=
-t phandle);
-=20
- qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
- ICPState *xics_icp_get(XICSFabric *xi, int server);
--void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu);
-+void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
- void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
-=20
- /* Internal XICS interfaces */
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index cacdd0a..e0ff041 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1200,6 +1200,7 @@ struct PowerPCCPU {
-     uint32_t max_compat;
-     uint32_t compat_pvr;
-     PPCVirtualHypervisor *vhyp;
-+    Object *intc;
-=20
-     /* Fields related to migration compatibility hacks */
-     bool pre_2_8_migration;
++int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
++                      const struct ipmi_sdr_compact **sdr, uint16_t *nex=
+trec);
+ #endif
 --=20
 2.9.3
