@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2iGb-00088w-II
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:59:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d2iKq-0000eZ-T8
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:03:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2iGa-0001Mu-Kc
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:59:17 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:34893)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d2iGa-0001MP-De
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:59:16 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id w64so3488531wma.0
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 10:59:16 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1d2iKn-0003vj-Fl
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:03:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48072)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d2iKn-0003ui-6x
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 14:03:37 -0400
+Date: Mon, 24 Apr 2017 19:03:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170424180332.GP2362@work-vm>
+References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170414131741eucas1p2f34e11e4292fef1c50ef63bd3522ad04@eucas1p2.samsung.com>
+	<1492175840-5021-7-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
-References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
-	<1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
-	<CAKmqyKMW-aTdzvTH5sir1BPx6U9XtgiZZ7TVigooXLFMY=UEQg@mail.gmail.com>
-	<CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
-	<CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Apr 2017 18:58:54 +0100
-Message-ID: <CAFEAcA_PuC_B6GqL0n==SDZooQj9FtviHK3XixHd=m0Twmfp+A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 1/4] msf2: Add Smartfusion2
- System timer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1492175840-5021-7-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH 6/6] migration: detailed traces for postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +28,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: sundeep subbaraya <sundeep.lkml@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com
 
-On 24 April 2017 at 18:44, Alistair Francis <alistair23@gmail.com> wrote:
-> Basically the simple explanation is that init is called when the
-> object is created and realize is called when the object is realized.
->
-> Generally for devices it will go something like this:
->  1. init
->  2. Set properties
->  3. Connect things
->  4. realize
->  5. Map to memory
->
->> Don't we need to use realize function for new models?
->
-> AFAIK we still put things like: sysbus_init_irq(),
-> memory_region_init_io() and sysbus_init_mmio() in the init function.
->
-> I don't think we are at a stage yet to not use init functions.
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> It could help to track down vCPU state during page fault and
+> page fault sources.
+> 
+> This patch showes proc's status/stack/syscall file at the moment of pagefault,
+> it's very interesting to know who was page fault initiator.
 
-Two-phase init is here to stay -- some things must be done in
-init, some must be done in realize, and some can be done in
-either. Some simple devices may find they can do everything
-in only one function.
+This is a LOT of debug code, almost none of it is postcopy specific,
+so probably a question for generic tracing code; but I'll admit to
+not being happy about the idea of putting this much code in for
+this type of dumping; when it gets this desperate we just normally do
+a special build.
 
-Must be done in init:
- * creating properties (for the cases where that is done "by hand"
-   by calling object_property_add_*())
- * calling init on child objects which you want to pass through
-   alias properties for
+However, some specific comments as well.
 
-Must be done in realize:
- * anything that can fail such that we need to report the
-   error and abandon creation of the device
- * anything which depends on the values of QOM properties that
-   the caller might have set
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
+>  migration/postcopy-ram.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++-
+>  migration/trace-events   |  6 +++
+>  2 files changed, 103 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 42330fd..513633c 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -412,7 +412,91 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+>      return 0;
+>  }
+>  
+> -static int get_mem_fault_cpu_index(uint32_t pid)
+> +#define PROC_LEN 1024
+> +#define DEBUG_FAULT_PROCESS_STATUS 1
+> +
+> +#ifdef DEBUG_FAULT_PROCESS_STATUS
+> +
+> +static FILE *get_proc_file(const gchar *frmt, pid_t thread_id)
+> +{
+> +    FILE *f = NULL;
+> +    gchar *file_path = g_strdup_printf(frmt, thread_id);
+> +    if (file_path == NULL) {
+> +        error_report("Couldn't allocate path for %u", thread_id);
+> +        return NULL;
+> +    }
 
-We should probably sit down and write up some guidelines for
-how we recommend dealing with the various things that could
-be called in either function -- this is basically a code
-style and consistency question.
+I was going to say that I thought g_strdup_printf couldn't
+return NULL; but then I looked at the source - eww it can.
 
-thanks
--- PMM
+> +    f = fopen(file_path, "r");
+> +    if (!f) {
+> +        error_report("can't open %s", file_path);
+> +    }
+> +
+> +    trace_get_proc_file(file_path);
+> +    g_free(file_path);
+> +    return f;
+> +}
+> +
+> +typedef void(*proc_line_handler)(const char *line);
+> +
+> +static void proc_line_cb(const char *line)
+> +{
+> +    /* trace_ functions are inline */
+> +    trace_proc_line_cb(line);
+> +}
+> +
+> +static void foreach_line_in_file(FILE *f, proc_line_handler cb)
+> +{
+> +    char *line = NULL;
+> +    ssize_t read;
+> +    size_t len;
+> +
+> +    while ((read = getline(&line, &len, f)) != -1) {
+> +        /* workaround, trace_ infrastructure already insert \n
+> +         * and getline includes it */
+> +        ssize_t str_len = strlen(line) - 1;
+> +        if (str_len <= 0)
+> +            continue;
+> +        line[str_len] = '\0';
+> +        cb(line);
+> +    }
+> +    free(line);
+> +}
+> +
+> +static void observe_thread_proc(const gchar *path_frmt, pid_t thread_id)
+> +{
+> +    FILE *f = get_proc_file(path_frmt, thread_id);
+> +    if (!f) {
+> +        error_report("can't read thread's proc");
+> +        return;
+> +    }
+> +
+> +    foreach_line_in_file(f, proc_line_cb);
+
+> +    fclose(f);
+> +}
+> +
+> +/*
+> + * for convinience tracing need to trace
+> + * observe_thread_begin
+> + * get_proc_file
+> + * proc_line_cb
+> + * observe_thread_end
+> + */
+> +static void observe_thread(const char *msg, pid_t thread_id)
+> +{
+> +    trace_observe_thread_begin(msg);
+> +    observe_thread_proc("/proc/%d/status", thread_id);
+> +    observe_thread_proc("/proc/%d/syscall", thread_id);
+> +    observe_thread_proc("/proc/%d/stack", thread_id);
+
+You could wrap that in something like:
+  if (TRACE_PROC_LINE_CB_ENABLED) {
+
+so it doesn't read all of the files and do all the allocation
+to get to the point it realised no one cared.
+
+Dave
+
+> +    trace_observe_thread_end(msg);
+> +}
+> +
+> +#else
+> +static void observe_thread(const char *msg, pid_t thread_id)
+> +{
+> +}
+> +
+> +#endif /* DEBUG_FAULT_PROCESS_STATUS */
+> +
+> +static int get_mem_fault_cpu_index(pid_t pid)
+>  {
+>      CPUState *cpu_iter;
+>  
+> @@ -421,9 +505,20 @@ static int get_mem_fault_cpu_index(uint32_t pid)
+>             return cpu_iter->cpu_index;
+>      }
+>      trace_get_mem_fault_cpu_index(pid);
+> +    observe_thread("not a vCPU", pid);
+> +
+>      return -1;
+>  }
+>  
+> +static void observe_vcpu_state(void)
+> +{
+> +    CPUState *cpu_iter;
+> +    CPU_FOREACH(cpu_iter) {
+> +        observe_thread("vCPU", cpu_iter->thread_id);
+> +        trace_vcpu_state(cpu_iter->running, cpu_iter->cpu_index);
+> +    }
+> +}
+> +
+>  /*
+>   * Handle faults detected by the USERFAULT markings
+>   */
+> @@ -465,6 +560,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>          }
+>  
+>          ret = read(mis->userfault_fd, &msg, sizeof(msg));
+> +        observe_vcpu_state();
+>          if (ret != sizeof(msg)) {
+>              if (errno == EAGAIN) {
+>                  /*
+> diff --git a/migration/trace-events b/migration/trace-events
+> index ab2e1e4..3a74f91 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -202,6 +202,12 @@ save_xbzrle_page_overflow(void) ""
+>  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+>  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
+>  get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
+> +observe_thread_status(int ptid, char *name, char *status) "host_tid %d %s %s"
+> +vcpu_state(int cpu_index, int is_running) "cpu %d running %d"
+> +proc_line_cb(const char *str) "%s"
+> +get_proc_file(const char *str) "opened %s"
+> +observe_thread_begin(const char *str) "%s"
+> +observe_thread_end(const char *str) "%s"
+>  
+>  # migration/exec.c
+>  migration_exec_outgoing(const char *cmd) "cmd=%s"
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
