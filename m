@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yigal@plexistor.com>) id 1d2XIz-0000Xo-EE
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:17:02 -0400
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2XSh-0001gr-EJ
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:27:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yigal@plexistor.com>) id 1d2XIy-0004ev-F3
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:17:01 -0400
-Received: from mail-qk0-x229.google.com ([2607:f8b0:400d:c09::229]:36095)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <yigal@plexistor.com>) id 1d2XIy-0004eV-8r
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:17:00 -0400
-Received: by mail-qk0-x229.google.com with SMTP id u75so11917176qka.3
-	for <qemu-devel@nongnu.org>; Sun, 23 Apr 2017 23:16:58 -0700 (PDT)
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2XSe-0007jC-A7
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:27:03 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3517
+	helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2XSd-0007fE-NG
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:27:00 -0400
+From: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Date: Mon, 24 Apr 2017 06:26:27 +0000
+Message-ID: <EC9759BC1E3E98429B5DE9A03DF86D8B59D1084B@DGGEML503-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-From: Yigal Korman <yigal@plexistor.com>
-Date: Mon, 24 Apr 2017 09:16:37 +0300
-Message-ID: <CACTTzNbu0NwXBw+Jj=8L2Nw+SBA3jLQ1-WDSa6-TgBuZwHj4ZQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] qemu-kvm hangs with DAX
+Subject: [Qemu-devel] [BUG] Migrate failes between boards with different PMC
+ counts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-fsdevel <linux-fsdevel@vger.kernel.org>, kvm@vger.kernel.org, qemu-devel@nongnu.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: Dan Williams <dan.j.williams@intel.com>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is a re-post, I didn't send it to all relevant mailing lists before...
-
-Original below.
-
-Hi everyone,
-
-I have an interesting issue with DAX and KVM - I'm trying to boot a VM
-with its memory mapped to a DAX-mounted file (kernel 4.9).
-
-The use case is a bit wacky but I'm trying to recreate something
-similar to what clearlinux[1] described (although they don't use this
-method anymore).
-
-When mapping the memory to a regular ext4 file, the VM boots fine.
-But when mapping to ext4+dax, the VM won't boot or perhaps boots
-extremely slowly.
-In both cases the FS is on a memory pmem device.
-
-Here's a snippet of how I load things:
-
-mkfs.ext4 /dev/pmem0
-mount /dev/pmem0 /mnt
-fallocate -l 512M /mnt/mem
-qemu-system-x86_64 -nodefconfig -nodefaults \
- -drive if=virtio,file=centos7.qcow2,index=0,media=disk \
- --enable-kvm -serial telnet:localhost:4443,server,nowait \
- -device sga -m 512 -smp 1,sockets=1,cores=1,threads=1 \
- -object memory-backend-file,prealloc=yes,mem-path=/mnt/mem,share=on,size=512M,id=ram
-\
- -numa node,nodeid=0,cpus=0,memdev=ram \
- -net nic,model=virtio,vlan=0 \
- -net user,vlan=0,hostname=vm,hostfwd=tcp:127.0.0.1:8001-:22 \
- -name test -monitor telnet:localhost:4444,server,nowait
-
-I use a headless host so I usually connect to the VM with 'telnet
-localhost 4443'.
-
-The above works and the VM boots in seconds.
-When adding '-o dax' to the mount command, I can catch the grub menu
-during boot but it gets stuck.
-Sometimes if I wait about 20 minutes, I see some kernel boot messages
-appear, but no errors.
-
-I've already tried something Dan Williams suggested - using 'dd'
-instead of 'fallocate', but it didn't seem to help.
-
-Also tried profiling the first 30s of qemu boot with 'perf stat' -
-doesn't seem any clearer to me but here are the results:
-
-for ext4 w/o DAX:
-
-       4804.688402      task-clock (msec)         #    0.160 CPUs
-utilized
-            22,389      context-switches          #    0.005 M/sec
-               144      cpu-migrations            #    0.030 K/sec
-           158,611      page-faults               #    0.033 M/sec
-     7,537,184,564      cycles                    #    1.569 GHz
-     8,034,998,998      instructions              #    1.07  insn per
-cycle
-     1,612,266,593      branches                  #  335.561 M/sec
-         8,574,733      branch-misses             #    0.53% of all
-branches
-
-for ext4 w/ DAX:
-
-      30001.643354      task-clock (msec)         #    1.000 CPUs
-utilized
-               584      context-switches          #    0.019 K/sec
-                12      cpu-migrations            #    0.000 K/sec
-           274,575      page-faults               #    0.009 M/sec
-     2,131,506,685      cycles                    #    0.071 GHz
-     2,252,004,361      instructions              #    1.06  insn per
-cycle
-       439,086,052      branches                  #   14.635 M/sec
-         2,663,760      branch-misses             #    0.61% of all
-branches
-
-Seems like w/o DAX, the boot will complete in seconds and the CPU will
-remain idle and w/ DAX the CPU is working very hard and there much
-more page-faults.
-
-Any thoughts?
-
-Regards,
-Yigal
+SGkgYWxsLA0KDQpSZWNlbnRseSwgSSBmb3VuZCBtaWdyYXRpb24gZmFpbGVkIHdoZW4gZW5hYmxl
+IHZQTVUuDQoNCm1pZ3JhdGUgdlBNVSBzdGF0ZSB3YXMgaW50cm9kdWNlZCBpbiBsaW51eC0zLjEw
+ICsgcWVtdS0xLjcuDQoNCkFzIGxvbmcgYXMgZW5hYmxlIHZQTVUsIHFlbXUgd2lsbCBzYXZlIC8g
+bG9hZCB0aGUNCnZtc3RhdGVfbXNyX2FyY2hpdGVjdHVyYWxfcG11KG1zcl9nbG9iYWxfY3RybCkg
+cmVnaXN0ZXIgZHVyaW5nIHRoZSBtaWdyYXRpb24uDQpCdXQgZ2xvYmFsX2N0cmwgZ2VuZXJhdGVk
+IGJhc2VkIG9uIGNwdWlkKDB4QSksIHRoZSBudW1iZXIgb2YgZ2VuZXJhbC1wdXJwb3NlIHBlcmZv
+cm1hbmNlDQptb25pdG9yaW5nIGNvdW50ZXJzKFBNQykgY2FuIHZhcnkgYWNjb3JkaW5nIHRvIElu
+dGVsIFNETi4gVGhlIG51bWJlciBvZiBQTUMgcHJlc2VudGVkDQp0byB2bSwgZG9lcyBub3Qgc3Vw
+cG9ydCBjb25maWd1cmF0aW9uIGN1cnJlbnRseSwgaXQgZGVwZW5kIG9uIGhvc3QgY3B1aWQsIGFu
+ZCBlbmFibGUgYWxsIHBtYw0KZGVmYXVsdGx5IGF0IEtWTS4gSXQgY2F1c2UgbWlncmF0aW9uIHRv
+IGZhaWwgYmV0d2VlbiBib2FyZHMgd2l0aCBkaWZmZXJlbnQgUE1DIGNvdW50cy4NCg0KVGhlIHJl
+dHVybiB2YWx1ZSBvZiBjcHVpZCAoMHhBKSBpcyBkaWZmZXJlbnQgZHVyIHRvIGNwdSwgYWNjb3Jk
+aW5nIHRvIEludGVsIFNETqOsMTgtMTAgVm9sLiAzQjoNCg0KTm90ZTogVGhlIG51bWJlciBvZiBn
+ZW5lcmFsLXB1cnBvc2UgcGVyZm9ybWFuY2UgbW9uaXRvcmluZyBjb3VudGVycyAoaS5lLiBOIGlu
+IEZpZ3VyZSAxOC05KQ0KY2FuIHZhcnkgYWNyb3NzIHByb2Nlc3NvciBnZW5lcmF0aW9ucyB3aXRo
+aW4gYSBwcm9jZXNzb3IgZmFtaWx5LCBhY3Jvc3MgcHJvY2Vzc29yIGZhbWlsaWVzLCBvcg0KY291
+bGQgYmUgZGlmZmVyZW50IGRlcGVuZGluZyBvbiB0aGUgY29uZmlndXJhdGlvbiBjaG9zZW4gYXQg
+Ym9vdCB0aW1lIGluIHRoZSBCSU9TIHJlZ2FyZGluZw0KSW50ZWwgSHlwZXIgVGhyZWFkaW5nIFRl
+Y2hub2xvZ3ksIChlLmcuIE49MiBmb3IgNDUgbm0gSW50ZWwgQXRvbSBwcm9jZXNzb3JzOyBOID00
+IGZvciBwcm9jZXNzb3JzDQpiYXNlZCBvbiB0aGUgTmVoYWxlbSBtaWNyb2FyY2hpdGVjdHVyZTsg
+Zm9yIHByb2Nlc3NvcnMgYmFzZWQgb24gdGhlIFNhbmR5IEJyaWRnZQ0KbWljcm9hcmNoaXRlY3R1
+cmUsIE4gPSA0IGlmIEludGVsIEh5cGVyIFRocmVhZGluZyBUZWNobm9sb2d5IGlzIGFjdGl2ZSBh
+bmQgTj04IGlmIG5vdCBhY3RpdmUpLg0KDQpBbHNvIEkgZm91bmQsIE49OCBpZiBIVCBpcyBub3Qg
+YWN0aXZlIGJhc2VkIG9uIHRoZSBicm9hZHdlbGyjrCwNCnN1Y2ggYXMgQ1BVIEU3LTg4OTAgdjQg
+QCAyLjIwR0h6ICAgDQoNCiMgLi94ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS14ODZfNjQgLS1l
+bmFibGUta3ZtIC1zbXAgNCAtbSA0MDk2IC1oZGENCi9kYXRhL3p5eS90ZXN0X3FlbXUuaW1nLnNs
+ZXMxMnNwMSAtdm5jIDo5OSAtY3B1IGt2bTY0LHBtdT10cnVlIC1pbmNvbWluZyB0Y3A6Ojg4ODgN
+CkNvbXBsZXRlZCAxMDAgJQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiBlcnJvcjogZmFpbGVkIHRvIHNl
+dCBNU1IgMHgzOGYgdG8gMHg3MDAwMDAwZmYNCnFlbXUtc3lzdGVtLXg4Nl82NDogL2RhdGEvenl5
+L2dpdC90ZXN0L3FlbXUvdGFyZ2V0L2kzODYva3ZtLmM6MTgzMzoga3ZtX3B1dF9tc3JzOiANCkFz
+c2VydGlvbiBgcmV0ID09IGNwdS0+a3ZtX21zcl9idWYtPm5tc3JzJyBmYWlsZWQuDQpBYm9ydGVk
+DQoNClNvIG1ha2UgbnVtYmVyIG9mIHBtYyBjb25maWd1cmFibGUgdG8gdm0gPyBBbnkgYmV0dGVy
+IGlkZWEgPw0KDQoNClJlZ2FyZHMsDQotWmh1YW5nIFlhbnlpbmcNCg==
