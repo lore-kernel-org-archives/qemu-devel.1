@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIM-0001h8-Ne
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TII-0001dh-Le
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIL-0003aV-N8
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIH-0003W5-DV
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:02 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:59:25 +1000
-Message-Id: <20170424015927.8933-46-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:59:23 +1000
+Message-Id: <20170424015927.8933-44-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 45/47] target/ppc: Flush TLB on write to PIDR
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 43/47] ppc/pnv: generate an OEM SEL event on
+ shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,88 +24,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The PIDR (process id register) is used to store the id of the currently
-running process, which is used to select the process table entry used to
-perform address translation. This means that when we write to this register
-all the translations in the TLB become outdated as they are for a
-previously running process. Thus when this register is written to we need
-to invalidate the TLB entries to ensure stale entries aren't used to
-to perform translation for the new process, which would result in at best
-segfaults or alternatively just random memory being accessed.
+OpenPOWER systems expect to be notified with such an event before a
+shutdown or a reboot. An OEM SEL message is sent with specific
+identifiers and a user data containing the request : OFF or REBOOT.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-[dwg: Fixed compile error for 32-bit targets]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/helper.h         |  1 +
- target/ppc/misc_helper.c    |  8 ++++++++
- target/ppc/translate_init.c | 10 ++++++++--
- 3 files changed, 17 insertions(+), 2 deletions(-)
+ hw/ppc/pnv.c         | 14 ++++++++++++++
+ hw/ppc/pnv_bmc.c     | 41 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/pnv.h |  2 ++
+ 3 files changed, 57 insertions(+)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 6d77661..bb6a94a 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -709,6 +709,7 @@ DEF_HELPER_FLAGS_1(load_601_rtcu, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_1(load_purr, TCG_CALL_NO_RWG, tl, env)
- #endif
- DEF_HELPER_2(store_sdr1, void, env, tl)
-+DEF_HELPER_2(store_pidr, void, env, tl)
- DEF_HELPER_FLAGS_2(store_tbl, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_FLAGS_2(store_tbu, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_FLAGS_2(store_atbl, TCG_CALL_NO_RWG, void, env, tl)
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index fa573dd..0e42178 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -88,6 +88,14 @@ void helper_store_sdr1(CPUPPCState *env, target_ulong val)
-     }
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 685eb12..d4bcdb0 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -485,6 +485,15 @@ static void *powernv_create_fdt(MachineState *machin=
+e)
+     return fdt;
  }
- 
-+void helper_store_pidr(CPUPPCState *env, target_ulong val)
+=20
++static void pnv_powerdown_notify(Notifier *n, void *opaque)
 +{
-+    PowerPCCPU *cpu = ppc_env_get_cpu(env);
++    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
 +
-+    env->spr[SPR_BOOKS_PID] = val;
-+    tlb_flush(CPU(cpu));
++    if (pnv->bmc) {
++        pnv_bmc_powerdown(pnv->bmc);
++    }
 +}
 +
- void helper_store_hid0_601(CPUPPCState *env, target_ulong val)
+ static void ppc_powernv_reset(void)
  {
-     target_ulong hid0;
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index aa0c44d..77e5463 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -394,8 +394,14 @@ static void spr_write_sdr1 (DisasContext *ctx, int sprn, int gprn)
-     gen_helper_store_sdr1(cpu_env, cpu_gpr[gprn]);
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+@@ -638,6 +647,11 @@ static void ppc_powernv_init(MachineState *machine)
+=20
+     /* Create an RTC ISA device too */
+     rtc_init(pnv->isa_bus, 2000, NULL);
++
++    /* OpenPOWER systems use a IPMI SEL Event message to notify the
++     * host to powerdown */
++    pnv->powerdown_notifier.notify =3D pnv_powerdown_notify;
++    qemu_register_powerdown_notifier(&pnv->powerdown_notifier);
  }
- 
--/* 64 bits PowerPC specific SPRs */
- #if defined(TARGET_PPC64)
-+/* 64 bits PowerPC specific SPRs */
-+/* PIDR */
-+static void spr_write_pidr(DisasContext *ctx, int sprn, int gprn)
+=20
+ /*
+diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+index a0820dc..7b60b4c 100644
+--- a/hw/ppc/pnv_bmc.c
++++ b/hw/ppc/pnv_bmc.c
+@@ -32,6 +32,47 @@
+ /* TODO: include definition in ipmi.h */
+ #define IPMI_SDR_FULL_TYPE 1
+=20
++/*
++ * OEM SEL Event data packet sent by BMC in response of a Read Event
++ * Message Buffer command
++ */
++typedef struct OemSel {
++    /* SEL header */
++    uint8_t id[2];
++    uint8_t type;
++    uint8_t timestamp[4];
++    uint8_t manuf_id[3];
++
++    /* OEM SEL data (6 bytes) follows */
++    uint8_t netfun;
++    uint8_t cmd;
++    uint8_t data[4];
++} OemSel;
++
++#define SOFT_OFF        0x00
++#define SOFT_REBOOT     0x01
++
++static void pnv_gen_oem_sel(IPMIBmc *bmc, uint8_t reboot)
 +{
-+    gen_helper_store_pidr(cpu_env, cpu_gpr[gprn]);
++    /* IPMI SEL Event are 16 bytes long */
++    OemSel sel =3D {
++        .id        =3D { 0x55 , 0x55 },
++        .type      =3D 0xC0, /* OEM */
++        .manuf_id  =3D { 0x0, 0x0, 0x0 },
++        .timestamp =3D { 0x0, 0x0, 0x0, 0x0 },
++        .netfun    =3D 0x3A, /* IBM */
++        .cmd       =3D 0x04, /* AMI OEM SEL Power Notification */
++        .data      =3D { reboot, 0xFF, 0xFF, 0xFF },
++    };
++
++    ipmi_bmc_gen_event(bmc, (uint8_t *) &sel, 0 /* do not log the event =
+*/);
 +}
 +
- static void spr_read_hior (DisasContext *ctx, int gprn, int sprn)
++void pnv_bmc_powerdown(IPMIBmc *bmc)
++{
++    pnv_gen_oem_sel(bmc, SOFT_OFF);
++}
++
+ void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
  {
-     tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, excp_prefix));
-@@ -8200,7 +8206,7 @@ static void gen_spr_power8_book4(CPUPPCState *env)
-                      KVM_REG_PPC_ACOP, 0);
-     spr_register_kvm(env, SPR_BOOKS_PID, "PID",
-                      SPR_NOACCESS, SPR_NOACCESS,
--                     &spr_read_generic, &spr_write_generic,
-+                     &spr_read_generic, &spr_write_pidr,
-                      KVM_REG_PPC_PID, 0);
-     spr_register_kvm(env, SPR_WORT, "WORT",
-                      SPR_NOACCESS, SPR_NOACCESS,
--- 
+     int offset;
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 02f6cf5..c1288f9 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -134,6 +134,7 @@ typedef struct PnvMachineState {
+     uint32_t     cpld_irqstate;
+=20
+     IPMIBmc      *bmc;
++    Notifier     powerdown_notifier;
+ } PnvMachineState;
+=20
+ #define PNV_FDT_ADDR          0x01000000
+@@ -143,6 +144,7 @@ typedef struct PnvMachineState {
+  * BMC helpers
+  */
+ void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
++void pnv_bmc_powerdown(IPMIBmc *bmc);
+=20
+ /*
+  * POWER8 MMIO base addresses
+--=20
 2.9.3
