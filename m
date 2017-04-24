@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1d2d6c-0007mH-2j
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:28:39 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d2d8p-0000yz-0Y
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1d2d6Y-0003HW-5D
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:28:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55912)
+	(envelope-from <kraxel@redhat.com>) id 1d2d8o-00043A-7j
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:30:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1d2d6X-0003HC-SB
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:28:34 -0400
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<5353279f68be14c63f049bc34902675290e45b1d.1487286467.git.ben@skyportsystems.com>
-	<20170220154909.4a88bfed@nial.brq.redhat.com>
-	<CAJ+F1CJ+KcBuhM8KEJtntELaZetciDWpmw9Rc00bWNFnAwJg4g@mail.gmail.com>
-	<B6E1C323-080B-4E53-8104-DFDBACE72A64@skyportsystems.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8eda513b-6a35-7d0c-e121-0f4d9f7bd436@redhat.com>
-Date: Mon, 24 Apr 2017 14:28:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <B6E1C323-080B-4E53-8104-DFDBACE72A64@skyportsystems.com>
-Content-Type: text/plain; charset=utf-8
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d2d8o-00042y-0M
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:30:54 -0400
+Message-ID: <1493037051.19018.32.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 24 Apr 2017 14:30:51 +0200
+In-Reply-To: <CAFEAcA9P9EECgmqubfN+71cYxsB5bbTddooyBfpM7=C2-6iTXw@mail.gmail.com>
+References: <20170421091632.30900-1-kraxel@redhat.com>
+	<20170421091632.30900-10-kraxel@redhat.com>
+	<alpine.BSF.2.20.1704211236100.58688@zero.eik.bme.hu>
+	<CAFEAcA9P9EECgmqubfN+71cYxsB5bbTddooyBfpM7=C2-6iTXw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 7/8] tests: Add unit tests for the VM
- Generation ID feature
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 9/9] sm501: make display updates thread safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ben Warren <ben@skyportsystems.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 04/21/17 19:59, Ben Warren wrote:
-> Hi,
+On Mo, 2017-04-24 at 13:09 +0100, Peter Maydell wrote:
+> On 21 April 2017 at 11:42, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> > On Fri, 21 Apr 2017, Gerd Hoffmann wrote:
+> >>
+> >> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> >> ---
+> >> hw/display/sm501.c | 23 ++++++-----------------
+> >> 1 file changed, 6 insertions(+), 17 deletions(-)
+> >
+> >
+> > Hold on with this please too. I have a series pending that changes this=
+.
 >=20
->> On Apr 21, 2017, at 3:14 AM, Marc-Andr=C3=A9 Lureau <marcandre.lureau@=
-gmail.com> wrote:
->>
->> Hi,
->>
->> Was this patch intentionally dropped from the series?
->>
->=20
-> Good question.  I thought the whole patch series was pulled in, but it =
-looks like this one was not.  I guess we=E2=80=99ll see what Michael has =
-to say.
+> Gerd: I've now applied Zoltan's patchset to git master, so you'll
+> want to rebase your changes on it.
 
-Unfortunately, the patch was lost due to a race condition in maintenance.
+Pull request for the first batch is just out of the door, without sm501
++ tcx + cg3 to avoid conflicts.  They will follow with the next batch,
+which then should also able to revert the temporary workaround.
 
-(1) The VMGENID unit test, added in this patch, can only succeed if the
-SeaBIOS binary bundled with QEMU contains VMGENID patches as well. When
-this v8 patch series was originally posted (Feb 16th), the SeaBIOS
-binary bundled with QEMU wasn't ready for this patch. So the patch was
-delayed / postponed.
-
-(2) For that reason, Michael sent the PULL req with the *rest* of the
-patches, on March 1st:
-
-http://mid.mail-archive.com/1488435591-17882-1-git-send-email-mst@redhat.=
-com
-
-(3) Gerd updated the SeaBIOS binary meanwhile, to a revision that
-contained Ben's matching bios patches:
-
-$ git log v2.8.0..v2.9.0 -- pc-bios/bios.bin
-
-commit 8779fccbef0c2e97fd6564ddf9f1df9fc724f2f0
-Author: Gerd Hoffmann <kraxel@redhat.com>
-Date:   Tue Feb 28 09:52:32 2017 +0100
-
-    seabios: update to 1.10.2 release
-
-    git shortlog rel-1.10.1..rel-1.10.2
-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-    Ben Warren (5):
-          QEMU DMA: Add DMA write capability
-          romfile-loader: Switch to using named structs
-          QEMU fw_cfg: Add command to write back address of file
-          QEMU fw_cfg: Add functions for accessing files by key
-          QEMU fw_cfg: Write fw_cfg back on S3 resume
-
-    Kevin O'Connor (1):
-          ps2port: Disable keyboard/mouse prior to resetting ps2 controll=
-er
-
-    Ladi Prosek (1):
-          ahci: Set upper 32-bit registers to zero
-
-    Paul Menzel (1):
-          vgasrc: Increase debug level
-
-    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-(4) In the end, the BIOS update commit, and the VMGENID v8 commits, are
-*not* in an ancestor/descandant relationship either way -- they are
-siblings:
-
-  $ git-contains 42697d88de6b 8779fccbef0c
-  42697d88de6b [42697d88de6b MAINTAINERS: Add VM Generation ID entries]
-  NEITHER CONTAINS NOR IS CONTAINED BY
-  8779fccbef0c [8779fccbef0c seabios: update to 1.10.2 release]
-
-And then the patch missed v2.9.0.
-
-
-I suggest to repost the patch now, and then maybe include it in 2.9.1
-stable.
-
-Thanks
-Laszlo
+cheers,
+  Gerd
