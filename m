@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TIA-0001VI-MB
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TID-0001YM-4j
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TI9-0003QC-Sz
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIC-0003Rf-68
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:57 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:59:03 +1000
-Message-Id: <20170424015927.8933-24-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:59:05 +1000
+Message-Id: <20170424015927.8933-26-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 23/47] ppc/pnv: extend the machine with a
- InterruptStatsProvider interface
+Subject: [Qemu-devel] [PULL 25/47] ppc/pnv: add a helper to calculate MMIO
+ addresses registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +28,45 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
+Some controllers (ICP, PSI) have a base register address which is
+calculated using the chip id.
+
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ include/hw/ppc/pnv.h | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 0a0cfe3..f3623ee 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -33,6 +33,8 @@
- #include "exec/address-spaces.h"
- #include "qemu/cutils.h"
- #include "qapi/visitor.h"
-+#include "monitor/monitor.h"
-+#include "hw/intc/intc.h"
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index df98a72..5693ba1 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -91,14 +91,24 @@ typedef struct PnvChipClass {
+     OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER9)
 =20
- #include "hw/ppc/xics.h"
- #include "hw/ppc/pnv_xscom.h"
-@@ -762,6 +764,18 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int pir=
-)
-     return cpu ? ICP(cpu->intc) : NULL;
- }
+ /*
+- * This generates a HW chip id depending on an index:
++ * This generates a HW chip id depending on an index, as found on a
++ * two socket system with dual chip modules :
+  *
+  *    0x0, 0x1, 0x10, 0x11
+  *
+  * 4 chips should be the maximum
++ *
++ * TODO: use a machine property to define the chip ids
+  */
+ #define PNV_CHIP_HWID(i) ((((i) & 0x3e) << 3) | ((i) & 0x1))
 =20
-+static void pnv_pic_print_info(InterruptStatsProvider *obj,
-+                               Monitor *mon)
-+{
-+    CPUState *cs;
++/*
++ * Converts back a HW chip id to an index. This is useful to calculate
++ * the MMIO addresses of some controllers which depend on the chip id.
++ */
++#define PNV_CHIP_INDEX(chip)                                    \
++    (((chip)->chip_id >> 2) * 2 + ((chip)->chip_id & 0x3))
 +
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+
-+        icp_pic_print_info(ICP(cpu->intc), mon);
-+    }
-+}
-+
- static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
-                               void *opaque, Error **errp)
- {
-@@ -813,6 +827,7 @@ static void powernv_machine_class_init(ObjectClass *o=
-c, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-     XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
-+    InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
-(oc);
-=20
-     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
-     mc->init =3D ppc_powernv_init;
-@@ -824,6 +839,7 @@ static void powernv_machine_class_init(ObjectClass *o=
-c, void *data)
-     mc->default_boot_order =3D NULL;
-     mc->default_ram_size =3D 1 * G_BYTE;
-     xic->icp_get =3D pnv_icp_get;
-+    ispc->print_info =3D pnv_pic_print_info;
-=20
-     powernv_machine_class_props_init(oc);
- }
-@@ -836,6 +852,7 @@ static const TypeInfo powernv_machine_info =3D {
-     .class_init    =3D powernv_machine_class_init,
-     .interfaces =3D (InterfaceInfo[]) {
-         { TYPE_XICS_FABRIC },
-+        { TYPE_INTERRUPT_STATS_PROVIDER },
-         { },
-     },
- };
+ #define TYPE_POWERNV_MACHINE       MACHINE_TYPE_NAME("powernv")
+ #define POWERNV_MACHINE(obj) \
+     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
 --=20
 2.9.3
