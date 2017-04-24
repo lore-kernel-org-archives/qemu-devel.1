@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1d2muK-0003Sp-Ro
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:56:38 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d2n4N-0005PV-Mo
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 19:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1d2muF-00011r-VJ
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:56:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1d2muF-00011I-MN
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 18:56:31 -0400
-Date: Mon, 24 Apr 2017 16:56:28 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170424165628.631b0455@w520.home>
-In-Reply-To: <20170424164338.0250f3fa@w520.home>
-References: <20170412052115.101657-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170412052115.101657-8-bjsdjshi@linux.vnet.ibm.com>
-	<20170424164338.0250f3fa@w520.home>
+	(envelope-from <jsnow@redhat.com>) id 1d2n4K-0007U2-Gu
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 19:06:58 -0400
+References: <20170411222945.11741-1-eblake@redhat.com>
+	<20170411222945.11741-18-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ada8b8e3-aa6e-b06a-d2bf-6f7e994f0e7d@redhat.com>
+Date: Mon, 24 Apr 2017 19:06:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170411222945.11741-18-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 07/13] vfio/ccw: vfio based subchannel
- passthrough driver
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 17/17] block: Make
+ bdrv_is_allocated_above() byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,301 +25,369 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Fam Zheng <famz@redhat.com>, Wen Congyang <wency@cn.fujitsu.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, 24 Apr 2017 16:43:38 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> On Wed, 12 Apr 2017 07:21:09 +0200
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
-> > From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> > 
-> > We use the IOMMU_TYPE1 of VFIO to realize the subchannels
-> > passthrough, implement a vfio based subchannels passthrough
-> > driver called "vfio-ccw".
-> > 
-> > Support qemu parameters in the style of:
-> > "-device vfio-ccw,sysfsdev=$mdev_file_path,devno=xx.x.xxxx'
-> > 
-> > Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > ---
-> >  default-configs/s390x-softmmu.mak |   1 +
-> >  hw/vfio/Makefile.objs             |   1 +
-> >  hw/vfio/ccw.c                     | 207 ++++++++++++++++++++++++++++++++++++++
-> >  include/hw/vfio/vfio-common.h     |   1 +
-> >  4 files changed, 210 insertions(+)
-> >  create mode 100644 hw/vfio/ccw.c
-> > 
-> > diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-> > index 36e15de..5576b0a 100644
-> > --- a/default-configs/s390x-softmmu.mak
-> > +++ b/default-configs/s390x-softmmu.mak
-> > @@ -4,4 +4,5 @@ CONFIG_VIRTIO=y
-> >  CONFIG_SCLPCONSOLE=y
-> >  CONFIG_S390_FLIC=y
-> >  CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
-> > +CONFIG_VFIO_CCW=$(CONFIG_LINUX)
-> >  CONFIG_WDT_DIAG288=y
-> > diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-> > index 05e7fbb..c3ab909 100644
-> > --- a/hw/vfio/Makefile.objs
-> > +++ b/hw/vfio/Makefile.objs
-> > @@ -1,6 +1,7 @@
-> >  ifeq ($(CONFIG_LINUX), y)
-> >  obj-$(CONFIG_SOFTMMU) += common.o
-> >  obj-$(CONFIG_PCI) += pci.o pci-quirks.o
-> > +obj-$(CONFIG_VFIO_CCW) += ccw.o
-> >  obj-$(CONFIG_SOFTMMU) += platform.o
-> >  obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
-> >  obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
-> > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> > new file mode 100644
-> > index 0000000..c491bee
-> > --- /dev/null
-> > +++ b/hw/vfio/ccw.c
-> > @@ -0,0 +1,207 @@
-> > +/*
-> > + * vfio based subchannel assignment support
-> > + *
-> > + * Copyright 2017 IBM Corp.
-> > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> > + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or(at
-> > + * your option) any version. See the COPYING file in the top-level
-> > + * directory.
-> > + */
-> > +
-> > +#include <linux/vfio.h>
-> > +#include <sys/ioctl.h>
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qapi/error.h"
-> > +#include "hw/sysbus.h"
-> > +#include "hw/vfio/vfio.h"
-> > +#include "hw/vfio/vfio-common.h"
-> > +#include "hw/s390x/s390-ccw.h"
-> > +#include "hw/s390x/ccw-device.h"
-> > +
-> > +#define TYPE_VFIO_CCW "vfio-ccw"
-> > +typedef struct VFIOCCWDevice {
-> > +    S390CCWDevice cdev;
-> > +    VFIODevice vdev;
-> > +} VFIOCCWDevice;
-> > +
-> > +static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
-> > +{
-> > +    vdev->needs_reset = false;
-> > +}
-> > +
-> > +/*
-> > + * We don't need vfio_hot_reset_multi and vfio_eoi operationis for
 
-One more:
+On 04/11/2017 06:29 PM, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  In the common case, allocation is unlikely to ever use
+> values that are not naturally sector-aligned, but it is possible
+> that byte-based values will let us be more precise about allocation
+> at the end of an unaligned file that can do byte-based access.
+> 
+> Changing the signature of the function to use int64_t *pnum ensures
+> that the compiler enforces that all callers are updated.  For now,
+> the io.c layer still assert()s that all callers are sector-aligned,
+> but that can be relaxed when a later patch implements byte-based
+> block status.  Therefore, for the most part this patch is just the
+> addition of scaling at the callers followed by inverse scaling at
+> bdrv_is_allocated().  But some code, particularly stream_run(),
+> gets a lot simpler because it no longer has to mess with sectors.
+> 
+> For ease of review, bdrv_is_allocated() was tackled separately.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/block/block.h |  2 +-
+>  block/commit.c        | 20 ++++++++------------
+>  block/io.c            | 36 +++++++++++++++---------------------
+>  block/mirror.c        |  5 ++++-
+>  block/replication.c   | 17 ++++++++++++-----
+>  block/stream.c        | 21 +++++++++------------
+>  qemu-img.c            | 10 +++++++---
+>  7 files changed, 56 insertions(+), 55 deletions(-)
+> 
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 8641149..740cb86 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -425,7 +425,7 @@ int64_t bdrv_get_block_status_above(BlockDriverState *bs,
+>  int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
+>                        int64_t *pnum);
+>  int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
+> -                            int64_t sector_num, int nb_sectors, int *pnum);
+> +                            int64_t offset, int64_t bytes, int64_t *pnum);
+> 
+>  bool bdrv_is_read_only(BlockDriverState *bs);
+>  bool bdrv_is_sg(BlockDriverState *bs);
+> diff --git a/block/commit.c b/block/commit.c
+> index 4d6bb2a..989de7d 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -132,7 +132,7 @@ static void coroutine_fn commit_run(void *opaque)
+>      int64_t offset;
+>      uint64_t delay_ns = 0;
+>      int ret = 0;
+> -    int n = 0; /* sectors */
+> +    int64_t n = 0; /* bytes */
+>      void *buf = NULL;
+>      int bytes_written = 0;
+>      int64_t base_len;
+> @@ -157,7 +157,7 @@ static void coroutine_fn commit_run(void *opaque)
+> 
+>      buf = blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
+> 
+> -    for (offset = 0; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
+> +    for (offset = 0; offset < s->common.len; offset += n) {
+>          bool copy;
+> 
+>          /* Note that even when no rate limit is applied we need to yield
+> @@ -169,15 +169,12 @@ static void coroutine_fn commit_run(void *opaque)
+>          }
+>          /* Copy if allocated above the base */
+>          ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base),
+> -                                      offset / BDRV_SECTOR_SIZE,
+> -                                      COMMIT_BUFFER_SIZE / BDRV_SECTOR_SIZE,
+> -                                      &n);
+> +                                      offset, COMMIT_BUFFER_SIZE, &n);
+>          copy = (ret == 1);
+> -        trace_commit_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
+> +        trace_commit_one_iteration(s, offset, n, ret);
+>          if (copy) {
+> -            ret = commit_populate(s->top, s->base, offset,
+> -                                  n * BDRV_SECTOR_SIZE, buf);
+> -            bytes_written += n * BDRV_SECTOR_SIZE;
+> +            ret = commit_populate(s->top, s->base, offset, n, buf);
+> +            bytes_written += n;
+>          }
+>          if (ret < 0) {
+>              BlockErrorAction action =
+> @@ -190,11 +187,10 @@ static void coroutine_fn commit_run(void *opaque)
+>              }
+>          }
+>          /* Publish progress */
+> -        s->common.offset += n * BDRV_SECTOR_SIZE;
+> +        s->common.offset += n;
+> 
+>          if (copy && s->common.speed) {
+> -            delay_ns = ratelimit_calculate_delay(&s->limit,
+> -                                                 n * BDRV_SECTOR_SIZE);
+> +            delay_ns = ratelimit_calculate_delay(&s->limit, n);
+>          }
+>      }
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 438a493..9218329 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1930,52 +1930,46 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
+>  /*
+>   * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [TOP]
+>   *
+> - * Return true if the given sector is allocated in any image between
+> + * Return true if the given offset is allocated in any image between
 
-s/operationis/operations/
+perhaps "range" instead of "offset"?
 
-> > + * vfio_ccw device now.
-> > + */
-> > +struct VFIODeviceOps vfio_ccw_ops = {
-> > +    .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
-> > +};
-> > +
-> > +static void vfio_ccw_reset(DeviceState *dev)
-> > +{
-> > +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-> > +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-> > +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> > +
-> > +    ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
-> > +}
-> > +
-> > +static void vfio_put_device(VFIOCCWDevice *vcdev)
-> > +{
-> > +    g_free(vcdev->vdev.name);
-> > +    vfio_put_base_device(&vcdev->vdev);
-> > +}
-> > +
-> > +static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, char **path,
-> > +                                     Error **errp)
-> > +{
-> > +    struct stat st;
-> > +    int groupid;
-> > +    GError *gerror = NULL;
-> > +
-> > +    /* Check that host subchannel exists. */
-> > +    path[0] = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x",
-> > +                              cdev->hostid.cssid,
-> > +                              cdev->hostid.ssid,
-> > +                              cdev->hostid.devid);
-> > +    if (stat(path[0], &st) < 0) {
-> > +        error_setg(errp, "vfio: no such host subchannel %s", path[0]);
-> > +        return NULL;
-> > +    }
-> > +
-> > +    /* Check that mediated device exists. */
-> > +    path[1] = g_strdup_printf("%s/%s", path[0], cdev->mdevid);
-> > +    if (stat(path[0], &st) < 0) {
-> > +        error_setg(errp, "vfio: no such mediated device %s", path[1]);
-> > +        return NULL;
-> > +    }  
+>   * BASE and TOP (inclusive).  BASE can be NULL to check if the given
+> - * sector is allocated in any image of the chain.  Return false otherwise,
+> + * offset is allocated in any image of the chain.  Return false otherwise,
+>   * or negative errno on failure.
+>   *
+> - * 'pnum' is set to the number of sectors (including and immediately following
+> - *  the specified sector) that are known to be in the same
+> + * 'pnum' is set to the number of bytes (including and immediately following
+> + *  the specified offset) that are known to be in the same
+>   *  allocated/unallocated state.
+>   *
+>   */
+>  int bdrv_is_allocated_above(BlockDriverState *top,
+>                              BlockDriverState *base,
+> -                            int64_t sector_num,
+> -                            int nb_sectors, int *pnum)
+> +                            int64_t offset, int64_t bytes, int64_t *pnum)
+>  {
+>      BlockDriverState *intermediate;
+> -    int ret, n = nb_sectors;
+> +    int ret;
+> +    int64_t n = bytes;
 > 
-> Isn't this all a bit circular since we build the S390CCWDevice based on
-> the sysfsdev mdev path?
+>      intermediate = top;
+>      while (intermediate && intermediate != base) {
+>          int64_t pnum_inter;
+> -        int psectors_inter;
 > 
-> > +
-> > +    /* Get the iommu_group patch as the interim variable. */
-> > +    path[2] = g_strconcat(path[1], "/iommu_group", NULL);
-> > +
-> > +    /* Get the link file path of the device iommu_group. */
-> > +    path[3] = g_file_read_link(path[2], &gerror);
-> > +    if (!path[3]) {
-> > +        error_setg(errp, "vfio: error no iommu_group for subchannel");
-> > +        return NULL;
-> > +    }
-> > +
-> > +    /* Get the device groupid. */
-> > +    if (sscanf(basename(path[3]), "%d", &groupid) != 1) {
-> > +        error_setg(errp, "vfio: error reading %s:%m", path[3]);
-> > +        return NULL;
-> > +    }
-> > +
-> > +    return vfio_get_group(groupid, &address_space_memory, errp);
-> > +}
-> > +
-> > +static void vfio_ccw_put_group(VFIOGroup *group, char **path)
-> > +{
-> > +    g_free(path);
-> > +    vfio_put_group(group);
-> > +}
-> > +
-> > +static void vfio_ccw_realize(DeviceState *dev, Error **errp)
-> > +{
-> > +    VFIODevice *vbasedev;
-> > +    VFIOGroup *group;
-> > +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-> > +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-> > +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> > +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-> > +    char *path[4] = {NULL, NULL, NULL, NULL};  
+> -        ret = bdrv_is_allocated(intermediate, sector_num * BDRV_SECTOR_SIZE,
+> -                                nb_sectors * BDRV_SECTOR_SIZE,
+> -                                &pnum_inter);
+> +        ret = bdrv_is_allocated(intermediate, offset, bytes, &pnum_inter);
+>          if (ret < 0) {
+>              return ret;
+>          }
+> -        assert(pnum_inter < INT_MAX * BDRV_SECTOR_SIZE);
+> -        psectors_inter = pnum_inter >> BDRV_SECTOR_BITS;
+>          if (ret) {
+> -            *pnum = psectors_inter;
+> +            *pnum = pnum_inter;
+>              return 1;
+>          }
 > 
-> I don't understand what's happening with 'path' throughout this
-> function.  vfio_ccw_get_group() allocates strings into this array, we
-> only seem to use one in an error path below, it's only freed on an error
-> path and I don't see it getting linked to the VFIOCCWDevice, so it
-> seems to be leaked, and even the g_free() above looks quite a bit
-> suspicious.
+>          /*
+> -         * [sector_num, nb_sectors] is unallocated on top but intermediate
+> -         * might have
+> -         *
+> -         * [sector_num+x, nr_sectors] allocated.
+> +         * [offset, bytes] is unallocated on top but intermediate
+> +         * might have [offset+x, bytes-x] allocated.
+>           */
+> -        if (n > psectors_inter &&
+> +        if (n > pnum_inter &&
+>              (intermediate == top ||
+> -             sector_num + psectors_inter < intermediate->total_sectors)) {
+
+
+
+> -            n = psectors_inter;
+> +             offset + pnum_inter < (intermediate->total_sectors *
+> +                                    BDRV_SECTOR_SIZE))) {
+
+Naive question: not worth using either bdrv_getlength for bytes, or the
+bdrv_nb_sectors helpers?
+
+(Not sure if this is appropriate due to the variable length calls which
+might disqualify it from internal usage)
+
+> +            n = pnum_inter;
+>          }
 > 
-> > +
-> > +    /* Call the class init function for subchannel. */
-> > +    if (cdc->realize) {
-> > +        cdc->realize(cdev, vcdev->vdev.sysfsdev, errp);
-> > +        if (*errp) {
-> > +            return;
-> > +        }
-> > +    }
-> > +
-> > +    group = vfio_ccw_get_group(cdev, path, errp);
-> > +    if (!group) {
-> > +        goto out_group_err;
-> > +    }
-> > +
-> > +    vcdev->vdev.ops = &vfio_ccw_ops;
-> > +    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
-> > +    vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
-> > +                                       cdev->hostid.ssid, cdev->hostid.devid);
-> > +    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> > +        if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
-> > +            error_setg(errp, "vfio: subchannel %s has already been attached",
-> > +                       basename(path[0]));
-> > +            goto out_device_err;
-> > +        }
-> > +    }
-> > +
-> > +    if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, errp)) {
-> > +        goto out_device_err;
-> > +    }
-> > +
-> > +    return;
-> > +
-> > +out_device_err:
-> > +    vfio_ccw_put_group(group, path);
-> > +out_group_err:
-> > +    if (cdc->unrealize) {
-> > +        cdc->unrealize(cdev, errp);
-> > +    }
-> > +}
-> > +
-> > +static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
-> > +{
-> > +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-> > +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-> > +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> > +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-> > +    VFIOGroup *group = vcdev->vdev.group;
-> > +
-> > +    if (cdc->unrealize) {
-> > +        cdc->unrealize(cdev, errp);
-> > +    }
-> > +
-> > +    vfio_put_device(vcdev);
-> > +    vfio_put_group(group);
-> > +}  
+>          intermediate = backing_bs(intermediate);
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 8de0492..c92335a 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -609,6 +609,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+>      BlockDriverState *bs = s->source;
+>      BlockDriverState *target_bs = blk_bs(s->target);
+>      int ret, n;
+> +    int64_t count;
 > 
-> Doesn't seem to matter here, but I would have expected the
-> cdc->unrealize to occur at the end to unwind the order of the realize
-> function.
+>      end = s->bdev_length / BDRV_SECTOR_SIZE;
 > 
-> > +
-> > +static Property vfio_ccw_properties[] = {
-> > +    DEFINE_PROP_STRING("sysfsdev", VFIOCCWDevice, vdev.sysfsdev),
-> > +    DEFINE_PROP_END_OF_LIST(),
-> > +};
-> > +
-> > +static const VMStateDescription vfio_ccw_vmstate = {
-> > +    .name = TYPE_VFIO_CCW,
-> > +    .unmigratable = 1,
-> > +};
-> > +
-> > +static void vfio_ccw_class_init(ObjectClass *klass, void *data)
-> > +{
-> > +    DeviceClass *dc = DEVICE_CLASS(klass);
-> > +
-> > +    dc->props = vfio_ccw_properties;
-> > +    dc->vmsd = &vfio_ccw_vmstate;
-> > +    dc->desc = "VFIO-based subchannel assignment";
-> > +    dc->realize = vfio_ccw_realize;
-> > +    dc->unrealize = vfio_ccw_unrealize;
-> > +    dc->reset = vfio_ccw_reset;
-> > +}
-> > +
-> > +static const TypeInfo vfio_ccw_info = {
-> > +    .name = TYPE_VFIO_CCW,
-> > +    .parent = TYPE_S390_CCW,
-> > +    .instance_size = sizeof(VFIOCCWDevice),
-> > +    .class_init = vfio_ccw_class_init,
-> > +};
-> > +
-> > +static void register_vfio_ccw_type(void)
-> > +{
-> > +    type_register_static(&vfio_ccw_info);
-> > +}
-> > +
-> > +type_init(register_vfio_ccw_type)
-> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> > index c582de1..9521013 100644
-> > --- a/include/hw/vfio/vfio-common.h
-> > +++ b/include/hw/vfio/vfio-common.h
-> > @@ -45,6 +45,7 @@
-> >  enum {
-> >      VFIO_DEVICE_TYPE_PCI = 0,
-> >      VFIO_DEVICE_TYPE_PLATFORM = 1,
-> > +    VFIO_DEVICE_TYPE_CCW = 2,
-> >  };
-> >  
-> >  typedef struct VFIOMmap {  
+> @@ -658,11 +659,13 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+>              return 0;
+>          }
 > 
+> -        ret = bdrv_is_allocated_above(bs, base, sector_num, nb_sectors, &n);
+> +        ret = bdrv_is_allocated_above(bs, base, sector_num * BDRV_SECTOR_SIZE,
+> +                                      nb_sectors * BDRV_SECTOR_SIZE, &count);
+>          if (ret < 0) {
+>              return ret;
+>          }
+> 
+> +        n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+>          assert(n > 0);
+>          if (ret == 1) {
+>              bdrv_set_dirty_bitmap(s->dirty_bitmap, sector_num, n);
+> diff --git a/block/replication.c b/block/replication.c
+> index 414ecc4..605d90f 100644
+> --- a/block/replication.c
+> +++ b/block/replication.c
+> @@ -264,7 +264,8 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
+>      BdrvChild *top = bs->file;
+>      BdrvChild *base = s->secondary_disk;
+>      BdrvChild *target;
+> -    int ret, n;
+> +    int ret;
+> +    int64_t n;
+> 
+>      ret = replication_get_io_status(s);
+>      if (ret < 0) {
+> @@ -283,14 +284,20 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
+>       */
+>      qemu_iovec_init(&hd_qiov, qiov->niov);
+>      while (remaining_sectors > 0) {
+> -        ret = bdrv_is_allocated_above(top->bs, base->bs, sector_num,
+> -                                      remaining_sectors, &n);
+> +        int64_t count;
+> +
+> +        ret = bdrv_is_allocated_above(top->bs, base->bs,
+> +                                      sector_num * BDRV_SECTOR_SIZE,
+> +                                      remaining_sectors * BDRV_SECTOR_SIZE,
+> +                                      &count);
+>          if (ret < 0) {
+>              goto out1;
+>          }
+> 
+> +        assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
+> +        n = count >> BDRV_SECTOR_BITS;
+>          qemu_iovec_reset(&hd_qiov);
+> -        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, n * BDRV_SECTOR_SIZE);
+> +        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, count);
+> 
+>          target = ret ? top : base;
+>          ret = bdrv_co_writev(target, sector_num, n, &hd_qiov);
+> @@ -300,7 +307,7 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
+> 
+>          remaining_sectors -= n;
+>          sector_num += n;
+> -        bytes_done += n * BDRV_SECTOR_SIZE;
+> +        bytes_done += count;
+>      }
+> 
+>  out1:
+> diff --git a/block/stream.c b/block/stream.c
+> index 85502eb..9033655 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -112,7 +112,7 @@ static void coroutine_fn stream_run(void *opaque)
+>      uint64_t delay_ns = 0;
+>      int error = 0;
+>      int ret = 0;
+> -    int n = 0; /* sectors */
+> +    int64_t n = 0; /* bytes */
+>      void *buf;
+> 
+>      if (!bs->backing) {
+> @@ -136,9 +136,8 @@ static void coroutine_fn stream_run(void *opaque)
+>          bdrv_enable_copy_on_read(bs);
+>      }
+> 
+> -    for ( ; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
+> +    for ( ; offset < s->common.len; offset += n) {
+>          bool copy;
+> -        int64_t count = 0;
+> 
+>          /* Note that even when no rate limit is applied we need to yield
+>           * with no pending I/O here so that bdrv_drain_all() returns.
+> @@ -150,26 +149,25 @@ static void coroutine_fn stream_run(void *opaque)
+> 
+>          copy = false;
+> 
+> -        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &count);
+> -        n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+> +        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &n);
+>          if (ret == 1) {
+>              /* Allocated in the top, no need to copy.  */
+>          } else if (ret >= 0) {
+>              /* Copy if allocated in the intermediate images.  Limit to the
+>               * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
+>              ret = bdrv_is_allocated_above(backing_bs(bs), base,
+> -                                          offset / BDRV_SECTOR_SIZE, n, &n);
+> +                                          offset, n, &n);
+> 
+>              /* Finish early if end of backing file has been reached */
+>              if (ret == 0 && n == 0) {
+> -                n = (s->common.len - offset) / BDRV_SECTOR_SIZE;
+> +                n = s->common.len - offset;
+>              }
+> 
+>              copy = (ret == 1);
+>          }
+> -        trace_stream_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
+> +        trace_stream_one_iteration(s, offset, n, ret);
+>          if (copy) {
+> -            ret = stream_populate(blk, offset, n * BDRV_SECTOR_SIZE, buf);
+> +            ret = stream_populate(blk, offset, n, buf);
+>          }
+>          if (ret < 0) {
+>              BlockErrorAction action =
+> @@ -188,10 +186,9 @@ static void coroutine_fn stream_run(void *opaque)
+>          ret = 0;
+> 
+>          /* Publish progress */
+> -        s->common.offset += n * BDRV_SECTOR_SIZE;
+> +        s->common.offset += n;
+>          if (copy && s->common.speed) {
+> -            delay_ns = ratelimit_calculate_delay(&s->limit,
+> -                                                 n * BDRV_SECTOR_SIZE);
+> +            delay_ns = ratelimit_calculate_delay(&s->limit, n);
+>          }
+>      }
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 2f21d69..d96b4d6 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1448,12 +1448,16 @@ static int img_compare(int argc, char **argv)
+>          }
+> 
+>          for (;;) {
+> +            int64_t count;
+> +
+>              nb_sectors = sectors_to_process(total_sectors_over, sector_num);
+>              if (nb_sectors <= 0) {
+>                  break;
+>              }
+> -            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL, sector_num,
+> -                                          nb_sectors, &pnum);
+> +            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL,
+> +                                          sector_num * BDRV_SECTOR_SIZE,
+> +                                          nb_sectors * BDRV_SECTOR_SIZE,
+> +                                          &count);
+>              if (ret < 0) {
+>                  ret = 3;
+>                  error_report("Sector allocation test failed for %s",
+> @@ -1461,7 +1465,7 @@ static int img_compare(int argc, char **argv)
+>                  goto out;
+> 
+>              }
+> -            nb_sectors = pnum;
+> +            nb_sectors = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+>              if (ret) {
+>                  ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
+>                                            filename_over, buf1, quiet);
+> 
+
+Reviewed-by: John Snow <jsnow@redhat.com>
