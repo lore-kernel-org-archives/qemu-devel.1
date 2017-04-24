@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TI9-0001Tk-C6
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TII-0001cn-7d
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TI7-0003On-Fy
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:53 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TIH-0003Vt-4d
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 22:00:02 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:59:00 +1000
-Message-Id: <20170424015927.8933-21-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:59:13 +1000
+Message-Id: <20170424015927.8933-34-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/47] ppc/xics: add a realize() handler to
- ICPStateClass
+Subject: [Qemu-devel] [PULL 33/47] ipmi: introduce an ipmi_bmc_gen_event()
+ API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +28,66 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-It will be used by derived classes in PowerNV for customization.
+It will be used to fill the message buffer with custom events expected
+by some systems. Typically, an Open PowerNV platform guest is notified
+with an OEM SEL message before a shutdown or a reboot.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: Corey Minyard <cminyard@mvista.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c        | 5 +++++
- include/hw/ppc/xics.h | 1 +
- 2 files changed, 6 insertions(+)
+ hw/ipmi/ipmi_bmc_sim.c | 24 ++++++++++++++++++++++++
+ include/hw/ipmi/ipmi.h |  2 ++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index d4428b4..292fffe 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -337,6 +337,7 @@ static void icp_reset(void *dev)
- static void icp_realize(DeviceState *dev, Error **errp)
- {
-     ICPState *icp =3D ICP(dev);
-+    ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
-     Object *obj;
-     Error *err =3D NULL;
-=20
-@@ -349,6 +350,10 @@ static void icp_realize(DeviceState *dev, Error **er=
-rp)
-=20
-     icp->xics =3D XICS_FABRIC(obj);
-=20
-+    if (icpc->realize) {
-+        icpc->realize(dev, errp);
-+    }
-+
-     qemu_register_reset(icp_reset, dev);
+diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+index 8185a84..155561d 100644
+--- a/hw/ipmi/ipmi_bmc_sim.c
++++ b/hw/ipmi/ipmi_bmc_sim.c
+@@ -473,6 +473,30 @@ static int attn_irq_enabled(IPMIBmcSim *ibs)
+             IPMI_BMC_MSG_FLAG_EVT_BUF_FULL_SET(ibs));
  }
 =20
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index b07f56f..731e177 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -60,6 +60,7 @@ typedef struct XICSFabric XICSFabric;
- struct ICPStateClass {
-     DeviceClass parent_class;
++void ipmi_bmc_gen_event(IPMIBmc *b, uint8_t *evt, bool log)
++{
++    IPMIBmcSim *ibs =3D IPMI_BMC_SIMULATOR(b);
++    IPMIInterface *s =3D ibs->parent.intf;
++    IPMIInterfaceClass *k =3D IPMI_INTERFACE_GET_CLASS(s);
++
++    if (!IPMI_BMC_EVENT_MSG_BUF_ENABLED(ibs)) {
++        return;
++    }
++
++    if (log && IPMI_BMC_EVENT_LOG_ENABLED(ibs)) {
++        sel_add_event(ibs, evt);
++    }
++
++    if (ibs->msg_flags & IPMI_BMC_MSG_FLAG_EVT_BUF_FULL) {
++        goto out;
++    }
++
++    memcpy(ibs->evtbuf, evt, 16);
++    ibs->msg_flags |=3D IPMI_BMC_MSG_FLAG_EVT_BUF_FULL;
++    k->set_atn(s, 1, attn_irq_enabled(ibs));
++ out:
++    return;
++}
+ static void gen_event(IPMIBmcSim *ibs, unsigned int sens_num, uint8_t de=
+assert,
+                       uint8_t evd1, uint8_t evd2, uint8_t evd3)
+ {
+diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
+index 0d36cfc..0affe5a 100644
+--- a/include/hw/ipmi/ipmi.h
++++ b/include/hw/ipmi/ipmi.h
+@@ -261,4 +261,6 @@ typedef uint8_t ipmi_sdr_compact_buffer[sizeof(struct=
+ ipmi_sdr_compact)];
 =20
-+    void (*realize)(DeviceState *dev, Error **errp);
-     void (*pre_save)(ICPState *s);
-     int (*post_load)(ICPState *s, int version_id);
-     void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+ int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
+                       const struct ipmi_sdr_compact **sdr, uint16_t *nex=
+trec);
++void ipmi_bmc_gen_event(IPMIBmc *b, uint8_t *evt, bool log);
++
+ #endif
 --=20
 2.9.3
