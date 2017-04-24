@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOs-0003zS-14
+	(envelope-from <armbru@redhat.com>) id 1d2YOs-0003zY-21
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOo-0006wz-SG
+	(envelope-from <armbru@redhat.com>) id 1d2YOq-0006xf-AY
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55116)
+Received: from mx1.redhat.com ([209.132.183.28]:51362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOo-0006wS-MR
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOq-0006xA-4Q
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:08 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A93E1369C4
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:27:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 182C665850
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:27:07 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 24 Apr 2017 09:26:50 +0200
-Message-Id: <1493018820-23445-6-git-send-email-armbru@redhat.com>
+Date: Mon, 24 Apr 2017 09:26:59 +0200
+Message-Id: <1493018820-23445-15-git-send-email-armbru@redhat.com>
 In-Reply-To: <1493018820-23445-1-git-send-email-armbru@redhat.com>
 References: <1493018820-23445-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 05/15] socket: Make errp the last parameter of
- vsock_connect_saddr
+Subject: [Qemu-devel] [PULL 14/15] qga: Make errp the last parameter of
+ qga_vss_fsfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +36,62 @@ Cc: Fam Zheng <famz@redhat.com>
 From: Fam Zheng <famz@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170421122710.15373-5-famz@redhat.com>
+Message-Id: <20170421122710.15373-14-famz@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- util/qemu-sockets.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ qga/commands-win32.c | 4 ++--
+ qga/vss-win32.c      | 2 +-
+ qga/vss-win32.h      | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 0fe5f13..8188d9a 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -728,9 +728,10 @@ static int vsock_connect_addr(const struct sockaddr_vm *svm, bool *in_progress,
-     return sock;
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 19d72b2..04026ee 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -768,7 +768,7 @@ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
+     /* cannot risk guest agent blocking itself on a write in this state */
+     ga_set_frozen(ga_state);
+ 
+-    qga_vss_fsfreeze(&i, &local_err, true);
++    qga_vss_fsfreeze(&i, true, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto error;
+@@ -807,7 +807,7 @@ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
+         return 0;
+     }
+ 
+-    qga_vss_fsfreeze(&i, errp, false);
++    qga_vss_fsfreeze(&i, false, errp);
+ 
+     ga_unset_frozen(ga_state);
+     return i;
+diff --git a/qga/vss-win32.c b/qga/vss-win32.c
+index 9a0e463..a80933c 100644
+--- a/qga/vss-win32.c
++++ b/qga/vss-win32.c
+@@ -145,7 +145,7 @@ void ga_uninstall_vss_provider(void)
  }
  
--static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp,
-+static int vsock_connect_saddr(VsockSocketAddress *vaddr,
-                                NonBlockingConnectHandler *callback,
--                               void *opaque)
-+                               void *opaque,
-+                               Error **errp)
+ /* Call VSS requester and freeze/thaw filesystems and applications */
+-void qga_vss_fsfreeze(int *nr_volume, Error **errp, bool freeze)
++void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
  {
-     struct sockaddr_vm svm;
-     int sock = -1;
-@@ -819,9 +820,9 @@ static void vsock_unsupported(Error **errp)
-     error_setg(errp, "socket family AF_VSOCK unsupported");
- }
+     const char *func_name = freeze ? "requester_freeze" : "requester_thaw";
+     QGAVSSRequesterFunc func;
+diff --git a/qga/vss-win32.h b/qga/vss-win32.h
+index 4d1d150..51d303a 100644
+--- a/qga/vss-win32.h
++++ b/qga/vss-win32.h
+@@ -21,6 +21,6 @@ bool vss_initialized(void);
+ int ga_install_vss_provider(void);
+ void ga_uninstall_vss_provider(void);
  
--static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp,
-+static int vsock_connect_saddr(VsockSocketAddress *vaddr,
-                                NonBlockingConnectHandler *callback,
--                               void *opaque)
-+                               void *opaque, Error **errp)
- {
-     vsock_unsupported(errp);
-     return -1;
-@@ -1100,7 +1101,7 @@ int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
-         break;
+-void qga_vss_fsfreeze(int *nr_volume, Error **errp, bool freeze);
++void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp);
  
-     case SOCKET_ADDRESS_KIND_VSOCK:
--        fd = vsock_connect_saddr(addr->u.vsock.data, errp, callback, opaque);
-+        fd = vsock_connect_saddr(addr->u.vsock.data, callback, opaque, errp);
-         break;
- 
-     default:
+ #endif
 -- 
 2.7.4
