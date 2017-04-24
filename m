@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d2jX6-0001gn-WC
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:25 -0400
+	(envelope-from <jcody@redhat.com>) id 1d2jX7-0001hu-VV
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d2jX6-0002oh-2U
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:24 -0400
+	(envelope-from <jcody@redhat.com>) id 1d2jX6-0002pC-LO
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:25 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 24 Apr 2017 15:20:01 -0400
-Message-Id: <20170424192002.18622-12-jcody@redhat.com>
+Date: Mon, 24 Apr 2017 15:20:02 -0400
+Message-Id: <20170424192002.18622-13-jcody@redhat.com>
 In-Reply-To: <20170424192002.18622-1-jcody@redhat.com>
 References: <20170424192002.18622-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL v2 11/12] block/rbd: Add support for reopen()
+Subject: [Qemu-devel] [PULL v2 12/12] qemu-iotests: _cleanup_qemu must be
+ called on exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,57 +23,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-This adds support for reopen in rbd, for changing between r/w and r/o.
+For the tests that use the common.qemu functions for running a QEMU
+process, _cleanup_qemu must be called in the exit function.
 
-Note, that this is only a flag change, but we will block a change from
-r/o to r/w if we are using an RBD internal snapshot.
+If it is not, if the qemu process aborts, then not all of the droppings
+are cleaned up (e.g. pidfile, fifos).
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This updates those tests that did not have a cleanup in qemu-iotests.
+
+(I swapped spaces for tabs in test 102 as well)
+
+Reported-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: d4e87539167ec6527d44c97b164eabcccf96e4f3.1491597120.git.jcody@redhat.com
+Message-id: d59c2f6ad6c1da8b9b3c7f357c94a7122ccfc55a.1492544096.git.jcody@redhat.com
 ---
- block/rbd.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ tests/qemu-iotests/028 |  1 +
+ tests/qemu-iotests/094 | 11 ++++++++---
+ tests/qemu-iotests/102 |  5 +++--
+ tests/qemu-iotests/109 |  1 +
+ tests/qemu-iotests/117 |  1 +
+ tests/qemu-iotests/130 |  1 +
+ tests/qemu-iotests/140 |  1 +
+ tests/qemu-iotests/141 |  1 +
+ tests/qemu-iotests/143 |  1 +
+ tests/qemu-iotests/156 |  1 +
+ 10 files changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 35853c9..6471f4f 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -668,6 +668,26 @@ failed_opts:
-     return r;
- }
+diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
+index 7783e57..97a8869 100755
+--- a/tests/qemu-iotests/028
++++ b/tests/qemu-iotests/028
+@@ -32,6 +32,7 @@ status=1	# failure is the default!
  
-+
-+/* Since RBD is currently always opened R/W via the API,
-+ * we just need to check if we are using a snapshot or not, in
-+ * order to determine if we will allow it to be R/W */
-+static int qemu_rbd_reopen_prepare(BDRVReopenState *state,
-+                                   BlockReopenQueue *queue, Error **errp)
+ _cleanup()
+ {
++    _cleanup_qemu
+     rm -f "${TEST_IMG}.copy"
+     _cleanup_test_img
+ }
+diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
+index 0ba0b0c..9aa01e3 100755
+--- a/tests/qemu-iotests/094
++++ b/tests/qemu-iotests/094
+@@ -27,7 +27,14 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "exit \$status" 0 1 2 3 15
++_cleanup()
 +{
-+    BDRVRBDState *s = state->bs->opaque;
-+    int ret = 0;
-+
-+    if (s->snap && state->flags & BDRV_O_RDWR) {
-+        error_setg(errp,
-+                   "Cannot change node '%s' to r/w when using RBD snapshot",
-+                   bdrv_get_device_or_node_name(state->bs));
-+        ret = -EINVAL;
-+    }
-+
-+    return ret;
++    _cleanup_qemu
++    _cleanup_test_img
++    rm -f "$TEST_DIR/source.$IMGFMT"
 +}
 +
- static void qemu_rbd_close(BlockDriverState *bs)
++trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+@@ -73,8 +80,6 @@ _send_qemu_cmd $QEMU_HANDLE \
+ 
+ wait=1 _cleanup_qemu
+ 
+-_cleanup_test_img
+-rm -f "$TEST_DIR/source.$IMGFMT"
+ 
+ # success, all done
+ echo '*** done'
+diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
+index 64b4af9..87db1bb 100755
+--- a/tests/qemu-iotests/102
++++ b/tests/qemu-iotests/102
+@@ -25,11 +25,12 @@ seq=$(basename $0)
+ echo "QA output created by $seq"
+ 
+ here=$PWD
+-status=1	# failure is the default!
++status=1    # failure is the default!
+ 
+ _cleanup()
  {
-     BDRVRBDState *s = bs->opaque;
-@@ -1074,6 +1094,7 @@ static BlockDriver bdrv_rbd = {
-     .bdrv_parse_filename    = qemu_rbd_parse_filename,
-     .bdrv_file_open         = qemu_rbd_open,
-     .bdrv_close             = qemu_rbd_close,
-+    .bdrv_reopen_prepare    = qemu_rbd_reopen_prepare,
-     .bdrv_create            = qemu_rbd_create,
-     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
-     .bdrv_get_info          = qemu_rbd_getinfo,
+-	_cleanup_test_img
++    _cleanup_qemu
++    _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
+index 927151a..6161633 100755
+--- a/tests/qemu-iotests/109
++++ b/tests/qemu-iotests/109
+@@ -29,6 +29,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     rm -f $TEST_IMG.src
+ 	_cleanup_test_img
+ }
+diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
+index e955d52..6c83461 100755
+--- a/tests/qemu-iotests/117
++++ b/tests/qemu-iotests/117
+@@ -29,6 +29,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+ 	_cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
+index f941fc9..e7e43de 100755
+--- a/tests/qemu-iotests/130
++++ b/tests/qemu-iotests/130
+@@ -31,6 +31,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     _cleanup_test_img
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
+index 49f9df4..8c80a5a 100755
+--- a/tests/qemu-iotests/140
++++ b/tests/qemu-iotests/140
+@@ -33,6 +33,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     _cleanup_test_img
+     rm -f "$TEST_DIR/nbd"
+ }
+diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
+index 27fb1cc..40a3405 100755
+--- a/tests/qemu-iotests/141
++++ b/tests/qemu-iotests/141
+@@ -29,6 +29,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     _cleanup_test_img
+     rm -f "$TEST_DIR/{b,m,o}.$IMGFMT"
+ }
+diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
+index ec4ef22..5ff1944 100755
+--- a/tests/qemu-iotests/143
++++ b/tests/qemu-iotests/143
+@@ -29,6 +29,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     rm -f "$TEST_DIR/nbd"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
+index 78deaff..d799b73 100755
+--- a/tests/qemu-iotests/156
++++ b/tests/qemu-iotests/156
+@@ -37,6 +37,7 @@ status=1	# failure is the default!
+ 
+ _cleanup()
+ {
++    _cleanup_qemu
+     rm -f "$TEST_IMG{,.target}{,.backing,.overlay}"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
 -- 
 2.9.3
