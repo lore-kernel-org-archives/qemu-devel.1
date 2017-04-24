@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d2hey-0007g7-1z
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:20:25 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d2hl3-0000NT-32
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:26:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d2heu-0003Js-P2
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:20:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60615)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1d2heu-0003JU-GY
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:20:20 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3OHIoMv052793
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 13:20:18 -0400
-Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a1j7647mg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 13:20:18 -0400
-Received: from localhost
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Mon, 24 Apr 2017 14:20:15 -0300
-Received: from d24av03.br.ibm.com (d24av03.br.ibm.com [9.8.31.95])
-	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v3OHKENR917854
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 14:20:14 -0300
-Received: from d24av03.br.ibm.com (localhost [127.0.0.1])
-	by d24av03.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v3OHKEi9006635
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 14:20:15 -0300
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Mon, 24 Apr 2017 14:19:58 -0300
-Message-Id: <1493054398-26013-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2] trace: add qemu mutex lock and unlock trace
- events
+	(envelope-from <dgilbert@redhat.com>) id 1d2hkz-0006Sh-SY
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:26:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d2hkz-0006SL-Jh
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:26:37 -0400
+Date: Mon, 24 Apr 2017 18:26:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170424172630.GO2362@work-vm>
+References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170414131740eucas1p28f240a4e6c78fb56be52f2641c3e5af6@eucas1p2.samsung.com>
+	<1492175840-5021-6-git-send-email-a.perevalov@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1492175840-5021-6-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH 5/6] migration: send postcopy downtime back
+ to source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,87 +29,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, pbonzini@redhat.com, famz@redhat.com
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com
 
-These trace events were very useful to help me to understand and find a
-reordering issue in vfio, for example:
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> Right now to initiate postcopy live migration need to
+> send request to source machine and specify destination.
+> 
+> User could request migration status by query-migrate qmp command on
+> source machine, but postcopy downtime is being evaluated on destination,
+> so it should be transmitted back to source. For this purpose return path
+> socket was shosen.
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 
-qemu_mutex_lock locked mutex 0x10905ad8
-  vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2020c, 4)
-qemu_mutex_unlock unlocked mutex 0x10905ad8
-qemu_mutex_lock locked mutex 0x10905ad8
-  vfio_region_write  (0001:03:00.0:region1+0xc4, 0xa0000, 4)
-qemu_mutex_unlock unlocked mutex 0x10905ad8
+That will break a migration from an older QEMU to a newer QEMU with this feature
+since the old QEMU won't know the message type and fail with a
+  'Received invalid message'
 
-that also helped me to see the desired result after the fix:
+near the start of source_return_path_thread.
 
-qemu_mutex_lock locked mutex 0x10905ad8
-  vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2000c, 4)
-  vfio_region_write  (0001:03:00.0:region1+0xc4, 0xb0000, 4)
-qemu_mutex_unlock unlocked mutex 0x10905ad8
+The simpler solution is to let the stat be read on the destination side
+and not bother sending it backwards over the wire.
 
-So it could be a good idea to have these traces implemented. It's worth
-mentioning that they should be surgically enabled during the debugging,
-otherwise it can flood the trace logs with lock/unlock messages.
+Dave
 
-How to use it:
-trace-event qemu_mutex_lock on|off
-trace-event qemu_mutex_unlock on|off
-or
-trace-event qemu_mutex* on|off
-
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
----
-v2:
-  - removed unecessary (void*) cast
-  - renamed parameter name to lock instead of qemu_global_mutex
-
- util/qemu-thread-posix.c | 5 +++++
- util/trace-events        | 4 ++++
- 2 files changed, 9 insertions(+)
-
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 73e3a0e..4f77d7b 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -14,6 +14,7 @@
- #include "qemu/thread.h"
- #include "qemu/atomic.h"
- #include "qemu/notify.h"
-+#include "trace.h"
- 
- static bool name_threads;
- 
-@@ -60,6 +61,8 @@ void qemu_mutex_lock(QemuMutex *mutex)
-     err = pthread_mutex_lock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
-+
-+    trace_qemu_mutex_lock(&mutex->lock);
- }
- 
- int qemu_mutex_trylock(QemuMutex *mutex)
-@@ -74,6 +77,8 @@ void qemu_mutex_unlock(QemuMutex *mutex)
-     err = pthread_mutex_unlock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
-+
-+    trace_qemu_mutex_unlock(&mutex->lock);
- }
- 
- void qemu_rec_mutex_init(QemuRecMutex *mutex)
-diff --git a/util/trace-events b/util/trace-events
-index b44ef4f..70f6212 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -55,3 +55,7 @@ lockcnt_futex_wait_prepare(const void *lockcnt, int expected, int new) "lockcnt
- lockcnt_futex_wait(const void *lockcnt, int val) "lockcnt %p waiting on %d"
- lockcnt_futex_wait_resume(const void *lockcnt, int new) "lockcnt %p after wait: %d"
- lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter"
-+
-+# util/qemu-thread-posix.c
-+qemu_mutex_lock(void *lock) "locked mutex %p"
-+qemu_mutex_unlock(void *lock) "unlocked mutex %p"
--- 
-2.7.4
+> ---
+>  include/migration/migration.h |  4 +++-
+>  migration/migration.c         | 20 ++++++++++++++++++--
+>  migration/postcopy-ram.c      |  1 +
+>  3 files changed, 22 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 5d2c628..5535aa6 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -55,7 +55,8 @@ enum mig_rp_message_type {
+>  
+>      MIG_RP_MSG_REQ_PAGES_ID, /* data (start: be64, len: be32, id: string) */
+>      MIG_RP_MSG_REQ_PAGES,    /* data (start: be64, len: be32) */
+> -
+> +    MIG_RP_MSG_DOWNTIME,    /* downtime value from destination,
+> +                               calculated and sent in case of post copy */
+>      MIG_RP_MSG_MAX
+>  };
+>  
+> @@ -364,6 +365,7 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+>                            uint32_t value);
+>  void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+>                                ram_addr_t start, size_t len);
+> +void migrate_send_rp_downtime(MigrationIncomingState *mis, uint64_t downtime);
+>  
+>  void ram_control_before_iterate(QEMUFile *f, uint64_t flags);
+>  void ram_control_after_iterate(QEMUFile *f, uint64_t flags);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 5bac434..3134e24 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -553,6 +553,19 @@ void migrate_send_rp_message(MigrationIncomingState *mis,
+>  }
+>  
+>  /*
+> + * Send postcopy migration downtime,
+> + * at the moment of calling this function migration should
+> + * be completed.
+> + */
+> +void migrate_send_rp_downtime(MigrationIncomingState *mis, uint64_t downtime)
+> +{
+> +    uint64_t buf;
+> +
+> +    buf = cpu_to_be64(downtime);
+> +    migrate_send_rp_message(mis, MIG_RP_MSG_DOWNTIME, sizeof(downtime), &buf);
+> +}
+> +
+> +/*
+>   * Send a 'SHUT' message on the return channel with the given value
+>   * to indicate that we've finished with the RP.  Non-0 value indicates
+>   * error.
+> @@ -1483,6 +1496,7 @@ static struct rp_cmd_args {
+>      [MIG_RP_MSG_PONG]           = { .len =  4, .name = "PONG" },
+>      [MIG_RP_MSG_REQ_PAGES]      = { .len = 12, .name = "REQ_PAGES" },
+>      [MIG_RP_MSG_REQ_PAGES_ID]   = { .len = -1, .name = "REQ_PAGES_ID" },
+> +    [MIG_RP_MSG_DOWNTIME]       = { .len =  8, .name = "DOWNTIME" },
+>      [MIG_RP_MSG_MAX]            = { .len = -1, .name = "MAX" },
+>  };
+>  
+> @@ -1613,6 +1627,10 @@ static void *source_return_path_thread(void *opaque)
+>              migrate_handle_rp_req_pages(ms, (char *)&buf[13], start, len);
+>              break;
+>  
+> +        case MIG_RP_MSG_DOWNTIME:
+> +            ms->downtime = ldq_be_p(buf);
+> +            break;
+> +
+>          default:
+>              break;
+>          }
+> @@ -1677,7 +1695,6 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+>      int ret;
+>      QIOChannelBuffer *bioc;
+>      QEMUFile *fb;
+> -    int64_t time_at_stop = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>      bool restart_block = false;
+>      migrate_set_state(&ms->state, MIGRATION_STATUS_ACTIVE,
+>                        MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> @@ -1779,7 +1796,6 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+>       */
+>      ms->postcopy_after_devices = true;
+>      notifier_list_notify(&migration_state_notifiers, ms);
+> -    ms->downtime =  qemu_clock_get_ms(QEMU_CLOCK_REALTIME) - time_at_stop;
+>  
+>      qemu_mutex_unlock_iothread();
+>  
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index ea89f4e..42330fd 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -330,6 +330,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>      }
+>  
+>      postcopy_state_set(POSTCOPY_INCOMING_END);
+> +    migrate_send_rp_downtime(mis, get_postcopy_total_downtime());
+>      migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
+>  
+>      if (mis->postcopy_tmp_page) {
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
