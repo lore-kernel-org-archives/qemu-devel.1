@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2XSh-0001gr-EJ
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:27:04 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d2Xhh-0003sc-IH
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2XSe-0007jC-A7
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:27:03 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3517
-	helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1d2XSd-0007fE-NG
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:27:00 -0400
-From: Zhuangyanying <ann.zhuangyanying@huawei.com>
-Date: Mon, 24 Apr 2017 06:26:27 +0000
-Message-ID: <EC9759BC1E3E98429B5DE9A03DF86D8B59D1084B@DGGEML503-MBX.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d2Xhe-000385-G2
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:42:33 -0400
+Received: from [59.151.112.132] (port=46161 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d2Xhc-00036Y-Tw
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:42:30 -0400
+References: <1492670346-18004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<2010f24d-1ad0-4bab-bcd5-5e98fe21578a@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <f747e078-4596-7cdc-0cae-4ab9da9da240@cn.fujitsu.com>
+Date: Mon, 24 Apr 2017 14:42:53 +0800
 MIME-Version: 1.0
-Subject: [Qemu-devel] [BUG] Migrate failes between boards with different PMC
- counts
+In-Reply-To: <2010f24d-1ad0-4bab-bcd5-5e98fe21578a@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH V2 0/6] Add COLO-proxy virtio-net support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "pbonzini@redhat.com" <pbonzini@redhat.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-SGkgYWxsLA0KDQpSZWNlbnRseSwgSSBmb3VuZCBtaWdyYXRpb24gZmFpbGVkIHdoZW4gZW5hYmxl
-IHZQTVUuDQoNCm1pZ3JhdGUgdlBNVSBzdGF0ZSB3YXMgaW50cm9kdWNlZCBpbiBsaW51eC0zLjEw
-ICsgcWVtdS0xLjcuDQoNCkFzIGxvbmcgYXMgZW5hYmxlIHZQTVUsIHFlbXUgd2lsbCBzYXZlIC8g
-bG9hZCB0aGUNCnZtc3RhdGVfbXNyX2FyY2hpdGVjdHVyYWxfcG11KG1zcl9nbG9iYWxfY3RybCkg
-cmVnaXN0ZXIgZHVyaW5nIHRoZSBtaWdyYXRpb24uDQpCdXQgZ2xvYmFsX2N0cmwgZ2VuZXJhdGVk
-IGJhc2VkIG9uIGNwdWlkKDB4QSksIHRoZSBudW1iZXIgb2YgZ2VuZXJhbC1wdXJwb3NlIHBlcmZv
-cm1hbmNlDQptb25pdG9yaW5nIGNvdW50ZXJzKFBNQykgY2FuIHZhcnkgYWNjb3JkaW5nIHRvIElu
-dGVsIFNETi4gVGhlIG51bWJlciBvZiBQTUMgcHJlc2VudGVkDQp0byB2bSwgZG9lcyBub3Qgc3Vw
-cG9ydCBjb25maWd1cmF0aW9uIGN1cnJlbnRseSwgaXQgZGVwZW5kIG9uIGhvc3QgY3B1aWQsIGFu
-ZCBlbmFibGUgYWxsIHBtYw0KZGVmYXVsdGx5IGF0IEtWTS4gSXQgY2F1c2UgbWlncmF0aW9uIHRv
-IGZhaWwgYmV0d2VlbiBib2FyZHMgd2l0aCBkaWZmZXJlbnQgUE1DIGNvdW50cy4NCg0KVGhlIHJl
-dHVybiB2YWx1ZSBvZiBjcHVpZCAoMHhBKSBpcyBkaWZmZXJlbnQgZHVyIHRvIGNwdSwgYWNjb3Jk
-aW5nIHRvIEludGVsIFNETqOsMTgtMTAgVm9sLiAzQjoNCg0KTm90ZTogVGhlIG51bWJlciBvZiBn
-ZW5lcmFsLXB1cnBvc2UgcGVyZm9ybWFuY2UgbW9uaXRvcmluZyBjb3VudGVycyAoaS5lLiBOIGlu
-IEZpZ3VyZSAxOC05KQ0KY2FuIHZhcnkgYWNyb3NzIHByb2Nlc3NvciBnZW5lcmF0aW9ucyB3aXRo
-aW4gYSBwcm9jZXNzb3IgZmFtaWx5LCBhY3Jvc3MgcHJvY2Vzc29yIGZhbWlsaWVzLCBvcg0KY291
-bGQgYmUgZGlmZmVyZW50IGRlcGVuZGluZyBvbiB0aGUgY29uZmlndXJhdGlvbiBjaG9zZW4gYXQg
-Ym9vdCB0aW1lIGluIHRoZSBCSU9TIHJlZ2FyZGluZw0KSW50ZWwgSHlwZXIgVGhyZWFkaW5nIFRl
-Y2hub2xvZ3ksIChlLmcuIE49MiBmb3IgNDUgbm0gSW50ZWwgQXRvbSBwcm9jZXNzb3JzOyBOID00
-IGZvciBwcm9jZXNzb3JzDQpiYXNlZCBvbiB0aGUgTmVoYWxlbSBtaWNyb2FyY2hpdGVjdHVyZTsg
-Zm9yIHByb2Nlc3NvcnMgYmFzZWQgb24gdGhlIFNhbmR5IEJyaWRnZQ0KbWljcm9hcmNoaXRlY3R1
-cmUsIE4gPSA0IGlmIEludGVsIEh5cGVyIFRocmVhZGluZyBUZWNobm9sb2d5IGlzIGFjdGl2ZSBh
-bmQgTj04IGlmIG5vdCBhY3RpdmUpLg0KDQpBbHNvIEkgZm91bmQsIE49OCBpZiBIVCBpcyBub3Qg
-YWN0aXZlIGJhc2VkIG9uIHRoZSBicm9hZHdlbGyjrCwNCnN1Y2ggYXMgQ1BVIEU3LTg4OTAgdjQg
-QCAyLjIwR0h6ICAgDQoNCiMgLi94ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS14ODZfNjQgLS1l
-bmFibGUta3ZtIC1zbXAgNCAtbSA0MDk2IC1oZGENCi9kYXRhL3p5eS90ZXN0X3FlbXUuaW1nLnNs
-ZXMxMnNwMSAtdm5jIDo5OSAtY3B1IGt2bTY0LHBtdT10cnVlIC1pbmNvbWluZyB0Y3A6Ojg4ODgN
-CkNvbXBsZXRlZCAxMDAgJQ0KcWVtdS1zeXN0ZW0teDg2XzY0OiBlcnJvcjogZmFpbGVkIHRvIHNl
-dCBNU1IgMHgzOGYgdG8gMHg3MDAwMDAwZmYNCnFlbXUtc3lzdGVtLXg4Nl82NDogL2RhdGEvenl5
-L2dpdC90ZXN0L3FlbXUvdGFyZ2V0L2kzODYva3ZtLmM6MTgzMzoga3ZtX3B1dF9tc3JzOiANCkFz
-c2VydGlvbiBgcmV0ID09IGNwdS0+a3ZtX21zcl9idWYtPm5tc3JzJyBmYWlsZWQuDQpBYm9ydGVk
-DQoNClNvIG1ha2UgbnVtYmVyIG9mIHBtYyBjb25maWd1cmFibGUgdG8gdm0gPyBBbnkgYmV0dGVy
-IGlkZWEgPw0KDQoNClJlZ2FyZHMsDQotWmh1YW5nIFlhbnlpbmcNCg==
+
+
+On 04/24/2017 11:48 AM, Jason Wang wrote:
+>
+>
+> On 2017年04月20日 14:39, Zhang Chen wrote:
+>> If user use -device virtio-net-pci, virtio-net driver will add a header
+>> to raw net packet that colo-proxy can't handle it. COLO-proxy just
+>> focus on the packet payload, so we skip the virtio-net header to compare
+>> the sent packet that primary guest's to secondary guest's.
+>>
+>> Zhang Chen (6):
+>>    net/filter-mirror.c: Add filter-mirror and filter-redirector vnet
+>>      support.
+>>    net/net.c: Add vnet header length to SocketReadState
+>>    net/colo-compare.c: Make colo-compare support vnet_hdr_len
+>>    net/socket.c: Add vnet packet support in net_socket_receive()
+>>    net/colo.c: Add vnet packet parse feature in colo-proxy
+>>    net/colo-compare.c: Add vnet packet's tcp/udp/icmp compare
+>>
+>>   include/net/net.h     |  4 +++-
+>>   net/colo-compare.c    | 48 
+>> +++++++++++++++++++++++++++++++++++++++---------
+>>   net/colo.c            |  9 +++++----
+>>   net/colo.h            |  4 +++-
+>>   net/filter-mirror.c   | 25 ++++++++++++++++++++-----
+>>   net/filter-rewriter.c |  2 +-
+>>   net/net.c             | 24 ++++++++++++++++++++++--
+>>   net/socket.c          |  6 ++++++
+>>   8 files changed, 99 insertions(+), 23 deletions(-)
+>>
+>
+> A quick glance at the series and find two issues:
+>
+> - We can't assume virtio-net is the only user for vnet header, you 
+> need query e.g NetClientState for a correct vnet header len.
+
+OK~~ I will fix it in next version.
+
+> - This series breaks qtest:
+>
+> **
+> ERROR:tests/e1000e-test.c:296:e1000e_send_verify: assertion failed 
+> (buffer == "TEST"): ("" == "TEST")
+> GTester: last random seed: R02S39dd06f7f52013798111df2e4eb602c5
+> **
+> ERROR:tests/e1000e-test.c:365:e1000e_receive_verify: assertion failed 
+> (le32_to_cpu(descr.wb.upper.status_error) & esta_dd == esta_dd): 
+> (0x00000000 == 0x00000001)
+> GTester: last random seed: R02S8c8200b8ec86358cb7addb5c6fe1303c
+> **
+> ERROR:tests/e1000e-test.c:296:e1000e_send_verify: assertion failed 
+> (buffer == "TEST"): ("" == "TEST")
+> GTester: last random seed: R02S9be86025aa7ded4902bdf644c3964a6e
+> **
+> ERROR:tests/libqos/virtio.c:94:qvirtio_wait_queue_isr: assertion 
+> failed: (g_get_monotonic_time() - start_time <= timeout_us)
+> GTester: last random seed: R02S30cac33d7a98fa56806ca59b35910ea5
+> **
+> ERROR:tests/libqos/virtio.c:94:qvirtio_wait_queue_isr: assertion 
+> failed: (g_get_monotonic_time() - start_time <= timeout_us)
+> GTester: last random seed: R02S258359836760a723622abf56cf2e61e7
+> ^C/home/devel/git/qemu/tests/Makefile.include:815: recipe for target 
+> 'check-qtest-x86_64' failed
+> make: *** [check-qtest-x86_64] Interrupt
+>
+> Please fix them.
+>
+
+Oh~~ I will fix thrm.
+
+Thanks
+Zhang Chen
+> Thanks
+>
+>
+> .
+>
+
+-- 
+Thanks
+Zhang Chen
