@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2WMZ-00047C-UY
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:40 -0400
+	(envelope-from <famz@redhat.com>) id 1d2Wnk-0003YB-RK
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2WMY-0006Fw-5f
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2WMX-0006Fg-Su
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:38 -0400
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 24 Apr 2017 13:16:06 +0800
-Message-Id: <1493010966-22976-9-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
-References: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] COLO-compare: Optimize tcp compare trace
- event
+	(envelope-from <famz@redhat.com>) id 1d2Wnj-0005Qd-PB
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:44:44 -0400
+Date: Mon, 24 Apr 2017 13:44:32 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170424054432.GB316@lemon.lan>
+References: <20170421035606.448-1-famz@redhat.com>
+	<20170421035606.448-6-famz@redhat.com>
+	<b4d67c71-ee5b-a698-69e8-c2ed5bb56e3c@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b4d67c71-ee5b-a698-69e8-c2ed5bb56e3c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v14 05/20] qemu-img: Update documentation
+ for --share-rw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+On Fri, 04/21 10:37, Eric Blake wrote:
+> On 04/20/2017 10:55 PM, Fam Zheng wrote:
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  qemu-img-cmds.hx | 48 ++++++++++++++++++++++++------------------------
+> >  1 file changed, 24 insertions(+), 24 deletions(-)
+> > 
+> > diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+> > index 8ac7822..1b00bb8 100644
+> > --- a/qemu-img-cmds.hx
+> > +++ b/qemu-img-cmds.hx
+> > @@ -10,15 +10,15 @@ STEXI
+> >  ETEXI
+> >  
+> >  DEF("bench", img_bench,
+> > -    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] filename")
+> > +    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] [--share-rw] filename")
+> 
+> General comment - it seems that we favor the short-option spelling where
+> one exists; should all of these updates mention -U instead of --share-rw?
 
-Optimize two trace events as one, adjust print format make
-it easy to read. rename trace_colo_compare_pkt_info_src/dst
-to trace_colo_compare_tcp_info.
+OK, I can change it.
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- net/colo-compare.c | 29 +++++++++++++++++------------
- net/trace-events   |  3 +--
- 2 files changed, 18 insertions(+), 14 deletions(-)
+> 
+> Also, why did you rename it from --unsafe-reads in an earlier revision?
+> After all, if I'm understanding this flag correctly, what you are asking
+> for is the ability to read the image in spite of other simultaneous
+> writers that may make your reads inconsistent.
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 4ab80b1..03ddebe 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -264,18 +264,23 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
-         res = -1;
-     }
- 
--    if (res != 0 && trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
--        trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
--                                        ntohl(stcp->th_seq),
--                                        ntohl(stcp->th_ack),
--                                        res, stcp->th_flags,
--                                        spkt->size);
--
--        trace_colo_compare_pkt_info_dst(inet_ntoa(ppkt->ip->ip_dst),
--                                        ntohl(ptcp->th_seq),
--                                        ntohl(ptcp->th_ack),
--                                        res, ptcp->th_flags,
--                                        ppkt->size);
-+    if (res && trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-+        char ip_src[20], ip_dst[20];
-+
-+        strcpy(ip_src, inet_ntoa(ppkt->ip->ip_src));
-+        strcpy(ip_dst, inet_ntoa(ppkt->ip->ip_dst));
-+
-+        trace_colo_compare_tcp_info(ip_src,
-+                                    ip_dst,
-+                                    ntohl(ptcp->th_seq),
-+                                    ntohl(stcp->th_seq),
-+                                    ntohl(ptcp->th_ack),
-+                                    ntohl(stcp->th_ack),
-+                                    res,
-+                                    ptcp->th_flags,
-+                                    stcp->th_flags,
-+                                    ppkt->size,
-+                                    spkt->size);
- 
-         qemu_hexdump((char *)ppkt->data, stderr,
-                      "colo-compare ppkt", ppkt->size);
-diff --git a/net/trace-events b/net/trace-events
-index 35198bc..123cb28 100644
---- a/net/trace-events
-+++ b/net/trace-events
-@@ -13,8 +13,7 @@ colo_compare_icmp_miscompare(const char *sta, int size) ": %s = %d"
- colo_compare_ip_info(int psize, const char *sta, const char *stb, int ssize, const char *stc, const char *std) "ppkt size = %d, ip_src = %s, ip_dst = %s, spkt size = %d, ip_src = %s, ip_dst = %s"
- colo_old_packet_check_found(int64_t old_time) "%" PRId64
- colo_compare_miscompare(void) ""
--colo_compare_pkt_info_src(const char *src, uint32_t sseq, uint32_t sack, int res, uint32_t sflag, int ssize) "src/dst: %s s: seq/ack=%u/%u res=%d flags=%x spkt_size: %d\n"
--colo_compare_pkt_info_dst(const char *dst, uint32_t dseq, uint32_t dack, int res, uint32_t dflag, int dsize) "src/dst: %s d: seq/ack=%u/%u res=%d flags=%x dpkt_size: %d\n"
-+colo_compare_tcp_info(const char *src, const char *dst, uint32_t pseq, uint32_t sseq, uint32_t pack, uint32_t sack, int res, uint32_t pflag, uint32_t sflag, int psize, int ssize) "src/dst: %s/%s pseq/sseq:%u/%u pack/sack:%u/%u res=%d pflags/sflag:%x/%x psize/ssize:%d/%d \n"
- 
- # net/filter-rewriter.c
- colo_filter_rewriter_debug(void) ""
--- 
-2.7.4
+It was a result of discussion with Kevin on IRC - consistent read as in the new
+op blocker API is specifically for the state of the intermediate nodes in commit
+job, and is orthogonal to the share-rw semantics as added to qdev. This option
+here for qemu-img/qemu-io, is more close to the latter, thus the name is updated
+to reflect its use case better.
+
+Fam
