@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1d2i2X-00046C-HX
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:44:46 -0400
+	(envelope-from <gm.ijewski@web.de>) id 1d2i9a-0005bA-7d
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1d2i2W-0007vm-C3
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:44:45 -0400
+	(envelope-from <gm.ijewski@web.de>) id 1d2i9W-0003VT-8a
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:52:02 -0400
+Received: from mout.web.de ([212.227.15.3]:55515)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gm.ijewski@web.de>) id 1d2i9V-0003Tl-SO
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 13:51:58 -0400
+From: Geert Martin Ijewski <gm.ijewski@web.de>
+Message-ID: <faa27752-45a9-e6f3-d6fc-cad8254c4f31@web.de>
+Date: Mon, 24 Apr 2017 19:51:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
-References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
-	<1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
-	<CAKmqyKMW-aTdzvTH5sir1BPx6U9XtgiZZ7TVigooXLFMY=UEQg@mail.gmail.com>
-	<CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 24 Apr 2017 10:44:12 -0700
-Message-ID: <CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 1/4] msf2: Add Smartfusion2
- System timer
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2] crypto_gen_random() now also works on
+ windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,266 +25,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
->>> +
->>> +    isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
->>> +    ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
->>> +
->>> +    qemu_set_irq(st->irq, (ier && isr));
->>> +}
->>> +
->>> +static uint64_t
->>> +timer_read(void *opaque, hwaddr addr, unsigned int size)
->>> +{
->>> +    struct timerblock *t = opaque;
->>> +    struct msf2_timer *st;
->>> +    uint32_t r = 0;
->>> +    unsigned int timer;
->>> +    int isr;
->>> +    int ier;
->>> +
->>> +    addr >>= 2;
->>> +    timer = timer_from_addr(addr);
->>> +    st = &t->timers[timer];
->>> +
->>> +    if (timer) {
->>> +        addr -= 6;
->>> +    }
->>
->> Isn't this timer logic just checking if (addr >> 2) == R_MAX and if it
->> is set (addr >> 2) back to zero? This seems an overly complex way to
->> check that.
-> I did not get you clearly. Do you want me to write like this:
-> unsigned int timer = 0;
->
-> addr >>= 2;
-> if (addr >= R_MAX) {
->     timer = 1;
->     addr =  addr - R_MAX;
-> }
+If no crypto library is included in the build QEMU uses 
+qcrypto_random_bytes() to generate random data. That function tried to 
+open /dev/urandom or /dev/random and if openeing neither file worked it 
+errored out.
 
-Yeah, I think this is clearer then what you had earlier.
+Those files obviously do not exist on windows, so there the code now 
+uses CryptGenRandom().
 
-Although why do you have to subtract R_MAX, shouldn't it just be an
-error if accessing values larger then R_MAX?
+Furthermore there was some refactoring and a new function 
+qcrypto_random_init() was introduced, that initalizes (platform 
+specific) handles that are used by qcrypto_random_bytes().
 
->
->>
->>> +
->>> +    switch (addr) {
->>> +    case R_VAL:
->>> +        r = ptimer_get_count(st->ptimer);
->>> +        D(qemu_log("msf2_timer t=%d read counter=%x\n", timer, r));
->>> +        break;
->>> +
->>> +    case R_MIS:
->>> +        isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
->>> +        ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
->>> +        r = ier && isr;
->>> +        break;
->>> +
->>> +    default:
->>> +        if (addr < ARRAY_SIZE(st->regs)) {
->>> +            r = st->regs[addr];
->>> +        }
->>> +        break;
->>> +    }
->>> +    D(fprintf(stderr, "%s timer=%d %x=%x\n", __func__, timer, addr * 4, r));
->>> +    return r;
->>> +}
->>> +
->>> +static void timer_update(struct msf2_timer *st)
->>> +{
->>> +    uint64_t count;
->>> +
->>> +    D(fprintf(stderr, "%s timer=%d\n", __func__, st->nr));
->>> +
->>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ENBL)) {
->>> +        ptimer_stop(st->ptimer);
->>> +        return;
->>> +    }
->>> +
->>> +    count = st->regs[R_LOADVAL];
->>> +    ptimer_set_limit(st->ptimer, count, 1);
->>> +    ptimer_run(st->ptimer, 1);
->>> +}
->>
->> The update function should be above the read/write functions.
->>
-> Ok I will change
->
->>> +
->>> +static void
->>> +timer_write(void *opaque, hwaddr addr,
->>> +            uint64_t val64, unsigned int size)
->>> +{
->>> +    struct timerblock *t = opaque;
->>> +    struct msf2_timer *st;
->>> +    unsigned int timer;
->>> +    uint32_t value = val64;
->>> +
->>> +    addr >>= 2;
->>> +    timer = timer_from_addr(addr);
->>> +    st = &t->timers[timer];
->>> +    D(fprintf(stderr, "%s addr=%x val=%x (timer=%d)\n",
->>> +             __func__, addr * 4, value, timer));
->>> +
->>> +    if (timer) {
->>> +        addr -= 6;
->>> +    }
->>
->> Same comment from the read function.
->>
->>> +
->>> +    switch (addr) {
->>> +    case R_CTRL:
->>> +        st->regs[R_CTRL] = value;
->>> +        timer_update(st);
->>> +        break;
->>> +
->>> +    case R_RIS:
->>> +        if (value & TIMER_RIS_ACK) {
->>> +            st->regs[R_RIS] &= ~TIMER_RIS_ACK;
->>> +        }
->>> +        break;
->>> +
->>> +    case R_LOADVAL:
->>> +        st->regs[R_LOADVAL] = value;
->>> +        if (st->regs[R_CTRL] & TIMER_CTRL_ENBL) {
->>> +            timer_update(st);
->>> +        }
->>> +        break;
->>> +
->>> +    case R_BGLOADVAL:
->>> +        st->regs[R_BGLOADVAL] = value;
->>> +        st->regs[R_LOADVAL] = value;
->>> +        break;
->>> +
->>> +    case R_VAL:
->>> +    case R_MIS:
->>> +        break;
->>> +
->>> +    default:
->>> +        if (addr < ARRAY_SIZE(st->regs)) {
->>> +            st->regs[addr] = value;
->>> +        }
->>> +        break;
->>> +    }
->>> +    timer_update_irq(st);
->>> +}
->>> +
->>> +static const MemoryRegionOps timer_ops = {
->>> +    .read = timer_read,
->>> +    .write = timer_write,
->>> +    .endianness = DEVICE_NATIVE_ENDIAN,
->>> +    .valid = {
->>> +        .min_access_size = 4,
->>> +        .max_access_size = 4
->>> +    }
->>> +};
->>> +
->>> +static void timer_hit(void *opaque)
->>> +{
->>> +    struct msf2_timer *st = opaque;
->>> +    D(fprintf(stderr, "%s %d\n", __func__, st->nr));
->>> +    st->regs[R_RIS] |= TIMER_RIS_ACK;
->>> +
->>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ONESHOT)) {
->>> +        timer_update(st);
->>> +    }
->>> +    timer_update_irq(st);
->>> +}
->>> +
->>> +static void msf2_timer_realize(DeviceState *dev, Error **errp)
->>> +{
->>> +    struct timerblock *t = MSF2_TIMER(dev);
->>> +    unsigned int i;
->>> +
->>> +    /* Init all the ptimers.  */
->>> +    t->timers = g_malloc0((sizeof t->timers[0]) * NUM_TIMERS);
->>> +    for (i = 0; i < NUM_TIMERS; i++) {
->>> +        struct msf2_timer *st = &t->timers[i];
->>> +
->>> +        st->parent = t;
->>> +        st->nr = i;
->>> +        st->bh = qemu_bh_new(timer_hit, st);
->>> +        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
->>> +        ptimer_set_freq(st->ptimer, t->freq_hz);
->>> +        sysbus_init_irq(SYS_BUS_DEVICE(dev), &st->irq);
->>> +    }
->>> +
->>> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, "msf2-timer",
->>> +                          R_MAX * 4 * NUM_TIMERS);
->>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &t->mmio);
->>
->> This should be in the devices init() function.
->
-> I referred Xilinx soft IP models for writing these models and used
-> same boilerplate code.
-> I am not clear about realize and init functions yet. Can you please
-> give a brief about them.
+Signed-off-by: Geert Martin Ijewski <gm.ijewski@web.de>
+---
+  crypto/init.c            |  6 ++++++
+  crypto/random-platform.c | 45 
++++++++++++++++++++++++++++++++++++++--------
+  include/crypto/random.h  |  9 +++++++++
+  3 files changed, 52 insertions(+), 8 deletions(-)
 
-Basically the simple explanation is that init is called when the
-object is created and realize is called when the object is realized.
+diff --git a/crypto/init.c b/crypto/init.c
+index f65207e..f131c42
+--- a/crypto/init.c
++++ b/crypto/init.c
+@@ -32,6 +32,8 @@
+  #include <gcrypt.h>
+  #endif
 
-Generally for devices it will go something like this:
- 1. init
- 2. Set properties
- 3. Connect things
- 4. realize
- 5. Map to memory
++#include "crypto/random.h"
++
+  /* #define DEBUG_GNUTLS */
 
-> Don't we need to use realize function for new models?
+  /*
+@@ -146,5 +148,9 @@ int qcrypto_init(Error **errp)
+      gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
+  #endif
 
-AFAIK we still put things like: sysbus_init_irq(),
-memory_region_init_io() and sysbus_init_mmio() in the init function.
++    if (qcrypto_random_init(errp) < 0) {
++        return -1;
++    }
++
+      return 0;
+  }
+diff --git a/crypto/random-platform.c b/crypto/random-platform.c
+index 82b755a..49d7f80
+@@ -22,14 +22,23 @@
 
-I don't think we are at a stage yet to not use init functions.
+  #include "crypto/random.h"
 
-Thanks,
+-int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+-                         size_t buflen G_GNUC_UNUSED,
+-                         Error **errp)
+-{
+-    int fd;
+-    int ret = -1;
+-    int got;
++#ifdef _WIN32
++#include <Wincrypt.h>
++HCRYPTPROV hCryptProv;
++#else
++int fd; /* a file handle to either /dev/urandom or /dev/random */
++#endif
 
-Alistair
++int qcrypto_random_init(Error **errp)
++{
++#ifdef _WIN32
++    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL,
++                             CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
++        error_setg_errno(errp, GetLastError(),
++                         "Unable to create cryptographic provider");
++        return -1;
++    }
++#else
+      /* TBD perhaps also add support for BSD getentropy / Linux
+       * getrandom syscalls directly */
+      fd = open("/dev/urandom", O_RDONLY);
+@@ -41,6 +50,18 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+          error_setg(errp, "No /dev/urandom or /dev/random found");
+          return -1;
+      }
++#endif
++
++    return 0;
++}
++
++int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
++                         size_t buflen G_GNUC_UNUSED,
++                         Error **errp)
++{
++#ifndef _WIN32
++    int ret = -1;
++    int got;
 
->
-> Thanks,
-> Sundeep
->>
->> Thanks,
->>
->> Alistair
->>
->>> +}
->>> +
->>> +static Property msf2_timer_properties[] = {
->>> +    DEFINE_PROP_UINT32("clock-frequency", struct timerblock, freq_hz,
->>> +                                                                83 * 1000000),
->>> +    DEFINE_PROP_END_OF_LIST(),
->>> +};
->>> +
->>> +static void msf2_timer_class_init(ObjectClass *klass, void *data)
->>> +{
->>> +    DeviceClass *dc = DEVICE_CLASS(klass);
->>> +
->>> +    dc->realize = msf2_timer_realize;
->>> +    dc->props = msf2_timer_properties;
->>> +}
->>> +
->>> +static const TypeInfo msf2_timer_info = {
->>> +    .name          = TYPE_MSF2_TIMER,
->>> +    .parent        = TYPE_SYS_BUS_DEVICE,
->>> +    .instance_size = sizeof(struct timerblock),
->>> +    .class_init    = msf2_timer_class_init,
->>> +};
->>> +
->>> +static void msf2_timer_register_types(void)
->>> +{
->>> +    type_register_static(&msf2_timer_info);
->>> +}
->>> +
->>> +type_init(msf2_timer_register_types)
->>> --
->>> 2.5.0
->>>
->>>
+      while (buflen > 0) {
+          got = read(fd, buf, buflen);
+@@ -59,6 +80,14 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+
+      ret = 0;
+   cleanup:
+-    close(fd);
+      return ret;
++#else
++    if (!CryptGenRandom(hCryptProv, buflen, buf)) {
++        error_setg_errno(errp, GetLastError(),
++                         "Unable to read random bytes");
++        return -1;
++    }
++
++    return 0;
++#endif
+  }
+diff --git a/include/crypto/random.h b/include/crypto/random.h
+index a101353..82a3209
+--- a/include/crypto/random.h
++++ b/include/crypto/random.h
+@@ -40,5 +40,14 @@ int qcrypto_random_bytes(uint8_t *buf,
+                           size_t buflen,
+                           Error **errp);
+
++/**
++ * qcrypto_random_init:
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Initalizes the handles used by qcrypto_random_bytes
++ *
++ * Returns 0 on success, -1 on error
++ */
++int qcrypto_random_init(Error **errp);
+
+  #endif /* QCRYPTO_RANDOM_H */
+-- 
+1.9.1
