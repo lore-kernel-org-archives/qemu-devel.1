@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TI2-0001Kk-GW
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TI3-0001MY-TI
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2TI1-0003K9-4f
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d2TI2-0003LL-RI
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 21:59:47 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Apr 2017 11:58:50 +1000
-Message-Id: <20170424015927.8933-11-david@gibson.dropbear.id.au>
+Date: Mon, 24 Apr 2017 11:58:53 +1000
+Message-Id: <20170424015927.8933-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20170424015927.8933-1-david@gibson.dropbear.id.au>
 References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 10/47] spapr: move spapr_populate_pa_features()
+Subject: [Qemu-devel] [PULL 13/47] target-ppc/kvm: Enable in-kernel TCE
+ acceleration for multi-tce
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,159 +21,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Sam Bobroff <sam.bobroff@au1.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-In the next patch, spapr_fixup_cpu_dt() will need to call
-spapr_populate_pa_features() so move it's definition up without making
-any other changes.
+This enables in-kernel handling of H_PUT_TCE_INDIRECT and
+H_STUFF_TCE hypercalls. The host kernel support is there since v4.6,
+in particular d3695aa4f452
+("KVM: PPC: Add support for multiple-TCE hcalls").
 
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+H_PUT_TCE is already accelerated and does not need any special enablement.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 122 ++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 61 insertions(+), 61 deletions(-)
+ hw/ppc/spapr.c       |  4 +++-
+ target/ppc/kvm.c     | 14 ++++++++++++++
+ target/ppc/kvm_ppc.h |  6 ++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 54391a1..21da9a1 100644
+index a355512..8749f1b 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -227,6 +227,67 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, CPUState *cs)
-     return ret;
+@@ -2361,10 +2361,12 @@ static void ppc_spapr_init(MachineState *machine)
+ 
+     qemu_register_boot_set(spapr_boot_set, spapr);
+ 
+-    /* to stop and start vmclock */
+     if (kvm_enabled()) {
++        /* to stop and start vmclock */
+         qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
+                                          &spapr->tb);
++
++        kvmppc_spapr_enable_inkernel_multitce();
+     }
  }
  
-+/* Populate the "ibm,pa-features" property */
-+static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index c959b90..8574c36 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2198,6 +2198,20 @@ bool kvmppc_spapr_use_multitce(void)
+     return cap_spapr_multitce;
+ }
+ 
++int kvmppc_spapr_enable_inkernel_multitce(void)
 +{
-+    uint8_t pa_features_206[] = { 6, 0,
-+        0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-+    uint8_t pa_features_207[] = { 24, 0,
-+        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0,
-+        0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
-+        0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
-+        0x80, 0x00, 0x80, 0x00, 0x00, 0x00 };
-+    /* Currently we don't advertise any of the "new" ISAv3.00 functionality */
-+    uint8_t pa_features_300[] = { 64, 0,
-+        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0, /*  0 -  5 */
-+        0x80, 0x00, 0x00, 0x00, 0x00, 0x00, /*  6 - 11 */
-+        0x00, 0x00, 0x00, 0x00, 0x80, 0x00, /* 12 - 17 */
-+        0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 18 - 23 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 24 - 29 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 30 - 35 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 36 - 41 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 42 - 47 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 48 - 53 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 54 - 59 */
-+        0x00, 0x00, 0x00, 0x00           }; /* 60 - 63 */
++    int ret;
 +
-+    uint8_t *pa_features;
-+    size_t pa_size;
-+
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-+    case POWERPC_MMU_VER_2_06:
-+        pa_features = pa_features_206;
-+        pa_size = sizeof(pa_features_206);
-+        break;
-+    case POWERPC_MMU_VER_2_07:
-+        pa_features = pa_features_207;
-+        pa_size = sizeof(pa_features_207);
-+        break;
-+    case POWERPC_MMU_VER_3_00:
-+        pa_features = pa_features_300;
-+        pa_size = sizeof(pa_features_300);
-+        break;
-+    default:
-+        return;
++    ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_ENABLE_HCALL, 0,
++                            H_PUT_TCE_INDIRECT, 1);
++    if (!ret) {
++        ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_ENABLE_HCALL, 0,
++                                H_STUFF_TCE, 1);
 +    }
 +
-+    if (env->ci_large_pages) {
-+        /*
-+         * Note: we keep CI large pages off by default because a 64K capable
-+         * guest provisioned with large pages might otherwise try to map a qemu
-+         * framebuffer (or other kind of memory mapped PCI BAR) using 64K pages
-+         * even if that qemu runs on a 4k host.
-+         * We dd this bit back here if we are confident this is not an issue
-+         */
-+        pa_features[3] |= 0x20;
-+    }
-+    if (kvmppc_has_cap_htm() && pa_size > 24) {
-+        pa_features[24] |= 0x80;    /* Transactional memory support */
-+    }
-+
-+    _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
++    return ret;
 +}
 +
- static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
- {
-     int ret = 0, offset, cpus_offset;
-@@ -379,67 +440,6 @@ static int spapr_populate_memory(sPAPRMachineState *spapr, void *fdt)
-     return 0;
+ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+                               uint64_t bus_offset, uint32_t nb_table,
+                               int *pfd, bool need_vfio)
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 4b2fd9a..f48243d 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -39,6 +39,7 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+ #ifndef CONFIG_USER_ONLY
+ off_t kvmppc_alloc_rma(void **rma);
+ bool kvmppc_spapr_use_multitce(void);
++int kvmppc_spapr_enable_inkernel_multitce(void);
+ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+                               uint64_t bus_offset, uint32_t nb_table,
+                               int *pfd, bool need_vfio);
+@@ -180,6 +181,11 @@ static inline bool kvmppc_spapr_use_multitce(void)
+     return false;
  }
  
--/* Populate the "ibm,pa-features" property */
--static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
--{
--    uint8_t pa_features_206[] = { 6, 0,
--        0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
--    uint8_t pa_features_207[] = { 24, 0,
--        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0,
--        0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
--        0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
--        0x80, 0x00, 0x80, 0x00, 0x00, 0x00 };
--    /* Currently we don't advertise any of the "new" ISAv3.00 functionality */
--    uint8_t pa_features_300[] = { 64, 0,
--        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0, /*  0 -  5 */
--        0x80, 0x00, 0x00, 0x00, 0x00, 0x00, /*  6 - 11 */
--        0x00, 0x00, 0x00, 0x00, 0x80, 0x00, /* 12 - 17 */
--        0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 18 - 23 */
--        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 24 - 29 */
--        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 30 - 35 */
--        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 36 - 41 */
--        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 42 - 47 */
--        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 48 - 53 */
--        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 54 - 59 */
--        0x00, 0x00, 0x00, 0x00           }; /* 60 - 63 */
--
--    uint8_t *pa_features;
--    size_t pa_size;
--
--    switch (POWERPC_MMU_VER(env->mmu_model)) {
--    case POWERPC_MMU_VER_2_06:
--        pa_features = pa_features_206;
--        pa_size = sizeof(pa_features_206);
--        break;
--    case POWERPC_MMU_VER_2_07:
--        pa_features = pa_features_207;
--        pa_size = sizeof(pa_features_207);
--        break;
--    case POWERPC_MMU_VER_3_00:
--        pa_features = pa_features_300;
--        pa_size = sizeof(pa_features_300);
--        break;
--    default:
--        return;
--    }
--
--    if (env->ci_large_pages) {
--        /*
--         * Note: we keep CI large pages off by default because a 64K capable
--         * guest provisioned with large pages might otherwise try to map a qemu
--         * framebuffer (or other kind of memory mapped PCI BAR) using 64K pages
--         * even if that qemu runs on a 4k host.
--         * We dd this bit back here if we are confident this is not an issue
--         */
--        pa_features[3] |= 0x20;
--    }
--    if (kvmppc_has_cap_htm() && pa_size > 24) {
--        pa_features[24] |= 0x80;    /* Transactional memory support */
--    }
--
--    _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
--}
--
- static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-                                   sPAPRMachineState *spapr)
- {
++static inline int kvmppc_spapr_enable_inkernel_multitce(void)
++{
++    return -1;
++}
++
+ static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+                                             uint64_t bus_offset,
+                                             uint32_t nb_table,
 -- 
 2.9.3
