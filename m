@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2RKa-0006Zp-HQ
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 19:54:17 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d2Ra7-0008Gt-E4
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 20:10:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d2RKY-0006f8-SP
-	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 19:54:16 -0400
-Date: Mon, 24 Apr 2017 09:17:22 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170423231722.GA14558@umbus.fritz.box>
-References: <201704212158.v3LLwNYl031738@linux03a.ddci.com>
+	(envelope-from <no-reply@patchew.org>) id 1d2Ra3-0001fW-DQ
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 20:10:19 -0400
+Resent-Message-Id: <E1d2Ra3-0001fW-DQ@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21389)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d2Ra3-0001cO-2o
+	for qemu-devel@nongnu.org; Sun, 23 Apr 2017 20:10:15 -0400
+In-Reply-To: <cover.1492986468.git.shorne@gmail.com>
+Message-ID: <149299259912.69.3083061025771244064@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IS0zKkzwUGydFO0o"
-Content-Disposition: inline
-In-Reply-To: <201704212158.v3LLwNYl031738@linux03a.ddci.com>
-Subject: Re: [Qemu-devel] Subject: [PATCH] target-ppc: Add global timer
- group A to open-pic.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 23 Apr 2017 17:09:59 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] Openrisc misc features / fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,310 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Larson <alarson@ddci.com>
-Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: shorne@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, openrisc@lists.librecores.org, mithro@mithis.com
 
-
---IS0zKkzwUGydFO0o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Apr 21, 2017 at 02:58:23PM -0700, Aaron Larson wrote:
-> Add global timer group A to open-pic.  This patch is still somewhat
-> dubious because I'm not sure how to determine what QEMU wants for the
-> timer frequency.  Suggestions solicited.
-
-This commit message really needs some more context.  What's a "global
-time group A" a and why do we want it?
-
->=20
-> Signed-off-by: Aaron Larson <alarson@ddci.com>
-> ---
->  hw/intc/openpic.c | 134 ++++++++++++++++++++++++++++++++++++++++++++++--=
-------
->  1 file changed, 116 insertions(+), 18 deletions(-)
->=20
-> diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
-> index 4349e45..769a31a 100644
-> --- a/hw/intc/openpic.c
-> +++ b/hw/intc/openpic.c
-> @@ -45,6 +45,7 @@
->  #include "qemu/bitops.h"
->  #include "qapi/qmp/qerror.h"
->  #include "qemu/log.h"
-> +#include "qemu/timer.h"
-> =20
->  //#define DEBUG_OPENPIC
-> =20
-> @@ -54,8 +55,10 @@ static const int debug_openpic =3D 1;
->  static const int debug_openpic =3D 0;
->  #endif
-> =20
-> +static int get_current_cpu(void);
->  #define DPRINTF(fmt, ...) do { \
->          if (debug_openpic) { \
-> +            printf("Core%d: ", get_current_cpu()); \
->              printf(fmt , ## __VA_ARGS__); \
->          } \
->      } while (0)
-> @@ -246,9 +249,24 @@ typedef struct IRQSource {
->  #define IDR_EP      0x80000000  /* external pin */
->  #define IDR_CI      0x40000000  /* critical interrupt */
-> =20
-> +/* Conversion between ticks and nanosecs: TODO: need better way for this.
-> + Assume a 100mhz clock, divided by 8, or 25mhz
-> + 25,000,000 ticks/sec, 25,000/ms, 25/us, 1 tick/40ns
-> +*/
-> +#define CONV_FACTOR 40LL
-> +static inline uint64_t ns_to_ticks(uint64_t ns)   { return ns   / CONV_F=
-ACTOR; }
-> +static inline uint64_t ticks_to_ns(uint64_t tick) { return tick * CONV_F=
-ACTOR; }
-> +
->  typedef struct OpenPICTimer {
->      uint32_t tccr;  /* Global timer current count register */
->      uint32_t tbcr;  /* Global timer base count register */
-> +    int                   n_IRQ;
-> +    bool                  qemu_timer_active; /* Is the qemu_timer is run=
-ning? */
-> +    struct QEMUTimer     *qemu_timer;   /* May be 0 if not created. */
-> +    struct OpenPICState  *opp;          /* device timer is part of. */
-> +    /* the time corresponding to the last current_count written or read,
-> +       only defined if qemu_timer_active. */
-> +    uint64_t              originTime;
->  } OpenPICTimer;
-> =20
->  typedef struct OpenPICMSI {
-> @@ -795,37 +813,102 @@ static uint64_t openpic_gbl_read(void *opaque, hwa=
-ddr addr, unsigned len)
->      return retval;
->  }
-> =20
-> +static void openpic_tmr_set_tmr(OpenPICTimer *tmr, uint32_t val, bool en=
-abled);
-> +
-> +static void qemu_timer_cb(void *opaque)
-> +{
-> +    OpenPICTimer *tmr =3D opaque;
-> +    OpenPICState *opp =3D tmr->opp;
-> +    uint32_t      n_IRQ =3D tmr->n_IRQ;
-> +    uint32_t val =3D   tmr->tbcr & ~TBCR_CI;
-> +    uint32_t tog =3D ((tmr->tccr & TCCR_TOG) ^ TCCR_TOG);  /* invert tog=
-gle. */
-> +
-> +    DPRINTF("%s n_IRQ=3D%d\n", __func__, n_IRQ);
-> +    /* reload current count from base count and setup timer. */
-> +    tmr->tccr =3D val | tog;
-> +    openpic_tmr_set_tmr(tmr, val, /*enabled=3D*/true);
-> +    /* raise the interrupt. */
-> +    opp->src[n_IRQ].destmask =3D read_IRQreg_idr(opp, n_IRQ);
-> +    openpic_set_irq(opp, n_IRQ, 1);
-> +    openpic_set_irq(opp, n_IRQ, 0);
-> +}
-> +
-> +/* If enabled is true, arranges for an interrupt to be raised val clocks=
- into
-> +   the future, if enabled is false cancels the timer. */
-> +static void openpic_tmr_set_tmr(OpenPICTimer *tmr, uint32_t val, bool en=
-abled)
-> +{
-> +    /* if timer doesn't exist, create it. */
-> +    if (tmr->qemu_timer =3D=3D 0) {
-> +        tmr->qemu_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, &qemu_timer=
-_cb, tmr);
-> +        DPRINTF("Created timer for n_IRQ %d\n", tmr->n_IRQ);
-> +    }
-> +    uint64_t ns =3D ticks_to_ns(val & ~TCCR_TOG);
-> +    /* A count of zero causes a timer to be set to expire immediately.  =
-This
-> +       effectively stops the simulation so we don't honor that configura=
-tion.
-> +       On real hardware, this would generate an interrupt on every clock=
- cycle
-> +       if the interrupt was unmasked. */
-> +    if ((ns =3D=3D 0) || !enabled) {
-> +        tmr->qemu_timer_active =3D false;
-> +        tmr->tccr =3D tmr->tccr & TCCR_TOG;
-> +        timer_del(tmr->qemu_timer); /* set timer to never expire. */
-> +    } else {
-> +        tmr->qemu_timer_active =3D true;
-> +        uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +        tmr->originTime =3D now;
-> +        timer_mod(tmr->qemu_timer, now + ns);     /* set timer expiratio=
-n. */
-> +    }
-> +}
-> +
-> +/* Returns the currrent tccr value, i.e., timer value (in clocks) with
-> +   appropriate TOG. */
-> +static uint64_t openpic_tmr_get_timer(OpenPICTimer *tmr)
-> +{
-> +    uint64_t retval;
-> +    if (!tmr->qemu_timer_active) {
-> +        retval =3D tmr->tccr;
-> +    } else {
-> +        uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +        uint64_t used =3D now - tmr->originTime;  /* nsecs */
-> +        uint32_t used_ticks =3D (uint32_t)ns_to_ticks(used);
-> +        uint32_t count =3D (tmr->tccr & ~TCCR_TOG) - used_ticks;
-> +        retval =3D (uint32_t)((tmr->tccr & TCCR_TOG) | (count & ~TCCR_TO=
-G));
-> +    }
-> +    return retval;
-> +}
-> +
->  static void openpic_tmr_write(void *opaque, hwaddr addr, uint64_t val,
-> -                                unsigned len)
-> +                              unsigned len)
->  {
->      OpenPICState *opp =3D opaque;
->      int idx;
-> =20
-> -    addr +=3D 0x10f0;
-> -
->      DPRINTF("%s: addr %#" HWADDR_PRIx " <=3D %08" PRIx64 "\n",
-> -            __func__, addr, val);
-> +            __func__, (addr + 0x10f0), val);
->      if (addr & 0xF) {
->          return;
->      }
-> =20
-> -    if (addr =3D=3D 0x10f0) {
-> +    if (addr =3D=3D 0) {
->          /* TFRR */
->          opp->tfrr =3D val;
->          return;
->      }
-> -
-> +    addr -=3D 0x10;  /* correct for TFRR */
->      idx =3D (addr >> 6) & 0x3;
-> -    addr =3D addr & 0x30;
-> =20
->      switch (addr & 0x30) {
->      case 0x00: /* TCCR */
->          break;
->      case 0x10: /* TBCR */
-> -        if ((opp->timers[idx].tccr & TCCR_TOG) !=3D 0 &&
-> -            (val & TBCR_CI) =3D=3D 0 &&
-> -            (opp->timers[idx].tbcr & TBCR_CI) !=3D 0) {
-> -            opp->timers[idx].tccr &=3D ~TCCR_TOG;
-> +        /* Did the enable status change? */
-> +        if ((opp->timers[idx].tbcr & TBCR_CI) !=3D (val & TBCR_CI)) {
-> +            /* Did "Count Inhibit" transition from 1 to 0? */
-> +            if ((val & TBCR_CI) =3D=3D 0) {
-> +                opp->timers[idx].tccr =3D val & ~TCCR_TOG;
-> +            }
-> +            openpic_tmr_set_tmr(&opp->timers[idx],
-> +                                (val & ~TBCR_CI),
-> +                                /*enabled=3D*/((val & TBCR_CI) =3D=3D 0)=
-);
->          }
->          opp->timers[idx].tbcr =3D val;
->          break;
-> @@ -844,27 +927,28 @@ static uint64_t openpic_tmr_read(void *opaque, hwad=
-dr addr, unsigned len)
->      uint32_t retval =3D -1;
->      int idx;
-> =20
-> -    DPRINTF("%s: addr %#" HWADDR_PRIx "\n", __func__, addr);
-> +    DPRINTF("%s: addr %#" HWADDR_PRIx "\n", __func__, addr + 0x10f0);
->      if (addr & 0xF) {
->          goto out;
->      }
-> -    idx =3D (addr >> 6) & 0x3;
-> -    if (addr =3D=3D 0x0) {
-> +    if (addr =3D=3D 0) {
->          /* TFRR */
->          retval =3D opp->tfrr;
->          goto out;
->      }
-> +    addr -=3D 0x10;  /* correct for TFRR */
-> +    idx =3D (addr >> 6) & 0x3;
->      switch (addr & 0x30) {
->      case 0x00: /* TCCR */
-> -        retval =3D opp->timers[idx].tccr;
-> +        retval =3D openpic_tmr_get_timer(&opp->timers[idx]);
->          break;
->      case 0x10: /* TBCR */
->          retval =3D opp->timers[idx].tbcr;
->          break;
-> -    case 0x20: /* TIPV */
-> +    case 0x20: /* TVPR */
->          retval =3D read_IRQreg_ivpr(opp, opp->irq_tim0 + idx);
->          break;
-> -    case 0x30: /* TIDE (TIDR) */
-> +    case 0x30: /* TDR */
->          retval =3D read_IRQreg_idr(opp, opp->irq_tim0 + idx);
->          break;
->      }
-> @@ -1138,7 +1222,10 @@ static uint32_t openpic_iack(OpenPICState *opp, IR=
-QDest *dst, int cpu)
->          IRQ_resetbit(&dst->raised, irq);
->      }
-> =20
-> -    if ((irq >=3D opp->irq_ipi0) &&  (irq < (opp->irq_ipi0 + OPENPIC_MAX=
-_IPI))) {
-> +    /* Timers and IPIs support multicast. */
-> +    if (((irq >=3D opp->irq_ipi0) && (irq < (opp->irq_ipi0 + OPENPIC_MAX=
-_IPI))) ||
-> +        ((irq >=3D opp->irq_tim0) && (irq < (opp->irq_tim0 + OPENPIC_MAX=
-_TMR)))) {
-> +        DPRINTF("irq is IPI or TMR\n");
->          src->destmask &=3D ~(1 << cpu);
->          if (src->destmask && !src->level) {
->              /* trigger on CPUs that didn't know about it yet */
-> @@ -1343,6 +1430,10 @@ static void openpic_reset(DeviceState *d)
->      for (i =3D 0; i < OPENPIC_MAX_TMR; i++) {
->          opp->timers[i].tccr =3D 0;
->          opp->timers[i].tbcr =3D TBCR_CI;
-> +        if (opp->timers[i].qemu_timer_active) {
-> +            timer_del(opp->timers[i].qemu_timer);  /* Inhibit timer */
-> +            opp->timers[i].qemu_timer_active =3D 0;
-> +        }
->      }
->      /* Go out of RESET state */
->      opp->gcr =3D 0;
-> @@ -1393,6 +1484,13 @@ static void fsl_common_init(OpenPICState *opp)
->          opp->src[i].type =3D IRQ_TYPE_FSLSPECIAL;
->          opp->src[i].level =3D false;
->      }
-> +
-> +    for (i =3D 0; i < OPENPIC_MAX_TMR; i++) {
-> +        opp->timers[i].n_IRQ =3D opp->irq_tim0 + i;
-> +        opp->timers[i].qemu_timer_active =3D 0;
-> +        opp->timers[i].qemu_timer =3D 0;
-> +        opp->timers[i].opp =3D opp;
-> +    }
->  }
-> =20
->  static void map_list(OpenPICState *opp, const MemReg *list, int *count)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---IS0zKkzwUGydFO0o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJY/TX/AAoJEGw4ysog2bOStwgP/2o7Yj/9+jaV+/Oxr4QOy8j8
-LZcF2N9PZrtz26cHhpmqspyAHWU87x0b9zv/jBjVd4c801wn7Xk5jKSByXOgl1J3
-FsOGStPRVEhhmtJOcWgljMn8kh29poa89vwxvqYthnJGFPDiKeuAll5qMf7LryyD
-w98pfN1aYNK/3JF6DKrkqXkb45ZlriF7j8npI2S5/48x1XSfBomVOqMBJ3QBb0wT
-edGV2rI1hoi706uaJBTpWmLHHWeG4HA39dpg6vWUsGx6Qqorza4IfbOzx546T7Ts
-lXM/ES0DS7iJVcWjdn+7FWL1zmNKxUgjwvHBHq+nBIhXTM/YCYQDtuS17j394ltX
-Jkxv6qFU0N5MNCiPXloVyuhcg099rR3Y7Mh9Z8srJu+NjrKJjhb/FMwMKsrNV+iJ
-oNWu9xInRnb7/FFfqEH74DY0yXmCRNVTxo18QcMmRrWh9oLE5iWBOXMY7Ss3axDs
-XiW9o4dZytaGAmoavn42RfzOHJziYymkdn3QoYEF/yUx5rI3+bQNu1/1cjrlw9LN
-LLOH0YxCRymppCKJJSksnMZJ3dSo4DUgBAE2Uux7xhxv0OKX7mzqgw2HcGRSlrCL
-ItDsCmqi//QrhuxFckbbsWS/bry43A+M05nxpugpjBcH5rIrkl2mFZC0T8E0Orgs
-5VPh5hy2P+SvbAFR81IN
-=sxD8
------END PGP SIGNATURE-----
-
---IS0zKkzwUGydFO0o--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogY292
+ZXIuMTQ5Mjk4NjQ2OC5naXQuc2hvcm5lQGdtYWlsLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0g
+W1BBVENIIHYyIDAvOV0gT3BlbnJpc2MgbWlzYyBmZWF0dXJlcyAvIGZpeGVzClR5cGU6IHNlcmll
+cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNl
+ZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
+b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
+aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
+JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
+aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
+ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
+UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
+NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTI1MTk1ZCB0YXJnZXQvb3Bl
+bnJpc2M6IFJlbW92ZSBkdXBsaWNhdGUgZmVhdHVyZXMgcHJvcGVydHkKN2VkNTBiZCB0YXJnZXQv
+b3BlbnJpc2M6IEltcGxlbWVudCBmdWxsIHZtc3RhdGUgc2VyaWFsaXphdGlvbgo0OWQwMTI3IG1p
+Z3JhdGlvbjogQWRkIFZNU1RBVEVfU1RSVUNUXzJEQVJSQVkoKQoyN2M0N2E5IHRhcmdldC9vcGVu
+cmlzYzogaW1wbGVtZW50IHNoYWRvdyByZWdpc3RlcnMKN2NmNjE1MSBtaWdyYXRpb246IEFkZCBW
+TVNUQVRFX1VJTlRUTF8yREFSUkFZKCkKNjQ5ODYzZiB0YXJnZXQvb3BlbnJpc2M6IGFkZCBudW1j
+b3JlcyBhbmQgY29yZWlkIHN1cHBvcnQKZGFiOTZhYiB0YXJnZXQvb3BlbnJpc2M6IEZpeGVzIGZv
+ciBtZW1vcnkgZGVidWdnaW5nCjlmZTBiZDkgdGFyZ2V0L29wZW5yaXNjOiBJbXBsZW1lbnQgRVBI
+IGJpdAo0MjMxNGE5IHRhcmdldC9vcGVucmlzYzogSW1wbGVtZW50IEVWQkFSIHJlZ2lzdGVyCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IHRhcmdldC9vcGVucmlzYzog
+SW1wbGVtZW50IEVWQkFSIHJlZ2lzdGVyLi4uCkNoZWNraW5nIFBBVENIIDIvOTogdGFyZ2V0L29w
+ZW5yaXNjOiBJbXBsZW1lbnQgRVBIIGJpdC4uLgpDaGVja2luZyBQQVRDSCAzLzk6IHRhcmdldC9v
+cGVucmlzYzogRml4ZXMgZm9yIG1lbW9yeSBkZWJ1Z2dpbmcuLi4KV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzQ1OiBGSUxFOiB0YXJnZXQvb3BlbnJpc2MvbW11LmM6MjMyOgorICAg
+ICAgICBtaXNzID0gY3B1X29wZW5yaXNjX2dldF9waHlzX2FkZHIoY3B1LCAmcGh5c19hZGRyLCAm
+cHJvdCwgYWRkciwgTU1VX0lOU1RfRkVUQ0gpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
+LCAzOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CkNoZWNraW5nIFBBVENIIDQvOTogdGFyZ2V0L29wZW5yaXNjOiBhZGQgbnVtY29yZXMgYW5kIGNv
+cmVpZCBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDUvOTogbWlncmF0aW9uOiBBZGQgVk1TVEFU
+RV9VSU5UVExfMkRBUlJBWSgpLi4uCkNoZWNraW5nIFBBVENIIDYvOTogdGFyZ2V0L29wZW5yaXNj
+OiBpbXBsZW1lbnQgc2hhZG93IHJlZ2lzdGVycy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojMTM1OiBGSUxFOiBsaW51eC11c2VyL3NpZ25hbC5jOjQ0OTI6CisgICAgX19wdXRf
+dXNlcihzYXNfc3NfZmxhZ3MoY3B1X2dldF9ncHIoZW52LCAxKSksICZmcmFtZS0+dWMudHVjX3N0
+YWNrLnNzX2ZsYWdzKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjMwIGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFU
+Q0ggNy85OiBtaWdyYXRpb246IEFkZCBWTVNUQVRFX1NUUlVDVF8yREFSUkFZKCkuLi4KRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyMDogRklMRTogaW5jbHVkZS9taWdyYXRpb24vdm1z
+dGF0ZS5oOjUwMzoKKyNkZWZpbmUgVk1TVEFURV9TVFJVQ1RfMkRBUlJBWV9URVNUKF9maWVsZCwg
+X3N0YXRlLCBfbjEsIF9uMiwgX3Rlc3QsIF92ZXJzaW9uLCBfdm1zZCwgX3R5cGUpIHsgXAoKRVJS
+T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnfCcgKGN0eDpWeFYpCiMyNzogRklMRTog
+aW5jbHVkZS9taWdyYXRpb24vdm1zdGF0ZS5oOjUxMDoKKyAgICAuZmxhZ3MgICAgICAgID0gVk1T
+X1NUUlVDVHxWTVNfQVJSQVksICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojMzg6IEZJTEU6IGluY2x1ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDo3NjE6CisjZGVm
+aW5lIFZNU1RBVEVfU1RSVUNUXzJEQVJSQVkoX2ZpZWxkLCBfc3RhdGUsIF9uMSwgX24yLCBfdmVy
+c2lvbiwgX3Ztc2QsIF90eXBlKSBcCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDI3IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
+aW5nIFBBVENIIDgvOTogdGFyZ2V0L29wZW5yaXNjOiBJbXBsZW1lbnQgZnVsbCB2bXN0YXRlIHNl
+cmlhbGl6YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggOS85OiB0YXJnZXQvb3BlbnJpc2M6IFJlbW92
+ZSBkdXBsaWNhdGUgZmVhdHVyZXMgcHJvcGVydHkuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
