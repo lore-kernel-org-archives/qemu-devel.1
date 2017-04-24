@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d2fFa-0006X3-CQ
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:46:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1d2fKf-0007tW-F3
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d2fFX-0007fu-9W
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:46:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53564)
+	(envelope-from <eblake@redhat.com>) id 1d2fKc-0000uA-Dw
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:51:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d2fFW-0007fe-PO
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:45:59 -0400
-Date: Mon, 24 Apr 2017 22:45:52 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170424144552.GA6511@lemon.lan>
-References: <1493044126-21488-1-git-send-email-joserz@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d2fKc-0000tu-4J
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 10:51:14 -0400
+References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3333f034-0fd2-875f-fbfc-a2c0eda1f09a@redhat.com>
+Date: Mon, 24 Apr 2017 09:51:11 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1493044126-21488-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] trace: add qemu mutex lock and unlock
- trace events
+In-Reply-To: <1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nxNraKcIoi73L6G5Op01gvkVF8TpaBEtO"
+Subject: Re: [Qemu-devel] [PATCH v2 05/18] COLO: Handle shutdown command for
+ VM in COLO state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
+Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, quintela@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, 04/24 11:28, Jose Ricardo Ziviani wrote:
-> These trace events were very useful to help me to understand and find a
-> reordering issue in vfio, for example:
-> 
-> qemu_mutex_lock locked mutex 0x10905ad8
->   vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2020c, 4)
-> qemu_mutex_unlock unlocked mutex 0x10905ad8
-> qemu_mutex_lock locked mutex 0x10905ad8
->   vfio_region_write  (0001:03:00.0:region1+0xc4, 0xa0000, 4)
-> qemu_mutex_unlock unlocked mutex 0x10905ad8
-> 
-> that also helped to see desired result after the fix:
-> 
-> qemu_mutex_lock locked mutex 0x10905ad8
->   vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2000c, 4)
->   vfio_region_write  (0001:03:00.0:region1+0xc4, 0xb0000, 4)
-> qemu_mutex_unlock unlocked mutex 0x10905ad8
-> 
-> So it could be a good idea to have these traces implemented. It's worth
-> mentioning that they should be surgically enabled during the debugging,
-> otherwise it'd flood the trace logs with lock/unlock messages.
-> 
-> How to use it:
-> trace-event qemu_mutex_lock on|off
-> trace-event qemu_mutex_unlock on|off
-> or
-> trace-event qemu_mutex* on|off
-> 
-> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nxNraKcIoi73L6G5Op01gvkVF8TpaBEtO
+From: Eric Blake <eblake@redhat.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
+Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com,
+ zhangchen.fnst@cn.fujitsu.com, quintela@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3333f034-0fd2-875f-fbfc-a2c0eda1f09a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 05/18] COLO: Handle shutdown command for
+ VM in COLO state
+References: <1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com>
+ <1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/22/2017 03:25 AM, zhanghailiang wrote:
+> If VM is in COLO FT state, we need to do some extra works before
+> starting normal shutdown process.
+>=20
+> Secondary VM will ignore the shutdown command if users issue it directl=
+y
+> to Secondary VM. COLO will capture shutdown command and after
+> shutdown request from user.
+>=20
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  util/qemu-thread-posix.c | 5 +++++
->  util/trace-events        | 4 ++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-> index 73e3a0e..909c2ac 100644
-> --- a/util/qemu-thread-posix.c
-> +++ b/util/qemu-thread-posix.c
-> @@ -14,6 +14,7 @@
->  #include "qemu/thread.h"
->  #include "qemu/atomic.h"
->  #include "qemu/notify.h"
-> +#include "trace.h"
->  
->  static bool name_threads;
->  
-> @@ -60,6 +61,8 @@ void qemu_mutex_lock(QemuMutex *mutex)
->      err = pthread_mutex_lock(&mutex->lock);
->      if (err)
->          error_exit(err, __func__);
-> +
-> +    trace_qemu_mutex_lock((void *)&mutex->lock);
 
-You don't need these casts as the parameter type is void * which accepts any
-pointers.
+> +++ b/qapi-schema.json
+> @@ -1187,12 +1187,14 @@
+>  #
+>  # @vmstate-loaded: VM's state has been loaded by SVM.
+>  #
+> +# @guest-shutdown: shutdown requested from PVM to SVM. (Since 2.9)
 
->  }
->  
->  int qemu_mutex_trylock(QemuMutex *mutex)
-> @@ -74,6 +77,8 @@ void qemu_mutex_unlock(QemuMutex *mutex)
->      err = pthread_mutex_unlock(&mutex->lock);
->      if (err)
->          error_exit(err, __func__);
-> +
-> +    trace_qemu_mutex_unlock((void *)&mutex->lock);
->  }
->  
->  void qemu_rec_mutex_init(QemuRecMutex *mutex)
-> diff --git a/util/trace-events b/util/trace-events
-> index b44ef4f..65c33fe 100644
-> --- a/util/trace-events
-> +++ b/util/trace-events
-> @@ -55,3 +55,7 @@ lockcnt_futex_wait_prepare(const void *lockcnt, int expected, int new) "lockcnt
->  lockcnt_futex_wait(const void *lockcnt, int val) "lockcnt %p waiting on %d"
->  lockcnt_futex_wait_resume(const void *lockcnt, int new) "lockcnt %p after wait: %d"
->  lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter"
-> +
-> +# util/qemu-thread-posix.c
-> +qemu_mutex_lock(void *qemu_global_mutex) "locked mutex %p"
-> +qemu_mutex_unlock(void *qemu_global_mutex) "unlocked mutex %p"
+You missed 2.9. Please fix this to state 2.10.
 
-Parameter name is slightly misleading, maybe s/qemu_global_mutex/lock/ for both
-lines?
+> +#
+>  # Since: 2.8
+>  ##
+>  { 'enum': 'COLOMessage',
+>    'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-repl=
+y',
+>              'vmstate-send', 'vmstate-size', 'vmstate-received',
+> -            'vmstate-loaded' ] }
+> +            'vmstate-loaded', 'guest-shutdown' ] }
+> =20
 
-Fam
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--nxNraKcIoi73L6G5Op01gvkVF8TpaBEtO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY/hDfAAoJEKeha0olJ0Nqr38IAIfPIeavkRDA+E0cokYmoRiK
+nqRjxY7ZT89lzgYGnrqxEKVVChlctqV69r5hO1KTAqavewIQBYOn/Bvk/r8hkmVc
+uwiCTcikW/Ed/QhE5MPkLZSVRv2wPsMZ8wA4ukYXn8JQR9kUUpFbj9CGcxJf036D
+FV9UvCS79vUniDobGofxFCAa652EGgGYnwT97nEh24EHGOUAZ57VdcapDHc5243J
+71HOlO5dArPw9C5Q13qxs0kxw3w2+t0+XCrMSPaHg9/y/pDm7nhAVGsqfCPTNsNH
+7eUrODMra/jeWCsQGfJfoF/bxPskHfJQozqBs/if/Qt6NYWr6ya4wy0nRmXzS5o=
+=DvrW
+-----END PGP SIGNATURE-----
+
+--nxNraKcIoi73L6G5Op01gvkVF8TpaBEtO--
