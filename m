@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2a7j-00034s-B4
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:17:36 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d2aAn-0005Vr-A8
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2a7i-0004JS-D9
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:17:35 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 24 Apr 2017 10:16:59 +0100
-Message-Id: <20170424091659.26708-5-berrange@redhat.com>
-In-Reply-To: <20170424091659.26708-1-berrange@redhat.com>
-References: <20170424091659.26708-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 4/4] qemu-img: copy *key-secret opts when
- opening newly created files
+	(envelope-from <imammedo@redhat.com>) id 1d2aAj-0005VI-BI
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:20:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d2aAj-0005V1-1P
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 05:20:41 -0400
+Date: Mon, 24 Apr 2017 11:20:33 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170424112033.286fa261@nial.brq.redhat.com>
+In-Reply-To: <20170424085248.GA16098@he>
+References: <1492759935-23933-1-git-send-email-he.chen@linux.intel.com>
+	<20170421115301.4475eff6@nial.brq.redhat.com>
+	<20170424085248.GA16098@he>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,107 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: He Chen <he.chen@linux.intel.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-The qemu-img dd/convert commands will create a image file and
-then try to open it. Historically it has been possible to open
-new files without passing any options. With encrypted files
-though, the *key-secret options are mandatory, so we need to
-provide those options when opening the newly created file.
+On Mon, 24 Apr 2017 16:52:48 +0800
+He Chen <he.chen@linux.intel.com> wrote:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- qemu-img.c | 41 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 6 deletions(-)
+> On Fri, Apr 21, 2017 at 11:53:01AM +0200, Igor Mammedov wrote:
+> > On Fri, 21 Apr 2017 15:32:15 +0800
+> > He Chen <he.chen@linux.intel.com> wrote:
+> >   
+> ...
+> > > +static void validate_numa_distance(void)
+> > > +{
+> > > +    int src, dst;
+> > > +    bool is_asymmetrical = false;
+> > > +
+> > > +    for (src = 0; src < nb_numa_nodes; src++) {
+> > > +        for (dst = 0; dst < nb_numa_nodes; dst++) {  
+> >                 ^^^ checks inside this loop are symmetric,
+> >                 is there any reason it wouldn't work wit previous variant 'dst = src'?
+> >   
+> I am sorry I don't have a clear understanding about what you suggested
+> here. You mean we should check whether the table is symmetric in this
+> loop?
+> Regarding 'dst = src', it represents local distance, user would
+> omit setting it and we will fix it in complete_init_numa_distance. Did I
+> mistake something? Could you please explain in more detail? Thanks.
+I was trying to say that
+since all checks inside this loop are symmetric
+you can scan only half of matrix, i.e.:
+  ...
+     for (dst = src; dst < nb_numa_nodes; dst++) {
+  ...
+but I won't insist on it if you prefer leave it as is.
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 2344e64..cee28db 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -305,15 +305,17 @@ static BlockBackend *img_open_opts(const char *optstr,
- }
- 
- static BlockBackend *img_open_file(const char *filename,
-+                                   QDict *options,
-                                    const char *fmt, int flags,
-                                    bool writethrough, bool quiet)
- {
-     BlockBackend *blk;
-     Error *local_err = NULL;
--    QDict *options = NULL;
- 
-     if (fmt) {
--        options = qdict_new();
-+        if (!options) {
-+            options = qdict_new();
-+        }
-         qdict_put(options, "driver", qstring_from_str(fmt));
-     }
- 
-@@ -332,6 +334,33 @@ static BlockBackend *img_open_file(const char *filename,
- }
- 
- 
-+static int img_add_key_secrets(void *opaque,
-+                               const char *name, const char *value,
-+                               Error **errp)
-+{
-+    QDict *options = opaque;
-+
-+    if (g_str_has_suffix(name, "key-secret")) {
-+        qdict_put(options, name, qstring_from_str(value));
-+    }
-+
-+    return 0;
-+}
-+
-+static BlockBackend *img_open_new_file(const char *filename,
-+                                       QemuOpts *create_opts,
-+                                       const char *fmt, int flags,
-+                                       bool writethrough, bool quiet)
-+{
-+    QDict *options = NULL;
-+
-+    options = qdict_new();
-+    qemu_opt_foreach(create_opts, img_add_key_secrets, options, &error_abort);
-+
-+    return img_open_file(filename, options, fmt, flags, writethrough, quiet);
-+}
-+
-+
- static BlockBackend *img_open(bool image_opts,
-                               const char *filename,
-                               const char *fmt, int flags, bool writethrough,
-@@ -351,7 +380,7 @@ static BlockBackend *img_open(bool image_opts,
-         }
-         blk = img_open_opts(filename, opts, flags, writethrough, quiet);
-     } else {
--        blk = img_open_file(filename, fmt, flags, writethrough, quiet);
-+        blk = img_open_file(filename, NULL, fmt, flags, writethrough, quiet);
-     }
-     return blk;
- }
-@@ -2303,8 +2332,8 @@ static int img_convert(int argc, char **argv)
-          * That has to wait for bdrv_create to be improved
-          * to allow filenames in option syntax
-          */
--        out_blk = img_open_file(out_filename, out_fmt,
--                                flags, writethrough, quiet);
-+        out_blk = img_open_new_file(out_filename, opts, out_fmt,
-+                                    flags, writethrough, quiet);
-     }
-     if (!out_blk) {
-         ret = -1;
-@@ -4353,7 +4382,7 @@ static int img_dd(int argc, char **argv)
-      * with the bdrv_create() call above which does not
-      * support image-opts style.
-      */
--    blk2 = img_open_file(out.filename, out_fmt, BDRV_O_RDWR,
-+    blk2 = img_open_file(out.filename, NULL, out_fmt, BDRV_O_RDWR,
-                          false, false);
- 
-     if (!blk2) {
--- 
-2.9.3
+> > > +            if (numa_info[src].present && numa_info[dst].present) {  
+> > we don't support sparse nodes, so this condition is always true
+> > and not needed as earlier code assures that all nodes upto nb_numa_nodes
+> > are present, greep for "numa: Node ID missing: %d"
+> > so you can remove this check in this func and in complete_init_numa_distance()
+> >   
+> > > +                if (numa_info[src].distance[dst] == 0 &&
+> > > +                    numa_info[dst].distance[src] == 0) {
+> > > +                    if (src != dst) {
+> > > +                        error_report("The distance between node %d and %d is missing, "
+> > > +                                     "please provide all unique node pair distances.",
+> > > +                                     src, dst);  
+> > s/all unique node .../ at least one distance value between each nodes should be provided/
+> > 
+> > or something like this
+> >   
+> > > +                        exit(EXIT_FAILURE);
+> > > +                    }
+> > > +                }
+> > > +
+> > > +                if (((numa_info[src].distance[dst] != 0) &&
+> > > +                    (numa_info[dst].distance[src] != 0)) &&
+> > > +                    (numa_info[src].distance[dst] !=
+> > > +                    numa_info[dst].distance[src])) {
+> > > +                    is_asymmetrical = true;
+> > > +                }
+> > > +            }
+> > > +        }
+> > > +    }
+> > > +
+[...]
