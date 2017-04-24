@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d2jX7-0001hV-LF
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d2jjC-0002CD-9R
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:32:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d2jX6-0002ov-FG
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:25 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 24 Apr 2017 15:20:00 -0400
-Message-Id: <20170424192002.18622-11-jcody@redhat.com>
-In-Reply-To: <20170424192002.18622-1-jcody@redhat.com>
-References: <20170424192002.18622-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL v2 10/12] block/rbd - update variable names to
- more apt names
+	(envelope-from <imammedo@redhat.com>) id 1d2jj8-0001eN-BG
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:32:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44242)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d2jj8-0001de-5P
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:32:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EDD328553E
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 19:32:48 +0000 (UTC)
+Date: Mon, 24 Apr 2017 21:32:33 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170424213233.2d19bdab@Igors-MacBook-Pro.local>
+In-Reply-To: <20170424191317.GA3482@thinpad.lan.raisama.net>
+References: <20170424185817.41002-1-imammedo@redhat.com>
+	<20170424191317.GA3482@thinpad.lan.raisama.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc/fwcfg: unbreak migration from qemu-2.5
+ and qemu-2.6 during firmware boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,139 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, dgilbert@redhat.com, lersek@redhat.com
 
-Update 'clientname' to be 'user', which tracks better with both
-the QAPI and rados variable naming.
+On Mon, 24 Apr 2017 16:13:17 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Update 'name' to be 'image_name', as it indicates the rbd image.
-Naming it 'image' would have been ideal, but we are using that for
-the rados_image_t value returned by rbd_open().
+> On Mon, Apr 24, 2017 at 08:58:17PM +0200, Igor Mammedov wrote:
+> [...]
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > index f3b372a18f..3f2d96da64 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -1047,7 +1047,7 @@ static void load_linux(PCMachineState *pcms,
+> >      fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
+> >      fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
+> >  
+> > -    if (fw_cfg_dma_enabled(fw_cfg)) {
+> > +    if (!pcmc->linuxboot_dma_disabled && fw_cfg_dma_enabled(fw_cfg)) {
+> 
+> Why not name the flag just "linuxboot_dma", set it to true by
+> default at pc_machine_class_init(), and avoid the double
+> negative?
+to avoid setting it to true somewhere else, so less thing could go wrong
+but is you prefer *_enable variant I can switch to it.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: b7ec1fb2e1cf36f9b6911631447a5b0422590b7d.1491597120.git.jcody@redhat.com
----
- block/rbd.c | 33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+> 
+> [...]
+> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > index f278b3ae89..ff6f13b61b 100644
+> > --- a/include/hw/i386/pc.h
+> > +++ b/include/hw/i386/pc.h
+> > @@ -151,6 +151,8 @@ struct PCMachineClass {
+> >      bool save_tsc_khz;
+> >      /* generate legacy CPU hotplug AML */
+> >      bool legacy_cpu_hotplug;
+> > +
+> 
+> A one-line description of the consequences of setting/clearing
+> the flag would be nice.
+will fix in v2
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 1c43171..35853c9 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -94,7 +94,7 @@ typedef struct BDRVRBDState {
-     rados_t cluster;
-     rados_ioctx_t io_ctx;
-     rbd_image_t image;
--    char *name;
-+    char *image_name;
-     char *snap;
- } BDRVRBDState;
- 
-@@ -350,7 +350,7 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-     int64_t bytes = 0;
-     int64_t objsize;
-     int obj_order = 0;
--    const char *pool, *name, *conf, *clientname, *keypairs;
-+    const char *pool, *image_name, *conf, *user, *keypairs;
-     const char *secretid;
-     rados_t cluster;
-     rados_ioctx_t io_ctx;
-@@ -393,11 +393,11 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-      */
-     pool       = qdict_get_try_str(options, "pool");
-     conf       = qdict_get_try_str(options, "conf");
--    clientname = qdict_get_try_str(options, "user");
--    name       = qdict_get_try_str(options, "image");
-+    user       = qdict_get_try_str(options, "user");
-+    image_name = qdict_get_try_str(options, "image");
-     keypairs   = qdict_get_try_str(options, "=keyvalue-pairs");
- 
--    ret = rados_create(&cluster, clientname);
-+    ret = rados_create(&cluster, user);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "error initializing");
-         goto exit;
-@@ -434,7 +434,7 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-         goto shutdown;
-     }
- 
--    ret = rbd_create(io_ctx, name, bytes, &obj_order);
-+    ret = rbd_create(io_ctx, image_name, bytes, &obj_order);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "error rbd create");
-     }
-@@ -540,7 +540,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
- {
-     BDRVRBDState *s = bs->opaque;
--    const char *pool, *snap, *conf, *clientname, *name, *keypairs;
-+    const char *pool, *snap, *conf, *user, *image_name, *keypairs;
-     const char *secretid;
-     QemuOpts *opts;
-     Error *local_err = NULL;
-@@ -567,24 +567,24 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     pool           = qemu_opt_get(opts, "pool");
-     conf           = qemu_opt_get(opts, "conf");
-     snap           = qemu_opt_get(opts, "snapshot");
--    clientname     = qemu_opt_get(opts, "user");
--    name           = qemu_opt_get(opts, "image");
-+    user           = qemu_opt_get(opts, "user");
-+    image_name     = qemu_opt_get(opts, "image");
-     keypairs       = qemu_opt_get(opts, "=keyvalue-pairs");
- 
--    if (!pool || !name) {
-+    if (!pool || !image_name) {
-         error_setg(errp, "Parameters 'pool' and 'image' are required");
-         r = -EINVAL;
-         goto failed_opts;
-     }
- 
--    r = rados_create(&s->cluster, clientname);
-+    r = rados_create(&s->cluster, user);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "error initializing");
-         goto failed_opts;
-     }
- 
-     s->snap = g_strdup(snap);
--    s->name = g_strdup(name);
-+    s->image_name = g_strdup(image_name);
- 
-     /* try default location when conf=NULL, but ignore failure */
-     r = rados_conf_read_file(s->cluster, conf);
-@@ -636,9 +636,10 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     /* rbd_open is always r/w */
--    r = rbd_open(s->io_ctx, s->name, &s->image, s->snap);
-+    r = rbd_open(s->io_ctx, s->image_name, &s->image, s->snap);
-     if (r < 0) {
--        error_setg_errno(errp, -r, "error reading header from %s", s->name);
-+        error_setg_errno(errp, -r, "error reading header from %s",
-+                         s->image_name);
-         goto failed_open;
-     }
- 
-@@ -660,7 +661,7 @@ failed_open:
- failed_shutdown:
-     rados_shutdown(s->cluster);
-     g_free(s->snap);
--    g_free(s->name);
-+    g_free(s->image_name);
- failed_opts:
-     qemu_opts_del(opts);
-     g_free(mon_host);
-@@ -674,7 +675,7 @@ static void qemu_rbd_close(BlockDriverState *bs)
-     rbd_close(s->image);
-     rados_ioctx_destroy(s->io_ctx);
-     g_free(s->snap);
--    g_free(s->name);
-+    g_free(s->image_name);
-     rados_shutdown(s->cluster);
- }
- 
--- 
-2.9.3
+> 
+> > +    bool linuxboot_dma_disabled;
+> >  };
+> >  
+> >  #define TYPE_PC_MACHINE "generic-pc-machine"
+> > @@ -432,10 +434,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+> >  #define PC_COMPAT_2_6 \
+> >      HW_COMPAT_2_6 \
+> >      {\
+> > -        .driver   = "fw_cfg_io",\
+> > -        .property = "dma_enabled",\
+> > -        .value    = "off",\
+> > -    },{\
+> >          .driver   = TYPE_X86_CPU,\
+> >          .property = "cpuid-0xb",\
+> >          .value    = "off",\
+> > -- 
+> > 2.11.0 (Apple Git-81)
+> > 
+> 
