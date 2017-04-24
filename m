@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d2bDJ-0003l7-PT
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:27:27 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1d2bGz-0004aG-De
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:31:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d2bDG-0003ah-K5
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:27:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41252)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d2bDG-0003a6-BD
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:27:22 -0400
-Date: Mon, 24 Apr 2017 11:27:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170424102716.GE2362@work-vm>
-References: <EC9759BC1E3E98429B5DE9A03DF86D8B59D1084B@DGGEML503-MBX.china.huawei.com>
-	<20170424092320.GC2362@work-vm> <20170424095235.GH20809@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1d2bGw-0004kN-9q
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:31:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47625)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1d2bGw-0004jy-09
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:31:10 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3OASwos007791
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 06:31:08 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a01geea7c-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 06:31:08 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 24 Apr 2017 06:31:06 -0400
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 24 Apr 2017 12:31:01 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170424095235.GH20809@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [BUG] Migrate failes between boards with different
- PMC counts
+Content-Transfer-Encoding: 8bit
+Message-Id: <70ef6f1f-27f4-133f-ab33-03a30f19867b@de.ibm.com>
+Subject: [Qemu-devel] postcopy migration hangs while loading virtio state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +38,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Zhuangyanying <ann.zhuangyanying@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Mon, Apr 24, 2017 at 10:23:21AM +0100, Dr. David Alan Gilbert wrote:
-> > * Zhuangyanying (ann.zhuangyanying@huawei.com) wrote:
-> > > Hi all,
-> > >=20
-> > > Recently, I found migration failed when enable vPMU.
-> > >=20
-> > > migrate vPMU state was introduced in linux-3.10 + qemu-1.7.
-> > >=20
-> > > As long as enable vPMU, qemu will save / load the
-> > > vmstate_msr_architectural_pmu(msr_global_ctrl) register during the =
-migration.
-> > > But global_ctrl generated based on cpuid(0xA), the number of genera=
-l-purpose performance
-> > > monitoring counters(PMC) can vary according to Intel SDN. The numbe=
-r of PMC presented
-> > > to vm, does not support configuration currently, it depend on host =
-cpuid, and enable all pmc
-> > > defaultly at KVM. It cause migration to fail between boards with di=
-fferent PMC counts.
-> > >=20
-> > > The return value of cpuid (0xA) is different dur to cpu, according =
-to Intel SDN=EF=BC=8C18-10 Vol. 3B:
-> > >=20
-> > > Note: The number of general-purpose performance monitoring counters=
- (i.e. N in Figure 18-9)
-> > > can vary across processor generations within a processor family, ac=
-ross processor families, or
-> > > could be different depending on the configuration chosen at boot ti=
-me in the BIOS regarding
-> > > Intel Hyper Threading Technology, (e.g. N=3D2 for 45 nm Intel Atom =
-processors; N =3D4 for processors
-> > > based on the Nehalem microarchitecture; for processors based on the=
- Sandy Bridge
-> > > microarchitecture, N =3D 4 if Intel Hyper Threading Technology is a=
-ctive and N=3D8 if not active).
-> > >=20
-> > > Also I found, N=3D8 if HT is not active based on the broadwell=EF=BC=
-=8C,
-> > > such as CPU E7-8890 v4 @ 2.20GHz  =20
-> > >=20
-> > > # ./x86_64-softmmu/qemu-system-x86_64 --enable-kvm -smp 4 -m 4096 -=
-hda
-> > > /data/zyy/test_qemu.img.sles12sp1 -vnc :99 -cpu kvm64,pmu=3Dtrue -i=
-ncoming tcp::8888
-> > > Completed 100 %
-> > > qemu-system-x86_64: error: failed to set MSR 0x38f to 0x7000000ff
-> > > qemu-system-x86_64: /data/zyy/git/test/qemu/target/i386/kvm.c:1833:=
- kvm_put_msrs:=20
-> > > Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-> > > Aborted
-> > >=20
-> > > So make number of pmc configurable to vm ? Any better idea ?
-> >=20
-> > Coincidentally we hit a similar problem a few days ago with -cpu host=
-  - it took me
-> > quite a while to spot the difference between the machines was the sou=
-rce
-> > had hyperthreading disabled.
-> >=20
-> > An option to set the number of counters makes sense to me; but I wond=
-er
-> > how many other options we need as well.  Also, I'm not sure there's a=
-ny
-> > easy way for libvirt etc to figure out how many counters a host suppo=
-rts -
-> > it's not in /proc/cpuinfo.
->=20
-> We actually try to avoid /proc/cpuinfo whereever possible. We do direct
-> CPUID asm instructions to identify features, and prefer to use
-> /sys/devices/system/cpu if that has suitable data
->=20
-> Where do the PMC counts come from originally ? CPUID or something else =
-?
+David, Juan,
 
-Yes, they're bits 8..15 of CPUID leaf 0xa
+I can trigger a hang of postcopy migration (when I do it early) so that
+both sides are in paused state. Looks like one thread is still loading
+vmstates for virtio and this load accesses guest memory and triggers
+a userfault. 
 
-Dave
+Thread 1 (Thread 0x3ffa2f45f00 (LWP 21122)):
+#0  0x0000000001017130 in lduw_he_p (ptr=0x3ff498d9002) at /root/qemu/include/qemu/bswap.h:317
+		<---- according to the host kernel this threads hangs in handle_userfault.
+#1  0x0000000001017342 in lduw_le_p (ptr=0x3ff498d9002) at /root/qemu/include/qemu/bswap.h:359
+#2  0x0000000001025840 in address_space_lduw_internal_cached (cache=0x283491d0, addr=2, attrs=..., result=0x0, endian=DEVICE_LITTLE_ENDIAN) at /root/qemu/memory_ldst.inc.c:284
+#3  0x00000000010259a6 in address_space_lduw_le_cached (cache=0x283491d0, addr=2, attrs=..., result=0x0) at /root/qemu/memory_ldst.inc.c:315
+#4  0x0000000001025ad6 in lduw_le_phys_cached (cache=0x283491d0, addr=2) at /root/qemu/memory_ldst.inc.c:334
+#5  0x0000000001116c10 in virtio_lduw_phys_cached (vdev=0x28275090, cache=0x283491d0, pa=2) at /root/qemu/include/hw/virtio/virtio-access.h:166
+#6  0x0000000001117940 in vring_used_idx (vq=0x3ffa2e1c090) at /root/qemu/hw/virtio/virtio.c:263
+#7  0x000000000111daea in virtio_load (vdev=0x28275090, f=0x28353600, version_id=2) at /root/qemu/hw/virtio/virtio.c:2168
+#8  0x000000000111d0cc in virtio_device_get (f=0x28353600, opaque=0x28275090, size=0, field=0x16adf38 <__compound_literal.0>) at /root/qemu/hw/virtio/virtio.c:1975
+#9  0x00000000012a7f50 in vmstate_load_state (f=0x28353600, vmsd=0x14db480 <vmstate_virtio_blk>, opaque=0x28275090, version_id=2) at /root/qemu/migration/vmstate.c:128
+#10 0x00000000010cbc08 in vmstate_load (f=0x28353600, se=0x28279e60, version_id=2) at /root/qemu/migration/savevm.c:732
+#11 0x00000000010ced6e in qemu_loadvm_section_start_full (f=0x28353600, mis=0x17169a8 <mis_current>) at /root/qemu/migration/savevm.c:1890
+#12 0x00000000010cf00c in qemu_loadvm_state_main (f=0x28353600, mis=0x17169a8 <mis_current>) at /root/qemu/migration/savevm.c:1947
+#13 0x00000000010ce5bc in loadvm_handle_cmd_packaged (mis=0x17169a8 <mis_current>) at /root/qemu/migration/savevm.c:1707
+#14 0x00000000010ce87e in loadvm_process_command (f=0x282c7d20) at /root/qemu/migration/savevm.c:1770
+#15 0x00000000010cf056 in qemu_loadvm_state_main (f=0x282c7d20, mis=0x17169a8 <mis_current>) at /root/qemu/migration/savevm.c:1960
+#16 0x00000000010cf2b6 in qemu_loadvm_state (f=0x282c7d20) at /root/qemu/migration/savevm.c:2020
+#17 0x000000000129d234 in process_incoming_migration_co (opaque=0x282c7d20) at /root/qemu/migration/migration.c:404
+#18 0x00000000014b6ca2 in coroutine_trampoline (i0=0, i1=674533168) at /root/qemu/util/coroutine-ucontext.c:79
+#19 0x000003ff8de530ea in __makecontext_ret () from target:/lib64/libc.so.6
 
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thread 8 (Thread 0x3ff40b38910 (LWP 21165)):
+#0  0x000003ff8df04336 in syscall () from target:/lib64/libc.so.6
+#1  0x00000000014933ce in qemu_futex_wait (f=0x17169b0 <mis_current+8>, val=4294967295) at /root/qemu/include/qemu/futex.h:26
+#2  0x00000000014935d0 in qemu_event_wait (ev=0x17169b0 <mis_current+8>) at /root/qemu/util/qemu-thread-posix.c:399
+#3  0x00000000010ce094 in postcopy_ram_listen_thread (opaque=0x282c7d20) at /root/qemu/migration/savevm.c:1532
+#4  0x000003ff8e007bc4 in start_thread () from target:/lib64/libpthread.so.0
+#5  0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 7 (Thread 0x3ff41338910 (LWP 21164)):
+#0  0x000003ff8defd72c in ?? () from target:/lib64/libc.so.6
+#1  0x00000000012af920 in postcopy_ram_fault_thread (opaque=0x17169a8 <mis_current>) at /root/qemu/migration/postcopy-ram.c:437
+#2  0x000003ff8e007bc4 in start_thread () from target:/lib64/libpthread.so.0
+#3  0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 6 (Thread 0x3ff41b38910 (LWP 21163)):
+#0  0x000003ff8e00d450 in pthread_cond_wait@@GLIBC_2.3.2 () from target:/lib64/libpthread.so.0
+#1  0x0000000001492d66 in qemu_cond_wait (cond=0x28302408, mutex=0x283023e0) at /root/qemu/util/qemu-thread-posix.c:133
+#2  0x00000000010c6080 in do_data_decompress (opaque=0x283023d8) at /root/qemu/migration/ram.c:2277
+#3  0x000003ff8e007bc4 in start_thread () from target:/lib64/libpthread.so.0
+#4  0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 5 (Thread 0x3ff42338910 (LWP 21162)):
+#0  0x000003ff8e00d450 in pthread_cond_wait@@GLIBC_2.3.2 () from target:/lib64/libpthread.so.0
+#1  0x0000000001492d66 in qemu_cond_wait (cond=0x28302390, mutex=0x28302368) at /root/qemu/util/qemu-thread-posix.c:133
+#2  0x00000000010c6080 in do_data_decompress (opaque=0x28302360) at /root/qemu/migration/ram.c:2277
+#3  0x000003ff8e007bc4 in start_thread () from target:/lib64/libpthread.so.0
+#4  0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 4 (Thread 0x3ff89287910 (LWP 21148)):
+#0  0x000003ff8e010abc in __lll_lock_wait () from target:/lib64/libpthread.so.0
+#1  0x000003ff8e00bcb6 in __pthread_mutex_cond_lock () from target:/lib64/libpthread.so.0
+#2  0x000003ff8e00d4ee in pthread_cond_wait@@GLIBC_2.3.2 () from target:/lib64/libpthread.so.0
+#3  0x0000000001492d66 in qemu_cond_wait (cond=0x2831eb00, mutex=0x1711688 <qemu_global_mutex>) at /root/qemu/util/qemu-thread-posix.c:133
+#4  0x000000000107720e in qemu_kvm_wait_io_event (cpu=0x282e09b0) at /root/qemu/cpus.c:1085
+#5  0x00000000010773aa in qemu_kvm_cpu_thread_fn (arg=0x282e09b0) at /root/qemu/cpus.c:1123
+#6  0x000003ff8e007bc4 in start_thread () from target:/lib64/libpthread.so.0
+#7  0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 3 (Thread 0x3ff8a7ff910 (LWP 21145)):
+#0  0x000003ff8defd832 in ppoll () from target:/lib64/libc.so.6
+#1  0x000000000148b092 in qemu_poll_ns (fds=0x3ff840008c0, nfds=1, timeout=-1) at /root/qemu/util/qemu-timer.c:322
+#2  0x000000000148f46a in aio_poll (ctx=0x2827e7b0, blocking=true) at /root/qemu/util/aio-posix.c:622
+#3  0x00000000011a78f6 in iothread_run (opaque=0x2827d740) at /root/qemu/iothread.c:59
+#4  0x000003ff8e007bc4 in start_thread () from target:/lib64/libpthread.so.0
+#5  0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+
+Thread 2 (Thread 0x3ff8afff910 (LWP 21142)):
+#0  0x000003ff8df04336 in syscall () from target:/lib64/libc.so.6
+#1  0x00000000014933ce in qemu_futex_wait (f=0x1b2b9b4 <rcu_call_ready_event>, val=4294967295) at /root/qemu/include/qemu/futex.h:26
+#2  0x00000000014935d0 in qemu_event_wait (ev=0x1b2b9b4 <rcu_call_ready_event>) at /root/qemu/util/qemu-thread-posix.c:399
+#3  0x00000000014b3e40 in call_rcu_thread (opaque=0x0) at /root/qemu/util/rcu.c:249
+#4  0x000003ff8e007bc4 in start_thread () from target:/lib64/libpthread.so.0
+#5  0x000003ff8df0a9f2 in thread_start () from target:/lib64/libc.so.6
+
+
+Looks like that this
+    <qemu:arg value='-drive'/>
+    <qemu:arg value='driver=null-aio,id=null1,if=none,size=100G'/>
+    <qemu:arg value='-device'/>
+    <qemu:arg value='virtio-blk-ccw,scsi=off,drive=null1,serial=null1,num-queues=4'/>
+
+is necessary to trigger the hang, with nun-qeues=1 everything seems to work fine, so it might
+be a virtio issue after all?
+
+Any idea?
