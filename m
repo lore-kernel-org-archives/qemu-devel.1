@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2WMO-0003xd-0o
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:31 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d2WMU-00043I-U0
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2WMI-0006BB-W0
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42046)
+	(envelope-from <jasowang@redhat.com>) id 1d2WMS-0006ES-1l
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42116)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2WMI-0006Au-GH
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:22 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2WMR-0006EH-KU
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:31 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 24 Apr 2017 13:16:01 +0800
-Message-Id: <1493010966-22976-4-git-send-email-jasowang@redhat.com>
+Date: Mon, 24 Apr 2017 13:16:04 +0800
+Message-Id: <1493010966-22976-7-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
 References: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/8] net: add FTGMAC100 support
+Subject: [Qemu-devel] [PULL 6/8] slirp: add a fake NC-SI backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,1174 +31,772 @@ Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Jason Wang <jasowang@r
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The FTGMAC100 device is an Ethernet controller with DMA function that
-can be found on Aspeed SoCs (which include NCSI).
+NC-SI (Network Controller Sideband Interface) enables a BMC to manage
+a set of NICs on a system. This model takes the simplest approach and
+reverses the NC-SI packets to pretend a NIC is present and exercise
+the Linux driver.
 
-It is fully compliant with IEEE 802.3 specification for 10/100 Mbps
-Ethernet and IEEE 802.3z specification for 1000 Mbps Ethernet and
-includes Reduced Media Independent Interface (RMII) and Reduced
-Gigabit Media Independent Interface (RGMII) interfaces. It adopts an
-AHB bus interface and integrates a link list DMA engine with direct
-M-Bus accesses for transmitting and receiving packets. It has
-independent TX/RX fifos, supports half and full duplex (1000 Mbps mode
-only supports full duplex), flow control for full duplex and
-backpressure for half duplex.
-
-The FTGMAC100 also implements IP, TCP, UDP checksum offloads and
-supports IEEE 802.1Q VLAN tag insertion and removal. It offers
-high-priority transmit queue for QoS and CoS applications
-
-This model is backed with a RealTek 8211E PHY which is the chip found
-on the AST2500 EVB. It is complete enough to satisfy two different
-Linux drivers and a U-Boot driver. Not supported features are :
-
- - IEEE 802.1Q VLAN
- - High Priority Transmit Queue
- - Wake-On-LAN functions
-
-The code is based on the Coldfire Fast Ethernet Controller model.
+The NCSI header file <ncsi-pkt.h> comes from mainline Linux and was
+untabified.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Acked-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- default-configs/arm-softmmu.mak |    1 +
- hw/net/Makefile.objs            |    1 +
- hw/net/ftgmac100.c              | 1003 +++++++++++++++++++++++++++++++++=
+ include/net/eth.h   |   1 +
+ slirp/Makefile.objs |   2 +-
+ slirp/ncsi-pkt.h    | 419 ++++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- include/hw/net/ftgmac100.h      |   60 +++
- 4 files changed, 1065 insertions(+)
- create mode 100644 hw/net/ftgmac100.c
- create mode 100644 include/hw/net/ftgmac100.h
+ slirp/ncsi.c        | 130 ++++++++++++++++
+ slirp/slirp.c       |   4 +
+ slirp/slirp.h       |   3 +
+ 6 files changed, 558 insertions(+), 1 deletion(-)
+ create mode 100644 slirp/ncsi-pkt.h
+ create mode 100644 slirp/ncsi.c
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index 1e3bd2b..78d7af0 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -29,6 +29,7 @@ CONFIG_LAN9118=3Dy
- CONFIG_SMC91C111=3Dy
- CONFIG_ALLWINNER_EMAC=3Dy
- CONFIG_IMX_FEC=3Dy
-+CONFIG_FTGMAC100=3Dy
- CONFIG_DS1338=3Dy
- CONFIG_PFLASH_CFI01=3Dy
- CONFIG_PFLASH_CFI02=3Dy
-diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-index 6a95d92..5ddaffe 100644
---- a/hw/net/Makefile.objs
-+++ b/hw/net/Makefile.objs
-@@ -26,6 +26,7 @@ common-obj-$(CONFIG_IMX_FEC) +=3D imx_fec.o
- common-obj-$(CONFIG_CADENCE) +=3D cadence_gem.o
- common-obj-$(CONFIG_STELLARIS_ENET) +=3D stellaris_enet.o
- common-obj-$(CONFIG_LANCE) +=3D lance.o
-+common-obj-$(CONFIG_FTGMAC100) +=3D ftgmac100.o
-=20
- obj-$(CONFIG_ETRAXFS) +=3D etraxfs_eth.o
- obj-$(CONFIG_COLDFIRE) +=3D mcf_fec.o
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+diff --git a/include/net/eth.h b/include/net/eth.h
+index afeb45b..09054a5 100644
+--- a/include/net/eth.h
++++ b/include/net/eth.h
+@@ -209,6 +209,7 @@ struct tcp_hdr {
+ #define ETH_P_IPV6                (0x86dd)
+ #define ETH_P_VLAN                (0x8100)
+ #define ETH_P_DVLAN               (0x88a8)
++#define ETH_P_NCSI                (0x88f8)
+ #define ETH_P_UNKNOWN             (0xffff)
+ #define VLAN_VID_MASK             0x0fff
+ #define IP_HEADER_VERSION_4       (4)
+diff --git a/slirp/Makefile.objs b/slirp/Makefile.objs
+index 1baa1f1..28049b0 100644
+--- a/slirp/Makefile.objs
++++ b/slirp/Makefile.objs
+@@ -2,4 +2,4 @@ common-obj-y =3D cksum.o if.o ip_icmp.o ip6_icmp.o ip6_in=
+put.o ip6_output.o \
+                ip_input.o ip_output.o dnssearch.o dhcpv6.o
+ common-obj-y +=3D slirp.o mbuf.o misc.o sbuf.o socket.o tcp_input.o tcp_=
+output.o
+ common-obj-y +=3D tcp_subr.o tcp_timer.o udp.o udp6.o bootp.o tftp.o arp=
+_table.o \
+-                ndp_table.o
++                ndp_table.o ncsi.o
+diff --git a/slirp/ncsi-pkt.h b/slirp/ncsi-pkt.h
 new file mode 100644
-index 0000000..fc309b3
+index 0000000..ea07d1c
 --- /dev/null
-+++ b/hw/net/ftgmac100.c
-@@ -0,0 +1,1003 @@
++++ b/slirp/ncsi-pkt.h
+@@ -0,0 +1,419 @@
 +/*
-+ * Faraday FTGMAC100 Gigabit Ethernet
++ * Copyright Gavin Shan, IBM Corporation 2016.
 + *
-+ * Copyright (C) 2016-2017, IBM Corporation.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#ifndef NCSI_PKT_H
++#define NCSI_PKT_H
++
++/* from linux/net/ncsi/ncsi-pkt.h */
++#define __be32 uint32_t
++#define __be16 uint16_t
++
++struct ncsi_pkt_hdr {
++        unsigned char mc_id;        /* Management controller ID */
++        unsigned char revision;     /* NCSI version - 0x01      */
++        unsigned char reserved;     /* Reserved                 */
++        unsigned char id;           /* Packet sequence number   */
++        unsigned char type;         /* Packet type              */
++        unsigned char channel;      /* Network controller ID    */
++        __be16        length;       /* Payload length           */
++        __be32        reserved1[2]; /* Reserved                 */
++};
++
++struct ncsi_cmd_pkt_hdr {
++        struct ncsi_pkt_hdr common; /* Common NCSI packet header */
++};
++
++struct ncsi_rsp_pkt_hdr {
++        struct ncsi_pkt_hdr common; /* Common NCSI packet header */
++        __be16              code;   /* Response code             */
++        __be16              reason; /* Response reason           */
++};
++
++struct ncsi_aen_pkt_hdr {
++        struct ncsi_pkt_hdr common;       /* Common NCSI packet header *=
+/
++        unsigned char       reserved2[3]; /* Reserved                  *=
+/
++        unsigned char       type;         /* AEN packet type           *=
+/
++};
++
++/* NCSI common command packet */
++struct ncsi_cmd_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
++        __be32                  checksum; /* Checksum       */
++        unsigned char           pad[26];
++};
++
++struct ncsi_rsp_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;      /* Response header */
++        __be32                  checksum; /* Checksum        */
++        unsigned char           pad[22];
++};
++
++/* Select Package */
++struct ncsi_cmd_sp_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;            /* Command header */
++        unsigned char           reserved[3];    /* Reserved       */
++        unsigned char           hw_arbitration; /* HW arbitration */
++        __be32                  checksum;       /* Checksum       */
++        unsigned char           pad[22];
++};
++
++/* Disable Channel */
++struct ncsi_cmd_dc_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;         /* Command header  */
++        unsigned char           reserved[3]; /* Reserved        */
++        unsigned char           ald;         /* Allow link down */
++        __be32                  checksum;    /* Checksum        */
++        unsigned char           pad[22];
++};
++
++/* Reset Channel */
++struct ncsi_cmd_rc_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
++        __be32                  reserved; /* Reserved       */
++        __be32                  checksum; /* Checksum       */
++        unsigned char           pad[22];
++};
++
++/* AEN Enable */
++struct ncsi_cmd_ae_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;         /* Command header   */
++        unsigned char           reserved[3]; /* Reserved         */
++        unsigned char           mc_id;       /* MC ID            */
++        __be32                  mode;        /* AEN working mode */
++        __be32                  checksum;    /* Checksum         */
++        unsigned char           pad[18];
++};
++
++/* Set Link */
++struct ncsi_cmd_sl_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;      /* Command header    */
++        __be32                  mode;     /* Link working mode */
++        __be32                  oem_mode; /* OEM link mode     */
++        __be32                  checksum; /* Checksum          */
++        unsigned char           pad[18];
++};
++
++/* Set VLAN Filter */
++struct ncsi_cmd_svf_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;       /* Command header    */
++        __be16                  reserved;  /* Reserved          */
++        __be16                  vlan;      /* VLAN ID           */
++        __be16                  reserved1; /* Reserved          */
++        unsigned char           index;     /* VLAN table index  */
++        unsigned char           enable;    /* Enable or disable */
++        __be32                  checksum;  /* Checksum          */
++        unsigned char           pad[14];
++};
++
++/* Enable VLAN */
++struct ncsi_cmd_ev_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;         /* Command header   */
++        unsigned char           reserved[3]; /* Reserved         */
++        unsigned char           mode;        /* VLAN filter mode */
++        __be32                  checksum;    /* Checksum         */
++        unsigned char           pad[22];
++};
++
++/* Set MAC Address */
++struct ncsi_cmd_sma_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;      /* Command header          */
++        unsigned char           mac[6];   /* MAC address             */
++        unsigned char           index;    /* MAC table index         */
++        unsigned char           at_e;     /* Addr type and operation */
++        __be32                  checksum; /* Checksum                */
++        unsigned char           pad[18];
++};
++
++/* Enable Broadcast Filter */
++struct ncsi_cmd_ebf_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
++        __be32                  mode;     /* Filter mode    */
++        __be32                  checksum; /* Checksum       */
++        unsigned char           pad[22];
++};
++
++/* Enable Global Multicast Filter */
++struct ncsi_cmd_egmf_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;      /* Command header */
++        __be32                  mode;     /* Global MC mode */
++        __be32                  checksum; /* Checksum       */
++        unsigned char           pad[22];
++};
++
++/* Set NCSI Flow Control */
++struct ncsi_cmd_snfc_pkt {
++        struct ncsi_cmd_pkt_hdr cmd;         /* Command header    */
++        unsigned char           reserved[3]; /* Reserved          */
++        unsigned char           mode;        /* Flow control mode */
++        __be32                  checksum;    /* Checksum          */
++        unsigned char           pad[22];
++};
++
++/* Get Link Status */
++struct ncsi_rsp_gls_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;        /* Response header   */
++        __be32                  status;     /* Link status       */
++        __be32                  other;      /* Other indications */
++        __be32                  oem_status; /* OEM link status   */
++        __be32                  checksum;
++        unsigned char           pad[10];
++};
++
++/* Get Version ID */
++struct ncsi_rsp_gvi_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;          /* Response header */
++        __be32                  ncsi_version; /* NCSI version    */
++        unsigned char           reserved[3];  /* Reserved        */
++        unsigned char           alpha2;       /* NCSI version    */
++        unsigned char           fw_name[12];  /* f/w name string */
++        __be32                  fw_version;   /* f/w version     */
++        __be16                  pci_ids[4];   /* PCI IDs         */
++        __be32                  mf_id;        /* Manufacture ID  */
++        __be32                  checksum;
++};
++
++/* Get Capabilities */
++struct ncsi_rsp_gc_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;         /* Response header   */
++        __be32                  cap;         /* Capabilities      */
++        __be32                  bc_cap;      /* Broadcast cap     */
++        __be32                  mc_cap;      /* Multicast cap     */
++        __be32                  buf_cap;     /* Buffering cap     */
++        __be32                  aen_cap;     /* AEN cap           */
++        unsigned char           vlan_cnt;    /* VLAN filter count */
++        unsigned char           mixed_cnt;   /* Mix filter count  */
++        unsigned char           mc_cnt;      /* MC filter count   */
++        unsigned char           uc_cnt;      /* UC filter count   */
++        unsigned char           reserved[2]; /* Reserved          */
++        unsigned char           vlan_mode;   /* VLAN mode         */
++        unsigned char           channel_cnt; /* Channel count     */
++        __be32                  checksum;    /* Checksum          */
++};
++
++/* Get Parameters */
++struct ncsi_rsp_gp_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;          /* Response header       *=
+/
++        unsigned char           mac_cnt;      /* Number of MAC addr    *=
+/
++        unsigned char           reserved[2];  /* Reserved              *=
+/
++        unsigned char           mac_enable;   /* MAC addr enable flags *=
+/
++        unsigned char           vlan_cnt;     /* VLAN tag count        *=
+/
++        unsigned char           reserved1;    /* Reserved              *=
+/
++        __be16                  vlan_enable;  /* VLAN tag enable flags *=
+/
++        __be32                  link_mode;    /* Link setting          *=
+/
++        __be32                  bc_mode;      /* BC filter mode        *=
+/
++        __be32                  valid_modes;  /* Valid mode parameters *=
+/
++        unsigned char           vlan_mode;    /* VLAN mode             *=
+/
++        unsigned char           fc_mode;      /* Flow control mode     *=
+/
++        unsigned char           reserved2[2]; /* Reserved              *=
+/
++        __be32                  aen_mode;     /* AEN mode              *=
+/
++        unsigned char           mac[6];       /* Supported MAC addr    *=
+/
++        __be16                  vlan;         /* Supported VLAN tags   *=
+/
++        __be32                  checksum;     /* Checksum              *=
+/
++};
++
++/* Get Controller Packet Statistics */
++struct ncsi_rsp_gcps_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;            /* Response header      =
+      */
++        __be32                  cnt_hi;         /* Counter cleared      =
+      */
++        __be32                  cnt_lo;         /* Counter cleared      =
+      */
++        __be32                  rx_bytes;       /* Rx bytes             =
+      */
++        __be32                  tx_bytes;       /* Tx bytes             =
+      */
++        __be32                  rx_uc_pkts;     /* Rx UC packets        =
+      */
++        __be32                  rx_mc_pkts;     /* Rx MC packets        =
+      */
++        __be32                  rx_bc_pkts;     /* Rx BC packets        =
+      */
++        __be32                  tx_uc_pkts;     /* Tx UC packets        =
+      */
++        __be32                  tx_mc_pkts;     /* Tx MC packets        =
+      */
++        __be32                  tx_bc_pkts;     /* Tx BC packets        =
+      */
++        __be32                  fcs_err;        /* FCS errors           =
+      */
++        __be32                  align_err;      /* Alignment errors     =
+      */
++        __be32                  false_carrier;  /* False carrier detecti=
+on    */
++        __be32                  runt_pkts;      /* Rx runt packets      =
+      */
++        __be32                  jabber_pkts;    /* Rx jabber packets    =
+      */
++        __be32                  rx_pause_xon;   /* Rx pause XON frames  =
+      */
++        __be32                  rx_pause_xoff;  /* Rx XOFF frames       =
+      */
++        __be32                  tx_pause_xon;   /* Tx XON frames        =
+      */
++        __be32                  tx_pause_xoff;  /* Tx XOFF frames       =
+      */
++        __be32                  tx_s_collision; /* Single collision fram=
+es    */
++        __be32                  tx_m_collision; /* Multiple collision fr=
+ames  */
++        __be32                  l_collision;    /* Late collision frames=
+      */
++        __be32                  e_collision;    /* Excessive collision f=
+rames */
++        __be32                  rx_ctl_frames;  /* Rx control frames    =
+      */
++        __be32                  rx_64_frames;   /* Rx 64-bytes frames   =
+      */
++        __be32                  rx_127_frames;  /* Rx 65-127 bytes frame=
+s     */
++        __be32                  rx_255_frames;  /* Rx 128-255 bytes fram=
+es    */
++        __be32                  rx_511_frames;  /* Rx 256-511 bytes fram=
+es    */
++        __be32                  rx_1023_frames; /* Rx 512-1023 bytes fra=
+mes   */
++        __be32                  rx_1522_frames; /* Rx 1024-1522 bytes fr=
+ames  */
++        __be32                  rx_9022_frames; /* Rx 1523-9022 bytes fr=
+ames  */
++        __be32                  tx_64_frames;   /* Tx 64-bytes frames   =
+      */
++        __be32                  tx_127_frames;  /* Tx 65-127 bytes frame=
+s     */
++        __be32                  tx_255_frames;  /* Tx 128-255 bytes fram=
+es    */
++        __be32                  tx_511_frames;  /* Tx 256-511 bytes fram=
+es    */
++        __be32                  tx_1023_frames; /* Tx 512-1023 bytes fra=
+mes   */
++        __be32                  tx_1522_frames; /* Tx 1024-1522 bytes fr=
+ames  */
++        __be32                  tx_9022_frames; /* Tx 1523-9022 bytes fr=
+ames  */
++        __be32                  rx_valid_bytes; /* Rx valid bytes       =
+      */
++        __be32                  rx_runt_pkts;   /* Rx error runt packets=
+      */
++        __be32                  rx_jabber_pkts; /* Rx error jabber packe=
+ts    */
++        __be32                  checksum;       /* Checksum             =
+      */
++};
++
++/* Get NCSI Statistics */
++struct ncsi_rsp_gns_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;           /* Response header       =
+  */
++        __be32                  rx_cmds;       /* Rx NCSI commands      =
+  */
++        __be32                  dropped_cmds;  /* Dropped commands      =
+  */
++        __be32                  cmd_type_errs; /* Command type errors   =
+  */
++        __be32                  cmd_csum_errs; /* Command checksum error=
+s */
++        __be32                  rx_pkts;       /* Rx NCSI packets       =
+  */
++        __be32                  tx_pkts;       /* Tx NCSI packets       =
+  */
++        __be32                  tx_aen_pkts;   /* Tx AEN packets        =
+  */
++        __be32                  checksum;      /* Checksum              =
+  */
++};
++
++/* Get NCSI Pass-through Statistics */
++struct ncsi_rsp_gnpts_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;            /* Response header     *=
+/
++        __be32                  tx_pkts;        /* Tx packets          *=
+/
++        __be32                  tx_dropped;     /* Tx dropped packets  *=
+/
++        __be32                  tx_channel_err; /* Tx channel errors   *=
+/
++        __be32                  tx_us_err;      /* Tx undersize errors *=
+/
++        __be32                  rx_pkts;        /* Rx packets          *=
+/
++        __be32                  rx_dropped;     /* Rx dropped packets  *=
+/
++        __be32                  rx_channel_err; /* Rx channel errors   *=
+/
++        __be32                  rx_us_err;      /* Rx undersize errors *=
+/
++        __be32                  rx_os_err;      /* Rx oversize errors  *=
+/
++        __be32                  checksum;       /* Checksum            *=
+/
++};
++
++/* Get package status */
++struct ncsi_rsp_gps_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;      /* Response header            =
+ */
++        __be32                  status;   /* Hardware arbitration status=
+ */
++        __be32                  checksum;
++};
++
++/* Get package UUID */
++struct ncsi_rsp_gpuuid_pkt {
++        struct ncsi_rsp_pkt_hdr rsp;      /* Response header */
++        unsigned char           uuid[16]; /* UUID            */
++        __be32                  checksum;
++};
++
++/* AEN: Link State Change */
++struct ncsi_aen_lsc_pkt {
++        struct ncsi_aen_pkt_hdr aen;        /* AEN header      */
++        __be32                  status;     /* Link status     */
++        __be32                  oem_status; /* OEM link status */
++        __be32                  checksum;   /* Checksum        */
++        unsigned char           pad[14];
++};
++
++/* AEN: Configuration Required */
++struct ncsi_aen_cr_pkt {
++        struct ncsi_aen_pkt_hdr aen;      /* AEN header */
++        __be32                  checksum; /* Checksum   */
++        unsigned char           pad[22];
++};
++
++/* AEN: Host Network Controller Driver Status Change */
++struct ncsi_aen_hncdsc_pkt {
++        struct ncsi_aen_pkt_hdr aen;      /* AEN header */
++        __be32                  status;   /* Status     */
++        __be32                  checksum; /* Checksum   */
++        unsigned char           pad[18];
++};
++
++/* NCSI packet revision */
++#define NCSI_PKT_REVISION       0x01
++
++/* NCSI packet commands */
++#define NCSI_PKT_CMD_CIS        0x00 /* Clear Initial State             =
+ */
++#define NCSI_PKT_CMD_SP         0x01 /* Select Package                  =
+ */
++#define NCSI_PKT_CMD_DP         0x02 /* Deselect Package                =
+ */
++#define NCSI_PKT_CMD_EC         0x03 /* Enable Channel                  =
+ */
++#define NCSI_PKT_CMD_DC         0x04 /* Disable Channel                 =
+ */
++#define NCSI_PKT_CMD_RC         0x05 /* Reset Channel                   =
+ */
++#define NCSI_PKT_CMD_ECNT       0x06 /* Enable Channel Network Tx       =
+ */
++#define NCSI_PKT_CMD_DCNT       0x07 /* Disable Channel Network Tx      =
+ */
++#define NCSI_PKT_CMD_AE         0x08 /* AEN Enable                      =
+ */
++#define NCSI_PKT_CMD_SL         0x09 /* Set Link                        =
+ */
++#define NCSI_PKT_CMD_GLS        0x0a /* Get Link                        =
+ */
++#define NCSI_PKT_CMD_SVF        0x0b /* Set VLAN Filter                 =
+ */
++#define NCSI_PKT_CMD_EV         0x0c /* Enable VLAN                     =
+ */
++#define NCSI_PKT_CMD_DV         0x0d /* Disable VLAN                    =
+ */
++#define NCSI_PKT_CMD_SMA        0x0e /* Set MAC address                 =
+ */
++#define NCSI_PKT_CMD_EBF        0x10 /* Enable Broadcast Filter         =
+ */
++#define NCSI_PKT_CMD_DBF        0x11 /* Disable Broadcast Filter        =
+ */
++#define NCSI_PKT_CMD_EGMF       0x12 /* Enable Global Multicast Filter  =
+ */
++#define NCSI_PKT_CMD_DGMF       0x13 /* Disable Global Multicast Filter =
+ */
++#define NCSI_PKT_CMD_SNFC       0x14 /* Set NCSI Flow Control           =
+ */
++#define NCSI_PKT_CMD_GVI        0x15 /* Get Version ID                  =
+ */
++#define NCSI_PKT_CMD_GC         0x16 /* Get Capabilities                =
+ */
++#define NCSI_PKT_CMD_GP         0x17 /* Get Parameters                  =
+ */
++#define NCSI_PKT_CMD_GCPS       0x18 /* Get Controller Packet Statistics=
+ */
++#define NCSI_PKT_CMD_GNS        0x19 /* Get NCSI Statistics             =
+ */
++#define NCSI_PKT_CMD_GNPTS      0x1a /* Get NCSI Pass-throu Statistics  =
+ */
++#define NCSI_PKT_CMD_GPS        0x1b /* Get package status              =
+ */
++#define NCSI_PKT_CMD_OEM        0x50 /* OEM                             =
+ */
++#define NCSI_PKT_CMD_PLDM       0x51 /* PLDM request over NCSI over RBT =
+ */
++#define NCSI_PKT_CMD_GPUUID     0x52 /* Get package UUID                =
+ */
++
++/* NCSI packet responses */
++#define NCSI_PKT_RSP_CIS        (NCSI_PKT_CMD_CIS    + 0x80)
++#define NCSI_PKT_RSP_SP         (NCSI_PKT_CMD_SP     + 0x80)
++#define NCSI_PKT_RSP_DP         (NCSI_PKT_CMD_DP     + 0x80)
++#define NCSI_PKT_RSP_EC         (NCSI_PKT_CMD_EC     + 0x80)
++#define NCSI_PKT_RSP_DC         (NCSI_PKT_CMD_DC     + 0x80)
++#define NCSI_PKT_RSP_RC         (NCSI_PKT_CMD_RC     + 0x80)
++#define NCSI_PKT_RSP_ECNT       (NCSI_PKT_CMD_ECNT   + 0x80)
++#define NCSI_PKT_RSP_DCNT       (NCSI_PKT_CMD_DCNT   + 0x80)
++#define NCSI_PKT_RSP_AE         (NCSI_PKT_CMD_AE     + 0x80)
++#define NCSI_PKT_RSP_SL         (NCSI_PKT_CMD_SL     + 0x80)
++#define NCSI_PKT_RSP_GLS        (NCSI_PKT_CMD_GLS    + 0x80)
++#define NCSI_PKT_RSP_SVF        (NCSI_PKT_CMD_SVF    + 0x80)
++#define NCSI_PKT_RSP_EV         (NCSI_PKT_CMD_EV     + 0x80)
++#define NCSI_PKT_RSP_DV         (NCSI_PKT_CMD_DV     + 0x80)
++#define NCSI_PKT_RSP_SMA        (NCSI_PKT_CMD_SMA    + 0x80)
++#define NCSI_PKT_RSP_EBF        (NCSI_PKT_CMD_EBF    + 0x80)
++#define NCSI_PKT_RSP_DBF        (NCSI_PKT_CMD_DBF    + 0x80)
++#define NCSI_PKT_RSP_EGMF       (NCSI_PKT_CMD_EGMF   + 0x80)
++#define NCSI_PKT_RSP_DGMF       (NCSI_PKT_CMD_DGMF   + 0x80)
++#define NCSI_PKT_RSP_SNFC       (NCSI_PKT_CMD_SNFC   + 0x80)
++#define NCSI_PKT_RSP_GVI        (NCSI_PKT_CMD_GVI    + 0x80)
++#define NCSI_PKT_RSP_GC         (NCSI_PKT_CMD_GC     + 0x80)
++#define NCSI_PKT_RSP_GP         (NCSI_PKT_CMD_GP     + 0x80)
++#define NCSI_PKT_RSP_GCPS       (NCSI_PKT_CMD_GCPS   + 0x80)
++#define NCSI_PKT_RSP_GNS        (NCSI_PKT_CMD_GNS    + 0x80)
++#define NCSI_PKT_RSP_GNPTS      (NCSI_PKT_CMD_GNPTS  + 0x80)
++#define NCSI_PKT_RSP_GPS        (NCSI_PKT_CMD_GPS    + 0x80)
++#define NCSI_PKT_RSP_OEM        (NCSI_PKT_CMD_OEM    + 0x80)
++#define NCSI_PKT_RSP_PLDM       (NCSI_PKT_CMD_PLDM   + 0x80)
++#define NCSI_PKT_RSP_GPUUID     (NCSI_PKT_CMD_GPUUID + 0x80)
++
++/* NCSI response code/reason */
++#define NCSI_PKT_RSP_C_COMPLETED        0x0000 /* Command Completed     =
+   */
++#define NCSI_PKT_RSP_C_FAILED           0x0001 /* Command Failed        =
+   */
++#define NCSI_PKT_RSP_C_UNAVAILABLE      0x0002 /* Command Unavailable   =
+   */
++#define NCSI_PKT_RSP_C_UNSUPPORTED      0x0003 /* Command Unsupported   =
+   */
++#define NCSI_PKT_RSP_R_NO_ERROR         0x0000 /* No Error              =
+   */
++#define NCSI_PKT_RSP_R_INTERFACE        0x0001 /* Interface not ready   =
+   */
++#define NCSI_PKT_RSP_R_PARAM            0x0002 /* Invalid Parameter     =
+   */
++#define NCSI_PKT_RSP_R_CHANNEL          0x0003 /* Channel not Ready     =
+   */
++#define NCSI_PKT_RSP_R_PACKAGE          0x0004 /* Package not Ready     =
+   */
++#define NCSI_PKT_RSP_R_LENGTH           0x0005 /* Invalid payload length=
+   */
++#define NCSI_PKT_RSP_R_UNKNOWN          0x7fff /* Command type unsupport=
+ed */
++
++/* NCSI AEN packet type */
++#define NCSI_PKT_AEN            0xFF /* AEN Packet               */
++#define NCSI_PKT_AEN_LSC        0x00 /* Link status change       */
++#define NCSI_PKT_AEN_CR         0x01 /* Configuration required   */
++#define NCSI_PKT_AEN_HNCDSC     0x02 /* HNC driver status change */
++
++#endif /* NCSI_PKT_H */
+diff --git a/slirp/ncsi.c b/slirp/ncsi.c
+new file mode 100644
+index 0000000..d12ba3e
+--- /dev/null
++++ b/slirp/ncsi.c
+@@ -0,0 +1,130 @@
++/*
++ * NC-SI (Network Controller Sideband Interface) "echo" model
 + *
-+ * Based on Coldfire Fast Ethernet Controller emulation.
-+ *
-+ * Copyright (c) 2007 CodeSourcery.
++ * Copyright (C) 2016 IBM Corp.
 + *
 + * This code is licensed under the GPL version 2 or later. See the
 + * COPYING file in the top-level directory.
 + */
-+
 +#include "qemu/osdep.h"
-+#include "hw/net/ftgmac100.h"
-+#include "sysemu/dma.h"
-+#include "qemu/log.h"
-+#include "net/checksum.h"
-+#include "net/eth.h"
-+#include "hw/net/mii.h"
++#include "slirp.h"
 +
-+/* For crc32 */
-+#include <zlib.h>
++#include "ncsi-pkt.h"
 +
-+/*
-+ * FTGMAC100 registers
-+ */
-+#define FTGMAC100_ISR             0x00
-+#define FTGMAC100_IER             0x04
-+#define FTGMAC100_MAC_MADR        0x08
-+#define FTGMAC100_MAC_LADR        0x0c
-+#define FTGMAC100_MATH0           0x10
-+#define FTGMAC100_MATH1           0x14
-+#define FTGMAC100_NPTXPD          0x18
-+#define FTGMAC100_RXPD            0x1C
-+#define FTGMAC100_NPTXR_BADR      0x20
-+#define FTGMAC100_RXR_BADR        0x24
-+#define FTGMAC100_HPTXPD          0x28
-+#define FTGMAC100_HPTXR_BADR      0x2c
-+#define FTGMAC100_ITC             0x30
-+#define FTGMAC100_APTC            0x34
-+#define FTGMAC100_DBLAC           0x38
-+#define FTGMAC100_REVR            0x40
-+#define FTGMAC100_FEAR1           0x44
-+#define FTGMAC100_RBSR            0x4c
-+#define FTGMAC100_TPAFCR          0x48
-+
-+#define FTGMAC100_MACCR           0x50
-+#define FTGMAC100_MACSR           0x54
-+#define FTGMAC100_PHYCR           0x60
-+#define FTGMAC100_PHYDATA         0x64
-+#define FTGMAC100_FCR             0x68
-+
-+/*
-+ * Interrupt status register & interrupt enable register
-+ */
-+#define FTGMAC100_INT_RPKT_BUF    (1 << 0)
-+#define FTGMAC100_INT_RPKT_FIFO   (1 << 1)
-+#define FTGMAC100_INT_NO_RXBUF    (1 << 2)
-+#define FTGMAC100_INT_RPKT_LOST   (1 << 3)
-+#define FTGMAC100_INT_XPKT_ETH    (1 << 4)
-+#define FTGMAC100_INT_XPKT_FIFO   (1 << 5)
-+#define FTGMAC100_INT_NO_NPTXBUF  (1 << 6)
-+#define FTGMAC100_INT_XPKT_LOST   (1 << 7)
-+#define FTGMAC100_INT_AHB_ERR     (1 << 8)
-+#define FTGMAC100_INT_PHYSTS_CHG  (1 << 9)
-+#define FTGMAC100_INT_NO_HPTXBUF  (1 << 10)
-+
-+/*
-+ * Automatic polling timer control register
-+ */
-+#define FTGMAC100_APTC_RXPOLL_CNT(x)        ((x) & 0xf)
-+#define FTGMAC100_APTC_RXPOLL_TIME_SEL      (1 << 4)
-+#define FTGMAC100_APTC_TXPOLL_CNT(x)        (((x) >> 8) & 0xf)
-+#define FTGMAC100_APTC_TXPOLL_TIME_SEL      (1 << 12)
-+
-+/*
-+ * PHY control register
-+ */
-+#define FTGMAC100_PHYCR_MIIRD               (1 << 26)
-+#define FTGMAC100_PHYCR_MIIWR               (1 << 27)
-+
-+#define FTGMAC100_PHYCR_DEV(x)              (((x) >> 16) & 0x1f)
-+#define FTGMAC100_PHYCR_REG(x)              (((x) >> 21) & 0x1f)
-+
-+/*
-+ * PHY data register
-+ */
-+#define FTGMAC100_PHYDATA_MIIWDATA(x)       ((x) & 0xffff)
-+#define FTGMAC100_PHYDATA_MIIRDATA(x)       (((x) >> 16) & 0xffff)
-+
-+/*
-+ * Feature Register
-+ */
-+#define FTGMAC100_REVR_NEW_MDIO_INTERFACE   (1 << 31)
-+
-+/*
-+ * MAC control register
-+ */
-+#define FTGMAC100_MACCR_TXDMA_EN         (1 << 0)
-+#define FTGMAC100_MACCR_RXDMA_EN         (1 << 1)
-+#define FTGMAC100_MACCR_TXMAC_EN         (1 << 2)
-+#define FTGMAC100_MACCR_RXMAC_EN         (1 << 3)
-+#define FTGMAC100_MACCR_RM_VLAN          (1 << 4)
-+#define FTGMAC100_MACCR_HPTXR_EN         (1 << 5)
-+#define FTGMAC100_MACCR_LOOP_EN          (1 << 6)
-+#define FTGMAC100_MACCR_ENRX_IN_HALFTX   (1 << 7)
-+#define FTGMAC100_MACCR_FULLDUP          (1 << 8)
-+#define FTGMAC100_MACCR_GIGA_MODE        (1 << 9)
-+#define FTGMAC100_MACCR_CRC_APD          (1 << 10) /* not needed */
-+#define FTGMAC100_MACCR_RX_RUNT          (1 << 12)
-+#define FTGMAC100_MACCR_JUMBO_LF         (1 << 13)
-+#define FTGMAC100_MACCR_RX_ALL           (1 << 14)
-+#define FTGMAC100_MACCR_HT_MULTI_EN      (1 << 15)
-+#define FTGMAC100_MACCR_RX_MULTIPKT      (1 << 16)
-+#define FTGMAC100_MACCR_RX_BROADPKT      (1 << 17)
-+#define FTGMAC100_MACCR_DISCARD_CRCERR   (1 << 18)
-+#define FTGMAC100_MACCR_FAST_MODE        (1 << 19)
-+#define FTGMAC100_MACCR_SW_RST           (1 << 31)
-+
-+/*
-+ * Transmit descriptor
-+ */
-+#define FTGMAC100_TXDES0_TXBUF_SIZE(x)   ((x) & 0x3fff)
-+#define FTGMAC100_TXDES0_EDOTR           (1 << 15)
-+#define FTGMAC100_TXDES0_CRC_ERR         (1 << 19)
-+#define FTGMAC100_TXDES0_LTS             (1 << 28)
-+#define FTGMAC100_TXDES0_FTS             (1 << 29)
-+#define FTGMAC100_TXDES0_TXDMA_OWN       (1 << 31)
-+
-+#define FTGMAC100_TXDES1_VLANTAG_CI(x)   ((x) & 0xffff)
-+#define FTGMAC100_TXDES1_INS_VLANTAG     (1 << 16)
-+#define FTGMAC100_TXDES1_TCP_CHKSUM      (1 << 17)
-+#define FTGMAC100_TXDES1_UDP_CHKSUM      (1 << 18)
-+#define FTGMAC100_TXDES1_IP_CHKSUM       (1 << 19)
-+#define FTGMAC100_TXDES1_LLC             (1 << 22)
-+#define FTGMAC100_TXDES1_TX2FIC          (1 << 30)
-+#define FTGMAC100_TXDES1_TXIC            (1 << 31)
-+
-+/*
-+ * Receive descriptor
-+ */
-+#define FTGMAC100_RXDES0_VDBC            0x3fff
-+#define FTGMAC100_RXDES0_EDORR           (1 << 15)
-+#define FTGMAC100_RXDES0_MULTICAST       (1 << 16)
-+#define FTGMAC100_RXDES0_BROADCAST       (1 << 17)
-+#define FTGMAC100_RXDES0_RX_ERR          (1 << 18)
-+#define FTGMAC100_RXDES0_CRC_ERR         (1 << 19)
-+#define FTGMAC100_RXDES0_FTL             (1 << 20)
-+#define FTGMAC100_RXDES0_RUNT            (1 << 21)
-+#define FTGMAC100_RXDES0_RX_ODD_NB       (1 << 22)
-+#define FTGMAC100_RXDES0_FIFO_FULL       (1 << 23)
-+#define FTGMAC100_RXDES0_PAUSE_OPCODE    (1 << 24)
-+#define FTGMAC100_RXDES0_PAUSE_FRAME     (1 << 25)
-+#define FTGMAC100_RXDES0_LRS             (1 << 28)
-+#define FTGMAC100_RXDES0_FRS             (1 << 29)
-+#define FTGMAC100_RXDES0_RXPKT_RDY       (1 << 31)
-+
-+#define FTGMAC100_RXDES1_VLANTAG_CI      0xffff
-+#define FTGMAC100_RXDES1_PROT_MASK       (0x3 << 20)
-+#define FTGMAC100_RXDES1_PROT_NONIP      (0x0 << 20)
-+#define FTGMAC100_RXDES1_PROT_IP         (0x1 << 20)
-+#define FTGMAC100_RXDES1_PROT_TCPIP      (0x2 << 20)
-+#define FTGMAC100_RXDES1_PROT_UDPIP      (0x3 << 20)
-+#define FTGMAC100_RXDES1_LLC             (1 << 22)
-+#define FTGMAC100_RXDES1_DF              (1 << 23)
-+#define FTGMAC100_RXDES1_VLANTAG_AVAIL   (1 << 24)
-+#define FTGMAC100_RXDES1_TCP_CHKSUM_ERR  (1 << 25)
-+#define FTGMAC100_RXDES1_UDP_CHKSUM_ERR  (1 << 26)
-+#define FTGMAC100_RXDES1_IP_CHKSUM_ERR   (1 << 27)
-+
-+/*
-+ * Receive and transmit Buffer Descriptor
-+ */
-+typedef struct {
-+    uint32_t        des0;
-+    uint32_t        des1;
-+    uint32_t        des2;        /* not used by HW */
-+    uint32_t        des3;
-+} FTGMAC100Desc;
-+
-+/*
-+ * Specific RTL8211E MII Registers
-+ */
-+#define RTL8211E_MII_PHYCR        16 /* PHY Specific Control */
-+#define RTL8211E_MII_PHYSR        17 /* PHY Specific Status */
-+#define RTL8211E_MII_INER         18 /* Interrupt Enable */
-+#define RTL8211E_MII_INSR         19 /* Interrupt Status */
-+#define RTL8211E_MII_RXERC        24 /* Receive Error Counter */
-+#define RTL8211E_MII_LDPSR        27 /* Link Down Power Saving */
-+#define RTL8211E_MII_EPAGSR       30 /* Extension Page Select */
-+#define RTL8211E_MII_PAGSEL       31 /* Page Select */
-+
-+/*
-+ * RTL8211E Interrupt Status
-+ */
-+#define PHY_INT_AUTONEG_ERROR       (1 << 15)
-+#define PHY_INT_PAGE_RECV           (1 << 12)
-+#define PHY_INT_AUTONEG_COMPLETE    (1 << 11)
-+#define PHY_INT_LINK_STATUS         (1 << 10)
-+#define PHY_INT_ERROR               (1 << 9)
-+#define PHY_INT_DOWN                (1 << 8)
-+#define PHY_INT_JABBER              (1 << 0)
-+
-+/*
-+ * Max frame size for the receiving buffer
-+ */
-+#define FTGMAC100_MAX_FRAME_SIZE    10240
-+
-+/* Limits depending on the type of the frame
-+ *
-+ *   9216 for Jumbo frames (+ 4 for VLAN)
-+ *   1518 for other frames (+ 4 for VLAN)
-+ */
-+static int ftgmac100_max_frame_size(FTGMAC100State *s)
++/* Get Capabilities */
++static int ncsi_rsp_handler_gc(struct ncsi_rsp_pkt_hdr *rnh)
 +{
-+    return (s->maccr & FTGMAC100_MACCR_JUMBO_LF ? 9216 : 1518) + 4;
++    struct ncsi_rsp_gc_pkt *rsp =3D (struct ncsi_rsp_gc_pkt *) rnh;
++
++    rsp->cap =3D htonl(~0);
++    rsp->bc_cap =3D htonl(~0);
++    rsp->mc_cap =3D htonl(~0);
++    rsp->buf_cap =3D htonl(~0);
++    rsp->aen_cap =3D htonl(~0);
++    rsp->vlan_mode =3D 0xff;
++    rsp->uc_cnt =3D 2;
++    return 0;
 +}
 +
-+static void ftgmac100_update_irq(FTGMAC100State *s)
++/* Get Link status */
++static int ncsi_rsp_handler_gls(struct ncsi_rsp_pkt_hdr *rnh)
 +{
-+    qemu_set_irq(s->irq, s->isr & s->ier);
++    struct ncsi_rsp_gls_pkt *rsp =3D (struct ncsi_rsp_gls_pkt *) rnh;
++
++    rsp->status =3D htonl(0x1);
++    return 0;
 +}
++
++static const struct ncsi_rsp_handler {
++        unsigned char   type;
++        int             payload;
++        int             (*handler)(struct ncsi_rsp_pkt_hdr *rnh);
++} ncsi_rsp_handlers[] =3D {
++        { NCSI_PKT_RSP_CIS,     4, NULL },
++        { NCSI_PKT_RSP_SP,      4, NULL },
++        { NCSI_PKT_RSP_DP,      4, NULL },
++        { NCSI_PKT_RSP_EC,      4, NULL },
++        { NCSI_PKT_RSP_DC,      4, NULL },
++        { NCSI_PKT_RSP_RC,      4, NULL },
++        { NCSI_PKT_RSP_ECNT,    4, NULL },
++        { NCSI_PKT_RSP_DCNT,    4, NULL },
++        { NCSI_PKT_RSP_AE,      4, NULL },
++        { NCSI_PKT_RSP_SL,      4, NULL },
++        { NCSI_PKT_RSP_GLS,    16, ncsi_rsp_handler_gls },
++        { NCSI_PKT_RSP_SVF,     4, NULL },
++        { NCSI_PKT_RSP_EV,      4, NULL },
++        { NCSI_PKT_RSP_DV,      4, NULL },
++        { NCSI_PKT_RSP_SMA,     4, NULL },
++        { NCSI_PKT_RSP_EBF,     4, NULL },
++        { NCSI_PKT_RSP_DBF,     4, NULL },
++        { NCSI_PKT_RSP_EGMF,    4, NULL },
++        { NCSI_PKT_RSP_DGMF,    4, NULL },
++        { NCSI_PKT_RSP_SNFC,    4, NULL },
++        { NCSI_PKT_RSP_GVI,    36, NULL },
++        { NCSI_PKT_RSP_GC,     32, ncsi_rsp_handler_gc },
++        { NCSI_PKT_RSP_GP,     -1, NULL },
++        { NCSI_PKT_RSP_GCPS,  172, NULL },
++        { NCSI_PKT_RSP_GNS,   172, NULL },
++        { NCSI_PKT_RSP_GNPTS, 172, NULL },
++        { NCSI_PKT_RSP_GPS,     8, NULL },
++        { NCSI_PKT_RSP_OEM,     0, NULL },
++        { NCSI_PKT_RSP_PLDM,    0, NULL },
++        { NCSI_PKT_RSP_GPUUID, 20, NULL }
++};
 +
 +/*
-+ * The MII phy could raise a GPIO to the processor which in turn
-+ * could be handled as an interrpt by the OS.
-+ * For now we don't handle any GPIO/interrupt line, so the OS will
-+ * have to poll for the PHY status.
++ * packet format : ncsi header + payload + checksum
 + */
-+static void phy_update_irq(FTGMAC100State *s)
-+{
-+    ftgmac100_update_irq(s);
-+}
++#define NCSI_MAX_PAYLOAD 172
++#define NCSI_MAX_LEN     (sizeof(struct ncsi_pkt_hdr) + NCSI_MAX_PAYLOAD=
+ + 4)
 +
-+static void phy_update_link(FTGMAC100State *s)
++void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
 +{
-+    /* Autonegotiation status mirrors link status.  */
-+    if (qemu_get_queue(s->nic)->link_down) {
-+        s->phy_status &=3D ~(MII_BMSR_LINK_ST | MII_BMSR_AN_COMP);
-+        s->phy_int |=3D PHY_INT_DOWN;
++    struct ncsi_pkt_hdr *nh =3D (struct ncsi_pkt_hdr *)(pkt + ETH_HLEN);
++    uint8_t ncsi_reply[ETH_HLEN + NCSI_MAX_LEN];
++    struct ethhdr *reh =3D (struct ethhdr *)ncsi_reply;
++    struct ncsi_rsp_pkt_hdr *rnh =3D (struct ncsi_rsp_pkt_hdr *)
++        (ncsi_reply + ETH_HLEN);
++    const struct ncsi_rsp_handler *handler =3D NULL;
++    int i;
++
++    memset(ncsi_reply, 0, sizeof(ncsi_reply));
++
++    memset(reh->h_dest, 0xff, ETH_ALEN);
++    memset(reh->h_source, 0xff, ETH_ALEN);
++    reh->h_proto =3D htons(ETH_P_NCSI);
++
++    for (i =3D 0; i < ARRAY_SIZE(ncsi_rsp_handlers); i++) {
++        if (ncsi_rsp_handlers[i].type =3D=3D nh->type + 0x80) {
++            handler =3D &ncsi_rsp_handlers[i];
++            break;
++        }
++    }
++
++    rnh->common.mc_id      =3D nh->mc_id;
++    rnh->common.revision   =3D NCSI_PKT_REVISION;
++    rnh->common.id         =3D nh->id;
++    rnh->common.type       =3D nh->type + 0x80;
++    rnh->common.channel    =3D nh->channel;
++
++    if (handler) {
++        rnh->common.length =3D htons(handler->payload);
++        rnh->code          =3D htons(NCSI_PKT_RSP_C_COMPLETED);
++        rnh->reason        =3D htons(NCSI_PKT_RSP_R_NO_ERROR);
++
++        if (handler->handler) {
++            /* TODO: handle errors */
++            handler->handler(rnh);
++        }
 +    } else {
-+        s->phy_status |=3D (MII_BMSR_LINK_ST | MII_BMSR_AN_COMP);
-+        s->phy_int |=3D PHY_INT_AUTONEG_COMPLETE;
++        rnh->common.length =3D 0;
++        rnh->code          =3D htons(NCSI_PKT_RSP_C_UNAVAILABLE);
++        rnh->reason        =3D htons(NCSI_PKT_RSP_R_UNKNOWN);
 +    }
-+    phy_update_irq(s);
++
++    /* TODO: add a checksum at the end of the frame but the specs
++     * allows it to be zero */
++
++    slirp_output(slirp->opaque, ncsi_reply, ETH_HLEN + sizeof(*nh) +
++                 (handler ? handler->payload : 0) + 4);
 +}
-+
-+static void ftgmac100_set_link(NetClientState *nc)
-+{
-+    phy_update_link(FTGMAC100(qemu_get_nic_opaque(nc)));
-+}
-+
-+static void phy_reset(FTGMAC100State *s)
-+{
-+    s->phy_status =3D (MII_BMSR_100TX_FD | MII_BMSR_100TX_HD | MII_BMSR_=
-10T_FD |
-+                     MII_BMSR_10T_HD | MII_BMSR_EXTSTAT | MII_BMSR_MFPS =
-|
-+                     MII_BMSR_AN_COMP | MII_BMSR_AUTONEG | MII_BMSR_LINK=
-_ST |
-+                     MII_BMSR_EXTCAP);
-+    s->phy_control =3D (MII_BMCR_AUTOEN | MII_BMCR_FD | MII_BMCR_SPEED10=
-00);
-+    s->phy_advertise =3D (MII_ANAR_PAUSE_ASYM | MII_ANAR_PAUSE | MII_ANA=
-R_TXFD |
-+                        MII_ANAR_TX | MII_ANAR_10FD | MII_ANAR_10 |
-+                        MII_ANAR_CSMACD);
-+    s->phy_int_mask =3D 0;
-+    s->phy_int =3D 0;
-+}
-+
-+static uint32_t do_phy_read(FTGMAC100State *s, int reg)
-+{
-+    uint32_t val;
-+
-+    switch (reg) {
-+    case MII_BMCR: /* Basic Control */
-+        val =3D s->phy_control;
-+        break;
-+    case MII_BMSR: /* Basic Status */
-+        val =3D s->phy_status;
-+        break;
-+    case MII_PHYID1: /* ID1 */
-+        val =3D RTL8211E_PHYID1;
-+        break;
-+    case MII_PHYID2: /* ID2 */
-+        val =3D RTL8211E_PHYID2;
-+        break;
-+    case MII_ANAR: /* Auto-neg advertisement */
-+        val =3D s->phy_advertise;
-+        break;
-+    case MII_ANLPAR: /* Auto-neg Link Partner Ability */
-+        val =3D (MII_ANLPAR_ACK | MII_ANLPAR_PAUSE | MII_ANLPAR_TXFD |
-+               MII_ANLPAR_TX | MII_ANLPAR_10FD | MII_ANLPAR_10 |
-+               MII_ANLPAR_CSMACD);
-+        break;
-+    case MII_ANER: /* Auto-neg Expansion */
-+        val =3D MII_ANER_NWAY;
-+        break;
-+    case MII_CTRL1000: /* 1000BASE-T control  */
-+        val =3D (MII_CTRL1000_HALF | MII_CTRL1000_FULL);
-+        break;
-+    case MII_STAT1000: /* 1000BASE-T status  */
-+        val =3D MII_STAT1000_FULL;
-+        break;
-+    case RTL8211E_MII_INSR:  /* Interrupt status.  */
-+        val =3D s->phy_int;
-+        s->phy_int =3D 0;
-+        phy_update_irq(s);
-+        break;
-+    case RTL8211E_MII_INER:  /* Interrupt enable */
-+        val =3D s->phy_int_mask;
-+        break;
-+    case RTL8211E_MII_PHYCR:
-+    case RTL8211E_MII_PHYSR:
-+    case RTL8211E_MII_RXERC:
-+    case RTL8211E_MII_LDPSR:
-+    case RTL8211E_MII_EPAGSR:
-+    case RTL8211E_MII_PAGSEL:
-+        qemu_log_mask(LOG_UNIMP, "%s: reg %d not implemented\n",
-+                      __func__, reg);
-+        val =3D 0;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address at offset %d\n",
-+                      __func__, reg);
-+        val =3D 0;
-+        break;
-+    }
-+
-+    return val;
-+}
-+
-+#define MII_BMCR_MASK (MII_BMCR_LOOPBACK | MII_BMCR_SPEED100 |          =
-\
-+                       MII_BMCR_SPEED | MII_BMCR_AUTOEN | MII_BMCR_PDOWN=
- | \
-+                       MII_BMCR_FD | MII_BMCR_CTST)
-+#define MII_ANAR_MASK 0x2d7f
-+
-+static void do_phy_write(FTGMAC100State *s, int reg, uint32_t val)
-+{
-+    switch (reg) {
-+    case MII_BMCR:     /* Basic Control */
-+        if (val & MII_BMCR_RESET) {
-+            phy_reset(s);
-+        } else {
-+            s->phy_control =3D val & MII_BMCR_MASK;
-+            /* Complete autonegotiation immediately.  */
-+            if (val & MII_BMCR_AUTOEN) {
-+                s->phy_status |=3D MII_BMSR_AN_COMP;
-+            }
-+        }
-+        break;
-+    case MII_ANAR:     /* Auto-neg advertisement */
-+        s->phy_advertise =3D (val & MII_ANAR_MASK) | MII_ANAR_TX;
-+        break;
-+    case RTL8211E_MII_INER: /* Interrupt enable */
-+        s->phy_int_mask =3D val & 0xff;
-+        phy_update_irq(s);
-+        break;
-+    case RTL8211E_MII_PHYCR:
-+    case RTL8211E_MII_PHYSR:
-+    case RTL8211E_MII_RXERC:
-+    case RTL8211E_MII_LDPSR:
-+    case RTL8211E_MII_EPAGSR:
-+    case RTL8211E_MII_PAGSEL:
-+        qemu_log_mask(LOG_UNIMP, "%s: reg %d not implemented\n",
-+                      __func__, reg);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address at offset %d\n",
-+                      __func__, reg);
-+        break;
-+    }
-+}
-+
-+static int ftgmac100_read_bd(FTGMAC100Desc *bd, dma_addr_t addr)
-+{
-+    if (dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd))) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to read descriptor @ =
-0x%"
-+                      HWADDR_PRIx "\n", __func__, addr);
-+        return -1;
-+    }
-+    bd->des0 =3D le32_to_cpu(bd->des0);
-+    bd->des1 =3D le32_to_cpu(bd->des1);
-+    bd->des2 =3D le32_to_cpu(bd->des2);
-+    bd->des3 =3D le32_to_cpu(bd->des3);
-+    return 0;
-+}
-+
-+static int ftgmac100_write_bd(FTGMAC100Desc *bd, dma_addr_t addr)
-+{
-+    FTGMAC100Desc lebd;
-+
-+    lebd.des0 =3D cpu_to_le32(bd->des0);
-+    lebd.des1 =3D cpu_to_le32(bd->des1);
-+    lebd.des2 =3D cpu_to_le32(bd->des2);
-+    lebd.des3 =3D cpu_to_le32(bd->des3);
-+    if (dma_memory_write(&address_space_memory, addr, &lebd, sizeof(lebd=
-))) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to write descriptor @=
- 0x%"
-+                      HWADDR_PRIx "\n", __func__, addr);
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static void ftgmac100_do_tx(FTGMAC100State *s, uint32_t tx_ring,
-+                            uint32_t tx_descriptor)
-+{
-+    int frame_size =3D 0;
-+    uint8_t *ptr =3D s->frame;
-+    uint32_t addr =3D tx_descriptor;
-+    uint32_t flags =3D 0;
-+    int max_frame_size =3D ftgmac100_max_frame_size(s);
-+
-+    while (1) {
-+        FTGMAC100Desc bd;
-+        int len;
-+
-+        if (ftgmac100_read_bd(&bd, addr) ||
-+            ((bd.des0 & FTGMAC100_TXDES0_TXDMA_OWN) =3D=3D 0)) {
-+            /* Run out of descriptors to transmit.  */
-+            s->isr |=3D FTGMAC100_INT_NO_NPTXBUF;
-+            break;
-+        }
-+
-+        /* record transmit flags as they are valid only on the first
-+         * segment */
-+        if (bd.des0 & FTGMAC100_TXDES0_FTS) {
-+            flags =3D bd.des1;
-+        }
-+
-+        len =3D bd.des0 & 0x3FFF;
-+        if (frame_size + len > max_frame_size) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %d bytes=
-\n",
-+                          __func__, len);
-+            len =3D max_frame_size - frame_size;
-+        }
-+
-+        if (dma_memory_read(&address_space_memory, bd.des3, ptr, len)) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to read packet @ =
-0x%x\n",
-+                          __func__, bd.des3);
-+            s->isr |=3D FTGMAC100_INT_NO_NPTXBUF;
-+            break;
-+        }
-+
-+        ptr +=3D len;
-+        frame_size +=3D len;
-+        if (bd.des0 & FTGMAC100_TXDES0_LTS) {
-+            if (flags & FTGMAC100_TXDES1_IP_CHKSUM) {
-+                net_checksum_calculate(s->frame, frame_size);
-+            }
-+            /* Last buffer in frame.  */
-+            qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_siz=
-e);
-+            ptr =3D s->frame;
-+            frame_size =3D 0;
-+            if (flags & FTGMAC100_TXDES1_TXIC) {
-+                s->isr |=3D FTGMAC100_INT_XPKT_ETH;
-+            }
-+        }
-+
-+        if (flags & FTGMAC100_TXDES1_TX2FIC) {
-+            s->isr |=3D FTGMAC100_INT_XPKT_FIFO;
-+        }
-+        bd.des0 &=3D ~FTGMAC100_TXDES0_TXDMA_OWN;
-+
-+        /* Write back the modified descriptor.  */
-+        ftgmac100_write_bd(&bd, addr);
-+        /* Advance to the next descriptor.  */
-+        if (bd.des0 & FTGMAC100_TXDES0_EDOTR) {
-+            addr =3D tx_ring;
-+        } else {
-+            addr +=3D sizeof(FTGMAC100Desc);
-+        }
-+    }
-+
-+    s->tx_descriptor =3D addr;
-+
-+    ftgmac100_update_irq(s);
-+}
-+
-+static int ftgmac100_can_receive(NetClientState *nc)
-+{
-+    FTGMAC100State *s =3D FTGMAC100(qemu_get_nic_opaque(nc));
-+    FTGMAC100Desc bd;
-+
-+    if ((s->maccr & (FTGMAC100_MACCR_RXDMA_EN | FTGMAC100_MACCR_RXMAC_EN=
-))
-+         !=3D (FTGMAC100_MACCR_RXDMA_EN | FTGMAC100_MACCR_RXMAC_EN)) {
-+        return 0;
-+    }
-+
-+    if (ftgmac100_read_bd(&bd, s->rx_descriptor)) {
-+        return 0;
-+    }
-+    return !(bd.des0 & FTGMAC100_RXDES0_RXPKT_RDY);
-+}
-+
-+/*
-+ * This is purely informative. The HW can poll the RW (and RX) ring
-+ * buffers for available descriptors but we don't need to trigger a
-+ * timer for that in qemu.
-+ */
-+static uint32_t ftgmac100_rxpoll(FTGMAC100State *s)
-+{
-+    /* Polling times :
-+     *
-+     * Speed      TIME_SEL=3D0    TIME_SEL=3D1
-+     *
-+     *    10         51.2 ms      819.2 ms
-+     *   100         5.12 ms      81.92 ms
-+     *  1000        1.024 ms     16.384 ms
-+     */
-+    static const int div[] =3D { 20, 200, 1000 };
-+
-+    uint32_t cnt =3D 1024 * FTGMAC100_APTC_RXPOLL_CNT(s->aptcr);
-+    uint32_t speed =3D (s->maccr & FTGMAC100_MACCR_FAST_MODE) ? 1 : 0;
-+    uint32_t period;
-+
-+    if (s->aptcr & FTGMAC100_APTC_RXPOLL_TIME_SEL) {
-+        cnt <<=3D 4;
-+    }
-+
-+    if (s->maccr & FTGMAC100_MACCR_GIGA_MODE) {
-+        speed =3D 2;
-+    }
-+
-+    period =3D cnt / div[speed];
-+
-+    return period;
-+}
-+
-+static void ftgmac100_reset(DeviceState *d)
-+{
-+    FTGMAC100State *s =3D FTGMAC100(d);
-+
-+    /* Reset the FTGMAC100 */
-+    s->isr =3D 0;
-+    s->ier =3D 0;
-+    s->rx_enabled =3D 0;
-+    s->rx_ring =3D 0;
-+    s->rbsr =3D 0x640;
-+    s->rx_descriptor =3D 0;
-+    s->tx_ring =3D 0;
-+    s->tx_descriptor =3D 0;
-+    s->math[0] =3D 0;
-+    s->math[1] =3D 0;
-+    s->itc =3D 0;
-+    s->aptcr =3D 1;
-+    s->dblac =3D 0x00022f00;
-+    s->revr =3D 0;
-+    s->fear1 =3D 0;
-+    s->tpafcr =3D 0xf1;
-+
-+    s->maccr =3D 0;
-+    s->phycr =3D 0;
-+    s->phydata =3D 0;
-+    s->fcr =3D 0x400;
-+
-+    /* and the PHY */
-+    phy_reset(s);
-+}
-+
-+static uint64_t ftgmac100_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    FTGMAC100State *s =3D FTGMAC100(opaque);
-+
-+    switch (addr & 0xff) {
-+    case FTGMAC100_ISR:
-+        return s->isr;
-+    case FTGMAC100_IER:
-+        return s->ier;
-+    case FTGMAC100_MAC_MADR:
-+        return (s->conf.macaddr.a[0] << 8)  | s->conf.macaddr.a[1];
-+    case FTGMAC100_MAC_LADR:
-+        return ((uint32_t) s->conf.macaddr.a[2] << 24) |
-+            (s->conf.macaddr.a[3] << 16) | (s->conf.macaddr.a[4] << 8) |
-+            s->conf.macaddr.a[5];
-+    case FTGMAC100_MATH0:
-+        return s->math[0];
-+    case FTGMAC100_MATH1:
-+        return s->math[1];
-+    case FTGMAC100_ITC:
-+        return s->itc;
-+    case FTGMAC100_DBLAC:
-+        return s->dblac;
-+    case FTGMAC100_REVR:
-+        return s->revr;
-+    case FTGMAC100_FEAR1:
-+        return s->fear1;
-+    case FTGMAC100_TPAFCR:
-+        return s->tpafcr;
-+    case FTGMAC100_FCR:
-+        return s->fcr;
-+    case FTGMAC100_MACCR:
-+        return s->maccr;
-+    case FTGMAC100_PHYCR:
-+        return s->phycr;
-+    case FTGMAC100_PHYDATA:
-+        return s->phydata;
-+
-+        /* We might want to support these one day */
-+    case FTGMAC100_HPTXPD: /* High Priority Transmit Poll Demand */
-+    case FTGMAC100_HPTXR_BADR: /* High Priority Transmit Ring Base Addre=
-ss */
-+    case FTGMAC100_MACSR: /* MAC Status Register (MACSR) */
-+        qemu_log_mask(LOG_UNIMP, "%s: read to unimplemented register 0x%=
-"
-+                      HWADDR_PRIx "\n", __func__, addr);
-+        return 0;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address at offset 0x%"
-+                      HWADDR_PRIx "\n", __func__, addr);
-+        return 0;
-+    }
-+}
-+
-+static void ftgmac100_write(void *opaque, hwaddr addr,
-+                          uint64_t value, unsigned size)
-+{
-+    FTGMAC100State *s =3D FTGMAC100(opaque);
-+    int reg;
-+
-+    switch (addr & 0xff) {
-+    case FTGMAC100_ISR: /* Interrupt status */
-+        s->isr &=3D ~value;
-+        break;
-+    case FTGMAC100_IER: /* Interrupt control */
-+        s->ier =3D value;
-+        break;
-+    case FTGMAC100_MAC_MADR: /* MAC */
-+        s->conf.macaddr.a[0] =3D value >> 8;
-+        s->conf.macaddr.a[1] =3D value;
-+        break;
-+    case FTGMAC100_MAC_LADR:
-+        s->conf.macaddr.a[2] =3D value >> 24;
-+        s->conf.macaddr.a[3] =3D value >> 16;
-+        s->conf.macaddr.a[4] =3D value >> 8;
-+        s->conf.macaddr.a[5] =3D value;
-+        break;
-+    case FTGMAC100_MATH0: /* Multicast Address Hash Table 0 */
-+        s->math[0] =3D value;
-+        break;
-+    case FTGMAC100_MATH1: /* Multicast Address Hash Table 1 */
-+        s->math[1] =3D value;
-+        break;
-+    case FTGMAC100_ITC: /* TODO: Interrupt Timer Control */
-+        s->itc =3D value;
-+        break;
-+    case FTGMAC100_RXR_BADR: /* Ring buffer address */
-+        s->rx_ring =3D value;
-+        s->rx_descriptor =3D s->rx_ring;
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 5a94b06..9a50918 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -870,6 +870,10 @@ void slirp_input(Slirp *slirp, const uint8_t *pkt, i=
+nt pkt_len)
+         }
+         break;
+=20
++    case ETH_P_NCSI:
++        ncsi_input(slirp, pkt, pkt_len);
 +        break;
 +
-+    case FTGMAC100_RBSR: /* DMA buffer size */
-+        s->rbsr =3D value;
-+        break;
+     default:
+         break;
+     }
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index 3877f66..5af4f48 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -231,6 +231,9 @@ extern Slirp *slirp_instance;
+=20
+ void if_start(Slirp *);
+=20
++/* ncsi.c */
++void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
 +
-+    case FTGMAC100_NPTXR_BADR: /* Transmit buffer address */
-+        s->tx_ring =3D value;
-+        s->tx_descriptor =3D s->tx_ring;
-+        break;
-+
-+    case FTGMAC100_NPTXPD: /* Trigger transmit */
-+        if ((s->maccr & (FTGMAC100_MACCR_TXDMA_EN | FTGMAC100_MACCR_TXMA=
-C_EN))
-+            =3D=3D (FTGMAC100_MACCR_TXDMA_EN | FTGMAC100_MACCR_TXMAC_EN)=
-) {
-+            /* TODO: high priority tx ring */
-+            ftgmac100_do_tx(s, s->tx_ring, s->tx_descriptor);
-+        }
-+        if (ftgmac100_can_receive(qemu_get_queue(s->nic))) {
-+            qemu_flush_queued_packets(qemu_get_queue(s->nic));
-+        }
-+        break;
-+
-+    case FTGMAC100_RXPD: /* Receive Poll Demand Register */
-+        if (ftgmac100_can_receive(qemu_get_queue(s->nic))) {
-+            qemu_flush_queued_packets(qemu_get_queue(s->nic));
-+        }
-+        break;
-+
-+    case FTGMAC100_APTC: /* Automatic polling */
-+        s->aptcr =3D value;
-+
-+        if (FTGMAC100_APTC_RXPOLL_CNT(s->aptcr)) {
-+            ftgmac100_rxpoll(s);
-+        }
-+
-+        if (FTGMAC100_APTC_TXPOLL_CNT(s->aptcr)) {
-+            qemu_log_mask(LOG_UNIMP, "%s: no transmit polling\n", __func=
-__);
-+        }
-+        break;
-+
-+    case FTGMAC100_MACCR: /* MAC Device control */
-+        s->maccr =3D value;
-+        if (value & FTGMAC100_MACCR_SW_RST) {
-+            ftgmac100_reset(DEVICE(s));
-+        }
-+
-+        if (ftgmac100_can_receive(qemu_get_queue(s->nic))) {
-+            qemu_flush_queued_packets(qemu_get_queue(s->nic));
-+        }
-+        break;
-+
-+    case FTGMAC100_PHYCR:  /* PHY Device control */
-+        reg =3D FTGMAC100_PHYCR_REG(value);
-+        s->phycr =3D value;
-+        if (value & FTGMAC100_PHYCR_MIIWR) {
-+            do_phy_write(s, reg, s->phydata & 0xffff);
-+            s->phycr &=3D ~FTGMAC100_PHYCR_MIIWR;
-+        } else {
-+            s->phydata =3D do_phy_read(s, reg) << 16;
-+            s->phycr &=3D ~FTGMAC100_PHYCR_MIIRD;
-+        }
-+        break;
-+    case FTGMAC100_PHYDATA:
-+        s->phydata =3D value & 0xffff;
-+        break;
-+    case FTGMAC100_DBLAC: /* DMA Burst Length and Arbitration Control */
-+        s->dblac =3D value;
-+        break;
-+    case FTGMAC100_REVR:  /* Feature Register */
-+        /* TODO: Only Old MDIO interface is supported */
-+        s->revr =3D value & ~FTGMAC100_REVR_NEW_MDIO_INTERFACE;
-+        break;
-+    case FTGMAC100_FEAR1: /* Feature Register 1 */
-+        s->fear1 =3D value;
-+        break;
-+    case FTGMAC100_TPAFCR: /* Transmit Priority Arbitration and FIFO Con=
-trol */
-+        s->tpafcr =3D value;
-+        break;
-+    case FTGMAC100_FCR: /* Flow Control  */
-+        s->fcr  =3D value;
-+        break;
-+
-+    case FTGMAC100_HPTXPD: /* High Priority Transmit Poll Demand */
-+    case FTGMAC100_HPTXR_BADR: /* High Priority Transmit Ring Base Addre=
-ss */
-+    case FTGMAC100_MACSR: /* MAC Status Register (MACSR) */
-+        qemu_log_mask(LOG_UNIMP, "%s: write to unimplemented register 0x=
-%"
-+                      HWADDR_PRIx "\n", __func__, addr);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address at offset 0x%"
-+                      HWADDR_PRIx "\n", __func__, addr);
-+        break;
-+    }
-+
-+    ftgmac100_update_irq(s);
-+}
-+
-+static int ftgmac100_filter(FTGMAC100State *s, const uint8_t *buf, size_=
-t len)
-+{
-+    unsigned mcast_idx;
-+
-+    if (s->maccr & FTGMAC100_MACCR_RX_ALL) {
-+        return 1;
-+    }
-+
-+    switch (get_eth_packet_type(PKT_GET_ETH_HDR(buf))) {
-+    case ETH_PKT_BCAST:
-+        if (!(s->maccr & FTGMAC100_MACCR_RX_BROADPKT)) {
-+            return 0;
-+        }
-+        break;
-+    case ETH_PKT_MCAST:
-+        if (!(s->maccr & FTGMAC100_MACCR_RX_MULTIPKT)) {
-+            if (!(s->maccr & FTGMAC100_MACCR_HT_MULTI_EN)) {
-+                return 0;
-+            }
-+
-+            /* TODO: this does not seem to work for ftgmac100 */
-+            mcast_idx =3D compute_mcast_idx(buf);
-+            if (!(s->math[mcast_idx / 32] & (1 << (mcast_idx % 32)))) {
-+                return 0;
-+            }
-+        }
-+        break;
-+    case ETH_PKT_UCAST:
-+        if (memcmp(s->conf.macaddr.a, buf, 6)) {
-+            return 0;
-+        }
-+        break;
-+    }
-+
-+    return 1;
-+}
-+
-+static ssize_t ftgmac100_receive(NetClientState *nc, const uint8_t *buf,
-+                                 size_t len)
-+{
-+    FTGMAC100State *s =3D FTGMAC100(qemu_get_nic_opaque(nc));
-+    FTGMAC100Desc bd;
-+    uint32_t flags =3D 0;
-+    uint32_t addr;
-+    uint32_t crc;
-+    uint32_t buf_addr;
-+    uint8_t *crc_ptr;
-+    uint32_t buf_len;
-+    size_t size =3D len;
-+    uint32_t first =3D FTGMAC100_RXDES0_FRS;
-+    int max_frame_size =3D ftgmac100_max_frame_size(s);
-+
-+    if ((s->maccr & (FTGMAC100_MACCR_RXDMA_EN | FTGMAC100_MACCR_RXMAC_EN=
-))
-+         !=3D (FTGMAC100_MACCR_RXDMA_EN | FTGMAC100_MACCR_RXMAC_EN)) {
-+        return -1;
-+    }
-+
-+    /* TODO : Pad to minimum Ethernet frame length */
-+    /* handle small packets.  */
-+    if (size < 10) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: dropped frame of %zd bytes\n=
-",
-+                      __func__, size);
-+        return size;
-+    }
-+
-+    if (size < 64 && !(s->maccr && FTGMAC100_MACCR_RX_RUNT)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: dropped runt frame of %zd by=
-tes\n",
-+                      __func__, size);
-+        return size;
-+    }
-+
-+    if (!ftgmac100_filter(s, buf, size)) {
-+        return size;
-+    }
-+
-+    /* 4 bytes for the CRC.  */
-+    size +=3D 4;
-+    crc =3D cpu_to_be32(crc32(~0, buf, size));
-+    crc_ptr =3D (uint8_t *) &crc;
-+
-+    /* Huge frames are truncated.  */
-+    if (size > max_frame_size) {
-+        size =3D max_frame_size;
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %zd bytes\n"=
-,
-+                      __func__, size);
-+        flags |=3D FTGMAC100_RXDES0_FTL;
-+    }
-+
-+    switch (get_eth_packet_type(PKT_GET_ETH_HDR(buf))) {
-+    case ETH_PKT_BCAST:
-+        flags |=3D FTGMAC100_RXDES0_BROADCAST;
-+        break;
-+    case ETH_PKT_MCAST:
-+        flags |=3D FTGMAC100_RXDES0_MULTICAST;
-+        break;
-+    case ETH_PKT_UCAST:
-+        break;
-+    }
-+
-+    addr =3D s->rx_descriptor;
-+    while (size > 0) {
-+        if (!ftgmac100_can_receive(nc)) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: Unexpected packet\n", __=
-func__);
-+            return -1;
-+        }
-+
-+        if (ftgmac100_read_bd(&bd, addr) ||
-+            (bd.des0 & FTGMAC100_RXDES0_RXPKT_RDY)) {
-+            /* No descriptors available.  Bail out.  */
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: Lost end of frame\n",
-+                          __func__);
-+            s->isr |=3D FTGMAC100_INT_NO_RXBUF;
-+            break;
-+        }
-+        buf_len =3D (size <=3D s->rbsr) ? size : s->rbsr;
-+        bd.des0 |=3D buf_len & 0x3fff;
-+        size -=3D buf_len;
-+
-+        /* The last 4 bytes are the CRC.  */
-+        if (size < 4) {
-+            buf_len +=3D size - 4;
-+        }
-+        buf_addr =3D bd.des3;
-+        dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
-+        buf +=3D buf_len;
-+        if (size < 4) {
-+            dma_memory_write(&address_space_memory, buf_addr + buf_len,
-+                             crc_ptr, 4 - size);
-+            crc_ptr +=3D 4 - size;
-+        }
-+
-+        bd.des0 |=3D first | FTGMAC100_RXDES0_RXPKT_RDY;
-+        first =3D 0;
-+        if (size =3D=3D 0) {
-+            /* Last buffer in frame.  */
-+            bd.des0 |=3D flags | FTGMAC100_RXDES0_LRS;
-+            s->isr |=3D FTGMAC100_INT_RPKT_BUF;
-+        } else {
-+            s->isr |=3D FTGMAC100_INT_RPKT_FIFO;
-+        }
-+        ftgmac100_write_bd(&bd, addr);
-+        if (bd.des0 & FTGMAC100_RXDES0_EDORR) {
-+            addr =3D s->rx_ring;
-+        } else {
-+            addr +=3D sizeof(FTGMAC100Desc);
-+        }
-+    }
-+    s->rx_descriptor =3D addr;
-+
-+    ftgmac100_update_irq(s);
-+    return len;
-+}
-+
-+static const MemoryRegionOps ftgmac100_ops =3D {
-+    .read =3D ftgmac100_read,
-+    .write =3D ftgmac100_write,
-+    .valid.min_access_size =3D 4,
-+    .valid.max_access_size =3D 4,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void ftgmac100_cleanup(NetClientState *nc)
-+{
-+    FTGMAC100State *s =3D FTGMAC100(qemu_get_nic_opaque(nc));
-+
-+    s->nic =3D NULL;
-+}
-+
-+static NetClientInfo net_ftgmac100_info =3D {
-+    .type =3D NET_CLIENT_DRIVER_NIC,
-+    .size =3D sizeof(NICState),
-+    .can_receive =3D ftgmac100_can_receive,
-+    .receive =3D ftgmac100_receive,
-+    .cleanup =3D ftgmac100_cleanup,
-+    .link_status_changed =3D ftgmac100_set_link,
-+};
-+
-+static void ftgmac100_realize(DeviceState *dev, Error **errp)
-+{
-+    FTGMAC100State *s =3D FTGMAC100(dev);
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-+
-+    memory_region_init_io(&s->iomem, OBJECT(dev), &ftgmac100_ops, s,
-+                          TYPE_FTGMAC100, 0x2000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq);
-+    qemu_macaddr_default_if_unset(&s->conf.macaddr);
-+
-+    s->conf.peers.ncs[0] =3D nd_table[0].netdev;
-+
-+    s->nic =3D qemu_new_nic(&net_ftgmac100_info, &s->conf,
-+                          object_get_typename(OBJECT(dev)), DEVICE(dev)-=
->id,
-+                          s);
-+    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
-+
-+    s->frame =3D g_malloc(FTGMAC100_MAX_FRAME_SIZE);
-+}
-+
-+static const VMStateDescription vmstate_ftgmac100 =3D {
-+    .name =3D TYPE_FTGMAC100,
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(irq_state, FTGMAC100State),
-+        VMSTATE_UINT32(isr, FTGMAC100State),
-+        VMSTATE_UINT32(ier, FTGMAC100State),
-+        VMSTATE_UINT32(rx_enabled, FTGMAC100State),
-+        VMSTATE_UINT32(rx_ring, FTGMAC100State),
-+        VMSTATE_UINT32(rbsr, FTGMAC100State),
-+        VMSTATE_UINT32(tx_ring, FTGMAC100State),
-+        VMSTATE_UINT32(rx_descriptor, FTGMAC100State),
-+        VMSTATE_UINT32(tx_descriptor, FTGMAC100State),
-+        VMSTATE_UINT32_ARRAY(math, FTGMAC100State, 2),
-+        VMSTATE_UINT32(itc, FTGMAC100State),
-+        VMSTATE_UINT32(aptcr, FTGMAC100State),
-+        VMSTATE_UINT32(dblac, FTGMAC100State),
-+        VMSTATE_UINT32(revr, FTGMAC100State),
-+        VMSTATE_UINT32(fear1, FTGMAC100State),
-+        VMSTATE_UINT32(tpafcr, FTGMAC100State),
-+        VMSTATE_UINT32(maccr, FTGMAC100State),
-+        VMSTATE_UINT32(phycr, FTGMAC100State),
-+        VMSTATE_UINT32(phydata, FTGMAC100State),
-+        VMSTATE_UINT32(fcr, FTGMAC100State),
-+        VMSTATE_UINT32(phy_status, FTGMAC100State),
-+        VMSTATE_UINT32(phy_control, FTGMAC100State),
-+        VMSTATE_UINT32(phy_advertise, FTGMAC100State),
-+        VMSTATE_UINT32(phy_int, FTGMAC100State),
-+        VMSTATE_UINT32(phy_int_mask, FTGMAC100State),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property ftgmac100_properties[] =3D {
-+    DEFINE_NIC_PROPERTIES(FTGMAC100State, conf),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void ftgmac100_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->vmsd =3D &vmstate_ftgmac100;
-+    dc->reset =3D ftgmac100_reset;
-+    dc->props =3D ftgmac100_properties;
-+    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-+    dc->realize =3D ftgmac100_realize;
-+    dc->desc =3D "Faraday FTGMAC100 Gigabit Ethernet emulation";
-+}
-+
-+static const TypeInfo ftgmac100_info =3D {
-+    .name =3D TYPE_FTGMAC100,
-+    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(FTGMAC100State),
-+    .class_init =3D ftgmac100_class_init,
-+};
-+
-+static void ftgmac100_register_types(void)
-+{
-+    type_register_static(&ftgmac100_info);
-+}
-+
-+type_init(ftgmac100_register_types)
-diff --git a/include/hw/net/ftgmac100.h b/include/hw/net/ftgmac100.h
-new file mode 100644
-index 0000000..962a718
---- /dev/null
-+++ b/include/hw/net/ftgmac100.h
-@@ -0,0 +1,60 @@
-+/*
-+ * Faraday FTGMAC100 Gigabit Ethernet
-+ *
-+ * Copyright (C) 2016-2017, IBM Corporation.
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ */
-+
-+#ifndef FTGMAC100_H
-+#define FTGMAC100_H
-+
-+#define TYPE_FTGMAC100 "ftgmac100"
-+#define FTGMAC100(obj) OBJECT_CHECK(FTGMAC100State, (obj), TYPE_FTGMAC10=
-0)
-+
-+#include "hw/sysbus.h"
-+#include "net/net.h"
-+
-+typedef struct FTGMAC100State {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    NICState *nic;
-+    NICConf conf;
-+    qemu_irq irq;
-+    MemoryRegion iomem;
-+
-+    uint8_t *frame;
-+
-+    uint32_t irq_state;
-+    uint32_t isr;
-+    uint32_t ier;
-+    uint32_t rx_enabled;
-+    uint32_t rx_ring;
-+    uint32_t rx_descriptor;
-+    uint32_t tx_ring;
-+    uint32_t tx_descriptor;
-+    uint32_t math[2];
-+    uint32_t rbsr;
-+    uint32_t itc;
-+    uint32_t aptcr;
-+    uint32_t dblac;
-+    uint32_t revr;
-+    uint32_t fear1;
-+    uint32_t tpafcr;
-+    uint32_t maccr;
-+    uint32_t phycr;
-+    uint32_t phydata;
-+    uint32_t fcr;
-+
-+
-+    uint32_t phy_status;
-+    uint32_t phy_control;
-+    uint32_t phy_advertise;
-+    uint32_t phy_int;
-+    uint32_t phy_int_mask;
-+} FTGMAC100State;
-+
-+#endif
+ #ifndef _WIN32
+ #include <netdb.h>
+ #endif
 --=20
 2.7.4
