@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2bHW-0004oy-Oj
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:31:50 -0400
+	(envelope-from <berrange@redhat.com>) id 1d2bKJ-0006Rh-6U
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d2bHV-0004vk-Q1
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:31:46 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36967)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d2bHV-0004vR-IK
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:31:45 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id m123so63140909wma.0
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 03:31:45 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1d2bKG-00068M-2E
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:34:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d2bKF-00066l-Pz
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 06:34:36 -0400
+Date: Mon, 24 Apr 2017 11:34:28 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170424103428.GI20809@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <EC9759BC1E3E98429B5DE9A03DF86D8B59D1084B@DGGEML503-MBX.china.huawei.com>
+	<20170424092320.GC2362@work-vm> <20170424095235.GH20809@redhat.com>
+	<20170424102716.GE2362@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Apr 2017 11:31:23 +0100
-Message-ID: <CAFEAcA-F4mKWyknfRWhJfymJxbsYPvWH20CSecTmY8-kq-dipA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/21] Please pull xen-20170421-tag for 2.10
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170424102716.GE2362@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [BUG] Migrate failes between boards with different
+ PMC counts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Zhuangyanying <ann.zhuangyanying@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-On 21 April 2017 at 21:14, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
->
->   Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
->
-> are available in the git repository at:
->
->   git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170421-tag
->
-> for you to fetch changes up to b0d48550a2d10f0fa8c30a7cc3ff5a1cbda8d4c4:
->
->   move xen-mapcache.c to hw/i386/xen/ (2017-04-21 12:41:29 -0700)
->
-> ----------------------------------------------------------------
-> Xen 2017/04/21
->
-> ----------------------------------------------------------------
+On Mon, Apr 24, 2017 at 11:27:16AM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > On Mon, Apr 24, 2017 at 10:23:21AM +0100, Dr. David Alan Gilbert wrot=
+e:
+> > > * Zhuangyanying (ann.zhuangyanying@huawei.com) wrote:
+> > > > Hi all,
+> > > >=20
+> > > > Recently, I found migration failed when enable vPMU.
+> > > >=20
+> > > > migrate vPMU state was introduced in linux-3.10 + qemu-1.7.
+> > > >=20
+> > > > As long as enable vPMU, qemu will save / load the
+> > > > vmstate_msr_architectural_pmu(msr_global_ctrl) register during th=
+e migration.
+> > > > But global_ctrl generated based on cpuid(0xA), the number of gene=
+ral-purpose performance
+> > > > monitoring counters(PMC) can vary according to Intel SDN. The num=
+ber of PMC presented
+> > > > to vm, does not support configuration currently, it depend on hos=
+t cpuid, and enable all pmc
+> > > > defaultly at KVM. It cause migration to fail between boards with =
+different PMC counts.
+> > > >=20
+> > > > The return value of cpuid (0xA) is different dur to cpu, accordin=
+g to Intel SDN=EF=BC=8C18-10 Vol. 3B:
+> > > >=20
+> > > > Note: The number of general-purpose performance monitoring counte=
+rs (i.e. N in Figure 18-9)
+> > > > can vary across processor generations within a processor family, =
+across processor families, or
+> > > > could be different depending on the configuration chosen at boot =
+time in the BIOS regarding
+> > > > Intel Hyper Threading Technology, (e.g. N=3D2 for 45 nm Intel Ato=
+m processors; N =3D4 for processors
+> > > > based on the Nehalem microarchitecture; for processors based on t=
+he Sandy Bridge
+> > > > microarchitecture, N =3D 4 if Intel Hyper Threading Technology is=
+ active and N=3D8 if not active).
+> > > >=20
+> > > > Also I found, N=3D8 if HT is not active based on the broadwell=EF=
+=BC=8C,
+> > > > such as CPU E7-8890 v4 @ 2.20GHz  =20
+> > > >=20
+> > > > # ./x86_64-softmmu/qemu-system-x86_64 --enable-kvm -smp 4 -m 4096=
+ -hda
+> > > > /data/zyy/test_qemu.img.sles12sp1 -vnc :99 -cpu kvm64,pmu=3Dtrue =
+-incoming tcp::8888
+> > > > Completed 100 %
+> > > > qemu-system-x86_64: error: failed to set MSR 0x38f to 0x7000000ff
+> > > > qemu-system-x86_64: /data/zyy/git/test/qemu/target/i386/kvm.c:183=
+3: kvm_put_msrs:=20
+> > > > Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+> > > > Aborted
+> > > >=20
+> > > > So make number of pmc configurable to vm ? Any better idea ?
+> > >=20
+> > > Coincidentally we hit a similar problem a few days ago with -cpu ho=
+st  - it took me
+> > > quite a while to spot the difference between the machines was the s=
+ource
+> > > had hyperthreading disabled.
+> > >=20
+> > > An option to set the number of counters makes sense to me; but I wo=
+nder
+> > > how many other options we need as well.  Also, I'm not sure there's=
+ any
+> > > easy way for libvirt etc to figure out how many counters a host sup=
+ports -
+> > > it's not in /proc/cpuinfo.
+> >=20
+> > We actually try to avoid /proc/cpuinfo whereever possible. We do dire=
+ct
+> > CPUID asm instructions to identify features, and prefer to use
+> > /sys/devices/system/cpu if that has suitable data
+> >=20
+> > Where do the PMC counts come from originally ? CPUID or something els=
+e ?
+>=20
+> Yes, they're bits 8..15 of CPUID leaf 0xa
 
-Hi; I'm afraid this doesn't build with clang:
+Ok, that's easy enough for libvirt to detect then. More a question of wha=
+t
+libvirt should then do this with the info....
 
-
-  CC      hw/9pfs/xen-9p-backend.o
-/home/petmay01/linaro/qemu-for-merges/hw/9pfs/xen-9p-backend.c:21:1:
-error: unused fun
-ction 'xen_9pfs_get_ring_ptr' [-Werror,-Wunused-function]
-DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);
-^
-/home/petmay01/linaro/qemu-for-merges/include/hw/xen/io/ring.h:469:79:
-note: expanded
-from macro 'DEFINE_XEN_FLEX_RING_AND_INTF'
-};                                                                            \
-                                                                              ^
-/home/petmay01/linaro/qemu-for-merges/include/hw/xen/io/ring.h:387:30:
-note: expanded from macro '\
-DEFINE_XEN_FLEX_RING'
-static inline unsigned char *name##_get_ring_ptr(unsigned char *buf,          \
-                             ^
-<scratch space>:151:1: note: expanded from here
-xen_9pfs_get_ring_ptr
-^
-/home/petmay01/linaro/qemu-for-merges/hw/9pfs/xen-9p-backend.c:21:1:
-error: unused function 'xen_9pfs_write_packet'
-[-Werror,-Wunused-function]
-/home/petmay01/linaro/qemu-for-merges/include/hw/xen/io/ring.h:469:79:
-note: expanded from macro 'DEFINE_XEN_FLEX_RING_AND_INTF'
-};                                                                            \
-                                                                              ^
-/home/petmay01/linaro/qemu-for-merges/include/hw/xen/io/ring.h:412:20:
-note: expanded from macro '\
-DEFINE_XEN_FLEX_RING'
-static inline void name##_write_packet(unsigned char *buf,                    \
-                   ^
-<scratch space>:155:1: note: expanded from here
-xen_9pfs_write_packet
-^
-2 errors generated.
-/home/petmay01/linaro/qemu-for-merges/rules.mak:69: recipe for target
-'hw/9pfs/xen-9p-backend.o' failed
-
-
-Clang requires that functions, even inline functions, defined in .c files
-must be used.
-
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
