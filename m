@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1d2Yui-000568-QF
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:10 -0400
+	(envelope-from <thuth@redhat.com>) id 1d2YvG-0005bb-Hh
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1d2Yuh-0006d5-RN
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:04 -0400
-Date: Mon, 24 Apr 2017 09:59:55 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170424075955.5s72guumt35dhmlb@eukaryote>
-References: <20170421204123.bdftoeuko6lwox3x@eukaryote>
-	<58FB2125.7020603@huawei.com>
+	(envelope-from <thuth@redhat.com>) id 1d2Yv6-0006vR-ON
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56136)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d2Yv6-0006uO-ID
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 04:00:28 -0400
+References: <VI1PR0601MB2479AC08F717F15FCE287FC99C020@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2ea59451-5508-8c80-16c9-66eeeb0cfe1c@redhat.com>
+Date: Mon, 24 Apr 2017 10:00:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58FB2125.7020603@huawei.com>
-Subject: Re: [Qemu-devel] [QEMU-2.8] Source QEMU crashes with:
- "bdrv_co_pwritev: Assertion `!(bs->open_flags & BDRV_O_INACTIVE)' failed"
+In-Reply-To: <VI1PR0601MB2479AC08F717F15FCE287FC99C020@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
+ networking (SLIRP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, qemu-block@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com
+To: FONNEMANN Mark <mark.fonnemann@hexagon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On Sat, Apr 22, 2017 at 05:23:49PM +0800, Hailiang Zhang wrote:
-> Hi,
+On 13.04.2017 22:17, FONNEMANN Mark wrote:
+> Hello-
+>=20
+> I posted this question on stack overflow and got no response. Stefan re=
+commended asking the question here.
+>=20
+> I=E2=80=99ve included a summary of the problem here in this email but m=
+ore details can be found here:
+>=20
+> http://stackoverflow.com/questions/43308310/dns-server-not-working-in-q=
+emu-usermode-networking?noredirect=3D1#comment73706410_43308310
+>=20
+> Basically, I can access the internet using static IP addresses but name=
+server resolution is not working. I can ping the router 10.0.2.2 address =
+and my 10.0.2.15 address but not the 10.0.2.3 address of the DNS server o=
+r the 10.0.2.4 of the SMB server both of which I need for my project.
+>=20
+> Any suggestions?
+>=20
+> p.s. I tried 2.9rc3 and it failed as well.
 
-Hi Hailiang,
+IIRC there have been some DNS related fixes shortly before the final 2.9
+release ... so does it work if you use the final 2.9.0 version instead?
 
-> I think the bellow patch can fix your problme.
-> [PATCH 2/4] qmp-cont: invalidate on RUN_STATE_PRELAUNCH
-> https://patchwork.kernel.org/patch/9591885/
-
-Hmm, the above patch ("qmp-cont: invalidate on RUN_STATE_PRELAUNCH") is
-not merged in Git, as it's stalled on design discussion between Kevin
-Wolf and Vladimir.
-
-And the below patch, from you, seems to be not submitted upstream (2.8
-stable tree, perhaps).  Do you intend to do so?
-
-> Actually, we encounter the same problem in our test, we fix it with the follow patch:
-> 
->      From 0e4d6d706afd9909b5fd71536b45c58af60892f8 Mon Sep 17 00:00:00 2001
->      From: zhanghailiang<zhang.zhanghailiang@huawei.com>
->      Date: Tue, 21 Mar 2017 09:44:36 +0800
->      Subject: [PATCH] migration: Re-activate blocks whenever migration been
->       cancelled
-> 
->      In commit 1d2acc3162d9c7772510c973f446353fbdd1f9a8, we try to fix the bug
->      'bdrv_co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed'
->      which occured in migration cancelling process.
-> 
->      But it seems that we didn't cover all the cases, we caught such a case which
->      slipped from the old fixup in our test: if libvirtd cancelled the migration
->      process for a shutting down VM, it will send 'system_reset' command first,
->      and then 'cont' command behind, after VM resumes to run, it will trigger the above
->      error reports, because we didn't regain the control of blocks for VM.
-> 
->      Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
->      Signed-off-by: Hongyang Yang<yanghongyang@huawei.com>
->      ---
->       block.c                       | 12 +++++++++++-
->       include/block/block.h         |  1 +
->       include/migration/migration.h |  3 ---
->       migration/migration.c         |  7 +------
->       qmp.c                         |  4 +---
->       5 files changed, 14 insertions(+), 13 deletions(-)
-
-[...]
-
--- 
-/kashyap
+ Thomas
