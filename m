@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2h15-0001Tg-RN
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:39:12 -0400
+	(envelope-from <berrange@redhat.com>) id 1d2h1d-0001nk-Qf
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2h12-0004iS-Nj
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:39:11 -0400
-Date: Mon, 24 Apr 2017 17:38:51 +0100
+	(envelope-from <berrange@redhat.com>) id 1d2h1a-0004zi-NW
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:39:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32945)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d2h1a-0004zd-HR
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 12:39:42 -0400
+Date: Mon, 24 Apr 2017 17:39:36 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170424163851.GA453@redhat.com>
+Message-ID: <20170424163936.GE7705@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170221115512.21918-1-berrange@redhat.com>
-	<20170221115512.21918-10-berrange@redhat.com>
-	<w51poibbs0d.fsf@maestria.local.igalia.com>
+References: <20170424125016.GM20809@redhat.com>
+	<CAFEAcA_p7rWmuRZ20PHBPfXoKswz95PtOjG866kaC2ooKx70PQ@mail.gmail.com>
+	<20170424133624.GP20809@redhat.com>
+	<CAFEAcA_LrsgToPR842redVqG7VnntTdg2ANgkDpnFAWiEqQVVw@mail.gmail.com>
+	<20170424135749.GR20809@redhat.com>
+	<CAFEAcA8YyeQ3NOGQkr8xVZ9S5F7RmdeDwcRkLGSyNci3hf4OCw@mail.gmail.com>
+	<20170424154117.GB7705@redhat.com>
+	<CAFEAcA8noBf9VCZ+n24NMqVKGZC9D7KKMhLoacNyEA=WJ39uAg@mail.gmail.com>
+	<20170424155255.GD7705@redhat.com>
+	<f92490f5-a09c-0f11-4ea5-f09969f78870@web.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <w51poibbs0d.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v5 09/18] qcow: convert QCow to use
- QCryptoBlock for encryption
+In-Reply-To: <f92490f5-a09c-0f11-4ea5-f09969f78870@web.de>
+Subject: Re: [Qemu-devel] error: qcrypto_random_bytes() tried to read from
+ /dev/[u]random, even on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +37,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Geert Martin Ijewski <gm.ijewski@web.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Feb 21, 2017 at 02:19:46PM +0100, Alberto Garcia wrote:
-> On Tue 21 Feb 2017 12:55:03 PM CET, Daniel P. Berrange wrote:
-> > @@ -175,8 +185,31 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-> >              ret = -ENOSYS;
-> >              goto fail;
-> >          }
-> > +        if (s->crypt_method_header == QCOW_CRYPT_AES) {
-> > +            crypto_opts = block_crypto_open_opts_init(
-> > +                Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", &local_err);
-> > +            if (local_err) {
-> > +                error_propagate(errp, local_err);
-> > +                ret = -EINVAL;
-> > +                goto fail;
-> > +            }
-> >
-> > +            if (flags & BDRV_O_NO_IO) {
-> > +                cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
-> > +            }
-> > +            s->crypto = qcrypto_block_open(crypto_opts, NULL, NULL,
-> > +                                           cflags, errp);
+On Mon, Apr 24, 2017 at 06:33:26PM +0200, Geert Martin Ijewski wrote:
+> > We can have the existing qcrypto_init() call a qcrypto_random_init()
+> > method to do the one-time initialization task, since that's already
+> > required to run early in order to initialize gnutls when we use it.
 > 
-> You don't call qcrypto_block_free() if qcow_open() eventually fails.
-> Although qcow_close() takes care of that, a failure to open the image
-> sets bs->drv = NULL in bdrv_open_common(), preventing qcow_close() from
-> being called.
+> Wouldn't it make sense to also move the unix initalization to that function?
 
-Yes, I'll fix that leak.
+Yep, we can do that.
 
-> 
-> > @@ -260,14 +293,17 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-> >          goto fail;
-> >      }
-> >  
-> > +    qapi_free_QCryptoBlockOpenOptions(crypto_opts);
-> >      qemu_co_mutex_init(&s->lock);
-> >      return 0;
-> >  
-> >   fail:
-> > +    qemu_opts_del(opts);
-> 
-> You need to delete opts as well if this function succeeds, don't you?
+> And what about deinitalization? Though because that handle needs to stay
+> valid throughout the whole lifetime of QEMU anyway, that probably can be
+> ignored and taken care of by the OS
 
-New version will avoid the use of QemuOpts entirely - using the QDict
-APIs instead, but I'll have equiv cleanup todo.
+Correct, there's no need for any de-init if we have a global handle, as it
+is needed until QEMU exits.
 
 Regards,
 Daniel
