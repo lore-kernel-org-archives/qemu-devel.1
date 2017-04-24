@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d2dre-0006md-Ab
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:17:15 -0400
+	(envelope-from <GM.Ijewski@web.de>) id 1d2cwU-0007DP-5b
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:18:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d2drc-0001BK-V8
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 09:17:14 -0400
+	(envelope-from <GM.Ijewski@web.de>) id 1d2cwP-0007hX-8b
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:18:10 -0400
+Received: from mout.web.de ([212.227.15.4]:50978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <GM.Ijewski@web.de>) id 1d2cwO-0007hA-Tt
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:18:05 -0400
+Message-ID: <trinity-b0e235ed-b74e-40f5-b249-c73867fd5ee9-1493036276162@3capp-webde-bs07>
+From: GM.Ijewski@web.de
+Date: Mon, 24 Apr 2017 14:17:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAOGPPbdM0SuG4HePS_pOimPNQwyqvOcuCV++R3EB10jdWOUg=A@mail.gmail.com>
-References: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
-	<CAOGPPbdM0SuG4HePS_pOimPNQwyqvOcuCV++R3EB10jdWOUg=A@mail.gmail.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Mon, 24 Apr 2017 21:17:11 +0800
-Message-ID: <CAOGPPbcu2WGndbZojRW39XBuEz3zjgXHOr3b=wzq5-kHM42HpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: use blk_co_pwrite_zeroes for
- zero sectors when compressed
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] error: qcrypto_random_bytes() tried to read from
+ /dev/[u]random, even on windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,113 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, mreitz@redhat.com
-Cc: qemu block <qemu-block@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
+To: berrange@redhat.com, qemu-devel@nongnu.org
 
-Hi Everyone:
-    Any suggestion about this patch?
-    Thanks.
+   Now it calls CryptGenRandom() if is it compiled for windows.
 
-On Sun, Apr 23, 2017 at 5:53 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
-> I test four test case for this patch.
-> 1.qcow2 image with lots of zero cluster, and convert with compress
-> 2.qcow2 image with lots of zero cluster, and convert with no compress
-> 3.qcow2 image with lots of non-zero clusters, and convert with compress
-> 4.qcow2 image with lots of non-zero clusters, and convert with no compress
-> all test case pass.
->
-> the qcow2 image with lots of zero clusters, the time reduce obviously.
-> and have no bad effort in other cases.
->
->
-> On Fri, Apr 21, 2017 at 5:57 PM,  <jemmy858585@gmail.com> wrote:
->> From: Lidong Chen <lidongchen@tencent.com>
->>
->> when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
->> blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
->> the time when converts the qcow2 image with lots of zero.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> ---
->> v2 changelog:
->>     unify the compressed and non-compressed code paths
->> ---
->>  qemu-img.c | 41 +++++++++++------------------------------
->>  1 file changed, 11 insertions(+), 30 deletions(-)
->>
->> diff --git a/qemu-img.c b/qemu-img.c
->> index b220cf7..60c9adf 100644
->> --- a/qemu-img.c
->> +++ b/qemu-img.c
->> @@ -1661,6 +1661,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
->>
->>      while (nb_sectors > 0) {
->>          int n = nb_sectors;
->> +        BdrvRequestFlags flags = s->compressed ? BDRV_REQ_WRITE_COMPRESSED : 0;
->> +
->>          switch (status) {
->>          case BLK_BACKING_FILE:
->>              /* If we have a backing file, leave clusters unallocated that are
->> @@ -1670,43 +1672,21 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
->>              break;
->>
->>          case BLK_DATA:
->> -            /* We must always write compressed clusters as a whole, so don't
->> -             * try to find zeroed parts in the buffer. We can only save the
->> -             * write if the buffer is completely zeroed and we're allowed to
->> -             * keep the target sparse. */
->> -            if (s->compressed) {
->> -                if (s->has_zero_init && s->min_sparse &&
->> -                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
->> -                {
->> -                    assert(!s->target_has_backing);
->> -                    break;
->> -                }
->> -
->> -                iov.iov_base = buf;
->> -                iov.iov_len = n << BDRV_SECTOR_BITS;
->> -                qemu_iovec_init_external(&qiov, &iov, 1);
->> -
->> -                ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
->> -                                     n << BDRV_SECTOR_BITS, &qiov,
->> -                                     BDRV_REQ_WRITE_COMPRESSED);
->> -                if (ret < 0) {
->> -                    return ret;
->> -                }
->> -                break;
->> -            }
->> -
->> -            /* If there is real non-zero data or we're told to keep the target
->> -             * fully allocated (-S 0), we must write it. Otherwise we can treat
->> +            /* If we're told to keep the target fully allocated (-S 0) or there
->> +             * is real non-zero data, we must write it. Otherwise we can treat
->>               * it as zero sectors. */
->>              if (!s->min_sparse ||
->> -                is_allocated_sectors_min(buf, n, &n, s->min_sparse))
->> -            {
->> +                (!s->compressed &&
->> +                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) ||
->> +                (s->compressed &&
->> +                 !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))) {
->> +
->>                  iov.iov_base = buf;
->>                  iov.iov_len = n << BDRV_SECTOR_BITS;
->>                  qemu_iovec_init_external(&qiov, &iov, 1);
->>
->>                  ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
->> -                                     n << BDRV_SECTOR_BITS, &qiov, 0);
->> +                                     n << BDRV_SECTOR_BITS, &qiov, flags);
->>                  if (ret < 0) {
->>                      return ret;
->>                  }
->> @@ -1716,6 +1696,7 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
->>
->>          case BLK_ZERO:
->>              if (s->has_zero_init) {
->> +                assert(!s->target_has_backing);
->>                  break;
->>              }
->>              ret = blk_co_pwrite_zeroes(s->target,
->> --
->> 1.8.3.1
->>
+   It might be possible to save the cryptographic provider in between
+   invocations, e.g. by making it static -- I have no idea how
+   computationally
+   intensive that operation actually is.
+
+   Signed-off-by: Geert Martin Ijewski <gm.ijewski@web.de>
+
+   diff --git a/crypto/random-platform.c b/crypto/random-platform.c
+   index 82b755a..7aa0476 100644
+   --- a/crypto/random-platform.c
+   +++ b/crypto/random-platform.c
+   @@ -26,6 +26,7 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+                             size_t buflen G_GNUC_UNUSED,
+                             Error **errp)
+    {
+   +#ifndef _WIN32
+        int fd;
+        int ret = -1;
+        int got;
+   @@ -61,4 +62,26 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+     cleanup:
+        close(fd);
+        return ret;
+   +#else
+   +    HCRYPTPROV   hCryptProv;
+   +
+   +    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL,
+   0)) {
+   +        if (NTE_BAD_KEYSET == GetLastError()) {
+   +            if (!CryptAcquireContext(&hCryptProv, NULL, NULL,
+   +                                     PROV_RSA_FULL, CRYPT_NEWKEYSET))
+   {
+   +                error_setg_errno(errp, GetLastError(),
+   +                         "Unable to create cryptographic provider");
+   +            }
+   +        }
+   +    }
+   +
+   +    if (!CryptGenRandom(hCryptProv, buflen, buf)) {
+   +        error_setg_errno(errp, GetLastError(),
+   +                         "Unable to read random bytes");
+   +        return -1;
+   +    }
+   +
+   +    CryptReleaseContext(hCryptProv, 0);
+   +    return 0;
+   +#endif
+    }
+   diff --git a/include/sysemu/os-win32.h b/include/sysemu/os-win32.h
+   index ff18b23..4a5d908 100644
+   --- a/include/sysemu/os-win32.h
+   +++ b/include/sysemu/os-win32.h
+   @@ -29,6 +29,7 @@
+    #include <winsock2.h>
+    #include <windows.h>
+    #include <ws2tcpip.h>
+   +#include <Wincrypt.h>
+
+    #if defined(_WIN64)
+    /* On w64, setjmp is implemented by _setjmp which needs a second
+   parameter.
