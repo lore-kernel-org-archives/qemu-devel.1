@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d2jWx-0001WO-2M
+	(envelope-from <jcody@redhat.com>) id 1d2jWx-0001WV-40
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d2jWv-0002fa-Rp
+	(envelope-from <jcody@redhat.com>) id 1d2jWv-0002fB-Jy
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 15:20:15 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 24 Apr 2017 15:19:54 -0400
-Message-Id: <20170424192002.18622-5-jcody@redhat.com>
+Date: Mon, 24 Apr 2017 15:19:53 -0400
+Message-Id: <20170424192002.18622-4-jcody@redhat.com>
 In-Reply-To: <20170424192002.18622-1-jcody@redhat.com>
 References: <20170424192002.18622-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL v2 04/12] block: add bdrv_set_read_only() helper
- function
+Subject: [Qemu-devel] [PULL v2 03/12] qemu-iotests: exclude vxhs from image
+ creation via protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,124 +23,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-We have a helper wrapper for checking for the BDS read_only flag,
-add a helper wrapper to set the read_only flag as well.
+The protocol VXHS does not support image creation.  Some tests expect
+to be able to create images through the protocol.  Exclude VXHS from
+these tests.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 9b18972d05f5fa2ac16c014f0af98d680553048d.1491597120.git.jcody@redhat.com
 ---
- block.c               | 5 +++++
- block/bochs.c         | 2 +-
- block/cloop.c         | 2 +-
- block/dmg.c           | 2 +-
- block/rbd.c           | 2 +-
- block/vvfat.c         | 4 ++--
- include/block/block.h | 1 +
- 7 files changed, 12 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/017 | 1 +
+ tests/qemu-iotests/020 | 1 +
+ tests/qemu-iotests/029 | 1 +
+ tests/qemu-iotests/073 | 1 +
+ tests/qemu-iotests/114 | 1 +
+ tests/qemu-iotests/130 | 1 +
+ tests/qemu-iotests/134 | 1 +
+ tests/qemu-iotests/156 | 1 +
+ tests/qemu-iotests/158 | 1 +
+ 9 files changed, 9 insertions(+)
 
-diff --git a/block.c b/block.c
-index 7eda9a4..6f21145 100644
---- a/block.c
-+++ b/block.c
-@@ -192,6 +192,11 @@ void path_combine(char *dest, int dest_size,
-     }
- }
+diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
+index e3f9e75..4f9302d 100755
+--- a/tests/qemu-iotests/017
++++ b/tests/qemu-iotests/017
+@@ -41,6 +41,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ # Any format supporting backing files
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
+ _unsupported_imgopts "subformat=monolithicFlat" "subformat=twoGbMaxExtentFlat"
  
-+void bdrv_set_read_only(BlockDriverState *bs, bool read_only)
-+{
-+    bs->read_only = read_only;
-+}
-+
- void bdrv_get_full_backing_filename_from_filename(const char *backed,
-                                                   const char *backing,
-                                                   char *dest, size_t sz,
-diff --git a/block/bochs.c b/block/bochs.c
-index 516da56..bdc2831 100644
---- a/block/bochs.c
-+++ b/block/bochs.c
-@@ -110,7 +110,7 @@ static int bochs_open(BlockDriverState *bs, QDict *options, int flags,
-         return -EINVAL;
-     }
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index 9c4a68c..7a11110 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -43,6 +43,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ # Any format supporting backing files
+ _supported_fmt qcow qcow2 vmdk qed
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
+ _unsupported_imgopts "subformat=monolithicFlat" \
+                      "subformat=twoGbMaxExtentFlat" \
+diff --git a/tests/qemu-iotests/029 b/tests/qemu-iotests/029
+index e639ac0..30bab24 100755
+--- a/tests/qemu-iotests/029
++++ b/tests/qemu-iotests/029
+@@ -42,6 +42,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ # Any format supporting intenal snapshots
+ _supported_fmt qcow2
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
+ # Internal snapshots are (currently) impossible with refcount_bits=1
+ _unsupported_imgopts 'refcount_bits=1[^0-9]'
+diff --git a/tests/qemu-iotests/073 b/tests/qemu-iotests/073
+index ad37a61..40f85b1 100755
+--- a/tests/qemu-iotests/073
++++ b/tests/qemu-iotests/073
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
  
--    bs->read_only = true; /* no write support yet */
-+    bdrv_set_read_only(bs, true); /* no write support yet */
+ _supported_fmt qcow2
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
  
-     ret = bdrv_pread(bs->file, 0, &bochs, sizeof(bochs));
-     if (ret < 0) {
-diff --git a/block/cloop.c b/block/cloop.c
-index a6c7b9d..11f17c8 100644
---- a/block/cloop.c
-+++ b/block/cloop.c
-@@ -72,7 +72,7 @@ static int cloop_open(BlockDriverState *bs, QDict *options, int flags,
-         return -EINVAL;
-     }
+ CLUSTER_SIZE=64k
+diff --git a/tests/qemu-iotests/114 b/tests/qemu-iotests/114
+index f110d4f..5b7dc54 100755
+--- a/tests/qemu-iotests/114
++++ b/tests/qemu-iotests/114
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
  
--    bs->read_only = true;
-+    bdrv_set_read_only(bs, true);
+ _supported_fmt qcow2
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
  
-     /* read header */
-     ret = bdrv_pread(bs->file, 128, &s->block_size, 4);
-diff --git a/block/dmg.c b/block/dmg.c
-index a7d25fc..27ce4a6 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -420,7 +420,7 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
-     }
  
-     block_module_load_one("dmg-bz2");
--    bs->read_only = true;
-+    bdrv_set_read_only(bs, true);
+diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
+index ecc8a5b..f941fc9 100755
+--- a/tests/qemu-iotests/130
++++ b/tests/qemu-iotests/130
+@@ -42,6 +42,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-     s->n_chunks = 0;
-     s->offsets = s->lengths = s->sectors = s->sectorcounts = NULL;
-diff --git a/block/rbd.c b/block/rbd.c
-index 1ceeeb5..6ad2904 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -641,7 +641,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto failed_open;
-     }
+ _supported_fmt qcow2
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
  
--    bs->read_only = (s->snap != NULL);
-+    bdrv_set_read_only(bs, (s->snap != NULL));
+ qemu_comm_method="monitor"
+diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
+index af618b8..acce946 100755
+--- a/tests/qemu-iotests/134
++++ b/tests/qemu-iotests/134
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-     qemu_opts_del(opts);
-     return 0;
-diff --git a/block/vvfat.c b/block/vvfat.c
-index af5153d..d4ce6d7 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1157,7 +1157,7 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-     s->current_cluster=0xffffffff;
+ _supported_fmt qcow2
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
  
-     /* read only is the default for safety */
--    bs->read_only = true;
-+    bdrv_set_read_only(bs, true);
-     s->qcow = NULL;
-     s->qcow_filename = NULL;
-     s->fat2 = NULL;
-@@ -1173,7 +1173,7 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-         if (ret < 0) {
-             goto fail;
-         }
--        bs->read_only = false;
-+        bdrv_set_read_only(bs, false);
-     }
  
-     bs->total_sectors = cyls * heads * secs;
-diff --git a/include/block/block.h b/include/block/block.h
-index 466de49..99d49f2 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -434,6 +434,7 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-                             int64_t sector_num, int nb_sectors, int *pnum);
+diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
+index cc95ff1..78deaff 100755
+--- a/tests/qemu-iotests/156
++++ b/tests/qemu-iotests/156
+@@ -48,6 +48,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
  
- bool bdrv_is_read_only(BlockDriverState *bs);
-+void bdrv_set_read_only(BlockDriverState *bs, bool read_only);
- bool bdrv_is_sg(BlockDriverState *bs);
- bool bdrv_is_inserted(BlockDriverState *bs);
- int bdrv_media_changed(BlockDriverState *bs);
+ _supported_fmt qcow2 qed
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
+ 
+ # Create source disk
+diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
+index a6cdd6d..ef8d70f 100755
+--- a/tests/qemu-iotests/158
++++ b/tests/qemu-iotests/158
+@@ -39,6 +39,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ 
+ _supported_fmt qcow2
+ _supported_proto generic
++_unsupported_proto vxhs
+ _supported_os Linux
+ 
+ 
 -- 
 2.9.3
