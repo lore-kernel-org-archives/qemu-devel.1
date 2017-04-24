@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOs-0003zj-2W
+	(envelope-from <armbru@redhat.com>) id 1d2YOs-0003za-1z
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOn-0006wM-Vd
+	(envelope-from <armbru@redhat.com>) id 1d2YOn-0006w3-Qa
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51330)
+Received: from mx1.redhat.com ([209.132.183.28]:51318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOn-0006vU-N0
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOn-0006vI-HZ
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:05 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AE91064D9B
+	by mx1.redhat.com (Postfix) with ESMTPS id 8472B66CB5
 	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:27:04 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 24 Apr 2017 09:26:54 +0200
-Message-Id: <1493018820-23445-10-git-send-email-armbru@redhat.com>
+Date: Mon, 24 Apr 2017 09:26:48 +0200
+Message-Id: <1493018820-23445-4-git-send-email-armbru@redhat.com>
 In-Reply-To: <1493018820-23445-1-git-send-email-armbru@redhat.com>
 References: <1493018820-23445-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 09/15] block: Make errp the last parameter of
- commit_active_start
+Subject: [Qemu-devel] [PULL 03/15] socket: Make errp the last parameter of
+ inet_connect_saddr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +36,78 @@ Cc: Fam Zheng <famz@redhat.com>
 From: Fam Zheng <famz@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170421122710.15373-9-famz@redhat.com>
+Message-Id: <20170421122710.15373-3-famz@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/mirror.c            | 4 ++--
- block/replication.c       | 2 +-
- blockdev.c                | 2 +-
- include/block/block_int.h | 6 +++---
- qemu-img.c                | 2 +-
- 5 files changed, 8 insertions(+), 8 deletions(-)
+ block/ssh.c            | 2 +-
+ include/qemu/sockets.h | 5 +++--
+ util/qemu-sockets.c    | 9 +++++----
+ 3 files changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 0c1a56c..9f5eb69 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1290,8 +1290,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-                          BlockDriverState *base, int creation_flags,
-                          int64_t speed, BlockdevOnError on_error,
-                          const char *filter_node_name,
--                         BlockCompletionFunc *cb, void *opaque, Error **errp,
--                         bool auto_complete)
-+                         BlockCompletionFunc *cb, void *opaque,
-+                         bool auto_complete, Error **errp)
- {
-     int orig_base_flags;
-     Error *local_err = NULL;
-diff --git a/block/replication.c b/block/replication.c
-index bf3c395..d300c15 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -656,7 +656,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
-         s->replication_state = BLOCK_REPLICATION_FAILOVER;
-         commit_active_start(NULL, s->active_disk->bs, s->secondary_disk->bs,
-                             BLOCK_JOB_INTERNAL, 0, BLOCKDEV_ON_ERROR_REPORT,
--                            NULL, replication_done, bs, errp, true);
-+                            NULL, replication_done, bs, true, errp);
-         break;
-     default:
-         aio_context_release(aio_context);
-diff --git a/blockdev.c b/blockdev.c
-index 94726ed..6428206 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3142,7 +3142,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-         }
-         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
-                             BLOCK_JOB_DEFAULT, speed, on_error,
--                            filter_node_name, NULL, NULL, &local_err, false);
-+                            filter_node_name, NULL, NULL, false, &local_err);
-     } else {
-         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
-         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 59400bd..4f8cd29 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -805,16 +805,16 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-  * a node name should be autogenerated.
-  * @cb: Completion function for the job.
-  * @opaque: Opaque pointer value passed to @cb.
-- * @errp: Error object.
-  * @auto_complete: Auto complete the job.
-+ * @errp: Error object.
-  *
+diff --git a/block/ssh.c b/block/ssh.c
+index 471ba8a..df09f6c 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -681,7 +681,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+     }
+ 
+     /* Open the socket and connect. */
+-    s->sock = inet_connect_saddr(s->inet, errp, NULL, NULL);
++    s->sock = inet_connect_saddr(s->inet, NULL, NULL, errp);
+     if (s->sock < 0) {
+         ret = -EIO;
+         goto err;
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 567eef1..af28532 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -36,8 +36,9 @@ int inet_ai_family_from_address(InetSocketAddress *addr,
+                                 Error **errp);
+ InetSocketAddress *inet_parse(const char *str, Error **errp);
+ int inet_connect(const char *str, Error **errp);
+-int inet_connect_saddr(InetSocketAddress *saddr, Error **errp,
+-                       NonBlockingConnectHandler *callback, void *opaque);
++int inet_connect_saddr(InetSocketAddress *saddr,
++                       NonBlockingConnectHandler *callback, void *opaque,
++                       Error **errp);
+ 
+ NetworkAddressFamily inet_netfamily(int family);
+ 
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index f79d334..8e11349 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -427,8 +427,9 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
+  * function succeeds, callback will be called when the connection
+  * completes, with the file descriptor on success, or -1 on error.
   */
- void commit_active_start(const char *job_id, BlockDriverState *bs,
-                          BlockDriverState *base, int creation_flags,
-                          int64_t speed, BlockdevOnError on_error,
-                          const char *filter_node_name,
--                         BlockCompletionFunc *cb, void *opaque, Error **errp,
--                         bool auto_complete);
-+                         BlockCompletionFunc *cb, void *opaque,
-+                         bool auto_complete, Error **errp);
- /*
-  * mirror_start:
-  * @job_id: The id of the newly-created job, or %NULL to use the
-diff --git a/qemu-img.c b/qemu-img.c
-index 2c09053..bbe1574 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -984,7 +984,7 @@ static int img_commit(int argc, char **argv)
-     aio_context_acquire(aio_context);
-     commit_active_start("commit", bs, base_bs, BLOCK_JOB_DEFAULT, 0,
-                         BLOCKDEV_ON_ERROR_REPORT, NULL, common_block_job_cb,
--                        &cbi, &local_err, false);
-+                        &cbi, false, &local_err);
-     aio_context_release(aio_context);
-     if (local_err) {
-         goto done;
+-int inet_connect_saddr(InetSocketAddress *saddr, Error **errp,
+-                       NonBlockingConnectHandler *callback, void *opaque)
++int inet_connect_saddr(InetSocketAddress *saddr,
++                       NonBlockingConnectHandler *callback, void *opaque,
++                       Error **errp)
+ {
+     Error *local_err = NULL;
+     struct addrinfo *res, *e;
+@@ -659,7 +660,7 @@ int inet_connect(const char *str, Error **errp)
+ 
+     addr = inet_parse(str, errp);
+     if (addr != NULL) {
+-        sock = inet_connect_saddr(addr, errp, NULL, NULL);
++        sock = inet_connect_saddr(addr, NULL, NULL, errp);
+         qapi_free_InetSocketAddress(addr);
+     }
+     return sock;
+@@ -1081,7 +1082,7 @@ int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
+ 
+     switch (addr->type) {
+     case SOCKET_ADDRESS_KIND_INET:
+-        fd = inet_connect_saddr(addr->u.inet.data, errp, callback, opaque);
++        fd = inet_connect_saddr(addr->u.inet.data, callback, opaque, errp);
+         break;
+ 
+     case SOCKET_ADDRESS_KIND_UNIX:
 -- 
 2.7.4
