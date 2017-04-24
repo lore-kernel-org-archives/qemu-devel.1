@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d2c64-0007oJ-Dt
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:24:01 -0400
+	(envelope-from <lersek@redhat.com>) id 1d2cAE-0000Li-TH
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d2c61-0000aq-6A
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:24:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47490)
+	(envelope-from <lersek@redhat.com>) id 1d2cA9-0001WI-S1
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:28:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d2c60-0000ad-TT
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:23:57 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6A66530D301
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 11:23:55 +0000 (UTC)
-Date: Mon, 24 Apr 2017 12:23:52 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170424112351.GB4283@work-vm>
-References: <1490860207-8302-1-git-send-email-thuth@redhat.com>
-	<1490860207-8302-4-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1d2cA9-0001WC-IT
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 07:28:13 -0400
+References: <76795e20-2f20-1e54-cfa5-7444f28b18ee@huawei.com>
+	<20170321113428.GC15920@cbox> <58D17AF0.2010802@arm.com>
+	<20170321193933.GB31111@cbox> <58DA3F68.6090901@arm.com>
+	<20170328112328.GA31156@cbox> <20170328115413.GJ23682@e104320-lin>
+	<b1c6e747-2fa7-b7a1-60d5-4a9c480b9dc9@huawei.com>
+	<58DA67BA.8070404@arm.com>
+	<5b7352f4-4965-3ed5-3879-db871797be47@huawei.com>
+	<20170329103658.GQ23682@e104320-lin>
+	<2a427164-9b37-6711-3a56-906634ba7f12@redhat.com>
+	<7c5c8ab7-8fcc-1c98-0bc1-cccb66c4c84d@huawei.com>
+	<6ac1597a-2ed5-36b2-848d-5fd048b16d66@redhat.com>
+	<3fdc8c8c-1cd9-b609-c7af-52d40e6141c5@huawei.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2aa1180d-2d05-d898-e1f2-be56c342a170@redhat.com>
+Date: Mon, 24 Apr 2017 13:27:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490860207-8302-4-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] tests: Add a tester for HMP commands
+In-Reply-To: <3fdc8c8c-1cd9-b609-c7af-52d40e6141c5@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] kvm: pass the virtual SEI syndrome to
+ guest OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,221 +38,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: gengdongjiu <gengdongjiu@huawei.com>, Achin Gupta <achin.gupta@arm.com>
+Cc: ard.biesheuvel@linaro.org, edk2-devel@lists.01.org, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, James Morse <james.morse@arm.com>, Christoffer Dall <cdall@linaro.org>, xiexiuqi@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, suzuki.poulose@arm.com, andre.przywara@arm.com, mark.rutland@arm.com, vladimir.murzin@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wangxiongfeng2@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, Leif.Lindholm@linaro.comnd@arm.com, Michael Tsirkin <mtsirkin@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> HMP commands do not get any automatic testing yet, so on certain
-> QEMU machines, some HMP commands were causing crashes in the past.
-> Thus we should test HMP commands in our test suite, too, to avoid
-> that such problems creep in again in the future.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/Makefile.include |   2 +
->  tests/test-hmp.c       | 161 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 163 insertions(+)
->  create mode 100644 tests/test-hmp.c
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index f3de81f..0e754ac 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -331,6 +331,7 @@ check-qtest-xtensaeb-y = $(check-qtest-xtensa-y)
->  check-qtest-s390x-y = tests/boot-serial-test$(EXESUF)
->  
->  check-qtest-generic-y += tests/qom-test$(EXESUF)
-> +check-qtest-generic-y += tests/test-hmp$(EXESUF)
->  
->  qapi-schema += alternate-any.json
->  qapi-schema += alternate-array.json
-> @@ -720,6 +721,7 @@ tests/tpci200-test$(EXESUF): tests/tpci200-test.o
->  tests/display-vga-test$(EXESUF): tests/display-vga-test.o
->  tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
->  tests/qom-test$(EXESUF): tests/qom-test.o
-> +tests/test-hmp$(EXESUF): tests/test-hmp.o
->  tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-pc-obj-y)
->  tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-obj-y)
->  tests/nvme-test$(EXESUF): tests/nvme-test.o
-> diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-> new file mode 100644
-> index 0000000..339ed41
-> --- /dev/null
-> +++ b/tests/test-hmp.c
-> @@ -0,0 +1,161 @@
-> +/*
-> + * Test HMP commands.
-> + *
-> + * Copyright (c) 2017 Red Hat Inc.
-> + *
-> + * Author:
-> + *    Thomas Huth <thuth@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2
-> + * or later. See the COPYING file in the top-level directory.
-> + *
-> + * This test calls some HMP commands for all machines that the current
-> + * QEMU binary provides, to check whether they terminate successfully
-> + * (i.e. do not crash QEMU).
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "libqtest.h"
-> +
-> +static int verbose;
-> +
-> +static const char *hmp_cmds[] = {
-> +    "boot_set ndc",
-> +    "chardev-add null,id=testchardev1",
-> +    "chardev-remove testchardev1",
-> +    "commit all",
-> +    "cpu-add 1",
-> +    "cpu 0",
-> +    "device_add ?",
-> +    "device_add usb-mouse,id=mouse1",
-> +    "mouse_button 7",
-> +    "mouse_move 10 10",
-> +    "mouse_button 0",
-> +    "device_del mouse1",
-> +    "dump-guest-memory /dev/null 0 4096",
-> +    "gdbserver",
-> +    "host_net_add user id=net0",
-> +    "hostfwd_add tcp::43210-:43210",
-> +    "hostfwd_remove tcp::43210-:43210",
-> +    "host_net_remove 0 net0",
-> +    "i /w 0",
-> +    "log all",
-> +    "log none",
-> +    "memsave 0 4096 \"/dev/null\"",
-> +    "migrate_set_cache_size 1",
-> +    "migrate_set_downtime 1",
-> +    "migrate_set_speed 1",
-> +    "netdev_add user,id=net1",
-> +    "set_link net1 off",
-> +    "set_link net1 on",
-> +    "netdev_del net1",
-> +    "nmi",
-> +    "o /w 0 0x1234",
-> +    "object_add memory-backend-ram,id=mem1,size=256M",
-> +    "object_del mem1",
-> +    "pmemsave 0 4096 \"/dev/null\"",
-> +    "p $pc + 8",
-> +    "qom-list /",
-> +    "qom-set /machine initrd test",
-> +    "screendump /dev/null",
-> +    "sendkey x",
-> +    "singlestep on",
-> +    "wavcapture /dev/null",
-> +    "stopcapture 0",
-> +    "sum 0 512",
-> +    "x /8i 0x100",
-> +    "xp /16x 0",
-> +    NULL
-> +};
-> +
-> +/* Run through the list of pre-defined commands */
-> +static void test_commands(void)
-> +{
-> +    char *response;
-> +    int i;
-> +
-> +    for (i = 0; hmp_cmds[i] != NULL; i++) {
-> +        if (verbose) {
-> +            fprintf(stderr, "\t%s\n", hmp_cmds[i]);
-> +        }
-> +        response = hmp(hmp_cmds[i]);
-> +        g_free(response);
-> +    }
-> +
-> +}
-> +
-> +/* Run through all info commands and call them blindly (without arguments) */
-> +static void test_info_commands(void)
-> +{
-> +    char *resp, *info, *info_buf, *endp;
-> +
-> +    info_buf = info = hmp("help info");
-> +
-> +    while (*info) {
-> +        /* Extract the info command, ignore parameters and description */
-> +        g_assert(strncmp(info, "info ", 5) == 0);
-> +        endp = strchr(&info[5], ' ');
-> +        g_assert(endp != NULL);
-> +        *endp = '\0';
-> +        /* Now run the info command */
-> +        if (verbose) {
-> +            fprintf(stderr, "\t%s\n", info);
-> +        }
-> +        resp = hmp(info);
-> +        g_free(resp);
-> +        /* And move forward to the next line */
-> +        info = strchr(endp + 1, '\n');
-> +        if (!info) {
-> +            break;
-> +        }
-> +        info += 1;
-> +    }
-> +
-> +    g_free(info_buf);
-> +}
-> +
-> +static void test_machine(gconstpointer data)
-> +{
-> +    const char *machine = data;
-> +    char *args;
-> +
-> +    args = g_strdup_printf("-S -M %s", machine);
-> +    qtest_start(args);
-> +
-> +    test_info_commands();
-> +    test_commands();
-> +
-> +    qtest_end();
-> +    g_free(args);
-> +    g_free((void *)data);
-> +}
-> +
-> +static void add_machine_test_case(const char *mname)
-> +{
-> +    char *path = g_strdup_printf("hmp/%s", mname);
-> +
-> +    /* Ignore blacklisted machines that have known problems */
-> +    if (!strcmp("isapc", mname) == 0 ||  !strcmp("puv3", mname)
-> +        || !strcmp("tricore_testboard", mname)
-> +        || !strcmp("xenfv", mname) == 0 || !strcmp("xenpv", mname)) {
+On 04/21/17 15:27, gengdongjiu wrote:
+> Hi all/Laszlo,
+>=20
+>   sorry, I have a question to consult with you.
+>=20
+>=20
+> On 2017/4/7 2:55, Laszlo Ersek wrote:
+>> On 04/06/17 14:35, gengdongjiu wrote:
+>>> Dear, Laszlo
+>>>    Thanks for your detailed explanation.
+>>>
+>>> On 2017/3/29 19:58, Laszlo Ersek wrote:
+>>>> (This ought to be one of the longest address lists I've ever seen :)
+>>>> Thanks for the CC. I'm glad Shannon is already on the CC list. For g=
+ood
+>>>> measure, I'm adding MST and Igor.)
+>>>>
+>>>> On 03/29/17 12:36, Achin Gupta wrote:
+>>>>> Hi gengdongjiu,
+>>>>>
+>>>>> On Wed, Mar 29, 2017 at 05:36:37PM +0800, gengdongjiu wrote:
+>>>>>>
+>>>>>> Hi Laszlo/Biesheuvel/Qemu developer,
+>>>>>>
+>>>>>>    Now I encounter a issue and want to consult with you in ARM64 p=
+latform=EF=BC=8C as described below:
+>>>>>>
+>>>>>> when guest OS happen synchronous or asynchronous abort, kvm needs
+>>>>>> to send the error address to Qemu or UEFI through sigbus to
+>>>>>> dynamically generate APEI table. from my investigation, there are
+>>>>>> two ways:
+>>>>>>
+>>>>>> (1) Qemu get the error address, and generate the APEI table, then
+>>>>>> notify UEFI to know this generation, then inject abort error to
+>>>>>> guest OS, guest OS read the APEI table.
+>>>>>> (2) Qemu get the error address, and let UEFI to generate the APEI
+>>>>>> table, then inject abort error to guest OS, guest OS read the APEI
+>>>>>> table.
+>>>>>
+>>>>> Just being pedantic! I don't think we are talking about creating th=
+e APEI table
+>>>>> dynamically here. The issue is: Once KVM has received an error that=
+ is destined
+>>>>> for a guest it will raise a SIGBUS to Qemu. Now before Qemu can inj=
+ect the error
+>>>>> into the guest OS, a CPER (Common Platform Error Record) has to be =
+generated
+>>>>> corresponding to the error source (GHES corresponding to memory sub=
+system,
+>>>>> processor etc) to allow the guest OS to do anything meaningful with=
+ the
+>>>>> error. So who should create the CPER is the question.
+>>>>>
+>>>>> At the EL3/EL2 interface (Secure Firmware and OS/Hypervisor), an er=
+ror arrives
+>>>>> at EL3 and secure firmware (at EL3 or a lower secure exception leve=
+l) is
+>>>>> responsible for creating the CPER. ARM is experimenting with using =
+a Standalone
+>>>>> MM EDK2 image in the secure world to do the CPER creation. This wil=
+l avoid
+>>>>> adding the same code in ARM TF in EL3 (better for security). The er=
+ror will then
+>>>>> be injected into the OS/Hypervisor (through SEA/SEI/SDEI) through A=
+RM Trusted
+>>>>> Firmware.
+>>>>>
+>>>>> Qemu is essentially fulfilling the role of secure firmware at the E=
+L2/EL1
+>>>>> interface (as discussed with Christoffer below). So it should gener=
+ate the CPER
+>>>>> before injecting the error.
+>>>>>
+>>>>> This is corresponds to (1) above apart from notifying UEFI (I am as=
+suming you
+>>>>> mean guest UEFI). At this time, the guest OS already knows where to=
+ pick up the
+>>>>> CPER from through the HEST. Qemu has to create the CPER and populat=
+e its address
+>>>>> at the address exported in the HEST. Guest UEFI should not be invol=
+ved in this
+>>>>> flow. Its job was to create the HEST at boot and that has been done=
+ by this
+>>>>> stage.
+>>>>>
+>>>>> Qemu folk will be able to add but it looks like support for CPER ge=
+neration will
+>>>>> need to be added to Qemu. We need to resolve this.
+>>>>>
+>>>>> Do shout if I am missing anything above.
+>>>>
+>>>> After reading this email, the use case looks *very* similar to what
+>>>> we've just done with VMGENID for QEMU 2.9.
+>>>>
+>>>> We have a facility between QEMU and the guest firmware, called "ACPI
+>>>> linker/loader", with which QEMU instructs the firmware to
+>>>>
+>>>> - allocate and download blobs into guest RAM (AcpiNVS type memory) -=
+-
+>>>> ALLOCATE command,
+>>>>
+>>>> - relocate pointers in those blobs, to fields in other (or the same)
+>>>> blobs -- ADD_POINTER command,
+>>>>
+>>>> - set ACPI table checksums -- ADD_CHECKSUM command,
+>>>>
+>>>> - and send GPAs of fields within such blobs back to QEMU --
+>>>> WRITE_POINTER command.
+>>>>
+>>>> This is how I imagine we can map the facility to the current use cas=
+e
+>>>> (note that this is the first time I read about HEST / GHES / CPER):
+>=20
+> Laszlo lists a Qemu GHES table generation solution, Mainly use the
+> four commands: "ALLOCATE/ADD_POINTER/ADD_CHECKSUM/WRITE_POINTER" to
+> communicate with BIOS so whether the four commands needs to be
+> supported by the guest firware/UEFI.  I found the  "WRITE_POINTER"
+> always failed. so I suspect guest UEFI/firmware not support the
+> "WRITE_POINTER" command. please help me confirm it, thanks so much.
 
-You've got a leak of 'path' there.
-However, it's only a test and it's small, so we can fix it up later.
+That's incorrect, both OVMF and ArmVirtQemu support the WRITE_POINTER
+command (see <https://bugzilla.tianocore.org/show_bug.cgi?id=3D359>.) A
+number of OvmfPkg/ modules are included in ArmVirtPkg binaries as well.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+In QEMU, the WRITE_POINTER command is currently generated for the
+VMGENID device only. If you try to test VMGENID with qemu-system-aarch64
+(for the purposes of WRITE_POINTER testing), that won't work, because
+the VMGENID device is not available for aarch64. (The Microsoft spec
+that describes the device lists Windows OS versions that are x86 only.)
 
-and series queued.
+In other words, no QEMU code exists at the moment that would allow you
+to readily test WRITE_POINTER in aarch64 guests. However, the
+firmware-side code is not architecture specific, and WRITE_POINTER
+support is already being built into ArmVirtQemu.
 
-Dave
-
-> +        return;
-> +    }
-> +
-> +    qtest_add_data_func(path, g_strdup(mname), test_machine);
-> +    g_free(path);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    char *v_env = getenv("V");
-> +
-> +    if (v_env && *v_env >= '2') {
-> +        verbose = true;
-> +    }
-> +
-> +    g_test_init(&argc, &argv, NULL);
-> +
-> +    qtest_cb_for_every_machine(add_machine_test_case);
-> +
-> +    return g_test_run();
-> +}
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks,
+Laszlo
