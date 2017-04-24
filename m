@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d2cnz-0002bn-Sm
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:09:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d2coM-0002ms-D6
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d2cny-0004dS-EB
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:09:23 -0400
-Date: Mon, 24 Apr 2017 20:09:06 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170424120906.GG14416@lemon.lan>
-References: <1492050868-16200-1-git-send-email-lidongchen@tencent.com>
-	<20170414060015.GA12191@lemon>
-	<CAOGPPbeUkBskJfFX9=Of62pDrt6U-KAjbFZ-r=yVNNeb+ceAuA@mail.gmail.com>
-	<20170417034925.GC6717@lemon.lan>
-	<CAOGPPbd_Y6m42EpuedngTWfGzt+MDvOwbPSmwp-OG5hVpMNBkA@mail.gmail.com>
-	<CAOGPPbc44H-oaY2Smm5kgNNbaP44C3rksi9_=0ocAXAnGdWdCg@mail.gmail.com>
-	<CAOGPPbfx_FoOwHMa96w_EioAApDs08_=saFRGr-5XdOrj60HNw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1d2coL-0004kw-G4
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:09:46 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38209)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d2coL-0004kM-9F
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 08:09:45 -0400
+Received: by mail-wm0-x234.google.com with SMTP id r190so65633660wme.1
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 05:09:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOGPPbfx_FoOwHMa96w_EioAApDs08_=saFRGr-5XdOrj60HNw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6] migration/block: use blk_pwrite_zeroes
- for each zero cluster
+In-Reply-To: <cover.1492787889.git.balaton@eik.bme.hu>
+References: <cover.1492787889.git.balaton@eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 24 Apr 2017 13:09:23 +0100
+Message-ID: <CAFEAcA8zdKvg-y=kGGNH9x4s_Z9CSgu3gP8_GW8JANj74i2h0Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v7 00/13] Improvements for SM501 display
+ controller emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, 04/24 19:54, 858585 jemmy wrote:
-> On Mon, Apr 24, 2017 at 3:40 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
-> > On Mon, Apr 17, 2017 at 12:00 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
-> >> On Mon, Apr 17, 2017 at 11:49 AM, Fam Zheng <famz@redhat.com> wrote:
-> >>> On Fri, 04/14 14:30, 858585 jemmy wrote:
-> >>>> Do you know some other format which have very small cluster size?
-> >>>
-> >>> 64k is the default cluster size for qcow2 but it can be configured at image
-> >>> creation time, as 512 bytes, for example:
-> >>>
-> >>>     $ qemu-img create -f qcow2 test.qcow2 -o cluster_size=512 1G
-> >>
-> >> Thanks, i will test the performance again.
-> >
-> > I find the performance reduce when cluster size is 512.
-> > I will optimize the performance and submit a patch later.
-> > Thanks.
-> 
-> after optimize the code, i find the destination qemu process still have very
-> bad performance when cluster_size is 512. the reason is cause by
-> qcow2_check_metadata_overlap.
-> 
-> if cluster_size is 512, the destination qemu process reach 100% cpu usage.
-> and the perf top result is below:
-> 
-> Samples: 32K of event 'cycles', Event count (approx.): 20105269445
->  91.68%  qemu-system-x86_64       [.] qcow2_check_metadata_overlap
->   3.33%  qemu-system-x86_64       [.] range_get_last
->   2.76%  qemu-system-x86_64       [.] ranges_overlap
->   0.61%  qemu-system-x86_64       [.] qcow2_cache_do_get
-> 
-> very large l1_size.
-> (gdb) p s->l1_size
-> $3 = 1310720
-> 
-> (gdb) p s->max_refcount_table_index
-> $5 = 21905
-> 
-> the backtrace:
-> 
-> Breakpoint 1, qcow2_check_metadata_overlap (bs=0x16feb00, ign=0,
-> offset=440329728, size=4096) at block/qcow2-refcount.c:2344
-> 2344    {
-> (gdb) bt
-> #0  qcow2_check_metadata_overlap (bs=0x16feb00, ign=0,
-> offset=440329728, size=4096) at block/qcow2-refcount.c:2344
-> #1  0x0000000000878d9f in qcow2_pre_write_overlap_check (bs=0x16feb00,
-> ign=0, offset=440329728, size=4096) at block/qcow2-refcount.c:2473
-> #2  0x000000000086e382 in qcow2_co_pwritev (bs=0x16feb00,
-> offset=771047424, bytes=704512, qiov=0x7fd026bfdb90, flags=0) at
-> block/qcow2.c:1653
-> #3  0x00000000008aeace in bdrv_driver_pwritev (bs=0x16feb00,
-> offset=770703360, bytes=1048576, qiov=0x7fd026bfdb90, flags=0) at
-> block/io.c:871
-> #4  0x00000000008b015c in bdrv_aligned_pwritev (child=0x171b630,
-> req=0x7fd026bfd980, offset=770703360, bytes=1048576, align=1,
-> qiov=0x7fd026bfdb90, flags=0) at block/io.c:1371
-> #5  0x00000000008b0d77 in bdrv_co_pwritev (child=0x171b630,
-> offset=770703360, bytes=1048576, qiov=0x7fd026bfdb90, flags=0) at
-> block/io.c:1622
-> #6  0x000000000089a76d in blk_co_pwritev (blk=0x16fe920,
-> offset=770703360, bytes=1048576, qiov=0x7fd026bfdb90, flags=0) at
-> block/block-backend.c:992
-> #7  0x000000000089a878 in blk_write_entry (opaque=0x7fd026bfdb70) at
-> block/block-backend.c:1017
-> #8  0x000000000089a95d in blk_prw (blk=0x16fe920, offset=770703360,
-> buf=0x362b050 "", bytes=1048576, co_entry=0x89a81a <blk_write_entry>,
-> flags=0) at block/block-backend.c:1045
-> #9  0x000000000089b222 in blk_pwrite (blk=0x16fe920, offset=770703360,
-> buf=0x362b050, count=1048576, flags=0) at block/block-backend.c:1208
-> #10 0x00000000007d480d in block_load (f=0x1784fa0, opaque=0xfd46a0,
-> version_id=1) at migration/block.c:992
-> #11 0x000000000049dc58 in vmstate_load (f=0x1784fa0, se=0x16fbdc0,
-> version_id=1) at /data/qemu/migration/savevm.c:730
-> #12 0x00000000004a0752 in qemu_loadvm_section_part_end (f=0x1784fa0,
-> mis=0xfd4160) at /data/qemu/migration/savevm.c:1923
-> #13 0x00000000004a0842 in qemu_loadvm_state_main (f=0x1784fa0,
-> mis=0xfd4160) at /data/qemu/migration/savevm.c:1954
-> #14 0x00000000004a0a33 in qemu_loadvm_state (f=0x1784fa0) at
-> /data/qemu/migration/savevm.c:2020
-> #15 0x00000000007c2d33 in process_incoming_migration_co
-> (opaque=0x1784fa0) at migration/migration.c:404
-> #16 0x0000000000966593 in coroutine_trampoline (i0=27108400, i1=0) at
-> util/coroutine-ucontext.c:79
-> #17 0x00007fd03946b8f0 in ?? () from /lib64/libc.so.6
-> #18 0x00007fff869c87e0 in ?? ()
-> #19 0x0000000000000000 in ?? ()
-> 
-> when the cluster_size is too small, the write performance is very bad.
-> How to solve this problem? Any suggestion?
-> 1. when the cluster_size is too small, not invoke qcow2_pre_write_overlap_check.
-> 2.limit the qcow2 cluster_size range, don't allow set the cluster_size
-> too small.
-> which way is better?
+On 21 April 2017 at 16:18, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> v7: Define default values for some variables to avoid an (invalid)
+>     warning from gcc 6 or 7 as suggested by Aurelien Jarno.
+>
+> BALATON Zoltan (13):
+>   sm501: Fixed code style and a few typos in comments
+>   sm501: Use defined constants instead of literal values where available
+>   sm501: Add missing arbitration control register
+>   sm501: QOMify
+>   sm501: Get rid of base address in draw_hwc_line
+>   sm501: Add emulation of chip connected via PCI
+>   sm501: Fix device endianness
+>   sm501: Fix hardware cursor
+>   sm501: Misc clean ups
+>   sm501: Add support for panel layer
+>   sm501: Add some more missing registers
+>   sm501: Add vmstate descriptor
+>   ppc: Add SM501 device in ppc softmmu targets default configs
 
-It's a separate problem.
+Thanks for working through the code review process on this one.
+Since SH4 is only 'odd fixes' and Aurelien has tested the code,
+I've applied it directly to git master.
 
-I think what should be done in this patch (or a follow up) is coalescing the
-same type of write as much as possible (by type I mean "zeroed" or "normal"
-write).  With that, cluster size won't matter that much.
-
-Fam
+thanks
+-- PMM
