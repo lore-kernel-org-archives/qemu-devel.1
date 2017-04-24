@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOs-0003zV-1A
+	(envelope-from <armbru@redhat.com>) id 1d2YOs-0003zj-2W
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2YOp-0006xH-Iy
+	(envelope-from <armbru@redhat.com>) id 1d2YOn-0006wM-Vd
 	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57188)
+Received: from mx1.redhat.com ([209.132.183.28]:51330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOp-0006wg-DE
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YOn-0006vU-N0
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:27:05 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5ED7CC059742
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:27:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AE91064D9B
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:27:04 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 24 Apr 2017 09:26:56 +0200
-Message-Id: <1493018820-23445-12-git-send-email-armbru@redhat.com>
+Date: Mon, 24 Apr 2017 09:26:54 +0200
+Message-Id: <1493018820-23445-10-git-send-email-armbru@redhat.com>
 In-Reply-To: <1493018820-23445-1-git-send-email-armbru@redhat.com>
 References: <1493018820-23445-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 11/15] fdc: Make errp the last parameter of
- fdctrl_connect_drives
+Subject: [Qemu-devel] [PULL 09/15] block: Make errp the last parameter of
+ commit_active_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +36,95 @@ Cc: Fam Zheng <famz@redhat.com>
 From: Fam Zheng <famz@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170421122710.15373-11-famz@redhat.com>
+Message-Id: <20170421122710.15373-9-famz@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/block/fdc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/mirror.c            | 4 ++--
+ block/replication.c       | 2 +-
+ blockdev.c                | 2 +-
+ include/block/block_int.h | 6 +++---
+ qemu-img.c                | 2 +-
+ 5 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index a328693..2e629b3 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -2521,8 +2521,8 @@ static void fdctrl_result_timer(void *opaque)
- }
- 
- /* Init functions */
--static void fdctrl_connect_drives(FDCtrl *fdctrl, Error **errp,
--                                  DeviceState *fdc_dev)
-+static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
-+                                  Error **errp)
+diff --git a/block/mirror.c b/block/mirror.c
+index 0c1a56c..9f5eb69 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1290,8 +1290,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
+                          BlockDriverState *base, int creation_flags,
+                          int64_t speed, BlockdevOnError on_error,
+                          const char *filter_node_name,
+-                         BlockCompletionFunc *cb, void *opaque, Error **errp,
+-                         bool auto_complete)
++                         BlockCompletionFunc *cb, void *opaque,
++                         bool auto_complete, Error **errp)
  {
-     unsigned int i;
-     FDrive *drive;
-@@ -2675,7 +2675,7 @@ static void fdctrl_realize_common(DeviceState *dev, FDCtrl *fdctrl,
-     }
- 
-     floppy_bus_create(fdctrl, &fdctrl->bus, dev);
--    fdctrl_connect_drives(fdctrl, errp, dev);
-+    fdctrl_connect_drives(fdctrl, dev, errp);
- }
- 
- static const MemoryRegionPortio fdc_portio_list[] = {
+     int orig_base_flags;
+     Error *local_err = NULL;
+diff --git a/block/replication.c b/block/replication.c
+index bf3c395..d300c15 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -656,7 +656,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+         s->replication_state = BLOCK_REPLICATION_FAILOVER;
+         commit_active_start(NULL, s->active_disk->bs, s->secondary_disk->bs,
+                             BLOCK_JOB_INTERNAL, 0, BLOCKDEV_ON_ERROR_REPORT,
+-                            NULL, replication_done, bs, errp, true);
++                            NULL, replication_done, bs, true, errp);
+         break;
+     default:
+         aio_context_release(aio_context);
+diff --git a/blockdev.c b/blockdev.c
+index 94726ed..6428206 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3142,7 +3142,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+         }
+         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
+                             BLOCK_JOB_DEFAULT, speed, on_error,
+-                            filter_node_name, NULL, NULL, &local_err, false);
++                            filter_node_name, NULL, NULL, false, &local_err);
+     } else {
+         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
+         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 59400bd..4f8cd29 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -805,16 +805,16 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+  * a node name should be autogenerated.
+  * @cb: Completion function for the job.
+  * @opaque: Opaque pointer value passed to @cb.
+- * @errp: Error object.
+  * @auto_complete: Auto complete the job.
++ * @errp: Error object.
+  *
+  */
+ void commit_active_start(const char *job_id, BlockDriverState *bs,
+                          BlockDriverState *base, int creation_flags,
+                          int64_t speed, BlockdevOnError on_error,
+                          const char *filter_node_name,
+-                         BlockCompletionFunc *cb, void *opaque, Error **errp,
+-                         bool auto_complete);
++                         BlockCompletionFunc *cb, void *opaque,
++                         bool auto_complete, Error **errp);
+ /*
+  * mirror_start:
+  * @job_id: The id of the newly-created job, or %NULL to use the
+diff --git a/qemu-img.c b/qemu-img.c
+index 2c09053..bbe1574 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -984,7 +984,7 @@ static int img_commit(int argc, char **argv)
+     aio_context_acquire(aio_context);
+     commit_active_start("commit", bs, base_bs, BLOCK_JOB_DEFAULT, 0,
+                         BLOCKDEV_ON_ERROR_REPORT, NULL, common_block_job_cb,
+-                        &cbi, &local_err, false);
++                        &cbi, false, &local_err);
+     aio_context_release(aio_context);
+     if (local_err) {
+         goto done;
 -- 
 2.7.4
