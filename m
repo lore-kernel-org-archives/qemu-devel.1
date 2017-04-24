@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2WMG-0003s8-Df
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:21 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d2WMO-0003xe-0u
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2WMF-0006AJ-06
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51310)
+	(envelope-from <jasowang@redhat.com>) id 1d2WML-0006Bf-Pu
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2WME-00069y-Mo
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:18 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2WML-0006BK-HA
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 01:16:25 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 24 Apr 2017 13:16:00 +0800
-Message-Id: <1493010966-22976-3-git-send-email-jasowang@redhat.com>
+Date: Mon, 24 Apr 2017 13:16:02 +0800
+Message-Id: <1493010966-22976-5-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
 References: <1493010966-22976-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/8] hw/net: add MII definitions
+Subject: [Qemu-devel] [PULL 4/8] net/ftgmac100: add a 'aspeed' property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,132 +31,103 @@ Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Jason Wang <jasowang@r
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This adds comments on the Basic mode control and status registers bit
-definitions. It also adds a couple of bits for 1000BASE-T and the
-RealTek 8211E PHY for the FTGMAC100 model to use.
+The Aspeed SoCs have a different definition of the end of the ring
+buffer bit. Add a property to specify which set of bits should be used
+by the NIC.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- include/hw/net/mii.h | 71 +++++++++++++++++++++++++++++++++++++++-------=
-------
- 1 file changed, 53 insertions(+), 18 deletions(-)
+ hw/net/ftgmac100.c         | 17 +++++++++++++++--
+ include/hw/net/ftgmac100.h |  4 ++++
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/net/mii.h b/include/hw/net/mii.h
-index 9fdd7bb..6ce48a6 100644
---- a/include/hw/net/mii.h
-+++ b/include/hw/net/mii.h
-@@ -22,13 +22,20 @@
- #define MII_H
+diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+index fc309b3..4c218bd 100644
+--- a/hw/net/ftgmac100.c
++++ b/hw/net/ftgmac100.c
+@@ -126,6 +126,7 @@
+ #define FTGMAC100_TXDES0_CRC_ERR         (1 << 19)
+ #define FTGMAC100_TXDES0_LTS             (1 << 28)
+ #define FTGMAC100_TXDES0_FTS             (1 << 29)
++#define FTGMAC100_TXDES0_EDOTR_ASPEED    (1 << 30)
+ #define FTGMAC100_TXDES0_TXDMA_OWN       (1 << 31)
 =20
- /* PHY registers */
--#define MII_BMCR            0
--#define MII_BMSR            1
--#define MII_PHYID1          2
--#define MII_PHYID2          3
--#define MII_ANAR            4
--#define MII_ANLPAR          5
--#define MII_ANER            6
-+#define MII_BMCR            0  /* Basic mode control register */
-+#define MII_BMSR            1  /* Basic mode status register */
-+#define MII_PHYID1          2  /* ID register 1 */
-+#define MII_PHYID2          3  /* ID register 2 */
-+#define MII_ANAR            4  /* Autonegotiation advertisement */
-+#define MII_ANLPAR          5  /* Autonegotiation lnk partner abilities =
-*/
-+#define MII_ANER            6  /* Autonegotiation expansion */
-+#define MII_ANNP            7  /* Autonegotiation next page */
-+#define MII_ANLPRNP         8  /* Autonegotiation link partner rx next p=
-age */
-+#define MII_CTRL1000        9  /* 1000BASE-T control */
-+#define MII_STAT1000        10 /* 1000BASE-T status */
-+#define MII_MDDACR          13 /* MMD access control */
-+#define MII_MDDAADR         14 /* MMD access address data */
-+#define MII_EXTSTAT         15 /* Extended Status */
- #define MII_NSR             16
- #define MII_LBREMR          17
- #define MII_REC             18
-@@ -38,19 +45,33 @@
- /* PHY registers fields */
- #define MII_BMCR_RESET      (1 << 15)
- #define MII_BMCR_LOOPBACK   (1 << 14)
--#define MII_BMCR_SPEED      (1 << 13)
--#define MII_BMCR_AUTOEN     (1 << 12)
--#define MII_BMCR_FD         (1 << 8)
-+#define MII_BMCR_SPEED100   (1 << 13)  /* LSB of Speed (100) */
-+#define MII_BMCR_SPEED      MII_BMCR_SPEED100
-+#define MII_BMCR_AUTOEN     (1 << 12) /* Autonegotiation enable */
-+#define MII_BMCR_PDOWN      (1 << 11) /* Enable low power state */
-+#define MII_BMCR_ISOLATE    (1 << 10) /* Isolate data paths from MII */
-+#define MII_BMCR_ANRESTART  (1 << 9)  /* Auto negotiation restart */
-+#define MII_BMCR_FD         (1 << 8)  /* Set duplex mode */
-+#define MII_BMCR_CTST       (1 << 7)  /* Collision test */
-+#define MII_BMCR_SPEED1000  (1 << 6)  /* MSB of Speed (1000) */
+ #define FTGMAC100_TXDES1_VLANTAG_CI(x)   ((x) & 0xffff)
+@@ -154,6 +155,7 @@
+ #define FTGMAC100_RXDES0_PAUSE_FRAME     (1 << 25)
+ #define FTGMAC100_RXDES0_LRS             (1 << 28)
+ #define FTGMAC100_RXDES0_FRS             (1 << 29)
++#define FTGMAC100_RXDES0_EDORR_ASPEED    (1 << 30)
+ #define FTGMAC100_RXDES0_RXPKT_RDY       (1 << 31)
 =20
--#define MII_BMSR_100TX_FD   (1 << 14)
--#define MII_BMSR_100TX_HD   (1 << 13)
--#define MII_BMSR_10T_FD     (1 << 12)
--#define MII_BMSR_10T_HD     (1 << 11)
--#define MII_BMSR_MFPS       (1 << 6)
--#define MII_BMSR_AN_COMP    (1 << 5)
--#define MII_BMSR_AUTONEG    (1 << 3)
--#define MII_BMSR_LINK_ST    (1 << 2)
-+#define MII_BMSR_100TX_FD   (1 << 14) /* Can do 100mbps, full-duplex */
-+#define MII_BMSR_100TX_HD   (1 << 13) /* Can do 100mbps, half-duplex */
-+#define MII_BMSR_10T_FD     (1 << 12) /* Can do 10mbps, full-duplex */
-+#define MII_BMSR_10T_HD     (1 << 11) /* Can do 10mbps, half-duplex */
-+#define MII_BMSR_100T2_FD   (1 << 10) /* Can do 100mbps T2, full-duplex =
-*/
-+#define MII_BMSR_100T2_HD   (1 << 9)  /* Can do 100mbps T2, half-duplex =
-*/
-+#define MII_BMSR_EXTSTAT    (1 << 8)  /* Extended status in register 15 =
-*/
-+#define MII_BMSR_MFPS       (1 << 6)  /* MII Frame Preamble Suppression =
-*/
-+#define MII_BMSR_AN_COMP    (1 << 5)  /* Auto-negotiation complete */
-+#define MII_BMSR_RFAULT     (1 << 4)  /* Remote fault */
-+#define MII_BMSR_AUTONEG    (1 << 3)  /* Able to do auto-negotiation */
-+#define MII_BMSR_LINK_ST    (1 << 2)  /* Link status */
-+#define MII_BMSR_JABBER     (1 << 1)  /* Jabber detected */
-+#define MII_BMSR_EXTCAP     (1 << 0)  /* Ext-reg capability */
+ #define FTGMAC100_RXDES1_VLANTAG_CI      0xffff
+@@ -462,7 +464,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32=
+_t tx_ring,
+         /* Write back the modified descriptor.  */
+         ftgmac100_write_bd(&bd, addr);
+         /* Advance to the next descriptor.  */
+-        if (bd.des0 & FTGMAC100_TXDES0_EDOTR) {
++        if (bd.des0 & s->txdes0_edotr) {
+             addr =3D tx_ring;
+         } else {
+             addr +=3D sizeof(FTGMAC100Desc);
+@@ -880,7 +882,7 @@ static ssize_t ftgmac100_receive(NetClientState *nc, =
+const uint8_t *buf,
+             s->isr |=3D FTGMAC100_INT_RPKT_FIFO;
+         }
+         ftgmac100_write_bd(&bd, addr);
+-        if (bd.des0 & FTGMAC100_RXDES0_EDORR) {
++        if (bd.des0 & s->rxdes0_edorr) {
+             addr =3D s->rx_ring;
+         } else {
+             addr +=3D sizeof(FTGMAC100Desc);
+@@ -921,6 +923,14 @@ static void ftgmac100_realize(DeviceState *dev, Erro=
+r **errp)
+     FTGMAC100State *s =3D FTGMAC100(dev);
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
 =20
-+#define MII_ANAR_PAUSE_ASYM (1 << 11) /* Try for asymetric pause */
-+#define MII_ANAR_PAUSE      (1 << 10) /* Try for pause */
- #define MII_ANAR_TXFD       (1 << 8)
- #define MII_ANAR_TX         (1 << 7)
- #define MII_ANAR_10FD       (1 << 6)
-@@ -58,17 +79,31 @@
- #define MII_ANAR_CSMACD     (1 << 0)
-=20
- #define MII_ANLPAR_ACK      (1 << 14)
-+#define MII_ANLPAR_PAUSEASY (1 << 11) /* can pause asymmetrically */
-+#define MII_ANLPAR_PAUSE    (1 << 10) /* can pause */
- #define MII_ANLPAR_TXFD     (1 << 8)
- #define MII_ANLPAR_TX       (1 << 7)
- #define MII_ANLPAR_10FD     (1 << 6)
- #define MII_ANLPAR_10       (1 << 5)
- #define MII_ANLPAR_CSMACD   (1 << 0)
-=20
-+#define MII_ANER_NWAY       (1 << 0) /* Can do N-way auto-nego */
++    if (s->aspeed) {
++        s->txdes0_edotr =3D FTGMAC100_TXDES0_EDOTR_ASPEED;
++        s->rxdes0_edorr =3D FTGMAC100_RXDES0_EDORR_ASPEED;
++    } else {
++        s->txdes0_edotr =3D FTGMAC100_TXDES0_EDOTR;
++        s->rxdes0_edorr =3D FTGMAC100_RXDES0_EDORR;
++    }
 +
-+#define MII_CTRL1000_FULL   (1 << 9)  /* 1000BASE-T full duplex */
-+#define MII_CTRL1000_HALF   (1 << 8)  /* 1000BASE-T half duplex */
-+
-+#define MII_STAT1000_FULL   (1 << 11) /* 1000BASE-T full duplex */
-+#define MII_STAT1000_HALF   (1 << 10) /* 1000BASE-T half duplex */
-+
- /* List of vendor identifiers */
- /* RealTek 8201 */
- #define RTL8201CP_PHYID1    0x0000
- #define RTL8201CP_PHYID2    0x8201
+     memory_region_init_io(&s->iomem, OBJECT(dev), &ftgmac100_ops, s,
+                           TYPE_FTGMAC100, 0x2000);
+     sysbus_init_mmio(sbd, &s->iomem);
+@@ -967,11 +977,14 @@ static const VMStateDescription vmstate_ftgmac100 =3D=
+ {
+         VMSTATE_UINT32(phy_advertise, FTGMAC100State),
+         VMSTATE_UINT32(phy_int, FTGMAC100State),
+         VMSTATE_UINT32(phy_int_mask, FTGMAC100State),
++        VMSTATE_UINT32(txdes0_edotr, FTGMAC100State),
++        VMSTATE_UINT32(rxdes0_edorr, FTGMAC100State),
+         VMSTATE_END_OF_LIST()
+     }
+ };
 =20
-+/* RealTek 8211E */
-+#define RTL8211E_PHYID1     0x001c
-+#define RTL8211E_PHYID2     0xc915
+ static Property ftgmac100_properties[] =3D {
++    DEFINE_PROP_BOOL("aspeed", FTGMAC100State, aspeed, false),
+     DEFINE_NIC_PROPERTIES(FTGMAC100State, conf),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+diff --git a/include/hw/net/ftgmac100.h b/include/hw/net/ftgmac100.h
+index 962a718..d9bc589 100644
+--- a/include/hw/net/ftgmac100.h
++++ b/include/hw/net/ftgmac100.h
+@@ -55,6 +55,10 @@ typedef struct FTGMAC100State {
+     uint32_t phy_advertise;
+     uint32_t phy_int;
+     uint32_t phy_int_mask;
 +
- /* National Semiconductor DP83848 */
- #define DP83848_PHYID1      0x2000
- #define DP83848_PHYID2      0x5c90
++    bool aspeed;
++    uint32_t txdes0_edotr;
++    uint32_t rxdes0_edorr;
+ } FTGMAC100State;
+=20
+ #endif
 --=20
 2.7.4
