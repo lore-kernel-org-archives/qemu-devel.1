@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d2Xhh-0003sc-IH
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:42:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1d2YID-0001zb-Da
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:20:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d2Xhe-000385-G2
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:42:33 -0400
-Received: from [59.151.112.132] (port=46161 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d2Xhc-00036Y-Tw
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 02:42:30 -0400
-References: <1492670346-18004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<2010f24d-1ad0-4bab-bcd5-5e98fe21578a@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <f747e078-4596-7cdc-0cae-4ab9da9da240@cn.fujitsu.com>
-Date: Mon, 24 Apr 2017 14:42:53 +0800
+	(envelope-from <armbru@redhat.com>) id 1d2YI8-00054n-H3
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:20:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2YI8-00053k-A7
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 03:20:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 196CA65D05
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 07:20:10 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170421122710.15373-1-famz@redhat.com>
+Date: Mon, 24 Apr 2017 09:20:06 +0200
+In-Reply-To: <20170421122710.15373-1-famz@redhat.com> (Fam Zheng's message of
+	"Fri, 21 Apr 2017 20:26:56 +0800")
+Message-ID: <878tmqqnkp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <2010f24d-1ad0-4bab-bcd5-5e98fe21578a@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V2 0/6] Add COLO-proxy virtio-net support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 00/14] Trivial cleanups around error
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +33,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Fam Zheng <famz@redhat.com> writes:
 
+> These are patches to:
+>
+> 1) reorder the function parameters so that Error **errp comes
+> last.
+>
+> Error pointer in the middle of a function parameter list is very uncommon, and
+> does caused mistakes, thus is not a good style. Change to the usual way.
+>
+> 2) apply the error_propagate_null.cocci semantics patch again.
 
-On 04/24/2017 11:48 AM, Jason Wang wrote:
->
->
-> On 2017年04月20日 14:39, Zhang Chen wrote:
->> If user use -device virtio-net-pci, virtio-net driver will add a header
->> to raw net packet that colo-proxy can't handle it. COLO-proxy just
->> focus on the packet payload, so we skip the virtio-net header to compare
->> the sent packet that primary guest's to secondary guest's.
->>
->> Zhang Chen (6):
->>    net/filter-mirror.c: Add filter-mirror and filter-redirector vnet
->>      support.
->>    net/net.c: Add vnet header length to SocketReadState
->>    net/colo-compare.c: Make colo-compare support vnet_hdr_len
->>    net/socket.c: Add vnet packet support in net_socket_receive()
->>    net/colo.c: Add vnet packet parse feature in colo-proxy
->>    net/colo-compare.c: Add vnet packet's tcp/udp/icmp compare
->>
->>   include/net/net.h     |  4 +++-
->>   net/colo-compare.c    | 48 
->> +++++++++++++++++++++++++++++++++++++++---------
->>   net/colo.c            |  9 +++++----
->>   net/colo.h            |  4 +++-
->>   net/filter-mirror.c   | 25 ++++++++++++++++++++-----
->>   net/filter-rewriter.c |  2 +-
->>   net/net.c             | 24 ++++++++++++++++++++++--
->>   net/socket.c          |  6 ++++++
->>   8 files changed, 99 insertions(+), 23 deletions(-)
->>
->
-> A quick glance at the series and find two issues:
->
-> - We can't assume virtio-net is the only user for vnet header, you 
-> need query e.g NetClientState for a correct vnet header len.
-
-OK~~ I will fix it in next version.
-
-> - This series breaks qtest:
->
-> **
-> ERROR:tests/e1000e-test.c:296:e1000e_send_verify: assertion failed 
-> (buffer == "TEST"): ("" == "TEST")
-> GTester: last random seed: R02S39dd06f7f52013798111df2e4eb602c5
-> **
-> ERROR:tests/e1000e-test.c:365:e1000e_receive_verify: assertion failed 
-> (le32_to_cpu(descr.wb.upper.status_error) & esta_dd == esta_dd): 
-> (0x00000000 == 0x00000001)
-> GTester: last random seed: R02S8c8200b8ec86358cb7addb5c6fe1303c
-> **
-> ERROR:tests/e1000e-test.c:296:e1000e_send_verify: assertion failed 
-> (buffer == "TEST"): ("" == "TEST")
-> GTester: last random seed: R02S9be86025aa7ded4902bdf644c3964a6e
-> **
-> ERROR:tests/libqos/virtio.c:94:qvirtio_wait_queue_isr: assertion 
-> failed: (g_get_monotonic_time() - start_time <= timeout_us)
-> GTester: last random seed: R02S30cac33d7a98fa56806ca59b35910ea5
-> **
-> ERROR:tests/libqos/virtio.c:94:qvirtio_wait_queue_isr: assertion 
-> failed: (g_get_monotonic_time() - start_time <= timeout_us)
-> GTester: last random seed: R02S258359836760a723622abf56cf2e61e7
-> ^C/home/devel/git/qemu/tests/Makefile.include:815: recipe for target 
-> 'check-qtest-x86_64' failed
-> make: *** [check-qtest-x86_64] Interrupt
->
-> Please fix them.
->
-
-Oh~~ I will fix thrm.
-
-Thanks
-Zhang Chen
-> Thanks
->
->
-> .
->
-
--- 
-Thanks
-Zhang Chen
+Applied with the commit message typo found by Eric corrected.  Thanks!
