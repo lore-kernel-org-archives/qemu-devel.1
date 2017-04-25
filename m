@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d30Wf-0001Y0-Kg
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:29:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d30Zo-0002Vn-2a
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d30Wb-0006In-25
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:29:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d30Wa-0006Ho-PK
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:29:00 -0400
-References: <1492662763-13852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d45772de-5011-9b0c-f5aa-6dcdd6f4c00f@redhat.com>
-Date: Tue, 25 Apr 2017 08:28:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1d30Zi-0007N4-4z
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:32:20 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:38720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d30Zh-0007MZ-Ta
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:32:14 -0400
+Received: by mail-wm0-x235.google.com with SMTP id r190so96541035wme.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 06:32:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1492662763-13852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BnBljppD11mEbuR44LbGh0dEX83gsUiW7"
-Subject: Re: [Qemu-devel] [PATCH] COLO-compare: Add compare_lock aviod
- comparison conflict
+In-Reply-To: <1493103101-25165-3-git-send-email-clg@kaod.org>
+References: <1493103101-25165-1-git-send-email-clg@kaod.org>
+	<1493103101-25165-3-git-send-email-clg@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Apr 2017 14:31:51 +0100
+Message-ID: <CAFEAcA9Y0C_byA8KsiMXdzsMDE73ZKmMcQZaMc7uwAF2bZC+hg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] ipmi: don't try to open a NULL filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BnBljppD11mEbuR44LbGh0dEX83gsUiW7
-From: Eric Blake <eblake@redhat.com>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>,
- qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Message-ID: <d45772de-5011-9b0c-f5aa-6dcdd6f4c00f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] COLO-compare: Add compare_lock aviod
- comparison conflict
-References: <1492662763-13852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1492662763-13852-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 25 April 2017 at 07:51, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> Currenlty, the code relies on the fact that open() handles NULL
+> filenames but that can cause an error with new clang:
+>
+>   hw/core/loader.c:67:15: runtime error: null pointer passed as argument =
+1,
+>   which is declared to never be null
 
-On 04/19/2017 11:32 PM, Zhang Chen wrote:
+This isn't "new clang", incidentally, it's just clang with the
+runtime-static-analysis enabled, which causes warnings to be
+printed at runtime for undefined behaviours. You can enable
+this by passing configure --extra-cflags=3D-fsanitize=3Dundefined .
+(I have clang 3.8.0 here.)
 
-In the subject: s/aviod/avoid/
-
-> When network traffic heavy, compare_pri_rs_finalize() and
-> compare_sec_rs_finalize() have a chance to confilct.
-
-s/confilct/conflict/
-
-> Both of them call colo_compare_connection() to compare packet,
-> But during compare_pri_rs_finalize() comparison, have secondary
-> packet come and call compare_sec_rs_finalize(), that packet will be
-> handle twice. If packet same, the pkt will be double free.
->=20
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---BnBljppD11mEbuR44LbGh0dEX83gsUiW7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY/08WAAoJEKeha0olJ0NqZQQIAK8AA0VK81ceo830vQn2YfDw
-WzR6ijWALflT9jyTg8FPj8uiKxK5tQw1TOAd9h/YHo5dKgdBQUr2mwjP/j9Tk01d
-KX3oTw5GHtMFg2Ani7d+k6u6tN3GRlLweAXSeW6dN4nBpMXETIbuhUrL9QHkQuTj
-VhqxVMvlzXX/5u03XExzpqsEtyRkStw/qqTqJRcM3wJbFpz8X50jU45vdkvBNfbt
-qccMYIv1rd2ygASQuTNZiUrt+CmYxYAx/LxJhsbkF8WyOYRtYLty1qbR7tiqa4+c
-x++elcMMwAwq5LjIeAfLKn1xirtU0ICCFe3nszZcF/tnoFVumTP8PuLoyDzewkI=
-=uTCX
------END PGP SIGNATURE-----
-
---BnBljppD11mEbuR44LbGh0dEX83gsUiW7--
+thanks
+-- PMM
