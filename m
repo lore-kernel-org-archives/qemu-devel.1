@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2ybp-0006Pu-Kp
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:26:18 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d2ybq-0006Qq-Tf
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:26:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2ybn-0001zm-0K
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:26:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57000)
+	(envelope-from <jasowang@redhat.com>) id 1d2ybq-00022D-0w
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:26:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2ybm-0001zM-Pu
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:26:14 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2ybp-00021T-Rs
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:26:17 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 25 Apr 2017 19:26:00 +0800
-Message-Id: <1493119568-15218-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL V2 0/8] Net patches
+Date: Tue, 25 Apr 2017 19:26:01 +0800
+Message-Id: <1493119568-15218-2-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1493119568-15218-1-git-send-email-jasowang@redhat.com>
+References: <1493119568-15218-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PULL V2 1/8] colo-compare: Fix old packet check bug.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +24,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
-The following changes since commit 32c7e0ab755745e961f1772e95cac381cc6876=
-9d:
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-  Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170=
-421' into staging (2017-04-21 15:59:27 +0100)
+If colo-compare find one old packet,we can notify colo-frame
+do checkpoint, no need continue find more old packet here.
 
-are available in the git repository at:
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ net/colo-compare.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-  https://github.com/jasowang/qemu.git tags/net-pull-request
-
-for you to fetch changes up to 0fc8aec7de64f2bf83a274a2a38b938ce03425d2:
-
-  COLO-compare: Optimize tcp compare trace event (2017-04-25 19:17:25 +08=
-00)
-
-----------------------------------------------------------------
-
-Changes from V1:
-- Fix clang warnings
-
-----------------------------------------------------------------
-C=C3=A9dric Le Goater (5):
-      hw/net: add MII definitions
-      net: add FTGMAC100 support
-      net/ftgmac100: add a 'aspeed' property
-      aspeed: add a FTGMAC100 nic
-      slirp: add a fake NC-SI backend
-
-Zhang Chen (3):
-      colo-compare: Fix old packet check bug.
-      COLO-compare: Optimize tcp compare for option field
-      COLO-compare: Optimize tcp compare trace event
-
- default-configs/arm-softmmu.mak |    1 +
- hw/arm/aspeed_soc.c             |   21 +
- hw/net/Makefile.objs            |    1 +
- hw/net/ftgmac100.c              | 1016 +++++++++++++++++++++++++++++++++=
-++++++
- include/hw/arm/aspeed_soc.h     |    2 +
- include/hw/net/ftgmac100.h      |   64 +++
- include/hw/net/mii.h            |   71 ++-
- include/net/eth.h               |    1 +
- net/colo-compare.c              |   69 ++-
- net/trace-events                |    3 +-
- slirp/Makefile.objs             |    2 +-
- slirp/ncsi-pkt.h                |  419 ++++++++++++++++
- slirp/ncsi.c                    |  130 +++++
- slirp/slirp.c                   |    4 +
- slirp/slirp.h                   |    3 +
- 15 files changed, 1770 insertions(+), 37 deletions(-)
- create mode 100644 hw/net/ftgmac100.c
- create mode 100644 include/hw/net/ftgmac100.h
- create mode 100644 slirp/ncsi-pkt.h
- create mode 100644 slirp/ncsi.c
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 54e6d40..9b09cfc 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -372,10 +372,9 @@ static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
+     }
+ }
+ 
+-static void colo_old_packet_check_one_conn(void *opaque,
+-                                           void *user_data)
++static int colo_old_packet_check_one_conn(Connection *conn,
++                                          void *user_data)
+ {
+-    Connection *conn = opaque;
+     GList *result = NULL;
+     int64_t check_time = REGULAR_PACKET_CHECK_MS;
+ 
+@@ -386,7 +385,10 @@ static void colo_old_packet_check_one_conn(void *opaque,
+     if (result) {
+         /* do checkpoint will flush old packet */
+         /* TODO: colo_notify_checkpoint();*/
++        return 0;
+     }
++
++    return 1;
+ }
+ 
+ /*
+@@ -398,7 +400,12 @@ static void colo_old_packet_check(void *opaque)
+ {
+     CompareState *s = opaque;
+ 
+-    g_queue_foreach(&s->conn_list, colo_old_packet_check_one_conn, NULL);
++    /*
++     * If we find one old packet, stop finding job and notify
++     * COLO frame do checkpoint.
++     */
++    g_queue_find_custom(&s->conn_list, NULL,
++                        (GCompareFunc)colo_old_packet_check_one_conn);
+ }
+ 
+ /*
+-- 
+2.7.4
