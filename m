@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d35gb-0007Va-C9
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:59:42 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1d35iA-0000Ga-3g
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d35gY-0008VI-QE
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:59:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34463)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d35gY-0008Uj-Fh
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:59:38 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1d35i7-0000c0-1H
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:01:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36507
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1d35i6-0000bo-RG
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:01:14 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3PIsADI102032
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 15:01:13 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a1v4s90u0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 15:01:13 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 25 Apr 2017 13:01:11 -0600
 References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
-	<1491575431-32170-6-git-send-email-amarnath.valluri@intel.com>
-	<e8ebc62a-63eb-c4c8-3f80-5e67d10b42ed@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1614e603-2d69-296b-cc31-716e710937e3@redhat.com>
-Date: Tue, 25 Apr 2017 13:59:34 -0500
+	<1491575431-32170-8-git-send-email-amarnath.valluri@intel.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 25 Apr 2017 15:01:07 -0400
 MIME-Version: 1.0
-In-Reply-To: <e8ebc62a-63eb-c4c8-3f80-5e67d10b42ed@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XnKGrBt9N16ej1jpKT4mgSIiCpm8rd32k"
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] tmp backend: Add new api to read
- backend TpmInfo
+In-Reply-To: <1491575431-32170-8-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <6f1fd088-1c3b-da1e-3e9b-68feaf1429b4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] tpm-backend: Move realloc_buffer()
+ implementation to base class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +43,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>, Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 Cc: patrick.ohly@intel.com, marcandre.lureau@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XnKGrBt9N16ej1jpKT4mgSIiCpm8rd32k
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>,
- Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: patrick.ohly@intel.com, marcandre.lureau@gmail.com
-Message-ID: <1614e603-2d69-296b-cc31-716e710937e3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] tmp backend: Add new api to read
- backend TpmInfo
-References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
- <1491575431-32170-6-git-send-email-amarnath.valluri@intel.com>
- <e8ebc62a-63eb-c4c8-3f80-5e67d10b42ed@linux.vnet.ibm.com>
-In-Reply-To: <e8ebc62a-63eb-c4c8-3f80-5e67d10b42ed@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 04/07/2017 10:30 AM, Amarnath Valluri wrote:
+> Provide base implementation of realloc_buffer(), so that backend implementations
+> can resue.
+>
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> ---
+>   backends/tpm.c           |  9 ++++++++-
+>   hw/tpm/tpm_passthrough.c | 12 ------------
+>   2 files changed, 8 insertions(+), 13 deletions(-)
+>
+> diff --git a/backends/tpm.c b/backends/tpm.c
+> index 3493df6..0da73e6 100644
+> --- a/backends/tpm.c
+> +++ b/backends/tpm.c
+> @@ -88,8 +88,15 @@ bool tpm_backend_had_startup_error(TPMBackend *s)
+>   size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
+>   {
+>       TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+> +    if (!k->ops->realloc_buffer) {
+> +        size_t wanted_size = 4096; /* Linux tpm.c buffer size */
+>
+> -    assert(k->ops->realloc_buffer);
+> +        if (sb->size != wanted_size) {
+> +            sb->buffer = g_realloc(sb->buffer, wanted_size);
+> +            sb->size = wanted_size;
+> +        }
+> +        return sb->size;
+> +    }
+>
+>       return k->ops->realloc_buffer(sb);
+>   }
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index 8e11ed3..1bffb6d 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -258,17 +258,6 @@ static bool tpm_passthrough_get_startup_error(TPMBackend *tb)
+>       return tpm_pt->had_startup_error;
+>   }
+>
+> -static size_t tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
+> -{
+> -    size_t wanted_size = 4096; /* Linux tpm.c buffer size */
+> -
+> -    if (sb->size != wanted_size) {
+> -        sb->buffer = g_realloc(sb->buffer, wanted_size);
+> -        sb->size = wanted_size;
+> -    }
+> -    return sb->size;
+> -}
+> -
+>   static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
+>   {
+>       TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+> @@ -470,7 +459,6 @@ static const TPMDriverOps tpm_passthrough_driver = {
+>       .opts                     = tpm_passthrough_cmdline_opts,
+>       .desc                     = tpm_passthrough_create_desc,
+>       .create                   = tpm_passthrough_create,
+> -    .realloc_buffer           = tpm_passthrough_realloc_buffer,
+>       .reset                    = tpm_passthrough_reset,
+>       .had_startup_error        = tpm_passthrough_get_startup_error,
+>       .cancel_cmd               = tpm_passthrough_cancel_cmd,
 
-On 04/25/2017 01:51 PM, Stefan Berger wrote:
 
->> +++ b/qapi-schema.json
->> @@ -5140,6 +5140,16 @@
->>   { 'command': 'query-tpm-types', 'returns': ['TpmType'] }
->>
->>   ##
->> +# @TPMOptions:
->> +#
->> +# Base type for TPM options
->> +#
->> +# Since: 2.10
->> +##
->> +{ 'struct': 'TPMOptions',
->> +  'data': { } }
->> +
->> +##
->>   # @TPMPassthroughOptions:
->>   #
->>   # Information about the TPM passthrough type
->> @@ -5151,20 +5161,9 @@
->>   #
->>   # Since: 1.5
->>   ##
->> -{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
->> -                                             '*cancel-path' : 'str'} =
-}
->> +{ 'struct': 'TPMPassthroughOptions', 'base': 'TPMOptions',
->> +  'data': { '*path' : 'str', '*cancel-path' : 'str'} }
->=20
->=20
-> I don't think that you can change it like this anymore since this is
-> part of the public interface.
-
-The change is backwards compatible; it doesn't break any existing QMP
-usage.  It's weird to have an empty base class, though.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---XnKGrBt9N16ej1jpKT4mgSIiCpm8rd32k
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY/5yWAAoJEKeha0olJ0NqEVQIAIETgcR/GgRqjtbB2uaDN7M4
-kN2rsg5rHgvKSaQrevWKhjHT4kAPyfgFUeCaLBkOhQjZDQ7tx3nL4l232efgpohh
-d/9OreWED1kLkQGUuA0YZuS7sa37NOycqY/xgj6g6stSHGhpa/vxSPVdETEXLAbt
-knHwPT/rlV9aboeYfWpB23d23DZSgCiafjfCBtDdgSH4KazBSwwbOvXhF1RvVa4X
-pr1+rmJqeWI79AKi1PUMv4AxOkQF+QMjMcnMG1bElNfxuSwZdkdTjsqnsRtGyGwb
-13/wMFFxkXYNCpGw5hsrvAWTj6ye99zHhOq/M4W8XRwLophDQRpN/w4xAUfc9KU=
-=5ZTC
------END PGP SIGNATURE-----
-
---XnKGrBt9N16ej1jpKT4mgSIiCpm8rd32k--
+If you don't need this realloc_buffer function in your driver, you could 
+entirely remove it.
