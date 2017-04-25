@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d30bL-0003Iy-UC
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:33:56 -0400
+	(envelope-from <lvivier@redhat.com>) id 1d30bV-0003RA-Uw
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d30bL-0007bo-5A
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:33:55 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d30bK-0007aR-Vd
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:33:55 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id z52so67586227wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 06:33:54 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1d30bS-0007d9-0g
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:34:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53324)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1d30bR-0007cx-O4
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:34:01 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9D0B979350
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 13:34:00 +0000 (UTC)
+References: <20170425102446.4008-1-quintela@redhat.com>
+	<20170425102446.4008-4-quintela@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <06bd8906-b122-86bf-d49c-76a7441e33d9@redhat.com>
+Date: Tue, 25 Apr 2017 15:33:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170425131828.22480-1-n54@gmx.com>
-References: <20170425131828.22480-1-n54@gmx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Apr 2017 14:33:33 +0100
-Message-ID: <CAFEAcA-PmbjRYb2EDDp60pKNnUQ8Rkdx79TTLgUMf_VRe2JT+w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] scripts/qemu-binfmt-conf.sh: Fix shell
- portability issue
+In-Reply-To: <20170425102446.4008-4-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/6] monitor: Move hmp_savevm from savevm.c
+ to hmp.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +35,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com
 
-On 25 April 2017 at 14:18, Kamil Rytarowski <n54@gmx.com> wrote:
-> Appease pkgsrc and use portable shell variable comparison.
-> This switches "==" to "=". It should not be a functional change.
->
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+On 25/04/2017 12:24, Juan Quintela wrote:
+> It is a monitor command, and has nothing migration specific in it.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+
 > ---
-
-Thanks for this patch; it's an easy bug to let slip in
-if your /bin/sh happens to be bash.
-
-PS: you forgot to cc qemu-devel@ on this patch.
-
->  scripts/qemu-binfmt-conf.sh | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-> index 0f1aa63872..8afc3eb5bb 100755
-> --- a/scripts/qemu-binfmt-conf.sh
-> +++ b/scripts/qemu-binfmt-conf.sh
-> @@ -284,12 +284,12 @@ while true ; do
->          shift
->          # check given cpu is in the supported CPU list
->          for cpu in ${qemu_target_list} ; do
-> -            if [ "$cpu" == "$1" ] ; then
-> +            if [ "$cpu" = "$1" ] ; then
->                  break
->              fi
->          done
->
-> -        if [ "$cpu" == "$1" ] ; then
-> +        if [ "$cpu" = "$1" ] ; then
->              qemu_target_list="$1"
->          else
->              echo "ERROR: unknown CPU \"$1\"" 1>&2
-> --
-> 2.12.2
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+>  hmp.c                   | 5 +++++
+>  hmp.h                   | 1 +
+>  include/sysemu/sysemu.h | 1 -
+>  migration/savevm.c      | 5 -----
+>  4 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index f6b8738..a82a952 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1281,6 +1281,11 @@ void hmp_loadvm(Monitor *mon, const QDict *qdict)
+>      }
+>  }
+>  
+> +void hmp_savevm(Monitor *mon, const QDict *qdict)
+> +{
+> +    save_vmstate(qdict_get_try_str(qdict, "name"));
+> +}
+> +
+>  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
+>  {
+>      qmp_migrate_cancel(NULL);
+> diff --git a/hmp.h b/hmp.h
+> index 385332c..b302c8d 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -64,6 +64,7 @@ void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdict);
+>  void hmp_drive_mirror(Monitor *mon, const QDict *qdict);
+>  void hmp_drive_backup(Monitor *mon, const QDict *qdict);
+>  void hmp_loadvm(Monitor *mon, const QDict *qdict);
+> +void hmp_savevm(Monitor *mon, const QDict *qdict);
+>  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
+>  void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
+>  void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index b6daf9d..914c36c 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -75,7 +75,6 @@ void qemu_remove_exit_notifier(Notifier *notify);
+>  void qemu_add_machine_init_done_notifier(Notifier *notify);
+>  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+>  
+> -void hmp_savevm(Monitor *mon, const QDict *qdict);
+>  int save_vmstate(const char *name);
+>  int load_vmstate(const char *name);
+>  void hmp_delvm(Monitor *mon, const QDict *qdict);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index ff934aa..bbff4d8 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2171,11 +2171,6 @@ int save_vmstate(const char *name)
+>      return ret;
+>  }
+>  
+> -void hmp_savevm(Monitor *mon, const QDict *qdict)
+> -{
+> -    save_vmstate(qdict_get_try_str(qdict, "name"));
+> -}
+> -
+>  void qmp_xen_save_devices_state(const char *filename, Error **errp)
+>  {
+>      QEMUFile *f;
+> 
