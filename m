@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d2xQi-0003dX-MB
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:10:46 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d2xR6-0003qU-Gy
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d2xQe-0004V2-IE
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:10:44 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:33159)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1d2xQe-0004Ur-9S
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:10:40 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OOY00K3NMXMAA90@mailout2.w1.samsung.com> for
-	qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:10:34 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <234489b0-d33b-9a49-ec17-b1a6823d4eb3@samsung.com>
-Date: Tue, 25 Apr 2017 13:10:30 +0300
-MIME-version: 1.0
-In-reply-to: <20170425082408.GB31709@pxdev.xzpeter.org>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
-References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170414131740eucas1p27eba648b990a93a627265c740e7ff118@eucas1p2.samsung.com>
-	<1492175840-5021-5-git-send-email-a.perevalov@samsung.com>
-	<20170425082408.GB31709@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 4/6] migration: calculate downtime on dst
- side
+	(envelope-from <rth7680@gmail.com>) id 1d2xR2-0004Yv-DS
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:11:08 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d2xR2-0004Ym-2i
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:11:04 -0400
+Received: by mail-wr0-x242.google.com with SMTP id g12so6299423wrg.2
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 03:11:04 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <ab4f029c-8264-7d35-b0e0-9b35a8e80d9d@twiddle.net>
+	<20170423215420.27098-1-shorne@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f6a7d386-80a9-0cc3-e1ec-1b2058aa5bf9@twiddle.net>
+Date: Tue, 25 Apr 2017 12:11:00 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170423215420.27098-1-shorne@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] target/openrisc: Support non-busy idle
+ state using PMR SPR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,121 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, i.maximets@samsung.com
+To: Stafford Horne <shorne@gmail.com>
+Cc: QEMU Development <qemu-devel@nongnu.org>, Openrisc <openrisc@lists.librecores.org>
 
-On 04/25/2017 11:24 AM, Peter Xu wrote:
-> On Fri, Apr 14, 2017 at 04:17:18PM +0300, Alexey Perevalov wrote:
->
-> [...]
->
->> +/*
->> + * This function calculates downtime per cpu and trace it
->> + *
->> + *  Also it calculates total downtime as an interval's overlap,
->> + *  for many vCPU.
->> + *
->> + *  The approach is following:
->> + *  Initially intervals are represented in tree where key is
->> + *  pagefault address, and values:
->> + *   begin - page fault time
->> + *   end   - page load time
->> + *   cpus  - bit mask shows affected cpus
->> + *
->> + *  To calculate overlap on all cpus, intervals converted into
->> + *  array of points in time (downtime_points), the size of
->> + *  array is 2 * number of nodes in tree of intervals (2 array
->> + *  elements per one in element of interval).
->> + *  Each element is marked as end (E) or as start (S) of interval.
->> + *  The overlap downtime will be calculated for SE, only in case
->> + *  there is sequence S(0..N)E(M) for every vCPU.
->> + *
->> + * As example we have 3 CPU
->> + *
->> + *      S1        E1           S1               E1
->> + * -----***********------------xxx***************------------------------> CPU1
->> + *
->> + *             S2                E2
->> + * ------------****************xxx---------------------------------------> CPU2
->> + *
->> + *                         S3            E3
->> + * ------------------------****xxx********-------------------------------> CPU3
->> + *
->> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
->> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
->> + * S3,S1,E2 - sequenece includes all CPUs, in this case overlap will be S1,E2
->> + * Legend of picture is following: * - means downtime per vCPU
->> + *                                 x - means overlapped downtime
->> + */
-> Not sure whether I get the point in this patch... iiuc we defined the
-> downtime here as the period when all vcpus are halted, right?
->
-> If so, I have a few questions:
->
-> - will this algorithm consume lots of memory? since I see we have one
->    trace object per fault page address
-I don't think, it consumes too much, one DowntimeDuration
-takes (if I'm using bitmap_try_new, in this patch set I used pointer to 
-uint64_t array to keep bitmap array,
-but I'm going to use include/qemu/bitmap.h, it works with pointers to long)
+On 04/23/2017 11:54 PM, Stafford Horne wrote:
+> The OpenRISC architecture has the Power Management Register (PMR)
+> special purpose register to manage cpu power states.  The interesting
+> modes are:
+> 
+>   * Doze Mode (DME) - Stop cpu except timer & pic - wake on interrupt
+>   * Sleep Mode (SME) - Stop cpu and all units - wake on interrupt
+>   * Suspend Model (SUME) - Stop cpu and all units - wake on reset
+> 
+> The linux kernel will set DME when idle.
 
-(2* int64 + (ROUND_UP((smp_cpus + BITS_PER_BYTE * sizeof(long) - 1 / 
-(BITS_PER_BYTE * sizeof(long)))) * siezof(long)
-so it's about 16 + at least 4 bytes, per page fault,
-Lets assume we migration 256 vCPU and 256 Gb of ram and that ram is 
-based on 4Kb pages - it's really bad case
-16 + ((256 + 8 * 4 - 1) / ( 8 * 4 )) * 4 = 52 bytes
-(256 * 1024 * 1024 * 1024)/(4 * 1024) = 67108864 page faults, but not 
-all of these pages will be pagefaulted, due to
-page pre-fetching
-67108864 * 52 = 3489660928 bytes (3.5 Gb for that operation),
-but I have a doubt, who will use 4Kb pages for 256 Gb, probably
-2Mb or 1G huge page will be chosen on x86, on ARM or other architecture 
-it could be another values.
+And SUME would be, essentially, poweroff?  Perhaps at least for the purposes of 
+QEMU; on real hardware one could press a button to assert reset and reboot.
 
->
-> - do we need to protect the tree to make sure there's no insertion
->    when doing the calculation?
-I asked the same question when sent RFC patches,
-the answer here is no, we should not, due to right now,
-it's only one socket and one listen thread (maybe in future,
-it will be required, maybe after multi fd patch set),
-and calculation is doing synchronously right after migration complete.
+> Also, I don't know if its due to this patch of an issue with the timer
+> interrupts.  After applying this patch the timer interrupts do not trigger
+> until a keypress is make.  i.e. something like this...
+> 
+>    $ sleep 5
+>    <hangs forever until a key is pressed>
+...
+> +            cpu_restore_state(cs, GETPC() + 4);
 
->
-> - if the only thing we want here is the "total downtime", whether
->    below would work? (assuming N is vcpu numbers)
->
->    a. define array cpu_fault_addr[N], to store current faulted address
->       for each vcpu. When vcpu X is running, cpu_fault_addr[X] should
->       be 0.
->
->    b. when page fault happens on vcpu A, setup cpu_fault_addr[A] with
->       corresponding fault address.
-at this time need to is fault happens for all another vCPU,
-and if it happens mark current time as total vCPU downtime start.
+This isn't correct.  You want
 
->    c. when page copy finished, loop over cpu_fault_addr[] to see
->       whether that matches any, clear corresponding element if matched.
-so when page copy finished and mark for total vCPU is set,
-yes that interval is a part of total downtime.
->
->    Then, we can just measure the period when cpu_fault_addr[] is all
->    set (by tracing at both b. and c.). Can this work?
-Yes, it works, but it's better to keep time - cpu_fault_time,
-address is not important here, it doesn't matter the reason of pagefault.
-2 vCPU could fault due to access to one page, ok, it's not a problem, 
-just store
-time when it was faulted.
-Looks like it's better algorithm, with lesser complexity,
-thank you a lot.
+	cpu_restore_state(cs, GETPC());
+	cs->env.pc += 4;
+
+So what's happening is that you're re-executing the MTSPR and going back to 
+sleep again.  Which probably explains the hang.
 
 
->
-> Thanks,
->
-
-
--- 
-Best regards,
-Alexey Perevalov
+r~
