@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d30Mn-0005S4-3q
+	(envelope-from <thuth@redhat.com>) id 1d30Mn-0005S6-QX
 	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d30Mi-0007QF-R1
+	(envelope-from <thuth@redhat.com>) id 1d30Mn-0007Up-2C
 	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:18:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58599)
+Received: from mx1.redhat.com ([209.132.183.28]:60302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d30Mi-0007PA-HE
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:18:48 -0400
-References: <1493103101-25165-1-git-send-email-clg@kaod.org>
-	<1493103101-25165-3-git-send-email-clg@kaod.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d3e51a7d-b078-074c-5a2a-352e91f16c14@redhat.com>
-Date: Tue, 25 Apr 2017 08:18:43 -0500
-MIME-Version: 1.0
-In-Reply-To: <1493103101-25165-3-git-send-email-clg@kaod.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="V2xLLWkCI5Q7O1MFB82xM4N7pVfGqMr69"
-Subject: Re: [Qemu-devel] [PATCH 2/2] ipmi: don't try to open a NULL filename
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d30Mm-0007Tv-SC
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:18:52 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 25 Apr 2017 15:18:47 +0200
+Message-Id: <1493126327-13162-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix crash with virtio-scsi-pci
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +22,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Corey Minyard <cminyard@mvista.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---V2xLLWkCI5Q7O1MFB82xM4N7pVfGqMr69
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Corey Minyard <cminyard@mvista.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <d3e51a7d-b078-074c-5a2a-352e91f16c14@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] ipmi: don't try to open a NULL filename
-References: <1493103101-25165-1-git-send-email-clg@kaod.org>
- <1493103101-25165-3-git-send-email-clg@kaod.org>
-In-Reply-To: <1493103101-25165-3-git-send-email-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+qemu-system-s390x currently crashes when it is started with a
+virtio-scsi-pci device, e.g.:
 
-On 04/25/2017 01:51 AM, C=C3=A9dric Le Goater wrote:
-> Currenlty, the code relies on the fact that open() handles NULL
-> filenames but that can cause an error with new clang:
+ qemu-system-s390x -nographic -enable-kvm -device virtio-scsi-pci \
+                   -drive file=/tmp/disk.dat,if=none,id=d1,format=raw \
+                   -device scsi-cd,drive=d1,bootindex=1
 
-POSIX doesn't require it to work. Linux is nice and gives you EFAULT,
-but there are systems where open(NULL) crashes with SIGSEGV.  The clang
-warning is correct.
+The problem is that the code in s390_gen_initial_iplb() currently assumes
+that all SCSI devices are also CCW devices, which is not the case for
+virtio-scsi-pci of course. Fix it by adding an appropriate check for
+TYPE_CCW_DEVICE here.
 
->=20
->   hw/core/loader.c:67:15: runtime error: null pointer passed as argumen=
-t 1,
->   which is declared to never be null
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  hw/ipmi/ipmi_bmc_sim.c | 5 +++++
->  1 file changed, 5 insertions(+)
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/s390x/ipl.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---V2xLLWkCI5Q7O1MFB82xM4N7pVfGqMr69
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY/0yzAAoJEKeha0olJ0NqXQEIAIwfR0JPrOmzY8m8BLMOmjZC
-Ity8ZReI3SCCP4cyWFgRhh9QDxQeSoN56L+pBK1LyryxAXRr8xJZKeoWrh5iqLxE
-+7zqaV5vYlsi5sx82kk+pQSTCLRPN8hdaLOX0KaYBhzj65znnRsDpwgHlOE2lwXv
-jqn8x4cRJHnqcqHm3R6aojsdT1iQfB7U9A1/0J9JTV1imp4y3a3GtOYURKqBOXWS
-hXcEWTX7OFt4UYQishKoAAO80iTSP7rbZGQ4IXjgMEbCnHM4qtj3s5MTTJshGswz
-q2iIICGdzDB47eGmTmXzRuHkH6B5XMnVsJWaOpn6AwbcEXj96GTbu/iosbnsrEA=
-=X96H
------END PGP SIGNATURE-----
-
---V2xLLWkCI5Q7O1MFB82xM4N7pVfGqMr69--
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 7978c7d..f674d50 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -248,7 +248,13 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+             SCSIBus *bus = scsi_bus_from_device(sd);
+             VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
+             VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw, vdev);
+-            CcwDevice *ccw_dev = CCW_DEVICE(scsi_ccw);
++            CcwDevice *ccw_dev;
++
++            ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
++                                                       TYPE_CCW_DEVICE);
++            if (!ccw_dev) {       /* It might be a PCI device instead */
++                return false;
++            }
+ 
+             ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
+             ipl->iplb.blk0_len =
+-- 
+1.8.3.1
