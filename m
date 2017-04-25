@@ -1,41 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d2wbF-0004ru-Rq
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:17:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d2wdR-0005eU-U5
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:19:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d2wbB-0000bJ-TZ
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:17:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51991
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1d2wbB-0000aj-Mj
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:17:29 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3P9Ee3j039911
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 05:17:28 -0400
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a21n9xcse-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 05:17:27 -0400
-Received: from localhost
-	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Tue, 25 Apr 2017 19:17:16 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <CAFEAcA9S+q8FiZ2chaLoUWmQJ3uForGaDVGqwrBHnxmpH4sy_Q@mail.gmail.com>
-References: <20170425083555.13547-1-nikunj@linux.vnet.ibm.com>
-	<CAFEAcA-dD=DZmtvMDAz2Z8u6Qb2ozGWNroPQhwXr+zczvtjqVA@mail.gmail.com>
-	<87pog0q2xz.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<CAFEAcA9S+q8FiZ2chaLoUWmQJ3uForGaDVGqwrBHnxmpH4sy_Q@mail.gmail.com>
-Date: Tue, 25 Apr 2017 14:46:17 +0530
+	(envelope-from <peter.maydell@linaro.org>) id 1d2wdR-0001ez-5U
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:19:49 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:35311)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d2wdQ-0001eX-Uw
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:19:49 -0400
+Received: by mail-wr0-x229.google.com with SMTP id z52so63782627wrc.2
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 02:19:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87mvb4q23i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH RFC] configure: fix clang failure for
- libatomic
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Apr 2017 10:19:27 +0100
+Message-ID: <CAFEAcA8QhyQUn0XJECvSYa3m0ws-44Dow0kE0h=eOJ83__iw1g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] pull requests and ARM patches during May
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,47 +27,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Hi all; I'm taking a break during May and won't be reading work
+emails during that time. Alex Benn=C3=A9e has volunteered to look after
+ARM patches, and Stefan Hajnoczi has agreed to handle applying
+pull requests. People working on ARM related patches can also
+help each other out by reviewing each others' patches.
 
-> On 25 April 2017 at 09:58, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> wrote:
->> I was trying out the program in the configure script with clang and I do
->> get errors without libatomic:
->>
->>     $ clang /tmp/atomic.c
->>     /tmp/atomic.c:6:7: warning: implicit declaration of function '__atomic_load_8' is invalid in C99 [-Wimplicit-function-declaration]
->>       y = __atomic_load_8(&x, 0);
->>           ^
->>     /tmp/atomic.c:7:3: warning: implicit declaration of function '__atomic_store_8' is invalid in C99 [-Wimplicit-function-declaration]
->>       __atomic_store_8(&x, y, 0);
->>       ^
->>     /tmp/atomic.c:8:3: warning: implicit declaration of function '__atomic_compare_exchange_8' is invalid in C99 [-Wimplicit-function-declaration]
->>       __atomic_compare_exchange_8(&x, &y, x, 0, 0, 0);
->>       ^
->>     /tmp/atomic.c:9:3: warning: implicit declaration of function '__atomic_exchange_8' is invalid in C99 [-Wimplicit-function-declaration]
->>       __atomic_exchange_8(&x, y, 0);
->>       ^
->>     /tmp/atomic.c:10:3: warning: implicit declaration of function '__atomic_fetch_add_8' is invalid in C99 [-Wimplicit-function-declaration]
->>       __atomic_fetch_add_8(&x, y, 0);
->>       ^
->>     5 warnings generated.
->>     /tmp/atomic-1660e0.o: In function `main':
->>     /tmp/atomic.c:(.text+0x28): undefined reference to `__atomic_load_8'
->>     /tmp/atomic.c:(.text+0x40): undefined reference to `__atomic_store_8'
->>     /tmp/atomic.c:(.text+0x69): undefined reference to `__atomic_compare_exchange_8'
->>     /tmp/atomic.c:(.text+0x7d): undefined reference to `__atomic_exchange_8'
->>     /tmp/atomic.c:(.text+0x91): undefined reference to `__atomic_fetch_add_8'
->>     clang-3.9: error: linker command failed with exit code 1 (use -v to see invocation)
->>
->> With -latomic, the linker succeeds in getting the binary.
->
-> What host is this on ?
+See you all in June :-)
 
-$ uname -a
-Linux abhimanyu 4.9.13-200.fc25.x86_64 #1 SMP Mon Feb 27 16:48:42 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
-$
-
-Regards
-Nikunj
+thanks
+-- PMM
