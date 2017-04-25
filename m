@@ -1,39 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d2sWz-00036F-6B
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 00:56:54 -0400
+	(envelope-from <marcel@redhat.com>) id 1d2sjj-0005MH-1N
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 01:10:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d2sWu-0004Rc-Ao
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 00:56:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41511
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1d2sWu-0004QS-4Z
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 00:56:48 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3P4raZt120886
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 00:56:47 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a1nx6qsbs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 00:56:46 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 25 Apr 2017 00:56:46 -0400
-Date: Tue, 25 Apr 2017 12:56:42 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170425045201.71457-1-bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <marcel@redhat.com>) id 1d2sjf-0000Fp-Ki
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 01:10:03 -0400
+References: <58FEB4A2.8070900@huawei.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <047de7e9-36fe-4633-6e52-b3000699d2f8@redhat.com>
+Date: Tue, 25 Apr 2017 08:09:53 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170425045201.71457-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170425045642.GG31848@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] vfio/pci: Fix incorrect error
- message
+In-Reply-To: <58FEB4A2.8070900@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pci: deassert intx when pci device
+ unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,44 +23,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com
+To: "Herongguang (Stephen)" <herongguang.he@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, "wangxinxin.wang@huawei.com >> wangxin (U)" <wangxinxin.wang@huawei.com>
 
-* Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-04-25 06:52:01 +0200]:
-
-Hey Alex,
-
-Please ignore the "RFC" tag in the subject. Sorry for the mistake.
-
-> When the "No host device provided" error occurs, the hint message
-> that starts with "Use -vfio-pci," makes no sense, since "-vfio-pci"
-> is not a valid command line parameter.
-> 
-> Correct this by replacing "-vfio-pci" with "-device vfio-pci".
-> 
-> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+On 04/25/2017 05:29 AM, Herongguang (Stephen) wrote:
+> If a pci device is not reset by VM (by writing into config space)
+> and unplugged by VM, after that when VM reboots, qemu may assert:
+> pcibus_reset: Assertion `bus->irq_count[i] == 0' failed
+>
+> Signed-off-by: herongguang <herongguang.he@huawei.com>
 > ---
->  hw/vfio/pci.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 03a3d01..32aca77 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2625,8 +2625,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->          if (!(~vdev->host.domain || ~vdev->host.bus ||
->                ~vdev->host.slot || ~vdev->host.function)) {
->              error_setg(errp, "No provided host device");
-> -            error_append_hint(errp, "Use -vfio-pci,host=DDDD:BB:DD.F "
-> -                              "or -vfio-pci,sysfsdev=PATH_TO_DEVICE\n");
-> +            error_append_hint(errp, "Use -device vfio-pci,host=DDDD:BB:DD.F "
-> +                              "or -device vfio-pci,sysfsdev=PATH_TO_DEVICE\n");
->              return;
->          }
->          vdev->vbasedev.sysfsdev =
-> -- 
-> 2.10.2
-> 
+>  hw/pci/pci.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 259483b..98ccc27 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1083,6 +1083,7 @@ static void pci_qdev_unrealize(DeviceState *dev, Error **errp)
+>          pc->exit(pci_dev);
+>      }
+>
+> +    pci_device_deassert_intx(pci_dev);
+>      do_pci_unregister_device(pci_dev);
+>  }
+>
+> --
+> 1.7.12.4
 
--- 
-Dong Jia Shi
+
+
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+
+Thanks,
+Marcel
