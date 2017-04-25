@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d31Sc-00085s-US
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:29:04 -0400
+	(envelope-from <drjones@redhat.com>) id 1d31Xd-0001ax-8j
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:34:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d31SZ-0003bI-Qq
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:28:58 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:36019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1d31SZ-0003as-Kf
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:28:55 -0400
-Received: by mail-it0-x242.google.com with SMTP id x188so21030084itb.3
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 07:28:55 -0700 (PDT)
-In-Reply-To: <9d8c02d4-952b-170c-5441-626aa296a582@redhat.com>
-References: <C6D1F9E0-0379-4DC5-927A-A32D2281937D@gmail.com>
-	<9d8c02d4-952b-170c-5441-626aa296a582@redhat.com>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <CADAF517-493E-46B3-9FB1-5D5385D4711E@gmail.com>
-Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Tue, 25 Apr 2017 10:28:52 -0400
-Subject: Re: [Qemu-devel] [PATCH 1/9] Add ppc.risu file
+	(envelope-from <drjones@redhat.com>) id 1d31Xc-0006MD-DJ
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:34:09 -0400
+Date: Tue, 25 Apr 2017 16:33:54 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170425143354.6ckotexdnik3deeo@kamzik.brq.redhat.com>
+References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
+	<1490189568-167621-5-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490189568-167621-5-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 04/23] hw/arm/virt: explicitly
+ allocate cpu_index for cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-
-On Apr 25, 2017, at 9:16 AM, Eric Blake wrote:
-
-> On 04/24/2017 10:17 PM, G 3 wrote:
->> Add the ppc.risu file. It defines the format for various PowerPC
->> instructions.
+On Wed, Mar 22, 2017 at 02:32:29PM +0100, Igor Mammedov wrote:
+> Currently cpu_index is implicitly auto assigned during
+> cpu.realize() time cpu_exec_realizefn()->cpu_list_add().
+> 
+> It happens to match index in possible_cpus so take
+> control over it and make board initialize cpu_index
+> to possible_cpus index explicitly. It will at least
+> document that board is in control of it and when
+> '-device cpu' support comes it will keep cpu_index
+> stable regardless of order cpus are created so it won't
+> break migration.
+> Within this series it will be used for internal
+> conversion from storing cpu_index based NUMA node
+> bitmaps to property based mapping with possible_cpus,
+> And will allow map cpu_index to a CPU entry in
+> possible_cpus array.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/arm/virt.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 4de46b1..0cbcbc1 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1364,6 +1364,7 @@ static void machvirt_init(MachineState *machine)
+>      mc->possible_cpu_arch_ids(machine);
+>      for (n = 0; n < machine->possible_cpus->len; n++) {
+>          Object *cpuobj;
+> +        CPUState *cs;
+>  
+>          if (n >= smp_cpus) {
+>              break;
+> @@ -1373,6 +1374,9 @@ static void machvirt_init(MachineState *machine)
+>          object_property_set_int(cpuobj, machine->possible_cpus->cpus[n].arch_id,
+>                                  "mp-affinity", NULL);
+>  
+> +        cs = CPU(cpuobj);
+> +        cs->cpu_index = n;
+> +
+>          if (!vms->secure) {
+>              object_property_set_bool(cpuobj, false, "has_el3", NULL);
+>          }
+> -- 
+> 2.7.4
+> 
 >
-> Your emails are missing In-Reply-To and References headers, which  
-> means
-> you posted 10 top-level threads instead of 9 replies to the 0/9 cover
-> letter. Please fix that, as it becomes awkward to track a series  
-> that is
-> not properly threaded.
 
-I did try to use git send-email but it failed. It was due to some  
-missing perl module. The computer I had to use to test risu on is 12  
-years old. I expected there to be some software incompatibilities.
+Reviewed-by: Andrew Jones <drjones@redhat.com>
