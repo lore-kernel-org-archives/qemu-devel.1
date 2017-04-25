@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d35JN-000817-61
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:43 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d35JP-00081F-37
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d35JJ-0005oL-Vg
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:41 -0400
-Received: from mail.kernel.org ([198.145.29.136]:50008)
+	(envelope-from <sstabellini@kernel.org>) id 1d35JN-0005pQ-98
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:43 -0400
+Received: from mail.kernel.org ([198.145.29.136]:50080)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d35JJ-0005nw-Pl
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:37 -0400
+	id 1d35JN-0005oz-1k
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:41 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 25 Apr 2017 11:35:03 -0700
-Message-Id: <1493145313-31311-11-git-send-email-sstabellini@kernel.org>
+Date: Tue, 25 Apr 2017 11:35:05 -0700
+Message-Id: <1493145313-31311-13-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1493145313-31311-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1704251134220.2875@sstabellini-ThinkPad-X260>
 	<1493145313-31311-1-git-send-email-sstabellini@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 11/21] 9p: introduce a type for the 9p header
+Subject: [Qemu-devel] [PATCH 13/21] xen/9pfs: connect to the frontend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +28,238 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-Use the new type in virtio-9p-device.
+Write the limits of the backend to xenstore. Connect to the frontend.
+Upon connection, allocate the rings according to the protocol
+specification.
+
+Initialize a QEMUBH to schedule work upon receiving an event channel
+notification from the frontend.
 
 Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 CC: anthony.perard@citrix.com
 CC: jgross@suse.com
 CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
 CC: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/9p.h               | 6 ++++++
- hw/9pfs/virtio-9p-device.c | 6 +-----
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ hw/9pfs/xen-9p-backend.c | 182 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 181 insertions(+), 1 deletion(-)
 
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index b7e8362..5312d8a 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -119,6 +119,12 @@ static inline char *rpath(FsContext *ctx, const char=
- *path)
- typedef struct V9fsPDU V9fsPDU;
- struct V9fsState;
-=20
-+typedef struct {
-+    uint32_t size_le;
-+    uint8_t id;
-+    uint16_t tag_le;
-+} QEMU_PACKED P9MsgHeader;
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index da8ae18..03dd881 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -17,8 +17,41 @@
+ #include "qemu/config-file.h"
+ #include "fsdev/qemu-fsdev.h"
+ 
++#define VERSIONS "1"
++#define MAX_RINGS 8
++#define MAX_RING_ORDER 8
 +
- struct V9fsPDU
++typedef struct Xen9pfsRing {
++    struct Xen9pfsDev *priv;
++
++    int ref;
++    xenevtchn_handle   *evtchndev;
++    int evtchn;
++    int local_port;
++    int ring_order;
++    struct xen_9pfs_data_intf *intf;
++    unsigned char *data;
++    struct xen_9pfs_data ring;
++
++    struct iovec *sg;
++    QEMUBH *bh;
++
++    /* local copies, so that we can read/write PDU data directly from
++     * the ring */
++    RING_IDX out_cons, out_size, in_cons;
++    bool inprogress;
++} Xen9pfsRing;
++
+ typedef struct Xen9pfsDev {
+     struct XenDevice xendev;  /* must be first */
++    V9fsState state;
++    char *path;
++    char *security_model;
++    char *tag;
++    char *id;
++
++    int num_rings;
++    Xen9pfsRing *rings;
+ } Xen9pfsDev;
+ 
+ static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
+@@ -67,22 +100,169 @@ static int xen_9pfs_init(struct XenDevice *xendev)
+     return 0;
+ }
+ 
++static void xen_9pfs_bh(void *opaque)
++{
++}
++
++static void xen_9pfs_evtchn_event(void *opaque)
++{
++}
++
+ static int xen_9pfs_free(struct XenDevice *xendev)
  {
-     uint32_t size;
-diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-index 27a4a32..3782f43 100644
---- a/hw/9pfs/virtio-9p-device.c
-+++ b/hw/9pfs/virtio-9p-device.c
-@@ -46,11 +46,7 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQ=
-ueue *vq)
-     VirtQueueElement *elem;
-=20
-     while ((pdu =3D pdu_alloc(s))) {
--        struct {
--            uint32_t size_le;
--            uint8_t id;
--            uint16_t tag_le;
--        } QEMU_PACKED out;
-+        P9MsgHeader out;
-=20
-         elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement));
-         if (!elem) {
---=20
+-    return -1;
++    int i;
++    Xen9pfsDev *xen_9pdev = container_of(xendev, Xen9pfsDev, xendev);
++
++    g_free(xen_9pdev->id);
++    g_free(xen_9pdev->tag);
++    g_free(xen_9pdev->path);
++    g_free(xen_9pdev->security_model);
++
++    for (i = 0; i < xen_9pdev->num_rings; i++) {
++        if (xen_9pdev->rings[i].data != NULL) {
++            xengnttab_unmap(xen_9pdev->xendev.gnttabdev,
++                    xen_9pdev->rings[i].data,
++                    (1 << xen_9pdev->rings[i].ring_order));
++        }
++        if (xen_9pdev->rings[i].intf != NULL) {
++            xengnttab_unmap(xen_9pdev->xendev.gnttabdev,
++                    xen_9pdev->rings[i].intf,
++                    1);
++        }
++        if (xen_9pdev->rings[i].evtchndev > 0) {
++            qemu_set_fd_handler(xenevtchn_fd(xen_9pdev->rings[i].evtchndev),
++                    NULL, NULL, NULL);
++            xenevtchn_unbind(xen_9pdev->rings[i].evtchndev,
++                             xen_9pdev->rings[i].local_port);
++        }
++        if (xen_9pdev->rings[i].bh != NULL) {
++            qemu_bh_delete(xen_9pdev->rings[i].bh);
++        }
++    }
++    g_free(xen_9pdev->rings);
++    return 0;
+ }
+ 
+ static int xen_9pfs_connect(struct XenDevice *xendev)
+ {
++    int i;
++    Xen9pfsDev *xen_9pdev = container_of(xendev, Xen9pfsDev, xendev);
++    V9fsState *s = &xen_9pdev->state;
++    QemuOpts *fsdev;
++
++    if (xenstore_read_fe_int(&xen_9pdev->xendev, "num-rings",
++                             &xen_9pdev->num_rings) == -1 ||
++        xen_9pdev->num_rings > MAX_RINGS || xen_9pdev->num_rings < 1) {
++        return -1;
++    }
++
++    xen_9pdev->rings = g_malloc0(xen_9pdev->num_rings * sizeof(Xen9pfsRing));
++    for (i = 0; i < xen_9pdev->num_rings; i++) {
++        char *str;
++        int ring_order;
++
++        xen_9pdev->rings[i].priv = xen_9pdev;
++        xen_9pdev->rings[i].evtchn = -1;
++        xen_9pdev->rings[i].local_port = -1;
++
++        str = g_strdup_printf("ring-ref%u", i);
++        if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
++                                 &xen_9pdev->rings[i].ref) == -1) {
++            goto out;
++        }
++        g_free(str);
++        str = g_strdup_printf("event-channel-%u", i);
++        if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
++                                 &xen_9pdev->rings[i].evtchn) == -1) {
++            goto out;
++        }
++        g_free(str);
++
++        xen_9pdev->rings[i].intf =  xengnttab_map_grant_ref(
++                xen_9pdev->xendev.gnttabdev,
++                xen_9pdev->xendev.dom,
++                xen_9pdev->rings[i].ref,
++                PROT_READ | PROT_WRITE);
++        if (!xen_9pdev->rings[i].intf) {
++            goto out;
++        }
++        ring_order = xen_9pdev->rings[i].intf->ring_order;
++        if (ring_order > MAX_RING_ORDER) {
++            goto out;
++        }
++        xen_9pdev->rings[i].ring_order = ring_order;
++        xen_9pdev->rings[i].data = xengnttab_map_domain_grant_refs(
++                xen_9pdev->xendev.gnttabdev,
++                (1 << ring_order),
++                xen_9pdev->xendev.dom,
++                xen_9pdev->rings[i].intf->ref,
++                PROT_READ | PROT_WRITE);
++        if (!xen_9pdev->rings[i].data) {
++            goto out;
++        }
++        xen_9pdev->rings[i].ring.in = xen_9pdev->rings[i].data;
++        xen_9pdev->rings[i].ring.out = xen_9pdev->rings[i].data +
++                                       XEN_FLEX_RING_SIZE(ring_order);
++
++        xen_9pdev->rings[i].bh = qemu_bh_new(xen_9pfs_bh, &xen_9pdev->rings[i]);
++        xen_9pdev->rings[i].out_cons = 0;
++        xen_9pdev->rings[i].out_size = 0;
++        xen_9pdev->rings[i].inprogress = false;
++
++
++        xen_9pdev->rings[i].evtchndev = xenevtchn_open(NULL, 0);
++        if (xen_9pdev->rings[i].evtchndev == NULL) {
++            goto out;
++        }
++        fcntl(xenevtchn_fd(xen_9pdev->rings[i].evtchndev), F_SETFD, FD_CLOEXEC);
++        xen_9pdev->rings[i].local_port = xenevtchn_bind_interdomain
++                                            (xen_9pdev->rings[i].evtchndev,
++                                             xendev->dom,
++                                             xen_9pdev->rings[i].evtchn);
++        if (xen_9pdev->rings[i].local_port == -1) {
++            xen_pv_printf(xendev, 0,
++                          "xenevtchn_bind_interdomain failed port=%d\n",
++                          xen_9pdev->rings[i].evtchn);
++            goto out;
++        }
++        xen_pv_printf(xendev, 2, "bind evtchn port %d\n", xendev->local_port);
++        qemu_set_fd_handler(xenevtchn_fd(xen_9pdev->rings[i].evtchndev),
++                xen_9pfs_evtchn_event, NULL, &xen_9pdev->rings[i]);
++    }
++
++    xen_9pdev->security_model = xenstore_read_be_str(xendev, "security_model");
++    xen_9pdev->path = xenstore_read_be_str(xendev, "path");
++    xen_9pdev->id = s->fsconf.fsdev_id =
++        g_strdup_printf("xen9p%d", xendev->dev);
++    xen_9pdev->tag = s->fsconf.tag = xenstore_read_fe_str(xendev, "tag");
++    v9fs_register_transport(s, &xen_9p_transport);
++    fsdev = qemu_opts_create(qemu_find_opts("fsdev"),
++            s->fsconf.tag,
++            1, NULL);
++    qemu_opt_set(fsdev, "fsdriver", "local", NULL);
++    qemu_opt_set(fsdev, "path", xen_9pdev->path, NULL);
++    qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
++    qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
++    qemu_fsdev_add(fsdev);
++    v9fs_device_realize_common(s, NULL);
++
+     return 0;
++
++out:
++    xen_9pfs_free(xendev);
++    return -1;
+ }
+ 
+ static void xen_9pfs_alloc(struct XenDevice *xendev)
+ {
++    xenstore_write_be_str(xendev, "versions", VERSIONS);
++    xenstore_write_be_int(xendev, "max-rings", MAX_RINGS);
++    xenstore_write_be_int(xendev, "max-ring-page-order", MAX_RING_ORDER);
+ }
+ 
+ static void xen_9pfs_disconnect(struct XenDevice *xendev)
+ {
++    /* Dynamic hotplug of PV filesystems at runtime is not supported. */
+ }
+ 
+ struct XenDevOps xen_9pfs_ops = {
+-- 
 1.9.1
