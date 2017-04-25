@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d31oy-00077g-AJ
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:52:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d31rn-0000Bf-8s
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:55:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d31ou-00045A-EV
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:52:04 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35804)
+	(envelope-from <peter.maydell@linaro.org>) id 1d31rm-0005iw-EM
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:54:59 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:33475)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d31ou-00044s-7z
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:52:00 -0400
-Received: by mail-wr0-x243.google.com with SMTP id g12so7324662wrg.2
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 07:52:00 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <ab4f029c-8264-7d35-b0e0-9b35a8e80d9d@twiddle.net>
-	<20170423215420.27098-1-shorne@gmail.com>
-	<f6a7d386-80a9-0cc3-e1ec-1b2058aa5bf9@twiddle.net>
-	<20170425141827.GA2724@lianli.shorne-pla.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <23c73add-77f3-f5c2-056f-0dc728a9027f@twiddle.net>
-Date: Tue, 25 Apr 2017 16:51:55 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d31rm-0005iY-76
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:54:58 -0400
+Received: by mail-wr0-x233.google.com with SMTP id w50so87078802wrc.0
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 07:54:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170425141827.GA2724@lianli.shorne-pla.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] target/openrisc: Support non-busy idle
- state using PMR SPR
+In-Reply-To: <1492763327-12742-12-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1492763327-12742-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1492763327-12742-12-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Apr 2017 15:54:36 +0100
+Message-ID: <CAFEAcA-V+6i-eQFiyBCki0-cYuQ=NvUo9raFphv=fz2-doVUqg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 11/13] tcx: remove primitives for
+ non-32-bit surfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Openrisc <openrisc@lists.librecores.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 04/25/2017 04:18 PM, Stafford Horne wrote:
-> On Tue, Apr 25, 2017 at 12:11:00PM +0200, Richard Henderson wrote:
->> On 04/23/2017 11:54 PM, Stafford Horne wrote:
->>> The OpenRISC architecture has the Power Management Register (PMR)
->>> special purpose register to manage cpu power states.  The interesting
->>> modes are:
->>>
->>>    * Doze Mode (DME) - Stop cpu except timer & pic - wake on interrupt
->>>    * Sleep Mode (SME) - Stop cpu and all units - wake on interrupt
->>>    * Suspend Model (SUME) - Stop cpu and all units - wake on reset
->>>
->>> The linux kernel will set DME when idle.
->>
->> And SUME would be, essentially, poweroff?  Perhaps at least for the purposes
->> of QEMU; on real hardware one could press a button to assert reset and
->> reboot.
-> 
-> Yes, that is what I am thinking, but I could add this later, after some
-> reviews with other OpenRISC folks.
-> 
->>> Also, I don't know if its due to this patch of an issue with the timer
->>> interrupts.  After applying this patch the timer interrupts do not trigger
->>> until a keypress is make.  i.e. something like this...
->>>
->>>     $ sleep 5
->>>     <hangs forever until a key is pressed>
->> ...
->>> +            cpu_restore_state(cs, GETPC() + 4);
->>
->> This isn't correct.  You want
->>
->> 	cpu_restore_state(cs, GETPC());
->> 	cs->env.pc += 4;
->>
->> So what's happening is that you're re-executing the MTSPR and going back to
->> sleep again.  Which probably explains the hang.
-> 
-> I have changed to the above, but I think its essentially the same.  It
-> resumes after the MTSPR in both cases.
+On 21 April 2017 at 09:28, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> As all surfaces in QEMU are now either shared or 32-bit ARGB regardless of
+> the guest depth, remove all non-32-bit primitives from tcx_update_display()
+> and consequence their implementation which are no longer required.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/tcx.c |  126 ++++--------------------------------------------------
+>  1 file changed, 8 insertions(+), 118 deletions(-)
+>
+> diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+> index 0dd007e..6da6dfb 100644
+> --- a/hw/display/tcx.c
+> +++ b/hw/display/tcx.c
+> @@ -140,25 +140,12 @@ static void update_palette_entries(TCXState *s, int start, int end)
+>      int i;
+>
+>      for (i = start; i < end; i++) {
+> -        switch (surface_bits_per_pixel(surface)) {
+> -        default:
+> -        case 8:
+> -            s->palette[i] = rgb_to_pixel8(s->r[i], s->g[i], s->b[i]);
+> -            break;
+> -        case 15:
+> -            s->palette[i] = rgb_to_pixel15(s->r[i], s->g[i], s->b[i]);
+> -            break;
+> -        case 16:
+> -            s->palette[i] = rgb_to_pixel16(s->r[i], s->g[i], s->b[i]);
+> -            break;
+> -        case 32:
+> -            if (is_surface_bgr(surface)) {
+> -                s->palette[i] = rgb_to_pixel32bgr(s->r[i], s->g[i], s->b[i]);
+> -            } else {
+> -                s->palette[i] = rgb_to_pixel32(s->r[i], s->g[i], s->b[i]);
+> -            }
+> -            break;
+> +        if (is_surface_bgr(surface)) {
+> +            s->palette[i] = rgb_to_pixel32bgr(s->r[i], s->g[i], s->b[i]);
+> +        } else {
+> +            s->palette[i] = rgb_to_pixel32(s->r[i], s->g[i], s->b[i]);
+>          }
+> +        break;
+>      }
 
-It's not essentially the same.  GETPC is a host address.  Doing guest 
-arithmetic on that is just wrong.
+Something's gone wrong here. Coverity points out that we now
+have a for() loop that only executes once, because it ends
+with a "break" statement. Looks like the 'break' from inside
+the 'case 32:' was retained when the switch was deleted,
+and it should just be deleted?
 
-> I fixed this now though, you should see another patch.  The issue is the
-> timer events get ignored once the cpu is in halt state, I added a
-> qemu_cpu_kick() call in the timer hardware to wake up the cpu on timer
-> interrupts.  Not sure if thats the best way to do it, but it works 100%
-> now.
-
-Ah, that could be.
-
-
-r~
+thanks
+-- PMM
