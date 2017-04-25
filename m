@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d2qye-0003hB-Dt
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:17:24 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1d2qzo-0004JQ-MH
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d2qyb-0002tt-Ql
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:17:20 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:33636)
+	(envelope-from <programmingkidx@gmail.com>) id 1d2qzk-0003RB-In
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:18:32 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:35330)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1d2qyb-0002tZ-Jn
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:17:17 -0400
-Received: by mail-it0-x242.google.com with SMTP id z67so20104790itb.0
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 20:17:17 -0700 (PDT)
+	id 1d2qzk-0003Qz-DQ
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:18:28 -0400
+Received: by mail-io0-x242.google.com with SMTP id d203so52470001iof.2
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 20:18:28 -0700 (PDT)
 Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <C6D1F9E0-0379-4DC5-927A-A32D2281937D@gmail.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <8366F7D4-6288-406E-8C64-2FE3777FC0C3@gmail.com>
 Content-Transfer-Encoding: 7bit
 From: G 3 <programmingkidx@gmail.com>
-Date: Mon, 24 Apr 2017 23:17:13 -0400
-Subject: [Qemu-devel] [PATCH 1/9] Add ppc.risu file
+Date: Mon, 24 Apr 2017 23:18:25 -0400
+Subject: [Qemu-devel] [PATCH 2/9] Add risu_ppc.c file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,591 +30,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-Add the ppc.risu file. It defines the format for various PowerPC  
-instructions.
+Add the risu_ppc.c file. It defines several functions used by risu.
 
 Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 ---
-  ppc.risu | 527 +++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-++++++++++
-  1 file changed, 527 insertions(+)
-  create mode 100644 ppc.risu
+  risu_ppc.c | 41 +++++++++++++++++++++++++++++++++++++++++
+  1 file changed, 41 insertions(+)
+  create mode 100644 risu_ppc.c
 
-diff --git a/ppc.risu b/ppc.risu
+diff --git a/risu_ppc.c b/risu_ppc.c
 new file mode 100644
-index 0000000..b6d6aee
+index 0000000..70a1cf7
 --- /dev/null
-+++ b/ppc.risu
-@@ -0,0 +1,527 @@
-+####################################################################### 
-########
-+# File: ppc.risu
-+# Date: 3-27-2017
-+# Description: Specifies PowerPC instruction test patterns.
-+####################################################################### 
-########
-+
-+.mode ppc
-+
-+# Note: register r1 cannot be used because it is the stack pointer.
-+# The branching, VEA, and OEA instructions cannot be used here  
-currently.
-+
-+ADD PPC 011111 rD:5 rA:5 rB:5 OE:1 100001010 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+ADDC PPC 011111 rD:5 rA:5 rB:5 OE:1 000001010 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+ADDE PPC 011111 rD:5 rA:5 rB:5 OE:1 010001010 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+ADDI PPC 001110 rD:5 rA:5 imm:16 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+ADDIC PPC 001100 rD:5 rA:5 imm:16 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+# ADDIC. and ADDIC are two different instructions
-+ADDICp PPC 001101 rD:5 rA:5 imm:16 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+ADDIS PPC 001111 rD:5 rA:5 imm:16 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+ADDME PPC 011111 rD:5 rA:5 00000 OE:1 011101010 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+ADDZE PPC 011111 rD:5 rA:5 00000 OE:1 011001010 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+AND PPC 011111 rD:5 rA:5 rB:5 0000011100 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+ANDC PPC 011111 rD:5 rA:5 rB:5 0000111100 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+# ANDI. - p stands for period
-+ANDIp PPC 011100 rD:5 rA:5 imm:16 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+# ANDIS. - p stands for period
-+ANDISp PPC 011101 rD:5 rA:5 imm:16 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+# For the CMP* instructions, if you want to test the PowerPC G5, set  
-L to 1
-+# in the constraints.
-+
-+CMP PPC 011111 crfD:3 0 L:1 rA:5 rB:5 0000000000 0 \
-+!constraints { $rA != 1 && $rB != 1 && $L == 0; }
-+
-+CMPI PPC 001011 crfD:3 0 L:1 rA:5 imm:16 \
-+!constraints { $rA != 1 && $L == 0; }
-+
-+CMPL PPC 011111 crfD:3 0 L:1 rA:5 rB:5 0000100000 0 \
-+!constraints { $rA != 1 && $rB == 1 && $L == 0; }
-+
-+CMPLI PPC 001010 crfD:3 0 L:1 rA:5 imm:16 \
-+!constraints { $rA != 1 && $L == 0; }
-+
-+CNTLZWX PPC 011111 rS:5 rA:5 00000 0000011010 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+CRAND PPC 010011 crbD:5 crbA:5 crbB:5 0100000001 0
-+
-+CRANDC PPC 010011 crbD:5 crbA:5 crbB:5 0010000001 0
-+
-+CREQV PPC 010011 crbD:5 crbA:5 crbB:5 0100100001 0
-+
-+CRNAND PPC 010011 crbD:5 crbA:5 crbB:5 0011100001 0
-+
-+CRNOR PPC 010011 crbD:5 crbA:5 crbB:5 0000100001 0
-+
-+CROR PPC 010011 crbD:5 crbA:5 crbB:5 0111000001 0
-+
-+CRORC PPC 010011 crbD:5 crbA:5 crbB:5 0110100001 0
-+
-+CRXOR PPC 010011 crbD:5 crbA:5 crbB:5 0011000001 0
-+
-+DIVW PPC 011111 rD:5 rA:5 rB:5 OE:1 111101011 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+DIVWU PPC 011111 rD:5 rA:5 rB:5 OE:1 111001011 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+EQV PPC 011111 rS:5 rA:5 rB:5 0100011100 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+EXTSB PPC 011111 rS:5 rA:5 00000 1110111010 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+EXTSH PPC 011111 rS:5 rA:5 00000 1110011010 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+FABS PPC 111111 fD:5 00000 fB:5 0100001000 Rc:1
-+
-+FADD PPC 111111 fD:5 fA:5 fB:5 00000 10101 Rc:1
-+
-+FADDS PPC 111011 fD:5 fA:5 fB:5 00000 10101 Rc:1
-+
-+FCMPO PPC 111111 crfD:3 00 fA:5 fB:5 0000100000 0
-+
-+FCMPU PPC 111111 crfD:3 00 fA:5 fB:5 0000000000 0
-+
-+FCTIW PPC 111111 fD:5 00000 fB:5 00000011100
-+
-+FCTIWZ PPC 111111 fD:5 00000 fB:5 0000001111 Rc:1
-+
-+FDIV PPC 111111 fD:5 fA:5 fB:5 00000 10010 Rc:1
-+
-+FDIVS PPC 111011 fD:5 fA:5 fB:5 00000 10010 Rc:1
-+
-+FMADD PPC 111111 fD:5 fA:5 fB:5 fC:5 11101 Rc:1
-+
-+FMADDS PPC 111011 fD:5 fA:5 fB:5 fC:5 11101 Rc:1
-+
-+FMR PPC 111111 fD:5 00000 fB:5 0001001000 Rc:1
-+
-+FMSUB PPC 111111 fD:5 fA:5 fB:5 fC:5 11100 Rc:1
-+
-+FMSUBS PPC 111011 fD:5 fA:5 fB:5 fC:5 11100 Rc:1
-+
-+FMUL PPC 111111 fD:5 fA:5 00000 fC:5 11001 Rc:1
-+
-+FMULS PPC 111011 fD:5 fA:5 00000 fC:5 11001 Rc:1
-+
-+FNABS PPC 111111 fD:5 00000 fB:5 0010001000 Rc:1
-+
-+FNEG PPC 111111 fD:5 00000 fB:5 0000101000 Rc:1
-+
-+FNMADD PPC 111111 fD:5 fA:5 fB:5 fC:5 11111 Rc:1
-+
-+FNMADDS PPC 111011 fD:5 fA:5 fB:5 fC:5 11111 Rc:1
-+
-+FNMSUB PPC 111111 fD:5 fA:5 fB:5 fC:5 11110 Rc:1
-+
-+FNMSUBS PPC 111011 fD:5 fA:5 fB:5 fC:5 11110 Rc:1
-+
-+# The value placed into register fD may vary between implementations  
-- too hard to test
-+#FRES PPC 111011 fD:5 00000 fB:5 00000 11000 Rc:1
-+
-+FRSP PPC 111111 fD:5 00000 fB:5 0000001100 Rc:1
-+
-+# The value placed into register fD may vary between implementations  
-- too hard to test
-+#FRSQRTE PPC 111111 fD:5 00000 fB:5 00000 11010 Rc:1
-+
-+FSEL PPC 111111 fD:5 fA:5 fB:5 fC:5 10111 Rc:1
-+
-+FSQRT PPC 111111 fD:5 00000 fB:5 00000 10110 Rc:1 \
-+!memory { load_double_float_to_reg($fB); }
-+
-+# Implementation of this instruction is optional
-+FSQRTS PPC 111011 fD:5 00000 fB:5 00000 10110 Rc:1 \
-+!memory { load_single_float_to_reg($fB); }
-+
-+FSUB PPC 111111 fD:5 fA:5 fB:5 00000 10100 Rc:1 \
-+!memory { load_double_float_to_reg($fA); load_double_float_to_reg 
-($fB); }
-+
-+FSUBS PPC 111011 fD:5 fA:5 fB:5 00000 10100 Rc:1 \
-+!memory { load_single_float_to_reg($fA); load_single_float_to_reg 
-($fB); }
-+
-+LBZ PPC 100010 rD:5 rA:5 imm:16 \
-+!constraints { $rD > 1 && $rA > 1 && $rA != $rD && $imm <= 500 &&  
-$imm >= 40; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LBZU PPC 100011 rD:5 rA:5 imm:16 \
-+!constraints { $rD > 1 && $rA > 1 && $rA != $rD && $imm >= 40 &&  
-$imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LBZUX PPC 011111 rD:5 rA:5 rB:5 0001110111 0 \
-+!constraints { $rD > 1 && $rA > 1 && $rB > 1 && $rA != $rD && $rB !=  
-$rD && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LBZX PPC 011111 rD:5 rA:5 rB:5 0001010111 0 \
-+!constraints { $rD > 1 && $rA > 1 && $rB > 1 && $rA != $rD && $rB !=  
-$rD && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LFD PPC 110010 fD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $imm <= 500 && $imm >= 40; } \
-+!memory { load_double_float_imm($rA, $imm); }
-+
-+LFDU PPC 110011 fD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $imm <= 500 && $imm >= 40; } \
-+!memory { load_double_float_imm($rA, $imm); }
-+
-+LFDUX PPC 011111 fD:5 rA:5 rB:5 1001110111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rA != $rB; } \
-+!memory { load_double_float_indexed($rA, $rB); }
-+
-+LFDX PPC 011111 fD:5 rA:5 rB:5 1001010111 0 \
-+!constraints { $rA != 1 && $rB != 1 && $rA != $rB; } \
-+!memory { load_double_float_indexed($rA, $rB); }
-+
-+LFS PPC 110000 fD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $imm <= 500 && $imm >= 40; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LFSU PPC 110001 fD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $imm <= 500 && $imm >= 40; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LFSUX PPC 011111 fD:5 rA:5 rB:5 1000110111 0 \
-+!constraints { $rA > 1 && $rB > 1&& $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LFSX PPC 011111 fD:5 rA:5 rB:5 1000010111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LHA PPC 101010 rD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $rD > 1 && $rA != $rD && $imm <= 500 &&  
-$imm >= 40; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LHAU PPC 101011 rD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $rD > 1 && $rA != $rD && $imm <= 500 &&  
-$imm >= 40; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LHAUX PPC 011111 rD:5 rA:5 rB:5 0101110111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rD > 1 && $rA != $rB && $rB !=  
-$rD && $rD != $rA; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LHAX PPC 011111 rD:5 rA:5 rB:5 0101010111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rD > 1 && $rA != $rB && $rB !=  
-$rD && $rD != $rA; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LHBRX PPC 011111 rD:5 rA:5 rB:5 1100010110 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rD > 1 && $rA != $rB && $rB !=  
-$rD && $rD != $rA; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LHZ PPC 101000 rD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $rD > 1 && $rA != $rD && $imm <= 500 &&  
-$imm >= 40; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LHZU PPC 101001 rD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $rD > 1 && $rA != $rD && $imm <= 500 &&  
-$imm >= 40; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LHZUX PPC 011111 rD:5 rA:5 rB:5 0100110111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rD > 1 && $rA != $rB && $rB !=  
-$rD && $rD != $rA; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LHZX PPC 011111 rD:5 rA:5 rB:5 0100010111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rD > 1 && $rA != $rB && $rB !=  
-$rD && $rD != $rA; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LMW PPC 101110 rD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $rD > 1 && $rA != $rD && $rA < $rD && $imm  
-<= 500 && $imm % 4 == 0 && $imm >= 40; } \
-+!memory { setup_lmw_test($rD, $rA, $imm); }
-+
-+LSWI PPC 011111 rD:5 rA:5 NB:5 1001010101 0 \
-+!constraints { $rA > 1 && $rD > 1 && $rA < $rD && $NB/4.0 + $rD < 32  
-&& $NB > 0; } \
-+!memory { setup_lswi_test($rD, $rA, $NB); }
-+
-+LSWX PPC 011111 rD:5 rA:5 rB:5 1000010101 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rD > 1 && $rD != $rA && $rD !=  
-$rB && $rA != $rB; } \
-+!memory { setup_lswx_test($rD, $rA, $rB); }
-+
-+# Can't test this instruction because it could cause problems for  
-the other instructions
-+#LWARX PPC 011111 rD:5 rA:5 rB:5 0000010100 0 \
-+#!constraints { $rA > 1 && $rB > 1 && $rD > 1; } \
-+#!memory { reg_plus_reg($rA, $rB); }
-+
-+LWBRX PPC 011111 rD:5 rA:5 rB:5 1000010110 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rD > 1 && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LWZ PPC 100000 rD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $rD > 1 && $rA != $rD && $imm >= 40 &&  
-$imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LWZU PPC 100001 rD:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $rD > 1 && $rA != $rD && $imm >= 40 &&  
-$imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+LWZUX PPC 011111 rD:5 rA:5 rB:5 0000110111 0 \
-+!constraints { $rD > 1 && $rA > 1 && $rB > 1 && $rA != $rD && $rB !=  
-$rD && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+LWZX PPC 011111 rD:5 rA:5 rB:5 0000010111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rD > 1 && $rA != $rB && $rB !=  
-$rD && $rD != $rA; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+MCRF PPC 010011 crfD:3 00 crfS:3 00 00000 0000000000 0
-+
-+MCRFS PPC 111111 crfD:3 00 crfS:3 00 00000 0001000000 0
-+
-+MCRXR PPC 011111 crfD:3 00 00000 00000 1000000000 0
-+
-+MFCR PPC 011111 rD:5 00000 00000 0000010011 0 \
-+!constraints { $rD > 1; }
-+
-+MFFS PPC 111111 fD:5 00000 00000 1001000111 Rc:1
-+
-+# mfspr for the xer
-+MFSPR_xer PPC 011111 rD:5 00001 00000 0101010011 0 \
-+!constraints { $rD > 1; }
-+
-+# mfspr for the lr
-+MFSPR_lr PPC 011111 rD:5 01000 00000 0101010011 0 \
-+!constraints { $rD > 1; }
-+
-+# mfspr for the ctr
-+MFSPR_ctr PPC 011111 rD:5 01001 00000 0101010011 0 \
-+!constraints { $rD > 1; }
-+
-+MTCRF PPC 011111 rS:5 0 CRM:8 0 0010010000 0 \
-+!constraints { $rS > 1; }
-+
-+MTFSB0 PPC 111111 crbD:5 00000 00000 0001000110 Rc:1
-+
-+MTFSB1 PPC 111111 crbD:5 00000 00000 0000100110 Rc:1
-+
-+MTFSF PPC 111111 0 FM:8 0 fB:5 1011000111 Rc:1
-+
-+MTFSFI PPC 111111 crfD:3 00 00000 imm:4 0 0010000110 Rc:1
-+
-+# mtspr for the xer
-+MTSPR_xer PPC 011111 rD:5 00001 00000 0101010011 0 \
-+!constraints { $rD > 1; }
-+
-+# mtspr for the lr
-+MTSPR_lr PPC 011111 rD:5 01000 00000 0101010011 0 \
-+!constraints { $rD > 1; }
-+
-+# mtspr for the ctr
-+MTSPR_ctr PPC 011111 rD:5 01001 00000 0101010011 0 \
-+!constraints { $rD > 1; }
-+
-+MULHW PPC 011111 rD:5 rA:5 rB:5 0 001001011 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+MULHWU PPC 011111 rD:5 rA:5 rB:5 0 000001011 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+MULLI PPC 000111 rD:5 rA:5 imm:16 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+MULLW PPC 011111 rD:5 rA:5 rB:5 OE:1 011101011 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+NAND PPC 011111 rD:5 rA:5 rB:5 0111011100 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+NEG PPC 011111 rD:5 rA:5 00000 OE:1 001101000 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+NOR PPC 011111 rS:5 rA:5 rB:5 0001111100 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+OR PPC 011111 rS:5 rA:5 rB:5 0110111100 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+ORC PPC 011111 rS:5 rA:5 rB:5 0110011100 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+ORI PPC 011000 rS:5 rA:5 imm:16 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+ORIS PPC 011001 rS:5 rA:5 imm:16 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+RLWIMI PPC 010100 rS:5 rA:5 SH:5 MB:5 ME:5 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+RLWINM PPC 010101 rS:5 rA:5 SH:5 MB:5 ME:5 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+RLWNM PPC 010111 rS:5 rA:5 rB:5 MB:5 ME:5 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+SLW PPC 011111 rS:5 rA:5 rB:5 0000011000 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+SRAW PPC 011111 rS:5 rA:5 rB:5 1100011000 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+SRAWI PPC 011111 rS:5 rA:5 SH:5 1100111000 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+SRW PPC 011111 rS:5 rA:5 rB:5 1000011000 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+STB PPC 100110 rS:5 rA:5 imm:16 \
-+!constraints { $rS > 1 && $rA > 1 && $imm >= 40 && $imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STBU PPC 100111 rS:5 rA:5 imm:16 \
-+!constraints { $rS > 1 && $rA > 1 && $imm >= 40 && $imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STBUX PPC 011111 rS:5 rA:5 rB:5 0011110111 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rB != $rS; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STBX PPC 011111 rS:5 rA:5 rB:5 0011010111 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STFD PPC 110110 fS:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $imm >= 40 && $imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STFDU PPC 110111 fS:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $imm >= 40 && $imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STFDUX PPC 011111 fS:5 rA:5 rB:5 1011110111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STFDX PPC 011111 fS:5 rA:5 rB:5 1011010111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STFIWX PPC 011111 fS:5 rA:5 rB:5 1111010111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STFS PPC 110100 fS:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $imm >= 40 && $imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STFSU PPC 110101 fS:5 rA:5 imm:16 \
-+!constraints { $rA > 1 && $imm >= 40 && $imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STFSUX PPC 011111 fS:5 rA:5 rB:5 1010110111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STFSX PPC 011111 fS:5 rA:5 rB:5 1010010111 0 \
-+!constraints { $rA > 1 && $rB > 1 && $rA != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STH PPC 101100 rS:5 rA:5 imm:16 \
-+!constraints { $rS > 1 && $rA > 1 && $rS != $rA && $imm >= 40 &&  
-$imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STHBRX PPC 011111 rS:5 rA:5 rB:5 1110010110 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STHU PPC 101101 rS:5 rA:5 imm:16 \
-+!constraints { $rS > 1 && $rA > 1 && $rS != $rA && $imm >= 40 &&  
-$imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STHUX PPC 011111 rS:5 rA:5 rB:5 0110110111 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STHX PPC 011111 rS:5 rA:5 rB:5 0110010111 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STMW PPC 101111 rS:5 rA:5 imm:16 \
-+!constraints { $rS > 1 && $rA > 1 && $imm >= 40 && $imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STSWI PPC 011111 rS:5 rA:5 NB:5 1011010101 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rS != $rA && $NB > 0; } \
-+!memory { reg_plus_imm($rA, 0); }
-+
-+STSWX PPC 011111 rS:5 rA:5 rB:5 1010010101 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STW PPC 100100 rS:5 rA:5 imm:16 \
-+!constraints { $rS > 1 && $rA > 1 && $rS != $rA && $imm >= 40 &&  
-$imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STWBRX PPC 011111 rS:5 rA:5 rB:5 1010010110 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STWCX PPC 011111 rS:5 rA:5 rB:5 0010010110 1 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STWU PPC 100101 rS:5 rA:5 imm:16 \
-+!constraints { $rS > 1 && $rA > 1 && $rS != $rA && $imm >= 40 &&  
-$imm <= 500; } \
-+!memory { reg_plus_imm($rA, $imm); }
-+
-+STWUX PPC 011111 rS:5 rA:5 rB:5 0010110111 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+STWX PPC 011111 rS:5 rA:5 rB:5 0010010111 0 \
-+!constraints { $rS > 1 && $rA > 1 && $rB > 1 && $rA != $rS && $rA !=  
-$rB && $rS != $rB; } \
-+!memory { reg_plus_reg($rA, $rB); }
-+
-+SUBF PPC 011111 rD:5 rA:5 rB:5 OE:1 000101000 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+SUBFC PPC 011111 rD:5 rA:5 rB:5 OE:1 000001000 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+SUBFE PPC 011111 rD:5 rA:5 rB:5 OE:1 010001000 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1 && $rB != 1; }
-+
-+SUBFIC PPC 001000 rD:5 rA:5 imm:16 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+SUBFME PPC 011111 rD:5 rA:5 00000 OE:1 011101000 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+SUBFZE PPC 011111 rD:5 rA:5 00000 OE:1 011001000 Rc:1 \
-+!constraints { $rD != 1 && $rA != 1; }
-+
-+SYNC PPC 011111 00000 00000 00000 1001010110 0
-+
-+XOR PPC 011111 rS:5 rA:5 rB:5 0100111100 Rc:1 \
-+!constraints { $rS != 1 && $rA != 1 && $rB != 1; }
-+
-+XORI PPC 011010 rS:5 rA:5 imm:16 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
-+XORIS PPC 011011 rS:5 rA:5 imm:16 \
-+!constraints { $rS != 1 && $rA != 1; }
-+
++++ b/risu_ppc.c
+@@ -0,0 +1,41 @@
++/*****************************************************************
++ * File: risu_ppc.c
++ * Date: 3-27-2017
++ * Description: Implement advance_pc(), set_ucontext_paramreg(),
++ *              get_reginfo_paramreg(), get_risuop()
++ *****************************************************************/
++
++#include "risu.h"
++
++/* Advances the program counter register to the next instruction */
++void advance_pc(void *vuc)
++{
++    ucontext_t *uc = (ucontext_t*)vuc;
++    uc->uc_mcontext->ss.srr0 += 4;
++}
++
++/* Sets register r0 to the address of a memory block. */
++void set_ucontext_paramreg(void *vuc, uint64_t value)
++{
++    ucontext_t *uc = vuc;
++    uc->uc_mcontext->ss.r0 = value;
++}
++
++/*
++ * Returns the register that keeps track of a memory block address.
++ * Used for the load and store to memory instructions like LFD.
++ * Returns general purpose register r0.
++ */
++uint64_t get_reginfo_paramreg(struct reginfo *ri)
++{
++    return ri->gpr[0];
++}
++
++int get_risuop(struct reginfo *ri)
++{
++    uint32_t insn = ri->faulting_insn;
++    uint32_t op = insn & 0xf;
++    uint32_t key = insn & ~0xf;
++    uint32_t risukey = 0x00005af0;
++    return (key != risukey) ? -1 : op;
++}
 -- 
 2.10.2
