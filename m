@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d2yik-0003ug-EE
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:27 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d2yil-0003v7-0H
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d2yij-0005rS-6U
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57792)
+	(envelope-from <jasowang@redhat.com>) id 1d2yik-0005rs-5J
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1d2yij-0005r4-0A
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:25 -0400
-Date: Tue, 25 Apr 2017 13:33:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170425113322.GB4615@noname.redhat.com>
-References: <58F92229.1080402@windriver.com>
-	<a09762ce-092f-6fb1-6cc3-08a94a3c3dd1@redhat.com>
-	<58FA32CC.2060104@windriver.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2yij-0005rW-VG
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:26 -0400
+References: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1492674416-9408-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<df05a73b-fba8-a6d3-bf6a-648304458257@redhat.com>
+	<58FD9546.5000104@huawei.com>
+	<82c50df3-28c9-fb21-f2c6-76a99f864bee@redhat.com>
+	<58FF1DF7.4000006@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <bfac018b-55cf-9cf8-5ffe-ff0d1fbd4b53@redhat.com>
+Date: Tue, 25 Apr 2017 19:33:17 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58FA32CC.2060104@windriver.com>
-Subject: Re: [Qemu-devel] question about block size and virtual disks
+In-Reply-To: <58FF1DF7.4000006@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: serialize compare
+ thread's initialization with main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chris Friesen <chris.friesen@windriver.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
 
-Am 21.04.2017 um 18:26 hat Chris Friesen geschrieben:
-> On 04/20/2017 03:21 PM, Eric Blake wrote:
-> >On 04/20/2017 04:03 PM, Chris Friesen wrote:
-> 
-> >>Also, does the 4KB block size get "passed-through" to the guest somehow
-> >>so that the guest knows it needs to use 4KB blocks, or does that need to
-> >>be explicitly specified via virtio-blk-pci.logical_block_size and/or
-> >>virtio-blk-pci.physical_block_size parameters?  (Assuming I'm using
-> >>virtio-blk-pci.)
-> >
-> >Again, qemu should be passing the advertisement of host properties down
-> >to the guest insofar as possible (so a good guest will see that the
-> >hardware is 4k only and will not try to make 512-byte requests), but at
-> >the same time, qemu should handle guests that are so old that they are
-> >blissfully unaware of the hardware advertisements and send 512-byte
-> >requests anyway.  Of course, such guests are penalized with
-> >read-modify-write delays when submitting 512-byte IO.  But explicitly
-> >stating available parameters is always the wisest course of action, if
-> >you don't want to rely on defaults changing underneath you.
-> 
-> I did an experiment with qemu-kvm-ev-2.6.0-28.el7_3.6.1, using
-> -drive cache=none,aio=native and an LVM volume as the storage.
-> 
-> The guest saw the logical/physical block size as 512B, even though
-> on the host both were 4KB.
-> 
-> Unless something is being lost in the LVM layer (which is possible)
-> it appears that qemu defaults to 512B block size unless explicitly
-> told otherwise.
 
-Yes, this is the default as it is the most compatible setting (qemu
-didn't support 4k sectors initially).
 
-If you know that your guest can handle 4k sectors just fine, it is
-recommended to explicitly set both options to 4k to avoid expensive
-512 byte sector emulation. If you need to boot from the disk with BIOS,
-you won't be able to change the logical block size, but you can still
-try setting the physical block size to 4k.
+On 2017=E5=B9=B404=E6=9C=8825=E6=97=A5 17:59, Hailiang Zhang wrote:
+> On 2017/4/25 16:41, Jason Wang wrote:
+>>
+>> On 2017=E5=B9=B404=E6=9C=8824=E6=97=A5 14:03, Hailiang Zhang wrote:
+>>> On 2017/4/24 12:10, Jason Wang wrote:
+>>>> On 2017=E5=B9=B404=E6=9C=8820=E6=97=A5 15:46, zhanghailiang wrote:
+>>>>> We call qemu_chr_fe_set_handlers() in colo-compare thread, it is us=
+ed
+>>>>> to detach watched fd from default main context, so it has chance to
+>>>>> handle the same watched fd with main thread concurrently, which wil=
+l
+>>>>> trigger an error report:
+>>>>> "qemu-char.c:918: io_watch_poll_finalize: Assertion `iwp->src =3D=3D
+>>>>> ((void *)0)' failed."
+>>>> Anyway to prevent fd from being handled by main thread before creati=
+ng
+>>>> colo thread? Using semaphore seems not elegant.
+>>> So how about calling qemu_mutex_lock_iothread() before
+>>> qemu_chr_fe_set_handlers() ?
+>> Looks better, but I needs more information e.g how main thread can=20
+>> touch it?
+>
+> Hmm, this happened quite occasionally, and we didn't catch the first=20
+> place (backtrace)
+> of removing fd from been watched, but  from the codes logic, we found=20
+> there should
+> be such possible cases:
+> tcp_chr_write (Or tcp_chr_read/tcp_chr_sync_read/chr_disconnect)
+>  ->tcp_chr_disconnect (Or char_socket_finalize)
+>     ->tcp_chr_free_connection
+>       -> remove_fd_in_watch(chr);
+>
+> Anyway, it needs the protection from been freed twice.
+>
+> Thanks,
+> Hailiang
 
-In practice, it shouldn't make too much of a difference because the
-OS will work only in complete file system blocks and/or pages, which are
-already 4k, so even on a disk with 512 byte sectors, you should mostly
-see 4k aligned requests that don't need emulation in qemu.
+Still a little bit confused. The question is how could main thread still=20
+call tcp_chr_write or other in the above case?
 
-Kevin
+Thanks
+
+>> Thanks
+>>
+>> .
+>>
+>
+>
