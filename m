@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1d30Ax-0000QQ-0H
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:06:39 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d30EU-0001RG-2j
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:10:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1d30Ar-0000uY-02
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:06:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34464)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d30EQ-0001v8-VD
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:10:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37902)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1d30Aq-0000sv-Pw
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:06:32 -0400
-From: P J P <ppandit@redhat.com>
-Date: Tue, 25 Apr 2017 18:36:23 +0530
-Message-Id: <20170425130623.3649-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH] vmw_pvscsi: check message ring page count at
- initialisation
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1d30EQ-0001up-Oa
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:10:14 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2133CC05AD8F
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 13:10:13 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 25 Apr 2017 17:05:20 +0400
+Message-Id: <20170425130520.31819-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] input: don't queue delay if paused
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,32 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, YY Z <bigbird475958471@gmail.com>, Dmitry Fleytman <dmitry@daynix.com>, P J P <ppandit@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Vmware Paravirtual SCSI emulation uses command descriptors to
-process SCSI commands. These come with their message ring buffers.
-A guest could set the message ring page count to an arbitrary value
-resulting in infinite loop. Add check to avoid it.
+qemu_input_event_send() discards key event when the guest is paused,
+but not the delay.
 
-Reported-by: YY Z <bigbird475958471@gmail.com>
-Signed-off-by: P J P <ppandit@redhat.com>
+The delay ends up in the input queue, and qemu_input_event_send_key()
+will further fill the queue with upcoming events.
+
+VNC uses qemu_input_event_send_key_delay(), not SPICE, which results
+in a different input behaviour on pause: VNC will queue the events
+(except the first that is discarded), SPICE will discard all events.
+
+Don't queue delay if paused, and provide same behaviour on SPICE and
+VNC clients on resume (and potentially avoid over-allocating the
+buffer queue)
+
+Fixes:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1444326
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/scsi/vmw_pvscsi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ ui/input.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-index 7557546..4a106da 100644
---- a/hw/scsi/vmw_pvscsi.c
-+++ b/hw/scsi/vmw_pvscsi.c
-@@ -202,7 +202,7 @@ pvscsi_ring_init_msg(PVSCSIRingInfo *m, PVSCSICmdDescSetupMsgRing *ri)
-     uint32_t len_log2;
-     uint32_t ring_size;
- 
--    if (ri->numPages > PVSCSI_SETUP_MSG_RING_MAX_NUM_PAGES) {
-+    if (!ri->numPages || ri->numPages > PVSCSI_SETUP_MSG_RING_MAX_NUM_PAGES) {
-         return -1;
-     }
-     ring_size = ri->numPages * PVSCSI_MAX_NUM_MSG_ENTRIES_PER_PAGE;
--- 
-2.9.3
+diff --git a/ui/input.c b/ui/input.c
+index ed88cda6d6..383158b65b 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -405,6 +405,10 @@ void qemu_input_event_send_key_qcode(QemuConsole *sr=
+c, QKeyCode q, bool down)
+=20
+ void qemu_input_event_send_key_delay(uint32_t delay_ms)
+ {
++    if (!runstate_is_running() && !runstate_check(RUN_STATE_SUSPENDED)) =
+{
++        return;
++    }
++
+     if (!kbd_timer) {
+         kbd_timer =3D timer_new_ms(QEMU_CLOCK_VIRTUAL, qemu_input_queue_=
+process,
+                                  &kbd_queue);
+--=20
+2.12.0.191.gc5d8de91d
