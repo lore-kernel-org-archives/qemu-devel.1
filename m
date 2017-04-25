@@ -1,39 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d38vA-0000eT-LL
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:26:57 -0400
+	(envelope-from <quintela@redhat.com>) id 1d395h-0008OB-UB
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:37:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d38v7-00053H-Cp
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:26:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53135)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d38v7-00052T-3u
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:26:53 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3PMO07i013372
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:26:51 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2ebthv1m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:26:51 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 25 Apr 2017 16:26:51 -0600
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170424220828.1472-2-danielhb@linux.vnet.ibm.com>
-References: <20170424220828.1472-1-danielhb@linux.vnet.ibm.com>
-	<20170424220828.1472-2-danielhb@linux.vnet.ibm.com>
-Date: Tue, 25 Apr 2017 17:26:40 -0500
-Message-Id: <149315920012.25359.9652547359202749316@loki>
-Subject: Re: [Qemu-devel] [PATCH 1/4] migration: alternative way to set
- instance_id in SaveStateEntry
+	(envelope-from <quintela@redhat.com>) id 1d395f-0002Et-65
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:37:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48734)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d395f-0002D9-02
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:37:47 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EE61C67EB5
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 22:37:45 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 26 Apr 2017 00:37:13 +0200
+Message-Id: <20170425223739.6703-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 00/26] Audio Cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,114 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Quoting Daniel Henrique Barboza (2017-04-24 17:08:25)
-> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
-> =
+Hi
 
-> In QOM (QEMU Object Model) migrated objects are identified with instance_=
-id
-> which is calculated automatically using their path in the QOM composition
-> tree. For some objects, this path could change from source to target in
-> migration. To migrate such objects, we need to make sure the instance_id =
-does
-> not change from source to target. We add a hook in DeviceClass to do cust=
-omized
-> instance_id calculation in such cases.
+This are an old series that were hidden on my harddisk.  To give you
+one idea, I had a patch to remove this:
 
-When I tried to pluck a subset of these patches for another series it
-was noticed that we don't actually need this patch anymore:
+commit 8307c294a355bbf3c5352e00877365b0cda66d52
+Author: Nutan Shinde <nutanshinde1992@gmail.com>
+Date:   Wed Oct 7 22:02:54 2015 +0530
 
-  https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05475.html
+    Remove macros IO_READ_PROTO and IO_WRITE_PROTO
 
-hw/ppc/spapr_iommu.c already implements an approach for registering DRCs
-that would work for our case as well since DRCs are bus-less and do not sit
-on a BusClass that implements bc->get_dev_path, so using
-vmstate_register(DEVICE(drc), drck->get_index(drc), ...) will work in
-the same way this patch expects it to.
+And somebody else removed it and got it upstream.
 
-> =
+There are just cleanups of removing unused code, or moving audio to
+c89 and int*_t types.
 
-> As a result, in these cases compat will not be set in the concerned
-> SaveStateEntry. This will prevent the inconsistent idstr to be sent over =
-in
-> migration. We could have set alias_id in a similar way. But that will be
-> overloading the purpose of alias_id.
-> =
+Please, review and consider them.
 
-> The first application will be setting instance_id for pseries DRC objects=
- using
-> its unique index. Doing this makes the instance_id of DRC to be consistent
-> across migration and supports flexible management of DRC objects in migra=
-tion.
-> =
+Later, Juan.
 
-> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> ---
->  include/hw/qdev-core.h | 6 ++++++
->  migration/savevm.c     | 6 ++++++
->  2 files changed, 12 insertions(+)
-> =
 
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 4bf86b0..9b3914c 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -127,6 +127,12 @@ typedef struct DeviceClass {
->      qdev_initfn init; /* TODO remove, once users are converted to realiz=
-e */
->      qdev_event exit; /* TODO remove, once users are converted to unreali=
-ze */
->      const char *bus_type;
-> +
-> +    /* When this field is set, qemu will use it to get an unique instanc=
-e_id
-> +     * instead of calculating an auto idstr and instance_id for the rele=
-vant
-> +     * SaveStateEntry
-> +     */
-> +    int (*dev_get_instance_id)(DeviceState *dev);
->  } DeviceClass;
-> =
+Juan Quintela (26):
+  adlib: Remove support for YMF262
+  audio: remove Y8950 configuration
+  audio: Remove YM3526 support
+  audio: YM3812 was always defined
+  audio: Remove UINT8
+  audio: remove UINT16
+  audio: remove UINT32
+  audio: Remove INT8
+  audio: remove INT16
+  audio: Remove INT32
+  audio: Unfold OPLSAMPLE
+  audio: Remove Unused OPL_TYPE_*
+  audio: Remove type field
+  audio: Remove unused fields
+  audio: GUSbyte is uint8_t
+  audio: remove GUSchar
+  audio: GUSword is uint16_t
+  audio: GUSword is uint16_t
+  audio: GUSsample is int16_t
+  audio: OPLSetIRQHandler is not used anywhere
+  audio: OPLSetUpdateHandler is not used anywhere
+  audio: IRQHandler is not used anymore
+  audio: UpdateHandler is not used anymore
+  audio: Remove unused typedefs
+  audio: un-export OPLResetChip
+  audio: Use ARRAY_SIZE from qemu/osdep.h
 
->  typedef struct NamedGPIOList NamedGPIOList;
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 03ae1bd..5d8135f 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -606,6 +606,9 @@ int register_savevm_live(DeviceState *dev,
->                           calculate_compat_instance_id(idstr) : instance_=
-id;
->              instance_id =3D -1;
->          }
-> +        if (DEVICE_GET_CLASS(dev)->dev_get_instance_id) {
-> +            instance_id =3D DEVICE_GET_CLASS(dev)->dev_get_instance_id(d=
-ev);
-> +        }
->      }
->      pstrcat(se->idstr, sizeof(se->idstr), idstr);
-> =
+ hw/audio/Makefile.objs  |   2 -
+ hw/audio/adlib.c        |  47 +-------
+ hw/audio/fmopl.c        | 277 ++++++++----------------------------------------
+ hw/audio/fmopl.h        | 175 +++++++++---------------------
+ hw/audio/gus.c          |   2 +-
+ hw/audio/gusemu.h       |  22 +---
+ hw/audio/gusemu_hal.c   |  74 ++++++-------
+ hw/audio/gusemu_mixer.c |  28 ++---
+ 8 files changed, 153 insertions(+), 474 deletions(-)
 
-> @@ -696,6 +699,9 @@ int vmstate_register_with_alias_id(DeviceState *dev, =
-int instance_id,
->                           calculate_compat_instance_id(vmsd->name) : inst=
-ance_id;
->              instance_id =3D -1;
->          }
-> +        if (DEVICE_GET_CLASS(dev)->dev_get_instance_id) {
-> +            instance_id =3D DEVICE_GET_CLASS(dev)->dev_get_instance_id(d=
-ev);
-> +        }
->      }
->      pstrcat(se->idstr, sizeof(se->idstr), vmsd->name);
-> =
-
-> -- =
-
-> 2.9.3
-> =
-
->=20
+-- 
+2.9.3
