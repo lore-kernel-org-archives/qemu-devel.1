@@ -1,32 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2wXn-0003w2-5x
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:14:00 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d2wbF-0004ru-Rq
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:17:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d2wXj-0007u1-6V
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:13:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40460)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d2wXi-0007tk-Tv
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:13:55 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DDA2F7F4D2
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 09:13:53 +0000 (UTC)
-Date: Tue, 25 Apr 2017 10:13:42 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170425091342.GC21129@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
-	<87o9yv890z.fsf@dusky.pond.sub.org>
-	<87lgqpei5d.fsf@dusky.pond.sub.org>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d2wbB-0000bJ-TZ
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:17:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51991
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1d2wbB-0000aj-Mj
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:17:29 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3P9Ee3j039911
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 05:17:28 -0400
+Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a21n9xcse-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 05:17:27 -0400
+Received: from localhost
+	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Tue, 25 Apr 2017 19:17:16 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <CAFEAcA9S+q8FiZ2chaLoUWmQJ3uForGaDVGqwrBHnxmpH4sy_Q@mail.gmail.com>
+References: <20170425083555.13547-1-nikunj@linux.vnet.ibm.com>
+	<CAFEAcA-dD=DZmtvMDAz2Z8u6Qb2ozGWNroPQhwXr+zczvtjqVA@mail.gmail.com>
+	<87pog0q2xz.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<CAFEAcA9S+q8FiZ2chaLoUWmQJ3uForGaDVGqwrBHnxmpH4sy_Q@mail.gmail.com>
+Date: Tue, 25 Apr 2017 14:46:17 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87lgqpei5d.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 00/25] qmp: add async command type
+Content-Type: text/plain
+Message-Id: <87mvb4q23i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH RFC] configure: fix clang failure for
+ libatomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +44,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Apr 24, 2017 at 09:10:22PM +0200, Markus Armbruster wrote:
-> With 2.9 out of the way, how can we make progress on this one?
-> 
-> I can see two ways to get asynchronous QMP commands accepted:
-> 
-> 1. We break QMP compatibility in QEMU 3.0 and convert all long-running
->    tasks from "synchronous command + event" to "asynchronous command".
-> 
->    This is design option 1 quoted below.  *If* we decide to leave
->    compatibility behind for 3.0, *and* we decide we like the
->    asynchronous sufficiently better to put in the work, we can do it.
-> 
->    I guess there's nothing to do here until we decide on breaking
->    compatibility in 3.0.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
->From the libvirt POV we'll generally be against QEMU breaking back
-compatibility, if there's a viable option which can avoid the back
-compat breakage.
+> On 25 April 2017 at 09:58, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> wrote:
+>> I was trying out the program in the configure script with clang and I do
+>> get errors without libatomic:
+>>
+>>     $ clang /tmp/atomic.c
+>>     /tmp/atomic.c:6:7: warning: implicit declaration of function '__atomic_load_8' is invalid in C99 [-Wimplicit-function-declaration]
+>>       y = __atomic_load_8(&x, 0);
+>>           ^
+>>     /tmp/atomic.c:7:3: warning: implicit declaration of function '__atomic_store_8' is invalid in C99 [-Wimplicit-function-declaration]
+>>       __atomic_store_8(&x, y, 0);
+>>       ^
+>>     /tmp/atomic.c:8:3: warning: implicit declaration of function '__atomic_compare_exchange_8' is invalid in C99 [-Wimplicit-function-declaration]
+>>       __atomic_compare_exchange_8(&x, &y, x, 0, 0, 0);
+>>       ^
+>>     /tmp/atomic.c:9:3: warning: implicit declaration of function '__atomic_exchange_8' is invalid in C99 [-Wimplicit-function-declaration]
+>>       __atomic_exchange_8(&x, y, 0);
+>>       ^
+>>     /tmp/atomic.c:10:3: warning: implicit declaration of function '__atomic_fetch_add_8' is invalid in C99 [-Wimplicit-function-declaration]
+>>       __atomic_fetch_add_8(&x, y, 0);
+>>       ^
+>>     5 warnings generated.
+>>     /tmp/atomic-1660e0.o: In function `main':
+>>     /tmp/atomic.c:(.text+0x28): undefined reference to `__atomic_load_8'
+>>     /tmp/atomic.c:(.text+0x40): undefined reference to `__atomic_store_8'
+>>     /tmp/atomic.c:(.text+0x69): undefined reference to `__atomic_compare_exchange_8'
+>>     /tmp/atomic.c:(.text+0x7d): undefined reference to `__atomic_exchange_8'
+>>     /tmp/atomic.c:(.text+0x91): undefined reference to `__atomic_fetch_add_8'
+>>     clang-3.9: error: linker command failed with exit code 1 (use -v to see invocation)
+>>
+>> With -latomic, the linker succeeds in getting the binary.
+>
+> What host is this on ?
 
-Is it possible to do option 1, but have it be an opt-in. ie when
-libvirt does the initial QMP greeting, it could issue a command
-to active async mode. For simplicity that could be an all-or-nothing
-switch - ie makes all commands be async. That way we avoid breaking
-any existing libvirt, but give new libvirt the chance to opt-in to
-the new way.
+$ uname -a
+Linux abhimanyu 4.9.13-200.fc25.x86_64 #1 SMP Mon Feb 27 16:48:42 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+$
 
-Regardless new libvirt will end up having to support both modes of
-QMP for 5-10 years...
-
-> 2. We don't break QMP compatibility, but we add asynchronous commands
->    anyway, because we decide that's how we want to do "jobs".
-> 
->    This is design option 3 quoted below.  As I said, I dislike its lack
->    of orthogonality.  But if asynchronous commands help us get jobs
->    done, I can bury my dislike.
-> 
->    I feel this is something you should investigate with John Snow.
->    Going through a middleman (me) makes no sense.  So I'm going to dump
->    my thoughts, then get out of the way.
-> 
->    You need to take care not to get bogged down in the jobs project's
->    complexity.  This is really only how to package up jobs for QMP.
-> 
->    With synchronous commands, the job-creating command creates a job,
->    jobs state changes trigger events, and job termination is just
->    another state change.  Job control commands interact with the job.
->  
->    Events obviously need to carry a job ID.  We can either require the
->    user to pass it as argument to the job-creating command (hopefully
->    unique), or have the job-creating command pick one (a unique one) and
->    return it.
-> 
->    With asynchronous commands, we could make the asynchronous command
->    the job.  The only difference is that job termination triggers the
->    command response.  When termination is of no interest to anyone but
->    the job's creator, the termination event can be omitted then.
-> 
->    Instead of a job ID, we could use the (user-specified and hopefully
->    unique) command ID that ties the command response to the command.
->    Perhaps throw in a monitor ID.
-> 
->    To be honest, I'm not sure asynchronous commands buy us much here.
->    But my view is from 10,000 feet, and John might have different ideas.
-> 
-> Rejecting asynchronous QMP commands is of course design option 2 quoted
-> below.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Regards
+Nikunj
