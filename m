@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d32S8-0005Ek-QM
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:32:37 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d32XZ-0007Cq-Gg
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:38:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d32S4-0005P4-2C
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:32:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34290)
+	(envelope-from <imammedo@redhat.com>) id 1d32XU-0007RD-KR
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:38:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d32S3-0005Oh-PK
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:32:27 -0400
-Date: Tue, 25 Apr 2017 16:32:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170425153222.GH2103@work-vm>
-References: <20170425104116.31435-1-dgilbert@redhat.com>
-	<CAFEAcA8yQXV3414cv72Nq7HVoXTgjR40HQWGFzK_+T_=h_Bykw@mail.gmail.com>
-	<726c98c5-7e63-417a-ea48-ae2737d50cdc@redhat.com>
-	<CAFEAcA_y+HBkFxs5bFavptvB96AfL3F+A33fyuaWc+-Cd3QuOA@mail.gmail.com>
-	<CAFEAcA-nsC-sFLTqDB1VscH5GajQw65Jq2RN8Y9TAoLE=aL65A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-nsC-sFLTqDB1VscH5GajQw65Jq2RN8Y9TAoLE=aL65A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/4] hmp queue
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d32XU-0007Qk-BN
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:38:04 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F0B1AC052500
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 15:38:02 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Tue, 25 Apr 2017 17:37:50 +0200
+Message-Id: <20170425153750.43322-1-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] pc/fwcfg: unbreak migration from qemu-2.5
+ and qemu-2.6 during firmware boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +28,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, mst@redhat.com, ehabkost@redhat.com, dgilbert@redhat.com, lersek@redhat.com
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 25 April 2017 at 16:05, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >         info jit
-> > qemu: qemu_mutex_lock: Invalid argument
-> 
-> Repro without the qtest machinery:
-> 
-> $ lldb -- ./aarch64-softmmu/qemu-system-aarch64 -M n810 -s -S -monitor
-> stdio -machine accel=qtest
-> 
-> then run and type 'info jit' at the monitor prompt.
-> Backtrace:
-> 
-> * thread #1: tid = 0x66a715, 0x00007fffd1931d42
-> libsystem_kernel.dylib`__pthread_kill + 10, queue =
-> 'com.apple.main-thread', stop reason = signal SIGABRT
->   * frame #0: 0x00007fffd1931d42 libsystem_kernel.dylib`__pthread_kill + 10
->     frame #1: 0x00007fffd1a1f5bf libsystem_pthread.dylib`pthread_kill + 90
->     frame #2: 0x00007fffd1897420 libsystem_c.dylib`abort + 129
->     frame #3: 0x000000010041bd05
-> qemu-system-aarch64`error_exit(err=<unavailable>, msg=<unavailable>) +
-> 53 at qemu-thread-posix.c:35
->     frame #4: 0x000000010041bd4d
-> qemu-system-aarch64`qemu_mutex_lock(mutex=<unavailable>) + 29 at
-> qemu-thread-posix.c:62
->     frame #5: 0x0000000100010c7c qemu-system-aarch64`dump_exec_info
-> [inlined] tb_lock + 12 at translate-all.c:167
->     frame #6: 0x0000000100010c70
-> qemu-system-aarch64`dump_exec_info(f=0x00000001020b6a10,
-> cpu_fprintf=(qemu-system-aarch64`monitor_fprintf at monitor.c:376)) +
-> 48 at translate-all.c:1869
->     frame #7: 0x0000000100048ec9
+Since 2.7 commit (b2a575a Add optionrom compatible with fw_cfg DMA version)
+regressed migration during firmware exection time by
+abusing fwcfg.dma_enabled property to decide loading
+dma version of option rom AND by mistake disabling DMA
+for 2.6 and earlier globally instead of only for option rom.
 
-OK, that looks like a real bug to me, in the KVM case it should fail
-the same way; if I understand correctly the tb_lock only gets init'd
-during code_gen_alloc called from tcg_init.
+so 2.6 machine type guest is broken when it already runs
+firmware in DMA mode but migrated to qemu-2.7(pc-2.6)
+at that time;
 
-'info jit' needs fixing.
+a) qemu-2.6:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
+b) qemu-2.7:pc2.6 (fwcfg.dma=off,firmware=ioport,oprom=ioport)
 
-Dave
+  to:   a     b
+from
+a       OK   FAIL
+b       OK   OK
 
-> qemu-system-aarch64`hmp_info_jit(mon=0x00000001020b6a10,
-> qdict=<unavailable>) + 25 at monitor.c:1089
->     frame #8: 0x0000000100043ae5
-> qemu-system-aarch64`handle_hmp_command(mon=0x00000001020b6a10,
-> cmdline=<unavailable>) + 3589 at monitor.c:3104
->     frame #9: 0x000000010004262e
-> qemu-system-aarch64`monitor_command_cb(opaque=0x00000001020b6a10,
-> cmdline=<unavailable>, readline_opaque=<unavailable>) + 30 at
-> monitor.c:3902
->     frame #10: 0x000000010042d355
-> qemu-system-aarch64`readline_handle_byte(rs=0x00000001028f4400,
-> ch=<unavailable>) + 3285 at readline.c:393
->     frame #11: 0x0000000100046adc
-> qemu-system-aarch64`monitor_read(opaque=<unavailable>, buf="\n",
-> size=1) + 60 at monitor.c:3885
->     frame #12: 0x00000001003c3cd3
-> qemu-system-aarch64`fd_chr_read(chan=<unavailable>,
-> cond=<unavailable>, opaque=<unavailable>) + 179 at char-fd.c:66
->     frame #13: 0x00000001010b60bd
-> libglib-2.0.0.dylib`g_main_context_dispatch + 460
->     frame #14: 0x00000001004193a1 qemu-system-aarch64`main_loop_wait
-> [inlined] glib_pollfds_poll + 545 at main-loop.c:213
->     frame #15: 0x0000000100419364 qemu-system-aarch64`main_loop_wait
-> [inlined] os_host_main_loop_wait(timeout=<unavailable>) + 67 at
-> main-loop.c:261
->     frame #16: 0x0000000100419321
-> qemu-system-aarch64`main_loop_wait(nonblocking=<unavailable>) + 417 at
-> main-loop.c:517
->     frame #17: 0x000000010019a74f qemu-system-aarch64`qemu_main
-> [inlined] main_loop + 48 at vl.c:1898
->     frame #18: 0x000000010019a71f
-> qemu-system-aarch64`qemu_main(argc=<unavailable>, argv=<unavailable>,
-> envp=<unavailable>) + 18623 at vl.c:4709
->     frame #19: 0x000000010033d4ce
-> qemu-system-aarch64`-[QemuCocoaAppController
-> startEmulationWithArgc:argv:](self=<unavailable>, _cmd=<unavailable>,
-> argc=<unavailable>, argv=<unavailable>) + 30 at cocoa.m:978
->     frame #20: 0x00007fffbbb0252c
-> CoreFoundation`__CFNOTIFICATIONCENTER_IS_CALLING_OUT_TO_AN_OBSERVER__
-> + 12
->     frame #21: 0x00007fffbbb0242b CoreFoundation`_CFXRegistrationPost + 427
->     frame #22: 0x00007fffbbb02192
-> CoreFoundation`___CFXNotificationPost_block_invoke + 50
->     frame #23: 0x00007fffbbac0772
-> CoreFoundation`-[_CFXNotificationRegistrar
-> find:object:observer:enumerator:] + 2018
->     frame #24: 0x00007fffbbabf75b CoreFoundation`_CFXNotificationPost + 667
->     frame #25: 0x00007fffbd500997 Foundation`-[NSNotificationCenter
-> postNotificationName:object:userInfo:] + 66
->     frame #26: 0x00007fffb9729b1f AppKit`-[NSApplication
-> _postDidFinishNotification] + 297
->     frame #27: 0x00007fffb9729884 AppKit`-[NSApplication
-> _sendFinishLaunchingNotification] + 208
->     frame #28: 0x00007fffb95ecbe9
-> AppKit`-[NSApplication(NSAppleEventHandling) _handleAEOpenEvent:] +
-> 552
->     frame #29: 0x00007fffb95ec83b
-> AppKit`-[NSApplication(NSAppleEventHandling)
-> _handleCoreEvent:withReplyEvent:] + 661
->     frame #30: 0x00007fffbd54be1d Foundation`-[NSAppleEventManager
-> dispatchRawAppleEvent:withRawReply:handlerRefCon:] + 290
->     frame #31: 0x00007fffbd54bc97
-> Foundation`_NSAppleEventManagerGenericHandler + 102
->     frame #32: 0x00007fffbc950f26 AE`aeDispatchAppleEvent(AEDesc
-> const*, AEDesc*, unsigned int, unsigned char*) + 544
->     frame #33: 0x00007fffbc950c9d AE`dispatchEventAndSendReply(AEDesc
-> const*, AEDesc*) + 39
->     frame #34: 0x00007fffbc950ba9 AE`aeProcessAppleEvent + 312
->     frame #35: 0x00007fffbb05dddf HIToolbox`AEProcessAppleEvent + 55
->     frame #36: 0x00007fffb95e80ed AppKit`_DPSNextEvent + 1833
->     frame #37: 0x00007fffb9d6385e AppKit`-[NSApplication(NSEvent)
-> _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 2796
->     frame #38: 0x00007fffb95dc7ab AppKit`-[NSApplication run] + 926
->     frame #39: 0x000000010033ee44
-> qemu-system-aarch64`main(argc=<unavailable>, argv=<unavailable>) +
-> 2212 at cocoa.m:1368
->     frame #40: 0x00007fffd1803235 libdyld.dylib`start + 1
->     frame #41: 0x00007fffd1803235 libdyld.dylib`start + 1
-> 
-> 
-> I don't think it makes a great deal of sense to be able to call into
-> the TCG dump_exec_info() statistics routine if we never initialized
-> the TCG accelerator (because we're using -accel=qtest). Not sure
-> it makes much sense if -accel=kvm, for that matter...
-> 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+So we currently have broken forward migration from
+qemu-2.6 to qemu-2.[789] that however could be fixed
+for 2.10 by re-enabling DMA for 2.[56] machine types
+and allowing dma capable option rom only since 2.7.
+As result qemu should end up with:
+
+c) qemu-2.10:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
+
+   to:  a     b    c
+from
+a      OK   FAIL  OK
+b      OK   OK    OK
+c      OK   FAIL  OK
+
+where forward migration from qemu-2.6 to qemu-2.10 should
+work again leaving only qemu-2.[789]:pc-2.6 broken.
+
+Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+Analyzed-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+---
+v3:
+  (Laszlo)
+    * s/mmio/ioport/ in commit message
+    * drop the last paragraph in commit msg that mentions
+      downstream
+v2:
+  (Eduardo Habkost <ehabkost@redhat.com>)
+    * s/linuxboot_dma_disabled/linuxboot_dma_enabled/
+    * add comment to linuxboot_dma_enabled field
+---
+ hw/i386/pc.c         | 9 ++++-----
+ hw/i386/pc_piix.c    | 1 +
+ hw/i386/pc_q35.c     | 1 +
+ include/hw/i386/pc.h | 7 +++----
+ 4 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f3b372a18f..8063241140 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1047,12 +1047,10 @@ static void load_linux(PCMachineState *pcms,
+     fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
+ 
+-    if (fw_cfg_dma_enabled(fw_cfg)) {
++    option_rom[nb_option_roms].bootindex = 0;
++    option_rom[nb_option_roms].name = "linuxboot.bin";
++    if (pcmc->linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
+         option_rom[nb_option_roms].name = "linuxboot_dma.bin";
+-        option_rom[nb_option_roms].bootindex = 0;
+-    } else {
+-        option_rom[nb_option_roms].name = "linuxboot.bin";
+-        option_rom[nb_option_roms].bootindex = 0;
+     }
+     nb_option_roms++;
+ }
+@@ -2321,6 +2319,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+      * to be used at the moment, 32K should be enough for a while.  */
+     pcmc->acpi_data_size = 0x20000 + 0x8000;
+     pcmc->save_tsc_khz = true;
++    pcmc->linuxboot_dma_enabled = true;
+     mc->get_hotplug_handler = pc_get_hotpug_handler;
+     mc->cpu_index_to_socket_id = pc_cpu_index_to_socket_id;
+     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 9f102aa388..a11190be46 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -474,6 +474,7 @@ static void pc_i440fx_2_6_machine_options(MachineClass *m)
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_i440fx_2_7_machine_options(m);
+     pcmc->legacy_cpu_hotplug = true;
++    pcmc->linuxboot_dma_enabled = false;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
+ }
+ 
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index dd792a8547..0a61a2070c 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -335,6 +335,7 @@ static void pc_q35_2_6_machine_options(MachineClass *m)
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_q35_2_7_machine_options(m);
+     pcmc->legacy_cpu_hotplug = true;
++    pcmc->linuxboot_dma_enabled = false;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
+ }
+ 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index f278b3ae89..a57c607a8c 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -151,6 +151,9 @@ struct PCMachineClass {
+     bool save_tsc_khz;
+     /* generate legacy CPU hotplug AML */
+     bool legacy_cpu_hotplug;
++
++    /* use DMA capable linuxboot option rom */
++    bool linuxboot_dma_enabled;
+ };
+ 
+ #define TYPE_PC_MACHINE "generic-pc-machine"
+@@ -432,10 +435,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ #define PC_COMPAT_2_6 \
+     HW_COMPAT_2_6 \
+     {\
+-        .driver   = "fw_cfg_io",\
+-        .property = "dma_enabled",\
+-        .value    = "off",\
+-    },{\
+         .driver   = TYPE_X86_CPU,\
+         .property = "cpuid-0xb",\
+         .value    = "off",\
+-- 
+2.11.0 (Apple Git-81)
