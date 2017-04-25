@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d36c7-0006v6-Dh
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:59:08 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d36cE-00071u-S8
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:59:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d36c6-0003yH-Kv
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:59:07 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d36cD-00041l-R8
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:59:14 -0400
 From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Wed, 26 Apr 2017 01:29:06 +0530
-Message-Id: <1493150351-28918-4-git-send-email-ashijeetacharya@gmail.com>
+Date: Wed, 26 Apr 2017 01:29:07 +0530
+Message-Id: <1493150351-28918-5-git-send-email-ashijeetacharya@gmail.com>
 In-Reply-To: <1493150351-28918-1-git-send-email-ashijeetacharya@gmail.com>
 References: <1493150351-28918-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 3/8] dmg: Limit the output buffer size to a
- max of 2MB
+Subject: [Qemu-devel] [PATCH v1 4/8] dmg: Refactor and prepare
+ dmg_read_chunk() to cache random access points
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +23,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: stefanha@gmail.com
 Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, famz@redhat.com, peter@lekensteyn.nl, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-The size of the output buffer is limited to a maximum of 2MB so that
-QEMU doesn't end up allocating huge amounts of memory while
-decompressing compressed input streams.
-
-2MB is an appropriate size because "qemu-img convert" has the same I/O
-buffer size and the most important use case for DMG files is to be
-compatible with qemu-img convert.
+Refactor dmg_read_chunk() to start making use of the new DMGReadState
+structure and do chunk and sector related calculations based on it.
+Add a new argument "DMGReadState *drs" to it.
 
 Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 ---
- block/dmg.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ block/dmg.c | 153 ++++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 91 insertions(+), 62 deletions(-)
 
 diff --git a/block/dmg.c b/block/dmg.c
-index c6fe8b0..7ae30e3 100644
+index 7ae30e3..dc356b0 100644
 --- a/block/dmg.c
 +++ b/block/dmg.c
-@@ -37,8 +37,8 @@ enum {
-     /* Limit chunk sizes to prevent unreasonable amounts of memory being used
-      * or truncating when converting to 32-bit types
-      */
--    DMG_LENGTHS_MAX = 64 * 1024 * 1024, /* 64 MB */
--    DMG_SECTORCOUNTS_MAX = DMG_LENGTHS_MAX / 512,
-+    DMG_MAX_OUTPUT = 2 * 1024 * 1024, /* 2 MB */
-+    DMG_SECTOR_MAX = DMG_MAX_OUTPUT / 512,
- };
+@@ -578,78 +578,106 @@ static inline uint32_t search_chunk(BDRVDMGState *s, uint64_t sector_num)
+     return s->n_chunks; /* error */
+ }
  
- static int dmg_probe(const uint8_t *buf, int buf_size, const char *filename)
-@@ -260,10 +260,10 @@ static int dmg_read_mish_block(BDRVDMGState *s, DmgHeaderState *ds,
+-static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num)
++static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_num,
++                                 DMGReadState *drs)
+ {
+     BDRVDMGState *s = bs->opaque;
  
-         /* all-zeroes sector (type 2) does not need to be "uncompressed" and can
-          * therefore be unbounded. */
--        if (s->types[i] != 2 && s->sectorcounts[i] > DMG_SECTORCOUNTS_MAX) {
-+        if (s->types[i] != 2 && s->sectorcounts[i] > DMG_SECTOR_MAX) {
-             error_report("sector count %" PRIu64 " for chunk %" PRIu32
-                          " is larger than max (%u)",
--                         s->sectorcounts[i], i, DMG_SECTORCOUNTS_MAX);
-+                         s->sectorcounts[i], i, DMG_SECTOR_MAX);
-             ret = -EINVAL;
-             goto fail;
++    int ret;
++    uint32_t sector_offset;
++    uint64_t sectors_read;
++    uint32_t chunk;
++
+     if (!is_sector_in_chunk(s, s->current_chunk, sector_num)) {
+-        int ret;
+-        uint32_t chunk = search_chunk(s, sector_num);
++        chunk = search_chunk(s, sector_num);
++    } else {
++        chunk = drs->saved_chunk_type;
++    }
+ 
+-        if (chunk >= s->n_chunks) {
++    if (chunk >= s->n_chunks) {
++            return -1;
++    }
++
++    /* reset our access point cache if we had a change in current chunk */
++    if (chunk != drs->saved_chunk_type) {
++        cache_access_point(drs, NULL, -1, -1, -1, -1);
++    }
++
++    sector_offset = sector_num - s->sectors[chunk];
++
++    if ((s->sectorcounts[chunk] - sector_offset) > DMG_SECTOR_MAX) {
++        sectors_read = DMG_SECTOR_MAX;
++    } else {
++        sectors_read = s->sectorcounts[chunk] - sector_offset;
++    }
++
++    /* truncate sectors read if it exceeds the 2MB buffer of qemu-img
++     * convert */
++    if ((sector_num % DMG_SECTOR_MAX) + sectors_read > DMG_SECTOR_MAX) {
++        sectors_read = DMG_SECTOR_MAX - (sector_num % DMG_SECTOR_MAX);
++    }
++
++    s->current_chunk = s->n_chunks;
++
++    switch (s->types[chunk]) { /* block entry type */
++    case 0x80000005: { /* zlib compressed */
++        /* we need to buffer, because only the chunk as whole can be
++         * inflated. */
++        ret = bdrv_pread(bs->file, s->offsets[chunk],
++                         s->compressed_chunk, s->lengths[chunk]);
++        if (ret != s->lengths[chunk]) {
+             return -1;
          }
-@@ -275,10 +275,10 @@ static int dmg_read_mish_block(BDRVDMGState *s, DmgHeaderState *ds,
-         /* length in (compressed) data fork */
-         s->lengths[i] = buff_read_uint64(buffer, offset + 0x20);
  
--        if (s->lengths[i] > DMG_LENGTHS_MAX) {
-+        if (s->lengths[i] > DMG_MAX_OUTPUT) {
-             error_report("length %" PRIu64 " for chunk %" PRIu32
-                          " is larger than max (%u)",
--                         s->lengths[i], i, DMG_LENGTHS_MAX);
-+                         s->lengths[i], i, DMG_MAX_OUTPUT);
-             ret = -EINVAL;
+-        s->current_chunk = s->n_chunks;
+-        switch (s->types[chunk]) { /* block entry type */
+-        case 0x80000005: { /* zlib compressed */
+-            /* we need to buffer, because only the chunk as whole can be
+-             * inflated. */
+-            ret = bdrv_pread(bs->file, s->offsets[chunk],
+-                             s->compressed_chunk, s->lengths[chunk]);
+-            if (ret != s->lengths[chunk]) {
+-                return -1;
+-            }
+-
+-            s->zstream.next_in = s->compressed_chunk;
+-            s->zstream.avail_in = s->lengths[chunk];
+-            s->zstream.next_out = s->uncompressed_chunk;
+-            s->zstream.avail_out = 512 * s->sectorcounts[chunk];
+-            ret = inflateReset(&s->zstream);
+-            if (ret != Z_OK) {
+-                return -1;
+-            }
+-            ret = inflate(&s->zstream, Z_FINISH);
+-            if (ret != Z_STREAM_END ||
+-                s->zstream.total_out != 512 * s->sectorcounts[chunk]) {
+-                return -1;
+-            }
+-            break; }
+-        case 0x80000006: /* bzip2 compressed */
+-            if (!dmg_uncompress_bz2) {
+-                break;
+-            }
+-            /* we need to buffer, because only the chunk as whole can be
+-             * inflated. */
+-            ret = bdrv_pread(bs->file, s->offsets[chunk],
+-                             s->compressed_chunk, s->lengths[chunk]);
+-            if (ret != s->lengths[chunk]) {
+-                return -1;
+-            }
+-
+-            ret = dmg_uncompress_bz2((char *)s->compressed_chunk,
+-                                     (unsigned int) s->lengths[chunk],
+-                                     (char *)s->uncompressed_chunk,
+-                                     (unsigned int)
+-                                         (512 * s->sectorcounts[chunk]));
+-            if (ret < 0) {
+-                return ret;
+-            }
+-            break;
+-        case 1: /* copy */
+-            ret = bdrv_pread(bs->file, s->offsets[chunk],
+-                             s->uncompressed_chunk, s->lengths[chunk]);
+-            if (ret != s->lengths[chunk]) {
+-                return -1;
+-            }
+-            break;
+-        case 2: /* zero */
+-            /* see dmg_read, it is treated specially. No buffer needs to be
+-             * pre-filled, the zeroes can be set directly. */
++        s->zstream.next_in = s->compressed_chunk;
++        s->zstream.avail_in = s->lengths[chunk];
++        s->zstream.next_out = s->uncompressed_chunk;
++        s->zstream.avail_out = 512 * s->sectorcounts[chunk];
++        ret = inflateReset(&s->zstream);
++        if (ret != Z_OK) {
++            return -1;
++        }
++        ret = inflate(&s->zstream, Z_FINISH);
++        if (ret != Z_STREAM_END ||
++            s->zstream.total_out != 512 * s->sectorcounts[chunk]) {
++            return -1;
++        }
++        break; }
++    case 0x80000006: /* bzip2 compressed */
++        if (!dmg_uncompress_bz2) {
+             break;
+         }
+-        s->current_chunk = chunk;
++        /* we need to buffer, because only the chunk as whole can be
++         * inflated. */
++        ret = bdrv_pread(bs->file, s->offsets[chunk],
++                         s->compressed_chunk, s->lengths[chunk]);
++        if (ret != s->lengths[chunk]) {
++            return -1;
++        }
++
++        ret = dmg_uncompress_bz2((char *)s->compressed_chunk,
++                                 (unsigned int) s->lengths[chunk],
++                                 (char *)s->uncompressed_chunk,
++                                 (unsigned int)
++                                    (512 * s->sectorcounts[chunk]));
++        if (ret < 0) {
++            return ret;
++        }
++        break;
++    case 1: /* copy */
++        ret = bdrv_pread(bs->file, s->offsets[chunk],
++                         s->uncompressed_chunk, s->lengths[chunk]);
++        if (ret != s->lengths[chunk]) {
++            return -1;
++        }
++        break;
++    case 2: /* zero */
++        /* see dmg_read, it is treated specially. No buffer needs to be
++         * pre-filled, the zeroes can be set directly. */
++        break;
+     }
++    s->current_chunk = chunk;
++
+     return 0;
+ }
+ 
+@@ -661,6 +689,7 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+     uint64_t sector_num = offset >> BDRV_SECTOR_BITS;
+     int nb_sectors = bytes >> BDRV_SECTOR_BITS;
+     int ret, i;
++    DMGReadState *drs = s->drs;
+ 
+     assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+     assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+@@ -671,7 +700,7 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+         uint32_t sector_offset_in_chunk;
+         void *data;
+ 
+-        if (dmg_read_chunk(bs, sector_num + i) != 0) {
++        if (dmg_read_chunk(bs, sector_num + i, drs) != 0) {
+             ret = -EIO;
              goto fail;
          }
 -- 
