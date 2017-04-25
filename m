@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1d2xNB-0002We-HI
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:07:06 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1d2xQi-0003dX-MB
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1d2xN7-0003r4-JD
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:07:05 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_PuC_B6GqL0n==SDZooQj9FtviHK3XixHd=m0Twmfp+A@mail.gmail.com>
-References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
-	<1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
-	<CAKmqyKMW-aTdzvTH5sir1BPx6U9XtgiZZ7TVigooXLFMY=UEQg@mail.gmail.com>
-	<CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
-	<CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
-	<CAFEAcA_PuC_B6GqL0n==SDZooQj9FtviHK3XixHd=m0Twmfp+A@mail.gmail.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Tue, 25 Apr 2017 15:37:00 +0530
-Message-ID: <CALHRZuqSvd2-XH_QwUT9BRkjXnsu6=HoMB3QJZEkS5DRAjVZ-Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 1/4] msf2: Add Smartfusion2
- System timer
+	(envelope-from <a.perevalov@samsung.com>) id 1d2xQe-0004V2-IE
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:10:44 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:33159)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1d2xQe-0004Ur-9S
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:10:40 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OOY00K3NMXMAA90@mailout2.w1.samsung.com> for
+	qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:10:34 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <234489b0-d33b-9a49-ec17-b1a6823d4eb3@samsung.com>
+Date: Tue, 25 Apr 2017 13:10:30 +0300
+MIME-version: 1.0
+In-reply-to: <20170425082408.GB31709@pxdev.xzpeter.org>
+Content-type: text/plain; charset=utf-8; format=flowed
+Content-transfer-encoding: 7bit
+References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170414131740eucas1p27eba648b990a93a627265c740e7ff118@eucas1p2.samsung.com>
+	<1492175840-5021-5-git-send-email-a.perevalov@samsung.com>
+	<20170425082408.GB31709@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH 4/6] migration: calculate downtime on dst
+ side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +36,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair23@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, i.maximets@samsung.com
 
-Hi Alistair and Peter,
+On 04/25/2017 11:24 AM, Peter Xu wrote:
+> On Fri, Apr 14, 2017 at 04:17:18PM +0300, Alexey Perevalov wrote:
+>
+> [...]
+>
+>> +/*
+>> + * This function calculates downtime per cpu and trace it
+>> + *
+>> + *  Also it calculates total downtime as an interval's overlap,
+>> + *  for many vCPU.
+>> + *
+>> + *  The approach is following:
+>> + *  Initially intervals are represented in tree where key is
+>> + *  pagefault address, and values:
+>> + *   begin - page fault time
+>> + *   end   - page load time
+>> + *   cpus  - bit mask shows affected cpus
+>> + *
+>> + *  To calculate overlap on all cpus, intervals converted into
+>> + *  array of points in time (downtime_points), the size of
+>> + *  array is 2 * number of nodes in tree of intervals (2 array
+>> + *  elements per one in element of interval).
+>> + *  Each element is marked as end (E) or as start (S) of interval.
+>> + *  The overlap downtime will be calculated for SE, only in case
+>> + *  there is sequence S(0..N)E(M) for every vCPU.
+>> + *
+>> + * As example we have 3 CPU
+>> + *
+>> + *      S1        E1           S1               E1
+>> + * -----***********------------xxx***************------------------------> CPU1
+>> + *
+>> + *             S2                E2
+>> + * ------------****************xxx---------------------------------------> CPU2
+>> + *
+>> + *                         S3            E3
+>> + * ------------------------****xxx********-------------------------------> CPU3
+>> + *
+>> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
+>> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
+>> + * S3,S1,E2 - sequenece includes all CPUs, in this case overlap will be S1,E2
+>> + * Legend of picture is following: * - means downtime per vCPU
+>> + *                                 x - means overlapped downtime
+>> + */
+> Not sure whether I get the point in this patch... iiuc we defined the
+> downtime here as the period when all vcpus are halted, right?
+>
+> If so, I have a few questions:
+>
+> - will this algorithm consume lots of memory? since I see we have one
+>    trace object per fault page address
+I don't think, it consumes too much, one DowntimeDuration
+takes (if I'm using bitmap_try_new, in this patch set I used pointer to 
+uint64_t array to keep bitmap array,
+but I'm going to use include/qemu/bitmap.h, it works with pointers to long)
 
-On Mon, Apr 24, 2017 at 11:28 PM, Peter Maydell
-<peter.maydell@linaro.org> wrote:
-> On 24 April 2017 at 18:44, Alistair Francis <alistair23@gmail.com> wrote:
->> Basically the simple explanation is that init is called when the
->> object is created and realize is called when the object is realized.
->>
->> Generally for devices it will go something like this:
->>  1. init
->>  2. Set properties
->>  3. Connect things
->>  4. realize
->>  5. Map to memory
->>
->>> Don't we need to use realize function for new models?
->>
->> AFAIK we still put things like: sysbus_init_irq(),
->> memory_region_init_io() and sysbus_init_mmio() in the init function.
->>
->> I don't think we are at a stage yet to not use init functions.
->
-> Two-phase init is here to stay -- some things must be done in
-> init, some must be done in realize, and some can be done in
-> either. Some simple devices may find they can do everything
-> in only one function.
->
-> Must be done in init:
->  * creating properties (for the cases where that is done "by hand"
->    by calling object_property_add_*())
->  * calling init on child objects which you want to pass through
->    alias properties for
->
-> Must be done in realize:
->  * anything that can fail such that we need to report the
->    error and abandon creation of the device
->  * anything which depends on the values of QOM properties that
->    the caller might have set
->
-> We should probably sit down and write up some guidelines for
-> how we recommend dealing with the various things that could
-> be called in either function -- this is basically a code
-> style and consistency question.
-
-Thanks for the brief. It makes sense for me now.
-I will make changes and send the patches.
-
-Thanks,
-Sundeep
+(2* int64 + (ROUND_UP((smp_cpus + BITS_PER_BYTE * sizeof(long) - 1 / 
+(BITS_PER_BYTE * sizeof(long)))) * siezof(long)
+so it's about 16 + at least 4 bytes, per page fault,
+Lets assume we migration 256 vCPU and 256 Gb of ram and that ram is 
+based on 4Kb pages - it's really bad case
+16 + ((256 + 8 * 4 - 1) / ( 8 * 4 )) * 4 = 52 bytes
+(256 * 1024 * 1024 * 1024)/(4 * 1024) = 67108864 page faults, but not 
+all of these pages will be pagefaulted, due to
+page pre-fetching
+67108864 * 52 = 3489660928 bytes (3.5 Gb for that operation),
+but I have a doubt, who will use 4Kb pages for 256 Gb, probably
+2Mb or 1G huge page will be chosen on x86, on ARM or other architecture 
+it could be another values.
 
 >
-> thanks
-> -- PMM
+> - do we need to protect the tree to make sure there's no insertion
+>    when doing the calculation?
+I asked the same question when sent RFC patches,
+the answer here is no, we should not, due to right now,
+it's only one socket and one listen thread (maybe in future,
+it will be required, maybe after multi fd patch set),
+and calculation is doing synchronously right after migration complete.
+
+>
+> - if the only thing we want here is the "total downtime", whether
+>    below would work? (assuming N is vcpu numbers)
+>
+>    a. define array cpu_fault_addr[N], to store current faulted address
+>       for each vcpu. When vcpu X is running, cpu_fault_addr[X] should
+>       be 0.
+>
+>    b. when page fault happens on vcpu A, setup cpu_fault_addr[A] with
+>       corresponding fault address.
+at this time need to is fault happens for all another vCPU,
+and if it happens mark current time as total vCPU downtime start.
+
+>    c. when page copy finished, loop over cpu_fault_addr[] to see
+>       whether that matches any, clear corresponding element if matched.
+so when page copy finished and mark for total vCPU is set,
+yes that interval is a part of total downtime.
+>
+>    Then, we can just measure the period when cpu_fault_addr[] is all
+>    set (by tracing at both b. and c.). Can this work?
+Yes, it works, but it's better to keep time - cpu_fault_time,
+address is not important here, it doesn't matter the reason of pagefault.
+2 vCPU could fault due to access to one page, ok, it's not a problem, 
+just store
+time when it was faulted.
+Looks like it's better algorithm, with lesser complexity,
+thank you a lot.
+
+
+>
+> Thanks,
+>
+
+
+-- 
+Best regards,
+Alexey Perevalov
