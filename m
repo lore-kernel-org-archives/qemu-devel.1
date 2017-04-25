@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d2sp2-0006fJ-FT
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 01:15:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1d2sqO-0007DT-Sq
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 01:16:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d2sox-0002rJ-GA
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 01:15:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37663)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1d2sox-0002r5-7F
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 01:15:27 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3P5DovQ025626
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 01:15:25 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a1qnwm8ge-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 01:15:25 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 25 Apr 2017 01:15:24 -0400
-Date: Tue, 25 Apr 2017 13:15:19 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170412052115.101657-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170412052115.101657-8-bjsdjshi@linux.vnet.ibm.com>
-	<20170424164338.0250f3fa@w520.home>
-	<20170424165628.631b0455@w520.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170424165628.631b0455@w520.home>
-Message-Id: <20170425051519.GH31848@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 07/13] vfio/ccw: vfio based subchannel
- passthrough driver
+	(envelope-from <thuth@redhat.com>) id 1d2sqJ-0003Lt-TC
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 01:16:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40470)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d2sqJ-0003Kq-Ji
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 01:16:51 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 86C9480473
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 05:16:50 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 25 Apr 2017 07:16:47 +0200
+Message-Id: <1493097407-20482-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <194bfbef-efad-0f2e-457c-84533e66fdb5@redhat.com>
+References: <194bfbef-efad-0f2e-457c-84533e66fdb5@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 3/3] tests: Add a tester for HMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,226 +29,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-* Alex Williamson <alex.williamson@redhat.com> [2017-04-24 16:56:28 -0600]:
+HMP commands do not get any automatic testing yet, so on certain
+QEMU machines, some HMP commands were causing crashes in the past.
+Thus we should test HMP commands in our test suite, too, to avoid
+that such problems creep in again in the future.
 
-[...]
-> > > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> > > new file mode 100644
-> > > index 0000000..c491bee
-> > > --- /dev/null
-> > > +++ b/hw/vfio/ccw.c
-> > > @@ -0,0 +1,207 @@
-> > > +/*
-> > > + * vfio based subchannel assignment support
-> > > + *
-> > > + * Copyright 2017 IBM Corp.
-> > > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > > + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> > > + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-> > > + *
-> > > + * This work is licensed under the terms of the GNU GPL, version 2 or(at
-> > > + * your option) any version. See the COPYING file in the top-level
-> > > + * directory.
-> > > + */
-> > > +
-> > > +#include <linux/vfio.h>
-> > > +#include <sys/ioctl.h>
-> > > +
-> > > +#include "qemu/osdep.h"
-> > > +#include "qapi/error.h"
-> > > +#include "hw/sysbus.h"
-> > > +#include "hw/vfio/vfio.h"
-> > > +#include "hw/vfio/vfio-common.h"
-> > > +#include "hw/s390x/s390-ccw.h"
-> > > +#include "hw/s390x/ccw-device.h"
-> > > +
-> > > +#define TYPE_VFIO_CCW "vfio-ccw"
-> > > +typedef struct VFIOCCWDevice {
-> > > +    S390CCWDevice cdev;
-> > > +    VFIODevice vdev;
-> > > +} VFIOCCWDevice;
-> > > +
-> > > +static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
-> > > +{
-> > > +    vdev->needs_reset = false;
-> > > +}
-> > > +
-> > > +/*
-> > > + * We don't need vfio_hot_reset_multi and vfio_eoi operationis for
-> 
-> One more:
-> 
-> s/operationis/operations/
-> 
-Ok.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v3:
+ - Fixed the stupid "!strcmp() == 0" problem
+ - Removed "isapc" from the blacklist since the "info lapic" problem
+   has already been fixed (see commit c7f15bc93661a36fe)
+ - Fixed the g_strdup_printf("hmp/%s", mname) memory leak
 
-> > > + * vfio_ccw device now.
-> > > + */
-> > > +struct VFIODeviceOps vfio_ccw_ops = {
-> > > +    .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
-> > > +};
-> > > +
-> > > +static void vfio_ccw_reset(DeviceState *dev)
-> > > +{
-> > > +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-> > > +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-> > > +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> > > +
-> > > +    ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
-> > > +}
-> > > +
-> > > +static void vfio_put_device(VFIOCCWDevice *vcdev)
-> > > +{
-> > > +    g_free(vcdev->vdev.name);
-> > > +    vfio_put_base_device(&vcdev->vdev);
-> > > +}
-> > > +
-> > > +static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, char **path,
-> > > +                                     Error **errp)
-> > > +{
-> > > +    struct stat st;
-> > > +    int groupid;
-> > > +    GError *gerror = NULL;
-> > > +
-> > > +    /* Check that host subchannel exists. */
-> > > +    path[0] = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x",
-> > > +                              cdev->hostid.cssid,
-> > > +                              cdev->hostid.ssid,
-> > > +                              cdev->hostid.devid);
-> > > +    if (stat(path[0], &st) < 0) {
-> > > +        error_setg(errp, "vfio: no such host subchannel %s", path[0]);
-> > > +        return NULL;
-> > > +    }
-> > > +
-> > > +    /* Check that mediated device exists. */
-> > > +    path[1] = g_strdup_printf("%s/%s", path[0], cdev->mdevid);
-> > > +    if (stat(path[0], &st) < 0) {
-> > > +        error_setg(errp, "vfio: no such mediated device %s", path[1]);
-> > > +        return NULL;
-> > > +    }  
-> > 
-> > Isn't this all a bit circular since we build the S390CCWDevice based on
-> > the sysfsdev mdev path?
-> > 
-Right! We don't need to verify the existance of the path here again,
-since we already did that during the realization of the S390CCWDevice,
-which is triggered by calling cdc->realize before vfio_ccw_get_group in
-vfio_ccw_realize.
+ tests/Makefile.include |   2 +
+ tests/test-hmp.c       | 161 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 163 insertions(+)
+ create mode 100644 tests/test-hmp.c
 
-> > > +
-> > > +    /* Get the iommu_group patch as the interim variable. */
-> > > +    path[2] = g_strconcat(path[1], "/iommu_group", NULL);
-> > > +
-> > > +    /* Get the link file path of the device iommu_group. */
-> > > +    path[3] = g_file_read_link(path[2], &gerror);
-> > > +    if (!path[3]) {
-> > > +        error_setg(errp, "vfio: error no iommu_group for subchannel");
-> > > +        return NULL;
-> > > +    }
-> > > +
-> > > +    /* Get the device groupid. */
-> > > +    if (sscanf(basename(path[3]), "%d", &groupid) != 1) {
-> > > +        error_setg(errp, "vfio: error reading %s:%m", path[3]);
-> > > +        return NULL;
-> > > +    }
-> > > +
-> > > +    return vfio_get_group(groupid, &address_space_memory, errp);
-> > > +}
-> > > +
-> > > +static void vfio_ccw_put_group(VFIOGroup *group, char **path)
-> > > +{
-> > > +    g_free(path);
-> > > +    vfio_put_group(group);
-> > > +}
-> > > +
-> > > +static void vfio_ccw_realize(DeviceState *dev, Error **errp)
-> > > +{
-> > > +    VFIODevice *vbasedev;
-> > > +    VFIOGroup *group;
-> > > +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-> > > +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-> > > +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> > > +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-> > > +    char *path[4] = {NULL, NULL, NULL, NULL};  
-> > 
-> > I don't understand what's happening with 'path' throughout this
-> > function.  vfio_ccw_get_group() allocates strings into this array, we
-> > only seem to use one in an error path below, it's only freed on an error
-> > path and I don't see it getting linked to the VFIOCCWDevice, so it
-> > seems to be leaked, and even the g_free() above looks quite a bit
-> > suspicious.
-This @path, together with the operations on it, must be a leftover of a
-previous implementation. I will rewrite these stuff. Thanks for the
-catch!
-
-> > 
-> > > +
-> > > +    /* Call the class init function for subchannel. */
-> > > +    if (cdc->realize) {
-> > > +        cdc->realize(cdev, vcdev->vdev.sysfsdev, errp);
-> > > +        if (*errp) {
-> > > +            return;
-> > > +        }
-> > > +    }
-> > > +
-> > > +    group = vfio_ccw_get_group(cdev, path, errp);
-> > > +    if (!group) {
-> > > +        goto out_group_err;
-> > > +    }
-> > > +
-> > > +    vcdev->vdev.ops = &vfio_ccw_ops;
-> > > +    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
-> > > +    vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
-> > > +                                       cdev->hostid.ssid, cdev->hostid.devid);
-> > > +    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> > > +        if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
-> > > +            error_setg(errp, "vfio: subchannel %s has already been attached",
-> > > +                       basename(path[0]));
-> > > +            goto out_device_err;
-> > > +        }
-> > > +    }
-> > > +
-> > > +    if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, errp)) {
-> > > +        goto out_device_err;
-> > > +    }
-> > > +
-> > > +    return;
-> > > +
-> > > +out_device_err:
-> > > +    vfio_ccw_put_group(group, path);
-> > > +out_group_err:
-> > > +    if (cdc->unrealize) {
-> > > +        cdc->unrealize(cdev, errp);
-> > > +    }
-> > > +}
-> > > +
-> > > +static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
-> > > +{
-> > > +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-> > > +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-> > > +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> > > +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-> > > +    VFIOGroup *group = vcdev->vdev.group;
-> > > +
-> > > +    if (cdc->unrealize) {
-> > > +        cdc->unrealize(cdev, errp);
-> > > +    }
-> > > +
-> > > +    vfio_put_device(vcdev);
-> > > +    vfio_put_group(group);
-> > > +}  
-> > 
-> > Doesn't seem to matter here, but I would have expected the
-> > cdc->unrealize to occur at the end to unwind the order of the realize
-> > function.
-Ok! Will do.
-
-> > 
-> > > +
-[...]
-
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 579ec07..31931c0 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -331,6 +331,7 @@ check-qtest-xtensaeb-y = $(check-qtest-xtensa-y)
+ check-qtest-s390x-y = tests/boot-serial-test$(EXESUF)
+ 
+ check-qtest-generic-y += tests/qom-test$(EXESUF)
++check-qtest-generic-y += tests/test-hmp$(EXESUF)
+ 
+ qapi-schema += alternate-any.json
+ qapi-schema += alternate-array.json
+@@ -720,6 +721,7 @@ tests/tpci200-test$(EXESUF): tests/tpci200-test.o
+ tests/display-vga-test$(EXESUF): tests/display-vga-test.o
+ tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
+ tests/qom-test$(EXESUF): tests/qom-test.o
++tests/test-hmp$(EXESUF): tests/test-hmp.o
+ tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-pc-obj-y)
+ tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-obj-y)
+ tests/nvme-test$(EXESUF): tests/nvme-test.o
+diff --git a/tests/test-hmp.c b/tests/test-hmp.c
+new file mode 100644
+index 0000000..99e35ec
+--- /dev/null
++++ b/tests/test-hmp.c
+@@ -0,0 +1,161 @@
++/*
++ * Test HMP commands.
++ *
++ * Copyright (c) 2017 Red Hat Inc.
++ *
++ * Author:
++ *    Thomas Huth <thuth@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2
++ * or later. See the COPYING file in the top-level directory.
++ *
++ * This test calls some HMP commands for all machines that the current
++ * QEMU binary provides, to check whether they terminate successfully
++ * (i.e. do not crash QEMU).
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++
++static int verbose;
++
++static const char *hmp_cmds[] = {
++    "boot_set ndc",
++    "chardev-add null,id=testchardev1",
++    "chardev-remove testchardev1",
++    "commit all",
++    "cpu-add 1",
++    "cpu 0",
++    "device_add ?",
++    "device_add usb-mouse,id=mouse1",
++    "mouse_button 7",
++    "mouse_move 10 10",
++    "mouse_button 0",
++    "device_del mouse1",
++    "dump-guest-memory /dev/null 0 4096",
++    "gdbserver",
++    "host_net_add user id=net0",
++    "hostfwd_add tcp::43210-:43210",
++    "hostfwd_remove tcp::43210-:43210",
++    "host_net_remove 0 net0",
++    "i /w 0",
++    "log all",
++    "log none",
++    "memsave 0 4096 \"/dev/null\"",
++    "migrate_set_cache_size 1",
++    "migrate_set_downtime 1",
++    "migrate_set_speed 1",
++    "netdev_add user,id=net1",
++    "set_link net1 off",
++    "set_link net1 on",
++    "netdev_del net1",
++    "nmi",
++    "o /w 0 0x1234",
++    "object_add memory-backend-ram,id=mem1,size=256M",
++    "object_del mem1",
++    "pmemsave 0 4096 \"/dev/null\"",
++    "p $pc + 8",
++    "qom-list /",
++    "qom-set /machine initrd test",
++    "screendump /dev/null",
++    "sendkey x",
++    "singlestep on",
++    "wavcapture /dev/null",
++    "stopcapture 0",
++    "sum 0 512",
++    "x /8i 0x100",
++    "xp /16x 0",
++    NULL
++};
++
++/* Run through the list of pre-defined commands */
++static void test_commands(void)
++{
++    char *response;
++    int i;
++
++    for (i = 0; hmp_cmds[i] != NULL; i++) {
++        if (verbose) {
++            fprintf(stderr, "\t%s\n", hmp_cmds[i]);
++        }
++        response = hmp(hmp_cmds[i]);
++        g_free(response);
++    }
++
++}
++
++/* Run through all info commands and call them blindly (without arguments) */
++static void test_info_commands(void)
++{
++    char *resp, *info, *info_buf, *endp;
++
++    info_buf = info = hmp("help info");
++
++    while (*info) {
++        /* Extract the info command, ignore parameters and description */
++        g_assert(strncmp(info, "info ", 5) == 0);
++        endp = strchr(&info[5], ' ');
++        g_assert(endp != NULL);
++        *endp = '\0';
++        /* Now run the info command */
++        if (verbose) {
++            fprintf(stderr, "\t%s\n", info);
++        }
++        resp = hmp(info);
++        g_free(resp);
++        /* And move forward to the next line */
++        info = strchr(endp + 1, '\n');
++        if (!info) {
++            break;
++        }
++        info += 1;
++    }
++
++    g_free(info_buf);
++}
++
++static void test_machine(gconstpointer data)
++{
++    const char *machine = data;
++    char *args;
++
++    args = g_strdup_printf("-S -M %s", machine);
++    qtest_start(args);
++
++    test_info_commands();
++    test_commands();
++
++    qtest_end();
++    g_free(args);
++    g_free((void *)data);
++}
++
++static void add_machine_test_case(const char *mname)
++{
++    char *path;
++
++    /* Ignore blacklisted machines that have known problems */
++    if (!strcmp("puv3", mname) || !strcmp("tricore_testboard", mname) ||
++        !strcmp("xenfv", mname) || !strcmp("xenpv", mname)) {
++        return;
++    }
++
++    path = g_strdup_printf("hmp/%s", mname);
++    qtest_add_data_func(path, g_strdup(mname), test_machine);
++    g_free(path);
++}
++
++int main(int argc, char **argv)
++{
++    char *v_env = getenv("V");
++
++    if (v_env && *v_env >= '2') {
++        verbose = true;
++    }
++
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_cb_for_every_machine(add_machine_test_case);
++
++    return g_test_run();
++}
 -- 
-Dong Jia Shi
+1.8.3.1
