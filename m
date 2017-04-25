@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d38bE-0007tp-Gn
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:06:22 -0400
+	(envelope-from <quintela@redhat.com>) id 1d38bG-0007wH-U3
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:06:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d38bB-0006JH-4g
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:06:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39984)
+	(envelope-from <quintela@redhat.com>) id 1d38bC-0006Ky-Qx
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:06:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49602)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d38bA-0006IJ-S2
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:06:17 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d38bC-0006K5-Hp
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:06:18 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC4723D97F
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 22:06:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9101C80043
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 22:06:17 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 26 Apr 2017 00:04:50 +0200
-Message-Id: <20170425220451.6028-41-quintela@redhat.com>
+Date: Wed, 26 Apr 2017 00:04:51 +0200
+Message-Id: <20170425220451.6028-42-quintela@redhat.com>
 In-Reply-To: <20170425220451.6028-1-quintela@redhat.com>
 References: <20170425220451.6028-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 40/41] migration: Make savevm.c target
- independent
+Subject: [Qemu-devel] [PATCH 41/41] migration: Remove unneeded includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,134 +32,292 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-It only needed TARGET_PAGE_SIZE/BITS/BITS_MIN values, so just export
-them from exec.h
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- Makefile.target            |  2 +-
- exec.c                     |  9 +++++++++
- include/exec/target_page.h |  2 ++
- migration/Makefile.objs    |  2 +-
- migration/savevm.c         | 14 +++++++-------
- 5 files changed, 20 insertions(+), 9 deletions(-)
+ include/migration/misc.h  | 2 ++
+ migration/block.c         | 6 ------
+ migration/colo-failover.c | 2 ++
+ migration/colo.c          | 2 --
+ migration/colo.h          | 3 ---
+ migration/exec.c          | 2 --
+ migration/fd.c            | 2 --
+ migration/global_state.c  | 1 -
+ migration/migration.c     | 6 ------
+ migration/migration.h     | 2 --
+ migration/postcopy-ram.c  | 4 +---
+ migration/qemu-file.c     | 2 --
+ migration/ram.c           | 4 ----
+ migration/savevm.c        | 6 ------
+ 14 files changed, 5 insertions(+), 39 deletions(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index e62021d..4020b01 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -146,7 +146,7 @@ obj-$(CONFIG_KVM) += kvm-all.o
- obj-y += memory.o cputlb.o
- obj-y += memory_mapping.o
- obj-y += dump.o
--obj-y += migration/ram.o migration/savevm.o
-+obj-y += migration/ram.o
- LIBS := $(libs_softmmu) $(LIBS)
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 28f69be..5c62e92 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -14,6 +14,8 @@
+ #ifndef MIGRATION_MISC_H
+ #define MIGRATION_MISC_H
  
- # xen support
-diff --git a/exec.c b/exec.c
-index e9a201a..447ac63 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3387,6 +3387,15 @@ size_t qemu_target_page_size(void)
-     return TARGET_PAGE_SIZE;
- }
- 
-+int qemu_target_page_bits(void)
-+{
-+    return TARGET_PAGE_BITS;
-+}
++#include "qemu/notify.h"
 +
-+int qemu_target_page_bits_min(void)
-+{
-+    return TARGET_PAGE_BITS_MIN;
-+}
- #endif
+ /* migration/ram.c */
  
- /*
-diff --git a/include/exec/target_page.h b/include/exec/target_page.h
-index 0961591..e3a19cc 100644
---- a/include/exec/target_page.h
-+++ b/include/exec/target_page.h
-@@ -16,5 +16,7 @@
- #define EXEC_TARGET_PAGE_H
+ void ram_mig_init(void);
+diff --git a/migration/block.c b/migration/block.c
+index 6457f25..5c89436 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -15,19 +15,13 @@
  
- size_t qemu_target_page_size(void);
-+int qemu_target_page_bits(void);
-+int qemu_target_page_bits_min(void);
- 
- #endif
-diff --git a/migration/Makefile.objs b/migration/Makefile.objs
-index 775e4ad..4277c88 100644
---- a/migration/Makefile.objs
-+++ b/migration/Makefile.objs
-@@ -1,5 +1,5 @@
- common-obj-y += migration.o socket.o fd.o exec.o
--common-obj-y += tls.o channel.o
-+common-obj-y += tls.o channel.o savevm.o
- common-obj-y += colo-comm.o colo.o colo-failover.o
- common-obj-y += vmstate.o vmstate-types.o page_cache.o
- common-obj-y += qemu-file.o global_state.o
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 6a47dcd..2e5f6a4 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -27,7 +27,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+-#include "block/block.h"
+ #include "qemu/error-report.h"
+-#include "qemu/main-loop.h"
+-#include "hw/hw.h"
+ #include "qemu/cutils.h"
+ #include "qemu/queue.h"
+-#include "qemu/timer.h"
+ #include "block.h"
+ #include "migration/misc.h"
+ #include "migration.h"
+ #include "migration/register.h"
+-#include "sysemu/blockdev.h"
+ #include "qemu-file.h"
+ #include "migration/vmstate.h"
+ #include "sysemu/block-backend.h"
+diff --git a/migration/colo-failover.c b/migration/colo-failover.c
+index 85c4526..9f2fb71 100644
+--- a/migration/colo-failover.c
++++ b/migration/colo-failover.c
+@@ -11,7 +11,9 @@
   */
  
  #include "qemu/osdep.h"
--#include "cpu.h"
- #include "hw/boards.h"
- #include "hw/hw.h"
- #include "hw/qdev.h"
-@@ -315,7 +314,7 @@ static void configuration_pre_save(void *opaque)
- 
-     state->len = strlen(current_name);
-     state->name = current_name;
--    state->target_page_bits = TARGET_PAGE_BITS;
-+    state->target_page_bits = qemu_target_page_bits();
- }
- 
- static int configuration_pre_load(void *opaque)
-@@ -326,7 +325,7 @@ static int configuration_pre_load(void *opaque)
-      * predates the variable-target-page-bits support and is using the
-      * minimum possible value for this CPU.
-      */
--    state->target_page_bits = TARGET_PAGE_BITS_MIN;
-+    state->target_page_bits = qemu_target_page_bits_min();
-     return 0;
- }
- 
-@@ -341,9 +340,9 @@ static int configuration_post_load(void *opaque, int version_id)
-         return -EINVAL;
-     }
- 
--    if (state->target_page_bits != TARGET_PAGE_BITS) {
-+    if (state->target_page_bits != qemu_target_page_bits()) {
-         error_report("Received TARGET_PAGE_BITS is %d but local is %d",
--                     state->target_page_bits, TARGET_PAGE_BITS);
-+                     state->target_page_bits, qemu_target_page_bits());
-         return -EINVAL;
-     }
- 
-@@ -359,7 +358,8 @@ static int configuration_post_load(void *opaque, int version_id)
++#include "qemu/main-loop.h"
+ #include "colo.h"
++#include "migration.h"
+ #include "colo-failover.h"
+ #include "qmp-commands.h"
+ #include "qapi/qmp/qerror.h"
+diff --git a/migration/colo.c b/migration/colo.c
+index 72001a5..4f41d2a 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -11,7 +11,6 @@
   */
- static bool vmstate_target_page_bits_needed(void *opaque)
- {
--    return TARGET_PAGE_BITS > TARGET_PAGE_BITS_MIN;
-+    return qemu_target_page_bits()
-+        > qemu_target_page_bits_min();
- }
  
- static const VMStateDescription vmstate_target_page_bits = {
-@@ -1165,7 +1165,7 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
-     }
+ #include "qemu/osdep.h"
+-#include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu-file-channel.h"
+ #include "migration.h"
+@@ -21,7 +20,6 @@
+ #include "io/channel-buffer.h"
+ #include "trace.h"
+ #include "qemu/error-report.h"
+-#include "qapi/error.h"
+ #include "colo-failover.h"
+ #include "replication.h"
+ #include "qmp-commands.h"
+diff --git a/migration/colo.h b/migration/colo.h
+index ba0bb6e..be6beba 100644
+--- a/migration/colo.h
++++ b/migration/colo.h
+@@ -14,9 +14,6 @@
+ #define QEMU_COLO_H
  
-     vmdesc = qjson_new();
--    json_prop_int(vmdesc, "page_size", TARGET_PAGE_SIZE);
-+    json_prop_int(vmdesc, "page_size", qemu_target_page_size());
-     json_start_array(vmdesc, "devices");
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+ #include "qemu-common.h"
+-#include "qemu/coroutine_int.h"
+-#include "qemu/thread.h"
+-#include "qemu/main-loop.h"
  
+ bool colo_supported(void);
+ void colo_info_init(void);
+diff --git a/migration/exec.c b/migration/exec.c
+index 074943a..6d535dc 100644
+--- a/migration/exec.c
++++ b/migration/exec.c
+@@ -19,10 +19,8 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "channel.h"
+ #include "exec.h"
+-#include "migration.h"
+ #include "io/channel-command.h"
+ #include "trace.h"
+ 
+diff --git a/migration/fd.c b/migration/fd.c
+index b2384bf..30f5258 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -16,10 +16,8 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "channel.h"
+ #include "fd.h"
+-#include "migration.h"
+ #include "monitor/monitor.h"
+ #include "io/channel-util.h"
+ #include "trace.h"
+diff --git a/migration/global_state.c b/migration/global_state.c
+index 3d67ba2..bf82aa7 100644
+--- a/migration/global_state.c
++++ b/migration/global_state.c
+@@ -20,7 +20,6 @@
+ #include "qapi/util.h"
+ #include "migration/global_state.h"
+ #include "migration/vmstate.h"
+-#include "sysemu/sysemu.h"
+ #include "trace.h"
+ 
+ typedef struct {
+diff --git a/migration/migration.c b/migration/migration.c
+index 38740b4..83caa58 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -16,7 +16,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+-#include "qemu/main-loop.h"
+ #include "migration/blocker.h"
+ #include "exec.h"
+ #include "fd.h"
+@@ -30,11 +29,9 @@
+ #include "qemu-file-channel.h"
+ #include "qemu-file.h"
+ #include "migration/vmstate.h"
+-#include "sysemu/sysemu.h"
+ #include "block/block.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/util.h"
+-#include "qemu/sockets.h"
+ #include "qemu/rcu.h"
+ #include "block.h"
+ #include "postcopy-ram.h"
+@@ -42,9 +39,6 @@
+ #include "qmp-commands.h"
+ #include "trace.h"
+ #include "qapi-event.h"
+-#include "qom/cpu.h"
+-#include "exec/memory.h"
+-#include "exec/address-spaces.h"
+ #include "exec/target_page.h"
+ #include "io/channel-buffer.h"
+ #include "colo.h"
+diff --git a/migration/migration.h b/migration/migration.h
+index 735f565..f6bac81 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -14,10 +14,8 @@
+ #ifndef QEMU_MIGRATION_H
+ #define QEMU_MIGRATION_H
+ 
+-#include "qapi/qmp/qdict.h"
+ #include "qemu-common.h"
+ #include "qemu/thread.h"
+-#include "qemu/notify.h"
+ #include "qapi-types.h"
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 88e1646..e9a0b5c 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -17,14 +17,12 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-
+-#include "qemu-common.h"
+ #include "exec/target_page.h"
+ #include "migration.h"
+ #include "qemu-file.h"
+-#include "savevm.h"
+ #include "postcopy-ram.h"
+ #include "ram.h"
++#include "savevm.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/balloon.h"
+ #include "qemu/error-report.h"
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index e65c373..2ab2bf3 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -26,8 +26,6 @@
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+ #include "qemu/iov.h"
+-#include "qemu/sockets.h"
+-#include "qemu/coroutine.h"
+ #include "migration.h"
+ #include "qemu-file.h"
+ #include "trace.h"
+diff --git a/migration/ram.c b/migration/ram.c
+index 14104f1..1d69f64 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -26,14 +26,12 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "cpu.h"
+ #include <zlib.h>
+ #include "qapi-event.h"
+ #include "qemu/cutils.h"
+ #include "qemu/bitops.h"
+ #include "qemu/bitmap.h"
+-#include "qemu/timer.h"
+ #include "qemu/main-loop.h"
+ #include "xbzrle.h"
+ #include "ram.h"
+@@ -41,9 +39,7 @@
+ #include "migration/register.h"
+ #include "migration/misc.h"
+ #include "qemu-file.h"
+-#include "migration/vmstate.h"
+ #include "postcopy-ram.h"
+-#include "exec/address-spaces.h"
+ #include "migration/page_cache.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 2e5f6a4..a84883f 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -28,12 +28,8 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/boards.h"
+-#include "hw/hw.h"
+-#include "hw/qdev.h"
+ #include "hw/xen/xen.h"
+ #include "net/net.h"
+-#include "sysemu/sysemu.h"
+-#include "qemu/timer.h"
+ #include "migration.h"
+ #include "migration/snapshot.h"
+ #include "migration/misc.h"
+@@ -46,13 +42,11 @@
+ #include "postcopy-ram.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/error-report.h"
+-#include "qemu/queue.h"
+ #include "sysemu/cpus.h"
+ #include "exec/memory.h"
+ #include "exec/target_page.h"
+ #include "qmp-commands.h"
+ #include "trace.h"
+-#include "qemu/bitops.h"
+ #include "qemu/iov.h"
+ #include "block/snapshot.h"
+ #include "qemu/cutils.h"
 -- 
 2.9.3
