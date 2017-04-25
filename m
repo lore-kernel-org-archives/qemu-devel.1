@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter@lekensteyn.nl>) id 1d2x7I-00056w-RU
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:50:43 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d2x7s-0005Vy-Rm
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:51:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter@lekensteyn.nl>) id 1d2x7E-0004Is-Vu
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:50:40 -0400
-Received: from lekensteyn.nl ([178.21.112.251]:36313)
+	(envelope-from <rth7680@gmail.com>) id 1d2x7o-0004WX-6E
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:51:16 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34682)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter@lekensteyn.nl>) id 1d2x7E-0004Gb-Kn
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:50:36 -0400
-Date: Tue, 25 Apr 2017 11:50:27 +0200
-From: Peter Wu <peter@lekensteyn.nl>
-Message-ID: <20170425095027.GB11840@al>
-References: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
-	<4ea264eb-128c-569a-264c-8ffa3956dca2@redhat.com>
-	<CAC2QTZYq4v+zcYQ3LrkWrYdZYEVwYe1kjpfh30+kKe+p+Z3-vg@mail.gmail.com>
-	<b45474c4-e4f6-6509-adcd-31aee92fd62c@redhat.com>
-	<CAC2QTZbvyKNFjLhaDn_tWzeF=X2kkNpq=2wws_yBLkhFbiBJBA@mail.gmail.com>
-	<CAC2QTZbz1isnu-SKRoe8PcEfzV5Yz5Rf82_7zTXqvEKB7NUJJQ@mail.gmail.com>
-	<e91d0cfe-407a-ab3b-ee9a-e32d570668a4@redhat.com>
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d2x7n-0004W2-Vu
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 05:51:12 -0400
+Received: by mail-wr0-x243.google.com with SMTP id 6so10217718wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 02:51:11 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170423223216.17856-1-aurelien@aurel32.net>
+	<23a3da7d-d330-7cad-5bef-8e80c8d9f50c@suse.de>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <70dad7b4-f893-1af7-d0c9-7dbb10506b04@twiddle.net>
+Date: Tue, 25 Apr 2017 11:51:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e91d0cfe-407a-ab3b-ee9a-e32d570668a4@redhat.com>
-Subject: Re: [Qemu-devel] DMG chunk size independence
+In-Reply-To: <23a3da7d-d330-7cad-5bef-8e80c8d9f50c@suse.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-s390x: Mask the SIGP order_code to
+ 8bit.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Philipp Kern <phil@philkern.de>
 
-On Mon, Apr 24, 2017 at 05:19:48PM -0400, John Snow wrote:
+On 04/24/2017 10:25 AM, Alexander Graf wrote:
 > 
 > 
-> On 04/23/2017 05:03 AM, Ashijeet Acharya wrote:
-> > Hi,
-> > 
-> > Great news!
-> > I have almost completed this task and the results are looking
-> > promising. I have not yet attended to the DMG files having bz2
-> > compressed chunks but that should be easy and pretty similar to my
-> > approach for zlib compressed files. So, no worries there.
-> > 
-> > For testing I am first converting the images to raw format and then
-> > comparing the resulting image with the one converted using v2.9.0 DMG
-> > driver and after battling for 2 days with my code, it finally prints
-> > "Images are identical." According to John, that should be pretty
-> > conclusive and I completely agree.
-> > 
+> On 24.04.17 00:32, Aurelien Jarno wrote:
+>> From: Philipp Kern <phil@philkern.de>
+>>
+>> According to "CPU Signaling and Response", "Signal-Processor Orders",
+>> the order field is bit position 56-63. Without this, the Linux
+>> guest kernel is sometimes unable to stop emulation and enters
+>> an infinite loop of "XXX unknown sigp: 0xffffffff00000005".
+>>
+>> Signed-off-by: Philipp Kern <phil@philkern.de>
+>> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+>> ---
+>>  target/s390x/misc_helper.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> This patch has been sent by Philipp Kern a lot of time ago, and it seems
+>> has been lost. I am resending it, as it is still useful.
+>>
+>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+>> index 3bf09ea222..4946b56ab3 100644
+>> --- a/target/s390x/misc_helper.c
+>> +++ b/target/s390x/misc_helper.c
+>> @@ -534,7 +534,7 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t 
+>> order_code, uint32_t r1,
+>>      /* Remember: Use "R1 or R1 + 1, whichever is the odd-numbered register"
+>>         as parameter (input). Status (output) is always R1. */
+>>
+>> -    switch (order_code) {
+>> +    switch (order_code & 0xff) {
 > 
-> Yes, comparing a sample.dmg against a raw file generated from the 2.9.0
-> qemu-img tool should be reasonably good evidence that you have not
-> altered the behavior of the tool.
-> 
-> > Now, the real thing I wanted to ask was, if someone is aware of a DMG
-> > file which has a chunk size above 64 MiB so that I can test those too.
-> > If yes, please share the download link with me.
-> > Currently I am testing the ones posted by Peter Wu while submitting
-> > his DMG work in 2014.
-> > Here -> https://lists.nongnu.org/archive/html/qemu-devel/2014-12/msg03606.html
-> > 
-> 
-> Are any of those over 64MB? I assume you're implying that they aren't.
-> 
-> Maybe Peter knows?...
+> This definitely needs a comment above the mask. Ideally I'd love to just change 
+> the function prototype to pass order_code as uint8_t, but I don't think that's 
+> possible with the TCG glue.
 
-I don't know DMG with bzip2-compressed chunks over 64M. Looking through
-more recent files, there is this log for "Install macOS Sierra
-10.12(16A323)-B.dmg" which contains only zlib-compressed or raw data
-where the uncompressed size (in the MISH block) is always at most 1MiB:
-https://github.com/Lekensteyn/dmg2img/issues/1#issuecomment-273662984
+Correct.  We'll need to leave the mask here.
 
-In an Xcode_7.2.dmg file, the situation was similar, only zlib or raw
-and also with a max uncompressed size of 1MiB (actually, an exact size
-of 1MiB in both cases based on "sectorCount").
 
-Perhaps bzip2-compressed chunks are not so common for larger disk images
-since zlib is faster.
--- 
-Kind regards,
-Peter Wu
-https://lekensteyn.nl
+r~
