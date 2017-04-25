@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d2vyf-0003yF-Jk
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:37:42 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d2w2m-0005L4-NA
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d2vyc-0007kp-Cr
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:37:41 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48022
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1d2vyc-0007kl-7O
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:37:38 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3P8XsmI046241
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 04:37:37 -0400
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a1v4rd8dg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 04:37:33 -0400
-Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Tue, 25 Apr 2017 18:37:01 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Tue, 25 Apr 2017 14:05:55 +0530
-Message-Id: <20170425083555.13547-1-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH RFC] configure: fix clang failure for libatomic
+	(envelope-from <jasowang@redhat.com>) id 1d2w2j-0001h8-Go
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:41:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40602)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2w2j-0001fo-AK
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:41:53 -0400
+References: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1492674416-9408-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<df05a73b-fba8-a6d3-bf6a-648304458257@redhat.com>
+	<58FD9546.5000104@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <82c50df3-28c9-fb21-f2c6-76a99f864bee@redhat.com>
+Date: Tue, 25 Apr 2017 16:41:45 +0800
+MIME-Version: 1.0
+In-Reply-To: <58FD9546.5000104@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: serialize compare
+ thread's initialization with main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,70 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
-Cc: alex.bennee@linaro.org, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org, pbonzini@redhat.com
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
 
-Travis builds failure was reported for powernv boot-serial test with
-qemu built with clang.
 
-Debugging revealed that CONFIG_ATOMIC64 wasnt getting set for the clang
-build because of that atomic operations weren't being used and was
-resulting in MTTCG failure in the powernv boot-serial test.
 
-libatomic is required to successfully test atomic64 and atomic128 for
-clang. Introduced newer checks for the same. And on failure default to
-single threaded tcg support in PPC64.
+On 2017=E5=B9=B404=E6=9C=8824=E6=97=A5 14:03, Hailiang Zhang wrote:
+> On 2017/4/24 12:10, Jason Wang wrote:
+>>
+>> On 2017=E5=B9=B404=E6=9C=8820=E6=97=A5 15:46, zhanghailiang wrote:
+>>> We call qemu_chr_fe_set_handlers() in colo-compare thread, it is used
+>>> to detach watched fd from default main context, so it has chance to
+>>> handle the same watched fd with main thread concurrently, which will
+>>> trigger an error report:
+>>> "qemu-char.c:918: io_watch_poll_finalize: Assertion `iwp->src =3D=3D=20
+>>> ((void *)0)' failed."
+>> Anyway to prevent fd from being handled by main thread before creating
+>> colo thread? Using semaphore seems not elegant.
+>
+> So how about calling qemu_mutex_lock_iothread() before=20
+> qemu_chr_fe_set_handlers() ?
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
----
+Looks better, but I needs more information e.g how main thread can touch =
+it?
 
-Reference:
-https://lists.gnu.org/archive/html/qemu-ppc/2017-04/msg00277.html
-
----
- configure | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/configure b/configure
-index d31a3e8..1e5f7af 100755
---- a/configure
-+++ b/configure
-@@ -4598,6 +4598,9 @@ int main(void)
- EOF
-   if compile_prog "" "" ; then
-     atomic128=yes
-+  elif compile_prog "" "-latomic" ; then
-+     atomic128=yes
-+     lib_atomic="-latomic"
-   fi
- fi
- 
-@@ -4628,6 +4631,9 @@ int main(void)
- EOF
- if compile_prog "" "" ; then
-   atomic64=yes
-+elif compile_prog "" "-latomic" ; then
-+  atomic64=yes
-+  lib_atomic="-latomic"
- fi
- 
- ########################################
-@@ -6065,6 +6071,16 @@ if [ "$TARGET_BASE_ARCH" = "" ]; then
-   TARGET_BASE_ARCH=$TARGET_ARCH
- fi
- 
-+if test $atomic64 == "yes" || test $atomic128 == "yes" ; then
-+    libs_softmmu="$lib_atomic $libs_softmmu"
-+elif test $mttcg == "yes" && test $TARGET_BASE_ARCH == "ppc"; then
-+    echo
-+    echo "Note: Atomic library (-latomic) not available, falling"
-+    echo "      back to single threaded mode by default"
-+    echo
-+    mttcg=no
-+fi
-+
- symlink "$source_path/Makefile.target" "$target_dir/Makefile"
- 
- upper() {
--- 
-2.9.3
+Thanks
