@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d30ts-0001uf-TG
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:53:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1d30vJ-0002a7-0n
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:54:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d30tp-0007Cj-MY
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:53:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:4794)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d30tp-0007CU-D8
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:53:01 -0400
-References: <faa27752-45a9-e6f3-d6fc-cad8254c4f31@web.de>
-	<20170425134259.GH21129@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d30vF-0007Zg-VY
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:54:33 -0400
+References: <20170425131828.22480-1-n54@gmx.com>
+	<CAFEAcA-PmbjRYb2EDDp60pKNnUQ8Rkdx79TTLgUMf_VRe2JT+w@mail.gmail.com>
+	<f4837473-2112-fe0c-862c-ae4b77dc0bc8@gmx.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a7cc0ade-e37f-0c06-afdb-dbcf69a72e6c@redhat.com>
-Date: Tue, 25 Apr 2017 08:52:58 -0500
+Message-ID: <0855b5b6-0aab-7f3a-33ce-8f289de3454f@redhat.com>
+Date: Tue, 25 Apr 2017 08:54:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170425134259.GH21129@redhat.com>
+In-Reply-To: <f4837473-2112-fe0c-862c-ae4b77dc0bc8@gmx.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="gqjbwvjhKEtTQlieF03DoMlhDll8wbuhj"
-Subject: Re: [Qemu-devel] [PATCH v2] crypto_gen_random() now also works on
- windows
+	boundary="4evGgwtJrnws3rRlg0tD9A6RkwExOBHew"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH]
+ scripts/qemu-binfmt-conf.sh: Fix shell portability issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Geert Martin Ijewski <gm.ijewski@web.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Kamil Rytarowski <n54@gmx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gqjbwvjhKEtTQlieF03DoMlhDll8wbuhj
+--4evGgwtJrnws3rRlg0tD9A6RkwExOBHew
 From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- Geert Martin Ijewski <gm.ijewski@web.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Message-ID: <a7cc0ade-e37f-0c06-afdb-dbcf69a72e6c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] crypto_gen_random() now also works on
- windows
-References: <faa27752-45a9-e6f3-d6fc-cad8254c4f31@web.de>
- <20170425134259.GH21129@redhat.com>
-In-Reply-To: <20170425134259.GH21129@redhat.com>
+To: Kamil Rytarowski <n54@gmx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <0855b5b6-0aab-7f3a-33ce-8f289de3454f@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] scripts/qemu-binfmt-conf.sh:
+ Fix shell portability issue
+References: <20170425131828.22480-1-n54@gmx.com>
+ <CAFEAcA-PmbjRYb2EDDp60pKNnUQ8Rkdx79TTLgUMf_VRe2JT+w@mail.gmail.com>
+ <f4837473-2112-fe0c-862c-ae4b77dc0bc8@gmx.com>
+In-Reply-To: <f4837473-2112-fe0c-862c-ae4b77dc0bc8@gmx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/25/2017 08:42 AM, Daniel P. Berrange wrote:
-> On Mon, Apr 24, 2017 at 07:51:49PM +0200, Geert Martin Ijewski wrote:
->> If no crypto library is included in the build QEMU uses
->> qcrypto_random_bytes() to generate random data. That function tried to=
- open
->> /dev/urandom or /dev/random and if openeing neither file worked it err=
-ored
->> out.
+On 04/25/2017 08:50 AM, Kamil Rytarowski wrote:
+> On 25.04.2017 15:33, Peter Maydell wrote:
+>> On 25 April 2017 at 14:18, Kamil Rytarowski <n54@gmx.com> wrote:
+>>> Appease pkgsrc and use portable shell variable comparison.
+>>> This switches "=3D=3D" to "=3D". It should not be a functional change=
+=2E
+>>>
+>>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+>>> ---
 >>
+>> Thanks for this patch; it's an easy bug to let slip in
+>> if your /bin/sh happens to be bash.
+>>
+>> PS: you forgot to cc qemu-devel@ on this patch.
+>>
+>=20
+> I assumed that qemu-trivial@ don't need to go to qemu-devel@. Thank you=
 
->> +int qcrypto_random_init(Error **errp)
->> +{
->> +#ifdef _WIN32
->> +    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL,
->> +                             CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
->> +        error_setg_errno(errp, GetLastError(),
->> +                         "Unable to create cryptographic provider");
->=20
-> Unfortunately the return value of 'GetLastError()' isn't an errno
-> so we can't use error_setg_errno here.
->=20
-> Just use error_setg, and report the error value with a '(code=3D%u)'
-> substitution at the end of the error message.
->=20
+> for pointing it out.
 
-Or, use error_setg_win32(), which is designed for this purpose.
+ALL patches need to go to qemu-devel (so we have a one-stop-shop for all
+pending patches), but some patches need to additionally go to secondary
+lists for catching the attention of the right maintainers.
+
+scripts/get_maintainer.pl is your friend, and it should always list
+qemu-devel in its answer.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -80,7 +78,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---gqjbwvjhKEtTQlieF03DoMlhDll8wbuhj
+--4evGgwtJrnws3rRlg0tD9A6RkwExOBHew
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -90,13 +88,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY/1S6AAoJEKeha0olJ0NqPVAH+gLsK2ckeFdjyeq0Ra79dy1F
-m+T6snTV4egRerR7dD63Uv9NCWx3dab7+B/B8vdyMZdfnXGotPTmLcBWqjTuIPZ1
-g78lQpYRXroh23swzc57UTxHeDu+LNHBZgEM2yXNR/ZoHRml3M0R6/PG5H/8lW0g
-exI22XGxuDV5LTnxXrb9vS9+kK98xHyBeNKCqYl4nv69o4v0Ar6dV7865Jt6yk6g
-aBYsDgfzFGJ/pPOq5uHNZDXu5LFHH1v+Fn5gGl19/FgJiQq9YWlz/LMSfGCkWO1c
-q2/2vTzNSUO8CEVwaev76m9IUleDCMPJu+KCfJxJ/5CMQOvKX1mHejmapmyy8jg=
-=Wgwf
+iQEcBAEBCAAGBQJY/1UTAAoJEKeha0olJ0NqIr4H/A/rkuxPp7StqgIaniTwDk+y
+6kMEHIu8wW/rCogMtWzyxziK5CM9fwpEGw/hyoHTRENUS0lTboWdtGqhiKLmFtrM
+DgedUfB78d5IIv8lbNvWJrSUIa0JMz+Rybc8DUqMy7wxerRAfybVGzGitxrh6R1s
+Lm+A0RpLXi1iOUWhCOI7RDvTtZFEMUCR+3s2gFjsw7TZ266pxiEwgg6OkxzpRoUr
+BbCBC/nyo97tDn41qPhLc+Q9sJr91Y0740bQ1/N57JIH2PDrccdkfYwQFF2WCIpf
+Z7N61y2zSKFzLrM+Fo6tG5z/AwAl1PDMGoqi9QTxnRu8fJe74iwDvTnEcqAScsw=
+=t4d+
 -----END PGP SIGNATURE-----
 
---gqjbwvjhKEtTQlieF03DoMlhDll8wbuhj--
+--4evGgwtJrnws3rRlg0tD9A6RkwExOBHew--
