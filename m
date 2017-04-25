@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d31aA-0002Vg-K9
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:36:51 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d31d4-0003Oc-VE
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:39:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d31a4-0007gr-Qd
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:36:46 -0400
-Date: Tue, 25 Apr 2017 16:36:20 +0200
+	(envelope-from <imammedo@redhat.com>) id 1d31d3-0000RJ-Rz
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:39:47 -0400
+Date: Tue, 25 Apr 2017 16:39:31 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170425163620.30f4ceb2@Igors-MacBook-Pro.local>
-In-Reply-To: <20170425142827.rezulct5cxetweyw@kamzik.brq.redhat.com>
+Message-ID: <20170425163931.396bfbe1@Igors-MacBook-Pro.local>
+In-Reply-To: <20170425140926.jufnkmtjgnzdxjos@kamzik.brq.redhat.com>
 References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-4-git-send-email-imammedo@redhat.com>
-	<20170425142827.rezulct5cxetweyw@kamzik.brq.redhat.com>
+	<1490189568-167621-3-git-send-email-imammedo@redhat.com>
+	<20170425140926.jufnkmtjgnzdxjos@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 03/23] hw/arm/virt: use
- machine->possible_cpus for storing possible topology info
+Subject: Re: [Qemu-devel] [PATCH for-2.10 02/23] hw/arm/virt: extract
+ mp-affinity calculation in separate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +28,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Andrew Jones <drjones@redhat.com>
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, 25 Apr 2017 16:28:27 +0200
+On Tue, 25 Apr 2017 16:09:26 +0200
 Andrew Jones <drjones@redhat.com> wrote:
 
-> On Wed, Mar 22, 2017 at 02:32:28PM +0100, Igor Mammedov wrote:
-> > for now precalculate and store mp_afinity in possible_cpus
-> > as ARM cpus don't have socket/core/thread-id properties yet.
-> > In follow patches possible_cpus will be used for storing
-> > and setting NUMA node mapping and replace legacy bitmap
-> > based numa_info[node_id].node_cpu/numa_get_node_for_cpu()
-> > 
-> > For the lack of better idea, this patch cannibalizes
-> > possible_cpus.cpus[x].props.thread_id so that
-> > *_cpu_index_to_props() callback could return addressable
-> > by props CPU which will used by machine_set_cpu_numa_node()
-> > in follow up patches to assign a CPU to node. But
-> > cannibalizing is fine for now as that thread_id isn't exposed
-> > to users (no hotpluggable_cpus callback support for ARM yet)
-> > and it will be used only internally until 'device_add cpu'
-> > is supported where we can decide on which properties to use.
-> > 
+> On Wed, Mar 22, 2017 at 02:32:27PM +0100, Igor Mammedov wrote:
 > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > > ---
-> >  hw/arm/virt.c | 39 ++++++++++++++++++++++++++++++++++++---
-> >  1 file changed, 36 insertions(+), 3 deletions(-)
+> >  hw/arm/virt.c | 59 ++++++++++++++++++++++++++++++++++++++++++-----------------
+> >  1 file changed, 42 insertions(+), 17 deletions(-)
 > > 
 > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 484754e..4de46b1 100644
+> > index 5f62a03..484754e 100644
 > > --- a/hw/arm/virt.c
 > > +++ b/hw/arm/virt.c
-> > @@ -1237,6 +1237,7 @@ static void machvirt_init(MachineState *machine)
-> >  {
-> >      VirtMachineState *vms = VIRT_MACHINE(machine);
-> >      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(machine);
-> > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> >      qemu_irq pic[NUM_IRQS];
-> >      MemoryRegion *sysmem = get_system_memory();
-> >      MemoryRegion *secure_sysmem = NULL;
-> > @@ -1360,10 +1361,16 @@ static void machvirt_init(MachineState *machine)
-> >          exit(1);
-> >      }
+> > @@ -1194,6 +1194,45 @@ void virt_machine_done(Notifier *notifier, void *data)
+> >      virt_build_smbios(vms);
+> >  }
 > >  
-> > -    for (n = 0; n < smp_cpus; n++) {
-> > -        Object *cpuobj = object_new(typename);
-> > +    mc->possible_cpu_arch_ids(machine);
+> > +static uint64_t virt_idx2mp_affinity(VirtMachineState *vms, int idx)
 > 
-> Hmm, this is a bit too subtle for my taste. Making this call, which by
-> name implies it returns the possible CPU Arch-IDs (which indeed it does),
-> but without assigning its return value to anything, looks wrong. I see
-> the reason to do so, though, is because on first call it will do the
-> allocation. I'd prefer a wrapper
-> 
->  static void virt_alloc_possible_cpus(MachineState *ms)
->  {
->     /* First invocation does allocation and initialization. */
->     (void)MACHINE_GET_CLASS(ms)->possible_cpu_arch_ids(ms);
->  }
-Ok, I'll make it generic
-machine_alloc_possible_cpus(MachineState *ms)
-and use it for x86/ppc as well
+> I think I'd prefer virt_cpu_mp_affinity, or anything without a '2' in it
+> for the name.
+I'll fix it in v2
 
 > 
-> > +    for (n = 0; n < machine->possible_cpus->len; n++) {
-> > +        Object *cpuobj;
-> >  
-> > -        object_property_set_int(cpuobj, virt_idx2mp_affinity(vms, n),
-> > +        if (n >= smp_cpus) {
-> > +            break;
+> > +{
+> > +    uint64_t mp_affinity;
+> > +    uint8_t clustersz;
+> > +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+> > +
+> > +    if (!vmc->disallow_affinity_adjustment) {
+> > +        uint8_t aff0, aff1;
+> 
+> The else part also needs aff0, aff1; might as well move them up.
+sure
+
+> 
+> > +
+> > +        if (vms->gic_version == 3) {
+> > +            clustersz = GICV3_TARGETLIST_BITS;
+> > +        } else {
+> > +            clustersz = GIC_TARGETLIST_BITS;
 > > +        }
 > > +
-> > +        cpuobj = object_new(typename);
-> > +        object_property_set_int(cpuobj, machine->possible_cpus->cpus[n].arch_id,
-> >                                  "mp-affinity", NULL);
-> >  
-> >          if (!vms->secure) {
-> > @@ -1543,6 +1550,31 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
-> >      }
-> >  }
-> >  
-> > +static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-> > +{
-> > +    int n;
-> > +    VirtMachineState *vms = VIRT_MACHINE(ms);
-> > +
-> > +    if (ms->possible_cpus) {
-> > +        assert(ms->possible_cpus->len == max_cpus);
-> > +        return ms->possible_cpus;
+> > +        /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
+> > +         * GIC's target-list limitations. 32-bit KVM hosts currently
+> > +         * always create clusters of 4 CPUs, but that is expected to
+> > +         * change when they gain support for gicv3. When KVM is enabled
+> > +         * it will override the changes we make here, therefore our
+> > +         * purposes are to make TCG consistent (with 64-bit KVM hosts)
+> > +         * and to improve SGI efficiency.
+> > +         */
+> > +        aff1 = idx / clustersz;
+> > +        aff0 = idx % clustersz;
+> > +        mp_affinity = (aff1 << ARM_AFF1_SHIFT) | aff0;
+> > +    } else {
+> > +        /* This cpu-id-to-MPIDR affinity is used only for TCG;
+> > +         * KVM will override it. We don't support setting cluster ID
+> > +         * ([16..23]) (known as Aff2 in later ARM ARM versions), or any of
+> > +         * the higher affinity level fields, so these bits always RAZ.
+> > +         */
+> > +        uint32_t Aff1 = idx / ARM_DEFAULT_CPUS_PER_CLUSTER;
+> > +        uint32_t Aff0 = idx % ARM_DEFAULT_CPUS_PER_CLUSTER;
+> > +        mp_affinity = (Aff1 << ARM_AFF1_SHIFT) | Aff0;
 > > +    }
-> > +
-> > +    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
-> > +                                  sizeof(CPUArchId) * max_cpus);
-> > +    ms->possible_cpus->len = max_cpus;
-> > +    for (n = 0; n < ms->possible_cpus->len; n++) {
-> > +        ms->possible_cpus->cpus[n].arch_id =
-> > +            virt_idx2mp_affinity(vms, n);
-> > +        ms->possible_cpus->cpus[n].props.has_thread_id = true;
-> > +        ms->possible_cpus->cpus[n].props.thread_id = n;
-> > +
-> > +        /* TODO: add 'has_node/node' here to describe
-> > +           to which node core belongs */
-> > +    }
-> > +    return ms->possible_cpus;
+> 
+> Maybe we should create an ARM CPU function
+> 
+>  uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz)
+>  {
+>    uint32_t Aff1 = idx / clustersz;
+>    uint32_t Aff0 = idx % clustersz;
+>    return (Aff1 << ARM_AFF1_SHIFT) | Aff0;
+>  }
+I'll add and use it in v2
+
+> which we'd use in arm_cpu_realizefn() and here
+> 
+>  static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>  {
+>    if (VIRT_MACHINE_GET_CLASS(vms)->disallow_affinity_adjustment) {
+>       return arm_cpu_mp_affinity(idx, ARM_DEFAULT_CPUS_PER_CLUSTER);
+>    }
+> 
+>    /* ...big comment... */
+>    return arm_cpu_mp_affinity(idx, vms->gic_version == 3 ?
+>                           GICV3_TARGETLIST_BITS : GIC_TARGETLIST_BITS);
+>  }
+> 
+> > +    return mp_affinity;
 > > +}
 > > +
-> >  static void virt_machine_class_init(ObjectClass *oc, void *data)
+> >  static void machvirt_init(MachineState *machine)
 > >  {
-> >      MachineClass *mc = MACHINE_CLASS(oc);
-> > @@ -1559,6 +1591,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >      mc->pci_allow_0_address = true;
-> >      /* We know we will never create a pre-ARMv7 CPU which needs 1K pages */
-> >      mc->minimum_page_bits = 12;
-> > +    mc->possible_cpu_arch_ids = virt_possible_cpu_arch_ids;
-> >  }
+> >      VirtMachineState *vms = VIRT_MACHINE(machine);
+> > @@ -1210,7 +1249,6 @@ static void machvirt_init(MachineState *machine)
+> >      CPUClass *cc;
+> >      Error *err = NULL;
+> >      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+> > -    uint8_t clustersz;
 > >  
-> >  static const TypeInfo virt_machine_info = {
+> >      if (!cpu_model) {
+> >          cpu_model = "cortex-a15";
+> > @@ -1263,10 +1301,8 @@ static void machvirt_init(MachineState *machine)
+> >       */
+> >      if (vms->gic_version == 3) {
+> >          virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / 0x20000;
+> > -        clustersz = GICV3_TARGETLIST_BITS;
+> >      } else {
+> >          virt_max_cpus = GIC_NCPU;
+> > -        clustersz = GIC_TARGETLIST_BITS;
+> >      }
+> >  
+> >      if (max_cpus > virt_max_cpus) {
+> > @@ -1326,20 +1362,9 @@ static void machvirt_init(MachineState *machine)
+> >  
+> >      for (n = 0; n < smp_cpus; n++) {
+> >          Object *cpuobj = object_new(typename);
+> > -        if (!vmc->disallow_affinity_adjustment) {
+> > -            /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
+> > -             * GIC's target-list limitations. 32-bit KVM hosts currently
+> > -             * always create clusters of 4 CPUs, but that is expected to
+> > -             * change when they gain support for gicv3. When KVM is enabled
+> > -             * it will override the changes we make here, therefore our
+> > -             * purposes are to make TCG consistent (with 64-bit KVM hosts)
+> > -             * and to improve SGI efficiency.
+> > -             */
+> > -            uint8_t aff1 = n / clustersz;
+> > -            uint8_t aff0 = n % clustersz;
+> > -            object_property_set_int(cpuobj, (aff1 << ARM_AFF1_SHIFT) | aff0,
+> > -                                    "mp-affinity", NULL);
+> > -        }
+> > +
+> > +        object_property_set_int(cpuobj, virt_idx2mp_affinity(vms, n),
+> > +                                "mp-affinity", NULL);
+> >  
+> >          if (!vms->secure) {
+> >              object_property_set_bool(cpuobj, false, "has_el3", NULL);
 > > -- 
 > > 2.7.4
 > > 
-> > 
+> >
 > 
 > Thanks,
-> drew
+> drew 
