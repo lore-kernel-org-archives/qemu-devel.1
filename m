@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d35JY-00089D-JF
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:54 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d35Jj-0008HY-9H
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d35JW-0005vD-M5
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:52 -0400
-Received: from mail.kernel.org ([198.145.29.136]:50388)
+	(envelope-from <sstabellini@kernel.org>) id 1d35Jf-0005zE-Ku
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:36:03 -0400
+Received: from mail.kernel.org ([198.145.29.136]:50462)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d35JW-0005uq-Cu
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:50 -0400
+	id 1d35Jf-0005yq-8r
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:59 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 25 Apr 2017 11:35:11 -0700
-Message-Id: <1493145313-31311-19-git-send-email-sstabellini@kernel.org>
+Date: Tue, 25 Apr 2017 11:35:13 -0700
+Message-Id: <1493145313-31311-21-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1493145313-31311-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1704251134220.2875@sstabellini-ThinkPad-X260>
 	<1493145313-31311-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PATCH 19/21] move xen-common.c to hw/xen/
+Subject: [Qemu-devel] [PATCH 21/21] move xen-mapcache.c to hw/i386/xen/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +30,90 @@ Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.per
 
 From: Anthony Xu <anthony.xu@intel.com>
 
-move xen-common.c to hw/xen/
+move xen-mapcache.c to hw/i386/xen/
 
 Signed-off -by: Anthony Xu <anthony.xu@intel.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- Makefile.target      |   2 -
- hw/xen/Makefile.objs |   2 +-
- hw/xen/xen-common.c  | 169 +++++++++++++++++++++++++++++++++++++++++++++++++++
- stubs/Makefile.objs  |   1 +
- stubs/xen-common.c   |  14 +++++
- xen-common-stub.c    |  14 -----
- xen-common.c         | 169 ---------------------------------------------------
- 7 files changed, 185 insertions(+), 186 deletions(-)
- create mode 100644 hw/xen/xen-common.c
- create mode 100644 stubs/xen-common.c
- delete mode 100644 xen-common-stub.c
- delete mode 100644 xen-common.c
+ Makefile.target                    |   3 -
+ default-configs/i386-softmmu.mak   |   1 -
+ default-configs/x86_64-softmmu.mak |   1 -
+ hw/i386/xen/Makefile.objs          |   2 +-
+ hw/i386/xen/trace-events           |   6 +
+ hw/i386/xen/xen-mapcache.c         | 459 +++++++++++++++++++++++++++++++++++++
+ trace-events                       |   5 -
+ xen-mapcache.c                     | 459 -------------------------------------
+ 8 files changed, 466 insertions(+), 470 deletions(-)
+ create mode 100644 hw/i386/xen/xen-mapcache.c
+ delete mode 100644 xen-mapcache.c
 
 diff --git a/Makefile.target b/Makefile.target
-index 7df2b8c..48c027f 100644
+index d5ff0c7..a535980 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -150,9 +150,7 @@ obj-y += migration/ram.o migration/savevm.o
+@@ -149,9 +149,6 @@ obj-y += dump.o
+ obj-y += migration/ram.o migration/savevm.o
  LIBS := $(libs_softmmu) $(LIBS)
  
- # xen support
--obj-$(CONFIG_XEN) += xen-common.o
- obj-$(CONFIG_XEN_I386) += xen-hvm.o xen-mapcache.o
--obj-$(call lnot,$(CONFIG_XEN)) += xen-common-stub.o
- obj-$(call lnot,$(CONFIG_XEN_I386)) += xen-hvm-stub.o
- 
+-# xen support
+-obj-$(CONFIG_XEN_I386) += xen-mapcache.o
+-
  # Hardware support
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index 4be3ec9..64a70bc 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -1,5 +1,5 @@
- # xen backend driver support
--common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o
-+common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o xen-common.o
- 
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+ ifeq ($(TARGET_NAME), sparc64)
+ obj-y += hw/sparc64/
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 029e952..d2ab2f6 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -39,7 +39,6 @@ CONFIG_TPM_TIS=$(CONFIG_TPM)
+ CONFIG_MC146818RTC=y
+ CONFIG_PCI_PIIX=y
+ CONFIG_WDT_IB700=y
+-CONFIG_XEN_I386=$(CONFIG_XEN)
+ CONFIG_ISA_DEBUG=y
+ CONFIG_ISA_TESTDEV=y
+ CONFIG_VMPORT=y
+diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+index d1d7432..9bde2f1 100644
+--- a/default-configs/x86_64-softmmu.mak
++++ b/default-configs/x86_64-softmmu.mak
+@@ -39,7 +39,6 @@ CONFIG_TPM_TIS=$(CONFIG_TPM)
+ CONFIG_MC146818RTC=y
+ CONFIG_PCI_PIIX=y
+ CONFIG_WDT_IB700=y
+-CONFIG_XEN_I386=$(CONFIG_XEN)
+ CONFIG_ISA_DEBUG=y
+ CONFIG_ISA_TESTDEV=y
+ CONFIG_VMPORT=y
+diff --git a/hw/i386/xen/Makefile.objs b/hw/i386/xen/Makefile.objs
+index daf4f53..be9d10c 100644
+--- a/hw/i386/xen/Makefile.objs
++++ b/hw/i386/xen/Makefile.objs
+@@ -1 +1 @@
+-obj-y += xen_platform.o xen_apic.o xen_pvdevice.o xen-hvm.o
++obj-y += xen_platform.o xen_apic.o xen_pvdevice.o xen-hvm.o xen-mapcache.o
+diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
+index f25d622..547438d 100644
+--- a/hw/i386/xen/trace-events
++++ b/hw/i386/xen/trace-events
+@@ -15,3 +15,9 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64
+ cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio read reg data=%#"PRIx64" port=%#"PRIx64" size=%d"
+ cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=%#"PRIx64" port=%#"PRIx64" size=%d"
+ cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=%#"PRIx64" data=%#"PRIx64" count=%d size=%d"
++
++# xen-mapcache.c
++xen_map_cache(uint64_t phys_addr) "want %#"PRIx64
++xen_remap_bucket(uint64_t index) "index %#"PRIx64
++xen_map_cache_return(void* ptr) "%p"
++
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
 new file mode 100644
-index 0000000..ae76150
+index 0000000..31debdf
 --- /dev/null
-+++ b/hw/xen/xen-common.c
-@@ -0,0 +1,169 @@
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -0,0 +1,459 @@
 +/*
-+ * Copyright (C) 2014       Citrix Systems UK Ltd.
++ * Copyright (C) 2011       Citrix Ltd.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2.  See
 + * the COPYING file in the top-level directory.
@@ -90,221 +123,478 @@ index 0000000..ae76150
 + */
 +
 +#include "qemu/osdep.h"
++
++#include <sys/resource.h>
++
 +#include "hw/xen/xen_backend.h"
-+#include "qmp-commands.h"
-+#include "sysemu/char.h"
-+#include "sysemu/accel.h"
-+#include "migration/migration.h"
++#include "sysemu/blockdev.h"
++#include "qemu/bitmap.h"
 +
-+//#define DEBUG_XEN
++#include <xen/hvm/params.h>
 +
-+#ifdef DEBUG_XEN
-+#define DPRINTF(fmt, ...) \
-+    do { fprintf(stderr, "xen: " fmt, ## __VA_ARGS__); } while (0)
++#include "sysemu/xen-mapcache.h"
++#include "trace.h"
++
++
++//#define MAPCACHE_DEBUG
++
++#ifdef MAPCACHE_DEBUG
++#  define DPRINTF(fmt, ...) do { \
++    fprintf(stderr, "xen_mapcache: " fmt, ## __VA_ARGS__); \
++} while (0)
 +#else
-+#define DPRINTF(fmt, ...) \
-+    do { } while (0)
++#  define DPRINTF(fmt, ...) do { } while (0)
 +#endif
 +
-+xc_interface *xen_xc;
-+xenforeignmemory_handle *xen_fmem;
-+xendevicemodel_handle *xen_dmod;
++#if HOST_LONG_BITS == 32
++#  define MCACHE_BUCKET_SHIFT 16
++#  define MCACHE_MAX_SIZE     (1UL<<31) /* 2GB Cap */
++#else
++#  define MCACHE_BUCKET_SHIFT 20
++#  define MCACHE_MAX_SIZE     (1UL<<35) /* 32GB Cap */
++#endif
++#define MCACHE_BUCKET_SIZE (1UL << MCACHE_BUCKET_SHIFT)
 +
-+static int store_dev_info(int domid, Chardev *cs, const char *string)
++/* This is the size of the virtual address space reserve to QEMU that will not
++ * be use by MapCache.
++ * From empirical tests I observed that qemu use 75MB more than the
++ * max_mcache_size.
++ */
++#define NON_MCACHE_MEMORY_SIZE (80 * 1024 * 1024)
++
++typedef struct MapCacheEntry {
++    hwaddr paddr_index;
++    uint8_t *vaddr_base;
++    unsigned long *valid_mapping;
++    uint8_t lock;
++    hwaddr size;
++    struct MapCacheEntry *next;
++} MapCacheEntry;
++
++typedef struct MapCacheRev {
++    uint8_t *vaddr_req;
++    hwaddr paddr_index;
++    hwaddr size;
++    QTAILQ_ENTRY(MapCacheRev) next;
++} MapCacheRev;
++
++typedef struct MapCache {
++    MapCacheEntry *entry;
++    unsigned long nr_buckets;
++    QTAILQ_HEAD(map_cache_head, MapCacheRev) locked_entries;
++
++    /* For most cases (>99.9%), the page address is the same. */
++    MapCacheEntry *last_entry;
++    unsigned long max_mcache_size;
++    unsigned int mcache_bucket_shift;
++
++    phys_offset_to_gaddr_t phys_offset_to_gaddr;
++    QemuMutex lock;
++    void *opaque;
++} MapCache;
++
++static MapCache *mapcache;
++
++static inline void mapcache_lock(void)
 +{
-+    struct xs_handle *xs = NULL;
-+    char *path = NULL;
-+    char *newpath = NULL;
-+    char *pts = NULL;
-+    int ret = -1;
++    qemu_mutex_lock(&mapcache->lock);
++}
 +
-+    /* Only continue if we're talking to a pty. */
-+    if (strncmp(cs->filename, "pty:", 4)) {
++static inline void mapcache_unlock(void)
++{
++    qemu_mutex_unlock(&mapcache->lock);
++}
++
++static inline int test_bits(int nr, int size, const unsigned long *addr)
++{
++    unsigned long res = find_next_zero_bit(addr, size + nr, nr);
++    if (res >= nr + size)
++        return 1;
++    else
++        return 0;
++}
++
++void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
++{
++    unsigned long size;
++    struct rlimit rlimit_as;
++
++    mapcache = g_malloc0(sizeof (MapCache));
++
++    mapcache->phys_offset_to_gaddr = f;
++    mapcache->opaque = opaque;
++    qemu_mutex_init(&mapcache->lock);
++
++    QTAILQ_INIT(&mapcache->locked_entries);
++
++    if (geteuid() == 0) {
++        rlimit_as.rlim_cur = RLIM_INFINITY;
++        rlimit_as.rlim_max = RLIM_INFINITY;
++        mapcache->max_mcache_size = MCACHE_MAX_SIZE;
++    } else {
++        getrlimit(RLIMIT_AS, &rlimit_as);
++        rlimit_as.rlim_cur = rlimit_as.rlim_max;
++
++        if (rlimit_as.rlim_max != RLIM_INFINITY) {
++            fprintf(stderr, "Warning: QEMU's maximum size of virtual"
++                    " memory is not infinity.\n");
++        }
++        if (rlimit_as.rlim_max < MCACHE_MAX_SIZE + NON_MCACHE_MEMORY_SIZE) {
++            mapcache->max_mcache_size = rlimit_as.rlim_max -
++                NON_MCACHE_MEMORY_SIZE;
++        } else {
++            mapcache->max_mcache_size = MCACHE_MAX_SIZE;
++        }
++    }
++
++    setrlimit(RLIMIT_AS, &rlimit_as);
++
++    mapcache->nr_buckets =
++        (((mapcache->max_mcache_size >> XC_PAGE_SHIFT) +
++          (1UL << (MCACHE_BUCKET_SHIFT - XC_PAGE_SHIFT)) - 1) >>
++         (MCACHE_BUCKET_SHIFT - XC_PAGE_SHIFT));
++
++    size = mapcache->nr_buckets * sizeof (MapCacheEntry);
++    size = (size + XC_PAGE_SIZE - 1) & ~(XC_PAGE_SIZE - 1);
++    DPRINTF("%s, nr_buckets = %lx size %lu\n", __func__,
++            mapcache->nr_buckets, size);
++    mapcache->entry = g_malloc0(size);
++}
++
++static void xen_remap_bucket(MapCacheEntry *entry,
++                             hwaddr size,
++                             hwaddr address_index)
++{
++    uint8_t *vaddr_base;
++    xen_pfn_t *pfns;
++    int *err;
++    unsigned int i;
++    hwaddr nb_pfn = size >> XC_PAGE_SHIFT;
++
++    trace_xen_remap_bucket(address_index);
++
++    pfns = g_malloc0(nb_pfn * sizeof (xen_pfn_t));
++    err = g_malloc0(nb_pfn * sizeof (int));
++
++    if (entry->vaddr_base != NULL) {
++        ram_block_notify_remove(entry->vaddr_base, entry->size);
++        if (munmap(entry->vaddr_base, entry->size) != 0) {
++            perror("unmap fails");
++            exit(-1);
++        }
++    }
++    g_free(entry->valid_mapping);
++    entry->valid_mapping = NULL;
++
++    for (i = 0; i < nb_pfn; i++) {
++        pfns[i] = (address_index << (MCACHE_BUCKET_SHIFT-XC_PAGE_SHIFT)) + i;
++    }
++
++    vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
++                                      nb_pfn, pfns, err);
++    if (vaddr_base == NULL) {
++        perror("xenforeignmemory_map");
++        exit(-1);
++    }
++
++    entry->vaddr_base = vaddr_base;
++    entry->paddr_index = address_index;
++    entry->size = size;
++    entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
++            BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
++
++    ram_block_notify_add(entry->vaddr_base, entry->size);
++    bitmap_zero(entry->valid_mapping, nb_pfn);
++    for (i = 0; i < nb_pfn; i++) {
++        if (!err[i]) {
++            bitmap_set(entry->valid_mapping, i, 1);
++        }
++    }
++
++    g_free(pfns);
++    g_free(err);
++}
++
++static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
++                                       uint8_t lock)
++{
++    MapCacheEntry *entry, *pentry = NULL;
++    hwaddr address_index;
++    hwaddr address_offset;
++    hwaddr cache_size = size;
++    hwaddr test_bit_size;
++    bool translated = false;
++
++tryagain:
++    address_index  = phys_addr >> MCACHE_BUCKET_SHIFT;
++    address_offset = phys_addr & (MCACHE_BUCKET_SIZE - 1);
++
++    trace_xen_map_cache(phys_addr);
++
++    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
++    if (size) {
++        test_bit_size = size + (phys_addr & (XC_PAGE_SIZE - 1));
++
++        if (test_bit_size % XC_PAGE_SIZE) {
++            test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
++        }
++    } else {
++        test_bit_size = XC_PAGE_SIZE;
++    }
++
++    if (mapcache->last_entry != NULL &&
++        mapcache->last_entry->paddr_index == address_index &&
++        !lock && !size &&
++        test_bits(address_offset >> XC_PAGE_SHIFT,
++                  test_bit_size >> XC_PAGE_SHIFT,
++                  mapcache->last_entry->valid_mapping)) {
++        trace_xen_map_cache_return(mapcache->last_entry->vaddr_base + address_offset);
++        return mapcache->last_entry->vaddr_base + address_offset;
++    }
++
++    /* size is always a multiple of MCACHE_BUCKET_SIZE */
++    if (size) {
++        cache_size = size + address_offset;
++        if (cache_size % MCACHE_BUCKET_SIZE) {
++            cache_size += MCACHE_BUCKET_SIZE - (cache_size % MCACHE_BUCKET_SIZE);
++        }
++    } else {
++        cache_size = MCACHE_BUCKET_SIZE;
++    }
++
++    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
++
++    while (entry && entry->lock && entry->vaddr_base &&
++            (entry->paddr_index != address_index || entry->size != cache_size ||
++             !test_bits(address_offset >> XC_PAGE_SHIFT,
++                 test_bit_size >> XC_PAGE_SHIFT,
++                 entry->valid_mapping))) {
++        pentry = entry;
++        entry = entry->next;
++    }
++    if (!entry) {
++        entry = g_malloc0(sizeof (MapCacheEntry));
++        pentry->next = entry;
++        xen_remap_bucket(entry, cache_size, address_index);
++    } else if (!entry->lock) {
++        if (!entry->vaddr_base || entry->paddr_index != address_index ||
++                entry->size != cache_size ||
++                !test_bits(address_offset >> XC_PAGE_SHIFT,
++                    test_bit_size >> XC_PAGE_SHIFT,
++                    entry->valid_mapping)) {
++            xen_remap_bucket(entry, cache_size, address_index);
++        }
++    }
++
++    if(!test_bits(address_offset >> XC_PAGE_SHIFT,
++                test_bit_size >> XC_PAGE_SHIFT,
++                entry->valid_mapping)) {
++        mapcache->last_entry = NULL;
++        if (!translated && mapcache->phys_offset_to_gaddr) {
++            phys_addr = mapcache->phys_offset_to_gaddr(phys_addr, size, mapcache->opaque);
++            translated = true;
++            goto tryagain;
++        }
++        trace_xen_map_cache_return(NULL);
++        return NULL;
++    }
++
++    mapcache->last_entry = entry;
++    if (lock) {
++        MapCacheRev *reventry = g_malloc0(sizeof(MapCacheRev));
++        entry->lock++;
++        reventry->vaddr_req = mapcache->last_entry->vaddr_base + address_offset;
++        reventry->paddr_index = mapcache->last_entry->paddr_index;
++        reventry->size = entry->size;
++        QTAILQ_INSERT_HEAD(&mapcache->locked_entries, reventry, next);
++    }
++
++    trace_xen_map_cache_return(mapcache->last_entry->vaddr_base + address_offset);
++    return mapcache->last_entry->vaddr_base + address_offset;
++}
++
++uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
++                       uint8_t lock)
++{
++    uint8_t *p;
++
++    mapcache_lock();
++    p = xen_map_cache_unlocked(phys_addr, size, lock);
++    mapcache_unlock();
++    return p;
++}
++
++ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
++{
++    MapCacheEntry *entry = NULL;
++    MapCacheRev *reventry;
++    hwaddr paddr_index;
++    hwaddr size;
++    ram_addr_t raddr;
++    int found = 0;
++
++    mapcache_lock();
++    QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
++        if (reventry->vaddr_req == ptr) {
++            paddr_index = reventry->paddr_index;
++            size = reventry->size;
++            found = 1;
++            break;
++        }
++    }
++    if (!found) {
++        fprintf(stderr, "%s, could not find %p\n", __func__, ptr);
++        QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
++            DPRINTF("   "TARGET_FMT_plx" -> %p is present\n", reventry->paddr_index,
++                    reventry->vaddr_req);
++        }
++        abort();
 +        return 0;
 +    }
-+    pts = cs->filename + 4;
 +
-+    /* We now have everything we need to set the xenstore entry. */
-+    xs = xs_open(0);
-+    if (xs == NULL) {
-+        fprintf(stderr, "Could not contact XenStore\n");
-+        goto out;
++    entry = &mapcache->entry[paddr_index % mapcache->nr_buckets];
++    while (entry && (entry->paddr_index != paddr_index || entry->size != size)) {
++        entry = entry->next;
 +    }
-+
-+    path = xs_get_domain_path(xs, domid);
-+    if (path == NULL) {
-+        fprintf(stderr, "xs_get_domain_path() error\n");
-+        goto out;
-+    }
-+    newpath = realloc(path, (strlen(path) + strlen(string) +
-+                strlen("/tty") + 1));
-+    if (newpath == NULL) {
-+        fprintf(stderr, "realloc error\n");
-+        goto out;
-+    }
-+    path = newpath;
-+
-+    strcat(path, string);
-+    strcat(path, "/tty");
-+    if (!xs_write(xs, XBT_NULL, path, pts, strlen(pts))) {
-+        fprintf(stderr, "xs_write for '%s' fail", string);
-+        goto out;
-+    }
-+    ret = 0;
-+
-+out:
-+    free(path);
-+    xs_close(xs);
-+
-+    return ret;
-+}
-+
-+void xenstore_store_pv_console_info(int i, Chardev *chr)
-+{
-+    if (i == 0) {
-+        store_dev_info(xen_domid, chr, "/console");
++    if (!entry) {
++        DPRINTF("Trying to find address %p that is not in the mapcache!\n", ptr);
++        raddr = 0;
 +    } else {
-+        char buf[32];
-+        snprintf(buf, sizeof(buf), "/device/console/%d", i);
-+        store_dev_info(xen_domid, chr, buf);
++        raddr = (reventry->paddr_index << MCACHE_BUCKET_SHIFT) +
++             ((unsigned long) ptr - (unsigned long) entry->vaddr_base);
 +    }
++    mapcache_unlock();
++    return raddr;
 +}
 +
-+
-+static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
++static void xen_invalidate_map_cache_entry_unlocked(uint8_t *buffer)
 +{
-+    char path[50];
++    MapCacheEntry *entry = NULL, *pentry = NULL;
++    MapCacheRev *reventry;
++    hwaddr paddr_index;
++    hwaddr size;
++    int found = 0;
 +
-+    if (xs == NULL) {
-+        fprintf(stderr, "xenstore connection not initialized\n");
-+        exit(1);
++    QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
++        if (reventry->vaddr_req == buffer) {
++            paddr_index = reventry->paddr_index;
++            size = reventry->size;
++            found = 1;
++            break;
++        }
++    }
++    if (!found) {
++        DPRINTF("%s, could not find %p\n", __func__, buffer);
++        QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
++            DPRINTF("   "TARGET_FMT_plx" -> %p is present\n", reventry->paddr_index, reventry->vaddr_req);
++        }
++        return;
++    }
++    QTAILQ_REMOVE(&mapcache->locked_entries, reventry, next);
++    g_free(reventry);
++
++    if (mapcache->last_entry != NULL &&
++        mapcache->last_entry->paddr_index == paddr_index) {
++        mapcache->last_entry = NULL;
 +    }
 +
-+    snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
-+    if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
-+        fprintf(stderr, "error recording dm state\n");
-+        exit(1);
++    entry = &mapcache->entry[paddr_index % mapcache->nr_buckets];
++    while (entry && (entry->paddr_index != paddr_index || entry->size != size)) {
++        pentry = entry;
++        entry = entry->next;
 +    }
++    if (!entry) {
++        DPRINTF("Trying to unmap address %p that is not in the mapcache!\n", buffer);
++        return;
++    }
++    entry->lock--;
++    if (entry->lock > 0 || pentry == NULL) {
++        return;
++    }
++
++    pentry->next = entry->next;
++    ram_block_notify_remove(entry->vaddr_base, entry->size);
++    if (munmap(entry->vaddr_base, entry->size) != 0) {
++        perror("unmap fails");
++        exit(-1);
++    }
++    g_free(entry->valid_mapping);
++    g_free(entry);
 +}
 +
-+
-+static void xen_change_state_handler(void *opaque, int running,
-+                                     RunState state)
++void xen_invalidate_map_cache_entry(uint8_t *buffer)
 +{
-+    if (running) {
-+        /* record state running */
-+        xenstore_record_dm_state(xenstore, "running");
-+    }
++    mapcache_lock();
++    xen_invalidate_map_cache_entry_unlocked(buffer);
++    mapcache_unlock();
 +}
 +
-+static int xen_init(MachineState *ms)
++void xen_invalidate_map_cache(void)
 +{
-+    xen_xc = xc_interface_open(0, 0, 0);
-+    if (xen_xc == NULL) {
-+        xen_pv_printf(NULL, 0, "can't open xen interface\n");
-+        return -1;
++    unsigned long i;
++    MapCacheRev *reventry;
++
++    /* Flush pending AIO before destroying the mapcache */
++    bdrv_drain_all();
++
++    mapcache_lock();
++
++    QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
++        DPRINTF("There should be no locked mappings at this time, "
++                "but "TARGET_FMT_plx" -> %p is present\n",
++                reventry->paddr_index, reventry->vaddr_req);
 +    }
-+    xen_fmem = xenforeignmemory_open(0, 0);
-+    if (xen_fmem == NULL) {
-+        xen_pv_printf(NULL, 0, "can't open xen fmem interface\n");
-+        xc_interface_close(xen_xc);
-+        return -1;
++
++    for (i = 0; i < mapcache->nr_buckets; i++) {
++        MapCacheEntry *entry = &mapcache->entry[i];
++
++        if (entry->vaddr_base == NULL) {
++            continue;
++        }
++        if (entry->lock > 0) {
++            continue;
++        }
++
++        if (munmap(entry->vaddr_base, entry->size) != 0) {
++            perror("unmap fails");
++            exit(-1);
++        }
++
++        entry->paddr_index = 0;
++        entry->vaddr_base = NULL;
++        entry->size = 0;
++        g_free(entry->valid_mapping);
++        entry->valid_mapping = NULL;
 +    }
-+    xen_dmod = xendevicemodel_open(0, 0);
-+    if (xen_dmod == NULL) {
-+        xen_pv_printf(NULL, 0, "can't open xen devicemodel interface\n");
-+        xenforeignmemory_close(xen_fmem);
-+        xc_interface_close(xen_xc);
-+        return -1;
-+    }
-+    qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
 +
-+    global_state_set_optional();
-+    savevm_skip_configuration();
-+    savevm_skip_section_footers();
++    mapcache->last_entry = NULL;
 +
-+    return 0;
++    mapcache_unlock();
 +}
-+
-+static void xen_accel_class_init(ObjectClass *oc, void *data)
-+{
-+    AccelClass *ac = ACCEL_CLASS(oc);
-+    ac->name = "Xen";
-+    ac->init_machine = xen_init;
-+    ac->allowed = &xen_allowed;
-+}
-+
-+#define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
-+
-+static const TypeInfo xen_accel_type = {
-+    .name = TYPE_XEN_ACCEL,
-+    .parent = TYPE_ACCEL,
-+    .class_init = xen_accel_class_init,
-+};
-+
-+static void xen_type_init(void)
-+{
-+    type_register_static(&xen_accel_type);
-+}
-+
-+type_init(xen_type_init);
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 224f04b..6c80613 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -37,3 +37,4 @@ stub-obj-y += target-monitor-defs.o
- stub-obj-y += target-get-monitor-def.o
- stub-obj-y += pc_madt_cpu_entry.o
- stub-obj-y += vmgenid.o
-+stub-obj-y += xen-common.o
-diff --git a/stubs/xen-common.c b/stubs/xen-common.c
-new file mode 100644
-index 0000000..09fce2d
---- /dev/null
-+++ b/stubs/xen-common.c
-@@ -0,0 +1,14 @@
-+/*
-+ * Copyright (C) 2014       Citrix Systems UK Ltd.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "hw/xen/xen.h"
-+
-+void xenstore_store_pv_console_info(int i, Chardev *chr)
-+{
-+}
-diff --git a/xen-common-stub.c b/xen-common-stub.c
-deleted file mode 100644
-index 09fce2d..0000000
---- a/xen-common-stub.c
-+++ /dev/null
-@@ -1,14 +0,0 @@
--/*
-- * Copyright (C) 2014       Citrix Systems UK Ltd.
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- */
+diff --git a/trace-events b/trace-events
+index 4e14487..e582d63 100644
+--- a/trace-events
++++ b/trace-events
+@@ -48,11 +48,6 @@ spice_vmc_register_interface(void *scd) "spice vmc registered interface %p"
+ spice_vmc_unregister_interface(void *scd) "spice vmc unregistered interface %p"
+ spice_vmc_event(int event) "spice vmc event %d"
+ 
+-# xen-mapcache.c
+-xen_map_cache(uint64_t phys_addr) "want %#"PRIx64
+-xen_remap_bucket(uint64_t index) "index %#"PRIx64
+-xen_map_cache_return(void* ptr) "%p"
 -
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "hw/xen/xen.h"
--
--void xenstore_store_pv_console_info(int i, Chardev *chr)
--{
--}
-diff --git a/xen-common.c b/xen-common.c
+ # monitor.c
+ monitor_protocol_event_handler(uint32_t event, void *qdict) "event=%d data=%p"
+ monitor_protocol_event_emit(uint32_t event, void *data) "event=%d data=%p"
+diff --git a/xen-mapcache.c b/xen-mapcache.c
 deleted file mode 100644
-index ae76150..0000000
---- a/xen-common.c
+index 1a96d2e..0000000
+--- a/xen-mapcache.c
 +++ /dev/null
-@@ -1,169 +0,0 @@
+@@ -1,459 +0,0 @@
 -/*
-- * Copyright (C) 2014       Citrix Systems UK Ltd.
+- * Copyright (C) 2011       Citrix Ltd.
 - *
 - * This work is licensed under the terms of the GNU GPL, version 2.  See
 - * the COPYING file in the top-level directory.
@@ -314,163 +604,453 @@ index ae76150..0000000
 - */
 -
 -#include "qemu/osdep.h"
+-
+-#include <sys/resource.h>
+-
 -#include "hw/xen/xen_backend.h"
--#include "qmp-commands.h"
--#include "sysemu/char.h"
--#include "sysemu/accel.h"
--#include "migration/migration.h"
+-#include "sysemu/blockdev.h"
+-#include "qemu/bitmap.h"
 -
--//#define DEBUG_XEN
+-#include <xen/hvm/params.h>
 -
--#ifdef DEBUG_XEN
--#define DPRINTF(fmt, ...) \
--    do { fprintf(stderr, "xen: " fmt, ## __VA_ARGS__); } while (0)
+-#include "sysemu/xen-mapcache.h"
+-#include "trace-root.h"
+-
+-
+-//#define MAPCACHE_DEBUG
+-
+-#ifdef MAPCACHE_DEBUG
+-#  define DPRINTF(fmt, ...) do { \
+-    fprintf(stderr, "xen_mapcache: " fmt, ## __VA_ARGS__); \
+-} while (0)
 -#else
--#define DPRINTF(fmt, ...) \
--    do { } while (0)
+-#  define DPRINTF(fmt, ...) do { } while (0)
 -#endif
 -
--xc_interface *xen_xc;
--xenforeignmemory_handle *xen_fmem;
--xendevicemodel_handle *xen_dmod;
+-#if HOST_LONG_BITS == 32
+-#  define MCACHE_BUCKET_SHIFT 16
+-#  define MCACHE_MAX_SIZE     (1UL<<31) /* 2GB Cap */
+-#else
+-#  define MCACHE_BUCKET_SHIFT 20
+-#  define MCACHE_MAX_SIZE     (1UL<<35) /* 32GB Cap */
+-#endif
+-#define MCACHE_BUCKET_SIZE (1UL << MCACHE_BUCKET_SHIFT)
 -
--static int store_dev_info(int domid, Chardev *cs, const char *string)
+-/* This is the size of the virtual address space reserve to QEMU that will not
+- * be use by MapCache.
+- * From empirical tests I observed that qemu use 75MB more than the
+- * max_mcache_size.
+- */
+-#define NON_MCACHE_MEMORY_SIZE (80 * 1024 * 1024)
+-
+-typedef struct MapCacheEntry {
+-    hwaddr paddr_index;
+-    uint8_t *vaddr_base;
+-    unsigned long *valid_mapping;
+-    uint8_t lock;
+-    hwaddr size;
+-    struct MapCacheEntry *next;
+-} MapCacheEntry;
+-
+-typedef struct MapCacheRev {
+-    uint8_t *vaddr_req;
+-    hwaddr paddr_index;
+-    hwaddr size;
+-    QTAILQ_ENTRY(MapCacheRev) next;
+-} MapCacheRev;
+-
+-typedef struct MapCache {
+-    MapCacheEntry *entry;
+-    unsigned long nr_buckets;
+-    QTAILQ_HEAD(map_cache_head, MapCacheRev) locked_entries;
+-
+-    /* For most cases (>99.9%), the page address is the same. */
+-    MapCacheEntry *last_entry;
+-    unsigned long max_mcache_size;
+-    unsigned int mcache_bucket_shift;
+-
+-    phys_offset_to_gaddr_t phys_offset_to_gaddr;
+-    QemuMutex lock;
+-    void *opaque;
+-} MapCache;
+-
+-static MapCache *mapcache;
+-
+-static inline void mapcache_lock(void)
 -{
--    struct xs_handle *xs = NULL;
--    char *path = NULL;
--    char *newpath = NULL;
--    char *pts = NULL;
--    int ret = -1;
+-    qemu_mutex_lock(&mapcache->lock);
+-}
 -
--    /* Only continue if we're talking to a pty. */
--    if (strncmp(cs->filename, "pty:", 4)) {
+-static inline void mapcache_unlock(void)
+-{
+-    qemu_mutex_unlock(&mapcache->lock);
+-}
+-
+-static inline int test_bits(int nr, int size, const unsigned long *addr)
+-{
+-    unsigned long res = find_next_zero_bit(addr, size + nr, nr);
+-    if (res >= nr + size)
+-        return 1;
+-    else
+-        return 0;
+-}
+-
+-void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
+-{
+-    unsigned long size;
+-    struct rlimit rlimit_as;
+-
+-    mapcache = g_malloc0(sizeof (MapCache));
+-
+-    mapcache->phys_offset_to_gaddr = f;
+-    mapcache->opaque = opaque;
+-    qemu_mutex_init(&mapcache->lock);
+-
+-    QTAILQ_INIT(&mapcache->locked_entries);
+-
+-    if (geteuid() == 0) {
+-        rlimit_as.rlim_cur = RLIM_INFINITY;
+-        rlimit_as.rlim_max = RLIM_INFINITY;
+-        mapcache->max_mcache_size = MCACHE_MAX_SIZE;
+-    } else {
+-        getrlimit(RLIMIT_AS, &rlimit_as);
+-        rlimit_as.rlim_cur = rlimit_as.rlim_max;
+-
+-        if (rlimit_as.rlim_max != RLIM_INFINITY) {
+-            fprintf(stderr, "Warning: QEMU's maximum size of virtual"
+-                    " memory is not infinity.\n");
+-        }
+-        if (rlimit_as.rlim_max < MCACHE_MAX_SIZE + NON_MCACHE_MEMORY_SIZE) {
+-            mapcache->max_mcache_size = rlimit_as.rlim_max -
+-                NON_MCACHE_MEMORY_SIZE;
+-        } else {
+-            mapcache->max_mcache_size = MCACHE_MAX_SIZE;
+-        }
+-    }
+-
+-    setrlimit(RLIMIT_AS, &rlimit_as);
+-
+-    mapcache->nr_buckets =
+-        (((mapcache->max_mcache_size >> XC_PAGE_SHIFT) +
+-          (1UL << (MCACHE_BUCKET_SHIFT - XC_PAGE_SHIFT)) - 1) >>
+-         (MCACHE_BUCKET_SHIFT - XC_PAGE_SHIFT));
+-
+-    size = mapcache->nr_buckets * sizeof (MapCacheEntry);
+-    size = (size + XC_PAGE_SIZE - 1) & ~(XC_PAGE_SIZE - 1);
+-    DPRINTF("%s, nr_buckets = %lx size %lu\n", __func__,
+-            mapcache->nr_buckets, size);
+-    mapcache->entry = g_malloc0(size);
+-}
+-
+-static void xen_remap_bucket(MapCacheEntry *entry,
+-                             hwaddr size,
+-                             hwaddr address_index)
+-{
+-    uint8_t *vaddr_base;
+-    xen_pfn_t *pfns;
+-    int *err;
+-    unsigned int i;
+-    hwaddr nb_pfn = size >> XC_PAGE_SHIFT;
+-
+-    trace_xen_remap_bucket(address_index);
+-
+-    pfns = g_malloc0(nb_pfn * sizeof (xen_pfn_t));
+-    err = g_malloc0(nb_pfn * sizeof (int));
+-
+-    if (entry->vaddr_base != NULL) {
+-        ram_block_notify_remove(entry->vaddr_base, entry->size);
+-        if (munmap(entry->vaddr_base, entry->size) != 0) {
+-            perror("unmap fails");
+-            exit(-1);
+-        }
+-    }
+-    g_free(entry->valid_mapping);
+-    entry->valid_mapping = NULL;
+-
+-    for (i = 0; i < nb_pfn; i++) {
+-        pfns[i] = (address_index << (MCACHE_BUCKET_SHIFT-XC_PAGE_SHIFT)) + i;
+-    }
+-
+-    vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
+-                                      nb_pfn, pfns, err);
+-    if (vaddr_base == NULL) {
+-        perror("xenforeignmemory_map");
+-        exit(-1);
+-    }
+-
+-    entry->vaddr_base = vaddr_base;
+-    entry->paddr_index = address_index;
+-    entry->size = size;
+-    entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
+-            BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
+-
+-    ram_block_notify_add(entry->vaddr_base, entry->size);
+-    bitmap_zero(entry->valid_mapping, nb_pfn);
+-    for (i = 0; i < nb_pfn; i++) {
+-        if (!err[i]) {
+-            bitmap_set(entry->valid_mapping, i, 1);
+-        }
+-    }
+-
+-    g_free(pfns);
+-    g_free(err);
+-}
+-
+-static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
+-                                       uint8_t lock)
+-{
+-    MapCacheEntry *entry, *pentry = NULL;
+-    hwaddr address_index;
+-    hwaddr address_offset;
+-    hwaddr cache_size = size;
+-    hwaddr test_bit_size;
+-    bool translated = false;
+-
+-tryagain:
+-    address_index  = phys_addr >> MCACHE_BUCKET_SHIFT;
+-    address_offset = phys_addr & (MCACHE_BUCKET_SIZE - 1);
+-
+-    trace_xen_map_cache(phys_addr);
+-
+-    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
+-    if (size) {
+-        test_bit_size = size + (phys_addr & (XC_PAGE_SIZE - 1));
+-
+-        if (test_bit_size % XC_PAGE_SIZE) {
+-            test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
+-        }
+-    } else {
+-        test_bit_size = XC_PAGE_SIZE;
+-    }
+-
+-    if (mapcache->last_entry != NULL &&
+-        mapcache->last_entry->paddr_index == address_index &&
+-        !lock && !size &&
+-        test_bits(address_offset >> XC_PAGE_SHIFT,
+-                  test_bit_size >> XC_PAGE_SHIFT,
+-                  mapcache->last_entry->valid_mapping)) {
+-        trace_xen_map_cache_return(mapcache->last_entry->vaddr_base + address_offset);
+-        return mapcache->last_entry->vaddr_base + address_offset;
+-    }
+-
+-    /* size is always a multiple of MCACHE_BUCKET_SIZE */
+-    if (size) {
+-        cache_size = size + address_offset;
+-        if (cache_size % MCACHE_BUCKET_SIZE) {
+-            cache_size += MCACHE_BUCKET_SIZE - (cache_size % MCACHE_BUCKET_SIZE);
+-        }
+-    } else {
+-        cache_size = MCACHE_BUCKET_SIZE;
+-    }
+-
+-    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
+-
+-    while (entry && entry->lock && entry->vaddr_base &&
+-            (entry->paddr_index != address_index || entry->size != cache_size ||
+-             !test_bits(address_offset >> XC_PAGE_SHIFT,
+-                 test_bit_size >> XC_PAGE_SHIFT,
+-                 entry->valid_mapping))) {
+-        pentry = entry;
+-        entry = entry->next;
+-    }
+-    if (!entry) {
+-        entry = g_malloc0(sizeof (MapCacheEntry));
+-        pentry->next = entry;
+-        xen_remap_bucket(entry, cache_size, address_index);
+-    } else if (!entry->lock) {
+-        if (!entry->vaddr_base || entry->paddr_index != address_index ||
+-                entry->size != cache_size ||
+-                !test_bits(address_offset >> XC_PAGE_SHIFT,
+-                    test_bit_size >> XC_PAGE_SHIFT,
+-                    entry->valid_mapping)) {
+-            xen_remap_bucket(entry, cache_size, address_index);
+-        }
+-    }
+-
+-    if(!test_bits(address_offset >> XC_PAGE_SHIFT,
+-                test_bit_size >> XC_PAGE_SHIFT,
+-                entry->valid_mapping)) {
+-        mapcache->last_entry = NULL;
+-        if (!translated && mapcache->phys_offset_to_gaddr) {
+-            phys_addr = mapcache->phys_offset_to_gaddr(phys_addr, size, mapcache->opaque);
+-            translated = true;
+-            goto tryagain;
+-        }
+-        trace_xen_map_cache_return(NULL);
+-        return NULL;
+-    }
+-
+-    mapcache->last_entry = entry;
+-    if (lock) {
+-        MapCacheRev *reventry = g_malloc0(sizeof(MapCacheRev));
+-        entry->lock++;
+-        reventry->vaddr_req = mapcache->last_entry->vaddr_base + address_offset;
+-        reventry->paddr_index = mapcache->last_entry->paddr_index;
+-        reventry->size = entry->size;
+-        QTAILQ_INSERT_HEAD(&mapcache->locked_entries, reventry, next);
+-    }
+-
+-    trace_xen_map_cache_return(mapcache->last_entry->vaddr_base + address_offset);
+-    return mapcache->last_entry->vaddr_base + address_offset;
+-}
+-
+-uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+-                       uint8_t lock)
+-{
+-    uint8_t *p;
+-
+-    mapcache_lock();
+-    p = xen_map_cache_unlocked(phys_addr, size, lock);
+-    mapcache_unlock();
+-    return p;
+-}
+-
+-ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
+-{
+-    MapCacheEntry *entry = NULL;
+-    MapCacheRev *reventry;
+-    hwaddr paddr_index;
+-    hwaddr size;
+-    ram_addr_t raddr;
+-    int found = 0;
+-
+-    mapcache_lock();
+-    QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
+-        if (reventry->vaddr_req == ptr) {
+-            paddr_index = reventry->paddr_index;
+-            size = reventry->size;
+-            found = 1;
+-            break;
+-        }
+-    }
+-    if (!found) {
+-        fprintf(stderr, "%s, could not find %p\n", __func__, ptr);
+-        QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
+-            DPRINTF("   "TARGET_FMT_plx" -> %p is present\n", reventry->paddr_index,
+-                    reventry->vaddr_req);
+-        }
+-        abort();
 -        return 0;
 -    }
--    pts = cs->filename + 4;
 -
--    /* We now have everything we need to set the xenstore entry. */
--    xs = xs_open(0);
--    if (xs == NULL) {
--        fprintf(stderr, "Could not contact XenStore\n");
--        goto out;
+-    entry = &mapcache->entry[paddr_index % mapcache->nr_buckets];
+-    while (entry && (entry->paddr_index != paddr_index || entry->size != size)) {
+-        entry = entry->next;
 -    }
--
--    path = xs_get_domain_path(xs, domid);
--    if (path == NULL) {
--        fprintf(stderr, "xs_get_domain_path() error\n");
--        goto out;
--    }
--    newpath = realloc(path, (strlen(path) + strlen(string) +
--                strlen("/tty") + 1));
--    if (newpath == NULL) {
--        fprintf(stderr, "realloc error\n");
--        goto out;
--    }
--    path = newpath;
--
--    strcat(path, string);
--    strcat(path, "/tty");
--    if (!xs_write(xs, XBT_NULL, path, pts, strlen(pts))) {
--        fprintf(stderr, "xs_write for '%s' fail", string);
--        goto out;
--    }
--    ret = 0;
--
--out:
--    free(path);
--    xs_close(xs);
--
--    return ret;
--}
--
--void xenstore_store_pv_console_info(int i, Chardev *chr)
--{
--    if (i == 0) {
--        store_dev_info(xen_domid, chr, "/console");
+-    if (!entry) {
+-        DPRINTF("Trying to find address %p that is not in the mapcache!\n", ptr);
+-        raddr = 0;
 -    } else {
--        char buf[32];
--        snprintf(buf, sizeof(buf), "/device/console/%d", i);
--        store_dev_info(xen_domid, chr, buf);
+-        raddr = (reventry->paddr_index << MCACHE_BUCKET_SHIFT) +
+-             ((unsigned long) ptr - (unsigned long) entry->vaddr_base);
 -    }
+-    mapcache_unlock();
+-    return raddr;
 -}
 -
--
--static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
+-static void xen_invalidate_map_cache_entry_unlocked(uint8_t *buffer)
 -{
--    char path[50];
+-    MapCacheEntry *entry = NULL, *pentry = NULL;
+-    MapCacheRev *reventry;
+-    hwaddr paddr_index;
+-    hwaddr size;
+-    int found = 0;
 -
--    if (xs == NULL) {
--        fprintf(stderr, "xenstore connection not initialized\n");
--        exit(1);
+-    QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
+-        if (reventry->vaddr_req == buffer) {
+-            paddr_index = reventry->paddr_index;
+-            size = reventry->size;
+-            found = 1;
+-            break;
+-        }
+-    }
+-    if (!found) {
+-        DPRINTF("%s, could not find %p\n", __func__, buffer);
+-        QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
+-            DPRINTF("   "TARGET_FMT_plx" -> %p is present\n", reventry->paddr_index, reventry->vaddr_req);
+-        }
+-        return;
+-    }
+-    QTAILQ_REMOVE(&mapcache->locked_entries, reventry, next);
+-    g_free(reventry);
+-
+-    if (mapcache->last_entry != NULL &&
+-        mapcache->last_entry->paddr_index == paddr_index) {
+-        mapcache->last_entry = NULL;
 -    }
 -
--    snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
--    if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
--        fprintf(stderr, "error recording dm state\n");
--        exit(1);
+-    entry = &mapcache->entry[paddr_index % mapcache->nr_buckets];
+-    while (entry && (entry->paddr_index != paddr_index || entry->size != size)) {
+-        pentry = entry;
+-        entry = entry->next;
 -    }
+-    if (!entry) {
+-        DPRINTF("Trying to unmap address %p that is not in the mapcache!\n", buffer);
+-        return;
+-    }
+-    entry->lock--;
+-    if (entry->lock > 0 || pentry == NULL) {
+-        return;
+-    }
+-
+-    pentry->next = entry->next;
+-    ram_block_notify_remove(entry->vaddr_base, entry->size);
+-    if (munmap(entry->vaddr_base, entry->size) != 0) {
+-        perror("unmap fails");
+-        exit(-1);
+-    }
+-    g_free(entry->valid_mapping);
+-    g_free(entry);
 -}
 -
--
--static void xen_change_state_handler(void *opaque, int running,
--                                     RunState state)
+-void xen_invalidate_map_cache_entry(uint8_t *buffer)
 -{
--    if (running) {
--        /* record state running */
--        xenstore_record_dm_state(xenstore, "running");
--    }
+-    mapcache_lock();
+-    xen_invalidate_map_cache_entry_unlocked(buffer);
+-    mapcache_unlock();
 -}
 -
--static int xen_init(MachineState *ms)
+-void xen_invalidate_map_cache(void)
 -{
--    xen_xc = xc_interface_open(0, 0, 0);
--    if (xen_xc == NULL) {
--        xen_pv_printf(NULL, 0, "can't open xen interface\n");
--        return -1;
+-    unsigned long i;
+-    MapCacheRev *reventry;
+-
+-    /* Flush pending AIO before destroying the mapcache */
+-    bdrv_drain_all();
+-
+-    mapcache_lock();
+-
+-    QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
+-        DPRINTF("There should be no locked mappings at this time, "
+-                "but "TARGET_FMT_plx" -> %p is present\n",
+-                reventry->paddr_index, reventry->vaddr_req);
 -    }
--    xen_fmem = xenforeignmemory_open(0, 0);
--    if (xen_fmem == NULL) {
--        xen_pv_printf(NULL, 0, "can't open xen fmem interface\n");
--        xc_interface_close(xen_xc);
--        return -1;
+-
+-    for (i = 0; i < mapcache->nr_buckets; i++) {
+-        MapCacheEntry *entry = &mapcache->entry[i];
+-
+-        if (entry->vaddr_base == NULL) {
+-            continue;
+-        }
+-        if (entry->lock > 0) {
+-            continue;
+-        }
+-
+-        if (munmap(entry->vaddr_base, entry->size) != 0) {
+-            perror("unmap fails");
+-            exit(-1);
+-        }
+-
+-        entry->paddr_index = 0;
+-        entry->vaddr_base = NULL;
+-        entry->size = 0;
+-        g_free(entry->valid_mapping);
+-        entry->valid_mapping = NULL;
 -    }
--    xen_dmod = xendevicemodel_open(0, 0);
--    if (xen_dmod == NULL) {
--        xen_pv_printf(NULL, 0, "can't open xen devicemodel interface\n");
--        xenforeignmemory_close(xen_fmem);
--        xc_interface_close(xen_xc);
--        return -1;
--    }
--    qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
 -
--    global_state_set_optional();
--    savevm_skip_configuration();
--    savevm_skip_section_footers();
+-    mapcache->last_entry = NULL;
 -
--    return 0;
+-    mapcache_unlock();
 -}
--
--static void xen_accel_class_init(ObjectClass *oc, void *data)
--{
--    AccelClass *ac = ACCEL_CLASS(oc);
--    ac->name = "Xen";
--    ac->init_machine = xen_init;
--    ac->allowed = &xen_allowed;
--}
--
--#define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
--
--static const TypeInfo xen_accel_type = {
--    .name = TYPE_XEN_ACCEL,
--    .parent = TYPE_ACCEL,
--    .class_init = xen_accel_class_init,
--};
--
--static void xen_type_init(void)
--{
--    type_register_static(&xen_accel_type);
--}
--
--type_init(xen_type_init);
 -- 
 1.9.1
