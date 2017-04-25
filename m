@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d352h-0001bm-SI
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:18:28 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1d354N-0002bk-GC
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:20:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d352d-0006A9-KU
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:18:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57022
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1d354J-0006pX-Cc
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:20:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42834)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1d352d-00069u-DV
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:18:23 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3PI8k9s012989
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 14:18:22 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a1v5175g6-1
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1d354J-0006od-3c
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:20:07 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3PI91KO141935
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 14:20:04 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a28hfhpyd-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 14:18:22 -0400
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 14:20:04 -0400
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 25 Apr 2017 12:18:21 -0600
-References: <1493126327-13162-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 25 Apr 2017 20:18:15 +0200
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 25 Apr 2017 12:20:02 -0600
+References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
+	<1491575431-32170-2-git-send-email-amarnath.valluri@intel.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 25 Apr 2017 14:19:56 -0400
 MIME-Version: 1.0
-In-Reply-To: <1493126327-13162-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+In-Reply-To: <1491575431-32170-2-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <2c3464b1-268b-f8a1-9935-cbd77c8ffc2a@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix crash with
- virtio-scsi-pci device
+Message-Id: <083d7ebb-268c-c46f-1728-df40b14938da@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/9] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,48 +42,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+Cc: patrick.ohly@intel.com, marcandre.lureau@gmail.com
 
-On 04/25/2017 03:18 PM, Thomas Huth wrote:
-> qemu-system-s390x currently crashes when it is started with a
-> virtio-scsi-pci device, e.g.:
-> 
->  qemu-system-s390x -nographic -enable-kvm -device virtio-scsi-pci \
->                    -drive file=/tmp/disk.dat,if=none,id=d1,format=raw \
->                    -device scsi-cd,drive=d1,bootindex=1
-> 
-> The problem is that the code in s390_gen_initial_iplb() currently assumes
-> that all SCSI devices are also CCW devices, which is not the case for
-> virtio-scsi-pci of course. Fix it by adding an appropriate check for
-> TYPE_CCW_DEVICE here.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-applied thanks.
-
+On 04/07/2017 10:30 AM, Amarnath Valluri wrote:
+> TPMDriverOps inside TPMBackend is not required, as it is supposed to be a class
+> member. The only possible reason for keeping in TPMBackend was, to get the
+> backend type in tpm.c where dedicated backend api, tpm_backend_get_type() is
+> present.
+>
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
 > ---
->  hw/s390x/ipl.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 7978c7d..f674d50 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -248,7 +248,13 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
->              SCSIBus *bus = scsi_bus_from_device(sd);
->              VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
->              VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw, vdev);
-> -            CcwDevice *ccw_dev = CCW_DEVICE(scsi_ccw);
-> +            CcwDevice *ccw_dev;
-> +
-> +            ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
-> +                                                       TYPE_CCW_DEVICE);
-> +            if (!ccw_dev) {       /* It might be a PCI device instead */
-> +                return false;
-> +            }
-> 
->              ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
->              ipl->iplb.blk0_len =
-> 
+>   hw/tpm/tpm_passthrough.c     | 4 ----
+>   include/sysemu/tpm_backend.h | 1 -
+>   tpm.c                        | 2 +-
+>   3 files changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index 9234eb3..a0baf5f 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -46,8 +46,6 @@
+>   #define TPM_PASSTHROUGH(obj) \
+>       OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+>
+> -static const TPMDriverOps tpm_passthrough_driver;
+> -
+>   /* data structures */
+>   typedef struct TPMPassthruThreadParams {
+>       TPMState *tpm_state;
+> @@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+>       /* let frontend set the fe_model to proper value */
+>       tb->fe_model = -1;
+>
+> -    tb->ops = &tpm_passthrough_driver;
+> -
+>       if (tpm_passthrough_handle_device_opts(opts, tb)) {
+>           goto err_exit;
+>       }
+> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+> index b58f52d..e7f590d 100644
+> --- a/include/sysemu/tpm_backend.h
+> +++ b/include/sysemu/tpm_backend.h
+> @@ -50,7 +50,6 @@ struct TPMBackend {
+>       enum TpmModel fe_model;
+>       char *path;
+>       char *cancel_path;
+> -    const TPMDriverOps *ops;
+>
+>       QLIST_ENTRY(TPMBackend) list;
+>   };
+> diff --git a/tpm.c b/tpm.c
+> index 9a7c711..0ee021a 100644
+> --- a/tpm.c
+> +++ b/tpm.c
+> @@ -258,7 +258,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+>       res->model = drv->fe_model;
+>       res->options = g_new0(TpmTypeOptions, 1);
+>
+> -    switch (drv->ops->type) {
+> +    switch (tpm_backend_get_type(drv)) {
+>       case TPM_TYPE_PASSTHROUGH:
+>           res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+>           tpo = g_new0(TPMPassthroughOptions, 1);
+
+
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
