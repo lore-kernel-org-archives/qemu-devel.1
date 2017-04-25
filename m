@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1d33PP-0004bF-70
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:33:48 -0400
+	(envelope-from <quintela@redhat.com>) id 1d33e2-0000WK-3G
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1d33PM-0000YJ-0Z
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:33:47 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:51630)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1d33PL-0000Y0-KZ
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:33:43 -0400
-References: <20170302005448.21336-1-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ca264315-91c3-97ac-9710-36f2dbfc63ad@vivier.eu>
-Date: Tue, 25 Apr 2017 18:33:41 +0200
+	(envelope-from <quintela@redhat.com>) id 1d33dz-000867-2m
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:48:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33602)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d33dy-000862-TR
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:48:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC84C7D0C7
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 16:48:48 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <53bc98ec-fbfd-318c-4613-2c14b4e9b65e@redhat.com> (Laurent
+	Vivier's message of "Tue, 25 Apr 2017 16:15:43 +0200")
+References: <20170425102446.4008-1-quintela@redhat.com>
+	<20170425102446.4008-6-quintela@redhat.com>
+	<53bc98ec-fbfd-318c-4613-2c14b4e9b65e@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 25 Apr 2017 18:48:42 +0200
+Message-ID: <87mvb4mo0l.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170302005448.21336-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: fix inotify
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 5/6] monitor: Move hmp_info_snapshots from
+ savevm.c to hmp.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +36,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-devel@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, peterx@redhat.com
 
-Ping?
+Laurent Vivier <lvivier@redhat.com> wrote:
+> On 25/04/2017 12:24, Juan Quintela wrote:
+>> It only uses block/* functions, nothing from migration.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+>
+> Perhaps the monitor.h include in savevm.c can be removed in PATCH 1/6?
 
-Laurent
+hmp_info_snapshots still uses monitor_printf(), so I have to left it
+until here.
 
-Le 02/03/2017 à 01:54, Laurent Vivier a écrit :
-> When a fd is opened using inotify_init(), a read provides
-> one or more inotify_event structures:
-> 
->     struct inotify_event {
->         int      wd;
->         uint32_t mask;
->         uint32_t cookie;
->         uint32_t len;
->         char     name[];
->     };
-> 
-> The integer fields must be byte-swapped to the target endianness.
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/syscall.c | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index cec8428..c2c4f3a 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7671,6 +7671,33 @@ static target_timer_t get_timer_id(abi_long arg)
->      return timerid;
->  }
->  
-> +#if (defined(TARGET_NR_inotify_init) && defined(__NR_inotify_init)) || \
-> +    (defined(CONFIG_INOTIFY1) && defined(TARGET_NR_inotify_init1) && \
-> +     defined(__NR_inotify_init1))
-> +static abi_long host_to_target_data_inotify(void *buf, size_t len)
-> +{
-> +    struct inotify_event *ev;
-> +    int i;
-> +    uint32_t name_len;
-> +
-> +    for (i = 0; i < len; i += sizeof(struct inotify_event) + name_len) {
-> +        ev = (struct inotify_event *)((char *)buf + i);
-> +        name_len = ev->len;
-> +
-> +        ev->wd = tswap32(ev->wd);
-> +        ev->mask = tswap32(ev->mask);
-> +        ev->cookie = tswap32(ev->cookie);
-> +        ev->len = tswap32(name_len);
-> +    }
-> +
-> +    return len;
-> +}
-> +
-> +static TargetFdTrans target_inotify_trans = {
-> +    .host_to_target_data = host_to_target_data_inotify,
-> +};
-> +#endif
-> +
->  /* do_syscall() should always have a single exit point at the end so
->     that actions, such as logging of syscall results, can be performed.
->     All errnos that do_syscall() returns must be -TARGET_<errcode>. */
-> @@ -11694,6 +11721,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->  #if defined(TARGET_NR_inotify_init) && defined(__NR_inotify_init)
->      case TARGET_NR_inotify_init:
->          ret = get_errno(sys_inotify_init());
-> +        fd_trans_register(ret, &target_inotify_trans);
->          break;
->  #endif
->  #ifdef CONFIG_INOTIFY1
-> @@ -11701,6 +11729,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_inotify_init1:
->          ret = get_errno(sys_inotify_init1(target_to_host_bitmask(arg1,
->                                            fcntl_flags_tbl)));
-> +        fd_trans_register(ret, &target_inotify_trans);
->          break;
->  #endif
->  #endif
-> 
+Thanks, Juan.
