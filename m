@@ -1,39 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d37pj-0002fX-18
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:17 -0400
+	(envelope-from <gm.ijewski@web.de>) id 1d38P5-0003H6-Go
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d37pe-000334-33
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44547)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d37pd-00031N-Qo
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:10 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3PLDgvH048908
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 17:17:08 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a27kn3seh-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 17:17:08 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 25 Apr 2017 17:17:06 -0400
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170419105258.4488-2-vfeenstr@redhat.com>
-References: <20170419105258.4488-1-vfeenstr@redhat.com>
-	<20170419105258.4488-2-vfeenstr@redhat.com>
-Date: Tue, 25 Apr 2017 15:52:18 -0500
-Message-Id: <149315353884.26622.6081569925906426907@loki>
-Subject: Re: [Qemu-devel] [PATCH v6 1/1] qga: Add `guest-get-timezone`
- command
+	(envelope-from <gm.ijewski@web.de>) id 1d38P0-0008Jq-HY
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:53:47 -0400
+Received: from mout.web.de ([212.227.17.12]:58086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gm.ijewski@web.de>) id 1d38P0-0008Ix-6N
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:53:42 -0400
+From: Geert Martin Ijewski <gm.ijewski@web.de>
+Date: Tue, 25 Apr 2017 23:53:32 +0200
+Message-Id: <1493157212-22070-1-git-send-email-gm.ijewski@web.de>
+Subject: [Qemu-devel] [PATCH v4] crypto: qcrypto_random_bytes() now works on
+ windows w/o any other crypto libs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,115 +22,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@gmail.com, sameeh@daynix.com
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, peter.maydell@linaro.org, berrange@redhat.com, Geert Martin Ijewski <gm.ijewski@web.de>
 
-Quoting Vinzenz 'evilissimo' Feenstra (2017-04-19 05:52:58)
-> From: Vinzenz Feenstra <vfeenstr@redhat.com>
-> =
+If no crypto library is included in the build, QEMU uses
+qcrypto_random_bytes() to generate random data. That function tried to open
+/dev/urandom or /dev/random and if opening both files failed it errored out.
 
-> Adds a new command `guest-get-timezone` reporting the currently
-> configured timezone on the system. The information on what timezone is
-> currently is configured is useful in case of Windows VMs where the
-> offset of the hardware clock is required to have the same offset. This
-> can be used for management systems like `oVirt` to detect the timezone
-> difference and warn administrators of the misconfiguration.
-> =
+Those files obviously do not exist on windows, so there the code uses
+CryptGenRandom().
 
-> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+Furthermore there was some refactoring and a new function
+qcrypto_random_init() was introduced. If a proper crypto library (gnutls or
+libgcrypt) is included in the build, this function does nothing. If neither
+is included it initializes the (platform specific) handles that are used by
+qcrypto_random_bytes().
+Either:
+* a handle to /dev/urandom | /dev/random on unix like systems
+* a handle to a cryptographic service provider on windows
 
-Thanks, applied to qga tree:
-  https://github.com/mdroth/qemu/commits/qga
+Signed-off-by: Geert Martin Ijewski <gm.ijewski@web.de>
+---
+ crypto/init.c            |  6 ++++++
+ crypto/random-gcrypt.c   |  2 ++
+ crypto/random-gnutls.c   |  3 +++
+ crypto/random-platform.c | 45 +++++++++++++++++++++++++++++++++++++--------
+ include/crypto/random.h  |  9 +++++++++
+ 5 files changed, 57 insertions(+), 8 deletions(-)
 
-> ---
->  qga/commands.c       | 38 ++++++++++++++++++++++++++++++++++++++
->  qga/qapi-schema.json | 26 ++++++++++++++++++++++++++
->  2 files changed, 64 insertions(+)
-> =
-
-> diff --git a/qga/commands.c b/qga/commands.c
-> index 4d92946..999538d 100644
-> --- a/qga/commands.c
-> +++ b/qga/commands.c
-> @@ -499,3 +499,41 @@ int ga_parse_whence(GuestFileWhence *whence, Error *=
-*errp)
->      error_setg(errp, "invalid whence code %"PRId64, whence->u.value);
->      return -1;
->  }
-> +
-> +GuestTimezone *qmp_guest_get_timezone(Error **errp)
-> +{
-> +#if !GLIB_CHECK_VERSION(2, 28, 0)
-> +    error_setg(errp, QERR_UNSUPPORTED);
-> +    return NULL;
-> +#else
-> +    GuestTimezone *info =3D NULL;
-> +    GTimeZone *tz =3D NULL;
-> +    gint64 now =3D 0;
-> +    gint32 intv =3D 0;
-> +    gchar const *name =3D NULL;
-> +
-> +    info =3D g_new0(GuestTimezone, 1);
-> +    tz =3D g_time_zone_new_local();
-> +    if (tz =3D=3D NULL) {
-> +        error_setg(errp, QERR_QGA_COMMAND_FAILED,
-> +                   "Couldn't retrieve local timezone");
-> +        goto error;
-> +    }
-> +
-> +    now =3D g_get_real_time() / G_USEC_PER_SEC;
-> +    intv =3D g_time_zone_find_interval(tz, G_TIME_TYPE_UNIVERSAL, now);
-> +    info->offset =3D g_time_zone_get_offset(tz, intv);
-> +    name =3D g_time_zone_get_abbreviation(tz, intv);
-> +    if (name !=3D NULL) {
-> +        info->has_zone =3D true;
-> +        info->zone =3D g_strdup(name);
-> +    }
-> +    g_time_zone_unref(tz);
-> +
-> +    return info;
-> +
-> +error:
-> +    g_free(info);
-> +    return NULL;
-> +#endif
-> +}
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index a02dbf2..5183ea2 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -1042,3 +1042,29 @@
->    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
->                 '*input-data': 'str', '*capture-output': 'bool' },
->    'returns': 'GuestExec' }
-> +
-> +
-> +##
-> +# @GuestTimezone:
-> +#
-> +# @zone:    Timezone name
-> +# @offset:  Offset to UTC in seconds, negative numbers for time zones we=
-st of
-> +#           GMT, positive numbers for east
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'GuestTimezone',
-> +  'data':   { '*zone': 'str', 'offset': 'int' } }
-> +
-> +
-> +##
-> +# @guest-get-timezone:
-> +#
-> +# Retrieves the timezone information from the guest.
-> +#
-> +# Returns: A GuestTimezone dictionary.
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'command': 'guest-get-timezone',
-> +  'returns': 'GuestTimezone' }
-> -- =
-
-> 2.9.3
->=20
+diff --git a/crypto/init.c b/crypto/init.c
+index f65207e..f131c42 100644
+--- a/crypto/init.c
++++ b/crypto/init.c
+@@ -32,6 +32,8 @@
+ #include <gcrypt.h>
+ #endif
+ 
++#include "crypto/random.h"
++
+ /* #define DEBUG_GNUTLS */
+ 
+ /*
+@@ -146,5 +148,9 @@ int qcrypto_init(Error **errp)
+     gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
+ #endif
+ 
++    if (qcrypto_random_init(errp) < 0) {
++        return -1;
++    }
++
+     return 0;
+ }
+diff --git a/crypto/random-gcrypt.c b/crypto/random-gcrypt.c
+index 0de9a09..2446142 100644
+--- a/crypto/random-gcrypt.c
++++ b/crypto/random-gcrypt.c
+@@ -31,3 +31,5 @@ int qcrypto_random_bytes(uint8_t *buf,
+     gcry_randomize(buf, buflen, GCRY_STRONG_RANDOM);
+     return 0;
+ }
++
++int qcrpto_random_init(Error **errp G_GNUC_UNUSED) { return 0; }
+diff --git a/crypto/random-gnutls.c b/crypto/random-gnutls.c
+index 04b45a8..d80c786 100644
+--- a/crypto/random-gnutls.c
++++ b/crypto/random-gnutls.c
+@@ -41,3 +41,6 @@ int qcrypto_random_bytes(uint8_t *buf,
+ 
+     return 0;
+ }
++
++
++int qcrpto_random_init(Error **errp G_GNUC_UNUSED) { return 0; }
+diff --git a/crypto/random-platform.c b/crypto/random-platform.c
+index 82b755a..0eddb91 100644
+--- a/crypto/random-platform.c
++++ b/crypto/random-platform.c
+@@ -22,14 +22,16 @@
+ 
+ #include "crypto/random.h"
+ 
+-int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+-                         size_t buflen G_GNUC_UNUSED,
+-                         Error **errp)
+-{
+-    int fd;
+-    int ret = -1;
+-    int got;
++#ifdef _WIN32
++#include <Wincrypt.h>
++static HCRYPTPROV hCryptProv;
++#else
++static int fd; /* a file handle to either /dev/urandom or /dev/random */
++#endif
+ 
++int qcrypto_random_init(Error **errp)
++{
++#ifndef _WIN32
+     /* TBD perhaps also add support for BSD getentropy / Linux
+      * getrandom syscalls directly */
+     fd = open("/dev/urandom", O_RDONLY);
+@@ -41,6 +43,25 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+         error_setg(errp, "No /dev/urandom or /dev/random found");
+         return -1;
+     }
++#else
++    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL,
++                             CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
++        error_setg_win32(errp, GetLastError(),
++                         "Unable to create cryptographic provider");
++        return -1;
++    }
++#endif
++
++    return 0;
++}
++
++int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
++                         size_t buflen G_GNUC_UNUSED,
++                         Error **errp)
++{
++#ifndef _WIN32
++    int ret = -1;
++    int got;
+ 
+     while (buflen > 0) {
+         got = read(fd, buf, buflen);
+@@ -59,6 +80,14 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+ 
+     ret = 0;
+  cleanup:
+-    close(fd);
+     return ret;
++#else
++    if (!CryptGenRandom(hCryptProv, buflen, buf)) {
++        error_setg_win32(errp, GetLastError(),
++                         "Unable to read random bytes");
++        return -1;
++    }
++
++    return 0;
++#endif
+ }
+diff --git a/include/crypto/random.h b/include/crypto/random.h
+index a101353..a07229c 100644
+--- a/include/crypto/random.h
++++ b/include/crypto/random.h
+@@ -40,5 +40,14 @@ int qcrypto_random_bytes(uint8_t *buf,
+                          size_t buflen,
+                          Error **errp);
+ 
++/**
++ * qcrypto_random_init:
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Initializes the handles used by qcrypto_random_bytes
++ *
++ * Returns 0 on success, -1 on error
++ */
++int qcrypto_random_init(Error **errp);
+ 
+ #endif /* QCRYPTO_RANDOM_H */
+-- 
+2.10.1.windows.1
