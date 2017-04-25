@@ -1,28 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkern@vsrv.kern.pm>) id 1d2yXg-0003Nn-Rk
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:22:02 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d2yYG-0003hH-Nk
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkern@vsrv.kern.pm>) id 1d2yXe-0006Lk-6U
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:22:00 -0400
-Received: from vsrv.kern.pm ([138.201.172.171]:45154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pkern@vsrv.kern.pm>) id 1d2yXd-0006DR-QF
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:21:58 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d2yYE-0007Uw-0u
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:22:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36041
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1d2yYD-0007TO-Qq
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:22:33 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3PBJXIJ145002
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 07:22:32 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a21na3bsn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 07:22:30 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Tue, 25 Apr 2017 21:22:06 +1000
+Received: from d23av06.au.ibm.com (d23av06.au.ibm.com [9.190.235.151])
+	by d23relay08.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v3PBLtSX5570960
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 21:22:03 +1000
+Received: from d23av06.au.ibm.com (localhost [127.0.0.1])
+	by d23av06.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v3PBLVJI021588
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 21:21:31 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170425104338.31984-1-rth@twiddle.net>
+References: <20170425104338.31984-1-rth@twiddle.net>
+Date: Tue, 25 Apr 2017 16:51:10 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 25 Apr 2017 13:21:42 +0200
-From: Philipp Kern <phil@philkern.de>
-In-Reply-To: <70dad7b4-f893-1af7-d0c9-7dbb10506b04@twiddle.net>
-References: <20170423223216.17856-1-aurelien@aurel32.net>
-	<23a3da7d-d330-7cad-5bef-8e80c8d9f50c@suse.de>
-	<70dad7b4-f893-1af7-d0c9-7dbb10506b04@twiddle.net>
-Message-ID: <51aa9f42dd0bb04e36dd67b02b226287@mail.kern.pm>
-Sender: www-data <phil@philkern.de>
-Subject: Re: [Qemu-devel] [PATCH] target-s390x: Mask the SIGP order_code to
- 8bit.
+Content-Type: text/plain
+Message-Id: <87a87468d5.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] tcg: Initialize return value after
+ exit_atomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +49,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org, Richard Henderson <rth7680@gmail.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: David Gibson <dgibson@redhat.com>
 
-On 2017-04-25 11:51, Richard Henderson wrote:
-> On 04/24/2017 10:25 AM, Alexander Graf wrote:
->> On 24.04.17 00:32, Aurelien Jarno wrote:
->>> From: Philipp Kern <phil@philkern.de>
->>> 
->>> According to "CPU Signaling and Response", "Signal-Processor Orders",
->>> the order field is bit position 56-63. Without this, the Linux
->>> guest kernel is sometimes unable to stop emulation and enters
->>> an infinite loop of "XXX unknown sigp: 0xffffffff00000005".
->>> 
->>> Signed-off-by: Philipp Kern <phil@philkern.de>
->>> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
->>> ---
->>>  target/s390x/misc_helper.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>> 
->>> This patch has been sent by Philipp Kern a lot of time ago, and it 
->>> seems
->>> has been lost. I am resending it, as it is still useful.
->>> 
->>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
->>> index 3bf09ea222..4946b56ab3 100644
->>> --- a/target/s390x/misc_helper.c
->>> +++ b/target/s390x/misc_helper.c
->>> @@ -534,7 +534,7 @@ uint32_t HELPER(sigp)(CPUS390XState *env, 
->>> uint64_t order_code, uint32_t r1,
->>>      /* Remember: Use "R1 or R1 + 1, whichever is the odd-numbered 
->>> register"
->>>         as parameter (input). Status (output) is always R1. */
->>> 
->>> -    switch (order_code) {
->>> +    switch (order_code & 0xff) {
->> 
->> This definitely needs a comment above the mask. Ideally I'd love to 
->> just change the function prototype to pass order_code as uint8_t, but 
->> I don't think that's possible with the TCG glue.
-> 
-> Correct.  We'll need to leave the mask here.
+Richard Henderson <rth@twiddle.net> writes:
 
-I shall point out that Alexander merged it into the s390-next tree when 
-I first sent it but that was never merged into qemu proper. I don't 
-think there's a problem in adding a comment that says what the commit 
-description says right there, like this:
+> Users of tcg_gen_atomic_cmpxchg and do_atomic_op rightfully utilize
+> the output.  Even though this code is dead, it gets translated, and
+> without the initialization we encounter a tcg_error.
+>
+> Reported-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 
-/* sigp contains the order code in bit positions 56-63, mask it here. */
+With this the tcg_error goes away.
 
-Kind regards
-Philipp Kern
+But then powernv skiboot code [1] enters into infinite loop. Basically,
+in target/ppc/translate.c:gen_conditional_store(), setcond_tl will
+always fail, and CRF_EQ_BIT will never be set, the lock will never be
+taken.
+
+So "make check" still fails at powernv serial test.
+
+./configure --target-list=ppc64-softmmu  --cc=clang --host-cc=clang && make && make check
+
+> ---
+>  tcg/tcg-op.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+> index 95a39b7..6b1f415 100644
+> --- a/tcg/tcg-op.c
+> +++ b/tcg/tcg-op.c
+> @@ -2861,6 +2861,9 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64 retv, TCGv addr, TCGv_i64 cmpv,
+>  #endif
+>  #else
+>          gen_helper_exit_atomic(tcg_ctx.tcg_env);
+> +        /* Produce a result, so that we have a well-formed opcode stream
+> +           with respect to uses of the result in the (dead) code following.  */
+> +        tcg_gen_movi_i64(retv, 0);
+>  #endif /* CONFIG_ATOMIC64 */
+>      } else {
+>          TCGv_i32 c32 = tcg_temp_new_i32();
+> @@ -2966,6 +2969,9 @@ static void do_atomic_op_i64(TCGv_i64 ret, TCGv addr, TCGv_i64 val,
+>  #endif
+>  #else
+>          gen_helper_exit_atomic(tcg_ctx.tcg_env);
+> +        /* Produce a result, so that we have a well-formed opcode stream
+> +           with respect to uses of the result in the (dead) code following.  */
+> +        tcg_gen_movi_i64(ret, 0);
+>  #endif /* CONFIG_ATOMIC64 */
+>      } else {
+>          TCGv_i32 v32 = tcg_temp_new_i32();
+> -- 
+
+Regards,
+Nikunj
+
+1. https://github.com/open-power/skiboot/blob/master/asm/lock.S#L36
