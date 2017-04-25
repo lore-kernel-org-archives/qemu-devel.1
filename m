@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d35JB-0007sk-Aw
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:32 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d35JE-0007vI-Ls
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d35J9-0005kk-UG
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:29 -0400
-Received: from mail.kernel.org ([198.145.29.136]:49734)
+	(envelope-from <sstabellini@kernel.org>) id 1d35JB-0005lA-E0
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:32 -0400
+Received: from mail.kernel.org ([198.145.29.136]:49776)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d35J9-0005kZ-Le
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:27 -0400
+	id 1d35JB-0005kx-53
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:35:29 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 25 Apr 2017 11:34:58 -0700
-Message-Id: <1493145313-31311-6-git-send-email-sstabellini@kernel.org>
+Date: Tue, 25 Apr 2017 11:34:59 -0700
+Message-Id: <1493145313-31311-7-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1493145313-31311-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1704251134220.2875@sstabellini-ThinkPad-X260>
 	<1493145313-31311-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PATCH 06/21] xen: use 5 digit xen versions
+Subject: [Qemu-devel] [PATCH 07/21] xen: use libxendevice model to restrict
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,217 +27,161 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Juergen Gross <jgross@suse.com>
+Cc: stefanha@gmail.com, sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Paul Durrant <paul.durrant@citrix.com>
 
-From: Juergen Gross <jgross@suse.com>
+From: Paul Durrant <paul.durrant@citrix.com>
 
-Today qemu is using e.g. the value 480 for Xen version 4.8.0. As some
-Xen version tests are using ">" relations this scheme will lead to
-problems when Xen version 4.10.0 is being reached.
+This patch adds a command-line option (-xen-domid-restrict) which will
+use the new libxendevicemodel API to restrict devicemodel [1] operations
+to the specified domid. (Such operations are not applicable to the xenpv
+machine type).
 
-Instead of the 3 digit schem use a 5 digit scheme (e.g. 40800 for
-version 4.8.0).
+This patch also adds a tracepoint to allow successful enabling of the
+restriction to be monitored.
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+[1] I.e. operations issued by libxendevicemodel. Operation issued by other
+    xen libraries (e.g. libxenforeignmemory) are currently still unrestricted
+    but this will be rectified by subsequent patches.
+
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- configure                   | 16 ++++++++--------
- hw/block/xen_disk.c         |  2 +-
- include/hw/xen/xen_common.h | 22 +++++++++++-----------
- 3 files changed, 20 insertions(+), 20 deletions(-)
+ hw/xen/trace-events         |  1 +
+ include/hw/xen/xen.h        |  1 +
+ include/hw/xen/xen_common.h | 20 ++++++++++++++++++++
+ qemu-options.hx             |  7 +++++++
+ vl.c                        |  8 ++++++++
+ xen-hvm.c                   |  8 ++++++++
+ 6 files changed, 45 insertions(+)
 
-diff --git a/configure b/configure
-index e333547..271bea8 100755
---- a/configure
-+++ b/configure
-@@ -2014,7 +2014,7 @@ EOF
-       compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
-     then
-     xen_stable_libs="-lxendevicemodel $xen_stable_libs"
--    xen_ctrl_version=490
-+    xen_ctrl_version=40900
-     xen=yes
-   elif
-       cat > $TMPC <<EOF &&
-@@ -2069,7 +2069,7 @@ int main(void) {
- EOF
-       compile_prog "" "$xen_libs $xen_stable_libs"
-     then
--    xen_ctrl_version=480
-+    xen_ctrl_version=40800
-     xen=yes
-   elif
-       cat > $TMPC <<EOF &&
-@@ -2120,7 +2120,7 @@ int main(void) {
- EOF
-       compile_prog "" "$xen_libs $xen_stable_libs"
-     then
--    xen_ctrl_version=471
-+    xen_ctrl_version=40701
-     xen=yes
-   elif
-       cat > $TMPC <<EOF &&
-@@ -2135,7 +2135,7 @@ int main(void) {
- EOF
-       compile_prog "" "$xen_libs"
-     then
--    xen_ctrl_version=470
-+    xen_ctrl_version=40700
-     xen=yes
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index c4fb6f1..5615dce 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -11,3 +11,4 @@ xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %
+ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+ xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
++xen_domid_restrict(int err) "err: %u"
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index 2b1733b..7efcdaa 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -21,6 +21,7 @@ enum xen_mode {
  
-   # Xen 4.6
-@@ -2163,7 +2163,7 @@ int main(void) {
- EOF
-       compile_prog "" "$xen_libs"
-     then
--    xen_ctrl_version=460
-+    xen_ctrl_version=40600
-     xen=yes
+ extern uint32_t xen_domid;
+ extern enum xen_mode xen_mode;
++extern bool xen_domid_restrict;
  
-   # Xen 4.5
-@@ -2190,7 +2190,7 @@ int main(void) {
- EOF
-       compile_prog "" "$xen_libs"
-     then
--    xen_ctrl_version=450
-+    xen_ctrl_version=40500
-     xen=yes
+ extern bool xen_allowed;
  
-   elif
-@@ -2215,7 +2215,7 @@ int main(void) {
- EOF
-       compile_prog "" "$xen_libs"
-     then
--    xen_ctrl_version=420
-+    xen_ctrl_version=40200
-     xen=yes
- 
-   else
-@@ -2227,7 +2227,7 @@ EOF
-   fi
- 
-   if test "$xen" = yes; then
--    if test $xen_ctrl_version -ge 471  ; then
-+    if test $xen_ctrl_version -ge 40701  ; then
-       libs_softmmu="$xen_stable_libs $libs_softmmu"
-     fi
-     libs_softmmu="$xen_libs $libs_softmmu"
-diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index 456a2d5..27df048 100644
---- a/hw/block/xen_disk.c
-+++ b/hw/block/xen_disk.c
-@@ -492,7 +492,7 @@ static int ioreq_map(struct ioreq *ioreq)
-     return 0;
- }
- 
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 480
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40800
- 
- static void ioreq_free_copy_buffers(struct ioreq *ioreq)
- {
 diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index b1f5f53..fa990a0 100644
+index fa990a0..0fcbba8 100644
 --- a/include/hw/xen/xen_common.h
 +++ b/include/hw/xen/xen_common.h
-@@ -26,7 +26,7 @@ extern xc_interface *xen_xc;
-  * We don't support Xen prior to 4.2.0.
-  */
- 
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
- 
- typedef xc_interface xendevicemodel_handle;
- 
-@@ -36,7 +36,7 @@ static inline xendevicemodel_handle *xendevicemodel_open(
-     return xen_xc;
- }
- 
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 450
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40500
- 
- static inline int xendevicemodel_create_ioreq_server(
-     xendevicemodel_handle *dmod, domid_t domid, int handle_bufioreq,
-@@ -99,7 +99,7 @@ static inline int xendevicemodel_set_ioreq_server_state(
-     return xc_hvm_set_ioreq_server_state(dmod, domid, id, enabled);
- }
- 
--#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 450 */
-+#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40500 */
- 
- static inline int xendevicemodel_set_pci_intx_level(
-     xendevicemodel_handle *dmod, domid_t domid, uint16_t segment,
-@@ -151,7 +151,7 @@ static inline int xendevicemodel_set_mem_type(
+@@ -151,6 +151,13 @@ static inline int xendevicemodel_set_mem_type(
      return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
  }
  
--#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 490 */
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
++static inline int xendevicemodel_restrict(
++    xendevicemodel_handle *dmod, domid_t domid)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
  
  #undef XC_WANT_COMPAT_DEVICEMODEL_API
- #include <xendevicemodel.h>
-@@ -207,7 +207,7 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+@@ -206,6 +213,19 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+     return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
  }
  
++static inline int xen_restrict(domid_t domid)
++{
++    int rc = xendevicemodel_restrict(xen_dmod, domid);
++
++    trace_xen_domid_restrict(errno);
++
++    if (errno == ENOTTY) {
++        return 0;
++    }
++
++    return rc;
++}
++
  /* Xen 4.2 through 4.6 */
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 471
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
  
- typedef xc_interface xenforeignmemory_handle;
- typedef xc_evtchn xenevtchn_handle;
-@@ -248,7 +248,7 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 99af8ed..2043371 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3354,6 +3354,11 @@ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
+     "-xen-attach     attach to existing xen domain\n"
+     "                xend will use this when starting QEMU\n",
+     QEMU_ARCH_ALL)
++DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
++    "-xen-domid-restrict     restrict set of available xen operations\n"
++    "                        to specified domain id. (Does not affect\n"
++    "                        xenpv machine type).\n",
++    QEMU_ARCH_ALL)
+ STEXI
+ @item -xen-domid @var{id}
+ @findex -xen-domid
+@@ -3366,6 +3371,8 @@ Warning: should not be used when xend is in use (XEN only).
+ @findex -xen-attach
+ Attach to existing xen domain.
+ xend will use this when starting QEMU (XEN only).
++@findex -xen-domid-restrict
++Restrict set of available xen operations to specified domain id (XEN only).
+ ETEXI
  
- #define xenforeignmemory_unmap(h, p, s) munmap(p, s * XC_PAGE_SIZE)
+ DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
+diff --git a/vl.c b/vl.c
+index 0b4ed52..f46e070 100644
+--- a/vl.c
++++ b/vl.c
+@@ -205,6 +205,7 @@ static NotifierList machine_init_done_notifiers =
+ bool xen_allowed;
+ uint32_t xen_domid;
+ enum xen_mode xen_mode = XEN_EMULATE;
++bool xen_domid_restrict;
  
--#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 471 */
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40701 */
+ static int has_defaults = 1;
+ static int default_serial = 1;
+@@ -3933,6 +3934,13 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 xen_mode = XEN_ATTACH;
+                 break;
++            case QEMU_OPTION_xen_domid_restrict:
++                if (!(xen_available())) {
++                    error_report("Option not supported for this target");
++                    exit(1);
++                }
++                xen_domid_restrict = true;
++                break;
+             case QEMU_OPTION_trace:
+                 g_free(trace_file);
+                 trace_file = trace_opt_parse(optarg);
+diff --git a/xen-hvm.c b/xen-hvm.c
+index 4b928cf..335e263 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -1226,6 +1226,14 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
  
- #include <xenevtchn.h>
- #include <xengnttab.h>
-@@ -284,7 +284,7 @@ static inline int xen_get_vmport_regs_pfn(xc_interface *xc, domid_t dom,
- #endif
++    if (xen_domid_restrict) {
++        rc = xen_restrict(xen_domid);
++        if (rc < 0) {
++            error_report("failed to restrict: error %d", errno);
++            goto err;
++        }
++    }
++
+     xen_create_ioreq_server(xen_domid, &state->ioservid);
  
- /* Xen before 4.6 */
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 460
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40600
- 
- #ifndef HVM_IOREQSRV_BUFIOREQ_ATOMIC
- #define HVM_IOREQSRV_BUFIOREQ_ATOMIC 2
-@@ -330,7 +330,7 @@ static inline int xen_get_default_ioreq_server_info(domid_t dom,
- }
- 
- /* Xen before 4.5 */
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 450
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40500
- 
- #ifndef HVM_PARAM_BUFIOREQ_EVTCHN
- #define HVM_PARAM_BUFIOREQ_EVTCHN 26
-@@ -569,7 +569,7 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
- 
- #endif
- 
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 460
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40600
- static inline int xen_xc_domain_add_to_physmap(xc_interface *xch, uint32_t domid,
-                                                unsigned int space,
-                                                unsigned long idx,
-@@ -592,7 +592,7 @@ static inline int xen_xc_domain_add_to_physmap(xc_interface *xch, uint32_t domid
- #endif
- 
- #ifdef CONFIG_XEN_PV_DOMAIN_BUILD
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 470
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40700
- static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
-                                     xen_domain_handle_t handle, uint32_t flags,
-                                     uint32_t *pdomid)
-@@ -611,7 +611,7 @@ static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
- 
- /* Xen before 4.8 */
- 
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 480
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40800
- 
- 
- typedef void *xengnttab_grant_copy_segment_t;
+     state->exit.notify = xen_exit_notifier;
 -- 
 1.9.1
