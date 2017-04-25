@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d2vFM-0007Th-VK
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:50:53 -0400
+	(envelope-from <cota@braap.org>) id 1d2vIf-0008FB-Aq
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:54:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d2vFJ-0007sm-SA
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:50:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d2vFJ-0007sC-MA
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:50:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6312685542
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 07:50:48 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 25 Apr 2017 09:50:44 +0200
-Message-Id: <1493106644-6049-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] net/dump: Issue a warning for the deprecated
- "-net dump"
+	(envelope-from <cota@braap.org>) id 1d2vIe-0000iw-IW
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:54:17 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Tue, 25 Apr 2017 03:53:49 -0400
+Message-Id: <1493106839-10438-4-git-send-email-cota@braap.org>
+In-Reply-To: <1493106839-10438-1-git-send-email-cota@braap.org>
+References: <1493106839-10438-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v2 03/13] tcg: enforce 64-byte alignment of
+ TCGContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +20,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-Network dumping should be done with "-object filter-dump" nowadays.
-Using "-net dump" via the VLAN mechanism is considered as deprecated
-and might be removed in a future release. So warn the users now
-to inform them to user the filter-dump method instead.
+This will allow us to prevent cache line false sharing in TCGContext.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Before:
+$ objdump -t  build/x86_64-linux-user/qemu-x86_64 | grep tcg_ctx
+00000000003ea820 g     O .bss   00000000000152d8              tcg_ctx
+
+After:
+$ objdump -t  build/x86_64-linux-user/qemu-x86_64 | grep tcg_ctx
+00000000003ea880 g     O .bss   0000000000015300              tcg_ctx
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- net/dump.c | 3 +++
- 1 file changed, 3 insertions(+)
+ tcg/tcg.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/dump.c b/net/dump.c
-index 89a149b..442eb53 100644
---- a/net/dump.c
-+++ b/net/dump.c
-@@ -194,6 +194,9 @@ int net_init_dump(const Netdev *netdev, const char *name,
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 6c216bb..5fdbfe3 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -727,7 +727,7 @@ struct TCGContext {
  
-     assert(peer);
+     uint16_t gen_insn_end_off[TCG_MAX_INSNS];
+     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
+-};
++} QEMU_ALIGNED(64);
  
-+    error_report("'-net dump' is deprecated. "
-+                 "Please use '-object filter-dump' instead.");
-+
-     if (dump->has_file) {
-         file = dump->file;
-     } else {
+ extern TCGContext tcg_ctx;
+ extern bool parallel_cpus;
 -- 
-1.8.3.1
+2.7.4
