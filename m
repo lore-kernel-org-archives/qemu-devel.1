@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d2y01-0000dz-IH
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:47:15 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d2y1G-0001j0-SA
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:48:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d2xzx-0001Qt-8V
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:47:13 -0400
-Received: from mailout4.w1.samsung.com ([210.118.77.14]:43664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1d2xzw-0001QA-WA
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:47:09 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout4.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OOY0094NOMHLYA0@mailout4.w1.samsung.com> for
-	qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:47:05 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <3703434c-977c-725e-422d-9184a0abe1cb@samsung.com>
-Date: Tue, 25 Apr 2017 13:47:01 +0300
-MIME-version: 1.0
-In-reply-to: <20170425102537.GD31709@pxdev.xzpeter.org>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
-References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170414131740eucas1p27eba648b990a93a627265c740e7ff118@eucas1p2.samsung.com>
-	<1492175840-5021-5-git-send-email-a.perevalov@samsung.com>
-	<20170425082408.GB31709@pxdev.xzpeter.org>
-	<234489b0-d33b-9a49-ec17-b1a6823d4eb3@samsung.com>
-	<20170425102537.GD31709@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 4/6] migration: calculate downtime on dst
- side
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d2y1D-0002QU-Lp
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:48:28 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:34006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1d2y1D-0002QB-Fs
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:48:27 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id x184so167357734oia.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 03:48:27 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
+References: <CAC2QTZa6LW2LcWQUDvT88KVw=O+D99ku03XcE3kiLi_SC4UMBw@mail.gmail.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Tue, 25 Apr 2017 16:18:26 +0530
+Message-ID: <CAC2QTZaJZ8umA8XfgC75RgtY4K_7R6_T-M0YTUt2TrfHaQX=ig@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] DMG chunk size independence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,126 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, i.maximets@samsung.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Wu <peter@lekensteyn.nl>
 
-On 04/25/2017 01:25 PM, Peter Xu wrote:
-> On Tue, Apr 25, 2017 at 01:10:30PM +0300, Alexey Perevalov wrote:
->> On 04/25/2017 11:24 AM, Peter Xu wrote:
->>> On Fri, Apr 14, 2017 at 04:17:18PM +0300, Alexey Perevalov wrote:
->>>
->>> [...]
->>>
->>>> +/*
->>>> + * This function calculates downtime per cpu and trace it
->>>> + *
->>>> + *  Also it calculates total downtime as an interval's overlap,
->>>> + *  for many vCPU.
->>>> + *
->>>> + *  The approach is following:
->>>> + *  Initially intervals are represented in tree where key is
->>>> + *  pagefault address, and values:
->>>> + *   begin - page fault time
->>>> + *   end   - page load time
->>>> + *   cpus  - bit mask shows affected cpus
->>>> + *
->>>> + *  To calculate overlap on all cpus, intervals converted into
->>>> + *  array of points in time (downtime_points), the size of
->>>> + *  array is 2 * number of nodes in tree of intervals (2 array
->>>> + *  elements per one in element of interval).
->>>> + *  Each element is marked as end (E) or as start (S) of interval.
->>>> + *  The overlap downtime will be calculated for SE, only in case
->>>> + *  there is sequence S(0..N)E(M) for every vCPU.
->>>> + *
->>>> + * As example we have 3 CPU
->>>> + *
->>>> + *      S1        E1           S1               E1
->>>> + * -----***********------------xxx***************------------------------> CPU1
->>>> + *
->>>> + *             S2                E2
->>>> + * ------------****************xxx---------------------------------------> CPU2
->>>> + *
->>>> + *                         S3            E3
->>>> + * ------------------------****xxx********-------------------------------> CPU3
->>>> + *
->>>> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
->>>> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
->>>> + * S3,S1,E2 - sequenece includes all CPUs, in this case overlap will be S1,E2
->>>> + * Legend of picture is following: * - means downtime per vCPU
->>>> + *                                 x - means overlapped downtime
->>>> + */
->>> Not sure whether I get the point in this patch... iiuc we defined the
->>> downtime here as the period when all vcpus are halted, right?
->>>
->>> If so, I have a few questions:
->>>
->>> - will this algorithm consume lots of memory? since I see we have one
->>>    trace object per fault page address
->> I don't think, it consumes too much, one DowntimeDuration
->> takes (if I'm using bitmap_try_new, in this patch set I used pointer to
->> uint64_t array to keep bitmap array,
->> but I'm going to use include/qemu/bitmap.h, it works with pointers to long)
->>
->> (2* int64 + (ROUND_UP((smp_cpus + BITS_PER_BYTE * sizeof(long) - 1 /
->> (BITS_PER_BYTE * sizeof(long)))) * siezof(long)
->> so it's about 16 + at least 4 bytes, per page fault,
->> Lets assume we migration 256 vCPU and 256 Gb of ram and that ram is based on
->> 4Kb pages - it's really bad case
->> 16 + ((256 + 8 * 4 - 1) / ( 8 * 4 )) * 4 = 52 bytes
->> (256 * 1024 * 1024 * 1024)/(4 * 1024) = 67108864 page faults, but not all of
->> these pages will be pagefaulted, due to
->> page pre-fetching
->> 67108864 * 52 = 3489660928 bytes (3.5 Gb for that operation),
->> but I have a doubt, who will use 4Kb pages for 256 Gb, probably
->> 2Mb or 1G huge page will be chosen on x86, on ARM or other architecture it
->> could be another values.
-> Hmm, it looks still big though...
->
->>> - do we need to protect the tree to make sure there's no insertion
->>>    when doing the calculation?
->> I asked the same question when sent RFC patches,
->> the answer here is no, we should not, due to right now,
->> it's only one socket and one listen thread (maybe in future,
->> it will be required, maybe after multi fd patch set),
->> and calculation is doing synchronously right after migration complete.
-> Okay.
->
->>> - if the only thing we want here is the "total downtime", whether
->>>    below would work? (assuming N is vcpu numbers)
->>>
->>>    a. define array cpu_fault_addr[N], to store current faulted address
->>>       for each vcpu. When vcpu X is running, cpu_fault_addr[X] should
->>>       be 0.
->>>
->>>    b. when page fault happens on vcpu A, setup cpu_fault_addr[A] with
->>>       corresponding fault address.
->> at this time need to is fault happens for all another vCPU,
->> and if it happens mark current time as total vCPU downtime start.
->>
->>>    c. when page copy finished, loop over cpu_fault_addr[] to see
->>>       whether that matches any, clear corresponding element if matched.
->> so when page copy finished and mark for total vCPU is set,
->> yes that interval is a part of total downtime.
->>>    Then, we can just measure the period when cpu_fault_addr[] is all
->>>    set (by tracing at both b. and c.). Can this work?
->> Yes, it works, but it's better to keep time - cpu_fault_time,
->> address is not important here, it doesn't matter the reason of pagefault.
-> We still need the addresses? So that when we do COPY, we can check the
-> new page address against these stored ones, to know which vcpus to
-> clear the bit.
-Frankly say, we need ) because there is not another way to determine
-vCPU at COPY time.
+Hi,
 
->
->> 2 vCPU could fault due to access to one page, ok, it's not a problem, just
->> store
->> time when it was faulted.
->> Looks like it's better algorithm, with lesser complexity,
->> thank you a lot.
-> My pleasure. Thanks,
->
+cc'ing Peter Wu in...
 
+Currently I have completed the task for zlib, uncompressed and zeroed
+chunks in a DMG file using the approach we discussed earlier.
+Unfortunately, this approach is not appropriate for bz2 chunks since
+we cannot restart our decompression from the access point we cached
+since bz2 decompression checks for a special magic key 'BZh' before it
+starts decompressing. Since our cached point can be pointing to any
+random location inside the compressed stream and not necessarily the
+start of a "block", dmg_uncompress_bz2_do() fails with an error value
+BZ_DATA_ERROR_MAGIC (-5) and thus our approach fails.
+This blog post here explains this limitation too ->
+https://blastedbio.blogspot.in/2011/11/random-access-to-bzip2.html
 
--- 
-Best regards,
-Alexey Perevalov
+Now, there is an interesting thing I found out about bz2 compressed
+streams i.e. the size of a compressed block varies from 0 to a max of
+900 KiB. This is guaranteed and can be verified because each block has
+a 4 byte header attached to it at the beginning in which the first
+three bytes are the magic key "BZh" followed by a number from 1-9.
+These help us find the max size that block will have as the size
+increments by 100KiB for each value (eg. BZh3 has a max of 300KiB).
+
+Now the wikipedia page here
+(https://en.wikipedia.org/wiki/Bzip2#File_format) states that a 900KiB
+block can expand to a max of 46MiB in its uncompressed form. Thus we
+need not worry about QEMU allocating wild sized memory at once as we
+have a limit of 64MiB as of now and stick to the approach of
+decompressing the whole block every time we enter it. This solves our
+problem of caching an access point and ultimately failing with this
+error value BZ_DATA_ERROR_MAGIC (-5).
+
+I am hesitant in this approach because I am not sure yet that "blocks"
+and "chunks" mean the same thing and are just two different
+terminologies (i.e. chunks == blocks) OR chunks are made up of blocks
+(i.e chunks = x * blocks).
+
+I approached Peter Wu (who worked on DMG a few years ago) about this
+and he's not sure either.
+
+(Peter, you may skip this part as I already explained you this earlier :-) )
+I did a little naive test of my own, where I downloaded one of the bz2
+DMG images and tried reading it with a HEX editor.
+
+First, I manually calculated the size between the appearance of two
+sequential magic keys ('BZh') offsets which marked the length of a
+block starting at the offset of first magic key. Next I compared it to
+the size of the corresponding chunk whose size (s->lenghts[chunk]) we
+get by reading the mish blocks and all that stuff while opening the
+image in QEMU, and interestingly both the sizes appeared to be equal.
+I repeated it for quite a few chunks and this test stayed valid for
+all.
+
+Peter thinks we cannot rely on this test thus I wouldn't mind more
+views on it...
+
+Ashijeet
