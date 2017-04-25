@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d2rDQ-0001Fa-R2
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:32:38 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d2rYq-0003qA-LJ
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:54:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d2rDN-0004QU-N9
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:32:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43410)
+	(envelope-from <jasowang@redhat.com>) id 1d2rYl-0005Js-PY
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:54:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56378)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d2rDN-0004Pr-EF
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:32:33 -0400
-References: <20170424153244.2600-1-dgilbert@redhat.com>
-	<CAFEAcA8Gq5iS1uSO1czmGsGdXiSU96rTfwNkQXDrCTeFQ0f=bA@mail.gmail.com>
-	<20170424165723.GK2362@work-vm>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <194bfbef-efad-0f2e-457c-84533e66fdb5@redhat.com>
-Date: Tue, 25 Apr 2017 05:32:26 +0200
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2rYl-0005J7-GF
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:54:39 -0400
+References: <1492670346-18004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<2010f24d-1ad0-4bab-bcd5-5e98fe21578a@redhat.com>
+	<c4d3b3af-2d16-0647-9375-e6646520e027@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2e132a33-18ea-455c-31ac-0b7fd7a54214@redhat.com>
+Date: Tue, 25 Apr 2017 11:54:29 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170424165723.GK2362@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/4] hmp queue
+In-Reply-To: <c4d3b3af-2d16-0647-9375-e6646520e027@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V2 0/6] Add COLO-proxy virtio-net support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On 24.04.2017 18:57, Dr. David Alan Gilbert wrote:
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
->> On 24 April 2017 at 16:32, Dr. David Alan Gilbert (git)
->> <dgilbert@redhat.com> wrote:
->>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>
->>> The following changes since commit 4c55b1d0bad8a703f0499fe62e3761a0cd288da3:
->>>
->>>   Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2017-04-24' into staging (2017-04-24 14:49:48 +0100)
->>>
->>> are available in the git repository at:
->>>
->>>   git://github.com/dagrh/qemu.git tags/pull-hmp-20170424
->>>
->>> for you to fetch changes up to e4e3992e626c4cc7514b271807c90f587771c646:
->>>
->>>   tests: Add a tester for HMP commands (2017-04-24 15:55:35 +0100)
->>>
->>> ----------------------------------------------------------------
->>> HMP pull
->>>
->>> ----------------------------------------------------------------
->>
->>
->> clang doesn't like some code in test-hmp.c:
->>
->> /home/petmay01/linaro/qemu-for-merges/tests/test-hmp.c:138:9: error:
->> logical not is only applied to the left hand side of this comparison
->> [-Werror,-Wlogical-not-parentheses]
->>     if (!strcmp("isapc", mname) == 0 ||  !strcmp("puv3", mname)
->>         ^                       ~~
-> 
-> <snip>
-> 
->> It does look rather odd:
->>
->> +    /* Ignore blacklisted machines that have known problems */
->> +    if (!strcmp("isapc", mname) == 0 ||  !strcmp("puv3", mname)
->> +        || !strcmp("tricore_testboard", mname)
->> +        || !strcmp("xenfv", mname) == 0 || !strcmp("xenpv", mname)) {
->> +        return;
->> +    }
->>
->> since it's not using the same kind of expression to test
->> each board name -- is that deliberate, or accidental ?
->>
->> I think this expression means we'll actually skip every machine...
-> 
-> Yep, you're right, just tried it with logging.
 
-Ouch, not sure how that happened ... looks like I used
-"strcmp("isapc", mname) == 0" in the first version of my patch, and then
-wanted to switch to "!strcmp()" when I added the xenfv and xenpv
-machines, but forgot to remove the "== 0" everywhere :-( Big sorry for
-that mess!
 
-> That's accidental; hmm I should add a clang build somewhere.
-> 
-> Thomas: Do you want to send me a fixed version?
+On 2017=E5=B9=B404=E6=9C=8824=E6=97=A5 20:02, Zhang Chen wrote:
+>
+>
+> On 04/24/2017 11:48 AM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B404=E6=9C=8820=E6=97=A5 14:39, Zhang Chen wrote:
+>>> If user use -device virtio-net-pci, virtio-net driver will add a head=
+er
+>>> to raw net packet that colo-proxy can't handle it. COLO-proxy just
+>>> focus on the packet payload, so we skip the virtio-net header to=20
+>>> compare
+>>> the sent packet that primary guest's to secondary guest's.
+>>>
+>>> Zhang Chen (6):
+>>>    net/filter-mirror.c: Add filter-mirror and filter-redirector vnet
+>>>      support.
+>>>    net/net.c: Add vnet header length to SocketReadState
+>>>    net/colo-compare.c: Make colo-compare support vnet_hdr_len
+>>>    net/socket.c: Add vnet packet support in net_socket_receive()
+>>>    net/colo.c: Add vnet packet parse feature in colo-proxy
+>>>    net/colo-compare.c: Add vnet packet's tcp/udp/icmp compare
+>>>
+>>>   include/net/net.h     |  4 +++-
+>>>   net/colo-compare.c    | 48=20
+>>> +++++++++++++++++++++++++++++++++++++++---------
+>>>   net/colo.c            |  9 +++++----
+>>>   net/colo.h            |  4 +++-
+>>>   net/filter-mirror.c   | 25 ++++++++++++++++++++-----
+>>>   net/filter-rewriter.c |  2 +-
+>>>   net/net.c             | 24 ++++++++++++++++++++++--
+>>>   net/socket.c          |  6 ++++++
+>>>   8 files changed, 99 insertions(+), 23 deletions(-)
+>>>
+>>
+>> A quick glance at the series and find two issues:
+>>
+>> - We can't assume virtio-net is the only user for vnet header, you=20
+>> need query e.g NetClientState for a correct vnet header len.
+>
+> I don't know whether I understand your means.
+> I found that I can't get vnet_hdr_len from NetClientState,
+>
+> typedef struct NetClientInfo {
+> .....
+>     HasVnetHdr *has_vnet_hdr;
+>     HasVnetHdrLen *has_vnet_hdr_len;
+>     UsingVnetHdr *using_vnet_hdr;
+>     SetOffload *set_offload;
+>     SetVnetHdrLen *set_vnet_hdr_len;
+>
+> .....
+> }NetClientInfo;
+>
+> This struct haven't a function like get_vnet_hdr_len.
+> Should I add the get_vnet_hdr_len callback here and write new function=20
+> in tap.c,tap-wen32.c and netmap.c ?
+>
+> Thanks
+> Zhang Chen
 
-Yes, I'll send a fixed version, where I also correct the memory leak
-that you noticed.
+Yes, you need add such callbacks I think.
 
- Thomas
+Thanks
+
+>
+>> - This series breaks qtest:
+>>
+>> **
+>> ERROR:tests/e1000e-test.c:296:e1000e_send_verify: assertion failed=20
+>> (buffer =3D=3D "TEST"): ("" =3D=3D "TEST")
+>> GTester: last random seed: R02S39dd06f7f52013798111df2e4eb602c5
+>> **
+>> ERROR:tests/e1000e-test.c:365:e1000e_receive_verify: assertion failed=20
+>> (le32_to_cpu(descr.wb.upper.status_error) & esta_dd =3D=3D esta_dd):=20
+>> (0x00000000 =3D=3D 0x00000001)
+>> GTester: last random seed: R02S8c8200b8ec86358cb7addb5c6fe1303c
+>> **
+>> ERROR:tests/e1000e-test.c:296:e1000e_send_verify: assertion failed=20
+>> (buffer =3D=3D "TEST"): ("" =3D=3D "TEST")
+>> GTester: last random seed: R02S9be86025aa7ded4902bdf644c3964a6e
+>> **
+>> ERROR:tests/libqos/virtio.c:94:qvirtio_wait_queue_isr: assertion=20
+>> failed: (g_get_monotonic_time() - start_time <=3D timeout_us)
+>> GTester: last random seed: R02S30cac33d7a98fa56806ca59b35910ea5
+>> **
+>> ERROR:tests/libqos/virtio.c:94:qvirtio_wait_queue_isr: assertion=20
+>> failed: (g_get_monotonic_time() - start_time <=3D timeout_us)
+>> GTester: last random seed: R02S258359836760a723622abf56cf2e61e7
+>> ^C/home/devel/git/qemu/tests/Makefile.include:815: recipe for target=20
+>> 'check-qtest-x86_64' failed
+>> make: *** [check-qtest-x86_64] Interrupt
+>>
+>> Please fix them.
+>>
+>> Thanks
+>>
+>>
+>> .
+>>
+>
