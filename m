@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d37pi-0002fO-0Y
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:16 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d37pj-0002fX-18
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d37pe-00032v-0D
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42721
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d37pe-000334-33
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44547)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d37pd-00031A-Pt
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:09 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3PLDiNE085908
+	id 1d37pd-00031N-Qo
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 17:17:10 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3PLDgvH048908
 	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 17:17:08 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a244ndhxf-1
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a27kn3seh-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 17:17:07 -0400
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 17:17:08 -0400
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
 	Tue, 25 Apr 2017 17:17:06 -0400
@@ -28,12 +27,13 @@ Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170419092615.11410-2-vfeenstr@redhat.com>
-References: <20170419092615.11410-1-vfeenstr@redhat.com>
-	<20170419092615.11410-2-vfeenstr@redhat.com>
-Date: Tue, 25 Apr 2017 15:52:47 -0500
-Message-Id: <149315356773.26622.14312359714025216394@loki>
-Subject: Re: [Qemu-devel] [PATCH v5 1/1] qga: Add 'guest-get-users' command
+In-Reply-To: <20170419105258.4488-2-vfeenstr@redhat.com>
+References: <20170419105258.4488-1-vfeenstr@redhat.com>
+	<20170419105258.4488-2-vfeenstr@redhat.com>
+Date: Tue, 25 Apr 2017 15:52:18 -0500
+Message-Id: <149315353884.26622.6081569925906426907@loki>
+Subject: Re: [Qemu-devel] [PATCH v6 1/1] qga: Add `guest-get-timezone`
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,26 +43,18 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@gmail.com, eblake@redhat.com
+Cc: marcandre.lureau@gmail.com, sameeh@daynix.com
 
-Quoting Vinzenz 'evilissimo' Feenstra (2017-04-19 04:26:15)
+Quoting Vinzenz 'evilissimo' Feenstra (2017-04-19 05:52:58)
 > From: Vinzenz Feenstra <vfeenstr@redhat.com>
 > =
 
-> A command that will list all currently logged in users, and the time
-> since when they are logged in.
-> =
-
-> Examples:
-> =
-
-> virsh # qemu-agent-command F25 '{ "execute": "guest-get-users" }'
-> {"return":[{"login-time":1490622289.903835,"user":"root"}]}
-> =
-
-> virsh # qemu-agent-command Win2k12r2 '{ "execute": "guest-get-users" }'
-> {"return":[{"login-time":1490351044.670552,"domain":"LADIDA",
-> "user":"Administrator"}]}
+> Adds a new command `guest-get-timezone` reporting the currently
+> configured timezone on the system. The information on what timezone is
+> currently is configured is useful in case of Windows VMs where the
+> offset of the hardware clock is required to have the same offset. This
+> can be used for management systems like `oVirt` to detect the timezone
+> difference and warn administrators of the misconfiguration.
 > =
 
 > Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
@@ -71,288 +63,93 @@ Thanks, applied to qga tree:
   https://github.com/mdroth/qemu/commits/qga
 
 > ---
->  configure             |   2 +-
->  include/glib-compat.h |   5 +++
->  qga/commands-posix.c  |  60 +++++++++++++++++++++++++++++
->  qga/commands-win32.c  | 103 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  qga/qapi-schema.json  |  24 ++++++++++++
->  5 files changed, 193 insertions(+), 1 deletion(-)
+>  qga/commands.c       | 38 ++++++++++++++++++++++++++++++++++++++
+>  qga/qapi-schema.json | 26 ++++++++++++++++++++++++++
+>  2 files changed, 64 insertions(+)
 > =
 
-> diff --git a/configure b/configure
-> index be4d326..55e6654 100755
-> --- a/configure
-> +++ b/configure
-> @@ -742,7 +742,7 @@ if test "$mingw32" =3D "yes" ; then
->    sysconfdir=3D"\${prefix}"
->    local_statedir=3D
->    confsuffix=3D""
-> -  libs_qga=3D"-lws2_32 -lwinmm -lpowrprof -liphlpapi -lnetapi32 $libs_qg=
-a"
-> +  libs_qga=3D"-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -liphlpapi -lnetapi=
-32 $libs_qga"
->  fi
-> =
-
->  werror=3D""
-> diff --git a/include/glib-compat.h b/include/glib-compat.h
-> index 863c8cf..f8ee9dc 100644
-> --- a/include/glib-compat.h
-> +++ b/include/glib-compat.h
-> @@ -217,6 +217,11 @@ static inline void g_hash_table_add(GHashTable *hash=
-_table, gpointer key)
->  {
->      g_hash_table_replace(hash_table, key, key);
+> diff --git a/qga/commands.c b/qga/commands.c
+> index 4d92946..999538d 100644
+> --- a/qga/commands.c
+> +++ b/qga/commands.c
+> @@ -499,3 +499,41 @@ int ga_parse_whence(GuestFileWhence *whence, Error *=
+*errp)
+>      error_setg(errp, "invalid whence code %"PRId64, whence->u.value);
+>      return -1;
 >  }
 > +
-> +static gboolean g_hash_table_contains(GHashTable *hash_table, gpointer k=
-ey)
+> +GuestTimezone *qmp_guest_get_timezone(Error **errp)
 > +{
-> +    return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
-> +}
->  #endif
-> =
-
->  #ifndef g_assert_true
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 915df9e..ba06be4 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -15,6 +15,7 @@
->  #include <sys/ioctl.h>
->  #include <sys/wait.h>
->  #include <dirent.h>
-> +#include <utmpx.h>
->  #include "qga/guest-agent-core.h"
->  #include "qga-qmp-commands.h"
->  #include "qapi/qmp/qerror.h"
-> @@ -2517,3 +2518,62 @@ void ga_command_state_init(GAState *s, GACommandSt=
-ate *cs)
->      ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
->  #endif
->  }
-> +
-> +#define QGA_MICRO_SECOND_TO_SECOND 1000000
-> +
-> +static double ga_get_login_time(struct utmpx *user_info)
-> +{
-> +    double seconds =3D (double)user_info->ut_tv.tv_sec;
-> +    double useconds =3D (double)user_info->ut_tv.tv_usec;
-> +    useconds /=3D QGA_MICRO_SECOND_TO_SECOND;
-> +    return seconds + useconds;
-> +}
-> +
-> +GuestUserList *qmp_guest_get_users(Error **err)
-> +{
-> +    GHashTable *cache =3D NULL;
-> +    GuestUserList *head =3D NULL, *cur_item =3D NULL;
-> +    struct utmpx *user_info =3D NULL;
-> +    gpointer value =3D NULL;
-> +    GuestUser *user =3D NULL;
-> +    GuestUserList *item =3D NULL;
-> +    double login_time =3D 0;
-> +
-> +    cache =3D g_hash_table_new(g_str_hash, g_str_equal);
-> +    setutxent();
-> +
-> +    for (;;) {
-> +        user_info =3D getutxent();
-> +        if (user_info =3D=3D NULL) {
-> +            break;
-> +        } else if (user_info->ut_type !=3D USER_PROCESS) {
-> +            continue;
-> +        } else if (g_hash_table_contains(cache, user_info->ut_user)) {
-> +            value =3D g_hash_table_lookup(cache, user_info->ut_user);
-> +            user =3D (GuestUser *)value;
-> +            login_time =3D ga_get_login_time(user_info);
-> +            /* We're ensuring the earliest login time to be sent */
-> +            if (login_time < user->login_time) {
-> +                user->login_time =3D login_time;
-> +            }
-> +            continue;
-> +        }
-> +
-> +        item =3D g_new0(GuestUserList, 1);
-> +        item->value =3D g_new0(GuestUser, 1);
-> +        item->value->user =3D g_strdup(user_info->ut_user);
-> +        item->value->login_time =3D ga_get_login_time(user_info);
-> +
-> +        g_hash_table_insert(cache, item->value->user, item->value);
-> +
-> +        if (!cur_item) {
-> +            head =3D cur_item =3D item;
-> +        } else {
-> +            cur_item->next =3D item;
-> +            cur_item =3D item;
-> +        }
-> +    }
-> +    endutxent();
-> +    g_hash_table_destroy(cache);
-> +    return head;
-> +}
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 19d72b2..fa99a8f 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -11,6 +11,9 @@
->   * See the COPYING file in the top-level directory.
->   */
-> =
-
-> +#ifndef _WIN32_WINNT
-> +#   define _WIN32_WINNT 0x0600
-> +#endif
->  #include "qemu/osdep.h"
->  #include <wtypes.h>
->  #include <powrprof.h>
-> @@ -25,6 +28,7 @@
->  #include <initguid.h>
->  #endif
->  #include <lm.h>
-> +#include <wtsapi32.h>
-> =
-
->  #include "qga/guest-agent-core.h"
->  #include "qga/vss-win32.h"
-> @@ -1536,3 +1540,102 @@ void ga_command_state_init(GAState *s, GACommandS=
-tate *cs)
->          ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
->      }
->  }
-> +
-> +/* MINGW is missing two fields: IncomingFrames & OutgoingFrames */
-> +typedef struct _GA_WTSINFOA {
-> +    WTS_CONNECTSTATE_CLASS State;
-> +    DWORD SessionId;
-> +    DWORD IncomingBytes;
-> +    DWORD OutgoingBytes;
-> +    DWORD IncomingFrames;
-> +    DWORD OutgoingFrames;
-> +    DWORD IncomingCompressedBytes;
-> +    DWORD OutgoingCompressedBy;
-> +    CHAR WinStationName[WINSTATIONNAME_LENGTH];
-> +    CHAR Domain[DOMAIN_LENGTH];
-> +    CHAR UserName[USERNAME_LENGTH + 1];
-> +    LARGE_INTEGER ConnectTime;
-> +    LARGE_INTEGER DisconnectTime;
-> +    LARGE_INTEGER LastInputTime;
-> +    LARGE_INTEGER LogonTime;
-> +    LARGE_INTEGER CurrentTime;
-> +
-> +} GA_WTSINFOA;
-> +
-> +GuestUserList *qmp_guest_get_users(Error **err)
-> +{
-> +#if (_WIN32_WINNT >=3D 0x0600)
-> +#define QGA_NANOSECONDS 10000000
-> +
-> +    GHashTable *cache =3D NULL;
-> +    GuestUserList *head =3D NULL, *cur_item =3D NULL;
-> +
-> +    DWORD buffer_size =3D 0, count =3D 0, i =3D 0;
-> +    GA_WTSINFOA *info =3D NULL;
-> +    WTS_SESSION_INFOA *entries =3D NULL;
-> +    GuestUserList *item =3D NULL;
-> +    GuestUser *user =3D NULL;
-> +    gpointer value =3D NULL;
-> +    INT64 login =3D 0;
-> +    double login_time =3D 0;
-> +
-> +    cache =3D g_hash_table_new(g_str_hash, g_str_equal);
-> +
-> +    if (WTSEnumerateSessionsA(NULL, 0, 1, &entries, &count)) {
-> +        for (i =3D 0; i < count; ++i) {
-> +            buffer_size =3D 0;
-> +            info =3D NULL;
-> +            if (WTSQuerySessionInformationA(
-> +                NULL,
-> +                entries[i].SessionId,
-> +                WTSSessionInfo,
-> +                (LPSTR *)&info,
-> +                &buffer_size
-> +            )) {
-> +
-> +                if (strlen(info->UserName) =3D=3D 0) {
-> +                    WTSFreeMemory(info);
-> +                    continue;
-> +                }
-> +
-> +                login =3D info->LogonTime.QuadPart;
-> +                login -=3D W32_FT_OFFSET;
-> +                login_time =3D ((double)login) / QGA_NANOSECONDS;
-> +
-> +                if (g_hash_table_contains(cache, info->UserName)) {
-> +                    value =3D g_hash_table_lookup(cache, info->UserName);
-> +                    user =3D (GuestUser *)value;
-> +                    if (user->login_time > login_time) {
-> +                        user->login_time =3D login_time;
-> +                    }
-> +                } else {
-> +                    item =3D g_new0(GuestUserList, 1);
-> +                    item->value =3D g_new0(GuestUser, 1);
-> +
-> +                    item->value->user =3D g_strdup(info->UserName);
-> +                    item->value->domain =3D g_strdup(info->Domain);
-> +                    item->value->has_domain =3D true;
-> +
-> +                    item->value->login_time =3D login_time;
-> +
-> +                    g_hash_table_add(cache, item->value->user);
-> +
-> +                    if (!cur_item) {
-> +                        head =3D cur_item =3D item;
-> +                    } else {
-> +                        cur_item->next =3D item;
-> +                        cur_item =3D item;
-> +                    }
-> +                }
-> +            }
-> +            WTSFreeMemory(info);
-> +        }
-> +        WTSFreeMemory(entries);
-> +    }
-> +    g_hash_table_destroy(cache);
-> +    return head;
+> +#if !GLIB_CHECK_VERSION(2, 28, 0)
+> +    error_setg(errp, QERR_UNSUPPORTED);
+> +    return NULL;
 > +#else
-> +    error_setg(err, QERR_UNSUPPORTED);
+> +    GuestTimezone *info =3D NULL;
+> +    GTimeZone *tz =3D NULL;
+> +    gint64 now =3D 0;
+> +    gint32 intv =3D 0;
+> +    gchar const *name =3D NULL;
+> +
+> +    info =3D g_new0(GuestTimezone, 1);
+> +    tz =3D g_time_zone_new_local();
+> +    if (tz =3D=3D NULL) {
+> +        error_setg(errp, QERR_QGA_COMMAND_FAILED,
+> +                   "Couldn't retrieve local timezone");
+> +        goto error;
+> +    }
+> +
+> +    now =3D g_get_real_time() / G_USEC_PER_SEC;
+> +    intv =3D g_time_zone_find_interval(tz, G_TIME_TYPE_UNIVERSAL, now);
+> +    info->offset =3D g_time_zone_get_offset(tz, intv);
+> +    name =3D g_time_zone_get_abbreviation(tz, intv);
+> +    if (name !=3D NULL) {
+> +        info->has_zone =3D true;
+> +        info->zone =3D g_strdup(name);
+> +    }
+> +    g_time_zone_unref(tz);
+> +
+> +    return info;
+> +
+> +error:
+> +    g_free(info);
 > +    return NULL;
 > +#endif
 > +}
 > diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index a02dbf2..27d10be 100644
+> index a02dbf2..5183ea2 100644
 > --- a/qga/qapi-schema.json
 > +++ b/qga/qapi-schema.json
-> @@ -1042,3 +1042,27 @@
+> @@ -1042,3 +1042,29 @@
 >    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
 >                 '*input-data': 'str', '*capture-output': 'bool' },
 >    'returns': 'GuestExec' }
 > +
-> +##
-> +# @GuestUser:
-> +# @user:       Username
-> +# @domain:     Logon domain (windows only)
-> +# @login-time: Time of login of this user on the computer. If multiple
-> +#              instances of the user are logged in, the earliest login t=
-ime is
-> +#              reported. The value is in fractional seconds since epoch =
-time.
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'GuestUser',
-> +  'data': { 'user': 'str', 'login-time': 'number', '*domain': 'str' } }
 > +
 > +##
-> +# @guest-get-users:
-> +# Retrieves a list of currently active users on the VM.
+> +# @GuestTimezone:
 > +#
-> +# Returns: A unique list of users.
+> +# @zone:    Timezone name
+> +# @offset:  Offset to UTC in seconds, negative numbers for time zones we=
+st of
+> +#           GMT, positive numbers for east
 > +#
 > +# Since: 2.10
 > +##
-> +{ 'command': 'guest-get-users',
-> +  'returns': ['GuestUser'] }
+> +{ 'struct': 'GuestTimezone',
+> +  'data':   { '*zone': 'str', 'offset': 'int' } }
+> +
+> +
+> +##
+> +# @guest-get-timezone:
+> +#
+> +# Retrieves the timezone information from the guest.
+> +#
+> +# Returns: A GuestTimezone dictionary.
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'command': 'guest-get-timezone',
+> +  'returns': 'GuestTimezone' }
 > -- =
 
 > 2.9.3
