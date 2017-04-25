@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d30Mn-0005S6-QX
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:18:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1d30OG-0006Wu-NC
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:20:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d30Mn-0007Up-2C
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:18:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60302)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d30Mm-0007Tv-SC
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:18:52 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 25 Apr 2017 15:18:47 +0200
-Message-Id: <1493126327-13162-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix crash with virtio-scsi-pci
- device
+	(envelope-from <eblake@redhat.com>) id 1d30OC-0000IU-3J
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:20:24 -0400
+References: <1493107736-6608-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <336a0e0f-b544-bef1-56dd-66901ec8487a@redhat.com>
+Date: Tue, 25 Apr 2017 08:20:11 -0500
+MIME-Version: 1.0
+In-Reply-To: <1493107736-6608-1-git-send-email-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ne0o7Lu6kqXb47n9cqKqE08o7lVvXALUM"
+Subject: Re: [Qemu-devel] [PATCH] Issue a deprecation warning if the user
+ specifies the "-hdachs" option.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 
-qemu-system-s390x currently crashes when it is started with a
-virtio-scsi-pci device, e.g.:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ne0o7Lu6kqXb47n9cqKqE08o7lVvXALUM
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
+Message-ID: <336a0e0f-b544-bef1-56dd-66901ec8487a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Issue a deprecation warning if the user
+ specifies the "-hdachs" option.
+References: <1493107736-6608-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1493107736-6608-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
- qemu-system-s390x -nographic -enable-kvm -device virtio-scsi-pci \
-                   -drive file=/tmp/disk.dat,if=none,id=d1,format=raw \
-                   -device scsi-cd,drive=d1,bootindex=1
+On 04/25/2017 03:08 AM, Thomas Huth wrote:
+> If the user needs to specify the disk geometry, the corresponding
+> parameters of the "-drive" option should be used instead. "-hdachs"
+> is considered as deprecated and might be removed soon.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  vl.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/vl.c b/vl.c
+> index 0b4ed52..0980213 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3230,6 +3230,8 @@ int main(int argc, char **argv, char **envp)
+>                          }
+>                      }
+>                  }
+> +                error_report("'-hdachs' is deprecated. Please use '-dr=
+ive"
+> +                             " ...,cyls=3Dc,heads=3Dh,secs=3Ds,trans=3D=
+t' instead.");
 
-The problem is that the code in s390_gen_initial_iplb() currently assumes
-that all SCSI devices are also CCW devices, which is not the case for
-virtio-scsi-pci of course. Fix it by adding an appropriate check for
-TYPE_CCW_DEVICE here.
+No trailing dot.  With that fixed,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/s390x/ipl.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 7978c7d..f674d50 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -248,7 +248,13 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
-             SCSIBus *bus = scsi_bus_from_device(sd);
-             VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
-             VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw, vdev);
--            CcwDevice *ccw_dev = CCW_DEVICE(scsi_ccw);
-+            CcwDevice *ccw_dev;
-+
-+            ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
-+                                                       TYPE_CCW_DEVICE);
-+            if (!ccw_dev) {       /* It might be a PCI device instead */
-+                return false;
-+            }
- 
-             ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
-             ipl->iplb.blk0_len =
--- 
-1.8.3.1
+
+--ne0o7Lu6kqXb47n9cqKqE08o7lVvXALUM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY/00LAAoJEKeha0olJ0Nq3YoH/23ySALBdAH9MuxSJs+Ud0lv
+9SFCcE5NKQJUxStDY+CAWnaD8mtwHU6xB0ZkhycRnViZ/waTghb0ZnsJxbJXKN53
+YxKJNnARdmW/XgfF8zB0/w9sm3S7aaZXl35ogvYOpiEW3anLCG9VPJFKZJ5wm8E+
+t0rwG2sOHtHsjeuJkxDWqVfnpXS2vchXlwC7MBXnLydQrI4sfVOcTPs6oyo7m2vw
+wW45E+nksRfhP3ArSB4mqPpK11Ri/kxmts90SkMUjgHnIUe1m2bimaT9gjhEtMWk
+qws6ZPgcPvknjP/arG2CBMKOs4qGr1sFEnR7blvbRCrSNjsfTEq9G4+x+IzX6/8=
+=Y7xg
+-----END PGP SIGNATURE-----
+
+--ne0o7Lu6kqXb47n9cqKqE08o7lVvXALUM--
