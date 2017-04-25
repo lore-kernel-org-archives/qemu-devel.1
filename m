@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2w2m-0005L4-NA
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:41:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d2w3p-0005uC-Pr
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:43:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2w2j-0001h8-Go
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:41:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2w2j-0001fo-AK
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:41:53 -0400
-References: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492674416-9408-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<df05a73b-fba8-a6d3-bf6a-648304458257@redhat.com>
-	<58FD9546.5000104@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <82c50df3-28c9-fb21-f2c6-76a99f864bee@redhat.com>
-Date: Tue, 25 Apr 2017 16:41:45 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1d2w3o-0002qO-Vr
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:43:01 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36975)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d2w3o-0002ob-OX
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 04:43:00 -0400
+Received: by mail-wm0-x233.google.com with SMTP id m123so89149209wma.0
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 01:43:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <58FD9546.5000104@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: serialize compare
- thread's initialization with main thread
+In-Reply-To: <20170425083555.13547-1-nikunj@linux.vnet.ibm.com>
+References: <20170425083555.13547-1-nikunj@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Apr 2017 09:42:39 +0100
+Message-ID: <CAFEAcA-dD=DZmtvMDAz2Z8u6Qb2ozGWNroPQhwXr+zczvtjqVA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH RFC] configure: fix clang failure for
+ libatomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-
-
-On 2017=E5=B9=B404=E6=9C=8824=E6=97=A5 14:03, Hailiang Zhang wrote:
-> On 2017/4/24 12:10, Jason Wang wrote:
->>
->> On 2017=E5=B9=B404=E6=9C=8820=E6=97=A5 15:46, zhanghailiang wrote:
->>> We call qemu_chr_fe_set_handlers() in colo-compare thread, it is used
->>> to detach watched fd from default main context, so it has chance to
->>> handle the same watched fd with main thread concurrently, which will
->>> trigger an error report:
->>> "qemu-char.c:918: io_watch_poll_finalize: Assertion `iwp->src =3D=3D=20
->>> ((void *)0)' failed."
->> Anyway to prevent fd from being handled by main thread before creating
->> colo thread? Using semaphore seems not elegant.
+On 25 April 2017 at 09:35, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> wrote:
+> Travis builds failure was reported for powernv boot-serial test with
+> qemu built with clang.
 >
-> So how about calling qemu_mutex_lock_iothread() before=20
-> qemu_chr_fe_set_handlers() ?
+> Debugging revealed that CONFIG_ATOMIC64 wasnt getting set for the clang
+> build because of that atomic operations weren't being used and was
+> resulting in MTTCG failure in the powernv boot-serial test.
+>
+> libatomic is required to successfully test atomic64 and atomic128 for
+> clang. Introduced newer checks for the same. And on failure default to
+> single threaded tcg support in PPC64.
+>
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-Looks better, but I needs more information e.g how main thread can touch =
-it?
+Do we really need libatomic? I thought the intention here was
+that atomic operations were only done on types of width of the
+pointer or less, which should all be doable by the compiler inline,
+and thus don't need the external library. In the past "doesn't
+work without libatomic" usually meant "accidentally tried to
+do an atomic operation on a type that is too wide".
 
-Thanks
+thanks
+-- PMM
