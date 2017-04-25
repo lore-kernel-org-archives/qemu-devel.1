@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d31vD-00023e-4C
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:58:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d31xY-00030a-8U
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:00:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d31v9-0007K6-ES
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:58:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55942)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d31v9-0007Jt-8K
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:58:27 -0400
-Date: Tue, 25 Apr 2017 15:58:23 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170425145823.GL21129@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAFEAcA8xJ11azOh-sQhzpsb0b++EGT+hML-fvvKRSkyOirB1PQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1d31xX-00080p-By
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:00:56 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35950)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d31xX-0007z0-6c
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:00:55 -0400
+Received: by mail-wr0-x233.google.com with SMTP id l50so36670469wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 08:00:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8xJ11azOh-sQhzpsb0b++EGT+hML-fvvKRSkyOirB1PQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] QEMU travis builds: can we move the preseed
- tarball to qemu.org ?
+In-Reply-To: <20170411122632.14050-11-famz@redhat.com>
+References: <20170411122632.14050-1-famz@redhat.com>
+	<20170411122632.14050-11-famz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Apr 2017 16:00:33 +0100
+Message-ID: <CAFEAcA81QghtjkwCP=KywhMx-ruxnXSRHVZ6oHpX3e5mnwZNBw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 10/11] block: Fix bdrv_co_flush early return
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Jeff Cody <jcody@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Apr 25, 2017 at 03:51:17PM +0100, Peter Maydell wrote:
-> Hi; a recent travis build failure made me notice that our .travis.yml
-> config references a preseed tarball from here:
-> http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz
-> 
-> I think this is a bit less than ideal -- we should really be hosting
-> this on qemu.org. Can we arrange to move it?
+On 11 April 2017 at 13:26, Fam Zheng <famz@redhat.com> wrote:
+> bdrv_inc_in_flight and bdrv_dec_in_flight are mandatory for
+> BDRV_POLL_WHILE to work, even for the shortcut case where flush is
+> unnecessary. Move the if block to below bdrv_dec_in_flight, and BTW fix
+> the variable declaration position.
+>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/io.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+>
+> diff --git a/block/io.c b/block/io.c
+> index 00e45ca..bae6947 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2278,16 +2278,17 @@ static void coroutine_fn bdrv_flush_co_entry(void *opaque)
+>
+>  int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+>  {
+> -    int ret;
+> -
+> -    if (!bs || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs) ||
+> -        bdrv_is_sg(bs)) {
+> -        return 0;
+> -    }
+> +    int current_gen;
+> +    int ret = 0;
+>
+>      bdrv_inc_in_flight(bs);
+>
+> -    int current_gen = bs->write_gen;
+> +    if (!bs || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs) ||
+> +        bdrv_is_sg(bs)) {
+> +        goto early_exit;
+> +    }
 
-I'm curious how much speed difference there is in seeding the git submodules
-in this way vs letting git pull down from git.qemu.org directly ?
+Coverity points out that there's a problem here -- we call
+bdrv_inc_in_flight(bs), which assumes bs is not NULL, before
+we do the test for whether bs is NULL.
 
+Presumably the NULL check needs to be pulled up earlier in
+the function?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
