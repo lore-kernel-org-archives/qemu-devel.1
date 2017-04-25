@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d317k-0006gb-DS
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:07:28 -0400
+	(envelope-from <drjones@redhat.com>) id 1d319w-0007dt-Ct
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d317a-0003Aw-VA
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:07:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d317a-0003Al-O6
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:07:14 -0400
-References: <20170425104116.31435-1-dgilbert@redhat.com>
-	<CAFEAcA8yQXV3414cv72Nq7HVoXTgjR40HQWGFzK_+T_=h_Bykw@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <726c98c5-7e63-417a-ea48-ae2737d50cdc@redhat.com>
-Date: Tue, 25 Apr 2017 16:07:10 +0200
+	(envelope-from <drjones@redhat.com>) id 1d319v-0003zK-7M
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:09:40 -0400
+Date: Tue, 25 Apr 2017 16:09:26 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170425140926.jufnkmtjgnzdxjos@kamzik.brq.redhat.com>
+References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
+	<1490189568-167621-3-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8yQXV3414cv72Nq7HVoXTgjR40HQWGFzK_+T_=h_Bykw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/4] hmp queue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490189568-167621-3-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 02/23] hw/arm/virt: extract
+ mp-affinity calculation in separate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +24,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 25.04.2017 15:13, Peter Maydell wrote:
-> On 25 April 2017 at 11:41, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
->> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>
->> The following changes since commit f4b5b021c847669b1c78050aea26fe9abceef6dd:
->>
->>   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2017-04-25 09:21:54 +0100)
->>
->> are available in the git repository at:
->>
->>   git://github.com/dagrh/qemu.git tags/pull-hmp-20170425
->>
->> for you to fetch changes up to 1eb8e78dd1cd4e0b4170fd42f6d8882c867f334b:
->>
->>   tests: Add a tester for HMP commands (2017-04-25 11:26:52 +0100)
->>
->> ----------------------------------------------------------------
->> HMP pull with fixed test/strcmp case
->>
->> ----------------------------------------------------------------
+On Wed, Mar 22, 2017 at 02:32:27PM +0100, Igor Mammedov wrote:
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/arm/virt.c | 59 ++++++++++++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 42 insertions(+), 17 deletions(-)
 > 
-> test-hmp fails for me on OSX hosts:
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 5f62a03..484754e 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1194,6 +1194,45 @@ void virt_machine_done(Notifier *notifier, void *data)
+>      virt_build_smbios(vms);
+>  }
+>  
+> +static uint64_t virt_idx2mp_affinity(VirtMachineState *vms, int idx)
+
+I think I'd prefer virt_cpu_mp_affinity, or anything without a '2' in it
+for the name.
+
+> +{
+> +    uint64_t mp_affinity;
+> +    uint8_t clustersz;
+> +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+> +
+> +    if (!vmc->disallow_affinity_adjustment) {
+> +        uint8_t aff0, aff1;
+
+The else part also needs aff0, aff1; might as well move them up.
+
+> +
+> +        if (vms->gic_version == 3) {
+> +            clustersz = GICV3_TARGETLIST_BITS;
+> +        } else {
+> +            clustersz = GIC_TARGETLIST_BITS;
+> +        }
+> +
+> +        /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
+> +         * GIC's target-list limitations. 32-bit KVM hosts currently
+> +         * always create clusters of 4 CPUs, but that is expected to
+> +         * change when they gain support for gicv3. When KVM is enabled
+> +         * it will override the changes we make here, therefore our
+> +         * purposes are to make TCG consistent (with 64-bit KVM hosts)
+> +         * and to improve SGI efficiency.
+> +         */
+> +        aff1 = idx / clustersz;
+> +        aff0 = idx % clustersz;
+> +        mp_affinity = (aff1 << ARM_AFF1_SHIFT) | aff0;
+> +    } else {
+> +        /* This cpu-id-to-MPIDR affinity is used only for TCG;
+> +         * KVM will override it. We don't support setting cluster ID
+> +         * ([16..23]) (known as Aff2 in later ARM ARM versions), or any of
+> +         * the higher affinity level fields, so these bits always RAZ.
+> +         */
+> +        uint32_t Aff1 = idx / ARM_DEFAULT_CPUS_PER_CLUSTER;
+> +        uint32_t Aff0 = idx % ARM_DEFAULT_CPUS_PER_CLUSTER;
+> +        mp_affinity = (Aff1 << ARM_AFF1_SHIFT) | Aff0;
+> +    }
+
+Maybe we should create an ARM CPU function
+
+ uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz)
+ {
+   uint32_t Aff1 = idx / clustersz;
+   uint32_t Aff0 = idx % clustersz;
+   return (Aff1 << ARM_AFF1_SHIFT) | Aff0;
+ }
+
+which we'd use in arm_cpu_realizefn() and here
+
+ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+ {
+   if (VIRT_MACHINE_GET_CLASS(vms)->disallow_affinity_adjustment) {
+      return arm_cpu_mp_affinity(idx, ARM_DEFAULT_CPUS_PER_CLUSTER);
+   }
+
+   /* ...big comment... */
+   return arm_cpu_mp_affinity(idx, vms->gic_version == 3 ?
+                          GICV3_TARGETLIST_BITS : GIC_TARGETLIST_BITS);
+ }
+
+> +    return mp_affinity;
+> +}
+> +
+>  static void machvirt_init(MachineState *machine)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(machine);
+> @@ -1210,7 +1249,6 @@ static void machvirt_init(MachineState *machine)
+>      CPUClass *cc;
+>      Error *err = NULL;
+>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+> -    uint8_t clustersz;
+>  
+>      if (!cpu_model) {
+>          cpu_model = "cortex-a15";
+> @@ -1263,10 +1301,8 @@ static void machvirt_init(MachineState *machine)
+>       */
+>      if (vms->gic_version == 3) {
+>          virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / 0x20000;
+> -        clustersz = GICV3_TARGETLIST_BITS;
+>      } else {
+>          virt_max_cpus = GIC_NCPU;
+> -        clustersz = GIC_TARGETLIST_BITS;
+>      }
+>  
+>      if (max_cpus > virt_max_cpus) {
+> @@ -1326,20 +1362,9 @@ static void machvirt_init(MachineState *machine)
+>  
+>      for (n = 0; n < smp_cpus; n++) {
+>          Object *cpuobj = object_new(typename);
+> -        if (!vmc->disallow_affinity_adjustment) {
+> -            /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
+> -             * GIC's target-list limitations. 32-bit KVM hosts currently
+> -             * always create clusters of 4 CPUs, but that is expected to
+> -             * change when they gain support for gicv3. When KVM is enabled
+> -             * it will override the changes we make here, therefore our
+> -             * purposes are to make TCG consistent (with 64-bit KVM hosts)
+> -             * and to improve SGI efficiency.
+> -             */
+> -            uint8_t aff1 = n / clustersz;
+> -            uint8_t aff0 = n % clustersz;
+> -            object_property_set_int(cpuobj, (aff1 << ARM_AFF1_SHIFT) | aff0,
+> -                                    "mp-affinity", NULL);
+> -        }
+> +
+> +        object_property_set_int(cpuobj, virt_idx2mp_affinity(vms, n),
+> +                                "mp-affinity", NULL);
+>  
+>          if (!vms->secure) {
+>              object_property_set_bool(cpuobj, false, "has_el3", NULL);
+> -- 
+> 2.7.4
 > 
-> TEST: tests/test-hmp... (pid=6008)
->   /aarch64/hmp/n810:
-> qemu: qemu_mutex_lock: Invalid argument
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02Sd714920da46f8a0e37afec762c6ee23b
-> (pid=6013)
->   /aarch64/hmp/tosa:
-> qemu: qemu_mutex_lock: Invalid argument
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02Sf3025925b9db75bdfdd9f09cf3119ad5
+>
 
-What a bummer... does it only happen with aarch64 or also with the
-other binaries?
-
-> Can't do a backtrace, I'm afraid -- Apple's debugger doesn't seem
-> to work if you're not root and the lack of X11 forwarding on the
-> box I'm using remotely interacts really badly with qtest's
-> desire to run qemu as a background process that it's hard to
-> attach a debugger to. Something's probably not initializing
-> a mutex, though -- Linux by default treats zeroes as a valid
-> initialized mutex so it won't notice. You may be able to repro
-> on Linux by using the Linux PTHREAD_MUTEX_ERRORCHECK_NP
-> mutex attr, possibly.
-
-I tried to set that attribute in qemu_mutex_init() (assuming that this
-is what you meant), but it does not make a difference here on Linux -
-the test always succeeds.
-
-So another idea: Could you start the test in verbose mode like this:
-
-V=2 QTEST_QEMU_BINARY=aarch64-softmmu/qemu-system-aarch64 tests/test-hmp
-
-Maybe we get a hint which HMP command is causing the trouble here...
-
- Thomas
+Thanks,
+drew 
