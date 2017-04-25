@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1d35qL-00037I-2r
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:09:46 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d35sJ-0004D2-Fz
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1d35qH-00054s-TF
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:09:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57361
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1d35qH-000547-Mt
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:09:41 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3PJ8x8A117365
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 15:09:40 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a1v519b4m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 15:09:40 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 25 Apr 2017 15:09:39 -0400
-References: <1491575431-32170-1-git-send-email-amarnath.valluri@intel.com>
-	<1491575431-32170-9-git-send-email-amarnath.valluri@intel.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 25 Apr 2017 15:09:37 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d35sI-0006CG-Cq
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 15:11:47 -0400
+References: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
+	<1492957997-28587-2-git-send-email-lidongchen@tencent.com>
+	<7c616dbd-f83f-1643-d211-f5be8d8b2dc4@redhat.com>
+	<7bb35794-6a50-c92f-fee7-e8f9cc55a1d0@amsat.org>
+	<f9ce81bc-72d5-d436-5cb6-58c9dbb10aa4@redhat.com>
+	<1cdac8de-6340-ac1a-9d2b-3546a4c7ffd3@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <4d38eb43-f61d-106a-ffd4-d4f0c76df71d@redhat.com>
+Date: Tue, 25 Apr 2017 21:11:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <1491575431-32170-9-git-send-email-amarnath.valluri@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <56cdf4f8-be48-f90c-b87f-8ed00520a7a6@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 8/9] tpm-passthrough: move reusable code
- to utils
+In-Reply-To: <1cdac8de-6340-ac1a-9d2b-3546a4c7ffd3@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="81HctBqA6wHRLOhoGllhmL36epaBA8j7J"
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: fix some spelling errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,182 +28,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: patrick.ohly@intel.com, marcandre.lureau@gmail.com
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, jemmy858585@gmail.com, Lidong Chen <lidongchen@tencent.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 04/07/2017 10:30 AM, Amarnath Valluri wrote:
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> ---
->   hw/tpm/tpm_passthrough.c | 64 ++++--------------------------------------------
->   hw/tpm/tpm_util.c        | 25 +++++++++++++++++++
->   hw/tpm/tpm_util.h        |  4 +++
->   3 files changed, 34 insertions(+), 59 deletions(-)
->
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index 1bffb6d..ca7c8bb 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -68,27 +68,6 @@ typedef struct TPMPassthruState TPMPassthruState;
->
->   static void tpm_passthrough_cancel_cmd(TPMBackend *tb);
->
-> -static int tpm_passthrough_unix_write(int fd, const uint8_t *buf, uint32_t len)
-> -{
-> -    int ret, remain;
-> -
-> -    remain = len;
-> -    while (remain > 0) {
-> -        ret = write(fd, buf, remain);
-> -        if (ret < 0) {
-> -            if (errno != EINTR && errno != EAGAIN) {
-> -                return -1;
-> -            }
-> -        } else if (ret == 0) {
-> -            break;
-> -        } else {
-> -            buf += ret;
-> -            remain -= ret;
-> -        }
-> -    }
-> -    return len - remain;
-> -}
-> -
->   static int tpm_passthrough_unix_read(int fd, uint8_t *buf, uint32_t len)
->   {
->       int ret;
-> @@ -102,45 +81,12 @@ static int tpm_passthrough_unix_read(int fd, uint8_t *buf, uint32_t len)
->       }
->       return ret;
->   }
-> -
-> -static uint32_t tpm_passthrough_get_size_from_buffer(const uint8_t *buf)
-> -{
-> -    struct tpm_resp_hdr *resp = (struct tpm_resp_hdr *)buf;
-> -
-> -    return be32_to_cpu(resp->len);
-> -}
-> -
-> -/*
-> - * Write an error message in the given output buffer.
-> - */
-> -static void tpm_write_fatal_error_response(uint8_t *out, uint32_t out_len)
-> -{
-> -    if (out_len >= sizeof(struct tpm_resp_hdr)) {
-> -        struct tpm_resp_hdr *resp = (struct tpm_resp_hdr *)out;
-> -
-> -        resp->tag = cpu_to_be16(TPM_TAG_RSP_COMMAND);
-> -        resp->len = cpu_to_be32(sizeof(struct tpm_resp_hdr));
-> -        resp->errcode = cpu_to_be32(TPM_FAIL);
-> -    }
-> -}
-> -
-> -static bool tpm_passthrough_is_selftest(const uint8_t *in, uint32_t in_len)
-> -{
-> -    struct tpm_req_hdr *hdr = (struct tpm_req_hdr *)in;
-> -
-> -    if (in_len >= sizeof(*hdr)) {
-> -        return (be32_to_cpu(hdr->ordinal) == TPM_ORD_ContinueSelfTest);
-> -    }
-> -
-> -    return false;
-> -}
-> -
->   static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->                                           const uint8_t *in, uint32_t in_len,
->                                           uint8_t *out, uint32_t out_len,
->                                           bool *selftest_done)
->   {
-> -    int ret;
-> +    ssize_t ret;
->       bool is_selftest;
->       const struct tpm_resp_hdr *hdr;
->
-> @@ -148,9 +94,9 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->       tpm_pt->tpm_executing = true;
->       *selftest_done = false;
->
-> -    is_selftest = tpm_passthrough_is_selftest(in, in_len);
-> +    is_selftest = tpm_util_is_selftest(in, in_len);
->
-> -    ret = tpm_passthrough_unix_write(tpm_pt->tpm_fd, in, in_len);
-> +    ret = qemu_write_full(tpm_pt->tpm_fd, (const void *)in, (size_t)in_len);
->       if (ret != in_len) {
->           if (!tpm_pt->tpm_op_canceled || errno != ECANCELED) {
->               error_report("tpm_passthrough: error while transmitting data "
-> @@ -170,7 +116,7 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->                            strerror(errno), errno);
->           }
->       } else if (ret < sizeof(struct tpm_resp_hdr) ||
-> -               tpm_passthrough_get_size_from_buffer(out) != ret) {
-> +               ((struct tpm_resp_hdr *)out)->len != ret) {
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--81HctBqA6wHRLOhoGllhmL36epaBA8j7J
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>, jemmy858585@gmail.com,
+ Lidong Chen <lidongchen@tencent.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <4d38eb43-f61d-106a-ffd4-d4f0c76df71d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: fix some spelling errors
+References: <1492957997-28587-1-git-send-email-lidongchen@tencent.com>
+ <1492957997-28587-2-git-send-email-lidongchen@tencent.com>
+ <7c616dbd-f83f-1643-d211-f5be8d8b2dc4@redhat.com>
+ <7bb35794-6a50-c92f-fee7-e8f9cc55a1d0@amsat.org>
+ <f9ce81bc-72d5-d436-5cb6-58c9dbb10aa4@redhat.com>
+ <1cdac8de-6340-ac1a-9d2b-3546a4c7ffd3@redhat.com>
+In-Reply-To: <1cdac8de-6340-ac1a-9d2b-3546a4c7ffd3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 24.04.2017 17:53, Eric Blake wrote:
+> On 04/24/2017 10:47 AM, Eric Blake wrote:
+>> On 04/24/2017 10:37 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>
+>>>>>  /*
+>>>>> - * Returns true iff the first sector pointed to by 'buf' contains =
+at
+>>>>> least
+>>>>> - * a non-NUL byte.
+>>>>> + * Returns true if the first sector pointed to by 'buf' contains a=
+t
+>>>>> least
+>>>>> + * a non-NULL byte.
+>>>>
+>>>> NACK to both changes.  'iff' is an English word that is shorthand fo=
+r
+>>>> "if and only if".  "NUL" means the one-byte character, while "NULL"
+>>>> means the 8-byte (or 4-byte, on 32-bit platform) pointer value.
+>>>
+>>> I agree with Lidong shorthands are not obvious from non-native speake=
+r.
+>>>
+>>> What about this?
+>>>
+>>>  * Returns true if (and only if) the first sector pointed to by 'buf'=
+
+>>> contains
+>>
+>> That might be okay.
+
+Might, yes, but we have it all over the code. I'm not particularly avid
+to change this, because I am in fact one of the culprits (and I'm a
+non-native speaker, but I do like to use LaTeX so I know my \iff).
+
+(By the way, judging from the author's name of this line of code (which
+is Thiemo Seufer), I'd wager he's not a native speaker either.)
+
+>>>  * at least a non-null character.
+>>
+>> But that still doesn't make sense.  The character name is NUL, and
+>> non-NULL refers to something that is a pointer, not a character.
+>=20
+> What's more, the NUL character can actually occupy more than one byte
+> (think UTF-16, where it is the two-byte 0 value).  Referring to NUL byt=
+e
+> rather than NUL character (or even the 'zero byte') makes it obvious
+> that this function is NOT encoding-sensitive, and doesn't start
+> mis-behaving just because the data picks a multi-byte character encodin=
+g.
+
+Furthermore, this doesn't have anything to do with being a native
+speaker or not: NUL is just the commonly used and probably standardized
+abbreviation of a certain ASCII character (in any language). It's OK not
+to know this, but I don't think it's OK to change the comment.
+
+Max
 
 
-Looks like you are missing the be32_to_cpu from above removal.
+--81HctBqA6wHRLOhoGllhmL36epaBA8j7J
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--    return be32_to_cpu(resp->len);
+-----BEGIN PGP SIGNATURE-----
 
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlj/n2YSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AY28IAMO2eOa4FvrRrUG8onpcaQylB8z1+Qz6
+CDz74pJC2cmJZe5t8jl7TPeAtMLg1J9j+NymPKFpRVGPc4JkLZz4aeJkB+JONdjK
+H9IlkKICWgsLK8e7c6nJnbX5mr3YrkRwzsiG6nteat574/TFo9EtSz99xQHxsPj7
+DZFEVHg3YGKVuRGFwfoje7DGF9MB7DqsKf4t2I2Y4n4xp3lAAPFQQSugwrqvvozF
+VxmsFEMMbKmmqFeR4SoWk1vuoLjsf9QfvuAVfZazSwfHFWYll7JwVEIGoLSMqyjF
+0OoTntYNjaAhnMruvCx8yKOFJGVakpTULeSZfRA4J90+inJCMatcHhQ=
+=UAeJ
+-----END PGP SIGNATURE-----
 
-
->           ret = -1;
->           error_report("tpm_passthrough: received invalid response "
->                        "packet from TPM");
-> @@ -183,7 +129,7 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
->
->   err_exit:
->       if (ret < 0) {
-> -        tpm_write_fatal_error_response(out, out_len);
-> +        tpm_util_write_fatal_error_response(out, out_len);
->       }
->
->       tpm_pt->tpm_executing = false;
-> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-> index 7b35429..fb929f6 100644
-> --- a/hw/tpm/tpm_util.c
-> +++ b/hw/tpm/tpm_util.c
-> @@ -24,6 +24,31 @@
->   #include "tpm_int.h"
->
->   /*
-> + * Write an error message in the given output buffer.
-> + */
-> +void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
-> +{
-> +    if (out_len >= sizeof(struct tpm_resp_hdr)) {
-> +        struct tpm_resp_hdr *resp = (struct tpm_resp_hdr *)out;
-> +
-> +        resp->tag = cpu_to_be16(TPM_TAG_RSP_COMMAND);
-> +        resp->len = cpu_to_be32(sizeof(struct tpm_resp_hdr));
-> +        resp->errcode = cpu_to_be32(TPM_FAIL);
-> +    }
-> +}
-> +
-> +bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
-> +{
-> +    struct tpm_req_hdr *hdr = (struct tpm_req_hdr *)in;
-> +
-> +    if (in_len >= sizeof(*hdr)) {
-> +        return (be32_to_cpu(hdr->ordinal) == TPM_ORD_ContinueSelfTest);
-> +    }
-> +
-> +    return false;
-> +}
-> +
-> +/*
->    * A basic test of a TPM device. We expect a well formatted response header
->    * (error response is fine) within one second.
->    */
-> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-> index df76245..2f7c961 100644
-> --- a/hw/tpm/tpm_util.h
-> +++ b/hw/tpm/tpm_util.h
-> @@ -24,6 +24,10 @@
->
->   #include "sysemu/tpm_backend.h"
->
-> +void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len);
-> +
-> +bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len);
-> +
->   int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
->
->   #endif /* TPM_TPM_UTIL_H */
+--81HctBqA6wHRLOhoGllhmL36epaBA8j7J--
