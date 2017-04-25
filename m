@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3100-0004Ac-RD
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:59:25 -0400
+	(envelope-from <clg@kaod.org>) id 1d316y-0006GK-WB
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d30zx-000063-RA
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:59:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57258)
+	(envelope-from <clg@kaod.org>) id 1d316u-0002kZ-0k
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:06:36 -0400
+Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:53764)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d30zx-00005k-KG
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:59:21 -0400
-Date: Tue, 25 Apr 2017 14:59:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170425135915.GF2103@work-vm>
-References: <20170425104116.31435-1-dgilbert@redhat.com>
-	<CAFEAcA8yQXV3414cv72Nq7HVoXTgjR40HQWGFzK_+T_=h_Bykw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1d316t-0002jS-QD
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:06:31 -0400
+Received: from player696.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 3242CCB8C7
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 16:06:29 +0200 (CEST)
+References: <1493103101-25165-1-git-send-email-clg@kaod.org>
+	<1493103101-25165-3-git-send-email-clg@kaod.org>
+	<CAFEAcA9Y0C_byA8KsiMXdzsMDE73ZKmMcQZaMc7uwAF2bZC+hg@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d48c2177-ad8e-a820-c640-898075110ee3@kaod.org>
+Date: Tue, 25 Apr 2017 16:06:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8yQXV3414cv72Nq7HVoXTgjR40HQWGFzK_+T_=h_Bykw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/4] hmp queue
+In-Reply-To: <CAFEAcA9Y0C_byA8KsiMXdzsMDE73ZKmMcQZaMc7uwAF2bZC+hg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] ipmi: don't try to open a NULL filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +32,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 25 April 2017 at 11:41, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > The following changes since commit f4b5b021c847669b1c78050aea26fe9abceef6dd:
-> >
-> >   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2017-04-25 09:21:54 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   git://github.com/dagrh/qemu.git tags/pull-hmp-20170425
-> >
-> > for you to fetch changes up to 1eb8e78dd1cd4e0b4170fd42f6d8882c867f334b:
-> >
-> >   tests: Add a tester for HMP commands (2017-04-25 11:26:52 +0100)
-> >
-> > ----------------------------------------------------------------
-> > HMP pull with fixed test/strcmp case
-> >
-> > ----------------------------------------------------------------
-> 
-> test-hmp fails for me on OSX hosts:
-> 
-> TEST: tests/test-hmp... (pid=6008)
->   /aarch64/hmp/n810:
-> qemu: qemu_mutex_lock: Invalid argument
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02Sd714920da46f8a0e37afec762c6ee23b
-> (pid=6013)
->   /aarch64/hmp/tosa:
-> qemu: qemu_mutex_lock: Invalid argument
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02Sf3025925b9db75bdfdd9f09cf3119ad5
-> etc etc.
-> 
-> Can't do a backtrace, I'm afraid -- Apple's debugger doesn't seem
-> to work if you're not root and the lack of X11 forwarding on the
-> box I'm using remotely interacts really badly with qtest's
-> desire to run qemu as a background process that it's hard to
-> attach a debugger to. Something's probably not initializing
-> a mutex, though -- Linux by default treats zeroes as a valid
-> initialized mutex so it won't notice. You may be able to repro
-> on Linux by using the Linux PTHREAD_MUTEX_ERRORCHECK_NP
-> mutex attr, possibly.
+On 04/25/2017 03:31 PM, Peter Maydell wrote:
+> On 25 April 2017 at 07:51, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>> Currenlty, the code relies on the fact that open() handles NULL
+>> filenames but that can cause an error with new clang:
+>>
+>>   hw/core/loader.c:67:15: runtime error: null pointer passed as argume=
+nt 1,
+>>   which is declared to never be null
+>=20
+> This isn't "new clang", incidentally, it's just clang with the
+> runtime-static-analysis enabled, which causes warnings to be
+> printed at runtime for undefined behaviours. You can enable
+> this by passing configure --extra-cflags=3D-fsanitize=3Dundefined .
+> (I have clang 3.8.0 here.)
 
-Hmm,  does running with QTEST_LOG=1  get you any more detail?
+OK. So I have now reproduced the issue on a f24. That made be=20
+realize that the IPMI tests check for the arch they are being=20
+run on and that more changes are required for them to run on=20
+ppc64.=20
 
-Dave
+We can drop patch 1/2. Tell me if you want a resend.
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks,
+
+C. =20
