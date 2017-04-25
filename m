@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d31Ib-0003Ip-9Y
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:18:38 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d31MV-00053J-6q
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:22:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d31IV-0008RJ-Ji
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:18:37 -0400
-Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:35008)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d31IV-0008R2-Ds
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:18:31 -0400
-Received: by mail-pf0-x22c.google.com with SMTP id v14so24060824pfd.2
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 07:18:31 -0700 (PDT)
-Date: Tue, 25 Apr 2017 23:18:27 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170425141827.GA2724@lianli.shorne-pla.net>
-References: <ab4f029c-8264-7d35-b0e0-9b35a8e80d9d@twiddle.net>
-	<20170423215420.27098-1-shorne@gmail.com>
-	<f6a7d386-80a9-0cc3-e1ec-1b2058aa5bf9@twiddle.net>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d31MQ-00018X-HN
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 10:22:39 -0400
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<20170225193155.447462-4-vsementsov@virtuozzo.com>
+	<20170307095323.GB5871@noname.str.redhat.com>
+	<20170328105544.GE2509@work-vm>
+	<20170328110900.GB11725@noname.redhat.com>
+	<20170328111315.GF2509@work-vm>
+	<20170328120900.GC11725@noname.redhat.com>
+	<4ed9821c-d19e-70fe-c7e5-fc89756b59f5@virtuozzo.com>
+	<09db3476-b1e4-fa80-6d83-d5da0a06bdfc@redhat.com>
+	<20170329152941.GC2501@work-vm>
+	<dd9b5dda-eb13-a184-9acc-839e966a103f@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <8d98b8bd-41d3-2bcb-ccee-3e5bfc3f37a9@virtuozzo.com>
+Date: Tue, 25 Apr 2017 17:22:12 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f6a7d386-80a9-0cc3-e1ec-1b2058aa5bf9@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH RFC] target/openrisc: Support non-busy idle
- state using PMR SPR
+In-Reply-To: <dd9b5dda-eb13-a184-9acc-839e966a103f@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] ping Re: [PATCH 3/4] savevm: fix savevm after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Development <qemu-devel@nongnu.org>, Openrisc <openrisc@lists.librecores.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On Tue, Apr 25, 2017 at 12:11:00PM +0200, Richard Henderson wrote:
-> On 04/23/2017 11:54 PM, Stafford Horne wrote:
-> > The OpenRISC architecture has the Power Management Register (PMR)
-> > special purpose register to manage cpu power states.  The interesting
-> > modes are:
-> > 
-> >   * Doze Mode (DME) - Stop cpu except timer & pic - wake on interrupt
-> >   * Sleep Mode (SME) - Stop cpu and all units - wake on interrupt
-> >   * Suspend Model (SUME) - Stop cpu and all units - wake on reset
-> > 
-> > The linux kernel will set DME when idle.
-> 
-> And SUME would be, essentially, poweroff?  Perhaps at least for the purposes
-> of QEMU; on real hardware one could press a button to assert reset and
-> reboot.
+29.03.2017 18:53, Paolo Bonzini wrote:
+>
+> On 29/03/2017 17:29, Dr. David Alan Gilbert wrote:
+>>>> 'abort' is not very good too I think. migration is completed, nothing to
+>>>> abort.. (may be successful migration to file for suspend, some kind of
+>>>> vm cloning, etc)
+>>> There is already migrate_cancel.  Does it make sense to make it
+>>> reactivate fds if migration is completed?
+>> It's potentially racy to do that.
+>> Imagine if your migration is almost finished and you issue a migrate_cancel,
+>> what happens?
+>> Maybe it cancelled it.
+>> Maybe it just completed in time - and you really better not be accessing
+>> the disks on the source unless you're sure the destination isn't running.
+> If you want to avoid races, you probably have to use -S anyway on the
+> destination and do more handshaking between source and destination.  But
+> yes, just to be safe it'd be better to add a new flag (-f for HMP,
+> 'cancel-completed-migration':true for QMP or something like that).
+>
+> Paolo
 
-Yes, that is what I am thinking, but I could add this later, after some
-reviews with other OpenRISC folks.
+Looks like we haven't final conclusion on this (solve problems, noted in 
+patches 2 and 3). Are someone working on this now?
 
-> > Also, I don't know if its due to this patch of an issue with the timer
-> > interrupts.  After applying this patch the timer interrupts do not trigger
-> > until a keypress is make.  i.e. something like this...
-> > 
-> >    $ sleep 5
-> >    <hangs forever until a key is pressed>
-> ...
-> > +            cpu_restore_state(cs, GETPC() + 4);
-> 
-> This isn't correct.  You want
-> 
-> 	cpu_restore_state(cs, GETPC());
-> 	cs->env.pc += 4;
-> 
-> So what's happening is that you're re-executing the MTSPR and going back to
-> sleep again.  Which probably explains the hang.
-
-I have changed to the above, but I think its essentially the same.  It
-resumes after the MTSPR in both cases.
-
-I fixed this now though, you should see another patch.  The issue is the
-timer events get ignored once the cpu is in halt state, I added a
-qemu_cpu_kick() call in the timer hardware to wake up the cpu on timer
-interrupts.  Not sure if thats the best way to do it, but it works 100%
-now.
-
--Stafford
+-- 
+Best regards,
+Vladimir
