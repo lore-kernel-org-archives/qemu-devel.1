@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d36hC-0002hJ-1M
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 16:04:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d375X-0000f0-4U
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 16:29:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d36h7-0006Zb-13
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 16:04:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53596)
+	(envelope-from <ehabkost@redhat.com>) id 1d375T-0000J9-2M
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 16:29:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19984)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d36h6-0006Y6-Ql
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 16:04:16 -0400
-Date: Tue, 25 Apr 2017 17:04:14 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d375S-0000Iv-Rg
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 16:29:26 -0400
+Date: Tue, 25 Apr 2017 17:29:20 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170425200414.GP3482@thinpad.lan.raisama.net>
-References: <20170419201314.GX25239@thinpad.lan.raisama.net>
-	<CAJhHMCDpJhRoeGXRvPdqLD7zeVh_dmKX9wDcZcCSFwLj_+Cwkw@mail.gmail.com>
-	<20170419205706.GY25239@thinpad.lan.raisama.net>
-	<CAJhHMCBN8N27M7H4a3ayv6rezKoc9+UH5xPqE4Pu2MPYKD8RgQ@mail.gmail.com>
-	<20170419213349.GC25239@thinpad.lan.raisama.net>
-	<CAJhHMCB1GBC6ay4O61gnF8NtHg9+DCVR3dAcVjd253-GX3BoAw@mail.gmail.com>
-	<20170420022629.GD25239@thinpad.lan.raisama.net>
-	<CAJhHMCAjHsRDwa5sbWeQstLCe3o4nA7-GHAYrewP59H7wYeBBg@mail.gmail.com>
-	<20170420184210.GF25239@thinpad.lan.raisama.net>
-	<8cf1d4e9-8177-3b09-5400-cb22a929e78b@redhat.com>
+Message-ID: <20170425202920.GQ3482@thinpad.lan.raisama.net>
+References: <20170424130355.31324-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <8cf1d4e9-8177-3b09-5400-cb22a929e78b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tcg/i386: Do not display HT warning for TCG
+In-Reply-To: <20170424130355.31324-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] RFC: vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, anderson@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Apr 21, 2017 at 11:38:30AM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 20/04/2017 20:42, Eduardo Habkost wrote:
-> >> -smp 4,threads=4 shows 4 cores
-> > This means 1 socket with 1 core, 4 threads per core. But if
-> > vendor ID is AMD, guests will probably ignore the hyperthreading
-> > info and treat each thread as a separate core. That's why we have
-> > a warning.
-> 
-> I'm not sure about the "probably".  As long as the HT bit is 1 and the
-> number of threads is > 1 in CPUID[EAX=1].EBX[bits 23:16], I am not sure
-> why the OS would care about the vendor.
-> 
+On Mon, Apr 24, 2017 at 05:03:55PM +0400, Marc-Andr=E9 Lureau wrote:
+[...]
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 5d5be91daf..d0c9b71902 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -135,6 +135,10 @@
+>          .driver   =3D "vmgenid",\
+>          .property =3D "x-write-pointer-available",\
+>          .value    =3D "off",\
+> +    },{\
+> +        .driver   =3D "vmcoreinfo",\
+> +        .property =3D "x-write-pointer-available",\
+> +        .value    =3D "off",\
+>      },
 
-On my testing, "-cpu qemu64,vendor=AuthenticAMD" and
-"-cpu qemu64,vendor=GenuineIntel" gave different results on lscpu
-and /proc/cpuinfo in a Fedora 25 guest (Linux 4.8.6-300.fc25).
+My first reaction to this was "we don't need this compat property, becaus=
+e the
+device didn't even exist in QEMU 2.4".
 
-> x86info does care (it just does not try to detect the topology for
-> !Intel processors), but Linux seems not to.  detect_ht is called
-> unconditionally.
+But then I read commit f2a1ae45d8ec5ad494e66a9234499a2e0fbf4b40 and now I=
+ see
+why this is required: this is a compat property whose sole function is to
+prevent the device from being instantiated.
 
-I see detect_ht() inside a "#ifdef CONFIG_X86_32" in
-amd_cpu_dev.c_init (init_amd()), and intel_cpudev.c_init
-(init_intel()). It is inside a "#ifdef CONFIG_X86_64" in
-identify_cpu(), though, so it looks like it is called at
-different places, but always called.
+Instead of requiring an extra compat property, I suggest just checking if
+fw_cfg has DMA enabled. e.g.:
 
-But the logic becomes very confusing after that: the core/sibling
-CPU masks are initialized based on phys_proc_id and cpu_core_id,
-and detect_ht() isn't the only place where those fields are
-initialized (see amd_get_topology(), amd_detect_cmp(),
-detect_extended_topology()). It looks like amd_detect_cmp()
-and/or amd_get_topology() will undo what detect_ht() did.
+ static void vmgenid_realize(DeviceState *dev, Error **errp)
+ {
+     VmGenIdState *vms =3D VMGENID(dev);
++    FWCfgState *fw_cfg =3D FW_CFG(object_resolve_path_type("", TYPE_FW_C=
+FG, NULL));
 
--- 
+-    if (!vms->write_pointer_available) {
++    if (!fw_cfg || !fw_cfg_dma_enabled(fw_cfg)) {
+         error_setg(errp, "%s requires DMA write support in fw_cfg, "
+                    "which this machine type does not provide", VMGENID_D=
+EVICE);
+         return;
+
+
+This has the additional benefit of handling other cases properly, like:
+
+  $ qemu-system-x86_64 -device vmgenid -machine none
+  qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write support=
+ in fw_cfg, which this machine type does not provide
+  $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.9 -global fw_=
+cfg.dma_enabled=3Doff
+  qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write support=
+ in fw_cfg, which this machine type does not provide
+  $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.6 -global fw_=
+cfg.dma_enabled=3Don
+  [boots normally]
+  $
+
+--=20
 Eduardo
