@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2yil-0003v7-0H
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:28 -0400
+	(envelope-from <wangyunjian@huawei.com>) id 1d2ynV-0007mU-Rh
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:38:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d2yik-0005rs-5J
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d2yij-0005rW-VG
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:33:26 -0400
-References: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492674416-9408-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<df05a73b-fba8-a6d3-bf6a-648304458257@redhat.com>
-	<58FD9546.5000104@huawei.com>
-	<82c50df3-28c9-fb21-f2c6-76a99f864bee@redhat.com>
-	<58FF1DF7.4000006@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <bfac018b-55cf-9cf8-5ffe-ff0d1fbd4b53@redhat.com>
-Date: Tue, 25 Apr 2017 19:33:17 +0800
-MIME-Version: 1.0
-In-Reply-To: <58FF1DF7.4000006@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <wangyunjian@huawei.com>) id 1d2ynR-0007tj-M1
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:38:21 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3909
+	helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <wangyunjian@huawei.com>) id 1d2ynR-0007p5-2D
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 07:38:17 -0400
+From: wangyunjian <wangyunjian@huawei.com>
+Date: Tue, 25 Apr 2017 11:37:53 +0000
+Message-ID: <34EFBCA9F01B0748BEB6B629CE643AE60BB3AC7D@DGGEMA505-MBS.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: serialize compare
- thread's initialization with main thread
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [BUG] QEMU crashes with dpdk virtio pmd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, caihe <caihe@huawei.com>, wangyunjian <wangyunjian@huawei.com>
 
+The q->tx_bh will free in virtio_net_del_queue() function, when remove virt=
+io queues=20
+if the guest doesn't support multiqueue. But it might be still referenced b=
+y others (eg . virtio_net_set_status()),
+which need so set NULL.
 
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 7d091c9..98bd683 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1522,9 +1522,12 @@ static void virtio_net_del_queue(VirtIONet *n, int i=
+ndex)
+     if (q->tx_timer) {
+         timer_del(q->tx_timer);
+         timer_free(q->tx_timer);
++        q->tx_timer =3D NULL;
+     } else {
+         qemu_bh_delete(q->tx_bh);
++        q->tx_bh =3D NULL;
+     }
++    q->tx_waiting =3D 0;
+     virtio_del_queue(vdev, index * 2 + 1);
+ }
 
-On 2017=E5=B9=B404=E6=9C=8825=E6=97=A5 17:59, Hailiang Zhang wrote:
-> On 2017/4/25 16:41, Jason Wang wrote:
->>
->> On 2017=E5=B9=B404=E6=9C=8824=E6=97=A5 14:03, Hailiang Zhang wrote:
->>> On 2017/4/24 12:10, Jason Wang wrote:
->>>> On 2017=E5=B9=B404=E6=9C=8820=E6=97=A5 15:46, zhanghailiang wrote:
->>>>> We call qemu_chr_fe_set_handlers() in colo-compare thread, it is us=
-ed
->>>>> to detach watched fd from default main context, so it has chance to
->>>>> handle the same watched fd with main thread concurrently, which wil=
-l
->>>>> trigger an error report:
->>>>> "qemu-char.c:918: io_watch_poll_finalize: Assertion `iwp->src =3D=3D
->>>>> ((void *)0)' failed."
->>>> Anyway to prevent fd from being handled by main thread before creati=
-ng
->>>> colo thread? Using semaphore seems not elegant.
->>> So how about calling qemu_mutex_lock_iothread() before
->>> qemu_chr_fe_set_handlers() ?
->> Looks better, but I needs more information e.g how main thread can=20
->> touch it?
->
-> Hmm, this happened quite occasionally, and we didn't catch the first=20
-> place (backtrace)
-> of removing fd from been watched, but  from the codes logic, we found=20
-> there should
-> be such possible cases:
-> tcp_chr_write (Or tcp_chr_read/tcp_chr_sync_read/chr_disconnect)
->  ->tcp_chr_disconnect (Or char_socket_finalize)
->     ->tcp_chr_free_connection
->       -> remove_fd_in_watch(chr);
->
-> Anyway, it needs the protection from been freed twice.
->
-> Thanks,
-> Hailiang
+From: wangyunjian=20
+Sent: Monday, April 24, 2017 6:10 PM
+To: qemu-devel@nongnu.org; Michael S. Tsirkin <mst@redhat.com>; 'Jason Wang=
+' <jasowang@redhat.com>
+Cc: wangyunjian <wangyunjian@huawei.com>; caihe <caihe@huawei.com>
+Subject: [Qemu-devel][BUG] QEMU crashes with dpdk virtio pmd=20
 
-Still a little bit confused. The question is how could main thread still=20
-call tcp_chr_write or other in the above case?
+Qemu crashes, with pre-condition:
+vm xml config with multiqueue, and the vm's driver virtio-net support multi=
+-queue
 
-Thanks
+reproduce steps:
+i. start dpdk testpmd in VM with the virtio nic
+ii. stop testpmd
+iii. reboot the VM
 
->> Thanks
->>
->> .
->>
->
->
+This commit "f9d6dbf0=A0 remove virtio queues if the guest doesn't support =
+multiqueue" is introduced.
+
+Qemu version: QEMU emulator version 2.9.50 (v2.9.0-137-g32c7e0a)
+VM DPDK version: =A0DPDK-1.6.1
+
+Call Trace:
+#0=A0 0x00007f60881fe5d7 in raise () from /usr/lib64/libc.so.6
+#1=A0 0x00007f60881ffcc8 in abort () from /usr/lib64/libc.so.6
+#2=A0 0x00007f608823e2f7 in __libc_message () from /usr/lib64/libc.so.6
+#3=A0 0x00007f60882456d3 in _int_free () from /usr/lib64/libc.so.6
+#4=A0 0x00007f608900158f in g_free () from /usr/lib64/libglib-2.0.so.0
+#5=A0 0x00007f6088fea32c in iter_remove_or_steal () from /usr/lib64/libglib=
+-2.0.so.0
+#6=A0 0x00007f608edc0986 in object_property_del_all (obj=3D0x7f6091e74800) =
+at qom/object.c:410
+#7=A0 object_finalize (data=3D0x7f6091e74800) at qom/object.c:467
+#8=A0 object_unref (obj=3Dobj@entry=3D0x7f6091e74800) at qom/object.c:903
+#9=A0 0x00007f608eaf1fd3 in phys_section_destroy (mr=3D0x7f6091e74800) at g=
+it/qemu/exec.c:1154
+#10 phys_sections_free (map=3D0x7f6090b72bb0) at git/qemu/exec.c:1163
+#11 address_space_dispatch_free (d=3D0x7f6090b72b90) at git/qemu/exec.c:251=
+4
+#12 0x00007f608ee91ace in call_rcu_thread (opaque=3D<optimized out>) at uti=
+l/rcu.c:272
+#13 0x00007f6089b0ddc5 in start_thread () from /usr/lib64/libpthread.so.0
+#14 0x00007f60882bf71d in clone () from /usr/lib64/libc.so.6
+
+Call Trace:
+#0=A0 0x00007fdccaeb9790 in ?? ()
+#1=A0 0x00007fdcd82d09fc in object_property_del_all (obj=3D0x7fdcdb8acf60) =
+at qom/object.c:405
+#2=A0 object_finalize (data=3D0x7fdcdb8acf60) at qom/object.c:467
+#3=A0 object_unref (obj=3Dobj@entry=3D0x7fdcdb8acf60) at qom/object.c:903
+#4=A0 0x00007fdcd8001fd3 in phys_section_destroy (mr=3D0x7fdcdb8acf60) at g=
+it/qemu/exec.c:1154
+#5=A0 phys_sections_free (map=3D0x7fdcdc86aa00) at git/qemu/exec.c:1163
+#6=A0 address_space_dispatch_free (d=3D0x7fdcdc86a9e0) at git/qemu/exec.c:2=
+514
+#7=A0 0x00007fdcd83a1ace in call_rcu_thread (opaque=3D<optimized out>) at u=
+til/rcu.c:272
+#8=A0 0x00007fdcd301ddc5 in start_thread () from /usr/lib64/libpthread.so.0
+#9=A0 0x00007fdcd17cf71d in clone () from /usr/lib64/libc.so.6
