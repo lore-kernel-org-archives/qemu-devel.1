@@ -1,15 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1d34r7-00076n-QM
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:06:31 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1d352h-0001bm-SI
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:18:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1d34r6-0001G0-4j
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:06:29 -0400
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Tue, 25 Apr 2017 20:06:09 +0200
-Message-Id: <20170425180609.11004-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH v3] hw/misc: Add Exynos4210 Pseudo Random
- Number Generator
+	(envelope-from <borntraeger@de.ibm.com>) id 1d352d-0006A9-KU
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:18:27 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57022
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1d352d-00069u-DV
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 14:18:23 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3PI8k9s012989
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 14:18:22 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a1v5175g6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 14:18:22 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 25 Apr 2017 12:18:21 -0600
+References: <1493126327-13162-1-git-send-email-thuth@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 25 Apr 2017 20:18:15 +0200
+MIME-Version: 1.0
+In-Reply-To: <1493126327-13162-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+Message-Id: <2c3464b1-268b-f8a1-9935-cbd77c8ffc2a@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix crash with
+ virtio-scsi-pci device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,368 +42,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-Add emulation for Exynos4210 Pseudo Random Number Generator which could
-work on fixed seeds or with seeds provided by True Random Number
-Generator block inside the SoC.
+On 04/25/2017 03:18 PM, Thomas Huth wrote:
+> qemu-system-s390x currently crashes when it is started with a
+> virtio-scsi-pci device, e.g.:
+> 
+>  qemu-system-s390x -nographic -enable-kvm -device virtio-scsi-pci \
+>                    -drive file=/tmp/disk.dat,if=none,id=d1,format=raw \
+>                    -device scsi-cd,drive=d1,bootindex=1
+> 
+> The problem is that the code in s390_gen_initial_iplb() currently assumes
+> that all SCSI devices are also CCW devices, which is not the case for
+> virtio-scsi-pci of course. Fix it by adding an appropriate check for
+> TYPE_CCW_DEVICE here.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Implement only the fixed seeds part of it in polling mode (no
-interrupts).
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Emulation tested with two independent Linux kernel exynos-rng drivers:
-1. New kcapi-rng interface (targeting Linux v4.12),
-2. Old hwrng inteface
-   # echo "exynos" > /sys/class/misc/hw_random/rng_current
-   # dd if=/dev/hwrng of=/dev/null bs=1 count=16
+applied thanks.
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-
----
-
-Changes since v2:
-1. Drop GRand in favor of qcrypto_random_bytes() after discussion with
-   Peter Maydell.
-2. Because of above, ignore the seed value but mark if each one of five
-   seed registers were seeded.
-3. Fix memset of s->randr_value (copy paste error, also shorter sizeof
-   can be used).
-
-Changes since v1:
-1. Use GRand-like functions to fix build on MingW32 (this adds also
-   finalize).
-2. Add DPRINTF macro.
-3. Use HWADDR_PRIx and family for printing values.
----
- hw/arm/exynos4210.c      |   4 +
- hw/misc/Makefile.objs    |   2 +-
- hw/misc/exynos4210_rng.c | 282 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 287 insertions(+), 1 deletion(-)
- create mode 100644 hw/misc/exynos4210_rng.c
-
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 960f27e45a36..5a622cfedfc8 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -86,6 +86,9 @@
- /* Clock controller SFR base address */
- #define EXYNOS4210_CLK_BASE_ADDR            0x10030000
- 
-+/* PRNG/HASH SFR base address */
-+#define EXYNOS4210_RNG_BASE_ADDR            0x10830400
-+
- /* Display controllers (FIMD) */
- #define EXYNOS4210_FIMD0_BASE_ADDR          0x11C00000
- 
-@@ -322,6 +325,7 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem,
-     sysbus_create_simple("exynos4210.pmu", EXYNOS4210_PMU_BASE_ADDR, NULL);
- 
-     sysbus_create_simple("exynos4210.clk", EXYNOS4210_CLK_BASE_ADDR, NULL);
-+    sysbus_create_simple("exynos4210.rng", EXYNOS4210_RNG_BASE_ADDR, NULL);
- 
-     /* PWM */
-     sysbus_create_varargs("exynos4210.pwm", EXYNOS4210_PWM_BASE_ADDR,
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index c8b489390f7e..e0699ea11155 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -26,7 +26,7 @@ obj-$(CONFIG_IVSHMEM) += ivshmem.o
- obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- obj-$(CONFIG_NSERIES) += cbus.o
- obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o
-+obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o exynos4210_rng.o
- obj-$(CONFIG_IMX) += imx_ccm.o
- obj-$(CONFIG_IMX) += imx31_ccm.o
- obj-$(CONFIG_IMX) += imx25_ccm.o
-diff --git a/hw/misc/exynos4210_rng.c b/hw/misc/exynos4210_rng.c
-new file mode 100644
-index 000000000000..3f1459edb5df
---- /dev/null
-+++ b/hw/misc/exynos4210_rng.c
-@@ -0,0 +1,282 @@
-+/*
-+ *  Exynos4210 Pseudo Random Nubmer Generator Emulation
-+ *
-+ *  Copyright (c) 2017 Krzysztof Kozlowski <krzk@kernel.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "crypto/random.h"
-+#include "hw/sysbus.h"
-+#include "qemu/log.h"
-+
-+#define DEBUG_EXYNOS_RNG 0
-+
-+#define DPRINTF(fmt, ...) \
-+    do { \
-+        if (DEBUG_EXYNOS_RNG) { \
-+            printf("exynos4210_rng: " fmt, ## __VA_ARGS__); \
-+        } \
-+    } while (0)
-+
-+#define TYPE_EXYNOS4210_RNG             "exynos4210.rng"
-+#define EXYNOS4210_RNG(obj) \
-+    OBJECT_CHECK(Exynos4210RngState, (obj), TYPE_EXYNOS4210_RNG)
-+
-+/*
-+ * Exynos4220, PRNG, only polling mode is supported.
-+ */
-+
-+/* RNG_CONTROL_1 register bitfields, reset value: 0x0 */
-+#define EXYNOS4210_RNG_CONTROL_1_PRNG           0x8
-+#define EXYNOS4210_RNG_CONTROL_1_START_INIT     BIT(4)
-+/* RNG_STATUS register bitfields, reset value: 0x1 */
-+#define EXYNOS4210_RNG_STATUS_PRNG_ERROR        BIT(7)
-+#define EXYNOS4210_RNG_STATUS_PRNG_DONE         BIT(5)
-+#define EXYNOS4210_RNG_STATUS_MSG_DONE          BIT(4)
-+#define EXYNOS4210_RNG_STATUS_PARTIAL_DONE      BIT(3)
-+#define EXYNOS4210_RNG_STATUS_PRNG_BUSY         BIT(2)
-+#define EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE BIT(1)
-+#define EXYNOS4210_RNG_STATUS_BUFFER_READY      BIT(0)
-+#define EXYNOS4210_RNG_STATUS_WRITE_MASK        (EXYNOS4210_RNG_STATUS_PRNG_DONE \
-+                                                    | EXYNOS4210_RNG_STATUS_MSG_DONE \
-+                                                    | EXYNOS4210_RNG_STATUS_PARTIAL_DONE)
-+
-+#define EXYNOS4210_RNG_CONTROL_1                  0x0
-+#define EXYNOS4210_RNG_STATUS                    0x10
-+#define EXYNOS4210_RNG_SEED_IN                  0x140
-+#define EXYNOS4210_RNG_SEED_IN_OFFSET(n)        (EXYNOS4210_RNG_SEED_IN + (n * 0x4))
-+#define EXYNOS4210_RNG_PRNG                     0x160
-+#define EXYNOS4210_RNG_PRNG_OFFSET(n)           (EXYNOS4210_RNG_PRNG + (n * 0x4))
-+
-+#define EXYNOS4210_RNG_PRNG_NUM                 5
-+
-+#define EXYNOS4210_RNG_REGS_MEM_SIZE            0x200
-+
-+typedef struct Exynos4210RngState {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+
-+    int32_t randr_value[EXYNOS4210_RNG_PRNG_NUM];
-+    /* bits from 0 to EXYNOS4210_RNG_PRNG_NUM if given seed register was set */
-+    uint32_t seed_set;
-+
-+    /* Register values */
-+    uint32_t reg_control;
-+    uint32_t reg_status;
-+} Exynos4210RngState;
-+
-+static bool exynos4210_rng_seed_ready(const Exynos4210RngState *s)
-+{
-+    unsigned int i;
-+
-+    for (i = 0; i < EXYNOS4210_RNG_PRNG_NUM; i++) {
-+        if ((s->seed_set & BIT(i)) == 0) {
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+}
-+
-+static void exynos4210_rng_set_seed(Exynos4210RngState *s, unsigned int i,
-+                                    uint64_t val)
-+{
-+    /*
-+     * We actually ignore the seed and always generate true random numbers.
-+     * Theoretically this should not match the device as Exynos has
-+     * a Pseudo Random Number Generator but testing shown that it always
-+     * generates random numbers regardless of the seed value.
-+     */
-+    s->seed_set |= BIT(i);
-+
-+    /* If all seeds were written, update the status to reflect it */
-+    if (exynos4210_rng_seed_ready(s)) {
-+        s->reg_status |= EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE;
-+    } else {
-+        s->reg_status &= ~EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE;
-+    }
-+}
-+
-+static void exynos4210_rng_run_engine(Exynos4210RngState *s)
-+{
-+    Error *err = NULL;
-+    int ret;
-+
-+    /* Seed set? */
-+    if ((s->reg_status & EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE) == 0) {
-+        goto out;
-+    }
-+
-+    /* PRNG engine chosen? */
-+    if ((s->reg_control & EXYNOS4210_RNG_CONTROL_1_PRNG) == 0) {
-+        goto out;
-+    }
-+
-+    /* PRNG engine started? */
-+    if ((s->reg_control & EXYNOS4210_RNG_CONTROL_1_START_INIT) == 0) {
-+        goto out;
-+    }
-+
-+    /* Get randoms */
-+    ret = qcrypto_random_bytes((uint8_t *)s->randr_value,
-+                               sizeof(s->randr_value), &err);
-+    if (!ret) {
-+        /* Notify that PRNG is ready */
-+        s->reg_status |= EXYNOS4210_RNG_STATUS_PRNG_DONE;
-+    } else {
-+        error_report_err(err);
-+    }
-+
-+out:
-+    /* Always clear start engine bit */
-+    s->reg_control &= ~EXYNOS4210_RNG_CONTROL_1_START_INIT;
-+}
-+
-+static uint64_t exynos4210_rng_read(void *opaque, hwaddr offset,
-+                                    unsigned size)
-+{
-+    Exynos4210RngState *s = (Exynos4210RngState *)opaque;
-+    uint32_t val = 0;
-+
-+    assert(size == 4);
-+
-+    switch (offset) {
-+    case EXYNOS4210_RNG_CONTROL_1:
-+        val = s->reg_control;
-+        break;
-+
-+    case EXYNOS4210_RNG_STATUS:
-+        val = s->reg_status;
-+        break;
-+
-+    case EXYNOS4210_RNG_PRNG_OFFSET(0):
-+    case EXYNOS4210_RNG_PRNG_OFFSET(1):
-+    case EXYNOS4210_RNG_PRNG_OFFSET(2):
-+    case EXYNOS4210_RNG_PRNG_OFFSET(3):
-+    case EXYNOS4210_RNG_PRNG_OFFSET(4):
-+        val = s->randr_value[(offset - EXYNOS4210_RNG_PRNG_OFFSET(0)) / 4];
-+        DPRINTF("returning random @0x%" HWADDR_PRIx ": 0x%" PRIx32 "\n",
-+                offset, val);
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad read offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+
-+    return val;
-+}
-+
-+static void exynos4210_rng_write(void *opaque, hwaddr offset,
-+                                 uint64_t val, unsigned size)
-+{
-+    Exynos4210RngState *s = (Exynos4210RngState *)opaque;
-+
-+    assert(size == 4);
-+
-+    switch (offset) {
-+    case EXYNOS4210_RNG_CONTROL_1:
-+        DPRINTF("RNG_CONTROL_1 = 0x%" PRIx64 "\n", val);
-+        s->reg_control = val;
-+        exynos4210_rng_run_engine(s);
-+        break;
-+
-+    case EXYNOS4210_RNG_STATUS:
-+        /* For clearing status fields */
-+        s->reg_status &= ~EXYNOS4210_RNG_STATUS_WRITE_MASK;
-+        s->reg_status |= val & EXYNOS4210_RNG_STATUS_WRITE_MASK;
-+        break;
-+
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(0):
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(1):
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(2):
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(3):
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(4):
-+        exynos4210_rng_set_seed(s,
-+                                (offset - EXYNOS4210_RNG_SEED_IN_OFFSET(0)) / 4,
-+                                val);
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+}
-+
-+static const MemoryRegionOps exynos4210_rng_ops = {
-+    .read = exynos4210_rng_read,
-+    .write = exynos4210_rng_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void exynos4210_rng_reset(DeviceState *dev)
-+{
-+    Exynos4210RngState *s = EXYNOS4210_RNG(dev);
-+
-+    s->reg_control = 0;
-+    s->reg_status = EXYNOS4210_RNG_STATUS_BUFFER_READY;
-+    memset(s->randr_value, 0, sizeof(s->randr_value));
-+    s->seed_set = 0;
-+}
-+
-+static void exynos4210_rng_init(Object *obj)
-+{
-+    Exynos4210RngState *s = EXYNOS4210_RNG(obj);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &exynos4210_rng_ops, s,
-+                          TYPE_EXYNOS4210_RNG, EXYNOS4210_RNG_REGS_MEM_SIZE);
-+    sysbus_init_mmio(dev, &s->iomem);
-+}
-+
-+static const VMStateDescription exynos4210_rng_vmstate = {
-+    .name = TYPE_EXYNOS4210_RNG,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_INT32_ARRAY(randr_value, Exynos4210RngState,
-+                            EXYNOS4210_RNG_PRNG_NUM),
-+        VMSTATE_UINT32(seed_set, Exynos4210RngState),
-+        VMSTATE_UINT32(reg_status, Exynos4210RngState),
-+        VMSTATE_UINT32(reg_control, Exynos4210RngState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void exynos4210_rng_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = exynos4210_rng_reset;
-+    dc->vmsd = &exynos4210_rng_vmstate;
-+}
-+
-+static const TypeInfo exynos4210_rng_info = {
-+    .name          = TYPE_EXYNOS4210_RNG,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(Exynos4210RngState),
-+    .instance_init = exynos4210_rng_init,
-+    .class_init    = exynos4210_rng_class_init,
-+};
-+
-+static void exynos4210_rng_register(void)
-+{
-+    type_register_static(&exynos4210_rng_info);
-+}
-+
-+type_init(exynos4210_rng_register)
--- 
-2.9.3
+> ---
+>  hw/s390x/ipl.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 7978c7d..f674d50 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -248,7 +248,13 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>              SCSIBus *bus = scsi_bus_from_device(sd);
+>              VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
+>              VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw, vdev);
+> -            CcwDevice *ccw_dev = CCW_DEVICE(scsi_ccw);
+> +            CcwDevice *ccw_dev;
+> +
+> +            ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
+> +                                                       TYPE_CCW_DEVICE);
+> +            if (!ccw_dev) {       /* It might be a PCI device instead */
+> +                return false;
+> +            }
+> 
+>              ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
+>              ipl->iplb.blk0_len =
+> 
