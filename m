@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d336Z-0006f6-Ob
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:14:21 -0400
+	(envelope-from <codyprime@gmail.com>) id 1d33C4-0008P6-Vm
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d336U-0007Ty-Qc
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:14:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44551)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d336U-0007Tf-Ka
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:14:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d336S-0000fo-Rc
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 16:14:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C5AFA2E8067
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 16:14:12 +0000 (UTC)
+	(envelope-from <codyprime@gmail.com>) id 1d33C3-0004qa-Mj
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:20:00 -0400
+Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:36450)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <codyprime@gmail.com>) id 1d33C3-0004qQ-Fb
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 12:19:59 -0400
+Received: by mail-it0-x230.google.com with SMTP id g66so22153191ite.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 09:19:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <878tmobhyy.fsf@linaro.org>
+References: <CAFEAcA8xJ11azOh-sQhzpsb0b++EGT+hML-fvvKRSkyOirB1PQ@mail.gmail.com>
+	<20170425145823.GL21129@redhat.com> <87bmrkbjdp.fsf@linaro.org>
+	<20170425153206.GM21129@redhat.com> <878tmobhyy.fsf@linaro.org>
+From: Jeff Cody <codyprime@gmail.com>
+Date: Tue, 25 Apr 2017 12:19:57 -0400
+Message-ID: <CAJ8Q05n+pq0E0vvJLt+gnLQik0SjQefXjLnu-0Xr1BO=awS0cA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 25 Apr 2017 12:58:25 -0000
-From: Thomas Huth <1289898@bugs.launchpad.net>
-Reply-To: Bug 1289898 <1289898@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140308232431.4881.19998.malonedeb@soybean.canonical.com>
-Message-Id: <20170425125826.6243.40291.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1289898] Re: qemu-system-ppc64 easily cause file
- corruption
+Subject: Re: [Qemu-devel] QEMU travis builds: can we move the preseed
+ tarball to qemu.org ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: jcody@redhat.com, qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-*** This bug is a duplicate of bug 1463812 ***
-    https://bugs.launchpad.net/bugs/1463812
+On Apr 25, 2017 11:55 AM, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> wrote=
+:
 
-** This bug has been marked a duplicate of bug 1463812
-   qemu-system-ppc64 V2.30 cause RHEL5.9 disk corruption
 
--- =
+Daniel P. Berrange <berrange@redhat.com> writes:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1289898
+> On Tue, Apr 25, 2017 at 04:24:18PM +0100, Alex Benn=C3=A9e wrote:
+>>
+>> Daniel P. Berrange <berrange@redhat.com> writes:
+>>
+>> > On Tue, Apr 25, 2017 at 03:51:17PM +0100, Peter Maydell wrote:
+>> >> Hi; a recent travis build failure made me notice that our .travis.yml
+>> >> config references a preseed tarball from here:
+>> >> http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz
+>> >>
+>> >> I think this is a bit less than ideal -- we should really be hosting
+>> >> this on qemu.org. Can we arrange to move it?
+>> >
+>> > I'm curious how much speed difference there is in seeding the git
+submodules
+>> > in this way vs letting git pull down from git.qemu.org directly ?
+>>
+>> It was quite high from what I recall, exacerbated by the fact we have
+>> quite so many submodules. Unfortunately it doesn't seem that easy to go
+>> back in the history of the tests to find out so I'll have to re-run the
+>> test:
+>>
+>>   https://travis-ci.org/stsquad/qemu/builds/225648653
+>>
+>> So roughly 62s without a seed vs 15s with. I presume the seed is also
+>> cached by Travis's web-caching.
+>
+> Wow, yes, that is quite a difference !
+>
+> I wonder if Travis' arbitrary sub-dir caching feature would help us to
+> the same extent, while avoiding need to manually maintain the preseed.
+>
+>   https://docs.travis-ci.com/user/caching/
+>
+> It just caches entire content of a given subdir between runs. First time
+> it would be slow, but presumably fast thereafter, and any time the
+submodule
+> gets new updates, those would get cached too
 
-Title:
-  qemu-system-ppc64 easily cause file corruption
+Maybe but I think the cwd of the build (and therefor the git tree) is
+user and project name dependent, e.g.:
 
-Status in QEMU:
-  Incomplete
+  PWD=3D/home/travis/build/stsquad/testcases
 
-Bug description:
-  the qemu-system-ppc64 is used to run RHEL5.9 for IBM Power on RHEL 5.3.
-  Previously I was using QEMU 1.5.x for several months with no problem. But=
- after the RHEL 5.3 host damaged, and rebuilt, now I tried both QEMU 1.6.2 =
-and QEMU 1.7.0, found both can easily cause file corruptions. Symptoms:
+But we could certainly try.
 
-  * using scp to transfer a tar.bz file from the RHEL 5.3 host to the RHEL =
-5.9 PPC VM, found the size is correct, but the content is corrupted from th=
-e middle of the 90+ MB file.  re-transfer again, got a correct file. But af=
-ter untar, found some extracted files corrupted.
-  The extracted file corruption happened several times, and also the filesy=
-stem in the VM had corrupted several times, had to restore the boot image t=
-o recover.
+>
+> Regards,
+> Daniel
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1289898/+subscriptions
+
+--
+Alex Benn=C3=A9e
+
+
+I do currently have an async script that runs for qemu.git, that is
+triggered by a post-receive hook.   Currently, it just does a push to
+GitHub, so that the mirror is updated in real-time.  It would be pretty
+trivial to have it also compose a tarball as well.
+
+Jeff
