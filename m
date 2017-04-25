@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hossein.ajallooiean@epfl.ch>) id 1d34Gd-00063y-Bs
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 13:28:49 -0400
+	(envelope-from <gm.ijewski@web.de>) id 1d34H4-0006Mp-Lu
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 13:29:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hossein.ajallooiean@epfl.ch>) id 1d34GY-00006a-Mr
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 13:28:47 -0400
-Received: from smtp4.epfl.ch ([2001:620:618:1e0:1:80b2:e059:1]:59232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hossein.ajallooiean@epfl.ch>)
-	id 1d34GY-00005Z-Ca
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 13:28:42 -0400
-From: Ajallooiean Hossein <hossein.ajallooiean@epfl.ch>
-Date: Tue, 25 Apr 2017 17:28:31 +0000
-Message-ID: <1493141311023.87468@epfl.ch>
-References: <5a275226-bce0-4c8f-a708-063245cfe8f2@Spark>
-	<583d86e4-dc32-ca67-6157-2b4c1654a758@ilande.co.uk>
-	<1492680594151.52017@epfl.ch>
-	<9d55b0bb-3d76-4b63-52d3-9f7df1003806@ilande.co.uk>
-	<1492787538720.44490@epfl.ch>,
-	<c8006ea5-9a10-9edd-7bfd-04359bfbd235@ilande.co.uk>,
-	<1492904528362.73566@epfl.ch>
-In-Reply-To: <1492904528362.73566@epfl.ch>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <gm.ijewski@web.de>) id 1d34Gz-0000Kn-O7
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 13:29:14 -0400
+Received: from mout.web.de ([217.72.192.78]:52588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gm.ijewski@web.de>) id 1d34Gz-0000K2-CL
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 13:29:09 -0400
+From: Geert Martin Ijewski <gm.ijewski@web.de>
+Message-ID: <e3fd9c8b-8976-eb31-4092-887e94f4a5ae@web.de>
+Date: Tue, 25 Apr 2017 19:28:07 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Help needed: Sparc 64, kernel panic
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v3] crypto: qcrypto_random_bytes() now works on
+ windows w/o any other crypto lib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,134 +25,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com
 
-Hi Mark
+If no crypto library is included in the build, QEMU uses
+qcrypto_random_bytes() to generate random data. That function tried to 
+open /dev/urandom or /dev/random and if openeing neither file worked it 
+errored out.
 
-Sorry for pinging so early.
+Those files obviously do not exist on windows, so there the code uses
+CryptGenRandom().
 
-Im just wondering if youve had time to go over my email below.
+Furthermore there was some refactoring and a new function
+qcrypto_random_init() was introduced. If a proper crypto library (gnutls 
+or libgcrypt) is included in the build, this function does nothing. If 
+neither is included it initalizes the (platform specific) handles that 
+are used by qcrypto_random_bytes().
+Either:
+* a handle to /dev/urandom | /dev/random on unix like systems
+* a handle to a cryptographic service provider on windows
 
-Any help would be greatly appreciated.
+Signed-off-by: Geert Martin Ijewski <gm.ijewski@web.de>
+---
+  crypto/init.c            |  6 ++++++
+  crypto/random-gcrypt.c   |  2 ++
+  crypto/random-gnutls.c   |  3 +++
+  crypto/random-platform.c | 45 
++++++++++++++++++++++++++++++++++++++--------
+  include/crypto/random.h  |  9 +++++++++
+  5 files changed, 57 insertions(+), 8 deletions(-)
 
-Thanks
-Hoss
-________________________________________
-From: Qemu-devel <qemu-devel-bounces+hossein.ajallooiean=3Depfl.ch@nongnu.o=
-rg> on behalf of Ajallooiean Hossein <hossein.ajallooiean@epfl.ch>
-Sent: Sunday, April 23, 2017 1:42:08 AM
-To: qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland
-Subject: Re: [Qemu-devel] Help needed: Sparc 64, kernel panic
+diff --git a/crypto/init.c b/crypto/init.c
+index f65207e..f131c42 100644
+--- a/crypto/init.c
++++ b/crypto/init.c
+@@ -32,6 +32,8 @@
+  #include <gcrypt.h>
+  #endif
 
-Hi Mark,
++#include "crypto/random.h"
++
+  /* #define DEBUG_GNUTLS */
 
-Thanks a lot for this. - it did work!
+  /*
+@@ -146,5 +148,9 @@ int qcrypto_init(Error **errp)
+      gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
+  #endif
 
-So, now im wondering how did you install the iso on disk?
++    if (qcrypto_random_init(errp) < 0) {
++        return -1;
++    }
++
+      return 0;
+  }
+diff --git a/crypto/random-gcrypt.c b/crypto/random-gcrypt.c
+index 0de9a09..2446142 100644
+--- a/crypto/random-gcrypt.c
++++ b/crypto/random-gcrypt.c
+@@ -31,3 +31,5 @@ int qcrypto_random_bytes(uint8_t *buf,
+      gcry_randomize(buf, buflen, GCRY_STRONG_RANDOM);
+      return 0;
+  }
++
++int qcrpto_random_init(Error **errp G_GNUC_UNUSED) { return 0; }
+diff --git a/crypto/random-gnutls.c b/crypto/random-gnutls.c
+index 04b45a8..d80c786 100644
+--- a/crypto/random-gnutls.c
++++ b/crypto/random-gnutls.c
+@@ -41,3 +41,6 @@ int qcrypto_random_bytes(uint8_t *buf,
 
-would you mind sharing your command line for the install please? and hacks =
-if any
+      return 0;
+  }
++
++
++int qcrpto_random_init(Error **errp G_GNUC_UNUSED) { return 0; }
+diff --git a/crypto/random-platform.c b/crypto/random-platform.c
+index 82b755a..c613b23 100644
+--- a/crypto/random-platform.c
++++ b/crypto/random-platform.c
+@@ -22,14 +22,23 @@
 
-i am now able to install and boot, but my boot hang after this line "[   22=
-.559491] [TTM] Initializing pool allocator" - inside user space. - I did bl=
-acklist bochs_drm for installing as such "-append 'modprobe.blacklist=3Dboc=
-hs_drm'".
+  #include "crypto/random.h"
 
-also, i have a couple of questions if you dont mind responding to them. - i=
-ll appreciate this a lot:
-1- did you use virtio for your install? i.e. not using the "-cdrom" command=
- and blacklisting the pata_cmd64x and also providing your own virtio device=
- (/dev/vdb)?
-    - i used this link for hints on how to install with virtio http://tyom.=
-blogspot.ch/2013/03/debiansparc64-wheezy-under-qemu-how-to.html
+-int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+-                         size_t buflen G_GNUC_UNUSED,
+-                         Error **errp)
+-{
+-    int fd;
+-    int ret = -1;
+-    int got;
++#ifdef _WIN32
++#include <Wincrypt.h>
++static HCRYPTPROV hCryptProv;
++#else
++static int fd; /* a file handle to either /dev/urandom or /dev/random */
++#endif
 
-2- i see that you used ext3 for your OS install, isnt that slower than ext4=
-? -again im referencing this: http://tyom.blogspot.ch/2013/03/virtio-perfor=
-mance-and-filesystems.html
++int qcrypto_random_init(Error **errp)
++{
++#ifdef _WIN32
++    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL,
++                             CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
++        error_setg_win32(errp, GetLastError(),
++                         "Unable to create cryptographic provider");
++        return -1;
++    }
++#else
+      /* TBD perhaps also add support for BSD getentropy / Linux
+       * getrandom syscalls directly */
+      fd = open("/dev/urandom", O_RDONLY);
+@@ -41,6 +50,18 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+          error_setg(errp, "No /dev/urandom or /dev/random found");
+          return -1;
+      }
++#endif
++
++    return 0;
++}
++
++int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
++                         size_t buflen G_GNUC_UNUSED,
++                         Error **errp)
++{
++#ifndef _WIN32
++    int ret = -1;
++    int got;
 
-3- also, im noticing that you didnt define root=3D/dev/sda or root=3D/dev/v=
-da1 for when your running qemu. and when im running your image i have to do=
- that, otherwise ill get to the initramfs only. is there a trick behind thi=
-s?
+      while (buflen > 0) {
+          got = read(fd, buf, buflen);
+@@ -59,6 +80,14 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
 
-4- i dont see you defining a kernel and initrd? is there a reason for this?=
- if i just use your cmd line, ill get this: also, are you extracting the ke=
-rnel and initrd from the image or the iso?
+      ret = 0;
+   cleanup:
+-    close(fd);
+      return ret;
++#else
++    if (!CryptGenRandom(hCryptProv, buflen, buf)) {
++        error_setg_win32(errp, GetLastError(),
++                         "Unable to read random bytes");
++        return -1;
++    }
++
++    return 0;
++#endif
+  }
+diff --git a/include/crypto/random.h b/include/crypto/random.h
+index a101353..82a3209 100644
+--- a/include/crypto/random.h
++++ b/include/crypto/random.h
+@@ -40,5 +40,14 @@ int qcrypto_random_bytes(uint8_t *buf,
+                           size_t buflen,
+                           Error **errp);
 
-OpenBIOS for Sparc64
-Configuration device id QEMU version 1 machine id 0
-kernel cmdline
-CPUs: 1 x SUNW,UltraSPARC-IIi
-UUID: 00000000-0000-0000-0000-000000000000
-Welcome to OpenBIOS v1.1 built on Mar 15 2017 19:37
-  Type 'help' for detailed information
-Trying disk:a...
-Not a bootable ELF image
-Loading a.out image...
-Loaded 7680 bytes
-entry point is 0x4000
-SILO Version 1.4.14
-boot:
++/**
++ * qcrypto_random_init:
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Initalizes the handles used by qcrypto_random_bytes
++ *
++ * Returns 0 on success, -1 on error
++ */
++int qcrypto_random_init(Error **errp);
 
-Thanks a lot in advance for your help.
-
-Cheers
-Hoss
-________________________________________
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Sent: Saturday, April 22, 2017 11:12 AM
-To: Ajallooiean Hossein; qemu-devel@nongnu.org
-Subject: Re: [Qemu-devel] Help needed: Sparc 64, kernel panic
-
-On 21/04/17 16:12, Ajallooiean Hossein wrote:
-
-> Thanks for the files and the notes.
->
-> I am attaching my config-host file for you. I'm on x86_64, running Linux =
-64, Ubuntu 16.04.2 LTS
->
-> so, i can also boot like you do - this worked before as well. btw, if you=
- try to install that to a disk, itll not be able to as youll need to define=
- memory for it.
->
-> The problem is after i install the iso on the qcow2 disk and then try to =
-boot qemu-system-sparc64.
->
-> so here is the steps to reproduce the issue:
-> 1- create a qcow2 image : debian-9.0-sparc64-NETINST-1.qcow2
-> 2- download debian image: debian-9.0-sparc64-NETINST-1.iso
-> 3- install the OS on dIsk
-> i use the below command line to do it:
->
-> ./qemu-system-sparc64 -cdrom /home/nihosa/Downloads/debian-9.0-sparc64-NE=
-TINST-1.iso -hda /home/nihosa/Downloads/debian-sparc.qcow2 -nographic -boot=
- d -L pc-bios -m 200
->
-> i guess i dont have to define a kernel in the above code???
->
-> 4- installation goes all well.
-> 5- i try to run the new disk image: - here i add kernel as if i dont add =
-it ill get the below:
->
-> https://pastebin.com/cFwrX9E9
-
-I've just done a test install with
-https://people.debian.org/~glaubitz/debian-cd/2017-03-24/debian-9.0-sparc64=
--NETINST-1.iso
-and I didn't see any errors similar to the ones you mention (although I
-did have to blacklist the bochs_drm module upon boot).
-
-The resulting qcow2 image can be found temporarily at
-https://www.ilande.co.uk/tmp/qemu/sparc64-kernel/deb90.qcow2.xz and you
-can launch it with:
-
-./qemu-system-sparc64 -hda deb90.qcow2 -m 256 -nographic
-
-Username and password are both root.
-
-
-ATB,
-
-Mark.
+  #endif /* QCRYPTO_RANDOM_H */
+-- 
+2.10.1.windows.1
