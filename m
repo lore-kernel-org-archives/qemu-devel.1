@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45151)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1d30fE-0005Fr-7o
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:37:57 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45662)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1d30h2-0005qX-NP
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1d30fA-0008UT-8x
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:37:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57116)
+	(envelope-from <pl@kamp.de>) id 1d30gy-0000Si-3v
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:39:48 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:50420 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1d30f9-0008Tt-Vg
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:37:52 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D1DD4C049D5B
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 13:37:50 +0000 (UTC)
-References: <20170425102446.4008-1-quintela@redhat.com>
-	<20170425102446.4008-3-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <542eb223-986c-6727-d4fc-c0a15b001bd1@redhat.com>
-Date: Tue, 25 Apr 2017 15:37:46 +0200
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1d30gx-0000Rw-QI
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 09:39:44 -0400
+References: <1492769076-64466-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<98514b87-d2a3-254d-f03e-0c6d3cd73ff6@kamp.de>
+	<88259101-7040-f057-5ed4-76bd36f2b1a0@virtuozzo.com>
+	<c9b0f997-efbd-92f2-2fba-57d6daad2ee7@kamp.de>
+	<15b32f67-fbce-fe9e-5a5f-ed25eae49941@virtuozzo.com>
+	<F7BA9764-937B-438A-B606-677DBF7379A6@kamp.de>
+	<59ebc5d3-5921-9d3c-1436-caecd1e23a60@virtuozzo.com>
+	<b5c4060a-45cc-d83a-d552-89db3283d394@kamp.de>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <6cfa6dc2-5fa8-b797-9532-924ae19dab0d@kamp.de>
+Date: Tue, 25 Apr 2017 15:39:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170425102446.4008-3-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <b5c4060a-45cc-d83a-d552-89db3283d394@kamp.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] monitor: Move hmp_loadvm from
- monitor.c to hmp.c
+Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH v2 1/1] qemu-img: wait for
+ convert coroutines to complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +34,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, qemu-stable@nongnu.org
 
-On 25/04/2017 12:24, Juan Quintela wrote:
-> We are going to move the rest of hmp snapshots functions there instead
-> of monitor.c.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+Am 25.04.2017 um 11:55 schrieb Peter Lieven:
+> Am 24.04.2017 um 22:13 schrieb Anton Nefedov:
+>>
+>> On 24/04/2017 21:16, Peter Lieven wrote:
+>>>
+>>>
+>>>> Am 24.04.2017 um 18:27 schrieb Anton Nefedov <anton.nefedov@virtuozzo.com>:
+>>>>
+>>>>> On 04/21/2017 03:37 PM, Peter Lieven wrote:
+>>>>>> Am 21.04.2017 um 14:19 schrieb Anton Nefedov:
+>>>>>>> On 04/21/2017 01:44 PM, Peter Lieven wrote:
+>>>>>>>> Am 21.04.2017 um 12:04 schrieb Anton Nefedov:
+>>>>>>>> On error path (like i/o error in one of the coroutines), it's required to
+>>>>>>>>  - wait for coroutines completion before cleaning the common structures
+>>>>>>>>  - reenter dependent coroutines so they ever finish
+>>>>>>>>
+>>>>>>>> Introduced in 2d9187bc65.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>>>>>>> ---
+>>>>>>>> [..]
+>>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>>> And what if we error out in the read path? Wouldn't be something like this easier?
+>>>>>>>
+>>>>>>>
+>>>>>>> diff --git a/qemu-img.c b/qemu-img.c
+>>>>>>> index 22f559a..4ff1085 100644
+>>>>>>> --- a/qemu-img.c
+>>>>>>> +++ b/qemu-img.c
+>>>>>>> @@ -1903,6 +1903,16 @@ static int convert_do_copy(ImgConvertState *s)
+>>>>>>>         main_loop_wait(false);
+>>>>>>>     }
+>>>>>>>
+>>>>>>> +    /* on error path we need to enter all coroutines that are still
+>>>>>>> +     * running before cleaning up common structures */
+>>>>>>> +    if (s->ret) {
+>>>>>>> +        for (i = 0; i < s->num_coroutines; i++) {
+>>>>>>> +             if (s->co[i]) {
+>>>>>>> +                 qemu_coroutine_enter(s->co[i]);
+>>>>>>> +             }
+>>>>>>> +        }
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>>     if (s->compressed && !s->ret) {
+>>>>>>>         /* signal EOF to align */
+>>>>>>>         ret = blk_pwrite_compressed(s->target, 0, NULL, 0);
+>>>>>>>
+>>>>>>>
+>>>>>>> Peter
+>>>>>>>
+>>>>>>
+>>>>>> seemed a bit too daring to me to re-enter every coroutine potentially including the ones that yielded waiting for I/O completion.
+>>>>>> If that's ok - that is for sure easier :)
+>>>>>
+>>>>> I think we should enter every coroutine that is still running and have it terminate correctly. It was my mistake that I have not
+>>>>> done this in the original patch. Can you check if the above fixes your test cases that triggered the bug?
+>>>>>
+>>>>
+>>>> hi, sorry I'm late with the answer
+>>>>
+>>>> this segfaults in bdrv_close(). Looks like it tries to finish some i/o which coroutine we have already entered and terminated?
+>>>>
+>>>> (gdb) run
+>>>> Starting program: /vz/anefedov/qemu-build/us/./qemu-img convert -O qcow2 ./harddisk.hdd.c ./harddisk.hdd
+>>>> [Thread debugging using libthread_db enabled]
+>>>> Using host libthread_db library "/lib64/libthread_db.so.1".
+>>>> [New Thread 0x7fffeac2d700 (LWP 436020)]
+>>>> [New Thread 0x7fffe4ed6700 (LWP 436021)]
+>>>> qemu-img: error while reading sector 20480: Input/output error
+>>>> qemu-img: error while writing sector 19712: Operation now in progress
+>>>>
+>>>> Program received signal SIGSEGV, Segmentation fault.
+>>>> aio_co_wake (co=0x0) at /mnt/code/us-qemu/util/async.c:454
+>>>> 454         ctx = atomic_read(&co->ctx);
+>>>> (gdb) bt
+>>>> #0  aio_co_wake (co=0x0) at /mnt/code/us-qemu/util/async.c:454
+>>>> /* [Anton]: thread_pool_co_cb () here */
+>>>> #1  0x0000555555634629 in thread_pool_completion_bh (opaque=0x555555cfe020) at /mnt/code/us-qemu/util/thread-pool.c:189
+>>>> #2  0x0000555555633b31 in aio_bh_call (bh=0x555555cfe0f0) at /mnt/code/us-qemu/util/async.c:90
+>>>> #3  aio_bh_poll (ctx=ctx@entry=0x555555cee6d0) at /mnt/code/us-qemu/util/async.c:118
+>>>> #4  0x0000555555636f14 in aio_poll (ctx=ctx@entry=0x555555cee6d0, blocking=<optimized out>) at /mnt/code/us-qemu/util/aio-posix.c:682
+>>>> #5  0x00005555555c52d4 in bdrv_drain_recurse (bs=bs@entry=0x555555d22560) at /mnt/code/us-qemu/block/io.c:164
+>>>> #6  0x00005555555c5aed in bdrv_drained_begin (bs=bs@entry=0x555555d22560) at /mnt/code/us-qemu/block/io.c:248
+>>>> #7  0x0000555555581443 in bdrv_close (bs=0x555555d22560) at /mnt/code/us-qemu/block.c:2909
+>>>> #8  bdrv_delete (bs=0x555555d22560) at /mnt/code/us-qemu/block.c:3100
+>>>> #9  bdrv_unref (bs=0x555555d22560) at /mnt/code/us-qemu/block.c:4087
+>>>> #10 0x00005555555baf44 in blk_remove_bs (blk=blk@entry=0x555555d22380) at /mnt/code/us-qemu/block/block-backend.c:552
+>>>> #11 0x00005555555bb173 in blk_delete (blk=0x555555d22380) at /mnt/code/us-qemu/block/block-backend.c:238
+>>>> #12 blk_unref (blk=blk@entry=0x555555d22380) at /mnt/code/us-qemu/block/block-backend.c:282
+>>>> #13 0x000055555557a22c in img_convert (argc=<optimized out>, argv=<optimized out>) at /mnt/code/us-qemu/qemu-img.c:2359
+>>>> #14 0x0000555555574189 in main (argc=5, argv=0x7fffffffe4a0) at /mnt/code/us-qemu/qemu-img.c:4464
+>>>>
+>>>>
+>>>>> Peter
+>>>>>
+>>>>
+>>>> /Anton
+>>>>
+>>>
+>>> it seems that this is a bit tricky, can you share how your test case works?
+>>>
+>>> thanks,
+>>> peter
+>>>
+>>
+>> how I tested today was basically
+>>
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index 4425aaa..3d2d506 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -1788,6 +1788,10 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+>>
+>>          if (status == BLK_DATA) {
+>>              ret = convert_co_read(s, sector_num, n, buf);
+>> +            const uint64_t fsector = 10*1024*1024/512;
+>> +            if (sector_num <= fsector && fsector < sector_num+n) {
+>> +                ret = -EIO;
+>> +            }
+>>              if (ret < 0) {
+>>                  error_report("error while reading sector %" PRId64
+>>                               ": %s", sector_num, strerror(-ret));
+>>
+>
+> I ended up with sth similar to your approach. Can you check this?
+>
+>
+> Thanks,
+>
+> Peter
+>
+>
+> diff --git a/qemu-img.c b/qemu-img.c
+> index b94fc11..ed9ce9e 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1761,13 +1761,13 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+>          qemu_co_mutex_lock(&s->lock);
+>          if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
+>              qemu_co_mutex_unlock(&s->lock);
+> -            goto out;
+> +            break;
+>          }
+>          n = convert_iteration_sectors(s, s->sector_num);
+>          if (n < 0) {
+>              qemu_co_mutex_unlock(&s->lock);
+>              s->ret = n;
+> -            goto out;
+> +            break;
+>          }
+>          /* save current sector and allocation status to local variables */
+>          sector_num = s->sector_num;
+> @@ -1792,7 +1792,6 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+>                  error_report("error while reading sector %" PRId64
+>                               ": %s", sector_num, strerror(-ret));
+>                  s->ret = ret;
+> -                goto out;
+>              }
+>          } else if (!s->min_sparse && status == BLK_ZERO) {
+>              status = BLK_DATA;
+> @@ -1801,22 +1800,20 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+>
+>          if (s->wr_in_order) {
+>              /* keep writes in order */
+> -            while (s->wr_offs != sector_num) {
+> -                if (s->ret != -EINPROGRESS) {
+> -                    goto out;
+> -                }
+> +            while (s->wr_offs != sector_num && s->ret == -EINPROGRESS) {
+>                  s->wait_sector_num[index] = sector_num;
+>                  qemu_coroutine_yield();
+>              }
+>              s->wait_sector_num[index] = -1;
+>          }
+>
+> -        ret = convert_co_write(s, sector_num, n, buf, status);
+> -        if (ret < 0) {
+> -            error_report("error while writing sector %" PRId64
+> -                         ": %s", sector_num, strerror(-ret));
+> -            s->ret = ret;
+> -            goto out;
+> +        if (s->ret == -EINPROGRESS) {
+> +            ret = convert_co_write(s, sector_num, n, buf, status);
+> +            if (ret < 0) {
+> +                error_report("error while writing sector %" PRId64
+> +                             ": %s", sector_num, strerror(-ret));
+> +                s->ret = ret;
+> +            }
+>          }
+>
+>          if (s->wr_in_order) {
+> @@ -1837,7 +1834,6 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+>          }
+>      }
+>
+> -out:
+>      qemu_vfree(buf);
+>      s->co[index] = NULL;
+>      s->running_coroutines--;
+> @@ -1899,7 +1895,7 @@ static int convert_do_copy(ImgConvertState *s)
+>          qemu_coroutine_enter(s->co[i]);
+>      }
+>
+> -    while (s->ret == -EINPROGRESS) {
+> +    while (s->running_coroutines) {
+>          main_loop_wait(false);
+>      }
+>
+>
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Great. Shall we take this one? I would prefer it because it avoids the separate convert_reenter_waiting function.
+If you want you can take my code and submit a V3.
 
-> ---
->  hmp.c     | 13 +++++++++++++
->  hmp.h     |  1 +
->  monitor.c | 13 -------------
->  3 files changed, 14 insertions(+), 13 deletions(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index ab407d6..f6b8738 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -19,6 +19,7 @@
->  #include "net/eth.h"
->  #include "sysemu/char.h"
->  #include "sysemu/block-backend.h"
-> +#include "sysemu/sysemu.h"
->  #include "qemu/config-file.h"
->  #include "qemu/option.h"
->  #include "qemu/timer.h"
-> @@ -1268,6 +1269,18 @@ void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdict)
->      hmp_handle_error(mon, &err);
->  }
->  
-> +void hmp_loadvm(Monitor *mon, const QDict *qdict)
-> +{
-> +    int saved_vm_running  = runstate_is_running();
-> +    const char *name = qdict_get_str(qdict, "name");
-> +
-> +    vm_stop(RUN_STATE_RESTORE_VM);
-> +
-> +    if (load_vmstate(name) == 0 && saved_vm_running) {
-> +        vm_start();
-> +    }
-> +}
-> +
->  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
->  {
->      qmp_migrate_cancel(NULL);
-> diff --git a/hmp.h b/hmp.h
-> index 799fd37..385332c 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -63,6 +63,7 @@ void hmp_snapshot_blkdev_internal(Monitor *mon, const QDict *qdict);
->  void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdict);
->  void hmp_drive_mirror(Monitor *mon, const QDict *qdict);
->  void hmp_drive_backup(Monitor *mon, const QDict *qdict);
-> +void hmp_loadvm(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
->  void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
-> diff --git a/monitor.c b/monitor.c
-> index be282ec..d02900d 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -37,7 +37,6 @@
->  #include "net/slirp.h"
->  #include "sysemu/char.h"
->  #include "ui/qemu-spice.h"
-> -#include "sysemu/sysemu.h"
->  #include "sysemu/numa.h"
->  #include "monitor/monitor.h"
->  #include "qemu/config-file.h"
-> @@ -1843,18 +1842,6 @@ void qmp_closefd(const char *fdname, Error **errp)
->      error_setg(errp, QERR_FD_NOT_FOUND, fdname);
->  }
->  
-> -static void hmp_loadvm(Monitor *mon, const QDict *qdict)
-> -{
-> -    int saved_vm_running  = runstate_is_running();
-> -    const char *name = qdict_get_str(qdict, "name");
-> -
-> -    vm_stop(RUN_STATE_RESTORE_VM);
-> -
-> -    if (load_vmstate(name) == 0 && saved_vm_running) {
-> -        vm_start();
-> -    }
-> -}
-> -
->  int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
->  {
->      mon_fd_t *monfd;
-> 
+Peter
