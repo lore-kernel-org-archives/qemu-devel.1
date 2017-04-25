@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d2zFc-0002Xu-Cj
+	(envelope-from <pm215@archaic.org.uk>) id 1d2zFc-0002YE-Q0
 	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 08:07:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d2zFb-0004cj-6s
+	(envelope-from <pm215@archaic.org.uk>) id 1d2zFb-0004dW-Nu
 	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 08:07:24 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Apr 2017 13:07:10 +0100
-Message-Id: <1493122030-32191-14-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 25 Apr 2017 13:07:08 +0100
+Message-Id: <1493122030-32191-12-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1493122030-32191-1-git-send-email-peter.maydell@linaro.org>
 References: <1493122030-32191-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 13/13] arm: Implement HFNMIENA support for M
- profile MPU
+Subject: [Qemu-devel] [PATCH 11/13] armv7m: Classify faults as MemManage or
+ BusFault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,139 +23,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Implement HFNMIENA support for the M profile MPU. This bit controls
-whether the MPU is treated as enabled when executing at execution
-priorities of less than zero (in NMI, HardFault or with the FAULTMASK
-bit set).
+From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-Doing this requires us to use a different MMU index for "running
-at execution priority < 0", because we will have different
-access permissions for that case versus the normal case.
+General logic is that operations stopped by the MPU are MemManage,
+and those which go through the MPU and are caught by the unassigned
+handle are BusFault. Distinguish these by looking at the
+exception.fsr values, and set the CFSR bits and (if appropriate)
+fill in the BFAR or MMFAR with the exception address.
 
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+[PMM: i-side faults do not set BFAR/MMFAR, only d-side;
+ added some CPU_LOG_INT logging]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h       | 24 +++++++++++++++++++++++-
- target/arm/helper.c    | 18 +++++++++++++++++-
- target/arm/translate.c |  1 +
- 3 files changed, 41 insertions(+), 2 deletions(-)
+ target/arm/helper.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index bbdd064..2e873e8 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2043,6 +2043,18 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-  * for the accesses done as part of a stage 1 page table walk, rather than
-  * having to walk the stage 2 page table over and over.)
-  *
-+ * R profile CPUs have an MPU, but can use the same set of MMU indexes
-+ * as A profile. They only need to distinguish NS EL0 and NS EL1 (and
-+ * NS EL2 if we ever model a Cortex-R52).
-+ *
-+ * M profile CPUs are rather different as they do not have a true MMU.
-+ * They have the following different MMU indexes:
-+ *  User
-+ *  Privileged
-+ *  Execution priority negative (this is like privileged, but the
-+ *  MPU HFNMIENA bit means that it may have different access permission
-+ *  check results to normal privileged code, so can't share a TLB).
-+ *
-  * The ARMMMUIdx and the mmu index value used by the core QEMU TLB code
-  * are not quite the same -- different CPU types (most notably M profile
-  * vs A/R profile) would like to use MMU indexes with different semantics,
-@@ -2078,6 +2090,7 @@ typedef enum ARMMMUIdx {
-     ARMMMUIdx_S2NS = 6 | ARM_MMU_IDX_A,
-     ARMMMUIdx_MUser = 0 | ARM_MMU_IDX_M,
-     ARMMMUIdx_MPriv = 1 | ARM_MMU_IDX_M,
-+    ARMMMUIdx_MNegPri = 2 | ARM_MMU_IDX_M,
-     /* Indexes below here don't have TLBs and are used only for AT system
-      * instructions or for the first stage of an S12 page table walk.
-      */
-@@ -2098,6 +2111,7 @@ typedef enum ARMMMUIdxBit {
-     ARMMMUIdxBit_S2NS = 1 << 6,
-     ARMMMUIdxBit_MUser = 1 << 0,
-     ARMMMUIdxBit_MPriv = 1 << 1,
-+    ARMMMUIdxBit_MNegPri = 1 << 2,
- } ARMMMUIdxBit;
- 
- #define MMU_USER_IDX 0
-@@ -2123,7 +2137,7 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
-     case ARM_MMU_IDX_A:
-         return mmu_idx & 3;
-     case ARM_MMU_IDX_M:
--        return mmu_idx & 1;
-+        return mmu_idx == ARMMMUIdx_MUser ? 0 : 1;
-     default:
-         g_assert_not_reached();
-     }
-@@ -2137,6 +2151,14 @@ static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
-     if (arm_feature(env, ARM_FEATURE_M)) {
-         ARMMMUIdx mmu_idx = el == 0 ? ARMMMUIdx_MUser : ARMMMUIdx_MPriv;
- 
-+        /* Execution priority is negative if FAULTMASK is set or
-+         * we're in a HardFault or NMI handler.
-+         */
-+        if ((env->v7m.exception > 0 && env->v7m.exception <= 3)
-+            || env->daif & PSTATE_F) {
-+            return arm_to_core_mmu_idx(ARMMMUIdx_MNegPri);
-+        }
-+
-         return arm_to_core_mmu_idx(mmu_idx);
-     }
- 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 5bf706d..3aae52a 100644
+index 51662ad..49b6d01 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7037,6 +7037,7 @@ static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
-     case ARMMMUIdx_S1NSE0:
-     case ARMMMUIdx_S1NSE1:
-     case ARMMMUIdx_MPriv:
-+    case ARMMMUIdx_MNegPri:
-     case ARMMMUIdx_MUser:
-         return 1;
-     default:
-@@ -7055,6 +7056,7 @@ static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
-     case ARMMMUIdx_S1E2:
-     case ARMMMUIdx_S2NS:
-     case ARMMMUIdx_MPriv:
-+    case ARMMMUIdx_MNegPri:
-     case ARMMMUIdx_MUser:
-         return false;
-     case ARMMMUIdx_S1E3:
-@@ -7077,7 +7079,21 @@ static inline bool regime_translation_disabled(CPUARMState *env,
-                                                ARMMMUIdx mmu_idx)
- {
-     if (arm_feature(env, ARM_FEATURE_M)) {
--        return !(env->v7m.mpu_ctrl & R_V7M_MPU_CTRL_ENABLE_MASK);
-+        switch (env->v7m.mpu_ctrl &
-+                (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK)) {
-+        case R_V7M_MPU_CTRL_ENABLE_MASK:
-+            /* Enabled, but not for HardFault and NMI */
-+            return mmu_idx == ARMMMUIdx_MNegPri;
-+        case R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK:
-+            /* Enabled for all cases */
-+            return false;
-+        case 0:
+@@ -6342,10 +6342,49 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+         break;
+     case EXCP_PREFETCH_ABORT:
+     case EXCP_DATA_ABORT:
+-        /* TODO: if we implemented the MPU registers, this is where we
+-         * should set the MMFAR, etc from exception.fsr and exception.vaddress.
++        /* Note that for M profile we don't have a guest facing FSR, but
++         * the env->exception.fsr will be populated by the code that
++         * raises the fault, in the A profile short-descriptor format.
+          */
+-        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM);
++        switch (env->exception.fsr & 0xf) {
++        case 0x8: /* External Abort */
++            switch (cs->exception_index) {
++            case EXCP_PREFETCH_ABORT:
++                env->v7m.cfsr |= R_V7M_CFSR_PRECISERR_MASK;
++                qemu_log_mask(CPU_LOG_INT, "...with CFSR.PRECISERR\n");
++                break;
++            case EXCP_DATA_ABORT:
++                env->v7m.cfsr |=
++                    (R_V7M_CFSR_IBUSERR_MASK | R_V7M_CFSR_BFARVALID_MASK);
++                env->v7m.bfar = env->exception.vaddress;
++                qemu_log_mask(CPU_LOG_INT,
++                              "...with CFSR.IBUSERR and BFAR 0x%x\n",
++                              env->v7m.bfar);
++                break;
++            }
++            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_BUS);
++            break;
 +        default:
-+            /* HFNMIENA set and ENABLE clear is UNPREDICTABLE, but
-+             * we warned about that in armv7m_nvic.c when the guest set it.
++            /* All other FSR values are either MPU faults or "can't happen
++             * for M profile" cases.
 +             */
-+            return true;
++            switch (cs->exception_index) {
++            case EXCP_PREFETCH_ABORT:
++                env->v7m.cfsr |= R_V7M_CFSR_IACCVIOL_MASK;
++                qemu_log_mask(CPU_LOG_INT, "...with CFSR.IACCVIOL\n");
++                break;
++            case EXCP_DATA_ABORT:
++                env->v7m.cfsr |=
++                    (R_V7M_CFSR_DACCVIOL_MASK | R_V7M_CFSR_MMARVALID_MASK);
++                env->v7m.mmfar = env->exception.vaddress;
++                qemu_log_mask(CPU_LOG_INT,
++                              "...with CFSR.DACCVIOL and MMFAR 0x%x\n",
++                              env->v7m.mmfar);
++                break;
++            }
++            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM);
++            break;
 +        }
-     }
- 
-     if (mmu_idx == ARMMMUIdx_S2NS) {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index ac905dd..ae6646c 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -163,6 +163,7 @@ static inline int get_a32_user_mem_index(DisasContext *s)
-         return arm_to_core_mmu_idx(ARMMMUIdx_S1SE0);
-     case ARMMMUIdx_MUser:
-     case ARMMMUIdx_MPriv:
-+    case ARMMMUIdx_MNegPri:
-         return arm_to_core_mmu_idx(ARMMMUIdx_MUser);
-     case ARMMMUIdx_S2NS:
-     default:
+         break;
+     case EXCP_BKPT:
+         if (semihosting_enabled()) {
 -- 
 2.7.4
