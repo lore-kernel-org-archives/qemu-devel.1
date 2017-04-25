@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d32KE-0002Kp-S9
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:24:26 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d32RU-0004df-R5
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:31:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d32KD-0001Sp-Hh
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:24:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37640)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d32KD-0001S8-98
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:24:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 245824E4D1
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 15:24:20 +0000 (UTC)
-Date: Tue, 25 Apr 2017 17:24:10 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170425172410.129fc85f@Igors-MacBook-Pro.local>
-In-Reply-To: <4e55a620-cfe9-9fc0-e55d-327283e26305@redhat.com>
-References: <20170424204500.41811-1-imammedo@redhat.com>
-	<4e55a620-cfe9-9fc0-e55d-327283e26305@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1d32RP-00054Z-UC
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:31:52 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:32834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d32RP-00053j-Nd
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 11:31:47 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id w50so87710402wrc.0
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 08:31:47 -0700 (PDT)
+References: <20170411105031.28904-1-alex.bennee@linaro.org>
+	<20170411105031.28904-3-alex.bennee@linaro.org>
+	<5280a17f-833c-33b8-256f-3083482d58b9@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <5280a17f-833c-33b8-256f-3083482d58b9@redhat.com>
+Date: Tue, 25 Apr 2017 16:32:13 +0100
+Message-ID: <87a874bj0i.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] pc/fwcfg: unbreak migration from
- qemu-2.5 and qemu-2.6 during firmware boot
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/3] cpus: dump TLB flush counts as
+ trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,171 +32,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, ehabkost@redhat.com, dgilbert@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: bobby.prani@gmail.com, rth@twiddle.net, stefanha@redhat.com, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Tue, 25 Apr 2017 17:01:21 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
 
-> On 04/24/17 22:45, Igor Mammedov wrote:
-> > Since 2.7 commit (b2a575a Add optionrom compatible with fw_cfg DMA version)
-> > regressed migration during firmware exection time by
-> > abusing fwcfg.dma_enabled property to decide loading
-> > dma version of option rom AND by mistake disabling DMA
-> > for 2.6 and earlier globally instead of only for option rom.
-> > 
-> > so 2.6 machine type guest is broken when it already runs
-> > firmware in DMA mode but migrated to qemu-2.7(pc-2.6)
-> > at that time;
-> > 
-> > a) qemu-2.6:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=mmio)
-> > b) qemu-2.7:pc2.6 (fwcfg.dma=off,firmware=mmio,oprom=mmio)
-> > 
-> >   to:   a     b
-> > from
-> > a       OK   FAIL
-> > b       OK   OK
-> > 
-> > So we currently have broken forward migration from
-> > qemu-2.6 to qemu-2.[789] that however could be fixed
-> > for 2.10 by re-enabling DMA for 2.[56] machine types
-> > and allowing dma capable option rom only since 2.7.
-> > As result qemu should end up with:
-> > 
-> > c) qemu-2.10:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=mmio)
-> > 
-> >    to:  a     b    c
-> > from
-> > a      OK   FAIL  OK
-> > b      OK   OK    OK
-> > c      OK   FAIL  OK
-> > 
-> > where forward migration from qemu-2.6 to qemu-2.10 should
-> > work again leaving only qemu-2.[789]:pc-2.6 broken.
-> > 
-> > Patch should also help downstream to maintain migration
-> > the way it used to be since dma cable option rom
-> > is managed by new
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > v2:
-> >   (Eduardo Habkost <ehabkost@redhat.com>)
-> >     * s/linuxboot_dma_disabled/linuxboot_dma_enabled/
-> >     * add comment to linuxboot_dma_enabled field
-> > ---
-> >  hw/i386/pc.c         | 9 ++++-----
-> >  hw/i386/pc_piix.c    | 1 +
-> >  hw/i386/pc_q35.c     | 1 +
-> >  include/hw/i386/pc.h | 7 +++----
-> >  4 files changed, 9 insertions(+), 9 deletions(-)
-> 
-> Two suggestions for the commit message:
-> 
-> - The last paragraph contains a typo (s/cable/capable/), plus it
-> generally looks unfinished. Please clean up that paragraph, or drop it.
-I'll drop it
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> 
-> - Since this is PC and on PC we use IO port mapped fw_cfg in the absence
-> of DMA (and not MMIO mapped fw_cfg), I suggest to replace all
-> occurrences of "mmio" with "ioport" in the commit message. Not
-> "critical" of course, just a bit more precise IMO.
-will fix in v3
+> On 11/04/2017 18:50, Alex Bennée wrote:
+>> This can be pre-processed later from the trace file.
+>
+> What about skipping this patch, and instead adding five trace points
+>
+> trace_tlb_flush_self(int vcpu)
+> trace_tlb_flush_async_schedule(int from, int to)
+> trace_tlb_flush_async_work(int vcpu)
+> trace_tlb_flush_synced_schedule(int vcpu)
+> trace_tlb_flush_synced_work(int vcpu)
+>
+> The disadvantage is that the TLB flush counts are not emitted in "info
+> tcg", but the resulting information is finer-grained and the offline
+> accumulation of tracepoints can provide the same information.
 
-> 
-> With those (or without, as you see fit):
-> 
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> 
-> In addition, if you and Eduardo agree, I would like to record that I too
-> worked quite a bit on the original bug analysis, so please consider adding:
-> 
-> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-> Analyzed-by: Laszlo Ersek <lersek@redhat.com>
-sure, I'll add it on repost
+In principle I agree. It depends if people find the console based TCG
+information useful or not.
 
-> 
-> Thank you very much for the patch.
-> Laszlo
-> 
-> > 
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index f3b372a18f..8063241140 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -1047,12 +1047,10 @@ static void load_linux(PCMachineState *pcms,
-> >      fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
-> >      fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
-> >  
-> > -    if (fw_cfg_dma_enabled(fw_cfg)) {
-> > +    option_rom[nb_option_roms].bootindex = 0;
-> > +    option_rom[nb_option_roms].name = "linuxboot.bin";
-> > +    if (pcmc->linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
-> >          option_rom[nb_option_roms].name = "linuxboot_dma.bin";
-> > -        option_rom[nb_option_roms].bootindex = 0;
-> > -    } else {
-> > -        option_rom[nb_option_roms].name = "linuxboot.bin";
-> > -        option_rom[nb_option_roms].bootindex = 0;
-> >      }
-> >      nb_option_roms++;
-> >  }
-> > @@ -2321,6 +2319,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-> >       * to be used at the moment, 32K should be enough for a while.  */
-> >      pcmc->acpi_data_size = 0x20000 + 0x8000;
-> >      pcmc->save_tsc_khz = true;
-> > +    pcmc->linuxboot_dma_enabled = true;
-> >      mc->get_hotplug_handler = pc_get_hotpug_handler;
-> >      mc->cpu_index_to_socket_id = pc_cpu_index_to_socket_id;
-> >      mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
-> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > index 9f102aa388..a11190be46 100644
-> > --- a/hw/i386/pc_piix.c
-> > +++ b/hw/i386/pc_piix.c
-> > @@ -474,6 +474,7 @@ static void pc_i440fx_2_6_machine_options(MachineClass *m)
-> >      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-> >      pc_i440fx_2_7_machine_options(m);
-> >      pcmc->legacy_cpu_hotplug = true;
-> > +    pcmc->linuxboot_dma_enabled = false;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
-> >  }
-> >  
-> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > index dd792a8547..0a61a2070c 100644
-> > --- a/hw/i386/pc_q35.c
-> > +++ b/hw/i386/pc_q35.c
-> > @@ -335,6 +335,7 @@ static void pc_q35_2_6_machine_options(MachineClass *m)
-> >      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-> >      pc_q35_2_7_machine_options(m);
-> >      pcmc->legacy_cpu_hotplug = true;
-> > +    pcmc->linuxboot_dma_enabled = false;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
-> >  }
-> >  
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index f278b3ae89..a57c607a8c 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -151,6 +151,9 @@ struct PCMachineClass {
-> >      bool save_tsc_khz;
-> >      /* generate legacy CPU hotplug AML */
-> >      bool legacy_cpu_hotplug;
-> > +
-> > +    /* use DMA capable linuxboot option rom */
-> > +    bool linuxboot_dma_enabled;
-> >  };
-> >  
-> >  #define TYPE_PC_MACHINE "generic-pc-machine"
-> > @@ -432,10 +435,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> >  #define PC_COMPAT_2_6 \
-> >      HW_COMPAT_2_6 \
-> >      {\
-> > -        .driver   = "fw_cfg_io",\
-> > -        .property = "dma_enabled",\
-> > -        .value    = "off",\
-> > -    },{\
-> >          .driver   = TYPE_X86_CPU,\
-> >          .property = "cpuid-0xb",\
-> >          .value    = "off",\
-> > 
-> 
+I could macro-up something that would use counters when tracing is not
+enabled and prompt users to use the tracing interface in the console
+when it is.
+
+>
+> Paolo
+>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  cpus.c       | 6 ++++++
+>>  trace-events | 3 +++
+>>  2 files changed, 9 insertions(+)
+>>
+>> diff --git a/cpus.c b/cpus.c
+>> index 740b8dc3f8..fae7344df5 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -50,6 +50,8 @@
+>>  #include "qapi-event.h"
+>>  #include "hw/nmi.h"
+>>  #include "sysemu/replay.h"
+>> +#include "exec/cputlb.h"
+>> +#include "trace-root.h"
+>>
+>>  #ifdef CONFIG_LINUX
+>>
+>> @@ -1252,6 +1254,10 @@ static int tcg_cpu_exec(CPUState *cpu)
+>>      int64_t ti;
+>>  #endif
+>>
+>> +    trace_tlb_flush_stats(tlb_self_flush_count,
+>> +                          tlb_async_flush_count,
+>> +                          tlb_synced_flush_count);
+>> +
+>>  #ifdef CONFIG_PROFILER
+>>      ti = profile_getclock();
+>>  #endif
+>> diff --git a/trace-events b/trace-events
+>> index b07a09ba95..fc23e15d25 100644
+>> --- a/trace-events
+>> +++ b/trace-events
+>> @@ -94,6 +94,9 @@ disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
+>>  disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
+>>  disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=%x"
+>>
+>> +# cpus.c
+>> +tlb_flush_stats(int self, int async, int synced) "self:%d async:%d synced:%d"
+>> +
+>>  # translate-all.c
+>>  translate_block(void *tb, uintptr_t pc, uint8_t *tb_code) "tb:%p, pc:0x%"PRIxPTR", tb_code:%p"
+>>
+>>
+
+
+--
+Alex Bennée
