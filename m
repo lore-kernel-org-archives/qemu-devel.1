@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d2r3p-0006RQ-Hv
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:22:42 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1d2r4Z-0006vh-4V
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d2r3o-00068u-Rg
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:22:41 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:36693)
+	(envelope-from <programmingkidx@gmail.com>) id 1d2r4V-0006fU-5Z
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:23:27 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:33018)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1d2r3o-00068Z-M3
-	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:22:40 -0400
-Received: by mail-io0-x244.google.com with SMTP id x86so52322258ioe.3
-	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 20:22:40 -0700 (PDT)
+	id 1d2r4V-0006fI-0L
+	for qemu-devel@nongnu.org; Mon, 24 Apr 2017 23:23:23 -0400
+Received: by mail-it0-x243.google.com with SMTP id z67so20116477itb.0
+	for <qemu-devel@nongnu.org>; Mon, 24 Apr 2017 20:23:22 -0700 (PDT)
 Mime-Version: 1.0 (Apple Message framework v753.1)
 Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <91290AE4-BAAF-44B1-AB1F-D8567D46A0AB@gmail.com>
+Message-Id: <67AB1E7B-31C0-4BB7-BE7A-93932916023E@gmail.com>
 Content-Transfer-Encoding: 7bit
 From: G 3 <programmingkidx@gmail.com>
-Date: Mon, 24 Apr 2017 23:22:37 -0400
-Subject: [Qemu-devel] [PATCH 6/9] Add ppc support to configure
+Date: Mon, 24 Apr 2017 23:23:19 -0400
+Subject: [Qemu-devel] [PATCH 7/9] Add verbose option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +30,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-Add ppc support to the configure script.
+Add an option that prints each instruction that is currently being  
+tested.
+To use this option, just add "--v" to risu's command-line.
 
 Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 ---
-  configure | 4 +++-
-  1 file changed, 3 insertions(+), 1 deletion(-)
+  risu.c | 11 ++++++++++-
+  1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 055e6d6..7881b18 100755
---- a/configure
-+++ b/configure
-@@ -56,6 +56,8 @@ guess_arch() {
-          else
-              ARCH="ppc64le"
-          fi
-+    elif check_define __ppc__ ; then
-+        ARCH="ppc"
-      else
-          echo "This cpu is not supported by risu. Try -h. " >&2
-          exit 1
-@@ -92,7 +94,7 @@ Some influential environment variables:
-                 prefixed with the given string.
+diff --git a/risu.c b/risu.c
+index 7e42160..ed5b605 100644
+--- a/risu.c
++++ b/risu.c
+@@ -37,6 +37,8 @@ sigjmp_buf jmpbuf;
+  /* Should we test for FP exception status bits? */
+  int test_fp_exc = 0;
 
-    ARCH         force target architecture instead of trying to  
-detect it.
--               Valid values=[arm|aarch64|ppc64|ppc64le|m68k]
-+               Valid values=[arm|aarch64|ppc64|ppc64le|m68k|ppc]
-
-    CC           C compiler command
-    CFLAGS       C compiler flags
++int verbose_mode = 0;
++
+  void master_sigill(int sig, siginfo_t *si, void *uc)
+  {
+     switch (recv_and_compare_register_info(master_socket, uc))
+@@ -125,7 +127,8 @@ int master(int sock)
+  {
+     if (sigsetjmp(jmpbuf, 1))
+     {
+-      return report_match_status();
++        int return_status = report_match_status();
++        exit(return_status);
+     }
+     master_socket = sock;
+     set_sigill_handler(&master_sigill);
+@@ -177,6 +180,7 @@ int main(int argc, char **argv)
+              { "host", required_argument, 0, 'h' },
+              { "port", required_argument, 0, 'p' },
+              { "test-fp-exc", no_argument, &test_fp_exc, 1 },
++            { "verbose testing", no_argument, 0, 'v'},
+              { 0,0,0,0 }
+           };
+        int optidx = 0;
+@@ -209,6 +213,11 @@ int main(int argc, char **argv)
+              usage();
+              exit(1);
+           }
++         case 'v':  /* Prints each instruction being tested */
++         {
++            verbose_mode = 1;
++            break;
++         }
+           default:
+              abort();
+        }
 -- 
 2.10.2
