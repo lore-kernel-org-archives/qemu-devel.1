@@ -1,40 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d39FD-0000Bf-1C
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:47:40 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d39L4-0005dh-Nh
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d39F8-000633-UU
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:47:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42015
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d39L0-0008OH-KX
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:53:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38035
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d39F8-00062i-Nu
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:47:34 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3PMhjCw123452
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:47:34 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a2ebvje9p-1
+	id 1d39L0-0008Nc-Dc
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:53:38 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3PMrTHZ056994
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:53:37 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2ebttkbf-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:47:33 -0400
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:53:37 -0400
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 25 Apr 2017 16:47:33 -0600
+	Tue, 25 Apr 2017 16:53:36 -0600
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170424220828.1472-4-danielhb@linux.vnet.ibm.com>
+In-Reply-To: <20170424220828.1472-5-danielhb@linux.vnet.ibm.com>
 References: <20170424220828.1472-1-danielhb@linux.vnet.ibm.com>
-	<20170424220828.1472-4-danielhb@linux.vnet.ibm.com>
-Date: Tue, 25 Apr 2017 17:47:25 -0500
-Message-Id: <149316044542.25359.10425152686852824599@loki>
-Subject: Re: [Qemu-devel] [PATCH 3/4] migration: spapr: migrate ccs_list in
- spapr state
+	<20170424220828.1472-5-danielhb@linux.vnet.ibm.com>
+Date: Tue, 25 Apr 2017 17:53:31 -0500
+Message-Id: <149316081119.25359.16931369246801836794@loki>
+Subject: Re: [Qemu-devel] [PATCH 4/4] migration: spapr: migrate
+ pending_events of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,99 +46,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Quoting Daniel Henrique Barboza (2017-04-24 17:08:27)
+Quoting Daniel Henrique Barboza (2017-04-24 17:08:28)
 > From: Jianjun Duan <duanj@linux.vnet.ibm.com>
 > =
 
-> ccs_list in spapr state maintains the device tree related
-> information on the rtas side for hotplugged devices. In racing
-> situations between hotplug events and migration operation, a rtas
-> hotplug event could be migrated from the source guest to target
-> guest, or the source guest could have not yet finished fetching
-> the device tree when migration is started, the target will try
-> to finish fetching the device tree. By migrating ccs_list, the
-> target can fetch the device tree properly.
+> In racing situations between hotplug events and migration operation,
+> a rtas hotplug event could have not yet be delivered to the source
+> guest when migration is started. In this case the pending_events of
+> spapr state need be transmitted to the target so that the hotplug
+> event can be finished on the target.
 > =
 
-> In theory there would be other alternatives besides migrating the
-> css_list to fix this. For example, we could add a flag that indicates
-> whether a device is in the middle of the configure_connector during the
-> migration process, in the post_load we can detect if this flag
-> is active and then return an error informing the guest to restart the
-> hotplug process. However, the DRC state can still be modified outside of
-> hotplug. Using:
+> All the different fields of the events are encoded as defined by
+> PAPR. We can migrate them as uint8_t binary stream without any
+> concerns about data padding or endianess.
 > =
 
->    drmgr -c pci -s <drc_index> -r
->    drmgr -c pci -s <drc_index> -a
-> =
-
-> it is possible to return a device to firmware and then later take it
-> back and reconfigure it. This is not a common case but it's not prohibite=
-d,
-> and performing a migration between these 2 operations would fail because
-> the default coldplug state on target assumes a configured state in
-> the source*. Migrating ccs_list is one solution that cover this
-> case as well.
-> =
-
-> ccs_list is put in a subsection in the spapr state VMSD to make
+> pending_events is put in a subsection in the spapr state VMSD to make
 > sure migration across different versions is not broken.
-> =
-
-> * see http://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg01763.ht=
-ml
-> for more information on this discussion.
 > =
 
 > Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
 > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 > ---
->  hw/ppc/spapr.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
+>  hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_events.c  | 24 +++++++++++++-----------
+>  include/hw/ppc/spapr.h |  3 ++-
+>  3 files changed, 48 insertions(+), 12 deletions(-)
 > =
 
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 35db949..22f351c 100644
+> index 22f351c..a3e939b 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1388,6 +1388,37 @@ static bool version_before_3(void *opaque, int ver=
-sion_id)
->      return version_id < 3;
->  }
+> @@ -1419,6 +1419,38 @@ static const VMStateDescription vmstate_spapr_ccs_=
+list =3D {
+>      },
+>  };
 > =
 
-> +static bool spapr_ccs_list_needed(void *opaque)
+> +static bool spapr_pending_events_needed(void *opaque)
 > +{
 > +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
-> +    return !QTAILQ_EMPTY(&spapr->ccs_list);
+> +    return !QTAILQ_EMPTY(&spapr->pending_events);
 > +}
 > +
-> +static const VMStateDescription vmstate_spapr_ccs =3D {
-> +    .name =3D "spaprconfigureconnectorstate",
+> +static const VMStateDescription vmstate_spapr_event_entry =3D {
+> +    .name =3D "spapreventlogentry",
 
-some word separators wouldn't hurt, since they might show up in
-migration error messages.
+Similar suggestion on the naming here and elsewhere.
 
 > +    .version_id =3D 1,
 > +    .minimum_version_id =3D 1,
 > +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT32(drc_index, sPAPRConfigureConnectorState),
-> +        VMSTATE_INT32(fdt_offset, sPAPRConfigureConnectorState),
-> +        VMSTATE_INT32(fdt_depth, sPAPRConfigureConnectorState),
+> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
+> +        VMSTATE_BOOL(exception, sPAPREventLogEntry),
+> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
+> +        VMSTATE_VARRAY_UINT32_ALLOC(data, sPAPREventLogEntry, data_size,
+> +                                    0, vmstate_info_uint8, uint8_t),
 > +        VMSTATE_END_OF_LIST()
 > +    },
 > +};
 > +
-> +static const VMStateDescription vmstate_spapr_ccs_list =3D {
-> +    .name =3D "spaprccslist",
+> +static const VMStateDescription vmstate_spapr_pending_events =3D {
+> +    .name =3D "spaprpendingevents",
 > +    .version_id =3D 1,
 > +    .minimum_version_id =3D 1,
-> +    .needed =3D spapr_ccs_list_needed,
+> +    .needed =3D spapr_pending_events_needed,
 > +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_QTAILQ_V(ccs_list, sPAPRMachineState, 1,
-> +                         vmstate_spapr_ccs, sPAPRConfigureConnectorState,
-> +                         next),
+> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
+> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, =
+next),
 > +        VMSTATE_END_OF_LIST()
 > +    },
 > +};
@@ -146,14 +124,169 @@ migration error messages.
 >  static bool spapr_ov5_cas_needed(void *opaque)
 >  {
 >      sPAPRMachineState *spapr =3D opaque;
-> @@ -1486,6 +1517,7 @@ static const VMStateDescription vmstate_spapr =3D {
->      .subsections =3D (const VMStateDescription*[]) {
+> @@ -1518,6 +1550,7 @@ static const VMStateDescription vmstate_spapr =3D {
 >          &vmstate_spapr_ov5_cas,
 >          &vmstate_spapr_patb_entry,
-> +        &vmstate_spapr_ccs_list,
+>          &vmstate_spapr_ccs_list,
+> +        &vmstate_spapr_pending_events,
 >          NULL
 >      }
 >  };
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 24a5758..399dd49 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -342,7 +342,8 @@ static int rtas_event_log_to_irq(sPAPRMachineState *s=
+papr, int log_type)
+>      return source->irq;
+>  }
+> =
+
+> -static void rtas_event_log_queue(int log_type, void *data, bool exceptio=
+n)
+> +static void rtas_event_log_queue(int log_type, void *data, bool exceptio=
+n,
+> +                                 int data_size)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      sPAPREventLogEntry *entry =3D g_new(sPAPREventLogEntry, 1);
+> @@ -351,6 +352,7 @@ static void rtas_event_log_queue(int log_type, void *=
+data, bool exception)
+>      entry->log_type =3D log_type;
+>      entry->exception =3D exception;
+>      entry->data =3D data;
+> +    entry->data_size =3D data_size;
+>      QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+>  }
+> =
+
+> @@ -445,6 +447,7 @@ static void spapr_powerdown_req(Notifier *n, void *op=
+aque)
+>      struct rtas_event_log_v6_mainb *mainb;
+>      struct rtas_event_log_v6_epow *epow;
+>      struct epow_log_full *new_epow;
+> +    uint32_t data_size;
+> =
+
+>      new_epow =3D g_malloc0(sizeof(*new_epow));
+>      hdr =3D &new_epow->hdr;
+> @@ -453,14 +456,13 @@ static void spapr_powerdown_req(Notifier *n, void *=
+opaque)
+>      mainb =3D &new_epow->mainb;
+>      epow =3D &new_epow->epow;
+> =
+
+> +    data_size =3D sizeof(*new_epow);
+>      hdr->summary =3D cpu_to_be32(RTAS_LOG_VERSION_6
+>                                 | RTAS_LOG_SEVERITY_EVENT
+>                                 | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+>                                 | RTAS_LOG_OPTIONAL_PART_PRESENT
+>                                 | RTAS_LOG_TYPE_EPOW);
+> -    hdr->extended_length =3D cpu_to_be32(sizeof(*new_epow)
+> -                                       - sizeof(new_epow->hdr));
+> -
+> +    hdr->extended_length =3D cpu_to_be32(data_size - sizeof(new_epow->hd=
+r));
+>      spapr_init_v6hdr(v6hdr);
+>      spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
+> =
+
+> @@ -479,7 +481,7 @@ static void spapr_powerdown_req(Notifier *n, void *op=
+aque)
+>      epow->event_modifier =3D RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
+>      epow->extended_modifier =3D RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPE=
+CIFIC;
+> =
+
+> -    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true);
+> +    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true, data_size);
+> =
+
+>      qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+>                                   rtas_event_log_to_irq(spapr,
+> @@ -504,6 +506,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
+nt8_t hp_action,
+>      struct rtas_event_log_v6_maina *maina;
+>      struct rtas_event_log_v6_mainb *mainb;
+>      struct rtas_event_log_v6_hp *hp;
+> +    uint32_t data_size;
+> =
+
+>      new_hp =3D g_malloc0(sizeof(struct hp_log_full));
+>      hdr =3D &new_hp->hdr;
+> @@ -512,14 +515,14 @@ static void spapr_hotplug_req_event(uint8_t hp_id, =
+uint8_t hp_action,
+>      mainb =3D &new_hp->mainb;
+>      hp =3D &new_hp->hp;
+> =
+
+> +    data_size =3D sizeof(*new_hp);
+>      hdr->summary =3D cpu_to_be32(RTAS_LOG_VERSION_6
+>                                 | RTAS_LOG_SEVERITY_EVENT
+>                                 | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+>                                 | RTAS_LOG_OPTIONAL_PART_PRESENT
+>                                 | RTAS_LOG_INITIATOR_HOTPLUG
+>                                 | RTAS_LOG_TYPE_HOTPLUG);
+> -    hdr->extended_length =3D cpu_to_be32(sizeof(*new_hp)
+> -                                       - sizeof(new_hp->hdr));
+> +    hdr->extended_length =3D cpu_to_be32(data_size - sizeof(new_hp->hdr)=
+);
+> =
+
+>      spapr_init_v6hdr(v6hdr);
+>      spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
+> @@ -572,7 +575,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
+nt8_t hp_action,
+>              cpu_to_be32(drc_id->count_indexed.index);
+>      }
+> =
+
+> -    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true);
+> +    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true, data_size);
+> =
+
+>      qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+>                                   rtas_event_log_to_irq(spapr,
+> @@ -671,8 +674,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMac=
+hineState *spapr,
+>      if (!event) {
+>          goto out_no_events;
+>      }
+> -
+> -    hdr =3D event->data;
+> +    hdr =3D (struct rtas_error_log *)event->data;
+>      event_len =3D be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+> =
+
+>      if (event_len < len) {
+> @@ -728,7 +730,7 @@ static void event_scan(PowerPCCPU *cpu, sPAPRMachineS=
+tate *spapr,
+>          goto out_no_events;
+>      }
+> =
+
+> -    hdr =3D event->data;
+> +    hdr =3D (struct rtas_error_log *)event->data;
+>      event_len =3D be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+> =
+
+>      if (event_len < len) {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 808aac8..c60dbd2 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -584,7 +584,8 @@ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong l=
+iobn);
+>  struct sPAPREventLogEntry {
+>      int log_type;
+>      bool exception;
+> -    void *data;
+> +    uint8_t *data;
+> +    uint32_t data_size;
+>      QTAILQ_ENTRY(sPAPREventLogEntry) next;
+>  };
+> =
+
 > -- =
 
 > 2.9.3
