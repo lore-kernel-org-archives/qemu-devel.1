@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d2xef-0004Gj-Q4
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:25:13 -0400
+	(envelope-from <peterx@redhat.com>) id 1d2xfI-0004sS-0b
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:25:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d2xeZ-00036X-Id
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:25:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46976)
+	(envelope-from <peterx@redhat.com>) id 1d2xfE-0003T3-Np
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:25:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d2xeZ-00036H-9b
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:25:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51B4D3B71E
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 10:25:02 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 25 Apr 2017 12:24:46 +0200
-Message-Id: <20170425102446.4008-7-quintela@redhat.com>
-In-Reply-To: <20170425102446.4008-1-quintela@redhat.com>
-References: <20170425102446.4008-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/6] migration: Pass Error ** argument to {save,
- load}_vmstate
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d2xfE-0003SR-Eg
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:25:44 -0400
+Date: Tue, 25 Apr 2017 18:25:37 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170425102537.GD31709@pxdev.xzpeter.org>
+References: <1492175840-5021-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170414131740eucas1p27eba648b990a93a627265c740e7ff118@eucas1p2.samsung.com>
+	<1492175840-5021-5-git-send-email-a.perevalov@samsung.com>
+	<20170425082408.GB31709@pxdev.xzpeter.org>
+	<234489b0-d33b-9a49-ec17-b1a6823d4eb3@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <234489b0-d33b-9a49-ec17-b1a6823d4eb3@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH 4/6] migration: calculate downtime on dst
+ side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,263 +31,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, i.maximets@samsung.com
 
-This way we use the "normal" way of printing errors for hmp commands.
+On Tue, Apr 25, 2017 at 01:10:30PM +0300, Alexey Perevalov wrote:
+> On 04/25/2017 11:24 AM, Peter Xu wrote:
+> >On Fri, Apr 14, 2017 at 04:17:18PM +0300, Alexey Perevalov wrote:
+> >
+> >[...]
+> >
+> >>+/*
+> >>+ * This function calculates downtime per cpu and trace it
+> >>+ *
+> >>+ *  Also it calculates total downtime as an interval's overlap,
+> >>+ *  for many vCPU.
+> >>+ *
+> >>+ *  The approach is following:
+> >>+ *  Initially intervals are represented in tree where key is
+> >>+ *  pagefault address, and values:
+> >>+ *   begin - page fault time
+> >>+ *   end   - page load time
+> >>+ *   cpus  - bit mask shows affected cpus
+> >>+ *
+> >>+ *  To calculate overlap on all cpus, intervals converted into
+> >>+ *  array of points in time (downtime_points), the size of
+> >>+ *  array is 2 * number of nodes in tree of intervals (2 array
+> >>+ *  elements per one in element of interval).
+> >>+ *  Each element is marked as end (E) or as start (S) of interval.
+> >>+ *  The overlap downtime will be calculated for SE, only in case
+> >>+ *  there is sequence S(0..N)E(M) for every vCPU.
+> >>+ *
+> >>+ * As example we have 3 CPU
+> >>+ *
+> >>+ *      S1        E1           S1               E1
+> >>+ * -----***********------------xxx***************------------------------> CPU1
+> >>+ *
+> >>+ *             S2                E2
+> >>+ * ------------****************xxx---------------------------------------> CPU2
+> >>+ *
+> >>+ *                         S3            E3
+> >>+ * ------------------------****xxx********-------------------------------> CPU3
+> >>+ *
+> >>+ * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
+> >>+ * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
+> >>+ * S3,S1,E2 - sequenece includes all CPUs, in this case overlap will be S1,E2
+> >>+ * Legend of picture is following: * - means downtime per vCPU
+> >>+ *                                 x - means overlapped downtime
+> >>+ */
+> >Not sure whether I get the point in this patch... iiuc we defined the
+> >downtime here as the period when all vcpus are halted, right?
+> >
+> >If so, I have a few questions:
+> >
+> >- will this algorithm consume lots of memory? since I see we have one
+> >   trace object per fault page address
+> I don't think, it consumes too much, one DowntimeDuration
+> takes (if I'm using bitmap_try_new, in this patch set I used pointer to
+> uint64_t array to keep bitmap array,
+> but I'm going to use include/qemu/bitmap.h, it works with pointers to long)
+> 
+> (2* int64 + (ROUND_UP((smp_cpus + BITS_PER_BYTE * sizeof(long) - 1 /
+> (BITS_PER_BYTE * sizeof(long)))) * siezof(long)
+> so it's about 16 + at least 4 bytes, per page fault,
+> Lets assume we migration 256 vCPU and 256 Gb of ram and that ram is based on
+> 4Kb pages - it's really bad case
+> 16 + ((256 + 8 * 4 - 1) / ( 8 * 4 )) * 4 = 52 bytes
+> (256 * 1024 * 1024 * 1024)/(4 * 1024) = 67108864 page faults, but not all of
+> these pages will be pagefaulted, due to
+> page pre-fetching
+> 67108864 * 52 = 3489660928 bytes (3.5 Gb for that operation),
+> but I have a doubt, who will use 4Kb pages for 256 Gb, probably
+> 2Mb or 1G huge page will be chosen on x86, on ARM or other architecture it
+> could be another values.
 
---
-Paolo suggestion
+Hmm, it looks still big though...
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- hmp.c                    |  9 +++++++--
- include/sysemu/sysemu.h  |  4 ++--
- migration/savevm.c       | 51 ++++++++++++++++++++++++------------------------
- replay/replay-snapshot.c |  6 ++++--
- vl.c                     |  4 +++-
- 5 files changed, 41 insertions(+), 33 deletions(-)
+> 
+> >
+> >- do we need to protect the tree to make sure there's no insertion
+> >   when doing the calculation?
+> I asked the same question when sent RFC patches,
+> the answer here is no, we should not, due to right now,
+> it's only one socket and one listen thread (maybe in future,
+> it will be required, maybe after multi fd patch set),
+> and calculation is doing synchronously right after migration complete.
 
-diff --git a/hmp.c b/hmp.c
-index bd7b1ca..d81f71e 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1273,17 +1273,22 @@ void hmp_loadvm(Monitor *mon, const QDict *qdict)
- {
-     int saved_vm_running  = runstate_is_running();
-     const char *name = qdict_get_str(qdict, "name");
-+    Error *err = NULL;
- 
-     vm_stop(RUN_STATE_RESTORE_VM);
- 
--    if (load_vmstate(name) == 0 && saved_vm_running) {
-+    if (load_vmstate(name, &err) == 0 && saved_vm_running) {
-         vm_start();
-     }
-+    hmp_handle_error(mon, &err);
- }
- 
- void hmp_savevm(Monitor *mon, const QDict *qdict)
- {
--    save_vmstate(qdict_get_try_str(qdict, "name"));
-+    Error *err = NULL;
-+
-+    save_vmstate(qdict_get_try_str(qdict, "name"), &err);
-+    hmp_handle_error(mon, &err);
- }
- 
- void hmp_delvm(Monitor *mon, const QDict *qdict)
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 15656b7..058d5eb 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -75,8 +75,8 @@ void qemu_remove_exit_notifier(Notifier *notify);
- void qemu_add_machine_init_done_notifier(Notifier *notify);
- void qemu_remove_machine_init_done_notifier(Notifier *notify);
- 
--int save_vmstate(const char *name);
--int load_vmstate(const char *name);
-+int save_vmstate(const char *name, Error **errp);
-+int load_vmstate(const char *name, Error **errp);
- 
- void qemu_announce_self(void);
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 8dd4306..0c01988 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2066,7 +2066,7 @@ int qemu_loadvm_state(QEMUFile *f)
-     return ret;
- }
- 
--int save_vmstate(const char *name)
-+int save_vmstate(const char *name, Error **errp)
- {
-     BlockDriverState *bs, *bs1;
-     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
-@@ -2076,29 +2076,27 @@ int save_vmstate(const char *name)
-     uint64_t vm_state_size;
-     qemu_timeval tv;
-     struct tm tm;
--    Error *local_err = NULL;
-     AioContext *aio_context;
- 
-     if (!bdrv_all_can_snapshot(&bs)) {
--        error_report("Device '%s' is writable but does not support snapshots",
--                     bdrv_get_device_name(bs));
-+        error_setg(errp, "Device '%s' is writable but does not support "
-+                   "snapshots", bdrv_get_device_name(bs));
-         return ret;
-     }
- 
-     /* Delete old snapshots of the same name */
-     if (name) {
--        ret = bdrv_all_delete_snapshot(name, &bs1, &local_err);
-+        ret = bdrv_all_delete_snapshot(name, &bs1, errp);
-         if (ret < 0) {
--            error_reportf_err(local_err,
--                              "Error while deleting snapshot on device '%s': ",
--                              bdrv_get_device_name(bs1));
-+            error_prepend(errp, "Error while deleting snapshot on device "
-+                          "'%s': ", bdrv_get_device_name(bs1));
-             return ret;
-         }
-     }
- 
-     bs = bdrv_all_find_vmstate_bs();
-     if (bs == NULL) {
--        error_report("No block device can accept snapshots");
-+        error_setg(errp, "No block device can accept snapshots");
-         return ret;
-     }
-     aio_context = bdrv_get_aio_context(bs);
-@@ -2107,7 +2105,7 @@ int save_vmstate(const char *name)
- 
-     ret = global_state_store();
-     if (ret) {
--        error_report("Error saving global state");
-+        error_setg(errp, "Error saving global state");
-         return ret;
-     }
-     vm_stop(RUN_STATE_SAVE_VM);
-@@ -2139,21 +2137,20 @@ int save_vmstate(const char *name)
-     /* save the VM state */
-     f = qemu_fopen_bdrv(bs, 1);
-     if (!f) {
--        error_report("Could not open VM state file");
-+        error_setg(errp, "Could not open VM state file");
-         goto the_end;
-     }
--    ret = qemu_savevm_state(f, &local_err);
-+    ret = qemu_savevm_state(f, errp);
-     vm_state_size = qemu_ftell(f);
-     qemu_fclose(f);
-     if (ret < 0) {
--        error_report_err(local_err);
-         goto the_end;
-     }
- 
-     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
-     if (ret < 0) {
--        error_report("Error while creating snapshot on '%s'",
--                     bdrv_get_device_name(bs));
-+        error_setg(errp, "Error while creating snapshot on '%s'",
-+                   bdrv_get_device_name(bs));
-         goto the_end;
-     }
- 
-@@ -2226,7 +2223,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
-     migration_incoming_state_destroy();
- }
- 
--int load_vmstate(const char *name)
-+int load_vmstate(const char *name, Error **errp)
- {
-     BlockDriverState *bs, *bs_vm_state;
-     QEMUSnapshotInfo sn;
-@@ -2236,20 +2233,22 @@ int load_vmstate(const char *name)
-     MigrationIncomingState *mis = migration_incoming_get_current();
- 
-     if (!bdrv_all_can_snapshot(&bs)) {
--        error_report("Device '%s' is writable but does not support snapshots",
--                     bdrv_get_device_name(bs));
-+        error_setg(errp,
-+                   "Device '%s' is writable but does not support snapshots",
-+                   bdrv_get_device_name(bs));
-         return -ENOTSUP;
-     }
-     ret = bdrv_all_find_snapshot(name, &bs);
-     if (ret < 0) {
--        error_report("Device '%s' does not have the requested snapshot '%s'",
--                     bdrv_get_device_name(bs), name);
-+        error_setg(errp,
-+                   "Device '%s' does not have the requested snapshot '%s'",
-+                   bdrv_get_device_name(bs), name);
-         return ret;
-     }
- 
-     bs_vm_state = bdrv_all_find_vmstate_bs();
-     if (!bs_vm_state) {
--        error_report("No block device supports snapshots");
-+        error_setg(errp, "No block device supports snapshots");
-         return -ENOTSUP;
-     }
-     aio_context = bdrv_get_aio_context(bs_vm_state);
-@@ -2261,8 +2260,8 @@ int load_vmstate(const char *name)
-     if (ret < 0) {
-         return ret;
-     } else if (sn.vm_state_size == 0) {
--        error_report("This is a disk-only snapshot. Revert to it offline "
--            "using qemu-img.");
-+        error_setg(errp, "This is a disk-only snapshot. Revert to it "
-+                   " offline using qemu-img");
-         return -EINVAL;
-     }
- 
-@@ -2271,7 +2270,7 @@ int load_vmstate(const char *name)
- 
-     ret = bdrv_all_goto_snapshot(name, &bs);
-     if (ret < 0) {
--        error_report("Error %d while activating snapshot '%s' on '%s'",
-+        error_setg(errp, "Error %d while activating snapshot '%s' on '%s'",
-                      ret, name, bdrv_get_device_name(bs));
-         return ret;
-     }
-@@ -2279,7 +2278,7 @@ int load_vmstate(const char *name)
-     /* restore the VM state */
-     f = qemu_fopen_bdrv(bs_vm_state, 0);
-     if (!f) {
--        error_report("Could not open VM state file");
-+        error_setg(errp, "Could not open VM state file");
-         return -EINVAL;
-     }
- 
-@@ -2293,7 +2292,7 @@ int load_vmstate(const char *name)
- 
-     migration_incoming_state_destroy();
-     if (ret < 0) {
--        error_report("Error %d while loading VM state", ret);
-+        error_setg(errp, "Error %d while loading VM state", ret);
-         return ret;
-     }
- 
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index 8cced46..fdc4353 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -62,14 +62,16 @@ void replay_vmstate_register(void)
- 
- void replay_vmstate_init(void)
- {
-+    Error *err = NULL;
-+
-     if (replay_snapshot) {
-         if (replay_mode == REPLAY_MODE_RECORD) {
--            if (save_vmstate(replay_snapshot) != 0) {
-+            if (save_vmstate(replay_snapshot, &err) != 0) {
-                 error_report("Could not create snapshot for icount record");
-                 exit(1);
-             }
-         } else if (replay_mode == REPLAY_MODE_PLAY) {
--            if (load_vmstate(replay_snapshot) != 0) {
-+            if (load_vmstate(replay_snapshot, &err) != 0) {
-                 error_report("Could not load snapshot for icount replay");
-                 exit(1);
-             }
-diff --git a/vl.c b/vl.c
-index 0b4ed52..8b3ec2e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4681,7 +4681,9 @@ int main(int argc, char **argv, char **envp)
-     if (replay_mode != REPLAY_MODE_NONE) {
-         replay_vmstate_init();
-     } else if (loadvm) {
--        if (load_vmstate(loadvm) < 0) {
-+        Error *local_err = NULL;
-+        if (load_vmstate(loadvm, &local_err) < 0) {
-+            error_report_err(local_err);
-             autostart = 0;
-         }
-     }
+Okay.
+
+> 
+> >
+> >- if the only thing we want here is the "total downtime", whether
+> >   below would work? (assuming N is vcpu numbers)
+> >
+> >   a. define array cpu_fault_addr[N], to store current faulted address
+> >      for each vcpu. When vcpu X is running, cpu_fault_addr[X] should
+> >      be 0.
+> >
+> >   b. when page fault happens on vcpu A, setup cpu_fault_addr[A] with
+> >      corresponding fault address.
+> at this time need to is fault happens for all another vCPU,
+> and if it happens mark current time as total vCPU downtime start.
+> 
+> >   c. when page copy finished, loop over cpu_fault_addr[] to see
+> >      whether that matches any, clear corresponding element if matched.
+> so when page copy finished and mark for total vCPU is set,
+> yes that interval is a part of total downtime.
+> >
+> >   Then, we can just measure the period when cpu_fault_addr[] is all
+> >   set (by tracing at both b. and c.). Can this work?
+> Yes, it works, but it's better to keep time - cpu_fault_time,
+> address is not important here, it doesn't matter the reason of pagefault.
+
+We still need the addresses? So that when we do COPY, we can check the
+new page address against these stored ones, to know which vcpus to
+clear the bit.
+
+> 2 vCPU could fault due to access to one page, ok, it's not a problem, just
+> store
+> time when it was faulted.
+> Looks like it's better algorithm, with lesser complexity,
+> thank you a lot.
+
+My pleasure. Thanks,
+
 -- 
-2.9.3
+Peter Xu
