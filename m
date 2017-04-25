@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d2xkK-0000xk-Cg
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:31:02 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1d2xpq-0003y3-In
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d2xkJ-0004y0-0L
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:31:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d2xkI-0004xa-IG
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:30:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 83A4361BAB
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 10:30:57 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 25 Apr 2017 12:30:49 +0200
-Message-Id: <20170425103049.4073-4-quintela@redhat.com>
-In-Reply-To: <20170425103049.4073-1-quintela@redhat.com>
-References: <20170425103049.4073-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] migration: Remove old MigrationParams
+	(envelope-from <sundeep.lkml@gmail.com>) id 1d2xpp-0006K0-1u
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 06:36:42 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
+References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
+	<1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
+	<CAKmqyKMW-aTdzvTH5sir1BPx6U9XtgiZZ7TVigooXLFMY=UEQg@mail.gmail.com>
+	<CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
+	<CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Tue, 25 Apr 2017 16:06:39 +0530
+Message-ID: <CALHRZuqgxQtiGwtPfm3qgm0ywpC4OdBkdSNKLO_Zzxtw2_cmHQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 1/4] msf2: Add Smartfusion2
+ System timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,204 +26,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Not used anymore after moving block migration to use capabilities.
+Hi Alistair,
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- include/migration/migration.h | 10 ++--------
- include/migration/vmstate.h   |  1 -
- include/qemu/typedefs.h       |  1 -
- include/sysemu/sysemu.h       |  3 +--
- migration/colo.c              |  2 +-
- migration/migration.c         |  8 +++-----
- migration/savevm.c            | 16 +++-------------
- 7 files changed, 10 insertions(+), 31 deletions(-)
+On Mon, Apr 24, 2017 at 11:14 PM, Alistair Francis <alistair23@gmail.com> wrote:
+>>>> +
+>>>> +    isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
+>>>> +    ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+>>>> +
+>>>> +    qemu_set_irq(st->irq, (ier && isr));
+>>>> +}
+>>>> +
+>>>> +static uint64_t
+>>>> +timer_read(void *opaque, hwaddr addr, unsigned int size)
+>>>> +{
+>>>> +    struct timerblock *t = opaque;
+>>>> +    struct msf2_timer *st;
+>>>> +    uint32_t r = 0;
+>>>> +    unsigned int timer;
+>>>> +    int isr;
+>>>> +    int ier;
+>>>> +
+>>>> +    addr >>= 2;
+>>>> +    timer = timer_from_addr(addr);
+>>>> +    st = &t->timers[timer];
+>>>> +
+>>>> +    if (timer) {
+>>>> +        addr -= 6;
+>>>> +    }
+>>>
+>>> Isn't this timer logic just checking if (addr >> 2) == R_MAX and if it
+>>> is set (addr >> 2) back to zero? This seems an overly complex way to
+>>> check that.
+>> I did not get you clearly. Do you want me to write like this:
+>> unsigned int timer = 0;
+>>
+>> addr >>= 2;
+>> if (addr >= R_MAX) {
+>>     timer = 1;
+>>     addr =  addr - R_MAX;
+>> }
+>
+> Yeah, I think this is clearer then what you had earlier.
+>
+> Although why do you have to subtract R_MAX, shouldn't it just be an
+> error if accessing values larger then R_MAX?
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 2917baa..3495162 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -41,10 +41,6 @@
- /* for vl.c */
- extern int only_migratable;
- 
--struct MigrationParams {
--    bool unused; /* C don't allow empty structs */
--};
--
- /* Messages sent on the return path from destination to source */
- enum mig_rp_message_type {
-     MIG_RP_MSG_INVALID = 0,  /* Must be 0 */
-@@ -134,12 +130,10 @@ struct MigrationState
-     QEMUBH *cleanup_bh;
-     QEMUFile *to_dst_file;
- 
--    /* New style params from 'migrate-set-parameters' */
-+    /* params from 'migrate-set-parameters' */
-     MigrationParameters parameters;
- 
-     int state;
--    /* Old style params from 'migrate' command */
--    MigrationParams params;
- 
-     /* State related to return path */
-     struct {
-@@ -229,7 +223,7 @@ void migrate_fd_connect(MigrationState *s);
- 
- void add_migration_state_change_notifier(Notifier *notify);
- void remove_migration_state_change_notifier(Notifier *notify);
--MigrationState *migrate_init(const MigrationParams *params);
-+MigrationState *migrate_init(void);
- bool migration_is_blocked(Error **errp);
- bool migration_in_setup(MigrationState *);
- bool migration_is_idle(void);
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 9452dec..4396d7e 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -37,7 +37,6 @@ typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
- 
- typedef struct SaveVMHandlers {
-     /* This runs inside the iothread lock.  */
--    void (*set_params)(const MigrationParams *params, void * opaque);
-     SaveStateHandler *save_state;
- 
-     void (*cleanup)(void *opaque);
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index f08d327..a388243 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -49,7 +49,6 @@ typedef struct MemoryRegion MemoryRegion;
- typedef struct MemoryRegionCache MemoryRegionCache;
- typedef struct MemoryRegionSection MemoryRegionSection;
- typedef struct MigrationIncomingState MigrationIncomingState;
--typedef struct MigrationParams MigrationParams;
- typedef struct MigrationState MigrationState;
- typedef struct Monitor Monitor;
- typedef struct MonitorDef MonitorDef;
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 058d5eb..3340202 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -102,8 +102,7 @@ enum qemu_vm_cmd {
- #define MAX_VM_CMD_PACKAGED_SIZE (1ul << 24)
- 
- bool qemu_savevm_state_blocked(Error **errp);
--void qemu_savevm_state_begin(QEMUFile *f,
--                             const MigrationParams *params);
-+void qemu_savevm_state_begin(QEMUFile *f);
- void qemu_savevm_state_header(QEMUFile *f);
- int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
- void qemu_savevm_state_cleanup(void);
-diff --git a/migration/colo.c b/migration/colo.c
-index 5c6c2f0..75e8807 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -333,7 +333,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-     }
- 
-     qemu_savevm_state_header(fb);
--    qemu_savevm_state_begin(fb, &s->params);
-+    qemu_savevm_state_begin(fb);
-     qemu_mutex_lock_iothread();
-     qemu_savevm_state_complete_precopy(fb, false);
-     qemu_mutex_unlock_iothread();
-diff --git a/migration/migration.c b/migration/migration.c
-index 9b96f1a..f094079 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1102,7 +1102,7 @@ bool migration_is_idle(void)
-     return false;
- }
- 
--MigrationState *migrate_init(const MigrationParams *params)
-+MigrationState *migrate_init(void)
- {
-     MigrationState *s = migrate_get_current();
- 
-@@ -1116,7 +1116,6 @@ MigrationState *migrate_init(const MigrationParams *params)
-     s->cleanup_bh = 0;
-     s->to_dst_file = NULL;
-     s->state = MIGRATION_STATUS_NONE;
--    s->params = *params;
-     s->rp_state.from_dst_file = NULL;
-     s->rp_state.error = false;
-     s->mbps = 0.0;
-@@ -1215,7 +1214,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
- {
-     Error *local_err = NULL;
-     MigrationState *s = migrate_get_current();
--    MigrationParams params;
-     const char *p;
- 
-     if (migration_is_setup_or_active(s->state) ||
-@@ -1233,7 +1231,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-         return;
-     }
- 
--    s = migrate_init(&params);
-+    s = migrate_init();
- 
-     if (has_blk && blk) {
-         migrate_set_block_enabled(s);
-@@ -1966,7 +1964,7 @@ static void *migration_thread(void *opaque)
-         qemu_savevm_send_postcopy_advise(s->to_dst_file);
-     }
- 
--    qemu_savevm_state_begin(s->to_dst_file, &s->params);
-+    qemu_savevm_state_begin(s->to_dst_file);
- 
-     s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
-     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 102b11d..97c6908 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -966,21 +966,13 @@ void qemu_savevm_state_header(QEMUFile *f)
- 
- }
- 
--void qemu_savevm_state_begin(QEMUFile *f,
--                             const MigrationParams *params)
-+void qemu_savevm_state_begin(QEMUFile *f)
- {
-     SaveStateEntry *se;
-     int ret;
- 
-     trace_savevm_state_begin();
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
--        if (!se->ops || !se->ops->set_params) {
--            continue;
--        }
--        se->ops->set_params(params, se->opaque);
--    }
--
--    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-         if (!se->ops || !se->ops->save_live_setup) {
-             continue;
-         }
-@@ -1232,9 +1224,7 @@ void qemu_savevm_state_cleanup(void)
- static int qemu_savevm_state(QEMUFile *f, Error **errp)
- {
-     int ret;
--    MigrationParams params = {
--    };
--    MigrationState *ms = migrate_init(&params);
-+    MigrationState *ms = migrate_init();
-     MigrationStatus status;
-     ms->to_dst_file = f;
- 
-@@ -1245,7 +1235,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
- 
-     qemu_mutex_unlock_iothread();
-     qemu_savevm_state_header(f);
--    qemu_savevm_state_begin(f, &params);
-+    qemu_savevm_state_begin(f);
-     qemu_mutex_lock_iothread();
- 
-     while (qemu_file_get_error(f) == 0) {
--- 
-2.9.3
+Sorry I forgot about replying to this in earlier mail.
+There are two independent timer blocks accessing same base address.
+Based on offset passed in read/write functions we figure out
+which block has to be handled.
+0x0 to 0x14 -> timer1
+0x18 to 0x2C -> timer2
+Here R_MAX is 0x18 hence addr >= R_MAX is valid and refers to timer2.
+Although I missed the bounds checking 0 < addr < 0x2C. I will add that
+check in read and
+write functions.
+
+Thanks,
+Sundeep
+>
+>>
+>>>
+>>>> +
+>>>> +    switch (addr) {
+>>>> +    case R_VAL:
+>>>> +        r = ptimer_get_count(st->ptimer);
+>>>> +        D(qemu_log("msf2_timer t=%d read counter=%x\n", timer, r));
+>>>> +        break;
+>>>> +
+>>>> +    case R_MIS:
+>>>> +        isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
+>>>> +        ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+>>>> +        r = ier && isr;
+>>>> +        break;
+>>>> +
+>>>> +    default:
+>>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>>> +            r = st->regs[addr];
+>>>> +        }
+>>>> +        break;
+>>>> +    }
+>>>> +    D(fprintf(stderr, "%s timer=%d %x=%x\n", __func__, timer, addr * 4, r));
+>>>> +    return r;
+>>>> +}
+>>>> +
+>>>> +static void timer_update(struct msf2_timer *st)
+>>>> +{
+>>>> +    uint64_t count;
+>>>> +
+>>>> +    D(fprintf(stderr, "%s timer=%d\n", __func__, st->nr));
+>>>> +
+>>>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ENBL)) {
+>>>> +        ptimer_stop(st->ptimer);
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    count = st->regs[R_LOADVAL];
+>>>> +    ptimer_set_limit(st->ptimer, count, 1);
+>>>> +    ptimer_run(st->ptimer, 1);
+>>>> +}
+>>>
+>>> The update function should be above the read/write functions.
+>>>
+>> Ok I will change
+>>
+>>>> +
+>>>> +static void
+>>>> +timer_write(void *opaque, hwaddr addr,
+>>>> +            uint64_t val64, unsigned int size)
+>>>> +{
+>>>> +    struct timerblock *t = opaque;
+>>>> +    struct msf2_timer *st;
+>>>> +    unsigned int timer;
+>>>> +    uint32_t value = val64;
+>>>> +
+>>>> +    addr >>= 2;
+>>>> +    timer = timer_from_addr(addr);
+>>>> +    st = &t->timers[timer];
+>>>> +    D(fprintf(stderr, "%s addr=%x val=%x (timer=%d)\n",
+>>>> +             __func__, addr * 4, value, timer));
+>>>> +
+>>>> +    if (timer) {
+>>>> +        addr -= 6;
+>>>> +    }
+>>>
+>>> Same comment from the read function.
+>>>
+>>>> +
+>>>> +    switch (addr) {
+>>>> +    case R_CTRL:
+>>>> +        st->regs[R_CTRL] = value;
+>>>> +        timer_update(st);
+>>>> +        break;
+>>>> +
+>>>> +    case R_RIS:
+>>>> +        if (value & TIMER_RIS_ACK) {
+>>>> +            st->regs[R_RIS] &= ~TIMER_RIS_ACK;
+>>>> +        }
+>>>> +        break;
+>>>> +
+>>>> +    case R_LOADVAL:
+>>>> +        st->regs[R_LOADVAL] = value;
+>>>> +        if (st->regs[R_CTRL] & TIMER_CTRL_ENBL) {
+>>>> +            timer_update(st);
+>>>> +        }
+>>>> +        break;
+>>>> +
+>>>> +    case R_BGLOADVAL:
+>>>> +        st->regs[R_BGLOADVAL] = value;
+>>>> +        st->regs[R_LOADVAL] = value;
+>>>> +        break;
+>>>> +
+>>>> +    case R_VAL:
+>>>> +    case R_MIS:
+>>>> +        break;
+>>>> +
+>>>> +    default:
+>>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>>> +            st->regs[addr] = value;
+>>>> +        }
+>>>> +        break;
+>>>> +    }
+>>>> +    timer_update_irq(st);
+>>>> +}
+>>>> +
+>>>> +static const MemoryRegionOps timer_ops = {
+>>>> +    .read = timer_read,
+>>>> +    .write = timer_write,
+>>>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>>>> +    .valid = {
+>>>> +        .min_access_size = 4,
+>>>> +        .max_access_size = 4
+>>>> +    }
+>>>> +};
+>>>> +
+>>>> +static void timer_hit(void *opaque)
+>>>> +{
+>>>> +    struct msf2_timer *st = opaque;
+>>>> +    D(fprintf(stderr, "%s %d\n", __func__, st->nr));
+>>>> +    st->regs[R_RIS] |= TIMER_RIS_ACK;
+>>>> +
+>>>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ONESHOT)) {
+>>>> +        timer_update(st);
+>>>> +    }
+>>>> +    timer_update_irq(st);
+>>>> +}
+>>>> +
+>>>> +static void msf2_timer_realize(DeviceState *dev, Error **errp)
+>>>> +{
+>>>> +    struct timerblock *t = MSF2_TIMER(dev);
+>>>> +    unsigned int i;
+>>>> +
+>>>> +    /* Init all the ptimers.  */
+>>>> +    t->timers = g_malloc0((sizeof t->timers[0]) * NUM_TIMERS);
+>>>> +    for (i = 0; i < NUM_TIMERS; i++) {
+>>>> +        struct msf2_timer *st = &t->timers[i];
+>>>> +
+>>>> +        st->parent = t;
+>>>> +        st->nr = i;
+>>>> +        st->bh = qemu_bh_new(timer_hit, st);
+>>>> +        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
+>>>> +        ptimer_set_freq(st->ptimer, t->freq_hz);
+>>>> +        sysbus_init_irq(SYS_BUS_DEVICE(dev), &st->irq);
+>>>> +    }
+>>>> +
+>>>> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, "msf2-timer",
+>>>> +                          R_MAX * 4 * NUM_TIMERS);
+>>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &t->mmio);
+>>>
+>>> This should be in the devices init() function.
+>>
+>> I referred Xilinx soft IP models for writing these models and used
+>> same boilerplate code.
+>> I am not clear about realize and init functions yet. Can you please
+>> give a brief about them.
+>
+> Basically the simple explanation is that init is called when the
+> object is created and realize is called when the object is realized.
+>
+> Generally for devices it will go something like this:
+>  1. init
+>  2. Set properties
+>  3. Connect things
+>  4. realize
+>  5. Map to memory
+>
+>> Don't we need to use realize function for new models?
+>
+> AFAIK we still put things like: sysbus_init_irq(),
+> memory_region_init_io() and sysbus_init_mmio() in the init function.
+>
+> I don't think we are at a stage yet to not use init functions.
+>
+> Thanks,
+>
+> Alistair
+>
+>>
+>> Thanks,
+>> Sundeep
+>>>
+>>> Thanks,
+>>>
+>>> Alistair
+>>>
+>>>> +}
+>>>> +
+>>>> +static Property msf2_timer_properties[] = {
+>>>> +    DEFINE_PROP_UINT32("clock-frequency", struct timerblock, freq_hz,
+>>>> +                                                                83 * 1000000),
+>>>> +    DEFINE_PROP_END_OF_LIST(),
+>>>> +};
+>>>> +
+>>>> +static void msf2_timer_class_init(ObjectClass *klass, void *data)
+>>>> +{
+>>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>>> +
+>>>> +    dc->realize = msf2_timer_realize;
+>>>> +    dc->props = msf2_timer_properties;
+>>>> +}
+>>>> +
+>>>> +static const TypeInfo msf2_timer_info = {
+>>>> +    .name          = TYPE_MSF2_TIMER,
+>>>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>>>> +    .instance_size = sizeof(struct timerblock),
+>>>> +    .class_init    = msf2_timer_class_init,
+>>>> +};
+>>>> +
+>>>> +static void msf2_timer_register_types(void)
+>>>> +{
+>>>> +    type_register_static(&msf2_timer_info);
+>>>> +}
+>>>> +
+>>>> +type_init(msf2_timer_register_types)
+>>>> --
+>>>> 2.5.0
+>>>>
+>>>>
