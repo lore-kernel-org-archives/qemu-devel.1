@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d396I-0000UL-VM
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:38:28 -0400
+	(envelope-from <quintela@redhat.com>) id 1d396M-0000XJ-0Z
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:38:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d396H-0002Xl-UP
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:38:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39298)
+	(envelope-from <quintela@redhat.com>) id 1d396K-0002Z1-Rv
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:38:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d396H-0002Xa-LJ
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:38:25 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d396K-0002YP-In
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 18:38:28 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9018D80482
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 22:38:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7C3E319CBD1
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 22:38:27 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 26 Apr 2017 00:37:31 +0200
-Message-Id: <20170425223739.6703-19-quintela@redhat.com>
+Date: Wed, 26 Apr 2017 00:37:32 +0200
+Message-Id: <20170425223739.6703-20-quintela@redhat.com>
 In-Reply-To: <20170425223739.6703-1-quintela@redhat.com>
 References: <20170425223739.6703-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 18/26] audio: GUSword is uint16_t
+Subject: [Qemu-devel] [PATCH 19/26] audio: GUSsample is int16_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,102 +34,98 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/audio/gusemu_hal.c   | 14 +++++++-------
+ hw/audio/gus.c          |  2 +-
+ hw/audio/gusemu.h       | 12 +-----------
+ hw/audio/gusemu_hal.c   |  2 +-
  hw/audio/gusemu_mixer.c |  8 ++++----
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ 4 files changed, 7 insertions(+), 17 deletions(-)
 
+diff --git a/hw/audio/gus.c b/hw/audio/gus.c
+index 3d08a65..ec103a4 100644
+--- a/hw/audio/gus.c
++++ b/hw/audio/gus.c
+@@ -53,7 +53,7 @@ typedef struct GUSState {
+     uint32_t freq;
+     uint32_t port;
+     int pos, left, shift, irqs;
+-    GUSsample *mixbuf;
++    int16_t *mixbuf;
+     uint8_t himem[1024 * 1024 + 32 + 4096];
+     int samples;
+     SWVoiceOut *voice;
+diff --git a/hw/audio/gusemu.h b/hw/audio/gusemu.h
+index 69dadef..ab591ee 100644
+--- a/hw/audio/gusemu.h
++++ b/hw/audio/gusemu.h
+@@ -25,16 +25,6 @@
+ #ifndef GUSEMU_H
+ #define GUSEMU_H
+ 
+-/* data types (need to be adjusted if neither a VC6 nor a C99 compatible compiler is used) */
+-
+-#if defined _WIN32 && defined _MSC_VER /* doesn't support other win32 compilers yet, do it yourself... */
+- typedef unsigned int GUSdword;
+- typedef signed short GUSsample;
+-#else
+- typedef uint32_t GUSdword;
+- typedef int16_t GUSsample;
+-#endif
+-
+ typedef struct _GUSEmuState
+ {
+  uint8_t *himemaddr; /* 1024*1024 bytes used for storing uploaded samples (+32 additional bytes for read padding) */
+@@ -86,7 +76,7 @@ void gus_dma_transferdata(GUSEmuState *state, char *dma_addr, unsigned int count
+ /* If the interrupts are asynchronous, it may be needed to use a separate thread mixing into a temporary */
+ /* audio buffer in order to avoid quality loss caused by large numsamples and elapsed_time values. */
+ 
+-void gus_mixvoices(GUSEmuState *state, unsigned int playback_freq, unsigned int numsamples, GUSsample *bufferpos);
++void gus_mixvoices(GUSEmuState *state, unsigned int playback_freq, unsigned int numsamples, int16_t *bufferpos);
+ /* recommended range: 10 < numsamples < 100 */
+ /* lower values may result in increased rounding error, higher values often cause audible timing delays */
+ 
 diff --git a/hw/audio/gusemu_hal.c b/hw/audio/gusemu_hal.c
-index 444a2bb..3dd7239 100644
+index 3dd7239..1150fc4 100644
 --- a/hw/audio/gusemu_hal.c
 +++ b/hw/audio/gusemu_hal.c
-@@ -31,7 +31,7 @@
- #include "gusemu.h"
+@@ -32,7 +32,7 @@
  
  #define GUSregb(position) (*            (gusptr+(position)))
--#define GUSregw(position) (*(GUSword *) (gusptr+(position)))
-+#define GUSregw(position) (*(uint16_t *) (gusptr+(position)))
- #define GUSregd(position) (*(GUSdword *)(gusptr+(position)))
+ #define GUSregw(position) (*(uint16_t *) (gusptr+(position)))
+-#define GUSregd(position) (*(GUSdword *)(gusptr+(position)))
++#define GUSregd(position) (*(uint16_t *)(gusptr+(position)))
  
  /* size given in bytes */
-@@ -173,7 +173,7 @@ unsigned int gus_read(GUSEmuState * state, int port, int size)
-                 value_read = value_read >> 8;
-             value_read &= 0xff;
-         }
--        return (GUSword) value_read;
-+        return (uint16_t) value_read;
-     /* case 0x306:                                  */ /* Mixer/Version info */
-         /*  return 0xff; */ /* Pre 3.6 boards, ICS mixer NOT present */
-     case 0x307:                                     /* DRAMaccess */
-@@ -318,15 +318,15 @@ void gus_write(GUSEmuState * state, int port, int size, unsigned int data)
-     case 0x304:
-     case 0x305:
-         {
--            GUSword         writedata = (GUSword) data;
--            GUSword         readmask = 0x0000;
-+            uint16_t         writedata = (uint16_t) data;
-+            uint16_t         readmask = 0x0000;
-             if (size == 1)
-             {
-                 readmask = 0xff00;
-                 writedata &= 0xff;
-                 if ((port & 0xff0f) == 0x305)
-                 {
--                    writedata = (GUSword) (writedata << 8);
-+                    writedata = (uint16_t) (writedata << 8);
-                     readmask = 0x00ff;
-                 }
-             }
-@@ -353,7 +353,7 @@ void gus_write(GUSEmuState * state, int port, int size, unsigned int data)
-                         break;  /* reset flag active? */
-                     offset = 2 * (GUSregb(FunkSelReg3x3) & 0x0f);
-                     offset += (GUSregb(VoiceSelReg3x2) & 0x1f) << 5; /*  = Voice*32 + Funktion*2 */
--                    GUSregw(offset) = (GUSword) ((GUSregw(offset) & readmask) | writedata);
-+                    GUSregw(offset) = (uint16_t) ((GUSregw(offset) & readmask) | writedata);
-                 }
-                 break;
-                 /* voice unspecific functions */
-@@ -521,7 +521,7 @@ void gus_dma_transferdata(GUSEmuState * state, char *dma_addr, unsigned int coun
-         destaddr = (char *) state->himemaddr + offset; /* wavetable RAM address */
-     }
- 
--    GUSregw(GUS42DMAStart) += (GUSword)  (count >> 4);                           /* ToDo: add 16bit GUS page limit? */
-+    GUSregw(GUS42DMAStart) += (uint16_t)  (count >> 4);                           /* ToDo: add 16bit GUS page limit? */
-     GUSregb(GUS50DMAHigh)   = (uint8_t) ((count + GUSregb(GUS50DMAHigh)) & 0xf); /* ToDo: add 16bit GUS page limit? */
- 
-     if (GUSregb(GUS41DMACtrl) & 0x02)   /* direction, 0 := sysram->gusram */
+ unsigned int gus_read(GUSEmuState * state, int port, int size)
 diff --git a/hw/audio/gusemu_mixer.c b/hw/audio/gusemu_mixer.c
-index b189db9..981a9ae 100644
+index 981a9ae..00b9861 100644
 --- a/hw/audio/gusemu_mixer.c
 +++ b/hw/audio/gusemu_mixer.c
-@@ -27,10 +27,10 @@
- #include "gustate.h"
+@@ -28,13 +28,13 @@
  
  #define GUSregb(position)  (*            (gusptr+(position)))
--#define GUSregw(position)  (*(GUSword *) (gusptr+(position)))
-+#define GUSregw(position)  (*(uint16_t *) (gusptr+(position)))
- #define GUSregd(position)  (*(GUSdword *)(gusptr+(position)))
+ #define GUSregw(position)  (*(uint16_t *) (gusptr+(position)))
+-#define GUSregd(position)  (*(GUSdword *)(gusptr+(position)))
++#define GUSregd(position)  (*(uint16_t *)(gusptr+(position)))
  
--#define GUSvoice(position) (*(GUSword *)(voiceptr+(position)))
-+#define GUSvoice(position) (*(uint16_t *)(voiceptr+(position)))
+ #define GUSvoice(position) (*(uint16_t *)(voiceptr+(position)))
  
  /* samples are always 16bit stereo (4 bytes each, first right then left interleaved) */
  void gus_mixvoices(GUSEmuState * state, unsigned int playback_freq, unsigned int numsamples,
-@@ -39,14 +39,14 @@ void gus_mixvoices(GUSEmuState * state, unsigned int playback_freq, unsigned int
+-                   GUSsample *bufferpos)
++                   int16_t *bufferpos)
+ {
      /* note that byte registers are stored in the upper half of each voice register! */
      uint8_t        *gusptr;
-     int             Voice;
--    GUSword        *voiceptr;
-+    uint16_t       *voiceptr;
+@@ -171,8 +171,8 @@ void gus_mixvoices(GUSEmuState * state, unsigned int playback_freq, unsigned int
+                 }
  
-     unsigned int    count;
-     for (count = 0; count < numsamples * 2; count++)
-         *(bufferpos + count) = 0;       /* clear */
- 
-     gusptr = state->gusdatapos;
--    voiceptr = (GUSword *) gusptr;
-+    voiceptr = (uint16_t *) gusptr;
-     if (!(GUSregb(GUS4cReset) & 0x01))  /* reset flag active? */
-         return;
- 
+                 /* mix samples into buffer */
+-                *(bufferpos + 2 * sample)     += (GUSsample) ((sample1 * PanningPos) >> 4);        /* right */
+-                *(bufferpos + 2 * sample + 1) += (GUSsample) ((sample1 * (15 - PanningPos)) >> 4); /* left */
++                *(bufferpos + 2 * sample)     += (int16_t) ((sample1 * PanningPos) >> 4);        /* right */
++                *(bufferpos + 2 * sample + 1) += (int16_t) ((sample1 * (15 - PanningPos)) >> 4); /* left */
+             }
+             /* write back voice and volume */
+             GUSvoice(wVSRCurrVol)   = Volume32 / 32;
 -- 
 2.9.3
