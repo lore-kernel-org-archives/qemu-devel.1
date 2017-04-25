@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2uvW-0001pA-SG
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:30:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1d2uwj-0002Mi-O3
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d2uvS-0007X1-V6
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:30:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50666)
+	(envelope-from <armbru@redhat.com>) id 1d2uwi-000852-NI
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:31:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2uvS-0007WI-OW
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:30:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E0A2DC04B951
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 07:30:16 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d2uwi-00084q-EY
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 03:31:36 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20170424153615.18614-1-berrange@redhat.com>
-Date: Tue, 25 Apr 2017 09:30:13 +0200
-In-Reply-To: <20170424153615.18614-1-berrange@redhat.com> (Daniel
-	P. Berrange's message of "Mon, 24 Apr 2017 16:36:15 +0100")
-Message-ID: <8760htaqre.fsf@dusky.pond.sub.org>
+References: <alpine.DEB.2.10.1704211258580.18403@sstabellini-ThinkPad-X260>
+	<CAFEAcA-F4mKWyknfRWhJfymJxbsYPvWH20CSecTmY8-kq-dipA@mail.gmail.com>
+	<alpine.DEB.2.10.1704241423030.16723@sstabellini-ThinkPad-X260>
+	<CAFEAcA8CWYCxVauuWSsmuQw4YG1O0DO+rYASm2aVhirp3Z3mZA@mail.gmail.com>
+	<alpine.DEB.2.10.1704241640160.16723@sstabellini-ThinkPad-X260>
+Date: Tue, 25 Apr 2017 09:31:31 +0200
+In-Reply-To: <alpine.DEB.2.10.1704241640160.16723@sstabellini-ThinkPad-X260>
+	(Stefano Stabellini's message of "Mon, 24 Apr 2017 16:44:53 -0700
+	(PDT)")
+Message-ID: <871sshaqp8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] crypto: move 'opaque' parameter to
- (nearly) the end of parameter list
+Subject: Re: [Qemu-devel] [PULL 0/21] Please pull xen-20170421-tag for 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
 
-"Daniel P. Berrange" <berrange@redhat.com> writes:
+Stefano Stabellini <sstabellini@kernel.org> writes:
 
-> Previous commit moved 'opaque' to be the 2nd parameter in the list:
+> On Mon, 24 Apr 2017, Peter Maydell wrote:
+>> On 24 April 2017 at 22:25, Stefano Stabellini <sstabellini@kernel.org> wrote:
+>> > diff --git a/hw/9pfs/xen-9pfs.h b/hw/9pfs/xen-9pfs.h
+>> > new file mode 100644
+>> > index 0000000..18f0ec0
+>> > --- /dev/null
+>> > +++ b/hw/9pfs/xen-9pfs.h
+>> > @@ -0,0 +1,14 @@
+>> > +/*
+>> > + * Xen 9p backend
+>> > + *
+>> > + * Copyright Aporeto 2017
+>> > + *
+>> > + * Authors:
+>> > + *  Stefano Stabellini <stefano@aporeto.com>
+>> > + *
+>> > + */
+>> 
+>> Trivial file, but I prefer it if we have a brief license
+>> statement in every file, just to be clear (it might
+>> accumulate more code later).
 >
->   commit 375092332eeaa6e47561ce47fd36144cdaf964d0
->   Author: Fam Zheng <famz@redhat.com>
->   Date:   Fri Apr 21 20:27:02 2017 +0800
+> Sure
 >
->     crypto: Make errp the last parameter of functions
+>> > +
+>> > +#include <xen/io/protocols.h>
+>> > +#include "hw/xen/io/ring.h"
+>> > +
+>> > +DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);
+>> 
+>> Is it worth a comment to dissuade people from thinking they can
+>> inline the file back into xen-9p-backend.c ?
 >
->     Move opaque to 2nd instead of the 2nd to last, so that compilers help
->     check with the conversion.
+> Thanks for the quick review! Here you go:
 >
-> this puts it back to the 2nd to last position.
 >
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> index 7e962aa..9c7f41a 100644
+> --- a/hw/9pfs/xen-9p-backend.c
+> +++ b/hw/9pfs/xen-9p-backend.c
+> @@ -13,12 +13,9 @@
+>  #include "hw/hw.h"
+>  #include "hw/9pfs/9p.h"
+>  #include "hw/xen/xen_backend.h"
+> -#include "hw/xen/io/ring.h"
+> +#include "hw/9pfs/xen-9pfs.h"
+>  #include "qemu/config-file.h"
+>  #include "fsdev/qemu-fsdev.h"
+> -#include <xen/io/protocols.h>
+> -
+> -DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);
+>  
+>  #define VERSIONS "1"
+>  #define MAX_RINGS 8
+> diff --git a/hw/9pfs/xen-9pfs.h b/hw/9pfs/xen-9pfs.h
+> new file mode 100644
+> index 0000000..6e33d77
+> --- /dev/null
+> +++ b/hw/9pfs/xen-9pfs.h
+> @@ -0,0 +1,21 @@
+> +/*
+> + * Xen 9p backend
+> + *
+> + * Copyright Aporeto 2017
+> + *
+> + * Authors:
+> + *  Stefano Stabellini <stefano@aporeto.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL version 2.
 
-I could take this through my tree, but I suggest you stick it into your
-next crypto pull request.
+Any particular reason for "version 2" instead of "version 2 or later"?
+
+
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include <xen/io/protocols.h>
+> +#include "hw/xen/io/ring.h"
+> +
+> +/*
+> + * Do not merge into xen-9p-backend.c: clang doesn't allow unused static
+> + * inline functions in c files.
+> + */
+> +DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);
