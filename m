@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d3ObX-00054m-56
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:11:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3Oc8-0005Ti-QD
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:12:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d3ObV-0003ya-OB
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:11:43 -0400
-References: <1493187803-4510-1-git-send-email-cota@braap.org>
-	<1493187803-4510-2-git-send-email-cota@braap.org>
-	<87efwf8nsm.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5af8f37b-3ffa-6689-bcfa-4e5601fb2087@redhat.com>
-Date: Wed, 26 Apr 2017 17:11:28 +0200
+	(envelope-from <eblake@redhat.com>) id 1d3Oc7-0004BF-R7
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:12:20 -0400
+References: <20170425153858.25660-1-berrange@redhat.com>
+	<20170425153858.25660-10-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0e96161d-2002-7b8c-858b-f593576aee80@redhat.com>
+Date: Wed, 26 Apr 2017 10:12:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <87efwf8nsm.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] tcg-runtime: add lookup_tb_ptr
- helper
+In-Reply-To: <20170425153858.25660-10-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1QXd8lwHAfsFRCOqoMU5qAWSNiIgH7UEo"
+Subject: Re: [Qemu-devel] [PATCH v6 09/18] qcow: convert QCow to use
+ QCryptoBlock for encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,131 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1QXd8lwHAfsFRCOqoMU5qAWSNiIgH7UEo
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+Message-ID: <0e96161d-2002-7b8c-858b-f593576aee80@redhat.com>
+Subject: Re: [PATCH v6 09/18] qcow: convert QCow to use QCryptoBlock for
+ encryption
+References: <20170425153858.25660-1-berrange@redhat.com>
+ <20170425153858.25660-10-berrange@redhat.com>
+In-Reply-To: <20170425153858.25660-10-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-On 26/04/2017 12:29, Alex Benn=C3=A9e wrote:
+On 04/25/2017 10:38 AM, Daniel P. Berrange wrote:
+> This converts the qcow driver to make use of the QCryptoBlock
+> APIs for encrypting image content. This is only wired up to
+> permit use of the legacy QCow encryption format. Users who wish
+> to have the strong LUKS format should switch to qcow2 instead.
 >=20
-> Emilio G. Cota <cota@braap.org> writes:
+> With this change it is now required to use the QCryptoSecret
+> object for providing passwords, instead of the current block
+> password APIs / interactive prompting.
 >=20
->> This paves the way for upcoming work.
->>
->> Reviewed-by: Richard Henderson <rth@twiddle.net>
->> Signed-off-by: Emilio G. Cota <cota@braap.org>
->> ---
->>  tcg-runtime.c     | 21 +++++++++++++++++++++
->>  tcg/tcg-runtime.h |  2 ++
->>  tcg/tcg.h         |  1 +
->>  3 files changed, 24 insertions(+)
->>
->> diff --git a/tcg-runtime.c b/tcg-runtime.c
->> index 4c60c96..90d2d4b 100644
->> --- a/tcg-runtime.c
->> +++ b/tcg-runtime.c
->> @@ -27,6 +27,7 @@
->>  #include "exec/helper-proto.h"
->>  #include "exec/cpu_ldst.h"
->>  #include "exec/exec-all.h"
->> +#include "exec/tb-hash.h"
->>
->>  /* 32-bit helpers */
->>
->> @@ -141,6 +142,26 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
->>      return ctpop64(arg);
->>  }
->>
->> +void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
->> +{
->> +    CPUState *cpu =3D ENV_GET_CPU(env);
->> +    TranslationBlock *tb;
->> +    target_ulong cs_base, pc;
->> +    uint32_t flags;
->> +
->> +    if (unlikely(atomic_read(&cpu->exit_request))) {
->> +        goto out_epilogue;
->> +    }
->> +    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
->> +    tb =3D atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(=
-addr)]);
->> +    if (likely(tb && tb->pc =3D=3D addr && tb->cs_base =3D=3D cs_base=
- &&
->> +               tb->flags =3D=3D flags)) {
+>   $QEMU \
+>     -object secret,id=3Dsec0,filename=3D/home/berrange/encrypted.pw \
+>     -drive file=3D/home/berrange/encrypted.qcow,encrypt.format=3Dqcow,\=
+
+>            encrypt.key-secret=3Dsec0
 >=20
-> Should we also not be checking the TB hasn't been invalidated: tb->inva=
-lid?
-
-It's not needed because this lookup is (if I understand it right) once
-only and is not reused later.  This is why tb_find doesn't check
-tb->invalid, but uses it to avoid adding the TB to the chain.
-
-Good:
-
-	tb_find			tb_phys_invalidate
-				  tb_lock
-				  tb->invalid =3D true
-	  lookup cache
-	  cache hit
-				  tb_unlock
-	  tb_lock
-	  tb->invalid?
-	    yes, skip tb_add_jump
-	  tb_unlock
-	  execute tb once
-
-Bad (doesn't happen):
-
-	tb_find			tb_phys_invalidate
-				  tb_lock
-				  tb->invalid =3D true
-	  lookup cache
-	  cache hit
-				  tb_unlock
-	  tb_lock
-	  tb_add_jump
-	  tb_unlock
-	  execute tb many times
-
-Paolo
-
->> +        return tb->tc_ptr;
->> +    }
->> + out_epilogue:
->> +    return tcg_ctx.code_gen_epilogue;
->> +}
->> +
->>  void HELPER(exit_atomic)(CPUArchState *env)
->>  {
->>      cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
->> diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
->> index 114ea6f..c41d38a 100644
->> --- a/tcg/tcg-runtime.h
->> +++ b/tcg/tcg-runtime.h
->> @@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i6=
-4, i64)
->>  DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
->>  DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
->>
->> +DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
->> +
->>  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
->>
->>  #ifdef CONFIG_SOFTMMU
->> diff --git a/tcg/tcg.h b/tcg/tcg.h
->> index 6c216bb..5ec48d1 100644
->> --- a/tcg/tcg.h
->> +++ b/tcg/tcg.h
->> @@ -699,6 +699,7 @@ struct TCGContext {
->>         extension that allows arithmetic on void*.  */
->>      int code_gen_max_blocks;
->>      void *code_gen_prologue;
->> +    void *code_gen_epilogue;
->>      void *code_gen_buffer;
->>      size_t code_gen_buffer_size;
->>      void *code_gen_ptr;
+> Likewise when creating such images
 >=20
+>   qemu-img create -f qcow \
+>     -object secret,id=3Dsec0,filename=3D/home/berrange/encrypted.pw \
+>     -o encrypt.format=3Dqcow,encrypt.key-secret=3Dsec0 \
+>     /home/berrange/encrypted.qcow
 >=20
-> --
-> Alex Benn=C3=A9e
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/crypto.c       |  10 +++
+>  block/crypto.h       |  20 ++++--
+>  block/qcow.c         | 196 +++++++++++++++++++++++++------------------=
+--------
+>  qapi/block-core.json |  37 +++++++++-
+>  4 files changed, 156 insertions(+), 107 deletions(-)
 >=20
+
+
+> +++ b/qapi/block-core.json
+> @@ -2277,6 +2277,41 @@
+>              'mode':  'Qcow2OverlapCheckMode' } }
+> =20
+>  ##
+> +# @BlockdevQcowEncryptionFormat:
+> +# @qcow: AES-CBC with plain64 initialization venctors
+
+s/venctors/vectors/
+
+With that fixed,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+and it turned out much nicer than v5 !
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--1QXd8lwHAfsFRCOqoMU5qAWSNiIgH7UEo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZALjKAAoJEKeha0olJ0NqyKcH/RhN7cp7aFLmRNjEOlL8qo1Y
+nfRY82t3yd0OHNtgBqFyn1MDCLPgRBE4CpOM4f3jpSz9XsKsyRDRSEM/SA54UK+S
+54qMfShSkxHlqYMGHYsd+cOdG+9Gt4H12Ng9GHMsMPchBDUw1QzOK9vjhlT9Ytmk
+5OK5BFhhjI21KnJ++LRHQkRnnTXeJBye8XPdL/xa2YV2TAZnwUduThKh07twMe9y
+On8HrHGpFl//Jj9AdahP6HrU1P/ST98hleh/IMUxD5O+0fh28p7fi3kuWxopRKWc
+xLmnbYeAaoeY7/mai8nxlDwa+uxcB8OsVc/NO2yqPU1P61WzSRFbI98tKQW8WvU=
+=7Pdq
+-----END PGP SIGNATURE-----
+
+--1QXd8lwHAfsFRCOqoMU5qAWSNiIgH7UEo--
