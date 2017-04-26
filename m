@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwz-0005Vu-I5
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gx2-0005ZT-Vl
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwo-00089g-03
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:21 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwp-0008Bs-Gh
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:25 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 17:00:28 +1000
-Message-Id: <20170426070034.10727-43-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 17:00:32 +1000
+Message-Id: <20170426070034.10727-47-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 42/48] ppc/pnv: add initial IPMI sensors for the
- BMC simulator
+Subject: [Qemu-devel] [PULL 46/48] e500,
+ book3s: mfspr 259: Register mapped/aliased SPRG3 user read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,222 +24,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Bernhard Kaindl <bernhard.kaindl@thalesgroup.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Bernhard Kaindl <bernhard.kaindl@thalesgroup.com>
 
-Skiboot, the firmware for the PowerNV platform, expects the BMC to
-provide some specific IPMI sensors. These sensors are exposed in the
-device tree and their values are updated by the firmware at boot time.
+This patch registers mfspr 259 for Book3S and e500 family cores
+following this research:
 
-Sensors of interest are :
+mfspr 259 provides read-only mapped user access to SPRG3(SPR 275) accordi=
+ng to:
 
-	"FW Boot Progress"
-	"Boot Count"
+- PowerISA 2.02, Book III (documents implementation starting with POWER4+=
+ @ p20)
+- IBM PowerPC 970MP RISC Microprocessor User's Manual v2.1, page 48
+- Amit Singh: "Mac OS X Internals: A Systems Approach" on 970 and 970FX c=
+ores:
+  He demonstrates mfspr 259 reading TLS data from Mac OS X on G5 on page =
+588
+- NXP documents it in the Core Reference Manuals of: e500, e500mc and e55=
+00
+- getcpu() of the 32 & 64-bit Book3S Linux vDSOs use it to read the core =
+number
 
-As such a device is defined on the command line, we can only detect
-its presence at reset time.
+mfspr 259 does not appear to be implemented in these cores according to:
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+- 74xx series: MPC7410/MPC7400 and MPC7450 RISC Microprocessor Reference =
+Manuals
+- 4xx series:  PPC440 Processor User's Manual, Revision 1.09 by AMCC
+- 750 series:  IBM PowerPC 750CL RISC Microprocessor User's Manual
+- e200 series: e200z4 Power Architecture=C3=A2 Core Reference Manual
+
+Implementation: gen_spr_usprg3() is called from init_proc_book3s_common()
+(covers the 970 and POWER cores) and init_proc_e500() (covers the e500 fa=
+mily)
+to register spr_read_ureg() in the same way which it already provides
+the mapped SPR access for SPR_USPRG4-7 in gen_spr_usprgh() for cores
+which have the same read-only mapped SPRG register access for SPRG4-7.
+
+Verified using Linux by pinning a thread to a core and checking sched_get=
+cpu()
+using qemu-system-ppc64 -M pseries -cpu POWER8 using MTTCG on a x86_64 ho=
+st.
+
+Signed-off-by: Bernhard Kaindl <bernhard.kaindl@thalesgroup.com>
+Reviewed-by: Stefan Resch <stefan.resch@thalesgroup.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/Makefile.objs |  2 +-
- hw/ppc/pnv.c         | 21 ++++++++++++++
- hw/ppc/pnv_bmc.c     | 81 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/ppc/pnv.h |  9 ++++++
- 4 files changed, 112 insertions(+), 1 deletion(-)
- create mode 100644 hw/ppc/pnv_bmc.c
+ target/ppc/translate_init.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index ef67ea8..7efc686 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -6,7 +6,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o sp=
-apr_rtas.o
- obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng=
-.o
- obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
- # IBM PowerNV
--obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
-i.o pnv_occ.o
-+obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_ps=
-i.o pnv_occ.o pnv_bmc.o
- ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
- obj-y +=3D spapr_pci_vfio.o
- endif
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 977e126..685eb12 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -35,6 +35,7 @@
- #include "qapi/visitor.h"
- #include "monitor/monitor.h"
- #include "hw/intc/intc.h"
-+#include "hw/ipmi/ipmi.h"
-=20
- #include "hw/ppc/xics.h"
- #include "hw/ppc/pnv_xscom.h"
-@@ -476,16 +477,36 @@ static void *powernv_create_fdt(MachineState *machi=
-ne)
-     /* Populate ISA devices on chip 0 */
-     lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
-     powernv_populate_isa(pnv->isa_bus, fdt, lpc_offset);
-+
-+    if (pnv->bmc) {
-+        pnv_bmc_populate_sensors(pnv->bmc, fdt);
-+    }
-+
-     return fdt;
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 77e5463..0ecf541 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -1640,6 +1640,14 @@ static void spr_write_booke_pid (DisasContext *ctx=
+, int sprn, int gprn)
  }
+ #endif
 =20
- static void ppc_powernv_reset(void)
- {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-+    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
-     void *fdt;
-+    Object *obj;
-=20
-     qemu_devices_reset();
-=20
-+    /* OpenPOWER systems have a BMC, which can be defined on the
-+     * command line with:
-+     *
-+     *   -device ipmi-bmc-sim,id=3Dbmc0
-+     *
-+     * This is the internal simulator but it could also be an external
-+     * BMC.
-+     */
-+    obj =3D object_resolve_path_type("", TYPE_IPMI_BMC, NULL);
-+    if (obj) {
-+        pnv->bmc =3D IPMI_BMC(obj);
-+    }
-+
-     fdt =3D powernv_create_fdt(machine);
-=20
-     /* Pack resulting tree */
-diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-new file mode 100644
-index 0000000..a0820dc
---- /dev/null
-+++ b/hw/ppc/pnv_bmc.c
-@@ -0,0 +1,81 @@
-+/*
-+ * QEMU PowerNV, BMC related functions
-+ *
-+ * Copyright (c) 2016-2017, IBM Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License, version 2, as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "sysemu/sysemu.h"
-+#include "target/ppc/cpu.h"
-+#include "qapi/error.h"
-+#include "qemu/log.h"
-+#include "hw/ipmi/ipmi.h"
-+#include "hw/ppc/fdt.h"
-+
-+#include "hw/ppc/pnv.h"
-+
-+#include <libfdt.h>
-+
-+/* TODO: include definition in ipmi.h */
-+#define IPMI_SDR_FULL_TYPE 1
-+
-+void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
++static void gen_spr_usprg3 (CPUPPCState *env)
 +{
-+    int offset;
-+    int i;
-+    const struct ipmi_sdr_compact *sdr;
-+    uint16_t nextrec;
-+
-+    offset =3D fdt_add_subnode(fdt, 0, "/bmc");
-+    _FDT(offset);
-+
-+    _FDT((fdt_setprop_string(fdt, offset, "name", "bmc")));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
-+
-+    offset =3D fdt_add_subnode(fdt, offset, "sensors");
-+    _FDT(offset);
-+
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0x1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 0x0)));
-+
-+    for (i =3D 0; !ipmi_bmc_sdr_find(bmc, i, &sdr, &nextrec); i++) {
-+        int off;
-+        char *name;
-+
-+        if (sdr->header.rec_type !=3D IPMI_SDR_COMPACT_TYPE &&
-+            sdr->header.rec_type !=3D IPMI_SDR_FULL_TYPE) {
-+            continue;
-+        }
-+
-+        name =3D g_strdup_printf("sensor@%x", sdr->sensor_owner_number);
-+        off =3D fdt_add_subnode(fdt, offset, name);
-+        _FDT(off);
-+        g_free(name);
-+
-+        _FDT((fdt_setprop_cell(fdt, off, "reg", sdr->sensor_owner_number=
-)));
-+        _FDT((fdt_setprop_string(fdt, off, "name", "sensor")));
-+        _FDT((fdt_setprop_string(fdt, off, "compatible", "ibm,ipmi-senso=
-r")));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-sensor-reading-type",
-+                               sdr->reading_type)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-entity-id",
-+                               sdr->entity_id)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-entity-instance",
-+                               sdr->entity_instance)));
-+        _FDT((fdt_setprop_cell(fdt, off, "ipmi-sensor-type",
-+                               sdr->sensor_type)));
-+    }
++    spr_register(env, SPR_USPRG3, "USPRG3",
++                 &spr_read_ureg, SPR_NOACCESS,
++                 &spr_read_ureg, SPR_NOACCESS,
++                 0x00000000);
 +}
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index b45a0d9..02f6cf5 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -118,6 +118,8 @@ typedef struct PnvChipClass {
- #define POWERNV_MACHINE(obj) \
-     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
-=20
-+typedef struct IPMIBmc IPMIBmc;
 +
- typedef struct PnvMachineState {
-     /*< private >*/
-     MachineState parent_obj;
-@@ -130,12 +132,19 @@ typedef struct PnvMachineState {
-=20
-     ISABus       *isa_bus;
-     uint32_t     cpld_irqstate;
-+
-+    IPMIBmc      *bmc;
- } PnvMachineState;
-=20
- #define PNV_FDT_ADDR          0x01000000
- #define PNV_TIMEBASE_FREQ     512000000ULL
-=20
- /*
-+ * BMC helpers
-+ */
-+void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
-+
-+/*
-  * POWER8 MMIO base addresses
-  */
- #define PNV_XSCOM_SIZE        0x800000000ull
+ static void gen_spr_usprgh (CPUPPCState *env)
+ {
+     spr_register(env, SPR_USPRG4, "USPRG4",
+@@ -4914,6 +4922,7 @@ static void init_proc_e500 (CPUPPCState *env, int v=
+ersion)
+             break;
+     }
+     gen_spr_BookE(env, ivor_mask);
++    gen_spr_usprg3(env);
+     /* Processor identification */
+     spr_register(env, SPR_BOOKE_PIR, "PIR",
+                  SPR_NOACCESS, SPR_NOACCESS,
+@@ -8245,6 +8254,7 @@ static void init_proc_book3s_common(CPUPPCState *en=
+v)
+ {
+     gen_spr_ne_601(env);
+     gen_tbl(env);
++    gen_spr_usprg3(env);
+     gen_spr_book3s_altivec(env);
+     gen_spr_book3s_pmu_sup(env);
+     gen_spr_book3s_pmu_user(env);
 --=20
 2.9.3
