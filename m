@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3HdB-0001rG-VP
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:44:59 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d3HjQ-0006jg-4H
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:51:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3HdA-0001Q4-RL
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:44:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3HdA-0001Pt-IF
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:44:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7BEB4C0567A2
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 07:44:55 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 26 Apr 2017 15:44:35 +0800
-Message-Id: <1493192675-16104-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1493192675-16104-1-git-send-email-peterx@redhat.com>
-References: <1493192675-16104-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] ramblock: add new hmp command "info
- ramblock"
+	(envelope-from <pbonzini@redhat.com>) id 1d3HjP-0003eF-5c
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:51:24 -0400
+References: <1493187803-4510-1-git-send-email-cota@braap.org>
+	<1493187803-4510-2-git-send-email-cota@braap.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <385dfdfb-263a-8012-8a7b-e3ce987e7fc4@redhat.com>
+Date: Wed, 26 Apr 2017 09:50:57 +0200
+MIME-Version: 1.0
+In-Reply-To: <1493187803-4510-2-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 01/10] tcg-runtime: add lookup_tb_ptr
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,155 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-To dump information about ramblocks. It looks like:
 
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used              Total
-            /objects/mem       2M  0x0000000000000000 0x0000000080000000 0x0000000080000000
-                vga.vram       4K  0x0000000080060000 0x0000000001000000 0x0000000001000000
-    /rom@etc/acpi/tables       4K  0x00000000810b0000 0x0000000000020000 0x0000000000200000
-                 pc.bios       4K  0x0000000080000000 0x0000000000040000 0x0000000000040000
-  0000:00:03.0/e1000.rom       4K  0x0000000081070000 0x0000000000040000 0x0000000000040000
-                  pc.rom       4K  0x0000000080040000 0x0000000000020000 0x0000000000020000
-    0000:00:02.0/vga.rom       4K  0x0000000081060000 0x0000000000010000 0x0000000000010000
-   /rom@etc/table-loader       4K  0x00000000812b0000 0x0000000000001000 0x0000000000001000
-      /rom@etc/acpi/rsdp       4K  0x00000000812b1000 0x0000000000001000 0x0000000000001000
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- exec.c                 | 34 ++++++++++++++++++++++++++++++++++
- hmp-commands-info.hx   | 14 ++++++++++++++
- hmp.c                  |  6 ++++++
- hmp.h                  |  1 +
- include/exec/ramlist.h |  1 +
- 5 files changed, 56 insertions(+)
+On 26/04/2017 08:23, Emilio G. Cota wrote:
+> This paves the way for upcoming work.
+> 
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  tcg-runtime.c     | 21 +++++++++++++++++++++
+>  tcg/tcg-runtime.h |  2 ++
+>  tcg/tcg.h         |  1 +
+>  3 files changed, 24 insertions(+)
+> 
+> diff --git a/tcg-runtime.c b/tcg-runtime.c
+> index 4c60c96..90d2d4b 100644
+> --- a/tcg-runtime.c
+> +++ b/tcg-runtime.c
+> @@ -27,6 +27,7 @@
+>  #include "exec/helper-proto.h"
+>  #include "exec/cpu_ldst.h"
+>  #include "exec/exec-all.h"
+> +#include "exec/tb-hash.h"
+>  
+>  /* 32-bit helpers */
+>  
+> @@ -141,6 +142,26 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
+>      return ctpop64(arg);
+>  }
+>  
+> +void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
+> +{
+> +    CPUState *cpu = ENV_GET_CPU(env);
+> +    TranslationBlock *tb;
+> +    target_ulong cs_base, pc;
+> +    uint32_t flags;
+> +
+> +    if (unlikely(atomic_read(&cpu->exit_request))) {
+> +        goto out_epilogue;
+> +    }
 
-diff --git a/exec.c b/exec.c
-index 50519ae..85a2c2b 100644
---- a/exec.c
-+++ b/exec.c
-@@ -71,6 +71,8 @@
- #include "qemu/mmap-alloc.h"
- #endif
- 
-+#include "monitor/monitor.h"
-+
- //#define DEBUG_SUBPAGE
- 
- #if !defined(CONFIG_USER_ONLY)
-@@ -1333,6 +1335,38 @@ void qemu_mutex_unlock_ramlist(void)
-     qemu_mutex_unlock(&ram_list.mutex);
- }
- 
-+static const char *page_size_to_str(size_t psize)
-+{
-+    switch (psize) {
-+    case 0x1000:
-+        return "4K";
-+    case 0x10000:
-+        return "64K";
-+    case 0x200000:
-+        return "2M";
-+    case 0x40000000:
-+        return "1G";
-+    default:
-+        return "N/A";
-+    }
-+}
-+
-+void ram_block_dump(Monitor *mon)
-+{
-+    RAMBlock *block;
-+
-+    rcu_read_lock();
-+    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-+                   "Block Name", "PSize", "Offset", "Used", "Total");
-+    RAMBLOCK_FOREACH(block) {
-+        monitor_printf(mon, "%24s %8s  0x%016lx 0x%016lx 0x%016lx\n",
-+                       block->idstr, page_size_to_str(block->page_size),
-+                       block->offset, block->used_length,
-+                       block->max_length);
-+    }
-+    rcu_read_unlock();
-+}
-+
- #ifdef __linux__
- /*
-  * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a53f105..ae16901 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -788,6 +788,20 @@ Display the latest dump status.
- ETEXI
- 
-     {
-+        .name       = "ramblock",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Display system ramblock information",
-+        .cmd        = hmp_info_ramblock,
-+    },
-+
-+STEXI
-+@item info ramblock
-+@findex ramblock
-+Dump all the ramblocks of the system.
-+ETEXI
-+
-+    {
-         .name       = "hotpluggable-cpus",
-         .args_type  = "",
-         .params     = "",
-diff --git a/hmp.c b/hmp.c
-index ab407d6..8369388 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -37,6 +37,7 @@
- #include "qemu-io.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-+#include "exec/ramlist.h"
- #include "hw/intc/intc.h"
- 
- #ifdef CONFIG_SPICE
-@@ -2563,6 +2564,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
-     qapi_free_DumpQueryResult(result);
- }
- 
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
-+{
-+    ram_block_dump(mon);
-+}
-+
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-diff --git a/hmp.h b/hmp.h
-index 799fd37..7353b67 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -136,6 +136,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- 
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-index f1c6b45..2e2ac6c 100644
---- a/include/exec/ramlist.h
-+++ b/include/exec/ramlist.h
-@@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
- void ram_block_notify_add(void *host, size_t size);
- void ram_block_notify_remove(void *host, size_t size);
- 
-+void ram_block_dump(Monitor *mon);
- 
- #endif /* RAMLIST_H */
--- 
-2.7.4
+This should not be necessary, because cpu->icount_decr will be checked
+by the prologue of the destination tb.
+
+Paolo
+
+> +    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+> +    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
+> +    if (likely(tb && tb->pc == addr && tb->cs_base == cs_base &&
+> +               tb->flags == flags)) {
+> +        return tb->tc_ptr;
+> +    }
+> + out_epilogue:
+> +    return tcg_ctx.code_gen_epilogue;
+> +}
+> +
+>  void HELPER(exit_atomic)(CPUArchState *env)
+>  {
+>      cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
+> diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
+> index 114ea6f..c41d38a 100644
+> --- a/tcg/tcg-runtime.h
+> +++ b/tcg/tcg-runtime.h
+> @@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+>  DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
+>  DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+>  
+> +DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
+> +
+>  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+>  
+>  #ifdef CONFIG_SOFTMMU
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 6c216bb..5ec48d1 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -699,6 +699,7 @@ struct TCGContext {
+>         extension that allows arithmetic on void*.  */
+>      int code_gen_max_blocks;
+>      void *code_gen_prologue;
+> +    void *code_gen_epilogue;
+>      void *code_gen_buffer;
+>      size_t code_gen_buffer_size;
+>      void *code_gen_ptr;
+> 
