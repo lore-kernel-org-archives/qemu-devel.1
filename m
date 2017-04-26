@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgnyang@gmail.com>) id 1d3MS1-0006Hg-1Z
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:45 -0400
+	(envelope-from <tgnyang@gmail.com>) id 1d3MS3-0006Ja-Gx
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgnyang@gmail.com>) id 1d3MRx-0005US-UZ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:45 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35896)
+	(envelope-from <tgnyang@gmail.com>) id 1d3MS2-0005VH-Ld
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:47 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35001)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d3MRx-0005UK-PN
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:41 -0400
-Received: by mail-pg0-x242.google.com with SMTP id v1so10773003pgv.3
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 05:53:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d3MS2-0005VB-Gt
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:46 -0400
+Received: by mail-pg0-x244.google.com with SMTP id 72so2625218pge.2
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 05:53:46 -0700 (PDT)
 From: Zihan Yang <tgnyang@gmail.com>
-Date: Wed, 26 Apr 2017 20:53:06 +0800
-Message-Id: <1493211188-24086-3-git-send-email-tgnyang@gmail.com>
+Date: Wed, 26 Apr 2017 20:53:07 +0800
+Message-Id: <1493211188-24086-4-git-send-email-tgnyang@gmail.com>
 In-Reply-To: <1493211188-24086-1-git-send-email-tgnyang@gmail.com>
 References: <1493211188-24086-1-git-send-email-tgnyang@gmail.com>
-Subject: [Qemu-devel] [PATCH 3/5] hw/s390: convert exit to unrealize in
- virtio_ccw_device_class_init
+Subject: [Qemu-devel] [PATCH 4/5] hw/audio: replace exit with unrealize in
+ hda_codec_device_class_init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Zihan Yang <tgnyang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: Zihan Yang <tgnyang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Currently the virtio_ccw_device_class_init function sets dc->exit, the
-exit callback of DeviceClass. It should be converted to dc->unrealize
-since exit callback of DeviceClass will be removed in the future.
+The exit callback of DeviceClass will be removed in the future, so
+convert to unrealize in the init functioin
 
 Signed-off-by: Zihan Yang <tgnyang@gmail.com>
 ---
- hw/s390x/virtio-ccw.c | 5 ++---
+ hw/audio/intel-hda.c | 5 ++---
  1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 91b43ac..5c193a8 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1621,13 +1621,12 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
-     virtio_ccw_device_realize(_dev, errp);
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index 537face..2c497eb 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -70,7 +70,7 @@ static void hda_codec_dev_realize(DeviceState *qdev, Error **errp)
+     }
  }
  
--static int virtio_ccw_busdev_exit(DeviceState *dev)
-+static void virtio_ccw_busdev_unrealize(DeviceState *dev, Error **errp)
+-static int hda_codec_dev_exit(DeviceState *qdev)
++static void hda_codec_dev_unrealize(DeviceState *qdev, Error **errp)
  {
-     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
-     VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
- 
-     _info->exit(_dev);
+     HDACodecDevice *dev = HDA_CODEC_DEVICE(qdev);
+     HDACodecDeviceClass *cdc = HDA_CODEC_DEVICE_GET_CLASS(dev);
+@@ -78,7 +78,6 @@ static int hda_codec_dev_exit(DeviceState *qdev)
+     if (cdc->exit) {
+         cdc->exit(dev);
+     }
 -    return 0;
  }
  
- static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
-@@ -1645,7 +1644,7 @@ static void virtio_ccw_device_class_init(ObjectClass *klass, void *data)
- 
-     k->unplug = virtio_ccw_busdev_unplug;
-     dc->realize = virtio_ccw_busdev_realize;
--    dc->exit = virtio_ccw_busdev_exit;
-+    dc->unrealize = virtio_ccw_busdev_unrealize;
-     dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
- }
- 
+ HDACodecDevice *hda_codec_find(HDACodecBus *bus, uint32_t cad)
+@@ -1318,7 +1317,7 @@ static void hda_codec_device_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *k = DEVICE_CLASS(klass);
+     k->realize = hda_codec_dev_realize;
+-    k->exit = hda_codec_dev_exit;
++    k->unrealize = hda_codec_dev_unrealize;
+     set_bit(DEVICE_CATEGORY_SOUND, k->categories);
+     k->bus_type = TYPE_HDA_BUS;
+     k->props = hda_props;
 -- 
 2.7.4
