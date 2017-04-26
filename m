@@ -1,28 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d3KGC-0002zF-Tn
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:33:26 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d3KHW-0003zU-8l
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d3KG8-0006gz-HM
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:33:24 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:36524)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d3KG8-0006g5-AM
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:33:20 -0400
-Received: by mail-wr0-x232.google.com with SMTP id l50so49242874wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 03:33:20 -0700 (PDT)
-References: <1493187803-4510-1-git-send-email-cota@braap.org>
-	<1493187803-4510-4-git-send-email-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1493187803-4510-4-git-send-email-cota@braap.org>
-Date: Wed, 26 Apr 2017 11:33:46 +0100
-Message-ID: <87d1bz8nlh.fsf@linaro.org>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d3KHT-0007IF-4H
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:34:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60205)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d3KHS-0007H3-SI
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:34:43 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3QAXog6112903
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:34:41 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2ebubwfv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:34:41 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Wed, 26 Apr 2017 11:34:39 +0100
+Date: Wed, 26 Apr 2017 12:34:27 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <1493126327-13162-1-git-send-email-thuth@redhat.com>
+References: <1493126327-13162-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 03/10] tcg: export
- tcg_gen_lookup_and_goto_ptr
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170426123427.48528f3c.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix crash with
+ virtio-scsi-pci device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,94 +41,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
+On Tue, 25 Apr 2017 15:18:47 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> Instead of exporting goto_ptr directly to TCG frontends, export
-> tcg_gen_lookup_and_goto_ptr(), which calls goto_ptr with the pointer
-> returned by the lookup_tb_ptr() helper. This is the only use case
-> we have for goto_ptr and lookup_tb_ptr, so having this function is
-> very convenient. Furthermore, it trivially allows us to avoid calling
-> the lookup helper if goto_ptr is not implemented by the backend.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
+> qemu-system-s390x currently crashes when it is started with a
+> virtio-scsi-pci device, e.g.:
+> 
+>  qemu-system-s390x -nographic -enable-kvm -device virtio-scsi-pci \
+>                    -drive file=/tmp/disk.dat,if=none,id=d1,format=raw \
+>                    -device scsi-cd,drive=d1,bootindex=1
+> 
+> The problem is that the code in s390_gen_initial_iplb() currently assumes
+> that all SCSI devices are also CCW devices, which is not the case for
+> virtio-scsi-pci of course. Fix it by adding an appropriate check for
+> TYPE_CCW_DEVICE here.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tcg/README   |  8 ++++++++
->  tcg/tcg-op.c | 13 +++++++++++++
->  tcg/tcg-op.h | 11 +++++++++++
->  3 files changed, 32 insertions(+)
->
-> diff --git a/tcg/README b/tcg/README
-> index a9858c2..bf49e82 100644
-> --- a/tcg/README
-> +++ b/tcg/README
-> @@ -477,6 +477,14 @@ current TB was linked to this TB. Otherwise execute the next
->  instructions. Only indices 0 and 1 are valid and tcg_gen_goto_tb may be issued
->  at most once with each slot index per TB.
->
-> +* lookup_and_goto_ptr tb_addr
+>  hw/s390x/ipl.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 7978c7d..f674d50 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -248,7 +248,13 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>              SCSIBus *bus = scsi_bus_from_device(sd);
+>              VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
+>              VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw, vdev);
+> -            CcwDevice *ccw_dev = CCW_DEVICE(scsi_ccw);
+> +            CcwDevice *ccw_dev;
 > +
-> +Look up a TB address ('tb_addr') and jump to it if valid. If not valid,
-> +jump to the TCG epilogue to go back to the exec loop.
-> +
-> +This operation is optional. If the TCG backend does not implement the
-> +goto_ptr opcode, emitting this op is equivalent to emitting exit_tb(0).
-> +
->  * qemu_ld_i32/i64 t0, t1, flags, memidx
->  * qemu_st_i32/i64 t0, t1, flags, memidx
->
-> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-> index 95a39b7..8ff1eaf 100644
-> --- a/tcg/tcg-op.c
-> +++ b/tcg/tcg-op.c
-> @@ -2587,6 +2587,19 @@ void tcg_gen_goto_tb(unsigned idx)
->      tcg_gen_op1i(INDEX_op_goto_tb, idx);
->  }
->
-> +void tcg_gen_lookup_and_goto_ptr(TCGv addr)
-> +{
-> +    if (TCG_TARGET_HAS_goto_ptr) {
-> +        TCGv_ptr ptr = tcg_temp_new_ptr();
-> +
-> +        gen_helper_lookup_tb_ptr(ptr, tcg_ctx.tcg_env, addr);
-> +        tcg_gen_op1i(INDEX_op_goto_ptr, GET_TCGV_PTR(ptr));
-> +        tcg_temp_free_ptr(ptr);
-> +    } else {
-> +        tcg_gen_exit_tb(0);
-> +    }
-> +}
-> +
->  static inline TCGMemOp tcg_canonicalize_memop(TCGMemOp op, bool is64, bool st)
->  {
->      /* Trigger the asserts within as early as possible.  */
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index c68e300..5d3278f 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -796,6 +796,17 @@ static inline void tcg_gen_exit_tb(uintptr_t val)
->   */
->  void tcg_gen_goto_tb(unsigned idx);
->
-> +/**
-> + * tcg_gen_lookup_and_goto_ptr() - look up a TB and jump to it if valid
-> + * @addr: Guest address of the target TB
-> + *
-> + * If the TB is not valid, jump to the epilogue.
-> + *
-> + * This operation is optional. If the TCG backend does not implement goto_ptr,
-> + * this op is equivalent to calling tcg_gen_exit_tb() with 0 as the argument.
-> + */
-> +void tcg_gen_lookup_and_goto_ptr(TCGv addr);
-> +
->  #if TARGET_LONG_BITS == 32
->  #define tcg_temp_new() tcg_temp_new_i32()
->  #define tcg_global_reg_new tcg_global_reg_new_i32
+> +            ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
+> +                                                       TYPE_CCW_DEVICE);
+> +            if (!ccw_dev) {       /* It might be a PCI device instead */
+> +                return false;
+> +            }
+> 
+>              ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
+>              ipl->iplb.blk0_len =
 
+This patch made me look at what we do if we have a non-ccw virtio-net
+device for ipl. We'll set ->netboot (which implies that we load the
+netboot fw later), but leave the iplb as invalid (so setting the start
+address in the iplb won't have any effect as we ignore an invalid iplb
+later on). The s390-ccw bios cannot deal with non-ccw boot devices
+anyway.
 
---
-Alex Bennée
+In the end, it's just a bit odd, but no harm is done.
