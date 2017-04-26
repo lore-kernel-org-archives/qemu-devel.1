@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Msu-0003Ut-8Z
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:21:36 -0400
+	(envelope-from <groug@kaod.org>) id 1d3MtH-0003mM-Ef
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:21:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Mss-0008Ib-Uz
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:21:32 -0400
-References: <1493196046-5607-1-git-send-email-den@openvz.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <322af251-e486-4b32-a234-357f0d5e1e4a@redhat.com>
-Date: Wed, 26 Apr 2017 08:21:18 -0500
+	(envelope-from <groug@kaod.org>) id 1d3MtD-0008PH-H0
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:21:55 -0400
+Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:38337)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d3MtD-0008P2-AQ
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:21:51 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id CE78FE99FC
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:21:49 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 26 Apr 2017 15:21:46 +0200
+Message-ID: <149321290672.6890.14889421479138766387.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <1493196046-5607-1-git-send-email-den@openvz.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="t46u4GUbOdiqCF8X5nNEWC7vFoENLa7uv"
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: fix alignment calculations in
- bdrv_co_do_zero_pwritev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] configure: fix trace backend list for
+ out-of-tree builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---t46u4GUbOdiqCF8X5nNEWC7vFoENLa7uv
-From: Eric Blake <eblake@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-block@nongnu.org
-Message-ID: <322af251-e486-4b32-a234-357f0d5e1e4a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: fix alignment calculations in
- bdrv_co_do_zero_pwritev
-References: <1493196046-5607-1-git-send-email-den@openvz.org>
-In-Reply-To: <1493196046-5607-1-git-send-email-den@openvz.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Since commit "c53eeaf75a04 configure: eliminate Python dependency for
+--help", configure --help fails to produce the list of available trace
+backends if invoked out-of-tree. It also spits the following error:
 
-On 04/26/2017 03:40 AM, Denis V. Lunev wrote:
-> tail_padding_bytes is calculated wrong. F.e. for
->     offset =3D 0
->     bytes =3D 2048
->     align =3D 512
-> we will have tail_padding_bytes =3D 512 which is definitely wrong. The =
-patch
-> fixes that arithmetics.
->=20
-> Fortunately this problem is harmless, we will have 1 extra allocation a=
-nd
-> free thus there is no need to put this into stable. The problem is here=
+grep: scripts/tracetool/backend/*.py: No such file or directory
 
-> from the very beginning.
->=20
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: Fam Zheng <famz@redhat.com>
-> ---
->  block/io.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+This patch simply adds the missing $source_path to fix it.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ configure |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---t46u4GUbOdiqCF8X5nNEWC7vFoENLa7uv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZAJ7OAAoJEKeha0olJ0Nq/SQH/iLMGYDL6/Z6HKZBnI1sceSE
-25D+3GB4L8rYna1HPO5tiuMCHNhqQvpNGjNFmZUTRDe5Gon0yDVyHqKlRbnJzvCC
-JbUIVBGNeu72rtuLWkmJWJM8g8QCA80IWIcorfjJNGgGTuqEofaXIDPS6h9O7ktU
-76hvouj4aL+zXCHQYBeinDyUX0XSvmRkxG0NFYxvTXLpk0eaV7OVRHqe2Wc2kpCr
-A453Y2SusA20y04eyh+quAy5SyckQ3bhPmWF1Xyx57csA9pO4nYlWMe1GaJJqnqL
-oNCdTXXbXZAFmERjAiI0HSssV2qPar7Xc9LD1r/1vFwF3eT5LXw8SNxrPknzI5Q=
-=Bi0/
------END PGP SIGNATURE-----
-
---t46u4GUbOdiqCF8X5nNEWC7vFoENLa7uv--
+diff --git a/configure b/configure
+index c35acf119261..96847b092c8d 100755
+--- a/configure
++++ b/configure
+@@ -1271,7 +1271,7 @@ for config in $mak_wilds; do
+ done
+ 
+ # Enumerate public trace backends for --help output
+-trace_backend_list=$(echo $(grep -le '^PUBLIC = True$' scripts/tracetool/backend/*.py | sed -e 's/^.*\/\(.*\)\.py$/\1/'))
++trace_backend_list=$(echo $(grep -le '^PUBLIC = True$' $source_path/scripts/tracetool/backend/*.py | sed -e 's/^.*\/\(.*\)\.py$/\1/'))
+ 
+ if test x"$show_help" = x"yes" ; then
+ cat << EOF
