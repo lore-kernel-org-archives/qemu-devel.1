@@ -1,20 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d3IsF-0003Gr-EY
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:04:42 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d3IvX-0004O3-UH
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:08:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d3IsC-0000cV-6T
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:04:35 -0400
-Resent-Message-Id: <E1d3IsC-0000cV-6T@eggs.gnu.org>
-In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-Message-ID: <149319744070.84.3729245150086786469@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d3IvU-0002CJ-N2
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:07:59 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46017
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1d3IvU-0002C6-HU
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:07:56 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3Q94402001836
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 05:07:55 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a2q25n1c3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 05:07:55 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 26 Apr 2017 05:07:55 -0400
+Date: Wed, 26 Apr 2017 17:07:51 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170425045201.71457-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170425045642.GG31848@bjsdjshi@linux.vnet.ibm.com>
+	<3a453449-f451-08d1-3a14-e26dd40b667f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 26 Apr 2017 02:04:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/48] ppc-for-2.10 queue 20170426
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3a453449-f451-08d1-3a14-e26dd40b667f@redhat.com>
+Message-Id: <20170426090751.GJ31848@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] vfio/pci: Fix incorrect error
+ message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,148 +44,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, qemu-ppc@nongnu.org, clg@kaod.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, alex.williamson@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA0MjYwNzAwMzQuMTA3MjctMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUKU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzQ4XSBwcGMtZm9yLTIuMTAgcXVldWUgMjAxNzA0MjYKVHlw
-ZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
-c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
-MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
-IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
-bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
-cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
-ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
-IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
-ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
-bXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNDkzMTc5OTA3LTIyNTE2LTEtZ2l0LXNl
-bmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0OTMxNzk5MDctMjI1MTYtMS1n
-aXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNo
-ZXcvMjAxNzA0MjYwNzMyNDcuNzQ0MS0yLXF1aW50ZWxhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
-MDE3MDQyNjA3MzI0Ny43NDQxLTItcXVpbnRlbGFAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCmMxNGVhNDIgTUFJTlRBSU5FUlM6IFJlbW92ZSBteXNlbGYgZnJvbSBl
-NTAwCmNkYTFiY2MgdGFyZ2V0L3BwYzogU3R5bGUgZml4ZXMKMjY4N2EyMiBlNTAwLCBib29rM3M6
-IG1mc3ByIDI1OTogUmVnaXN0ZXIgbWFwcGVkL2FsaWFzZWQgU1BSRzMgdXNlciByZWFkCjRkODBi
-ZWEgdGFyZ2V0L3BwYzogRmx1c2ggVExCIG9uIHdyaXRlIHRvIFBJRFIKODAzYTQ1MiBzcGFwci1j
-cHUtY29yZTogUmVsZWFzZSBJQ1BTdGF0ZSBvYmplY3QgZHVyaW5nIENQVSB1bnJlYWxpemF0aW9u
-CmRhZDE0MTEgcHBjL3BudjogZ2VuZXJhdGUgYW4gT0VNIFNFTCBldmVudCBvbiBzaHV0ZG93bgo4
-MWZjOGRjIHBwYy9wbnY6IGFkZCBpbml0aWFsIElQTUkgc2Vuc29ycyBmb3IgdGhlIEJNQyBzaW11
-bGF0b3IKNTliNjI2OSBwcGMvcG52OiBwb3B1bGF0ZSBkZXZpY2UgdHJlZSBmb3IgSVBNSSBCVCBk
-ZXZpY2VzCjk2MzFiZTAgcHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9yIHNlcmlhbCBk
-ZXZpY2VzCjBhYTI5ZmUgcHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9yIFJUQyBkZXZp
-Y2VzCjM4Y2YxYmEgcHBjL3Budjogc2NhbiBJU0EgYnVzIHRvIHBvcHVsYXRlIGRldmljZSB0cmVl
-Cjc3YTk4YTYgcHBjL3BudjogZW5hYmxlIG9ubHkgb25lIExQQyBidXMKYTQ0NDhlMCBwcGMvcG52
-OiBBZGQgc3VwcG9ydCBmb3IgUE9XRVI4KyBMUEMgQ29udHJvbGxlcgowNTJjNmY4IHNwYXByOiBy
-ZW1vdmUgdGhlICducl9zZXJ2ZXJzJyBmaWVsZCBmcm9tIHRoZSBtYWNoaW5lCjkzMDA1M2QgdGFy
-Z2V0L3BwYzogRml4IHNpemUgb2Ygc3RydWN0IFBQQ0VsZlByc3RhdHVzCjc1ZGY2YjMgaXBtaTog
-aW50cm9kdWNlIGFuIGlwbWlfYm1jX2dlbl9ldmVudCgpIEFQSQoyMzVlYjFiIGlwbWk6IGludHJv
-ZHVjZSBhbiBpcG1pX2JtY19zZHJfZmluZCgpIEFQSQo2YzRiOGI5IGlwbWk6IHByb3ZpZGUgc3Vw
-cG9ydCBmb3IgRlJVcwozNzU5NDBlIGlwbWk6IHVzZSBhIGZpbGUgdG8gbG9hZCBTRFJzCjVkNzA2
-MzAgcHBjOiBhZGQgSVBNSSBzdXBwb3J0CjhlMDcxNjkgcHBjL3BudjogQWRkIE9DQyBtb2RlbCBz
-dHViIHdpdGggaW50ZXJydXB0IHN1cHBvcnQKOGYwNDlmZCBwcGMvcG52OiBBZGQgY3V0IGRvd24g
-UFNJIGJyaWRnZSBtb2RlbCBhbmQgaG9va3VwIGV4dGVybmFsIGludGVycnVwdAo4YjUwZmM0IHBw
-Yy9wbnY6IGFkZCBtZW1vcnkgcmVnaW9ucyBmb3IgdGhlIElDUCByZWdpc3RlcnMKYWZlYTQwNyBw
-cGMvcG52OiBhZGQgYSBoZWxwZXIgdG8gY2FsY3VsYXRlIE1NSU8gYWRkcmVzc2VzIHJlZ2lzdGVy
-cwowNTNjYzk2IHBwYy9wbnY6IGNyZWF0ZSB0aGUgSUNQIG9iamVjdCB1bmRlciBQbnZDb3JlCjc3
-NDU0YzYgcHBjL3BudjogZXh0ZW5kIHRoZSBtYWNoaW5lIHdpdGggYSBJbnRlcnJ1cHRTdGF0c1By
-b3ZpZGVyIGludGVyZmFjZQoyNzQ5NmZkIHBwYy9wbnY6IGV4dGVuZCB0aGUgbWFjaGluZSB3aXRo
-IGEgWElDU0ZhYnJpYyBpbnRlcmZhY2UKY2I2MGI0MSBwcGMvcG52OiBhZGQgYSBQbnZJQ1BTdGF0
-ZSBvYmplY3QKYjNlNDJiOCBwcGMveGljczogYWRkIGEgcmVhbGl6ZSgpIGhhbmRsZXIgdG8gSUNQ
-U3RhdGVDbGFzcwo0M2ZhM2Q3IHNwYXByOiBhbGxvY2F0ZSB0aGUgSUNQU3RhdGUgb2JqZWN0IGZy
-b20gdW5kZXIgc1BBUFJDUFVDb3JlCjU1NTE5ZTAgc3BhcHI6IG1vdmUgdGhlIElSUSBzZXJ2ZXIg
-bnVtYmVyIG1hcHBpbmcgdW5kZXIgdGhlIG1hY2hpbmUKNTliY2EwOCBwcGMveGljczogaW50cm9k
-dWNlIGFuICdpbnRjJyBiYWNrbGluayB1bmRlciBQb3dlclBDQ1BVCmNhYWUyYTkgdGFyZ2V0L3Bw
-YzogQWRkIGlibSwgcHJvY2Vzc29yLXJhZGl4LUFQLWVuY29kaW5ncyBmb3IgVENHCjQ0Njk5NjUg
-c3BhcHJfcGNpOiBSZW1vdmVkIHVudXNlZCBpbmNsdWRlCmRmYTlmYWYgc3BhcHJfcGNpOiBXYXJu
-IHdoZW4gUkFNIHBhZ2Ugc2l6ZSBpcyBub3QgZW5hYmxlZCBpbiBJT01NVSBwYWdlIG1hc2sKMDVm
-YWY0ZiB0YXJnZXQtcHBjL2t2bTogRW5hYmxlIGluLWtlcm5lbCBUQ0UgYWNjZWxlcmF0aW9uIGZv
-ciBtdWx0aS10Y2UKODA4ZThjMSBzcGFwcjogV29ya2Fyb3VuZCBmb3IgYnJva2VuIHJhZGl4IGd1
-ZXN0cwo3YzQyM2E3IHNwYXByOiBFbmFibGUgSVNBIDMuMCBNTVUgbW9kZSBzZWxlY3Rpb24gdmlh
-IENBUwoxN2QyYzc2IHNwYXByOiBtb3ZlIHNwYXByX3BvcHVsYXRlX3BhX2ZlYXR1cmVzKCkKYTlk
-ZjI3NSB0YXJnZXQvcHBjOiBJbXBsZW1lbnQgSF9SRUdJU1RFUl9QUk9DRVNTX1RBQkxFIEhfQ0FM
-TApiM2E5NDM2IHRhcmdldC9wcGM6IEFkZCBuZXcgSC1DQUxMIHNoZWxscyBmb3IgaW4gbWVtb3J5
-IHRhYmxlIHRyYW5zbGF0aW9uCjI5ZmFlZjMgdGFyZ2V0LXBwYzogc3VwcG9ydCBLVk1fQ0FQX1BQ
-Q19NTVVfUkFESVgsIEtWTV9DQVBfUFBDX01NVV9IQVNIX1YzCmI4ZTI4Zjggc3BhcHI6IEFkZCBp
-Ym0sIHByb2Nlc3Nvci1yYWRpeC1BUC1lbmNvZGluZ3MgdG8gdGhlIGRldmljZSB0cmVlCmU4ZTMy
-YjggdGFyZ2V0LXBwYzoga3ZtOiBtYWtlIHVzZSBvZiBLVk1fQ1JFQVRFX1NQQVBSX1RDRV82NApi
-MmYxYzU2IGh3L3BwYy9wbnY6IENsYXNzaWZ5IHRoZSAiUG93ZXJOViBDaGlwIiBkZXZpY2VzIGFz
-IENQVSBkZXZpY2VzCjRkNjlhNzAgcHBjL3NwYXByOiBRT00naWZ5IHNQQVBSUlRDU3RhdGUKZDcw
-OTFlMSBwc2VyaWVzOiBBZGQgcHNlcmllcy0yLjEwIG1hY2hpbmUgdHlwZQoxYmM4NTlmIHRhcmdl
-dC9wcGM6IEltcHJvdmUgYWNjdXJhY3kgb2YgZ3Vlc3QgSFRNIGF2YWlsYWJpbGl0eSBvbiBQOHMK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDg6IHRhcmdldC9wcGM6IElt
-cHJvdmUgYWNjdXJhY3kgb2YgZ3Vlc3QgSFRNIGF2YWlsYWJpbGl0eSBvbiBQOHMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMi80ODogcHNlcmllczogQWRkIHBzZXJpZXMtMi4xMCBtYWNoaW5lIHR5cGUuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMy80ODogcHBjL3NwYXByOiBRT00naWZ5IHNQQVBSUlRDU3RhdGUuLi4K
-Q2hlY2tpbmcgUEFUQ0ggNC80ODogaHcvcHBjL3BudjogQ2xhc3NpZnkgdGhlICJQb3dlck5WIENo
-aXAiIGRldmljZXMgYXMgQ1BVIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS80ODogdGFyZ2V0
-LXBwYzoga3ZtOiBtYWtlIHVzZSBvZiBLVk1fQ1JFQVRFX1NQQVBSX1RDRV82NC4uLgpDaGVja2lu
-ZyBQQVRDSCA2LzQ4OiBzcGFwcjogQWRkIGlibSwgcHJvY2Vzc29yLXJhZGl4LUFQLWVuY29kaW5n
-cyB0byB0aGUgZGV2aWNlIHRyZWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy80ODogdGFyZ2V0LXBwYzog
-c3VwcG9ydCBLVk1fQ0FQX1BQQ19NTVVfUkFESVgsIEtWTV9DQVBfUFBDX01NVV9IQVNIX1YzLi4u
-CkNoZWNraW5nIFBBVENIIDgvNDg6IHRhcmdldC9wcGM6IEFkZCBuZXcgSC1DQUxMIHNoZWxscyBm
-b3IgaW4gbWVtb3J5IHRhYmxlIHRyYW5zbGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDkvNDg6IHRh
-cmdldC9wcGM6IEltcGxlbWVudCBIX1JFR0lTVEVSX1BST0NFU1NfVEFCTEUgSF9DQUxMLi4uCkNo
-ZWNraW5nIFBBVENIIDEwLzQ4OiBzcGFwcjogbW92ZSBzcGFwcl9wb3B1bGF0ZV9wYV9mZWF0dXJl
-cygpLi4uCkNoZWNraW5nIFBBVENIIDExLzQ4OiBzcGFwcjogRW5hYmxlIElTQSAzLjAgTU1VIG1v
-ZGUgc2VsZWN0aW9uIHZpYSBDQVMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNDg6IHNwYXByOiBXb3Jr
-YXJvdW5kIGZvciBicm9rZW4gcmFkaXggZ3Vlc3RzLi4uCkNoZWNraW5nIFBBVENIIDEzLzQ4OiB0
-YXJnZXQtcHBjL2t2bTogRW5hYmxlIGluLWtlcm5lbCBUQ0UgYWNjZWxlcmF0aW9uIGZvciBtdWx0
-aS10Y2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvNDg6IHNwYXByX3BjaTogV2FybiB3aGVuIFJBTSBw
-YWdlIHNpemUgaXMgbm90IGVuYWJsZWQgaW4gSU9NTVUgcGFnZSBtYXNrLi4uCkNoZWNraW5nIFBB
-VENIIDE1LzQ4OiBzcGFwcl9wY2k6IFJlbW92ZWQgdW51c2VkIGluY2x1ZGUuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTYvNDg6IHRhcmdldC9wcGM6IEFkZCBpYm0sIHByb2Nlc3Nvci1yYWRpeC1BUC1lbmNv
-ZGluZ3MgZm9yIFRDRy4uLgpDaGVja2luZyBQQVRDSCAxNy80ODogcHBjL3hpY3M6IGludHJvZHVj
-ZSBhbiAnaW50YycgYmFja2xpbmsgdW5kZXIgUG93ZXJQQ0NQVS4uLgpDaGVja2luZyBQQVRDSCAx
-OC80ODogc3BhcHI6IG1vdmUgdGhlIElSUSBzZXJ2ZXIgbnVtYmVyIG1hcHBpbmcgdW5kZXIgdGhl
-IG1hY2hpbmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvNDg6IHNwYXByOiBhbGxvY2F0ZSB0aGUgSUNQ
-U3RhdGUgb2JqZWN0IGZyb20gdW5kZXIgc1BBUFJDUFVDb3JlLi4uCkNoZWNraW5nIFBBVENIIDIw
-LzQ4OiBwcGMveGljczogYWRkIGEgcmVhbGl6ZSgpIGhhbmRsZXIgdG8gSUNQU3RhdGVDbGFzcy4u
-LgpDaGVja2luZyBQQVRDSCAyMS80ODogcHBjL3BudjogYWRkIGEgUG52SUNQU3RhdGUgb2JqZWN0
-Li4uCkNoZWNraW5nIFBBVENIIDIyLzQ4OiBwcGMvcG52OiBleHRlbmQgdGhlIG1hY2hpbmUgd2l0
-aCBhIFhJQ1NGYWJyaWMgaW50ZXJmYWNlLi4uCkNoZWNraW5nIFBBVENIIDIzLzQ4OiBwcGMvcG52
-OiBleHRlbmQgdGhlIG1hY2hpbmUgd2l0aCBhIEludGVycnVwdFN0YXRzUHJvdmlkZXIgaW50ZXJm
-YWNlLi4uCkNoZWNraW5nIFBBVENIIDI0LzQ4OiBwcGMvcG52OiBjcmVhdGUgdGhlIElDUCBvYmpl
-Y3QgdW5kZXIgUG52Q29yZS4uLgpDaGVja2luZyBQQVRDSCAyNS80ODogcHBjL3BudjogYWRkIGEg
-aGVscGVyIHRvIGNhbGN1bGF0ZSBNTUlPIGFkZHJlc3NlcyByZWdpc3RlcnMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMjYvNDg6IHBwYy9wbnY6IGFkZCBtZW1vcnkgcmVnaW9ucyBmb3IgdGhlIElDUCByZWdp
-c3RlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvNDg6IHBwYy9wbnY6IEFkZCBjdXQgZG93biBQU0kg
-YnJpZGdlIG1vZGVsIGFuZCBob29rdXAgZXh0ZXJuYWwgaW50ZXJydXB0Li4uCkNoZWNraW5nIFBB
-VENIIDI4LzQ4OiBwcGMvcG52OiBBZGQgT0NDIG1vZGVsIHN0dWIgd2l0aCBpbnRlcnJ1cHQgc3Vw
-cG9ydC4uLgpDaGVja2luZyBQQVRDSCAyOS80ODogcHBjOiBhZGQgSVBNSSBzdXBwb3J0Li4uCkNo
-ZWNraW5nIFBBVENIIDMwLzQ4OiBpcG1pOiB1c2UgYSBmaWxlIHRvIGxvYWQgU0RScy4uLgpDaGVj
-a2luZyBQQVRDSCAzMS80ODogaXBtaTogcHJvdmlkZSBzdXBwb3J0IGZvciBGUlVzLi4uCkNoZWNr
-aW5nIFBBVENIIDMyLzQ4OiBpcG1pOiBpbnRyb2R1Y2UgYW4gaXBtaV9ibWNfc2RyX2ZpbmQoKSBB
-UEkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzMvNDg6IGlwbWk6IGludHJvZHVjZSBhbiBpcG1pX2JtY19n
-ZW5fZXZlbnQoKSBBUEkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzQvNDg6IHRhcmdldC9wcGM6IEZpeCBz
-aXplIG9mIHN0cnVjdCBQUENFbGZQcnN0YXR1cy4uLgpDaGVja2luZyBQQVRDSCAzNS80ODogc3Bh
-cHI6IHJlbW92ZSB0aGUgJ25yX3NlcnZlcnMnIGZpZWxkIGZyb20gdGhlIG1hY2hpbmUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMzYvNDg6IHBwYy9wbnY6IEFkZCBzdXBwb3J0IGZvciBQT1dFUjgrIExQQyBD
-b250cm9sbGVyLi4uCkNoZWNraW5nIFBBVENIIDM3LzQ4OiBwcGMvcG52OiBlbmFibGUgb25seSBv
-bmUgTFBDIGJ1cy4uLgpDaGVja2luZyBQQVRDSCAzOC80ODogcHBjL3Budjogc2NhbiBJU0EgYnVz
-IHRvIHBvcHVsYXRlIGRldmljZSB0cmVlLi4uCkNoZWNraW5nIFBBVENIIDM5LzQ4OiBwcGMvcG52
-OiBwb3B1bGF0ZSBkZXZpY2UgdHJlZSBmb3IgUlRDIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NDAvNDg6IHBwYy9wbnY6IHBvcHVsYXRlIGRldmljZSB0cmVlIGZvciBzZXJpYWwgZGV2aWNlcy4u
-LgpDaGVja2luZyBQQVRDSCA0MS80ODogcHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9y
-IElQTUkgQlQgZGV2aWNlcy4uLgpDaGVja2luZyBQQVRDSCA0Mi80ODogcHBjL3BudjogYWRkIGlu
-aXRpYWwgSVBNSSBzZW5zb3JzIGZvciB0aGUgQk1DIHNpbXVsYXRvci4uLgpDaGVja2luZyBQQVRD
-SCA0My80ODogcHBjL3BudjogZ2VuZXJhdGUgYW4gT0VNIFNFTCBldmVudCBvbiBzaHV0ZG93bi4u
-LgpDaGVja2luZyBQQVRDSCA0NC80ODogc3BhcHItY3B1LWNvcmU6IFJlbGVhc2UgSUNQU3RhdGUg
-b2JqZWN0IGR1cmluZyBDUFUgdW5yZWFsaXphdGlvbi4uLgpDaGVja2luZyBQQVRDSCA0NS80ODog
-dGFyZ2V0L3BwYzogRmx1c2ggVExCIG9uIHdyaXRlIHRvIFBJRFIuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NDYvNDg6IGU1MDAsIGJvb2szczogbWZzcHIgMjU5OiBSZWdpc3RlciBtYXBwZWQvYWxpYXNlZCBT
-UFJHMyB1c2VyIHJlYWQuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlv
-biBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNTE6IEZJTEU6IHRhcmdldC9wcGMvdHJh
-bnNsYXRlX2luaXQuYzoxNjQzOgorc3RhdGljIHZvaWQgZ2VuX3Nwcl91c3ByZzMgKENQVVBQQ1N0
-YXRlICplbnYpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI4IGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQ3
-LzQ4OiB0YXJnZXQvcHBjOiBTdHlsZSBmaXhlcy4uLgpDaGVja2luZyBQQVRDSCA0OC80ODogTUFJ
-TlRBSU5FUlM6IFJlbW92ZSBteXNlbGYgZnJvbSBlNTAwLi4uCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+* Auger Eric <eric.auger@redhat.com> [2017-04-26 10:06:58 +0200]:
+
+Hi Eric,
+
+> Hi Dong,
+> 
+> On 25/04/2017 06:56, Dong Jia Shi wrote:
+> > * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-04-25 06:52:01 +0200]:
+> > 
+> > Hey Alex,
+> > 
+> > Please ignore the "RFC" tag in the subject. Sorry for the mistake.
+> > 
+> >> When the "No host device provided" error occurs, the hint message
+> >> that starts with "Use -vfio-pci," makes no sense, since "-vfio-pci"
+> >> is not a valid command line parameter.
+> >>
+> >> Correct this by replacing "-vfio-pci" with "-device vfio-pci".
+> >>
+> >> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks for the review!
+
+> 
+> Thanks
+> 
+> Eric
+> >> ---
+> >>  hw/vfio/pci.c | 4 ++--
+> >>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> >> index 03a3d01..32aca77 100644
+> >> --- a/hw/vfio/pci.c
+> >> +++ b/hw/vfio/pci.c
+> >> @@ -2625,8 +2625,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >>          if (!(~vdev->host.domain || ~vdev->host.bus ||
+> >>                ~vdev->host.slot || ~vdev->host.function)) {
+> >>              error_setg(errp, "No provided host device");
+> >> -            error_append_hint(errp, "Use -vfio-pci,host=DDDD:BB:DD.F "
+> >> -                              "or -vfio-pci,sysfsdev=PATH_TO_DEVICE\n");
+> >> +            error_append_hint(errp, "Use -device vfio-pci,host=DDDD:BB:DD.F "
+> >> +                              "or -device vfio-pci,sysfsdev=PATH_TO_DEVICE\n");
+> >>              return;
+> >>          }
+> >>          vdev->vbasedev.sysfsdev =
+> >> -- 
+> >> 2.10.2
+> >>
+> > 
+> 
+
+-- 
+Dong Jia Shi
