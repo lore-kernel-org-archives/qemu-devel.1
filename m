@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3NLW-0004xc-6F
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:51:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d3NRT-0000Dd-LA
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3NLU-0003yh-Ug
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:51:06 -0400
-Date: Wed, 26 Apr 2017 14:50:51 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170426135051.GY18933@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170425153858.25660-1-berrange@redhat.com>
-	<20170425153858.25660-3-berrange@redhat.com>
-	<48ac644a-441b-134a-7d4c-fb3239fb5e0f@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <48ac644a-441b-134a-7d4c-fb3239fb5e0f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 02/18] block: add ability to set a
- prefix for opt names
+	(envelope-from <dgilbert@redhat.com>) id 1d3NRR-0006kO-W7
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45298)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3NRR-0006k1-Qw
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BCC697F4AB
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 13:57:12 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 26 Apr 2017 14:57:05 +0100
+Message-Id: <20170426135707.5261-4-dgilbert@redhat.com>
+In-Reply-To: <20170426135707.5261-1-dgilbert@redhat.com>
+References: <20170426135707.5261-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 3/5] libqtest: Ignore QMP events when parsing
+ the response for HMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, thuth@redhat.com
 
-On Wed, Apr 26, 2017 at 08:28:04AM -0500, Eric Blake wrote:
-> On 04/25/2017 10:38 AM, Daniel P. Berrange wrote:
-> > When integrating the crypto support with qcow/qcow2, we don't
-> > want to use the bare LUKS option names "hash-alg", "key-secret",
-> > etc. We want to namespace them "luks-hash-alg", "luks-key-secret"
-> > so that they don't clash with any general qcow options at a later
-> > date.
-> > 
-> > Reviewed-by: Max Reitz <mreitz@redhat.com>
-> > Reviewed-by: Alberto Garcia <berto@igalia.com>
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  block/crypto.c | 16 ++++++++--------
-> >  block/crypto.h | 40 ++++++++++++++++++++--------------------
-> >  2 files changed, 28 insertions(+), 28 deletions(-)
-> > 
-> > diff --git a/block/crypto.c b/block/crypto.c
-> > index 8205bd8..7edcc49 100644
-> > --- a/block/crypto.c
-> > +++ b/block/crypto.c
-> > @@ -129,7 +129,7 @@ static QemuOptsList block_crypto_runtime_opts_luks = {
-> >      .name = "crypto",
-> >      .head = QTAILQ_HEAD_INITIALIZER(block_crypto_runtime_opts_luks.head),
-> >      .desc = {
-> > -        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
-> > +        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET(""),
-> 
-> Is this still needed, given your cover letter said you reworked things
-> to use a nested struct?  I'm still not convinced we need the complexity
-> of two different prefixes if we can instead reuse a common structure.
+From: Thomas Huth <thuth@redhat.com>
 
-Yes, we still need this at the QemuOpts level.  We have the general
-purpose luks driver that has opts directly in the top level QAPI block
-driver options, vs the qcow2 integration, which now has the encryption
-options in a nested struct/union, rather than having an option prefix
-in the QAPI member names.
+When running certain HMP commands (like "device_del") via QMP, we
+can sometimes get a QMP event in the response first, so that the
+"g_assert(ret)" statement in qtest_hmp() triggers and the test
+fails. Fix this by ignoring such QMP events while looking for the
+real return value from QMP.
 
-At the QemuOpts level, this mean that the option names have changed
-from being 'luks-key-secret', 'aes-key-secret', to be "encrypt.key-secret"
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1490860207-8302-2-git-send-email-thuth@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+  Added note to qtest_hmp/qtest_hmpv's header description to say
+  it discards events
+---
+ tests/libqtest.c | 6 ++++++
+ tests/libqtest.h | 4 +++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-So this change is about letting us provide the "encrypt." prefix for
-the QemuOpts. 
-
-
-Regards,
-Daniel
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 99b1195355..0b0bf1d460 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -588,6 +588,12 @@ char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
+                      " 'arguments': {'command-line': %s}}",
+                      cmd);
+     ret = g_strdup(qdict_get_try_str(resp, "return"));
++    while (ret == NULL && qdict_get_try_str(resp, "event")) {
++        /* Ignore asynchronous QMP events */
++        QDECREF(resp);
++        resp = qtest_qmp_receive(s);
++        ret = g_strdup(qdict_get_try_str(resp, "return"));
++    }
+     g_assert(ret);
+     QDECREF(resp);
+     g_free(cmd);
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 2c9962d94f..ee237448da 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -132,11 +132,12 @@ void qtest_qmp_eventwait(QTestState *s, const char *event);
+ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
+ 
+ /**
+- * qtest_hmpv:
++ * qtest_hmp:
+  * @s: #QTestState instance to operate on.
+  * @fmt...: HMP command to send to QEMU
+  *
+  * Send HMP command to QEMU via QMP's human-monitor-command.
++ * QMP events are discarded.
+  *
+  * Returns: the command's output.  The caller should g_free() it.
+  */
+@@ -149,6 +150,7 @@ char *qtest_hmp(QTestState *s, const char *fmt, ...);
+  * @ap: HMP command arguments
+  *
+  * Send HMP command to QEMU via QMP's human-monitor-command.
++ * QMP events are discarded.
+  *
+  * Returns: the command's output.  The caller should g_free() it.
+  */
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.12.2
