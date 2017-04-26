@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3O1L-0007ob-GE
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:34:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3O8y-0002WR-Om
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3O1K-0005VG-Ii
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:34:19 -0400
-Date: Wed, 26 Apr 2017 16:34:02 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170426143402.GK4538@noname.str.redhat.com>
-References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-19-famz@redhat.com>
-	<20170426125227.GF4538@noname.str.redhat.com>
-	<20170426131517.GB9205@lemon.lan>
+	(envelope-from <eblake@redhat.com>) id 1d3O8u-0000dd-6O
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:42:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d3O8t-0000cy-St
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:42:08 -0400
+References: <1493211188-24086-1-git-send-email-tgnyang@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f2769605-4cd0-7f95-0409-850258ccbaeb@redhat.com>
+Date: Wed, 26 Apr 2017 09:42:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170426131517.GB9205@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH v15 18/21] block: Reuse bs as backing hd
- for drive-backup sync=none
+In-Reply-To: <1493211188-24086-1-git-send-email-tgnyang@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="82EmSnGl1l5r4Xo8h7NUFaptweujAsUtL"
+Subject: Re: [Qemu-devel] [PATCH 1/5] hw/char: remove console_exit function
+ in sclp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Zihan Yang <tgnyang@gmail.com>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Am 26.04.2017 um 15:15 hat Fam Zheng geschrieben:
-> On Wed, 04/26 14:52, Kevin Wolf wrote:
-> > Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
-> > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > 
-> > The commit message is a bit terse. :-)
-> > 
-> > So I think this means that instead of opening the backing file of the
-> > backup (which is probably the active file of the VM) a second time, we
-> > instead take a reference on the existing node. Very good idea.
-> > 
-> > In fact, my question is: How did this ever work? Did we just neglect to
-> > test this? The backup backing file will use stale qcow2 metadata when we
-> > continue to write to the source.
-> 
-> Reading from the target BDS would be a problem, but I guess it's relatively
-> uncommon:
-> 
-> - In QEMU code, COW is always done manually in backup_do_cow, so no reading from
->   target->backing in block layer.
-> 
-> - Writing to target is done in target cluster granularity so no COW too.
-> 
-> But it's still a fully valid point, for example it can be exported to NBD, etc.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--82EmSnGl1l5r4Xo8h7NUFaptweujAsUtL
+From: Eric Blake <eblake@redhat.com>
+To: Zihan Yang <tgnyang@gmail.com>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Message-ID: <f2769605-4cd0-7f95-0409-850258ccbaeb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] hw/char: remove console_exit function in
+ sclp
+References: <1493211188-24086-1-git-send-email-tgnyang@gmail.com>
+In-Reply-To: <1493211188-24086-1-git-send-email-tgnyang@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Which I believe is the exact setup for fleecing.
+On 04/26/2017 07:53 AM, Zihan Yang wrote:
+> Currently, the console_exit function in sclpconsole-lm.c and sclpconsol=
+e.c
+> does nothing, so remove them and convert the callback in SCLPEventClass=
+ to
+> void. Since there is a NULL check on the DeviceClass exit callback as
+> suggested by Frederic Konrad, it should be safe to remove them.
 
-And actually, if we were sure that we never read from the file, we
-wouldn't even have to attach the backing file in the first place.
+When sending a patch series, please be sure to include a 0/5 cover
+letter, to make it easier on automated tooling that processes the list.
+You can use 'git config format.coverletter auto' to make it easier to
+remember this for patches created by 'git format-patch'/'git send-email'.=
 
-> > Unless I'm missing something, I'd propose this for qemu-stable.
-> 
-> Yes, sounds good.
-> 
-> > 
-> > Also, mirror with MIRROR_OPEN_BACKING_CHAIN probably has a similar
-> > problem with opening the images in the backing chain a second time.
-> 
-> Seems so. But if there was such a test case, image locking would have
-> complained.
-> 
-> Is that a practical use case?  Mirror target image uses the active image as
-> backign file? (It's a bit late in the evening, please remind me :-)
 
-I believe storage migration uses a mode like this, but to be honest I
-don't remember the details at the moment either.
+More submission hints at: http://wiki.qemu.org/Contribute/SubmitAPatch
 
-But I do see that NEW_IMAGE_MODE_ABSOLUTE_PATHS enters the source as the
-backing file of the target and opens it (a second instance of it) when
-the mirror completes. Hopefully, by that time the source doesn't have
-another user that keeps it alive (and I think op blockers should
-actually ensure this), but it looks a bit fishy. Probably worth a closer
-look.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Kevin
+
+--82EmSnGl1l5r4Xo8h7NUFaptweujAsUtL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZALG6AAoJEKeha0olJ0Nq8xcH/2LZMifg64mYHCY8+BaTPr38
+QKARlc19+P35NMxQgoUusXmRtFa3rMpfO4GpO8Im7R1OM9OnbfB5HLzEmpWNvLWi
+Xyi5wR+mWL8BgjT8K0sHl5rBNIJdTC8/Mf+Up79Iu2aRCZbPx55GPniPCXWAQDAt
+QORncsfrq4A4oZpEKuwAZ3MxGpJEirrFEF9wjp64PZrMAodjx4nTrnnof3YRKDpT
+1zVG9P6oBScQpQ60ejgybRSK0lw49pjaiVbB4LlieSR3ABfAF+tvqKaA8jxOD+wS
+BqYgdzM1BkYH7KPDg6u3HttHc/Fm/kZo5Tk7VPZPubIGTR7aTv7kYTEuX9rbS18=
+=vxE0
+-----END PGP SIGNATURE-----
+
+--82EmSnGl1l5r4Xo8h7NUFaptweujAsUtL--
