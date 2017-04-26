@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3O1H-0007lI-SD
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:34:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d3O1L-0007ob-GE
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3O1B-0005RN-PN
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:34:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45548)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d3O1B-0005Qh-J4
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:34:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 90AC67AE9A
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 14:34:08 +0000 (UTC)
-Date: Wed, 26 Apr 2017 11:34:04 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170426143404.GX3482@thinpad.lan.raisama.net>
-References: <20170425153750.43322-1-imammedo@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1d3O1K-0005VG-Ii
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:34:19 -0400
+Date: Wed, 26 Apr 2017 16:34:02 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170426143402.GK4538@noname.str.redhat.com>
+References: <20170426033413.17192-1-famz@redhat.com>
+	<20170426033413.17192-19-famz@redhat.com>
+	<20170426125227.GF4538@noname.str.redhat.com>
+	<20170426131517.GB9205@lemon.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170425153750.43322-1-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] pc/fwcfg: unbreak migration from
- qemu-2.5 and qemu-2.6 during firmware boot
+In-Reply-To: <20170426131517.GB9205@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH v15 18/21] block: Reuse bs as backing hd
+ for drive-backup sync=none
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, dgilbert@redhat.com, lersek@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Tue, Apr 25, 2017 at 05:37:50PM +0200, Igor Mammedov wrote:
-> Since 2.7 commit (b2a575a Add optionrom compatible with fw_cfg DMA version)
-> regressed migration during firmware exection time by
-> abusing fwcfg.dma_enabled property to decide loading
-> dma version of option rom AND by mistake disabling DMA
-> for 2.6 and earlier globally instead of only for option rom.
+Am 26.04.2017 um 15:15 hat Fam Zheng geschrieben:
+> On Wed, 04/26 14:52, Kevin Wolf wrote:
+> > Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > 
+> > The commit message is a bit terse. :-)
+> > 
+> > So I think this means that instead of opening the backing file of the
+> > backup (which is probably the active file of the VM) a second time, we
+> > instead take a reference on the existing node. Very good idea.
+> > 
+> > In fact, my question is: How did this ever work? Did we just neglect to
+> > test this? The backup backing file will use stale qcow2 metadata when we
+> > continue to write to the source.
 > 
-> so 2.6 machine type guest is broken when it already runs
-> firmware in DMA mode but migrated to qemu-2.7(pc-2.6)
-> at that time;
+> Reading from the target BDS would be a problem, but I guess it's relatively
+> uncommon:
 > 
-> a) qemu-2.6:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
-> b) qemu-2.7:pc2.6 (fwcfg.dma=off,firmware=ioport,oprom=ioport)
+> - In QEMU code, COW is always done manually in backup_do_cow, so no reading from
+>   target->backing in block layer.
 > 
->   to:   a     b
-> from
-> a       OK   FAIL
-> b       OK   OK
+> - Writing to target is done in target cluster granularity so no COW too.
 > 
-> So we currently have broken forward migration from
-> qemu-2.6 to qemu-2.[789] that however could be fixed
-> for 2.10 by re-enabling DMA for 2.[56] machine types
-> and allowing dma capable option rom only since 2.7.
-> As result qemu should end up with:
-> 
-> c) qemu-2.10:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
-> 
->    to:  a     b    c
-> from
-> a      OK   FAIL  OK
-> b      OK   OK    OK
-> c      OK   FAIL  OK
-> 
-> where forward migration from qemu-2.6 to qemu-2.10 should
-> work again leaving only qemu-2.[789]:pc-2.6 broken.
-> 
-> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-> Analyzed-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> But it's still a fully valid point, for example it can be exported to NBD, etc.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Which I believe is the exact setup for fleecing.
 
--- 
-Eduardo
+And actually, if we were sure that we never read from the file, we
+wouldn't even have to attach the backing file in the first place.
+
+> > Unless I'm missing something, I'd propose this for qemu-stable.
+> 
+> Yes, sounds good.
+> 
+> > 
+> > Also, mirror with MIRROR_OPEN_BACKING_CHAIN probably has a similar
+> > problem with opening the images in the backing chain a second time.
+> 
+> Seems so. But if there was such a test case, image locking would have
+> complained.
+> 
+> Is that a practical use case?  Mirror target image uses the active image as
+> backign file? (It's a bit late in the evening, please remind me :-)
+
+I believe storage migration uses a mode like this, but to be honest I
+don't remember the details at the moment either.
+
+But I do see that NEW_IMAGE_MODE_ABSOLUTE_PATHS enters the source as the
+backing file of the target and opens it (a second instance of it) when
+the mirror completes. Hopefully, by that time the source doesn't have
+another user that keeps it alive (and I think op blockers should
+actually ensure this), but it looks a bit fishy. Probably worth a closer
+look.
+
+Kevin
