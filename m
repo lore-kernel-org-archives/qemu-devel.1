@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d3HVQ-0003Es-8l
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:36:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3HVR-0003GY-HO
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d3HVO-0005fw-SB
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:36:56 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3HVP-0005gQ-CW
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:36:57 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 26 Apr 2017 09:36:37 +0200
-Message-Id: <1493192202-3184-3-git-send-email-armbru@redhat.com>
+Date: Wed, 26 Apr 2017 09:36:40 +0200
+Message-Id: <1493192202-3184-6-git-send-email-armbru@redhat.com>
 In-Reply-To: <1493192202-3184-1-git-send-email-armbru@redhat.com>
 References: <1493192202-3184-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/7] sockets: Prepare inet_parse() for
- flattened SocketAddress
+Subject: [Qemu-devel] [PATCH 5/7] sockets: Rename SocketAddressFlat to
+ SocketAddress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,190 +23,434 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, eblake@redhat.com, qemu-block@nongnu.org
 
-I'm going to flatten SocketAddress: rename SocketAddress to
-SocketAddressLegacy, SocketAddressFlat to SocketAddress, eliminate
-SocketAddressLegacy except in external interfaces.
-
-inet_parse() returns a newly allocated InetSocketAddress.  Lift the
-allocation from inet_parse() into its caller socket_parse() to prepare
-for flattening SocketAddress.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/nbd.c            |  8 ++++----
- include/qemu/sockets.h |  2 +-
- migration/rdma.c       |  4 ++--
- migration/socket.c     |  5 +++--
- util/qemu-sockets.c    | 30 ++++++++++++------------------
- 5 files changed, 22 insertions(+), 27 deletions(-)
+ block/gluster.c        | 48 ++++++++++++++++++++++++------------------------
+ block/nbd.c            | 26 +++++++++++++-------------
+ block/sheepdog.c       |  6 +++---
+ include/qemu/sockets.h |  4 ++--
+ qapi-schema.json       | 14 +++++++-------
+ qapi/block-core.json   |  6 +++---
+ util/qemu-sockets.c    | 10 +++++-----
+ 7 files changed, 57 insertions(+), 57 deletions(-)
 
+diff --git a/block/gluster.c b/block/gluster.c
+index cf29b5f..93eac87 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -321,7 +321,7 @@ static int parse_volume_options(BlockdevOptionsGluster *gconf, char *path)
+ static int qemu_gluster_parse_uri(BlockdevOptionsGluster *gconf,
+                                   const char *filename)
+ {
+-    SocketAddressFlat *gsconf;
++    SocketAddress *gsconf;
+     URI *uri;
+     QueryParams *qp = NULL;
+     bool is_unix = false;
+@@ -332,19 +332,19 @@ static int qemu_gluster_parse_uri(BlockdevOptionsGluster *gconf,
+         return -EINVAL;
+     }
+ 
+-    gconf->server = g_new0(SocketAddressFlatList, 1);
+-    gconf->server->value = gsconf = g_new0(SocketAddressFlat, 1);
++    gconf->server = g_new0(SocketAddressList, 1);
++    gconf->server->value = gsconf = g_new0(SocketAddress, 1);
+ 
+     /* transport */
+     if (!uri->scheme || !strcmp(uri->scheme, "gluster")) {
+-        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
++        gsconf->type = SOCKET_ADDRESS_TYPE_INET;
+     } else if (!strcmp(uri->scheme, "gluster+tcp")) {
+-        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
++        gsconf->type = SOCKET_ADDRESS_TYPE_INET;
+     } else if (!strcmp(uri->scheme, "gluster+unix")) {
+-        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_UNIX;
++        gsconf->type = SOCKET_ADDRESS_TYPE_UNIX;
+         is_unix = true;
+     } else if (!strcmp(uri->scheme, "gluster+rdma")) {
+-        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
++        gsconf->type = SOCKET_ADDRESS_TYPE_INET;
+         error_report("Warning: rdma feature is not supported, falling "
+                      "back to tcp");
+     } else {
+@@ -396,7 +396,7 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+     struct glfs *glfs;
+     int ret;
+     int old_errno;
+-    SocketAddressFlatList *server;
++    SocketAddressList *server;
+     unsigned long long port;
+ 
+     glfs = glfs_find_preopened(gconf->volume);
+@@ -413,11 +413,11 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+ 
+     for (server = gconf->server; server; server = server->next) {
+         switch (server->value->type) {
+-        case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
++        case SOCKET_ADDRESS_TYPE_UNIX:
+             ret = glfs_set_volfile_server(glfs, "unix",
+                                    server->value->u.q_unix.path, 0);
+             break;
+-        case SOCKET_ADDRESS_FLAT_TYPE_INET:
++        case SOCKET_ADDRESS_TYPE_INET:
+             if (parse_uint_full(server->value->u.inet.port, &port, 10) < 0 ||
+                 port > 65535) {
+                 error_setg(errp, "'%s' is not a valid port number",
+@@ -429,8 +429,8 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+                                    server->value->u.inet.host,
+                                    (int)port);
+             break;
+-        case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
+-        case SOCKET_ADDRESS_FLAT_TYPE_FD:
++        case SOCKET_ADDRESS_TYPE_VSOCK:
++        case SOCKET_ADDRESS_TYPE_FD:
+         default:
+             abort();
+         }
+@@ -450,7 +450,7 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+         error_setg(errp, "Gluster connection for volume %s, path %s failed"
+                          " to connect", gconf->volume, gconf->path);
+         for (server = gconf->server; server; server = server->next) {
+-            if (server->value->type  == SOCKET_ADDRESS_FLAT_TYPE_UNIX) {
++            if (server->value->type  == SOCKET_ADDRESS_TYPE_UNIX) {
+                 error_append_hint(errp, "hint: failed on socket %s ",
+                                   server->value->u.q_unix.path);
+             } else {
+@@ -487,8 +487,8 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+                                   QDict *options, Error **errp)
+ {
+     QemuOpts *opts;
+-    SocketAddressFlat *gsconf = NULL;
+-    SocketAddressFlatList *curr = NULL;
++    SocketAddress *gsconf = NULL;
++    SocketAddressList *curr = NULL;
+     QDict *backing_options = NULL;
+     Error *local_err = NULL;
+     char *str = NULL;
+@@ -542,14 +542,14 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+             goto out;
+ 
+         }
+-        gsconf = g_new0(SocketAddressFlat, 1);
++        gsconf = g_new0(SocketAddress, 1);
+         if (!strcmp(ptr, "tcp")) {
+             ptr = "inet";       /* accept legacy "tcp" */
+         }
+-        type = qapi_enum_parse(SocketAddressFlatType_lookup, ptr,
+-                               SOCKET_ADDRESS_FLAT_TYPE__MAX, -1, NULL);
+-        if (type != SOCKET_ADDRESS_FLAT_TYPE_INET
+-            && type != SOCKET_ADDRESS_FLAT_TYPE_UNIX) {
++        type = qapi_enum_parse(SocketAddressType_lookup, ptr,
++                               SOCKET_ADDRESS_TYPE__MAX, -1, NULL);
++        if (type != SOCKET_ADDRESS_TYPE_INET
++            && type != SOCKET_ADDRESS_TYPE_UNIX) {
+             error_setg(&local_err,
+                        "Parameter '%s' may be 'inet' or 'unix'",
+                        GLUSTER_OPT_TYPE);
+@@ -559,7 +559,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+         gsconf->type = type;
+         qemu_opts_del(opts);
+ 
+-        if (gsconf->type == SOCKET_ADDRESS_FLAT_TYPE_INET) {
++        if (gsconf->type == SOCKET_ADDRESS_TYPE_INET) {
+             /* create opts info from runtime_inet_opts list */
+             opts = qemu_opts_create(&runtime_inet_opts, NULL, 0, &error_abort);
+             qemu_opts_absorb_qdict(opts, backing_options, &local_err);
+@@ -628,11 +628,11 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+         }
+ 
+         if (gconf->server == NULL) {
+-            gconf->server = g_new0(SocketAddressFlatList, 1);
++            gconf->server = g_new0(SocketAddressList, 1);
+             gconf->server->value = gsconf;
+             curr = gconf->server;
+         } else {
+-            curr->next = g_new0(SocketAddressFlatList, 1);
++            curr->next = g_new0(SocketAddressList, 1);
+             curr->next->value = gsconf;
+             curr = curr->next;
+         }
+@@ -648,7 +648,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+ 
+ out:
+     error_propagate(errp, local_err);
+-    qapi_free_SocketAddressFlat(gsconf);
++    qapi_free_SocketAddress(gsconf);
+     qemu_opts_del(opts);
+     g_free(str);
+     QDECREF(backing_options);
 diff --git a/block/nbd.c b/block/nbd.c
-index 814ab26d..9f4ff44 100644
+index 8bdcbc5..ee51d1a 100644
 --- a/block/nbd.c
 +++ b/block/nbd.c
-@@ -199,16 +199,16 @@ static void nbd_parse_filename(const char *filename, QDict *options,
-         qdict_put(options, "server.type", qstring_from_str("unix"));
-         qdict_put(options, "server.path", qstring_from_str(unixpath));
-     } else {
--        InetSocketAddress *addr = NULL;
-+        InetSocketAddress *addr = g_new(InetSocketAddress, 1);
+@@ -47,7 +47,7 @@ typedef struct BDRVNBDState {
+     NBDClientSession client;
  
--        addr = inet_parse(host_spec, errp);
--        if (!addr) {
--            goto out;
-+        if (inet_parse(addr, host_spec, errp)) {
-+            goto out_inet;
-         }
+     /* For nbd_refresh_filename() */
+-    SocketAddressFlat *saddr;
++    SocketAddress *saddr;
+     char *export, *tlscredsid;
+ } BDRVNBDState;
  
-         qdict_put(options, "server.type", qstring_from_str("inet"));
-         qdict_put(options, "server.host", qstring_from_str(addr->host));
-         qdict_put(options, "server.port", qstring_from_str(addr->port));
-+    out_inet:
-         qapi_free_InetSocketAddress(addr);
+@@ -259,10 +259,10 @@ static bool nbd_process_legacy_socket_options(QDict *output_options,
+     return true;
+ }
+ 
+-static SocketAddressFlat *nbd_config(BDRVNBDState *s, QDict *options,
+-                                     Error **errp)
++static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
++                                 Error **errp)
+ {
+-    SocketAddressFlat *saddr = NULL;
++    SocketAddress *saddr = NULL;
+     QDict *addr = NULL;
+     QObject *crumpled_addr = NULL;
+     Visitor *iv = NULL;
+@@ -288,7 +288,7 @@ static SocketAddressFlat *nbd_config(BDRVNBDState *s, QDict *options,
+      * visitor expects the former.
+      */
+     iv = qobject_input_visitor_new(crumpled_addr);
+-    visit_type_SocketAddressFlat(iv, NULL, &saddr, &local_err);
++    visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto done;
+@@ -307,7 +307,7 @@ NBDClientSession *nbd_get_client_session(BlockDriverState *bs)
+     return &s->client;
+ }
+ 
+-static QIOChannelSocket *nbd_establish_connection(SocketAddressFlat *saddr_flat,
++static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr_flat,
+                                                   Error **errp)
+ {
+     SocketAddressLegacy *saddr = socket_address_crumple(saddr_flat);
+@@ -413,7 +413,7 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+         goto error;
      }
  
+-    /* Translate @host, @port, and @path to a SocketAddressFlat */
++    /* Translate @host, @port, and @path to a SocketAddress */
+     if (!nbd_process_legacy_socket_options(options, opts, errp)) {
+         goto error;
+     }
+@@ -434,7 +434,7 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+         }
+ 
+         /* TODO SOCKET_ADDRESS_KIND_FD where fd has AF_INET or AF_INET6 */
+-        if (s->saddr->type != SOCKET_ADDRESS_FLAT_TYPE_INET) {
++        if (s->saddr->type != SOCKET_ADDRESS_TYPE_INET) {
+             error_setg(errp, "TLS only supported over IP sockets");
+             goto error;
+         }
+@@ -461,7 +461,7 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+         object_unref(OBJECT(tlscreds));
+     }
+     if (ret < 0) {
+-        qapi_free_SocketAddressFlat(s->saddr);
++        qapi_free_SocketAddress(s->saddr);
+         g_free(s->export);
+         g_free(s->tlscredsid);
+     }
+@@ -487,7 +487,7 @@ static void nbd_close(BlockDriverState *bs)
+ 
+     nbd_client_close(bs);
+ 
+-    qapi_free_SocketAddressFlat(s->saddr);
++    qapi_free_SocketAddress(s->saddr);
+     g_free(s->export);
+     g_free(s->tlscredsid);
+ }
+@@ -518,13 +518,13 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+     Visitor *ov;
+     const char *host = NULL, *port = NULL, *path = NULL;
+ 
+-    if (s->saddr->type == SOCKET_ADDRESS_FLAT_TYPE_INET) {
++    if (s->saddr->type == SOCKET_ADDRESS_TYPE_INET) {
+         const InetSocketAddress *inet = &s->saddr->u.inet;
+         if (!inet->has_ipv4 && !inet->has_ipv6 && !inet->has_to) {
+             host = inet->host;
+             port = inet->port;
+         }
+-    } else if (s->saddr->type == SOCKET_ADDRESS_FLAT_TYPE_UNIX) {
++    } else if (s->saddr->type == SOCKET_ADDRESS_TYPE_UNIX) {
+         path = s->saddr->u.q_unix.path;
+     } /* else can't represent as pseudo-filename */
+ 
+@@ -545,7 +545,7 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
+     }
+ 
+     ov = qobject_output_visitor_new(&saddr_qdict);
+-    visit_type_SocketAddressFlat(ov, NULL, &s->saddr, &error_abort);
++    visit_type_SocketAddress(ov, NULL, &s->saddr, &error_abort);
+     visit_complete(ov, &saddr_qdict);
+     visit_free(ov);
+     qdict_put_obj(opts, "server", saddr_qdict);
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 7ee2e6e..547239a 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -554,7 +554,7 @@ static SocketAddressLegacy *sd_server_config(QDict *options, Error **errp)
+     QDict *server = NULL;
+     QObject *crumpled_server = NULL;
+     Visitor *iv = NULL;
+-    SocketAddressFlat *saddr_flat = NULL;
++    SocketAddress *saddr_flat = NULL;
+     SocketAddressLegacy *saddr = NULL;
+     Error *local_err = NULL;
+ 
+@@ -574,7 +574,7 @@ static SocketAddressLegacy *sd_server_config(QDict *options, Error **errp)
+      * visitor expects the former.
+      */
+     iv = qobject_input_visitor_new(crumpled_server);
+-    visit_type_SocketAddressFlat(iv, NULL, &saddr_flat, &local_err);
++    visit_type_SocketAddress(iv, NULL, &saddr_flat, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto done;
+@@ -583,7 +583,7 @@ static SocketAddressLegacy *sd_server_config(QDict *options, Error **errp)
+     saddr = socket_address_crumple(saddr_flat);
+ 
+ done:
+-    qapi_free_SocketAddressFlat(saddr_flat);
++    qapi_free_SocketAddress(saddr_flat);
+     visit_free(iv);
+     qobject_decref(crumpled_server);
+     QDECREF(server);
 diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-index af28532..8b9325c 100644
+index f4a4b10..82b7460 100644
 --- a/include/qemu/sockets.h
 +++ b/include/qemu/sockets.h
-@@ -34,7 +34,7 @@ typedef void NonBlockingConnectHandler(int fd, Error *err, void *opaque);
+@@ -124,11 +124,11 @@ char *socket_address_to_string(struct SocketAddressLegacy *addr, Error **errp);
+  * socket_address_crumple:
+  * @addr_flat: the socket address to crumple
+  *
+- * Convert SocketAddressFlat to SocketAddressLegacy.  Caller is responsible
++ * Convert SocketAddress to SocketAddressLegacy.  Caller is responsible
+  * for freeing with qapi_free_SocketAddressLegacy().
+  *
+  * Returns: the argument converted to SocketAddressLegacy.
+  */
+-SocketAddressLegacy *socket_address_crumple(SocketAddressFlat *addr_flat);
++SocketAddressLegacy *socket_address_crumple(SocketAddress *addr);
  
- int inet_ai_family_from_address(InetSocketAddress *addr,
-                                 Error **errp);
--InetSocketAddress *inet_parse(const char *str, Error **errp);
-+int inet_parse(InetSocketAddress *addr, const char *str, Error **errp);
- int inet_connect(const char *str, Error **errp);
- int inet_connect_saddr(InetSocketAddress *saddr,
-                        NonBlockingConnectHandler *callback, void *opaque,
-diff --git a/migration/rdma.c b/migration/rdma.c
-index fe0a4b5..7eaaf96 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -2506,8 +2506,8 @@ static void *qemu_rdma_data_init(const char *host_port, Error **errp)
-         rdma->current_index = -1;
-         rdma->current_chunk = -1;
+ #endif /* QEMU_SOCKETS_H */
+diff --git a/qapi-schema.json b/qapi-schema.json
+index b5a042b..a741fdd 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4126,7 +4126,7 @@
+ #
+ # Captures the address of a socket, which could also be a named file descriptor
+ #
+-# Note: This type is deprecated in favor of SocketAddressFlat.
++# Note: This type is deprecated in favor of SocketAddress.
+ #
+ # Since: 1.3
+ ##
+@@ -4138,9 +4138,9 @@
+     'fd': 'String' } }
  
--        addr = inet_parse(host_port, NULL);
--        if (addr != NULL) {
-+        addr = g_new(InetSocketAddress, 1);
-+        if (!inet_parse(addr, host_port, NULL)) {
-             rdma->port = atoi(addr->port);
-             rdma->host = g_strdup(addr->host);
-         } else {
-diff --git a/migration/socket.c b/migration/socket.c
-index 13966f1..8db6d0d 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -27,10 +27,11 @@
+ ##
+-# @SocketAddressFlatType:
++# @SocketAddressType:
+ #
+-# Available SocketAddressFlat types
++# Available SocketAddress types
+ #
+ # @inet:  Internet address
+ #
+@@ -4148,11 +4148,11 @@
+ #
+ # Since: 2.9
+ ##
+-{ 'enum': 'SocketAddressFlatType',
++{ 'enum': 'SocketAddressType',
+   'data': [ 'inet', 'unix', 'vsock', 'fd' ] }
  
- static SocketAddress *tcp_build_address(const char *host_port, Error **errp)
- {
--    InetSocketAddress *iaddr = inet_parse(host_port, errp);
-+    InetSocketAddress *iaddr = g_new(InetSocketAddress, 1);
-     SocketAddress *saddr;
+ ##
+-# @SocketAddressFlat:
++# @SocketAddress:
+ #
+ # Captures the address of a socket
+ #
+@@ -4164,8 +4164,8 @@
+ #
+ # Since: 2.9
+ ##
+-{ 'union': 'SocketAddressFlat',
+-  'base': { 'type': 'SocketAddressFlatType' },
++{ 'union': 'SocketAddress',
++  'base': { 'type': 'SocketAddressType' },
+   'discriminator': 'type',
+   'data': { 'inet': 'InetSocketAddress',
+             'unix': 'UnixSocketAddress',
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 033457c..aed43e1 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2520,7 +2520,7 @@
+ { 'struct': 'BlockdevOptionsGluster',
+   'data': { 'volume': 'str',
+             'path': 'str',
+-            'server': ['SocketAddressFlat'],
++            'server': ['SocketAddress'],
+             '*debug': 'int',
+             '*logfile': 'str' } }
  
--    if (!iaddr) {
-+    if (inet_parse(iaddr, host_port, errp)) {
-+        qapi_free_InetSocketAddress(iaddr);
-         return NULL;
-     }
+@@ -2632,7 +2632,7 @@
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsSheepdog',
+-  'data': { 'server': 'SocketAddressFlat',
++  'data': { 'server': 'SocketAddress',
+             'vdi': 'str',
+             '*snap-id': 'uint32',
+             '*tag': 'str' } }
+@@ -2847,7 +2847,7 @@
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsNbd',
+-  'data': { 'server': 'SocketAddressFlat',
++  'data': { 'server': 'SocketAddress',
+             '*export': 'str',
+             '*tls-creds': 'str' } }
  
 diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 1abe095..62c93ba 100644
+index 4c48203..801aa7a 100644
 --- a/util/qemu-sockets.c
 +++ b/util/qemu-sockets.c
-@@ -578,16 +578,15 @@ err:
+@@ -1341,27 +1341,27 @@ char *socket_address_to_string(struct SocketAddressLegacy *addr, Error **errp)
+     return buf;
  }
  
- /* compatibility wrapper */
--InetSocketAddress *inet_parse(const char *str, Error **errp)
-+int inet_parse(InetSocketAddress *addr, const char *str, Error **errp)
+-SocketAddressLegacy *socket_address_crumple(SocketAddressFlat *addr_flat)
++SocketAddressLegacy *socket_address_crumple(SocketAddress *addr_flat)
  {
--    InetSocketAddress *addr;
-     const char *optstr, *h;
-     char host[65];
-     char port[33];
-     int to;
-     int pos;
+     SocketAddressLegacy *addr = g_new(SocketAddressLegacy, 1);
  
--    addr = g_new0(InetSocketAddress, 1);
-+    memset(addr, 0, sizeof(*addr));
- 
-     /* parse address */
-     if (str[0] == ':') {
-@@ -595,20 +594,20 @@ InetSocketAddress *inet_parse(const char *str, Error **errp)
-         host[0] = '\0';
-         if (sscanf(str, ":%32[^,]%n", port, &pos) != 1) {
-             error_setg(errp, "error parsing port in address '%s'", str);
--            goto fail;
-+            return -1;
-         }
-     } else if (str[0] == '[') {
-         /* IPv6 addr */
-         if (sscanf(str, "[%64[^]]]:%32[^,]%n", host, port, &pos) != 2) {
-             error_setg(errp, "error parsing IPv6 address '%s'", str);
--            goto fail;
-+            return -1;
-         }
-         addr->ipv6 = addr->has_ipv6 = true;
-     } else {
-         /* hostname or IPv4 addr */
-         if (sscanf(str, "%64[^:]:%32[^,]%n", host, port, &pos) != 2) {
-             error_setg(errp, "error parsing address '%s'", str);
--            goto fail;
-+            return -1;
-         }
-         if (host[strspn(host, "0123456789.")] == '\0') {
-             addr->ipv4 = addr->has_ipv4 = true;
-@@ -626,7 +625,7 @@ InetSocketAddress *inet_parse(const char *str, Error **errp)
-         if (sscanf(h, "%d%n", &to, &pos) != 1 ||
-             (h[pos] != '\0' && h[pos] != ',')) {
-             error_setg(errp, "error parsing to= argument");
--            goto fail;
-+            return -1;
-         }
-         addr->has_to = true;
-         addr->to = to;
-@@ -637,11 +636,7 @@ InetSocketAddress *inet_parse(const char *str, Error **errp)
-     if (strstr(optstr, ",ipv6")) {
-         addr->ipv6 = addr->has_ipv6 = true;
-     }
--    return addr;
--
--fail:
--    qapi_free_InetSocketAddress(addr);
--    return NULL;
-+    return 0;
- }
- 
- 
-@@ -656,13 +651,12 @@ fail:
- int inet_connect(const char *str, Error **errp)
- {
-     int sock = -1;
--    InetSocketAddress *addr;
-+    InetSocketAddress *addr = g_new(InetSocketAddress, 1);
- 
--    addr = inet_parse(str, errp);
--    if (addr != NULL) {
-+    if (!inet_parse(addr, str, errp)) {
-         sock = inet_connect_saddr(addr, NULL, NULL, errp);
--        qapi_free_InetSocketAddress(addr);
-     }
-+    qapi_free_InetSocketAddress(addr);
-     return sock;
- }
- 
-@@ -1066,8 +1060,8 @@ SocketAddress *socket_parse(const char *str, Error **errp)
-         }
-     } else {
-         addr->type = SOCKET_ADDRESS_KIND_INET;
--        addr->u.inet.data = inet_parse(str, errp);
--        if (addr->u.inet.data == NULL) {
-+        addr->u.inet.data = g_new(InetSocketAddress, 1);
-+        if (inet_parse(addr->u.inet.data, str, errp)) {
-             goto fail;
-         }
-     }
+     switch (addr_flat->type) {
+-    case SOCKET_ADDRESS_FLAT_TYPE_INET:
++    case SOCKET_ADDRESS_TYPE_INET:
+         addr->type = SOCKET_ADDRESS_LEGACY_KIND_INET;
+         addr->u.inet.data = QAPI_CLONE(InetSocketAddress,
+                                        &addr_flat->u.inet);
+         break;
+-    case SOCKET_ADDRESS_FLAT_TYPE_UNIX:
++    case SOCKET_ADDRESS_TYPE_UNIX:
+         addr->type = SOCKET_ADDRESS_LEGACY_KIND_UNIX;
+         addr->u.q_unix.data = QAPI_CLONE(UnixSocketAddress,
+                                          &addr_flat->u.q_unix);
+         break;
+-    case SOCKET_ADDRESS_FLAT_TYPE_VSOCK:
++    case SOCKET_ADDRESS_TYPE_VSOCK:
+         addr->type = SOCKET_ADDRESS_LEGACY_KIND_VSOCK;
+         addr->u.vsock.data = QAPI_CLONE(VsockSocketAddress,
+                                         &addr_flat->u.vsock);
+         break;
+-    case SOCKET_ADDRESS_FLAT_TYPE_FD:
++    case SOCKET_ADDRESS_TYPE_FD:
+         addr->type = SOCKET_ADDRESS_LEGACY_KIND_FD;
+         addr->u.fd.data = QAPI_CLONE(String, &addr_flat->u.fd);
+         break;
 -- 
 2.7.4
