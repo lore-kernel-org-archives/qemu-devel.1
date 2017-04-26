@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3WBn-0007Oq-7t
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:17:40 -0400
+	(envelope-from <mst@redhat.com>) id 1d3WEx-0008Sr-EZ
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3WBm-0005vP-5b
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:17:39 -0400
-Date: Wed, 26 Apr 2017 19:17:32 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170426231732.GA27379@flamenco>
-References: <1493187803-4510-1-git-send-email-cota@braap.org>
-	<1493187803-4510-2-git-send-email-cota@braap.org>
-	<e206fe3e-5920-49c5-8f95-e4961aad5f89@twiddle.net>
+	(envelope-from <mst@redhat.com>) id 1d3WEs-00072f-Hj
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:20:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39200)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d3WEs-00072G-Bl
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:20:50 -0400
+Date: Thu, 27 Apr 2017 02:20:28 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170426192753-mutt-send-email-mst@kernel.org>
+References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
+	<1492076108-117229-3-git-send-email-wei.w.wang@intel.com>
+	<20170413184040-mutt-send-email-mst@kernel.org>
+	<58F08A60.2020407@intel.com>
+	<20170415000934-mutt-send-email-mst@kernel.org>
+	<58F43801.7060004@intel.com>
+	<286AC319A985734F985F78AFA26841F7391F6DCD@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e206fe3e-5920-49c5-8f95-e4961aad5f89@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] tcg-runtime: add lookup_tb_ptr
- helper
+In-Reply-To: <286AC319A985734F985F78AFA26841F7391F6DCD@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v9 2/5] virtio-balloon:
+ VIRTIO_BALLOON_F_BALLOON_CHUNKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
 
-On Wed, Apr 26, 2017 at 10:40:45 +0200, Richard Henderson wrote:
-> On 04/26/2017 08:23 AM, Emilio G. Cota wrote:
-> >This paves the way for upcoming work.
-> >
-> >Reviewed-by: Richard Henderson <rth@twiddle.net>
-> >Signed-off-by: Emilio G. Cota <cota@braap.org>
-> >---
-> >  tcg-runtime.c     | 21 +++++++++++++++++++++
-> >  tcg/tcg-runtime.h |  2 ++
-> >  tcg/tcg.h         |  1 +
-> >  3 files changed, 24 insertions(+)
-> >
-> >diff --git a/tcg-runtime.c b/tcg-runtime.c
-> >index 4c60c96..90d2d4b 100644
-> >--- a/tcg-runtime.c
-> >+++ b/tcg-runtime.c
-> >@@ -27,6 +27,7 @@
-> >  #include "exec/helper-proto.h"
-> >  #include "exec/cpu_ldst.h"
-> >  #include "exec/exec-all.h"
-> >+#include "exec/tb-hash.h"
-> >  /* 32-bit helpers */
-> >@@ -141,6 +142,26 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
-> >      return ctpop64(arg);
-> >  }
-> >+    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-> >+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
-> >+    if (likely(tb && tb->pc == addr && tb->cs_base == cs_base &&
-> >+               tb->flags == flags)) {
-> 
-> This comparison is wrong.  It will incorrectly reject a TB for i386 guest
-> when CS_BASE != 0.  You really want
-> 
->   tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
->   if (tb) {
->     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
->     if (tb->pc == pc && tb->cs_base == cs_base && tb->flags == flags) {
->       return tb->tc_ptr;
->     }
->   }
->   return tcg_ctx.code_gen_epilogue;
-> 
-> where you don't even load the cpu state if there isn't a preliminary hit in
-> the cache.
+On Wed, Apr 26, 2017 at 11:03:34AM +0000, Wang, Wei W wrote:
+> Hi Michael, could you please give some feedback?
 
-Yes, I like this.
+I'm sorry, I'm not sure feedback on what you are requesting.
 
-> (Note to self: That minor optimization would also apply to tb_find.)
+The interface looks reasonable now, even though there's
+a way to make it even simpler if we can limit chunk size
+to 2G (in fact 4G - 1). Do you think we can live with this
+limitation?
 
-FWIW I looked at tb_find -- you need the pc though, which comes from
-loading the CPU state:
+But the code still needs some cleanup.
 
-    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-                               ^^
-    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)]);
-                                                                   ^^
-
-If we wanted to really avoid getting all the state I guess we'd have to add
-another function that returned just the pc.
-
-		E.
+-- 
+MST
