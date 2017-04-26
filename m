@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3KDm-0000hj-AF
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:30:55 -0400
+	(envelope-from <quintela@redhat.com>) id 1d3KEX-0001LD-Ed
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:31:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3KDh-0005XU-95
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:30:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36541)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d3KDh-0005XA-2u
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:30:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d3KDf-0004ug-48
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 10:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 02B4F2E80CC
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 10:30:47 +0000 (UTC)
+	(envelope-from <quintela@redhat.com>) id 1d3KES-0005ww-Ht
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:31:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d3KES-0005wb-Bh
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:31:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4013A61D11
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 10:31:35 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170426100623.GD16228@pxdev.xzpeter.org> (Peter Xu's message of
+	"Wed, 26 Apr 2017 18:06:23 +0800")
+References: <20170425101758.3944-1-quintela@redhat.com>
+	<20170425101758.3944-2-quintela@redhat.com>
+	<20170426100623.GD16228@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Wed, 26 Apr 2017 12:31:32 +0200
+Message-ID: <871ssflat7.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Apr 2017 10:25:02 -0000
-From: Richard Jones <rjones@redhat.com>
-Reply-To: Bug 1686364 <1686364@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170426102503.20345.45815.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1686364] [NEW] qemu -readconfig/-writeconfig
- cannot handle quotes in values
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration: Move check_migratable()
+ into qdev.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,93 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-Public bug reported:
+Peter Xu <peterx@redhat.com> wrote:
+> On Tue, Apr 25, 2017 at 12:17:57PM +0200, Juan Quintela wrote:
+>> The function is only used once, and nothing else in migration knows
+>> about objects.  Create the function vmstate_device_is_migratable() in
+>> savem.c that really do the bit that is related with migration.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-$ qemu-system-x86_64 -drive file=3D/tmp/foo\" -writeconfig -
-# qemu config file
+>
+> Here the name vmstate_device_is_migratable() let me think of "return
+> true if the device can migrate, false otherwise". However what it
+> actually does is mixed with "--only-migratable" parameter, say, when
+> without that parameter, all device will be getting "true" here, even
+> unmigratable devices...
+>
+> Not sure whether it'll be nicer we do this:
+>
+> bool vmstate_device_is_migratable(const VMStateDescription *vmsd)
+> {
+>     return !(vmsd & vmsd->unmigratable);
+> }
+>
+> Then we can define check_migratable() as:
+>
+> static int check_migratable(Object *obj, Error **err)
+> {
+>     DeviceClass *dc = DEVICE_GET_CLASS(obj);
+>
+>     /* no check needed if --only-migratable not specified */
+>     if (!only_migratable) {
+>        return true;
+>     }
+>
+>     if (!vmstate_device_is_migratable(dc->vmsd)) {
+>         error_setg(err, "Device %s is not migratable, but "
+>                    "--only-migratable was specified",
+>                    object_get_typename(obj));
+>         return -1;
+>     }
+>
+>     return 0;
+> }
+>
+> Thanks,
 
-[drive]
-=C2=A0=C2=A0file =3D "/tmp/foo""
+I see your point.  We have to teach things about migrate to qdev.c or
+things about objects to migration.
 
-For bonus points, try to construct a valid qemu config file that
-contains a quoted value.  It's pretty clear (from looking at the code
-also) that this is not possible.
+Will change.
 
-Also:
-
-- maximum value length is hard-coded in the parser at 1023 characters
-(for no apparent reason)
-
-- the format is undocumented
-
-- don't use sscanf for parsing!
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Description changed:
-
-  $ qemu-system-x86_64 -drive file=3D/tmp/foo\" -writeconfig -
-  # qemu config file
-  =
-
-  [drive]
--   file =3D "/tmp/foo""
-+ =C2=A0=C2=A0file =3D "/tmp/foo""
-  =
-
-- For bonus points, try to construct a value qemu config file that
-+ For bonus points, try to construct a valid qemu config file that
-  contains a quoted value.  It's pretty clear (from looking at the code
-  also) that this is not possible.
-  =
-
-  Also:
-  =
-
-  - maximum value length is hard-coded in the parser at 1023 characters
-  (for no apparent reason)
-  =
-
-  - the format is undocumented
-  =
-
-  - don't use sscanf for parsing!
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1686364
-
-Title:
-  qemu -readconfig/-writeconfig cannot handle quotes in values
-
-Status in QEMU:
-  New
-
-Bug description:
-  $ qemu-system-x86_64 -drive file=3D/tmp/foo\" -writeconfig -
-  # qemu config file
-
-  [drive]
-  =C2=A0=C2=A0file =3D "/tmp/foo""
-
-  For bonus points, try to construct a valid qemu config file that
-  contains a quoted value.  It's pretty clear (from looking at the code
-  also) that this is not possible.
-
-  Also:
-
-  - maximum value length is hard-coded in the parser at 1023 characters
-  (for no apparent reason)
-
-  - the format is undocumented
-
-  - don't use sscanf for parsing!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1686364/+subscriptions
+Thanks, Juan.
