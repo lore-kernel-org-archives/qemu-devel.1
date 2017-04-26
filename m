@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d3OsU-0007iI-23
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:29:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1d3OuF-0000uM-Oj
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d3OsQ-0003Yu-Uu
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:29:14 -0400
-Date: Wed, 26 Apr 2017 18:29:05 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170426182535-mutt-send-email-mst@kernel.org>
-References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
-	<20170328021651.19350-3-david@gibson.dropbear.id.au>
+	(envelope-from <bounces@canonical.com>) id 1d3OuC-0004LF-JI
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:31:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40787)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d3OuC-0004JU-5D
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:31:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d3Ou8-00060K-Mc
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:30:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A988E2E80C2
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:30:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170328021651.19350-3-david@gibson.dropbear.id.au>
-Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
- override PCI/PCIe hybrid device behaviour
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 26 Apr 2017 15:24:14 -0000
+From: Alain Kalker <miki@dds.nl>
+Reply-To: Bug 1686170 <1686170@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170425183112.19801.4371.malonedeb@soybean.canonical.com>
+Message-Id: <20170426152414.22554.12853.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1686170] Re: qemu-system-x86_64+gdb: unable to
+ correctly disassemble "real mode" (i8086) instructions after attaching to
+ QEMU started with "-S -s" options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +38,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: ehabkost@redhat.com, aik@ozlabs.ru, marcel@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lersek@redhat.com
+To: qemu-devel@nongnu.org
 
-On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
-> Currently PCI/PCIe hybrid devices - that is, devices which can appear as
-> either plain PCI or PCIe depending on where they're attached - will only
-> appear in PCIe mode if they're attached to a PCIe bus via a root port or
-> downstream port.
-> 
-> This is correct for "standard" PCIe setups, but there are some platforms
-> which need different behaviour (notably "pseries" whose paravirtualized
-> PCI host bridges have some idiosyncracies).
-> 
-> This patch allows the host bridge to override the normal behaviour.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/pci/pci.c              | 11 +++++++++--
->  include/hw/pci/pci_host.h |  1 +
->  2 files changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 779787b..ac68065 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
->  
->  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
->  {
-> -    PCIBus *bus = pci_dev->bus;
-> +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(pci_device_root_bus(pci_dev)->qbus.parent);
-> +    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
-> +
-> +    if (hc->allow_hybrid_pcie) {
-> +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
-> +    } else {
-> +        PCIBus *bus = pci_dev->bus;
->  
-> -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
-> +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
-> +    }
->  }
->  
->  void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+If it is decided to retain the change, please do consider adding a
+commandline option to enable debugging Real mode code after `set
+architecture i8086`, even if this requires the GDB workaround previously
+mentioned. Thanks in advance.
 
-I think I'd prefer adding some flags in PCIBus. While we are at it,
-is_root can become a flag too.
+-- =
 
-> diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
-> index ba31595..ad03cca 100644
-> --- a/include/hw/pci/pci_host.h
-> +++ b/include/hw/pci/pci_host.h
-> @@ -54,6 +54,7 @@ typedef struct PCIHostBridgeClass {
->      SysBusDeviceClass parent_class;
->  
->      const char *(*root_bus_path)(PCIHostState *, PCIBus *);
-> +    bool (*allow_hybrid_pcie)(PCIHostState *, PCIDevice *);
->  } PCIHostBridgeClass;
->  
->  /* common internal helpers for PCI/PCIe hosts, cut off overflows */
-> -- 
-> 2.9.3
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1686170
+
+Title:
+  qemu-system-x86_64+gdb: unable to correctly disassemble "real mode"
+  (i8086) instructions after attaching to QEMU started with "-S -s"
+  options
+
+Status in QEMU:
+  New
+
+Bug description:
+  OS: Void Linux x86_64 (glibc)
+  QEMU version: 2.9.0
+  GDB version: 7.12.1
+
+  Problem description:
+
+  After I updated QEMU from version 2.8.1 to 2.9.0, I found that when I try=
+ to connect GDB to a running QEMU and try to debug Real mode machine code, =
+I can no longer set architecture to 'i8086'.
+  To be able to connect to QEMU from GDB at all, I have to specify one of t=
+he 64 bit architectures, which among other things leads to incorrect disass=
+embly listings. This makes debugging Real mode bootloaders, bootsectors and=
+ BIOS code much more difficult.
+
+  Steps to reproduce:
+
+  - Run QEMU
+  - In another terminal, run GDB
+  - In GDB, connect to QEMU
+  - In GDB, disassemble some Real mode machine code.
+
+  Expected results (from QEMU version 2.8.1):
+
+      [terminal #1]
+      $ qemu-system-x86_64 -S -s
+
+      [terminal #2]
+      (gdb) set architecture i8086
+      warning: A handler for the OS ABI "GNU/Linux" is not built =
+
+      into this configuration
+      of GDB.  Attempting to continue with the default i8086 settings.
+
+      The target architecture is assumed to be i8086
+      (gdb) target remote :1234
+      Remote debugging using :1234
+      warning: No executable has been specified and target does not support
+      determining executable automatically.  Try using the "file" command.
+      0x0000fff0 in ?? ()
+      (gdb) x/i $cs*16+$eip
+         0xffff0:	ljmp   $0xf000,$0xe05b
+
+  Actual results:
+
+      [terminal #1]
+      $ qemu-system-x86_64 -S -s
+
+      [terminal #2]
+      $ gdb -q
+      (gdb) set architecture i8086 =
+
+      warning: A handler for the OS ABI "GNU/Linux" is not built into this =
+configuration
+      of GDB.  Attempting to continue with the default i8086 settings.
+
+      The target architecture is assumed to be i8086
+      (gdb) target remote :1234
+      Remote debugging using :1234
+      warning: No executable has been specified and target does not support
+      determining executable automatically.  Try using the "file" command.
+      Remote 'g' packet reply is too long: =
+
+      [..snip..]
+
+  Workarounds tried:
+
+    - Try different architecures
+      (gdb) set architecture i386:intel
+      The target architecture is assumed to be i386:intel
+      (gdb) target remote :1234
+      Remote debugging using :1234
+      warning: No executable has been specified and target does not support
+      determining executable automatically.  Try using the "file" command.
+      Remote 'g' packet reply is too long: =
+
+      [..snip..]
+      (gdb) set architecture i386:x86-64
+      The target architecture is assumed to be i386:x86-64
+      (gdb) target remote :1234
+      Remote debugging using :1234
+      warning: No executable has been specified and target does not support
+      determining executable automatically.  Try using the "file" command.
+      0x000000000000fff0 in ?? ()
+
+  The last try finally allowed me to connect to QEMU, but as can be
+  expected from using an incorrect architecture setting, disassembly
+  output is complete gibberish:
+
+      (gdb) x/10i $cs*16+$rip
+         0xffff0:	(bad)  =
+
+         0xffff1:	pop    %rbx
+         0xffff2:	loopne 0xffff4
+         0xffff4:	lock xor %dh,(%rsi)
+         0xffff7:	(bad)  =
+
+         0xffff8:	xor    (%rbx),%dh
+         0xffffa:	(bad)  =
+
+         0xffffb:	cmp    %edi,(%rcx)
+         0xffffd:	add    %bh,%ah
+         0xfffff:	add    %al,(%rax)
+
+  Discussion:
+
+  I think I've traced the problem to the following commit: "x86: Fix x86_64=
+ 'g' packet response to gdb from 32-bit mode."[1].
+  While I admire the effort to make life for people using GDB to debug QEMU=
+ VMs, I think the problem here is with GDB and can't be fixed entirely from=
+ the side of QEMU without breaking other features.
+
+  In fact, there is a well-known workaround to this problem published on
+  OSDev Wiki (Workaround #1)[2] which doesn't require patching either
+  QEMU or GDB. This workaround has worked for me using several previous
+  versions of QEMU.
+
+      $ gdb -q
+      (gdb) set architecture i8086
+      (gdb) target remote :1234
+      (gdb) break some_breakpoint_in_32_bit_or_64_bit_code
+      (gdb) continue
+      [...]
+      Remote 'g' packet reply is too long: [...]
+      (gdb) disconnect # IMPORTANT STEP #1
+      (gdb) set architecture i386:x86-64
+      (gdb) target remote :1234 # IMPORTANT STEP #2
+      (gdb) continue
+
+  [1]: http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3De3592bc9d841c397eed=
+a87f0019fab94ff71004b
+  [2]: http://wiki.osdev.org/QEMU_and_GDB_in_long_mode#Workaround_1:_Reconn=
+ecting
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1686170/+subscriptions
