@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Niq-00031E-Jf
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:15:16 -0400
+	(envelope-from <bounces@canonical.com>) id 1d3Njd-0003cn-Go
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Nim-000577-IN
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:15:12 -0400
-References: <20170425153858.25660-1-berrange@redhat.com>
-	<20170425153858.25660-8-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <37afd84b-2183-8c99-c810-87a60c528d96@redhat.com>
-Date: Wed, 26 Apr 2017 09:14:55 -0500
+	(envelope-from <bounces@canonical.com>) id 1d3NjZ-0005Mi-9v
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:16:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d3NjY-0005Lt-VU
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:15:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d3NjW-0004IX-N1
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 14:15:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 23F9D2E80CF
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 14:15:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170425153858.25660-8-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2wDOqTAtbqLUSkbx14SggEISNpcFvr1he"
-Subject: Re: [Qemu-devel] [PATCH v6 07/18] block: deprecate "encryption=on"
- in favour of "encrypt.format=aes"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 26 Apr 2017 14:01:11 -0000
+From: leon <lyan@suse.com>
+Reply-To: Bug 1686390 <1686390@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170426131252.6340.68549.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170426140111.6309.23409.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1686390] Re: vnc server closed socket after arrow
+ "down" keyevent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2wDOqTAtbqLUSkbx14SggEISNpcFvr1he
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Message-ID: <37afd84b-2183-8c99-c810-87a60c528d96@redhat.com>
-Subject: Re: [PATCH v6 07/18] block: deprecate "encryption=on" in favour of
- "encrypt.format=aes"
-References: <20170425153858.25660-1-berrange@redhat.com>
- <20170425153858.25660-8-berrange@redhat.com>
-In-Reply-To: <20170425153858.25660-8-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+** Description changed:
 
-On 04/25/2017 10:38 AM, Daniel P. Berrange wrote:
-> Historically the qcow & qcow2 image formats supported a property
-> "encryption=3Don" to enable their built-in AES encryption. We'll
-> soon be supporting LUKS for qcow2, so need a more general purpose
-> way to enable encryption, with a choice of formats.
->=20
-> This introduces an "encrypt.format" option, which will later be
-> joined by a number of other "encrypt.XXX" options. The use of
-> a "encrypt." prefix instead of "encrypt-" is done to facilitate
-> mapping to a nested QAPI schema at later date.
->=20
-> e.g. the preferred syntax is now
->=20
->   qemu-img create -f qcow2 -o encrypt.format=3Daes demo.qcow2
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
+  This is a rewrite for https://bugs.launchpad.net/qemu/+bug/1670377
+  =
 
+  QEMU 2.6 or later
+- tigervncviwer 1.6  =
 
-> @@ -3370,10 +3385,16 @@ static QemuOptsList qcow2_create_opts =3D {
->          {
->              .name =3D BLOCK_OPT_ENCRYPT,
->              .type =3D QEMU_OPT_BOOL,
-> -            .help =3D "Encrypt the image",
-> +            .help =3D "Encrypt the image with format 'aes'. (Deprecate=
-d "
-> +                    "in favour of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)"=
-,
++ tigervncviwer 1.6
+  =
 
-I don't think we have any strong position on US vs. UK spellings in
-user-facing documentation, so I won't insist on any change.
+  Once get into grub boot interface(choose boot os, or recovery mode),
+- keep pressing arrow down button for couple times, qemu will close the
+- connection, vnc used zrle mode.
++ keep holding press arrow down button for a while(no release), qemu will
++ close the connection, vnc used zrle mode.
+  =
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+  Interesting place:
+- 1. when stopped at grub interface, only arrow up and down key could trigg=
+er it, =
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
++ 1. when stopped at grub interface, only arrow up and down key could trigg=
+er it,
+  2.  only in zrle or tight mode, could work well in raw mode
+  2. it only triggered by remote connection, not happen if local vncviewer =
+and vnc server
+- =
 
+  =
 
---2wDOqTAtbqLUSkbx14SggEISNpcFvr1he
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  A trace is attached.
+  =
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  Thanks
 
-iQEcBAEBCAAGBQJZAKtfAAoJEKeha0olJ0NqaBIH/06Hv1V73Lgv3LmYy0mlgP4J
-spF/zBComw7SLT13j36i9pFuNTYMzIfRk+uuV+1zamJloDTGJdV1L5bK8pM3oFkO
-siUK2r1CkmGtxvckb9JUFgiBlpJ0x6IwjMKtu6zT9xAooeSHAVL2Q7nfhdjtbHwg
-eyHm9nWa9CQDlq8uw1f8xhfLO7XQBqx2t6oiic5H6RnmqPjyZlfvNS9bM/0WVWPv
-rt7JM9s3rZGt1WNK0qH+SS06uSZLha+lWXeFwQUbFL1ETbJIV2DxJkOBnkunHAML
-QGJ8LQfaHquF5NSfO44xWMvVU6ud9MTG/trF83V7jTJUAI7SKpOmXr8xq0/l2QE=
-=yr2Y
------END PGP SIGNATURE-----
+-- =
 
---2wDOqTAtbqLUSkbx14SggEISNpcFvr1he--
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1686390
+
+Title:
+  vnc server closed socket after arrow "down" keyevent
+
+Status in QEMU:
+  New
+
+Bug description:
+  This is a rewrite for https://bugs.launchpad.net/qemu/+bug/1670377
+
+  QEMU 2.6 or later
+  tigervncviwer 1.6
+
+  Once get into grub boot interface(choose boot os, or recovery mode),
+  keep holding press arrow down button for a while(no release), qemu
+  will close the connection, vnc used zrle mode.
+
+  Interesting place:
+  1. when stopped at grub interface, only arrow up and down key could trigg=
+er it,
+  2.  only in zrle or tight mode, could work well in raw mode
+  2. it only triggered by remote connection, not happen if local vncviewer =
+and vnc server
+
+  A trace is attached.
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1686390/+subscriptions
