@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwo-0005Ij-ME
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:23 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwp-0005Jv-Mr
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwg-00081m-NS
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwj-00084N-OU
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:11 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 17:00:12 +1000
-Message-Id: <20170426070034.10727-27-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 17:00:16 +1000
+Message-Id: <20170426070034.10727-31-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/48] ppc/pnv: add memory regions for the ICP
- registers
+Subject: [Qemu-devel] [PULL 30/48] ipmi: use a file to load SDRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,186 +27,135 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This provides to a PowerNV chip (POWER8) access to the Interrupt
-Management area, which contains the registers of the Interrupt Control
-Presenters of each thread. These are used to accept, return, forward
-interrupts in the system.
+The IPMI BMC simulator populates the sdr/sensor tables with a minimal
+set of entries (Watchdog). But some qemu platforms might want to use
+extra entries for their custom needs.
 
-This area is modeled with a per-chip container memory region holding
-all the ICP registers. Each thread of a chip is then associated with
-its ICP registers using a memory subregion indexed by its PIR number
-in the overall region.
-
-The device tree is populated accordingly.
+This patch modifies slighty the initializing routine to take into
+account a larger set read from a file. The name of the file to use is
+defined through a new 'sdr' property of the simulator device.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c         | 81 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/ppc/pnv.h | 19 ++++++++++++
- 2 files changed, 100 insertions(+)
+ hw/ipmi/ipmi_bmc_sim.c | 23 +++++++++++++++++++++--
+ qemu-options.hx        | 11 ++++++++++-
+ 2 files changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 2add2ad..1fa90d6 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -218,6 +218,43 @@ static void powernv_create_core_node(PnvChip *chip, =
-PnvCore *pc, void *fdt)
-                        servers_prop, sizeof(servers_prop))));
- }
+diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+index c7883d6..1142c0c 100644
+--- a/hw/ipmi/ipmi_bmc_sim.c
++++ b/hw/ipmi/ipmi_bmc_sim.c
+@@ -27,6 +27,7 @@
+ #include "qemu/timer.h"
+ #include "hw/ipmi/ipmi.h"
+ #include "qemu/error-report.h"
++#include "hw/loader.h"
 =20
-+static void powernv_populate_icp(PnvChip *chip, void *fdt, uint32_t pir,
-+                                 uint32_t nr_threads)
-+{
-+    uint64_t addr =3D PNV_ICP_BASE(chip) | (pir << 12);
-+    char *name;
-+    const char compat[] =3D "IBM,power8-icp\0IBM,ppc-xicp";
-+    uint32_t irange[2], i, rsize;
-+    uint64_t *reg;
-+    int offset;
-+
-+    irange[0] =3D cpu_to_be32(pir);
-+    irange[1] =3D cpu_to_be32(nr_threads);
-+
-+    rsize =3D sizeof(uint64_t) * 2 * nr_threads;
-+    reg =3D g_malloc(rsize);
-+    for (i =3D 0; i < nr_threads; i++) {
-+        reg[i * 2] =3D cpu_to_be64(addr | ((pir + i) * 0x1000));
-+        reg[i * 2 + 1] =3D cpu_to_be64(0x1000);
+ #define IPMI_NETFN_CHASSIS            0x00
+=20
+@@ -213,6 +214,7 @@ struct IPMIBmcSim {
+     IPMISel sel;
+     IPMISdr sdr;
+     IPMISensor sensors[MAX_SENSORS];
++    char *sdr_filename;
+=20
+     /* Odd netfns are for responses, so we only need the even ones. */
+     const IPMINetfn *netfns[MAX_NETFNS / 2];
+@@ -1696,22 +1698,33 @@ static void ipmi_sdr_init(IPMIBmcSim *ibs)
+=20
+     sdrs_size =3D sizeof(init_sdrs);
+     sdrs =3D init_sdrs;
++    if (ibs->sdr_filename &&
++        !g_file_get_contents(ibs->sdr_filename, (gchar **) &sdrs, &sdrs_=
+size,
++                             NULL)) {
++        error_report("failed to load sdr file '%s'", ibs->sdr_filename);
++        sdrs_size =3D sizeof(init_sdrs);
++        sdrs =3D init_sdrs;
 +    }
-+
-+    name =3D g_strdup_printf("interrupt-controller@%"PRIX64, addr);
-+    offset =3D fdt_add_subnode(fdt, 0, name);
-+    _FDT(offset);
-+    g_free(name);
-+
-+    _FDT((fdt_setprop(fdt, offset, "compatible", compat, sizeof(compat))=
-));
-+    _FDT((fdt_setprop(fdt, offset, "reg", reg, rsize)));
-+    _FDT((fdt_setprop_string(fdt, offset, "device_type",
-+                              "PowerPC-External-Interrupt-Presentation")=
-));
-+    _FDT((fdt_setprop(fdt, offset, "interrupt-controller", NULL, 0)));
-+    _FDT((fdt_setprop(fdt, offset, "ibm,interrupt-server-ranges",
-+                       irange, sizeof(irange))));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#interrupt-cells", 1)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 0)));
-+    g_free(reg);
-+}
-+
- static void powernv_populate_chip(PnvChip *chip, void *fdt)
- {
-     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-@@ -231,6 +268,10 @@ static void powernv_populate_chip(PnvChip *chip, voi=
-d *fdt)
-         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
 =20
-         powernv_create_core_node(chip, pnv_core, fdt);
-+
-+        /* Interrupt Control Presenters (ICP). One per core. */
-+        powernv_populate_icp(chip, fdt, pnv_core->pir,
-+                             CPU_CORE(pnv_core)->nr_threads);
+     for (i =3D 0; i < sdrs_size; i +=3D len) {
+         struct ipmi_sdr_header *sdrh;
+=20
+         if (i + IPMI_SDR_HEADER_SIZE > sdrs_size) {
+             error_report("Problem with recid 0x%4.4x", i);
+-            return;
++            break;
+         }
+         sdrh =3D (struct ipmi_sdr_header *) &sdrs[i];
+         len =3D ipmi_sdr_length(sdrh);
+         if (i + len > sdrs_size) {
+             error_report("Problem with recid 0x%4.4x", i);
+-            return;
++            break;
+         }
+         sdr_add_entry(ibs, sdrh, len, NULL);
      }
-=20
-     if (chip->ram_size) {
-@@ -643,6 +684,38 @@ static void pnv_chip_init(Object *obj)
-     object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
++
++    if (sdrs !=3D init_sdrs) {
++        g_free(sdrs);
++    }
  }
 =20
-+static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
-+{
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-+    char *typename =3D pnv_core_typename(pcc->cpu_model);
-+    size_t typesize =3D object_type_get_instance_size(typename);
-+    int i, j;
-+    char *name;
-+    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
+ static const VMStateDescription vmstate_ipmi_sim =3D {
+@@ -1780,6 +1793,11 @@ static void ipmi_sim_realize(DeviceState *dev, Err=
+or **errp)
+     vmstate_register(NULL, 0, &vmstate_ipmi_sim, ibs);
+ }
+=20
++static Property ipmi_sim_properties[] =3D {
++    DEFINE_PROP_STRING("sdrfile", IPMIBmcSim, sdr_filename),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-+    name =3D g_strdup_printf("icp-%x", chip->chip_id);
-+    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZE=
-);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
-+    g_free(name);
-+
-+    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
-+
-+    /* Map the ICP registers for each thread */
-+    for (i =3D 0; i < chip->nr_cores; i++) {
-+        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-+        int core_hwid =3D CPU_CORE(pnv_core)->core_id;
-+
-+        for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
-+            uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
-+            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
-+
-+            memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp=
-->mmio);
-+        }
-+    }
-+
-+    g_free(typename);
-+}
-+
- static void pnv_chip_realize(DeviceState *dev, Error **errp)
+ static void ipmi_sim_class_init(ObjectClass *oc, void *data)
  {
-     PnvChip *chip =3D PNV_CHIP(dev);
-@@ -713,6 +786,14 @@ static void pnv_chip_realize(DeviceState *dev, Error=
- **errp)
-     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-                              &error_fatal);
-     pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xscom_r=
-egs);
-+
-+    /* Interrupt Management Area. This is the memory region holding
-+     * all the Interrupt Control Presenter (ICP) registers */
-+    pnv_chip_icp_realize(chip, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
-+    }
+     DeviceClass *dc =3D DEVICE_CLASS(oc);
+@@ -1787,6 +1805,7 @@ static void ipmi_sim_class_init(ObjectClass *oc, vo=
+id *data)
+=20
+     dc->hotpluggable =3D false;
+     dc->realize =3D ipmi_sim_realize;
++    dc->props =3D ipmi_sim_properties;
+     bk->handle_command =3D ipmi_sim_handle_command;
  }
 =20
- static Property pnv_chip_properties[] =3D {
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 5693ba1..96231c1 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -54,6 +54,7 @@ typedef struct PnvChip {
-     MemoryRegion xscom_mmio;
-     MemoryRegion xscom;
-     AddressSpace xscom_as;
-+    MemoryRegion icp_mmio;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9171bd5..366b088 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -425,7 +425,7 @@ possible drivers and properties, use @code{-device he=
+lp} and
+ @code{-device @var{driver},help}.
 =20
-     PnvLpcController lpc;
- } PnvChip;
-@@ -136,4 +137,22 @@ typedef struct PnvMachineState {
- #define PNV_XSCOM_BASE(chip)                                            =
-\
-     (chip->xscom_base + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZE)
+ Some drivers are:
+-@item -device ipmi-bmc-sim,id=3D@var{id}[,slave_addr=3D@var{val}]
++@item -device ipmi-bmc-sim,id=3D@var{id}[,slave_addr=3D@var{val}][,sdrfi=
+le=3D@var{file}]
 =20
-+/*
-+ * XSCOM 0x20109CA defines the ICP BAR:
-+ *
-+ * 0:29   : bits 14 to 43 of address to define 1 MB region.
-+ * 30     : 1 to enable ICP to receive loads/stores against its BAR regi=
-on
-+ * 31:63  : Constant 0
-+ *
-+ * Usually defined as :
-+ *
-+ *      0xffffe00200000000 -> 0x0003ffff80000000
-+ *      0xffffe00600000000 -> 0x0003ffff80100000
-+ *      0xffffe02200000000 -> 0x0003ffff80800000
-+ *      0xffffe02600000000 -> 0x0003ffff80900000
-+ */
-+#define PNV_ICP_SIZE         0x0000000000100000ull
-+#define PNV_ICP_BASE(chip)                                              =
-\
-+    (0x0003ffff80000000ull + (uint64_t) PNV_CHIP_INDEX(chip) * PNV_ICP_S=
-IZE)
+ Add an IPMI BMC.  This is a simulation of a hardware management
+ interface processor that normally sits on a system.  It provides
+@@ -437,6 +437,15 @@ This address is the BMC's address on the I2C network=
+ of management
+ controllers.  If you don't know what this means, it is safe to ignore
+ it.
+=20
++@table @option
++@item bmc=3D@var{id}
++The BMC to connect to, one of ipmi-bmc-sim or ipmi-bmc-extern above.
++@item slave_addr=3D@var{val}
++Define slave address to use for the BMC.  The default is 0x20.
++@item sdrfile=3D@var{file}
++file containing raw Sensor Data Records (SDR) data.  The default is none=
+.
++@end table
 +
- #endif /* _PPC_PNV_H */
+ @item -device ipmi-bmc-extern,id=3D@var{id},chardev=3D@var{id}[,slave_ad=
+dr=3D@var{val}]
+=20
+ Add a connection to an external IPMI BMC simulator.  Instead of
 --=20
 2.9.3
