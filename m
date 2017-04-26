@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3KkT-0000wA-G3
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:04:42 -0400
+	(envelope-from <peterx@redhat.com>) id 1d3Kt0-00052n-Pn
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3KkS-0007DX-LO
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:04:41 -0400
-Date: Wed, 26 Apr 2017 08:04:32 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170426110432.GT3482@thinpad.lan.raisama.net>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-11-git-send-email-imammedo@redhat.com>
-	<20170412211529.GD27126@thinpad.lan.raisama.net>
-	<20170419115245.5855f624@nial.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170419115245.5855f624@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 10/23] numa: mirror cpu to node
- mapping in MachineState::possible_cpus
+	(envelope-from <peterx@redhat.com>) id 1d3Ksw-0002x0-Qx
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:13:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3Ksw-0002w4-Lq
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:13:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 744BBC05AD62
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 11:13:25 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 26 Apr 2017 19:13:10 +0800
+Message-Id: <1493205192-26743-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] ramblock: add hmp command "info
+ ramblock"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Apr 19, 2017 at 11:52:45AM +0200, Igor Mammedov wrote:
-> On Wed, 12 Apr 2017 18:15:29 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Wed, Mar 22, 2017 at 02:32:35PM +0100, Igor Mammedov wrote:
-> > > Introduce machine_set_cpu_numa_node() helper that stores
-> > > node mapping for CPU in MachineState::possible_cpus.
-> > > CPU and node it belongs to is specified by 'props' argument.
-> > > 
-> > > Patch doesn't remove old way of storing mapping in
-> > > numa_info[X].node_cpu as removing it at the same time
-> > > makes patch rather big. Instead it just mirrors mapping
-> > > in possible_cpus and follow up per target patches will
-> > > switch to possible_cpus and numa_info[X].node_cpu will
-> > > be removed once there isn't any users left.
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> > 
-> > So, this patch is the one that makes "-numa" and "-numa cpu"
-> > affect query-hotpluggable-cpus output.
-> that was intent behind series.
-> 
-> [...]
-> > As noted in another message, I am not sure we really should make
-> > "-numa" affect query-hotpluggable-cpus output unconditionally (I
-> > believe we shouldn't). But we do, we need to document this very
-> > clearly.
-> What place would you suggest to document this at?
+v2:
+- replace "lx" with "PRIx64" in three places
 
-qemu-options.hx documentation for -numa cpu, NumaCpuOptions docs
-on qapi-schema, and/or query-hotpluggable-cpus docs on
-qapi-schema.
+Sometimes I would like to know ramblock info for a VM. This command
+would help. It provides a way to dump ramblock info. Currently the
+list is by default sorted by size, though I think it's good enough.
+
+Please review, thanks.
+
+Peter Xu (2):
+  ramblock: add RAMBLOCK_FOREACH()
+  ramblock: add new hmp command "info ramblock"
+
+ exec.c                 | 57 ++++++++++++++++++++++++++++++++++++++++----------
+ hmp-commands-info.hx   | 14 +++++++++++++
+ hmp.c                  |  6 ++++++
+ hmp.h                  |  1 +
+ include/exec/ramlist.h |  6 ++++++
+ migration/ram.c        | 15 ++++++-------
+ 6 files changed, 81 insertions(+), 18 deletions(-)
 
 -- 
-Eduardo
+2.7.4
