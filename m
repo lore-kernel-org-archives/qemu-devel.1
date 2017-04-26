@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3OuF-0000uM-Oj
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:31:05 -0400
+	(envelope-from <berrange@redhat.com>) id 1d3P2F-0004uO-7t
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:39:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3OuC-0004LF-JI
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:31:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40787)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d3OuC-0004JU-5D
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:31:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d3Ou8-00060K-Mc
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:30:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A988E2E80C2
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:30:56 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1d3P2B-0000LO-6s
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:39:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d3P2A-0000KO-UD
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:39:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98C9E4E4FC
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:39:13 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed, 26 Apr 2017 16:39:00 +0100
+Message-Id: <20170426153900.21066-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Apr 2017 15:24:14 -0000
-From: Alain Kalker <miki@dds.nl>
-Reply-To: Bug 1686170 <1686170@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170425183112.19801.4371.malonedeb@soybean.canonical.com>
-Message-Id: <20170426152414.22554.12853.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1686170] Re: qemu-system-x86_64+gdb: unable to
- correctly disassemble "real mode" (i8086) instructions after attaching to
- QEMU started with "-S -s" options
+Subject: [Qemu-devel] [PATCH] trace: disallow more than 10 arguments per
+ trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,159 +32,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-If it is decided to retain the change, please do consider adding a
-commandline option to enable debugging Real mode code after `set
-architecture i8086`, even if this requires the GDB workaround previously
-mentioned. Thanks in advance.
+The UST trace backend can only cope with upto 10 arguments. To ensure we
+don't exceed the limit when UST is not compiled in, disallow more than
+10 arguments upfront.
 
--- =
+This prevents the case where:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1686170
+  commit 0fc8aec7de64f2bf83a274a2a38b938ce03425d2
+  Author: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+  Date:   Tue Apr 18 10:20:20 2017 +0800
 
-Title:
-  qemu-system-x86_64+gdb: unable to correctly disassemble "real mode"
-  (i8086) instructions after attaching to QEMU started with "-S -s"
-  options
+    COLO-compare: Optimize tcp compare trace event
 
-Status in QEMU:
-  New
+    Optimize two trace events as one, adjust print format make
+    it easy to read. rename trace_colo_compare_pkt_info_src/dst
+    to trace_colo_compare_tcp_info.
 
-Bug description:
-  OS: Void Linux x86_64 (glibc)
-  QEMU version: 2.9.0
-  GDB version: 7.12.1
+regressed the fix done in
 
-  Problem description:
+  commit 2dfe5113b11ce0ddb08176ebb54ab7ac4104b413
+  Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+  Date:   Fri Oct 28 14:25:59 2016 +0100
 
-  After I updated QEMU from version 2.8.1 to 2.9.0, I found that when I try=
- to connect GDB to a running QEMU and try to debug Real mode machine code, =
-I can no longer set architecture to 'i8086'.
-  To be able to connect to QEMU from GDB at all, I have to specify one of t=
-he 64 bit architectures, which among other things leads to incorrect disass=
-embly listings. This makes debugging Real mode bootloaders, bootsectors and=
- BIOS code much more difficult.
+    net: split colo_compare_pkt_info into two trace events
 
-  Steps to reproduce:
+    It seems there is a limit to the number of arguments a UST trace even=
+t
+    can take and at 11 the previous trace command broke the build. Split =
+the
+    trace into a src pkt and dst pkt trace to fix this.
 
-  - Run QEMU
-  - In another terminal, run GDB
-  - In GDB, connect to QEMU
-  - In GDB, disassemble some Real mode machine code.
+    Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+    Message-id: 20161028132559.8324-1-alex.bennee@linaro.org
+    Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+    Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-  Expected results (from QEMU version 2.8.1):
+Now we get an immediate fail even when UST is disabled:
 
-      [terminal #1]
-      $ qemu-system-x86_64 -S -s
+  GEN     net/trace.h
+Traceback (most recent call last):
+  File "/home/berrange/src/virt/qemu/scripts/tracetool.py", line 154, in =
+<module>
+    main(sys.argv)
+  File "/home/berrange/src/virt/qemu/scripts/tracetool.py", line 145, in =
+main
+    events.extend(tracetool.read_events(fh))
+  File "/home/berrange/src/virt/qemu/scripts/tracetool/__init__.py", line=
+ 307, in read_events
+    event =3D Event.build(line)
+  File "/home/berrange/src/virt/qemu/scripts/tracetool/__init__.py", line=
+ 244, in build
+    event =3D Event(name, props, fmt, args)
+  File "/home/berrange/src/virt/qemu/scripts/tracetool/__init__.py", line=
+ 196, in __init__
+    "argument count" % name)
+ValueError: Event 'colo_compare_tcp_info' has more than maximum permitted=
+ argument count
+Makefile:96: recipe for target 'net/trace.h-timestamp' failed
 
-      [terminal #2]
-      (gdb) set architecture i8086
-      warning: A handler for the OS ABI "GNU/Linux" is not built =
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
 
-      into this configuration
-      of GDB.  Attempting to continue with the default i8086 settings.
+Obviously dont apply this until 0fc8aec7de64f2bf83a274a2a38b938ce03425d2 =
+has
+been reverted :-)
 
-      The target architecture is assumed to be i8086
-      (gdb) target remote :1234
-      Remote debugging using :1234
-      warning: No executable has been specified and target does not support
-      determining executable automatically.  Try using the "file" command.
-      0x0000fff0 in ?? ()
-      (gdb) x/i $cs*16+$eip
-         0xffff0:	ljmp   $0xf000,$0xe05b
+ scripts/tracetool/__init__.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-  Actual results:
-
-      [terminal #1]
-      $ qemu-system-x86_64 -S -s
-
-      [terminal #2]
-      $ gdb -q
-      (gdb) set architecture i8086 =
-
-      warning: A handler for the OS ABI "GNU/Linux" is not built into this =
-configuration
-      of GDB.  Attempting to continue with the default i8086 settings.
-
-      The target architecture is assumed to be i8086
-      (gdb) target remote :1234
-      Remote debugging using :1234
-      warning: No executable has been specified and target does not support
-      determining executable automatically.  Try using the "file" command.
-      Remote 'g' packet reply is too long: =
-
-      [..snip..]
-
-  Workarounds tried:
-
-    - Try different architecures
-      (gdb) set architecture i386:intel
-      The target architecture is assumed to be i386:intel
-      (gdb) target remote :1234
-      Remote debugging using :1234
-      warning: No executable has been specified and target does not support
-      determining executable automatically.  Try using the "file" command.
-      Remote 'g' packet reply is too long: =
-
-      [..snip..]
-      (gdb) set architecture i386:x86-64
-      The target architecture is assumed to be i386:x86-64
-      (gdb) target remote :1234
-      Remote debugging using :1234
-      warning: No executable has been specified and target does not support
-      determining executable automatically.  Try using the "file" command.
-      0x000000000000fff0 in ?? ()
-
-  The last try finally allowed me to connect to QEMU, but as can be
-  expected from using an incorrect architecture setting, disassembly
-  output is complete gibberish:
-
-      (gdb) x/10i $cs*16+$rip
-         0xffff0:	(bad)  =
-
-         0xffff1:	pop    %rbx
-         0xffff2:	loopne 0xffff4
-         0xffff4:	lock xor %dh,(%rsi)
-         0xffff7:	(bad)  =
-
-         0xffff8:	xor    (%rbx),%dh
-         0xffffa:	(bad)  =
-
-         0xffffb:	cmp    %edi,(%rcx)
-         0xffffd:	add    %bh,%ah
-         0xfffff:	add    %al,(%rax)
-
-  Discussion:
-
-  I think I've traced the problem to the following commit: "x86: Fix x86_64=
- 'g' packet response to gdb from 32-bit mode."[1].
-  While I admire the effort to make life for people using GDB to debug QEMU=
- VMs, I think the problem here is with GDB and can't be fixed entirely from=
- the side of QEMU without breaking other features.
-
-  In fact, there is a well-known workaround to this problem published on
-  OSDev Wiki (Workaround #1)[2] which doesn't require patching either
-  QEMU or GDB. This workaround has worked for me using several previous
-  versions of QEMU.
-
-      $ gdb -q
-      (gdb) set architecture i8086
-      (gdb) target remote :1234
-      (gdb) break some_breakpoint_in_32_bit_or_64_bit_code
-      (gdb) continue
-      [...]
-      Remote 'g' packet reply is too long: [...]
-      (gdb) disconnect # IMPORTANT STEP #1
-      (gdb) set architecture i386:x86-64
-      (gdb) target remote :1234 # IMPORTANT STEP #2
-      (gdb) continue
-
-  [1]: http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3De3592bc9d841c397eed=
-a87f0019fab94ff71004b
-  [2]: http://wiki.osdev.org/QEMU_and_GDB_in_long_mode#Workaround_1:_Reconn=
-ecting
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1686170/+subscriptions
+diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
+y
+index 365446f..1ffbc1d 100644
+--- a/scripts/tracetool/__init__.py
++++ b/scripts/tracetool/__init__.py
+@@ -191,6 +191,10 @@ class Event(object):
+         self.event_trans =3D event_trans
+         self.event_exec =3D event_exec
+=20
++        if len(args) > 10:
++            raise ValueError("Event '%s' has more than maximum permitted=
+ "
++                             "argument count" % name)
++
+         if orig is None:
+             self.original =3D weakref.ref(self)
+         else:
+--=20
+2.9.3
