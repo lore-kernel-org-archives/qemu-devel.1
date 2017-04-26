@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3Ugq-0008Ps-H8
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:41:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3Uma-0001li-KY
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:47:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3Ugp-0000Oq-LJ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:41:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3UmZ-0003OM-NO
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:47:32 -0400
 References: <20170418013356.3578-1-eblake@redhat.com>
-	<20170418013356.3578-2-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <09e20a54-07bd-bb46-d4e1-21a3e6db3d9e@redhat.com>
-Date: Wed, 26 Apr 2017 17:41:22 -0400
+	<20170418013356.3578-3-eblake@redhat.com>
+	<8f65f4aa-c5a2-bad9-404f-0d72961d3cc6@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ee675116-5c29-b5d0-9c56-514daf81d9ae@redhat.com>
+Date: Wed, 26 Apr 2017 16:47:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170418013356.3578-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/31] block: Drop unused
- bdrv_round_sectors_to_clusters()
+In-Reply-To: <8f65f4aa-c5a2-bad9-404f-0d72961d3cc6@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GLpMBReSamGC5jLTPkNPGSJLi5pD1OG0O"
+Subject: Re: [Qemu-devel] [PATCH 02/31] block: Make bdrv_round_to_clusters()
+ signature more useful
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, kwolf@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, kwolf@nongnu.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GLpMBReSamGC5jLTPkNPGSJLi5pD1OG0O
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
+ qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ kwolf@nongnu.org
+Message-ID: <ee675116-5c29-b5d0-9c56-514daf81d9ae@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/31] block: Make bdrv_round_to_clusters()
+ signature more useful
+References: <20170418013356.3578-1-eblake@redhat.com>
+ <20170418013356.3578-3-eblake@redhat.com>
+ <8f65f4aa-c5a2-bad9-404f-0d72961d3cc6@redhat.com>
+In-Reply-To: <8f65f4aa-c5a2-bad9-404f-0d72961d3cc6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-On 04/17/2017 09:33 PM, Eric Blake wrote:
-> Now that the last user [mirror_iteration()] has converted to using
-> bytes, we no longer need a function to round sectors to clusters.
+On 04/26/2017 04:41 PM, John Snow wrote:
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
+> On 04/17/2017 09:33 PM, Eric Blake wrote:
+>> In the process of converting sector-based interfaces to bytes,
+>> I'm finding it easier to represent a byte count as a 64-bit
+>> integer at the block layer (even if we are internally capped
+>> by SIZE_MAX or even INT_MAX for individual transactions, it's
+>> still nicer to not have to worry about truncation/overflow
+>> issues on as many variables).  Update the signature of
+>> bdrv_round_to_clusters() to uniformly use uint64_t, matching
+>                                             ^^^^^^^^
+>=20
+> While we're here, since you went with int64_t in the end, what steered
+> you away from uint64_t, or was that just a thinko?
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Later patches were made easier with signed (the compiler complained when
+I mixed signed and unsigned pointers).
 
-> ---
->  include/block/block.h |  4 ----
->  block/io.c            | 21 ---------------------
->  2 files changed, 25 deletions(-)
 >=20
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 740cb86..86ad511 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -467,10 +467,6 @@ const char *bdrv_get_device_or_node_name(const Blo=
-ckDriverState *bs);
->  int bdrv_get_flags(BlockDriverState *bs);
->  int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi);
->  ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs);
-> -void bdrv_round_sectors_to_clusters(BlockDriverState *bs,
-> -                                    int64_t sector_num, int nb_sectors=
-,
-> -                                    int64_t *cluster_sector_num,
-> -                                    int *cluster_nb_sectors);
->  void bdrv_round_to_clusters(BlockDriverState *bs,
->                              int64_t offset, unsigned int bytes,
->                              int64_t *cluster_offset,
-> diff --git a/block/io.c b/block/io.c
-> index d22d35f..d61a906 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -419,27 +419,6 @@ static void mark_request_serialising(BdrvTrackedRe=
-quest *req, uint64_t align)
->  }
+> (AFAICT: off_t is usually something like int64_t, so your choice makes
+> sense to me, generally.)
+
+Indeed, and that's something I should update my commit message to mention=
+=2E
+
 >=20
->  /**
-> - * Round a region to cluster boundaries (sector-based)
-> - */
-> -void bdrv_round_sectors_to_clusters(BlockDriverState *bs,
-> -                                    int64_t sector_num, int nb_sectors=
-,
-> -                                    int64_t *cluster_sector_num,
-> -                                    int *cluster_nb_sectors)
-> -{
-> -    BlockDriverInfo bdi;
-> -
-> -    if (bdrv_get_info(bs, &bdi) < 0 || bdi.cluster_size =3D=3D 0) {
-> -        *cluster_sector_num =3D sector_num;
-> -        *cluster_nb_sectors =3D nb_sectors;
-> -    } else {
-> -        int64_t c =3D bdi.cluster_size / BDRV_SECTOR_SIZE;
-> -        *cluster_sector_num =3D QEMU_ALIGN_DOWN(sector_num, c);
-> -        *cluster_nb_sectors =3D QEMU_ALIGN_UP(sector_num - *cluster_se=
-ctor_num +
-> -                                            nb_sectors, c);
-> -    }
-> -}
-> -
-> -/**
->   * Round a region to cluster boundaries
->   */
->  void bdrv_round_to_clusters(BlockDriverState *bs,
+> --js
 >=20
+>> the signature already chosen for bdrv_is_allocated, and
+>> adjust clients according to the required fallout.
+
+If you want me to try and use uint64_t *pnum instead of int64_t *pnum
+throughout both my series 1  (the changes to bdrv_is_allocated) and this
+one, it will take more effort.  I'll do it if there's a reason, but I'd
+rather not if the signed version is good enough.
 
 --=20
-=E2=80=94js
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--GLpMBReSamGC5jLTPkNPGSJLi5pD1OG0O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZARVmAAoJEKeha0olJ0NqW7IH/28LE9oXXeT8UceZYRs91eR6
+FEy5dJqDASZH5i7+6Rqw1O1BMVXNR78h8/b1Ed8pe0YKVoveMjJJHfSqkSEJPvYJ
+zt0H9DaYzRhsruzuoTpy4iUZ1j3hgz+bLeBKnsB0tGyf3JRABeQnMAiNxGKNgJx7
+w3W3Lf4rH5IL6OVFiUssYFLfK8/K+KpYM+DLBrf06Y9d+EQWh6F0Owt1Ucb+Yv/l
+C+RiA0YX6MaDJ1YqqCxOHcOOuP6TzXEIJsoR2t77qrAhSj/EGPVqO7KzYnI7PJoe
+54J7cQmOk6Cx5JpWTF/C+ua4Ndz3gDAOagLa8JI7dlTwbYnpYUh9RsaKMAXyjpA=
+=qxEj
+-----END PGP SIGNATURE-----
+
+--GLpMBReSamGC5jLTPkNPGSJLi5pD1OG0O--
