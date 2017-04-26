@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d3KHW-0003zU-8l
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:34:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d3KMS-0000De-Kn
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:39:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d3KHT-0007IF-4H
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:34:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60205)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d3KHS-0007H3-SI
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:34:43 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3QAXog6112903
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:34:41 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2ebubwfv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:34:41 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 26 Apr 2017 11:34:39 +0100
-Date: Wed, 26 Apr 2017 12:34:27 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <1493126327-13162-1-git-send-email-thuth@redhat.com>
-References: <1493126327-13162-1-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1d3KMR-0001Us-Oq
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:39:52 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35466)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d3KMR-0001To-Hh
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:39:51 -0400
+Received: by mail-wr0-x236.google.com with SMTP id z52so81808998wrc.2
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 03:39:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170426123427.48528f3c.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix crash with
- virtio-scsi-pci device
+In-Reply-To: <alpine.DEB.2.10.1704251134220.2875@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1704251134220.2875@sstabellini-ThinkPad-X260>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 26 Apr 2017 11:39:29 +0100
+Message-ID: <CAFEAcA86yt0gf_NWuoMbF_kWJ8FhcPFO3=wEzjADq0Pu+KULuA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/21] Please pull xen-20170421-v2-tag for
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,54 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 25 Apr 2017 15:18:47 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On 25 April 2017 at 19:34, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> Added a fix for the clang build, see
+> alpine.DEB.2.10.1704251014320.2875@sstabellini-ThinkPad-X260
+>
+>
+> The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
+>
+>   Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
+>
+> are available in the git repository at:
+>
+>   git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170421-v2-tag
+>
+> for you to fetch changes up to 28b99f473bda682385da944b0404aedbe11ea0dc:
+>
+>   move xen-mapcache.c to hw/i386/xen/ (2017-04-25 11:04:34 -0700)
+>
+> ----------------------------------------------------------------
+> Xen 2017/04/21 + fix
+>
 
-> qemu-system-s390x currently crashes when it is started with a
-> virtio-scsi-pci device, e.g.:
-> 
->  qemu-system-s390x -nographic -enable-kvm -device virtio-scsi-pci \
->                    -drive file=/tmp/disk.dat,if=none,id=d1,format=raw \
->                    -device scsi-cd,drive=d1,bootindex=1
-> 
-> The problem is that the code in s390_gen_initial_iplb() currently assumes
-> that all SCSI devices are also CCW devices, which is not the case for
-> virtio-scsi-pci of course. Fix it by adding an appropriate check for
-> TYPE_CCW_DEVICE here.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/s390x/ipl.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 7978c7d..f674d50 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -248,7 +248,13 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
->              SCSIBus *bus = scsi_bus_from_device(sd);
->              VirtIOSCSI *vdev = container_of(bus, VirtIOSCSI, bus);
->              VirtIOSCSICcw *scsi_ccw = container_of(vdev, VirtIOSCSICcw, vdev);
-> -            CcwDevice *ccw_dev = CCW_DEVICE(scsi_ccw);
-> +            CcwDevice *ccw_dev;
-> +
-> +            ccw_dev = (CcwDevice *)object_dynamic_cast(OBJECT(scsi_ccw),
-> +                                                       TYPE_CCW_DEVICE);
-> +            if (!ccw_dev) {       /* It might be a PCI device instead */
-> +                return false;
-> +            }
-> 
->              ipl->iplb.len = cpu_to_be32(S390_IPLB_MIN_QEMU_SCSI_LEN);
->              ipl->iplb.blk0_len =
+Applied, thanks.
 
-This patch made me look at what we do if we have a non-ccw virtio-net
-device for ipl. We'll set ->netboot (which implies that we load the
-netboot fw later), but leave the iplb as invalid (so setting the start
-address in the iplb won't have any effect as we ignore an invalid iplb
-later on). The s390-ccw bios cannot deal with non-ccw boot devices
-anyway.
-
-In the end, it's just a bit odd, but no harm is done.
+-- PMM
