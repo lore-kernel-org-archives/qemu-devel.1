@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3NyO-0005aV-I9
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:31:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d3Nzb-0006B1-9o
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3NyK-00048d-BX
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:31:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d3NyK-00048B-2O
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:31:12 -0400
-Date: Wed, 26 Apr 2017 11:31:08 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170426143108.GW3482@thinpad.lan.raisama.net>
-References: <20170426100701.21893-1-lvivier@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1d3Nza-0004bL-7A
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:32:31 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33025)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d3NzZ-0004aK-WC
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:32:30 -0400
+Received: by mail-wr0-x231.google.com with SMTP id w50so1298364wrc.0
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 07:32:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170426100701.21893-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] numa: equally distribute memory on nodes
+In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
+References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 26 Apr 2017 15:32:08 +0100
+Message-ID: <CAFEAcA9+KdCGAb0Andsaxcn+-RRzxcHT-jY=q4Rd4iNuaqcqMA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/48] ppc-for-2.10 queue 20170426
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,105 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 
-On Wed, Apr 26, 2017 at 12:07:01PM +0200, Laurent Vivier wrote:
-> When there is more nodes than memory available to put the minimum
-> allowed memory by node, all the memory is put on the last node.
-> 
-> This is because we put (ram_size / nb_numa_nodes) &
-> ~((1 << mc->numa_mem_align_shift) - 1); on each node, and in this
-> case the value is 0. This is particularly true with pseries,
-> as the memory must be aligned to 256MB.
-> 
-> To avoid this problem, this patch uses an error diffusion algorithm [1]
-> to distribute equally the memory on nodes.
+On 26 April 2017 at 07:59, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit fe491fa85c4634453b340b18046aae2eaf8147db:
+>
+>   Merge remote-tracking branch 'remotes/agraf/tags/signed-s390-for-upstream' into staging (2017-04-25 14:48:55 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170426
+>
+> for you to fetch changes up to df02d2ca8b23ba1fff137090a65731c68cf1393d:
+>
+>   MAINTAINERS: Remove myself from e500 (2017-04-26 12:41:56 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2017-04-26
+>
+> Here's a respind of my first pull request for qemu-2.10, consisting of
+> assorted patches which have accumulated while qemu-2.9 stabilized.
+> Highlights are:
+>     * Rework / cleanup of the XICS interrupt controller
+>     * Substantial improvement to the 'powernv' machine type
+>         - Includes an MMIO XICS version
+>     * POWER9 support improvements
+>         - POWER9 guests with KVM
+>         - Partial support for POWER9 guests with TCG
+>     * IOMMU and VFIO improvements
+>     * Assorted minor changes
+>
+> There are several IPMI patches here that aren't usually in my area of
+> maintenance, but there isn't a regular maintainer and these patches
+> are for the benefit of the powernv machine type.
+>
+> This pull request supersedes my 2017-04-26 pull request.  This new set
+> fixes a bug in one of the aforementioned IPMI patches which caused
+> clang sanitizer failures (and may have crashed on some libc / host
+> versions).
 
-Nice.
+Applied, thanks.
 
-But we need compat code to keep the previous behavior on older
-machine-types. We can use either a new boolean MachineClass
-field, or a MachineClass method (mc->auto_assign_ram(), maybe?)
-that 2.9 machine-types could override.
-
-> 
-> Example:
-> 
-> qemu-system-ppc64 -S -nographic  -nodefaults -monitor stdio -m 1G -smp 8 \
->                   -numa node -numa node -numa node \
->                   -numa node -numa node -numa node
-> 
-> Before:
-> 
-> (qemu) info numa
-> 6 nodes
-> node 0 cpus: 0 6
-> node 0 size: 0 MB
-> node 1 cpus: 1 7
-> node 1 size: 0 MB
-> node 2 cpus: 2
-> node 2 size: 0 MB
-> node 3 cpus: 3
-> node 3 size: 0 MB
-> node 4 cpus: 4
-> node 4 size: 0 MB
-> node 5 cpus: 5
-> node 5 size: 1024 MB
-> 
-> After:
-> (qemu) info numa
-> 6 nodes
-> node 0 cpus: 0 6
-> node 0 size: 0 MB
-> node 1 cpus: 1 7
-> node 1 size: 256 MB
-> node 2 cpus: 2
-> node 2 size: 0 MB
-> node 3 cpus: 3
-> node 3 size: 256 MB
-> node 4 cpus: 4
-> node 4 size: 256 MB
-> node 5 cpus: 5
-> node 5 size: 256 MB
-> 
-> [1] https://en.wikipedia.org/wiki/Error_diffusion
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  numa.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/numa.c b/numa.c
-> index 6fc2393..bcf1c54 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -336,15 +336,19 @@ void parse_numa_opts(MachineClass *mc)
->              }
->          }
->          if (i == nb_numa_nodes) {
-> -            uint64_t usedmem = 0;
-> +            uint64_t usedmem = 0, node_mem;
-> +            uint64_t granularity = ram_size / nb_numa_nodes;
-> +            uint64_t propagate = 0;
->  
->              /* Align each node according to the alignment
->               * requirements of the machine class
->               */
->              for (i = 0; i < nb_numa_nodes - 1; i++) {
-> -                numa_info[i].node_mem = (ram_size / nb_numa_nodes) &
-> +                node_mem = (granularity + propagate) &
->                                          ~((1 << mc->numa_mem_align_shift) - 1);
-> -                usedmem += numa_info[i].node_mem;
-> +                propagate = granularity + propagate - node_mem;
-> +                numa_info[i].node_mem = node_mem;
-> +                usedmem += node_mem;
->              }
->              numa_info[i].node_mem = ram_size - usedmem;
->          }
-> -- 
-> 2.9.3
-> 
-
--- 
-Eduardo
+-- PMM
