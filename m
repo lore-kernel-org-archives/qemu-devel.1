@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3GMU-0000em-7M
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 02:23:39 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3GMS-0000Oq-Bj
+	(envelope-from <cota@braap.org>) id 1d3GMT-0000ds-F5
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 02:23:38 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <cota@braap.org>) id 1d3GMS-0000OG-48
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 02:23:37 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 26 Apr 2017 02:23:22 -0400
-Message-Id: <1493187803-4510-10-git-send-email-cota@braap.org>
+Date: Wed, 26 Apr 2017 02:23:14 -0400
+Message-Id: <1493187803-4510-2-git-send-email-cota@braap.org>
 In-Reply-To: <1493187803-4510-1-git-send-email-cota@braap.org>
 References: <1493187803-4510-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 09/10] target/i386: optimize indirect
- branches
+Subject: [Qemu-devel] [PATCH v3 01/10] tcg-runtime: add lookup_tb_ptr helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,108 +22,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-Speed up indirect branches by jumping to the target if it is valid.
+This paves the way for upcoming work.
 
-Softmmu measurements (see later commit for user-mode numbers):
-
-Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
-
--                  SPECint06 (test set), x86_64-softmmu (Ubuntu 16.04 guest). Host: Intel i7-4790K @ 4.00GHz
-
- 2.4x +-+--------------------------------------------------------------------------------------------------------------+-+
-      |                                                                                                                  |
-      |   cross                                                                                                          |
- 2.2x +cross+jr..........................................................................+++...........................+-+
-      |                                                                                   |                              |
-      |                                                                               +++ |                              |
-   2x +-+..............................................................................|..|............................+-+
-      |                                                                                |  |                              |
-      |                                                                                |  |                              |
- 1.8x +-+..............................................................................|####...........................+-+
-      |                                                                                |# |#                             |
-      |                                                                              **** |#                             |
- 1.6x +-+............................................................................*.|*.|#...........................+-+
-      |                                                                              * |* |#                             |
-      |                                                                              * |* |#                             |
- 1.4x +-+.......................................................................+++..*.|*.|#...........................+-+
-      |                                                      ++++++             #### * |*++#             +++             |
-      |                        +++                            |  |              #++# *++*  #          +++ |              |
- 1.2x +-+......................###.....####....+++............|..|...........****..#.*..*..#....####...|.###.....####..+-+
-      |        +++          **** #  ****  #    ####          ***###          *++*  # *  *  #    #++#  ****|#  +++#++#    |
-      |    ****###     +++  *++* #  *++*  #  ++#  #    ####  *|* |#     +++  *  *  # *  *  #  ***  #  *| *|#  ****  #    |
-   1x +-++-*++*++#++***###++*++*+#++*+-*++#+****++#++***++#+-*+*++#-+****##++*++*-+#+*++*-+#++*+*++#++*-+*+#++*++*++#-++-+
-      |    *  *  #  * *  #  *  * #  *  *  # *  *  #  * *  #  *|* |#  *++* #  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
-      |    *  *  #  * *  #  *  * #  *  *  # *  *  #  * *  #  *+*++#  *  * #  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
- 0.8x +-+--****###--***###--****##--****###-****###--***###--***###--****##--****###-****###--***###--****##--****###--+-+
-         astar   bzip2      gcc   gobmk h264ref   hmmlibquantum      mcf omnetpperlbench   sjengxalancbmk   hmean
-  png: http://imgur.com/DU36YFU
-
-NB. 'cross' represents the previous commit.
-
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/translate.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ tcg-runtime.c     | 21 +++++++++++++++++++++
+ tcg/tcg-runtime.h |  2 ++
+ tcg/tcg.h         |  1 +
+ 3 files changed, 24 insertions(+)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index a065271..3bd80c0 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4988,7 +4988,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-             gen_push_v(s, cpu_T1);
-             gen_op_jmp_v(cpu_T0);
-             gen_bnd_jmp(s);
--            gen_eob(s);
-+            gen_jr(s, cpu_T0);
-             break;
-         case 3: /* lcall Ev */
-             gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
-@@ -5006,7 +5006,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-                                       tcg_const_i32(dflag - 1),
-                                       tcg_const_i32(s->pc - s->cs_base));
-             }
--            gen_eob(s);
-+            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
-+            gen_jr(s, cpu_tmp4);
-             break;
-         case 4: /* jmp Ev */
-             if (dflag == MO_16) {
-@@ -5014,7 +5015,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-             }
-             gen_op_jmp_v(cpu_T0);
-             gen_bnd_jmp(s);
--            gen_eob(s);
-+            gen_jr(s, cpu_T0);
-             break;
-         case 5: /* ljmp Ev */
-             gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
-@@ -5029,7 +5030,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-                 gen_op_movl_seg_T0_vm(R_CS);
-                 gen_op_jmp_v(cpu_T1);
-             }
--            gen_eob(s);
-+            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
-+            gen_jr(s, cpu_tmp4);
-             break;
-         case 6: /* push Ev */
-             gen_push_v(s, cpu_T0);
-@@ -6409,7 +6411,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-         /* Note that gen_pop_T0 uses a zero-extending load.  */
-         gen_op_jmp_v(cpu_T0);
-         gen_bnd_jmp(s);
--        gen_eob(s);
-+        gen_jr(s, cpu_T0);
-         break;
-     case 0xc3: /* ret */
-         ot = gen_pop_T0(s);
-@@ -6417,7 +6419,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-         /* Note that gen_pop_T0 uses a zero-extending load.  */
-         gen_op_jmp_v(cpu_T0);
-         gen_bnd_jmp(s);
--        gen_eob(s);
-+        gen_jr(s, cpu_T0);
-         break;
-     case 0xca: /* lret im */
-         val = cpu_ldsw_code(env, s->pc);
+diff --git a/tcg-runtime.c b/tcg-runtime.c
+index 4c60c96..90d2d4b 100644
+--- a/tcg-runtime.c
++++ b/tcg-runtime.c
+@@ -27,6 +27,7 @@
+ #include "exec/helper-proto.h"
+ #include "exec/cpu_ldst.h"
+ #include "exec/exec-all.h"
++#include "exec/tb-hash.h"
+ 
+ /* 32-bit helpers */
+ 
+@@ -141,6 +142,26 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
+     return ctpop64(arg);
+ }
+ 
++void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
++{
++    CPUState *cpu = ENV_GET_CPU(env);
++    TranslationBlock *tb;
++    target_ulong cs_base, pc;
++    uint32_t flags;
++
++    if (unlikely(atomic_read(&cpu->exit_request))) {
++        goto out_epilogue;
++    }
++    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
++    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
++    if (likely(tb && tb->pc == addr && tb->cs_base == cs_base &&
++               tb->flags == flags)) {
++        return tb->tc_ptr;
++    }
++ out_epilogue:
++    return tcg_ctx.code_gen_epilogue;
++}
++
+ void HELPER(exit_atomic)(CPUArchState *env)
+ {
+     cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
+diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
+index 114ea6f..c41d38a 100644
+--- a/tcg/tcg-runtime.h
++++ b/tcg/tcg-runtime.h
+@@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+ DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
+ DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+ 
++DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
++
+ DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+ 
+ #ifdef CONFIG_SOFTMMU
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 6c216bb..5ec48d1 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -699,6 +699,7 @@ struct TCGContext {
+        extension that allows arithmetic on void*.  */
+     int code_gen_max_blocks;
+     void *code_gen_prologue;
++    void *code_gen_epilogue;
+     void *code_gen_buffer;
+     size_t code_gen_buffer_size;
+     void *code_gen_ptr;
 -- 
 2.7.4
