@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1d3QCt-0006tv-0t
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:54:23 -0400
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1d3QCt-0006tu-0r
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:54:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1d3QCr-0008Rw-So
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1d3QCp-0008Qi-Tn
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:54:23 -0400
-Received: from foss.arm.com ([217.140.101.70]:37538)
+Received: from foss.arm.com ([217.140.101.70]:37532)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1d3QCr-0008Ri-N0
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:54:21 -0400
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1d3QCp-0008PL-KG
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:54:19 -0400
 References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-6-git-send-email-yi.l.liu@intel.com>
+	<1493201525-14418-2-git-send-email-yi.l.liu@intel.com>
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <e8927c18-148f-4dbd-28f9-1a8805a98e05@arm.com>
-Date: Wed, 26 Apr 2017 17:56:50 +0100
+Message-ID: <c042bf90-d48b-4ebf-c01a-fca7c4875277@arm.com>
+Date: Wed, 26 Apr 2017 17:56:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <1493201525-14418-6-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1493201525-14418-2-git-send-email-yi.l.liu@intel.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 5/8] VFIO: Add new IOTCL for PASID
- Table bind propagation
+Subject: Re: [Qemu-devel] [RFC PATCH 1/8] iommu: Introduce bind_pasid_table
+ API function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-On 26/04/17 11:12, Liu, Yi L wrote:
-> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Hi Yi, Jacob,
+
+On 26/04/17 11:11, Liu, Yi L wrote:
+> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > 
-> This patch adds VFIO_IOMMU_SVM_BIND_TASK for potential PASID table
-> binding requests.
+> Virtual IOMMU was proposed to support Shared Virtual Memory (SVM) use
+> case in the guest:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05311.html
 > 
-> On VT-d, this IOCTL cmd would be used to link the guest PASID page table
-> to host. While for other vendors, it may also be used to support other
-> kind of SVM bind request. Previously, there is a discussion on it with
-> ARM engineer. It can be found by the link below. This IOCTL cmd may
-> support SVM PASID bind request from userspace driver, or page table(cr3)
-> bind request from guest. These SVM bind requests would be supported by
-> adding different flags. e.g. VFIO_SVM_BIND_PASID is added to support
-> PASID bind from userspace driver, VFIO_SVM_BIND_PGTABLE is added to
-> support page table bind from guest.
+> As part of the proposed architecture, when a SVM capable PCI
+> device is assigned to a guest, nested mode is turned on. Guest owns the
+> first level page tables (request with PASID) and performs GVA->GPA
+> translation. Second level page tables are owned by the host for GPA->HPA
+> translation for both request with and without PASID.
 > 
-> https://patchwork.kernel.org/patch/9594231/
+> A new IOMMU driver interface is therefore needed to perform tasks as
+> follows:
+> * Enable nested translation and appropriate translation type
+> * Assign guest PASID table pointer (in GPA) and size to host IOMMU
 > 
+> This patch introduces new functions called iommu_(un)bind_pasid_table()
+> to IOMMU APIs. Architecture specific IOMMU function can be added later
+> to perform the specific steps for binding pasid table of assigned devices.
+> 
+> This patch also adds model definition in iommu.h. It would be used to
+> check if the bind request is from a compatible entity. e.g. a bind
+> request from an intel_iommu emulator may not be supported by an ARM SMMU
+> driver.
+> 
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 > ---
->  include/uapi/linux/vfio.h | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+>  drivers/iommu/iommu.c | 19 +++++++++++++++++++
+>  include/linux/iommu.h | 31 +++++++++++++++++++++++++++++++
+>  2 files changed, 50 insertions(+)
 > 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 519eff3..6b97987 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -547,6 +547,23 @@ struct vfio_iommu_type1_dma_unmap {
->  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
->  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index dbe7f65..f2da636 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1134,6 +1134,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_attach_device);
 >  
-> +/* IOCTL for Shared Virtual Memory Bind */
-> +struct vfio_device_svm {
-> +	__u32	argsz;
-> +#define VFIO_SVM_BIND_PASIDTBL	(1 << 0) /* Bind PASID Table */
-> +#define VFIO_SVM_BIND_PASID	(1 << 1) /* Bind PASID from userspace driver */
-> +#define VFIO_SVM_BIND_PGTABLE	(1 << 2) /* Bind guest mmu page table */
-> +	__u32	flags;
-> +	__u32	length;
-> +	__u8	data[];
-> +};
-> +
-> +#define VFIO_SVM_TYPE_MASK	(VFIO_SVM_BIND_PASIDTBL | \
-> +				VFIO_SVM_BIND_PASID | \
-> +				VFIO_SVM_BIND_PGTABLE)
-> +
-> +#define VFIO_IOMMU_SVM_BIND_TASK	_IO(VFIO_TYPE, VFIO_BASE + 22)
+> +int iommu_bind_pasid_table(struct iommu_domain *domain, struct device *dev,
+> +			struct pasid_table_info *pasidt_binfo)
 
-This could be called "VFIO_IOMMU_SVM_BIND, since it will be used both to
-bind tables and individual tasks.
+I guess that domain can always be deduced from dev using
+iommu_get_domain_for_dev, and doesn't need to be passed as argument?
 
-Thanks,
+For the next version of my SVM series, I was thinking of passing group
+instead of device to iommu_bind. Since all devices in a group are expected
+to share the same mappings (whether they want it or not), users will have
+to do iommu_group_for_each_dev anyway (as you do in patch 6/8). So it
+might be simpler to let the IOMMU core take the group lock and do
+group->domain->ops->bind_task(dev...) for each device. The question also
+holds for iommu_do_invalidate in patch 3/8.
+
+This way the prototypes would be:
+int iommu_bind...(struct iommu_group *group, struct ... *info)
+int iommu_unbind...(struct iommu_group *group, struct ...*info)
+int iommu_invalidate...(struct iommu_group *group, struct ...*info)
+
+For PASID table binding it might not matter much, as VFIO will most likely
+be the only user. But task binding will be called by device drivers, which
+by now should be encouraged to do things at iommu_group granularity.
+Alternatively it could be done implicitly like in iommu_attach_device,
+with "iommu_bind_device_x" calling "iommu_bind_group_x".
+
+
+Extending this reasoning, since groups in a domain are also supposed to
+have the same mappings, then similarly to map/unmap,
+bind/unbind/invalidate should really be done with an iommu_domain (and
+nothing else) as target argument. However this requires the IOMMU core to
+keep a group list in each domain, which might complicate things a little
+too much.
+
+But "all devices in a domain share the same PASID table" is the paradigm
+I'm currently using in the guts of arm-smmu-v3. And I wonder if, as with
+iommu_group, it should be made more explicit to users, so they don't
+assume that devices within a domain are isolated from each others with
+regard to PASID DMA.
+
+> +{
+> +	if (unlikely(!domain->ops->bind_pasid_table))
+> +		return -EINVAL;
+> +
+> +	return domain->ops->bind_pasid_table(domain, dev, pasidt_binfo);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_bind_pasid_table);
+> +
+> +int iommu_unbind_pasid_table(struct iommu_domain *domain, struct device *dev)
+> +{
+> +	if (unlikely(!domain->ops->unbind_pasid_table))
+> +		return -EINVAL;
+> +
+> +	return domain->ops->unbind_pasid_table(domain, dev);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_unbind_pasid_table);
+> +
+>  static void __iommu_detach_device(struct iommu_domain *domain,
+>  				  struct device *dev)
+>  {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 0ff5111..491a011 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -131,6 +131,15 @@ struct iommu_dm_region {
+>  	int			prot;
+>  };
+>  
+> +struct pasid_table_info {
+> +	__u64	ptr;	/* PASID table ptr */
+> +	__u64	size;	/* PASID table size*/
+> +	__u32	model;	/* magic number */
+> +#define INTEL_IOMMU	(1 << 0)
+> +#define ARM_SMMU	(1 << 1)
+
+Not sure if there is any advantage in this being a bitfield rather than
+simple values (1, 2, 3, etc).
+The names should also have a prefix, such as "PASID_TABLE_MODEL_"
+
+Thanks a lot for doing this,
 Jean
