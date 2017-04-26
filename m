@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Oc8-0005Ti-QD
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:12:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3Oe8-0007sk-2B
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:14:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Oc7-0004BF-R7
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:12:20 -0400
-References: <20170425153858.25660-1-berrange@redhat.com>
-	<20170425153858.25660-10-berrange@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d3Oe7-0004la-4q
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:14:24 -0400
+References: <1493192202-3184-1-git-send-email-armbru@redhat.com>
+	<1493192202-3184-2-git-send-email-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0e96161d-2002-7b8c-858b-f593576aee80@redhat.com>
-Date: Wed, 26 Apr 2017 10:12:10 -0500
+Message-ID: <11cba40b-32c0-a660-b8b9-f6bb0da989d4@redhat.com>
+Date: Wed, 26 Apr 2017 10:14:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170425153858.25660-10-berrange@redhat.com>
+In-Reply-To: <1493192202-3184-2-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="1QXd8lwHAfsFRCOqoMU5qAWSNiIgH7UEo"
-Subject: Re: [Qemu-devel] [PATCH v6 09/18] qcow: convert QCow to use
- QCryptoBlock for encryption
+	boundary="RfRDrUo4pGEdTqNcHRkdTJJ1i2aTx3X8D"
+Subject: Re: [Qemu-devel] [PATCH 1/7] sockets: Prepare vsock_parse() for
+ flattened SocketAddress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1QXd8lwHAfsFRCOqoMU5qAWSNiIgH7UEo
+--RfRDrUo4pGEdTqNcHRkdTJJ1i2aTx3X8D
 From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Message-ID: <0e96161d-2002-7b8c-858b-f593576aee80@redhat.com>
-Subject: Re: [PATCH v6 09/18] qcow: convert QCow to use QCryptoBlock for
- encryption
-References: <20170425153858.25660-1-berrange@redhat.com>
- <20170425153858.25660-10-berrange@redhat.com>
-In-Reply-To: <20170425153858.25660-10-berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
+ qemu-block@nongnu.org
+Message-ID: <11cba40b-32c0-a660-b8b9-f6bb0da989d4@redhat.com>
+Subject: Re: [PATCH 1/7] sockets: Prepare vsock_parse() for flattened
+ SocketAddress
+References: <1493192202-3184-1-git-send-email-armbru@redhat.com>
+ <1493192202-3184-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1493192202-3184-2-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/25/2017 10:38 AM, Daniel P. Berrange wrote:
-> This converts the qcow driver to make use of the QCryptoBlock
-> APIs for encrypting image content. This is only wired up to
-> permit use of the legacy QCow encryption format. Users who wish
-> to have the strong LUKS format should switch to qcow2 instead.
+On 04/26/2017 02:36 AM, Markus Armbruster wrote:
+> I'm going to flatten SocketAddress: rename SocketAddress to
+> SocketAddressLegacy, SocketAddressFlat to SocketAddress, eliminate
+> SocketAddressLegacy except in external interfaces.
 >=20
-> With this change it is now required to use the QCryptoSecret
-> object for providing passwords, instead of the current block
-> password APIs / interactive prompting.
+> vsock_parse() returns a newly allocated VsockSocketAddress.  Lift the
+> allocation from vsock_parse() into its caller socket_parse() to
+> prepare for flattening SocketAddress.
 >=20
->   $QEMU \
->     -object secret,id=3Dsec0,filename=3D/home/berrange/encrypted.pw \
->     -drive file=3D/home/berrange/encrypted.qcow,encrypt.format=3Dqcow,\=
-
->            encrypt.key-secret=3Dsec0
->=20
-> Likewise when creating such images
->=20
->   qemu-img create -f qcow \
->     -object secret,id=3Dsec0,filename=3D/home/berrange/encrypted.pw \
->     -o encrypt.format=3Dqcow,encrypt.key-secret=3Dsec0 \
->     /home/berrange/encrypted.qcow
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  block/crypto.c       |  10 +++
->  block/crypto.h       |  20 ++++--
->  block/qcow.c         | 196 +++++++++++++++++++++++++------------------=
---------
->  qapi/block-core.json |  37 +++++++++-
->  4 files changed, 156 insertions(+), 107 deletions(-)
+>  util/qemu-sockets.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 >=20
 
-
-> +++ b/qapi/block-core.json
-> @@ -2277,6 +2277,41 @@
->              'mode':  'Qcow2OverlapCheckMode' } }
-> =20
->  ##
-> +# @BlockdevQcowEncryptionFormat:
-> +# @qcow: AES-CBC with plain64 initialization venctors
-
-s/venctors/vectors/
-
-With that fixed,
 Reviewed-by: Eric Blake <eblake@redhat.com>
-
-and it turned out much nicer than v5 !
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -98,7 +66,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---1QXd8lwHAfsFRCOqoMU5qAWSNiIgH7UEo
+--RfRDrUo4pGEdTqNcHRkdTJJ1i2aTx3X8D
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -108,13 +76,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZALjKAAoJEKeha0olJ0NqyKcH/RhN7cp7aFLmRNjEOlL8qo1Y
-nfRY82t3yd0OHNtgBqFyn1MDCLPgRBE4CpOM4f3jpSz9XsKsyRDRSEM/SA54UK+S
-54qMfShSkxHlqYMGHYsd+cOdG+9Gt4H12Ng9GHMsMPchBDUw1QzOK9vjhlT9Ytmk
-5OK5BFhhjI21KnJ++LRHQkRnnTXeJBye8XPdL/xa2YV2TAZnwUduThKh07twMe9y
-On8HrHGpFl//Jj9AdahP6HrU1P/ST98hleh/IMUxD5O+0fh28p7fi3kuWxopRKWc
-xLmnbYeAaoeY7/mai8nxlDwa+uxcB8OsVc/NO2yqPU1P61WzSRFbI98tKQW8WvU=
-=7Pdq
+iQEcBAEBCAAGBQJZALlBAAoJEKeha0olJ0NqqxUH/iYRWl6t+HYNXLEzthZIMgA4
+Y0Q1xlklhm8+h8yQ/LezF0/Eef3GOeOZqfRevPThFf0qTR5LPbWcH0vloojMirve
+w5ta7BSU1WfmQ6cbkaSyZdPDYgzTmcCpuuipXTJ9E8qT6I+8xEUm0U9FfirdjYoz
+R96pba+2ATbc04YUiKur2Ry/mK7G1nYwK3wTVdgK0bHSohbGajXQi2EpdV6J1k9M
++Ppz5LBEkZQT/QhCVflCJo0FbhixJSNmw/U9Brer1Yb6REr/zMsDGLI4OiwEHgIe
+nCR7YAQkitK1t+Dt6JcuoDCwgUdbn+Hmvcz101gr1TxsXYGcrm+w/6XCALsgJHA=
+=WW6C
 -----END PGP SIGNATURE-----
 
---1QXd8lwHAfsFRCOqoMU5qAWSNiIgH7UEo--
+--RfRDrUo4pGEdTqNcHRkdTJJ1i2aTx3X8D--
