@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3M9m-0008Fr-IV
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:34:55 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d3MGT-0001tl-0J
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:41:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3M9l-0004lQ-OV
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:34:54 -0400
-Date: Wed, 26 Apr 2017 14:34:41 +0200
+	(envelope-from <kwolf@redhat.com>) id 1d3MGP-0000C7-7Q
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:41:49 -0400
+Date: Wed, 26 Apr 2017 14:41:36 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170426123441.GD4538@noname.str.redhat.com>
+Message-ID: <20170426124136.GE4538@noname.str.redhat.com>
 References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-14-famz@redhat.com>
+	<20170426033413.17192-17-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170426033413.17192-14-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v15 13/21] iotests: 091: Quit QEMU before
- checking image
+In-Reply-To: <20170426033413.17192-17-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v15 16/21] file-posix: Add 'locking' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +27,35 @@ To: Fam Zheng <famz@redhat.com>
 Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
 Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/091 | 2 ++
->  1 file changed, 2 insertions(+)
+> Making this option available even before implementing it will let
+> converting tests easier: in coming patches they can specify the option
+> already when necessary, before we actually write code to lock the
+> images.
 > 
-> diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
-> index 32bbd56..10ac4a8 100755
-> --- a/tests/qemu-iotests/091
-> +++ b/tests/qemu-iotests/091
-> @@ -95,7 +95,9 @@ echo "vm2: qemu process running successfully"
->  echo "vm2: flush io, and quit"
->  _send_qemu_cmd $h2 'qemu-io disk flush' "(qemu)"
->  _send_qemu_cmd $h2 'quit' ""
-> +_send_qemu_cmd $h1 'quit' ""
->  
-> +wait
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index ade71db..2114720 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -392,6 +392,11 @@ static QemuOptsList raw_runtime_opts = {
+>              .type = QEMU_OPT_STRING,
+>              .help = "host AIO implementation (threads, native)",
+>          },
+> +        {
+> +            .name = "locking",
+> +            .type = QEMU_OPT_BOOL,
+> +            .help = "lock the file",
+> +        },
+>          { /* end of list */ }
+>      },
+>  };
 
-I think it's better to use the function from common.qemu for this:
-
-    wait=1 _cleanup_qemu
+I don't mind whether it happens in this patch or when the option is
+actually implemented, but this option needs to be added to the QAPI
+schema.
 
 Kevin
