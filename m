@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddv-0007vS-LO
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddv-0007vT-Mg
 	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddu-0000Fk-Gh
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddu-0000Fi-H7
 	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:27 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:56517)
+Received: from ozlabs.org ([2401:3900:2:1::2]:60503)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d3Ddt-0000DI-GT
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d3Ddt-0000DH-GA
 	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:26 -0400
-Date: Wed, 26 Apr 2017 12:43:21 +1000
+Date: Wed, 26 Apr 2017 12:42:44 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170426024321.GL16882@umbus.fritz.box>
+Message-ID: <20170426024244.GK16882@umbus.fritz.box>
 References: <1493103101-25165-1-git-send-email-clg@kaod.org>
 	<1493103101-25165-3-git-send-email-clg@kaod.org>
-	<CAFEAcA9Y0C_byA8KsiMXdzsMDE73ZKmMcQZaMc7uwAF2bZC+hg@mail.gmail.com>
-	<d48c2177-ad8e-a820-c640-898075110ee3@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lHuqAdgBYNjQz/wy"
+	protocol="application/pgp-signature"; boundary="ZG5hGh9V5E9QzVHS"
 Content-Disposition: inline
-In-Reply-To: <d48c2177-ad8e-a820-c640-898075110ee3@kaod.org>
+In-Reply-To: <1493103101-25165-3-git-send-email-clg@kaod.org>
 Subject: Re: [Qemu-devel] [PATCH 2/2] ipmi: don't try to open a NULL filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,39 +29,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
 
---lHuqAdgBYNjQz/wy
+--ZG5hGh9V5E9QzVHS
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 25, 2017 at 04:06:17PM +0200, C=E9dric Le Goater wrote:
-> On 04/25/2017 03:31 PM, Peter Maydell wrote:
-> > On 25 April 2017 at 07:51, C=E9dric Le Goater <clg@kaod.org> wrote:
-> >> Currenlty, the code relies on the fact that open() handles NULL
-> >> filenames but that can cause an error with new clang:
-> >>
-> >>   hw/core/loader.c:67:15: runtime error: null pointer passed as argume=
-nt 1,
-> >>   which is declared to never be null
-> >=20
-> > This isn't "new clang", incidentally, it's just clang with the
-> > runtime-static-analysis enabled, which causes warnings to be
-> > printed at runtime for undefined behaviours. You can enable
-> > this by passing configure --extra-cflags=3D-fsanitize=3Dundefined .
-> > (I have clang 3.8.0 here.)
+On Tue, Apr 25, 2017 at 08:51:41AM +0200, C=E9dric Le Goater wrote:
+> Currenlty, the code relies on the fact that open() handles NULL
+> filenames but that can cause an error with new clang:
 >=20
-> OK. So I have now reproduced the issue on a f24. That made be=20
-> realize that the IPMI tests check for the arch they are being=20
-> run on and that more changes are required for them to run on=20
-> ppc64.=20
+>   hw/core/loader.c:67:15: runtime error: null pointer passed as argument =
+1,
+>   which is declared to never be null
 >=20
-> We can drop patch 1/2. Tell me if you want a resend.
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-No, that's fine.  A patch to enable the tests on ppc properly ASAP
-would be great, though.
+Since my ppc-for-2.10 pull request has been held up because of this
+anyway, tather than just apply this on top, I've folded it into your
+earlier patch which caused the bug - that way we won't break bisect.
+
+> ---
+>  hw/ipmi/ipmi_bmc_sim.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+> index 155561d06614..277c28cb40ed 100644
+> --- a/hw/ipmi/ipmi_bmc_sim.c
+> +++ b/hw/ipmi/ipmi_bmc_sim.c
+> @@ -1899,6 +1899,10 @@ static void ipmi_fru_init(IPMIFru *fru)
+>      int fsize;
+>      int size =3D 0;
+> =20
+> +    if (!fru->filename) {
+> +        goto out;
+> +    }
+> +
+>      fsize =3D get_image_size(fru->filename);
+>      if (fsize > 0) {
+>          size =3D QEMU_ALIGN_UP(fsize, fru->areasize);
+> @@ -1910,6 +1914,7 @@ static void ipmi_fru_init(IPMIFru *fru)
+>          }
+>      }
+> =20
+> +out:
+>      if (!fru->data) {
+>          /* give one default FRU */
+>          size =3D fru->areasize;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -71,25 +85,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---lHuqAdgBYNjQz/wy
+--ZG5hGh9V5E9QzVHS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZAAlJAAoJEGw4ysog2bOSy2wP/3xSmIo19EzpENTSqVKiFooU
-IzYC/+Z+toETdYlcsGzGAY4t2t6hl8RgxUlgIGJbMQ3hnJpx1lX5Gyz60XIH/x8F
-yrkNFy5NyMh6/2Fc8mqTWY4hRr9Rx8pcL903Qg8ZYl6ujlhusHaZYTSnb1HULCd+
-Soe/KbYL6iSgKH4zymvHgDIXXdyyvn59xPruFuYhhrHDCsCG3fR1ilhHBrLA2VWK
-9u4BEY9xF4kR0gVCFW+OZZWiDzPo2S7MK3VFdQOMhCVhLKAMOxbw8V2mfYiAz0Zq
-Gg/q0qLGJ5NVqztJ5LL0eG4oifXPirfftYZZ6TLM6MFNXDD6nGHc5YCExWogl0ax
-/Er44aQz6RYsAHeUHXLsxh+4CIxLcDh+sqxf7awRsY3AEfplB2U8cioK+v3/VfdI
-RN02/A+9bW46LDwjMBbKZh7zD6/FsQISagUL0WjZsX+f9KnJ7I1ln/oHrLROYbVH
-+hsPSie2hLV6gHL3E2yNamT7bD3ejXdDcbvN7KSrlXP1/6rJgQu/EWarjpht/KBt
-ykBsSvdiJ1wwbQeC0pc4XAvWlsSIeli3O2vFf3NTCRKz+cijP/x1ujR/qoSSwJWs
-TR6f4785gn0yZG3mHY4KozKrK0/KDztj/hPcN79ZkoCdpaDHqY46VTYssBvjt0mj
-F+jgao/I2NwxeIoj3ZAV
-=JaA/
+iQIcBAEBCAAGBQJZAAkkAAoJEGw4ysog2bOS6zsQALEogq5MT245RWCdfZuqzODh
+Etik1tlCyeqKlefftQ8qOtmIqxVGwyfNuCDo+jl1yX0FJ6dWAvT3HUPBt85t61qy
+DRE7povHb/JU+SKmgJSYN/xHMWVwkM2oqTg78PlSv+6SOcSmR3hbmxGG0fuLRFEo
+NxiYCX87ZmQ3mfDcAe9ycKXzy6wbLK/ISkDTSvav3a2uV91XoSx4cYA6t9c3kvTe
+Ow5e3YJrpo1BZU1/+D9n0HzOF5QcOah0JmUqHvnvYVKyO00ZMGcdKtS0v6ojq0OS
+A6HEllDMMwkAUXpwy87Wu39UGH8iSw2jQ9QX2CU/OsmkmhpJZJIIravh87vAgTqx
+tnOZTVErb+Be8i3xy7dGizVrGwxxcxlbXATJP0r4Wuh2DYojuAKN8HsgoHxpM77v
+aFPvu90FyoPnlMVlfzVfg2n4XW+HeU57TDi04JFz8zBORgN1d2UuJvCygWFN5TQK
+ysCdeboLbj0EhVnL27jSJhOV9z5KGgTUEkaOytmI8rrIeatLAwB/nmItnbnLmgS9
+5O8Lceg9LANeX3sM3hqpdi0lvQofxt4Z+iNKrPL/nfUjyCWcdlwWiiusgtrNHZnj
+SWdDkgerZw5G9ILaqd89mrmKNdidtoydQf7b+Dx9HOZo5cQhT0Nlk0V89g8Y8h5P
+m5jOL72kJgt4y7tcqsmN
+=gir0
 -----END PGP SIGNATURE-----
 
---lHuqAdgBYNjQz/wy--
+--ZG5hGh9V5E9QzVHS--
