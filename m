@@ -1,41 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d3Ju0-0006Er-Hl
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:10:30 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1d3Jwt-0007Py-2K
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d3Jtx-0003sM-9t
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:10:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40013)
+	(envelope-from <borntraeger@de.ibm.com>) id 1d3Jwp-0005Ep-TV
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:13:27 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40521
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1d3Jtx-0003sF-0v
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:10:25 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3QA9XFx060043
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:10:24 -0400
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2eby35qp-1
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1d3Jwp-0005Eh-OB
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:13:23 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3QA9Jfq033479
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:13:23 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a2q25qtp6-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:10:23 -0400
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:13:22 -0400
 Received: from localhost
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 26 Apr 2017 07:10:21 -0300
-References: <20170424220828.1472-1-danielhb@linux.vnet.ibm.com>
-	<20170424220828.1472-5-danielhb@linux.vnet.ibm.com>
-	<149316081119.25359.16931369246801836794@loki>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed, 26 Apr 2017 07:10:12 -0300
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 26 Apr 2017 06:13:22 -0400
+References: <70ef6f1f-27f4-133f-ab33-03a30f19867b@de.ibm.com>
+	<20170424105344.GF2362@work-vm>
+	<75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
+	<20170424143516.GD2075@work-vm>
+	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
+	<20170424191202.GQ2362@work-vm>
+	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 26 Apr 2017 12:13:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <149316081119.25359.16931369246801836794@loki>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <699cb225-8f54-a728-35ca-d7bb389d259f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] migration: spapr: migrate
- pending_events of spapr state
+Message-Id: <81fb2c37-fe68-732e-85a5-a6f797e6ec2d@de.ibm.com>
+Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,219 +47,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
+On 04/26/2017 11:59 AM, Christian Borntraeger wrote:
 
+> source:
+> 28863@1493200554.418978:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419047:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419056:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419064:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419071:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419077:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419083:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419088:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419094:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419100:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419106:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419112:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419117:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419123:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419130:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419138:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419145:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419151:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419156:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419163:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419169:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419174:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419179:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419184:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419189:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
+> 28863@1493200554.419208:qemu_savevm_send_postcopy_ram_discard s390.ram: 9d
+> 28863@1493200554.818195:migrate_handle_rp_req_pages in s390.ram at 3c6b000 len 1000
+> 28863@1493200554.818208:ram_save_queue_pages s390.ram: start: 3c6b000 len: 1000
+> 28863@1493200554.818469:get_queued_page_not_dirty s390.ram/3c6b000 ram_addr=3c6b000 (sent=0)
+> 
+> I also get 
+> ram_save_page: s390.ram:3c6b000
 
-On 04/25/2017 07:53 PM, Michael Roth wrote:
-> Quoting Daniel Henrique Barboza (2017-04-24 17:08:28)
->> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
->>
->> In racing situations between hotplug events and migration operation,
->> a rtas hotplug event could have not yet be delivered to the source
->> guest when migration is started. In this case the pending_events of
->> spapr state need be transmitted to the target so that the hotplug
->> event can be finished on the target.
->>
->> All the different fields of the events are encoded as defined by
->> PAPR. We can migrate them as uint8_t binary stream without any
->> concerns about data padding or endianess.
->>
->> pending_events is put in a subsection in the spapr state VMSD to make
->> sure migration across different versions is not broken.
->>
->> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
->> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->> ---
->>   hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
->>   hw/ppc/spapr_events.c  | 24 +++++++++++++-----------
->>   include/hw/ppc/spapr.h |  3 ++-
->>   3 files changed, 48 insertions(+), 12 deletions(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 22f351c..a3e939b 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1419,6 +1419,38 @@ static const VMStateDescription vmstate_spapr_ccs_list = {
->>       },
->>   };
->>
->> +static bool spapr_pending_events_needed(void *opaque)
->> +{
->> +    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
->> +    return !QTAILQ_EMPTY(&spapr->pending_events);
->> +}
->> +
->> +static const VMStateDescription vmstate_spapr_event_entry = {
->> +    .name = "spapreventlogentry",
-> Similar suggestion on the naming here and elsewhere.
-
-I'll review all of them in the code to make them more readable.
-
-Thanks!
-
->
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
->> +        VMSTATE_BOOL(exception, sPAPREventLogEntry),
->> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
->> +        VMSTATE_VARRAY_UINT32_ALLOC(data, sPAPREventLogEntry, data_size,
->> +                                    0, vmstate_info_uint8, uint8_t),
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->> +static const VMStateDescription vmstate_spapr_pending_events = {
->> +    .name = "spaprpendingevents",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .needed = spapr_pending_events_needed,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
->> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, next),
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->>   static bool spapr_ov5_cas_needed(void *opaque)
->>   {
->>       sPAPRMachineState *spapr = opaque;
->> @@ -1518,6 +1550,7 @@ static const VMStateDescription vmstate_spapr = {
->>           &vmstate_spapr_ov5_cas,
->>           &vmstate_spapr_patb_entry,
->>           &vmstate_spapr_ccs_list,
->> +        &vmstate_spapr_pending_events,
->>           NULL
->>       }
->>   };
->> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->> index 24a5758..399dd49 100644
->> --- a/hw/ppc/spapr_events.c
->> +++ b/hw/ppc/spapr_events.c
->> @@ -342,7 +342,8 @@ static int rtas_event_log_to_irq(sPAPRMachineState *spapr, int log_type)
->>       return source->irq;
->>   }
->>
->> -static void rtas_event_log_queue(int log_type, void *data, bool exception)
->> +static void rtas_event_log_queue(int log_type, void *data, bool exception,
->> +                                 int data_size)
->>   {
->>       sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
->>       sPAPREventLogEntry *entry = g_new(sPAPREventLogEntry, 1);
->> @@ -351,6 +352,7 @@ static void rtas_event_log_queue(int log_type, void *data, bool exception)
->>       entry->log_type = log_type;
->>       entry->exception = exception;
->>       entry->data = data;
->> +    entry->data_size = data_size;
->>       QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
->>   }
->>
->> @@ -445,6 +447,7 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
->>       struct rtas_event_log_v6_mainb *mainb;
->>       struct rtas_event_log_v6_epow *epow;
->>       struct epow_log_full *new_epow;
->> +    uint32_t data_size;
->>
->>       new_epow = g_malloc0(sizeof(*new_epow));
->>       hdr = &new_epow->hdr;
->> @@ -453,14 +456,13 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
->>       mainb = &new_epow->mainb;
->>       epow = &new_epow->epow;
->>
->> +    data_size = sizeof(*new_epow);
->>       hdr->summary = cpu_to_be32(RTAS_LOG_VERSION_6
->>                                  | RTAS_LOG_SEVERITY_EVENT
->>                                  | RTAS_LOG_DISPOSITION_NOT_RECOVERED
->>                                  | RTAS_LOG_OPTIONAL_PART_PRESENT
->>                                  | RTAS_LOG_TYPE_EPOW);
->> -    hdr->extended_length = cpu_to_be32(sizeof(*new_epow)
->> -                                       - sizeof(new_epow->hdr));
->> -
->> +    hdr->extended_length = cpu_to_be32(data_size - sizeof(new_epow->hdr));
->>       spapr_init_v6hdr(v6hdr);
->>       spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
->>
->> @@ -479,7 +481,7 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
->>       epow->event_modifier = RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
->>       epow->extended_modifier = RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPECIFIC;
->>
->> -    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true);
->> +    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true, data_size);
->>
->>       qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
->>                                    rtas_event_log_to_irq(spapr,
->> @@ -504,6 +506,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
->>       struct rtas_event_log_v6_maina *maina;
->>       struct rtas_event_log_v6_mainb *mainb;
->>       struct rtas_event_log_v6_hp *hp;
->> +    uint32_t data_size;
->>
->>       new_hp = g_malloc0(sizeof(struct hp_log_full));
->>       hdr = &new_hp->hdr;
->> @@ -512,14 +515,14 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
->>       mainb = &new_hp->mainb;
->>       hp = &new_hp->hp;
->>
->> +    data_size = sizeof(*new_hp);
->>       hdr->summary = cpu_to_be32(RTAS_LOG_VERSION_6
->>                                  | RTAS_LOG_SEVERITY_EVENT
->>                                  | RTAS_LOG_DISPOSITION_NOT_RECOVERED
->>                                  | RTAS_LOG_OPTIONAL_PART_PRESENT
->>                                  | RTAS_LOG_INITIATOR_HOTPLUG
->>                                  | RTAS_LOG_TYPE_HOTPLUG);
->> -    hdr->extended_length = cpu_to_be32(sizeof(*new_hp)
->> -                                       - sizeof(new_hp->hdr));
->> +    hdr->extended_length = cpu_to_be32(data_size - sizeof(new_hp->hdr));
->>
->>       spapr_init_v6hdr(v6hdr);
->>       spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
->> @@ -572,7 +575,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
->>               cpu_to_be32(drc_id->count_indexed.index);
->>       }
->>
->> -    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true);
->> +    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true, data_size);
->>
->>       qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
->>                                    rtas_event_log_to_irq(spapr,
->> @@ -671,8 +674,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->>       if (!event) {
->>           goto out_no_events;
->>       }
->> -
->> -    hdr = event->data;
->> +    hdr = (struct rtas_error_log *)event->data;
->>       event_len = be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
->>
->>       if (event_len < len) {
->> @@ -728,7 +730,7 @@ static void event_scan(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->>           goto out_no_events;
->>       }
->>
->> -    hdr = event->data;
->> +    hdr = (struct rtas_error_log *)event->data;
->>       event_len = be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
->>
->>       if (event_len < len) {
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 808aac8..c60dbd2 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -584,7 +584,8 @@ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
->>   struct sPAPREventLogEntry {
->>       int log_type;
->>       bool exception;
->> -    void *data;
->> +    uint8_t *data;
->> +    uint32_t data_size;
->>       QTAILQ_ENTRY(sPAPREventLogEntry) next;
->>   };
->>
->> -- 
->> 2.9.3
->>
->>
->
+looks like this one happens before the discards.
