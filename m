@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54295)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d3C4m-0002Sm-M5
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:49:05 -0400
+	id 1d3C8c-00046F-FQ
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d3C4j-0001ey-IK
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:49:04 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34633)
+	id 1d3C8Z-0003C2-6d
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:53:02 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36863)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d3C4j-0001eh-Ed
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:49:01 -0400
-Received: by mail-qk0-x241.google.com with SMTP id u75so11548389qka.1
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:49:01 -0700 (PDT)
+	id 1d3C8Y-0003Bp-Uf
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:52:59 -0400
+Received: by mail-qk0-x242.google.com with SMTP id y63so19488616qkd.3
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:52:58 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170425223739.6703-1-quintela@redhat.com>
-	<20170425223739.6703-27-quintela@redhat.com>
+References: <alpine.DEB.2.10.1704251134220.2875@sstabellini-ThinkPad-X260>
+	<1493145313-31311-1-git-send-email-sstabellini@kernel.org>
+	<1493145313-31311-10-git-send-email-sstabellini@kernel.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ae2ae7e8-6e56-8cd2-a50c-f6837c7ccc07@amsat.org>
-Date: Tue, 25 Apr 2017 22:48:57 -0300
+Message-ID: <1f7ba214-8881-939a-c663-f6bf0d4b74ae@amsat.org>
+Date: Tue, 25 Apr 2017 22:52:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170425223739.6703-27-quintela@redhat.com>
+In-Reply-To: <1493145313-31311-10-git-send-email-sstabellini@kernel.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 26/26] audio: Use ARRAY_SIZE from
- qemu/osdep.h
+Subject: Re: [Qemu-devel] [PATCH 10/21] xen: import ring.h from xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +35,540 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Stefano Stabellini <sstabellini@kernel.org>, peter.maydell@linaro.org
+Cc: jgross@suse.com, stefanha@gmail.com, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
 
-On 04/25/2017 07:37 PM, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 04/25/2017 03:35 PM, Stefano Stabellini wrote:
+> Do not use the ring.h header installed on the system. Instead, import
+> the header into the QEMU codebase. This avoids problems when QEMU is
+> built against a Xen version too old to provide all the ring macros.
+>
+> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+> CC: anthony.perard@citrix.com
+> CC: jgross@suse.com
 > ---
->  hw/audio/fmopl.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+>  hw/block/xen_blkif.h     |   2 +-
+>  hw/usb/xen-usb.c         |   2 +-
+>  include/hw/xen/io/ring.h | 482 +++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 484 insertions(+), 2 deletions(-)
+>  create mode 100644 include/hw/xen/io/ring.h
 >
-> diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
-> index dc9043c..202f752 100644
-> --- a/hw/audio/fmopl.c
-> +++ b/hw/audio/fmopl.c
-> @@ -34,15 +34,11 @@
->  #include <math.h>
->  //#include "driver.h"		/* use M.A.M.E. */
->  #include "fmopl.h"
-> -
-> +#include "qemu/osdep.h"
->  #ifndef PI
->  #define PI 3.14159265358979323846
->  #endif
+> diff --git a/hw/block/xen_blkif.h b/hw/block/xen_blkif.h
+> index 3300b6f..3e6e1ea 100644
+> --- a/hw/block/xen_blkif.h
+> +++ b/hw/block/xen_blkif.h
+> @@ -1,7 +1,7 @@
+>  #ifndef XEN_BLKIF_H
+>  #define XEN_BLKIF_H
 >
-> -#ifndef ARRAY_SIZE
-> -#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-> -#endif
-> -
->  /* -------------------- for debug --------------------- */
->  /* #define OPL_OUTPUT_LOG */
->  #ifdef OPL_OUTPUT_LOG
+> -#include <xen/io/ring.h>
+> +#include "hw/xen/io/ring.h"
+>  #include <xen/io/blkif.h>
+>  #include <xen/io/protocols.h>
+>
+> diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
+> index 8e676e6..370b3d9 100644
+> --- a/hw/usb/xen-usb.c
+> +++ b/hw/usb/xen-usb.c
+> @@ -33,7 +33,7 @@
+>  #include "qapi/qmp/qint.h"
+>  #include "qapi/qmp/qstring.h"
+>
+> -#include <xen/io/ring.h>
+> +#include "hw/xen/io/ring.h"
+>  #include <xen/io/usbif.h>
+>
+>  /*
+> diff --git a/include/hw/xen/io/ring.h b/include/hw/xen/io/ring.h
+> new file mode 100644
+> index 0000000..abbca47
+> --- /dev/null
+> +++ b/include/hw/xen/io/ring.h
+> @@ -0,0 +1,482 @@
+> +/******************************************************************************
+> + * ring.h
+> + *
+> + * Shared producer-consumer ring macros.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to
+> + * deal in the Software without restriction, including without limitation the
+> + * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+> + * sell copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+> + * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+> + * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+> + * DEALINGS IN THE SOFTWARE.
+> + *
+> + * Tim Deegan and Andrew Warfield November 2004.
+> + */
+> +
+> +#ifndef __XEN_PUBLIC_IO_RING_H__
+> +#define __XEN_PUBLIC_IO_RING_H__
+> +
+> +/*
+> + * When #include'ing this header, you need to provide the following
+> + * declaration upfront:
+> + * - standard integers types (uint8_t, uint16_t, etc)
+> + * They are provided by stdint.h of the standard headers.
+> + *
+> + * In addition, if you intend to use the FLEX macros, you also need to
+> + * provide the following, before invoking the FLEX macros:
+> + * - size_t
+> + * - memcpy
+> + * - grant_ref_t
+> + * These declarations are provided by string.h of the standard headers,
+> + * and grant_table.h from the Xen public headers.
+> + */
+> +
+> +#if __XEN_INTERFACE_VERSION__ < 0x00030208
+> +#define xen_mb()  mb()
+> +#define xen_rmb() rmb()
+> +#define xen_wmb() wmb()
+> +#endif
+> +
+> +typedef unsigned int RING_IDX;
+> +
+> +/* Round a 32-bit unsigned constant down to the nearest power of two. */
+> +#define __RD2(_x)  (((_x) & 0x00000002) ? 0x2                  : ((_x) & 0x1))
+> +#define __RD4(_x)  (((_x) & 0x0000000c) ? __RD2((_x)>>2)<<2    : __RD2(_x))
+> +#define __RD8(_x)  (((_x) & 0x000000f0) ? __RD4((_x)>>4)<<4    : __RD4(_x))
+> +#define __RD16(_x) (((_x) & 0x0000ff00) ? __RD8((_x)>>8)<<8    : __RD8(_x))
+> +#define __RD32(_x) (((_x) & 0xffff0000) ? __RD16((_x)>>16)<<16 : __RD16(_x))
+> +
+> +/*
+> + * Calculate size of a shared ring, given the total available space for the
+> + * ring and indexes (_sz), and the name tag of the request/response structure.
+> + * A ring contains as many entries as will fit, rounded down to the nearest
+> + * power of two (so we can mask with (size-1) to loop around).
+> + */
+> +#define __CONST_RING_SIZE(_s, _sz) \
+> +    (__RD32(((_sz) - offsetof(struct _s##_sring, ring)) / \
+> +	    sizeof(((struct _s##_sring *)0)->ring[0])))
+> +/*
+> + * The same for passing in an actual pointer instead of a name tag.
+> + */
+> +#define __RING_SIZE(_s, _sz) \
+> +    (__RD32(((_sz) - (long)(_s)->ring + (long)(_s)) / sizeof((_s)->ring[0])))
+> +
+> +/*
+> + * Macros to make the correct C datatypes for a new kind of ring.
+> + *
+> + * To make a new ring datatype, you need to have two message structures,
+> + * let's say request_t, and response_t already defined.
+> + *
+> + * In a header where you want the ring datatype declared, you then do:
+> + *
+> + *     DEFINE_RING_TYPES(mytag, request_t, response_t);
+> + *
+> + * These expand out to give you a set of types, as you can see below.
+> + * The most important of these are:
+> + *
+> + *     mytag_sring_t      - The shared ring.
+> + *     mytag_front_ring_t - The 'front' half of the ring.
+> + *     mytag_back_ring_t  - The 'back' half of the ring.
+> + *
+> + * To initialize a ring in your code you need to know the location and size
+> + * of the shared memory area (PAGE_SIZE, for instance). To initialise
+> + * the front half:
+> + *
+> + *     mytag_front_ring_t front_ring;
+> + *     SHARED_RING_INIT((mytag_sring_t *)shared_page);
+> + *     FRONT_RING_INIT(&front_ring, (mytag_sring_t *)shared_page, PAGE_SIZE);
+> + *
+> + * Initializing the back follows similarly (note that only the front
+> + * initializes the shared ring):
+> + *
+> + *     mytag_back_ring_t back_ring;
+> + *     BACK_RING_INIT(&back_ring, (mytag_sring_t *)shared_page, PAGE_SIZE);
+> + */
+> +
+> +#define DEFINE_RING_TYPES(__name, __req_t, __rsp_t)                     \
+> +                                                                        \
+> +/* Shared ring entry */                                                 \
+> +union __name##_sring_entry {                                            \
+> +    __req_t req;                                                        \
+> +    __rsp_t rsp;                                                        \
+> +};                                                                      \
+> +                                                                        \
+> +/* Shared ring page */                                                  \
+> +struct __name##_sring {                                                 \
+> +    RING_IDX req_prod, req_event;                                       \
+> +    RING_IDX rsp_prod, rsp_event;                                       \
+> +    union {                                                             \
+> +        struct {                                                        \
+> +            uint8_t smartpoll_active;                                   \
+> +        } netif;                                                        \
+> +        struct {                                                        \
+> +            uint8_t msg;                                                \
+> +        } tapif_user;                                                   \
+> +        uint8_t pvt_pad[4];                                             \
+> +    } pvt;                                                              \
+> +    uint8_t __pad[44];                                                  \
+> +    union __name##_sring_entry ring[1]; /* variable-length */           \
+> +};                                                                      \
+> +                                                                        \
+> +/* "Front" end's private variables */                                   \
+> +struct __name##_front_ring {                                            \
+> +    RING_IDX req_prod_pvt;                                              \
+> +    RING_IDX rsp_cons;                                                  \
+> +    unsigned int nr_ents;                                               \
+> +    struct __name##_sring *sring;                                       \
+> +};                                                                      \
+> +                                                                        \
+> +/* "Back" end's private variables */                                    \
+> +struct __name##_back_ring {                                             \
+> +    RING_IDX rsp_prod_pvt;                                              \
+> +    RING_IDX req_cons;                                                  \
+> +    unsigned int nr_ents;                                               \
+> +    struct __name##_sring *sring;                                       \
+> +};                                                                      \
+> +                                                                        \
+> +/* Syntactic sugar */                                                   \
+> +typedef struct __name##_sring __name##_sring_t;                         \
+> +typedef struct __name##_front_ring __name##_front_ring_t;               \
+> +typedef struct __name##_back_ring __name##_back_ring_t
+> +
+> +/*
+> + * Macros for manipulating rings.
+> + *
+> + * FRONT_RING_whatever works on the "front end" of a ring: here
+> + * requests are pushed on to the ring and responses taken off it.
+> + *
+> + * BACK_RING_whatever works on the "back end" of a ring: here
+> + * requests are taken off the ring and responses put on.
+> + *
+> + * N.B. these macros do NO INTERLOCKS OR FLOW CONTROL.
+> + * This is OK in 1-for-1 request-response situations where the
+> + * requestor (front end) never has more than RING_SIZE()-1
+> + * outstanding requests.
+> + */
+> +
+> +/* Initialising empty rings */
+> +#define SHARED_RING_INIT(_s) do {                                       \
+> +    (_s)->req_prod  = (_s)->rsp_prod  = 0;                              \
+> +    (_s)->req_event = (_s)->rsp_event = 1;                              \
+> +    (void)memset((_s)->pvt.pvt_pad, 0, sizeof((_s)->pvt.pvt_pad));      \
+> +    (void)memset((_s)->__pad, 0, sizeof((_s)->__pad));                  \
+> +} while(0)
+> +
+> +#define FRONT_RING_INIT(_r, _s, __size) do {                            \
+> +    (_r)->req_prod_pvt = 0;                                             \
+> +    (_r)->rsp_cons = 0;                                                 \
+> +    (_r)->nr_ents = __RING_SIZE(_s, __size);                            \
+> +    (_r)->sring = (_s);                                                 \
+> +} while (0)
+> +
+> +#define BACK_RING_INIT(_r, _s, __size) do {                             \
+> +    (_r)->rsp_prod_pvt = 0;                                             \
+> +    (_r)->req_cons = 0;                                                 \
+> +    (_r)->nr_ents = __RING_SIZE(_s, __size);                            \
+> +    (_r)->sring = (_s);                                                 \
+> +} while (0)
+> +
+> +/* How big is this ring? */
+> +#define RING_SIZE(_r)                                                   \
+> +    ((_r)->nr_ents)
+> +
+> +/* Number of free requests (for use on front side only). */
+> +#define RING_FREE_REQUESTS(_r)                                          \
+> +    (RING_SIZE(_r) - ((_r)->req_prod_pvt - (_r)->rsp_cons))
+> +
+> +/* Test if there is an empty slot available on the front ring.
+> + * (This is only meaningful from the front. )
+> + */
+> +#define RING_FULL(_r)                                                   \
+> +    (RING_FREE_REQUESTS(_r) == 0)
+> +
+> +/* Test if there are outstanding messages to be processed on a ring. */
+> +#define RING_HAS_UNCONSUMED_RESPONSES(_r)                               \
+> +    ((_r)->sring->rsp_prod - (_r)->rsp_cons)
+> +
+> +#ifdef __GNUC__
+> +#define RING_HAS_UNCONSUMED_REQUESTS(_r) ({                             \
+> +    unsigned int req = (_r)->sring->req_prod - (_r)->req_cons;          \
+> +    unsigned int rsp = RING_SIZE(_r) -                                  \
+> +        ((_r)->req_cons - (_r)->rsp_prod_pvt);                          \
+> +    req < rsp ? req : rsp;                                              \
+> +})
+> +#else
+> +/* Same as above, but without the nice GCC ({ ... }) syntax. */
+> +#define RING_HAS_UNCONSUMED_REQUESTS(_r)                                \
+> +    ((((_r)->sring->req_prod - (_r)->req_cons) <                        \
+> +      (RING_SIZE(_r) - ((_r)->req_cons - (_r)->rsp_prod_pvt))) ?        \
+> +     ((_r)->sring->req_prod - (_r)->req_cons) :                         \
+> +     (RING_SIZE(_r) - ((_r)->req_cons - (_r)->rsp_prod_pvt)))
+> +#endif
+> +
+> +/* Direct access to individual ring elements, by index. */
+> +#define RING_GET_REQUEST(_r, _idx)                                      \
+> +    (&((_r)->sring->ring[((_idx) & (RING_SIZE(_r) - 1))].req))
+> +
+> +/*
+> + * Get a local copy of a request.
+> + *
+> + * Use this in preference to RING_GET_REQUEST() so all processing is
+> + * done on a local copy that cannot be modified by the other end.
+> + *
+> + * Note that https://gcc.gnu.org/bugzilla/show_bug.cgi?id=58145 may cause this
+> + * to be ineffective where _req is a struct which consists of only bitfields.
+> + */
+> +#define RING_COPY_REQUEST(_r, _idx, _req) do {				\
+> +	/* Use volatile to force the copy into _req. */			\
+> +	*(_req) = *(volatile typeof(_req))RING_GET_REQUEST(_r, _idx);	\
+> +} while (0)
+> +
+> +#define RING_GET_RESPONSE(_r, _idx)                                     \
+> +    (&((_r)->sring->ring[((_idx) & (RING_SIZE(_r) - 1))].rsp))
+> +
+> +/* Loop termination condition: Would the specified index overflow the ring? */
+> +#define RING_REQUEST_CONS_OVERFLOW(_r, _cons)                           \
+> +    (((_cons) - (_r)->rsp_prod_pvt) >= RING_SIZE(_r))
+> +
+> +/* Ill-behaved frontend determination: Can there be this many requests? */
+> +#define RING_REQUEST_PROD_OVERFLOW(_r, _prod)                           \
+> +    (((_prod) - (_r)->rsp_prod_pvt) > RING_SIZE(_r))
+> +
+> +#define RING_PUSH_REQUESTS(_r) do {                                     \
+> +    xen_wmb(); /* back sees requests /before/ updated producer index */ \
+> +    (_r)->sring->req_prod = (_r)->req_prod_pvt;                         \
+> +} while (0)
+> +
+> +#define RING_PUSH_RESPONSES(_r) do {                                    \
+> +    xen_wmb(); /* front sees resps /before/ updated producer index */   \
+> +    (_r)->sring->rsp_prod = (_r)->rsp_prod_pvt;                         \
+> +} while (0)
+> +
+> +/*
+> + * Notification hold-off (req_event and rsp_event):
+> + *
+> + * When queueing requests or responses on a shared ring, it may not always be
+> + * necessary to notify the remote end. For example, if requests are in flight
+> + * in a backend, the front may be able to queue further requests without
+> + * notifying the back (if the back checks for new requests when it queues
+> + * responses).
+> + *
+> + * When enqueuing requests or responses:
+> + *
+> + *  Use RING_PUSH_{REQUESTS,RESPONSES}_AND_CHECK_NOTIFY(). The second argument
+> + *  is a boolean return value. True indicates that the receiver requires an
+> + *  asynchronous notification.
+> + *
+> + * After dequeuing requests or responses (before sleeping the connection):
+> + *
+> + *  Use RING_FINAL_CHECK_FOR_REQUESTS() or RING_FINAL_CHECK_FOR_RESPONSES().
+> + *  The second argument is a boolean return value. True indicates that there
+> + *  are pending messages on the ring (i.e., the connection should not be put
+> + *  to sleep).
+> + *
+> + *  These macros will set the req_event/rsp_event field to trigger a
+> + *  notification on the very next message that is enqueued. If you want to
+> + *  create batches of work (i.e., only receive a notification after several
+> + *  messages have been enqueued) then you will need to create a customised
+> + *  version of the FINAL_CHECK macro in your own code, which sets the event
+> + *  field appropriately.
+> + */
+> +
+> +#define RING_PUSH_REQUESTS_AND_CHECK_NOTIFY(_r, _notify) do {           \
+> +    RING_IDX __old = (_r)->sring->req_prod;                             \
+> +    RING_IDX __new = (_r)->req_prod_pvt;                                \
+> +    xen_wmb(); /* back sees requests /before/ updated producer index */ \
+> +    (_r)->sring->req_prod = __new;                                      \
+> +    xen_mb(); /* back sees new requests /before/ we check req_event */  \
+> +    (_notify) = ((RING_IDX)(__new - (_r)->sring->req_event) <           \
+> +                 (RING_IDX)(__new - __old));                            \
+> +} while (0)
+> +
+> +#define RING_PUSH_RESPONSES_AND_CHECK_NOTIFY(_r, _notify) do {          \
+> +    RING_IDX __old = (_r)->sring->rsp_prod;                             \
+> +    RING_IDX __new = (_r)->rsp_prod_pvt;                                \
+> +    xen_wmb(); /* front sees resps /before/ updated producer index */   \
+> +    (_r)->sring->rsp_prod = __new;                                      \
+> +    xen_mb(); /* front sees new resps /before/ we check rsp_event */    \
+> +    (_notify) = ((RING_IDX)(__new - (_r)->sring->rsp_event) <           \
+> +                 (RING_IDX)(__new - __old));                            \
+> +} while (0)
+> +
+> +#define RING_FINAL_CHECK_FOR_REQUESTS(_r, _work_to_do) do {             \
+> +    (_work_to_do) = RING_HAS_UNCONSUMED_REQUESTS(_r);                   \
+> +    if (_work_to_do) break;                                             \
+> +    (_r)->sring->req_event = (_r)->req_cons + 1;                        \
+> +    xen_mb();                                                           \
+> +    (_work_to_do) = RING_HAS_UNCONSUMED_REQUESTS(_r);                   \
+> +} while (0)
+> +
+> +#define RING_FINAL_CHECK_FOR_RESPONSES(_r, _work_to_do) do {            \
+> +    (_work_to_do) = RING_HAS_UNCONSUMED_RESPONSES(_r);                  \
+> +    if (_work_to_do) break;                                             \
+> +    (_r)->sring->rsp_event = (_r)->rsp_cons + 1;                        \
+> +    xen_mb();                                                           \
+> +    (_work_to_do) = RING_HAS_UNCONSUMED_RESPONSES(_r);                  \
+> +} while (0)
+> +
+> +
+> +/*
+> + * DEFINE_XEN_FLEX_RING_AND_INTF defines two monodirectional rings and
+> + * functions to check if there is data on the ring, and to read and
+> + * write to them.
+> + *
+> + * DEFINE_XEN_FLEX_RING is similar to DEFINE_XEN_FLEX_RING_AND_INTF, but
+> + * does not define the indexes page. As different protocols can have
+> + * extensions to the basic format, this macro allow them to define their
+> + * own struct.
+> + *
+> + * XEN_FLEX_RING_SIZE
+> + *   Convenience macro to calculate the size of one of the two rings
+> + *   from the overall order.
+> + *
+> + * $NAME_mask
+> + *   Function to apply the size mask to an index, to reduce the index
+> + *   within the range [0-size].
+> + *
+> + * $NAME_read_packet
+> + *   Function to read data from the ring. The amount of data to read is
+> + *   specified by the "size" argument.
+> + *
+> + * $NAME_write_packet
+> + *   Function to write data to the ring. The amount of data to write is
+> + *   specified by the "size" argument.
+> + *
+> + * $NAME_get_ring_ptr
+> + *   Convenience function that returns a pointer to read/write to the
+> + *   ring at the right location.
+> + *
+> + * $NAME_data_intf
+> + *   Indexes page, shared between frontend and backend. It also
+> + *   contains the array of grant refs.
+> + *
+> + * $NAME_queued
+> + *   Function to calculate how many bytes are currently on the ring,
+> + *   ready to be read. It can also be used to calculate how much free
+> + *   space is currently on the ring (XEN_FLEX_RING_SIZE() -
+> + *   $NAME_queued()).
+> + */
+> +
+> +#ifndef XEN_PAGE_SHIFT
+> +/* The PAGE_SIZE for ring protocols and hypercall interfaces is always
+> + * 4K, regardless of the architecture, and page granularity chosen by
+> + * operating systems.
+> + */
+> +#define XEN_PAGE_SHIFT 12
+> +#endif
+> +#define XEN_FLEX_RING_SIZE(order)                                             \
+> +    (1UL << ((order) + XEN_PAGE_SHIFT - 1))
+> +
+> +#define DEFINE_XEN_FLEX_RING(name)                                            \
+> +static inline RING_IDX name##_mask(RING_IDX idx, RING_IDX ring_size)          \
+> +{                                                                             \
+> +    return idx & (ring_size - 1);                                             \
+> +}                                                                             \
+> +                                                                              \
+> +static inline unsigned char *name##_get_ring_ptr(unsigned char *buf,          \
+> +                                                 RING_IDX idx,                \
+> +                                                 RING_IDX ring_size)          \
+> +{                                                                             \
+> +    return buf + name##_mask(idx, ring_size);                                 \
+> +}                                                                             \
+> +                                                                              \
+> +static inline void name##_read_packet(void *opaque,                           \
+> +                                      const unsigned char *buf,               \
+> +                                      size_t size,                            \
+> +                                      RING_IDX masked_prod,                   \
+> +                                      RING_IDX *masked_cons,                  \
+> +                                      RING_IDX ring_size)                     \
+> +{                                                                             \
+> +    if (*masked_cons < masked_prod ||                                         \
+> +        size <= ring_size - *masked_cons) {                                   \
+> +        memcpy(opaque, buf + *masked_cons, size);                             \
+> +    } else {                                                                  \
+> +        memcpy(opaque, buf + *masked_cons, ring_size - *masked_cons);         \
+> +        memcpy((unsigned char *)opaque + ring_size - *masked_cons, buf,       \
+> +               size - (ring_size - *masked_cons));                            \
+> +    }                                                                         \
+> +    *masked_cons = name##_mask(*masked_cons + size, ring_size);               \
+> +}                                                                             \
+> +                                                                              \
+> +static inline void name##_write_packet(unsigned char *buf,                    \
+> +                                       const void *opaque,                    \
+> +                                       size_t size,                           \
+> +                                       RING_IDX *masked_prod,                 \
+> +                                       RING_IDX masked_cons,                  \
+> +                                       RING_IDX ring_size)                    \
+> +{                                                                             \
+> +    if (*masked_prod < masked_cons ||                                         \
+> +        size <= ring_size - *masked_prod) {                                   \
+> +        memcpy(buf + *masked_prod, opaque, size);                             \
+> +    } else {                                                                  \
+> +        memcpy(buf + *masked_prod, opaque, ring_size - *masked_prod);         \
+> +        memcpy(buf, (unsigned char *)opaque + (ring_size - *masked_prod),     \
+> +               size - (ring_size - *masked_prod));                            \
+> +    }                                                                         \
+> +    *masked_prod = name##_mask(*masked_prod + size, ring_size);               \
+> +}                                                                             \
+> +                                                                              \
+> +static inline RING_IDX name##_queued(RING_IDX prod,                           \
+> +                                     RING_IDX cons,                           \
+> +                                     RING_IDX ring_size)                      \
+> +{                                                                             \
+> +    RING_IDX size;                                                            \
+> +                                                                              \
+> +    if (prod == cons)                                                         \
+> +        return 0;                                                             \
+> +                                                                              \
+> +    prod = name##_mask(prod, ring_size);                                      \
+> +    cons = name##_mask(cons, ring_size);                                      \
+> +                                                                              \
+> +    if (prod == cons)                                                         \
+> +        return ring_size;                                                     \
+> +                                                                              \
+> +    if (prod > cons)                                                          \
+> +        size = prod - cons;                                                   \
+> +    else                                                                      \
+> +        size = ring_size - (cons - prod);                                     \
+> +    return size;                                                              \
+> +}                                                                             \
+> +                                                                              \
+> +struct name##_data {                                                          \
+> +    unsigned char *in; /* half of the allocation */                           \
+> +    unsigned char *out; /* half of the allocation */                          \
+> +}
+> +
+> +#define DEFINE_XEN_FLEX_RING_AND_INTF(name)                                   \
+> +struct name##_data_intf {                                                     \
+> +    RING_IDX in_cons, in_prod;                                                \
+> +                                                                              \
+> +    uint8_t pad1[56];                                                         \
+> +                                                                              \
+> +    RING_IDX out_cons, out_prod;                                              \
+> +                                                                              \
+> +    uint8_t pad2[56];                                                         \
+> +                                                                              \
+> +    RING_IDX ring_order;                                                      \
+> +    grant_ref_t ref[];                                                        \
+> +};                                                                            \
+> +DEFINE_XEN_FLEX_RING(name)
+> +
+> +#endif /* __XEN_PUBLIC_IO_RING_H__ */
+> +
+> +/*
+> + * Local variables:
+> + * mode: C
+> + * c-file-style: "BSD"
+> + * c-basic-offset: 4
+> + * tab-width: 4
+> + * indent-tabs-mode: nil
+> + * End:
+> + */
 >
