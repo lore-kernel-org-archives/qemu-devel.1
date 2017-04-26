@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d3FA2-0001xW-Je
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 01:06:43 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1d3FA2-0001xV-J3
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 01:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d3F9x-0002uG-QG
+	(envelope-from <a.perevalov@samsung.com>) id 1d3F9x-0002uA-Oh
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 01:06:42 -0400
-Received: from mailout4.w1.samsung.com ([210.118.77.14]:12916)
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:32442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1d3F9x-0002tg-Kb
+	id 1d3F9x-0002tk-Ih
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 01:06:37 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout4.w1.samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout3.w1.samsung.com
 	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OP00034F3IZ0S00@mailout4.w1.samsung.com> for
+	2014)) with ESMTP id <0OP000A5S3IZEN00@mailout3.w1.samsung.com> for
 	qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:06:35 +0100 (BST)
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Wed, 26 Apr 2017 08:06:17 +0300
-Message-id: <1493183181-21962-4-git-send-email-a.perevalov@samsung.com>
+Date: Wed, 26 Apr 2017 08:06:18 +0300
+Message-id: <1493183181-21962-5-git-send-email-a.perevalov@samsung.com>
 In-reply-to: <1493183181-21962-1-git-send-email-a.perevalov@samsung.com>
 References: <1493183181-21962-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170426050633eucas1p2f0c7756e8762fb70d1e1e045095eb3a2@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH V3 3/6] migration: split ufd_version_check onto
- receive/request features part
+	<CGME20170426050634eucas1p1a1c95d312025c99453a185084b75396a@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH V3 4/6] migration: add postcopy downtime into
+ MigrationIncommingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,117 +34,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: dgilbert@redhat.com
 Cc: a.perevalov@samsung.com, i.maximets@samsung.com, f4bug@amsat.org, peterx@redhat.com, qemu-devel@nongnu.org
 
-This modification is necessary for userfault fd features which are
-required to be requested from userspace.
-UFFD_FEATURE_THREAD_ID is a one of such "on demand" feature, which will
-be introduced in the next patch.
+This patch add request to kernel space for UFFD_FEATURE_THREAD_ID,
+in case when this feature is provided by kernel.
 
-QEMU need to use separate userfault file descriptor, due to
-userfault context has internal state, and after first call of
-ioctl UFFD_API it changes its state to UFFD_STATE_RUNNING (in case of
-success), but
-kernel while handling ioctl UFFD_API expects UFFD_STATE_WAIT_API. So
-only one ioctl with UFFD_API is possible per ufd.
+DowntimeContext is incapsulated inside migration.c.
 
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 ---
- migration/postcopy-ram.c | 68 ++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 63 insertions(+), 5 deletions(-)
+ include/migration/migration.h | 12 ++++++++++++
+ migration/migration.c         | 33 +++++++++++++++++++++++++++++++++
+ migration/postcopy-ram.c      |  8 ++++++++
+ 3 files changed, 53 insertions(+)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 5720c88..b1759f7 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -83,6 +83,8 @@ typedef enum {
+     POSTCOPY_INCOMING_END
+ } PostcopyState;
+ 
++struct DowntimeContext;
++
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
+@@ -123,10 +125,20 @@ struct MigrationIncomingState {
+ 
+     /* See savevm.c */
+     LoadStateEntry_Head loadvm_handlers;
++
++    /*
++     * DowntimeContext to keep information for postcopy
++     * live migration, to calculate downtime
++     * */
++    struct DowntimeContext *downtime_ctx;
+ };
+ 
+ MigrationIncomingState *migration_incoming_get_current(void);
+ void migration_incoming_state_destroy(void);
++/*
++ * Functions to work with downtime context
++ */
++struct DowntimeContext *downtime_context_new(void);
+ 
+ /*
+  * An outstanding page request, on the source, having been received
+diff --git a/migration/migration.c b/migration/migration.c
+index 79f6425..0309c2b 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -77,6 +77,18 @@ static NotifierList migration_state_notifiers =
+ 
+ static bool deferred_incoming;
+ 
++typedef struct DowntimeContext {
++    /* time when page fault initiated per vCPU */
++    int64_t *page_fault_vcpu_time;
++    /* page address per vCPU */
++    uint64_t *vcpu_addr;
++    int64_t total_downtime;
++    /* downtime per vCPU */
++    int64_t *vcpu_downtime;
++    /* point in time when last page fault was initiated */
++    int64_t last_begin;
++} DowntimeContext;
++
+ /*
+  * Current state of incoming postcopy; note this is not part of
+  * MigrationIncomingState since it's state is used during cleanup
+@@ -117,6 +129,23 @@ MigrationState *migrate_get_current(void)
+     return &current_migration;
+ }
+ 
++struct DowntimeContext *downtime_context_new(void)
++{
++    DowntimeContext *ctx = g_new0(DowntimeContext, 1);
++    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
++    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
++    ctx->vcpu_downtime = g_new0(int64_t, smp_cpus);
++    return ctx;
++}
++
++static void destroy_downtime_context(struct DowntimeContext *ctx)
++{
++    g_free(ctx->page_fault_vcpu_time);
++    g_free(ctx->vcpu_addr);
++    g_free(ctx->vcpu_downtime);
++    g_free(ctx);
++}
++
+ MigrationIncomingState *migration_incoming_get_current(void)
+ {
+     static bool once;
+@@ -139,6 +168,10 @@ void migration_incoming_state_destroy(void)
+ 
+     qemu_event_destroy(&mis->main_thread_load_event);
+     loadvm_free_handlers(mis);
++    if (mis->downtime_ctx) {
++        destroy_downtime_context(mis->downtime_ctx);
++        mis->downtime_ctx = NULL;
++    }
+ }
+ 
+ 
 diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index dcf2ed1..55b5243 100644
+index 55b5243..ce1ea5d 100644
 --- a/migration/postcopy-ram.c
 +++ b/migration/postcopy-ram.c
-@@ -60,15 +60,51 @@ struct PostcopyDiscardState {
- #include <sys/eventfd.h>
- #include <linux/userfaultfd.h>
- 
--static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
-+
-+/*
-+ * Check userfault fd features, to request only supported features in
-+ * future.
-+ * __NR_userfaultfd - should be checked before
-+ * Return obtained features
-+ */
-+static bool receive_ufd_features(__u64 *features)
- {
--    struct uffdio_api api_struct;
--    uint64_t ioctl_mask;
-+    struct uffdio_api api_struct = {0};
-+    int ufd;
-+    bool ret = true;
- 
-+    /* if we are here __NR_userfaultfd should exists */
-+    ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
-+    if (ufd == -1) {
-+        return false;
-+    }
-+
-+    /* ask features */
-     api_struct.api = UFFD_API;
-     api_struct.features = 0;
-     if (ioctl(ufd, UFFDIO_API, &api_struct)) {
--        error_report("postcopy_ram_supported_by_host: UFFDIO_API failed: %s",
-+        error_report("receive_ufd_features: UFFDIO_API failed: %s",
-+                strerror(errno));
-+        ret = false;
-+        goto release_ufd;
-+    }
-+
-+    *features = api_struct.features;
-+
-+release_ufd:
-+    close(ufd);
-+    return ret;
-+}
-+
-+static bool request_ufd_features(int ufd, __u64 features)
-+{
-+    struct uffdio_api api_struct = {0};
-+    uint64_t ioctl_mask;
-+
-+    api_struct.api = UFFD_API;
-+    api_struct.features = features;
-+    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
-+        error_report("request_ufd_features: UFFDIO_API failed: %s",
-                      strerror(errno));
-         return false;
-     }
-@@ -81,11 +117,33 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+@@ -132,6 +132,14 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
          return false;
      }
  
-+    return true;
-+}
-+
-+static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
-+{
-+    __u64 new_features = 0;
-+
-+    /* ask features */
-+    __u64 supported_features;
-+
-+    if (!receive_ufd_features(&supported_features)) {
-+        error_report("ufd_version_check failed");
-+        return false;
++#ifdef UFFD_FEATURE_THREAD_ID
++    if (mis && UFFD_FEATURE_THREAD_ID & supported_features) {
++        /* kernel supports that feature */
++        mis->downtime_ctx = downtime_context_new();
++        new_features |= UFFD_FEATURE_THREAD_ID;
 +    }
++#endif
 +
-+    /* request features */
-+    if (new_features && !request_ufd_features(ufd, new_features)) {
-+        error_report("ufd_version_check failed: features %" PRIu64,
-+                (uint64_t)new_features);
-+        return false;
-+    }
-+
-     if (getpagesize() != ram_pagesize_summary()) {
-         bool have_hp = false;
-         /* We've got a huge page */
- #ifdef UFFD_FEATURE_MISSING_HUGETLBFS
--        have_hp = api_struct.features & UFFD_FEATURE_MISSING_HUGETLBFS;
-+        have_hp = supported_features & UFFD_FEATURE_MISSING_HUGETLBFS;
- #endif
-         if (!have_hp) {
-             error_report("Userfault on this host does not support huge pages");
+     /* request features */
+     if (new_features && !request_ufd_features(ufd, new_features)) {
+         error_report("ufd_version_check failed: features %" PRIu64,
 -- 
 1.9.1
