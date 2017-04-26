@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwi-0005DP-5S
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwn-0005II-Vc
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwb-0007yc-33
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:03 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwg-00081Q-77
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:10 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 16:59:58 +1000
-Message-Id: <20170426070034.10727-13-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 17:00:10 +1000
+Message-Id: <20170426070034.10727-25-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/48] spapr: Workaround for broken radix guests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 24/48] ppc/pnv: create the ICP object under
+ PnvCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,140 +24,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Sam Bobroff <sam.bobroff@au1.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-For a little while around 4.9, Linux kernels that saw the radix bit in
-ibm,pa-features would attempt to set up the MMU as if they were a
-hypervisor, even if they were a guest, which would cause them to
-crash.
+Each thread of a core is linked to an ICP. This allocates a PnvICPState
+object before the PowerPCCPU object is realized and lets the XICSFabric
+do the store under the 'intc' backlink when xics_cpu_setup() is
+called.
 
-Work around this by detecting pre-ISA 3.0 guests by their lack of that
-bit in option vector 1, and then removing the radix bit from
-ibm,pa-features. Note: This now requires regeneration of that node
-after CAS negotiation.
+This modeling removes the need of maintaining an array of ICP objects
+under the PowerNV machine and also simplifies the XICSFabric icp_get()
+handler.
 
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-[dwg: Fix style nits]
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c              | 15 +++++++++++++--
- hw/ppc/spapr_hcall.c        |  6 ++++--
- include/hw/ppc/spapr.h      |  1 +
- include/hw/ppc/spapr_ovec.h |  3 +++
- 4 files changed, 21 insertions(+), 4 deletions(-)
+ hw/ppc/pnv.c      |  2 ++
+ hw/ppc/pnv_core.c | 27 +++++++++++++++++++++++++--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d967ec3..a355512 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -228,7 +228,8 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, CPUState *cs)
- }
- 
- /* Populate the "ibm,pa-features" property */
--static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
-+static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
-+                                      bool legacy_guest)
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index f3623ee..2add2ad 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -694,6 +694,8 @@ static void pnv_chip_realize(DeviceState *dev, Error =
+**errp)
+         object_property_set_int(OBJECT(pnv_core),
+                                 pcc->core_pir(chip, core_hwid),
+                                 "pir", &error_fatal);
++        object_property_add_const_link(OBJECT(pnv_core), "xics",
++                                       qdev_get_machine(), &error_fatal)=
+;
+         object_property_set_bool(OBJECT(pnv_core), true, "realized",
+                                  &error_fatal);
+         object_unref(OBJECT(pnv_core));
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index d79d530..1b7ec70 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -25,6 +25,7 @@
+ #include "hw/ppc/pnv.h"
+ #include "hw/ppc/pnv_core.h"
+ #include "hw/ppc/pnv_xscom.h"
++#include "hw/ppc/xics.h"
+=20
+ static void powernv_cpu_reset(void *opaque)
  {
-     uint8_t pa_features_206[] = { 6, 0,
-         0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-@@ -295,6 +296,12 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
-     if (kvmppc_has_cap_htm() && pa_size > 24) {
-         pa_features[24] |= 0x80;    /* Transactional memory support */
-     }
-+    if (legacy_guest && pa_size > 40) {
-+        /* Workaround for broken kernels that attempt (guest) radix
-+         * mode when they can't handle it, if they see the radix bit set
-+         * in pa-features. So hide it from them. */
-+        pa_features[40 + 2] &= ~0x80; /* Radix MMU */
+@@ -110,23 +111,37 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D=
+ {
+     .endianness =3D DEVICE_BIG_ENDIAN,
+ };
+=20
+-static void pnv_core_realize_child(Object *child, Error **errp)
++static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error =
+**errp)
+ {
+     Error *local_err =3D NULL;
+     CPUState *cs =3D CPU(child);
+     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++    Object *obj;
++
++    obj =3D object_new(TYPE_PNV_ICP);
++    object_property_add_child(OBJECT(cpu), "icp", obj, NULL);
++    object_property_add_const_link(obj, "xics", OBJECT(xi), &error_abort=
+);
++    object_property_set_bool(obj, true, "realized", &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
 +    }
- 
-     _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
- }
-@@ -309,6 +316,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
- 
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
-+        CPUPPCState *env = &cpu->env;
-         DeviceClass *dc = DEVICE_GET_CLASS(cs);
-         int index = ppc_get_vcpu_dt_id(cpu);
-         int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-@@ -350,6 +358,9 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-         if (ret < 0) {
-             return ret;
-         }
+=20
+     object_property_set_bool(child, true, "realized", &local_err);
+     if (local_err) {
++        object_unparent(obj);
+         error_propagate(errp, local_err);
+         return;
+     }
+=20
+     powernv_cpu_init(cpu, &local_err);
+     if (local_err) {
++        object_unparent(obj);
+         error_propagate(errp, local_err);
+         return;
+     }
 +
-+        spapr_populate_pa_features(env, fdt, offset,
-+                                         spapr->cas_legacy_guest_workaround);
-     }
-     return ret;
++    xics_cpu_setup(xi, cpu, ICP(obj));
  }
-@@ -547,7 +558,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-                           page_sizes_prop, page_sizes_prop_size)));
-     }
- 
--    spapr_populate_pa_features(env, fdt, offset);
-+    spapr_populate_pa_features(env, fdt, offset, false);
- 
-     _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
-                            cs->cpu_index / vcpus_per_socket)));
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index cbd1f29..9f18f75 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1062,7 +1062,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     uint32_t max_compat = cpu->max_compat;
-     uint32_t best_compat = 0;
-     int i;
--    sPAPROptionVector *ov5_guest, *ov5_cas_old, *ov5_updates;
-+    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-     bool guest_radix;
- 
-     /*
-@@ -1114,6 +1114,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     /* For the future use: here @ov_table points to the first option vector */
-     ov_table = list;
- 
-+    ov1_guest = spapr_ovec_parse_vector(ov_table, 1);
-     ov5_guest = spapr_ovec_parse_vector(ov_table, 5);
-     if (spapr_ovec_test(ov5_guest, OV5_MMU_BOTH)) {
-         error_report("guest requested hash and radix MMU, which is invalid.");
-@@ -1155,7 +1156,8 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-             exit(EXIT_FAILURE);
-         }
-     }
--
-+    spapr->cas_legacy_guest_workaround = !spapr_ovec_test(ov1_guest,
-+                                                          OV1_PPC_3_00);
-     if (!spapr->cas_reboot) {
-         spapr->cas_reboot =
-             (spapr_h_cas_compose_response(spapr, args[1], args[2],
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index d234efc..e27de64 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -89,6 +89,7 @@ struct sPAPRMachineState {
-     sPAPROptionVector *ov5;         /* QEMU-supported option vectors */
-     sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vectors */
-     bool cas_reboot;
-+    bool cas_legacy_guest_workaround;
- 
-     Notifier epow_notifier;
-     QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
-diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
-index f7f2abe..f088833 100644
---- a/include/hw/ppc/spapr_ovec.h
-+++ b/include/hw/ppc/spapr_ovec.h
-@@ -43,6 +43,9 @@ typedef struct sPAPROptionVector sPAPROptionVector;
- 
- #define OV_BIT(byte, bit) ((byte - 1) * BITS_PER_BYTE + bit)
- 
-+/* option vector 1 */
-+#define OV1_PPC_3_00            OV_BIT(3, 0) /* guest supports PowerPC 3.00? */
+=20
+ static void pnv_core_realize(DeviceState *dev, Error **errp)
+@@ -140,6 +155,14 @@ static void pnv_core_realize(DeviceState *dev, Error=
+ **errp)
+     void *obj;
+     int i, j;
+     char name[32];
++    Object *xi;
 +
- /* option vector 5 */
- #define OV5_DRCONF_MEMORY       OV_BIT(2, 2)
- #define OV5_FORM1_AFFINITY      OV_BIT(5, 0)
--- 
++    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
++    if (!xi) {
++        error_setg(errp, "%s: required link 'xics' not found: %s",
++                   __func__, error_get_pretty(local_err));
++        return;
++    }
+=20
+     pc->threads =3D g_malloc0(size * cc->nr_threads);
+     for (i =3D 0; i < cc->nr_threads; i++) {
+@@ -160,7 +183,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+     for (j =3D 0; j < cc->nr_threads; j++) {
+         obj =3D pc->threads + j * size;
+=20
+-        pnv_core_realize_child(obj, &local_err);
++        pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
+         if (local_err) {
+             goto err;
+         }
+--=20
 2.9.3
