@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3KiA-0007a5-3d
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:02:21 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d3KjZ-0000Dt-Jy
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:03:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3Ki5-0006B2-Ai
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:02:18 -0400
-Date: Wed, 26 Apr 2017 08:02:01 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170426110201.GS3482@thinpad.lan.raisama.net>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-11-git-send-email-imammedo@redhat.com>
-	<20170413135805.GE27126@thinpad.lan.raisama.net>
-	<20170419113105.48020438@nial.brq.redhat.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1d3KjU-0006mt-Fm
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:03:45 -0400
+Received: from mga05.intel.com ([192.55.52.43]:4737)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1d3KjU-0006lS-2P
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:03:40 -0400
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Wed, 26 Apr 2017 11:03:34 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F7391F6DCD@shsmsx102.ccr.corp.intel.com>
+References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
+	<1492076108-117229-3-git-send-email-wei.w.wang@intel.com>
+	<20170413184040-mutt-send-email-mst@kernel.org>
+	<58F08A60.2020407@intel.com>
+	<20170415000934-mutt-send-email-mst@kernel.org>
+	<58F43801.7060004@intel.com>
+In-Reply-To: <58F43801.7060004@intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170419113105.48020438@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 10/23] numa: mirror cpu to node
- mapping in MachineState::possible_cpus
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v9 2/5] virtio-balloon:
+ VIRTIO_BALLOON_F_BALLOON_CHUNKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,129 +34,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: "Wang, Wei W" <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
 
-Just noticed I didn't reply to this yet:
+Hi Michael, could you please give some feedback?
 
-On Wed, Apr 19, 2017 at 11:31:05AM +0200, Igor Mammedov wrote:
-> On Thu, 13 Apr 2017 10:58:05 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Wed, Mar 22, 2017 at 02:32:35PM +0100, Igor Mammedov wrote:
-> > > Introduce machine_set_cpu_numa_node() helper that stores
-> > > node mapping for CPU in MachineState::possible_cpus.
-> > > CPU and node it belongs to is specified by 'props' argument.
-> > > 
-> > > Patch doesn't remove old way of storing mapping in
-> > > numa_info[X].node_cpu as removing it at the same time
-> > > makes patch rather big. Instead it just mirrors mapping
-> > > in possible_cpus and follow up per target patches will
-> > > switch to possible_cpus and numa_info[X].node_cpu will
-> > > be removed once there isn't any users left.
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > >  include/hw/boards.h |  2 ++
-> > >  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  numa.c              |  8 +++++++
-> > >  3 files changed, 78 insertions(+)
-> > > 
-> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > index 1dd0fde..40f30f1 100644
-> > > --- a/include/hw/boards.h
-> > > +++ b/include/hw/boards.h
-> > > @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
-> > >  bool machine_mem_merge(MachineState *machine);
-> > >  void machine_register_compat_props(MachineState *machine);
-> > >  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
-> > > +void machine_set_cpu_numa_node(MachineState *machine,
-> > > +                               CpuInstanceProperties *props, Error **errp);
-> > >  
-> > >  /**
-> > >   * CPUArchId:
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index 0d92672..6ff0b45 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
-> > >      return head;
-> > >  }
-> > >  
-> > > +void machine_set_cpu_numa_node(MachineState *machine,
-> > > +                               CpuInstanceProperties *props, Error **errp)  
-> > 
-> > If you change this to:
-> > 
-> >   void cpu_slot_set_numa_node(CPUArchId *slot, uint64_t node_id,
-> >                               Error **errp);
-> > 
-> > and move the CPU slot lookup code from machine_set_cpu_numa_node()
-> > to a helper:
-> > 
-> >   CPUArchId *machine_get_cpu_slot(MachineState *machine,
-> >                                   CpuInstanceProperties *props, Error **errp);
-> it would work in case of exact 1:1 lookup, but Paolo asked for
-> wildcard support (i.e. -numa cpu,node-id=x,socket-id=y should set
-> mapping for all cpus in socket y).
-> So I'd prefer to keep machine_set_cpu_numa_node() as is,
-> with it series splits nicely in clean and bisectable patches
-> without breaking anything in the middle.
-
-Makes sense to me. And this is also a good reason we won't have a
-1:1 mapping from query-hotpluggable-cpus output to -numa cpu
-input. (So this answers my question about the intent to change
-query-hotpluggable-cpus output)
-
-> 
-> 
-> > and change cpu_index_to_cpu_instance_props to return CPUArchId:
-> > 
-> >   CPUArchId *cpu_index_to_cpu_slot(MachineState *machine, int cpu_index);
-> > 
-> > We could simply have this on "-numa cpu" code:
-> > 
-> >     slot = machine_get_cpu_slot(machine, props);
-> >     cpu_slot_set_numa_node(slot, node_id);
-> > 
-> > and this on the legacy "-numa node,cpu=..." code:
-> > 
-> >     slot = mc->cpu_index_to_cpu_slot(machine, i);
-> >     cpu_slot_set_numa_node(slot, node_id);
-> > 
-> > I believe we will be able to reuse machine_get_cpu_slot() to
-> > replace pc_find_cpu_slot() and spapr_find_cpu_slot() later.
-> As I already replied to David, xxx_find_cpu_slot() possibly might
-> be generalized but I'd like to postpone it until ARM topology
-> is materialized and merged.
-
-OK.
-
-> 
-> Another reason I'd like to postpone generalization is that
-> xxx_find_cpu_slot() could be optimized in target specific way
-> replacing CPU lookup in array with computational expression.
-> It will make lookup O(1) function and it could be used as
-> a better replacement for qemu_get_cpu()/cpu_exists() but
-> I haven't looked into this yet.
-
-I would prefer optimization in generic code to machine-specific
-code just for optimization. But both approaches are valid, let's
-see how this evolves.
-
-> 
->  
-> > (I also suggest renaming "CPUArchId" and "possible CPUs" to
-> > "CPUSlot" and "CPU slots" in the code and comments. This would
-> > help people reviewing the code, but it can be done later if you
-> > prefer.)
-> I'm fine with changing CPUArchId to CPUSlot but I'd leave
-> "possible CPUs" as is, since it precisely describes what it is,
-> "CPU slots" is too ambiguous.
-
-No problem to me. We can discuss that later, anyway.
-
-Thanks!
-
--- 
-Eduardo
+On Monday, April 17, 2017 11:35 AM, Wei Wang wrote:
+> On 04/15/2017 05:38 AM, Michael S. Tsirkin wrote:
+> > On Fri, Apr 14, 2017 at 04:37:52PM +0800, Wei Wang wrote:
+> >> On 04/14/2017 12:34 AM, Michael S. Tsirkin wrote:
+> >>> On Thu, Apr 13, 2017 at 05:35:05PM +0800, Wei Wang wrote:
+> >>>
+> >>> So we don't need the bitmap to talk to host, it is just a data
+> >>> structure we chose to maintain lists of pages, right?
+> >> Right. bitmap is the way to gather pages to chunk.
+> >> It's only needed in the balloon page case.
+> >> For the unused page case, we don't need it, since the free page
+> >> blocks are already chunks.
+> >>
+> >>> OK as far as it goes but you need much better isolation for it.
+> >>> Build a data structure with APIs such as _init, _cleanup, _add,
+> >>> _clear, _find_first, _find_next.
+> >>> Completely unrelated to pages, it just maintains bits.
+> >>> Then use it here.
+> >>>
+> >>>
+> >>>>    static int oom_pages =3D OOM_VBALLOON_DEFAULT_PAGES;
+> >>>>    module_param(oom_pages, int, S_IRUSR | S_IWUSR);
+> >>>>    MODULE_PARM_DESC(oom_pages, "pages to free on OOM"); @@ -50,6
+> >>>> +54,10 @@ MODULE_PARM_DESC(oom_pages, "pages to free on OOM");
+> >>>>    static struct vfsmount *balloon_mnt;
+> >>>>    #endif
+> >>>> +/* Types of pages to chunk */
+> >>>> +#define PAGE_CHUNK_TYPE_BALLOON 0
+> >>>> +
+> >>> Doesn't look like you are ever adding more types in this patchset.
+> >>> Pls keep code simple, generalize it later.
+> >>>
+> >> "#define PAGE_CHUNK_TYPE_UNUSED 1" is added in another patch.
+> > I would say add the extra code there too. Or maybe we can avoid adding
+> > it altogether.
+>=20
+> I'm trying to have the two features( i.e. "balloon pages" and "unused pag=
+es")
+> decoupled while trying to use common functions to deal with the commonali=
+ties.
+> That's the reason to define the above macro.
+> Without the macro, we will need to have separate functions, for example,
+> instead of one "add_one_chunk()", we need to have
+> add_one_balloon_page_chunk() and add_one_unused_page_chunk(), and some
+> of the implementations will be kind of duplicate in the two functions.
+> Probably we can add it when the second feature comes to the code.
+>=20
+> >
+> >> Types of page to chunk are treated differently. Different types of
+> >> page chunks are sent to the host via different protocols.
+> >>
+> >> 1) PAGE_CHUNK_TYPE_BALLOON: Ballooned (i.e. inflated/deflated) pages
+> >> to chunk.  For the ballooned type, it uses the basic chunk msg format:
+> >>
+> >> virtio_balloon_page_chunk_hdr +
+> >> virtio_balloon_page_chunk * MAX_PAGE_CHUNKS
+> >>
+> >> 2) PAGE_CHUNK_TYPE_UNUSED: unused pages to chunk. It uses this miscq
+> >> msg
+> >> format:
+> >> miscq_hdr +
+> >> virtio_balloon_page_chunk_hdr +
+> >> virtio_balloon_page_chunk * MAX_PAGE_CHUNKS
+> >>
+> >> The chunk msg is actually the payload of the miscq msg.
+> >>
+> >>
+> > So just combine the two message formats and then it'll all be easier?
+> >
+>=20
+> Yes, it'll be simple with only one msg format. But the problem I see here=
+ is that
+> miscq hdr is something necessary for the "unused page"
+> usage, but not needed by the "balloon page" usage. To be more precise, st=
+ruct
+> virtio_balloon_miscq_hdr {
+>   __le16 cmd;
+>   __le16 flags;
+> };
+> 'cmd' specifies  the command from the miscq (I envision that miscq will b=
+e
+> further used to handle other possible miscellaneous requests either from =
+the
+> host or to the host), so 'cmd' is necessary for the miscq. But the inflat=
+eq is
+> exclusively used for inflating pages, so adding a command to it would be
+> redundant and look a little bewildered there.
+> 'flags': We currently use bit 0 of flags to indicate the completion ofa c=
+ommand,
+> this is also useful in the "unused page" usage, and not needed by the "ba=
+lloon
+> page" usage.
+> >>>> +#define MAX_PAGE_CHUNKS 4096
+> >>> This is an order-4 allocation. I'd make it 4095 and then it's an
+> >>> order-3 one.
+> >> Sounds good, thanks.
+> >> I think it would be better to make it 4090. Leave some space for the
+> >> hdr as well.
+> > And miscq hdr. In fact just let compiler do the math - something like:
+> > (8 * PAGE_SIZE - sizeof(hdr)) / sizeof(chunk)
+> Agree, thanks.
+>=20
+> >
+> > I skimmed explanation of algorithms below but please make sure code
+> > speaks for itself and add comments inline to document it.
+> > Whenever you answered me inline this is where you want to try to make
+> > code clearer and add comments.
+> >
+> > Also, pls find ways to abstract the data structure so we don't need to
+> > deal with its internals all over the code.
+> >
+> >
+> > ....
+> >
+> >>>>    {
+> >>>>    	struct scatterlist sg;
+> >>>> +	struct virtio_balloon_page_chunk_hdr *hdr;
+> >>>> +	void *buf;
+> >>>>    	unsigned int len;
+> >>>> -	sg_init_one(&sg, vb->pfns, sizeof(vb->pfns[0]) * vb->num_pfns);
+> >>>> +	switch (type) {
+> >>>> +	case PAGE_CHUNK_TYPE_BALLOON:
+> >>>> +		hdr =3D vb->balloon_page_chunk_hdr;
+> >>>> +		len =3D 0;
+> >>>> +		break;
+> >>>> +	default:
+> >>>> +		dev_warn(&vb->vdev->dev, "%s: chunk %d of unknown
+> pages\n",
+> >>>> +			 __func__, type);
+> >>>> +		return;
+> >>>> +	}
+> >>>> -	/* We should always be able to add one buffer to an empty queue. *=
+/
+> >>>> -	virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
+> >>>> -	virtqueue_kick(vq);
+> >>>> +	buf =3D (void *)hdr - len;
+> >>> Moving back to before the header? How can this make sense?
+> >>> It works fine since len is 0, so just buf =3D hdr.
+> >>>
+> >> For the unused page chunk case, it follows its own protocol:
+> >> miscq_hdr + payload(chunk msg).
+> >>   "buf =3D (void *)hdr - len" moves the buf pointer to the miscq_hdr,
+> >> to send the entire miscq msg.
+> > Well just pass the correct pointer in.
+> >
+> OK. The miscq msg is
+> {
+> miscq_hdr;
+> chunk_msg;
+> }
+>=20
+> We can probably change the code like this:
+>=20
+> #define CHUNK_TO_MISCQ_MSG(chunk) (chunk - sizeof(struct
+> virtio_balloon_miscq_hdr))
+>=20
+> switch (type) {
+>          case PAGE_CHUNK_TYPE_BALLOON:
+>                  msg_buf =3D vb->balloon_page_chunk_hdr;
+>                  msg_len =3D sizeof(struct virtio_balloon_page_chunk_hdr)=
+ +
+>                      nr_chunks * sizeof(struct virtio_balloon_page_chunk_=
+entry);
+>                  break;
+>          case PAGE_CHUNK_TYPE_UNUSED:
+>                  msg_buf =3D CHUNK_TO_MISCQ_MSG(vb->unused_page_chunk_hdr=
+);
+>                  msg_len =3D sizeof(struct virtio_balloon_miscq_hdr) + si=
+zeof(struct
+> virtio_balloon_page_chunk_hdr) +
+>                      nr_chunks * sizeof(struct virtio_balloon_page_chunk_=
+entry);
+>                  break;
+>          default:
+>                  dev_warn(&vb->vdev->dev, "%s: chunk %d of unknown pages\=
+n",
+>                           __func__, type);
+>                  return;
+>          }
+>=20
+>=20
+>=20
+> >> Please check the patch for implementing the unused page chunk, it
+> >> will be clear. If necessary, I can put "buf =3D (void *)hdr - len" fro=
+m
+> >> that patch.
+> > Exactly. And all this pointer math is very messy. Please look for ways
+> > to clean it. It's generally easy to fill structures:
+> >
+> > struct foo *foo =3D kmalloc(..., sizeof(*foo) + n * sizeof(foo->a[0]));
+> > for (i =3D 0; i < n; ++i)
+> > 	foo->a[i] =3D b;
+> >
+> > this is the kind of code that's easy to understand and it's obvious
+> > there are no overflows and no info leaks here.
+> >
+> OK, will take your suggestion:
+>=20
+> struct virtio_balloon_page_chunk {
+> 	struct virtio_balloon_page_chunk_hdr hdr;
+> 	struct virtio_balloon_page_chunk_entry entries[]; };
+>=20
+>=20
+> >>>> +	len +=3D sizeof(struct virtio_balloon_page_chunk_hdr);
+> >>>> +	len +=3D hdr->chunks * sizeof(struct virtio_balloon_page_chunk);
+> >>>> +	sg_init_table(&sg, 1);
+> >>>> +	sg_set_buf(&sg, buf, len);
+> >>>> +	if (!virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL)) {
+> >>>> +		virtqueue_kick(vq);
+> >>>> +		if (busy_wait)
+> >>>> +			while (!virtqueue_get_buf(vq, &len) &&
+> >>>> +			       !virtqueue_is_broken(vq))
+> >>>> +				cpu_relax();
+> >>>> +		else
+> >>>> +			wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+> >>>> +		hdr->chunks =3D 0;
+> >>> Why zero it here after device used it? Better to zero before use.
+> >> hdr->chunks tells the host how many chunks are there in the payload.
+> >> After the device use it, it is ready to zero it.
+> > It's rather confusing. Try to pass # of chunks around in some other
+> > way.
+>=20
+> Not sure if this was explained clearly - we just let the chunk msg hdr in=
+dicates
+> the # of chunks in the payload. I think this should be a pretty normal us=
+age, like
+> the network UDP hdr, which uses a length field to indicate the packet len=
+gth.
+>=20
+> >>>> +	}
+> >>>> +}
+> >>>> +
+> >>>> +static void add_one_chunk(struct virtio_balloon *vb, struct virtque=
+ue *vq,
+> >>>> +			  int type, u64 base, u64 size)
+> >>> what are the units here? Looks like it's in 4kbyte units?
+> >> what is the "unit" you referred to?
+> >> This is the function to add one chunk, base pfn and size of the chunk
+> >> are supplied to the function.
+> >>
+> > Are both size and base in bytes then?
+> > But you do not send them to host as is, you shift them for some reason
+> > before sending them to host.
+> >
+> Not in bytes actually. base is a base pfn, which is the starting address =
+of the
+> continuous pfns. Size is the chunk size, which is the number of continuou=
+s pfns.
+>=20
+> They are shifted based on the chunk format we agreed before:
+>=20
+> --------------------------------------------------------
+> |                 Base (52 bit)        | Rsvd (12 bit) |
+> --------------------------------------------------------
+> --------------------------------------------------------
+> |                 Size (52 bit)        | Rsvd (12 bit) |
+> --------------------------------------------------------
+>=20
+>=20
+> Here, the pfn will be the balloon page pfn (4KB).In this way, the host do=
+esn't
+> need to know PAGE_SIZE of the guest.
+>=20
+>=20
+>=20
+> >>>> +			if (zero >=3D end)
+> >>>> +				chunk_size =3D end - one;
+> >>>> +			else
+> >>>> +				chunk_size =3D zero - one;
+> >>>> +
+> >>>> +			if (chunk_size)
+> >>>> +				add_one_chunk(vb, vq,
+> PAGE_CHUNK_TYPE_BALLOON,
+> >>>> +					      pfn_start + one, chunk_size);
+> >>> Still not so what does a bit refer to? page or 4kbytes?
+> >>> I think it should be a page.
+> >> A bit in the bitmap corresponds to a pfn of a balloon page(4KB).
+> > That's a waste on systems with large page sizes, and it does not look
+> > like you handle that case correctly.
+>=20
+> OK, I will change the bitmap to be PAGE_SIZE based here, instead of
+> BALLOON_PAGE_SIZE based. When convert them into chunks, making it based
+> on BALLOON_PAGE_SIZE.
+>=20
+>=20
+> Best,
+> Wei
+>=20
+>=20
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
