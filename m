@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anand.indukala@gmail.com>) id 1d3Qdo-0007XK-Uo
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:22:13 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3QmG-0002FO-Ck
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anand.indukala@gmail.com>) id 1d3Qdo-0004mQ-22
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:22:12 -0400
-MIME-Version: 1.0
-From: Anand J <anand.indukala@gmail.com>
-Date: Wed, 26 Apr 2017 22:52:07 +0530
-Message-ID: <CANDALvka-DzZeLGDRjv6jeqeUrxA0DsJU9JG_1FeHPOh28K0DQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] SVM processor state flag
+	(envelope-from <rth7680@gmail.com>) id 1d3QmC-0000eH-4d
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:30:56 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34562)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3QmB-0000e5-UV
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:30:52 -0400
+Received: by mail-wm0-x243.google.com with SMTP id z129so3009164wmb.1
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 10:30:51 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Wed, 26 Apr 2017 19:30:43 +0200
+Message-Id: <20170426173044.32525-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL] tcg queued patch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,17 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-discuss@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, stefanha@redhat.com
 
-Hi All,
+Fixes a tcg_error when building with clang on some hosts.
 
-Is there any register flag in SVM enabled processors to figure out the
-running mode of that processor in order to differentiate between hypervisor
-execution and guest OS execution?
 
-Also can context switch happen while a processor executes KVM code? If yes,
-how is the state of the hypervisor saved including the hidden states?
+r~
 
-Thanks,
-Anand
+
+The following changes since commit 51b9d495f2a99c65c9e524c8f6fe283ebfabae1d:
+
+  Revert "COLO-compare: Optimize tcp compare trace event" (2017-04-26 16:19:27 +0100)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20170426
+
+for you to fetch changes up to 79b1af906245558c30e0a5faf26cb52b63f83cce:
+
+  tcg: Initialize return value after exit_atomic (2017-04-26 19:26:11 +0200)
+
+----------------------------------------------------------------
+Fix for exit_atomic tcg opcode paths
+
+----------------------------------------------------------------
+Richard Henderson (1):
+      tcg: Initialize return value after exit_atomic
+
+ tcg/tcg-op.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
