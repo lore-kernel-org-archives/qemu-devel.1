@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9l-000419-CQ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:51 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9m-00041M-0H
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9i-0002Hv-FT
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9i-0002Hi-DX
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:49 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:29577 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:31852 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1d3L9i-0002Eg-41
+	id 1d3L9i-0002DY-3L
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:46 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 26 Apr 2017 14:30:29 +0300
-Message-Id: <20170426113038.60044-16-vsementsov@virtuozzo.com>
+Date: Wed, 26 Apr 2017 14:30:34 +0300
+Message-Id: <20170426113038.60044-21-vsementsov@virtuozzo.com>
 In-Reply-To: <20170426113038.60044-1-vsementsov@virtuozzo.com>
 References: <20170426113038.60044-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 15/24] block: add
- bdrv_can_store_new_dirty_bitmap
+Subject: [Qemu-devel] [PATCH 20/24] iotests: test qcow2 persistent dirty
+ bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +28,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-This will be needed to check some restrictions before making bitmap
-persistent in qmp-block-dirty-bitmap-add (this functionality will be
-added by future patch)
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block.c                   | 22 ++++++++++++++++++++++
- include/block/block.h     |  3 +++
- include/block/block_int.h |  5 +++++
- 3 files changed, 30 insertions(+)
+ tests/qemu-iotests/165     | 89 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/165.out |  5 +++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 95 insertions(+)
+ create mode 100755 tests/qemu-iotests/165
+ create mode 100644 tests/qemu-iotests/165.out
 
-diff --git a/block.c b/block.c
-index 16cf522219..cf9919a5e0 100644
---- a/block.c
-+++ b/block.c
-@@ -4093,3 +4093,25 @@ void bdrv_del_child(BlockDriverState *parent_bs, BdrvChild *child, Error **errp)
- 
-     parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
- }
+diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+new file mode 100755
+index 0000000000..d583b33733
+--- /dev/null
++++ b/tests/qemu-iotests/165
+@@ -0,0 +1,89 @@
++#!/usr/bin/env python
++#
++# Tests for persistent dirty bitmaps.
++#
++# Copyright: Vladimir Sementsov-Ogievskiy 2015-2017
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
-+                                     uint32_t granularity, Error **errp)
-+{
-+    BlockDriver *drv = bs->drv;
++import os
++import iotests
++from iotests import qemu_img
 +
-+    if (!drv) {
-+        error_setg_errno(errp, ENOMEDIUM,
-+                         "Can't store persistent bitmaps to %s",
-+                         bdrv_get_device_or_node_name(bs));
-+        return false;
-+    }
++disk = os.path.join(iotests.test_dir, 'disk')
++disk_size = 0x40000000 # 1G
 +
-+    if (!drv->bdrv_can_store_new_dirty_bitmap) {
-+        error_setg_errno(errp, ENOTSUP,
-+                         "Can't store persistent bitmaps to %s",
-+                         bdrv_get_device_or_node_name(bs));
-+        return false;
-+    }
++# regions for qemu_io: (start, count) in bytes
++regions1 = ((0,        0x100000),
++            (0x200000, 0x100000))
 +
-+    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
-+}
-diff --git a/include/block/block.h b/include/block/block.h
-index 4e81f2069b..93718ab245 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -551,4 +551,7 @@ void bdrv_add_child(BlockDriverState *parent, BlockDriverState *child,
-                     Error **errp);
- void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
- 
-+bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
-+                                     uint32_t granularity, Error **errp);
++regions2 = ((0x10000000, 0x20000),
++            (0x3fff0000, 0x10000))
 +
- #endif
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 2d92d7edfe..f943a7c24e 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -320,6 +320,11 @@ struct BlockDriver {
-     void (*bdrv_del_child)(BlockDriverState *parent, BdrvChild *child,
-                            Error **errp);
- 
-+    bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs,
-+                                            const char *name,
-+                                            uint32_t granularity,
-+                                            Error **errp);
++class TestPersistentDirtyBitmap(iotests.QMPTestCase):
 +
-     QLIST_ENTRY(BlockDriver) list;
- };
- 
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk, str(disk_size))
++
++    def tearDown(self):
++        os.remove(disk)
++
++    def mkVm(self):
++        return iotests.VM().add_drive(disk)
++
++    def getSha256(self):
++        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                             node='drive0', name='bitmap0')
++        return result['return']['sha256']
++
++    def checkBitmap(self, sha256):
++        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                             node='drive0', name='bitmap0')
++        self.assert_qmp(result, 'return/sha256', sha256);
++
++    def writeRegions(self, regions):
++        for r in regions:
++            self.vm.hmp_qemu_io('drive0',
++                                'write %d %d' % r)
++
++    def qmpAddBitmap(self):
++        self.vm.qmp('block-dirty-bitmap-add', node='drive0',
++                    name='bitmap0', persistent=True, autoload=True)
++
++    def test_persistent(self):
++        self.vm = self.mkVm()
++        self.vm.launch()
++        self.qmpAddBitmap()
++
++        self.writeRegions(regions1)
++        sha256 = self.getSha256()
++
++        self.vm.shutdown()
++        self.vm = self.mkVm()
++        self.vm.launch()
++
++        self.checkBitmap(sha256)
++        self.writeRegions(regions2)
++        sha256 = self.getSha256()
++
++        self.vm.shutdown()
++        self.vm.launch()
++
++        self.checkBitmap(sha256)
++
++        self.vm.shutdown()
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
+new file mode 100644
+index 0000000000..ae1213e6f8
+--- /dev/null
++++ b/tests/qemu-iotests/165.out
+@@ -0,0 +1,5 @@
++.
++----------------------------------------------------------------------
++Ran 1 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 866c1a032d..8bd7a84f5a 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -162,6 +162,7 @@
+ 159 rw auto quick
+ 160 rw auto quick
+ 162 auto quick
++165 rw auto quick
+ 170 rw auto quick
+ 171 rw auto quick
+ 172 auto
 -- 
 2.11.1
