@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3WJD-0001Ny-1K
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:25:20 -0400
+	(envelope-from <mst@redhat.com>) id 1d3WaR-0004hb-3d
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:43:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3WJB-0000Fl-Va
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:25:19 -0400
-Date: Wed, 26 Apr 2017 19:25:10 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170426232510.GB27379@flamenco>
-References: <1493187803-4510-1-git-send-email-cota@braap.org>
-	<1493187803-4510-2-git-send-email-cota@braap.org>
-	<e206fe3e-5920-49c5-8f95-e4961aad5f89@twiddle.net>
-	<20170426215604.GA16014@flamenco>
-	<22fb44cc-b8de-c3fb-0980-bfc908229a2e@twiddle.net>
-	<20170426224531.GB16014@flamenco> <20170426231132.GC16014@flamenco>
+	(envelope-from <mst@redhat.com>) id 1d3WaN-0006kV-6s
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:43:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d3WaM-0006kG-TM
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 19:43:03 -0400
+Date: Thu, 27 Apr 2017 02:42:56 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170427024124-mutt-send-email-mst@kernel.org>
+References: <149321107781.13002.9081643707477650100.stgit@bahia.lan>
+	<20170426151548.0b30d39c.cornelia.huck@de.ibm.com>
+	<20170426152946.5d7a4922@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170426231132.GC16014@flamenco>
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] tcg-runtime: add lookup_tb_ptr
- helper
+In-Reply-To: <20170426152946.5d7a4922@bahia>
+Subject: Re: [Qemu-devel] [PATCH] virtio: allow broken device to notify guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Apr 26, 2017 at 19:11:32 -0400, Emilio G. Cota wrote:
-> On Wed, Apr 26, 2017 at 18:45:31 -0400, Emilio G. Cota wrote:
-> > On Thu, Apr 27, 2017 at 00:29:49 +0200, Richard Henderson wrote:
-> > > On 04/26/2017 11:56 PM, Emilio G. Cota wrote:
-> > > >On Wed, Apr 26, 2017 at 10:40:45 +0200, Richard Henderson wrote:
-> > > >>On 04/26/2017 08:23 AM, Emilio G. Cota wrote:
-> > > >(snip)
-> > > >>>+    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-> > > >>>+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
-> > > >>>+    if (likely(tb && tb->pc == addr && tb->cs_base == cs_base &&
-> > > >>>+               tb->flags == flags)) {
-> > > >>
-> > > >>This comparison is wrong.  It will incorrectly reject a TB for i386 guest
-> > > >>when CS_BASE != 0.  You really want
-> > > >>
-> > > >>   tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
-> > > >>   if (tb) {
-> > > >>     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-> > > >>     if (tb->pc == pc && tb->cs_base == cs_base && tb->flags == flags) {
-> > > >>       return tb->tc_ptr;
-> > > >>     }
-> > > >>   }
-> > > >>   return tcg_ctx.code_gen_epilogue;
-> > > >
-> > > >wrt the comparison, the only change I notice in your suggested change is
-> > > >   tb->pc == pc
-> > > >
-> > > >instead of
-> > > >   tb->pc == addr
-> > > >
-> > > >, which seems innocuous to me (since tb->pc == addr).
-> > > >
-> > > >I fail to see how this relates to your "CS_BASE != 0" comment.
-> > > >What am I missing?
-> > > 
-> > > Recall how you computed vaddr for target/i386:
-> > > 
-> > >   addr = pc + cs_base
+On Wed, Apr 26, 2017 at 03:29:46PM +0200, Greg Kurz wrote:
+> On Wed, 26 Apr 2017 15:15:48 +0200
+> Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+> 
+> > On Wed, 26 Apr 2017 14:51:17 +0200
+> > Greg Kurz <groug@kaod.org> wrote:
 > > 
-> > I see, thanks!
+> > > According to section 2.1.2 of the virtio-1 specification:
+> > > 
+> > > "The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state that
+> > > a reset is needed. If DRIVER_OK is set, after it sets DEVICE_NEEDS_RESET,
+> > > the device MUST send a device configuration change notification to the
+> > > driver."
+> > > 
+> > > Commit "f5ed36635d8f virtio: stop virtqueue processing if device is broken"
+> > > introduced a virtio_error() call that just does that:
+> > > 
+> > > - internally mark the device as broken
+> > > - set the DEVICE_NEEDS_RESET bit in the status
+> > > - send a configuration change notification
+> > > 
+> > > Unfortunately, virtio_notify_vector(), called by virtio_notify_config(),
+> > > returns right away when the device is marked as broken and the notification
+> > > isn't sent in this case.
+> > > 
+> > > The spec doesn't say whether a broken device can send notifications
+> > > in other situations or not. But since the driver isn't supposed to do
+> > > anything but to reset the device, it makes sense to keep the check in
+> > > virtio_notify_config().
+> > > 
+> > > Marking the device as broken AFTER the configuration change notification was
+> > > sent is enough to fix the issue.
+> > > 
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > >  hw/virtio/virtio.c |    4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > > index 03592c542a55..890b4d7eb751 100644
+> > > --- a/hw/virtio/virtio.c
+> > > +++ b/hw/virtio/virtio.c
+> > > @@ -2451,12 +2451,12 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+> > >      error_vreport(fmt, ap);
+> > >      va_end(ap);
+> > > 
+> > > -    vdev->broken = true;
+> > > -
+> > >      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+> > >          virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
+> > >          virtio_notify_config(vdev);
+> > >      }
+> > > +
+> > > +    vdev->broken = true;
+> > >  }
+> > > 
+> > >  static void virtio_memory_listener_commit(MemoryListener *listener)
+> > >   
+> > 
+> > Good catch.
+> > 
+> > Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > 
+> > Should this be cc:stable, as it's a spec violation?
+> > 
 > 
-> Hmm TB's are added to tb_jmp_cache by pc, not by pc + cs_base:
-> 
->   atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)], tb);
-> 
-> Shouldn't we then pass just the pc (without adding cs_base) to
-> lookup_ptr, then? i.e.
-> 
-> --- a/target/i386/translate.c
-> +++ b/target/i386/translate.c
-> @@ -2533,11 +2533,7 @@ gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, TCGv jr)
->      } else if (s->tf) {
->          gen_helper_single_step(cpu_env);
->      } else if (!TCGV_IS_UNUSED(jr)) {
-> -        TCGv vaddr = tcg_temp_new();
-> -
-> -        tcg_gen_add_tl(vaddr, jr, cpu_seg_base[R_CS]);
-> -        tcg_gen_lookup_and_goto_ptr(vaddr);
-> -        tcg_temp_free(vaddr);
-> +        tcg_gen_lookup_and_goto_ptr(jr);
->      } else {
->          tcg_gen_exit_tb(0);
->      }
-> 
-> And while at it, rename the "addr" argument in lookup_ptr to "pc". Hmm?
+> I don't know if this qualifies for stable, but if it does then it affects
+> all versions >= 2.8.0.
 
-Answering to myself again..
 
-target/i386/cpu.c:
-static inline void cpu_get_tb_cpu_state(CPUX86State *env, target_ulong *pc,
-                                        target_ulong *cs_base, uint32_t *flags)
-{
-    *cs_base = env->segs[R_CS].base;
-    *pc = *cs_base + env->eip;
-    *flags = env->hflags |
-        (env->eflags & (IOPL_MASK | TF_MASK | RF_MASK | VM_MASK | AC_MASK));
-}
+It's a SHOULD so not a violation, just a quality of implementation
+issue. Seems a bit too intrusive for stable and we are yet to
+have drivers actually handling these errors, so let's wait a bit
+and see.
 
-cpu-exec.c:
-        /* We add the TB in the virtual pc hash table for the fast lookup */
-        atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)], tb);
+I'll apply this to master for now.
 
-So in lookup_and_goto_ptr, checking tb->pc == pc or tb->pc == addr,
-where addr was passed from 'jr + cpu_seg_base[R_CS]', are both correct.
-FWIW, I just checked with an assertion in full-system mode.
 
-		E.
+-- 
+MST
