@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d3KBN-0006t6-35
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:26 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1d3KBU-00070r-US
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d3KBL-0004LR-FK
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:24 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1d3KBP-0004Oe-Ui
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:32 -0400
 Received: from mga03.intel.com ([134.134.136.65]:33549)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d3KBL-0004JF-2P
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:23 -0400
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d3KBP-0004JF-I8
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:27 -0400
 From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Wed, 26 Apr 2017 18:11:58 +0800
-Message-Id: <1493201525-14418-2-git-send-email-yi.l.liu@intel.com>
+Date: Wed, 26 Apr 2017 18:11:59 +0800
+Message-Id: <1493201525-14418-3-git-send-email-yi.l.liu@intel.com>
 In-Reply-To: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
 References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-Subject: [Qemu-devel] [RFC PATCH 1/8] iommu: Introduce bind_pasid_table API
+Subject: [Qemu-devel] [RFC PATCH 2/8] iommu/vt-d: add bind_pasid_table
  function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,136 +29,159 @@ Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@
 
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 
-Virtual IOMMU was proposed to support Shared Virtual Memory (SVM) use
-case in the guest:
-https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05311.html
+Add Intel VT-d ops to the generic iommu_bind_pasid_table API
+functions.
 
-As part of the proposed architecture, when a SVM capable PCI
-device is assigned to a guest, nested mode is turned on. Guest owns the
-first level page tables (request with PASID) and performs GVA->GPA
-translation. Second level page tables are owned by the host for GPA->HPA
-translation for both request with and without PASID.
+The primary use case is for direct assignment of SVM capable
+device. Originated from emulated IOMMU in the guest, the request goes
+through many layers (e.g. VFIO). Upon calling host IOMMU driver, caller
+passes guest PASID table pointer (GPA) and size.
 
-A new IOMMU driver interface is therefore needed to perform tasks as
-follows:
-* Enable nested translation and appropriate translation type
-* Assign guest PASID table pointer (in GPA) and size to host IOMMU
+Device context table entry is modified by Intel IOMMU specific
+bind_pasid_table function. This will turn on nesting mode and matching
+translation type.
 
-This patch introduces new functions called iommu_(un)bind_pasid_table()
-to IOMMU APIs. Architecture specific IOMMU function can be added later
-to perform the specific steps for binding pasid table of assigned devices.
-
-This patch also adds model definition in iommu.h. It would be used to
-check if the bind request is from a compatible entity. e.g. a bind
-request from an intel_iommu emulator may not be supported by an ARM SMMU
-driver.
+The unbind operation restores default context mapping.
 
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 ---
- drivers/iommu/iommu.c | 19 +++++++++++++++++++
- include/linux/iommu.h | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+)
+ drivers/iommu/intel-iommu.c   | 103 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/dma_remapping.h |   1 +
+ 2 files changed, 104 insertions(+)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index dbe7f65..f2da636 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -1134,6 +1134,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+index 646756c..6d5b939 100644
+--- a/drivers/iommu/intel-iommu.c
++++ b/drivers/iommu/intel-iommu.c
+@@ -5306,6 +5306,105 @@ struct intel_iommu *intel_svm_device_to_iommu(struct device *dev)
+ 
+ 	return iommu;
  }
- EXPORT_SYMBOL_GPL(iommu_attach_device);
- 
-+int iommu_bind_pasid_table(struct iommu_domain *domain, struct device *dev,
-+			struct pasid_table_info *pasidt_binfo)
++
++static int intel_iommu_bind_pasid_table(struct iommu_domain *domain,
++		struct device *dev, struct pasid_table_info *pasidt_binfo)
 +{
-+	if (unlikely(!domain->ops->bind_pasid_table))
++	struct intel_iommu *iommu;
++	struct context_entry *context;
++	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
++	struct device_domain_info *info;
++	u8 bus, devfn;
++	u16 did, *sid;
++	int ret = 0;
++	unsigned long flags;
++	u64 ctx_lo;
++
++	if (pasidt_binfo == NULL || pasidt_binfo->model != INTEL_IOMMU) {
++		pr_warn("%s: Invalid bind request!\n", __func__);
 +		return -EINVAL;
++	}
 +
-+	return domain->ops->bind_pasid_table(domain, dev, pasidt_binfo);
++	iommu = device_to_iommu(dev, &bus, &devfn);
++	if (!iommu)
++		return -ENODEV;
++
++	sid = (u16 *)&pasidt_binfo->opaque;
++	/* check SID, if it is not correct, return */
++	if (PCI_DEVID(bus, devfn) != *sid)
++		return 0;
++
++	info = dev->archdata.iommu;
++	if (!info || !info->pasid_supported) {
++		pr_err("Device %d:%d.%d has no pasid support\n", bus,
++			PCI_SLOT(devfn), PCI_FUNC(devfn));
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (pasidt_binfo->size >= intel_iommu_get_pts(iommu)) {
++		pr_err("Invalid gPASID table size %llu, host size %lu\n",
++			pasidt_binfo->size,
++			intel_iommu_get_pts(iommu));
++		ret = -EINVAL;
++		goto out;
++	}
++	spin_lock_irqsave(&iommu->lock, flags);
++	context = iommu_context_addr(iommu, bus, devfn, 0);
++	if (!context || !context_present(context)) {
++		pr_warn("%s: ctx not present for bus devfn %x:%x\n",
++			__func__, bus, devfn);
++		spin_unlock_irqrestore(&iommu->lock, flags);
++		goto out;
++	}
++	/* Anticipate guest to use SVM and owns the first level */
++	ctx_lo = context[0].lo;
++	ctx_lo |= CONTEXT_NESTE;
++	ctx_lo |= CONTEXT_PRS;
++	ctx_lo |= CONTEXT_PASIDE;
++	ctx_lo &= ~CONTEXT_TT_MASK;
++	ctx_lo |= CONTEXT_TT_DEV_IOTLB << 2;
++	context[0].lo = ctx_lo;
++
++	/* Assign guest PASID table pointer and size */
++	ctx_lo = (pasidt_binfo->ptr & VTD_PAGE_MASK) | pasidt_binfo->size;
++	context[1].lo = ctx_lo;
++	/* make sure context entry is updated before flushing */
++	wmb();
++	did = dmar_domain->iommu_did[iommu->seq_id];
++	iommu->flush.flush_context(iommu, did,
++				(((u16)bus) << 8) | devfn,
++				DMA_CCMD_MASK_NOBIT,
++				DMA_CCMD_DEVICE_INVL);
++	iommu->flush.flush_iotlb(iommu, did, 0, 0, DMA_TLB_DSI_FLUSH);
++	spin_unlock_irqrestore(&iommu->lock, flags);
++
++
++out:
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(iommu_bind_pasid_table);
 +
-+int iommu_unbind_pasid_table(struct iommu_domain *domain, struct device *dev)
++static int intel_iommu_unbind_pasid_table(struct iommu_domain *domain,
++					struct device *dev)
 +{
-+	if (unlikely(!domain->ops->unbind_pasid_table))
-+		return -EINVAL;
++	struct intel_iommu *iommu;
++	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
++	u8 bus, devfn;
 +
-+	return domain->ops->unbind_pasid_table(domain, dev);
++	iommu = device_to_iommu(dev, &bus, &devfn);
++	if (!iommu)
++		return -ENODEV;
++	/*
++	 * REVISIT: we might want to clear the PASID table pointer
++	 * as part of context clear operation. Currently, it leaves
++	 * stale data but should be ignored by hardware since PASIDE
++	 * is clear.
++	 */
++	/* ATS will be reenabled when remapping is restored */
++	pci_disable_ats(to_pci_dev(dev));
++	domain_context_clear(iommu, dev);
++	return domain_context_mapping_one(dmar_domain, iommu, bus, devfn);
 +}
-+EXPORT_SYMBOL_GPL(iommu_unbind_pasid_table);
-+
- static void __iommu_detach_device(struct iommu_domain *domain,
- 				  struct device *dev)
- {
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 0ff5111..491a011 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -131,6 +131,15 @@ struct iommu_dm_region {
- 	int			prot;
- };
+ #endif /* CONFIG_INTEL_IOMMU_SVM */
  
-+struct pasid_table_info {
-+	__u64	ptr;	/* PASID table ptr */
-+	__u64	size;	/* PASID table size*/
-+	__u32	model;	/* magic number */
-+#define INTEL_IOMMU	(1 << 0)
-+#define ARM_SMMU	(1 << 1)
-+	__u8	opaque[];/* IOMMU-specific details */
-+};
-+
- #ifdef CONFIG_IOMMU_API
+ static const struct iommu_ops intel_iommu_ops = {
+@@ -5314,6 +5413,10 @@ struct intel_iommu *intel_svm_device_to_iommu(struct device *dev)
+ 	.domain_free	= intel_iommu_domain_free,
+ 	.attach_dev	= intel_iommu_attach_device,
+ 	.detach_dev	= intel_iommu_detach_device,
++#ifdef CONFIG_INTEL_IOMMU_SVM
++	.bind_pasid_table	= intel_iommu_bind_pasid_table,
++	.unbind_pasid_table	= intel_iommu_unbind_pasid_table,
++#endif
+ 	.map		= intel_iommu_map,
+ 	.unmap		= intel_iommu_unmap,
+ 	.map_sg		= default_iommu_map_sg,
+diff --git a/include/linux/dma_remapping.h b/include/linux/dma_remapping.h
+index 187c102..c03b62a 100644
+--- a/include/linux/dma_remapping.h
++++ b/include/linux/dma_remapping.h
+@@ -27,6 +27,7 @@
  
- /**
-@@ -159,6 +168,8 @@ struct iommu_dm_region {
-  * @domain_get_windows: Return the number of windows for a domain
-  * @of_xlate: add OF master IDs to iommu grouping
-  * @pgsize_bitmap: bitmap of all possible supported page sizes
-+ * @bind_pasid_table: bind pasid table pointer for guest SVM
-+ * @unbind_pasid_table: unbind pasid table pointer and restore defaults
-  */
- struct iommu_ops {
- 	bool (*capable)(enum iommu_cap);
-@@ -200,6 +211,10 @@ struct iommu_ops {
- 	u32 (*domain_get_windows)(struct iommu_domain *domain);
+ #define CONTEXT_DINVE		(1ULL << 8)
+ #define CONTEXT_PRS		(1ULL << 9)
++#define CONTEXT_NESTE		(1ULL << 10)
+ #define CONTEXT_PASIDE		(1ULL << 11)
  
- 	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
-+	int (*bind_pasid_table)(struct iommu_domain *domain, struct device *dev,
-+				struct pasid_table_info *pasidt_binfo);
-+	int (*unbind_pasid_table)(struct iommu_domain *domain,
-+				struct device *dev);
- 
- 	unsigned long pgsize_bitmap;
- };
-@@ -221,6 +236,10 @@ extern int iommu_attach_device(struct iommu_domain *domain,
- 			       struct device *dev);
- extern void iommu_detach_device(struct iommu_domain *domain,
- 				struct device *dev);
-+extern int iommu_bind_pasid_table(struct iommu_domain *domain,
-+		struct device *dev, struct pasid_table_info *pasidt_binfo);
-+extern int iommu_unbind_pasid_table(struct iommu_domain *domain,
-+				struct device *dev);
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
- 		     phys_addr_t paddr, size_t size, int prot);
-@@ -595,6 +614,18 @@ const struct iommu_ops *iommu_get_instance(struct fwnode_handle *fwnode)
- 	return NULL;
- }
- 
-+static inline
-+int iommu_bind_pasid_table(struct iommu_domain *domain, struct device *dev,
-+			struct pasid_table_info *pasidt_binfo)
-+{
-+	return -EINVAL;
-+}
-+static inline
-+int iommu_unbind_pasid_table(struct iommu_domain *domain, struct device *dev)
-+{
-+	return -EINVAL;
-+}
-+
- #endif /* CONFIG_IOMMU_API */
- 
- #endif /* __LINUX_IOMMU_H */
+ struct intel_iommu;
 -- 
 1.9.1
