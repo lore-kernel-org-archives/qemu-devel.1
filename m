@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9l-00041B-Jq
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9j-000412-Ek
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9i-0002I1-GO
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:49 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:17687 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9h-0002GJ-HD
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:47 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:37942 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1d3L9i-0002ET-6G
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:46 -0400
+	id 1d3L9h-0002EY-6W
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:45 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 26 Apr 2017 14:30:35 +0300
-Message-Id: <20170426113038.60044-22-vsementsov@virtuozzo.com>
+Date: Wed, 26 Apr 2017 14:30:18 +0300
+Message-Id: <20170426113038.60044-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20170426113038.60044-1-vsementsov@virtuozzo.com>
 References: <20170426113038.60044-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 21/24] block/dirty-bitmap: add
- bdrv_remove_persistent_dirty_bitmap
+Subject: [Qemu-devel] [PATCH 04/24] tests: add hbitmap iter test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +27,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Interface for removing persistent bitmap from its storage.
+Test that hbitmap iter is resistant to bitmap resetting.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c         | 18 ++++++++++++++++++
- include/block/block_int.h    |  3 +++
- include/block/dirty-bitmap.h |  3 +++
- 3 files changed, 24 insertions(+)
+ tests/test-hbitmap.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index b684d8b00e..05e0aaef90 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -327,12 +327,30 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
- /**
-  * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
-  * There must not be any frozen bitmaps attached.
-+ * This function does not remove persistent bitmaps from the storage.
-  */
- void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
- {
-     bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index 23773d2051..1acb353889 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -909,6 +909,22 @@ static void hbitmap_test_add(const char *testpath,
+                hbitmap_test_teardown);
  }
  
-+/**
-+ * Remove persistent dirty bitmap from the storage if it exists.
-+ * Absence of bitmap is not an error, because we have the following scenario:
-+ * BdrvDirtyBitmap can have .persistent = true but not yet saved and have no
-+ * stored version. For such bitmap bdrv_remove_persistent_dirty_bitmap() should
-+ * not fail.
-+ * This function doesn't release corresponding BdrvDirtyBitmap.
-+ */
-+void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-+                                         const char *name,
-+                                         Error **errp)
++static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
++                                        const void *unused)
 +{
-+    if (bs->drv && bs->drv->bdrv_remove_persistent_dirty_bitmap) {
-+        bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
-+    }
++    HBitmapIter hbi;
++
++    hbitmap_test_init(data, L1 * 2, 0);
++    hbitmap_set(data->hb, 0, data->size);
++
++    hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
++
++    hbitmap_iter_next(&hbi);
++
++    hbitmap_reset_all(data->hb);
++    hbitmap_iter_next(&hbi);
 +}
 +
- void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ int main(int argc, char **argv)
  {
-     assert(!bdrv_dirty_bitmap_frozen(bitmap));
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index f943a7c24e..f7f7dd7717 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -324,6 +324,9 @@ struct BlockDriver {
-                                             const char *name,
-                                             uint32_t granularity,
-                                             Error **errp);
-+    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
-+                                                const char *name,
-+                                                Error **errp);
+     g_test_init(&argc, &argv, NULL);
+@@ -966,6 +982,9 @@ int main(int argc, char **argv)
+                      test_hbitmap_serialize_part);
+     hbitmap_test_add("/hbitmap/serialize/zeroes",
+                      test_hbitmap_serialize_zeroes);
++
++    hbitmap_test_add("/hbitmap/iter/iter_and_reset",
++                     test_hbitmap_iter_and_reset);
+     g_test_run();
  
-     QLIST_ENTRY(BlockDriver) list;
- };
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index b022b34964..ce126109e0 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -25,6 +25,9 @@ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
- void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
- void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
- void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
-+void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-+                                         const char *name,
-+                                         Error **errp);
- void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
+     return 0;
 -- 
 2.11.1
