@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d3MPz-0004cV-1y
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:51:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d3MQv-0005CC-UW
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d3MPv-0004er-Vq
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:51:39 -0400
-Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:36515)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d3MPv-0004de-Ou
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:51:35 -0400
-Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C2BE5E9401
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 14:51:26 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 26 Apr 2017 14:51:17 +0200
-Message-ID: <149321107781.13002.9081643707477650100.stgit@bahia.lan>
+	(envelope-from <kwolf@redhat.com>) id 1d3MQv-00053p-9x
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:52:38 -0400
+Date: Wed, 26 Apr 2017 14:52:27 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170426125227.GF4538@noname.str.redhat.com>
+References: <20170426033413.17192-1-famz@redhat.com>
+	<20170426033413.17192-19-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] virtio: allow broken device to notify guest
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170426033413.17192-19-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v15 18/21] block: Reuse bs as backing hd
+ for drive-backup sync=none
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-According to section 2.1.2 of the virtio-1 specification:
+Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-"The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state that
-a reset is needed. If DRIVER_OK is set, after it sets DEVICE_NEEDS_RESET,
-the device MUST send a device configuration change notification to the
-driver."
+The commit message is a bit terse. :-)
 
-Commit "f5ed36635d8f virtio: stop virtqueue processing if device is broken"
-introduced a virtio_error() call that just does that:
+So I think this means that instead of opening the backing file of the
+backup (which is probably the active file of the VM) a second time, we
+instead take a reference on the existing node. Very good idea.
 
-- internally mark the device as broken
-- set the DEVICE_NEEDS_RESET bit in the status
-- send a configuration change notification
+In fact, my question is: How did this ever work? Did we just neglect to
+test this? The backup backing file will use stale qcow2 metadata when we
+continue to write to the source.
 
-Unfortunately, virtio_notify_vector(), called by virtio_notify_config(),
-returns right away when the device is marked as broken and the notification
-isn't sent in this case.
+Unless I'm missing something, I'd propose this for qemu-stable.
 
-The spec doesn't say whether a broken device can send notifications
-in other situations or not. But since the driver isn't supposed to do
-anything but to reset the device, it makes sense to keep the check in
-virtio_notify_config().
+Also, mirror with MIRROR_OPEN_BACKING_CHAIN probably has a similar
+problem with opening the images in the backing chain a second time.
 
-Marking the device as broken AFTER the configuration change notification was
-sent is enough to fix the issue.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/virtio/virtio.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 03592c542a55..890b4d7eb751 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2451,12 +2451,12 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
-     error_vreport(fmt, ap);
-     va_end(ap);
- 
--    vdev->broken = true;
--
-     if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-         virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-         virtio_notify_config(vdev);
-     }
-+
-+    vdev->broken = true;
- }
- 
- static void virtio_memory_listener_commit(MemoryListener *listener)
+Kevin
