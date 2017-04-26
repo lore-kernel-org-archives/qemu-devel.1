@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3Nwt-0004vR-T8
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:29:45 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d3NyO-0005aV-I9
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:31:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3Nws-0003jD-HW
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:29:43 -0400
-Date: Wed, 26 Apr 2017 15:29:28 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170426142928.GB18933@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-20-famz@redhat.com>
-	<20170426125714.GG4538@noname.str.redhat.com>
-	<20170426132028.GC9205@lemon.lan>
+	(envelope-from <ehabkost@redhat.com>) id 1d3NyK-00048d-BX
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:31:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d3NyK-00048B-2O
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:31:12 -0400
+Date: Wed, 26 Apr 2017 11:31:08 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170426143108.GW3482@thinpad.lan.raisama.net>
+References: <20170426100701.21893-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170426132028.GC9205@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH v15 19/21] osdep: Add qemu_lock_fd and
- qemu_unlock_fd
+In-Reply-To: <20170426100701.21893-1-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] numa: equally distribute memory on nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +26,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Apr 26, 2017 at 09:20:28PM +0800, Fam Zheng wrote:
-> On Wed, 04/26 14:57, Kevin Wolf wrote:
-> > Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
-> > > They are wrappers of POSIX fcntl "file private locking", with a
-> > > convenient "try lock" wrapper implemented with F_OFD_GETLK.
-> > > 
-> > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > Reviewed-by: Max Reitz <mreitz@redhat.com>
-> > > ---
-> > >  include/qemu/osdep.h |  3 +++
-> > >  util/osdep.c         | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  2 files changed, 51 insertions(+)
-> > > 
-> > > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > > index 122ff06..1c9f5e2 100644
-> > > --- a/include/qemu/osdep.h
-> > > +++ b/include/qemu/osdep.h
-> > > @@ -341,6 +341,9 @@ int qemu_close(int fd);
-> > >  #ifndef _WIN32
-> > >  int qemu_dup(int fd);
-> > >  #endif
-> > > +int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
-> > > +int qemu_unlock_fd(int fd, int64_t start, int64_t len);
-> > > +int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
-> > 
-> > For the record: On IRC, I proposed adding something like the following:
-> > 
-> >     #ifndef F_OFD_SETLK
-> >     #define F_OFD_SETLK F_SETLK
-> >     #define F_OFD_GETLK F_GETLK
-> >     #endif
-> > 
-> > F_OFD_* are still relatively new and e.g. RHEL 7 doesn't support it yet.
-> > Using process-based locks is suboptimal because we can easily lose them
-> > earlier than we want, but it's still better than nothing and covers the
-> > common simple cases.
+On Wed, Apr 26, 2017 at 12:07:01PM +0200, Laurent Vivier wrote:
+> When there is more nodes than memory available to put the minimum
+> allowed memory by node, all the memory is put on the last node.
 > 
-> Yes, we should add that. But I'd prefer:
+> This is because we put (ram_size / nb_numa_nodes) &
+> ~((1 << mc->numa_mem_align_shift) - 1); on each node, and in this
+> case the value is 0. This is particularly true with pseries,
+> as the memory must be aligned to 256MB.
 > 
->     #ifdef F_OFD_SETLK
->     #define QEMU_SETLK F_OFD_SETLK
->     #define QEMU_GETLK F_OFD_GETLK
->     #else
->     #define QEMU_SETLK F_SETLK
->     #define QEMU_GETLK F_GETLK
->     #endif
-> 
-> to avoid "abusing" the macro name.
-> 
-> Another question is whether we should print a warning to make users aware? Even
-> the test case in patch 21 can see three "lock losses" on RHEL with posix lock,
-> and there are way more corner cases, I believe.
+> To avoid this problem, this patch uses an error diffusion algorithm [1]
+> to distribute equally the memory on nodes.
 
-Is it possible to use F_GETLK to detect when we have a missing lock, then
-add assertions in various key places that call F_GETLK to validate hat
-the lock still exists & print an warning.
+Nice.
 
-I don't like the idea that downstream would be running with locking enabled,
-but silently loosing locks with no indication at all that this happened,
-especially when upstream development won't be testing this since those devs
-will use the F_OFD_SETLK instead.
+But we need compat code to keep the previous behavior on older
+machine-types. We can use either a new boolean MachineClass
+field, or a MachineClass method (mc->auto_assign_ram(), maybe?)
+that 2.9 machine-types could override.
 
-Regards,
-Daniel
+> 
+> Example:
+> 
+> qemu-system-ppc64 -S -nographic  -nodefaults -monitor stdio -m 1G -smp 8 \
+>                   -numa node -numa node -numa node \
+>                   -numa node -numa node -numa node
+> 
+> Before:
+> 
+> (qemu) info numa
+> 6 nodes
+> node 0 cpus: 0 6
+> node 0 size: 0 MB
+> node 1 cpus: 1 7
+> node 1 size: 0 MB
+> node 2 cpus: 2
+> node 2 size: 0 MB
+> node 3 cpus: 3
+> node 3 size: 0 MB
+> node 4 cpus: 4
+> node 4 size: 0 MB
+> node 5 cpus: 5
+> node 5 size: 1024 MB
+> 
+> After:
+> (qemu) info numa
+> 6 nodes
+> node 0 cpus: 0 6
+> node 0 size: 0 MB
+> node 1 cpus: 1 7
+> node 1 size: 256 MB
+> node 2 cpus: 2
+> node 2 size: 0 MB
+> node 3 cpus: 3
+> node 3 size: 256 MB
+> node 4 cpus: 4
+> node 4 size: 256 MB
+> node 5 cpus: 5
+> node 5 size: 256 MB
+> 
+> [1] https://en.wikipedia.org/wiki/Error_diffusion
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  numa.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/numa.c b/numa.c
+> index 6fc2393..bcf1c54 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -336,15 +336,19 @@ void parse_numa_opts(MachineClass *mc)
+>              }
+>          }
+>          if (i == nb_numa_nodes) {
+> -            uint64_t usedmem = 0;
+> +            uint64_t usedmem = 0, node_mem;
+> +            uint64_t granularity = ram_size / nb_numa_nodes;
+> +            uint64_t propagate = 0;
+>  
+>              /* Align each node according to the alignment
+>               * requirements of the machine class
+>               */
+>              for (i = 0; i < nb_numa_nodes - 1; i++) {
+> -                numa_info[i].node_mem = (ram_size / nb_numa_nodes) &
+> +                node_mem = (granularity + propagate) &
+>                                          ~((1 << mc->numa_mem_align_shift) - 1);
+> -                usedmem += numa_info[i].node_mem;
+> +                propagate = granularity + propagate - node_mem;
+> +                numa_info[i].node_mem = node_mem;
+> +                usedmem += node_mem;
+>              }
+>              numa_info[i].node_mem = ram_size - usedmem;
+>          }
+> -- 
+> 2.9.3
+> 
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eduardo
