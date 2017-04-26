@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3GMT-0000dk-8n
+	(envelope-from <cota@braap.org>) id 1d3GMT-0000e6-MT
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 02:23:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3GMR-0000Nh-QZ
+	(envelope-from <cota@braap.org>) id 1d3GMS-0000PB-Fz
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 02:23:37 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 26 Apr 2017 02:23:21 -0400
-Message-Id: <1493187803-4510-9-git-send-email-cota@braap.org>
+Date: Wed, 26 Apr 2017 02:23:17 -0400
+Message-Id: <1493187803-4510-5-git-send-email-cota@braap.org>
 In-Reply-To: <1493187803-4510-1-git-send-email-cota@braap.org>
 References: <1493187803-4510-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 08/10] target/i386: optimize cross-page
- direct jumps in softmmu
+Subject: [Qemu-devel] [PATCH v3 04/10] tcg/i386: implement goto_ptr op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +22,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-Instead of unconditionally exiting to the exec loop, use the
-gen_jr helper to jump to the target if it is valid.
-
-Perf impact: see next commit's log.
-
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tcg/i386/tcg-target.h     |  2 +-
+ tcg/i386/tcg-target.inc.c | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 59f6eaa..a065271 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -2154,9 +2154,9 @@ static inline void gen_goto_tb(DisasContext *s, int tb_num, target_ulong eip)
-         gen_jmp_im(eip);
-         tcg_gen_exit_tb((uintptr_t)s->tb + tb_num);
-     } else {
--        /* jump to another page: currently not optimized */
-+        /* jump to another page */
-         gen_jmp_im(eip);
--        gen_eob(s);
-+        gen_jr(s, cpu_tmp0);
-     }
- }
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 59d9835..73a15f7 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -107,7 +107,7 @@ extern bool have_popcnt;
+ #define TCG_TARGET_HAS_muls2_i32        1
+ #define TCG_TARGET_HAS_muluh_i32        0
+ #define TCG_TARGET_HAS_mulsh_i32        0
+-#define TCG_TARGET_HAS_goto_ptr         0
++#define TCG_TARGET_HAS_goto_ptr         1
+ 
+ #if TCG_TARGET_REG_BITS == 64
+ #define TCG_TARGET_HAS_extrl_i64_i32    0
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 5918008..d0bf53a 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -1906,6 +1906,10 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         }
+         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
+         break;
++    case INDEX_op_goto_ptr:
++        /* jmp to the given host address (could be epilogue) */
++        tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, a0);
++        break;
+     case INDEX_op_br:
+         tcg_out_jxx(s, JCC_JMP, arg_label(a0), 0);
+         break;
+@@ -2277,6 +2281,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+ 
+ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+ {
++    static const TCGTargetOpDef r = { .args_ct_str = { "r" } };
+     static const TCGTargetOpDef ri_r = { .args_ct_str = { "ri", "r" } };
+     static const TCGTargetOpDef re_r = { .args_ct_str = { "re", "r" } };
+     static const TCGTargetOpDef qi_r = { .args_ct_str = { "qi", "r" } };
+@@ -2299,6 +2304,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+         = { .args_ct_str = { "L", "L", "L", "L" } };
+ 
+     switch (op) {
++    case INDEX_op_goto_ptr:
++        return &r;
++
+     case INDEX_op_ld8u_i32:
+     case INDEX_op_ld8u_i64:
+     case INDEX_op_ld8s_i32:
+@@ -2567,6 +2575,13 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, tcg_target_call_iarg_regs[1]);
+ #endif
+ 
++    /*
++     * Return path for goto_ptr. Set return value to 0, a-la exit_tb,
++     * and fall through to the rest of the epilogue.
++     */
++    s->code_gen_epilogue = s->code_ptr;
++    tcg_out_movi(s, TCG_TYPE_REG, TCG_REG_EAX, 0);
++
+     /* TB epilogue */
+     tb_ret_addr = s->code_ptr;
  
 -- 
 2.7.4
