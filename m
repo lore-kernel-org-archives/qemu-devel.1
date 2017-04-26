@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9j-00040y-Ez
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9l-000419-CQ
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9h-0002G3-9u
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:47 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:44720 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9i-0002Hv-FT
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:49 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:29577 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1d3L9g-0002Da-Uy
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:45 -0400
+	id 1d3L9i-0002Eg-41
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:46 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 26 Apr 2017 14:30:31 +0300
-Message-Id: <20170426113038.60044-18-vsementsov@virtuozzo.com>
+Date: Wed, 26 Apr 2017 14:30:29 +0300
+Message-Id: <20170426113038.60044-16-vsementsov@virtuozzo.com>
 In-Reply-To: <20170426113038.60044-1-vsementsov@virtuozzo.com>
 References: <20170426113038.60044-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 17/24] qmp: add persistent flag to
- block-dirty-bitmap-add
+Subject: [Qemu-devel] [PATCH 15/24] block: add
+ bdrv_can_store_new_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Add optional 'persistent' flag to qmp command block-dirty-bitmap-add.
-Default is false.
+This will be needed to check some restrictions before making bitmap
+persistent in qmp-block-dirty-bitmap-add (this functionality will be
+added by future patch)
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c           | 18 +++++++++++++++++-
- qapi/block-core.json |  8 +++++++-
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ block.c                   | 22 ++++++++++++++++++++++
+ include/block/block.h     |  3 +++
+ include/block/block_int.h |  5 +++++
+ 3 files changed, 30 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index 245e1e1d17..40605faccc 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1967,6 +1967,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
-     /* AIO context taken and released within qmp_block_dirty_bitmap_add */
-     qmp_block_dirty_bitmap_add(action->node, action->name,
-                                action->has_granularity, action->granularity,
-+                               action->has_persistent, action->persistent,
-                                &local_err);
+diff --git a/block.c b/block.c
+index 16cf522219..cf9919a5e0 100644
+--- a/block.c
++++ b/block.c
+@@ -4093,3 +4093,25 @@ void bdrv_del_child(BlockDriverState *parent_bs, BdrvChild *child, Error **errp)
  
-     if (!local_err) {
-@@ -2696,10 +2697,12 @@ out:
- 
- void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-                                 bool has_granularity, uint32_t granularity,
-+                                bool has_persistent, bool persistent,
-                                 Error **errp)
- {
-     AioContext *aio_context;
-     BlockDriverState *bs;
-+    BdrvDirtyBitmap *bitmap;
- 
-     if (!name || name[0] == '\0') {
-         error_setg(errp, "Bitmap name cannot be empty");
-@@ -2725,7 +2728,20 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-         granularity = bdrv_get_default_bitmap_granularity(bs);
-     }
- 
--    bdrv_create_dirty_bitmap(bs, granularity, name, errp);
-+    if (!has_persistent) {
-+        persistent = false;
+     parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+ }
++
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp)
++{
++    BlockDriver *drv = bs->drv;
++
++    if (!drv) {
++        error_setg_errno(errp, ENOMEDIUM,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
 +    }
 +
-+    if (persistent &&
-+        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
-+    {
-+        goto out;
++    if (!drv->bdrv_can_store_new_dirty_bitmap) {
++        error_setg_errno(errp, ENOTSUP,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
 +    }
 +
-+    bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
-+    if (bitmap != NULL) {
-+        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
-+    }
++    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
++}
+diff --git a/include/block/block.h b/include/block/block.h
+index 4e81f2069b..93718ab245 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -551,4 +551,7 @@ void bdrv_add_child(BlockDriverState *parent, BlockDriverState *child,
+                     Error **errp);
+ void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
  
-  out:
-     aio_context_release(aio_context);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 932f5bb3b4..535df20212 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1559,10 +1559,16 @@
- # @granularity: #optional the bitmap granularity, default is 64k for
- #               block-dirty-bitmap-add
- #
-+# @persistent: #optional the bitmap is persistent, i.e. it will be saved to the
-+#              corresponding block device image file on its close. For now only
-+#              Qcow2 disks support persistent bitmaps. Default is false.
-+#              (Since 2.9)
-+#
- # Since: 2.4
- ##
- { 'struct': 'BlockDirtyBitmapAdd',
--  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32' } }
-+  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
-+            '*persistent': 'bool' } }
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp);
++
+ #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 2d92d7edfe..f943a7c24e 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -320,6 +320,11 @@ struct BlockDriver {
+     void (*bdrv_del_child)(BlockDriverState *parent, BdrvChild *child,
+                            Error **errp);
  
- ##
- # @block-dirty-bitmap-add:
++    bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs,
++                                            const char *name,
++                                            uint32_t granularity,
++                                            Error **errp);
++
+     QLIST_ENTRY(BlockDriver) list;
+ };
+ 
 -- 
 2.11.1
