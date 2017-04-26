@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwe-0005D4-Q4
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:07 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwd-0005Cz-5C
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3GwY-0007vp-Q1
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:00 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3GwW-0007vO-Qa
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:00:59 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 16:59:54 +1000
-Message-Id: <20170426070034.10727-9-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 16:59:49 +1000
+Message-Id: <20170426070034.10727-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/48] target/ppc: Add new H-CALL shells for in
- memory table translation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/48] ppc/spapr: QOM'ify sPAPRRTCState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,87 +23,248 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The use of the new in memory tables introduced in ISAv3.00 for translation,
-also referred to as process tables, requires the introduction of 3 new
-H-CALLs; H_REGISTER_PROCESS_TABLE, H_CLEAN_SLB, and H_INVALIDATE_PID.
+Also use an 'sPAPRRTCState' attribute under the sPAPR machine to hold
+the RTC object. Overall, these changes remove an unnecessary and
+implicit dependency on SysBus.
 
-Add shells for each of these and register them as the hypercall handlers.
-Currently they all log an unimplemented hypercall and return H_FUNCTION.
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-[dwg: Fix style nits]
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_hcall.c   | 31 +++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  3 +++
- 2 files changed, 34 insertions(+)
+ hw/ppc/spapr.c         | 16 ++++++++--------
+ hw/ppc/spapr_events.c  |  2 +-
+ hw/ppc/spapr_rtc.c     | 41 +++++++----------------------------------
+ include/hw/ppc/spapr.h | 21 ++++++++++++++++-----
+ include/hw/ppc/xics.h  |  2 +-
+ 5 files changed, 33 insertions(+), 49 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index f05a90e..7952129 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -878,6 +878,32 @@ static target_ulong h_set_mode(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-     return ret;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index de5db75..3edc3dd 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1333,13 +1333,13 @@ static void spapr_create_nvram(sPAPRMachineState =
+*spapr)
+=20
+ static void spapr_rtc_create(sPAPRMachineState *spapr)
+ {
+-    DeviceState *dev =3D qdev_create(NULL, TYPE_SPAPR_RTC);
+-
+-    qdev_init_nofail(dev);
+-    spapr->rtc =3D dev;
+-
+-    object_property_add_alias(qdev_get_machine(), "rtc-time",
+-                              OBJECT(spapr->rtc), "date", NULL);
++    object_initialize(&spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC);
++    object_property_add_child(OBJECT(spapr), "rtc", OBJECT(&spapr->rtc),
++                              &error_fatal);
++    object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
++                              &error_fatal);
++    object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spapr->=
+rtc),
++                              "date", &error_fatal);
  }
- 
-+static target_ulong h_clean_slb(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-+                                target_ulong opcode, target_ulong *args)
-+{
-+    qemu_log_mask(LOG_UNIMP, "Unimplemented SPAPR hcall 0x"TARGET_FMT_lx"%s\n",
-+                  opcode, " (H_CLEAN_SLB)");
-+    return H_FUNCTION;
-+}
-+
-+static target_ulong h_invalidate_pid(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-+                                     target_ulong opcode, target_ulong *args)
-+{
-+    qemu_log_mask(LOG_UNIMP, "Unimplemented SPAPR hcall 0x"TARGET_FMT_lx"%s\n",
-+                  opcode, " (H_INVALIDATE_PID)");
-+    return H_FUNCTION;
-+}
-+
-+static target_ulong h_register_process_table(PowerPCCPU *cpu,
-+                                             sPAPRMachineState *spapr,
-+                                             target_ulong opcode,
-+                                             target_ulong *args)
-+{
-+    qemu_log_mask(LOG_UNIMP, "Unimplemented SPAPR hcall 0x"TARGET_FMT_lx"%s\n",
-+                  opcode, " (H_REGISTER_PROC_TBL)");
-+    return H_FUNCTION;
-+}
-+
- #define H_SIGNAL_SYS_RESET_ALL         -1
- #define H_SIGNAL_SYS_RESET_ALLBUTSELF  -2
- 
-@@ -1084,6 +1110,11 @@ static void hypercall_register_types(void)
-     spapr_register_hypercall(H_PAGE_INIT, h_page_init);
-     spapr_register_hypercall(H_SET_MODE, h_set_mode);
- 
-+    /* In Memory Table MMU h-calls */
-+    spapr_register_hypercall(H_CLEAN_SLB, h_clean_slb);
-+    spapr_register_hypercall(H_INVALIDATE_PID, h_invalidate_pid);
-+    spapr_register_hypercall(H_REGISTER_PROC_TBL, h_register_process_table);
-+
-     /* "debugger" hcalls (also used by SLOF). Note: We do -not- differenciate
-      * here between the "CI" and the "CACHE" variants, they will use whatever
-      * mapping attributes qemu is using. When using KVM, the kernel will
+=20
+ /* Returns whether we want to use VGA or not */
+@@ -1377,7 +1377,7 @@ static int spapr_post_load(void *opaque, int versio=
+n_id)
+      * So when migrating from those versions, poke the incoming offset
+      * value into the RTC device */
+     if (version_id < 3) {
+-        err =3D spapr_rtc_import_offset(spapr->rtc, spapr->rtc_offset);
++        err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
+     }
+=20
+     return err;
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index 24a5758..f0b28d8 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -422,7 +422,7 @@ static void spapr_init_maina(struct rtas_event_log_v6=
+_maina *maina,
+     maina->hdr.section_id =3D cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MAINA);
+     maina->hdr.section_length =3D cpu_to_be16(sizeof(*maina));
+     /* FIXME: section version, subtype and creator id? */
+-    spapr_rtc_read(spapr->rtc, &tm, NULL);
++    spapr_rtc_read(&spapr->rtc, &tm, NULL);
+     year =3D tm.tm_year + 1900;
+     maina->creation_date =3D cpu_to_be32((to_bcd(year / 100) << 24)
+                                        | (to_bcd(year % 100) << 16)
+diff --git a/hw/ppc/spapr_rtc.c b/hw/ppc/spapr_rtc.c
+index 3a17ac4..00a4e4c 100644
+--- a/hw/ppc/spapr_rtc.c
++++ b/hw/ppc/spapr_rtc.c
+@@ -33,19 +33,8 @@
+ #include "qapi-event.h"
+ #include "qemu/cutils.h"
+=20
+-#define SPAPR_RTC(obj) \
+-    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
+-
+-typedef struct sPAPRRTCState sPAPRRTCState;
+-struct sPAPRRTCState {
+-    /*< private >*/
+-    SysBusDevice parent_obj;
+-    int64_t ns_offset;
+-};
+-
+-void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns)
++void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns)
+ {
+-    sPAPRRTCState *rtc =3D SPAPR_RTC(dev);
+     int64_t host_ns =3D qemu_clock_get_ns(rtc_clock);
+     int64_t guest_ns;
+     time_t guest_s;
+@@ -63,16 +52,12 @@ void spapr_rtc_read(DeviceState *dev, struct tm *tm, =
+uint32_t *ns)
+     }
+ }
+=20
+-int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset)
++int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset)
+ {
+-    sPAPRRTCState *rtc;
+-
+-    if (!dev) {
++    if (!rtc) {
+         return -ENODEV;
+     }
+=20
+-    rtc =3D SPAPR_RTC(dev);
+-
+     rtc->ns_offset =3D legacy_offset * NANOSECONDS_PER_SECOND;
+=20
+     return 0;
+@@ -91,12 +76,7 @@ static void rtas_get_time_of_day(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+         return;
+     }
+=20
+-    if (!spapr->rtc) {
+-        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+-        return;
+-    }
+-
+-    spapr_rtc_read(spapr->rtc, &tm, &ns);
++    spapr_rtc_read(&spapr->rtc, &tm, &ns);
+=20
+     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+     rtas_st(rets, 1, tm.tm_year + 1900);
+@@ -113,7 +93,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+                                  target_ulong args,
+                                  uint32_t nret, target_ulong rets)
+ {
+-    sPAPRRTCState *rtc;
++    sPAPRRTCState *rtc =3D &spapr->rtc;
+     struct tm tm;
+     time_t new_s;
+     int64_t host_ns;
+@@ -123,11 +103,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sP=
+APRMachineState *spapr,
+         return;
+     }
+=20
+-    if (!spapr->rtc) {
+-        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+-        return;
+-    }
+-
+     tm.tm_year =3D rtas_ld(args, 0) - 1900;
+     tm.tm_mon =3D rtas_ld(args, 1) - 1;
+     tm.tm_mday =3D rtas_ld(args, 2);
+@@ -144,8 +119,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+     /* Generate a monitor event for the change */
+     qapi_event_send_rtc_change(qemu_timedate_diff(&tm), &error_abort);
+=20
+-    rtc =3D SPAPR_RTC(spapr->rtc);
+-
+     host_ns =3D qemu_clock_get_ns(rtc_clock);
+=20
+     rtc->ns_offset =3D (new_s * NANOSECONDS_PER_SECOND) - host_ns;
+@@ -155,7 +128,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+=20
+ static void spapr_rtc_qom_date(Object *obj, struct tm *current_tm, Error=
+ **errp)
+ {
+-    spapr_rtc_read(DEVICE(obj), current_tm, NULL);
++    spapr_rtc_read(SPAPR_RTC(obj), current_tm, NULL);
+ }
+=20
+ static void spapr_rtc_realize(DeviceState *dev, Error **errp)
+@@ -200,7 +173,7 @@ static void spapr_rtc_class_init(ObjectClass *oc, voi=
+d *data)
+=20
+ static const TypeInfo spapr_rtc_info =3D {
+     .name          =3D TYPE_SPAPR_RTC,
+-    .parent        =3D TYPE_SYS_BUS_DEVICE,
++    .parent        =3D TYPE_DEVICE,
+     .instance_size =3D sizeof(sPAPRRTCState),
+     .class_init    =3D spapr_rtc_class_init,
+ };
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index ba9e689..342f7a6 100644
+index 808aac8..ba9e689 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -361,6 +361,9 @@ struct sPAPRMachineState {
- #define H_XIRR_X                0x2FC
- #define H_RANDOM                0x300
- #define H_SET_MODE              0x31C
-+#define H_CLEAN_SLB             0x374
-+#define H_INVALIDATE_PID        0x378
-+#define H_REGISTER_PROC_TBL     0x37C
- #define H_SIGNAL_SYS_RESET      0x380
- #define MAX_HCALL_OPCODE        H_SIGNAL_SYS_RESET
- 
--- 
+@@ -20,6 +20,18 @@ typedef struct sPAPREventSource sPAPREventSource;
+=20
+ #define SPAPR_TIMEBASE_FREQ     512000000ULL
+=20
++#define TYPE_SPAPR_RTC "spapr-rtc"
++
++#define SPAPR_RTC(obj)                                  \
++    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
++
++typedef struct sPAPRRTCState sPAPRRTCState;
++struct sPAPRRTCState {
++    /*< private >*/
++    DeviceState parent_obj;
++    int64_t ns_offset;
++};
++
+ typedef struct sPAPRMachineClass sPAPRMachineClass;
+=20
+ #define TYPE_SPAPR_MACHINE      "spapr-machine"
+@@ -58,7 +70,7 @@ struct sPAPRMachineState {
+     QLIST_HEAD(, sPAPRPHBState) phbs;
+     struct sPAPRNVRAM *nvram;
+     ICSState *ics;
+-    DeviceState *rtc;
++    sPAPRRTCState rtc;
+=20
+     void *htab;
+     uint32_t htab_shift;
+@@ -629,11 +641,10 @@ struct sPAPRConfigureConnectorState {
+=20
+ void spapr_ccs_reset_hook(void *opaque);
+=20
+-#define TYPE_SPAPR_RTC "spapr-rtc"
+-#define TYPE_SPAPR_RNG "spapr-rng"
++void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
++int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+=20
+-void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns);
+-int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset);
++#define TYPE_SPAPR_RNG "spapr-rng"
+=20
+ int spapr_rng_populate_dt(void *fdt);
+=20
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 9a5e715..ce23018 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -28,7 +28,7 @@
+ #ifndef XICS_H
+ #define XICS_H
+=20
+-#include "hw/sysbus.h"
++#include "hw/qdev.h"
+=20
+ #define XICS_IPI        0x2
+ #define XICS_BUID       0x1
+--=20
 2.9.3
