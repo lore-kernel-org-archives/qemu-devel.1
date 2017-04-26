@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3Bdr-0005X3-BF
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:21:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d3Bxt-0008N0-4T
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3Bdm-0006vh-RP
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:21:15 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:38260)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3Bdl-0006rP-5o
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:21:10 -0400
-Date: Wed, 26 Apr 2017 09:20:38 +0800 (CST)
-Message-ID: <201704260920380633515@zte.com.cn>
-References: 1493107940-29950-1-git-send-email-lu.zhipeng@zte.com.cn,
-	149315501241.11573.3299495533468354978@loki
-Mime-Version: 1.0
-From: <lu.zhipeng@zte.com.cn>
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_v4=5D_qga=3A_Add_support_network?=
- =?utf-8?q?_interfacestatistics_in?=
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d3Bxp-0005Ji-50
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:41:57 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36027)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d3Bxo-0005J8-W6
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:41:53 -0400
+Received: by mail-qk0-x243.google.com with SMTP id y63so19459227qkd.3
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:41:52 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170425223739.6703-1-quintela@redhat.com>
+	<20170425223739.6703-6-quintela@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1558ac56-8c05-0940-f19c-d3783c708ab3@amsat.org>
+Date: Tue, 25 Apr 2017 22:41:48 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170425223739.6703-6-quintela@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/26] audio: Remove UINT8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,321 +34,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
+Hi Juan,
 
---=====_002_next=====
-Content-Transfer-Encoding: base64 
-Content-Type: text/plain;
-	charset="UTF-8"
+On 04/25/2017 07:37 PM, Juan Quintela wrote:
+> uint8_t has existed since ..... all this century?
+>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hw/audio/fmopl.c |  8 ++++----
+>  hw/audio/fmopl.h | 39 ++++++++++++++++++++-------------------
+>  2 files changed, 24 insertions(+), 23 deletions(-)
+>
+> diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
+> index 282662a..3d14b45 100644
+> --- a/hw/audio/fmopl.c
+> +++ b/hw/audio/fmopl.c
+> @@ -789,8 +789,8 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
+>  			}
+>  			else
+>  			{	/* set IRQ mask ,timer enable*/
+> -				UINT8 st1 = v&1;
+> -				UINT8 st2 = (v>>1)&1;
+> +				uint8_t st1 = v&1;
+> +				uint8_t st2 = (v>>1)&1;
 
-77yeICsgICAqL++8niArICAgICAgICBjb2xvbiA9IHN0cmNocihsaW5lLCAnOicp77yeICsgICAg
-ICAgIGlmICghY29sb24pIHvvvJ4gKyAgICAgICAgICAgIGNvbnRpbnVl77yeICsgICAgICAgIH3v
-vJ4gKyAgICAgICAgKmNvbG9uID0gJ1wwJ++8niArICAgICAgICBpZiAoY29sb24gLSBwYXRoX2xl
-biDvvJ49IGxpbmUgJiYgc3RyY21wKGNvbG9uIC0gcGF0aF9sZW4sIHBhdGgpID09IDApIHtjb2xv
-biAtIHBhdGhfbGVuIO+8niBsaW5lIHdvdWxkIGltcGx5IHRoZSBjdXJyZW50IGxpbmUgaXNuJ3Qg
-YSBtYXRjaGVpdGhlciwgc28gaSB0aGluayB0aGF0IGNhbiBiZSB0aWdodGVuZWQgdG8gY29sb24g
-LSBwYXRoX2xlbiA9PSBsaW5lLg0KDQotLS0tLS0tLS0tLS0NCg0KVGhlIHRleHQgcmVhZGluZyBm
-cm9tIC9wcm9jL25ldC9kZXYvIGlzICBhbGlnbmVkIHRvIHRoZSByaWdodC4gc28gaSB0aGluayBp
-dCBzaG91bGQgYmUgY29sb24gLSBwYXRoX2xlbiDvvJ49IGxpbmUNCg0KDQoNCg0KDQoNCg0KDQoN
-Cg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0K5Li65LqG6K6p5oKo55qEVlBsYXTomZrmi5/ljJbm
-lYXpmpzlvpfliLDpq5jmlYjnmoTlpITnkIbvvIzor7fkuIrmiqXmlYXpmpzliLA6ICRWUGxhdOaK
-gOacr+aUr+aMgeOAgg0KDQoNCuiKpuW/l+aciyBsdXpoaXBlbmcNCg0KDQoNCg0KDQoNCklU5byA
-5Y+R5bel56iL5biIIElUIERldmVsb3BtZW50CkVuZ2luZWVyDQrmk43kvZzns7vnu5/kuqflk4Hp
-g6gv5Lit5b+D56CU56m26ZmiL+ezu+e7n+S6p+WTgSBPUyBQcm9kdWN0IERlcHQuL0NlbnRyYWwg
-Uu+8hkQgSW5zdGl0dXRlL1N5c3RlbSBQcm9kdWN0DQoNCg0KDQoNCg0KDQoNCg0KDQrmt7HlnLPl
-uILljZflsbHljLrnp5HmioDljZfot681NeWPt+S4reWFtOmAmuiur+eglOWPkeWkp+alvDMz5qW8
-IA0KMzMvRiwgUiZEIEJ1aWxkaW5nLCBaVEUKQ29ycG9yYXRpb24gSGktdGVjaCBSb2FkIFNvdXRo
-LCANCkhpLXRlY2gKSW5kdXN0cmlhbCBQYXJrIE5hbnNoYW4gRGlzdHJpY3QsIFNoZW56aGVuLCBQ
-LlIuQ2hpbmEsIDUxODA1NyANClQ6ICs4NiA3NTUgeHh4eHh4eHggRjorODYgNzU1IHh4eHh4eHh4
-IA0KTTogKzg2IHh4eHh4eHh4eHh4IA0KRTogbHUuemhpcGVuZ0B6dGUuY29tLmNuIA0Kd3d3Lnp0
-ZS5jb20uY24NCg0KDQoNCg0KDQoNCuWOn+Wni+mCruS7tg0KDQoNCg0K5Y+R5Lu25Lq677yaIO+8
-nG1kcm90aEBsaW51eC52bmV0LmlibS5jb23vvJ4NCuaUtuS7tuS6uu+8muiKpuW/l+acizEwMTA4
-MjcyDQrmioTpgIHkurrvvJroiqblv5fmnIsxMDEwODI3MiDvvJxxZW11LWRldmVsQG5vbmdudS5v
-cmfvvJ4NCuaXpSDmnJ8g77yaMjAxN+W5tDA05pyIMjbml6UgMDU6MTcNCuS4uyDpopgg77yaUmU6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggdjRdIHFnYTogQWRkIHN1cHBvcnQgbmV0d29yayBpbnRlcmZh
-Y2VzdGF0aXN0aWNzIGluDQoNCg0KDQoNCg0KUXVvdGluZyBaaGlQZW5nIEx1ICgyMDE3LTA0LTI1
-IDAzOjEyOjIwKQ0K77yeIHdlIGNhbiBnZXQgdGhlIG5ldHdvcmsgaW50ZXJmYWNlIHN0YXRpc3Rp
-Y3MgaW5zaWRlIGEgdmlydHVhbCBtYWNoaW5lIGJ5DQrvvJ4gZ3Vlc3QtbmV0d29yay1nZXQtaW50
-ZXJmYWNlcyBjb21tYW5kLiBpdCBpcyB2ZXJ5IHVzZWZ1bCBmb3IgdXMgdG8gbW9uaXRvcg0K77ye
-IGFuZCBhbmFseXplIG5ldHdvcmsgdHJhZmZpYy4NCu+8niANCu+8niBTaWduZWQtb2ZmLWJ5OiBa
-aGlQZW5nIEx1IO+8nGx1LnpoaXBlbmdAenRlLmNvbS5jbu+8ng0K77yeIFNpZ25lZC1vZmYtYnk6
-IERhbmllbCBQLiBCZXJyYW5nZSDvvJxiZXJyYW5nZUByZWRoYXQuY29t77yeDQrvvJ4gLS0tDQrv
-vJ4gIHFnYS9jb21tYW5kcy1wb3NpeC5jIHwgNzEgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrLQ0K77yeICBxZ2EvcWFwaS1zY2hlbWEuanNvbiB8IDM4
-ICsrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCu+8niAgMiBmaWxlcyBjaGFuZ2VkLCAxMDcg
-aW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCu+8niANCu+8niBkaWZmIC0tZ2l0IGEvcWdh
-L2NvbW1hbmRzLXBvc2l4LmMgYi9xZ2EvY29tbWFuZHMtcG9zaXguYw0K77yeIGluZGV4IDkxNWRm
-OWUuLjFlMzUzNDAgMTAwNjQ0DQrvvJ4gLS0tIGEvcWdhL2NvbW1hbmRzLXBvc2l4LmMNCu+8niAr
-KysgYi9xZ2EvY29tbWFuZHMtcG9zaXguYw0K77yeIEBAIC0xNjM4LDYgKzE2MzgsNjUgQEAgZ3Vl
-c3RfZmluZF9pbnRlcmZhY2UoR3Vlc3ROZXR3b3JrSW50ZXJmYWNlTGlzdCAqaGVhZCwNCu+8niAg
-ICAgIHJldHVybiBoZWFkDQrvvJ4gIH0NCu+8niANCu+8niArIHN0YXRpYyBpbnQgZ3Vlc3RfZ2V0
-X25ldHdvcmtfc3RhdHMoY29uc3QgY2hhciAqcGF0aCwNCg0KUGF0aCBpcyBhIGxpdHRsZSBtaXNs
-ZWFkaW5nLiBJc24ndCB0aGlzIHRoZSBkZXZpY2UgbmFtZT8NCg0K77yeICsgICAgICAgICAgICAg
-ICAgICAgICAgIEd1ZXN0TmV0d29ya0ludGVyZmFjZVN0YXQgKnN0YXRzKQ0K77yeICt7DQrvvJ4g
-KyAgICBpbnQgcGF0aF9sZW4NCu+8niArICAgIGNoYXIgY29uc3QgKmRldmluZm8gPSAiL3Byb2Mv
-bmV0L2RldiINCu+8niArICAgIEZJTEUgKmZwDQrvvJ4gKyAgICBjaGFyICpsaW5lID0gTlVMTCwg
-KmNvbG9uDQrvvJ4gKyAgICBzaXplX3Qgbg0K77yeICsgICAgZnAgPSBmb3BlbihkZXZpbmZvLCAi
-ciIpDQrvvJ4gKyAgICBpZiAoIWZwKSB7DQrvvJ4gKyAgICAgICAgcmV0dXJuIC0xDQrvvJ4gKyAg
-ICB9DQrvvJ4gKyAgICBwYXRoX2xlbiA9IHN0cmxlbihwYXRoKQ0KDQpuYW1lX2xlbj8NCg0K77ye
-ICsgICAgd2hpbGUgKGdldGxpbmUoJmxpbmUsICZuLCBmcCkgIT0gLTEpIHsNCu+8niArICAgICAg
-ICBsb25nIGxvbmcgZHVtbXkNCu+8niArICAgICAgICBsb25nIGxvbmcgcnhfYnl0ZXMNCu+8niAr
-ICAgICAgICBsb25nIGxvbmcgcnhfcGFja2V0cw0K77yeICsgICAgICAgIGxvbmcgbG9uZyByeF9l
-cnJzDQrvvJ4gKyAgICAgICAgbG9uZyBsb25nIHJ4X2Ryb3BwZWQNCu+8niArICAgICAgICBsb25n
-IGxvbmcgdHhfYnl0ZXMNCu+8niArICAgICAgICBsb25nIGxvbmcgdHhfcGFja2V0cw0K77yeICsg
-ICAgICAgIGxvbmcgbG9uZyB0eF9lcnJzDQrvvJ4gKyAgICAgICAgbG9uZyBsb25nIHR4X2Ryb3Bw
-ZWQNCu+8niArDQrvvJ4gKyAgLyogVGhlIGxpbmUgbG9va3MgbGlrZToNCu+8niArICAgKiIgICBl
-dGgwOi4uLiINCu+8niArICAgKlNwbGl0IGl0IGF0IHRoZSBjb2xvbi4NCg0KU3BhY2UgYWZ0ZXIg
-dGhlICIqIi4gSW5kZW50YXRpb24gc2VlbXMgdG8gd3JvbmcgdG9vLg0KDQrvvJ4gKyAgICovDQrv
-vJ4gKyAgICAgICAgY29sb24gPSBzdHJjaHIobGluZSwgJzonKQ0K77yeICsgICAgICAgIGlmICgh
-Y29sb24pIHsNCu+8niArICAgICAgICAgICAgY29udGludWUNCu+8niArICAgICAgICB9DQrvvJ4g
-KyAgICAgICAgKmNvbG9uID0gJ1wwJw0K77yeICsgICAgICAgIGlmIChjb2xvbiAtIHBhdGhfbGVu
-IO+8nj0gbGluZSAmJiBzdHJjbXAoY29sb24gLSBwYXRoX2xlbiwgcGF0aCkgPT0gMCkgew0KDQpj
-b2xvbiAtIHBhdGhfbGVuIO+8niBsaW5lIHdvdWxkIGltcGx5IHRoZSBjdXJyZW50IGxpbmUgaXNu
-J3QgYSBtYXRjaA0KZWl0aGVyLCBzbyBpIHRoaW5rIHRoYXQgY2FuIGJlIHRpZ2h0ZW5lZCB0byBj
-b2xvbiAtIHBhdGhfbGVuID09IGxpbmUuDQoNCu+8niArICAgICAgICAgICAgaWYgKHNzY2FuZihj
-b2xvbiArIDEsDQrvvJ4gKyAgICAgICAgICAgICAgICAiJWxsZCAlbGxkICVsbGQgJWxsZCAlbGxk
-ICVsbGQgJWxsZCAlbGxkICVsbGQgJWxsZCAlbGxkICVsbGQgJWxsZCAlbGxkICVsbGQgJWxsZCIs
-DQrvvJ4gKyAgICAgICAgICAgICAgICAgICZyeF9ieXRlcywgJnJ4X3BhY2tldHMsICZyeF9lcnJz
-LCAmcnhfZHJvcHBlZCwNCu+8niArICAgICAgICAgICAgICAgICAgJmR1bW15LCAmZHVtbXksICZk
-dW1teSwgJmR1bW15LA0K77yeICsgICAgICAgICAgICAgICAgICAmdHhfYnl0ZXMsICZ0eF9wYWNr
-ZXRzLCAmdHhfZXJycywgJnR4X2Ryb3BwZWQsDQrvvJ4gKyAgICAgICAgICAgICAgICAgICZkdW1t
-eSwgJmR1bW15LCAmZHVtbXksICZkdW1teSkgIT0gMTYpIHsNCu+8niArICAgICAgICAgICAgICAg
-IGNvbnRpbnVlDQrvvJ4gKyAgICAgICAgICAgIH0NCu+8niArICAgICAgICAgICAgc3RhdHMt77ye
-cnhfYnl0ZXMgPSByeF9ieXRlcw0K77yeICsgICAgICAgICAgICBzdGF0cy3vvJ5yeF9wYWNrZXRz
-ID0gcnhfcGFja2V0cw0K77yeICsgICAgICAgICAgICBzdGF0cy3vvJ5yeF9lcnJzID0gcnhfZXJy
-cw0K77yeICsgICAgICAgICAgICBzdGF0cy3vvJ5yeF9kcm9wcGVkID0gcnhfZHJvcHBlZA0K77ye
-ICsgICAgICAgICAgICBzdGF0cy3vvJ50eF9ieXRlcyA9IHR4X2J5dGVzDQrvvJ4gKyAgICAgICAg
-ICAgIHN0YXRzLe+8nnR4X3BhY2tldHMgPSB0eF9wYWNrZXRzDQrvvJ4gKyAgICAgICAgICAgIHN0
-YXRzLe+8nnR4X2VycnMgPSB0eF9lcnJzDQrvvJ4gKyAgICAgICAgICAgIHN0YXRzLe+8nnR4X2Ry
-b3BwZWQgPSB0eF9kcm9wcGVkDQrvvJ4gKyAgICAgICAgICAgIGZjbG9zZShmcCkNCu+8niArICAg
-ICAgICAgICAgcmV0dXJuIDANCu+8niArICAgICAgICB9DQrvvJ4gKyAgICB9DQrvvJ4gKyAgICBm
-Y2xvc2UoZnApDQrvvJ4gKyAgICBnX2RlYnVnKCIvcHJvYy9uZXQvZGV2OiBJbnRlcmZhY2Ugbm90
-IGZvdW5kIikNCu+8niArICAgIHJldHVybiAtMQ0K77yeICt9DQrvvJ4gKw0K77yeICAvKg0K77ye
-ICAgKiBCdWlsZCBpbmZvcm1hdGlvbiBhYm91dCBndWVzdCBpbnRlcmZhY2VzDQrvvJ4gICAqLw0K
-77yeIEBAIC0xNjU0LDYgKzE3MTMsNyBAQCBHdWVzdE5ldHdvcmtJbnRlcmZhY2VMaXN0ICpxbXBf
-Z3Vlc3RfbmV0d29ya19nZXRfaW50ZXJmYWNlcyhFcnJvciAqKmVycnApDQrvvJ4gICAgICBmb3Ig
-KGlmYSA9IGlmYXAgaWZhIGlmYSA9IGlmYS3vvJ5pZmFfbmV4dCkgew0K77yeICAgICAgICAgIEd1
-ZXN0TmV0d29ya0ludGVyZmFjZUxpc3QgKmluZm8NCu+8niAgICAgICAgICBHdWVzdElwQWRkcmVz
-c0xpc3QgKiphZGRyZXNzX2xpc3QgPSBOVUxMLCAqYWRkcmVzc19pdGVtID0gTlVMTA0K77yeICsg
-ICAgICAgIEd1ZXN0TmV0d29ya0ludGVyZmFjZVN0YXQgICppbnRlcmZhY2Vfc3RhdCA9IE5VTEwN
-Cu+8niAgICAgICAgICBjaGFyIGFkZHI0W0lORVRfQUREUlNUUkxFTl0NCu+8niAgICAgICAgICBj
-aGFyIGFkZHI2W0lORVQ2X0FERFJTVFJMRU5dDQrvvJ4gICAgICAgICAgaW50IHNvY2sNCu+8niBA
-QCAtMTc3Myw3ICsxODMzLDE2IEBAIEd1ZXN0TmV0d29ya0ludGVyZmFjZUxpc3QgKnFtcF9ndWVz
-dF9uZXR3b3JrX2dldF9pbnRlcmZhY2VzKEVycm9yICoqZXJycCkNCu+8niANCu+8niAgICAgICAg
-ICBpbmZvLe+8nnZhbHVlLe+8nmhhc19pcF9hZGRyZXNzZXMgPSB0cnVlDQrvvJ4gDQrvvJ4gLQ0K
-77yeICsgICAgICAgIGlmICghaW5mby3vvJ52YWx1ZS3vvJ5oYXNfc3RhdGlzdGljcykgew0K77ye
-ICsgICAgICAgICAgICBpbnRlcmZhY2Vfc3RhdCA9IGdfbWFsbG9jMChzaXplb2YoKmludGVyZmFj
-ZV9zdGF0KSkNCu+8niArICAgICAgICAgICAgaWYgKGd1ZXN0X2dldF9uZXR3b3JrX3N0YXRzKGlu
-Zm8t77yedmFsdWUt77yebmFtZSwNCu+8niArICAgICAgICAgICAgICAgIGludGVyZmFjZV9zdGF0
-KSA9PSAtMSkgew0K77yeICsgICAgICAgICAgICAgICAgZXJyb3Jfc2V0Z19lcnJubyhlcnJwLCBl
-cnJubywgImd1ZXN0X2dldF9uZXR3b3JrX3N0YXRzIGZhaWxlZCIpDQoNCk5lZWQgdG8gZnJlZSBp
-bnRlcmZhY2Vfc3RhdCBoZXJlIGVsc2UgeW91J2xsIGxlYWsgbWVtb3J5Lg0KDQpTaW5jZSBpdCdz
-IGFuIG9wdGlvbmFsIGZpZWxkIEknbSBub3Qgc3VyZSB3ZSBzaG91bGQgdHJlYXQgY2FzZXMgd2hl
-cmUNCi9wcm9jL25ldC9kZXYgZG9lc24ndCBleGlzdCBhcyBhIGZhaWx1cmUgZWl0aGVyLiBXZSBz
-aG91bGQgcHJvYmFibHkganVzdA0Kc2V0IGhhc19zdGF0aXN0aWNzID0gZmFsc2UgdG8gbWFpbnRh
-aW4gdGhlIGV4aXN0aW5nIHN1cHBvcnQuDQoNCu+8niArICAgICAgICAgICAgICAgIGdvdG8gZXJy
-b3INCu+8niArICAgICAgICAgICAgfQ0K77yeICsgICAgICAgICAgICBpbmZvLe+8nnZhbHVlLe+8
-nnN0YXRpc3RpY3MgPSBpbnRlcmZhY2Vfc3RhdA0K77yeICsgICAgICAgICAgICBpbmZvLe+8nnZh
-bHVlLe+8nmhhc19zdGF0aXN0aWNzID0gdHJ1ZQ0K77yeICsgICAgICAgIH0NCu+8niAgICAgIH0N
-Cu+8niANCu+8niAgICAgIGZyZWVpZmFkZHJzKGlmYXApDQrvvJ4gZGlmZiAtLWdpdCBhL3FnYS9x
-YXBpLXNjaGVtYS5qc29uIGIvcWdhL3FhcGktc2NoZW1hLmpzb24NCu+8niBpbmRleCBhMDJkYmYy
-Li45NDgyMTliIDEwMDY0NA0K77yeIC0tLSBhL3FnYS9xYXBpLXNjaGVtYS5qc29uDQrvvJ4gKysr
-IGIvcWdhL3FhcGktc2NoZW1hLmpzb24NCu+8niBAQCAtNjM1LDYgKzYzNSwzOCBAQA0K77yeICAg
-ICAgICAgICAgICdwcmVmaXgnOiAnaW50J30gfQ0K77yeIA0K77yeICAjIw0K77yeICsjIEBHdWVz
-dE5ldHdvcmtJbnRlcmZhY2VTdGF0Og0K77yeICsjDQrvvJ4gKyMgQHJ4LWJ5dGVzOiB0b3RhbCBi
-eXRlcyByZWNlaXZlZA0K77yeICsjDQrvvJ4gKyMgQHJ4LXBhY2tldHM6IHRvdGFsIHBhY2tldHMg
-cmVjZWl2ZWQNCu+8niArIw0K77yeICsjIEByeC1lcnJzOiBiYWQgcGFja2V0cyByZWNlaXZlZA0K
-77yeICsjDQrvvJ4gKyMgQHJ4LWRyb3BwZWQ6IHJlY2VpdmVyIGRyb3BwZWQgcGFja2V0cw0K77ye
-ICsjDQrvvJ4gKyMgQHR4LWJ5dGVzOiB0b3RhbCBieXRlcyB0cmFuc21pdHRlZA0K77yeICsjDQrv
-vJ4gKyMgQHR4LXBhY2tldHM6IHRvdGFsIHBhY2tldHMgdHJhbnNtaXR0ZWQNCu+8niArIw0K77ye
-ICsjIEB0eC1lcnJzOiBwYWNrZXQgdHJhbnNtaXQgcHJvYmxlbXMNCu+8niArIw0K77yeICsjIEB0
-eC1kcm9wcGVkOiBkcm9wcGVkIHBhY2tldHMgdHJhbnNtaXR0ZWQNCu+8niArIw0K77yeICsjIFNp
-bmNlOiAyLjEwDQrvvJ4gKyMjDQrvvJ4gK3sgJ3N0cnVjdCc6ICdHdWVzdE5ldHdvcmtJbnRlcmZh
-Y2VTdGF0JywNCu+8niArICAnZGF0YSc6IHsncngtYnl0ZXMnOiAndWludDY0JywNCu+8niArICAg
-ICAgICAgICAgJ3J4LXBhY2tldHMnOiAndWludDY0JywNCu+8niArICAgICAgICAgICAgJ3J4LWVy
-cnMnOiAndWludDY0JywNCu+8niArICAgICAgICAgICAgJ3J4LWRyb3BwZWQnOiAndWludDY0JywN
-Cu+8niArICAgICAgICAgICAgJ3R4LWJ5dGVzJzogJ3VpbnQ2NCcsDQrvvJ4gKyAgICAgICAgICAg
-ICd0eC1wYWNrZXRzJzogJ3VpbnQ2NCcsDQrvvJ4gKyAgICAgICAgICAgICd0eC1lcnJzJzogJ3Vp
-bnQ2NCcsDQrvvJ4gKyAgICAgICAgICAgICd0eC1kcm9wcGVkJzogJ3VpbnQ2NCcNCu+8niArICAg
-ICAgICAgICB9IH0NCu+8niArDQrvvJ4gKyMjDQrvvJ4gICMgQEd1ZXN0TmV0d29ya0ludGVyZmFj
-ZToNCu+8niAgIw0K77yeICAjIEBuYW1lOiBUaGUgbmFtZSBvZiBpbnRlcmZhY2UgZm9yIHdoaWNo
-IGluZm8gYXJlIGJlaW5nIGRlbGl2ZXJlZA0K77yeIEBAIC02NDMsMTIgKzY3NSwxNiBAQA0K77ye
-ICAjDQrvvJ4gICMgQGlwLWFkZHJlc3NlczogTGlzdCBvZiBhZGRyZXNzZXMgYXNzaWduZWQgdG8g
-QG5hbWUNCu+8niAgIw0K77yeICsjIEBzdGF0aXN0aWNzOiB2YXJpb3VzIHN0YXRpc3RpYyBjb3Vu
-dGVycyByZWxhdGVkIHRvIEBuYW1lDQrvvJ4gKyMgKHNpbmNlIDIuMTApDQrvvJ4gKyMNCu+8niAg
-IyBTaW5jZTogMS4xDQrvvJ4gICMjDQrvvJ4gIHsgJ3N0cnVjdCc6ICdHdWVzdE5ldHdvcmtJbnRl
-cmZhY2UnLA0K77yeICAgICdkYXRhJzogeyduYW1lJzogJ3N0cicsDQrvvJ4gICAgICAgICAgICAg
-JypoYXJkd2FyZS1hZGRyZXNzJzogJ3N0cicsDQrvvJ4gLSAgICAgICAgICAgJyppcC1hZGRyZXNz
-ZXMnOiBbJ0d1ZXN0SXBBZGRyZXNzJ10gfSB9DQrvvJ4gKyAgICAgICAgICAgJyppcC1hZGRyZXNz
-ZXMnOiBbJ0d1ZXN0SXBBZGRyZXNzJ10sDQrvvJ4gKyAgICAgICAgICAgJypzdGF0aXN0aWNzJzog
-J0d1ZXN0TmV0d29ya0ludGVyZmFjZVN0YXQnIH0gfQ0K77yeIA0K77yeICAjIw0K77yeICAjIEBn
-dWVzdC1uZXR3b3JrLWdldC1pbnRlcmZhY2VzOg0K77yeIC0tIA0K77yeIDEuOC4zLjENCu+8niAN
-Cu+8ng==
+Welcome to stdint! but since you're changing this code please make it 
+more readable (at least spaces) so checkpatch don't reject your serie:
 
+ERROR: spaces required around that '&'
 
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?MjQyNDJlNTYzN2FmNDI4ODkxYzRkYjczMWU3NzY1YWQuanBn?="
-Content-ID: <24242e5637af428891c4db731e7765ad>
-Content-Transfer-Encoding: base64
-
-R0lGODlhcwAmAPcAAAAAAP///wCP1QCP1Pf7/vL5/QCP1gWR1gqT1gyU2AyU1w6V1xWY2BeZ2R6c
-2iGd2iyi3C6j3TOl3Tqo3kWt4Emv4Uyw4U2x4lOz4ly35F645GO65WW75me85m6/53XC6IHH64XJ
-64bK7IzM7I/N7JXQ7ZfR7pnS7pzT7p3U76PW8KPW76XX8K7b8bDc8rff87vh9Lzh9L7i9cnn9tLr
-+Nnu+eDx+uf0++n1++33/PD4/PT6/fj8/gKQ1AWR1QeS1QiT1QmT1g+W1xCW1xOX1xia2Bub2Ryb
-2R+d2SCd2SKe2iSf2iag2ymh2yqh2yui3DSm3Tio3Typ3j2q3j6q3kCr30Os30eu4Euw4U6x4U+y
-4k+y4VGz4lCy4Va141W04li241q341245F+55GW75Ga85Wm95mi95Gq+5Wu+5m2/5m/A53HB6HDA
-53HB5nLB53PC53XC53bD53nE6HvF6X3G6X/H6YHI6oHI6YLI6oLI6YbK64TJ6YnL64rM64zM65HP
-7JPQ7ZbR7ZrT7qXX76bY8KfY76jZ8Kra8azb8a/c8bDc8bHd8rLd8rXe8rXe8bjg87zi9Lzh873i
-88Dj9MPl9cXm9cfm9cnn9c3p9s/q987p9tHr99Lr99Xt+Nbt+Nrv+d/x+eDx+eX0++Tz+u/4/OHy
-+ePz+ur2+/b7/fr9/vz+/v7//////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAK0ALAAAAABzACYA
-Rwj/AAMIHEiwoMGDCBMqXMiwoUOGiti0mUhxopcBAgZoHKAglcATFaVg3DgAC0U2hgKsKkJyiZqK
-FUV4bHijx4AHDFmN0BiJ4A2NRFYRJKAAo6WFKzJibOCQEclMB1WxxOgDUQEeqbKm2sEDoQaMhAqS
-sonE4B2MeQ7WmGlwj0YKCv0oHeDkIUGnAvJCNShVowA7dgXyyXKhsGEJG6kYNqxFUEImGSsQDJFR
-gOSClUj61cx5wAmEBKJk9JIwTefTaxzaGNnQxhIBex0WAUPwRZoOZnLr3q27Q6CBKXgL742mhUBW
-e3AP771HlcNSaDjQCVwwByQc1A2+9vtbodONsQn2/8UI2O6F03lP+/1QcEpeJgMbabwyMEzeOQuJ
-bBSAyC5ejeENNN5GQzBAxIEHNgAGAQZ9JQAlBvUggBIGlYDWQBtYoKGGW1yw4YZacPGhBVjsIRAB
-B4xEV3YCfZdRgAKNJ0ATLBo01gBlOXSIARgpohAEeQkgSo1EFmnkkUgmqeSSCKkxl3qaMRUBZ5V1
-llcHAaQ40lxP+uXQWALkmB0HGplhECYHWADDQ24oJYAVClHilwCgRMVSXiYGhgIZG/TZZxlXaNTD
-F2X4+adxA+Fg0wBkEGTfACkQhNgAKzR0iop0MvQdgHZu5EdgXw0AYUE2UViQhQKkVdAcQZYSAA9D
-GP/xxQ4B1KHRFg1h4OYYDzHiJowBDKgiSZXlSZAGeYVFEJhiDnRHXnoM5EOXxO7HmQMGdRJkRtj5
-txmwMqoRWBZPplftuXEkxIUJBj2CxUJSVPkGi5sOAO5UA6hqJCql2sVKEBilcRCyAxhQB0GFqEet
-X3IglAhJlxzEAwPoaSaABV+S1VAmQ+RlREOTBHkGkySXbPLJKKes8sosC6TJllCS9JshC8NsbSUB
-eFAzZ244FIpSNfrRxADsGoRKQS/ETCWWIShspSMBUGyteu82dGOzCr3AR0EyaESFQU4OAJdDcBC7
-SEJjuJmuQTzg+0SSNmG7ECuQDZBAQUlo9AlBg2D/BMVDm2wpQA4KOUISJ53mpa9DJVRmLkZcUgv1
-QDRjRMNAI2SUmkAzYDSEcw3xMVcEmj7VqUblPSRGRl2ooMIKK6hAh0Y/kMBC7K9PkBceBeGwUaUB
-gLKRc/xqZIpD7vkFR0Obwna6AGiAqlEhBY1iUxIG5YFRtAZh1IYOAh090AIY9cRQAUBALsBRzM91
-734CICDEAvQvoMAQGNBaELICKDvQ1Wa5kEBi4IJGNMITmTCgAhvhgg8o5QsvMKALcHaQSKRHAAro
-SlO+ZafHQQ5mAuhDg8AiFo0VBAQCDAAIMWWuKlWGKQZJg5vg5C2/vI92LujKKna4CtAdRAwa8QIL
-7YY4xLPErwREHGIVMMI7km0nL4CgjovsdboBiNAumbPYsKpkLUQZRAZ5+dtAOrEAAXwtITjgkiey
-U68bDiB1RSKARo4QmEOkR3wDOUNlMnCQQrgJPvQyHV+KUCwkAfAhYMjLD4RyECxUJhEESeRmBCAB
-mMCkBAlpnhsHwAQPWHIifWCQ1UzIEFAEqQsLwQEQ8gIBgWiBS0qbI0JeMJcaHGQV04plXr6kEbkp
-hBVTEkAPjtcQOWSEVwGQxBw+wMxmOvOZHxiEQnIAgj1o8JZ/gKY2SeDDhejgDW1YnEI+AUm7fIKR
-LUunOtfJThYFBAA7
-
-
---=====_002_next=====
-Content-Type: image/jpeg;
-	 name="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
-Content-Disposition: inline;
-	filename="=?UTF-8?B?OWFlM2UyMTRjMTdkNDllZDkzNWQ4N2M2NzRiYTNlZTIuanBn?="
-Content-ID: <9ae3e214c17d49ed935d87c674ba3ee2>
-Content-Transfer-Encoding: base64
-
-R0lGODlhggB4AHcAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQICgAAACwAAAAAggB4AIcATr79vg2j
-x+twuSDo8tdNjNSk0mTQ57AojVB4uI7+1GPI3/P+6rKPxan9yjsBes4/gtD+34y61u9jm9rr9vva
-7Pek0aolccv///8Baccki9Sj0FwSfM6DtOOAv2Wy1e9Mo92axurf78n9xisLacf+2XNwpN33+vE7
-m9r9zkv+89Q0jNWMvebh7/nL5KPR5vbC3vP+5Jxks+NbpN10u+UDg9Gqzuyi0YLx9+aTvuYkhNF/
-wDbZ7L0cjNQAdccAZMUlkta73Y0Ybsn+z1CUyk5LnNpiqd88k9f9whz+3YNNqt9EnNr0+/18vOaF
-weczm9oBjNQae879xzK426PV7fjc8vqIxCek0u79zEP+5qR8r+Cd0u5ss+O84vT+8Mlbqd8Le87M
-6fdTnNrl8dMrg9G22e8BXcMKdMsrdcyUyuuMy+xtqd+s1vAsktb+9t3+1muy2Hqs1XTt+f1xsdvE
-4/X9012BwQ3u9uIwjelDkteKxTTW6rr+23tTo939xCNEo91ro92DvPd7wOcchNKEwoQ8jNRtvOZN
-ltg8o90sm9qIvui02YOm0/kri9QLgM/m+f1dseIUg9EMjNQOZsZUqd8NW8I0k9cSdMv+4ZObzOwk
-fM/H6ff+6Ku24PN1wunV8frz+esyhNHN5quDvOZcnNrU6vczeM2bzVpxr+y/35R7viO73PLb7cOn
-0mz++OTE4Z2s2vHj8/oSbsphpN6TyTwAbMmU0O6r05rb7vn9wRTN7PlDi9Ti8M1Dltj+7LvT6LRK
-ktaTxene+Pw3od2EyetbrOHL5fV0reAse86d2PF6vSlzteMCk9am2PEtldigz/Eckdaz1/Gt1IW6
-3IRjreGz3PkBVMBNseEzltg8mOH9yC9sreFVrOBSltgcdMs9ltgkldmKwOdhueUeftAAddCMw+mB
-v+kNbcnn89ir0+6jzex6tOP90E/q9NyVyPBEqd7R56+k0nH9yTSz2/ILftB8w+mAvyP92G390VQK
-hNEBdMuEw+kAfdARftD+/v7///8I/wAxCBxIsKDBgwgTKlzIsKHDhxAJMimHAgaGckvoYNgHgg6T
-JktKMaFRpBSGZSBKyeECogIFLn1iYeDyxSW1LxRiFeMmh8kXarGq9KHGBNdPDLH6cImFC8QyDC9A
-0MBABUQTJsaWNMFAZ8koDFn3MemyJBiGVX/SYJiHItNaFFsiLkwH4goTarXSYZihjw2GPvrSyQFx
-xiMKfRaPgFkV69slY7Es0aOCoVEkY1UaaYpValAkCnIG6SjVeQUFY5E0FAXTBtcmDnmYrHrwhKu+
-IhTmnenDJJ0+EBg+1OJ9pdY2DMH0ycCQptayibW+ZvozT67BJrW4gFXXgusVmXS+c/9NR+HslfKr
-0slMT0E2GyZr2bRf9YEJkw/RBKaLZj/aKgwUpFNdb/MwIUc6FgX4HwVX/BcLgkhd0QVS6mgUiw3G
-YICLOhnickWGpahTwUw1uGXdWcGU8kIaGp3o4oswMsSEEpKsUkoT1UVUzAMmxujjjz5SoUMtsFzx
-ADVyZfLFf0A26eRDxswTxhrArGJME/lBSUd5T3YZC3xdFtSUDuowBSYT8zC5EBMgaGBRmE3OM0sw
-XMKJQRP6RAemQKvkg8KeCTExgyUt2hkjE1xY0wguhlLRiD5PbFJQVto1xMSXhv54BQo01NnlRA/w
-eJB9Db3gUaY/XiqHobGAoI8zlBn/REEzOSokxiVZogrjKtzs4+mTqP0gw6oGrXJJHgzRgEKhup6I
-aAYrjAhnUhr4dVApXJi1UE6ANisXBcXU0kascFYhUqDdHmTMKr96CxEFkOiTCLldzgPJFQnFkkmu
-CYnhDb+6VlFPPYw6RMEXPzRi0kNXGMKsQhQYYY0l7fKpzxEMdSDGw6iyUUsGejnERDBkzCKTQ1UU
-Ys1xlqpDilgIlbJNOO5CtMouBXQRS8UHUdAJvQvF8skxppQD0SbEvkhHNDzbyUQYYawyAw0nF8QE
-FfPYUh0uIaRT1BZX0FF1QVfMEIwuW4q8yhqZpCtQLGlYq9Af+nxQ80Cj/KAP1QRV/wELSJHoA4S+
-ZuiAyyj6PIANNVvoAmgzGphxBNBBI+zM2AStoo8lDIHEcbPzAFHLA50KVMoMD+SpzyW94ALDEUux
-EMUZqrehzkDz9FALGII0fVAslECK+UAVcGH03RGFro8+acQixxWa/NDDH4bYIilSq8YCSz3XgHPG
-D7MwQUEYooPBN0SxcKMPIr43tG77mc7TRiQg9EJDGKNQM0/SCDGhiyfcSFMf3gGNSPROLunTxzCG
-97Z9MaQIl5Ab8qgShmVUQgfGIJVAVBCDJCShBAp4Ax8w4QWB2IcC67CGBmBxLgSqLxEMxEAZZIGs
-hYyiDxmaoOmoYIxllKNOWVCAA//8II8I4CMXSPADEkZQB04MZBViaB4V3MYQnfzAEjGsQBN6FCj4
-xa8NjdgfmHyhgBH4YQQjkEcS+CCPETjAAW1EAj5KiJRYUIMM++DfQ9jQh2BQEQN/JAgd2BDDgP1h
-dLDYIB+kQEQ4ysMBUsBHDCJQhwjEoAR1SGMWTHiEH0Qikdapgh77tg98LaQIZ7Ab8iayPBnIxBUx
-wAIS5IEFB9QhCW9QQAmScA985DIFSYhAEmMgEHVEIgMgqEJEmHCFOVFRc5xbCAtmkcO7GaMNtYCV
-QDiByzfIEguYiEEddukANyoRCxHIAj4CMIJNMgESZwCDWt7VB2tgg2e4WAcXdZj/EDnsI3H7EIg6
-bRmDN+AjAkI8IxbQSMs68OGhJXBAABzgBq4AIQN/oJxCZKPPQDZkFeK5G/B+0BoMeCEFSpRHCdLJ
-h1yMAB/4wEIJMBnOOsgDH5gogTxu6YqZZOCTEYmFRgcSi2CETCGHAeXd2ACCeSbBD1gYgjzkoYAy
-yuMenKCkF2KQgqrKAwkO4IMHIzACJ9JBDFxQ5kN00gs1GWQetYimQpoAgmq6KxZhUCsGFIAEEQ7x
-jG/AxBvekAIHYKKMSXRAYV+ahSTkogRvo0IVPEoQWOgjAzA7SPGOx0+FLIMDAcWAG/CBBD5koQ4p
-wIcCJimPRmKBD5eEIxZSIA8p/2BCmCmoaFZK4hCd1CISbjUIZcEyDy++qCcCkQMFllsFQFSCNwLh
-KxYGiwlOvAGODsBCLUeggDXyAR+0dAA7kmDVEqphEqaIhnJBAx8DYaAKm5AJBfZRA31Q4o8tCIYp
-bSWL2xlDHYxhQgX2EwtMuYgOf5ABBeighCcg4gnFUMcHCoWJJNIyBQ+VrXa164BcpCALb3CjTOvw
-RnkwAAO6SEMImoCIPyBiGGlgQibqwgXQrmR5PajVQVZBQ48GgxppuFIPuNEJY2QCGyCYxxWkdaIQ
-mOEMpQiBLDKgD73JQBgFeQMStjzR645gwxzuawzwoQ3tFvaN2tgkIGFBBr3V4v8HRfgEKczQhyWY
-YRmxEIMZejDPhFRgFLdb03rDAIstUQAX89CZgU9kjBlw4TTUWEIfvoCCfPRCx67IAghDSFgzErG1
-KvUFJ1Lw5Vpmt5ybjMUyNJCIGdS5CJmQgzrEIKFyZGgV4VjFcD+aCeO6aGeRxUUskuGIWoSWIK5I
-thtU4AVu4mMEKSjBG9aYhDoQccMOWKIvuDIkQzCFCrho72QBOZDhtqAc+03IEs4QXF3RQQP6qIdD
-VJBV8mIBqhHgQznTmIKuVnQVjyJGkzSHAob82CP20WCmuqCBB8j7ISpAqRTayAdOhLAE+BArJgQC
-i4YLHEi42GJvq0ByybrbEvr/EEdEMHHGwmJBtZY0aApOjAE15AMMcanZKtJQigL7XFe4KMIPnlBI
-hPAhsQ7QhmIXGgAFDEQGP9CBjmN0uEAjVR/tRhUT1iGLPvhaIK7ggxmnasYA5KIOPRXIMkhQBL36
-aB76+AZDylGMFyAvDPuYkHWCiIWpyoMdmEi7QIxhiHT7CBfm2Gf/9rRrH9knFlfw2omanQUGVLTc
-Si66ixSeEBikQWck/8S4DRXyfYTjHOMIg5OoEApjN94hVWeIGM7RNjkERfM+ioUMaqGDYjQCBbgP
-KggeIIkkD/xYDEkDFxamq1hA4gG1QAFkwkCHguXeGB7SQcIM/6JYqOGo6HLX/zpqUYsn6F0dOgBB
-8BlysEbgKxxgEJdSdcWGclgfVZCoBTb0zoRRUPkqMbIPD/ADT0EBTQAGP3AEqhcjpbAMfZYQvVAL
-bRMUogcjuJAGnrAP+1APnjCBTfB5W6B3g4cNv5UGo2cdbDAI4sIkBsgBS+B2LgJXbcAQmXAMdGB7
-VVCBCNQE1OAh8RcqeRIFXZAJP8ABzEcQufMAPQAC+mMdq+AM+pAP6TYrSrYN3BcR52Z1mRIGZ2AG
-mUAHRxAFGjCGUZAHhIYMCogQ9SAJoVJ+n6MQuLAEP0A66SIHS2ANS/B6LhINmbB+MTMPxrANVYIB
-m5AMsDAPsNAMGcIEzdAFVP/UBT1QA8xQAw/AWQ5RAUPiSj0zCrvAAnooJoDGECiQFy7SFP2QBnLw
-CJ84EMbQcFBQAzWgLQ0RC11AB2lwPqPyCauYObWAMQuRBpSwP0FRBX7IBP+UAQD4IojCAanTB0e4
-EOWwG7sYERWwDzm3EDhIcroAg3B4GM6wgDAyXwn2jBs1CpWwAn4II5yHEPPQhyfSJw43jcJFVJgi
-B2pFASRXBbhAB13QBegGdB/IEIcgCwDzEFvwADUwfz8SC/vwBG3QNk0ABAXCBeCQCE/wBIPAAU4g
-j8lzDrGxEJmwDCZhe6vyeO1BRSMzOlMXI1XADWCQAT9ADVUADNZQDrHQCHr/szx6Yw7eoi+qtCZ0
-0AlNYAlcUItXUARfMA/NwI0CMQ+RoE1N0gSpowFGoGuZAAgekQkz8AWGQAM04I6dZRDpsA/zUAXp
-sAyZIFl0MAq2ljajQgfkCCMVMIpPAAsncykmVGCgMUqZggvLIIvq1hcmxHgeFQtbIBhNEgYaQIDu
-sgevMAagwAup8As4gAOvkApjcAJj4AINQA7ZQINNEJcNoQ4/cAlZ5yIvcWnNcgKsEAcGIAKgsAdx
-8Art0A5BAAesAAqsMA23EAwF6SSrUADdYHdNUgVhEAxr8B7pQAMDUw800AQZpA7Q+SKg8Au/wAt7
-wAongAGg0A53IBB30A6g/8Cd7YADDpEOihAGBqJcfJkQxNglcpAHACADVXAEZrA8efIDo1AKoWAG
-AbWLr0AEogARVPCXDLEEtYCKOagLuthbadBrT9J/efAd20AGbXChjRAK6oALgFAIWzAPowCOEJEK
-qTCeD6EbNaQQ6nA/gMSeD5EJu3Oa6khUdFCj/Kie7yVUnTQVETEGvIBAaQB+geIsaaAPNSBBubcF
-LEJZYYBNxRARd+ACY2AdyDUX4XB/EJEJD5APK3lcMpAP+jAIlsiOPaAPlfIQonAKIiAXFbANY3oQ
-h3AOppRwL7qlXeoiVzAI/AAFm2NXBoEL8RIJircQe5AK7SAXq+CRDPEBNP9Qlgt6giCJkHd6IvtA
-D5L4AGE0V3lCCV+HAeFpHQ8ioxKxni7qEM2hDwoJI/PgijXQAzKQCUwpKGagASL4EHeQmXCSCTTA
-ZBFBB70gBrx6KGkwCOujBBwQBYjgCVtglzUHAgA2CqnaEL+wCFMaEaXwBV+xECQopBChC0OljDRg
-CQ3SCBlQC/oQCZqwDlWAAgAwA+3ZEC4QB9UKEXAnVwlxBSyApQ9BBTRgk0+CV/DRBSShA9DXdplA
-CuowjWPAAyaKPg7UEPZIjEHxrgWRCWZQC2/SJPi4J1ijBp6QI6pInQ3bJekwCl2Qg6JHBesHA2Iw
-A6L5IqNQCFr4JLzwCyP/6xAywwIMEYES9HrC8Ahdsg7IEAJ28gqtMK8PsQpnkKL3SjAncjh08q9U
-0KkRcQBBcKhBdQWTKhEuAqOL8SSHxpEL0Q5I+y6UdQU0cIPD6IdFWgNbS6ng8Ax2wgoEYB3Xmq0K
-cQgkUHsk54dayqVPQgP54A5wkgpxgLXJcwa94FHpEAz66hB/+7Zy0Q434AFTcLM/0g6t8AonQgET
-5jRpsKXV0CRjcApWYAWqEAeYS53YqZ2Gonzf+ou14AMWwAPfiQ6ikJu6eQDtcAJ3cAC5yZoHMKV3
-8At7gAOgMAa/YAD2oAdEMAA7AA/tIAqQ+bt7MJ4iMLyeygPHiwFjIAo//xqblIkBv7ABQfCdLlIK
-lLAVC4GgtXd7+4oKcyANuBmbrXC17ZAKrZCbrHC/Y3AHrxAHooADrAAH1Dq9cKAHVkALp7ADypAK
-PNAKv9AOBTwNvADAAnwHIrAIi3DBomAALnCrixAHF2y1ZYuoDyB3CzEP5aC2OciU/RQLY8AK33kH
-PMALJxCZNOyprMALoJC8rHCod8AKsHkC7SACcKAMqkALqrADv2DDvYsDIsALOKCZQXwCBFzE7cAD
-vQsKIsAKVby635IOomo1dPoQL3AM65CODNEO8aAKdmAFiyDGYfmLInkiFlsLZTy5hIAACUDHE/QC
-s4C3gfmb7sMNS/EkjP+AB4FQxwVhLMDAEPUnEnJAkhDxCWxsMLhAsRNEAYUmIxT4CZ+wjVAyFJns
-EDDwAVSbKcvFECGwfIPZeGmQAWcguaG0C8jwhhNkDH9wpgkRp4acfEZqy9+yDD3oyHyytAyxCltw
-yhgQuWGyXLiQDi9bMwtGnOznOplQlhRABftBclQEzXASDEJwDMjsEOUAZHRgCJJwDfNgi+CACGyw
-BY/LBG0brUASDWLgFsLWWcZQBE+xEIeRBgumNcRYCsuKC6XAM5lAZXusjF9iDIVgBKu8wpAgA7Y8
-G9jAENEQDM6saniGKsYQCjixClzgIGLzXl1QHlVwgxqSNvsIHzGNFFv/gA2hsgLVwUOmcyphkEEU
-wAYP/Wtd4Di6wgRwiQE0kAFfwQJkcDssgAx20QRkIAEnQQZ2sw6hoGt3lCGjwIyvaKYUsA2FMCJ9
-UAjGIAeksAt2N1zBsA3YDBHBEAUzUNEvYtIawQIaigE5AAFeMwpTjQFYbTcdAAGrIAfbEApcHQUP
-8IoPsAxhPdZ7kQcvIAcTAAyk0QfrIJDnQNUQYSAsMAmNELuZEgu6UB4UcC54lT1ThBRELVTtVdPL
-YwnVQdoCUQWrLcoYsAChMAMM0Y4Su1zOY0LEcik5QQflUCFq0AznfCLzQAkB1BC5ocsEoS/FUAwy
-IAPFwAVhQAHlwAUt/zARXyAD3AAEPxAFxLzcDNgH7KsQbPAH8bc80HcOTaALmmAG6RAGoZCT+nAG
-0ofeqAIDUVAEDFEMZ9AGKJAIFgkNzqAebbIl3KDgT0AJmfC4/h2hdCCiCAFSKpuPuDBuTPE2uCBs
-dF3hEVGlMiK2JO4kuDALBVDNAxEMRzCzKa5DcTgIfooQTcABDzjj/LQuw1UBZWniPF4zsVAOo9Cp
-HOqJQ343jgIG0r1jF9ANJbnkWkcHkJEGTsDG+lJcmTAKMlFgtX0y75mjYS4Q/cwEY37mai4TRVEe
-V1MecoALbj61gLTah2badm7n4QYg49bN8BG2SLHnHx7oGFABK/CCMP9CBYWABmEQCzMw14JiBAU2
-C8eBC0rBBC3QB45dCkWQ2f+c2Zx+Ff/8FavgFVyxBOUgG73gFmywBEQ7D9/QNumQB3qRCb1wO+rw
-Dfhi6/8RDL2QH8GwBAVSDr3A1d9gEaOwBDDQf0UQbtvwDS/QAt0wAxT+EBSQCUaDC2QQCrHwCBBQ
-CKWACxBQAFgxCLFRCqZwCLFAB8gwAWfhDWLAFWgw16uABoCAAVfgDfcuARewDc9zAR2AASHgDZmt
-Dt5wFSFwAWYxCt6gszngDak+ChcgABhwDN5wO1pw8UxwDGjwHzPgDVRtAt7gNYBgCgvABGIwDv9h
-e00yFqdSo/ZRo4BJVIsC0QUZNBaqRwFdoHo4DyCdYBKxYCM+Txk+A/TzQBmxMA+MkvQyUQVKjxTz
-0PRRTxU6oyGdIBNYsyphUFxUXx6lwPWusYsBAQA7
-
-
---=====_002_next=====--
+>  				/* IRQRST,T1MSK,t2MSK,EOSMSK,BRMSK,x,ST2,ST1 */
+>  				OPL_STATUS_RESET(OPL,v&0x78);
+>  				OPL_STATUSMASK_SET(OPL,((~v)&0x78)|0x01);
+> @@ -838,7 +838,7 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
+>  		case 0xbd:
+>  			/* amsep,vibdep,r,bd,sd,tom,tc,hh */
+>  			{
+> -			UINT8 rkey = OPL->rhythm^v;
+> +			uint8_t rkey = OPL->rhythm^v;
+>  			OPL->ams_table = &AMS_TABLE[v&0x80 ? AMS_ENT : 0];
+>  			OPL->vib_table = &VIB_TABLE[v&0x40 ? VIB_ENT : 0];
+>  			OPL->rhythm  = v&0x3f;
+> @@ -991,7 +991,7 @@ void YM3812UpdateOne(FM_OPL *OPL, INT16 *buffer, int length)
+>  	OPLSAMPLE *buf = buffer;
+>  	UINT32 amsCnt  = OPL->amsCnt;
+>  	UINT32 vibCnt  = OPL->vibCnt;
+> -	UINT8 rhythm = OPL->rhythm&0x20;
+> +	uint8_t rhythm = OPL->rhythm&0x20;
+>  	OPL_CH *CH,*R_CH;
+>
+>  	if( (void *)OPL != cur_chip ){
+> diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
+> index e476497..3df8942 100644
+> --- a/hw/audio/fmopl.h
+> +++ b/hw/audio/fmopl.h
+> @@ -1,6 +1,8 @@
+>  #ifndef FMOPL_H
+>  #define FMOPL_H
+>
+> +#include <stdint.h>
+> +
+>  /* --- system optimize --- */
+>  /* select bit size of output : 8 or 16 */
+>  #define OPL_OUTPUT_BIT 16
+> @@ -8,7 +10,6 @@
+>  /* compiler dependence */
+>  #ifndef OSD_CPU_H
+>  #define OSD_CPU_H
+> -typedef unsigned char	UINT8;   /* unsigned  8bit */
+>  typedef unsigned short	UINT16;  /* unsigned 16bit */
+>  typedef unsigned int	UINT32;  /* unsigned 32bit */
+>  typedef signed char		INT8;    /* signed  8bit   */
+> @@ -41,19 +42,19 @@ typedef unsigned char (*OPL_PORTHANDLER_R)(int param);
+>  typedef struct fm_opl_slot {
+>  	INT32 TL;		/* total level     :TL << 8            */
+>  	INT32 TLL;		/* adjusted now TL                     */
+> -	UINT8  KSR;		/* key scale rate  :(shift down bit)   */
+> +	uint8_t  KSR;		/* key scale rate  :(shift down bit)   */
+>  	INT32 *AR;		/* attack rate     :&AR_TABLE[AR<<2]   */
+>  	INT32 *DR;		/* decay rate      :&DR_TALBE[DR<<2]   */
+>  	INT32 SL;		/* sustin level    :SL_TALBE[SL]       */
+>  	INT32 *RR;		/* release rate    :&DR_TABLE[RR<<2]   */
+> -	UINT8 ksl;		/* keyscale level  :(shift down bits)  */
+> -	UINT8 ksr;		/* key scale rate  :kcode>>KSR         */
+> +	uint8_t ksl;		/* keyscale level  :(shift down bits)  */
+> +	uint8_t ksr;		/* key scale rate  :kcode>>KSR         */
+>  	UINT32 mul;		/* multiple        :ML_TABLE[ML]       */
+>  	UINT32 Cnt;		/* frequency count :                   */
+>  	UINT32 Incr;	/* frequency step  :                   */
+>  	/* envelope generator state */
+> -	UINT8 eg_typ;	/* envelope type flag                  */
+> -	UINT8 evm;		/* envelope phase                      */
+> +	uint8_t eg_typ;	/* envelope type flag                  */
+> +	uint8_t evm;		/* envelope phase                      */
+>  	INT32 evc;		/* envelope counter                    */
+>  	INT32 eve;		/* envelope counter end point          */
+>  	INT32 evs;		/* envelope counter step               */
+> @@ -61,8 +62,8 @@ typedef struct fm_opl_slot {
+>  	INT32 evsd;	/* envelope step for DR :DR[ksr]           */
+>  	INT32 evsr;	/* envelope step for RR :RR[ksr]           */
+>  	/* LFO */
+> -	UINT8 ams;		/* ams flag                            */
+> -	UINT8 vib;		/* vibrate flag                        */
+> +	uint8_t ams;		/* ams flag                            */
+> +	uint8_t vib;		/* vibrate flag                        */
+>  	/* wave selector */
+>  	INT32 **wavetable;
+>  }OPL_SLOT;
+> @@ -70,38 +71,38 @@ typedef struct fm_opl_slot {
+>  /* ---------- OPL one of channel  ---------- */
+>  typedef struct fm_opl_channel {
+>  	OPL_SLOT SLOT[2];
+> -	UINT8 CON;			/* connection type                     */
+> -	UINT8 FB;			/* feed back       :(shift down bit)   */
+> +	uint8_t CON;			/* connection type                     */
+> +	uint8_t FB;			/* feed back       :(shift down bit)   */
+>  	INT32 *connect1;	/* slot1 output pointer                */
+>  	INT32 *connect2;	/* slot2 output pointer                */
+>  	INT32 op1_out[2];	/* slot1 output for selfeedback        */
+>  	/* phase generator state */
+>  	UINT32  block_fnum;	/* block+fnum      :                   */
+> -	UINT8 kcode;		/* key code        : KeyScaleCode      */
+> +	uint8_t kcode;		/* key code        : KeyScaleCode      */
+>  	UINT32  fc;			/* Freq. Increment base                */
+>  	UINT32  ksl_base;	/* KeyScaleLevel Base step             */
+> -	UINT8 keyon;		/* key on/off flag                     */
+> +	uint8_t keyon;		/* key on/off flag                     */
+>  } OPL_CH;
+>
+>  /* OPL state */
+>  typedef struct fm_opl_f {
+> -	UINT8 type;			/* chip type                         */
+> +	uint8_t type;			/* chip type                         */
+>  	int clock;			/* master clock  (Hz)                */
+>  	int rate;			/* sampling rate (Hz)                */
+>  	double freqbase;	/* frequency base                    */
+>  	double TimerBase;	/* Timer base time (==sampling time) */
+> -	UINT8 address;		/* address register                  */
+> -	UINT8 status;		/* status flag                       */
+> -	UINT8 statusmask;	/* status mask                       */
+> +	uint8_t address;		/* address register                  */
+> +	uint8_t status;		/* status flag                       */
+> +	uint8_t statusmask;	/* status mask                       */
+>  	UINT32 mode;		/* Reg.08 : CSM , notesel,etc.       */
+>  	/* Timer */
+>  	int T[2];			/* timer counter                     */
+> -	UINT8 st[2];		/* timer enable                      */
+> +	uint8_t st[2];		/* timer enable                      */
+>  	/* FM channel slots */
+>  	OPL_CH *P_CH;		/* pointer of CH                     */
+>  	int	max_ch;			/* maximum channel                   */
+>  	/* Rhythm sention */
+> -	UINT8 rhythm;		/* Rhythm mode , key flag */
+> +	uint8_t rhythm;		/* Rhythm mode , key flag */
+>  	OPL_PORTHANDLER_R porthandler_r;
+>  	OPL_PORTHANDLER_W porthandler_w;
+>  	int port_param;
+> @@ -120,7 +121,7 @@ typedef struct fm_opl_f {
+>  	INT32 vibCnt;
+>  	INT32 vibIncr;
+>  	/* wave selector enable flag */
+> -	UINT8 wavesel;
+> +	uint8_t wavesel;
+>  	/* external event callback handler */
+>  	OPL_TIMERHANDLER  TimerHandler;		/* TIMER handler   */
+>  	int TimerParam;						/* TIMER parameter */
+>
