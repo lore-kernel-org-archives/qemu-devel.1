@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d3JCQ-0002bJ-CL
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:25:27 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d3JEK-0003RL-4Q
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:27:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d3JCL-0002fW-CQ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:25:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56460)
+	(envelope-from <dgilbert@redhat.com>) id 1d3JEF-0003qr-Cj
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:27:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d3JCL-0002fH-3E
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:25:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 367CD8004A
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 09:25:19 +0000 (UTC)
-References: <1493106644-6049-1-git-send-email-thuth@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <cee42ea6-5b1c-ebc3-089a-24b49ef76d82@redhat.com>
-Date: Wed, 26 Apr 2017 17:25:12 +0800
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3JEF-0003qM-6T
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:27:19 -0400
+Date: Wed, 26 Apr 2017 10:27:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170426092714.GC2098@work-vm>
+References: <1493179907-22516-1-git-send-email-thuth@redhat.com>
+	<20170426081816.GA2098@work-vm>
+	<CAFEAcA8kDDnSuMfU7tFwMQf9sMVzpz=+dkuroWGRXGtbPkdFzg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1493106644-6049-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net/dump: Issue a warning for the
- deprecated "-net dump"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8kDDnSuMfU7tFwMQf9sMVzpz=+dkuroWGRXGtbPkdFzg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: Check whether TCG is enabled
+ before running the "info jit" code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 26 April 2017 at 09:18, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> > * Thomas Huth (thuth@redhat.com) wrote:
+> >> The "info jit" command currently aborts on Mac OS X with the message
+> >> "qemu_mutex_lock: Invalid argument" when running with "-M accel=qtest".
+> >> We should only call into the TCG code here if TCG has really been
+> >> enabled and initialized.
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  monitor.c | 5 +++++
+> >>  1 file changed, 5 insertions(+)
+> >>
+> >> diff --git a/monitor.c b/monitor.c
+> >> index be282ec..3e0979d 100644
+> >> --- a/monitor.c
+> >> +++ b/monitor.c
+> >> @@ -1086,6 +1086,11 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+> >>
+> >>  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+> >>  {
+> >> +    if (!tcg_enabled()) {
+> >> +        error_report("JIT information is only available with accel=tcg");
+> >> +        return;
+> >> +    }
+> >> +
+> >>      dump_exec_info((FILE *)mon, monitor_fprintf);
+> >>      dump_drift_info((FILE *)mon, monitor_fprintf);
+> >>  }
+> >
+> > so tcg_enabled checks tcg_ctx.code_gen_buffer != NULL
+> > code_gen_buffer is set by code_gen_alloc
+> > code_gen_alloc does a qemu_mutex_init of tb_lock
+> > and the previous problem was an uninitialised tb_lock.
+> >
+> > So:
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >
+> >
+> > Peter: Does this fix the hmp test for you?
+> 
+> Yes, it does.
+> 
+> Tested-by: Peter Maydell <peter.maydell@linaro.org>
 
+OK, I'll cook a new version of the HMP pull later with this in it.
 
-On 2017=E5=B9=B404=E6=9C=8825=E6=97=A5 15:50, Thomas Huth wrote:
-> Network dumping should be done with "-object filter-dump" nowadays.
-> Using "-net dump" via the VLAN mechanism is considered as deprecated
-> and might be removed in a future release. So warn the users now
-> to inform them to user the filter-dump method instead.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   net/dump.c | 3 +++
->   1 file changed, 3 insertions(+)
->
-> diff --git a/net/dump.c b/net/dump.c
-> index 89a149b..442eb53 100644
-> --- a/net/dump.c
-> +++ b/net/dump.c
-> @@ -194,6 +194,9 @@ int net_init_dump(const Netdev *netdev, const char =
-*name,
->  =20
->       assert(peer);
->  =20
-> +    error_report("'-net dump' is deprecated. "
-> +                 "Please use '-object filter-dump' instead.");
-> +
->       if (dump->has_file) {
->           file =3D dump->file;
->       } else {
+Dave
 
-Applied.
-
-Thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
