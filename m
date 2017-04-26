@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1d3Jqm-0003aw-Vx
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:07:10 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3Jqt-0003hJ-NB
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:07:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1d3Jqj-00024g-Ro
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:07:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1d3Jqj-00024B-LQ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:07:05 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Wed, 26 Apr 2017 12:07:01 +0200
-Message-Id: <20170426100701.21893-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH] numa: equally distribute memory on nodes
+	(envelope-from <rth7680@gmail.com>) id 1d3Jqn-00026g-Q5
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:07:15 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1493051615-30715-1-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <b196d1fa-3db5-6d9b-8eff-dda153f23a01@twiddle.net>
+Date: Wed, 26 Apr 2017 12:07:05 +0200
+MIME-Version: 1.0
+In-Reply-To: <1493051615-30715-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/3] split core mmu_idx from ARMMMUIdx values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,92 +24,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-When there is more nodes than memory available to put the minimum
-allowed memory by node, all the memory is put on the last node.
+On 04/24/2017 06:33 PM, Peter Maydell wrote:
+> Overall questions:
+>   * does this look like it's workable enough to justify taking
+>     it rather than the simple-but-worse-perf-on-some-archs
+>     option 1 ?
 
-This is because we put (ram_size / nb_numa_nodes) &
-~((1 << mc->numa_mem_align_shift) - 1); on each node, and in this
-case the value is 0. This is particularly true with pseries,
-as the memory must be aligned to 256MB.
+I think it's workable.
 
-To avoid this problem, this patch uses an error diffusion algorithm [1]
-to distribute equally the memory on nodes.
+>   * this does risk breaking A profile in corner cases, because
+>     C unfortunately doesn't typecheck int vs enum so if I forgot
+>     a call to an index conversion function somewhere things will
+>     break. are we happy the risk isn't too huge?
 
-Example:
+If you like, we could add a tcg_debug assert somewhere that verifies that the 
+given index is < NB_MMU_MODES...
 
-qemu-system-ppc64 -S -nographic  -nodefaults -monitor stdio -m 1G -smp 8 \
-                  -numa node -numa node -numa node \
-                  -numa node -numa node -numa node
 
-Before:
-
-(qemu) info numa
-6 nodes
-node 0 cpus: 0 6
-node 0 size: 0 MB
-node 1 cpus: 1 7
-node 1 size: 0 MB
-node 2 cpus: 2
-node 2 size: 0 MB
-node 3 cpus: 3
-node 3 size: 0 MB
-node 4 cpus: 4
-node 4 size: 0 MB
-node 5 cpus: 5
-node 5 size: 1024 MB
-
-After:
-(qemu) info numa
-6 nodes
-node 0 cpus: 0 6
-node 0 size: 0 MB
-node 1 cpus: 1 7
-node 1 size: 256 MB
-node 2 cpus: 2
-node 2 size: 0 MB
-node 3 cpus: 3
-node 3 size: 256 MB
-node 4 cpus: 4
-node 4 size: 256 MB
-node 5 cpus: 5
-node 5 size: 256 MB
-
-[1] https://en.wikipedia.org/wiki/Error_diffusion
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- numa.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/numa.c b/numa.c
-index 6fc2393..bcf1c54 100644
---- a/numa.c
-+++ b/numa.c
-@@ -336,15 +336,19 @@ void parse_numa_opts(MachineClass *mc)
-             }
-         }
-         if (i == nb_numa_nodes) {
--            uint64_t usedmem = 0;
-+            uint64_t usedmem = 0, node_mem;
-+            uint64_t granularity = ram_size / nb_numa_nodes;
-+            uint64_t propagate = 0;
- 
-             /* Align each node according to the alignment
-              * requirements of the machine class
-              */
-             for (i = 0; i < nb_numa_nodes - 1; i++) {
--                numa_info[i].node_mem = (ram_size / nb_numa_nodes) &
-+                node_mem = (granularity + propagate) &
-                                         ~((1 << mc->numa_mem_align_shift) - 1);
--                usedmem += numa_info[i].node_mem;
-+                propagate = granularity + propagate - node_mem;
-+                numa_info[i].node_mem = node_mem;
-+                usedmem += node_mem;
-             }
-             numa_info[i].node_mem = ram_size - usedmem;
-         }
--- 
-2.9.3
+r~
