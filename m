@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3Lsk-0007dT-TZ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:17:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3LtP-0007xB-QF
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:18:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3Lsg-0005Tt-VE
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:17:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41066)
+	(envelope-from <armbru@redhat.com>) id 1d3LtK-0005bZ-S6
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:17:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d3Lsg-0005TJ-Kd
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:17:14 -0400
-Date: Wed, 26 Apr 2017 13:17:07 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170426121707.GS18933@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1492845627-4384-1-git-send-email-longpeng2@huawei.com>
-	<1492845627-4384-14-git-send-email-longpeng2@huawei.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3LtK-0005b9-Mb
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:17:54 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170426102503.20345.45815.malonedeb@soybean.canonical.com>
+Date: Wed, 26 Apr 2017 14:17:51 +0200
+In-Reply-To: <20170426102503.20345.45815.malonedeb@soybean.canonical.com>
+	(Richard Jones's message of "Wed, 26 Apr 2017 10:25:02 -0000")
+Message-ID: <871ssfxt00.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1492845627-4384-14-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3 13/18] crypto: cipher: add afalg-backend
- cipher support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1686364] [NEW] qemu -readconfig/-writeconfig
+ cannot handle quotes in values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,347 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: arei.gonglei@huawei.com, longpeng.mike@gmail.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
+To: Richard Jones <rjones@redhat.com>
+Cc: qemu-devel@nongnu.org, Bug 1686364 <1686364@bugs.launchpad.net>
 
-On Sat, Apr 22, 2017 at 03:20:22PM +0800, Longpeng(Mike) wrote:
-> Adds afalg-backend cipher support: introduces some private APIs
-> firstly, and then intergrates them into qcrypto_cipher_afalg_driver.
-> 
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
->  crypto/Makefile.objs       |   1 +
->  crypto/afalgpriv.h         |   9 ++
->  crypto/cipher-afalg.c      | 229 +++++++++++++++++++++++++++++++++++++++++++++
->  crypto/cipher.c            |  28 +++++-
->  crypto/cipherpriv.h        |  11 +++
->  include/crypto/cipher.h    |   8 ++
->  tests/test-crypto-cipher.c |  10 +-
->  7 files changed, 294 insertions(+), 2 deletions(-)
->  create mode 100644 crypto/cipher-afalg.c
-> 
+Richard Jones <rjones@redhat.com> writes:
 
-> diff --git a/crypto/cipher-afalg.c b/crypto/cipher-afalg.c
-> new file mode 100644
-> index 0000000..cce8e6b
-> --- /dev/null
-> +++ b/crypto/cipher-afalg.c
-
-> +static char *
-> +qcrypto_afalg_cipher_format_name(QCryptoCipherAlgorithm alg,
-> +                                 QCryptoCipherMode mode,
-> +                                 Error **errp)
-> +{
-> +    char *name;
-> +    const char *alg_name;
-> +    const char *mode_name;
-> +    int ret;
-> +
-> +    switch (alg) {
-> +    case QCRYPTO_CIPHER_ALG_AES_128:
-> +    case QCRYPTO_CIPHER_ALG_AES_192:
-> +    case QCRYPTO_CIPHER_ALG_AES_256:
-> +        alg_name = "aes";
-> +        break;
-> +    case QCRYPTO_CIPHER_ALG_CAST5_128:
-> +        alg_name = "cast5";
-> +        break;
-> +    case QCRYPTO_CIPHER_ALG_SERPENT_128:
-> +    case QCRYPTO_CIPHER_ALG_SERPENT_192:
-> +    case QCRYPTO_CIPHER_ALG_SERPENT_256:
-> +        alg_name = "serpent";
-> +        break;
-> +    case QCRYPTO_CIPHER_ALG_TWOFISH_128:
-> +    case QCRYPTO_CIPHER_ALG_TWOFISH_192:
-> +    case QCRYPTO_CIPHER_ALG_TWOFISH_256:
-> +        alg_name = "twofish";
-> +        break;
-> +
-> +    default:
-> +        error_setg(errp, "Unsupported cipher algorithm %d", alg);
-> +        return NULL;
-> +    }
-> +
-> +    mode_name = QCryptoCipherMode_lookup[mode];
-> +
-> +    name = g_new0(char, SALG_NAME_LEN_MAX);
-> +    ret = snprintf(name, SALG_NAME_LEN_MAX, "%s(%s)", mode_name,
-> +                   alg_name);
-> +    if (ret < 0 || ret >= SALG_NAME_LEN_MAX) {
-> +        error_setg(errp, "Build ciphername(name='%s',mode='%s') failed",
-> +                   alg_name, mode_name);
-> +        g_free(name);
-> +        return NULL;
-> +    }
-
-Using g_new0+snprintf() is never a good idea. Instead use  g_strdup_printf().
-
-There is no need for the length check here either, since 
-qcrypto_afalg_comm_alloc() is already going to bounds check
-it
-
-
-> +
-> +    return name;
-> +}
-> +
-> +QCryptoAFAlg *
-> +qcrypto_afalg_cipher_ctx_new(QCryptoCipherAlgorithm alg,
-> +                             QCryptoCipherMode mode,
-> +                             const uint8_t *key,
-> +                             size_t nkey, Error **errp)
-> +{
-> +    QCryptoAFAlg *afalg;
-> +    size_t except_niv;
-
-Typo - I think you meant  'expect_niv' instead - same typo in other
-methods below too
-
-> +    char *name;
-> +
-> +    name = qcrypto_afalg_cipher_format_name(alg, mode, errp);
-> +    if (!name) {
-> +        return NULL;
-> +    }
-> +
-> +    afalg = qcrypto_afalg_comm_alloc(AFALG_TYPE_CIPHER, name, errp);
-> +    if (!afalg) {
-> +        g_free(name);
-> +        return NULL;
-> +    }
-> +    afalg->name = name;
-> +
-> +    /* setkey */
-> +    if (qemu_setsockopt(afalg->tfmfd, SOL_ALG, ALG_SET_KEY, key,
-> +                        nkey) != 0) {
-> +        error_setg_errno(errp, errno, "Set key failed");
-> +        qcrypto_afalg_comm_free(afalg);
-> +        return NULL;
-> +    }
-> +
-> +    /* prepare msg header */
-> +    afalg->msg = g_new0(struct msghdr, 1);
-> +    afalg->msg->msg_controllen += CMSG_SPACE(ALG_OPTYPE_LEN);
-> +    except_niv = qcrypto_cipher_get_iv_len(alg, mode);
-> +    if (except_niv) {
-> +        afalg->msg->msg_controllen += CMSG_SPACE(ALG_MSGIV_LEN(except_niv));
-> +    }
-> +    afalg->msg->msg_control = g_new0(uint8_t, afalg->msg->msg_controllen);
-> +
-> +    /* We use 1st msghdr for crypto-info and 2nd msghdr for IV-info */
-> +    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
-> +    afalg->cmsg->cmsg_level = SOL_ALG;
-> +    afalg->cmsg->cmsg_type = ALG_SET_OP;
-> +    afalg->cmsg->cmsg_len = CMSG_SPACE(ALG_OPTYPE_LEN);
-> +
-> +    return afalg;
-> +}
-> +
-> +static int
-> +qcrypto_afalg_cipher_setiv(QCryptoCipher *cipher,
-> +                           const uint8_t *iv,
-> +                           size_t niv, Error **errp)
-> +{
-> +    struct af_alg_iv *alg_iv;
-> +    size_t except_niv;
-> +    QCryptoAFAlg *afalg = cipher->opaque;
-> +
-> +    except_niv = qcrypto_cipher_get_iv_len(cipher->alg, cipher->mode);
-> +    if (niv != except_niv) {
-> +        error_setg(errp, "Set IV len(%lu) not match excepted(%lu)",
-> +                   niv, except_niv);
-
-When printing variables that are 'size_t', you need '%zu' rather
-than '%lu'
-
-> +        return -1;
-> +    }
-> +
-> +    /* move ->cmsg to next msghdr, for IV-info */
-> +    afalg->cmsg = CMSG_NXTHDR(afalg->msg, afalg->cmsg);
-> +
-> +    /* build setiv msg */
-> +    afalg->cmsg->cmsg_level = SOL_ALG;
-> +    afalg->cmsg->cmsg_type = ALG_SET_IV;
-> +    afalg->cmsg->cmsg_len = CMSG_SPACE(ALG_MSGIV_LEN(niv));
-> +    alg_iv = (struct af_alg_iv *)CMSG_DATA(afalg->cmsg);
-> +    alg_iv->ivlen = niv;
-> +    memcpy(alg_iv->iv, iv, niv);
-> +
-> +    return 0;
-> +}
-> +
-> +static int
-> +qcrypto_afalg_cipher_op(QCryptoAFAlg *afalg,
-> +                        const void *in, void *out,
-> +                        size_t len, bool do_encrypt,
-> +                        Error **errp)
-> +{
-> +    uint32_t *type = NULL;
-> +    struct iovec iov;
-> +    size_t ret, done = 0;
-> +    uint32_t origin_contorllen;
-
-Typo - you mean 'origin_controllen'
-
-> +
-> +    origin_contorllen = afalg->msg->msg_controllen;
-> +    /* movev ->cmsg to first header, for crypto-info */
-> +    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
-> +
-> +    /* build encrypt msg */
-> +    afalg->msg->msg_iov = &iov;
-> +    afalg->msg->msg_iovlen = 1;
-> +    type = (uint32_t *)CMSG_DATA(afalg->cmsg);
-> +    if (do_encrypt) {
-> +        *type = ALG_OP_ENCRYPT;
-> +    } else {
-> +        *type = ALG_OP_DECRYPT;
-> +    }
-> +
-> +    do {
-> +        iov.iov_base = (void *)in + done;
-> +        iov.iov_len = len - done;
-> +
-> +        /* send info to AF_ALG core */
-> +        ret = sendmsg(afalg->opfd, afalg->msg, 0);
-> +        if (ret == -1) {
-> +            error_setg_errno(errp, errno, "Send data to AF_ALG core failed");
-> +            return -1;
-> +        }
-> +
-> +        /* encrypto && get result */
-> +        if (ret != read(afalg->opfd, out, ret)) {
-> +            error_setg_errno(errp, errno, "Get result from AF_ALG core failed");
-> +            return -1;
-> +        }
-> +
-> +        /* do not update IV for following chunks */
-> +        afalg->msg->msg_controllen = 0;
-> +        done += ret;
-> +    } while (done < len);
-> +
-> +    afalg->msg->msg_controllen = origin_contorllen;
-> +
-> +    return 0;
-> +}
-
-
-> diff --git a/crypto/cipher.c b/crypto/cipher.c
-> index a6e052c..4a6f548 100644
-> --- a/crypto/cipher.c
-> +++ b/crypto/cipher.c
-> @@ -164,17 +164,34 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
->  {
->      QCryptoCipher *cipher;
->      void *ctx;
-
-Initialize this to NULL;
-
-> +    Error *err2 = NULL;
-> +    QCryptoCipherDriver *drv;
-> +
-> +#ifdef CONFIG_AF_ALG
-> +    ctx = qcrypto_afalg_cipher_ctx_new(alg, mode, key, nkey, &err2);
-> +    if (ctx) {
-> +        drv = &qcrypto_cipher_afalg_driver;
-> +        goto set_cipher;
-
-And drop the goto here.
-
-> +    }
-> +#endif
+> Public bug reported:
 >
+> $ qemu-system-x86_64 -drive file=3D/tmp/foo\" -writeconfig -
+> # qemu config file
+>
+> [drive]
+> =C2=A0=C2=A0file =3D "/tmp/foo""
+>
+> For bonus points, try to construct a valid qemu config file that
+> contains a quoted value.  It's pretty clear (from looking at the code
+> also) that this is not possible.
+>
+> Also:
+>
+> - maximum value length is hard-coded in the parser at 1023 characters
+> (for no apparent reason)
+>
+> - the format is undocumented
 
-And add 'if (!ctx)' before this next block:
+Perhaps for the better, as -readconfig and -writeconfig are seriously
+limited in serveral ways.
 
->      ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
->      if (ctx == NULL) {
-> +        error_free(err2);
->          return NULL;
->      }
->  
-> +    drv = &qcrypto_cipher_lib_driver;
-> +    error_free(err2);
-> +
-> +#ifdef CONFIG_AF_ALG
-> +set_cipher:
-> +#endif
->      cipher = g_new0(QCryptoCipher, 1);
->      cipher->alg = alg;
->      cipher->mode = mode;
->      cipher->opaque = ctx;
-> -    cipher->driver = (void *)&qcrypto_cipher_lib_driver;
-> +    cipher->driver = (void *)drv;
->  
->      return cipher;
->  }
-> @@ -220,3 +237,12 @@ void qcrypto_cipher_free(QCryptoCipher *cipher)
->          g_free(cipher);
->      }
->  }
-> +
-> +bool qcrypto_cipher_using_afalg_drv(QCryptoCipher *cipher)
-> +{
-> +#ifdef CONFIG_AF_ALG
-> +    return cipher->driver == (void *)&qcrypto_cipher_afalg_driver;
-> +#else
-> +    return false;
-> +#endif
-> +}
+The format is Windows INI, which is as poorly specified as it's
+widespread.
 
+I intend to work on more capable configuration file support, but it'll
+take some time.
 
-> diff --git a/include/crypto/cipher.h b/include/crypto/cipher.h
-> index 984fb82..037f602 100644
-> --- a/include/crypto/cipher.h
-> +++ b/include/crypto/cipher.h
-> @@ -233,4 +233,12 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
->                           const uint8_t *iv, size_t niv,
->                           Error **errp);
->  
-> +/**
-> + * qcrypto_cipher_using_afalg_drv:
-> + * @ the cipher object
-> + *
-> + * Returns: true if @cipher is using afalg driver, otherwise false.
-> + */
-> +bool qcrypto_cipher_using_afalg_drv(QCryptoCipher *cipher);
-
-IMHO whether we use afalg or not should be hidden from users of the
-crypto API, so I'd prefer we didn't add this method
-
-> diff --git a/tests/test-crypto-cipher.c b/tests/test-crypto-cipher.c
-> index 07fa2fa..8bb3308 100644
-> --- a/tests/test-crypto-cipher.c
-> +++ b/tests/test-crypto-cipher.c
-> @@ -715,6 +715,7 @@ static void test_cipher_null_iv(void)
->      uint8_t key[32] = { 0 };
->      uint8_t plaintext[32] = { 0 };
->      uint8_t ciphertext[32] = { 0 };
-> +    Error *err = NULL;
->  
->      cipher = qcrypto_cipher_new(
->          QCRYPTO_CIPHER_ALG_AES_256,
-> @@ -729,7 +730,14 @@ static void test_cipher_null_iv(void)
->                             plaintext,
->                             ciphertext,
->                             sizeof(plaintext),
-> -                           &error_abort);
-> +                           &err);
-> +
-> +    if (qcrypto_cipher_using_afalg_drv(cipher)) {
-> +        g_assert(err != NULL);
-> +        error_free_or_abort(&err);
-> +    } else {
-> +        g_assert(err == NULL);
-> +    }
-
-This looks wierd - we should not have different behaviour here when
-using afalg
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> - don't use sscanf for parsing!
+>
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>
+> ** Description changed:
+>
+>   $ qemu-system-x86_64 -drive file=3D/tmp/foo\" -writeconfig -
+>   # qemu config file
+>=20=20=20
+>   [drive]
+> -   file =3D "/tmp/foo""
+> + =C2=A0=C2=A0file =3D "/tmp/foo""
+>=20=20=20
+> - For bonus points, try to construct a value qemu config file that
+> + For bonus points, try to construct a valid qemu config file that
+>   contains a quoted value.  It's pretty clear (from looking at the code
+>   also) that this is not possible.
+>=20=20=20
+>   Also:
+>=20=20=20
+>   - maximum value length is hard-coded in the parser at 1023 characters
+>   (for no apparent reason)
+>=20=20=20
+>   - the format is undocumented
+>=20=20=20
+>   - don't use sscanf for parsing!
