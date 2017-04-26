@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3NRU-0000E3-B7
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:17 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d3NRW-0000FU-0n
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3NRO-0006iA-Nz
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48682)
+	(envelope-from <dgilbert@redhat.com>) id 1d3NRP-0006ie-UE
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3NRO-0006hb-Hi
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:10 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3NRP-0006iJ-Ki
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:11 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C8DA23E6D0
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 13:57:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7AFBC3D945
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 13:57:10 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 26 Apr 2017 14:57:02 +0100
-Message-Id: <20170426135707.5261-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/5] hmp queue
+Date: Wed, 26 Apr 2017 14:57:03 +0100
+Message-Id: <20170426135707.5261-2-dgilbert@redhat.com>
+In-Reply-To: <20170426135707.5261-1-dgilbert@redhat.com>
+References: <20170426135707.5261-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 1/5] hmp: gpa2hva and gpa2hpa hostaddr command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +32,178 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, thuth@redhat.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-The following changes since commit dcaed66cbe2803f9378f3a043c2e482bf8035d=
-fd:
+These commands are useful when testing machine-check passthrough.
+gpa2hva is useful to inject a MADV_HWPOISON madvise from gdb, while
+gpa2hpa is useful to inject an error with the mce-inject kernel
+module.
 
-  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.10-2017042=
-6' into staging (2017-04-26 13:17:11 +0100)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1490021158-4469-1-git-send-email-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20170420133058.12911-1-pbonzini@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hmp-commands.hx |  32 ++++++++++++++++++
+ monitor.c       | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 133 insertions(+)
 
-are available in the git repository at:
-
-  git://github.com/dagrh/qemu.git tags/pull-hmp-20170426
-
-for you to fetch changes up to 78f86a2b7c6b5c490a612729816473485d7ac570:
-
-  tests: Add a tester for HMP commands (2017-04-26 14:42:31 +0100)
-
-----------------------------------------------------------------
-HMP pull, with tcg fix
-
-----------------------------------------------------------------
-Paolo Bonzini (1):
-      hmp: gpa2hva and gpa2hpa hostaddr command
-
-Thomas Huth (4):
-      monitor: Check whether TCG is enabled before running the "info jit"=
- code
-      libqtest: Ignore QMP events when parsing the response for HMP comma=
-nds
-      libqtest: Add a generic function to run a callback function for eve=
-ry machine
-      tests: Add a tester for HMP commands
-
- hmp-commands.hx        |  32 ++++++++++
- monitor.c              | 106 ++++++++++++++++++++++++++++++++
- tests/Makefile.include |   2 +
- tests/libqtest.c       |  36 +++++++++++
- tests/libqtest.h       |  12 +++-
- tests/pc-cpu-test.c    |  95 +++++++++++------------------
- tests/qom-test.c       |  36 ++---------
- tests/test-hmp.c       | 161 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 8 files changed, 390 insertions(+), 90 deletions(-)
- create mode 100644 tests/test-hmp.c
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 88192817b2..0aca984261 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -526,6 +526,38 @@ Dump 80 16 bit values at the start of the video memory.
+ ETEXI
+ 
+     {
++        .name       = "gpa2hva",
++        .args_type  = "addr:l",
++        .params     = "addr",
++        .help       = "print the host virtual address corresponding to a guest physical address",
++        .cmd        = hmp_gpa2hva,
++    },
++
++STEXI
++@item gpa2hva @var{addr}
++@findex gpa2hva
++Print the host virtual address at which the guest's physical address @var{addr}
++is mapped.
++ETEXI
++
++#ifdef CONFIG_LINUX
++    {
++        .name       = "gpa2hpa",
++        .args_type  = "addr:l",
++        .params     = "addr",
++        .help       = "print the host physical address corresponding to a guest physical address",
++        .cmd        = hmp_gpa2hpa,
++    },
++#endif
++
++STEXI
++@item gpa2hpa @var{addr}
++@findex gpa2hpa
++Print the host physical address at which the guest's physical address @var{addr}
++is mapped.
++ETEXI
++
++    {
+         .name       = "p|print",
+         .args_type  = "fmt:/,val:l",
+         .params     = "/fmt expr",
+diff --git a/monitor.c b/monitor.c
+index be282ecb80..a27dc8003f 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1421,6 +1421,107 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
+     memory_dump(mon, count, format, size, addr, 1);
+ }
+ 
++static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
++{
++    MemoryRegionSection mrs = memory_region_find(get_system_memory(),
++                                                 addr, 1);
++
++    if (!mrs.mr) {
++        error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
++        return NULL;
++    }
++
++    if (!memory_region_is_ram(mrs.mr) && !memory_region_is_romd(mrs.mr)) {
++        error_setg(errp, "Memory at address 0x%" HWADDR_PRIx "is not RAM", addr);
++        memory_region_unref(mrs.mr);
++        return NULL;
++    }
++
++    *p_mr = mrs.mr;
++    return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
++}
++
++static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
++{
++    hwaddr addr = qdict_get_int(qdict, "addr");
++    Error *local_err = NULL;
++    MemoryRegion *mr = NULL;
++    void *ptr;
++
++    ptr = gpa2hva(&mr, addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return;
++    }
++
++    monitor_printf(mon, "Host virtual address for 0x%" HWADDR_PRIx
++                   " (%s) is %p\n",
++                   addr, mr->name, ptr);
++
++    memory_region_unref(mr);
++}
++
++#ifdef CONFIG_LINUX
++static uint64_t vtop(void *ptr, Error **errp)
++{
++    uint64_t pinfo;
++    uint64_t ret = -1;
++    uintptr_t addr = (uintptr_t) ptr;
++    uintptr_t pagesize = getpagesize();
++    off_t offset = addr / pagesize * sizeof(pinfo);
++    int fd;
++
++    fd = open("/proc/self/pagemap", O_RDONLY);
++    if (fd == -1) {
++        error_setg_errno(errp, errno, "Cannot open /proc/self/pagemap");
++        return -1;
++    }
++
++    /* Force copy-on-write if necessary.  */
++    atomic_add((uint8_t *)ptr, 0);
++
++    if (pread(fd, &pinfo, sizeof(pinfo), offset) != sizeof(pinfo)) {
++        error_setg_errno(errp, errno, "Cannot read pagemap");
++        goto out;
++    }
++    if ((pinfo & (1ull << 63)) == 0) {
++        error_setg(errp, "Page not present");
++        goto out;
++    }
++    ret = ((pinfo & 0x007fffffffffffffull) * pagesize) | (addr & (pagesize - 1));
++
++out:
++    close(fd);
++    return ret;
++}
++
++static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
++{
++    hwaddr addr = qdict_get_int(qdict, "addr");
++    Error *local_err = NULL;
++    MemoryRegion *mr = NULL;
++    void *ptr;
++    uint64_t physaddr;
++
++    ptr = gpa2hva(&mr, addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return;
++    }
++
++    physaddr = vtop(ptr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++    } else {
++        monitor_printf(mon, "Host physical address for 0x%" HWADDR_PRIx
++                       " (%s) is 0x%" PRIx64 "\n",
++                       addr, mr->name, (uint64_t) physaddr);
++    }
++
++    memory_region_unref(mr);
++}
++#endif
++
+ static void do_print(Monitor *mon, const QDict *qdict)
+ {
+     int format = qdict_get_int(qdict, "format");
+-- 
+2.12.2
