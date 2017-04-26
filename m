@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d3NFG-0008IE-Pd
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:44:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d3NHa-0001UB-2O
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d3NFG-0001N7-2N
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:44:38 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1493107736-6608-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f523e9f6-4e05-38a2-413a-9891033c9466@redhat.com>
-Date: Wed, 26 Apr 2017 15:44:30 +0200
-MIME-Version: 1.0
-In-Reply-To: <1493107736-6608-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Issue a deprecation warning if the user
- specifies the "-hdachs" option.
+	(envelope-from <mreitz@redhat.com>) id 1d3NHW-0002Kp-70
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:02 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 26 Apr 2017 15:46:46 +0200
+Message-Id: <20170426134649.9042-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] qemu-img/convert: Some small fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +17,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+
+This series fixes some small issues in qemu-img's convert subcommand.
 
 
+v2:
+- Not CC'd to qemu-stable: This is mostly a rebase onto block-next, and
+  the patches that make a difference will not appear in qemu-stable.
+  Therefore, if this is merged, v1 will be good for qemu-stable.
+- Dropped the old patch 1, it became superfluous
+- (New) patch 2: Rebased onto block-next
+  - %s/bs_n/s.src_num/g
+  - The block that's removed no longer sets ret to -1; but we still have
+    to do this in the block that's added (and don't set it to -EINVAL
+    there because all the places around it use -1 as well and -EINVAL
+    would thus look weird).
+- (New) patch 3: Added, as reported by Eric
 
-On 25/04/2017 10:08, Thomas Huth wrote:
-> If the user needs to specify the disk geometry, the corresponding
-> parameters of the "-drive" option should be used instead. "-hdachs"
-> is considered as deprecated and might be removed soon.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  vl.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/vl.c b/vl.c
-> index 0b4ed52..0980213 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3230,6 +3230,8 @@ int main(int argc, char **argv, char **envp)
->                          }
->                      }
->                  }
-> +                error_report("'-hdachs' is deprecated. Please use '-drive"
-> +                             " ...,cyls=c,heads=h,secs=s,trans=t' instead.");
->                  break;
->              case QEMU_OPTION_numa:
->                  opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
-> 
 
-Not even this, which should also be deprecated; please suggest using
-"-device ide-hd" instead.
+git-backport-diff against v1:
 
-Paolo
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/3:[----] [-C] 'qemu-img/convert: Use @opts for one thing only'
+002/3:[0007] [FC] 'qemu-img/convert: Move bs_n > 1 && -B check down'
+003/3:[down] 'qemu-img: Document backing options'
+
+
+Max Reitz (3):
+  qemu-img/convert: Use @opts for one thing only
+  qemu-img/convert: Move bs_n > 1 && -B check down
+  qemu-img: Document backing options
+
+ qemu-img.c                 | 23 +++++++++++++----------
+ qemu-img-cmds.hx           |  8 ++++----
+ qemu-img.texi              |  4 ++--
+ tests/qemu-iotests/122.out |  4 ++--
+ 4 files changed, 21 insertions(+), 18 deletions(-)
+
+-- 
+2.12.2
