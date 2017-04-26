@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3NsX-0002Pk-E0
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:25:16 -0400
+	(envelope-from <berrange@redhat.com>) id 1d3Nwt-0004vR-T8
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:29:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3NsR-0001kG-Qn
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:25:13 -0400
-Date: Wed, 26 Apr 2017 16:24:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170426142456.GJ4538@noname.str.redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1d3Nws-0003jD-HW
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:29:43 -0400
+Date: Wed, 26 Apr 2017 15:29:28 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170426142928.GB18933@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170426033413.17192-1-famz@redhat.com>
 	<20170426033413.17192-20-famz@redhat.com>
 	<20170426125714.GG4538@noname.str.redhat.com>
 	<20170426132028.GC9205@lemon.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20170426132028.GC9205@lemon.lan>
 Subject: Re: [Qemu-devel] [PATCH v15 19/21] osdep: Add qemu_lock_fd and
@@ -27,9 +28,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Am 26.04.2017 um 15:20 hat Fam Zheng geschrieben:
+On Wed, Apr 26, 2017 at 09:20:28PM +0800, Fam Zheng wrote:
 > On Wed, 04/26 14:57, Kevin Wolf wrote:
 > > Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
 > > > They are wrappers of POSIX fcntl "file private locking", with a
@@ -77,16 +78,23 @@ Am 26.04.2017 um 15:20 hat Fam Zheng geschrieben:
 >     #endif
 > 
 > to avoid "abusing" the macro name.
-
-Makes sense.
-
-> Another question is whether we should print a warning to make users
-> aware? Even the test case in patch 21 can see three "lock losses" on
-> RHEL with posix lock, and there are way more corner cases, I believe.
 > 
-> We can print a warning to stderr in raw_open_common when F_OFD_GETLK
-> is not available, I think.
+> Another question is whether we should print a warning to make users aware? Even
+> the test case in patch 21 can see three "lock losses" on RHEL with posix lock,
+> and there are way more corner cases, I believe.
 
-Yes, this sounds reasonable, too. Dependent on s->use_locks, I guess.
+Is it possible to use F_GETLK to detect when we have a missing lock, then
+add assertions in various key places that call F_GETLK to validate hat
+the lock still exists & print an warning.
 
-Kevin
+I don't like the idea that downstream would be running with locking enabled,
+but silently loosing locks with no indication at all that this happened,
+especially when upstream development won't be testing this since those devs
+will use the F_OFD_SETLK instead.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
