@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3GMT-0000ds-F5
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 02:23:38 -0400
+	(envelope-from <cota@braap.org>) id 1d3GMT-0000e7-NA
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 02:23:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3GMS-0000OG-48
+	(envelope-from <cota@braap.org>) id 1d3GMS-0000P5-ET
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 02:23:37 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 26 Apr 2017 02:23:14 -0400
-Message-Id: <1493187803-4510-2-git-send-email-cota@braap.org>
+Date: Wed, 26 Apr 2017 02:23:19 -0400
+Message-Id: <1493187803-4510-7-git-send-email-cota@braap.org>
 In-Reply-To: <1493187803-4510-1-git-send-email-cota@braap.org>
 References: <1493187803-4510-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 01/10] tcg-runtime: add lookup_tb_ptr helper
+Subject: [Qemu-devel] [PATCH v3 06/10] target/arm: optimize indirect branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,79 +22,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-This paves the way for upcoming work.
+Speed up indirect branches by jumping to the target if it is valid.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Softmmu measurements (see later commit for user-mode results):
+
+Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
+
+- Impact on Boot time
+
+| setup  | ARM debian jessie boot+shutdown time | stddev |
+|--------+--------------------------------------+--------|
+| v2.9.0 |                                 8.84 |   0.07 |
+| +cross |                                 8.85 |   0.03 |
+| +jr    |                                 8.83 |   0.06 |
+
+-                            NBench, arm-softmmu (debian jessie guest). Host: Intel i7-4790K @ 4.00GHz
+
+  1.3x +-+-------------------------------------------------------------------------------------------------------------+-+
+       |                                                                                                                 |
+       |   cross                                                          ####                                           |
+ 1.25x +cross+jr..........................................................#++#.........................................+-+
+       |                                                        ####      #  #                                           |
+       |                                                     +++#  #      #  #                                           |
+       |                                      +++            ****  #      #  #                                           |
+  1.2x +-+...................................####............*..*..#......#..#.........................................+-+
+       |                                  ****  #            *  *  #      #  #     ####                                  |
+       |                                  *  *  #            *  *  #      #  #     #  #                                  |
+ 1.15x +-+................................*..*..#............*..*..#......#..#.....#..#................................+-+
+       |                                  *  *  #            *  *  #      #  #     #  #                                  |
+       |                                  *  *  #      ####  *  *  #      #  #     #  #                                  |
+       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         ####     |
+  1.1x +-+................................*..*..#......#..#..*..*..#......#..#.....#..#.........................#..#...+-+
+       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         #  #     |
+       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         #  #     |
+ 1.05x +-+..........................####..*..*..#......#..#..*..*..#......#..#.....#..#......+++............*****..#...+-+
+       |                        *****  #  *  *  #      #  #  *  *  #  *****  #     #  #   +++ |    ****###  *   *  #     |
+       |                        *+++*  #  *  *  #      #  #  *  *  #  *+++*  #  ****  #  *****###  *  *  #  *   *  #     |
+       |     *****###  +++####  *   *  #  *  *  #  *****  #  *  *  #  *   *  #  *  *  #  * | *++#  *  *  #  *   *  #     |
+    1x +-++-+*+++*-+#++****++#++*+-+*++#+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-++-+
+       |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
+       |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
+ 0.95x +-+---*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###---+-+
+       ASSIGNMENT BITFIELD   FOURFP EMULATION   HUFFMAN   LU DECOMPOSITIONEURAL NNUMERIC SOSTRING SORT     hmean
+  png: http://imgur.com/eOLmZNR
+
+NB. 'cross' represents the previous commit.
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tcg-runtime.c     | 21 +++++++++++++++++++++
- tcg/tcg-runtime.h |  2 ++
- tcg/tcg.h         |  1 +
- 3 files changed, 24 insertions(+)
+ target/arm/translate.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/tcg-runtime.c b/tcg-runtime.c
-index 4c60c96..90d2d4b 100644
---- a/tcg-runtime.c
-+++ b/tcg-runtime.c
-@@ -27,6 +27,7 @@
- #include "exec/helper-proto.h"
- #include "exec/cpu_ldst.h"
- #include "exec/exec-all.h"
-+#include "exec/tb-hash.h"
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 02cad96..73595b4 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -65,6 +65,7 @@ static TCGv_i32 cpu_R[16];
+ TCGv_i32 cpu_CF, cpu_NF, cpu_VF, cpu_ZF;
+ TCGv_i64 cpu_exclusive_addr;
+ TCGv_i64 cpu_exclusive_val;
++static bool gen_jr;
  
- /* 32-bit helpers */
- 
-@@ -141,6 +142,26 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
-     return ctpop64(arg);
+ /* FIXME:  These should be removed.  */
+ static TCGv_i32 cpu_F0s, cpu_F1s;
+@@ -221,6 +222,7 @@ static void store_reg(DisasContext *s, int reg, TCGv_i32 var)
+          */
+         tcg_gen_andi_i32(var, var, s->thumb ? ~1 : ~3);
+         s->is_jmp = DISAS_JUMP;
++        gen_jr = true;
+     }
+     tcg_gen_mov_i32(cpu_R[reg], var);
+     tcg_temp_free_i32(var);
+@@ -893,6 +895,7 @@ static inline void gen_bx_im(DisasContext *s, uint32_t addr)
+         tcg_temp_free_i32(tmp);
+     }
+     tcg_gen_movi_i32(cpu_R[15], addr & ~1);
++    gen_jr = true;
  }
  
-+void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
-+{
-+    CPUState *cpu = ENV_GET_CPU(env);
-+    TranslationBlock *tb;
-+    target_ulong cs_base, pc;
-+    uint32_t flags;
-+
-+    if (unlikely(atomic_read(&cpu->exit_request))) {
-+        goto out_epilogue;
-+    }
-+    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
-+    if (likely(tb && tb->pc == addr && tb->cs_base == cs_base &&
-+               tb->flags == flags)) {
-+        return tb->tc_ptr;
-+    }
-+ out_epilogue:
-+    return tcg_ctx.code_gen_epilogue;
-+}
-+
- void HELPER(exit_atomic)(CPUArchState *env)
- {
-     cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
-diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
-index 114ea6f..c41d38a 100644
---- a/tcg/tcg-runtime.h
-+++ b/tcg/tcg-runtime.h
-@@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
- DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+ /* Set PC and Thumb state from var.  var is marked as dead.  */
+@@ -902,6 +905,7 @@ static inline void gen_bx(DisasContext *s, TCGv_i32 var)
+     tcg_gen_andi_i32(cpu_R[15], var, ~1);
+     tcg_gen_andi_i32(var, var, 1);
+     store_cpu_field(var, thumb);
++    gen_jr = true;
+ }
  
-+DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
+ /* Variant of store_reg which uses branch&exchange logic when storing
+@@ -12034,6 +12038,16 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             gen_set_pc_im(dc, dc->pc);
+             /* fall through */
+         case DISAS_JUMP:
++            if (gen_jr) {
++                TCGv addr = tcg_temp_new();
 +
- DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
- 
- #ifdef CONFIG_SOFTMMU
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 6c216bb..5ec48d1 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -699,6 +699,7 @@ struct TCGContext {
-        extension that allows arithmetic on void*.  */
-     int code_gen_max_blocks;
-     void *code_gen_prologue;
-+    void *code_gen_epilogue;
-     void *code_gen_buffer;
-     size_t code_gen_buffer_size;
-     void *code_gen_ptr;
++                gen_jr = false;
++                tcg_gen_extu_i32_tl(addr, cpu_R[15]);
++                tcg_gen_lookup_and_goto_ptr(addr);
++                tcg_temp_free(addr);
++                break;
++            }
++            /* fall through */
+         default:
+             /* indicate that the hash table must be used to find the next TB */
+             tcg_gen_exit_tb(0);
 -- 
 2.7.4
