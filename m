@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d3NHe-0001be-HE
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d3NHd-0001ZV-HP
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d3NHd-0002NB-DQ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d3NHZ-0002Lt-GU
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:05 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 26 Apr 2017 15:46:49 +0200
-Message-Id: <20170426134649.9042-4-mreitz@redhat.com>
+Date: Wed, 26 Apr 2017 15:46:48 +0200
+Message-Id: <20170426134649.9042-3-mreitz@redhat.com>
 In-Reply-To: <20170426134649.9042-1-mreitz@redhat.com>
 References: <20170426134649.9042-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] qemu-img: Document backing options
+Subject: [Qemu-devel] [PATCH v2 2/3] qemu-img/convert: Move bs_n > 1 && -B
+ check down
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,67 +23,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-The create and convert subcommands have shorthands to set the
-backing_file and, in the case of create, the backing_fmt options for the
-new image. However, they have not been documented so far, which is
-remedied by this patch.
+It does not make much sense to use a backing image for the target when
+you concatenate multiple images (because then there is no correspondence
+between the source images' backing files and the target's); but it was
+still possible to give one by using -o backing_file=X instead of -B X.
 
-Reported-by: Eric Blake <eblake@redhat.com>
+Fix this by moving the check.
+
+(Also, change the error message because -B is not the only way to
+ specify the backing file, evidently.)
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img-cmds.hx | 8 ++++----
- qemu-img.texi    | 4 ++--
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ qemu-img.c                 | 13 +++++++------
+ tests/qemu-iotests/122.out |  4 ++--
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 8ac78222af..bf4ce59019 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -22,9 +22,9 @@ STEXI
- ETEXI
+diff --git a/qemu-img.c b/qemu-img.c
+index ae6f27f899..9eb82830f7 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -2089,12 +2089,6 @@ static int img_convert(int argc, char **argv)
+     }
  
- DEF("create", img_create,
--    "create [-q] [--object objectdef] [-f fmt] [-o options] filename [size]")
-+    "create [-q] [--object objectdef] [-f fmt] [-b backing_file] [-F backing_fmt] [-o options] filename [size]")
- STEXI
--@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-o @var{options}] @var{filename} [@var{size}]
-+@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-o @var{options}] @var{filename} [@var{size}]
- ETEXI
  
- DEF("commit", img_commit,
-@@ -40,9 +40,9 @@ STEXI
- ETEXI
+-    if (s.src_num > 1 && out_baseimg) {
+-        error_report("-B makes no sense when concatenating multiple input "
+-                     "images");
+-        goto fail_getopt;
+-    }
+-
+     /* ret is still -EINVAL until here */
+     ret = bdrv_parse_cache_mode(src_cache, &src_flags, &src_writethrough);
+     if (ret < 0) {
+@@ -2208,6 +2202,13 @@ static int img_convert(int argc, char **argv)
+     }
+     s.target_has_backing = (bool) out_baseimg;
  
- DEF("convert", img_convert,
--    "convert [--object objectdef] [--image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
-+    "convert [--object objectdef] [--image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
- STEXI
--@item convert [--object @var{objectdef}] [--image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
-+@item convert [--object @var{objectdef}] [--image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
- ETEXI
++    if (s.src_num > 1 && out_baseimg) {
++        error_report("Having a backing file for the target makes no sense when "
++                     "concatenating multiple input images");
++        ret = -1;
++        goto out;
++    }
++
+     /* Check if compression is supported */
+     if (s.compressed) {
+         bool encryption =
+diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
+index 98814de5d6..9317d801ad 100644
+--- a/tests/qemu-iotests/122.out
++++ b/tests/qemu-iotests/122.out
+@@ -61,8 +61,8 @@ read 65536/65536 bytes at offset 4194304
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 65536/65536 bytes at offset 8388608
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-qemu-img: -B makes no sense when concatenating multiple input images
+-qemu-img: -B makes no sense when concatenating multiple input images
++qemu-img: Having a backing file for the target makes no sense when concatenating multiple input images
++qemu-img: Having a backing file for the target makes no sense when concatenating multiple input images
  
- DEF("dd", img_dd,
-diff --git a/qemu-img.texi b/qemu-img.texi
-index c81db3e81c..8c573ae010 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -224,7 +224,7 @@ If @code{-r} is specified, exit codes representing the image state refer to the
- state after (the attempt at) repairing it. That is, a successful @code{-r all}
- will yield the exit code 0, independently of the image state before.
+ === Compression with misaligned allocations and image sizes ===
  
--@item create [-f @var{fmt}] [-o @var{options}] @var{filename} [@var{size}]
-+@item create [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-o @var{options}] @var{filename} [@var{size}]
- 
- Create the new disk image @var{filename} of size @var{size} and format
- @var{fmt}. Depending on the file format, you can add one or more @var{options}
-@@ -302,7 +302,7 @@ Error on reading data
- 
- @end table
- 
--@item convert [-c] [-p] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-m @var{num_coroutines}] [-W] [-S @var{sparse_size}] @var{filename} [@var{filename2} [...]] @var{output_filename}
-+@item convert [-c] [-p] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-m @var{num_coroutines}] [-W] [-S @var{sparse_size}] @var{filename} [@var{filename2} [...]] @var{output_filename}
- 
- Convert the disk image @var{filename} or a snapshot @var{snapshot_param}(@var{snapshot_id_or_name} is deprecated)
- to disk image @var{output_filename} using format @var{output_fmt}. It can be optionally compressed (@code{-c}
 -- 
 2.12.2
