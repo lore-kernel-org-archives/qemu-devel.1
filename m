@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d3OWD-0003YF-MS
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:06:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d3OZ8-0004D6-Lr
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d3OW7-0001ja-P0
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:06:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49230)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d3OW7-0001if-Fm
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:06:07 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3QF43fV112424
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 11:06:06 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2ebygvf1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 11:06:05 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 26 Apr 2017 16:06:03 +0100
-Date: Wed, 26 Apr 2017 17:05:53 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <f2769605-4cd0-7f95-0409-850258ccbaeb@redhat.com>
-References: <1493211188-24086-1-git-send-email-tgnyang@gmail.com>
-	<f2769605-4cd0-7f95-0409-850258ccbaeb@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1d3OZ4-0003Mc-J8
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:09:14 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38219)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d3OZ4-0003MM-Cf
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:09:10 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id r190so7662342wme.1
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 08:09:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170426170553.1d45e1d7.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] hw/char: remove console_exit function
- in sclp
+In-Reply-To: <20170426135707.5261-1-dgilbert@redhat.com>
+References: <20170426135707.5261-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 26 Apr 2017 16:08:48 +0100
+Message-ID: <CAFEAcA_HL-6W_Z-FUoEG6pY0Yi3R_SsHr6gNDVf5EAp5zYSKMA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/5] hmp queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,27 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Zihan Yang <tgnyang@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On Wed, 26 Apr 2017 09:42:02 -0500
-Eric Blake <eblake@redhat.com> wrote:
+On 26 April 2017 at 14:57, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit dcaed66cbe2803f9378f3a043c2e482bf8035dfd:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.10-20170426' into staging (2017-04-26 13:17:11 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-hmp-20170426
+>
+> for you to fetch changes up to 78f86a2b7c6b5c490a612729816473485d7ac570:
+>
+>   tests: Add a tester for HMP commands (2017-04-26 14:42:31 +0100)
+>
+> ----------------------------------------------------------------
+> HMP pull, with tcg fix
+>
+> ----------------------------------------------------------------
+> Paolo Bonzini (1):
+>       hmp: gpa2hva and gpa2hpa hostaddr command
+>
+> Thomas Huth (4):
+>       monitor: Check whether TCG is enabled before running the "info jit" code
+>       libqtest: Ignore QMP events when parsing the response for HMP commands
+>       libqtest: Add a generic function to run a callback function for every machine
+>       tests: Add a tester for HMP commands
 
-> On 04/26/2017 07:53 AM, Zihan Yang wrote:
-> > Currently, the console_exit function in sclpconsole-lm.c and sclpconsole.c
-> > does nothing, so remove them and convert the callback in SCLPEventClass to
-> > void. Since there is a NULL check on the DeviceClass exit callback as
-> > suggested by Frederic Konrad, it should be safe to remove them.
-> 
-> When sending a patch series, please be sure to include a 0/5 cover
-> letter, to make it easier on automated tooling that processes the list.
-> You can use 'git config format.coverletter auto' to make it easier to
-> remember this for patches created by 'git format-patch'/'git send-email'.
-> 
-> More submission hints at: http://wiki.qemu.org/Contribute/SubmitAPatch
-> 
+Applied, thanks.
 
-Nod.
-
-Of the hints in the wiki page above, I'd especially like to point out
-versioning and change logs.
+-- PMM
