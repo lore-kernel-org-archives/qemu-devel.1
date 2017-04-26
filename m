@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d3MRb-0005ZA-Ct
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:23 -0400
+	(envelope-from <tgnyang@gmail.com>) id 1d3MRp-0005zX-58
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d3MRa-0005IV-LX
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:19 -0400
-Date: Wed, 26 Apr 2017 20:53:10 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170426125310.GA9205@lemon.lan>
-References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-22-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170426033413.17192-22-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v15 21/21] qemu-iotests: Add test case 153
- for image locking
+	(envelope-from <tgnyang@gmail.com>) id 1d3MRm-0005Or-3U
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:33 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35860)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d3MRl-0005Ny-UG
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:53:30 -0400
+Received: by mail-pg0-x241.google.com with SMTP id v1so10771821pgv.3
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 05:53:29 -0700 (PDT)
+From: Zihan Yang <tgnyang@gmail.com>
+Date: Wed, 26 Apr 2017 20:53:04 +0800
+Message-Id: <1493211188-24086-1-git-send-email-tgnyang@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/5] hw/char: remove console_exit function in
+ sclp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,21 +25,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Zihan Yang <tgnyang@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 04/26 11:34, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/qemu-iotests/153     | 220 +++++++++++++++++++++++++
->  tests/qemu-iotests/153.out | 390 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 611 insertions(+)
->  create mode 100755 tests/qemu-iotests/153
->  create mode 100644 tests/qemu-iotests/153.out
-> 
-> diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-> +== Creating /var/tmp/q/build/tests/qemu-iotests/scratch/t.qcow2.[abc] ==
+Currently, the console_exit function in sclpconsole-lm.c and sclpconsole.c
+does nothing, so remove them and convert the callback in SCLPEventClass to
+void. Since there is a NULL check on the DeviceClass exit callback as
+suggested by Frederic Konrad, it should be safe to remove them.
 
-Forgot to filter test dir here.
+Signed-off-by: Zihan Yang <tgnyang@gmail.com>
+---
+ hw/char/sclpconsole-lm.c          | 6 ------
+ hw/char/sclpconsole.c             | 6 ------
+ hw/s390x/event-facility.c         | 6 +-----
+ include/hw/s390x/event-facility.h | 2 +-
+ 4 files changed, 2 insertions(+), 18 deletions(-)
 
-Fam
+diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+index 07d6ebd..86ddda6 100644
+--- a/hw/char/sclpconsole-lm.c
++++ b/hw/char/sclpconsole-lm.c
+@@ -318,11 +318,6 @@ static int console_init(SCLPEvent *event)
+     return 0;
+ }
+ 
+-static int console_exit(SCLPEvent *event)
+-{
+-    return 0;
+-}
+-
+ static void console_reset(DeviceState *dev)
+ {
+    SCLPEvent *event = SCLP_EVENT(dev);
+@@ -349,7 +344,6 @@ static void console_class_init(ObjectClass *klass, void *data)
+     dc->reset = console_reset;
+     dc->vmsd = &vmstate_sclplmconsole;
+     ec->init = console_init;
+-    ec->exit = console_exit;
+     ec->get_send_mask = send_mask;
+     ec->get_receive_mask = receive_mask;
+     ec->can_handle_event = can_handle_event;
+diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+index b78f240..e916cac 100644
+--- a/hw/char/sclpconsole.c
++++ b/hw/char/sclpconsole.c
+@@ -246,11 +246,6 @@ static void console_reset(DeviceState *dev)
+    scon->notify = false;
+ }
+ 
+-static int console_exit(SCLPEvent *event)
+-{
+-    return 0;
+-}
+-
+ static Property console_properties[] = {
+     DEFINE_PROP_CHR("chardev", SCLPConsole, chr),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -265,7 +260,6 @@ static void console_class_init(ObjectClass *klass, void *data)
+     dc->reset = console_reset;
+     dc->vmsd = &vmstate_sclpconsole;
+     ec->init = console_init;
+-    ec->exit = console_exit;
+     ec->get_send_mask = send_mask;
+     ec->get_receive_mask = receive_mask;
+     ec->can_handle_event = can_handle_event;
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index 34b2faf..f7c509c 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -413,11 +413,7 @@ static void event_unrealize(DeviceState *qdev, Error **errp)
+     SCLPEvent *event = SCLP_EVENT(qdev);
+     SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
+     if (child->exit) {
+-        int rc = child->exit(event);
+-        if (rc < 0) {
+-            error_setg(errp, "SCLP event exit failed.");
+-            return;
+-        }
++        child->exit(event);
+     }
+ }
+ 
+diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+index def1bb0..1a32f3a 100644
+--- a/include/hw/s390x/event-facility.h
++++ b/include/hw/s390x/event-facility.h
+@@ -162,7 +162,7 @@ typedef struct SCLPEvent {
+ typedef struct SCLPEventClass {
+     DeviceClass parent_class;
+     int (*init)(SCLPEvent *event);
+-    int (*exit)(SCLPEvent *event);
++    void (*exit)(SCLPEvent *event);
+ 
+     /* get SCLP's send mask */
+     unsigned int (*get_send_mask)(void);
+-- 
+2.7.4
