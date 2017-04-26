@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d3NHa-0001UB-2O
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d3NHb-0001Vf-Sd
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d3NHW-0002Kp-70
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d3NHV-0002Ki-VW
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:03 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 26 Apr 2017 15:46:46 +0200
-Message-Id: <20170426134649.9042-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] qemu-img/convert: Some small fixes
+Date: Wed, 26 Apr 2017 15:46:47 +0200
+Message-Id: <20170426134649.9042-2-mreitz@redhat.com>
+In-Reply-To: <20170426134649.9042-1-mreitz@redhat.com>
+References: <20170426134649.9042-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/3] qemu-img/convert: Use @opts for one
+ thing only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,46 +23,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This series fixes some small issues in qemu-img's convert subcommand.
+After storing the creation options for the new image into @opts, we
+fetch some things for our own information, like the backing file name,
+or whether to use encryption or preallocation.
 
+With the -n parameter, there will not be any creation options; this is
+not too bad because this just means that querying a NULL @opts will
+always return the default value.
 
-v2:
-- Not CC'd to qemu-stable: This is mostly a rebase onto block-next, and
-  the patches that make a difference will not appear in qemu-stable.
-  Therefore, if this is merged, v1 will be good for qemu-stable.
-- Dropped the old patch 1, it became superfluous
-- (New) patch 2: Rebased onto block-next
-  - %s/bs_n/s.src_num/g
-  - The block that's removed no longer sets ret to -1; but we still have
-    to do this in the block that's added (and don't set it to -EINVAL
-    there because all the places around it use -1 as well and -EINVAL
-    would thus look weird).
-- (New) patch 3: Added, as reported by Eric
+However, we also use @opts for the --object options. Therefore, @opts is
+not necessarily NULL if -n was specified; instead, it may contain those
+options. In practice, this probably does not cause any problems because
+there most likely is no object that supports any of the parameters we
+query here, but this is neither something we should rely on nor does
+this variable reuse make the code very nice to read.
 
+Therefore, just use an own variable for the --object options.
 
-git-backport-diff against v1:
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ qemu-img.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/3:[----] [-C] 'qemu-img/convert: Use @opts for one thing only'
-002/3:[0007] [FC] 'qemu-img/convert: Move bs_n > 1 && -B check down'
-003/3:[down] 'qemu-img: Document backing options'
-
-
-Max Reitz (3):
-  qemu-img/convert: Use @opts for one thing only
-  qemu-img/convert: Move bs_n > 1 && -B check down
-  qemu-img: Document backing options
-
- qemu-img.c                 | 23 +++++++++++++----------
- qemu-img-cmds.hx           |  8 ++++----
- qemu-img.texi              |  4 ++--
- tests/qemu-iotests/122.out |  4 ++--
- 4 files changed, 21 insertions(+), 18 deletions(-)
-
+diff --git a/qemu-img.c b/qemu-img.c
+index b2c4dc9613..ae6f27f899 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -2049,13 +2049,15 @@ static int img_convert(int argc, char **argv)
+         case 'W':
+             s.wr_in_order = false;
+             break;
+-        case OPTION_OBJECT:
+-            opts = qemu_opts_parse_noisily(&qemu_object_opts,
+-                                           optarg, true);
+-            if (!opts) {
++        case OPTION_OBJECT: {
++            QemuOpts *object_opts;
++            object_opts = qemu_opts_parse_noisily(&qemu_object_opts,
++                                                  optarg, true);
++            if (!object_opts) {
+                 goto fail_getopt;
+             }
+             break;
++        }
+         case OPTION_IMAGE_OPTS:
+             image_opts = true;
+             break;
 -- 
 2.12.2
