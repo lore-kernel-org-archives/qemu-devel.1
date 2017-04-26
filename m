@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d3PcJ-0002cO-Ny
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:16:36 -0400
+	(envelope-from <mst@redhat.com>) id 1d3PcM-0002gW-Ew
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:16:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d3PcG-0001mk-Gr
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:16:35 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38911)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d3PcG-0001mQ-AN
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:16:32 -0400
-Received: by mail-wm0-x233.google.com with SMTP id r190so9690953wme.1
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 09:16:31 -0700 (PDT)
-References: <1493187803-4510-1-git-send-email-cota@braap.org>
-	<1493187803-4510-2-git-send-email-cota@braap.org>
-	<87efwf8nsm.fsf@linaro.org>
-	<5af8f37b-3ffa-6689-bcfa-4e5601fb2087@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <5af8f37b-3ffa-6689-bcfa-4e5601fb2087@redhat.com>
-Date: Wed, 26 Apr 2017 17:16:58 +0100
-Message-ID: <87a87387ph.fsf@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1d3PcK-0001nL-T9
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:16:38 -0400
+Date: Wed, 26 Apr 2017 19:16:26 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170426191406-mutt-send-email-mst@kernel.org>
+References: <20170417215916.12431-1-ehabkost@redhat.com>
+	<20170417215916.12431-4-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] tcg-runtime: add lookup_tb_ptr
- helper
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170417215916.12431-4-ehabkost@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 3/7] pci: Change pci_bus_new*() parameter to
+ PCIHostState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,141 +25,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org
 
+On Mon, Apr 17, 2017 at 06:59:12PM -0300, Eduardo Habkost wrote:
+> The pci_bus_new*() functions already require the 'parent' argument to b=
+e
+> a PCI_HOST_BRIDGE object. Change the parameter type to reflect that.
+>=20
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> Cc: "Herv=E9 Poussineau" <hpoussin@reactos.org>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-ppc@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+This function doesn't create a generic pci bus, it's only good
+for creating root buses.
 
-> On 26/04/2017 12:29, Alex Bennée wrote:
->>
->> Emilio G. Cota <cota@braap.org> writes:
->>
->>> This paves the way for upcoming work.
->>>
->>> Reviewed-by: Richard Henderson <rth@twiddle.net>
->>> Signed-off-by: Emilio G. Cota <cota@braap.org>
->>> ---
->>>  tcg-runtime.c     | 21 +++++++++++++++++++++
->>>  tcg/tcg-runtime.h |  2 ++
->>>  tcg/tcg.h         |  1 +
->>>  3 files changed, 24 insertions(+)
->>>
->>> diff --git a/tcg-runtime.c b/tcg-runtime.c
->>> index 4c60c96..90d2d4b 100644
->>> --- a/tcg-runtime.c
->>> +++ b/tcg-runtime.c
->>> @@ -27,6 +27,7 @@
->>>  #include "exec/helper-proto.h"
->>>  #include "exec/cpu_ldst.h"
->>>  #include "exec/exec-all.h"
->>> +#include "exec/tb-hash.h"
->>>
->>>  /* 32-bit helpers */
->>>
->>> @@ -141,6 +142,26 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
->>>      return ctpop64(arg);
->>>  }
->>>
->>> +void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
->>> +{
->>> +    CPUState *cpu = ENV_GET_CPU(env);
->>> +    TranslationBlock *tb;
->>> +    target_ulong cs_base, pc;
->>> +    uint32_t flags;
->>> +
->>> +    if (unlikely(atomic_read(&cpu->exit_request))) {
->>> +        goto out_epilogue;
->>> +    }
->>> +    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
->>> +    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
->>> +    if (likely(tb && tb->pc == addr && tb->cs_base == cs_base &&
->>> +               tb->flags == flags)) {
->>
->> Should we also not be checking the TB hasn't been invalidated: tb->invalid?
->
-> It's not needed because this lookup is (if I understand it right) once
-> only and is not reused later.  This is why tb_find doesn't check
-> tb->invalid, but uses it to avoid adding the TB to the chain.
+As we are changing all callers anyway, let's rename this to
+pci_host_bus_new or pci_root_bus_new?
 
-Right. And when tb->invalid = true is set we then flush it from the
-jump cache so it will never be found by the helper after.
-
-
-OK nothing to see here ;-)
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
->
-> Good:
->
-> 	tb_find			tb_phys_invalidate
-> 				  tb_lock
-> 				  tb->invalid = true
-> 	  lookup cache
-> 	  cache hit
-> 				  tb_unlock
-> 	  tb_lock
-> 	  tb->invalid?
-> 	    yes, skip tb_add_jump
-> 	  tb_unlock
-> 	  execute tb once
->
-> Bad (doesn't happen):
->
-> 	tb_find			tb_phys_invalidate
-> 				  tb_lock
-> 				  tb->invalid = true
-> 	  lookup cache
-> 	  cache hit
-> 				  tb_unlock
-> 	  tb_lock
-> 	  tb_add_jump
-> 	  tb_unlock
-> 	  execute tb many times
->
-> Paolo
->
->>> +        return tb->tc_ptr;
->>> +    }
->>> + out_epilogue:
->>> +    return tcg_ctx.code_gen_epilogue;
->>> +}
->>> +
->>>  void HELPER(exit_atomic)(CPUArchState *env)
->>>  {
->>>      cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
->>> diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
->>> index 114ea6f..c41d38a 100644
->>> --- a/tcg/tcg-runtime.h
->>> +++ b/tcg/tcg-runtime.h
->>> @@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
->>>  DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
->>>  DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
->>>
->>> +DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
->>> +
->>>  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
->>>
->>>  #ifdef CONFIG_SOFTMMU
->>> diff --git a/tcg/tcg.h b/tcg/tcg.h
->>> index 6c216bb..5ec48d1 100644
->>> --- a/tcg/tcg.h
->>> +++ b/tcg/tcg.h
->>> @@ -699,6 +699,7 @@ struct TCGContext {
->>>         extension that allows arithmetic on void*.  */
->>>      int code_gen_max_blocks;
->>>      void *code_gen_prologue;
->>> +    void *code_gen_epilogue;
->>>      void *code_gen_buffer;
->>>      size_t code_gen_buffer_size;
->>>      void *code_gen_ptr;
->>
->>
->> --
->> Alex Bennée
->>
-
-
---
-Alex Bennée
+> ---
+>  include/hw/pci/pci.h                |  5 +++--
+>  hw/pci-bridge/pci_expander_bridge.c | 15 ++++++++-------
+>  hw/pci-host/piix.c                  |  2 +-
+>  hw/pci-host/prep.c                  |  2 +-
+>  hw/pci-host/q35.c                   |  2 +-
+>  hw/pci-host/versatile.c             |  2 +-
+>  hw/pci/pci.c                        | 13 ++++++-------
+>  7 files changed, 21 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index a37a2d5cb6..2242aa25eb 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -393,12 +393,13 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *op=
+aque, int pin);
+> =20
+>  bool pci_bus_is_express(PCIBus *bus);
+>  bool pci_bus_is_root(PCIBus *bus);
+> -void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *pa=
+rent,
+> +void pci_bus_new_inplace(PCIBus *bus, size_t bus_size,
+> +                         PCIHostState *phb,
+>                           const char *name,
+>                           MemoryRegion *address_space_mem,
+>                           MemoryRegion *address_space_io,
+>                           uint8_t devfn_min, const char *typename);
+> -PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+> +PCIBus *pci_bus_new(PCIHostState *phb, const char *name,
+>                      MemoryRegion *address_space_mem,
+>                      MemoryRegion *address_space_io,
+>                      uint8_t devfn_min, const char *typename);
+> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_ex=
+pander_bridge.c
+> index 6ac187fa32..39d29d2230 100644
+> --- a/hw/pci-bridge/pci_expander_bridge.c
+> +++ b/hw/pci-bridge/pci_expander_bridge.c
+> @@ -213,7 +213,8 @@ static gint pxb_compare(gconstpointer a, gconstpoin=
+ter b)
+>  static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **=
+errp)
+>  {
+>      PXBDev *pxb =3D convert_to_pxb(dev);
+> -    DeviceState *ds, *bds =3D NULL;
+> +    DeviceState *bds =3D NULL;
+> +    PCIHostState *phb;
+>      PCIBus *bus;
+>      const char *dev_name =3D NULL;
+>      Error *local_err =3D NULL;
+> @@ -228,11 +229,11 @@ static void pxb_dev_realize_common(PCIDevice *dev=
+, bool pcie, Error **errp)
+>          dev_name =3D dev->qdev.id;
+>      }
+> =20
+> -    ds =3D qdev_create(NULL, TYPE_PXB_HOST);
+> +    phb =3D PCI_HOST_BRIDGE(qdev_create(NULL, TYPE_PXB_HOST));
+>      if (pcie) {
+> -        bus =3D pci_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_PCIE=
+_BUS);
+> +        bus =3D pci_bus_new(phb, dev_name, NULL, NULL, 0, TYPE_PXB_PCI=
+E_BUS);
+>      } else {
+> -        bus =3D pci_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE_PX=
+B_BUS);
+> +        bus =3D pci_bus_new(phb, "pxb-internal", NULL, NULL, 0, TYPE_P=
+XB_BUS);
+>          bds =3D qdev_create(BUS(bus), "pci-bridge");
+>          bds->id =3D dev_name;
+>          qdev_prop_set_uint8(bds, PCI_BRIDGE_DEV_PROP_CHASSIS_NR, pxb->=
+bus_nr);
+> @@ -244,7 +245,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, =
+bool pcie, Error **errp)
+>      bus->address_space_io =3D dev->bus->address_space_io;
+>      bus->map_irq =3D pxb_map_irq_fn;
+> =20
+> -    PCI_HOST_BRIDGE(ds)->bus =3D bus;
+> +    phb->bus =3D bus;
+> =20
+>      pxb_register_bus(dev, bus, &local_err);
+>      if (local_err) {
+> @@ -252,7 +253,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, =
+bool pcie, Error **errp)
+>          goto err_register_bus;
+>      }
+> =20
+> -    qdev_init_nofail(ds);
+> +    qdev_init_nofail(DEVICE(phb));
+>      if (bds) {
+>          qdev_init_nofail(bds);
+>      }
+> @@ -267,7 +268,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, =
+bool pcie, Error **errp)
+>  err_register_bus:
+>      object_unref(OBJECT(bds));
+>      object_unparent(OBJECT(bus));
+> -    object_unref(OBJECT(ds));
+> +    object_unref(OBJECT(phb));
+>  }
+> =20
+>  static void pxb_dev_realize(PCIDevice *dev, Error **errp)
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index f9218aa952..91fec05b38 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -340,7 +340,7 @@ PCIBus *i440fx_init(const char *host_type, const ch=
+ar *pci_type,
+> =20
+>      dev =3D qdev_create(NULL, host_type);
+>      s =3D PCI_HOST_BRIDGE(dev);
+> -    b =3D pci_bus_new(dev, NULL, pci_address_space,
+> +    b =3D pci_bus_new(s, NULL, pci_address_space,
+>                      address_space_io, 0, TYPE_PCI_BUS);
+>      s->bus =3D b;
+>      object_property_add_child(qdev_get_machine(), "i440fx", OBJECT(dev=
+), NULL);
+> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+> index 260a119a9e..2e2cd267f4 100644
+> --- a/hw/pci-host/prep.c
+> +++ b/hw/pci-host/prep.c
+> @@ -269,7 +269,7 @@ static void raven_pcihost_initfn(Object *obj)
+>      memory_region_add_subregion_overlap(address_space_mem, 0x80000000,
+>                                          &s->pci_io_non_contiguous, 1);
+>      memory_region_add_subregion(address_space_mem, 0xc0000000, &s->pci=
+_memory);
+> -    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), DEVICE(obj), =
+NULL,
+> +    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), h, NULL,
+>                          &s->pci_memory, &s->pci_io, 0, TYPE_PCI_BUS);
+> =20
+>      /* Bus master address space */
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 344f77b10c..860b47a1ba 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -49,7 +49,7 @@ static void q35_host_realize(DeviceState *dev, Error =
+**errp)
+>      sysbus_add_io(sbd, MCH_HOST_BRIDGE_CONFIG_DATA, &pci->data_mem);
+>      sysbus_init_ioports(sbd, MCH_HOST_BRIDGE_CONFIG_DATA, 4);
+> =20
+> -    pci->bus =3D pci_bus_new(DEVICE(s), "pcie.0",
+> +    pci->bus =3D pci_bus_new(pci, "pcie.0",
+>                             s->mch.pci_address_space, s->mch.address_sp=
+ace_io,
+>                             0, TYPE_PCIE_BUS);
+>      PC_MACHINE(qdev_get_machine())->bus =3D pci->bus;
+> diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
+> index 467cbb9cb8..24ef87610b 100644
+> --- a/hw/pci-host/versatile.c
+> +++ b/hw/pci-host/versatile.c
+> @@ -386,7 +386,7 @@ static void pci_vpb_init(Object *obj)
+>      memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 1ULL << =
+32);
+>      memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 1ULL <=
+< 32);
+> =20
+> -    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), DEVICE(obj), =
+"pci",
+> +    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), h, "pci",
+>                          &s->pci_mem_space, &s->pci_io_space,
+>                          PCI_DEVFN(11, 0), TYPE_PCI_BUS);
+>      h->bus =3D &s->pci_bus;
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index d9535c0bdc..f4488b46fc 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -388,26 +388,25 @@ bool pci_bus_is_root(PCIBus *bus)
+>      return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+>  }
+> =20
+> -void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *pa=
+rent,
+> +void pci_bus_new_inplace(PCIBus *bus, size_t bus_size,
+> +                         PCIHostState *phb,
+>                           const char *name,
+>                           MemoryRegion *address_space_mem,
+>                           MemoryRegion *address_space_io,
+>                           uint8_t devfn_min, const char *typename)
+>  {
+> -    PCIHostState *phb =3D PCI_HOST_BRIDGE(parent);
+> -    qbus_create_inplace(bus, bus_size, typename, parent, name);
+> +    qbus_create_inplace(bus, bus_size, typename, DEVICE(phb), name);
+>      pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_=
+min);
+>  }
+> =20
+> -PCIBus *pci_bus_new(DeviceState *parent, const char *name,
+> +PCIBus *pci_bus_new(PCIHostState *phb, const char *name,
+>                      MemoryRegion *address_space_mem,
+>                      MemoryRegion *address_space_io,
+>                      uint8_t devfn_min, const char *typename)
+>  {
+> -    PCIHostState *phb =3D PCI_HOST_BRIDGE(parent);
+>      PCIBus *bus;
+> =20
+> -    bus =3D PCI_BUS(qbus_create(typename, parent, name));
+> +    bus =3D PCI_BUS(qbus_create(typename, DEVICE(phb), name));
+>      pci_bus_init(bus, phb, address_space_mem, address_space_io, devfn_=
+min);
+>      return bus;
+>  }
+> @@ -431,7 +430,7 @@ PCIBus *pci_register_bus(DeviceState *parent, const=
+ char *name,
+>  {
+>      PCIBus *bus;
+> =20
+> -    bus =3D pci_bus_new(parent, name, address_space_mem,
+> +    bus =3D pci_bus_new(PCI_HOST_BRIDGE(parent), name, address_space_m=
+em,
+>                        address_space_io, devfn_min, typename);
+>      pci_bus_irqs(bus, set_irq, map_irq, irq_opaque, nirq);
+>      return bus;
+> --=20
+> 2.11.0.259.g40922b1
