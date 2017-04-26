@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwi-0005Dg-Fo
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwl-0005F5-BH
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwc-0007zB-Gu
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwe-00080T-O1
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:07 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 16:59:59 +1000
-Message-Id: <20170426070034.10727-14-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 17:00:06 +1000
+Message-Id: <20170426070034.10727-21-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 13/48] target-ppc/kvm: Enable in-kernel TCE
- acceleration for multi-tce
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 20/48] ppc/xics: add a realize() handler to
+ ICPStateClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +26,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This enables in-kernel handling of H_PUT_TCE_INDIRECT and
-H_STUFF_TCE hypercalls. The host kernel support is there since v4.6,
-in particular d3695aa4f452
-("KVM: PPC: Add support for multiple-TCE hcalls").
+It will be used by derived classes in PowerNV for customization.
 
-H_PUT_TCE is already accelerated and does not need any special enablement.
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c       |  4 +++-
- target/ppc/kvm.c     | 14 ++++++++++++++
- target/ppc/kvm_ppc.h |  6 ++++++
- 3 files changed, 23 insertions(+), 1 deletion(-)
+ hw/intc/xics.c        | 5 +++++
+ include/hw/ppc/xics.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a355512..8749f1b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2361,10 +2361,12 @@ static void ppc_spapr_init(MachineState *machine)
- 
-     qemu_register_boot_set(spapr_boot_set, spapr);
- 
--    /* to stop and start vmclock */
-     if (kvm_enabled()) {
-+        /* to stop and start vmclock */
-         qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
-                                          &spapr->tb);
-+
-+        kvmppc_spapr_enable_inkernel_multitce();
-     }
- }
- 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index c959b90..8574c36 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2198,6 +2198,20 @@ bool kvmppc_spapr_use_multitce(void)
-     return cap_spapr_multitce;
- }
- 
-+int kvmppc_spapr_enable_inkernel_multitce(void)
-+{
-+    int ret;
-+
-+    ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_ENABLE_HCALL, 0,
-+                            H_PUT_TCE_INDIRECT, 1);
-+    if (!ret) {
-+        ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_ENABLE_HCALL, 0,
-+                                H_STUFF_TCE, 1);
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index d4428b4..292fffe 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -337,6 +337,7 @@ static void icp_reset(void *dev)
+ static void icp_realize(DeviceState *dev, Error **errp)
+ {
+     ICPState *icp =3D ICP(dev);
++    ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
+     Object *obj;
+     Error *err =3D NULL;
+=20
+@@ -349,6 +350,10 @@ static void icp_realize(DeviceState *dev, Error **er=
+rp)
+=20
+     icp->xics =3D XICS_FABRIC(obj);
+=20
++    if (icpc->realize) {
++        icpc->realize(dev, errp);
 +    }
 +
-+    return ret;
-+}
-+
- void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
-                               uint64_t bus_offset, uint32_t nb_table,
-                               int *pfd, bool need_vfio)
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 4b2fd9a..f48243d 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -39,6 +39,7 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
- #ifndef CONFIG_USER_ONLY
- off_t kvmppc_alloc_rma(void **rma);
- bool kvmppc_spapr_use_multitce(void);
-+int kvmppc_spapr_enable_inkernel_multitce(void);
- void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
-                               uint64_t bus_offset, uint32_t nb_table,
-                               int *pfd, bool need_vfio);
-@@ -180,6 +181,11 @@ static inline bool kvmppc_spapr_use_multitce(void)
-     return false;
+     qemu_register_reset(icp_reset, dev);
  }
- 
-+static inline int kvmppc_spapr_enable_inkernel_multitce(void)
-+{
-+    return -1;
-+}
-+
- static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
-                                             uint64_t bus_offset,
-                                             uint32_t nb_table,
--- 
+=20
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index b07f56f..731e177 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -60,6 +60,7 @@ typedef struct XICSFabric XICSFabric;
+ struct ICPStateClass {
+     DeviceClass parent_class;
+=20
++    void (*realize)(DeviceState *dev, Error **errp);
+     void (*pre_save)(ICPState *s);
+     int (*post_load)(ICPState *s, int version_id);
+     void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+--=20
 2.9.3
