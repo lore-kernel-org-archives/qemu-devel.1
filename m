@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3JNB-00051Y-CJ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:36:34 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3JhI-0000N6-SO
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:57:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3JNA-0008Hu-KZ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:36:33 -0400
-Date: Wed, 26 Apr 2017 11:36:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170426093622.GB4538@noname.str.redhat.com>
-References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-3-famz@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1d3JhE-0001XX-7C
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:57:20 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1493051615-30715-1-git-send-email-peter.maydell@linaro.org>
+	<1493051615-30715-2-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <3b00cc54-e40f-9dfb-3701-3cda61a6ce8a@twiddle.net>
+Date: Wed, 26 Apr 2017 11:57:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170426033413.17192-3-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v15 02/21] block: Define BLK_PERM_MAX
+In-Reply-To: <1493051615-30715-2-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 1/3] arm: Use the mmu_idx we're passed in
+ arm_cpu_do_unaligned_access()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-Am 26.04.2017 um 05:33 hat Fam Zheng geschrieben:
-> This is the order of the largest possible permission.
+On 04/24/2017 06:33 PM, Peter Maydell wrote:
+> When identifying the DFSR format for an alignment fault, use
+> the mmu index that we are passed, rather than calling cpu_mmu_index()
+> to get the mmu index for the current CPU state. This doesn't actually
+> make any difference since the only cases where the current MMU index
+> differs from the index used for the load are the "unprivileged
+> load/store" instructions, and in that case the mmu index may
+> differ but the translation regime is the same (apart from the
+> "use from Hyp mode" case which is UNPREDICTABLE).
+> However it's the more logical thing to do.
 > 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Peter Maydell<peter.maydell@linaro.org>
 > ---
->  include/block/block.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/include/block/block.h b/include/block/block.h
-> index eb0565d..a798f10 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -224,6 +224,8 @@ enum {
->      BLK_PERM_ALL                = 0x1f,
->  };
->  
-> +#define BLK_PERM_MAX (64 - clz64((uint64_t)BLK_PERM_ALL))
+>   target/arm/op_helper.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-Contrary to the commit message, this is the number of permission bits in
-use (i.e. one more than the largest possible permission). You're using
-it correctly, though, because your loop condition is i < BLK_PERM_MAX.
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-This could use an updated commit message and a comment at the #define at
-least. Ideally a less ambiguous name instead of the commit (because _MAX
-seems to imply what the commit message currently says, not what it
-really is), but I can't think of one.
 
-Kevin
+r~
