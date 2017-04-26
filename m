@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d3NHd-0001ZV-HP
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d3NIj-0002qR-Dp
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d3NHZ-0002Lt-GU
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:47:05 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 26 Apr 2017 15:46:48 +0200
-Message-Id: <20170426134649.9042-3-mreitz@redhat.com>
-In-Reply-To: <20170426134649.9042-1-mreitz@redhat.com>
-References: <20170426134649.9042-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] qemu-img/convert: Move bs_n > 1 && -B
- check down
+	(envelope-from <alex.bennee@linaro.org>) id 1d3NIf-0002mf-2J
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:48:13 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:34468)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d3NIe-0002mJ-RD
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:48:08 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id r190so21080033wme.1
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:48:08 -0700 (PDT)
+References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
+	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
+	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
+Date: Wed, 26 Apr 2017 14:48:35 +0100
+Message-ID: <87bmrj8eks.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] What is the best commit for record-replay?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,70 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Igor R <boost.lists@gmail.com>
+Cc: Pranith Kumar <bobby.prani+qemu@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-It does not make much sense to use a backing image for the target when
-you concatenate multiple images (because then there is no correspondence
-between the source images' backing files and the target's); but it was
-still possible to give one by using -o backing_file=X instead of -B X.
 
-Fix this by moving the check.
+Igor R <boost.lists@gmail.com> writes:
 
-(Also, change the error message because -B is not the only way to
- specify the backing file, evidently.)
+>>> Hi,
+>>>
+>>> I'm trying to use the deterministic record/replay feature, and I would
+>>> like to know which commit I should take to get it work.
+>>> In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381dc, as
+>
+>> Can you retry with the latest rc? There were some fixes regarding rr since rc0.
+>
+>
+> I've taken 2.9 release, and RR does not seem to work there.
+> I recorded the boot process of x86 Fedora-21 linux and the replay got
+> stuck almost immediately.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- qemu-img.c                 | 13 +++++++------
- tests/qemu-iotests/122.out |  4 ++--
- 2 files changed, 9 insertions(+), 8 deletions(-)
+What's your command line?
 
-diff --git a/qemu-img.c b/qemu-img.c
-index ae6f27f899..9eb82830f7 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2089,12 +2089,6 @@ static int img_convert(int argc, char **argv)
-     }
- 
- 
--    if (s.src_num > 1 && out_baseimg) {
--        error_report("-B makes no sense when concatenating multiple input "
--                     "images");
--        goto fail_getopt;
--    }
--
-     /* ret is still -EINVAL until here */
-     ret = bdrv_parse_cache_mode(src_cache, &src_flags, &src_writethrough);
-     if (ret < 0) {
-@@ -2208,6 +2202,13 @@ static int img_convert(int argc, char **argv)
-     }
-     s.target_has_backing = (bool) out_baseimg;
- 
-+    if (s.src_num > 1 && out_baseimg) {
-+        error_report("Having a backing file for the target makes no sense when "
-+                     "concatenating multiple input images");
-+        ret = -1;
-+        goto out;
-+    }
-+
-     /* Check if compression is supported */
-     if (s.compressed) {
-         bool encryption =
-diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
-index 98814de5d6..9317d801ad 100644
---- a/tests/qemu-iotests/122.out
-+++ b/tests/qemu-iotests/122.out
-@@ -61,8 +61,8 @@ read 65536/65536 bytes at offset 4194304
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 65536/65536 bytes at offset 8388608
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--qemu-img: -B makes no sense when concatenating multiple input images
--qemu-img: -B makes no sense when concatenating multiple input images
-+qemu-img: Having a backing file for the target makes no sense when concatenating multiple input images
-+qemu-img: Having a backing file for the target makes no sense when concatenating multiple input images
- 
- === Compression with misaligned allocations and image sizes ===
- 
--- 
-2.12.2
+Does it get stuck at the same place each time?
+
+Can you boot fine with icount but without record/replay?
+
+--
+Alex Bennée
