@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3J8A-00089V-NS
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:21:04 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d3J8p-00005R-9h
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3J85-0000Q7-Lg
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:21:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48289)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d3J85-0000P8-Br
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:20:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d3J82-0000f6-0e
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 09:20:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BC79B2E80E7
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 09:20:50 +0000 (UTC)
+	(envelope-from <jasowang@redhat.com>) id 1d3J8k-0000g6-1o
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:21:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d3J8j-0000fk-Nv
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:21:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AA9537F7AF
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 09:21:36 +0000 (UTC)
+References: <1491221116-11776-1-git-send-email-thuth@redhat.com>
+	<babc2e07-1383-6f5e-e5b0-8ad9ddd3b5b0@amsat.org>
+	<76493142-5ae8-f031-d549-67d506812539@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <57ac3657-7eb0-b205-0585-2e9ecfc283cc@redhat.com>
+Date: Wed, 26 Apr 2017 17:21:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <76493142-5ae8-f031-d549-67d506812539@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Apr 2017 09:15:17 -0000
-From: Robert Hu <robert.hu@intel.com>
-Reply-To: Bug 1686350 <1686350@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170426091517.1328.12576.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] =?utf-8?b?W0J1ZyAxNjg2MzUwXSBbTkVXXSBbS1ZNXSBUaGUg?=
- =?utf-8?q?qemu_=E2=80=98-cpu=E2=80=99_option_not_have_skylake_server_cpu_?=
- =?utf-8?q?model?=
+Subject: Re: [Qemu-devel] [PATCH for-2.10] net/tap: Replace tap-haiku.c and
+ tap-aix.c by a generic tap-stub.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,123 +35,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Public bug reported:
 
-Environment:
--------------------
-KVM commit/branch: bd17117b/next
-Qemu commit/branch: cd1ea508/master
-Host OS: RHEL7.3 ia32e
-Host Kernel:4.11.0-rc3
-Bug detailed description:
-----------------------------------
-In latest qemu commit the qemu still not have skylake server cpu model
-Reproduce steps:
--------------------------
-[root@skl-2s2 ~]# qemu-system-x86_64 -cpu help
-Available CPUs:
-x86 486
-x86 Broadwell-noTSX Intel Core Processor (Broadwell, no TSX)
-x86 Broadwell Intel Core Processor (Broadwell)
-x86 Conroe Intel Celeron_4x0 (Conroe/Merom Class Core 2)
-x86 Haswell-noTSX Intel Core Processor (Haswell, no TSX)
-x86 Haswell Intel Core Processor (Haswell)
-x86 IvyBridge Intel Xeon E3-12xx v2 (Ivy Bridge)
-x86 Nehalem Intel Core i7 9xx (Nehalem Class Core i7)
-x86 Opteron_G1 AMD Opteron 240 (Gen 1 Class Opteron)
-x86 Opteron_G2 AMD Opteron 22xx (Gen 2 Class Opteron)
-x86 Opteron_G3 AMD Opteron 23xx (Gen 3 Class Opteron)
-x86 Opteron_G4 AMD Opteron 62xx class CPU
-x86 Opteron_G5 AMD Opteron 63xx class CPU
-x86 Penryn Intel Core 2 Duo P9xxx (Penryn Class Core 2)
-x86 SandyBridge Intel Xeon E312xx (Sandy Bridge)
-x86 Skylake-Client Intel Core Processor (Skylake)
-x86 Westmere Westmere E56xx/L56xx/X56xx (Nehalem-C)
-x86 athlon QEMU Virtual CPU version 2.5+
-x86 core2duo Intel(R) Core(TM)2 Duo CPU T7700 @ 2.40GHz
-x86 coreduo Genuine Intel(R) CPU T2600 @ 2.16GHz
-x86 kvm32 Common 32-bit KVM processor
-x86 kvm64 Common KVM processor
-x86 n270 Intel(R) Atom(TM) CPU N270 @ 1.60GHz
-x86 pentium
-x86 pentium2
-x86 pentium3
-x86 phenom AMD Phenom(tm) 9550 Quad-Core Processor
-x86 qemu32 QEMU Virtual CPU version 2.5+
-x86 qemu64 QEMU Virtual CPU version 2.5+
-x86 base base CPU model type with no features enabled
-x86 host KVM processor with all supported host features (only available in =
-KVM mode)
-x86 max Enables all features supported by the accelerator in the current ho=
-st
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+On 2017=E5=B9=B404=E6=9C=8826=E6=97=A5 15:23, Thomas Huth wrote:
+> On 03.04.2017 14:22, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 04/03/2017 09:05 AM, Thomas Huth wrote:
+>>> The files tap-haiku.c and tap-aix.c are identical (except one line
+>>> of error message). We should avoid such code duplication, so replace
+>>> these by a generic tap-stub.c file instead.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>
+>>> ---
+>>>   net/Makefile.objs             | 15 ++++----
+>>>   net/tap-haiku.c               | 87
+>>> -------------------------------------------
+>>>   net/{tap-aix.c =3D> tap-stub.c} |  3 +-
+>>>   3 files changed, 9 insertions(+), 96 deletions(-)
+>>>   delete mode 100644 net/tap-haiku.c
+>>>   rename net/{tap-aix.c =3D> tap-stub.c} (97%)
+>>>
+>>> diff --git a/net/Makefile.objs b/net/Makefile.objs
+>>> index 2e2fd43..67ba5e2 100644
+>>> --- a/net/Makefile.objs
+>>> +++ b/net/Makefile.objs
+>>> @@ -3,13 +3,7 @@ common-obj-y +=3D socket.o
+>>>   common-obj-y +=3D dump.o
+>>>   common-obj-y +=3D eth.o
+>>>   common-obj-$(CONFIG_L2TPV3) +=3D l2tpv3.o
+>>> -common-obj-$(CONFIG_POSIX) +=3D tap.o vhost-user.o
+>>> -common-obj-$(CONFIG_LINUX) +=3D tap-linux.o
+>>> -common-obj-$(CONFIG_WIN32) +=3D tap-win32.o
+>>> -common-obj-$(CONFIG_BSD) +=3D tap-bsd.o
+>>> -common-obj-$(CONFIG_SOLARIS) +=3D tap-solaris.o
+>>> -common-obj-$(CONFIG_AIX) +=3D tap-aix.o
+>>> -common-obj-$(CONFIG_HAIKU) +=3D tap-haiku.o
+>>> +common-obj-$(CONFIG_POSIX) +=3D vhost-user.o
+>>>   common-obj-$(CONFIG_SLIRP) +=3D slirp.o
+>>>   common-obj-$(CONFIG_VDE) +=3D vde.o
+>>>   common-obj-$(CONFIG_NETMAP) +=3D netmap.o
+>>> @@ -20,3 +14,10 @@ common-obj-y +=3D colo-compare.o
+>>>   common-obj-y +=3D colo.o
+>>>   common-obj-y +=3D filter-rewriter.o
+>>>   common-obj-y +=3D filter-replay.o
+>>> +
+>>> +tap-obj-$(CONFIG_LINUX) =3D tap-linux.o
+>>> +tap-obj-$(CONFIG_BSD) =3D tap-bsd.o
+>>> +tap-obj-$(CONFIG_SOLARIS) =3D tap-solaris.o
+>>> +tap-obj-y ?=3D tap-stub.o
+>>> +common-obj-$(CONFIG_POSIX) +=3D tap.o $(tap-obj-y)
+>>> +common-obj-$(CONFIG_WIN32) +=3D tap-win32.o
+>>> diff --git a/net/tap-haiku.c b/net/tap-haiku.c
+>>> deleted file mode 100644
+>>> index b27e57e..0000000
+>>> --- a/net/tap-haiku.c
+>>> +++ /dev/null
+>>> @@ -1,87 +0,0 @@
+>>> -/*
+>>> - * QEMU System Emulator
+>>> - *
+>>> - * Copyright (c) 2003-2008 Fabrice Bellard
+>>> - *
+>>> - * Permission is hereby granted, free of charge, to any person
+>>> obtaining a copy
+>>> - * of this software and associated documentation files (the
+>>> "Software"), to deal
+>>> - * in the Software without restriction, including without limitation
+>>> the rights
+>>> - * to use, copy, modify, merge, publish, distribute, sublicense,
+>>> and/or sell
+>>> - * copies of the Software, and to permit persons to whom the Softwar=
+e is
+>>> - * furnished to do so, subject to the following conditions:
+>>> - *
+>>> - * The above copyright notice and this permission notice shall be
+>>> included in
+>>> - * all copies or substantial portions of the Software.
+>>> - *
+>>> - * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+>>> EXPRESS OR
+>>> - * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+>>> MERCHANTABILITY,
+>>> - * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+>>> SHALL
+>>> - * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+>>> OR OTHER
+>>> - * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+>>> ARISING FROM,
+>>> - * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+>>> DEALINGS IN
+>>> - * THE SOFTWARE.
+>>> - */
+>>> -
+>>> -#include "qemu/osdep.h"
+>>> -#include "qapi/error.h"
+>>> -#include "tap_int.h"
+>>> -
+>>> -int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+>>> -             int vnet_hdr_required, int mq_required, Error **errp)
+>>> -{
+>>> -    error_setg(errp, "no tap on Haiku");
+>>> -    return -1;
+>>> -}
+>>> -
+>>> -void tap_set_sndbuf(int fd, const NetdevTapOptions *tap, Error **err=
+p)
+>>> -{
+>>> -}
+>>> -
+>>> -int tap_probe_vnet_hdr(int fd)
+>>> -{
+>>> -    return 0;
+>>> -}
+>>> -
+>>> -int tap_probe_has_ufo(int fd)
+>>> -{
+>>> -    return 0;
+>>> -}
+>>> -
+>>> -int tap_probe_vnet_hdr_len(int fd, int len)
+>>> -{
+>>> -    return 0;
+>>> -}
+>>> -
+>>> -void tap_fd_set_vnet_hdr_len(int fd, int len)
+>>> -{
+>>> -}
+>>> -
+>>> -int tap_fd_set_vnet_le(int fd, int is_le)
+>>> -{
+>>> -    return -EINVAL;
+>>> -}
+>>> -
+>>> -int tap_fd_set_vnet_be(int fd, int is_be)
+>>> -{
+>>> -    return -EINVAL;
+>>> -}
+>>> -
+>>> -void tap_fd_set_offload(int fd, int csum, int tso4,
+>>> -                        int tso6, int ecn, int ufo)
+>>> -{
+>>> -}
+>>> -
+>>> -int tap_fd_enable(int fd)
+>>> -{
+>>> -    return -1;
+>>> -}
+>>> -
+>>> -int tap_fd_disable(int fd)
+>>> -{
+>>> -    return -1;
+>>> -}
+>>> -
+>>> -int tap_fd_get_ifname(int fd, char *ifname)
+>>> -{
+>>> -    return -1;
+>>> -}
+>>> diff --git a/net/tap-aix.c b/net/tap-stub.c
+>>> similarity index 97%
+>>> rename from net/tap-aix.c
+>>> rename to net/tap-stub.c
+>>> index 0e6da63..a9ab8f8 100644
+>>> --- a/net/tap-aix.c
+>>> +++ b/net/tap-stub.c
+>>> @@ -29,7 +29,7 @@
+>>>   int tap_open(char *ifname, int ifname_size, int *vnet_hdr,
+>>>                int vnet_hdr_required, int mq_required, Error **errp)
+>>>   {
+>>> -    error_setg(errp, "no tap on AIX");
+>>> +    error_setg(errp, "tap is not supported in this build");
+>>>       return -1;
+>>>   }
+>>>
+>>> @@ -85,4 +85,3 @@ int tap_fd_get_ifname(int fd, char *ifname)
+>>>   {
+>>>       return -1;
+>>>   }
+>>> -
+>>>
+> Ping?
+>
+>   Thomas
 
--- =
+Applied.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1686350
-
-Title:
-  [KVM] The qemu =E2=80=98-cpu=E2=80=99 option not have skylake server cpu =
-model
-
-Status in QEMU:
-  New
-
-Bug description:
-  Environment:
-  -------------------
-  KVM commit/branch: bd17117b/next
-  Qemu commit/branch: cd1ea508/master
-  Host OS: RHEL7.3 ia32e
-  Host Kernel:4.11.0-rc3
-  Bug detailed description:
-  ----------------------------------
-  In latest qemu commit the qemu still not have skylake server cpu model
-  Reproduce steps:
-  -------------------------
-  [root@skl-2s2 ~]# qemu-system-x86_64 -cpu help
-  Available CPUs:
-  x86 486
-  x86 Broadwell-noTSX Intel Core Processor (Broadwell, no TSX)
-  x86 Broadwell Intel Core Processor (Broadwell)
-  x86 Conroe Intel Celeron_4x0 (Conroe/Merom Class Core 2)
-  x86 Haswell-noTSX Intel Core Processor (Haswell, no TSX)
-  x86 Haswell Intel Core Processor (Haswell)
-  x86 IvyBridge Intel Xeon E3-12xx v2 (Ivy Bridge)
-  x86 Nehalem Intel Core i7 9xx (Nehalem Class Core i7)
-  x86 Opteron_G1 AMD Opteron 240 (Gen 1 Class Opteron)
-  x86 Opteron_G2 AMD Opteron 22xx (Gen 2 Class Opteron)
-  x86 Opteron_G3 AMD Opteron 23xx (Gen 3 Class Opteron)
-  x86 Opteron_G4 AMD Opteron 62xx class CPU
-  x86 Opteron_G5 AMD Opteron 63xx class CPU
-  x86 Penryn Intel Core 2 Duo P9xxx (Penryn Class Core 2)
-  x86 SandyBridge Intel Xeon E312xx (Sandy Bridge)
-  x86 Skylake-Client Intel Core Processor (Skylake)
-  x86 Westmere Westmere E56xx/L56xx/X56xx (Nehalem-C)
-  x86 athlon QEMU Virtual CPU version 2.5+
-  x86 core2duo Intel(R) Core(TM)2 Duo CPU T7700 @ 2.40GHz
-  x86 coreduo Genuine Intel(R) CPU T2600 @ 2.16GHz
-  x86 kvm32 Common 32-bit KVM processor
-  x86 kvm64 Common KVM processor
-  x86 n270 Intel(R) Atom(TM) CPU N270 @ 1.60GHz
-  x86 pentium
-  x86 pentium2
-  x86 pentium3
-  x86 phenom AMD Phenom(tm) 9550 Quad-Core Processor
-  x86 qemu32 QEMU Virtual CPU version 2.5+
-  x86 qemu64 QEMU Virtual CPU version 2.5+
-  x86 base base CPU model type with no features enabled
-  x86 host KVM processor with all supported host features (only available i=
-n KVM mode)
-  x86 max Enables all features supported by the accelerator in the current =
-host
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1686350/+subscriptions
+Thanks
