@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3Kt4-00054Q-Ru
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:13:36 -0400
+	(envelope-from <bjsprakash.linux@gmail.com>) id 1d3KxV-0007Pv-Cc
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:18:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3Kt3-00030d-RN
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:13:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3Kt3-00030B-J8
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:13:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D04A624A9
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 11:13:32 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 26 Apr 2017 19:13:12 +0800
-Message-Id: <1493205192-26743-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1493205192-26743-1-git-send-email-peterx@redhat.com>
-References: <1493205192-26743-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] ramblock: add new hmp command "info
- ramblock"
+	(envelope-from <bjsprakash.linux@gmail.com>) id 1d3KxU-00058w-JN
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:18:09 -0400
+MIME-Version: 1.0
+In-Reply-To: <1492173995-14140-1-git-send-email-eric.auger@redhat.com>
+References: <1492173995-14140-1-git-send-email-eric.auger@redhat.com>
+From: Prakash B <bjsprakash.linux@gmail.com>
+Date: Wed, 26 Apr 2017 16:48:04 +0530
+Message-ID: <CACJhumcMAtJgnRVctCLE5XJ0eo0vpQ35zjjB8twMTkbVphfB8g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC v5 0/4] vITS save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,156 +21,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, drjones@redhat.com, Vijay Kilari <vijay.kilari@gmail.com>, quintela@redhat.com, dgilbert@redhat.com, Vijaya.Kumar@cavium.com, Christoffer Dall <christoffer.dall@linaro.org>
 
-To dump information about ramblocks. It looks like:
+Verified on Cavium ThunderX platform
+Continousily migrated Guest more than 500 times b/w different  hosts.
+Please feel free to add  Tested-by: Prakash, Brahmajyosyula
+<Brahmajyosyula.Prakash@cavium.com>
 
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used              Total
-            /objects/mem       2M  0x0000000000000000 0x0000000080000000 0x0000000080000000
-                vga.vram       4K  0x0000000080060000 0x0000000001000000 0x0000000001000000
-    /rom@etc/acpi/tables       4K  0x00000000810b0000 0x0000000000020000 0x0000000000200000
-                 pc.bios       4K  0x0000000080000000 0x0000000000040000 0x0000000000040000
-  0000:00:03.0/e1000.rom       4K  0x0000000081070000 0x0000000000040000 0x0000000000040000
-                  pc.rom       4K  0x0000000080040000 0x0000000000020000 0x0000000000020000
-    0000:00:02.0/vga.rom       4K  0x0000000081060000 0x0000000000010000 0x0000000000010000
-   /rom@etc/table-loader       4K  0x00000000812b0000 0x0000000000001000 0x0000000000001000
-      /rom@etc/acpi/rsdp       4K  0x00000000812b1000 0x0000000000001000 0x0000000000001000
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- exec.c                 | 35 +++++++++++++++++++++++++++++++++++
- hmp-commands-info.hx   | 14 ++++++++++++++
- hmp.c                  |  6 ++++++
- hmp.h                  |  1 +
- include/exec/ramlist.h |  1 +
- 5 files changed, 57 insertions(+)
-
-diff --git a/exec.c b/exec.c
-index 50519ae..e999be7 100644
---- a/exec.c
-+++ b/exec.c
-@@ -71,6 +71,8 @@
- #include "qemu/mmap-alloc.h"
- #endif
- 
-+#include "monitor/monitor.h"
-+
- //#define DEBUG_SUBPAGE
- 
- #if !defined(CONFIG_USER_ONLY)
-@@ -1333,6 +1335,39 @@ void qemu_mutex_unlock_ramlist(void)
-     qemu_mutex_unlock(&ram_list.mutex);
- }
- 
-+static const char *page_size_to_str(size_t psize)
-+{
-+    switch (psize) {
-+    case 0x1000:
-+        return "4K";
-+    case 0x10000:
-+        return "64K";
-+    case 0x200000:
-+        return "2M";
-+    case 0x40000000:
-+        return "1G";
-+    default:
-+        return "N/A";
-+    }
-+}
-+
-+void ram_block_dump(Monitor *mon)
-+{
-+    RAMBlock *block;
-+
-+    rcu_read_lock();
-+    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-+                   "Block Name", "PSize", "Offset", "Used", "Total");
-+    RAMBLOCK_FOREACH(block) {
-+        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
-+                       " 0x%016" PRIx64 "\n", block->idstr,
-+                       page_size_to_str(block->page_size),
-+                       block->offset, block->used_length,
-+                       block->max_length);
-+    }
-+    rcu_read_unlock();
-+}
-+
- #ifdef __linux__
- /*
-  * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a53f105..ae16901 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -788,6 +788,20 @@ Display the latest dump status.
- ETEXI
- 
-     {
-+        .name       = "ramblock",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Display system ramblock information",
-+        .cmd        = hmp_info_ramblock,
-+    },
-+
-+STEXI
-+@item info ramblock
-+@findex ramblock
-+Dump all the ramblocks of the system.
-+ETEXI
-+
-+    {
-         .name       = "hotpluggable-cpus",
-         .args_type  = "",
-         .params     = "",
-diff --git a/hmp.c b/hmp.c
-index ab407d6..8369388 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -37,6 +37,7 @@
- #include "qemu-io.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-+#include "exec/ramlist.h"
- #include "hw/intc/intc.h"
- 
- #ifdef CONFIG_SPICE
-@@ -2563,6 +2564,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
-     qapi_free_DumpQueryResult(result);
- }
- 
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
-+{
-+    ram_block_dump(mon);
-+}
-+
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-diff --git a/hmp.h b/hmp.h
-index 799fd37..7353b67 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -136,6 +136,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- 
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-index f1c6b45..2e2ac6c 100644
---- a/include/exec/ramlist.h
-+++ b/include/exec/ramlist.h
-@@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
- void ram_block_notify_add(void *host, size_t size);
- void ram_block_notify_remove(void *host, size_t size);
- 
-+void ram_block_dump(Monitor *mon);
- 
- #endif /* RAMLIST_H */
--- 
-2.7.4
+On Fri, Apr 14, 2017 at 6:16 PM, Eric Auger <eric.auger@redhat.com> wrote:
+> This series allows ITS save/restore and migration use cases.
+> It relies on not upstreamed kernel series [1].
+>
+> ITS tables are flushed into guest RAM on VM stop while registers
+> are save on pre_save() callback. Tables and registers are restored
+> on ITS post_load().
+>
+> Redistributor pending tables also are flushed on VM stop, independently
+> on ITS tables.
+>
+> That work was tested on Cavium ThunderX using virsh save/restore and
+> virt-manager live migration.
+>
+> Best Regards
+>
+> Eric
+>
+> Host Kernel dependencies:
+> - [1] [PATCH v5 00/22] vITS save/restore
+>
+> History:
+> v4 -> v5:
+> - adapt to the new user API
+> - new patch "hw/intc/arm_gicv3_kvm: Implement pending table save"
+>   as the pending table save now is handled on GICV3 side.
+>
+> v3 -> v4:
+> - oversight in v3, missed a last minute correction related to
+>   reg useless declaration in kvm_arm_its_pre_save
+>
+> v2 -> v3:
+> - GITS_IIDR is now saved and restored to check ABI revision.
+> - get/put functions renamed into pre_save/post_load
+> - unmigratable = false removed
+> - changed the migration blocker message
+> - remove the extract64 round s->ctlr
+> - reword some comments
+>
+> v1 -> v2:
+> - rebase on 2.9 soft release code
+> - handle case where migrate_add_blocker fails
+> - add comments along with ITS and GICv3 migration priorities
+>
+>
+> Eric Auger (4):
+>   linux-headers: Update for vITS save/restore
+>   hw/intc/arm_gicv3_its: Implement state save/restore
+>   hw/intc/arm_gicv3_kvm: Implement pending table save
+>   hw/intc/arm_gicv3_its: Allow save/restore
+>
+>  hw/intc/arm_gicv3_common.c             |   1 +
+>  hw/intc/arm_gicv3_its_common.c         |  11 ++-
+>  hw/intc/arm_gicv3_its_kvm.c            | 120 +++++++++++++++++++++++++++++----
+>  hw/intc/arm_gicv3_kvm.c                |  25 +++++++
+>  include/hw/intc/arm_gicv3_its_common.h |   8 +++
+>  include/migration/vmstate.h            |   2 +
+>  linux-headers/asm-arm/kvm.h            |   6 +-
+>  linux-headers/asm-arm64/kvm.h          |   6 +-
+>  8 files changed, 164 insertions(+), 15 deletions(-)
+>
+> --
+> 2.5.5
+>
+>
