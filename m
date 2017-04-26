@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3I7L-0003JJ-Nd
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:16:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d3I9Z-0004Ar-UK
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:18:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3I7I-0007rI-GV
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:16:07 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3528
-	helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3I7H-0007mB-TI
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:16:04 -0400
-References: <1492850128-17472-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492850128-17472-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<5e7f11a4-83d4-e363-6f80-a749c206c190@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <590056FC.1020105@huawei.com>
-Date: Wed, 26 Apr 2017 16:14:52 +0800
+	(envelope-from <dgilbert@redhat.com>) id 1d3I9W-0000q5-Ni
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:18:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3I9W-0000pW-Gv
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:18:22 -0400
+Date: Wed, 26 Apr 2017 09:18:17 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170426081816.GA2098@work-vm>
+References: <1493179907-22516-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5e7f11a4-83d4-e363-6f80-a749c206c190@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH RESEND v2 01/18] net/colo: Add
- notifier/callback related helpers for filter
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493179907-22516-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: Check whether TCG is enabled
+ before running the "info jit" code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
-Cc: xuquan8@huawei.com, quintela@redhat.com, zhangchen.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 2017/4/25 19:40, Jason Wang wrote:
->
-> On 2017年04月22日 16:35, zhanghailiang wrote:
->> We will use this notifier to help COLO to notify filter object
->> to do something, like do checkpoint, or process failover event.
->>
->> Cc: Jason Wang<jasowang@redhat.com>
->> Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
->> Signed-off-by: Zhang Chen<zhangchen.fnst@cn.fujitsu.com>
->> Signed-off-by: Li Zhijian<lizhijian@cn.fujitsu.com>
->> ---
->>    net/colo.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>    net/colo.h |  19 +++++++++++
->>    2 files changed, 124 insertions(+)
-> Went through this series and I feel that the code duplicates (at least
-> part) functionality of IOThread (iothread.c) . So I come to an idea that,
-> switch to use IOThread for COLO comparing thread then you can use aio bh
-> to do the inter process communication.
->
-> Thoughts?
+* Thomas Huth (thuth@redhat.com) wrote:
+> The "info jit" command currently aborts on Mac OS X with the message
+> "qemu_mutex_lock: Invalid argument" when running with "-M accel=qtest".
+> We should only call into the TCG code here if TCG has really been
+> enabled and initialized.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  monitor.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index be282ec..3e0979d 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1086,6 +1086,11 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+>  
+>  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+>  {
+> +    if (!tcg_enabled()) {
+> +        error_report("JIT information is only available with accel=tcg");
+> +        return;
+> +    }
+> +
+>      dump_exec_info((FILE *)mon, monitor_fprintf);
+>      dump_drift_info((FILE *)mon, monitor_fprintf);
+>  }
 
-Interesting idea, but after investigation, we found it will make things quite complex
-if we use iothread for net compare (Actually, i don't think we can use it directly for COLO),
-It seems to be special for block, you can see some codes call block helpers.
-Besides, we still have to realize a way to communicate with COLO frame for filters  (I mean patch 16/17/18),
-even we use it after reconstruct those iothread part. ;)
+so tcg_enabled checks tcg_ctx.code_gen_buffer != NULL
+code_gen_buffer is set by code_gen_alloc
+code_gen_alloc does a qemu_mutex_init of tb_lock
+and the previous problem was an uninitialised tb_lock.
 
-Thanks,
-Hailiang
+So:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> Thanks
->
-> .
->
+
+Peter: Does this fix the hmp test for you?
+
+Dave
+
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
