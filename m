@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43019)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1d3MvD-0005kf-M3
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:24:01 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43233)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1d3Mvv-0006Al-BU
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:24:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1d3Mv9-0000ep-Np
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:23:55 -0400
-From: Kamil Rytarowski <n54@gmx.com>
-Date: Wed, 26 Apr 2017 15:16:04 +0200
-Message-Id: <20170426131604.3459-1-n54@gmx.com>
-In-Reply-To: <20170426115826.1826-1-n54@gmx.com>
-References: <20170426115826.1826-1-n54@gmx.com>
-Subject: [Qemu-devel] [PATCH v2] scripts: Switch to more portable Perl
- shebang
+	(envelope-from <eblake@redhat.com>) id 1d3Mvt-0000xN-TY
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:24:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37852)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d3Mvt-0000ww-J0
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:24:37 -0400
+References: <201704260920380633515@zte.com.cn>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dccb2383-f94f-63e7-4319-4222e435c83b@redhat.com>
+Date: Wed, 26 Apr 2017 08:24:34 -0500
+MIME-Version: 1.0
+In-Reply-To: <201704260920380633515@zte.com.cn>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="C9cWbSB9Wt6p9J582nJMHPoRpSmogkvsj"
+Subject: Re: [Qemu-devel] [PATCH v4] qga: Add support network
+ interfacestatistics in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,148 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, armbru@redhat.com, Kamil Rytarowski <n54@gmx.com>
+To: lu.zhipeng@zte.com.cn, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
 
-The default NetBSD package manager is pkgsrc and it installs Perl
-along other third party programs under custom and configurable prefix.
-The default prefix for binary prebuilt packages is /usr/pkg, and the
-Perl executable lands in /usr/pkg/bin/perl.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--C9cWbSB9Wt6p9J582nJMHPoRpSmogkvsj
+From: Eric Blake <eblake@redhat.com>
+To: lu.zhipeng@zte.com.cn, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
+Message-ID: <dccb2383-f94f-63e7-4319-4222e435c83b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4] qga: Add support network
+ interfacestatistics in
+References: <201704260920380633515@zte.com.cn>
+In-Reply-To: <201704260920380633515@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This change switches "/usr/bin/perl" to "/usr/bin/env perl" as it's
-the most portable solution that should work for almost everybody.
-Perl's executable is detected automatically.
+On 04/25/2017 08:20 PM, lu.zhipeng@zte.com.cn wrote:
+> =EF=BC=9E +   */=EF=BC=9E +        colon =3D strchr(line, ':')=EF=BC=9E=
+ +        if (!colon) {=EF=BC=9E +            continue=EF=BC=9E +        =
+}=EF=BC=9E +        *colon =3D '\0'=EF=BC=9E +        if (colon - path_le=
+n =EF=BC=9E=3D line && strcmp(colon - path_len, path) =3D=3D 0) {colon - =
+path_len =EF=BC=9E line would imply the current line isn't a matcheither,=
+ so i think that can be tightened to colon - path_len =3D=3D line.
 
-This change switches -w option passed to the executable with more
-modern "use warnings;" approach. There is no functional change to the
-default behavior.
+Ouch. Your mailer doesn't know how to quote properly, rendering your
+email illegible.
 
-Signed-off-by: Kamil Rytarowski <n54@gmx.com>
----
- scripts/checkpatch.pl           | 3 ++-
- scripts/clean-header-guards.pl  | 3 ++-
- scripts/cleanup-trace-events.pl | 2 +-
- scripts/disas-objdump.pl        | 4 +++-
- scripts/get_maintainer.pl       | 3 ++-
- scripts/shaderinclude.pl        | 2 +-
- scripts/switch-timer-api        | 2 +-
- scripts/texi2pod.pl             | 4 +++-
- 8 files changed, 15 insertions(+), 8 deletions(-)
+>=20
+> ------------
+>=20
+> The text reading from /proc/net/dev/ is  aligned to the right. so i thi=
+nk it should be colon - path_len =EF=BC=9E=3D line
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index f084542934..3bb6fc95bd 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -1,4 +1,4 @@
--#!/usr/bin/perl -w
-+#!/usr/bin/env perl
- # (c) 2001, Dave Jones. (the file handling bit)
- # (c) 2005, Joel Schopp <jschopp@austin.ibm.com> (the ugly bit)
- # (c) 2007,2008, Andy Whitcroft <apw@uk.ibm.com> (new conditions, test suite)
-@@ -6,6 +6,7 @@
- # Licensed under the terms of the GNU GPL License version 2
- 
- use strict;
-+use warnings;
- 
- my $P = $0;
- $P =~ s@.*/@@g;
-diff --git a/scripts/clean-header-guards.pl b/scripts/clean-header-guards.pl
-index 54ab99ae29..5e67f1998c 100755
---- a/scripts/clean-header-guards.pl
-+++ b/scripts/clean-header-guards.pl
-@@ -1,4 +1,4 @@
--#!/usr/bin/perl -w
-+#!/usr/bin/env perl
- #
- # Clean up include guards in headers
- #
-@@ -28,6 +28,7 @@
- #   "cc -E -DGUARD_H -c -P -", and fed the test program on stdin.
- 
- use strict;
-+use warnings;
- use Getopt::Std;
- 
- # Stuff we don't want to clean because we import it into our tree:
-diff --git a/scripts/cleanup-trace-events.pl b/scripts/cleanup-trace-events.pl
-index 7e808efb6a..e93abc00da 100755
---- a/scripts/cleanup-trace-events.pl
-+++ b/scripts/cleanup-trace-events.pl
-@@ -1,4 +1,4 @@
--#!/usr/bin/perl
-+#!/usr/bin/env perl
- # Copyright (C) 2013 Red Hat, Inc.
- #
- # Authors:
-diff --git a/scripts/disas-objdump.pl b/scripts/disas-objdump.pl
-index 8f7e8182a1..bec905f04b 100755
---- a/scripts/disas-objdump.pl
-+++ b/scripts/disas-objdump.pl
-@@ -1,4 +1,6 @@
--#!/usr/bin/perl -w
-+#!/usr/bin/env perl
-+
-+use warnings;
- 
- use File::Temp qw/ tempfile /;
- use Getopt::Long;
-diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
-index 8261bcb1ad..d7c2311123 100755
---- a/scripts/get_maintainer.pl
-+++ b/scripts/get_maintainer.pl
-@@ -1,4 +1,4 @@
--#!/usr/bin/perl -w
-+#!/usr/bin/env perl
- # (c) 2007, Joe Perches <joe@perches.com>
- #           created from checkpatch.pl
- #
-@@ -11,6 +11,7 @@
- # Licensed under the terms of the GNU GPL License version 2
- 
- use strict;
-+use warnings;
- 
- my $P = $0;
- my $V = '0.26';
-diff --git a/scripts/shaderinclude.pl b/scripts/shaderinclude.pl
-index 81b5146332..cd3bb40b12 100644
---- a/scripts/shaderinclude.pl
-+++ b/scripts/shaderinclude.pl
-@@ -1,4 +1,4 @@
--#!/usr/bin/perl
-+#!/usr/bin/env perl
- use strict;
- use warnings;
- 
-diff --git a/scripts/switch-timer-api b/scripts/switch-timer-api
-index b0e230b9f1..41736d11dd 100755
---- a/scripts/switch-timer-api
-+++ b/scripts/switch-timer-api
-@@ -1,4 +1,4 @@
--#!/usr/bin/perl
-+#!/usr/bin/env perl
- 
- use strict;
- use warnings;
-diff --git a/scripts/texi2pod.pl b/scripts/texi2pod.pl
-index 6e8fec41a1..39ce584a32 100755
---- a/scripts/texi2pod.pl
-+++ b/scripts/texi2pod.pl
-@@ -1,4 +1,4 @@
--#! /usr/bin/perl -w
-+#! /usr/bin/env perl
- 
- #   Copyright (C) 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
- 
-@@ -22,6 +22,8 @@
- # markup to Perl POD format.  It's intended to be used to extract
- # something suitable for a manpage from a Texinfo document.
- 
-+use warnings;
-+
- $output = 0;
- $skipping = 0;
- %sects = ();
--- 
-2.12.2
+<snip>
+
+> =E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9A =EF=BC=9Cmdroth@linux.vnet.ibm.com=
+=EF=BC=9E
+> =E6=94=B6=E4=BB=B6=E4=BA=BA=EF=BC=9A=E8=8A=A6=E5=BF=97=E6=9C=8B10108272=
+
+> =E6=8A=84=E9=80=81=E4=BA=BA=EF=BC=9A=E8=8A=A6=E5=BF=97=E6=9C=8B10108272=
+ =EF=BC=9Cqemu-devel@nongnu.org=EF=BC=9E
+> =E6=97=A5 =E6=9C=9F =EF=BC=9A2017=E5=B9=B404=E6=9C=8826=E6=97=A5 05:17
+> =E4=B8=BB =E9=A2=98 =EF=BC=9ARe: [Qemu-devel] [PATCH v4] qga: Add suppo=
+rt network interfacestatistics in
+>=20
+
+Also, we prefer that you do not top-post on technical lists, but instead
+reply inline to the relevant portions of the email.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--C9cWbSB9Wt6p9J582nJMHPoRpSmogkvsj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZAJ+SAAoJEKeha0olJ0Nqt+sH/Az8JV7hUbg6gtv5IwTA7y+P
+gP5LI3qC//9tc0XToehV++ULF2S1kbNuw3YwDlWcpSZNFRqkOsKWP6m4GsgTQhxi
+20Mllal62mhLeqxsv4w3oSxSQ5gUc/qg6J8pDgjZXtTx/n9o6089PFWVBXPrXm5L
+CgLA5NMMX7jQW/xhvcG2cuETvIJjfWShYy1ej4rQZ2KmgWhslVsHR1yr5d+gi24k
+bLBP8L/sO71zotQLOmnrVYGMxhVKfTMHVrwPepogqKkGHDedQqoWp6Mmk7CXT+rh
+tUAsWeczMzZGt58/GBNMjNqv0fWdxtf0ifriJuof1x7f0Hg5wx6pl933TBeGwdY=
+=brzy
+-----END PGP SIGNATURE-----
+
+--C9cWbSB9Wt6p9J582nJMHPoRpSmogkvsj--
