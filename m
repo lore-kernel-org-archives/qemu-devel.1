@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d3KBh-0007CW-Ha
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:46 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1d3KBq-0007KR-Ko
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d3KBg-0004TO-K6
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:45 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1d3KBo-0004YD-LA
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:54 -0400
 Received: from mga03.intel.com ([134.134.136.65]:33549)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d3KBg-0004JF-Ap
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:44 -0400
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d3KBo-0004JF-9h
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:52 -0400
 From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Wed, 26 Apr 2017 18:12:03 +0800
-Message-Id: <1493201525-14418-7-git-send-email-yi.l.liu@intel.com>
+Date: Wed, 26 Apr 2017 18:12:05 +0800
+Message-Id: <1493201525-14418-9-git-send-email-yi.l.liu@intel.com>
 In-Reply-To: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
 References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-Subject: [Qemu-devel] [RFC PATCH 6/8] VFIO: do pasid table binding
+Subject: [Qemu-devel] [RFC PATCH 8/8] VFIO: do IOMMU TLB invalidation from
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +29,57 @@ Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@
 
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-This patch adds IOCTL processing in vfio_iommu_type1 for
-VFIO_IOMMU_SVM_BIND_TASK. Binds the PASID table bind by
-calling iommu_ops->bind_pasid_table to link the whole
-PASID table to pIOMMU.
+This patch adds support for VFIO_IOMMU_TLB_INVALIDATE cmd in
+vfio_iommu_type1.
 
-For VT-d, it is linking the guest PASID table to host pIOMMU.
-This is key point to support SVM virtualization on VT-d.
+For SVM virtualization on VT-d, for VFIO_IOMMU_TLB_INVALIDATE, it
+calls iommu_ops->do_invalidate() to submit the guest iommu cache
+invalidation to pIOMMU.
 
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 72 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index b3cc33f..30b6d48 100644
+index 30b6d48..6cebdfd 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1512,6 +1512,50 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+@@ -1528,6 +1528,17 @@ static int bind_pasid_tbl_fn(struct device *dev, void *data)
  	return ret;
  }
  
-+struct vfio_svm_task {
-+	struct iommu_domain *domain;
-+	void *payload;
-+};
-+
-+static int bind_pasid_tbl_fn(struct device *dev, void *data)
++static int do_tlb_inv_fn(struct device *dev, void *data)
 +{
 +	int ret = 0;
 +	struct vfio_svm_task *task = data;
-+	struct pasid_table_info *pasidt_binfo;
++	struct tlb_invalidate_info *inv_info;
 +
-+	pasidt_binfo = task->payload;
-+	ret = iommu_bind_pasid_table(task->domain, dev, pasidt_binfo);
++	inv_info = task->payload;
++	ret = iommu_do_invalidate(task->domain, dev, inv_info);
 +	return ret;
 +}
 +
-+static int vfio_do_svm_task(struct vfio_iommu *iommu, void *data,
-+				int (*fn)(struct device *, void *))
-+{
-+	int ret = 0;
-+	struct vfio_domain *d;
-+	struct vfio_group *g;
-+	struct vfio_svm_task task;
-+
-+	task.payload = data;
-+
-+	mutex_lock(&iommu->lock);
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		list_for_each_entry(g, &d->group_list, next) {
-+			if (g->iommu_group != NULL) {
-+				task.domain = d->domain;
-+				ret = iommu_group_for_each_dev(
-+					g->iommu_group, &task, fn);
-+				if (ret != 0)
-+					break;
-+			}
-+		}
-+	}
-+
-+	mutex_unlock(&iommu->lock);
-+	return ret;
-+}
-+
- static long vfio_iommu_type1_ioctl(void *iommu_data,
- 				   unsigned int cmd, unsigned long arg)
+ static int vfio_do_svm_task(struct vfio_iommu *iommu, void *data,
+ 				int (*fn)(struct device *, void *))
  {
-@@ -1582,6 +1626,34 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 
- 		return copy_to_user((void __user *)arg, &unmap, minsz) ?
- 			-EFAULT : 0;
-+	} else if (cmd == VFIO_IOMMU_SVM_BIND_TASK) {
-+		struct vfio_device_svm hdr;
+@@ -1654,6 +1665,21 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		}
+ 		kfree(data);
+ 		return ret;
++	} else if (cmd == VFIO_IOMMU_TLB_INVALIDATE) {
++		struct vfio_iommu_tlb_invalidate hdr;
 +		u8 *data = NULL;
 +		int ret = 0;
 +
-+		minsz = offsetofend(struct vfio_device_svm, length);
++		minsz = offsetofend(struct vfio_iommu_tlb_invalidate, length);
 +		if (copy_from_user(&hdr, (void __user *)arg, minsz))
 +			return -EFAULT;
-+
 +		if (hdr.length == 0)
 +			return -EINVAL;
-+
 +		data = memdup_user((void __user *)(arg + minsz),
-+					hdr.length);
-+		if (IS_ERR(data))
-+			return PTR_ERR(data);
-+
-+		switch (hdr.flags & VFIO_SVM_TYPE_MASK) {
-+		case VFIO_SVM_BIND_PASIDTBL:
-+			ret = vfio_do_svm_task(iommu, data,
-+						bind_pasid_tbl_fn);
-+			break;
-+		default:
-+			ret = -EINVAL;
-+			break;
-+		}
++				hdr.length);
++		ret = vfio_do_svm_task(iommu, data, do_tlb_inv_fn);
 +		kfree(data);
 +		return ret;
  	}
