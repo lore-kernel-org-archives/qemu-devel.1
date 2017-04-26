@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51191)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3Lhk-0006cQ-P2
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:05:57 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51238)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1d3Lhq-0006gi-53
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:06:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3Lhg-0000ez-Oa
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:05:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46078)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d3Lhg-0000ej-I8
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:05:52 -0400
-Date: Wed, 26 Apr 2017 13:05:46 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170426120546.GN18933@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1492845627-4384-1-git-send-email-longpeng2@huawei.com>
-	<1492845627-4384-9-git-send-email-longpeng2@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1492845627-4384-9-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3 08/18] crypto: hmac: introduce
- qcrypto_hmac_ctx_new for gcrypt-backend
+	(envelope-from <n54@gmx.com>) id 1d3Lhl-0000gs-QZ
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:06:02 -0400
+Received: from mout.gmx.net ([212.227.15.18]:63291)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1d3Lhl-0000gW-EM
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:05:57 -0400
+From: Kamil Rytarowski <n54@gmx.com>
+Date: Wed, 26 Apr 2017 13:58:26 +0200
+Message-Id: <20170426115826.1826-1-n54@gmx.com>
+Subject: [Qemu-devel] [PATCH] scripts: Switch to more portable Perl shebang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +21,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: arei.gonglei@huawei.com, longpeng.mike@gmail.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Kamil Rytarowski <n54@gmx.com>
 
-On Sat, Apr 22, 2017 at 03:20:17PM +0800, Longpeng(Mike) wrote:
-> 1) Fix a handle-leak problem in qcrypto_hmac_new(), doesn't free
->    ctx->handle if gcry_mac_setkey fails.
-> 
-> 2) Extracts qcrypto_hmac_ctx_new() from qcrypto_hmac_new() for
->    gcrypt-backend impls.
-> 
-> Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
->  crypto/hmac-gcrypt.c | 35 +++++++++++++++++++++++++----------
->  1 file changed, 25 insertions(+), 10 deletions(-)
+The default NetBSD package manager is pkgsrc and it installs Perl
+along other third party programs under custom and configurable prefix.
+The default prefix for binary prebuilt packages is /usr/pkg, and the
+Perl executable lands in /usr/pkg/bin/perl.
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+This change switches "/usr/bin/perl" to "/usr/bin/evn perl" as it's
+the most portable solution that should work for almost everybody.
+Perl's executable is detected automatically.
 
+This change switches -w option passed to the executable with more
+modern "usr warnings;" approach. There is no functional change to the
+default behavior.
 
-Regards,
-Daniel
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+---
+ scripts/checkpatch.pl           | 3 ++-
+ scripts/clean-header-guards.pl  | 3 ++-
+ scripts/cleanup-trace-events.pl | 2 +-
+ scripts/disas-objdump.pl        | 4 +++-
+ scripts/get_maintainer.pl       | 3 ++-
+ scripts/shaderinclude.pl        | 2 +-
+ scripts/switch-timer-api        | 2 +-
+ scripts/texi2pod.pl             | 4 +++-
+ 8 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index f084542934..3bb6fc95bd 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl -w
++#!/usr/bin/env perl
+ # (c) 2001, Dave Jones. (the file handling bit)
+ # (c) 2005, Joel Schopp <jschopp@austin.ibm.com> (the ugly bit)
+ # (c) 2007,2008, Andy Whitcroft <apw@uk.ibm.com> (new conditions, test suite)
+@@ -6,6 +6,7 @@
+ # Licensed under the terms of the GNU GPL License version 2
+ 
+ use strict;
++use warnings;
+ 
+ my $P = $0;
+ $P =~ s@.*/@@g;
+diff --git a/scripts/clean-header-guards.pl b/scripts/clean-header-guards.pl
+index 54ab99ae29..5e67f1998c 100755
+--- a/scripts/clean-header-guards.pl
++++ b/scripts/clean-header-guards.pl
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl -w
++#!/usr/bin/env perl
+ #
+ # Clean up include guards in headers
+ #
+@@ -28,6 +28,7 @@
+ #   "cc -E -DGUARD_H -c -P -", and fed the test program on stdin.
+ 
+ use strict;
++use warnings;
+ use Getopt::Std;
+ 
+ # Stuff we don't want to clean because we import it into our tree:
+diff --git a/scripts/cleanup-trace-events.pl b/scripts/cleanup-trace-events.pl
+index 7e808efb6a..e93abc00da 100755
+--- a/scripts/cleanup-trace-events.pl
++++ b/scripts/cleanup-trace-events.pl
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ # Copyright (C) 2013 Red Hat, Inc.
+ #
+ # Authors:
+diff --git a/scripts/disas-objdump.pl b/scripts/disas-objdump.pl
+index 8f7e8182a1..bec905f04b 100755
+--- a/scripts/disas-objdump.pl
++++ b/scripts/disas-objdump.pl
+@@ -1,4 +1,6 @@
+-#!/usr/bin/perl -w
++#!/usr/bin/env perl
++
++use warnings;
+ 
+ use File::Temp qw/ tempfile /;
+ use Getopt::Long;
+diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+index 8261bcb1ad..d7c2311123 100755
+--- a/scripts/get_maintainer.pl
++++ b/scripts/get_maintainer.pl
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl -w
++#!/usr/bin/env perl
+ # (c) 2007, Joe Perches <joe@perches.com>
+ #           created from checkpatch.pl
+ #
+@@ -11,6 +11,7 @@
+ # Licensed under the terms of the GNU GPL License version 2
+ 
+ use strict;
++use warnings;
+ 
+ my $P = $0;
+ my $V = '0.26';
+diff --git a/scripts/shaderinclude.pl b/scripts/shaderinclude.pl
+index 81b5146332..cd3bb40b12 100644
+--- a/scripts/shaderinclude.pl
++++ b/scripts/shaderinclude.pl
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ use strict;
+ use warnings;
+ 
+diff --git a/scripts/switch-timer-api b/scripts/switch-timer-api
+index b0e230b9f1..41736d11dd 100755
+--- a/scripts/switch-timer-api
++++ b/scripts/switch-timer-api
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ 
+ use strict;
+ use warnings;
+diff --git a/scripts/texi2pod.pl b/scripts/texi2pod.pl
+index 6e8fec41a1..39ce584a32 100755
+--- a/scripts/texi2pod.pl
++++ b/scripts/texi2pod.pl
+@@ -1,4 +1,4 @@
+-#! /usr/bin/perl -w
++#! /usr/bin/env perl
+ 
+ #   Copyright (C) 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
+ 
+@@ -22,6 +22,8 @@
+ # markup to Perl POD format.  It's intended to be used to extract
+ # something suitable for a manpage from a Texinfo document.
+ 
++use warnings;
++
+ $output = 0;
+ $skipping = 0;
+ %sects = ();
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.12.2
