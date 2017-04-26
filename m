@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Nm5-0005re-Qu
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:18:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3Nmw-0006TO-2d
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Nm1-0006V6-Os
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:18:33 -0400
-References: <20170426141407.10161-1-mreitz@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d3Nmq-000705-Ej
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:19:26 -0400
+References: <20170426134649.9042-1-mreitz@redhat.com>
+	<20170426134649.9042-3-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c4d1a9fa-a155-3760-bb4e-69200764476e@redhat.com>
-Date: Wed, 26 Apr 2017 09:18:15 -0500
+Message-ID: <76adb721-71c5-62bb-ad17-ad17af42bc87@redhat.com>
+Date: Wed, 26 Apr 2017 09:19:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170426141407.10161-1-mreitz@redhat.com>
+In-Reply-To: <20170426134649.9042-3-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ibihrm3V9mBpip1GLNS18Aceq23fPK5u5"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: Launch qemu-nbd with
- -e 42
+	boundary="TLJqOTpikmfodkEGicWhGdcFsXqoIlutl"
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qemu-img/convert: Move bs_n > 1 &&
+ -B check down
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +26,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ibihrm3V9mBpip1GLNS18Aceq23fPK5u5
+--TLJqOTpikmfodkEGicWhGdcFsXqoIlutl
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <c4d1a9fa-a155-3760-bb4e-69200764476e@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] iotests: Launch qemu-nbd with -e 42
-References: <20170426141407.10161-1-mreitz@redhat.com>
-In-Reply-To: <20170426141407.10161-1-mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <76adb721-71c5-62bb-ad17-ad17af42bc87@redhat.com>
+Subject: Re: [PATCH v2 2/3] qemu-img/convert: Move bs_n > 1 && -B check down
+References: <20170426134649.9042-1-mreitz@redhat.com>
+ <20170426134649.9042-3-mreitz@redhat.com>
+In-Reply-To: <20170426134649.9042-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/26/2017 09:14 AM, Max Reitz wrote:
-> There is no reason for the qemu-nbd server used for tests not to accept=
-
-> an arbitrary number of clients. In fact, test 181 will require it to
-> accept two clients at the same time (and thus it fails before this
-> patch).
+On 04/26/2017 08:46 AM, Max Reitz wrote:
+> It does not make much sense to use a backing image for the target when
+> you concatenate multiple images (because then there is no correspondenc=
+e
+> between the source images' backing files and the target's); but it was
+> still possible to give one by using -o backing_file=3DX instead of -B X=
+=2E
 >=20
-> This patch updates common.rc to launch qemu-nbd with -e 42 which should=
-
-> be enough for all of our current and future tests.
-
-Perfect place for you to inject some jibe about "life, the universe, and
-everything" ;)
-
+> Fix this by moving the check.
+>=20
+> (Also, change the error message because -B is not the only way to
+>  specify the backing file, evidently.)
 >=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/common.rc | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-
-
+>  qemu-img.c                 | 13 +++++++------
+>  tests/qemu-iotests/122.out |  4 ++--
+>  2 files changed, 9 insertions(+), 8 deletions(-)
 >=20
-> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.r=
-c
-> index 7d4781d4ad..31b888d4e9 100644
-> --- a/tests/qemu-iotests/common.rc
-> +++ b/tests/qemu-iotests/common.rc
-> @@ -168,7 +168,9 @@ _make_test_img()
-> =20
->      # Start an NBD server on the image file, which is what we'll be ta=
-lking to
->      if [ $IMGPROTO =3D "nbd" ]; then
-> -        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT  $TEST_=
-IMG_FILE >/dev/null &"
-> +        # Pass a sufficiently high number to -e that should be enough =
-for all
-> +        # tests
-> +        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT -e 42  =
-$TEST_IMG_FILE >/dev/null &"
-
-Worth dropping the double-space before $TEST_IMG_FILE while touching this=
-?
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -90,7 +70,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---ibihrm3V9mBpip1GLNS18Aceq23fPK5u5
+--TLJqOTpikmfodkEGicWhGdcFsXqoIlutl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -100,13 +80,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZAKwnAAoJEKeha0olJ0Nq1eEH/2IIb2oYJaV+16SQPn9e4fj/
-ik2rrULX9/xBGTIAC0C0gQAG6xP66L6Cc0U5oU7LYyt1jJzkaWrHofeA4CyYuOIz
-O8pl3ujlHpoOxICeN6n03QO+NLcZiKCxiqYdwrGPcHcHx1jsN1QfrhbMxJSk15nG
-TthTY/Wb8fxxos72sOp4oEYjaYN2LDpQU0ilBSLfJ2Fr0BDzl8QmbILsVYXlufJl
-GcLtC/xCYAu2CEkwgr4coQE+kZUgYncyeVxHOubgU1NXNpvkTywbufK8fYGeg7+j
-iBmHvcg/mkrhke1WxFFs0VZG/2pqsYdfPFopinBRfJMl/HgbXIZnX7Ov3gRd0ZQ=
-=7X2O
+iQEcBAEBCAAGBQJZAKxiAAoJEKeha0olJ0NqPV4H/3o+2FowpJpGj3V1TWn5kT38
+hsa6cQHfTfqautQ7pWVvAkB1rSboJnHn7Qz7F3aNaAVyOaorLnN+qAF4kLnOVgOt
+C3gH4kFF0sivGuRYEY0+TMWucU/X7ua58aYyZP2gY278FO4P84Z1rbtGCL0kxim5
+THU413Kdpvz4E+mLjaQ9Lnje06O6kSLkaDbQg8W3NggIl4MpL13R48xCwyi6fXDr
+wZrv3PnLsccCioICA9AAPAukNksE94Y4hhFm5Tjuuc3X6DQ8c4v/ec+8s++fC2qo
+OG8sDEU2kanNIzOWpCmaHGEUua2Qb1WU6o2ICmfs36USZaQ7UgjEoPdSu56l2iU=
+=KY7K
 -----END PGP SIGNATURE-----
 
---ibihrm3V9mBpip1GLNS18Aceq23fPK5u5--
+--TLJqOTpikmfodkEGicWhGdcFsXqoIlutl--
