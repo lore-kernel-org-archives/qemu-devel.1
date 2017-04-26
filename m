@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3RiI-0006G5-39
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:30:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d3Roi-0000I9-Ll
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3RiE-0003Ad-PB
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:30:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47632
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1d3RiE-0003AD-IV
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:30:50 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3QITA4N173910
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 14:30:49 -0400
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a2ebv2cun-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 14:30:48 -0400
-Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 27 Apr 2017 04:30:46 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Wed, 26 Apr 2017 23:59:49 +0530
-Message-Id: <20170426182949.13433-1-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] target/ppc: do not reset reserve_addr in
- exec_enter
+	(envelope-from <dgilbert@redhat.com>) id 1d3Roh-0006YQ-OP
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:37:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33476)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3Roh-0006YF-Hm
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:37:31 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 26 Apr 2017 19:37:21 +0100
+Message-Id: <20170426183721.7482-3-dgilbert@redhat.com>
+In-Reply-To: <20170426183721.7482-1-dgilbert@redhat.com>
+References: <20170426183721.7482-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] migration: Extra tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
-Cc: alex.bennee@linaro.org, nikunj@linux.vnet.ibm.com, benh@kernel.crashing.org
+To: qemu-devel@nongnu.org, borntraeger@de.ibm.com, quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-In case when atomic operation is not supported, exit_atomic is called
-and we stop the world and execute the atomic operation. This results
-in a following call chain:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-tcg_gen_atomic_cmpxchg_tl()
-  -> gen_helper_exit_atomic()
-     -> HELPER(exit_atomic)
-        -> cpu_loop_exit_atomic() -> EXCP_ATOMIC
-           -> qemu_tcg_cpu_thread_fn() => case EXCP_ATOMIC
-              -> cpu_exec_step_atomic()
-                 -> cpu_step_atomic()
-                    -> cc->cpu_exec_enter() = ppc_cpu_exec_enter()
-                       Sets env->reserve_addr = -1;
+A couple more traces that would have made fixing that postcopy
+bug a bit easier.
 
-But by the time it return back, the reservation is erased and the code
-fails, this continues forever and the lock is never taken.
-
-Instead set this in powerpc_excp()
-
-Now that ppc_cpu_exec_enter() doesn't have anything meaningful to do,
-let us get rid of the function.
-
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
+ migration/ram.c        | 2 ++
+ migration/trace-events | 2 ++
+ 2 files changed, 4 insertions(+)
 
-Depends on following fix by Richard Henderson:
-https://patchwork.ozlabs.org/patch/755582/
-
----
-
- target/ppc/excp_helper.c    | 3 +++
- target/ppc/translate_init.c | 9 ---------
- 2 files changed, 3 insertions(+), 9 deletions(-)
-
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index f4ee7aa..a6bcb47 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -728,6 +728,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
-     cs->exception_index = POWERPC_EXCP_NONE;
-     env->error_code = 0;
+diff --git a/migration/ram.c b/migration/ram.c
+index b4ed41c725..3ac41ccaba 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -812,6 +812,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+     ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
  
-+    /* Reset the reservation */
-+    env->reserve_addr = -1;
-+
-     /* Any interrupt is context synchronizing, check if TCG TLB
-      * needs a delayed flush on ppc64
-      */
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 77e5463..dc4239d 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10426,14 +10426,6 @@ static bool ppc_cpu_has_work(CPUState *cs)
-     return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
- }
+     p = block->host + offset;
++    trace_ram_save_page(block->idstr, (uint64_t)offset, p);
  
--static void ppc_cpu_exec_enter(CPUState *cs)
--{
--    PowerPCCPU *cpu = POWERPC_CPU(cs);
--    CPUPPCState *env = &cpu->env;
--
--    env->reserve_addr = -1;
--}
--
- /* CPUClass::reset() */
- static void ppc_cpu_reset(CPUState *s)
- {
-@@ -10650,7 +10642,6 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
-     cc->get_phys_page_debug = ppc_cpu_get_phys_page_debug;
-     cc->vmsd = &vmstate_ppc_cpu;
- #endif
--    cc->cpu_exec_enter = ppc_cpu_exec_enter;
- #if defined(CONFIG_SOFTMMU)
-     cc->write_elf64_note = ppc64_cpu_write_elf64_note;
-     cc->write_elf32_note = ppc32_cpu_write_elf32_note;
+     /* In doubt sent page as normal */
+     bytes_xmit = 0;
+@@ -2614,6 +2615,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+                 ret = -EINVAL;
+                 break;
+             }
++            trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
+         }
+ 
+         switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
+diff --git a/migration/trace-events b/migration/trace-events
+index b8f01a218c..5b8ccf301c 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -69,8 +69,10 @@ migration_bitmap_sync_start(void) ""
+ migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
+ migration_throttle(void) ""
+ ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %" PRIx64 " %zx"
++ram_load_loop(const char *rbname, uint64_t addr, int flags, void *host) "%s: addr: %" PRIx64 " flags: %x host: %p"
+ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
+ ram_postcopy_send_discard_bitmap(void) ""
++ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: %" PRIx64 " host: %p"
+ ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: %zx len: %zx"
+ 
+ # migration/migration.c
 -- 
-2.9.3
+2.12.2
