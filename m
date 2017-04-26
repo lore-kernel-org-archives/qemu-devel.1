@@ -1,44 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d3LNw-0000e0-H5
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:45:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1d3LVy-0007oq-OD
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d3LNr-0000KG-0s
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:45:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1d3LNq-0000Jn-No
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:45:22 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3QBhsUL100202
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 07:45:21 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2ebv7911-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 07:45:21 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 26 Apr 2017 05:45:20 -0600
-References: <70ef6f1f-27f4-133f-ab33-03a30f19867b@de.ibm.com>
-	<20170424105344.GF2362@work-vm>
-	<75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
-	<20170424143516.GD2075@work-vm>
-	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
-	<20170424191202.GQ2362@work-vm>
-	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
-	<20170426110144.GF2098@work-vm>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 26 Apr 2017 13:45:14 +0200
+	(envelope-from <peterx@redhat.com>) id 1d3LVv-0003qE-NR
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:53:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3LVv-0003pu-Gg
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:53:43 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C04885541
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 11:53:42 +0000 (UTC)
+Date: Wed, 26 Apr 2017 19:53:31 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170426115331.GA26792@pxdev.xzpeter.org>
+References: <20170425101758.3944-1-quintela@redhat.com>
+	<20170425101758.3944-3-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170426110144.GF2098@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <cbf8c55d-9473-9f6f-eb89-779afe7c1fd2@de.ibm.com>
-Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170425101758.3944-3-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration: to_dst_file at that point
+ is NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,206 +34,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On 04/26/2017 01:01 PM, Dr. David Alan Gilbert wrote:
-> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->> On 04/24/2017 09:12 PM, Dr. David Alan Gilbert wrote:
->>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>>> On 04/24/2017 04:35 PM, Dr. David Alan Gilbert wrote:
->>>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>>>>> On 04/24/2017 12:53 PM, Dr. David Alan Gilbert wrote:
->>>>>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>>>>>>> David, Juan,
->>>>>>>>
->>>>>>>> I can trigger a hang of postcopy migration (when I do it early) so
->>>>>>>> that both sides are in paused state. Looks like one thread is still
->>>>>>>> loading vmstates for virtio and this load accesses guest memory and
->>>>>>>> triggers a userfault.
->>>>>>>
->>>>>>> It's perfectly legal for the destination to cause a userfault as it
->>>>>>> loads the virtio queue - the virtio queue should be being loaded by
->>>>>>> the main thread from the buffer while the 'listening' thread is
->>>>>>> waiting for the incoming page data.
->>>>>>>
->>>>>>> Can you turn on the following tracing please: destination: 
->>>>>>> postcopy_ram_fault_thread_request postcopy_place_page 
->>>>>>> postcopy_place_page_zero
->>>>>>>
->>>>>>> source: migrate_handle_rp_req_pages ram_save_queue_pages
->>>>>>>
->>>>>>> You should see: virtio does the access userfault generates a fault 
->>>>>>> postcopy_ram_fault_thread_request sends the request to the source
->>>>>>>
->>>>>>> the source sees migrate_handle_rp_req_pages queues it with
->>>>>>> ram_save_queue_pages
->>>>>>>
->>>>>>> the destination sees the page arrive and postcopy_place_page or
->>>>>>> postcopy_place_page_zero
->>>>>>>
->>>>>>> some of that might disappear if the page was already on it's way.
->>>>>>
->>>>>>
->>>>>> the last event on the source are
->>>>>> [..]
->>>>>> 58412@1493037953.747988:postcopy_place_page host=0x3ff92246000
->>>>>> 58412@1493037953.747992:postcopy_place_page host=0x3ff92247000
->>>>>
->>>>> How do you see those on the source???
->>>>
->>>> It was the previous migrate (I did it in a loop forth and back)
->>>> The problem happens on the migrate back.
->>>
->>> OK, good.
->>>
->>>>>
->>>>>> 58412@1493037956.804210:migrate_handle_rp_req_pages in s390.ram at 41d9000 len 1000
->>>>>> 58412@1493037956.804216:ram_save_queue_pages s390.ram: start: 41d9000 len: 100
->>>>>>
->>>>>
->>>>> Is that a typo? I'm expecting those two 'len' fields to be the same?
->>>>
->>>> Yes, its a cut'n' paste "miss the last byte"
->>>
->>> Good.
->>>
->>> Ok, before digging further, is this a new bug or does it happen on older
->>> QEMU?  Have you got a rune to reproduce it on x86?
->>>
->>>>
->>>>>
->>>>>> On the target a see lots of
->>>>>>
->>>>>> 39741@1493037958.833710:postcopy_place_page_zero host=0x3ff9befa000
->>>>>> 39741@1493037958.833716:postcopy_place_page host=0x3ff9befb000
->>>>>> 39741@1493037958.833759:postcopy_place_page host=0x3ff9befc000
->>>>>> 39741@1493037958.833818:postcopy_place_page host=0x3ff9befd000
->>>>>> 39741@1493037958.833819:postcopy_place_page_zero host=0x3ff9befe000
->>>>>> 39741@1493037958.833822:postcopy_place_page host=0x3ff9beff000
->>>>>>
->>>>>> So we have about 2 seconds of traffic going on after that request,
->>>>>> I assume its precopy related.
->>>>>>
->>>>>> Looking back on the target history there was
->>>>>> 39741@1493037956.804337:postcopy_ram_fault_thread_request Request for HVA=3ff618d9000 rb=s390.ram offset=41d9000
->>>>>>
->>>>>> In fact it seems to be the first and only request:
->>>>>>
->>>>>> # cat /tmp/test0.trace | grep -v postcopy_place_page
->>>>>>
->>>>>> 39741@1493037956.804337:postcopy_ram_fault_thread_request Request for HVA=3ff618d9000 rb=s390.ram offset=41d9000
->>>>>
->>>>> OK, does the HVA there correspond to the address that your virtio device is blocking on?
->>>>
->>>> yes it is the same page.
->>>>
->>>>
->>>>> (or at least the start of the page)
->>>>> Do you see a postcopy_place_page with a host= the same HVA ?
->>>>
->>>> no
->>>
->>> Hmm, that's bad.
->>> The flow is:
->>>     Precopy
->>>        (a) Send pages
->>>     Switch to postcopy
->>>        (b) Send discards for pages that have been changed after
->>>            (a)
->>>     Postcopy
->>>        (c) Keep sending pages until we run out
->>>        (d) But send pages we're asked for first
->>>
->>>  (d) might be ignored if the source thinks the page was already sent or not dirty.
->>>
->>> So we need to figure out:
->>>   1) If the source sent the pages during (a)
->>>   2) If the source discarded it during (b)
->>>   3) If it sent it again any time in c/d
->>>   4) If it ignored the request from d
->>>
->>>
->>> So please turn on the traces:
->>>     get_queued_page_not_dirty                should help with (4)
->>>     get_queued_page                          should help with (4)
->>>     ram_discard_range                        should help with (2)
->>>     loadvm_postcopy_ram_handle_discard       should help with (2)
->>>     qemu_savevm_send_postcopy_ram_discard    should help with (2)
->>>
->>> add near the top of ram_save_page in ram.c:
->>>   fprintf(stderr, "%s: %s:%zx\n", __func__, block->idstr, (size_t)offset);
->>>
->>>    should help with 1, 3
->>
->>
->> source:
->> 28863@1493200554.418978:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419047:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419056:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419064:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419071:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419077:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419083:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419088:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419094:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419100:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419106:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419112:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419117:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419123:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419130:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419138:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419145:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419151:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419156:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419163:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419169:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419174:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419179:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419184:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419189:qemu_savevm_send_postcopy_ram_discard s390.ram: 12d
->> 28863@1493200554.419208:qemu_savevm_send_postcopy_ram_discard s390.ram: 9d
->> 28863@1493200554.818195:migrate_handle_rp_req_pages in s390.ram at 3c6b000 len 1000
->> 28863@1493200554.818208:ram_save_queue_pages s390.ram: start: 3c6b000 len: 1000
->> 28863@1493200554.818469:get_queued_page_not_dirty s390.ram/3c6b000 ram_addr=3c6b000 (sent=0)
+On Tue, Apr 25, 2017 at 12:17:58PM +0200, Juan Quintela wrote:
+> We have just arrived as:
 > 
-> OK, the source is ignoring the request because it thinks the page has
-> already been sent and hasn't been redirtied.
+> migration.c: qemu_migrate()
+>   ....
+>   s = migrate_init() <- puts it to NULL
+>   ....
+>   {tcp,unix}_start_outgoing_migration ->
+>      socket_outgoing_migration
+>         migration_channel_connect()
+> 	   sets to_dst_file
 > 
->> I also get 
->> ram_save_page: s390.ram:3c6b000
+> if tls is enabled, we do another round through
+> migrate_channel_tls_connect(), but we only set it up if there is no
+> error.  So we don't need the assignation.  I am removing it to remove
+> in the follwing patches the knowledge about MigrationState in that two
+> files.
 > 
-> and you said in your other message that happens before the discards, which
-> means it's precopy, and that's why you don't see the 'place_page'.
-> 
->> target (without postcopy_place)
->> 10929@1493200553.657966:ram_discard_range s390.ram: start: 0 5dc00000
-> 
-> That's start of day I think, so we can ignore that (I think!)
-> 
->> 10929@1493200554.428226:loadvm_postcopy_ram_handle_discard 
-> 
-> ....
-> 
->> 10929@1493200554.438231:ram_discard_range s390.ram: start: 3bf6000 1000
->> 10929@1493200554.438233:ram_discard_range s390.ram: start: 3bfd000 1000
->> 10929@1493200554.438235:ram_discard_range s390.ram: start: 3c06000 4000
->> 10929@1493200554.438240:loadvm_postcopy_ram_handle_discard 
->> 10929@1493200554.438241:ram_discard_range s390.ram: start: 3c79000 3000
-> 
-> Well, it's not discarded the 3c6b000 page, so the page we received
-> during precopy should still be there, and it shouldn't fault.
-> 
-> In migration/ram.c in ram_load, before the line:
->            switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
-> 
-> can you add:
->     fprintf(stderr, "%s: addr=%zx flags=%zx host=%p\n", __func__, addr, flags, host);
-> 
-> that should show the incoming blocks during precopy and we should be able
-> to see the page coming in.
-> Hmm, I have a theory, if the flags field has bit 1 set, i.e. RAM_SAVE_FLAG_COMPRESS
-> then try changing ram_handle_compressed to always do the memset.
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-FWIW, changing ram_handle_compressed to always memset makes the problem go away.
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+> ---
+>  migration/socket.c | 1 -
+>  migration/tls.c    | 1 -
+>  2 files changed, 2 deletions(-)
+> 
+> diff --git a/migration/socket.c b/migration/socket.c
+> index 13966f1..dc88812 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -79,7 +79,6 @@ static void socket_outgoing_migration(QIOTask *task,
+>  
+>      if (qio_task_propagate_error(task, &err)) {
+>          trace_migration_socket_outgoing_error(error_get_pretty(err));
+> -        data->s->to_dst_file = NULL;
+>          migrate_fd_error(data->s, err);
+>          error_free(err);
+>      } else {
+> diff --git a/migration/tls.c b/migration/tls.c
+> index 45bec44..a33ecb7 100644
+> --- a/migration/tls.c
+> +++ b/migration/tls.c
+> @@ -116,7 +116,6 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
+>  
+>      if (qio_task_propagate_error(task, &err)) {
+>          trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
+> -        s->to_dst_file = NULL;
+>          migrate_fd_error(s, err);
+>          error_free(err);
+>      } else {
+> -- 
+> 2.9.3
+> 
+
+-- 
+Peter Xu
