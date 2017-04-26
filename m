@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d3KBW-00072E-Cl
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:35 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1d3KBa-000763-4S
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d3KBV-0004Pr-CD
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:34 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1d3KBY-0004Qs-Vc
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:38 -0400
 Received: from mga03.intel.com ([134.134.136.65]:33549)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d3KBV-0004JF-33
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:33 -0400
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d3KBY-0004JF-I3
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 06:28:36 -0400
 From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Wed, 26 Apr 2017 18:12:00 +0800
-Message-Id: <1493201525-14418-4-git-send-email-yi.l.liu@intel.com>
+Date: Wed, 26 Apr 2017 18:12:01 +0800
+Message-Id: <1493201525-14418-5-git-send-email-yi.l.liu@intel.com>
 In-Reply-To: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
 References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-Subject: [Qemu-devel] [RFC PATCH 3/8] iommu: Introduce iommu do invalidate
- API function
+Subject: [Qemu-devel] [RFC PATCH 4/8] iommu/vt-d: Add iommu do invalidate
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +25,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com, Jacob Pan <jacob.jun.pan@linux.intel.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 
-When a SVM capable device is assigned to a guest, the first level page
-tables are owned by the guest and the guest PASID table pointer is
-linked to the device context entry of the physical IOMMU.
+This patch adds Intel VT-d specific function to implement
+iommu_do_invalidate API.
 
-Host IOMMU driver has no knowledge of caching structure updates unless
-the guest invalidation activities are passed down to the host. The
-primary usage is derived from emulated IOMMU in the guest, where QEMU
-can trap invalidation activities before pass them down the
-host/physical IOMMU. There are IOMMU architectural specific actions
-need to be taken which requires the generic APIs introduced in this
-patch to have opaque data in the tlb_invalidate_info argument.
+The use case is for supporting caching structure invalidation
+of assigned SVM capable devices. Emulated IOMMU exposes queue
+invalidation capability and passes down all descriptors from the guest
+to the physical IOMMU.
+
+The assumption is that guest to host device ID mapping should be
+resolved prior to calling IOMMU driver. Based on the device handle,
+host IOMMU driver can replace certain fields before submit to the
+invalidation queue.
 
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 ---
- drivers/iommu/iommu.c | 13 +++++++++++++
- include/linux/iommu.h | 16 ++++++++++++++++
- 2 files changed, 29 insertions(+)
+ drivers/iommu/intel-iommu.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ include/linux/intel-iommu.h | 11 +++++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index f2da636..ca7cff2 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -1153,6 +1153,19 @@ int iommu_unbind_pasid_table(struct iommu_domain *domain, struct device *dev)
+diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+index 6d5b939..0b098ad 100644
+--- a/drivers/iommu/intel-iommu.c
++++ b/drivers/iommu/intel-iommu.c
+@@ -5042,6 +5042,48 @@ static void intel_iommu_detach_device(struct iommu_domain *domain,
+ 	dmar_remove_one_dev_info(to_dmar_domain(domain), dev);
  }
- EXPORT_SYMBOL_GPL(iommu_unbind_pasid_table);
  
-+int iommu_do_invalidate(struct iommu_domain *domain,
++static int intel_iommu_do_invalidate(struct iommu_domain *domain,
 +		struct device *dev, struct tlb_invalidate_info *inv_info)
 +{
 +	int ret = 0;
++	struct intel_iommu *iommu;
++	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
++	struct intel_invalidate_data *inv_data;
++	struct qi_desc *qi;
++	u16 did;
++	u8 bus, devfn;
 +
-+	if (unlikely(domain->ops->do_invalidate == NULL))
++	if (!inv_info || !dmar_domain || (inv_info->model != INTEL_IOMMU))
++		return -EINVAL;
++
++	iommu = device_to_iommu(dev, &bus, &devfn);
++	if (!iommu)
 +		return -ENODEV;
 +
-+	ret = domain->ops->do_invalidate(domain, dev, inv_info);
++	inv_data = (struct intel_invalidate_data *)&inv_info->opaque;
++
++	/* check SID */
++	if (PCI_DEVID(bus, devfn) != inv_data->sid)
++		return 0;
++
++	qi = &inv_data->inv_desc;
++
++	switch (qi->low & QI_TYPE_MASK) {
++	case QI_DIOTLB_TYPE:
++	case QI_DEIOTLB_TYPE:
++		/* for device IOTLB, we just let it pass through */
++		break;
++	default:
++		did = dmar_domain->iommu_did[iommu->seq_id];
++		set_mask_bits(&qi->low, QI_DID_MASK, QI_DID(did));
++		break;
++	}
++
++	ret = qi_submit_sync(qi, iommu);
++
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(iommu_do_invalidate);
 +
- static void __iommu_detach_device(struct iommu_domain *domain,
- 				  struct device *dev)
- {
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 491a011..a48e3b75 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -140,6 +140,11 @@ struct pasid_table_info {
- 	__u8	opaque[];/* IOMMU-specific details */
- };
+ static int intel_iommu_map(struct iommu_domain *domain,
+ 			   unsigned long iova, phys_addr_t hpa,
+ 			   size_t size, int iommu_prot)
+@@ -5416,6 +5458,7 @@ static int intel_iommu_unbind_pasid_table(struct iommu_domain *domain,
+ #ifdef CONFIG_INTEL_IOMMU_SVM
+ 	.bind_pasid_table	= intel_iommu_bind_pasid_table,
+ 	.unbind_pasid_table	= intel_iommu_unbind_pasid_table,
++	.do_invalidate		= intel_iommu_do_invalidate,
+ #endif
+ 	.map		= intel_iommu_map,
+ 	.unmap		= intel_iommu_unmap,
+diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
+index ac04f28..9d6562c 100644
+--- a/include/linux/intel-iommu.h
++++ b/include/linux/intel-iommu.h
+@@ -29,6 +29,7 @@
+ #include <linux/dma_remapping.h>
+ #include <linux/mmu_notifier.h>
+ #include <linux/list.h>
++#include <linux/bitops.h>
+ #include <asm/cacheflush.h>
+ #include <asm/iommu.h>
  
-+struct tlb_invalidate_info {
-+	__u32	model;
-+	__u8	opaque[];
+@@ -271,6 +272,10 @@ enum {
+ #define QI_PGRP_RESP_TYPE	0x9
+ #define QI_PSTRM_RESP_TYPE	0xa
+ 
++#define QI_DID(did)		(((u64)did & 0xffff) << 16)
++#define QI_DID_MASK		GENMASK(31, 16)
++#define QI_TYPE_MASK		GENMASK(3, 0)
++
+ #define QI_IEC_SELECTIVE	(((u64)1) << 4)
+ #define QI_IEC_IIDEX(idx)	(((u64)(idx & 0xffff) << 32))
+ #define QI_IEC_IM(m)		(((u64)(m & 0x1f) << 27))
+@@ -529,6 +534,12 @@ struct intel_svm {
+ extern struct intel_iommu *intel_svm_device_to_iommu(struct device *dev);
+ #endif
+ 
++struct intel_invalidate_data {
++	u16 sid;
++	u32 pasid;
++	struct qi_desc inv_desc;
 +};
 +
- #ifdef CONFIG_IOMMU_API
- 
- /**
-@@ -215,6 +220,8 @@ struct iommu_ops {
- 				struct pasid_table_info *pasidt_binfo);
- 	int (*unbind_pasid_table)(struct iommu_domain *domain,
- 				struct device *dev);
-+	int (*do_invalidate)(struct iommu_domain *domain,
-+		struct device *dev, struct tlb_invalidate_info *inv_info);
- 
- 	unsigned long pgsize_bitmap;
- };
-@@ -240,6 +247,9 @@ extern int iommu_bind_pasid_table(struct iommu_domain *domain,
- 		struct device *dev, struct pasid_table_info *pasidt_binfo);
- extern int iommu_unbind_pasid_table(struct iommu_domain *domain,
- 				struct device *dev);
-+extern int iommu_do_invalidate(struct iommu_domain *domain,
-+		struct device *dev, struct tlb_invalidate_info *inv_info);
-+
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
- 		     phys_addr_t paddr, size_t size, int prot);
-@@ -626,6 +636,12 @@ int iommu_unbind_pasid_table(struct iommu_domain *domain, struct device *dev)
- 	return -EINVAL;
- }
- 
-+static inline int iommu_do_invalidate(struct iommu_domain *domain,
-+		struct device *dev, struct tlb_invalidate_info *inv_info)
-+{
-+	return -EINVAL;
-+}
-+
- #endif /* CONFIG_IOMMU_API */
- 
- #endif /* __LINUX_IOMMU_H */
+ extern const struct attribute_group *intel_iommu_groups[];
+ extern void intel_iommu_debugfs_init(void);
+ extern struct context_entry *iommu_context_addr(struct intel_iommu *iommu,
 -- 
 1.9.1
