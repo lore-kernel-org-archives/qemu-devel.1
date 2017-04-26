@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d3Diq-0002LZ-CD
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:34:33 -0400
+	(envelope-from <famz@redhat.com>) id 1d3Diy-0002Tt-Kt
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d3Dip-0001ZJ-7z
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:34:32 -0400
+	(envelope-from <famz@redhat.com>) id 1d3Div-0001aV-Mi
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:34:40 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 26 Apr 2017 11:33:55 +0800
-Message-Id: <20170426033413.17192-4-famz@redhat.com>
+Date: Wed, 26 Apr 2017 11:33:57 +0800
+Message-Id: <20170426033413.17192-6-famz@redhat.com>
 In-Reply-To: <20170426033413.17192-1-famz@redhat.com>
 References: <20170426033413.17192-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v15 03/21] block: Add,
- parse and store "force-share" option
+Subject: [Qemu-devel] [PATCH v15 05/21] qemu-img: Add --force-share option
+ to subcommands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +23,561 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+This will force the opened images to allow sharing all permissions with other
+programs.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block.c                   | 17 +++++++++++++++++
- include/block/block.h     |  1 +
- include/block/block_int.h |  1 +
- qapi/block-core.json      |  3 +++
- 4 files changed, 22 insertions(+)
+ qemu-img.c | 154 ++++++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 118 insertions(+), 36 deletions(-)
 
-diff --git a/block.c b/block.c
-index fce77bf..9db39b6 100644
---- a/block.c
-+++ b/block.c
-@@ -763,6 +763,7 @@ static void bdrv_inherited_options(int *child_flags, QDict *child_options,
-      * the parent. */
-     qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_DIRECT);
-     qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_NO_FLUSH);
-+    qdict_copy_default(child_options, parent_options, BDRV_OPT_FORCE_SHARE);
+diff --git a/qemu-img.c b/qemu-img.c
+index ed24371..c0fb1ce 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -28,6 +28,7 @@
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qbool.h"
+ #include "qemu/cutils.h"
+ #include "qemu/config-file.h"
+ #include "qemu/option.h"
+@@ -283,12 +284,20 @@ static int img_open_password(BlockBackend *blk, const char *filename,
  
-     /* Inherit the read-only option from the parent if it's not set */
-     qdict_copy_default(child_options, parent_options, BDRV_OPT_READ_ONLY);
-@@ -871,6 +872,7 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
-      * which is only applied on the top level (BlockBackend) */
-     qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_DIRECT);
-     qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_NO_FLUSH);
-+    qdict_copy_default(child_options, parent_options, BDRV_OPT_FORCE_SHARE);
- 
-     /* backing files always opened read-only */
-     qdict_set_default_str(child_options, BDRV_OPT_READ_ONLY, "on");
-@@ -1115,6 +1117,11 @@ QemuOptsList bdrv_runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "discard operation (ignore/off, unmap/on)",
-         },
-+        {
-+            .name = BDRV_OPT_FORCE_SHARE,
-+            .type = QEMU_OPT_BOOL,
-+            .help = "always accept other writers (default: off)",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -1154,6 +1161,16 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
-     drv = bdrv_find_format(driver_name);
-     assert(drv != NULL);
- 
-+    bs->force_share = qemu_opt_get_bool(opts, BDRV_OPT_FORCE_SHARE, false);
-+
-+    if (bs->force_share && (bs->open_flags & BDRV_O_RDWR)) {
-+        error_setg(errp,
-+                   BDRV_OPT_FORCE_SHARE
-+                   "=on can only be used with read-only images");
-+        ret = -EINVAL;
-+        goto fail_opts;
+ static BlockBackend *img_open_opts(const char *optstr,
+                                    QemuOpts *opts, int flags, bool writethrough,
+-                                   bool quiet)
++                                   bool quiet, bool force_share)
+ {
+     QDict *options;
+     Error *local_err = NULL;
+     BlockBackend *blk;
+     options = qemu_opts_to_qdict(opts, NULL);
++    if (force_share) {
++        if (qdict_haskey(options, BDRV_OPT_FORCE_SHARE)
++            && !qdict_get_bool(options, BDRV_OPT_FORCE_SHARE)) {
++            error_report("--force-share/-U conflicts with image options");
++            return NULL;
++        }
++        qdict_put(options, BDRV_OPT_FORCE_SHARE, qbool_from_bool(true));
 +    }
-+
-     if (file != NULL) {
-         filename = blk_bs(file)->filename;
+     blk = blk_new_open(NULL, NULL, options, flags, &local_err);
+     if (!blk) {
+         error_reportf_err(local_err, "Could not open '%s': ", optstr);
+@@ -305,17 +314,20 @@ static BlockBackend *img_open_opts(const char *optstr,
+ 
+ static BlockBackend *img_open_file(const char *filename,
+                                    const char *fmt, int flags,
+-                                   bool writethrough, bool quiet)
++                                   bool writethrough, bool quiet,
++                                   bool force_share)
+ {
+     BlockBackend *blk;
+     Error *local_err = NULL;
+-    QDict *options = NULL;
++    QDict *options = qdict_new();
+ 
+     if (fmt) {
+-        options = qdict_new();
+         qdict_put(options, "driver", qstring_from_str(fmt));
+     }
+ 
++    if (force_share) {
++        qdict_put(options, BDRV_OPT_FORCE_SHARE, qbool_from_bool(true));
++    }
+     blk = blk_new_open(filename, NULL, options, flags, &local_err);
+     if (!blk) {
+         error_reportf_err(local_err, "Could not open '%s': ", filename);
+@@ -334,7 +346,7 @@ static BlockBackend *img_open_file(const char *filename,
+ static BlockBackend *img_open(bool image_opts,
+                               const char *filename,
+                               const char *fmt, int flags, bool writethrough,
+-                              bool quiet)
++                              bool quiet, bool force_share)
+ {
+     BlockBackend *blk;
+     if (image_opts) {
+@@ -348,9 +360,11 @@ static BlockBackend *img_open(bool image_opts,
+         if (!opts) {
+             return NULL;
+         }
+-        blk = img_open_opts(filename, opts, flags, writethrough, quiet);
++        blk = img_open_opts(filename, opts, flags, writethrough, quiet,
++                            force_share);
      } else {
-diff --git a/include/block/block.h b/include/block/block.h
-index a798f10..feae379 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -109,6 +109,7 @@ typedef struct HDGeometry {
- #define BDRV_OPT_CACHE_NO_FLUSH "cache.no-flush"
- #define BDRV_OPT_READ_ONLY      "read-only"
- #define BDRV_OPT_DISCARD        "discard"
-+#define BDRV_OPT_FORCE_SHARE    "force-share"
+-        blk = img_open_file(filename, fmt, flags, writethrough, quiet);
++        blk = img_open_file(filename, fmt, flags, writethrough, quiet,
++                            force_share);
+     }
+     return blk;
+ }
+@@ -650,6 +664,7 @@ static int img_check(int argc, char **argv)
+     ImageCheck *check;
+     bool quiet = false;
+     bool image_opts = false;
++    bool force_share = false;
  
+     fmt = NULL;
+     output = NULL;
+@@ -664,9 +679,10 @@ static int img_check(int argc, char **argv)
+             {"output", required_argument, 0, OPTION_OUTPUT},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hf:r:T:q",
++        c = getopt_long(argc, argv, ":hf:r:T:qU",
+                         long_options, &option_index);
+         if (c == -1) {
+             break;
+@@ -705,6 +721,9 @@ static int img_check(int argc, char **argv)
+         case 'q':
+             quiet = true;
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         case OPTION_OBJECT: {
+             QemuOpts *opts;
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+@@ -744,7 +763,8 @@ static int img_check(int argc, char **argv)
+         return 1;
+     }
  
- #define BDRV_SECTOR_BITS   9
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 59400bd..94ba697 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -518,6 +518,7 @@ struct BlockDriverState {
-     bool valid_key; /* if true, a valid encryption key has been set */
-     bool sg;        /* if true, the device is a /dev/sg* */
-     bool probed;    /* if true, format was probed rather than specified */
-+    bool force_share; /* if true, always allow all shared permissions */
+-    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet);
++    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
++                   force_share);
+     if (!blk) {
+         return 1;
+     }
+@@ -947,7 +967,8 @@ static int img_commit(int argc, char **argv)
+         return 1;
+     }
  
-     BlockDriver *drv; /* NULL means no media */
-     void *opaque;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 033457c..5bc56969 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2880,6 +2880,8 @@
- #                 (default: false)
- # @detect-zeroes: detect and optimize zero writes (Since 2.1)
- #                 (default: off)
-+# @force-share:   force share all permission on added nodes.
-+#                 Requires read-only=true. (Since 2.10)
- #
- # Remaining options are determined by the block driver.
- #
-@@ -2891,6 +2893,7 @@
-             '*discard': 'BlockdevDiscardOptions',
-             '*cache': 'BlockdevCacheOptions',
-             '*read-only': 'bool',
-+            '*force-share': 'bool',
-             '*detect-zeroes': 'BlockdevDetectZeroesOptions' },
-   'discriminator': 'driver',
-   'data': {
+-    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet);
++    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
++                   false);
+     if (!blk) {
+         return 1;
+     }
+@@ -1206,6 +1227,7 @@ static int img_compare(int argc, char **argv)
+     int c, pnum;
+     uint64_t progress_base;
+     bool image_opts = false;
++    bool force_share = false;
+ 
+     cache = BDRV_DEFAULT_CACHE;
+     for (;;) {
+@@ -1213,9 +1235,10 @@ static int img_compare(int argc, char **argv)
+             {"help", no_argument, 0, 'h'},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hf:F:T:pqs",
++        c = getopt_long(argc, argv, ":hf:F:T:pqsU",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -1248,6 +1271,9 @@ static int img_compare(int argc, char **argv)
+         case 's':
+             strict = true;
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         case OPTION_OBJECT: {
+             QemuOpts *opts;
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+@@ -1293,13 +1319,15 @@ static int img_compare(int argc, char **argv)
+         goto out3;
+     }
+ 
+-    blk1 = img_open(image_opts, filename1, fmt1, flags, writethrough, quiet);
++    blk1 = img_open(image_opts, filename1, fmt1, flags, writethrough, quiet,
++                    force_share);
+     if (!blk1) {
+         ret = 2;
+         goto out3;
+     }
+ 
+-    blk2 = img_open(image_opts, filename2, fmt2, flags, writethrough, quiet);
++    blk2 = img_open(image_opts, filename2, fmt2, flags, writethrough, quiet,
++                    force_share);
+     if (!blk2) {
+         ret = 2;
+         goto out2;
+@@ -1934,6 +1962,7 @@ static int img_convert(int argc, char **argv)
+     bool writethrough, src_writethrough, quiet = false, image_opts = false,
+          compress = false, skip_create = false, progress = false;
+     int64_t ret = -EINVAL;
++    bool force_share = false;
+ 
+     ImgConvertState s = (ImgConvertState) {
+         /* Need at least 4k of zeros for sparse detection */
+@@ -1948,9 +1977,10 @@ static int img_convert(int argc, char **argv)
+             {"help", no_argument, 0, 'h'},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
++        c = getopt_long(argc, argv, ":hf:O:B:ce6o:s:l:S:pt:T:qnm:WU",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -2054,6 +2084,9 @@ static int img_convert(int argc, char **argv)
+         case 'W':
+             s.wr_in_order = false;
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         case OPTION_OBJECT:
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+                                            optarg, true);
+@@ -2117,7 +2150,8 @@ static int img_convert(int argc, char **argv)
+ 
+     for (bs_i = 0; bs_i < s.src_num; bs_i++) {
+         s.src[bs_i] = img_open(image_opts, argv[optind + bs_i],
+-                                fmt, src_flags, src_writethrough, quiet);
++                               fmt, src_flags, src_writethrough, quiet,
++                               force_share);
+         if (!s.src[bs_i]) {
+             ret = -1;
+             goto out;
+@@ -2262,7 +2296,8 @@ static int img_convert(int argc, char **argv)
+      * the bdrv_create() call which takes different params.
+      * Not critical right now, so fix can wait...
+      */
+-    s.target = img_open_file(out_filename, out_fmt, flags, writethrough, quiet);
++    s.target = img_open_file(out_filename, out_fmt, flags, writethrough, quiet,
++                             false);
+     if (!s.target) {
+         ret = -1;
+         goto out;
+@@ -2413,7 +2448,7 @@ static gboolean str_equal_func(gconstpointer a, gconstpointer b)
+ static ImageInfoList *collect_image_info_list(bool image_opts,
+                                               const char *filename,
+                                               const char *fmt,
+-                                              bool chain)
++                                              bool chain, bool force_share)
+ {
+     ImageInfoList *head = NULL;
+     ImageInfoList **last = &head;
+@@ -2436,7 +2471,8 @@ static ImageInfoList *collect_image_info_list(bool image_opts,
+         g_hash_table_insert(filenames, (gpointer)filename, NULL);
+ 
+         blk = img_open(image_opts, filename, fmt,
+-                       BDRV_O_NO_BACKING | BDRV_O_NO_IO, false, false);
++                       BDRV_O_NO_BACKING | BDRV_O_NO_IO, false, false,
++                       force_share);
+         if (!blk) {
+             goto err;
+         }
+@@ -2488,6 +2524,7 @@ static int img_info(int argc, char **argv)
+     const char *filename, *fmt, *output;
+     ImageInfoList *list;
+     bool image_opts = false;
++    bool force_share = false;
+ 
+     fmt = NULL;
+     output = NULL;
+@@ -2500,9 +2537,10 @@ static int img_info(int argc, char **argv)
+             {"backing-chain", no_argument, 0, OPTION_BACKING_CHAIN},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":f:h",
++        c = getopt_long(argc, argv, ":f:hU",
+                         long_options, &option_index);
+         if (c == -1) {
+             break;
+@@ -2520,6 +2558,9 @@ static int img_info(int argc, char **argv)
+         case 'f':
+             fmt = optarg;
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         case OPTION_OUTPUT:
+             output = optarg;
+             break;
+@@ -2559,7 +2600,8 @@ static int img_info(int argc, char **argv)
+         return 1;
+     }
+ 
+-    list = collect_image_info_list(image_opts, filename, fmt, chain);
++    list = collect_image_info_list(image_opts, filename, fmt, chain,
++                                   force_share);
+     if (!list) {
+         return 1;
+     }
+@@ -2705,6 +2747,7 @@ static int img_map(int argc, char **argv)
+     MapEntry curr = { .length = 0 }, next;
+     int ret = 0;
+     bool image_opts = false;
++    bool force_share = false;
+ 
+     fmt = NULL;
+     output = NULL;
+@@ -2716,9 +2759,10 @@ static int img_map(int argc, char **argv)
+             {"output", required_argument, 0, OPTION_OUTPUT},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":f:h",
++        c = getopt_long(argc, argv, ":f:hU",
+                         long_options, &option_index);
+         if (c == -1) {
+             break;
+@@ -2736,6 +2780,9 @@ static int img_map(int argc, char **argv)
+         case 'f':
+             fmt = optarg;
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         case OPTION_OUTPUT:
+             output = optarg;
+             break;
+@@ -2772,7 +2819,7 @@ static int img_map(int argc, char **argv)
+         return 1;
+     }
+ 
+-    blk = img_open(image_opts, filename, fmt, 0, false, false);
++    blk = img_open(image_opts, filename, fmt, 0, false, false, force_share);
+     if (!blk) {
+         return 1;
+     }
+@@ -2835,6 +2882,7 @@ static int img_snapshot(int argc, char **argv)
+     bool quiet = false;
+     Error *err = NULL;
+     bool image_opts = false;
++    bool force_share = false;
+ 
+     bdrv_oflags = BDRV_O_RDWR;
+     /* Parse commandline parameters */
+@@ -2843,9 +2891,10 @@ static int img_snapshot(int argc, char **argv)
+             {"help", no_argument, 0, 'h'},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":la:c:d:hq",
++        c = getopt_long(argc, argv, ":la:c:d:hqU",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -2895,6 +2944,9 @@ static int img_snapshot(int argc, char **argv)
+         case 'q':
+             quiet = true;
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         case OPTION_OBJECT: {
+             QemuOpts *opts;
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+@@ -2921,7 +2973,8 @@ static int img_snapshot(int argc, char **argv)
+     }
+ 
+     /* Open the image */
+-    blk = img_open(image_opts, filename, NULL, bdrv_oflags, false, quiet);
++    blk = img_open(image_opts, filename, NULL, bdrv_oflags, false, quiet,
++                   force_share);
+     if (!blk) {
+         return 1;
+     }
+@@ -2985,6 +3038,7 @@ static int img_rebase(int argc, char **argv)
+     int c, flags, src_flags, ret;
+     bool writethrough, src_writethrough;
+     int unsafe = 0;
++    bool force_share = false;
+     int progress = 0;
+     bool quiet = false;
+     Error *local_err = NULL;
+@@ -3001,9 +3055,10 @@ static int img_rebase(int argc, char **argv)
+             {"help", no_argument, 0, 'h'},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hf:F:b:upt:T:q",
++        c = getopt_long(argc, argv, ":hf:F:b:upt:T:qU",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -3053,6 +3108,9 @@ static int img_rebase(int argc, char **argv)
+         case OPTION_IMAGE_OPTS:
+             image_opts = true;
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         }
+     }
+ 
+@@ -3101,7 +3159,8 @@ static int img_rebase(int argc, char **argv)
+      * Ignore the old backing file for unsafe rebase in case we want to correct
+      * the reference to a renamed or moved backing file.
+      */
+-    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet);
++    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
++                   false);
+     if (!blk) {
+         ret = -1;
+         goto out;
+@@ -3126,6 +3185,13 @@ static int img_rebase(int argc, char **argv)
+             qdict_put(options, "driver", qstring_from_str(bs->backing_format));
+         }
+ 
++        if (force_share) {
++            if (!options) {
++                options = qdict_new();
++            }
++            qdict_put(options, BDRV_OPT_FORCE_SHARE,
++                      qbool_from_bool(true));
++        }
+         bdrv_get_backing_filename(bs, backing_name, sizeof(backing_name));
+         blk_old_backing = blk_new_open(backing_name, NULL,
+                                        options, src_flags, &local_err);
+@@ -3138,11 +3204,13 @@ static int img_rebase(int argc, char **argv)
+         }
+ 
+         if (out_baseimg[0]) {
++            options = qdict_new();
+             if (out_basefmt) {
+-                options = qdict_new();
+                 qdict_put(options, "driver", qstring_from_str(out_basefmt));
+-            } else {
+-                options = NULL;
++            }
++            if (force_share) {
++                qdict_put(options, BDRV_OPT_FORCE_SHARE,
++                          qbool_from_bool(true));
+             }
+ 
+             blk_new_backing = blk_new_open(out_baseimg, NULL,
+@@ -3448,7 +3516,8 @@ static int img_resize(int argc, char **argv)
+     qemu_opts_del(param);
+ 
+     blk = img_open(image_opts, filename, fmt,
+-                   BDRV_O_RDWR | BDRV_O_RESIZE, false, quiet);
++                   BDRV_O_RDWR | BDRV_O_RESIZE, false, quiet,
++                   false);
+     if (!blk) {
+         ret = -1;
+         goto out;
+@@ -3611,7 +3680,8 @@ static int img_amend(int argc, char **argv)
+         goto out;
+     }
+ 
+-    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet);
++    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
++                   false);
+     if (!blk) {
+         ret = -1;
+         goto out;
+@@ -3779,6 +3849,7 @@ static int img_bench(int argc, char **argv)
+     bool writethrough = false;
+     struct timeval t1, t2;
+     int i;
++    bool force_share = false;
+ 
+     for (;;) {
+         static const struct option long_options[] = {
+@@ -3787,9 +3858,10 @@ static int img_bench(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {"pattern", required_argument, 0, OPTION_PATTERN},
+             {"no-drain", no_argument, 0, OPTION_NO_DRAIN},
++            {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hc:d:f:no:qs:S:t:w", long_options, NULL);
++        c = getopt_long(argc, argv, ":hc:d:f:no:qs:S:t:wU", long_options, NULL);
+         if (c == -1) {
+             break;
+         }
+@@ -3883,6 +3955,9 @@ static int img_bench(int argc, char **argv)
+             flags |= BDRV_O_RDWR;
+             is_write = true;
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         case OPTION_PATTERN:
+         {
+             unsigned long res;
+@@ -3930,7 +4005,8 @@ static int img_bench(int argc, char **argv)
+         goto out;
+     }
+ 
+-    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet);
++    blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
++                   force_share);
+     if (!blk) {
+         ret = -1;
+         goto out;
+@@ -4097,6 +4173,7 @@ static int img_dd(int argc, char **argv)
+     const char *fmt = NULL;
+     int64_t size = 0;
+     int64_t block_count = 0, out_pos, in_pos;
++    bool force_share = false;
+     struct DdInfo dd = {
+         .flags = 0,
+         .count = 0,
+@@ -4125,10 +4202,11 @@ static int img_dd(int argc, char **argv)
+     const struct option long_options[] = {
+         { "help", no_argument, 0, 'h'},
+         { "image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++        { "force-share", no_argument, 0, 'U'},
+         { 0, 0, 0, 0 }
+     };
+ 
+-    while ((c = getopt_long(argc, argv, ":hf:O:", long_options, NULL))) {
++    while ((c = getopt_long(argc, argv, ":hf:O:U", long_options, NULL))) {
+         if (c == EOF) {
+             break;
+         }
+@@ -4148,6 +4226,9 @@ static int img_dd(int argc, char **argv)
+         case 'h':
+             help();
+             break;
++        case 'U':
++            force_share = true;
++            break;
+         case OPTION_IMAGE_OPTS:
+             image_opts = true;
+             break;
+@@ -4192,7 +4273,8 @@ static int img_dd(int argc, char **argv)
+         ret = -1;
+         goto out;
+     }
+-    blk1 = img_open(image_opts, in.filename, fmt, 0, false, false);
++    blk1 = img_open(image_opts, in.filename, fmt, 0, false, false,
++                    force_share);
+ 
+     if (!blk1) {
+         ret = -1;
+@@ -4260,7 +4342,7 @@ static int img_dd(int argc, char **argv)
+     }
+ 
+     blk2 = img_open(image_opts, out.filename, out_fmt, BDRV_O_RDWR,
+-                    false, false);
++                    false, false, false);
+ 
+     if (!blk2) {
+         ret = -1;
 -- 
 2.9.3
