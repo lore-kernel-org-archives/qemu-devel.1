@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d3HxI-0006e0-42
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:05:45 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1d3Hye-0008Es-4j
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:07:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d3HxB-0002wk-Vl
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:05:44 -0400
-Received: from [59.151.112.132] (port=16366 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d3HxB-0002ta-Iu
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:05:37 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Wed, 26 Apr 2017 16:04:15 +0800
-Message-ID: <6824abf3c4e5b865de1799c302f60e8055c8d3dc.1493191677.git.maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <eric.auger@redhat.com>) id 1d3Hya-0003UV-Um
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:07:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1d3Hya-0003T3-PB
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:07:04 -0400
+References: <20170425045201.71457-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170425045642.GG31848@bjsdjshi@linux.vnet.ibm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3a453449-f451-08d1-3a14-e26dd40b667f@redhat.com>
+Date: Wed, 26 Apr 2017 10:06:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 1/4] net/socket: Convert the non-blocking
- connection mechanism to QIOchannel
+In-Reply-To: <20170425045642.GG31848@bjsdjshi@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] vfio/pci: Fix incorrect error
+ message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,111 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, pbonzini@redhat.com, jasowang@redhat.com
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, alex.williamson@redhat.com
 
-Currently, socket connection in net is realized by an old
-mechanism which is non-blocking.
+Hi Dong,
 
-That old mechanism may cause net blocks on DNS lookups and
-QEmu has already replaced it with QIOchannel in many features,
-such as migration.
+On 25/04/2017 06:56, Dong Jia Shi wrote:
+> * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-04-25 06:52:01 +0200]:
+> 
+> Hey Alex,
+> 
+> Please ignore the "RFC" tag in the subject. Sorry for the mistake.
+> 
+>> When the "No host device provided" error occurs, the hint message
+>> that starts with "Use -vfio-pci," makes no sense, since "-vfio-pci"
+>> is not a valid command line parameter.
+>>
+>> Correct this by replacing "-vfio-pci" with "-device vfio-pci".
+>>
+>> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Convert it to QIOchannel for net as well.
+Thanks
 
-CC: berrange@redhat.com, pbonzini@redhat.com, jasowang@redhat.com
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
----
-The test steps like this:
-
-    $ qemu-system-x86_64 -net nic -net socket,listen=:1234 ~/img/test.img
-    $ qemu-system-x86_64 -net nic -net socket,connect=127.0.0.1:1234 ~/img/test.img
-
-No exception.
-
- net/socket.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
-
-diff --git a/net/socket.c b/net/socket.c
-index b8c931e..52f9dce 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -33,6 +33,7 @@
- #include "qemu/sockets.h"
- #include "qemu/iov.h"
- #include "qemu/main-loop.h"
-+#include "io/channel-socket.h"
- 
- typedef struct NetSocketState {
-     NetClientState nc;
-@@ -525,16 +526,22 @@ typedef struct {
-     char *name;
- } socket_connect_data;
- 
--static void socket_connect_data_free(socket_connect_data *c)
-+static void socket_connect_data_free(void *opaque)
- {
-+    socket_connect_data *c = opaque;
-+    if (!c) {
-+        return;
-+    }
-+
-     qapi_free_SocketAddress(c->saddr);
-     g_free(c->model);
-     g_free(c->name);
-     g_free(c);
- }
- 
--static void net_socket_connected(int fd, Error *err, void *opaque)
-+static void net_socket_connected(QIOTask *task, void *opaque)
- {
-+    QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(qio_task_get_source(task));
-     socket_connect_data *c = opaque;
-     NetSocketState *s;
-     char *addr_str = NULL;
-@@ -543,13 +550,13 @@ static void net_socket_connected(int fd, Error *err, void *opaque)
-     addr_str = socket_address_to_string(c->saddr, &local_error);
-     if (addr_str == NULL) {
-         error_report_err(local_error);
--        closesocket(fd);
-+        closesocket(sioc->fd);
-         goto end;
-     }
- 
--    s = net_socket_fd_init(c->peer, c->model, c->name, fd, true);
-+    s = net_socket_fd_init(c->peer, c->model, c->name, sioc->fd, true);
-     if (!s) {
--        closesocket(fd);
-+        closesocket(sioc->fd);
-         goto end;
-     }
- 
-@@ -567,7 +574,7 @@ static int net_socket_connect_init(NetClientState *peer,
-                                    const char *host_str)
- {
-     socket_connect_data *c = g_new0(socket_connect_data, 1);
--    int fd = -1;
-+    QIOChannelSocket *sioc;
-     Error *local_error = NULL;
- 
-     c->peer = peer;
-@@ -578,11 +585,12 @@ static int net_socket_connect_init(NetClientState *peer,
-         goto err;
-     }
- 
--    fd = socket_connect(c->saddr, net_socket_connected, c, &local_error);
--    if (fd < 0) {
--        goto err;
--    }
--
-+    sioc = qio_channel_socket_new();
-+    qio_channel_socket_connect_async(sioc,
-+                                     c->saddr,
-+                                     net_socket_connected,
-+                                     c,
-+                                     NULL);
-     return 0;
- 
- err:
--- 
-2.9.3
+Eric
+>> ---
+>>  hw/vfio/pci.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index 03a3d01..32aca77 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -2625,8 +2625,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>>          if (!(~vdev->host.domain || ~vdev->host.bus ||
+>>                ~vdev->host.slot || ~vdev->host.function)) {
+>>              error_setg(errp, "No provided host device");
+>> -            error_append_hint(errp, "Use -vfio-pci,host=DDDD:BB:DD.F "
+>> -                              "or -vfio-pci,sysfsdev=PATH_TO_DEVICE\n");
+>> +            error_append_hint(errp, "Use -device vfio-pci,host=DDDD:BB:DD.F "
+>> +                              "or -device vfio-pci,sysfsdev=PATH_TO_DEVICE\n");
+>>              return;
+>>          }
+>>          vdev->vbasedev.sysfsdev =
+>> -- 
+>> 2.10.2
+>>
+> 
