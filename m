@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwd-0005Cz-5C
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwf-0005DD-H7
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3GwW-0007vO-Qa
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:00:59 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3GwZ-0007wJ-Cl
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:01 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 16:59:49 +1000
-Message-Id: <20170426070034.10727-4-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 16:59:52 +1000
+Message-Id: <20170426070034.10727-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/48] ppc/spapr: QOM'ify sPAPRRTCState
+Subject: [Qemu-devel] [PULL 06/48] spapr: Add ibm,
+ processor-radix-AP-encodings to the device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,248 +21,148 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Sam Bobroff <sam.bobroff@au1.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-Also use an 'sPAPRRTCState' attribute under the sPAPR machine to hold
-the RTC object. Overall, these changes remove an unnecessary and
-implicit dependency on SysBus.
+Use the new ioctl, KVM_PPC_GET_RMMU_INFO, to fetch radix MMU
+information from KVM and present the page encodings in the device tree
+under ibm,processor-radix-AP-encodings. This provides page size
+information to the guest which is necessary for it to use radix mode.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+[dwg: Compile fix for 32-bit targets, style nit fix]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         | 16 ++++++++--------
- hw/ppc/spapr_events.c  |  2 +-
- hw/ppc/spapr_rtc.c     | 41 +++++++----------------------------------
- include/hw/ppc/spapr.h | 21 ++++++++++++++++-----
- include/hw/ppc/xics.h  |  2 +-
- 5 files changed, 33 insertions(+), 49 deletions(-)
+ hw/ppc/spapr.c       | 13 +++++++++++++
+ include/sysemu/kvm.h |  1 +
+ target/ppc/cpu-qom.h |  1 +
+ target/ppc/cpu.h     |  4 ++++
+ target/ppc/kvm.c     | 29 +++++++++++++++++++++++++++++
+ 5 files changed, 48 insertions(+)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index de5db75..3edc3dd 100644
+index 3edc3dd..ea247e6 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1333,13 +1333,13 @@ static void spapr_create_nvram(sPAPRMachineState =
-*spapr)
-=20
- static void spapr_rtc_create(sPAPRMachineState *spapr)
- {
--    DeviceState *dev =3D qdev_create(NULL, TYPE_SPAPR_RTC);
--
--    qdev_init_nofail(dev);
--    spapr->rtc =3D dev;
--
--    object_property_add_alias(qdev_get_machine(), "rtc-time",
--                              OBJECT(spapr->rtc), "date", NULL);
-+    object_initialize(&spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC);
-+    object_property_add_child(OBJECT(spapr), "rtc", OBJECT(&spapr->rtc),
-+                              &error_fatal);
-+    object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
-+                              &error_fatal);
-+    object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spapr->=
-rtc),
-+                              "date", &error_fatal);
+@@ -459,6 +459,8 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+     sPAPRDRConnector *drc;
+     sPAPRDRConnectorClass *drck;
+     int drc_index;
++    uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
++    int i;
+ 
+     drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, index);
+     if (drc) {
+@@ -544,6 +546,17 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+     _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cs));
+ 
+     _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt));
++
++    if (pcc->radix_page_info) {
++        for (i = 0; i < pcc->radix_page_info->count; i++) {
++            radix_AP_encodings[i] =
++                cpu_to_be32(pcc->radix_page_info->entries[i]);
++        }
++        _FDT((fdt_setprop(fdt, offset, "ibm,processor-radix-AP-encodings",
++                          radix_AP_encodings,
++                          pcc->radix_page_info->count *
++                          sizeof(radix_AP_encodings[0]))));
++    }
  }
-=20
- /* Returns whether we want to use VGA or not */
-@@ -1377,7 +1377,7 @@ static int spapr_post_load(void *opaque, int versio=
-n_id)
-      * So when migrating from those versions, poke the incoming offset
-      * value into the RTC device */
-     if (version_id < 3) {
--        err =3D spapr_rtc_import_offset(spapr->rtc, spapr->rtc_offset);
-+        err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
-     }
-=20
-     return err;
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 24a5758..f0b28d8 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -422,7 +422,7 @@ static void spapr_init_maina(struct rtas_event_log_v6=
-_maina *maina,
-     maina->hdr.section_id =3D cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MAINA);
-     maina->hdr.section_length =3D cpu_to_be16(sizeof(*maina));
-     /* FIXME: section version, subtype and creator id? */
--    spapr_rtc_read(spapr->rtc, &tm, NULL);
-+    spapr_rtc_read(&spapr->rtc, &tm, NULL);
-     year =3D tm.tm_year + 1900;
-     maina->creation_date =3D cpu_to_be32((to_bcd(year / 100) << 24)
-                                        | (to_bcd(year % 100) << 16)
-diff --git a/hw/ppc/spapr_rtc.c b/hw/ppc/spapr_rtc.c
-index 3a17ac4..00a4e4c 100644
---- a/hw/ppc/spapr_rtc.c
-+++ b/hw/ppc/spapr_rtc.c
-@@ -33,19 +33,8 @@
- #include "qapi-event.h"
- #include "qemu/cutils.h"
-=20
--#define SPAPR_RTC(obj) \
--    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
--
--typedef struct sPAPRRTCState sPAPRRTCState;
--struct sPAPRRTCState {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    int64_t ns_offset;
--};
--
--void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns)
-+void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns)
- {
--    sPAPRRTCState *rtc =3D SPAPR_RTC(dev);
-     int64_t host_ns =3D qemu_clock_get_ns(rtc_clock);
-     int64_t guest_ns;
-     time_t guest_s;
-@@ -63,16 +52,12 @@ void spapr_rtc_read(DeviceState *dev, struct tm *tm, =
-uint32_t *ns)
-     }
- }
-=20
--int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset)
-+int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset)
- {
--    sPAPRRTCState *rtc;
--
--    if (!dev) {
-+    if (!rtc) {
-         return -ENODEV;
-     }
-=20
--    rtc =3D SPAPR_RTC(dev);
--
-     rtc->ns_offset =3D legacy_offset * NANOSECONDS_PER_SECOND;
-=20
-     return 0;
-@@ -91,12 +76,7 @@ static void rtas_get_time_of_day(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-         return;
-     }
-=20
--    if (!spapr->rtc) {
--        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--        return;
--    }
--
--    spapr_rtc_read(spapr->rtc, &tm, &ns);
-+    spapr_rtc_read(&spapr->rtc, &tm, &ns);
-=20
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-     rtas_st(rets, 1, tm.tm_year + 1900);
-@@ -113,7 +93,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-                                  target_ulong args,
-                                  uint32_t nret, target_ulong rets)
- {
--    sPAPRRTCState *rtc;
-+    sPAPRRTCState *rtc =3D &spapr->rtc;
-     struct tm tm;
-     time_t new_s;
-     int64_t host_ns;
-@@ -123,11 +103,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sP=
-APRMachineState *spapr,
-         return;
-     }
-=20
--    if (!spapr->rtc) {
--        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--        return;
--    }
--
-     tm.tm_year =3D rtas_ld(args, 0) - 1900;
-     tm.tm_mon =3D rtas_ld(args, 1) - 1;
-     tm.tm_mday =3D rtas_ld(args, 2);
-@@ -144,8 +119,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-     /* Generate a monitor event for the change */
-     qapi_event_send_rtc_change(qemu_timedate_diff(&tm), &error_abort);
-=20
--    rtc =3D SPAPR_RTC(spapr->rtc);
--
-     host_ns =3D qemu_clock_get_ns(rtc_clock);
-=20
-     rtc->ns_offset =3D (new_s * NANOSECONDS_PER_SECOND) - host_ns;
-@@ -155,7 +128,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-=20
- static void spapr_rtc_qom_date(Object *obj, struct tm *current_tm, Error=
- **errp)
- {
--    spapr_rtc_read(DEVICE(obj), current_tm, NULL);
-+    spapr_rtc_read(SPAPR_RTC(obj), current_tm, NULL);
- }
-=20
- static void spapr_rtc_realize(DeviceState *dev, Error **errp)
-@@ -200,7 +173,7 @@ static void spapr_rtc_class_init(ObjectClass *oc, voi=
-d *data)
-=20
- static const TypeInfo spapr_rtc_info =3D {
-     .name          =3D TYPE_SPAPR_RTC,
--    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .parent        =3D TYPE_DEVICE,
-     .instance_size =3D sizeof(sPAPRRTCState),
-     .class_init    =3D spapr_rtc_class_init,
+ 
+ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 24281fc..5cc83f2 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -527,5 +527,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source);
+  * Returns: 0 on success, or a negative errno on failure.
+  */
+ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
++struct ppc_radix_page_info *kvm_get_radix_page_info(void);
+ int kvm_get_max_memslots(void);
+ #endif
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index 81500e5..d0cf6ca 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -197,6 +197,7 @@ typedef struct PowerPCCPUClass {
+     int bfd_mach;
+     uint32_t l1_dcache_size, l1_icache_size;
+     const struct ppc_segment_page_sizes *sps;
++    struct ppc_radix_page_info *radix_page_info;
+     void (*init_proc)(CPUPPCState *env);
+     int  (*check_pow)(CPUPPCState *env);
+     int (*handle_mmu_fault)(PowerPCCPU *cpu, vaddr eaddr, int rwx, int mmu_idx);
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 5ee33b3..cacdd0a 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -943,6 +943,10 @@ struct ppc_segment_page_sizes {
+     struct ppc_one_seg_page_size sps[PPC_PAGE_SIZES_MAX_SZ];
  };
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 808aac8..ba9e689 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -20,6 +20,18 @@ typedef struct sPAPREventSource sPAPREventSource;
-=20
- #define SPAPR_TIMEBASE_FREQ     512000000ULL
-=20
-+#define TYPE_SPAPR_RTC "spapr-rtc"
-+
-+#define SPAPR_RTC(obj)                                  \
-+    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
-+
-+typedef struct sPAPRRTCState sPAPRRTCState;
-+struct sPAPRRTCState {
-+    /*< private >*/
-+    DeviceState parent_obj;
-+    int64_t ns_offset;
+ 
++struct ppc_radix_page_info {
++    uint32_t count;
++    uint32_t entries[PPC_PAGE_SIZES_MAX_SZ];
 +};
+ 
+ /*****************************************************************************/
+ /* The whole PowerPC CPU context */
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 79b90a6..9dc2f7f 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -50,6 +50,7 @@
+ #include "hw/ppc/spapr_cpu_core.h"
+ #endif
+ #include "elf.h"
++#include "sysemu/kvm_int.h"
+ 
+ //#define DEBUG_KVM
+ 
+@@ -333,6 +334,30 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info)
+     kvm_get_fallback_smmu_info(cpu, info);
+ }
+ 
++struct ppc_radix_page_info *kvm_get_radix_page_info(void)
++{
++    KVMState *s = KVM_STATE(current_machine->accelerator);
++    struct ppc_radix_page_info *radix_page_info;
++    struct kvm_ppc_rmmu_info rmmu_info;
++    int i;
 +
- typedef struct sPAPRMachineClass sPAPRMachineClass;
-=20
- #define TYPE_SPAPR_MACHINE      "spapr-machine"
-@@ -58,7 +70,7 @@ struct sPAPRMachineState {
-     QLIST_HEAD(, sPAPRPHBState) phbs;
-     struct sPAPRNVRAM *nvram;
-     ICSState *ics;
--    DeviceState *rtc;
-+    sPAPRRTCState rtc;
-=20
-     void *htab;
-     uint32_t htab_shift;
-@@ -629,11 +641,10 @@ struct sPAPRConfigureConnectorState {
-=20
- void spapr_ccs_reset_hook(void *opaque);
-=20
--#define TYPE_SPAPR_RTC "spapr-rtc"
--#define TYPE_SPAPR_RNG "spapr-rng"
-+void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
-+int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
-=20
--void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns);
--int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset);
-+#define TYPE_SPAPR_RNG "spapr-rng"
-=20
- int spapr_rng_populate_dt(void *fdt);
-=20
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 9a5e715..ce23018 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -28,7 +28,7 @@
- #ifndef XICS_H
- #define XICS_H
-=20
--#include "hw/sysbus.h"
-+#include "hw/qdev.h"
-=20
- #define XICS_IPI        0x2
- #define XICS_BUID       0x1
---=20
++    if (!kvm_check_extension(s, KVM_CAP_PPC_MMU_RADIX)) {
++        return NULL;
++    }
++    if (kvm_vm_ioctl(s, KVM_PPC_GET_RMMU_INFO, &rmmu_info)) {
++        return NULL;
++    }
++    radix_page_info = g_malloc0(sizeof(*radix_page_info));
++    radix_page_info->count = 0;
++    for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
++        if (rmmu_info.ap_encodings[i]) {
++            radix_page_info->entries[i] = rmmu_info.ap_encodings[i];
++            radix_page_info->count++;
++        }
++    }
++    return radix_page_info;
++}
++
+ static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32_t shift)
+ {
+     if (!(flags & KVM_PPC_PAGE_SIZES_REAL)) {
+@@ -2303,6 +2328,10 @@ static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
+     if (icache_size != -1) {
+         pcc->l1_icache_size = icache_size;
+     }
++
++#if defined(TARGET_PPC64)
++    pcc->radix_page_info = kvm_get_radix_page_info();
++#endif /* defined(TARGET_PPC64) */
+ }
+ 
+ bool kvmppc_has_cap_epr(void)
+-- 
 2.9.3
