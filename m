@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3Iij-00011m-1g
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:54:47 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d3IsF-0003Gr-EY
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:04:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3Iie-0001nx-PH
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:54:45 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3858
-	helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3Iid-0001mQ-Dh
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 04:54:40 -0400
-References: <20170426073247.7441-1-quintela@redhat.com>
-	<20170426073247.7441-2-quintela@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <5900603E.4040606@huawei.com>
-Date: Wed, 26 Apr 2017 16:54:22 +0800
+	(envelope-from <no-reply@patchew.org>) id 1d3IsC-0000cV-6T
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 05:04:35 -0400
+Resent-Message-Id: <E1d3IsC-0000cV-6T@eggs.gnu.org>
+In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
+Message-ID: <149319744070.84.3729245150086786469@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20170426073247.7441-2-quintela@redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ram: Split dirty bitmap by RAMBlock
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 26 Apr 2017 02:04:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/48] ppc-for-2.10 queue 20170426
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,638 +23,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: xuquan8@huawei.com, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: david@gibson.dropbear.id.au
+Cc: famz@redhat.com, peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, qemu-ppc@nongnu.org, clg@kaod.org
 
-On 2017/4/26 15:32, Juan Quintela wrote:
-> Both the ram bitmap and the unsent bitmap are split by RAMBlock.
->
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
->
-> --
->
-> Fix compilation when DEBUG_POSTCOPY is enabled (thanks Hailiang)
->
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->   include/exec/ram_addr.h          |  13 +-
->   include/migration/migration.h    |   3 +-
->   include/migration/postcopy-ram.h |   3 -
->   migration/postcopy-ram.c         |   5 +-
->   migration/ram.c                  | 273 +++++++++++++++------------------------
->   5 files changed, 119 insertions(+), 178 deletions(-)
->
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 6436a41..c56b35b 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -39,6 +39,14 @@ struct RAMBlock {
->       QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
->       int fd;
->       size_t page_size;
-> +    /* dirty bitmap used during migration */
-> +    unsigned long *bmap;
-> +    /* bitmap of pages that haven't been sent even once
-> +     * only maintained and used in postcopy at the moment
-> +     * where it's used to send the dirtymap at the start
-> +     * of the postcopy phase
-> +     */
-> +    unsigned long *unsentmap;
->   };
->   
->   static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
-> @@ -360,16 +368,15 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
->   
->   
->   static inline
-> -uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
-> -                                               RAMBlock *rb,
-> +uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
->                                                  ram_addr_t start,
->                                                  ram_addr_t length,
->                                                  uint64_t *real_dirty_pages)
->   {
->       ram_addr_t addr;
-> -    start = rb->offset + start;
->       unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
->       uint64_t num_dirty = 0;
-> +    unsigned long *dest = rb->bmap;
->   
->       /* start address is aligned at the start of a word? */
->       if (((page * BITS_PER_LONG) << TARGET_PAGE_BITS) == start) {
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index ba1a16c..e29cb01 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -266,7 +266,8 @@ uint64_t xbzrle_mig_pages_cache_miss(void);
->   double xbzrle_mig_cache_miss_rate(void);
->   
->   void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
-> -void ram_debug_dump_bitmap(unsigned long *todump, bool expected);
-> +void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
-> +                           unsigned long pages);
->   /* For outgoing discard bitmap */
->   int ram_postcopy_send_discard_bitmap(MigrationState *ms);
->   /* For incoming postcopy discard */
-> diff --git a/include/migration/postcopy-ram.h b/include/migration/postcopy-ram.h
-> index 8e036b9..4c25f03 100644
-> --- a/include/migration/postcopy-ram.h
-> +++ b/include/migration/postcopy-ram.h
-> @@ -43,12 +43,9 @@ int postcopy_ram_prepare_discard(MigrationIncomingState *mis);
->   
->   /*
->    * Called at the start of each RAMBlock by the bitmap code.
-> - * 'offset' is the bitmap offset of the named RAMBlock in the migration
-> - * bitmap.
->    * Returns a new PDS
->    */
->   PostcopyDiscardState *postcopy_discard_send_init(MigrationState *ms,
-> -                                                 unsigned long offset,
->                                                    const char *name);
->   
->   /*
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 85fd8d7..e3f4a37 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -33,7 +33,6 @@
->   
->   struct PostcopyDiscardState {
->       const char *ramblock_name;
-> -    uint64_t offset; /* Bitmap entry for the 1st bit of this RAMBlock */
->       uint16_t cur_entry;
->       /*
->        * Start and length of a discard range (bytes)
-> @@ -717,14 +716,12 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
->    * returns: a new PDS.
->    */
->   PostcopyDiscardState *postcopy_discard_send_init(MigrationState *ms,
-> -                                                 unsigned long offset,
->                                                    const char *name)
->   {
->       PostcopyDiscardState *res = g_malloc0(sizeof(PostcopyDiscardState));
->   
->       if (res) {
->           res->ramblock_name = name;
-> -        res->offset = offset;
->       }
->   
->       return res;
-> @@ -745,7 +742,7 @@ void postcopy_discard_send_range(MigrationState *ms, PostcopyDiscardState *pds,
->   {
->       size_t tp_size = qemu_target_page_size();
->       /* Convert to byte offsets within the RAM block */
-> -    pds->start_list[pds->cur_entry] = (start - pds->offset) * tp_size;
-> +    pds->start_list[pds->cur_entry] = start  * tp_size;
->       pds->length_list[pds->cur_entry] = length * tp_size;
->       trace_postcopy_discard_send_range(pds->ramblock_name, start, length);
->       pds->cur_entry++;
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f48664e..235f400 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -138,19 +138,6 @@ out:
->       return ret;
->   }
->   
-> -struct RAMBitmap {
-> -    struct rcu_head rcu;
-> -    /* Main migration bitmap */
-> -    unsigned long *bmap;
-> -    /* bitmap of pages that haven't been sent even once
-> -     * only maintained and used in postcopy at the moment
-> -     * where it's used to send the dirtymap at the start
-> -     * of the postcopy phase
-> -     */
-> -    unsigned long *unsentmap;
-> -};
-> -typedef struct RAMBitmap RAMBitmap;
-> -
->   /*
->    * An outstanding page request, on the source, having been received
->    * and queued
-> @@ -220,8 +207,6 @@ struct RAMState {
->       uint64_t postcopy_requests;
->       /* protects modification of the bitmap */
->       QemuMutex bitmap_mutex;
-> -    /* Ram Bitmap protected by RCU */
-> -    RAMBitmap *ram_bitmap;
->       /* The RAMBlock used in the last src_page_requests */
->       RAMBlock *last_req_rb;
->       /* Queue of outstanding page requests from the destination */
-> @@ -614,22 +599,17 @@ static inline
->   unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->                                             unsigned long start)
->   {
-> -    unsigned long base = rb->offset >> TARGET_PAGE_BITS;
-> -    unsigned long nr = base + start;
-> -    uint64_t rb_size = rb->used_length;
-> -    unsigned long size = base + (rb_size >> TARGET_PAGE_BITS);
-> -    unsigned long *bitmap;
-> -
-> +    unsigned long size = rb->used_length >> TARGET_PAGE_BITS;
-> +    unsigned long *bitmap = rb->bmap;
->       unsigned long next;
->   
-> -    bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> -    if (rs->ram_bulk_stage && nr > base) {
-> -        next = nr + 1;
-> +    if (rs->ram_bulk_stage && start > 0) {
-> +        next = start + 1;
->       } else {
-> -        next = find_next_bit(bitmap, size, nr);
-> +        next = find_next_bit(bitmap, size, start);
->       }
->   
-> -    return next - base;
-> +    return next;
->   }
->   
->   static inline bool migration_bitmap_clear_dirty(RAMState *rs,
-> @@ -637,10 +617,8 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
->                                                   unsigned long page)
->   {
->       bool ret;
-> -    unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> -    unsigned long nr = (rb->offset >> TARGET_PAGE_BITS) + page;
->   
-> -    ret = test_and_clear_bit(nr, bitmap);
-> +    ret = test_and_clear_bit(page, rb->bmap);
->   
->       if (ret) {
->           rs->migration_dirty_pages--;
-> @@ -651,10 +629,8 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
->   static void migration_bitmap_sync_range(RAMState *rs, RAMBlock *rb,
->                                           ram_addr_t start, ram_addr_t length)
->   {
-> -    unsigned long *bitmap;
-> -    bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
->       rs->migration_dirty_pages +=
-> -        cpu_physical_memory_sync_dirty_bitmap(bitmap, rb, start, length,
-> +        cpu_physical_memory_sync_dirty_bitmap(rb, start, length,
->                                                 &rs->num_dirty_pages_period);
->   }
->   
-> @@ -1153,17 +1129,13 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->            * search already sent it.
->            */
->           if (block) {
-> -            unsigned long *bitmap;
->               unsigned long page;
->   
-> -            bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> -            page = (block->offset + offset) >> TARGET_PAGE_BITS;
-> -            dirty = test_bit(page, bitmap);
-> +            page = offset >> TARGET_PAGE_BITS;
-> +            dirty = test_bit(page, block->bmap);
->               if (!dirty) {
->                   trace_get_queued_page_not_dirty(block->idstr, (uint64_t)offset,
-> -                    page,
-> -                    test_bit(page,
-> -                             atomic_rcu_read(&rs->ram_bitmap)->unsentmap));
-> +                       page, test_bit(page, block->unsentmap));
->               } else {
->                   trace_get_queued_page(block->idstr, (uint64_t)offset, page);
->               }
-> @@ -1301,16 +1273,13 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->   
->       /* Check the pages is dirty and if it is send it */
->       if (migration_bitmap_clear_dirty(rs, pss->block, pss->page)) {
-> -        unsigned long *unsentmap;
->           /*
->            * If xbzrle is on, stop using the data compression after first
->            * round of migration even if compression is enabled. In theory,
->            * xbzrle can do better than compression.
->            */
-> -        unsigned long page =
-> -            (pss->block->offset >> TARGET_PAGE_BITS) + pss->page;
-> -        if (migrate_use_compression()
-> -            && (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
-> +        if (migrate_use_compression() &&
-> +            (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
->               res = ram_save_compressed_page(rs, pss, last_stage);
->           } else {
->               res = ram_save_page(rs, pss, last_stage);
-> @@ -1319,9 +1288,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->           if (res < 0) {
->               return res;
->           }
-> -        unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
-> -        if (unsentmap) {
-> -            clear_bit(page, unsentmap);
-> +        if (pss->block->unsentmap) {
-> +            clear_bit(pss->page, pss->block->unsentmap);
->           }
->       }
->   
-> @@ -1451,25 +1419,20 @@ void free_xbzrle_decoded_buf(void)
->       xbzrle_decoded_buf = NULL;
->   }
->   
-> -static void migration_bitmap_free(RAMBitmap *bmap)
-> -{
-> -    g_free(bmap->bmap);
-> -    g_free(bmap->unsentmap);
-> -    g_free(bmap);
-> -}
-> -
->   static void ram_migration_cleanup(void *opaque)
->   {
-> -    RAMState *rs = opaque;
-> +    RAMBlock *block;
->   
->       /* caller have hold iothread lock or is in a bh, so there is
->        * no writing race against this migration_bitmap
->        */
-> -    RAMBitmap *bitmap = rs->ram_bitmap;
-> -    atomic_rcu_set(&rs->ram_bitmap, NULL);
-> -    if (bitmap) {
-> -        memory_global_dirty_log_stop();
-> -        call_rcu(bitmap, migration_bitmap_free, rcu);
-> +    memory_global_dirty_log_stop();
-> +
-> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +        g_free(block->bmap);
-> +        block->bmap = NULL;
-> +        g_free(block->unsentmap);
-> +        block->unsentmap = NULL;
->       }
->   
->       XBZRLE_cache_lock();
-> @@ -1501,27 +1464,22 @@ static void ram_state_reset(RAMState *rs)
->    * of; it won't bother printing lines that are all this value.
->    * If 'todump' is null the migration bitmap is dumped.
->    */
-> -void ram_debug_dump_bitmap(unsigned long *todump, bool expected)
-> +void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
-> +                           unsigned long pages)
->   {
-> -    unsigned long ram_pages = last_ram_page();
-> -    RAMState *rs = &ram_state;
->       int64_t cur;
->       int64_t linelen = 128;
->       char linebuf[129];
->   
-> -    if (!todump) {
-> -        todump = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> -    }
-> -
-> -    for (cur = 0; cur < ram_pages; cur += linelen) {
-> +    for (cur = 0; cur < pages; cur += linelen) {
->           int64_t curb;
->           bool found = false;
->           /*
->            * Last line; catch the case where the line length
->            * is longer than remaining ram
->            */
-> -        if (cur + linelen > ram_pages) {
-> -            linelen = ram_pages - cur;
-> +        if (cur + linelen > pages) {
-> +            linelen = pages - cur;
->           }
->           for (curb = 0; curb < linelen; curb++) {
->               bool thisbit = test_bit(cur + curb, todump);
-> @@ -1539,14 +1497,12 @@ void ram_debug_dump_bitmap(unsigned long *todump, bool expected)
->   
->   void ram_postcopy_migrated_memory_release(MigrationState *ms)
->   {
-> -    RAMState *rs = &ram_state;
->       struct RAMBlock *block;
-> -    unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
->   
->       QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> -        unsigned long first = block->offset >> TARGET_PAGE_BITS;
-> -        unsigned long range = first + (block->used_length >> TARGET_PAGE_BITS);
-> -        unsigned long run_start = find_next_zero_bit(bitmap, range, first);
-> +        unsigned long *bitmap = block->bmap;
-> +        unsigned long range = block->used_length >> TARGET_PAGE_BITS;
-> +        unsigned long run_start = find_next_zero_bit(bitmap, range, 0);
->   
->           while (run_start < range) {
->               unsigned long run_end = find_next_bit(bitmap, range, run_start + 1);
-> @@ -1573,16 +1529,13 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms)
->    */
->   static int postcopy_send_discard_bm_ram(MigrationState *ms,
->                                           PostcopyDiscardState *pds,
-> -                                        unsigned long start,
-> -                                        unsigned long length)
-> +                                        RAMBlock *block)
->   {
-> -    RAMState *rs = &ram_state;
-> -    unsigned long end = start + length; /* one after the end */
-> +    unsigned long end = block->used_length >> TARGET_PAGE_BITS;
->       unsigned long current;
-> -    unsigned long *unsentmap;
-> +    unsigned long *unsentmap = block->unsentmap;
->   
-> -    unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
-> -    for (current = start; current < end; ) {
-> +    for (current = 0; current < end; ) {
->           unsigned long one = find_next_bit(unsentmap, end, current);
->   
->           if (one <= end) {
-> @@ -1625,18 +1578,15 @@ static int postcopy_each_ram_send_discard(MigrationState *ms)
->       int ret;
->   
->       QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> -        unsigned long first = block->offset >> TARGET_PAGE_BITS;
-> -        PostcopyDiscardState *pds = postcopy_discard_send_init(ms,
-> -                                                               first,
-> -                                                               block->idstr);
-> +        PostcopyDiscardState *pds =
-> +            postcopy_discard_send_init(ms, block->idstr);
->   
->           /*
->            * Postcopy sends chunks of bitmap over the wire, but it
->            * just needs indexes at this point, avoids it having
->            * target page specific code.
->            */
-> -        ret = postcopy_send_discard_bm_ram(ms, pds, first,
-> -                                    block->used_length >> TARGET_PAGE_BITS);
-> +        ret = postcopy_send_discard_bm_ram(ms, pds, block);
->           postcopy_discard_send_finish(ms, pds);
->           if (ret) {
->               return ret;
-> @@ -1667,12 +1617,10 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
->                                             PostcopyDiscardState *pds)
->   {
->       RAMState *rs = &ram_state;
-> -    unsigned long *bitmap;
-> -    unsigned long *unsentmap;
-> +    unsigned long *bitmap = block->bmap;
-> +    unsigned long *unsentmap = block->unsentmap;
->       unsigned int host_ratio = block->page_size / TARGET_PAGE_SIZE;
-> -    unsigned long first = block->offset >> TARGET_PAGE_BITS;
-> -    unsigned long len = block->used_length >> TARGET_PAGE_BITS;
-> -    unsigned long last = first + (len - 1);
-> +    unsigned long pages = block->used_length >> TARGET_PAGE_BITS;
->       unsigned long run_start;
->   
->       if (block->page_size == TARGET_PAGE_SIZE) {
-> @@ -1680,18 +1628,15 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
->           return;
->       }
->   
-> -    bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> -    unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
-> -
->       if (unsent_pass) {
->           /* Find a sent page */
-> -        run_start = find_next_zero_bit(unsentmap, last + 1, first);
-> +        run_start = find_next_zero_bit(unsentmap, pages, 0);
->       } else {
->           /* Find a dirty page */
-> -        run_start = find_next_bit(bitmap, last + 1, first);
-> +        run_start = find_next_bit(bitmap, pages, 0);
->       }
->   
-> -    while (run_start <= last) {
-> +    while (run_start < pages) {
->           bool do_fixup = false;
->           unsigned long fixup_start_addr;
->           unsigned long host_offset;
-> @@ -1711,9 +1656,9 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
->               /* Find the end of this run */
->               unsigned long run_end;
->               if (unsent_pass) {
-> -                run_end = find_next_bit(unsentmap, last + 1, run_start + 1);
-> +                run_end = find_next_bit(unsentmap, pages, run_start + 1);
->               } else {
-> -                run_end = find_next_zero_bit(bitmap, last + 1, run_start + 1);
-> +                run_end = find_next_zero_bit(bitmap, pages, run_start + 1);
->               }
->               /*
->                * If the end isn't at the start of a host page, then the
-> @@ -1770,11 +1715,10 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
->   
->           if (unsent_pass) {
->               /* Find the next sent page for the next iteration */
-> -            run_start = find_next_zero_bit(unsentmap, last + 1,
-> -                                           run_start);
-> +            run_start = find_next_zero_bit(unsentmap, pages, run_start);
->           } else {
->               /* Find the next dirty page for the next iteration */
-> -            run_start = find_next_bit(bitmap, last + 1, run_start);
-> +            run_start = find_next_bit(bitmap, pages, run_start);
->           }
->       }
->   }
-> @@ -1791,34 +1735,22 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
->    * Returns zero on success
->    *
->    * @ms: current migration state
-> + * @block: block we want to work with
->    */
-> -static int postcopy_chunk_hostpages(MigrationState *ms)
-> +static int postcopy_chunk_hostpages(MigrationState *ms, RAMBlock *block)
->   {
-> -    RAMState *rs = &ram_state;
-> -    struct RAMBlock *block;
-> -
-> -    /* Easiest way to make sure we don't resume in the middle of a host-page */
-> -    rs->last_seen_block = NULL;
-> -    rs->last_sent_block = NULL;
-> -    rs->last_page = 0;
-> -
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> -        unsigned long first = block->offset >> TARGET_PAGE_BITS;
-> -
-> -        PostcopyDiscardState *pds =
-> -                         postcopy_discard_send_init(ms, first, block->idstr);
-> -
-> -        /* First pass: Discard all partially sent host pages */
-> -        postcopy_chunk_hostpages_pass(ms, true, block, pds);
-> -        /*
-> -         * Second pass: Ensure that all partially dirty host pages are made
-> -         * fully dirty.
-> -         */
-> -        postcopy_chunk_hostpages_pass(ms, false, block, pds);
-> -
-> -        postcopy_discard_send_finish(ms, pds);
-> -    } /* ram_list loop */
-> -
-> +    PostcopyDiscardState *pds =
-> +        postcopy_discard_send_init(ms, block->idstr);
-> +
-> +    /* First pass: Discard all partially sent host pages */
-> +    postcopy_chunk_hostpages_pass(ms, true, block, pds);
-> +    /*
-> +     * Second pass: Ensure that all partially dirty host pages are made
-> +     * fully dirty.
-> +     */
-> +    postcopy_chunk_hostpages_pass(ms, false, block, pds);
-> +
-> +    postcopy_discard_send_finish(ms, pds);
->       return 0;
-
-It always return 0 here for postcopy_chunk_hostpages(), so change it to void ?
-
->   }
->   
-> @@ -1836,47 +1768,53 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
->    * Hopefully this is pretty sparse
->    *
->    * @ms: current migration state
-> - */
-> + * @block: block that contains the page we want to canonicalize */
->   int ram_postcopy_send_discard_bitmap(MigrationState *ms)
->   {
->       RAMState *rs = &ram_state;
-> +    RAMBlock *block;
->       int ret;
-> -    unsigned long *bitmap, *unsentmap;
->   
->       rcu_read_lock();
->   
->       /* This should be our last sync, the src is now paused */
->       migration_bitmap_sync(rs);
->   
-> -    unsentmap = atomic_rcu_read(&rs->ram_bitmap)->unsentmap;
-> -    if (!unsentmap) {
-> -        /* We don't have a safe way to resize the sentmap, so
-> -         * if the bitmap was resized it will be NULL at this
-> -         * point.
-> +    /* Easiest way to make sure we don't resume in the middle of a host-page */
-> +    rs->last_seen_block = NULL;
-> +    rs->last_sent_block = NULL;
-> +    rs->last_page = 0;
-> +
-> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +        unsigned long pages = block->used_length >> TARGET_PAGE_BITS;
-> +        unsigned long *bitmap = block->bmap;
-> +        unsigned long *unsentmap = block->unsentmap;
-> +
-> +        if (!unsentmap) {
-> +            /* We don't have a safe way to resize the sentmap, so
-> +             * if the bitmap was resized it will be NULL at this
-> +             * point.
-> +             */
-> +            error_report("migration ram resized during precopy phase");
-> +            rcu_read_unlock();
-> +            return -EINVAL;
-> +        }
-> +        /* Deal with TPS != HPS and huge pages */
-> +        ret = postcopy_chunk_hostpages(ms, block);
-> +        if (ret) {
-
-It will never go here, see above.
-
-> +            rcu_read_unlock();
-> +            return ret;
-> +        }
-> +
-> +        /*
-> +         * Update the unsentmap to be unsentmap = unsentmap | dirty
->            */
-> -        error_report("migration ram resized during precopy phase");
-> -        rcu_read_unlock();
-> -        return -EINVAL;
-> -    }
-> -
-> -    /* Deal with TPS != HPS and huge pages */
-> -    ret = postcopy_chunk_hostpages(ms);
-> -    if (ret) {
-> -        rcu_read_unlock();
-> -        return ret;
-> -    }
-> -
-> -    /*
-> -     * Update the unsentmap to be unsentmap = unsentmap | dirty
-> -     */
-> -    bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
-> -    bitmap_or(unsentmap, unsentmap, bitmap, last_ram_page());
-> -
-> -
-> -    trace_ram_postcopy_send_discard_bitmap();
-> +        bitmap_or(unsentmap, unsentmap, bitmap, pages);
->   #ifdef DEBUG_POSTCOPY
-> -    ram_debug_dump_bitmap(unsentmap, true);
-> +    	ram_debug_dump_bitmap(unsentmap, true, pages);
-Indent, you use tab here.
-
-Others look good to me.
-
-Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-
->   #endif
-> +    }
-> +    trace_ram_postcopy_send_discard_bitmap();
->   
->       ret = postcopy_each_ram_send_discard(ms);
->       rcu_read_unlock();
-> @@ -1918,8 +1856,6 @@ err:
->   
->   static int ram_state_init(RAMState *rs)
->   {
-> -    unsigned long ram_bitmap_pages;
-> -
->       memset(rs, 0, sizeof(*rs));
->       qemu_mutex_init(&rs->bitmap_mutex);
->       qemu_mutex_init(&rs->src_page_req_mutex);
-> @@ -1961,16 +1897,19 @@ static int ram_state_init(RAMState *rs)
->       rcu_read_lock();
->       ram_state_reset(rs);
->   
-> -    rs->ram_bitmap = g_new0(RAMBitmap, 1);
->       /* Skip setting bitmap if there is no RAM */
->       if (ram_bytes_total()) {
-> -        ram_bitmap_pages = last_ram_page();
-> -        rs->ram_bitmap->bmap = bitmap_new(ram_bitmap_pages);
-> -        bitmap_set(rs->ram_bitmap->bmap, 0, ram_bitmap_pages);
-> +        RAMBlock *block;
->   
-> -        if (migrate_postcopy_ram()) {
-> -            rs->ram_bitmap->unsentmap = bitmap_new(ram_bitmap_pages);
-> -            bitmap_set(rs->ram_bitmap->unsentmap, 0, ram_bitmap_pages);
-> +        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +            unsigned long pages = block->max_length >> TARGET_PAGE_BITS;
-> +
-> +            block->bmap = bitmap_new(pages);
-> +            bitmap_set(block->bmap, 0, pages);
-> +            if (migrate_postcopy_ram()) {
-> +                block->unsentmap = bitmap_new(pages);
-> +                bitmap_set(block->unsentmap, 0, pages);
-> +            }
->           }
->       }
->   
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA0MjYwNzAwMzQuMTA3MjctMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzQ4XSBwcGMtZm9yLTIuMTAgcXVldWUgMjAxNzA0MjYKVHlw
+ZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
+c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
+MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
+IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
+bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
+cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
+Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
+ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNDkzMTc5OTA3LTIyNTE2LTEtZ2l0LXNl
+bmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0OTMxNzk5MDctMjI1MTYtMS1n
+aXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNo
+ZXcvMjAxNzA0MjYwNzMyNDcuNzQ0MS0yLXF1aW50ZWxhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
+MDE3MDQyNjA3MzI0Ny43NDQxLTItcXVpbnRlbGFAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5l
+dyBicmFuY2ggJ3Rlc3QnCmMxNGVhNDIgTUFJTlRBSU5FUlM6IFJlbW92ZSBteXNlbGYgZnJvbSBl
+NTAwCmNkYTFiY2MgdGFyZ2V0L3BwYzogU3R5bGUgZml4ZXMKMjY4N2EyMiBlNTAwLCBib29rM3M6
+IG1mc3ByIDI1OTogUmVnaXN0ZXIgbWFwcGVkL2FsaWFzZWQgU1BSRzMgdXNlciByZWFkCjRkODBi
+ZWEgdGFyZ2V0L3BwYzogRmx1c2ggVExCIG9uIHdyaXRlIHRvIFBJRFIKODAzYTQ1MiBzcGFwci1j
+cHUtY29yZTogUmVsZWFzZSBJQ1BTdGF0ZSBvYmplY3QgZHVyaW5nIENQVSB1bnJlYWxpemF0aW9u
+CmRhZDE0MTEgcHBjL3BudjogZ2VuZXJhdGUgYW4gT0VNIFNFTCBldmVudCBvbiBzaHV0ZG93bgo4
+MWZjOGRjIHBwYy9wbnY6IGFkZCBpbml0aWFsIElQTUkgc2Vuc29ycyBmb3IgdGhlIEJNQyBzaW11
+bGF0b3IKNTliNjI2OSBwcGMvcG52OiBwb3B1bGF0ZSBkZXZpY2UgdHJlZSBmb3IgSVBNSSBCVCBk
+ZXZpY2VzCjk2MzFiZTAgcHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9yIHNlcmlhbCBk
+ZXZpY2VzCjBhYTI5ZmUgcHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9yIFJUQyBkZXZp
+Y2VzCjM4Y2YxYmEgcHBjL3Budjogc2NhbiBJU0EgYnVzIHRvIHBvcHVsYXRlIGRldmljZSB0cmVl
+Cjc3YTk4YTYgcHBjL3BudjogZW5hYmxlIG9ubHkgb25lIExQQyBidXMKYTQ0NDhlMCBwcGMvcG52
+OiBBZGQgc3VwcG9ydCBmb3IgUE9XRVI4KyBMUEMgQ29udHJvbGxlcgowNTJjNmY4IHNwYXByOiBy
+ZW1vdmUgdGhlICducl9zZXJ2ZXJzJyBmaWVsZCBmcm9tIHRoZSBtYWNoaW5lCjkzMDA1M2QgdGFy
+Z2V0L3BwYzogRml4IHNpemUgb2Ygc3RydWN0IFBQQ0VsZlByc3RhdHVzCjc1ZGY2YjMgaXBtaTog
+aW50cm9kdWNlIGFuIGlwbWlfYm1jX2dlbl9ldmVudCgpIEFQSQoyMzVlYjFiIGlwbWk6IGludHJv
+ZHVjZSBhbiBpcG1pX2JtY19zZHJfZmluZCgpIEFQSQo2YzRiOGI5IGlwbWk6IHByb3ZpZGUgc3Vw
+cG9ydCBmb3IgRlJVcwozNzU5NDBlIGlwbWk6IHVzZSBhIGZpbGUgdG8gbG9hZCBTRFJzCjVkNzA2
+MzAgcHBjOiBhZGQgSVBNSSBzdXBwb3J0CjhlMDcxNjkgcHBjL3BudjogQWRkIE9DQyBtb2RlbCBz
+dHViIHdpdGggaW50ZXJydXB0IHN1cHBvcnQKOGYwNDlmZCBwcGMvcG52OiBBZGQgY3V0IGRvd24g
+UFNJIGJyaWRnZSBtb2RlbCBhbmQgaG9va3VwIGV4dGVybmFsIGludGVycnVwdAo4YjUwZmM0IHBw
+Yy9wbnY6IGFkZCBtZW1vcnkgcmVnaW9ucyBmb3IgdGhlIElDUCByZWdpc3RlcnMKYWZlYTQwNyBw
+cGMvcG52OiBhZGQgYSBoZWxwZXIgdG8gY2FsY3VsYXRlIE1NSU8gYWRkcmVzc2VzIHJlZ2lzdGVy
+cwowNTNjYzk2IHBwYy9wbnY6IGNyZWF0ZSB0aGUgSUNQIG9iamVjdCB1bmRlciBQbnZDb3JlCjc3
+NDU0YzYgcHBjL3BudjogZXh0ZW5kIHRoZSBtYWNoaW5lIHdpdGggYSBJbnRlcnJ1cHRTdGF0c1By
+b3ZpZGVyIGludGVyZmFjZQoyNzQ5NmZkIHBwYy9wbnY6IGV4dGVuZCB0aGUgbWFjaGluZSB3aXRo
+IGEgWElDU0ZhYnJpYyBpbnRlcmZhY2UKY2I2MGI0MSBwcGMvcG52OiBhZGQgYSBQbnZJQ1BTdGF0
+ZSBvYmplY3QKYjNlNDJiOCBwcGMveGljczogYWRkIGEgcmVhbGl6ZSgpIGhhbmRsZXIgdG8gSUNQ
+U3RhdGVDbGFzcwo0M2ZhM2Q3IHNwYXByOiBhbGxvY2F0ZSB0aGUgSUNQU3RhdGUgb2JqZWN0IGZy
+b20gdW5kZXIgc1BBUFJDUFVDb3JlCjU1NTE5ZTAgc3BhcHI6IG1vdmUgdGhlIElSUSBzZXJ2ZXIg
+bnVtYmVyIG1hcHBpbmcgdW5kZXIgdGhlIG1hY2hpbmUKNTliY2EwOCBwcGMveGljczogaW50cm9k
+dWNlIGFuICdpbnRjJyBiYWNrbGluayB1bmRlciBQb3dlclBDQ1BVCmNhYWUyYTkgdGFyZ2V0L3Bw
+YzogQWRkIGlibSwgcHJvY2Vzc29yLXJhZGl4LUFQLWVuY29kaW5ncyBmb3IgVENHCjQ0Njk5NjUg
+c3BhcHJfcGNpOiBSZW1vdmVkIHVudXNlZCBpbmNsdWRlCmRmYTlmYWYgc3BhcHJfcGNpOiBXYXJu
+IHdoZW4gUkFNIHBhZ2Ugc2l6ZSBpcyBub3QgZW5hYmxlZCBpbiBJT01NVSBwYWdlIG1hc2sKMDVm
+YWY0ZiB0YXJnZXQtcHBjL2t2bTogRW5hYmxlIGluLWtlcm5lbCBUQ0UgYWNjZWxlcmF0aW9uIGZv
+ciBtdWx0aS10Y2UKODA4ZThjMSBzcGFwcjogV29ya2Fyb3VuZCBmb3IgYnJva2VuIHJhZGl4IGd1
+ZXN0cwo3YzQyM2E3IHNwYXByOiBFbmFibGUgSVNBIDMuMCBNTVUgbW9kZSBzZWxlY3Rpb24gdmlh
+IENBUwoxN2QyYzc2IHNwYXByOiBtb3ZlIHNwYXByX3BvcHVsYXRlX3BhX2ZlYXR1cmVzKCkKYTlk
+ZjI3NSB0YXJnZXQvcHBjOiBJbXBsZW1lbnQgSF9SRUdJU1RFUl9QUk9DRVNTX1RBQkxFIEhfQ0FM
+TApiM2E5NDM2IHRhcmdldC9wcGM6IEFkZCBuZXcgSC1DQUxMIHNoZWxscyBmb3IgaW4gbWVtb3J5
+IHRhYmxlIHRyYW5zbGF0aW9uCjI5ZmFlZjMgdGFyZ2V0LXBwYzogc3VwcG9ydCBLVk1fQ0FQX1BQ
+Q19NTVVfUkFESVgsIEtWTV9DQVBfUFBDX01NVV9IQVNIX1YzCmI4ZTI4Zjggc3BhcHI6IEFkZCBp
+Ym0sIHByb2Nlc3Nvci1yYWRpeC1BUC1lbmNvZGluZ3MgdG8gdGhlIGRldmljZSB0cmVlCmU4ZTMy
+YjggdGFyZ2V0LXBwYzoga3ZtOiBtYWtlIHVzZSBvZiBLVk1fQ1JFQVRFX1NQQVBSX1RDRV82NApi
+MmYxYzU2IGh3L3BwYy9wbnY6IENsYXNzaWZ5IHRoZSAiUG93ZXJOViBDaGlwIiBkZXZpY2VzIGFz
+IENQVSBkZXZpY2VzCjRkNjlhNzAgcHBjL3NwYXByOiBRT00naWZ5IHNQQVBSUlRDU3RhdGUKZDcw
+OTFlMSBwc2VyaWVzOiBBZGQgcHNlcmllcy0yLjEwIG1hY2hpbmUgdHlwZQoxYmM4NTlmIHRhcmdl
+dC9wcGM6IEltcHJvdmUgYWNjdXJhY3kgb2YgZ3Vlc3QgSFRNIGF2YWlsYWJpbGl0eSBvbiBQOHMK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDg6IHRhcmdldC9wcGM6IElt
+cHJvdmUgYWNjdXJhY3kgb2YgZ3Vlc3QgSFRNIGF2YWlsYWJpbGl0eSBvbiBQOHMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMi80ODogcHNlcmllczogQWRkIHBzZXJpZXMtMi4xMCBtYWNoaW5lIHR5cGUuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMy80ODogcHBjL3NwYXByOiBRT00naWZ5IHNQQVBSUlRDU3RhdGUuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNC80ODogaHcvcHBjL3BudjogQ2xhc3NpZnkgdGhlICJQb3dlck5WIENo
+aXAiIGRldmljZXMgYXMgQ1BVIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS80ODogdGFyZ2V0
+LXBwYzoga3ZtOiBtYWtlIHVzZSBvZiBLVk1fQ1JFQVRFX1NQQVBSX1RDRV82NC4uLgpDaGVja2lu
+ZyBQQVRDSCA2LzQ4OiBzcGFwcjogQWRkIGlibSwgcHJvY2Vzc29yLXJhZGl4LUFQLWVuY29kaW5n
+cyB0byB0aGUgZGV2aWNlIHRyZWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy80ODogdGFyZ2V0LXBwYzog
+c3VwcG9ydCBLVk1fQ0FQX1BQQ19NTVVfUkFESVgsIEtWTV9DQVBfUFBDX01NVV9IQVNIX1YzLi4u
+CkNoZWNraW5nIFBBVENIIDgvNDg6IHRhcmdldC9wcGM6IEFkZCBuZXcgSC1DQUxMIHNoZWxscyBm
+b3IgaW4gbWVtb3J5IHRhYmxlIHRyYW5zbGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDkvNDg6IHRh
+cmdldC9wcGM6IEltcGxlbWVudCBIX1JFR0lTVEVSX1BST0NFU1NfVEFCTEUgSF9DQUxMLi4uCkNo
+ZWNraW5nIFBBVENIIDEwLzQ4OiBzcGFwcjogbW92ZSBzcGFwcl9wb3B1bGF0ZV9wYV9mZWF0dXJl
+cygpLi4uCkNoZWNraW5nIFBBVENIIDExLzQ4OiBzcGFwcjogRW5hYmxlIElTQSAzLjAgTU1VIG1v
+ZGUgc2VsZWN0aW9uIHZpYSBDQVMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNDg6IHNwYXByOiBXb3Jr
+YXJvdW5kIGZvciBicm9rZW4gcmFkaXggZ3Vlc3RzLi4uCkNoZWNraW5nIFBBVENIIDEzLzQ4OiB0
+YXJnZXQtcHBjL2t2bTogRW5hYmxlIGluLWtlcm5lbCBUQ0UgYWNjZWxlcmF0aW9uIGZvciBtdWx0
+aS10Y2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvNDg6IHNwYXByX3BjaTogV2FybiB3aGVuIFJBTSBw
+YWdlIHNpemUgaXMgbm90IGVuYWJsZWQgaW4gSU9NTVUgcGFnZSBtYXNrLi4uCkNoZWNraW5nIFBB
+VENIIDE1LzQ4OiBzcGFwcl9wY2k6IFJlbW92ZWQgdW51c2VkIGluY2x1ZGUuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTYvNDg6IHRhcmdldC9wcGM6IEFkZCBpYm0sIHByb2Nlc3Nvci1yYWRpeC1BUC1lbmNv
+ZGluZ3MgZm9yIFRDRy4uLgpDaGVja2luZyBQQVRDSCAxNy80ODogcHBjL3hpY3M6IGludHJvZHVj
+ZSBhbiAnaW50YycgYmFja2xpbmsgdW5kZXIgUG93ZXJQQ0NQVS4uLgpDaGVja2luZyBQQVRDSCAx
+OC80ODogc3BhcHI6IG1vdmUgdGhlIElSUSBzZXJ2ZXIgbnVtYmVyIG1hcHBpbmcgdW5kZXIgdGhl
+IG1hY2hpbmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvNDg6IHNwYXByOiBhbGxvY2F0ZSB0aGUgSUNQ
+U3RhdGUgb2JqZWN0IGZyb20gdW5kZXIgc1BBUFJDUFVDb3JlLi4uCkNoZWNraW5nIFBBVENIIDIw
+LzQ4OiBwcGMveGljczogYWRkIGEgcmVhbGl6ZSgpIGhhbmRsZXIgdG8gSUNQU3RhdGVDbGFzcy4u
+LgpDaGVja2luZyBQQVRDSCAyMS80ODogcHBjL3BudjogYWRkIGEgUG52SUNQU3RhdGUgb2JqZWN0
+Li4uCkNoZWNraW5nIFBBVENIIDIyLzQ4OiBwcGMvcG52OiBleHRlbmQgdGhlIG1hY2hpbmUgd2l0
+aCBhIFhJQ1NGYWJyaWMgaW50ZXJmYWNlLi4uCkNoZWNraW5nIFBBVENIIDIzLzQ4OiBwcGMvcG52
+OiBleHRlbmQgdGhlIG1hY2hpbmUgd2l0aCBhIEludGVycnVwdFN0YXRzUHJvdmlkZXIgaW50ZXJm
+YWNlLi4uCkNoZWNraW5nIFBBVENIIDI0LzQ4OiBwcGMvcG52OiBjcmVhdGUgdGhlIElDUCBvYmpl
+Y3QgdW5kZXIgUG52Q29yZS4uLgpDaGVja2luZyBQQVRDSCAyNS80ODogcHBjL3BudjogYWRkIGEg
+aGVscGVyIHRvIGNhbGN1bGF0ZSBNTUlPIGFkZHJlc3NlcyByZWdpc3RlcnMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMjYvNDg6IHBwYy9wbnY6IGFkZCBtZW1vcnkgcmVnaW9ucyBmb3IgdGhlIElDUCByZWdp
+c3RlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvNDg6IHBwYy9wbnY6IEFkZCBjdXQgZG93biBQU0kg
+YnJpZGdlIG1vZGVsIGFuZCBob29rdXAgZXh0ZXJuYWwgaW50ZXJydXB0Li4uCkNoZWNraW5nIFBB
+VENIIDI4LzQ4OiBwcGMvcG52OiBBZGQgT0NDIG1vZGVsIHN0dWIgd2l0aCBpbnRlcnJ1cHQgc3Vw
+cG9ydC4uLgpDaGVja2luZyBQQVRDSCAyOS80ODogcHBjOiBhZGQgSVBNSSBzdXBwb3J0Li4uCkNo
+ZWNraW5nIFBBVENIIDMwLzQ4OiBpcG1pOiB1c2UgYSBmaWxlIHRvIGxvYWQgU0RScy4uLgpDaGVj
+a2luZyBQQVRDSCAzMS80ODogaXBtaTogcHJvdmlkZSBzdXBwb3J0IGZvciBGUlVzLi4uCkNoZWNr
+aW5nIFBBVENIIDMyLzQ4OiBpcG1pOiBpbnRyb2R1Y2UgYW4gaXBtaV9ibWNfc2RyX2ZpbmQoKSBB
+UEkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzMvNDg6IGlwbWk6IGludHJvZHVjZSBhbiBpcG1pX2JtY19n
+ZW5fZXZlbnQoKSBBUEkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzQvNDg6IHRhcmdldC9wcGM6IEZpeCBz
+aXplIG9mIHN0cnVjdCBQUENFbGZQcnN0YXR1cy4uLgpDaGVja2luZyBQQVRDSCAzNS80ODogc3Bh
+cHI6IHJlbW92ZSB0aGUgJ25yX3NlcnZlcnMnIGZpZWxkIGZyb20gdGhlIG1hY2hpbmUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMzYvNDg6IHBwYy9wbnY6IEFkZCBzdXBwb3J0IGZvciBQT1dFUjgrIExQQyBD
+b250cm9sbGVyLi4uCkNoZWNraW5nIFBBVENIIDM3LzQ4OiBwcGMvcG52OiBlbmFibGUgb25seSBv
+bmUgTFBDIGJ1cy4uLgpDaGVja2luZyBQQVRDSCAzOC80ODogcHBjL3Budjogc2NhbiBJU0EgYnVz
+IHRvIHBvcHVsYXRlIGRldmljZSB0cmVlLi4uCkNoZWNraW5nIFBBVENIIDM5LzQ4OiBwcGMvcG52
+OiBwb3B1bGF0ZSBkZXZpY2UgdHJlZSBmb3IgUlRDIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NDAvNDg6IHBwYy9wbnY6IHBvcHVsYXRlIGRldmljZSB0cmVlIGZvciBzZXJpYWwgZGV2aWNlcy4u
+LgpDaGVja2luZyBQQVRDSCA0MS80ODogcHBjL3BudjogcG9wdWxhdGUgZGV2aWNlIHRyZWUgZm9y
+IElQTUkgQlQgZGV2aWNlcy4uLgpDaGVja2luZyBQQVRDSCA0Mi80ODogcHBjL3BudjogYWRkIGlu
+aXRpYWwgSVBNSSBzZW5zb3JzIGZvciB0aGUgQk1DIHNpbXVsYXRvci4uLgpDaGVja2luZyBQQVRD
+SCA0My80ODogcHBjL3BudjogZ2VuZXJhdGUgYW4gT0VNIFNFTCBldmVudCBvbiBzaHV0ZG93bi4u
+LgpDaGVja2luZyBQQVRDSCA0NC80ODogc3BhcHItY3B1LWNvcmU6IFJlbGVhc2UgSUNQU3RhdGUg
+b2JqZWN0IGR1cmluZyBDUFUgdW5yZWFsaXphdGlvbi4uLgpDaGVja2luZyBQQVRDSCA0NS80ODog
+dGFyZ2V0L3BwYzogRmx1c2ggVExCIG9uIHdyaXRlIHRvIFBJRFIuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NDYvNDg6IGU1MDAsIGJvb2szczogbWZzcHIgMjU5OiBSZWdpc3RlciBtYXBwZWQvYWxpYXNlZCBT
+UFJHMyB1c2VyIHJlYWQuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlv
+biBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNTE6IEZJTEU6IHRhcmdldC9wcGMvdHJh
+bnNsYXRlX2luaXQuYzoxNjQzOgorc3RhdGljIHZvaWQgZ2VuX3Nwcl91c3ByZzMgKENQVVBQQ1N0
+YXRlICplbnYpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI4IGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQ3
+LzQ4OiB0YXJnZXQvcHBjOiBTdHlsZSBmaXhlcy4uLgpDaGVja2luZyBQQVRDSCA0OC80ODogTUFJ
+TlRBSU5FUlM6IFJlbW92ZSBteXNlbGYgZnJvbSBlNTAwLi4uCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
