@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1d3N48-0002WF-2k
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:33:08 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3N6Z-0003wU-Tp
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1d3N44-0005In-5B
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:33:08 -0400
-Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:56313)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1d3N43-0005Hi-V2
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:33:04 -0400
-Received: from player691.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 89E3C6F052
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:33:01 +0200 (CEST)
-References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
-	<CAFEAcA-SR5LXw4uw_Xid94JTarDBpVO2nkGb2axRUu2BcX318Q@mail.gmail.com>
-	<20170426023843.GJ16882@umbus.fritz.box>
-	<fbf91cf1-53d1-4b75-74b3-fa9abefdd788@kaod.org>
-	<CAFEAcA_WJP0tBKayzjZ4iVBCjfiQp+bGz_c2RpfwmhLwxM90ug@mail.gmail.com>
-	<CAFEAcA-hhB4PC8QHDr3agixYqg-E=Z+7yQDGwAn78dARJWUY3Q@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <701a8274-5126-cc42-c438-d18a00f59f08@kaod.org>
-Date: Wed, 26 Apr 2017 15:32:52 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3N6Z-0006Bi-1R
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:35:39 -0400
+References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
+	<1486979689-230770-16-git-send-email-vsementsov@virtuozzo.com>
+	<20170216134830.GB28784@lemon.lan>
+	<a6e7cad6-3c9f-1276-baca-1fceb5db7e8f@virtuozzo.com>
+	<20170217122141.GD3468@lemon.lan>
+	<4fbb78a1-a486-3031-1666-6f586a5d4ab9@virtuozzo.com>
+	<20170217140537.GA15819@lemon.lan> <20170217195133.GB20911@work-vm>
+	<051f049e-a063-3392-4c39-e4aefbfdc2a0@redhat.com>
+	<2813f67f-bf85-4a86-e3e9-c6402c92d740@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <10e87deb-dc39-913a-71c3-0dac5be5da3b@virtuozzo.com>
+Date: Wed, 26 Apr 2017 16:35:24 +0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-hhB4PC8QHDr3agixYqg-E=Z+7yQDGwAn78dARJWUY3Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/47] ppc-for-2.10 queue 20170424
+In-Reply-To: <2813f67f-bf85-4a86-e3e9-c6402c92d740@virtuozzo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 15/17] iotests: add default node-name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jdenemar@redhat.com
 
-On 04/26/2017 03:15 PM, Peter Maydell wrote:
-> On 26 April 2017 at 11:46, Peter Maydell <peter.maydell@linaro.org> wrote:
->> All the stuff about shifts is false positives, because the sanitizer
->> doesn't know that -fwrapv makes these operations defined behaviour.
+11.04.2017 06:37, Vladimir Sementsov-Ogievskiy wrote:
+> 11.04.2017 00:49, John Snow wrote:
 >>
->> Newer versions of clang I think get this correct, and less new
->> but not ancient clang has a flag that says "don't report that
->> particular set of shift errors".
-> 
-> I just looked into this, and I think the best set of configure options is:
-> '--cc=clang' '--cxx=clang++' '--extra-cflags=-fsanitize=undefined
-> -fno-sanitize=shift-base -Werror'
+>> On 02/17/2017 02:51 PM, Dr. David Alan Gilbert wrote:
+>>> * Fam Zheng (famz@redhat.com) wrote:
+>>>> On Fri, 02/17 16:36, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 17.02.2017 15:21, Fam Zheng wrote:
+>>>>>> On Fri, 02/17 13:20, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>> 16.02.2017 16:48, Fam Zheng wrote:
+>>>>>>>> On Mon, 02/13 12:54, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>>> When testing migration, auto-generated by qemu node-names=20
+>>>>>>>>> differs in
+>>>>>>>>> source and destination qemu and migration fails. After this=20
+>>>>>>>>> patch,
+>>>>>>>>> auto-generated by iotest nodenames will be the same.
+>>>>>>>> What should be done in libvirt to make sure the node-names are=20
+>>>>>>>> matching
+>>>>>>>> correctly at both sides?
+>>>>>>> Hmm, just set node names appropriately?
+>>>>>> But I think the problem is that node names are not configurable=20
+>>>>>> from libvirt
+>>>>>> today, and then the migration will fail. Should the device name=20
+>>>>>> take precedence
+>>>>>> in the code, to make it easier?
+>>>>> libvirt can use same parameters as I in this patch..
+>>>> If I'm not mistaken, libvirt can be patched to explicitly set the=20
+>>>> same node
+>>>> names in the QEMU command line, but that is some extra work to do=20
+>>>> there. My
+>>>> point is if device names are used during migration, when available,=20
+>>>> this patch
+>>>> and the libvirt change is not necessary.
+>>> Always best to check with libvirt guys to see what makes sense for=20
+>>> them;
+>>> ccing in jdenemar.
+>>>
+>>> Dave
+>>>
+>>>> Fam
+>>> --=20
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+>> Sorry for the necromancy, looks like discussion died here. Vladimir,
+>> what's plans?
+>>
+>> --js
+>
+> Looks like libvirt guys are not interested ;)
+>
+> I'm very busy now with other tasks, I think I'll continue work on my=20
+> series in the list in about 1-2 weeks
+>
+>
 
-Ah ! Too fast you are for me :) you beat me to it. 
+Better is push "qcow2: persistent dirty bitmaps=E2=80=8B" series first, a=
+s after=20
+Kevin's request about storing bitmaps in inactivate, we need some=20
+additional mechanism here, to prevent this storing (some flag=20
+somewhere). So, I'll wait for persistent series to be accepted and then=20
+update these series.
 
-> Works with clang-3.8.0 at least.
 
-Yes. confirmed.
-
-Thanks,
-
-C. 
+--=20
+Best regards,
+Vladimir
