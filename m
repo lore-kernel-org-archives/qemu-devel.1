@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Orb-0006xa-Iv
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:28:20 -0400
+	(envelope-from <mst@redhat.com>) id 1d3OsU-0007iI-23
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:29:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3Ora-0003C7-NJ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:28:19 -0400
-References: <1493192202-3184-1-git-send-email-armbru@redhat.com>
-	<1493192202-3184-3-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c8958cfa-7018-c740-bcb6-0d33b70d8bf8@redhat.com>
-Date: Wed, 26 Apr 2017 10:28:05 -0500
+	(envelope-from <mst@redhat.com>) id 1d3OsQ-0003Yu-Uu
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 11:29:14 -0400
+Date: Wed, 26 Apr 2017 18:29:05 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170426182535-mutt-send-email-mst@kernel.org>
+References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
+	<20170328021651.19350-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <1493192202-3184-3-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CaiQs8bc8cxcj896GxfrCTUBEo5PEgcmD"
-Subject: Re: [Qemu-devel] [PATCH 2/7] sockets: Prepare inet_parse() for
- flattened SocketAddress
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170328021651.19350-3-david@gibson.dropbear.id.au>
+Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
+ override PCI/PCIe hybrid device behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: ehabkost@redhat.com, aik@ozlabs.ru, marcel@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lersek@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CaiQs8bc8cxcj896GxfrCTUBEo5PEgcmD
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
- qemu-block@nongnu.org
-Message-ID: <c8958cfa-7018-c740-bcb6-0d33b70d8bf8@redhat.com>
-Subject: Re: [PATCH 2/7] sockets: Prepare inet_parse() for flattened
- SocketAddress
-References: <1493192202-3184-1-git-send-email-armbru@redhat.com>
- <1493192202-3184-3-git-send-email-armbru@redhat.com>
-In-Reply-To: <1493192202-3184-3-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/26/2017 02:36 AM, Markus Armbruster wrote:
-> I'm going to flatten SocketAddress: rename SocketAddress to
-> SocketAddressLegacy, SocketAddressFlat to SocketAddress, eliminate
-> SocketAddressLegacy except in external interfaces.
->=20
-> inet_parse() returns a newly allocated InetSocketAddress.  Lift the
-> allocation from inet_parse() into its caller socket_parse() to prepare
-> for flattening SocketAddress.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
+> Currently PCI/PCIe hybrid devices - that is, devices which can appear as
+> either plain PCI or PCIe depending on where they're attached - will only
+> appear in PCIe mode if they're attached to a PCIe bus via a root port or
+> downstream port.
+> 
+> This is correct for "standard" PCIe setups, but there are some platforms
+> which need different behaviour (notably "pseries" whose paravirtualized
+> PCI host bridges have some idiosyncracies).
+> 
+> This patch allows the host bridge to override the normal behaviour.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  block/nbd.c            |  8 ++++----
->  include/qemu/sockets.h |  2 +-
->  migration/rdma.c       |  4 ++--
->  migration/socket.c     |  5 +++--
->  util/qemu-sockets.c    | 30 ++++++++++++------------------
->  5 files changed, 22 insertions(+), 27 deletions(-)
->=20
+>  hw/pci/pci.c              | 11 +++++++++--
+>  include/hw/pci/pci_host.h |  1 +
+>  2 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 779787b..ac68065 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
+>  
+>  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
+>  {
+> -    PCIBus *bus = pci_dev->bus;
+> +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(pci_device_root_bus(pci_dev)->qbus.parent);
+> +    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
+> +
+> +    if (hc->allow_hybrid_pcie) {
+> +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
+> +    } else {
+> +        PCIBus *bus = pci_dev->bus;
+>  
+> -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> +    }
+>  }
+>  
+>  void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I think I'd prefer adding some flags in PCIBus. While we are at it,
+is_root can become a flag too.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---CaiQs8bc8cxcj896GxfrCTUBEo5PEgcmD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZALyFAAoJEKeha0olJ0NqzQAIAINgHn/5K88KKLVv1Y7cq7vq
-ttW/XY/wRFAyiy+E9h5gk2r1pGEOIjS2Vu+zcEygjqiSvdemn+BJhg/7bVXbR+1Y
-+AS95XnrC2gcMOCHmnRpiOiWWa9kLKKrv5Dire/4eAKaDPurto2FelTa0EqnRllp
-rhKgv9H2vPRd7QRx449lTVNbfvABHmDpagk44s9tgqu5Gz1OX/YPOL0SyUWKWX4q
-Mv/Ma9YEsnS8O45jL20jP3GFkW3dPRKzzZjrlZGsw8U3hs/rB9tuadMRT/7+N6zl
-mWerSf/lAiLmbe/LkK3QVZWJglLOwj/DpVLzuXV/WTqgAa3EvuhO5FC9QkyJtu0=
-=yE4V
------END PGP SIGNATURE-----
-
---CaiQs8bc8cxcj896GxfrCTUBEo5PEgcmD--
+> diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+> index ba31595..ad03cca 100644
+> --- a/include/hw/pci/pci_host.h
+> +++ b/include/hw/pci/pci_host.h
+> @@ -54,6 +54,7 @@ typedef struct PCIHostBridgeClass {
+>      SysBusDeviceClass parent_class;
+>  
+>      const char *(*root_bus_path)(PCIHostState *, PCIBus *);
+> +    bool (*allow_hybrid_pcie)(PCIHostState *, PCIDevice *);
+>  } PCIHostBridgeClass;
+>  
+>  /* common internal helpers for PCI/PCIe hosts, cut off overflows */
+> -- 
+> 2.9.3
