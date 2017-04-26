@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d3QVM-00027H-W5
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:13:29 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d3QVU-0002Ee-VL
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1d3QVM-0000Nz-5o
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:13:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1d3QVP-0000QI-Dk
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:13:36 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 26 Apr 2017 18:13:09 +0100
-Message-Id: <1493226792-3237-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/3] gicv3: Correct mishandling of NS BPR1
- values
+Date: Wed, 26 Apr 2017 18:13:11 +0100
+Message-Id: <1493226792-3237-3-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1493226792-3237-1-git-send-email-peter.maydell@linaro.org>
+References: <1493226792-3237-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/3] hw/intc/arm_gicv3_cpuif: Don't let BPR be
+ set below its minimum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,34 +23,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-I happened to be looking at the GICv3 spec and our implementation,
-and I realized that we don't correctly calculate the mask values
-to get group priorities based on BPR values if the NS BPR1 is
-being used. This BPR, unlike the S BPR1 or the BPR0, has
-off-by-one semantics, so instead of "use bits [7:1]" being
-bpr == 0, it is bpr == 1, and so on, with an NS BPR1 value of
-0 being impossible.
+icc_bpr_write() was not enforcing that writing a value below the
+minimum for the BPR should behave as if the BPR was set to the
+minimum value. This doesn't make a difference for the secure
+BPRs (since we define the minimum for the QEMU implementation
+as zero) but did mean we were allowing the NS BPR1 to be set to
+0 when 1 should be the lowest value.
 
-Patch 3 in this set fixes this error, and fixes the comments
-so they're actually accurate. Patches 1 and 2 are preliminary
-bug fixes which ensure that the NS BPR1 values are actually
-constrained to be greater than 0, so that the assert()s added
-in patch 3 can't fire.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/intc/arm_gicv3_cpuif.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I'm sending this as the last thing before I head out of the
-door, so will respond to review comments in June...
-
-thanks
--- PMM
-
-
-Peter Maydell (3):
-  hw/intc/arm_gicv3_cpuif: Fix reset value for VMCR_EL2.VBPR1
-  hw/intc/arm_gicv3_cpuif: Don't let BPR be set below its minimum
-  hw/intc/arm_gicv3_cpuif: Fix priority masking for NS BPR1
-
- hw/intc/arm_gicv3_cpuif.c | 49 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 44 insertions(+), 5 deletions(-)
-
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index d31eba0..e660b3f 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -1388,6 +1388,7 @@ static void icc_bpr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int grp = (ri->crm == 8) ? GICV3_G0 : GICV3_G1;
++    uint64_t minval;
+ 
+     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
+         icv_bpr_write(env, ri, value);
+@@ -1415,6 +1416,11 @@ static void icc_bpr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+         return;
+     }
+ 
++    minval = (grp == GICV3_G1NS) ? GIC_MIN_BPR_NS : GIC_MIN_BPR;
++    if (value < minval) {
++        value = minval;
++    }
++
+     cs->icc_bpr[grp] = value & 7;
+     gicv3_cpuif_update(cs);
+ }
 -- 
 2.7.4
