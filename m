@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3R4Z-0001RY-2t
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:49:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3R8z-0003FN-4F
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3R4X-0008Os-Ks
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:49:51 -0400
-Date: Wed, 26 Apr 2017 14:49:36 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170426174936.GZ3482@thinpad.lan.raisama.net>
-References: <20170417215916.12431-1-ehabkost@redhat.com>
-	<20170417215916.12431-4-ehabkost@redhat.com>
-	<20170426191406-mutt-send-email-mst@kernel.org>
+	(envelope-from <eblake@redhat.com>) id 1d3R8u-0002GN-Pc
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:54:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46877)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d3R8u-0002GD-GO
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:54:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 38ECF65D17
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 17:54:19 +0000 (UTC)
+References: <20170426153900.21066-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3f6dc142-2faf-d4c5-e293-6691c2218133@redhat.com>
+Date: Wed, 26 Apr 2017 12:54:12 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170426191406-mutt-send-email-mst@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 3/7] pci: Change pci_bus_new*() parameter to
- PCIHostState
+In-Reply-To: <20170426153900.21066-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="m6nuOEaxAiRPHVuDd4BDnqiLREmridASr"
+Subject: Re: [Qemu-devel] [PATCH] trace: disallow more than 10 arguments per
+ trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,257 +34,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <dgibson@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-arm@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Apr 26, 2017 at 07:16:26PM +0300, Michael S. Tsirkin wrote:
-> On Mon, Apr 17, 2017 at 06:59:12PM -0300, Eduardo Habkost wrote:
-> > The pci_bus_new*() functions already require the 'parent' argument to=
- be
-> > a PCI_HOST_BRIDGE object. Change the parameter type to reflect that.
-> >=20
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Marcel Apfelbaum <marcel@redhat.com>
-> > Cc: "Herv=E9 Poussineau" <hpoussin@reactos.org>
-> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > Cc: qemu-ppc@nongnu.org
-> > Cc: qemu-arm@nongnu.org
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--m6nuOEaxAiRPHVuDd4BDnqiLREmridASr
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <3f6dc142-2faf-d4c5-e293-6691c2218133@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] trace: disallow more than 10 arguments per
+ trace event
+References: <20170426153900.21066-1-berrange@redhat.com>
+In-Reply-To: <20170426153900.21066-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/26/2017 10:39 AM, Daniel P. Berrange wrote:
+> The UST trace backend can only cope with upto 10 arguments. To ensure w=
+e
+
+s/upto/up to/
+
+> don't exceed the limit when UST is not compiled in, disallow more than
+> 10 arguments upfront.
 >=20
-> This function doesn't create a generic pci bus, it's only good
-> for creating root buses.
+> This prevents the case where:
 >=20
-> As we are changing all callers anyway, let's rename this to
-> pci_host_bus_new or pci_root_bus_new?
-
-Something similar was already done on v2[1]. But based on
-additional feedback on v2, I plan to make pci_bus_new() more
-generic, moving the PCIHostState-specific initialization to
-pci_host_bus_init*() wrappers.
-
-[1] The new function names were:
-* pci_host_bus_init() (replacing pci_bus_new())
-* pci_host_bus_init_inplace() (replacing pci_bus_new_inplace())
-* pci_host_bus_init_irqs() (replacing pci_register_bus())
-
+>   commit 0fc8aec7de64f2bf83a274a2a38b938ce03425d2
 
 >=20
-> > ---
-> >  include/hw/pci/pci.h                |  5 +++--
-> >  hw/pci-bridge/pci_expander_bridge.c | 15 ++++++++-------
-> >  hw/pci-host/piix.c                  |  2 +-
-> >  hw/pci-host/prep.c                  |  2 +-
-> >  hw/pci-host/q35.c                   |  2 +-
-> >  hw/pci-host/versatile.c             |  2 +-
-> >  hw/pci/pci.c                        | 13 ++++++-------
-> >  7 files changed, 21 insertions(+), 20 deletions(-)
-> >=20
-> > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> > index a37a2d5cb6..2242aa25eb 100644
-> > --- a/include/hw/pci/pci.h
-> > +++ b/include/hw/pci/pci.h
-> > @@ -393,12 +393,13 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *=
-opaque, int pin);
-> > =20
-> >  bool pci_bus_is_express(PCIBus *bus);
-> >  bool pci_bus_is_root(PCIBus *bus);
-> > -void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *=
-parent,
-> > +void pci_bus_new_inplace(PCIBus *bus, size_t bus_size,
-> > +                         PCIHostState *phb,
-> >                           const char *name,
-> >                           MemoryRegion *address_space_mem,
-> >                           MemoryRegion *address_space_io,
-> >                           uint8_t devfn_min, const char *typename);
-> > -PCIBus *pci_bus_new(DeviceState *parent, const char *name,
-> > +PCIBus *pci_bus_new(PCIHostState *phb, const char *name,
-> >                      MemoryRegion *address_space_mem,
-> >                      MemoryRegion *address_space_io,
-> >                      uint8_t devfn_min, const char *typename);
-> > diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_=
-expander_bridge.c
-> > index 6ac187fa32..39d29d2230 100644
-> > --- a/hw/pci-bridge/pci_expander_bridge.c
-> > +++ b/hw/pci-bridge/pci_expander_bridge.c
-> > @@ -213,7 +213,8 @@ static gint pxb_compare(gconstpointer a, gconstpo=
-inter b)
-> >  static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error =
-**errp)
-> >  {
-> >      PXBDev *pxb =3D convert_to_pxb(dev);
-> > -    DeviceState *ds, *bds =3D NULL;
-> > +    DeviceState *bds =3D NULL;
-> > +    PCIHostState *phb;
-> >      PCIBus *bus;
-> >      const char *dev_name =3D NULL;
-> >      Error *local_err =3D NULL;
-> > @@ -228,11 +229,11 @@ static void pxb_dev_realize_common(PCIDevice *d=
-ev, bool pcie, Error **errp)
-> >          dev_name =3D dev->qdev.id;
-> >      }
-> > =20
-> > -    ds =3D qdev_create(NULL, TYPE_PXB_HOST);
-> > +    phb =3D PCI_HOST_BRIDGE(qdev_create(NULL, TYPE_PXB_HOST));
-> >      if (pcie) {
-> > -        bus =3D pci_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_PC=
-IE_BUS);
-> > +        bus =3D pci_bus_new(phb, dev_name, NULL, NULL, 0, TYPE_PXB_P=
-CIE_BUS);
-> >      } else {
-> > -        bus =3D pci_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE_=
-PXB_BUS);
-> > +        bus =3D pci_bus_new(phb, "pxb-internal", NULL, NULL, 0, TYPE=
-_PXB_BUS);
-> >          bds =3D qdev_create(BUS(bus), "pci-bridge");
-> >          bds->id =3D dev_name;
-> >          qdev_prop_set_uint8(bds, PCI_BRIDGE_DEV_PROP_CHASSIS_NR, pxb=
-->bus_nr);
-> > @@ -244,7 +245,7 @@ static void pxb_dev_realize_common(PCIDevice *dev=
-, bool pcie, Error **errp)
-> >      bus->address_space_io =3D dev->bus->address_space_io;
-> >      bus->map_irq =3D pxb_map_irq_fn;
-> > =20
-> > -    PCI_HOST_BRIDGE(ds)->bus =3D bus;
-> > +    phb->bus =3D bus;
-> > =20
-> >      pxb_register_bus(dev, bus, &local_err);
-> >      if (local_err) {
-> > @@ -252,7 +253,7 @@ static void pxb_dev_realize_common(PCIDevice *dev=
-, bool pcie, Error **errp)
-> >          goto err_register_bus;
-> >      }
-> > =20
-> > -    qdev_init_nofail(ds);
-> > +    qdev_init_nofail(DEVICE(phb));
-> >      if (bds) {
-> >          qdev_init_nofail(bds);
-> >      }
-> > @@ -267,7 +268,7 @@ static void pxb_dev_realize_common(PCIDevice *dev=
-, bool pcie, Error **errp)
-> >  err_register_bus:
-> >      object_unref(OBJECT(bds));
-> >      object_unparent(OBJECT(bus));
-> > -    object_unref(OBJECT(ds));
-> > +    object_unref(OBJECT(phb));
-> >  }
-> > =20
-> >  static void pxb_dev_realize(PCIDevice *dev, Error **errp)
-> > diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-> > index f9218aa952..91fec05b38 100644
-> > --- a/hw/pci-host/piix.c
-> > +++ b/hw/pci-host/piix.c
-> > @@ -340,7 +340,7 @@ PCIBus *i440fx_init(const char *host_type, const =
-char *pci_type,
-> > =20
-> >      dev =3D qdev_create(NULL, host_type);
-> >      s =3D PCI_HOST_BRIDGE(dev);
-> > -    b =3D pci_bus_new(dev, NULL, pci_address_space,
-> > +    b =3D pci_bus_new(s, NULL, pci_address_space,
-> >                      address_space_io, 0, TYPE_PCI_BUS);
-> >      s->bus =3D b;
-> >      object_property_add_child(qdev_get_machine(), "i440fx", OBJECT(d=
-ev), NULL);
-> > diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-> > index 260a119a9e..2e2cd267f4 100644
-> > --- a/hw/pci-host/prep.c
-> > +++ b/hw/pci-host/prep.c
-> > @@ -269,7 +269,7 @@ static void raven_pcihost_initfn(Object *obj)
-> >      memory_region_add_subregion_overlap(address_space_mem, 0x8000000=
-0,
-> >                                          &s->pci_io_non_contiguous, 1=
-);
-> >      memory_region_add_subregion(address_space_mem, 0xc0000000, &s->p=
-ci_memory);
-> > -    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), DEVICE(obj)=
-, NULL,
-> > +    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), h, NULL,
-> >                          &s->pci_memory, &s->pci_io, 0, TYPE_PCI_BUS)=
-;
-> > =20
-> >      /* Bus master address space */
-> > diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-> > index 344f77b10c..860b47a1ba 100644
-> > --- a/hw/pci-host/q35.c
-> > +++ b/hw/pci-host/q35.c
-> > @@ -49,7 +49,7 @@ static void q35_host_realize(DeviceState *dev, Erro=
-r **errp)
-> >      sysbus_add_io(sbd, MCH_HOST_BRIDGE_CONFIG_DATA, &pci->data_mem);
-> >      sysbus_init_ioports(sbd, MCH_HOST_BRIDGE_CONFIG_DATA, 4);
-> > =20
-> > -    pci->bus =3D pci_bus_new(DEVICE(s), "pcie.0",
-> > +    pci->bus =3D pci_bus_new(pci, "pcie.0",
-> >                             s->mch.pci_address_space, s->mch.address_=
-space_io,
-> >                             0, TYPE_PCIE_BUS);
-> >      PC_MACHINE(qdev_get_machine())->bus =3D pci->bus;
-> > diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
-> > index 467cbb9cb8..24ef87610b 100644
-> > --- a/hw/pci-host/versatile.c
-> > +++ b/hw/pci-host/versatile.c
-> > @@ -386,7 +386,7 @@ static void pci_vpb_init(Object *obj)
-> >      memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 1ULL <=
-< 32);
-> >      memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 1ULL=
- << 32);
-> > =20
-> > -    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), DEVICE(obj)=
-, "pci",
-> > +    pci_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), h, "pci",
-> >                          &s->pci_mem_space, &s->pci_io_space,
-> >                          PCI_DEVFN(11, 0), TYPE_PCI_BUS);
-> >      h->bus =3D &s->pci_bus;
-> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > index d9535c0bdc..f4488b46fc 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -388,26 +388,25 @@ bool pci_bus_is_root(PCIBus *bus)
-> >      return PCI_BUS_GET_CLASS(bus)->is_root(bus);
-> >  }
-> > =20
-> > -void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *=
-parent,
-> > +void pci_bus_new_inplace(PCIBus *bus, size_t bus_size,
-> > +                         PCIHostState *phb,
-> >                           const char *name,
-> >                           MemoryRegion *address_space_mem,
-> >                           MemoryRegion *address_space_io,
-> >                           uint8_t devfn_min, const char *typename)
-> >  {
-> > -    PCIHostState *phb =3D PCI_HOST_BRIDGE(parent);
-> > -    qbus_create_inplace(bus, bus_size, typename, parent, name);
-> > +    qbus_create_inplace(bus, bus_size, typename, DEVICE(phb), name);
-> >      pci_bus_init(bus, phb, address_space_mem, address_space_io, devf=
-n_min);
-> >  }
-> > =20
-> > -PCIBus *pci_bus_new(DeviceState *parent, const char *name,
-> > +PCIBus *pci_bus_new(PCIHostState *phb, const char *name,
-> >                      MemoryRegion *address_space_mem,
-> >                      MemoryRegion *address_space_io,
-> >                      uint8_t devfn_min, const char *typename)
-> >  {
-> > -    PCIHostState *phb =3D PCI_HOST_BRIDGE(parent);
-> >      PCIBus *bus;
-> > =20
-> > -    bus =3D PCI_BUS(qbus_create(typename, parent, name));
-> > +    bus =3D PCI_BUS(qbus_create(typename, DEVICE(phb), name));
-> >      pci_bus_init(bus, phb, address_space_mem, address_space_io, devf=
-n_min);
-> >      return bus;
-> >  }
-> > @@ -431,7 +430,7 @@ PCIBus *pci_register_bus(DeviceState *parent, con=
-st char *name,
-> >  {
-> >      PCIBus *bus;
-> > =20
-> > -    bus =3D pci_bus_new(parent, name, address_space_mem,
-> > +    bus =3D pci_bus_new(PCI_HOST_BRIDGE(parent), name, address_space=
-_mem,
-> >                        address_space_io, devfn_min, typename);
-> >      pci_bus_irqs(bus, set_irq, map_irq, irq_opaque, nirq);
-> >      return bus;
-> > --=20
-> > 2.11.0.259.g40922b1
+> regressed the fix done in
+>=20
+>   commit 2dfe5113b11ce0ddb08176ebb54ab7ac4104b413
+
+>=20
+> Now we get an immediate fail even when UST is disabled:
+>=20
+>   GEN     net/trace.h
+> Traceback (most recent call last):
+>   File "/home/berrange/src/virt/qemu/scripts/tracetool.py", line 154, i=
+n <module>
+>     main(sys.argv)
+>   File "/home/berrange/src/virt/qemu/scripts/tracetool.py", line 145, i=
+n main
+>     events.extend(tracetool.read_events(fh))
+>   File "/home/berrange/src/virt/qemu/scripts/tracetool/__init__.py", li=
+ne 307, in read_events
+>     event =3D Event.build(line)
+>   File "/home/berrange/src/virt/qemu/scripts/tracetool/__init__.py", li=
+ne 244, in build
+>     event =3D Event(name, props, fmt, args)
+>   File "/home/berrange/src/virt/qemu/scripts/tracetool/__init__.py", li=
+ne 196, in __init__
+>     "argument count" % name)
+> ValueError: Event 'colo_compare_tcp_info' has more than maximum permitt=
+ed argument count
+> Makefile:96: recipe for target 'net/trace.h-timestamp' failed
+
+Not necessarily the nicest-looking error, but sufficient to prevent the
+regression.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>=20
+> Obviously dont apply this until 0fc8aec7de64f2bf83a274a2a38b938ce03425d=
+2 has
+> been reverted :-)
+
+It now has: commit 51b9d495.
 
 --=20
-Eduardo
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--m6nuOEaxAiRPHVuDd4BDnqiLREmridASr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZAN7FAAoJEKeha0olJ0NqwtYH/1cVDKFWwJnY61TMkTZxEiTj
+lClljkAZNh9KgIenFH66jpluoUx4GEzsbq1gH3MdQZET5a5BUS6I7vJ2S0VzqKmF
+BL40fZG/DdDsugR7XU6XjEb03FrE2gnBpPivl5iCev1/tS6E7hNLVREaH6Lxcv3J
+gykTyxuQHJtUDsLGXbmvAOSWR3jQZiA++Rx3BiA7y+NmxIy+T3t0KY7mNzuO7bbn
+4HTCB0C4smjezJSHgNlBxjrII/SsgbL8oFRpnwNmyBCiPAtgwcziVnZPVBvnKrlf
+sBfNkRn+wruAhvv7KLEU3YgFSfSyM5ghT7ZAxsSzhCknFC75PLV5cO37xERjSxo=
+=umuA
+-----END PGP SIGNATURE-----
+
+--m6nuOEaxAiRPHVuDd4BDnqiLREmridASr--
