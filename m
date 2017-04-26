@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3LVy-0007oq-OD
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:53:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1d3LeE-0003wS-NX
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:02:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3LVv-0003qE-NR
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:53:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60944)
+	(envelope-from <berrange@redhat.com>) id 1d3LeB-0007kV-Mf
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:02:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3LVv-0003pu-Gg
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:53:43 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C04885541
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 11:53:42 +0000 (UTC)
-Date: Wed, 26 Apr 2017 19:53:31 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170426115331.GA26792@pxdev.xzpeter.org>
-References: <20170425101758.3944-1-quintela@redhat.com>
-	<20170425101758.3944-3-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d3LeB-0007kL-HH
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:02:15 -0400
+Date: Wed, 26 Apr 2017 13:02:03 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170426120203.GG18933@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1492845627-4384-1-git-send-email-longpeng2@huawei.com>
+	<1492845627-4384-2-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170425101758.3944-3-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration: to_dst_file at that point
- is NULL
+In-Reply-To: <1492845627-4384-2-git-send-email-longpeng2@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/18] crypto: cipher: introduce context
+ free function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc: arei.gonglei@huawei.com, longpeng.mike@gmail.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
 
-On Tue, Apr 25, 2017 at 12:17:58PM +0200, Juan Quintela wrote:
-> We have just arrived as:
+On Sat, Apr 22, 2017 at 03:20:10PM +0800, Longpeng(Mike) wrote:
+> Refactors the qcrypto_cipher_free(), splits it into two parts. One
+> is gcrypt/nettle__cipher_free_ctx() to free the special context.
 > 
-> migration.c: qemu_migrate()
->   ....
->   s = migrate_init() <- puts it to NULL
->   ....
->   {tcp,unix}_start_outgoing_migration ->
->      socket_outgoing_migration
->         migration_channel_connect()
-> 	   sets to_dst_file
+> This makes code more clear, what's more, it would be used by the
+> later patch.
 > 
-> if tls is enabled, we do another round through
-> migrate_channel_tls_connect(), but we only set it up if there is no
-> error.  So we don't need the assignation.  I am removing it to remove
-> in the follwing patches the knowledge about MigrationState in that two
-> files.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-> ---
->  migration/socket.c | 1 -
->  migration/tls.c    | 1 -
->  2 files changed, 2 deletions(-)
-> 
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 13966f1..dc88812 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -79,7 +79,6 @@ static void socket_outgoing_migration(QIOTask *task,
->  
->      if (qio_task_propagate_error(task, &err)) {
->          trace_migration_socket_outgoing_error(error_get_pretty(err));
-> -        data->s->to_dst_file = NULL;
->          migrate_fd_error(data->s, err);
->          error_free(err);
->      } else {
-> diff --git a/migration/tls.c b/migration/tls.c
-> index 45bec44..a33ecb7 100644
-> --- a/migration/tls.c
-> +++ b/migration/tls.c
-> @@ -116,7 +116,6 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
->  
->      if (qio_task_propagate_error(task, &err)) {
->          trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
-> -        s->to_dst_file = NULL;
->          migrate_fd_error(s, err);
->          error_free(err);
->      } else {
-> -- 
-> 2.9.3
-> 
 
+Regards,
+Daniel
 -- 
-Peter Xu
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
