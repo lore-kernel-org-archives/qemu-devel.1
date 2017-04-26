@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1d3ODg-0003Ox-6O
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:47:05 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1d3ODa-0002Oo-Eq
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1d3ODf-0003Ob-3T
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:47:04 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47395)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1d3ODa-0002Oa-61
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:47:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49099
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
-	id 1d3ODa-0002Nx-6b
+	id 1d3ODa-0002LF-0g
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 10:46:58 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3QEi2Ad086130
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 10:46:57 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2wj306pj-1
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3QEi9rL094796
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 10:46:54 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a2ebwyu3d-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 10:46:56 -0400
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 10:46:54 -0400
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
-	Wed, 26 Apr 2017 15:46:53 +0100
+	Wed, 26 Apr 2017 15:46:52 +0100
 From: Eric Farman <farman@linux.vnet.ibm.com>
-Date: Wed, 26 Apr 2017 16:46:44 +0200
+Date: Wed, 26 Apr 2017 16:46:41 +0200
 In-Reply-To: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
 References: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
-Message-Id: <20170426144645.12476-5-farman@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v1 4/5] pc-bios/s390-ccw: Break up
- virtio-scsi read into multiples
+Message-Id: <20170426144645.12476-2-farman@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v1 1/5] hw/scsi: Override the max_sectors
+ value for virtio-scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,65 +42,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Eric Farman <farman@linux.vnet.ibm.com>
 
-A virtio-scsi request that goes through the host sd driver and
-exceeds the maximum transfer size is automatically broken up
-for us. But the equivalent request going to the sg driver
-presumes that any length requirements have already been honored.
-Let's use the max_sectors field from the device and break up
-all virtio-scsi requests (both sd and sg) to avoid problem from
-the host drivers.
+The virtio spec states that the max_sectors field is
+"a hint to the driver for the maximum transfer size"
+that would be used for a virtio-scsi request.
+
+It's currently hardcoded to xFFFF unless one is established
+by the max_sectors parameter on the command line, but let's
+roll through the associated devices and set it to anything
+lower if one is set for the underlying block device and
+retrieved by the BLKSECTGET ioctl.
 
 Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
 ---
- pc-bios/s390-ccw/s390-ccw.h    |  4 ++++
- pc-bios/s390-ccw/virtio-scsi.c | 19 ++++++++++++++-----
- 2 files changed, 18 insertions(+), 5 deletions(-)
+ hw/scsi/virtio-scsi.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index ded67bc..e1f3751 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -42,6 +42,10 @@ typedef unsigned long long __u64;
- #ifndef NULL
- #define NULL    0
- #endif
-+#ifndef MIN
-+#define MIN(a, b) (((a) < (b)) ? (a) : (b));
-+#endif
-+
- 
- #include "cio.h"
- #include "iplb.h"
-diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
-index 6d070e2..90a8cc8 100644
---- a/pc-bios/s390-ccw/virtio-scsi.c
-+++ b/pc-bios/s390-ccw/virtio-scsi.c
-@@ -254,12 +254,21 @@ static void virtio_scsi_locate_device(VDev *vdev)
- int virtio_scsi_read_many(VDev *vdev,
-                           ulong sector, void *load_addr, int sec_num)
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 46a3e3f..bca9461 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -640,7 +640,11 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
+                                    uint8_t *config)
  {
-+    int sector_count;
-     int f = vdev->blk_factor;
--    unsigned int data_size = sec_num * virtio_get_block_size() * f;
--
--    if (!scsi_read_10(vdev, sector * f, sec_num * f, load_addr, data_size)) {
--        virtio_scsi_verify_response(&resp, "virtio-scsi:read_many");
--    }
-+    unsigned int data_size;
-+
-+    do {
-+        sector_count = MIN(sec_num, vdev->config.scsi.max_sectors);
-+        data_size = sector_count * virtio_get_block_size() * f;
-+        if (!scsi_read_10(vdev, sector * f, sector_count * f, load_addr,
-+                          data_size)) {
-+            virtio_scsi_verify_response(&resp, "virtio-scsi:read_many");
-+        }
-+        load_addr += data_size;
-+        sector += sector_count;
-+        sec_num -= sector_count;
-+    } while (sec_num > 0);
+     VirtIOSCSIConfig *scsiconf = (VirtIOSCSIConfig *)config;
++    VirtIOSCSI *vs = VIRTIO_SCSI(vdev);
+     VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(vdev);
++    SCSIDevice *d;
++    BusChild *kid;
++    unsigned int max_transfer;
  
-     return 0;
+     virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
+     virtio_stl_p(vdev, &scsiconf->seg_max, 128 - 2);
+@@ -652,6 +656,14 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
+     virtio_stw_p(vdev, &scsiconf->max_channel, VIRTIO_SCSI_MAX_CHANNEL);
+     virtio_stw_p(vdev, &scsiconf->max_target, VIRTIO_SCSI_MAX_TARGET);
+     virtio_stl_p(vdev, &scsiconf->max_lun, VIRTIO_SCSI_MAX_LUN);
++
++    QTAILQ_FOREACH(kid, &vs->bus.qbus.children, sibling) {
++        d = SCSI_DEVICE(kid->child);
++        max_transfer = blk_get_max_transfer(d->conf.blk) / d->blocksize;
++        virtio_stl_p(vdev,
++                     &scsiconf->max_sectors,
++                     MIN_NON_ZERO(max_transfer, scsiconf->max_sectors));
++    }
  }
+ 
+ static void virtio_scsi_set_config(VirtIODevice *vdev,
 -- 
 2.10.2
