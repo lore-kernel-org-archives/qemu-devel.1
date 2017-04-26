@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3M5z-0006v1-Ol
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:31:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d3M9m-0008Fr-IV
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3M5y-0003b3-HK
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:30:59 -0400
-Date: Wed, 26 Apr 2017 14:30:46 +0200
+	(envelope-from <kwolf@redhat.com>) id 1d3M9l-0004lQ-OV
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:34:54 -0400
+Date: Wed, 26 Apr 2017 14:34:41 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170426123046.GC4538@noname.str.redhat.com>
+Message-ID: <20170426123441.GD4538@noname.str.redhat.com>
 References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-12-famz@redhat.com>
+	<20170426033413.17192-14-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170426033413.17192-12-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v15 11/21] iotests: 085: Avoid image
- locking conflict
+In-Reply-To: <20170426033413.17192-14-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v15 13/21] iotests: 091: Quit QEMU before
+ checking image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +28,26 @@ To: Fam Zheng <famz@redhat.com>
 Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
 Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
-> In the case where we test the expected error when a blockdev-snapshot
-> target already has a backing image, the backing chain is opened multiple
-> times. This will be a problem when we use image locking, so use a
-> different backing file that is not already open.
-> 
 > Signed-off-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/085     | 34 ++++++++++++++++++++--------------
->  tests/qemu-iotests/085.out |  3 ++-
->  2 files changed, 22 insertions(+), 15 deletions(-)
+>  tests/qemu-iotests/091 | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-> index c53e97f..cc6efd8 100755
-> --- a/tests/qemu-iotests/085
-> +++ b/tests/qemu-iotests/085
-> @@ -45,7 +45,7 @@ _cleanup()
->          rm -f "${TEST_DIR}/${i}-${snapshot_virt0}"
->          rm -f "${TEST_DIR}/${i}-${snapshot_virt1}"
->      done
-> -    rm -f "${TEST_IMG}.1" "${TEST_IMG}.2"
-> +    rm -f "${TEST_IMG}" "${TEST_IMG}.1" "${TEST_IMG}.2" "${TEST_IMG}.base"
+> diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
+> index 32bbd56..10ac4a8 100755
+> --- a/tests/qemu-iotests/091
+> +++ b/tests/qemu-iotests/091
+> @@ -95,7 +95,9 @@ echo "vm2: qemu process running successfully"
+>  echo "vm2: flush io, and quit"
+>  _send_qemu_cmd $h2 'qemu-io disk flush' "(qemu)"
+>  _send_qemu_cmd $h2 'quit' ""
+> +_send_qemu_cmd $h1 'quit' ""
 >  
->  }
->  trap "_cleanup; exit \$status" 0 1 2 3 15
-> @@ -87,24 +87,26 @@ function create_group_snapshot()
->  }
->  
->  # ${1}: unique identifier for the snapshot filename
-> -# ${2}: true: open backing images; false: don't open them (default)
-> +# ${2}: extra_params to the blockdev-add command
-> +# ${3}: filename
-> +function do_blockdev_add()
-> +{
-> +    cmd="{ 'execute': 'blockdev-add', 'arguments':
-> +           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${2}
-> +             'file':
-> +             { 'driver': 'file', 'filename': '${3}',
-> +               'node-name': 'file_${1}' } } }"
-> +    _send_qemu_cmd $h "${cmd}" "return"
-> +}
-> +
-> +# ${1}: unique identifier for the snapshot filename
->  function add_snapshot_image()
->  {
-> -    if [ "${2}" = "true" ]; then
-> -        extra_params=""
-> -    else
-> -        extra_params="'backing': '', "
-> -    fi
->      base_image="${TEST_DIR}/$((${1}-1))-${snapshot_virt0}"
->      snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
->      _make_test_img -b "${base_image}" "$size"
->      mv "${TEST_IMG}" "${snapshot_file}"
-> -    cmd="{ 'execute': 'blockdev-add', 'arguments':
-> -           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${extra_params}
-> -             'file':
-> -             { 'driver': 'file', 'filename': '${snapshot_file}',
-> -               'node-name': 'file_${1}' } } }"
-> -    _send_qemu_cmd $h "${cmd}" "return"
-> +    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
->  }
->  
->  # ${1}: unique identifier for the snapshot filename
-> @@ -222,7 +224,11 @@ echo === Invalid command - snapshot node has a backing image ===
->  echo
->  
->  SNAPSHOTS=$((${SNAPSHOTS}+1))
-> -add_snapshot_image ${SNAPSHOTS} true
-> +
-> +_make_test_img "$size"
-> +mv "${TEST_IMG}" "${TEST_IMG}.base"
+> +wait
 
-The common idiom is:
+I think it's better to use the function from common.qemu for this:
 
-    TEST_IMG="$TEST_IMG.base" _make_test_img "$size"
-
-This avoids using mv, which is helpful if we ever want to extend the
-testcase for non-file protocols.
-
-But I see that you just copied this from add_snapshot_image(), so it's
-preexisting and matter for a different patch/series.
-
-> +_make_test_img -b "${TEST_IMG}.base" "$size"
-> +do_blockdev_add ${SNAPSHOTS} "" "${TEST_IMG}"
->  blockdev_snapshot ${SNAPSHOTS} error
+    wait=1 _cleanup_qemu
 
 Kevin
