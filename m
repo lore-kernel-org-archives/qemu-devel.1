@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3RAy-00048H-P7
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:56:33 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3RiI-0006G5-39
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3RAt-0002yr-9e
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 13:56:28 -0400
-References: <1493192202-3184-1-git-send-email-armbru@redhat.com>
-	<1493192202-3184-4-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fee3a5ba-5f80-61a6-bdca-92a420f5f3a1@redhat.com>
-Date: Wed, 26 Apr 2017 12:56:12 -0500
-MIME-Version: 1.0
-In-Reply-To: <1493192202-3184-4-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="31fj2DbQtoWDV8RsJtukcXXWtRfhXUE12"
-Subject: Re: [Qemu-devel] [PATCH 3/7] qapi: New QAPI_CLONE_MEMBERS()
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3RiE-0003Ad-PB
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:30:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47632
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1d3RiE-0003AD-IV
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 14:30:50 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3QITA4N173910
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 14:30:49 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a2ebv2cun-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 14:30:48 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Thu, 27 Apr 2017 04:30:46 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Wed, 26 Apr 2017 23:59:49 +0530
+Message-Id: <20170426182949.13433-1-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] target/ppc: do not reset reserve_addr in
+ exec_enter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: alex.bennee@linaro.org, nikunj@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---31fj2DbQtoWDV8RsJtukcXXWtRfhXUE12
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
- qemu-block@nongnu.org
-Message-ID: <fee3a5ba-5f80-61a6-bdca-92a420f5f3a1@redhat.com>
-Subject: Re: [PATCH 3/7] qapi: New QAPI_CLONE_MEMBERS()
-References: <1493192202-3184-1-git-send-email-armbru@redhat.com>
- <1493192202-3184-4-git-send-email-armbru@redhat.com>
-In-Reply-To: <1493192202-3184-4-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In case when atomic operation is not supported, exit_atomic is called
+and we stop the world and execute the atomic operation. This results
+in a following call chain:
 
-On 04/26/2017 02:36 AM, Markus Armbruster wrote:
-> QAPI_CLONE() returns a newly allocated QAPI object.  Inconvenient when
-> we want to clone into an existing object.  QAPI_CLONE_MEMBERS() does
-> exactly that.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qapi/clone-visitor.h | 14 ++++++++++++++
->  qapi/qapi-clone-visitor.c    | 13 +++++++++++++
->  2 files changed, 27 insertions(+)
->=20
+tcg_gen_atomic_cmpxchg_tl()
+  -> gen_helper_exit_atomic()
+     -> HELPER(exit_atomic)
+        -> cpu_loop_exit_atomic() -> EXCP_ATOMIC
+           -> qemu_tcg_cpu_thread_fn() => case EXCP_ATOMIC
+              -> cpu_exec_step_atomic()
+                 -> cpu_step_atomic()
+                    -> cc->cpu_exec_enter() = ppc_cpu_exec_enter()
+                       Sets env->reserve_addr = -1;
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+But by the time it return back, the reservation is erased and the code
+fails, this continues forever and the lock is never taken.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Instead set this in powerpc_excp()
 
+Now that ppc_cpu_exec_enter() doesn't have anything meaningful to do,
+let us get rid of the function.
 
---31fj2DbQtoWDV8RsJtukcXXWtRfhXUE12
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+---
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Depends on following fix by Richard Henderson:
+https://patchwork.ozlabs.org/patch/755582/
 
-iQEcBAEBCAAGBQJZAN88AAoJEKeha0olJ0NqfAUH/3tMT8z9zr0gfzYhiJgjqw9h
-hGZjFTjKDK1WDR4SbHPT4zm/WHI7eyFq4pbb4jJPkNo68y6l046eI9USZzFxbSAx
-ti/fOJNfuFCI6DrcrUEEWsJY0CNBvZ3zPQNufbmbxOjaXEqqqYOv8WG/w/QxQuda
-nkfp5EGvUfjSGLH8ja+KfEw4+/L9nF8m/s2ktD0qJlSNKo4ZWMXaedWJT/YvQLFh
-TkxEHrADNHIcb/Dv1Y/IQTtDsooH1JZgrNZln6+96+vrLIvi6pVDx6IYPrPFAeRN
-qhOkhp7TkZsS7R4KlKEEpUEKRRwdfxA48q3ADMv0HI9MMN0zoyH1TzfolMyX7Wk=
-=0UmX
------END PGP SIGNATURE-----
+---
 
---31fj2DbQtoWDV8RsJtukcXXWtRfhXUE12--
+ target/ppc/excp_helper.c    | 3 +++
+ target/ppc/translate_init.c | 9 ---------
+ 2 files changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index f4ee7aa..a6bcb47 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -728,6 +728,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+     cs->exception_index = POWERPC_EXCP_NONE;
+     env->error_code = 0;
+ 
++    /* Reset the reservation */
++    env->reserve_addr = -1;
++
+     /* Any interrupt is context synchronizing, check if TCG TLB
+      * needs a delayed flush on ppc64
+      */
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 77e5463..dc4239d 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -10426,14 +10426,6 @@ static bool ppc_cpu_has_work(CPUState *cs)
+     return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
+ }
+ 
+-static void ppc_cpu_exec_enter(CPUState *cs)
+-{
+-    PowerPCCPU *cpu = POWERPC_CPU(cs);
+-    CPUPPCState *env = &cpu->env;
+-
+-    env->reserve_addr = -1;
+-}
+-
+ /* CPUClass::reset() */
+ static void ppc_cpu_reset(CPUState *s)
+ {
+@@ -10650,7 +10642,6 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+     cc->get_phys_page_debug = ppc_cpu_get_phys_page_debug;
+     cc->vmsd = &vmstate_ppc_cpu;
+ #endif
+-    cc->cpu_exec_enter = ppc_cpu_exec_enter;
+ #if defined(CONFIG_SOFTMMU)
+     cc->write_elf64_note = ppc64_cpu_write_elf64_note;
+     cc->write_elf32_note = ppc32_cpu_write_elf32_note;
+-- 
+2.9.3
