@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddx-0007vd-L2
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:30 -0400
+	(envelope-from <famz@redhat.com>) id 1d3Dih-0002EB-To
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddu-0000Fc-GR
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:29 -0400
-Date: Wed, 26 Apr 2017 12:38:43 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170426023843.GJ16882@umbus.fritz.box>
-References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
-	<CAFEAcA-SR5LXw4uw_Xid94JTarDBpVO2nkGb2axRUu2BcX318Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pMCBjikF2xGw87uL"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-SR5LXw4uw_Xid94JTarDBpVO2nkGb2axRUu2BcX318Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/47] ppc-for-2.10 queue 20170424
+	(envelope-from <famz@redhat.com>) id 1d3Dig-0001XY-SQ
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:34:23 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 26 Apr 2017 11:33:52 +0800
+Message-Id: <20170426033413.17192-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v15 00/21] block: Image locking series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,143 +17,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+v15: Rework a number of things, especially around what and how lockings are
+     done.  [Kevin]
+     - Map each permission to a locked byte.
+     - Make the new option --force-share-perms, and require read-only=on.
+     - Update test case 153 accordingly.
+     - Only add -U where necessary in iotest 030.
+     - Reject -U if conflicting with image opts in qemu-img/qemu-io.
 
---pMCBjikF2xGw87uL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v14: Replace BDRV_ flag with the "force-shared-write" block option. [Kevin]
+     Add bs->force_shared_write.
+     Update test case accordingly.
+     A few fixes in the locking code spotted by patchew and the new test,
+     though the long line error is still there for readability.
+     Replace the workaround to drive-backup with a real fix in patch 17.
 
-On Mon, Apr 24, 2017 at 02:12:19PM +0100, Peter Maydell wrote:
-> On 24 April 2017 at 02:58, David Gibson <david@gibson.dropbear.id.au> wro=
-te:
-> > The following changes since commit 32c7e0ab755745e961f1772e95cac381cc68=
-769d:
-> >
-> >   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/201=
-70421' into staging (2017-04-21 15:59:27 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170424
-> >
-> > for you to fetch changes up to 4cab48942a1c5353f0a314fab1aa85a5f0a61461:
-> >
-> >   target/ppc: Style fixes (2017-04-24 08:56:19 +1000)
-> >
-> > ----------------------------------------------------------------
-> > ppc patch queue 2017-04-24
-> >
-> > Here's my first pull request for qemu-2.10, consisting of assorted
-> > patches which have accumulated while qemu-2.9 stabilized.  Highlights
-> > are:
-> >     * Rework / cleanup of the XICS interrupt controller
-> >     * Substantial improvement to the 'powernv' machine type
-> >         - Includes an MMIO XICS version
-> >     * POWER9 support improvements
-> >         - POWER9 guests with KVM
-> >         - Partial support for POWER9 guests with TCG
-> >     * IOMMU and VFIO improvements
-> >     * Assorted minor changes
-> >
-> > There are several IPMI patches here that aren't usually in my area of
-> > maintenance, but there isn't a regular maintainer and these patches
-> > are for the benefit of the powernv machine type.
->=20
->=20
-> Hi -- I'm afraid this pullreq generates a new clang sanitizer warning
-> running 'make check':
+v13: - Address Max's comments.
+     - Add reviewed-by from Max and Eric.
+     - Rebase for 2.10:
+       * Use op blocker API
+       * Add --unsafe-read for qemu-img and qemu-io
 
-Drat.  What do I need to do to see these warnings?  Sounds like I
-should add that to my pre-pull-request testing sequence.  Just
-building with clang (on Fedora 25) and running make check doesn't seem
-to be sufficient.
+Fam Zheng (21):
+  block: Make bdrv_perm_names public
+  block: Define BLK_PERM_MAX
+  block: Add, parse and store "force-share" option
+  block: Respect "force-share" in perm propagating
+  qemu-img: Add --force-share option to subcommands
+  qemu-img: Update documentation for -U
+  qemu-io: Add --force-share option
+  iotests: 030: Prepare for image locking
+  iotests: 046: Prepare for image locking
+  iotests: 055: Don't attach the target image already for drive-backup
+  iotests: 085: Avoid image locking conflict
+  iotests: 087: Don't attach test image twice
+  iotests: 091: Quit QEMU before checking image
+  iotests: 172: Use separate images for multiple devices
+  tests: Use null-co:// instead of /dev/null as the dummy image
+  file-posix: Add 'locking' option
+  tests: Disable image lock in test-replication
+  block: Reuse bs as backing hd for drive-backup sync=none
+  osdep: Add qemu_lock_fd and qemu_unlock_fd
+  file-posix: Add image locking to perm operations
+  qemu-iotests: Add test case 153 for image locking
 
-> /home/petmay01/linaro/qemu-for-merges/hw/core/loader.c:67:15: runtime
-> error: null pointer passed as argument 1, which is declared to never
-> be null
->=20
-> It looks like we try to call open(NULL, ...).
->=20
-> Affected tests are in check-qtest-i386:
-> tests/bios-tables-test
->   /i386/acpi/piix4/ipmi
->   /i386/acpi/q35/ipmi
-> tests/ipmi-kcs-test
->=20
-> Here's a backtrace:
->=20
-> #0  0x00005555567e6197 in get_image_size (filename=3D0x0) at
-> /home/petmay01/linaro/qemu-for-merges/hw/core/loader.c:67
-> #1  0x00005555568ead3c in ipmi_fru_init (fru=3D0x55555ab98588)
->     at /home/petmay01/linaro/qemu-for-merges/hw/ipmi/ipmi_bmc_sim.c:1902
-> #2  0x00005555568e91ac in ipmi_sim_realize (dev=3D<optimised out>,
-> errp=3D<optimised out>)
->     at /home/petmay01/linaro/qemu-for-merges/hw/ipmi/ipmi_bmc_sim.c:1943
-> #3  0x00005555567d6df6 in device_set_realized (obj=3D<optimised out>,
-> value=3D<optimised out>, errp=3D<optimised out>)
->     at /home/petmay01/linaro/qemu-for-merges/hw/core/qdev.c:905
-> #4  0x0000555556d7b1f8 in property_set_bool (obj=3D0x55555ab93c90,
-> v=3D<optimised out>, name=3D<optimised out>, opaque=3D<optimised out>,
-> errp=3D0x7fffffffde90) at
-> /home/petmay01/linaro/qemu-for-merges/qom/object.c:1860
-> #5  0x0000555556d7dd1d in object_property_set_qobject (obj=3D0x0,
-> value=3D<optimised out>, name=3D0x58fdf801 <error: Cannot access memory at
-> address 0x58fdf801>, errp=3D0x1) at
-> /home/petmay01/linaro/qemu-for-merges/qom/qom-qobject.c:27
-> #6  0x0000555556d78cb2 in object_property_set_bool
-> (obj=3D0x55555ab93c90, value=3D<optimised out>, name=3D0x55555710e087
-> "realized", errp=3D0x7fffffffde90) at
-> /home/petmay01/linaro/qemu-for-merges/qom/object.c:1163
-> #7  0x000055555661d80d in qdev_device_add (opts=3D<optimised out>,
-> errp=3D<optimised out>)
->     at /home/petmay01/linaro/qemu-for-merges/qdev-monitor.c:630
-> #8  0x00005555566374cb in device_init_func (opaque=3D<optimised out>,
-> opts=3D0x0, errp=3D0x58fdf801)
->     at /home/petmay01/linaro/qemu-for-merges/vl.c:2305
-> #9  0x000055555701dc81 in qemu_opts_foreach (list=3D<optimised out>,
-> func=3D<optimised out>, opaque=3D<optimised out>, errp=3D<optimised out>)=
- at
-> /home/petmay01/linaro/qemu-for-merges/util/qemu-option.c:1114
-> #10 0x0000555556633289 in main (argc=3D<optimised out>, argv=3D<optimised
-> out>, envp=3D<optimised out>)
->     at /home/petmay01/linaro/qemu-for-merges/vl.c:4583
->=20
-> It looks like the device doesn't handle not having its fru.filename
-> property set -- this should either cause an error in realize or the
-> rest of the device code should handle NULL.
->=20
-> thanks
-> -- PMM
->=20
+ block.c                    |  51 ++++--
+ block/file-posix.c         | 272 ++++++++++++++++++++++++++++++-
+ blockdev.c                 |  15 +-
+ include/block/block.h      |   5 +
+ include/block/block_int.h  |   1 +
+ include/qemu/osdep.h       |   3 +
+ qapi/block-core.json       |   3 +
+ qemu-img-cmds.hx           |  36 ++---
+ qemu-img.c                 | 154 +++++++++++++-----
+ qemu-io.c                  |  42 ++++-
+ tests/drive_del-test.c     |   2 +-
+ tests/nvme-test.c          |   2 +-
+ tests/qemu-iotests/030     |  18 +--
+ tests/qemu-iotests/046     |   2 +-
+ tests/qemu-iotests/055     |  32 ++--
+ tests/qemu-iotests/085     |  34 ++--
+ tests/qemu-iotests/085.out |   3 +-
+ tests/qemu-iotests/087     |   6 +-
+ tests/qemu-iotests/091     |   2 +
+ tests/qemu-iotests/153     | 220 +++++++++++++++++++++++++
+ tests/qemu-iotests/153.out | 390 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/172     |  55 ++++---
+ tests/qemu-iotests/172.out |  50 +++---
+ tests/qemu-iotests/group   |   1 +
+ tests/test-replication.c   |   9 +-
+ tests/usb-hcd-uhci-test.c  |   2 +-
+ tests/usb-hcd-xhci-test.c  |   2 +-
+ tests/virtio-blk-test.c    |   2 +-
+ tests/virtio-scsi-test.c   |   5 +-
+ util/osdep.c               |  48 ++++++
+ 30 files changed, 1291 insertions(+), 176 deletions(-)
+ create mode 100755 tests/qemu-iotests/153
+ create mode 100644 tests/qemu-iotests/153.out
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---pMCBjikF2xGw87uL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZAAgvAAoJEGw4ysog2bOSjMIQANCX2RjVYS3FD6b0KZrLGPQ9
-S8SM21DGLAecuRCscyu5nMQ0y5EoOhdaSefSjsXC4G9xCdTUfUrVhfaECiVEaJPz
-csokU0OAJqJDyyId8+KMT/HdzHmW+KXWLtQVYZkHPG5USlRBPPDEH5A1ijq327gd
-hAFSH2B3q80btcnG2nGqt9FF4Kpt224ipKkcS45DSK8t6Ugium8R7dQiEC6ynRH0
-f9RkpsXxHH69q+paNNRWybfd1r6n61zN8MIvQhrFP8I9VgR9JCW5doloVDnyg+II
-MLB3fE2psBC4VZzVDH5ccDNr1umL+FjxH7Mb0fvJtsgjNjvgPECCVWp3JzfDR86B
-TgzbU7XegYAPqo3V6KgooZ1xhc1vemEgHPdK+Tr0RuO+3OlGPu2wHXaSHbp+Vtnr
-eqXcgaTAGQaCDCiQm5QNs3h1VXrmd2EspXJdSgO4LZS6a6xBkLtLloC2R+6d3aNw
-xxkUGKPPcHuIw1QOZCpLJp04CV4SYV8gN7zCQIHrdS3QGvPlLN+NJbM+1Is70I9t
-T36zFJuUhCEmxCyBN5YsplY6cGH0UOcKlCoyHYUuR66w7DRZgsFL2nNYqjlTqcsR
-wW0Dy2CWGLMH7fmYbRSXl7Tj4+QVbPiQNZcB24BihcktrINnUfIe22ZMJXGtKETS
-gr/vA+HZ20+5F68haqT/
-=3zBJ
------END PGP SIGNATURE-----
-
---pMCBjikF2xGw87uL--
+-- 
+2.9.3
