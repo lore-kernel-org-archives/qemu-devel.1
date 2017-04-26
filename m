@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9l-00041F-NT
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9m-00041N-6e
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9i-0002HC-60
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:49 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:47859 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d3L9i-0002IU-Mw
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:50 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:6312 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1d3L9h-0002Ec-PH
+	id 1d3L9i-0002FJ-CU
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 07:30:46 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 26 Apr 2017 14:30:16 +0300
-Message-Id: <20170426113038.60044-3-vsementsov@virtuozzo.com>
+Date: Wed, 26 Apr 2017 14:30:38 +0300
+Message-Id: <20170426113038.60044-25-vsementsov@virtuozzo.com>
 In-Reply-To: <20170426113038.60044-1-vsementsov@virtuozzo.com>
 References: <20170426113038.60044-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 02/24] specs/qcow2: do not use wording 'bitmap
- header'
+Subject: [Qemu-devel] [PATCH 24/24] block: release persistent bitmaps on
+ inactivate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-A bitmap directory entry is sometimes called a 'bitmap header'. This
-patch leaves only one name - 'bitmap directory entry'. The name 'bitmap
-header' creates misunderstandings with 'qcow2 header' and 'qcow2 bitmap
-header extension' (which is extension of qcow2 header)
+We should release them here to reload on invalidate cache.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- docs/specs/qcow2.txt | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
-index dda53dd2a3..8874e8c774 100644
---- a/docs/specs/qcow2.txt
-+++ b/docs/specs/qcow2.txt
-@@ -201,7 +201,7 @@ The fields of the bitmaps extension are:
+Alternative is to release bitmaps from format driver, immediately after
+storing them - I'm not sure what is better.
+
+If this is OK, I can merge this to some point earlier in the series
+ (if needed)
+
+ block.c                      |  4 ++++
+ block/dirty-bitmap.c         | 29 +++++++++++++++++++++++------
+ include/block/dirty-bitmap.h |  1 +
+ 3 files changed, 28 insertions(+), 6 deletions(-)
+
+diff --git a/block.c b/block.c
+index cf9919a5e0..90f4a2f91d 100644
+--- a/block.c
++++ b/block.c
+@@ -3305,6 +3305,10 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
+     if (setting_flag) {
+         bs->open_flags |= BDRV_O_INACTIVE;
+     }
++
++    /* At this point persistent bitmaps should be stored by format driver */
++    bdrv_release_persistent_dirty_bitmaps(bs);
++
+     return 0;
+ }
  
-           8 - 15:  bitmap_directory_size
-                    Size of the bitmap directory in bytes. It is the cumulative
--                   size of all (nb_bitmaps) bitmap headers.
-+                   size of all (nb_bitmaps) bitmap directory entries.
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 05e0aaef90..9b83170319 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -294,13 +294,18 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
+     }
+ }
  
-          16 - 23:  bitmap_directory_offset
-                    Offset into the image file at which the bitmap directory
-@@ -426,8 +426,7 @@ Each bitmap saved in the image is described in a bitmap directory entry. The
- bitmap directory is a contiguous area in the image file, whose starting offset
- and length are given by the header extension fields bitmap_directory_offset and
- bitmap_directory_size. The entries of the bitmap directory have variable
--length, depending on the lengths of the bitmap name and extra data. These
--entries are also called bitmap headers.
-+length, depending on the lengths of the bitmap name and extra data.
+-static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
+-                                                  BdrvDirtyBitmap *bitmap,
+-                                                  bool only_named)
++static bool bdrv_dirty_bitmap_has_name(BdrvDirtyBitmap *bitmap)
++{
++    return !!bdrv_dirty_bitmap_name(bitmap);
++}
++
++static void bdrv_do_release_matching_dirty_bitmap(
++    BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
++    bool (*cond)(BdrvDirtyBitmap *bitmap))
+ {
+     BdrvDirtyBitmap *bm, *next;
+     QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
+-        if ((!bitmap || bm == bitmap) && (!only_named || bm->name)) {
++        if ((!bitmap || bm == bitmap) && (!cond || cond(bm))) {
+             assert(!bm->active_iterators);
+             assert(!bdrv_dirty_bitmap_frozen(bm));
+             assert(!bm->meta);
+@@ -321,7 +326,7 @@ static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
  
- Structure of a bitmap directory entry:
+ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+ {
+-    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false);
++    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, NULL);
+ }
  
+ /**
+@@ -331,7 +336,19 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+  */
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
+ {
+-    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
++    bdrv_do_release_matching_dirty_bitmap(bs, NULL, bdrv_dirty_bitmap_has_name);
++}
++
++/**
++ * Release all persistent dirty bitmaps attached to a BDS (for use in
++ * bdrv_inactivate_recurse()).
++ * There must not be any frozen bitmaps attached.
++ * This function does not remove persistent bitmaps from the storage.
++ */
++void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs)
++{
++    bdrv_do_release_matching_dirty_bitmap(bs, NULL,
++                                          bdrv_dirty_bitmap_get_persistance);
+ }
+ 
+ /**
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index ce126109e0..2113633519 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -25,6 +25,7 @@ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
+ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
++void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs);
+ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+                                          const char *name,
+                                          Error **errp);
 -- 
 2.11.1
