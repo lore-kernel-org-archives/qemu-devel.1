@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3LeE-0003wS-NX
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:02:19 -0400
+	(envelope-from <berrange@redhat.com>) id 1d3Lf0-0004OW-3A
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3LeB-0007kV-Mf
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:02:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59582)
+	(envelope-from <berrange@redhat.com>) id 1d3Lex-00082M-1a
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:03:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18673)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d3LeB-0007kL-HH
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:02:15 -0400
-Date: Wed, 26 Apr 2017 13:02:03 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d3Lew-00081v-Rt
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:03:02 -0400
+Date: Wed, 26 Apr 2017 13:02:56 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170426120203.GG18933@redhat.com>
+Message-ID: <20170426120256.GH18933@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <1492845627-4384-1-git-send-email-longpeng2@huawei.com>
-	<1492845627-4384-2-git-send-email-longpeng2@huawei.com>
+	<1492845627-4384-3-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1492845627-4384-2-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3 01/18] crypto: cipher: introduce context
- free function
+In-Reply-To: <1492845627-4384-3-git-send-email-longpeng2@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v3 02/18] crypto: cipher: introduce
+ qcrypto_cipher_ctx_new for gcrypt-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +32,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Longpeng(Mike)" <longpeng2@huawei.com>
 Cc: arei.gonglei@huawei.com, longpeng.mike@gmail.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
 
-On Sat, Apr 22, 2017 at 03:20:10PM +0800, Longpeng(Mike) wrote:
-> Refactors the qcrypto_cipher_free(), splits it into two parts. One
-> is gcrypt/nettle__cipher_free_ctx() to free the special context.
-> 
-> This makes code more clear, what's more, it would be used by the
-> later patch.
+On Sat, Apr 22, 2017 at 03:20:11PM +0800, Longpeng(Mike) wrote:
+> Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
+> gcrypt-backend impls.
 > 
 > Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 > Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> ---
+>  crypto/cipher-gcrypt.c | 50 +++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 33 insertions(+), 17 deletions(-)
 
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-
 
 Regards,
 Daniel
