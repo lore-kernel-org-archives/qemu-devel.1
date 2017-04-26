@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3UW4-0002KS-AF
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:30:29 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d3UXM-0002si-J3
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:31:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3UW3-00039E-Ax
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:30:28 -0400
-References: <1493150351-28918-1-git-send-email-ashijeetacharya@gmail.com>
-	<1493150351-28918-4-git-send-email-ashijeetacharya@gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5e859188-5072-ab41-c10a-82c0182406cc@redhat.com>
-Date: Wed, 26 Apr 2017 17:30:13 -0400
-MIME-Version: 1.0
-In-Reply-To: <1493150351-28918-4-git-send-email-ashijeetacharya@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/8] dmg: Limit the output buffer size
- to a max of 2MB
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d3UXI-0003X1-Cf
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:31:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42904
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1d3UXI-0003Wb-6R
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 17:31:44 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3QLSmoF017989
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 17:31:40 -0400
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2ebvh1ey-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 17:31:39 -0400
+Received: from localhost
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Wed, 26 Apr 2017 18:31:37 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Wed, 26 Apr 2017 18:31:20 -0300
+Message-Id: <20170426213124.29064-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/4 v7] migration/ppc: migrating DRC,
+ ccs_list and pending_events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>, stefanha@gmail.com
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, peter@lekensteyn.nl
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+
+v7:
+- removed the first patch. DRC registration is now done by vmstate_register
+in patch 2.
+- added a new patch that changes spapr_dr_connector_new to receive as argument
+the detach_cb.
+- removed the callback logic of patch 2 since there is no need to restore the
+detach_cb on post-load due to the detach_cb on spapr_dr_connector_new change.
+- added word separators in the VMSD names of patch 3 and 4.
+
+v6: - Rebased with QEMU master after 6+ months.
+    - Simplified the logic in patch 1.
+    - Reworked patch 2: added CPU DRC migration, removed a function pointer from DRC
+class and minor improvements.
+    - Added clarifications from the previous v5 discussions in the commit messages.
+
+v5: - Rebased to David's ppc-for-2.8.
+
+v4: - Introduce a way to set customized instance_id in SaveStateEntry. Use it
+      to set instance_id for DRC using its unique index to address David 
+      Gibson's concern.
+    - Rename VMS_CSTM to VMS_LINKED based on Paolo Bonzini's suggestions.
+    - Clean up qjson stuff in put_qtailq. 
+    - Add trace for put_qtailq and get_qtailq based on David Gilbert's 
+      suggestion.
+
+    - Based on David's ppc-for-2.7. 
+
+v3: - Simplify overall design followng discussion with Paolo. No longer need
+      metadata to migrate QTAILQ.
+    - Extend VMStateInfo instead of adding similar fields to VMStateField.
+    - Clean up macros in qemu/queue.h.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg05695.html)
+
+v2: - Introduce a general approach to migrate QTAILQ in qemu/queue.h.
+    - Migrate signalled field in the DRC state.
+    - Put the newly added migrating fields in subsections so that backward 
+      migration is not broken.  
+    - Set detach_cb field right after migration so that a migrated hot-unplug
+      event could finish its course.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg04188.html)
+
+v1: - Inital version.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-04/msg02601.html)
+
+
+To make guest devices (PCI, CPU and memory) hotplug work together 
+with guest migration, spapr drc state needs be transmitted in
+migration. This patch defines the VMStateDescription struct for
+spapr drc state to enable it.
+
+To fix the potential racing between hotplug events on guest and 
+guest migration, ccs_list and pending_events of spapr state need be 
+transmitted in migration. This patch set also takes care of it.
 
 
 
-On 04/25/2017 03:59 PM, Ashijeet Acharya wrote:
-> The size of the output buffer is limited to a maximum of 2MB so that
-> QEMU doesn't end up allocating huge amounts of memory while
-> decompressing compressed input streams.
-> 
-> 2MB is an appropriate size because "qemu-img convert" has the same I/O
-> buffer size and the most important use case for DMG files is to be
-> compatible with qemu-img convert.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> ---
 
-Patch 1 adds a new structure and patch 2 starts using it, but in a
-store-only manner and only with placeholder variables that are difficult
-to authenticate, so there's still "insufficient data" to review either
-patch meaningfully.
+Daniel Henrique Barboza (2):
+  hw/ppc: setting spapr_drc_detach_cb in spapr_dr_connector_new
+  hw/ppc: migrating the DRC state of hotplugged devices
 
-This patch seems unrelated to either of those, so the ordering is strange.
+Jianjun Duan (2):
+  migration: spapr: migrate ccs_list in spapr state
+  migration: spapr: migrate pending_events of spapr state
 
->  block/dmg.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/dmg.c b/block/dmg.c
-> index c6fe8b0..7ae30e3 100644
-> --- a/block/dmg.c
-> +++ b/block/dmg.c
-> @@ -37,8 +37,8 @@ enum {
->      /* Limit chunk sizes to prevent unreasonable amounts of memory being used
->       * or truncating when converting to 32-bit types
->       */
-> -    DMG_LENGTHS_MAX = 64 * 1024 * 1024, /* 64 MB */
-> -    DMG_SECTORCOUNTS_MAX = DMG_LENGTHS_MAX / 512,
-> +    DMG_MAX_OUTPUT = 2 * 1024 * 1024, /* 2 MB */
+ hw/ppc/spapr.c             | 136 +++++++++++++++++++++++++++++++++------------
+ hw/ppc/spapr_drc.c         |  78 +++++++++++++++++++++++---
+ hw/ppc/spapr_events.c      |  24 ++++----
+ hw/ppc/spapr_pci.c         |   5 +-
+ include/hw/ppc/spapr.h     |   3 +-
+ include/hw/ppc/spapr_drc.h |   4 +-
+ 6 files changed, 190 insertions(+), 60 deletions(-)
 
-why "MAX OUTPUT" ? Aren't we using this for buffering on reads?
-
-> +    DMG_SECTOR_MAX = DMG_MAX_OUTPUT / 512,
->  };
->  
->  static int dmg_probe(const uint8_t *buf, int buf_size, const char *filename)
-> @@ -260,10 +260,10 @@ static int dmg_read_mish_block(BDRVDMGState *s, DmgHeaderState *ds,
->  
->          /* all-zeroes sector (type 2) does not need to be "uncompressed" and can
->           * therefore be unbounded. */
-> -        if (s->types[i] != 2 && s->sectorcounts[i] > DMG_SECTORCOUNTS_MAX) {
-> +        if (s->types[i] != 2 && s->sectorcounts[i] > DMG_SECTOR_MAX) {
->              error_report("sector count %" PRIu64 " for chunk %" PRIu32
->                           " is larger than max (%u)",
-> -                         s->sectorcounts[i], i, DMG_SECTORCOUNTS_MAX);
-> +                         s->sectorcounts[i], i, DMG_SECTOR_MAX);
->              ret = -EINVAL;
->              goto fail;
->          }
-> @@ -275,10 +275,10 @@ static int dmg_read_mish_block(BDRVDMGState *s, DmgHeaderState *ds,
->          /* length in (compressed) data fork */
->          s->lengths[i] = buff_read_uint64(buffer, offset + 0x20);
->  
-> -        if (s->lengths[i] > DMG_LENGTHS_MAX) {
-> +        if (s->lengths[i] > DMG_MAX_OUTPUT) {
->              error_report("length %" PRIu64 " for chunk %" PRIu32
->                           " is larger than max (%u)",
-> -                         s->lengths[i], i, DMG_LENGTHS_MAX);
-> +                         s->lengths[i], i, DMG_MAX_OUTPUT);
->              ret = -EINVAL;
->              goto fail;
->          }
-> 
-
-Seems OK otherwise, but I would normally expect you to fix the buffering
-problems first, and then reduce the size of the buffer -- not the other
-way around. This version introduces new limitations that didn't exist
-previously (As of this commit, QEMU can't open DMG files with chunks
-larger than 2MB now, right?)
-
---js
+-- 
+2.9.3
