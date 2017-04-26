@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d3Pdb-0004I3-1R
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:17:55 -0400
+	(envelope-from <lvivier@redhat.com>) id 1d3Pui-00009r-2M
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:35:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d3PdX-00025M-RA
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:17:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56904)
+	(envelope-from <lvivier@redhat.com>) id 1d3Pue-0000S3-2U
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:35:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d3PdX-00024L-KH
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:17:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E333B6198F
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 16:17:49 +0000 (UTC)
-Date: Wed, 26 Apr 2017 18:17:43 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170426181743.33a547fa@nial.brq.redhat.com>
-In-Reply-To: <20170426143404.GX3482@thinpad.lan.raisama.net>
-References: <20170425153750.43322-1-imammedo@redhat.com>
-	<20170426143404.GX3482@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1d3Pud-0000Rw-Sh
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 12:35:32 -0400
+References: <20170426100701.21893-1-lvivier@redhat.com>
+	<20170426143108.GW3482@thinpad.lan.raisama.net>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <d23b0241-dc53-250a-82a6-be0ce156311a@redhat.com>
+Date: Wed, 26 Apr 2017 18:35:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170426143108.GW3482@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] pc/fwcfg: unbreak migration from
- qemu-2.5 and qemu-2.6 during firmware boot
+Subject: Re: [Qemu-devel] [PATCH] numa: equally distribute memory on nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +29,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, dgilbert@redhat.com, lersek@redhat.com, Marcel Apfelbaum <marcel@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, 26 Apr 2017 11:34:04 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Tue, Apr 25, 2017 at 05:37:50PM +0200, Igor Mammedov wrote:
-> > Since 2.7 commit (b2a575a Add optionrom compatible with fw_cfg DMA version)
-> > regressed migration during firmware exection time by
-> > abusing fwcfg.dma_enabled property to decide loading
-> > dma version of option rom AND by mistake disabling DMA
-> > for 2.6 and earlier globally instead of only for option rom.
-> > 
-> > so 2.6 machine type guest is broken when it already runs
-> > firmware in DMA mode but migrated to qemu-2.7(pc-2.6)
-> > at that time;
-> > 
-> > a) qemu-2.6:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
-> > b) qemu-2.7:pc2.6 (fwcfg.dma=off,firmware=ioport,oprom=ioport)
-> > 
-> >   to:   a     b
-> > from
-> > a       OK   FAIL
-> > b       OK   OK
-> > 
-> > So we currently have broken forward migration from
-> > qemu-2.6 to qemu-2.[789] that however could be fixed
-> > for 2.10 by re-enabling DMA for 2.[56] machine types
-> > and allowing dma capable option rom only since 2.7.
-> > As result qemu should end up with:
-> > 
-> > c) qemu-2.10:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
-> > 
-> >    to:  a     b    c
-> > from
-> > a      OK   FAIL  OK
-> > b      OK   OK    OK
-> > c      OK   FAIL  OK
-> > 
-> > where forward migration from qemu-2.6 to qemu-2.10 should
-> > work again leaving only qemu-2.[789]:pc-2.6 broken.
-> > 
-> > Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-> > Analyzed-by: Laszlo Ersek <lersek@redhat.com>
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: Laszlo Ersek <lersek@redhat.com>  
+On 26/04/2017 16:31, Eduardo Habkost wrote:
+> On Wed, Apr 26, 2017 at 12:07:01PM +0200, Laurent Vivier wrote:
+>> When there is more nodes than memory available to put the minimum
+>> allowed memory by node, all the memory is put on the last node.
+>>
+>> This is because we put (ram_size / nb_numa_nodes) &
+>> ~((1 << mc->numa_mem_align_shift) - 1); on each node, and in this
+>> case the value is 0. This is particularly true with pseries,
+>> as the memory must be aligned to 256MB.
+>>
+>> To avoid this problem, this patch uses an error diffusion algorithm [1]
+>> to distribute equally the memory on nodes.
 > 
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Nice.
+> 
+> But we need compat code to keep the previous behavior on older
+> machine-types. We can use either a new boolean MachineClass
+> field, or a MachineClass method (mc->auto_assign_ram(), maybe?)
+> that 2.9 machine-types could override.
 
-Marcel or Michael,
+You're right. I'm going to introduce a "numa_auto_assign_ram()" function
+it the MachineClass.
 
-could you pick up and merge the patch through your tree?
+Thanks,
+Laurent
