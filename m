@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3TUu-0002BU-Jp
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 16:25:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d3TVK-0002Q2-Of
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 16:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3TUr-0007mP-F4
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 16:25:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d3TUr-0007kU-4k
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 16:25:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C036CA08F1
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 20:25:07 +0000 (UTC)
-References: <20170419144219.20371-1-pbonzini@redhat.com>
-	<20170419144219.20371-8-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e733d2b3-4c20-e9a4-4807-86675661f2cc@redhat.com>
-Date: Wed, 26 Apr 2017 16:25:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d3TVJ-0007xC-Kr
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 16:25:38 -0400
+References: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e2c5132f-abd5-131d-c65b-b6fbdaa7b9bb@redhat.com>
+Date: Wed, 26 Apr 2017 22:25:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170419144219.20371-8-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/11] blockjob: introduce
- block_job_cancel_async, check iostatus invariants
+In-Reply-To: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SmikCgu7jeCQMV7Q0LvAoNlGKRd3Fc7D1"
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: use blk_co_pwrite_zeroes for
+ zero sectors when compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,116 +24,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: jemmy858585@gmail.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SmikCgu7jeCQMV7Q0LvAoNlGKRd3Fc7D1
+From: Max Reitz <mreitz@redhat.com>
+To: jemmy858585@gmail.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org,
+ Lidong Chen <lidongchen@tencent.com>
+Message-ID: <e2c5132f-abd5-131d-c65b-b6fbdaa7b9bb@redhat.com>
+Subject: Re: [PATCH v2] qemu-img: use blk_co_pwrite_zeroes for zero sectors
+ when compressed
+References: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
+In-Reply-To: <1492768654-11053-1-git-send-email-lidongchen@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 21.04.2017 11:57, jemmy858585@gmail.com wrote:
+> From: Lidong Chen <lidongchen@tencent.com>
+>=20
+> when the buffer is zero, blk_co_pwrite_zeroes is more effectively than
 
-On 04/19/2017 10:42 AM, Paolo Bonzini wrote:
-> The new functions helps respecting the invariant that the coroutine
-> is entered with false user_resume, zero pause count and no error
-> recorded in the iostatus.
-> 
-> Resetting the iostatus is now common to all of block_job_cancel_async,
-> block_job_user_resume and block_job_iostatus_reset, albeit with slight
-> differences:
-> 
-> - block_job_cancel_async resets the iostatus, and resumes the job if
-> there was an error, but the coroutine is not restarted immediately.
-> For example the caller may continue with a call to block_job_finish_sync.
-> 
-> - block_job_user_resume resets the iostatus.  It wants to resume the job
-> unconditionally, even if there was no error.
-> 
-> - block_job_iostatus_reset doesn't resume the job at all.  Maybe that's
-> a bug but it should be fixed separately.
-> 
-> block_job_iostatus_reset does the least common denominator, so add some
-> checking but otherwise leave it as the entry point for resetting the
-> iostatus.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+s/when/When/, s/effectively/effective/
+
+> blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. this patch can reduces
+
+s/this/This/, s/reduces/reduce/
+
+> the time when converts the qcow2 image with lots of zero.
+
+s/when converts the qcow2 image/for converting qcow2 images/,
+s/zero/zero data/
+
+>=20
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 > ---
->         v1->v2: rewritten
-> 
->  blockjob.c | 24 ++++++++++++++++++++----
->  1 file changed, 20 insertions(+), 4 deletions(-)
-> 
-> diff --git a/blockjob.c b/blockjob.c
-> index 5906266..1756153 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -304,6 +304,19 @@ static void block_job_completed_single(BlockJob *job)
->      block_job_unref(job);
->  }
->  
-> +static void block_job_cancel_async(BlockJob *job)
-> +{
-> +    if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
-> +        block_job_iostatus_reset(job);
-> +    }
-> +    if (job->user_paused) {
-> +        /* Do not call block_job_enter here, the caller will handle it.  */
-> +        job->user_paused = false;
-> +        job->pause_count--;
-> +    }
-> +    job->cancelled = true;
-> +}
+> v2 changelog:
+>     unify the compressed and non-compressed code paths
+> ---
+>  qemu-img.c | 41 +++++++++++------------------------------
+>  1 file changed, 11 insertions(+), 30 deletions(-)
+
+Functionally, looks good to me. Just some stylistic nit picks:
+
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index b220cf7..60c9adf 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1661,6 +1661,8 @@ static int coroutine_fn convert_co_write(ImgConve=
+rtState *s, int64_t sector_num,
+> =20
+>      while (nb_sectors > 0) {
+>          int n =3D nb_sectors;
+> +        BdrvRequestFlags flags =3D s->compressed ? BDRV_REQ_WRITE_COMP=
+RESSED : 0;
 > +
->  static void block_job_completed_txn_abort(BlockJob *job)
->  {
->      AioContext *ctx;
-> @@ -328,7 +341,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
->               * them; this job, however, may or may not be cancelled, depending
->               * on the caller, so leave it. */
->              if (other_job != job) {
-> -                other_job->cancelled = true;
-> +                block_job_cancel_async(other_job);
+>          switch (status) {
+>          case BLK_BACKING_FILE:
+>              /* If we have a backing file, leave clusters unallocated t=
+hat are
+> @@ -1670,43 +1672,21 @@ static int coroutine_fn convert_co_write(ImgCon=
+vertState *s, int64_t sector_num,
+>              break;
+> =20
+>          case BLK_DATA:
+> -            /* We must always write compressed clusters as a whole, so=
+ don't
+> -             * try to find zeroed parts in the buffer. We can only sav=
+e the
+> -             * write if the buffer is completely zeroed and we're allo=
+wed to
+> -             * keep the target sparse. */
+> -            if (s->compressed) {
+> -                if (s->has_zero_init && s->min_sparse &&
+> -                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
+> -                {
+> -                    assert(!s->target_has_backing);
+> -                    break;
+> -                }
+> -
+> -                iov.iov_base =3D buf;
+> -                iov.iov_len =3D n << BDRV_SECTOR_BITS;
+> -                qemu_iovec_init_external(&qiov, &iov, 1);
+> -
+> -                ret =3D blk_co_pwritev(s->target, sector_num << BDRV_S=
+ECTOR_BITS,
+> -                                     n << BDRV_SECTOR_BITS, &qiov,
+> -                                     BDRV_REQ_WRITE_COMPRESSED);
+> -                if (ret < 0) {
+> -                    return ret;
+> -                }
+> -                break;
+> -            }
+> -
+> -            /* If there is real non-zero data or we're told to keep th=
+e target
+> -             * fully allocated (-S 0), we must write it. Otherwise we =
+can treat
+> +            /* If we're told to keep the target fully allocated (-S 0)=
+ or there
+> +             * is real non-zero data, we must write it. Otherwise we c=
+an treat
+>               * it as zero sectors. */
+
+I think we should still mention why there is a difference depending on
+s->compressed. Maybe like this:
+
+/* If we're told to keep the target fully allocated (-S 0) or there
+ * is real non-zero data, we must write it. Otherwise we can treat
+ * it as zero sectors.
+ * Compressed clusters need to be written as a whole, so in that
+ * case we can only save the write if the buffer is completely
+ * zeroed. */
+
+>              if (!s->min_sparse ||
+> -                is_allocated_sectors_min(buf, n, &n, s->min_sparse))
+> -            {
+> +                (!s->compressed &&
+> +                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) =
+||
+> +                (s->compressed &&
+> +                 !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))) {
+> +
+
+This newline is a bit weird. Normally we don't have newlines at the
+start of a block.
+
+If you (like me) think there should be a visual separation between the
+if condition and the block, I'd suggest keeping the opening brace { on
+its own line (as it is now).
+
+Max
+
+>                  iov.iov_base =3D buf;
+>                  iov.iov_len =3D n << BDRV_SECTOR_BITS;
+>                  qemu_iovec_init_external(&qiov, &iov, 1);
+> =20
+>                  ret =3D blk_co_pwritev(s->target, sector_num << BDRV_S=
+ECTOR_BITS,
+> -                                     n << BDRV_SECTOR_BITS, &qiov, 0);=
+
+> +                                     n << BDRV_SECTOR_BITS, &qiov, fla=
+gs);
+>                  if (ret < 0) {
+>                      return ret;
+>                  }
+> @@ -1716,6 +1696,7 @@ static int coroutine_fn convert_co_write(ImgConve=
+rtState *s, int64_t sector_num,
+> =20
+>          case BLK_ZERO:
+>              if (s->has_zero_init) {
+> +                assert(!s->target_has_backing);
+>                  break;
 >              }
->              continue;
->          }
-> @@ -411,8 +424,8 @@ bool block_job_user_paused(BlockJob *job)
->  void block_job_user_resume(BlockJob *job)
->  {
->      if (job && job->user_paused && job->pause_count > 0) {
-> -        job->user_paused = false;
->          block_job_iostatus_reset(job);
-> +        job->user_paused = false;
->          block_job_resume(job);
->      }
->  }
-> @@ -420,8 +433,7 @@ void block_job_user_resume(BlockJob *job)
->  void block_job_cancel(BlockJob *job)
->  {
->      if (block_job_started(job)) {
-> -        job->cancelled = true;
-> -        block_job_iostatus_reset(job);
-> +        block_job_cancel_async(job);
->          block_job_enter(job);>      } else {
->          block_job_completed(job, -ECANCELED);
-> @@ -765,6 +777,10 @@ void block_job_yield(BlockJob *job)
->  
->  void block_job_iostatus_reset(BlockJob *job)
->  {
-> +    if (job->iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
-> +        return;
-> +    }
-> +    assert(job->user_paused && job->pause_count > 0);
+>              ret =3D blk_co_pwrite_zeroes(s->target,
+>=20
 
-Why assert that it's user-paused? Will that be true from:
 
-(A) All users of block_job_cancel_async, including:
 
-- block_job_cancel
-- block_job_completed
-    block_job_completed_txn_abort
+--SmikCgu7jeCQMV7Q0LvAoNlGKRd3Fc7D1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-(B) all users of blk_iostatus_reset:
-- blk_do_attach_dev
-- qmp_cont
+-----BEGIN PGP SIGNATURE-----
 
-It's ... not really clear to me that this is true, can you help me out?
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkBAjgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ACIQH/3dTECenSfc7oJNtI/ZLSLru39tq1+Wi
+vyGcz3tu8iVLeHkrJM/An8w8PYo63HhBFv8wa5mAmNi5qC8gBMxJC5e3W6tPCj1p
+9qxuiRukF5i3r0WFbKNzRGeo1wNrRGMlO3HgslEZIRkXGViLZRA3ojW+TaOv18w5
+RuDsLqWaI1ahNOEcpmlukFQyC+UDDbJUEvo7E9ZsQBvtfpTF2uIXSUeT+C/qhLcK
+nkw+5YR2FekP3dMibBHWnslJj/q2CbzkJU6/C0BWFKzrSG5zjPpAeu3v6SzSTHKv
++ev3muyGRy/DyHVlectrt/TEN5XVhNYH+LWoq+pa906bqDz0ECK1VJM=
+=SCBj
+-----END PGP SIGNATURE-----
 
->      job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
->  }
->  
-> 
+--SmikCgu7jeCQMV7Q0LvAoNlGKRd3Fc7D1--
