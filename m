@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3NRT-0000De-LF
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d3NRS-0000DT-Jh
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3NRQ-0006is-UI
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43228)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3NRQ-0006il-Ne
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:12 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9EF363D959
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 13:57:11 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 26 Apr 2017 14:57:04 +0100
-Message-Id: <20170426135707.5261-3-dgilbert@redhat.com>
-In-Reply-To: <20170426135707.5261-1-dgilbert@redhat.com>
-References: <20170426135707.5261-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 2/5] monitor: Check whether TCG is enabled
- before running the "info jit" code
+	(envelope-from <peter.maydell@linaro.org>) id 1d3NRR-0006kC-PR
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:14 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36210)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d3NRR-0006ip-Ib
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:57:13 -0400
+Received: by mail-wr0-x229.google.com with SMTP id l50so625447wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 06:57:13 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <701a8274-5126-cc42-c438-d18a00f59f08@kaod.org>
+References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
+	<CAFEAcA-SR5LXw4uw_Xid94JTarDBpVO2nkGb2axRUu2BcX318Q@mail.gmail.com>
+	<20170426023843.GJ16882@umbus.fritz.box>
+	<fbf91cf1-53d1-4b75-74b3-fa9abefdd788@kaod.org>
+	<CAFEAcA_WJP0tBKayzjZ4iVBCjfiQp+bGz_c2RpfwmhLwxM90ug@mail.gmail.com>
+	<CAFEAcA-hhB4PC8QHDr3agixYqg-E=Z+7yQDGwAn78dARJWUY3Q@mail.gmail.com>
+	<701a8274-5126-cc42-c438-d18a00f59f08@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 26 Apr 2017 14:56:51 +0100
+Message-ID: <CAFEAcA_g_MfU7-fFB+=8ZOVxnF858NXqGfBpCUr4D0qS5NKp_A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/47] ppc-for-2.10 queue 20170424
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On 26 April 2017 at 14:32, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> On 04/26/2017 03:15 PM, Peter Maydell wrote:
+>> I just looked into this, and I think the best set of configure options i=
+s:
+>> '--cc=3Dclang' '--cxx=3Dclang++' '--extra-cflags=3D-fsanitize=3Dundefine=
+d
+>> -fno-sanitize=3Dshift-base -Werror'
+>
+> Ah ! Too fast you are for me :) you beat me to it.
+>
+>> Works with clang-3.8.0 at least.
+>
+> Yes. confirmed.
 
-The "info jit" command currently aborts on Mac OS X with the message
-"qemu_mutex_lock: Invalid argument" when running with "-M accel=qtest".
-We should only call into the TCG code here if TCG has really been
-enabled and initialized.
+I've added info on how to use clang ubsan to
+ http://wiki.qemu.org/Testing#clang_UBSan
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1493179907-22516-1-git-send-email-thuth@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Tested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- monitor.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/monitor.c b/monitor.c
-index a27dc8003f..6289e5256c 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1086,6 +1086,11 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
- 
- static void hmp_info_jit(Monitor *mon, const QDict *qdict)
- {
-+    if (!tcg_enabled()) {
-+        error_report("JIT information is only available with accel=tcg");
-+        return;
-+    }
-+
-     dump_exec_info((FILE *)mon, monitor_fprintf);
-     dump_drift_info((FILE *)mon, monitor_fprintf);
- }
--- 
-2.12.2
+thanks
+-- PMM
