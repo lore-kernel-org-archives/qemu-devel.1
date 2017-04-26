@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3Lm1-0001rT-FJ
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:10:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3Lm2-0001sZ-Sg
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:10:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3Lm0-0002rc-F4
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:10:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40818)
+	(envelope-from <armbru@redhat.com>) id 1d3Lm1-0002sA-Ug
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:10:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d3Lm0-0002rR-5N
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:10:20 -0400
-Date: Wed, 26 Apr 2017 13:10:13 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170426121013.GR18933@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1492845627-4384-1-git-send-email-longpeng2@huawei.com>
-	<1492845627-4384-13-git-send-email-longpeng2@huawei.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3Lm1-0002rs-P4
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 08:10:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C74E33DBC8
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 12:10:20 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1493192675-16104-1-git-send-email-peterx@redhat.com>
+	<1493192675-16104-3-git-send-email-peterx@redhat.com>
+Date: Wed, 26 Apr 2017 14:10:16 +0200
+In-Reply-To: <1493192675-16104-3-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Wed, 26 Apr 2017 15:44:35 +0800")
+Message-ID: <8760hrxtcn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1492845627-4384-13-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3 12/18] crypto: introduce some common
- functions for af_alg backend
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2] ramblock: add new hmp command "info
+ ramblock"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +34,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: arei.gonglei@huawei.com, longpeng.mike@gmail.com, qemu-devel@nongnu.org, weidong.huang@huawei.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Sat, Apr 22, 2017 at 03:20:21PM +0800, Longpeng(Mike) wrote:
-> The AF_ALG socket family is the userspace interface for linux
-> crypto API, this patch adds af_alg family support and some common
-> functions for af_alg backend. It'll be used by afalg-backend crypto
-> latter.
-> 
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
->  configure            |  21 +++++++++
->  crypto/Makefile.objs |   1 +
->  crypto/afalg.c       | 118 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  crypto/afalgpriv.h   |  59 ++++++++++++++++++++++++++
->  4 files changed, 199 insertions(+)
->  create mode 100644 crypto/afalg.c
->  create mode 100644 crypto/afalgpriv.h
+Peter Xu <peterx@redhat.com> writes:
 
-> +static bool
-> +qcrypto_afalg_build_saddr(const char *type, const char *name,
-> +                          struct sockaddr_alg *salg, Error **errp)
-> +{
-> +    salg->salg_family = AF_ALG;
-> +
-> +    if (qemu_strnlen(type, SALG_TYPE_LEN_MAX) == SALG_TYPE_LEN_MAX) {
-> +        error_setg(errp, "Afalg type(%s) is larger than %d bytes",
-> +                   type, SALG_TYPE_LEN_MAX);
-> +        return false;
-> +    }
-> +
-> +    if (qemu_strnlen(name, SALG_NAME_LEN_MAX) == SALG_NAME_LEN_MAX) {
-> +        error_setg(errp, "Afalg name(%s) is larger than %d bytes",
-> +                   name, SALG_NAME_LEN_MAX);
-> +        return false;
-> +    }
+> To dump information about ramblocks. It looks like:
+>
+> (qemu) info ramblock
+>               Block Name    PSize              Offset               Used              Total
+>             /objects/mem       2M  0x0000000000000000 0x0000000080000000 0x0000000080000000
+>                 vga.vram       4K  0x0000000080060000 0x0000000001000000 0x0000000001000000
+>     /rom@etc/acpi/tables       4K  0x00000000810b0000 0x0000000000020000 0x0000000000200000
+>                  pc.bios       4K  0x0000000080000000 0x0000000000040000 0x0000000000040000
+>   0000:00:03.0/e1000.rom       4K  0x0000000081070000 0x0000000000040000 0x0000000000040000
+>                   pc.rom       4K  0x0000000080040000 0x0000000000020000 0x0000000000020000
+>     0000:00:02.0/vga.rom       4K  0x0000000081060000 0x0000000000010000 0x0000000000010000
+>    /rom@etc/table-loader       4K  0x00000000812b0000 0x0000000000001000 0x0000000000001000
+>       /rom@etc/acpi/rsdp       4K  0x00000000812b1000 0x0000000000001000 0x0000000000001000
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-This is uneccessarily complicated - we can just use
+You implemented this just for HMP.
 
-   if (strlen(name) >= SALG_NAME_LEN_MAX) {
-       ....
-   }
+In general, functionality available in HMP should also available in QMP.
+Exceptions include functionality that makes no sense in QMP, or is of
+use only for human users.  If you think your command is an exception,
+please explain why in the commit message.
 
-> +    pstrcpy((char *)salg->salg_type, SALG_TYPE_LEN_MAX, type);
-> +    pstrcpy((char *)salg->salg_name, SALG_NAME_LEN_MAX, name);
-> +
-> +    return true;
-> +}
-
-
-> +void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg)
-> +{
-> +    if (afalg) {
-
-Rather than indenting the entire method it is preferrable to
-invert the condition and return immediately, eg
-
-  if (!afalg) {
-     return;
-  }
-
-> +        if (afalg->msg) {
-> +            g_free(afalg->msg->msg_control);
-> +            g_free(afalg->msg);
-> +        }
-> +
-> +        if (afalg->name) {
-> +            g_free(afalg->name);
-> +        }
-> +
-> +        if (afalg->tfmfd != -1) {
-> +            closesocket(afalg->tfmfd);
-> +        }
-> +
-> +        if (afalg->opfd != -1) {
-> +            closesocket(afalg->opfd);
-> +        }
-> +
-> +        g_free(afalg);
-> +    }
-> +}
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+If it isn't, you need to implement it for QMP, then rewrite the HMP
+version to reuse either the QMP command or a common core.
