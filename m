@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53512)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d3C48-000295-TU
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:48:25 -0400
+	id 1d3C4m-0002Sm-M5
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:49:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d3C48-0001JU-46
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:48:24 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36536)
+	id 1d3C4j-0001ey-IK
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:49:04 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34633)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d3C47-0001Ij-Vi
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:48:24 -0400
-Received: by mail-qk0-x241.google.com with SMTP id y63so19476446qkd.3
-	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:48:23 -0700 (PDT)
+	id 1d3C4j-0001eh-Ed
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 21:49:01 -0400
+Received: by mail-qk0-x241.google.com with SMTP id u75so11548389qka.1
+	for <qemu-devel@nongnu.org>; Tue, 25 Apr 2017 18:49:01 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170425223739.6703-1-quintela@redhat.com>
-	<20170425223739.6703-26-quintela@redhat.com>
+	<20170425223739.6703-27-quintela@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b64642f8-50c9-4829-7981-8f25e3cc5253@amsat.org>
-Date: Tue, 25 Apr 2017 22:48:19 -0300
+Message-ID: <ae2ae7e8-6e56-8cd2-a50c-f6837c7ccc07@amsat.org>
+Date: Tue, 25 Apr 2017 22:48:57 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170425223739.6703-26-quintela@redhat.com>
+In-Reply-To: <20170425223739.6703-27-quintela@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 25/26] audio: un-export OPLResetChip
+Subject: Re: [Qemu-devel] [PATCH 26/26] audio: Use ARRAY_SIZE from
+ qemu/osdep.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,33 +44,28 @@ On 04/25/2017 07:37 PM, Juan Quintela wrote:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/audio/fmopl.c | 2 +-
->  hw/audio/fmopl.h | 1 -
->  2 files changed, 1 insertion(+), 2 deletions(-)
+>  hw/audio/fmopl.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
 >
 > diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
-> index 99d09c5..dc9043c 100644
+> index dc9043c..202f752 100644
 > --- a/hw/audio/fmopl.c
 > +++ b/hw/audio/fmopl.c
-> @@ -1036,7 +1036,7 @@ void YM3812UpdateOne(FM_OPL *OPL, int16_t *buffer, int length)
->  }
+> @@ -34,15 +34,11 @@
+>  #include <math.h>
+>  //#include "driver.h"		/* use M.A.M.E. */
+>  #include "fmopl.h"
+> -
+> +#include "qemu/osdep.h"
+>  #ifndef PI
+>  #define PI 3.14159265358979323846
+>  #endif
 >
->  /* ---------- reset one of chip ---------- */
-> -void OPLResetChip(FM_OPL *OPL)
-> +static void OPLResetChip(FM_OPL *OPL)
->  {
->  	int c,s;
->  	int i;
-> diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
-> index f89af08..fc9f16b 100644
-> --- a/hw/audio/fmopl.h
-> +++ b/hw/audio/fmopl.h
-> @@ -95,7 +95,6 @@ FM_OPL *OPLCreate(int clock, int rate);
->  void OPLDestroy(FM_OPL *OPL);
->  void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER TimerHandler,int channelOffset);
->
-> -void OPLResetChip(FM_OPL *OPL);
->  int OPLWrite(FM_OPL *OPL,int a,int v);
->  unsigned char OPLRead(FM_OPL *OPL,int a);
->  int OPLTimerOver(FM_OPL *OPL,int c);
+> -#ifndef ARRAY_SIZE
+> -#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+> -#endif
+> -
+>  /* -------------------- for debug --------------------- */
+>  /* #define OPL_OUTPUT_LOG */
+>  #ifdef OPL_OUTPUT_LOG
 >
