@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddv-0007vT-Mg
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:28 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddx-0007ve-LK
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddu-0000Fi-H7
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:27 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:60503)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d3Ddt-0000DH-GA
-	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:26 -0400
-Date: Wed, 26 Apr 2017 12:42:44 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Ddu-0000FY-GB
+	for qemu-devel@nongnu.org; Tue, 25 Apr 2017 23:29:29 -0400
+Date: Wed, 26 Apr 2017 12:51:34 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170426024244.GK16882@umbus.fritz.box>
-References: <1493103101-25165-1-git-send-email-clg@kaod.org>
-	<1493103101-25165-3-git-send-email-clg@kaod.org>
+Message-ID: <20170426025134.GM16882@umbus.fritz.box>
+References: <201704212158.v3LLwNYl031738@linux03a.ddci.com>
+	<20170423231722.GA14558@umbus.fritz.box>
+	<OF7D33B8CD.4B2CD628-ON8625810C.00022270-8625810C.000378AB@ddci.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ZG5hGh9V5E9QzVHS"
+	protocol="application/pgp-signature"; boundary="00sTfE/IIAT5d2r5"
 Content-Disposition: inline
-In-Reply-To: <1493103101-25165-3-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 2/2] ipmi: don't try to open a NULL filename
+In-Reply-To: <OF7D33B8CD.4B2CD628-ON8625810C.00022270-8625810C.000378AB@ddci.com>
+Subject: Re: [Qemu-devel] Subject: [PATCH] target-ppc: Add global timer
+ group A to open-pic.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: alarson@ddci.com
+Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---ZG5hGh9V5E9QzVHS
-Content-Type: text/plain; charset=iso-8859-1
+--00sTfE/IIAT5d2r5
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 25, 2017 at 08:51:41AM +0200, C=E9dric Le Goater wrote:
-> Currenlty, the code relies on the fact that open() handles NULL
-> filenames but that can cause an error with new clang:
+On Sun, Apr 23, 2017 at 07:37:55PM -0500, alarson@ddci.com wrote:
+> David Gibson <david@gibson.dropbear.id.au> wrote on 04/23/2017 06:17:22=
+=20
+> PM:
 >=20
->   hw/core/loader.c:67:15: runtime error: null pointer passed as argument =
-1,
->   which is declared to never be null
+> > From: David Gibson <david@gibson.dropbear.id.au>
+> > To: Aaron Larson <alarson@ddci.com>
+> > Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+> > Date: 04/23/2017 06:54 PM
+> > Subject: Re: Subject: [PATCH] target-ppc: Add global timer group A to=
+=20
+> open-pic.
+> >=20
+> > On Fri, Apr 21, 2017 at 02:58:23PM -0700, Aaron Larson wrote:
+> > > Add global timer group A to open-pic.  This patch is still somewhat
+> > > dubious because I'm not sure how to determine what QEMU wants for the
+> > > timer frequency.  Suggestions solicited.
+> >=20
+> > This commit message really needs some more context.  What's a "global
+> > time group A" a and why do we want it?
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> The open-pic spec includes two sets/groups of timers, groups A and B,
+> 4 timers in each group.  Previously in QEMU the timer group A
+> registers were implemented but they did not "count" or generate any
+> interrupts.  The patch makes the timers to do both (count and generate
+> interrupts).
 
-Since my ppc-for-2.10 pull request has been held up because of this
-anyway, tather than just apply this on top, I've folded it into your
-earlier patch which caused the bug - that way we won't break bisect.
+Ok, sounds good, but this is exactly the sort of thing that needs to
+go in the commit message.
 
-> ---
->  hw/ipmi/ipmi_bmc_sim.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-> index 155561d06614..277c28cb40ed 100644
-> --- a/hw/ipmi/ipmi_bmc_sim.c
-> +++ b/hw/ipmi/ipmi_bmc_sim.c
-> @@ -1899,6 +1899,10 @@ static void ipmi_fru_init(IPMIFru *fru)
->      int fsize;
->      int size =3D 0;
-> =20
-> +    if (!fru->filename) {
-> +        goto out;
-> +    }
-> +
->      fsize =3D get_image_size(fru->filename);
->      if (fsize > 0) {
->          size =3D QEMU_ALIGN_UP(fsize, fru->areasize);
-> @@ -1910,6 +1914,7 @@ static void ipmi_fru_init(IPMIFru *fru)
->          }
->      }
-> =20
-> +out:
->      if (!fru->data) {
->          /* give one default FRU */
->          size =3D fru->areasize;
+> About a year ago I mentioned that we had implemented this and offered
+> to submit a patch, which seemed to be acceptable.  Sadly, when I
+> reviewed the implementation it had several egregious errors that I
+> didn't know how to fix until recently.
+
+Ok.  Now that you mention that, it rings a vague bell.
+
+> Quite frankly I didn't expect the patch to be accepted in its current
+> form for the reason mentioned in the above commit log and was hoping
+> for some guidance.  If this is no longer a desirable patch, I can
+> certainly continue to maintain it locally for our use.
+
+That's fine - but I need context of what the patch is attempting to
+do, and why that's desirable in order to properly review it.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -85,25 +86,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ZG5hGh9V5E9QzVHS
+--00sTfE/IIAT5d2r5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZAAkkAAoJEGw4ysog2bOS6zsQALEogq5MT245RWCdfZuqzODh
-Etik1tlCyeqKlefftQ8qOtmIqxVGwyfNuCDo+jl1yX0FJ6dWAvT3HUPBt85t61qy
-DRE7povHb/JU+SKmgJSYN/xHMWVwkM2oqTg78PlSv+6SOcSmR3hbmxGG0fuLRFEo
-NxiYCX87ZmQ3mfDcAe9ycKXzy6wbLK/ISkDTSvav3a2uV91XoSx4cYA6t9c3kvTe
-Ow5e3YJrpo1BZU1/+D9n0HzOF5QcOah0JmUqHvnvYVKyO00ZMGcdKtS0v6ojq0OS
-A6HEllDMMwkAUXpwy87Wu39UGH8iSw2jQ9QX2CU/OsmkmhpJZJIIravh87vAgTqx
-tnOZTVErb+Be8i3xy7dGizVrGwxxcxlbXATJP0r4Wuh2DYojuAKN8HsgoHxpM77v
-aFPvu90FyoPnlMVlfzVfg2n4XW+HeU57TDi04JFz8zBORgN1d2UuJvCygWFN5TQK
-ysCdeboLbj0EhVnL27jSJhOV9z5KGgTUEkaOytmI8rrIeatLAwB/nmItnbnLmgS9
-5O8Lceg9LANeX3sM3hqpdi0lvQofxt4Z+iNKrPL/nfUjyCWcdlwWiiusgtrNHZnj
-SWdDkgerZw5G9ILaqd89mrmKNdidtoydQf7b+Dx9HOZo5cQhT0Nlk0V89g8Y8h5P
-m5jOL72kJgt4y7tcqsmN
-=gir0
+iQIcBAEBCAAGBQJZAAs2AAoJEGw4ysog2bOSHYoP/iboJjzupEAc93kdfBvX/Cpv
+erQ/dvKOd76V7RGgNP/vk09xCllRAx3JJD8PwQYB27urb790ulAsmcniN5aXNIA0
+TiUHPBn8ryGHcrNS2dKE/GDpe+kJLyU0vGz35xrEBfuTCp4TE6SdmRXpGdhmzdc/
+Ukd784sgGYiKP5QOxHO1Z5+mNe48wFlRv2GlXlHXJvrr0Uagsi9XSVSsmKzeQKvE
+uvyHZxGY9cc7zxQ2lSXnpHu6EG03mvSIOa/yiV5TnkoEXvfUCL5gxOhrYHnGIBsx
+WsAsP+bMq9HfABXSHekbxasW18JOzrBnVA7yZ3QMYsDr0hS3TWWyZ9vakfIDHivK
+NIM8Wt0TRHrGUF7/Pg9nKkypa+1lIbdSbz26hkyMCBBTSc/uHx7GF5Z2b9VrY+u6
+LuK9RXbJS6oJ5p6vl/stSxGdGoqctLxTx6eiB6Ik3jRItJugQP04VWUwRCSueU4J
+4FWMMPCbFte3brdJLABnRhjYxY4vTAInDPYnbbw7whf82gwCtKRwMQAj+yx3XO+o
+gzZv4lDZyDAsemjTYJyc2A1EacNY7zaigvV/OHQFjUcfmKjCMantdSbn9+MWovJm
+2O5e7QghPfHzaHSPhLs1IBisWwC5JPUIEK0KPw4mKMSTgfzvJ4rYkT85NM8ebXYI
+FRgrJwOfL/jd5JbgdjVe
+=Hmkr
 -----END PGP SIGNATURE-----
 
---ZG5hGh9V5E9QzVHS--
+--00sTfE/IIAT5d2r5--
