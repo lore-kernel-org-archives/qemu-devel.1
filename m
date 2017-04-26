@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d3HjQ-0006jg-4H
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:51:25 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3Hk1-0007CP-B4
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:52:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d3HjP-0003eF-5c
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:51:24 -0400
-References: <1493187803-4510-1-git-send-email-cota@braap.org>
-	<1493187803-4510-2-git-send-email-cota@braap.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <385dfdfb-263a-8012-8a7b-e3ce987e7fc4@redhat.com>
-Date: Wed, 26 Apr 2017 09:50:57 +0200
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3Hjx-0003rV-Dd
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:52:01 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3910
+	helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d3Hjw-0003nZ-RK
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:51:57 -0400
+References: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1492674416-9408-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<df05a73b-fba8-a6d3-bf6a-648304458257@redhat.com>
+	<58FD9546.5000104@huawei.com>
+	<82c50df3-28c9-fb21-f2c6-76a99f864bee@redhat.com>
+	<58FF1DF7.4000006@huawei.com>
+	<bfac018b-55cf-9cf8-5ffe-ff0d1fbd4b53@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <59005180.4000205@huawei.com>
+Date: Wed, 26 Apr 2017 15:51:28 +0800
 MIME-Version: 1.0
-In-Reply-To: <1493187803-4510-2-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] tcg-runtime: add lookup_tb_ptr
- helper
+In-Reply-To: <bfac018b-55cf-9cf8-5ffe-ff0d1fbd4b53@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: serialize compare
+ thread's initialization with main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
+To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com
+Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com
 
+On 2017/4/25 19:33, Jason Wang wrote:
+>
+> On 2017年04月25日 17:59, Hailiang Zhang wrote:
+>> On 2017/4/25 16:41, Jason Wang wrote:
+>>> On 2017年04月24日 14:03, Hailiang Zhang wrote:
+>>>> On 2017/4/24 12:10, Jason Wang wrote:
+>>>>> On 2017年04月20日 15:46, zhanghailiang wrote:
+>>>>>> We call qemu_chr_fe_set_handlers() in colo-compare thread, it is used
+>>>>>> to detach watched fd from default main context, so it has chance to
+>>>>>> handle the same watched fd with main thread concurrently, which will
+>>>>>> trigger an error report:
+>>>>>> "qemu-char.c:918: io_watch_poll_finalize: Assertion `iwp->src ==
+>>>>>> ((void *)0)' failed."
+>>>>> Anyway to prevent fd from being handled by main thread before creating
+>>>>> colo thread? Using semaphore seems not elegant.
+>>>> So how about calling qemu_mutex_lock_iothread() before
+>>>> qemu_chr_fe_set_handlers() ?
+>>> Looks better, but I needs more information e.g how main thread can
+>>> touch it?
+>> Hmm, this happened quite occasionally, and we didn't catch the first
+>> place (backtrace)
+>> of removing fd from been watched, but  from the codes logic, we found
+>> there should
+>> be such possible cases:
+>> tcp_chr_write (Or tcp_chr_read/tcp_chr_sync_read/chr_disconnect)
+>>   ->tcp_chr_disconnect (Or char_socket_finalize)
+>>      ->tcp_chr_free_connection
+>>        -> remove_fd_in_watch(chr);
+>>
+>> Anyway, it needs the protection from been freed twice.
+>>
+>> Thanks,
+>> Hailiang
+> Still a little bit confused. The question is how could main thread still
+> call tcp_chr_write or other in the above case?
 
+The 'char_socekt_finalize' ? Hmm, I'd better to reproduce it again to get the first
+time of removing the fd been watched...
 
-On 26/04/2017 08:23, Emilio G. Cota wrote:
-> This paves the way for upcoming work.
-> 
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  tcg-runtime.c     | 21 +++++++++++++++++++++
->  tcg/tcg-runtime.h |  2 ++
->  tcg/tcg.h         |  1 +
->  3 files changed, 24 insertions(+)
-> 
-> diff --git a/tcg-runtime.c b/tcg-runtime.c
-> index 4c60c96..90d2d4b 100644
-> --- a/tcg-runtime.c
-> +++ b/tcg-runtime.c
-> @@ -27,6 +27,7 @@
->  #include "exec/helper-proto.h"
->  #include "exec/cpu_ldst.h"
->  #include "exec/exec-all.h"
-> +#include "exec/tb-hash.h"
->  
->  /* 32-bit helpers */
->  
-> @@ -141,6 +142,26 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
->      return ctpop64(arg);
->  }
->  
-> +void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
-> +{
-> +    CPUState *cpu = ENV_GET_CPU(env);
-> +    TranslationBlock *tb;
-> +    target_ulong cs_base, pc;
-> +    uint32_t flags;
-> +
-> +    if (unlikely(atomic_read(&cpu->exit_request))) {
-> +        goto out_epilogue;
-> +    }
-
-This should not be necessary, because cpu->icount_decr will be checked
-by the prologue of the destination tb.
-
-Paolo
-
-> +    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-> +    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
-> +    if (likely(tb && tb->pc == addr && tb->cs_base == cs_base &&
-> +               tb->flags == flags)) {
-> +        return tb->tc_ptr;
-> +    }
-> + out_epilogue:
-> +    return tcg_ctx.code_gen_epilogue;
-> +}
-> +
->  void HELPER(exit_atomic)(CPUArchState *env)
->  {
->      cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
-> diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
-> index 114ea6f..c41d38a 100644
-> --- a/tcg/tcg-runtime.h
-> +++ b/tcg/tcg-runtime.h
-> @@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
->  DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
->  DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
->  
-> +DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
-> +
->  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
->  
->  #ifdef CONFIG_SOFTMMU
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 6c216bb..5ec48d1 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -699,6 +699,7 @@ struct TCGContext {
->         extension that allows arithmetic on void*.  */
->      int code_gen_max_blocks;
->      void *code_gen_prologue;
-> +    void *code_gen_epilogue;
->      void *code_gen_buffer;
->      size_t code_gen_buffer_size;
->      void *code_gen_ptr;
-> 
+> Thanks
+>
+>>> Thanks
+>>>
+>>> .
+>>>
+>>
+>
+> .
+>
