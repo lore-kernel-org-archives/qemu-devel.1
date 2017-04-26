@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gx1-0005YJ-IW
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gx4-0005b9-HC
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwp-0008BH-4A
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:23 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwq-0008Cu-Fl
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:26 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 17:00:30 +1000
-Message-Id: <20170426070034.10727-45-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 17:00:31 +1000
+Message-Id: <20170426070034.10727-46-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 44/48] spapr-cpu-core: Release ICPState object
- during CPU unrealization
+Subject: [Qemu-devel] [PULL 45/48] target/ppc: Flush TLB on write to PIDR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +20,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Recent commits that re-organized ICPState object missed to destroy
-the object when CPU is unrealized. Fix this so that CPU unplug
-doesn't abort QEMU.
+The PIDR (process id register) is used to store the id of the currently
+running process, which is used to select the process table entry used to
+perform address translation. This means that when we write to this register
+all the translations in the TLB become outdated as they are for a
+previously running process. Thus when this register is written to we need
+to invalidate the TLB entries to ensure stale entries aren't used to
+to perform translation for the new process, which would result in at best
+segfaults or alternatively just random memory being accessed.
 
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+[dwg: Fixed compile error for 32-bit targets]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 1 +
- 1 file changed, 1 insertion(+)
+ target/ppc/helper.h         |  1 +
+ target/ppc/misc_helper.c    |  8 ++++++++
+ target/ppc/translate_init.c | 10 ++++++++--
+ 3 files changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 2e689b5..4389ef4 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -127,6 +127,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *d=
-ev, Error **errp)
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
-         spapr_cpu_destroy(cpu);
-+        object_unparent(cpu->intc);
-         cpu_remove_sync(cs);
-         object_unparent(obj);
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 6d77661..bb6a94a 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -709,6 +709,7 @@ DEF_HELPER_FLAGS_1(load_601_rtcu, TCG_CALL_NO_RWG, tl, env)
+ DEF_HELPER_FLAGS_1(load_purr, TCG_CALL_NO_RWG, tl, env)
+ #endif
+ DEF_HELPER_2(store_sdr1, void, env, tl)
++DEF_HELPER_2(store_pidr, void, env, tl)
+ DEF_HELPER_FLAGS_2(store_tbl, TCG_CALL_NO_RWG, void, env, tl)
+ DEF_HELPER_FLAGS_2(store_tbu, TCG_CALL_NO_RWG, void, env, tl)
+ DEF_HELPER_FLAGS_2(store_atbl, TCG_CALL_NO_RWG, void, env, tl)
+diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+index fa573dd..0e42178 100644
+--- a/target/ppc/misc_helper.c
++++ b/target/ppc/misc_helper.c
+@@ -88,6 +88,14 @@ void helper_store_sdr1(CPUPPCState *env, target_ulong val)
      }
---=20
+ }
+ 
++void helper_store_pidr(CPUPPCState *env, target_ulong val)
++{
++    PowerPCCPU *cpu = ppc_env_get_cpu(env);
++
++    env->spr[SPR_BOOKS_PID] = val;
++    tlb_flush(CPU(cpu));
++}
++
+ void helper_store_hid0_601(CPUPPCState *env, target_ulong val)
+ {
+     target_ulong hid0;
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index aa0c44d..77e5463 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -394,8 +394,14 @@ static void spr_write_sdr1 (DisasContext *ctx, int sprn, int gprn)
+     gen_helper_store_sdr1(cpu_env, cpu_gpr[gprn]);
+ }
+ 
+-/* 64 bits PowerPC specific SPRs */
+ #if defined(TARGET_PPC64)
++/* 64 bits PowerPC specific SPRs */
++/* PIDR */
++static void spr_write_pidr(DisasContext *ctx, int sprn, int gprn)
++{
++    gen_helper_store_pidr(cpu_env, cpu_gpr[gprn]);
++}
++
+ static void spr_read_hior (DisasContext *ctx, int gprn, int sprn)
+ {
+     tcg_gen_ld_tl(cpu_gpr[gprn], cpu_env, offsetof(CPUPPCState, excp_prefix));
+@@ -8200,7 +8206,7 @@ static void gen_spr_power8_book4(CPUPPCState *env)
+                      KVM_REG_PPC_ACOP, 0);
+     spr_register_kvm(env, SPR_BOOKS_PID, "PID",
+                      SPR_NOACCESS, SPR_NOACCESS,
+-                     &spr_read_generic, &spr_write_generic,
++                     &spr_read_generic, &spr_write_pidr,
+                      KVM_REG_PPC_PID, 0);
+     spr_register_kvm(env, SPR_WORT, "WORT",
+                      SPR_NOACCESS, SPR_NOACCESS,
+-- 
 2.9.3
