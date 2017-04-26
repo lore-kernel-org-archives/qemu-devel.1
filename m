@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwk-0005Eg-Rw
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwf-0005DC-BW
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwe-000809-6K
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3GwZ-0007w5-AH
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:01 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 17:00:04 +1000
-Message-Id: <20170426070034.10727-19-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 16:59:53 +1000
+Message-Id: <20170426070034.10727-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/48] spapr: move the IRQ server number mapping
- under the machine
+Subject: [Qemu-devel] [PULL 07/48] target-ppc: support KVM_CAP_PPC_MMU_RADIX,
+ KVM_CAP_PPC_MMU_HASH_V3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +21,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, Sam Bobroff <sam.bobroff@au1.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-This is the second step to abstract the IRQ 'server' number of the
-XICS layer. Now that the prereq cleanups have been done in the
-previous patch, we can move down the 'cpu_dt_id' to 'cpu_index'
-mapping in the sPAPR machine handler.
+Query and cache the value of two new KVM capabilities that indicate
+KVM's support for new radix and hash modes of the MMU.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics_spapr.c    | 5 ++---
- hw/ppc/spapr.c          | 3 ++-
- hw/ppc/spapr_cpu_core.c | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ target/ppc/kvm.c     | 14 ++++++++++++++
+ target/ppc/kvm_ppc.h | 12 ++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 58f100d..f05308b8 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -52,9 +52,8 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
- static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                           target_ulong opcode, target_ulong *args)
- {
--    target_ulong server =3D xics_get_cpu_index_by_dt_id(args[0]);
-     target_ulong mfrr =3D args[1];
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), server);
-+    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), args[0]);
-=20
-     if (!icp) {
-         return H_PARAMETER;
-@@ -122,7 +121,7 @@ static void rtas_set_xive(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
-     }
-=20
-     nr =3D rtas_ld(args, 0);
--    server =3D xics_get_cpu_index_by_dt_id(rtas_ld(args, 1));
-+    server =3D rtas_ld(args, 1);
-     priority =3D rtas_ld(args, 2);
-=20
-     if (!ics_valid_irq(ics, nr) || !xics_icp_get(XICS_FABRIC(spapr), ser=
-ver)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8749f1b..08f8615 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3112,9 +3112,10 @@ static void spapr_ics_resend(XICSFabric *dev)
-     ics_resend(spapr->ics);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 9dc2f7f..38db27b 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -86,6 +86,8 @@ static int cap_papr;
+ static int cap_htab_fd;
+ static int cap_fixup_hcalls;
+ static int cap_htm;             /* Hardware transactional memory support */
++static int cap_mmu_radix;
++static int cap_mmu_hash_v3;
+ 
+ static uint32_t debug_inst_opcode;
+ 
+@@ -140,6 +142,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_htab_fd = kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+     cap_fixup_hcalls = kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
+     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
++    cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
++    cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
+ 
+     if (!cap_interrupt_level) {
+         fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
+@@ -2354,6 +2358,16 @@ bool kvmppc_has_cap_htm(void)
+     return cap_htm;
  }
-=20
--static ICPState *spapr_icp_get(XICSFabric *xi, int server)
-+static ICPState *spapr_icp_get(XICSFabric *xi, int cpu_dt_id)
+ 
++bool kvmppc_has_cap_mmu_radix(void)
++{
++    return cap_mmu_radix;
++}
++
++bool kvmppc_has_cap_mmu_hash_v3(void)
++{
++    return cap_mmu_hash_v3;
++}
++
+ static PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
  {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-+    int server =3D xics_get_cpu_index_by_dt_id(cpu_dt_id);
-=20
-     return (server < spapr->nr_servers) ? &spapr->icps[server] : NULL;
+     ObjectClass *oc = OBJECT_CLASS(pcc);
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 08ecf75..64189a4 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -54,6 +54,8 @@ void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n);
+ void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1);
+ bool kvmppc_has_cap_fixup_hcalls(void);
+ bool kvmppc_has_cap_htm(void);
++bool kvmppc_has_cap_mmu_radix(void);
++bool kvmppc_has_cap_mmu_hash_v3(void);
+ int kvmppc_enable_hwrng(void);
+ int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+@@ -254,6 +256,16 @@ static inline bool kvmppc_has_cap_htm(void)
+     return false;
  }
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 7db61bd..4e1a995 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -64,7 +64,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
-werPCCPU *cpu,
+ 
++static inline bool kvmppc_has_cap_mmu_radix(void)
++{
++    return false;
++}
++
++static inline bool kvmppc_has_cap_mmu_hash_v3(void)
++{
++    return false;
++}
++
+ static inline int kvmppc_enable_hwrng(void)
  {
-     CPUPPCState *env =3D &cpu->env;
-     XICSFabric *xi =3D XICS_FABRIC(spapr);
--    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
-+    ICPState *icp =3D xics_icp_get(xi, cpu->cpu_dt_id);
-=20
-     /* Set time-base frequency to 512 MHz */
-     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
---=20
+     return -1;
+-- 
 2.9.3
