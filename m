@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwi-0005Du-Ru
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwf-0005DE-UF
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwc-0007zU-PI
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3GwZ-0007wO-Cu
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:01 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 17:00:03 +1000
-Message-Id: <20170426070034.10727-18-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 16:59:51 +1000
+Message-Id: <20170426070034.10727-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/48] ppc/xics: introduce an 'intc' backlink
- under PowerPCCPU
+Subject: [Qemu-devel] [PULL 05/48] target-ppc: kvm: make use of
+ KVM_CREATE_SPAPR_TCE_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,186 +23,171 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Today, the ICPState array of the sPAPR machine is indexed with
-'cpu_index' of the CPUState. This numbering of CPUs is internal to
-QEMU and the guest only knows about what is exposed in the device
-tree, that is the 'cpu_dt_id'. This is why sPAPR uses the helper
-xics_get_cpu_index_by_dt_id() to do the mapping in a couple of places.
+KVM_CAP_SPAPR_TCE capability allows creating TCE tables in KVM which
+allows having in-kernel acceleration for H_PUT_TCE_xxx hypercalls.
+However it only supports 32bit DMA windows at zero bus offset.
 
-To provide a more generic XICS layer, we need to abstract the IRQ
-'server' number and remove any assumption made on its nature. It
-should not be used as a 'cpu_index' for lookups like xics_cpu_setup()
-and xics_cpu_destroy() do.
+There is a new KVM_CAP_SPAPR_TCE_64 capability which supports 64bit
+window size, variable page size and bus offset.
 
-To reach that goal, we choose to introduce a generic 'intc' backlink
-under PowerPCCPU, and let the machine core init routine do the
-ICPState lookup. The resulting object is passed on to xics_cpu_setup()
-which does the store under PowerPCCPU. The IRQ 'server' number in XICS
-is now generic. sPAPR uses 'cpu_dt_id' and PowerNV will use 'PIR'
-number.
+This makes use of the new capability. The kernel headers are already
+updated as the kernel support went in to v4.6.
 
-This also has the benefit of simplifying the sPAPR hcall routines
-which do not need to do any ICPState lookups anymore.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c          |  6 +++---
- hw/intc/xics_spapr.c    | 20 +++++---------------
- hw/ppc/spapr_cpu_core.c |  4 +++-
- include/hw/ppc/xics.h   |  2 +-
- target/ppc/cpu.h        |  1 +
- 5 files changed, 13 insertions(+), 20 deletions(-)
+ hw/ppc/spapr_iommu.c |  8 +++++---
+ target/ppc/kvm.c     | 48 +++++++++++++++++++++++++++++++++++++-----------
+ target/ppc/kvm_ppc.h | 12 +++++++-----
+ 3 files changed, 49 insertions(+), 19 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index e740989..56fe70c 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -52,7 +52,7 @@ int xics_get_cpu_index_by_dt_id(int cpu_dt_id)
- void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index ae30bbe..29c80bb 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -79,15 +79,16 @@ static IOMMUAccessFlags spapr_tce_iommu_access_flags(uint64_t tce)
+ 
+ static uint64_t *spapr_tce_alloc_table(uint32_t liobn,
+                                        uint32_t page_shift,
++                                       uint64_t bus_offset,
+                                        uint32_t nb_table,
+                                        int *fd,
+                                        bool need_vfio)
  {
-     CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
-+    ICPState *icp =3D ICP(cpu->intc);
-=20
-     assert(icp);
-     assert(cs =3D=3D icp->cs);
-@@ -61,15 +61,15 @@ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu=
-)
-     icp->cs =3D NULL;
- }
-=20
--void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu)
-+void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp)
- {
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
--    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
-     ICPStateClass *icpc;
-=20
-     assert(icp);
-=20
-+    cpu->intc =3D OBJECT(icp);
-     icp->cs =3D cs;
-=20
-     icpc =3D ICP_GET_CLASS(icp);
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 84d24b2..58f100d 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -43,11 +43,9 @@
- static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
-     target_ulong cppr =3D args[0];
-=20
--    icp_set_cppr(icp, cppr);
-+    icp_set_cppr(ICP(cpu->intc), cppr);
-     return H_SUCCESS;
- }
-=20
-@@ -69,9 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
- static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
--    uint32_t xirr =3D icp_accept(icp);
-+    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
-=20
-     args[0] =3D xirr;
-     return H_SUCCESS;
-@@ -80,9 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
- static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                              target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
--    uint32_t xirr =3D icp_accept(icp);
-+    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
-=20
-     args[0] =3D xirr;
-     args[1] =3D cpu_get_host_ticks();
-@@ -92,21 +86,17 @@ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMa=
-chineState *spapr,
- static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                           target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
-     target_ulong xirr =3D args[0];
-=20
--    icp_eoi(icp, xirr);
-+    icp_eoi(ICP(cpu->intc), xirr);
-     return H_SUCCESS;
- }
-=20
- static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                             target_ulong opcode, target_ulong *args)
- {
--    CPUState *cs =3D CPU(cpu);
--    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
-     uint32_t mfrr;
--    uint32_t xirr =3D icp_ipoll(icp, &mfrr);
-+    uint32_t xirr =3D icp_ipoll(ICP(cpu->intc), &mfrr);
-=20
-     args[0] =3D xirr;
-     args[1] =3D mfrr;
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 6883f09..7db61bd 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -63,6 +63,8 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
-werPCCPU *cpu,
-                            Error **errp)
- {
-     CPUPPCState *env =3D &cpu->env;
-+    XICSFabric *xi =3D XICS_FABRIC(spapr);
-+    ICPState *icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
-=20
-     /* Set time-base frequency to 512 MHz */
-     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
-@@ -80,7 +82,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
-werPCCPU *cpu,
-         }
+     uint64_t *table = NULL;
+-    uint64_t window_size = (uint64_t)nb_table << page_shift;
+ 
+-    if (kvm_enabled() && !(window_size >> 32)) {
+-        table = kvmppc_create_spapr_tce(liobn, window_size, fd, need_vfio);
++    if (kvm_enabled()) {
++        table = kvmppc_create_spapr_tce(liobn, page_shift, bus_offset, nb_table,
++                                        fd, need_vfio);
      }
-=20
--    xics_cpu_setup(XICS_FABRIC(spapr), cpu);
-+    xics_cpu_setup(xi, cpu, icp);
-=20
-     qemu_register_reset(spapr_cpu_reset, cpu);
-     spapr_cpu_reset(cpu);
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index ce23018..b97d30b 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -168,7 +168,7 @@ void spapr_dt_xics(int nr_servers, void *fdt, uint32_=
-t phandle);
-=20
- qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
- ICPState *xics_icp_get(XICSFabric *xi, int server);
--void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu);
-+void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu, ICPState *icp);
- void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu);
-=20
- /* Internal XICS interfaces */
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index cacdd0a..e0ff041 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1200,6 +1200,7 @@ struct PowerPCCPU {
-     uint32_t max_compat;
-     uint32_t compat_pvr;
-     PPCVirtualHypervisor *vhyp;
-+    Object *intc;
-=20
-     /* Fields related to migration compatibility hacks */
-     bool pre_2_8_migration;
---=20
+ 
+     if (!table) {
+@@ -342,6 +343,7 @@ void spapr_tce_table_enable(sPAPRTCETable *tcet,
+     tcet->nb_table = nb_table;
+     tcet->table = spapr_tce_alloc_table(tcet->liobn,
+                                         tcet->page_shift,
++                                        tcet->bus_offset,
+                                         tcet->nb_table,
+                                         &tcet->fd,
+                                         tcet->need_vfio);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index c3d4262..79b90a6 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -74,6 +74,7 @@ static int cap_booke_sregs;
+ static int cap_ppc_smt;
+ static int cap_ppc_rma;
+ static int cap_spapr_tce;
++static int cap_spapr_tce_64;
+ static int cap_spapr_multitce;
+ static int cap_spapr_vfio;
+ static int cap_hior;
+@@ -126,6 +127,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_ppc_smt = kvm_check_extension(s, KVM_CAP_PPC_SMT);
+     cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
++    cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+     cap_spapr_multitce = kvm_check_extension(s, KVM_CAP_SPAPR_MULTITCE);
+     cap_spapr_vfio = false;
+     cap_one_reg = kvm_check_extension(s, KVM_CAP_ONE_REG);
+@@ -2136,13 +2138,10 @@ bool kvmppc_spapr_use_multitce(void)
+     return cap_spapr_multitce;
+ }
+ 
+-void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+-                              bool need_vfio)
++void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                              uint64_t bus_offset, uint32_t nb_table,
++                              int *pfd, bool need_vfio)
+ {
+-    struct kvm_create_spapr_tce args = {
+-        .liobn = liobn,
+-        .window_size = window_size,
+-    };
+     long len;
+     int fd;
+     void *table;
+@@ -2155,14 +2154,41 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+         return NULL;
+     }
+ 
+-    fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE, &args);
+-    if (fd < 0) {
+-        fprintf(stderr, "KVM: Failed to create TCE table for liobn 0x%x\n",
+-                liobn);
++    if (cap_spapr_tce_64) {
++        struct kvm_create_spapr_tce_64 args = {
++            .liobn = liobn,
++            .page_shift = page_shift,
++            .offset = bus_offset >> page_shift,
++            .size = nb_table,
++            .flags = 0
++        };
++        fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE_64, &args);
++        if (fd < 0) {
++            fprintf(stderr,
++                    "KVM: Failed to create TCE64 table for liobn 0x%x\n",
++                    liobn);
++            return NULL;
++        }
++    } else if (cap_spapr_tce) {
++        uint64_t window_size = (uint64_t) nb_table << page_shift;
++        struct kvm_create_spapr_tce args = {
++            .liobn = liobn,
++            .window_size = window_size,
++        };
++        if ((window_size != args.window_size) || bus_offset) {
++            return NULL;
++        }
++        fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE, &args);
++        if (fd < 0) {
++            fprintf(stderr, "KVM: Failed to create TCE table for liobn 0x%x\n",
++                    liobn);
++            return NULL;
++        }
++    } else {
+         return NULL;
+     }
+ 
+-    len = (window_size / SPAPR_TCE_PAGE_SIZE) * sizeof(uint64_t);
++    len = nb_table * sizeof(uint64_t);
+     /* FIXME: round this up to page size */
+ 
+     table = mmap(NULL, len, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 8e9f42d..08ecf75 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -36,8 +36,9 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
+ #ifndef CONFIG_USER_ONLY
+ off_t kvmppc_alloc_rma(void **rma);
+ bool kvmppc_spapr_use_multitce(void);
+-void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+-                              bool need_vfio);
++void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                              uint64_t bus_offset, uint32_t nb_table,
++                              int *pfd, bool need_vfio);
+ int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+ int kvmppc_reset_htab(int shift_hint);
+ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
+@@ -167,9 +168,10 @@ static inline bool kvmppc_spapr_use_multitce(void)
+     return false;
+ }
+ 
+-static inline void *kvmppc_create_spapr_tce(uint32_t liobn,
+-                                            uint32_t window_size, int *fd,
+-                                            bool need_vfio)
++static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                                            uint64_t bus_offset,
++                                            uint32_t nb_table,
++                                            int *pfd, bool need_vfio)
+ {
+     return NULL;
+ }
+-- 
 2.9.3
