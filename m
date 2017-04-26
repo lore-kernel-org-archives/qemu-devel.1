@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwl-0005F5-BH
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwm-0005GB-EX
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwe-00080T-O1
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:07 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d3Gwe-00080d-Vv
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 03:01:08 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 26 Apr 2017 17:00:06 +1000
-Message-Id: <20170426070034.10727-21-david@gibson.dropbear.id.au>
+Date: Wed, 26 Apr 2017 17:00:09 +1000
+Message-Id: <20170426070034.10727-24-david@gibson.dropbear.id.au>
 In-Reply-To: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/48] ppc/xics: add a realize() handler to
- ICPStateClass
+Subject: [Qemu-devel] [PULL 23/48] ppc/pnv: extend the machine with a
+ InterruptStatsProvider interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +28,71 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.o
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-It will be used by derived classes in PowerNV for customization.
-
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c        | 5 +++++
- include/hw/ppc/xics.h | 1 +
- 2 files changed, 6 insertions(+)
+ hw/ppc/pnv.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index d4428b4..292fffe 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -337,6 +337,7 @@ static void icp_reset(void *dev)
- static void icp_realize(DeviceState *dev, Error **errp)
- {
-     ICPState *icp =3D ICP(dev);
-+    ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
-     Object *obj;
-     Error *err =3D NULL;
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 0a0cfe3..f3623ee 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -33,6 +33,8 @@
+ #include "exec/address-spaces.h"
+ #include "qemu/cutils.h"
+ #include "qapi/visitor.h"
++#include "monitor/monitor.h"
++#include "hw/intc/intc.h"
 =20
-@@ -349,6 +350,10 @@ static void icp_realize(DeviceState *dev, Error **er=
-rp)
-=20
-     icp->xics =3D XICS_FABRIC(obj);
-=20
-+    if (icpc->realize) {
-+        icpc->realize(dev, errp);
-+    }
-+
-     qemu_register_reset(icp_reset, dev);
+ #include "hw/ppc/xics.h"
+ #include "hw/ppc/pnv_xscom.h"
+@@ -762,6 +764,18 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int pir=
+)
+     return cpu ? ICP(cpu->intc) : NULL;
  }
 =20
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index b07f56f..731e177 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -60,6 +60,7 @@ typedef struct XICSFabric XICSFabric;
- struct ICPStateClass {
-     DeviceClass parent_class;
++static void pnv_pic_print_info(InterruptStatsProvider *obj,
++                               Monitor *mon)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++
++        icp_pic_print_info(ICP(cpu->intc), mon);
++    }
++}
++
+ static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
+@@ -813,6 +827,7 @@ static void powernv_machine_class_init(ObjectClass *o=
+c, void *data)
+ {
+     MachineClass *mc =3D MACHINE_CLASS(oc);
+     XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
++    InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
+(oc);
 =20
-+    void (*realize)(DeviceState *dev, Error **errp);
-     void (*pre_save)(ICPState *s);
-     int (*post_load)(ICPState *s, int version_id);
-     void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
+     mc->init =3D ppc_powernv_init;
+@@ -824,6 +839,7 @@ static void powernv_machine_class_init(ObjectClass *o=
+c, void *data)
+     mc->default_boot_order =3D NULL;
+     mc->default_ram_size =3D 1 * G_BYTE;
+     xic->icp_get =3D pnv_icp_get;
++    ispc->print_info =3D pnv_pic_print_info;
+=20
+     powernv_machine_class_props_init(oc);
+ }
+@@ -836,6 +852,7 @@ static const TypeInfo powernv_machine_info =3D {
+     .class_init    =3D powernv_machine_class_init,
+     .interfaces =3D (InterfaceInfo[]) {
+         { TYPE_XICS_FABRIC },
++        { TYPE_INTERRUPT_STATS_PROVIDER },
+         { },
+     },
+ };
 --=20
 2.9.3
