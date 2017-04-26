@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3NEq-0007zo-JM
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:44:15 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d3NFG-0008IE-Pd
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d3NEm-0001Fn-7T
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:44:09 -0400
-References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
-	<20170225193155.447462-3-vsementsov@virtuozzo.com>
-	<20170307100204.GC5871@noname.str.redhat.com>
-	<ec621d28-d6bd-a125-fa1c-5e9a09b04c22@virtuozzo.com>
-	<20170426122246.v2px6y33k4dpiiqb@eukaryote>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <fa24f024-c94c-784a-0136-763be0152202@virtuozzo.com>
-Date: Wed, 26 Apr 2017 16:43:52 +0300
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d3NFG-0001N7-2N
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 09:44:38 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1493107736-6608-1-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f523e9f6-4e05-38a2-413a-9891033c9466@redhat.com>
+Date: Wed, 26 Apr 2017 15:44:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170426122246.v2px6y33k4dpiiqb@eukaryote>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1493107736-6608-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/4] qmp-cont: invalidate on
- RUN_STATE_PRELAUNCH
+Subject: Re: [Qemu-devel] [PATCH] Issue a deprecation warning if the user
+ specifies the "-hdachs" option.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
-
-26.04.2017 15:22, Kashyap Chamarthy wrote:
-> On Tue, Mar 07, 2017 at 01:11:23PM +0300, Vladimir Sementsov-Ogievskiy wrote:
->> 07.03.2017 13:02, Kevin Wolf wrote:
->>> Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>> We must invalidate on RUN_STATE_PRELAUNCH too, as it is available
->>>> through qmp_system_reset from RUN_STATE_POSTMIGRATE. Otherwise, we will
->>>> come to
->>>>
->>>> qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
->>>>          Assertion `!(bs->open_flags & 0x0800)' failed.
->>>>
->>>> on the first write after vm start.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> Wouldn't it make more sense to invalidate in qmp_system_reset() where
->>> the migration states are left?
->>>
->>> Or maybe BDRV_O_INACTIVE could even be tied directly to runstates? Not
->>> sure how realistic this one is, but if we start adding invalidate_cache
->>> calls all over the place, maybe that's a sign that we need to look for a
->>> more central place.
->> I've proposed it in cover letter) These bugs and my fixes are just show that
->> something should be rethought.. I don't claim that these fixes are true way,
->> they are just the simplest.
-> Hi Vladimir,
->
-> I wonder if you have a new version of your patch ("qmp-cont: invalidate
-> on RUN_STATE_PRELAUNCH").
->
-> Hailiang Zhang tells me on this the below thread that your patch fixes
-> the issue:
->
->    http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg03925.html
->    -- [QEMU-2.8] Source QEMU crashes with: "bdrv_co_pwritev: Assertion
->    `!(bs->open_flags & BDRV_O_INACTIVE)' failed"
->
-
-No, I haven't new version, discussion is unfinished about true way of 
-doing it. This version is ok with the case it fixes.
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 
 
--- 
-Best regards,
-Vladimir
+
+On 25/04/2017 10:08, Thomas Huth wrote:
+> If the user needs to specify the disk geometry, the corresponding
+> parameters of the "-drive" option should be used instead. "-hdachs"
+> is considered as deprecated and might be removed soon.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  vl.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/vl.c b/vl.c
+> index 0b4ed52..0980213 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3230,6 +3230,8 @@ int main(int argc, char **argv, char **envp)
+>                          }
+>                      }
+>                  }
+> +                error_report("'-hdachs' is deprecated. Please use '-drive"
+> +                             " ...,cyls=c,heads=h,secs=s,trans=t' instead.");
+>                  break;
+>              case QEMU_OPTION_numa:
+>                  opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
+> 
+
+Not even this, which should also be deprecated; please suggest using
+"-device ide-hd" instead.
+
+Paolo
