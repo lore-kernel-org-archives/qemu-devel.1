@@ -1,42 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d3T0z-0000Ly-T2
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 15:54:18 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d3TUu-0002BU-Jp
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 16:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d3T0v-0000rz-1L
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 15:54:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46101)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1d3T0u-0000qN-Nd
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 15:54:12 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3QJrn9f072832
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:54:11 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2eby5v5w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 15:54:11 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 26 Apr 2017 13:54:10 -0600
-References: <20170426183721.7482-1-dgilbert@redhat.com>
-	<20170426183721.7482-2-dgilbert@redhat.com>
-	<8a107a40-073c-8181-75aa-e5700f2900a7@de.ibm.com>
-	<20170426190442.GG2394@work-vm>
-	<a56800e0-53c5-8e30-4b6b-eaab088ad449@de.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 26 Apr 2017 21:54:05 +0200
+	(envelope-from <jsnow@redhat.com>) id 1d3TUr-0007mP-F4
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 16:25:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d3TUr-0007kU-4k
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 16:25:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C036CA08F1
+	for <qemu-devel@nongnu.org>; Wed, 26 Apr 2017 20:25:07 +0000 (UTC)
+References: <20170419144219.20371-1-pbonzini@redhat.com>
+	<20170419144219.20371-8-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e733d2b3-4c20-e9a4-4807-86675661f2cc@redhat.com>
+Date: Wed, 26 Apr 2017 16:25:06 -0400
 MIME-Version: 1.0
-In-Reply-To: <a56800e0-53c5-8e30-4b6b-eaab088ad449@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20170419144219.20371-8-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <43b13188-7fa4-5994-2415-fe29388f1093@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] Postcopy: Force allocation of all-zero
- precopy pages
+Subject: Re: [Qemu-devel] [PATCH 07/11] blockjob: introduce
+ block_job_cancel_async, check iostatus invariants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,43 +35,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, aarcange@redhat.com
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 04/26/2017 09:52 PM, Christian Borntraeger wrote:
-> On 04/26/2017 09:04 PM, Dr. David Alan Gilbert wrote:
->> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>> On 04/26/2017 08:37 PM, Dr. David Alan Gilbert (git) wrote:
->>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>>
->>>> When an all-zero page is received during the precopy
->>>> phase of a postcopy-enabled migration we must force
->>>> allocation otherwise accesses to the page will still
->>>> get blocked by userfault.
->>>>
->>>> Symptom:
->>>>   a) If the page is accessed by a device during device-load
->>>>     then we get a deadlock as the source finishes sending
->>>>     all its pages but the destination device-load is still
->>>>     paused and so doesn't clean up.
->>>>
->>>>   b) If the page is accessed later, then the thread will stay
->>>>     paused until the end of migration rather than carrying on
->>>>     running, until we release userfault at the end.
->>>>
->>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>
->>> CC stable? after all the guest hangs on both sides
->>>
->>> Has survived 40 migrations (usually failed at the 2nd)
->>> Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>
->> Great...but.....
->> Andrea (added to the mail) says this shouldn't be necessary.
->> The read we were doing in the is_zero_range() should have been sufficient
->> to get the page mapped and that zero page should have survived.
+
+
+On 04/19/2017 10:42 AM, Paolo Bonzini wrote:
+> The new functions helps respecting the invariant that the coroutine
+> is entered with false user_resume, zero pause count and no error
+> recorded in the iostatus.
 > 
-> We do not do is_zero_range if ch==0 because of lazy evaluation, no?
+> Resetting the iostatus is now common to all of block_job_cancel_async,
+> block_job_user_resume and block_job_iostatus_reset, albeit with slight
+> differences:
+> 
+> - block_job_cancel_async resets the iostatus, and resumes the job if
+> there was an error, but the coroutine is not restarted immediately.
+> For example the caller may continue with a call to block_job_finish_sync.
+> 
+> - block_job_user_resume resets the iostatus.  It wants to resume the job
+> unconditionally, even if there was no error.
+> 
+> - block_job_iostatus_reset doesn't resume the job at all.  Maybe that's
+> a bug but it should be fixed separately.
+> 
+> block_job_iostatus_reset does the least common denominator, so add some
+> checking but otherwise leave it as the entry point for resetting the
+> iostatus.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2: rewritten
+> 
+>  blockjob.c | 24 ++++++++++++++++++++----
+>  1 file changed, 20 insertions(+), 4 deletions(-)
+> 
+> diff --git a/blockjob.c b/blockjob.c
+> index 5906266..1756153 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -304,6 +304,19 @@ static void block_job_completed_single(BlockJob *job)
+>      block_job_unref(job);
+>  }
+>  
+> +static void block_job_cancel_async(BlockJob *job)
+> +{
+> +    if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
+> +        block_job_iostatus_reset(job);
+> +    }
+> +    if (job->user_paused) {
+> +        /* Do not call block_job_enter here, the caller will handle it.  */
+> +        job->user_paused = false;
+> +        job->pause_count--;
+> +    }
+> +    job->cancelled = true;
+> +}
+> +
+>  static void block_job_completed_txn_abort(BlockJob *job)
+>  {
+>      AioContext *ctx;
+> @@ -328,7 +341,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
+>               * them; this job, however, may or may not be cancelled, depending
+>               * on the caller, so leave it. */
+>              if (other_job != job) {
+> -                other_job->cancelled = true;
+> +                block_job_cancel_async(other_job);
+>              }
+>              continue;
+>          }
+> @@ -411,8 +424,8 @@ bool block_job_user_paused(BlockJob *job)
+>  void block_job_user_resume(BlockJob *job)
+>  {
+>      if (job && job->user_paused && job->pause_count > 0) {
+> -        job->user_paused = false;
+>          block_job_iostatus_reset(job);
+> +        job->user_paused = false;
+>          block_job_resume(job);
+>      }
+>  }
+> @@ -420,8 +433,7 @@ void block_job_user_resume(BlockJob *job)
+>  void block_job_cancel(BlockJob *job)
+>  {
+>      if (block_job_started(job)) {
+> -        job->cancelled = true;
+> -        block_job_iostatus_reset(job);
+> +        block_job_cancel_async(job);
+>          block_job_enter(job);>      } else {
+>          block_job_completed(job, -ECANCELED);
+> @@ -765,6 +777,10 @@ void block_job_yield(BlockJob *job)
+>  
+>  void block_job_iostatus_reset(BlockJob *job)
+>  {
+> +    if (job->iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
+> +        return;
+> +    }
+> +    assert(job->user_paused && job->pause_count > 0);
 
-Sorry misread that code. We do.
+Why assert that it's user-paused? Will that be true from:
+
+(A) All users of block_job_cancel_async, including:
+
+- block_job_cancel
+- block_job_completed
+    block_job_completed_txn_abort
+
+(B) all users of blk_iostatus_reset:
+- blk_do_attach_dev
+- qmp_cont
+
+It's ... not really clear to me that this is true, can you help me out?
+
+>      job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
+>  }
+>  
+> 
