@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1d3r61-0004lv-30
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:37:06 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d3rEr-0007Dg-JI
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1d3r5w-00072D-5b
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:37:05 -0400
-Message-Id: <59026477020000480014395C@prv-mh.provo.novell.com>
-Date: Thu, 27 Apr 2017 15:36:55 -0600
-From: "Bruce Rogers" <brogers@suse.com>
-References: <1493323148-32461-1-git-send-email-brogers@suse.com>
-	<alpine.DEB.2.10.1704271403550.2895@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1704271403550.2895@sstabellini-ThinkPad-X260>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d3rEn-0003bk-Mk
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:46:13 -0400
+Received: from hera.aquilenet.fr ([141.255.128.1]:48908)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d3rEn-0003aP-Fy
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:46:09 -0400
+Date: Thu, 27 Apr 2017 15:21:26 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170427132126.lkdi5owqezvlp6o2@var.youpi.perso.aquilenet.fr>
+References: <20170420204301.154912-1-lepton@google.com>
+	<42f99074-9330-c974-e884-f0a62e63c697@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: Re: [Qemu-devel] [PATCH] ACPI: don't call acpi_pcihp_device_plug_cb
- on xen
+In-Reply-To: <42f99074-9330-c974-e884-f0a62e63c697@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] slirp: don't zero ti_i since we
+ acccess it later.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, imammedo@redhat.com, mst@redhat.com
+To: Tao Wu <ytht.net@gmail.com>, Tao Wu <lepton@google.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
+Hello,
 
+Thomas Huth, on lun. 24 avril 2017 11:15:56 +0200, wrote:
+> On 20.04.2017 22:43, Tao Wu wrote:
+> > The current code looks buggy, we zero ti_i while we access
+> > ti_dst/ti_src later.
 
->>> On 4/27/2017 at 03:09 PM, Stefano Stabellini <sstabellini@kernel.org> =
-wrote:=20
-> On Thu, 27 Apr 2017, Bruce Rogers wrote:
->> Commit f0c9d64a exposed the issue that with a xenfv machine using
->> pci passthrough, acpi cpi hotplug code was being executed by mistake.
->> Guard calls to acpi_pcihp_device_plug_cb (and corresponding
->> acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
->> this check I am seeing an error that the bus doesn't have the
->> acpi-pcihp-bsel property set.
->>=20
->> Signed-off-by: Bruce Rogers <brogers@suse.com>
->> ---
->>  hw/acpi/piix4.c | 11 ++++++++---
->>  1 file changed, 8 insertions(+), 3 deletions(-)
->>=20
->> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
->> index a553a7e..c409374 100644
->> --- a/hw/acpi/piix4.c
->> +++ b/hw/acpi/piix4.c
->> @@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler=20
-> *hotplug_dev,
->>                                  dev, errp);
->>          }
->>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->> -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, =
-dev,=20
-> errp);
->> +        if (!xen_enabled()) {
->> +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug=
-, dev,
->> +                                      errp);
->> +        }
->>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->>          if (s->cpu_hotplug_legacy) {
->>              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, =
-errp);
->> @@ -408,8 +411,10 @@ static void=20
-> piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->>          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotp=
-lug,
->>                                        dev, errp);
->>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, =
-dev,
->> -                                    errp);
->> +        if (!xen_enabled()) {
->> +            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotpl=
-ug,=20
-> dev,
->> +                                        errp);
->> +        }
->>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
->>                 !s->cpu_hotplug_legacy) {
->>          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, =
-errp);
->=20
-> Wouldn't it be better to simply turn the error_setg("Unsupported bus...)
-> in acpi_pcihp_device_plug_cb and acpi_pcihp_device_unplug_cb into debug
-> printfs? After all, from this description it is clear that they are not
-> an error conditions. PCI Passthough works correctly, right?
->=20
-> I realize that I should have suggested this earlier, sorry about that.
+Indeed.
 
-I don't think we want to be running through qemu acpi code any more than =
-is
-necessary when using xen hvm.
+> > Signed-off-by: Tao Wu <lepton@google.com>
+
+> >  		*mtod(m, struct tcpiphdr *) = *ti;
+> >  		ti = mtod(m, struct tcpiphdr *);
+> > -		memset(&ti->ti, 0, sizeof(ti->ti));
+
+But then we don't make sure that ih_x1 is 0, which is needed for the
+checksum to be correct, but possibly not set by the caller.
+
+So please replace the memset call with setting the proper ih_x1 field to
+0 (which thus needs the introductino of a switch over af like below in
+the code).
+
+Samuel
