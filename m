@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3dHu-00058F-Om
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:52:28 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1d3dOJ-0006ST-Nu
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3dHq-0003kg-SS
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:52:26 -0400
-Received: from mga06.intel.com ([134.134.136.31]:9969)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1d3dHq-0003h7-Ga
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:52:22 -0400
-Date: Thu, 27 Apr 2017 14:36:23 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20170427063623.GC14925@sky-dev>
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-2-git-send-email-yi.l.liu@intel.com>
-	<c042bf90-d48b-4ebf-c01a-fca7c4875277@arm.com>
+	(envelope-from <eric.auger@redhat.com>) id 1d3dOI-0002o0-Tp
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:59:03 -0400
+References: <1492173995-14140-1-git-send-email-eric.auger@redhat.com>
+	<CACJhumcMAtJgnRVctCLE5XJ0eo0vpQ35zjjB8twMTkbVphfB8g@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <fe5d76da-6fe5-65b2-af35-7673601ff1b8@redhat.com>
+Date: Thu, 27 Apr 2017 08:58:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c042bf90-d48b-4ebf-c01a-fca7c4875277@arm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/8] iommu: Introduce bind_pasid_table
- API function
+In-Reply-To: <CACJhumcMAtJgnRVctCLE5XJ0eo0vpQ35zjjB8twMTkbVphfB8g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v5 0/4] vITS save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,142 +23,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: Prakash B <bjsprakash.linux@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, drjones@redhat.com, Vijay Kilari <vijay.kilari@gmail.com>, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, qemu-arm@nongnu.org, Vijaya.Kumar@cavium.com, Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com
 
-On Wed, Apr 26, 2017 at 05:56:45PM +0100, Jean-Philippe Brucker wrote:
-> Hi Yi, Jacob,
-> 
-> On 26/04/17 11:11, Liu, Yi L wrote:
-> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > 
-> > Virtual IOMMU was proposed to support Shared Virtual Memory (SVM) use
-> > case in the guest:
-> > https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05311.html
-> > 
-> > As part of the proposed architecture, when a SVM capable PCI
-> > device is assigned to a guest, nested mode is turned on. Guest owns the
-> > first level page tables (request with PASID) and performs GVA->GPA
-> > translation. Second level page tables are owned by the host for GPA->HPA
-> > translation for both request with and without PASID.
-> > 
-> > A new IOMMU driver interface is therefore needed to perform tasks as
-> > follows:
-> > * Enable nested translation and appropriate translation type
-> > * Assign guest PASID table pointer (in GPA) and size to host IOMMU
-> > 
-> > This patch introduces new functions called iommu_(un)bind_pasid_table()
-> > to IOMMU APIs. Architecture specific IOMMU function can be added later
-> > to perform the specific steps for binding pasid table of assigned devices.
-> > 
-> > This patch also adds model definition in iommu.h. It would be used to
-> > check if the bind request is from a compatible entity. e.g. a bind
-> > request from an intel_iommu emulator may not be supported by an ARM SMMU
-> > driver.
-> > 
-> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> > ---
-> >  drivers/iommu/iommu.c | 19 +++++++++++++++++++
-> >  include/linux/iommu.h | 31 +++++++++++++++++++++++++++++++
-> >  2 files changed, 50 insertions(+)
-> > 
-> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> > index dbe7f65..f2da636 100644
-> > --- a/drivers/iommu/iommu.c
-> > +++ b/drivers/iommu/iommu.c
-> > @@ -1134,6 +1134,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
-> >  }
-> >  EXPORT_SYMBOL_GPL(iommu_attach_device);
-> >  
-> > +int iommu_bind_pasid_table(struct iommu_domain *domain, struct device *dev,
-> > +			struct pasid_table_info *pasidt_binfo)
-> 
-> I guess that domain can always be deduced from dev using
-> iommu_get_domain_for_dev, and doesn't need to be passed as argument?
-> 
-> For the next version of my SVM series, I was thinking of passing group
-> instead of device to iommu_bind. Since all devices in a group are expected
-> to share the same mappings (whether they want it or not), users will have
-> to do iommu_group_for_each_dev anyway (as you do in patch 6/8). So it
-> might be simpler to let the IOMMU core take the group lock and do
-> group->domain->ops->bind_task(dev...) for each device. The question also
-> holds for iommu_do_invalidate in patch 3/8.
-> 
-> This way the prototypes would be:
-> int iommu_bind...(struct iommu_group *group, struct ... *info)
-> int iommu_unbind...(struct iommu_group *group, struct ...*info)
-> int iommu_invalidate...(struct iommu_group *group, struct ...*info)
-> 
-> For PASID table binding it might not matter much, as VFIO will most likely
-> be the only user. But task binding will be called by device drivers, which
-> by now should be encouraged to do things at iommu_group granularity.
-> Alternatively it could be done implicitly like in iommu_attach_device,
-> with "iommu_bind_device_x" calling "iommu_bind_group_x".
-> 
-> 
-> Extending this reasoning, since groups in a domain are also supposed to
-> have the same mappings, then similarly to map/unmap,
-> bind/unbind/invalidate should really be done with an iommu_domain (and
-> nothing else) as target argument. However this requires the IOMMU core to
-> keep a group list in each domain, which might complicate things a little
-> too much.
-> 
-> But "all devices in a domain share the same PASID table" is the paradigm
-> I'm currently using in the guts of arm-smmu-v3. And I wonder if, as with
-> iommu_group, it should be made more explicit to users, so they don't
-> assume that devices within a domain are isolated from each others with
-> regard to PASID DMA.
-> 
-> > +{
-> > +	if (unlikely(!domain->ops->bind_pasid_table))
-> > +		return -EINVAL;
-> > +
-> > +	return domain->ops->bind_pasid_table(domain, dev, pasidt_binfo);
-> > +}
-> > +EXPORT_SYMBOL_GPL(iommu_bind_pasid_table);
-> > +
-> > +int iommu_unbind_pasid_table(struct iommu_domain *domain, struct device *dev)
-> > +{
-> > +	if (unlikely(!domain->ops->unbind_pasid_table))
-> > +		return -EINVAL;
-> > +
-> > +	return domain->ops->unbind_pasid_table(domain, dev);
-> > +}
-> > +EXPORT_SYMBOL_GPL(iommu_unbind_pasid_table);
-> > +
-> >  static void __iommu_detach_device(struct iommu_domain *domain,
-> >  				  struct device *dev)
-> >  {
-> > diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> > index 0ff5111..491a011 100644
-> > --- a/include/linux/iommu.h
-> > +++ b/include/linux/iommu.h
-> > @@ -131,6 +131,15 @@ struct iommu_dm_region {
-> >  	int			prot;
-> >  };
-> >  
-> > +struct pasid_table_info {
-> > +	__u64	ptr;	/* PASID table ptr */
-> > +	__u64	size;	/* PASID table size*/
-> > +	__u32	model;	/* magic number */
-> > +#define INTEL_IOMMU	(1 << 0)
-> > +#define ARM_SMMU	(1 << 1)
-> 
-> Not sure if there is any advantage in this being a bitfield rather than
-> simple values (1, 2, 3, etc).
-> The names should also have a prefix, such as "PASID_TABLE_MODEL_"
+Hi Brahmajyosyula,
 
-Hi Jean,
+On 26/04/2017 13:18, Prakash B wrote:
+> Verified on Cavium ThunderX platform
+> Continousily migrated Guest more than 500 times b/w different  hosts.
+> Please feel free to add  Tested-by: Prakash, Brahmajyosyula
+> <Brahmajyosyula.Prakash@cavium.com>
 
-For the value, no special reason from my side. so it is fine to just
-use (1,2..).
-For the prefix, model definition may also needed for iommu tlb
-invalidate propagation. So it may be suitable to have a prefix like
-"SVM_MODEL_" or so? Does it make sense?
 
-Thanks,
-Yi L
+Many thanks for your testing efforts!
 
-> Thanks a lot for doing this,
-> Jean
+Best Regards
+
+Eric
+> 
+> On Fri, Apr 14, 2017 at 6:16 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>> This series allows ITS save/restore and migration use cases.
+>> It relies on not upstreamed kernel series [1].
+>>
+>> ITS tables are flushed into guest RAM on VM stop while registers
+>> are save on pre_save() callback. Tables and registers are restored
+>> on ITS post_load().
+>>
+>> Redistributor pending tables also are flushed on VM stop, independently
+>> on ITS tables.
+>>
+>> That work was tested on Cavium ThunderX using virsh save/restore and
+>> virt-manager live migration.
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>> Host Kernel dependencies:
+>> - [1] [PATCH v5 00/22] vITS save/restore
+>>
+>> History:
+>> v4 -> v5:
+>> - adapt to the new user API
+>> - new patch "hw/intc/arm_gicv3_kvm: Implement pending table save"
+>>   as the pending table save now is handled on GICV3 side.
+>>
+>> v3 -> v4:
+>> - oversight in v3, missed a last minute correction related to
+>>   reg useless declaration in kvm_arm_its_pre_save
+>>
+>> v2 -> v3:
+>> - GITS_IIDR is now saved and restored to check ABI revision.
+>> - get/put functions renamed into pre_save/post_load
+>> - unmigratable = false removed
+>> - changed the migration blocker message
+>> - remove the extract64 round s->ctlr
+>> - reword some comments
+>>
+>> v1 -> v2:
+>> - rebase on 2.9 soft release code
+>> - handle case where migrate_add_blocker fails
+>> - add comments along with ITS and GICv3 migration priorities
+>>
+>>
+>> Eric Auger (4):
+>>   linux-headers: Update for vITS save/restore
+>>   hw/intc/arm_gicv3_its: Implement state save/restore
+>>   hw/intc/arm_gicv3_kvm: Implement pending table save
+>>   hw/intc/arm_gicv3_its: Allow save/restore
+>>
+>>  hw/intc/arm_gicv3_common.c             |   1 +
+>>  hw/intc/arm_gicv3_its_common.c         |  11 ++-
+>>  hw/intc/arm_gicv3_its_kvm.c            | 120 +++++++++++++++++++++++++++++----
+>>  hw/intc/arm_gicv3_kvm.c                |  25 +++++++
+>>  include/hw/intc/arm_gicv3_its_common.h |   8 +++
+>>  include/migration/vmstate.h            |   2 +
+>>  linux-headers/asm-arm/kvm.h            |   6 +-
+>>  linux-headers/asm-arm64/kvm.h          |   6 +-
+>>  8 files changed, 164 insertions(+), 15 deletions(-)
+>>
+>> --
+>> 2.5.5
+>>
+>>
+> 
