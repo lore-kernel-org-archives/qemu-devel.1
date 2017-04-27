@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d3nqE-0003aB-2M
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:08:35 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d3nux-0004zE-Vr
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d3nq9-0001si-2E
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:08:34 -0400
-Date: Thu, 27 Apr 2017 11:08:23 -0700 (PDT)
+	(envelope-from <sstabellini@kernel.org>) id 1d3nut-0004ZV-2G
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:13:28 -0400
+Received: from mail.kernel.org ([198.145.29.136]:42378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1d3nus-0004ZB-QS
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:13:22 -0400
+Date: Thu, 27 Apr 2017 11:13:18 -0700 (PDT)
 From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20170427193551.446a6793@Igors-MacBook-Pro.local>
-Message-ID: <alpine.DEB.2.10.1704271107260.11141@sstabellini-ThinkPad-X260>
-References: <1493233622-14485-1-git-send-email-brogers@suse.com>
-	<20170427111135.7a7bbfa9@nial.brq.redhat.com>
-	<590211DF02000048001438FF@prv-mh.provo.novell.com>
-	<20170427180832.55eed506@Igors-MacBook-Pro.local>
-	<5902218B0200004800143927@prv-mh.provo.novell.com>
-	<20170427193551.446a6793@Igors-MacBook-Pro.local>
+In-Reply-To: <149328811036.1628.11119485249329354693.stgit@bahia.lan>
+Message-ID: <alpine.DEB.2.10.1704271113120.11141@sstabellini-ThinkPad-X260>
+References: <149328811036.1628.11119485249329354693.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] ACPI: call acpi_set_pci_info when only
- acpi enabled
+Subject: Re: [Qemu-devel] [PATCH] virtio-9p/xen-9p: move 9p specific bits to
+ core 9p code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Bruce Rogers <brogers@suse.com>, sstabellini@kernel.org, mst@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>
 
-On Thu, 27 Apr 2017, Igor Mammedov wrote:
-> On Thu, 27 Apr 2017 10:51:23 -0600
-> "Bruce Rogers" <brogers@suse.com> wrote:
+On Thu, 27 Apr 2017, Greg Kurz wrote:
+> These bits aren't related to the transport so let's move them to the core
+> code.
 > 
-> > 
-> > 
-> > >>> On 4/27/2017 at 10:08 AM, Igor Mammedov <imammedo@redhat.com> wrote: 
-> > > On Thu, 27 Apr 2017 09:44:31 -0600
-> > > "Bruce Rogers" <brogers@suse.com> wrote:
-> > > 
-> > >> >>> On 4/27/2017 at 03:11 AM, Igor Mammedov <imammedo@redhat.com> wrote: 
-> > >> > On Wed, 26 Apr 2017 13:07:02 -0600
-> > >> > Bruce Rogers <brogers@suse.com> wrote:
-> > >> > 
-> > >> >> Commit f0c9d64a exposed an issue with the code order in acpi_setup.
-> > >> >> As of that commit, a xenfv machine type guest will no longer start
-> > >> >> if using pci passthrough. Re-order the code in that function to
-> > >> >> allow acpi_set_pci_info to be called before bailing on the other,
-> > >> >> non-related conditions. With this change I can again use pci
-> > >> >> passthrough and xenfv together.
-> > >> >> 
-> > >> >> Signed-off-by: Bruce Rogers <brogers@suse.com>
-> > >> > it doesn't look right,
-> > >> > acpi_set_pci_info() is supposed to affect only ACPI based hotplug
-> > >> > 
-> > >> > could you elaborate more on what's going on and
-> > >> > what error you see at startup?
-> > >> 
-> > >> I am using libvirt, driving the creation of the Xen HVM guest via
-> > >> libxl. libxl dynamically attaches the pci device via QMP. In the
-> > >> context of qmp_device_add(), we get a failure in hw/acpi/pcihp.c:
-> > >> acpi_pcihp_device_plug_cb() when it checks for bsel, and errors
-> > >> with the message: "Unsupported bus. Bus doesn't have property
-> > >> 'acpi-pcihp-bsel' set". I guess it wasn't clear from my description
-> > >> that hotplug was involved.
-> > >> 
-> > > is dev->hotplugged in acpi_pcihp_device_plug_cb() true at that time?
-> > > 
-> > > the point is that bsel is needed only when there is supporting ACPI code
-> > > and useless otherwise, so acpi_pcihp_device_plug_cb() probably shouldn't
-> > > run under xenfv. I'd try to add compat prop to PIIX4_PM and disable
-> > > acpi_pcihp_device_plug_cb() for xenfv via machine compat property.
-> > 
-> > So what would be wrong with simply conditionalizing the call to 
-> >  acpi_pcihp_device_plug_cb() with a check for xen in piix4_device_plug_cb()
-> > as follows:
-> > 
-> >          }
-> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> > -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, errp);
-> > +        if (!xen_enabled()) {
-> > +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> > +                                      errp);
-> > +        }
-> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> >          if (s->cpu_hotplug_legacy) {
-> >              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
-> > 
-> > Wouldn't that be the solution?
-> it should work
-> 
-> is it possible to see unplug on that device later under xen?
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Yes, it would be possible. I guess we need to do the same for
-acpi_pcihp_device_unplug_cb?
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+
+
+> ---
+>  hw/9pfs/9p.c               |    8 +++++++-
+>  hw/9pfs/9p.h               |    2 +-
+>  hw/9pfs/virtio-9p-device.c |    8 +-------
+>  hw/9pfs/xen-9p-backend.c   |    6 +-----
+>  4 files changed, 10 insertions(+), 14 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index c80ba67389ce..b40001e3dea3 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -3446,12 +3446,16 @@ static inline bool is_read_only_op(V9fsPDU *pdu)
+>      }
+>  }
+>  
+> -void pdu_submit(V9fsPDU *pdu)
+> +void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
+>  {
+>      Coroutine *co;
+>      CoroutineEntry *handler;
+>      V9fsState *s = pdu->s;
+>  
+> +    pdu->size = le32_to_cpu(hdr->size_le);
+> +    pdu->id = hdr->id;
+> +    pdu->tag = le16_to_cpu(hdr->tag_le);
+> +
+>      if (pdu->id >= ARRAY_SIZE(pdu_co_handlers) ||
+>          (pdu_co_handlers[pdu->id] == NULL)) {
+>          handler = v9fs_op_not_supp;
+> @@ -3462,6 +3466,8 @@ void pdu_submit(V9fsPDU *pdu)
+>      if (is_ro_export(&s->ctx) && !is_read_only_op(pdu)) {
+>          handler = v9fs_fs_ro;
+>      }
+> +
+> +    qemu_co_queue_init(&pdu->complete);
+>      co = qemu_coroutine_create(handler, pdu);
+>      qemu_coroutine_enter(co);
+>  }
+> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> index 5312d8a42405..c886ba78d2ee 100644
+> --- a/hw/9pfs/9p.h
+> +++ b/hw/9pfs/9p.h
+> @@ -347,7 +347,7 @@ ssize_t pdu_marshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...);
+>  ssize_t pdu_unmarshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...);
+>  V9fsPDU *pdu_alloc(V9fsState *s);
+>  void pdu_free(V9fsPDU *pdu);
+> -void pdu_submit(V9fsPDU *pdu);
+> +void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr);
+>  void v9fs_reset(V9fsState *s);
+>  
+>  struct V9fsTransport {
+> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> index 3782f437029b..245abd8aaef1 100644
+> --- a/hw/9pfs/virtio-9p-device.c
+> +++ b/hw/9pfs/virtio-9p-device.c
+> @@ -70,13 +70,7 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQueue *vq)
+>              goto out_free_req;
+>          }
+>  
+> -        pdu->size = le32_to_cpu(out.size_le);
+> -
+> -        pdu->id = out.id;
+> -        pdu->tag = le16_to_cpu(out.tag_le);
+> -
+> -        qemu_co_queue_init(&pdu->complete);
+> -        pdu_submit(pdu);
+> +        pdu_submit(pdu, &out);
+>      }
+>  
+>      return;
+> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> index 9c7f41af99da..c0b9d534298a 100644
+> --- a/hw/9pfs/xen-9p-backend.c
+> +++ b/hw/9pfs/xen-9p-backend.c
+> @@ -243,14 +243,10 @@ static int xen_9pfs_receive(Xen9pfsRing *ring)
+>  
+>      /* cannot fail, because we only handle one request per ring at a time */
+>      pdu = pdu_alloc(&ring->priv->state);
+> -    pdu->size = le32_to_cpu(h.size_le);
+> -    pdu->id = h.id;
+> -    pdu->tag = le32_to_cpu(h.tag_le);
+>      ring->out_size = le32_to_cpu(h.size_le);
+>      ring->out_cons = cons + le32_to_cpu(h.size_le);
+>  
+> -    qemu_co_queue_init(&pdu->complete);
+> -    pdu_submit(pdu);
+> +    pdu_submit(pdu, &h);
+>  
+>      return 0;
+>  }
+> 
