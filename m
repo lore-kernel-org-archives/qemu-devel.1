@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3lbG-00071b-Vm
+	(envelope-from <bounces@canonical.com>) id 1d3lbG-00071d-Vo
 	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:45:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3lbD-0002xa-85
+	(envelope-from <bounces@canonical.com>) id 1d3lbC-0002xJ-U6
 	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:44:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59601)
+Received: from indium.canonical.com ([91.189.90.7]:59597)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d3lbD-0002xB-1h
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:44:55 -0400
+	id 1d3lbC-0002x6-Nq
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:44:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d3lbC-0008HV-3P
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:44:54 +0000
+	id 1d3lbB-0008HT-Mx
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:44:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 16F292E80C6
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:44:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id A195D2E80C6
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:44:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Apr 2017 15:33:23 -0000
-From: Thomas Huth <1184089@bugs.launchpad.net>
-Reply-To: Bug 1184089 <1184089@bugs.launchpad.net>
+Date: Thu, 27 Apr 2017 15:32:36 -0000
+From: Thomas Huth <1284090@bugs.launchpad.net>
+Reply-To: Bug 1284090 <1284090@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130525082911.27253.67454.malonedeb@gac.canonical.com>
-Message-Id: <20170427153324.22759.53723.launchpad@wampee.canonical.com>
+References: <20140224123257.31623.72910.malonedeb@gac.canonical.com>
+Message-Id: <20170427153236.26915.31001.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1184089] Re: [Feature request] loadvm snapshot as
- read-only
+Subject: [Qemu-devel] [Bug 1284090] Re: RFE: QMP: report error reason in
+ BLOCK_IO_ERROR message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,34 +46,24 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1184089
+https://bugs.launchpad.net/bugs/1284090
 
 Title:
-  [Feature request] loadvm snapshot as read-only
+  RFE: QMP: report error reason in BLOCK_IO_ERROR message
 
 Status in QEMU:
   New
 
 Bug description:
-  There are many ways to take and manage snapshots in QEMU, but one main
-  feature that's missing is the ability to 'loadvm' a LIVE snapshot and
-  have all future changes redirected to a temporary file.  This would
-  effectively be combining the -loadvm and -snapshot switches and make
-  the snapshot read-only.  With this feature, users would be provided a
-  "sandbox" and be able to start and restart the same live snapshot
-  without corrupting the image in doing so.
+  when a disk drive is configured with the error policy enospc for write er=
+rors, the monitoring client needs a way to distinguish
+  betwwen generic I/O error and the I/O error for space exausted.
 
-  I found a lot of discussion about this topic on the mailing list years
-  ago, including some patch submissions, but none of the conversations
-  panned out.
+  The JSON QMP protocol lacks this information: the BLOCK_IO_ERROR
+  message does not provide a reason or code for the error verified, so
+  the monitoring client cannot distinguish the source of the errors.
 
-  http://lists.gnu.org/archive/html/qemu-discuss/2011-10/msg00011.html
-  http://copilotco.com/mail-archives/qemu.2008/msg00072.html
-  http://web.archiveorange.com/archive/v/1XS1vcusGInZKG2e0ImX
-  http://marc.info/?l=3Dqemu-devel&m=3D117191084713590
-
-  What would it take for this feature to be added, and can we use the
-  patches submitted by Eddie Kohler to enable this feature?
+  verified against git 105a060188dc6fdd4551571a966514d1a5f6815a
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1184089/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1284090/+subscriptions
