@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eRC-0003CU-7x
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:07 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eRI-0003Fr-Qr
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eR8-00080y-A3
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:06 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eRC-00085I-UK
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:12 -0400
 From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Thu, 27 Apr 2017 13:36:30 +0530
-Message-Id: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 0/7] Refactor DMG driver to have chunk size
- independence
+Date: Thu, 27 Apr 2017 13:36:31 +0530
+Message-Id: <1493280397-9622-2-git-send-email-ashijeetacharya@gmail.com>
+In-Reply-To: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
+References: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 1/7] dmg: Introduce a new struct to cache
+ random access points
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,80 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: stefanha@gmail.com
 Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, famz@redhat.com, peter@lekensteyn.nl, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Previously posted series patches:
-v1: http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg04641.html
+We need to cache the random access point while performing partial
+decompression so that we can resume decompression from that point
+onwards in our next sequential read request. Introduce a new struct
+DMGReadState which will help us do this.
 
-This series helps to provide chunk size independence for DMG driver to prevent
-denial-of-service in cases where untrusted files are being accessed by the user.
+Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+---
+ block/dmg.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-This task is mentioned on the public block ToDo
-Here -> http://wiki.qemu.org/ToDo/Block/DmgChunkSizeIndependence
-
-Patch 1 introduces a new data structure to aid caching of random access points
-within a compressed stream.
-
-Patch 2 is an extension of patch 1 and introduces a new function to
-initialize/update/reset our cached random access point.
-
-Patch 3 limits the output buffer size to a max of 2MB to avoid QEMU allocate
-huge amounts of memory.
-
-Patch 4 is a simple preparatory patch to aid handling of various types of chunks.
-
-Patches 5 & 6 help to handle various types of chunks.
-
-Patch 7 simply refactors dmg_co_preadv() to read multiple sectors at once.
-
-Patch 8 finally removes the error messages QEMU used to throw when an image with
-chunk sizes above 64MB were accessed by the user.
-
-->Testing procedure:
-Convert a DMG file to raw format using the "qemu-img convert" tool present in
-v2.9.0
-Next convert the same image again after applying these patches.
-Compare the two images using "qemu-img compare" tool to check if they are
-identical.
-
-You can pickup any DMG image from the collection present
-Here -> https://lists.gnu.org/archive/html/qemu-devel/2014-12/msg03606.html
-
-->Important note:
-These patches assume that the terms "chunk" and "block" are synonyms of each other
-when we talk about bz2 compressed streams. Thus according to the bz2 docs[1],
-the max uncompressed size of a chunk/block can reach to 46MB which is less than
-the previously allowed size of 64MB, so we can continue decompressing the whole
-chunk/block at once instead of partial decompression just like we do now.
-
-This limitation was forced by the fact that bz2 compressed streams do not allow
-random access midway through a chunk/block as the BZ2_bzDecompress() API in bzlib
-seeks for the magic key "BZh" before starting decompression.[2] This magic key is
-present at the start of every chunk/block only and since our cached random access
-points need not necessarily point to the start of a chunk/block, BZ2_bzDecompress()
-fails with an error value BZ_DATA_ERROR_MAGIC[3]
-
-[1] https://en.wikipedia.org/wiki/Bzip2#File_format
-[2] https://blastedbio.blogspot.in/2011/11/random-access-to-bzip2.html
-[3] http://linux.math.tifr.res.in/manuals/html/manual_3.html#SEC17
-
-Special thanks to Peter Wu for helping me understand and tackle the bz2
-compressed chunks.
-
-Changes in v2:
-- limit the buffer size to 2MB after fixing the buffering problems (john/fam)
-
-Ashijeet Acharya (7):
-  dmg: Introduce a new struct to cache random access points
-  dmg: New function to help us cache random access point
-  dmg: Refactor and prepare dmg_read_chunk() to cache random access
-    points
-  dmg: Handle zlib compressed chunks
-  dmg: Handle bz2 compressed/raw/zeroed chunks
-  dmg: Refactor dmg_co_preadv() to start reading multiple sectors
-  dmg: Limit the output buffer size to a max of 2MB
-
- block/dmg.c | 214 +++++++++++++++++++++++++++++++++++++++---------------------
- block/dmg.h |  10 +++
- 2 files changed, 148 insertions(+), 76 deletions(-)
-
+diff --git a/block/dmg.h b/block/dmg.h
+index b592d6f..ee67ae1 100644
+--- a/block/dmg.h
++++ b/block/dmg.h
+@@ -31,6 +31,15 @@
+ #include "block/block_int.h"
+ #include <zlib.h>
+ 
++/* used to cache current position in compressed input stream */
++typedef struct DMGReadState {
++    uint8_t *saved_next_in;
++    int64_t saved_avail_in;
++    int32_t saved_chunk_type;
++    int64_t sectors_read; /* possible sectors read in each cycle */
++    int32_t sector_offset_in_chunk;
++} DMGReadState;
++
+ typedef struct BDRVDMGState {
+     CoMutex lock;
+     /* each chunk contains a certain number of sectors,
+@@ -51,6 +60,7 @@ typedef struct BDRVDMGState {
+     uint8_t *compressed_chunk;
+     uint8_t *uncompressed_chunk;
+     z_stream zstream;
++    DMGReadState *drs;
+ } BDRVDMGState;
+ 
+ extern int (*dmg_uncompress_bz2)(char *next_in, unsigned int avail_in,
 -- 
 2.6.2
