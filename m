@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d3dWP-0001eb-FC
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:07:26 -0400
+	(envelope-from <famz@redhat.com>) id 1d3dfE-0003PG-VT
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d3dWK-0008EB-Mf
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:07:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d3dWK-0008BJ-GE
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:07:20 -0400
-Message-ID: <1493276836.31995.38.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 27 Apr 2017 09:07:16 +0200
-In-Reply-To: <201704271430117024953@zte.com.cn>
-References: <201704271430117024953@zte.com.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel]
- =?utf-8?q?New_function=3A=E3=80=80Remot_USB_support?=
- =?utf-8?q?_in_qemu?=
+	(envelope-from <famz@redhat.com>) id 1d3dfE-00049o-0L
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:16:32 -0400
+Date: Thu, 27 Apr 2017 15:16:23 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170427071623.GL9205@lemon.lan>
+References: <20170426033413.17192-1-famz@redhat.com>
+	<20170426033413.17192-12-famz@redhat.com>
+	<20170426123046.GC4538@noname.str.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170426123046.GC4538@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v15 11/21] iotests: 085: Avoid image
+ locking conflict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +25,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuan.zhong@zte.com.cn
-Cc: afaerber@suse.de, pbonzini@redhat.com, qemu-devel@nongnu.org, Hans de Goede <hdegoede@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Do, 2017-04-27 at 14:30 +0800, yuan.zhong@zte.com.cn wrote:
-> Mr. Hoffmann,
->=20
->=20
-> Thank you for your time.
->=20
->=20
-> This email will describe a new module that I'd like to commit to the
-> qemu code source.
->=20
-> We call it as remote usb, and this is features:
->=20
-> 1. real usb device is aside on a windows client.
->=20
-> 2. keeping a connection between the client and the VMs host OS
->=20
-> 3. qemu simulate a remote usb device through our remote usb module
->=20
-> 4. the communication between real usb device and the simulation remote
-> usb is based on USB/IP protocol.
+On Wed, 04/26 14:30, Kevin Wolf wrote:
+> Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
+> > In the case where we test the expected error when a blockdev-snapshot
+> > target already has a backing image, the backing chain is opened multiple
+> > times. This will be a problem when we use image locking, so use a
+> > different backing file that is not already open.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  tests/qemu-iotests/085     | 34 ++++++++++++++++++++--------------
+> >  tests/qemu-iotests/085.out |  3 ++-
+> >  2 files changed, 22 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
+> > index c53e97f..cc6efd8 100755
+> > --- a/tests/qemu-iotests/085
+> > +++ b/tests/qemu-iotests/085
+> > @@ -45,7 +45,7 @@ _cleanup()
+> >          rm -f "${TEST_DIR}/${i}-${snapshot_virt0}"
+> >          rm -f "${TEST_DIR}/${i}-${snapshot_virt1}"
+> >      done
+> > -    rm -f "${TEST_IMG}.1" "${TEST_IMG}.2"
+> > +    rm -f "${TEST_IMG}" "${TEST_IMG}.1" "${TEST_IMG}.2" "${TEST_IMG}.base"
+> >  
+> >  }
+> >  trap "_cleanup; exit \$status" 0 1 2 3 15
+> > @@ -87,24 +87,26 @@ function create_group_snapshot()
+> >  }
+> >  
+> >  # ${1}: unique identifier for the snapshot filename
+> > -# ${2}: true: open backing images; false: don't open them (default)
+> > +# ${2}: extra_params to the blockdev-add command
+> > +# ${3}: filename
+> > +function do_blockdev_add()
+> > +{
+> > +    cmd="{ 'execute': 'blockdev-add', 'arguments':
+> > +           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${2}
+> > +             'file':
+> > +             { 'driver': 'file', 'filename': '${3}',
+> > +               'node-name': 'file_${1}' } } }"
+> > +    _send_qemu_cmd $h "${cmd}" "return"
+> > +}
+> > +
+> > +# ${1}: unique identifier for the snapshot filename
+> >  function add_snapshot_image()
+> >  {
+> > -    if [ "${2}" = "true" ]; then
+> > -        extra_params=""
+> > -    else
+> > -        extra_params="'backing': '', "
+> > -    fi
+> >      base_image="${TEST_DIR}/$((${1}-1))-${snapshot_virt0}"
+> >      snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
+> >      _make_test_img -b "${base_image}" "$size"
+> >      mv "${TEST_IMG}" "${snapshot_file}"
+> > -    cmd="{ 'execute': 'blockdev-add', 'arguments':
+> > -           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${extra_params}
+> > -             'file':
+> > -             { 'driver': 'file', 'filename': '${snapshot_file}',
+> > -               'node-name': 'file_${1}' } } }"
+> > -    _send_qemu_cmd $h "${cmd}" "return"
+> > +    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
+> >  }
+> >  
+> >  # ${1}: unique identifier for the snapshot filename
+> > @@ -222,7 +224,11 @@ echo === Invalid command - snapshot node has a backing image ===
+> >  echo
+> >  
+> >  SNAPSHOTS=$((${SNAPSHOTS}+1))
+> > -add_snapshot_image ${SNAPSHOTS} true
+> > +
+> > +_make_test_img "$size"
+> > +mv "${TEST_IMG}" "${TEST_IMG}.base"
+> 
+> The common idiom is:
+> 
+>     TEST_IMG="$TEST_IMG.base" _make_test_img "$size"
+> 
+> This avoids using mv, which is helpful if we ever want to extend the
+> testcase for non-file protocols.
 
-qemu supports that already.  It's called usb redirection.
-https://www.spice-space.org/page/UsbRedir
-https://github.com/SPICE/usbredir
+Yes. Cleaning up "mv" usages in all iotests should be done, once again.
 
-usb redirection can use either plain tcp or a spice channel as
-transport.  The spice client supports usb devices on windows clients.
+I can change this one in this patch, though.
 
-Hans (Cc'ed, usbredir author) looked at the USB/IP protocol and found a
-number of deficits and decided to not use it because of that.  I don't
-remember the details though.
-
-So I think using the existing usb redirection support is the better
-option for you.
-
-cheers,
-  Gerd
+Fam
