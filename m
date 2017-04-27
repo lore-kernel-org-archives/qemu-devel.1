@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3qNf-0005PR-Gr
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:51:16 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d3qNl-0005Sk-6r
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3qNc-0004Hs-GL
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:51:15 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d3qNk-0004LM-Dn
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:51:21 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu, 27 Apr 2017 16:50:59 -0400
-Message-Id: <20170427205100.9505-2-jsnow@redhat.com>
+Date: Thu, 27 Apr 2017 16:51:00 -0400
+Message-Id: <20170427205100.9505-3-jsnow@redhat.com>
 In-Reply-To: <20170427205100.9505-1-jsnow@redhat.com>
 References: <20170427205100.9505-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] iotests: clarify help text
+Subject: [Qemu-devel] [PATCH 2/2] iotests: fix exclusion option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,47 +22,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-trivial@nongnu.org, kwolf@redhat.com, eblake@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-Split the help text to highlight the groups of options
-a little better, carving out a clear "format" and
-"protocols" section.
+If you are running out-of-tree, the -x option to exclude
+a certain iotest is broken.
 
+Replace porcelain usage of ls with a sturdier awk command.
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/common | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/common | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
-index 9c6f972..fa8e69e 100644
+index fa8e69e..f2a7199 100644
 --- a/tests/qemu-iotests/common
 +++ b/tests/qemu-iotests/common
-@@ -138,7 +138,7 @@ common options
-     -v                  verbose
-     -d                  debug
- 
--check options
-+image format options
-     -raw                test raw (default)
-     -bochs              test bochs
-     -cloop              test cloop
-@@ -150,14 +150,18 @@ check options
-     -vpc                test vpc
-     -vhdx               test vhdx
-     -vmdk               test vmdk
-+    -luks               test luks
-+
-+image protocol options
-     -file               test file (default)
-     -rbd                test rbd
-     -sheepdog           test sheepdog
-     -nbd                test nbd
-     -ssh                test ssh
-     -nfs                test nfs
--    -luks               test luks
-     -vxhs               test vxhs
-+
-+other options
-     -xdiff              graphical mode diff
-     -nocache            use O_DIRECT on backing file
-     -misalign           misalign memory allocations
+@@ -86,7 +86,8 @@ s/ .*//p
+     elif $xgroup
+     then
+         # arg after -x
+-        [ ! -s $tmp.list ] && ls [0-9][0-9][0-9] [0-9][0-9][0-9][0-9] >$tmp.list 2>/dev/null
++        # Populate $tmp.list with all tests
++        awk '/^[0-9]{3,}/ {print $1}' "${source_iotests}/group" > $tmp.list 2>/dev/null
+         group_list=`sed -n <"$source_iotests/group" -e 's/$/ /' -e "/^[0-9][0-9][0-9].* $r /"'{
+ s/ .*//p
+ }'`
 -- 
 2.9.3
