@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d3dfE-0003PG-VT
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:16:34 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3did-0004QX-V3
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:20:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d3dfE-00049o-0L
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:16:32 -0400
-Date: Thu, 27 Apr 2017 15:16:23 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170427071623.GL9205@lemon.lan>
-References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-12-famz@redhat.com>
-	<20170426123046.GC4538@noname.str.redhat.com>
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3dic-0005lB-Na
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:20:03 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170426123046.GC4538@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v15 11/21] iotests: 085: Avoid image
- locking conflict
+In-Reply-To: <5e859188-5072-ab41-c10a-82c0182406cc@redhat.com>
+References: <1493150351-28918-1-git-send-email-ashijeetacharya@gmail.com>
+	<1493150351-28918-4-git-send-email-ashijeetacharya@gmail.com>
+	<5e859188-5072-ab41-c10a-82c0182406cc@redhat.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Thu, 27 Apr 2017 12:49:58 +0530
+Message-ID: <CAC2QTZa9csv6J=bK=B_oJTAmd9OG68CgW_V6+i5M9ECZGCOpag@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v1 3/8] dmg: Limit the output buffer size
+ to a max of 2MB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,92 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Peter Wu <peter@lekensteyn.nl>
 
-On Wed, 04/26 14:30, Kevin Wolf wrote:
-> Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
-> > In the case where we test the expected error when a blockdev-snapshot
-> > target already has a backing image, the backing chain is opened multiple
-> > times. This will be a problem when we use image locking, so use a
-> > different backing file that is not already open.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  tests/qemu-iotests/085     | 34 ++++++++++++++++++++--------------
-> >  tests/qemu-iotests/085.out |  3 ++-
-> >  2 files changed, 22 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-> > index c53e97f..cc6efd8 100755
-> > --- a/tests/qemu-iotests/085
-> > +++ b/tests/qemu-iotests/085
-> > @@ -45,7 +45,7 @@ _cleanup()
-> >          rm -f "${TEST_DIR}/${i}-${snapshot_virt0}"
-> >          rm -f "${TEST_DIR}/${i}-${snapshot_virt1}"
-> >      done
-> > -    rm -f "${TEST_IMG}.1" "${TEST_IMG}.2"
-> > +    rm -f "${TEST_IMG}" "${TEST_IMG}.1" "${TEST_IMG}.2" "${TEST_IMG}.base"
-> >  
-> >  }
-> >  trap "_cleanup; exit \$status" 0 1 2 3 15
-> > @@ -87,24 +87,26 @@ function create_group_snapshot()
-> >  }
-> >  
-> >  # ${1}: unique identifier for the snapshot filename
-> > -# ${2}: true: open backing images; false: don't open them (default)
-> > +# ${2}: extra_params to the blockdev-add command
-> > +# ${3}: filename
-> > +function do_blockdev_add()
-> > +{
-> > +    cmd="{ 'execute': 'blockdev-add', 'arguments':
-> > +           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${2}
-> > +             'file':
-> > +             { 'driver': 'file', 'filename': '${3}',
-> > +               'node-name': 'file_${1}' } } }"
-> > +    _send_qemu_cmd $h "${cmd}" "return"
-> > +}
-> > +
-> > +# ${1}: unique identifier for the snapshot filename
-> >  function add_snapshot_image()
-> >  {
-> > -    if [ "${2}" = "true" ]; then
-> > -        extra_params=""
-> > -    else
-> > -        extra_params="'backing': '', "
-> > -    fi
-> >      base_image="${TEST_DIR}/$((${1}-1))-${snapshot_virt0}"
-> >      snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
-> >      _make_test_img -b "${base_image}" "$size"
-> >      mv "${TEST_IMG}" "${snapshot_file}"
-> > -    cmd="{ 'execute': 'blockdev-add', 'arguments':
-> > -           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${extra_params}
-> > -             'file':
-> > -             { 'driver': 'file', 'filename': '${snapshot_file}',
-> > -               'node-name': 'file_${1}' } } }"
-> > -    _send_qemu_cmd $h "${cmd}" "return"
-> > +    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
-> >  }
-> >  
-> >  # ${1}: unique identifier for the snapshot filename
-> > @@ -222,7 +224,11 @@ echo === Invalid command - snapshot node has a backing image ===
-> >  echo
-> >  
-> >  SNAPSHOTS=$((${SNAPSHOTS}+1))
-> > -add_snapshot_image ${SNAPSHOTS} true
-> > +
-> > +_make_test_img "$size"
-> > +mv "${TEST_IMG}" "${TEST_IMG}.base"
-> 
-> The common idiom is:
-> 
->     TEST_IMG="$TEST_IMG.base" _make_test_img "$size"
-> 
-> This avoids using mv, which is helpful if we ever want to extend the
-> testcase for non-file protocols.
+On Thu, Apr 27, 2017 at 3:00 AM, John Snow <jsnow@redhat.com> wrote:
+>
+>
+> On 04/25/2017 03:59 PM, Ashijeet Acharya wrote:
+>> The size of the output buffer is limited to a maximum of 2MB so that
+>> QEMU doesn't end up allocating huge amounts of memory while
+>> decompressing compressed input streams.
+>>
+>> 2MB is an appropriate size because "qemu-img convert" has the same I/O
+>> buffer size and the most important use case for DMG files is to be
+>> compatible with qemu-img convert.
+>>
+>> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+>> ---
+>
+> Patch 1 adds a new structure and patch 2 starts using it, but in a
+> store-only manner and only with placeholder variables that are difficult
+> to authenticate, so there's still "insufficient data" to review either
+> patch meaningfully.
+>
+> This patch seems unrelated to either of those, so the ordering is strange.
 
-Yes. Cleaning up "mv" usages in all iotests should be done, once again.
+Actually, I have tried to keep these patches very short so that it is
+easier to review them (mainly because of the time limitation I have).
+But seems like I over tried. If you have any suggestions for the first
+2 patches, I am happy to change them in you preferred way.
 
-I can change this one in this patch, though.
+>
+>>  block/dmg.c | 12 ++++++------
+>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/dmg.c b/block/dmg.c
+>> index c6fe8b0..7ae30e3 100644
+>> --- a/block/dmg.c
+>> +++ b/block/dmg.c
+>> @@ -37,8 +37,8 @@ enum {
+>>      /* Limit chunk sizes to prevent unreasonable amounts of memory being used
+>>       * or truncating when converting to 32-bit types
+>>       */
+>> -    DMG_LENGTHS_MAX = 64 * 1024 * 1024, /* 64 MB */
+>> -    DMG_SECTORCOUNTS_MAX = DMG_LENGTHS_MAX / 512,
+>> +    DMG_MAX_OUTPUT = 2 * 1024 * 1024, /* 2 MB */
+>
+> why "MAX OUTPUT" ? Aren't we using this for buffering on reads?
 
-Fam
+I just thought that this looked better, but I will revert back to the
+original one.
+
+>
+>> +    DMG_SECTOR_MAX = DMG_MAX_OUTPUT / 512,
+>>  };
+>>
+>>  static int dmg_probe(const uint8_t *buf, int buf_size, const char *filename)
+>> @@ -260,10 +260,10 @@ static int dmg_read_mish_block(BDRVDMGState *s, DmgHeaderState *ds,
+>>
+>>          /* all-zeroes sector (type 2) does not need to be "uncompressed" and can
+>>           * therefore be unbounded. */
+>> -        if (s->types[i] != 2 && s->sectorcounts[i] > DMG_SECTORCOUNTS_MAX) {
+>> +        if (s->types[i] != 2 && s->sectorcounts[i] > DMG_SECTOR_MAX) {
+>>              error_report("sector count %" PRIu64 " for chunk %" PRIu32
+>>                           " is larger than max (%u)",
+>> -                         s->sectorcounts[i], i, DMG_SECTORCOUNTS_MAX);
+>> +                         s->sectorcounts[i], i, DMG_SECTOR_MAX);
+>>              ret = -EINVAL;
+>>              goto fail;
+>>          }
+>> @@ -275,10 +275,10 @@ static int dmg_read_mish_block(BDRVDMGState *s, DmgHeaderState *ds,
+>>          /* length in (compressed) data fork */
+>>          s->lengths[i] = buff_read_uint64(buffer, offset + 0x20);
+>>
+>> -        if (s->lengths[i] > DMG_LENGTHS_MAX) {
+>> +        if (s->lengths[i] > DMG_MAX_OUTPUT) {
+>>              error_report("length %" PRIu64 " for chunk %" PRIu32
+>>                           " is larger than max (%u)",
+>> -                         s->lengths[i], i, DMG_LENGTHS_MAX);
+>> +                         s->lengths[i], i, DMG_MAX_OUTPUT);
+>>              ret = -EINVAL;
+>>              goto fail;
+>>          }
+>>
+>
+> Seems OK otherwise, but I would normally expect you to fix the buffering
+> problems first, and then reduce the size of the buffer -- not the other
+> way around. This version introduces new limitations that didn't exist
+> previously (As of this commit, QEMU can't open DMG files with chunks
+> larger than 2MB now, right?)
+
+I think I will squash it with the last one (patch 8) which removes
+this limitation completely and will also fix the problem of handling
+the buffering problems first and then reducing the buffer size?
+
+Ashijeet
