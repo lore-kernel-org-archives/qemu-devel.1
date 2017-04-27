@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d3fOC-0001Uc-Pr
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:07:05 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d3fOI-0001kz-9H
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d3fOB-0001xv-Nz
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:07:04 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35611)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d3fOH-00021l-76
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:07:10 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36389)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d3fOB-0001xQ-GJ
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:07:03 -0400
-Received: by mail-lf0-x244.google.com with SMTP id i3so3325200lfh.2
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 02:07:03 -0700 (PDT)
+	id 1d3fOG-00020i-Qz
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:07:09 -0400
+Received: by mail-lf0-x243.google.com with SMTP id 75so3308832lfs.3
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 02:07:08 -0700 (PDT)
 MIME-Version: 1.0
 References: <1493282486-28338-1-git-send-email-armbru@redhat.com>
-	<1493282486-28338-3-git-send-email-armbru@redhat.com>
-In-Reply-To: <1493282486-28338-3-git-send-email-armbru@redhat.com>
+	<1493282486-28338-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1493282486-28338-2-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 27 Apr 2017 09:06:51 +0000
-Message-ID: <CAJ+F1CKUxUXyCYbg-ZU9sO22cH3tK2PESjyeu=kBGLUnPX_UAg@mail.gmail.com>
+Date: Thu, 27 Apr 2017 09:06:57 +0000
+Message-ID: <CAJ+F1CLUm-QWKgP6R_r=72aP=7j6D-jP8eRdcO3JJUjtHUe1iA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/4] qobject-input-visitor: Document
- full_name_nth()
+Subject: Re: [Qemu-devel] [PATCH 1/4] qmp: Improve QMP dispatch error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,10 +34,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com
 
-On Thu, Apr 27, 2017 at 12:41 PM Markus Armbruster <armbru@redhat.com>
+On Thu, Apr 27, 2017 at 12:46 PM Markus Armbruster <armbru@redhat.com>
 wrote:
 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 >
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
@@ -45,32 +46,62 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  qapi/qobject-input-visitor.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  qapi/qmp-dispatch.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 >
-> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-> index 865e948..2530959 100644
-> --- a/qapi/qobject-input-visitor.c
-> +++ b/qapi/qobject-input-visitor.c
-> @@ -55,6 +55,17 @@ static QObjectInputVisitor *to_qiv(Visitor *v)
->      return container_of(v, QObjectInputVisitor, visitor);
->  }
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index dc50212..5ad36f8 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -30,7 +30,7 @@ static QDict *qmp_dispatch_check_obj(const QObject
+> *request, Error **errp)
 >
-> +/*
-> + * Find the full name of something @qiv is currently visiting.
-> + * @qiv is visiting something named @name in the stack of containers
-> + * @qiv->stack.
-> + * If @n is zero, return its full name.
-> + * If @n is positive, return the full name of the @n-th container
-> + * counting from the top.  The stack of containers must have at least
-> + * @n elements.
-> + * The returned string is valid until the next full_name_nth(@v) or
-> + * destruction of @v.
-> + */
->  static const char *full_name_nth(QObjectInputVisitor *qiv, const char
-> *name,
->                                   int n)
->  {
+>      dict =3D qobject_to_qdict(request);
+>      if (!dict) {
+> -        error_setg(errp, "Expected '%s' in QMP input", "object");
+> +        error_setg(errp, "QMP input must be a JSON object");
+>          return NULL;
+>      }
+>
+> @@ -41,26 +41,26 @@ static QDict *qmp_dispatch_check_obj(const QObject
+> *request, Error **errp)
+>
+>          if (!strcmp(arg_name, "execute")) {
+>              if (qobject_type(arg_obj) !=3D QTYPE_QSTRING) {
+> -                error_setg(errp, "QMP input object member '%s' expects
+> '%s'",
+> -                           "execute", "string");
+> +                error_setg(errp,
+> +                           "QMP input member 'execute' must be a string"=
+);
+>                  return NULL;
+>              }
+>              has_exec_key =3D true;
+>          } else if (!strcmp(arg_name, "arguments")) {
+>              if (qobject_type(arg_obj) !=3D QTYPE_QDICT) {
+> -                error_setg(errp, "QMP input object member '%s' expects
+> '%s'",
+> -                           "arguments", "object");
+> +                error_setg(errp,
+> +                           "QMP input member 'arguments' must be an
+> object");
+>                  return NULL;
+>              }
+>          } else {
+> -            error_setg(errp, "QMP input object member '%s' is unexpected=
+",
+> +            error_setg(errp, "QMP input member '%s' is unexpected",
+>                         arg_name);
+>              return NULL;
+>          }
+>      }
+>
+>      if (!has_exec_key) {
+> -        error_setg(errp, "Expected '%s' in QMP input", "execute");
+> +        error_setg(errp, "QMP input lacks member 'execute'");
+>          return NULL;
+>      }
+>
 > --
 > 2.7.4
 >
