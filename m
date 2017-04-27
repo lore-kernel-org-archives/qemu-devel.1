@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d3ZB1-0007zW-24
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:29:03 -0400
+	(envelope-from <famz@redhat.com>) id 1d3ZBx-0008RY-I1
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d3ZAx-0003dM-4Z
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:29:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42222)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d3ZAw-0003dG-Tq
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:28:59 -0400
-References: <1493119568-15218-1-git-send-email-jasowang@redhat.com>
-	<1493119568-15218-9-git-send-email-jasowang@redhat.com>
-	<CAFEAcA81uAqOZHiXBiQgrKO5Mziq47dRr=R_t5PLMV9qVxbSZw@mail.gmail.com>
-	<CAFEAcA8OxPhzymdFqRd78zVmLPkqXptXWUKYpmYahmwykGwamw@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <4c353e1f-dfeb-a482-1e0c-6799ca295beb@redhat.com>
-Date: Thu, 27 Apr 2017 10:28:52 +0800
+	(envelope-from <famz@redhat.com>) id 1d3ZBw-0003mB-QK
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:30:01 -0400
+Date: Thu, 27 Apr 2017 10:29:52 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170427022952.GI9205@lemon.lan>
+References: <20170426033413.17192-1-famz@redhat.com>
+	<20170426033413.17192-17-famz@redhat.com>
+	<20170426124136.GE4538@noname.str.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8OxPhzymdFqRd78zVmLPkqXptXWUKYpmYahmwykGwamw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL V2 8/8] COLO-compare: Optimize tcp compare
- trace event
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170426124136.GE4538@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v15 16/21] file-posix: Add 'locking' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+On Wed, 04/26 14:41, Kevin Wolf wrote:
+> Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
+> > Making this option available even before implementing it will let
+> > converting tests easier: in coming patches they can specify the option
+> > already when necessary, before we actually write code to lock the
+> > images.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  block/file-posix.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/block/file-posix.c b/block/file-posix.c
+> > index ade71db..2114720 100644
+> > --- a/block/file-posix.c
+> > +++ b/block/file-posix.c
+> > @@ -392,6 +392,11 @@ static QemuOptsList raw_runtime_opts = {
+> >              .type = QEMU_OPT_STRING,
+> >              .help = "host AIO implementation (threads, native)",
+> >          },
+> > +        {
+> > +            .name = "locking",
+> > +            .type = QEMU_OPT_BOOL,
+> > +            .help = "lock the file",
+> > +        },
+> >          { /* end of list */ }
+> >      },
+> >  };
+> 
+> I don't mind whether it happens in this patch or when the option is
+> actually implemented, but this option needs to be added to the QAPI
+> schema.
 
+I will add it.
 
-On 2017=E5=B9=B404=E6=9C=8826=E6=97=A5 23:55, Peter Maydell wrote:
-> On 26 April 2017 at 16:18, Peter Maydell <peter.maydell@linaro.org> wro=
-te:
->> On 25 April 2017 at 12:26, Jason Wang <jasowang@redhat.com> wrote:
->>> From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>>
->>> Optimize two trace events as one, adjust print format make
->>> it easy to read. rename trace_colo_compare_pkt_info_src/dst
->>> to trace_colo_compare_tcp_info.
->>>
->>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> Hi. This commit has broken building with the UST backend,
->> because it is effectively reverting commit 2dfe5113b11,
->> which split this trace line into two events because the
->> UST backend has a limit on the number of arguments that
->> a UST event can take.
->>
->> Could you revert it, please?
-> ...actually it looks like it reverts cleanly on master, so
-> I'll just revert it directly.
->
-> thanks
-> -- PMM
->
-
-Zheng Chen, consider the UST limitation, I think we can just leave the=20
-two tracepoints as is (of course you can improve readability).
-
-Thanks
+Fam
