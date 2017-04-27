@@ -1,27 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d3kgp-0002R7-6F
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:46:40 -0400
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d3ktZ-0006Ce-Dx
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:59:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d3kgk-0005U1-9R
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:46:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d3kgj-0005TG-WB
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:46:34 -0400
-Date: Thu, 27 Apr 2017 16:46:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170427164626.78f65611@nial.brq.redhat.com>
-In-Reply-To: <874lxa2bex.fsf@dusky.pond.sub.org>
-References: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
-	<24766133-5384-09fd-a24a-8acf964c9367@redhat.com>
-	<20170427153222.5d991d2b@nial.brq.redhat.com>
-	<874lxa2bex.fsf@dusky.pond.sub.org>
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d3ktV-0003IO-GG
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:59:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34938
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1d3ktV-0003Hc-9X
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:59:45 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3REwfvP040227
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 10:59:43 -0400
+Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a34yd35ve-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 10:59:43 -0400
+Received: from localhost
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Thu, 27 Apr 2017 11:59:40 -0300
+Received: from d24av01.br.ibm.com (d24av01.br.ibm.com [9.8.31.91])
+	by d24relay03.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v3RExbtS22347840
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 11:59:38 -0300
+Received: from d24av01.br.ibm.com (localhost [127.0.0.1])
+	by d24av01.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v3RExbcH029200
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 11:59:37 -0300
+Date: Thu, 27 Apr 2017 11:59:26 -0300
+From: joserz@linux.vnet.ibm.com
+References: <1493054398-26013-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<e0285ff8-d878-82a0-4b68-3b37b933dce6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9] Allow setting NUMA distance for
- different NUMA nodes
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e0285ff8-d878-82a0-4b68-3b37b933dce6@redhat.com>
+Message-Id: <20170427145926.GA32606@pacoca>
+Subject: Re: [Qemu-devel] [PATCH v2] trace: add qemu mutex lock and unlock
+ trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +51,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, He Chen <he.chen@linux.intel.com>, "Michael S .
-	Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
 
-On Thu, 27 Apr 2017 16:05:42 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+On Thu, Apr 27, 2017 at 10:55:04AM +0200, Paolo Bonzini wrote:
+> 
+> 
+> On 24/04/2017 19:19, Jose Ricardo Ziviani wrote:
+> > These trace events were very useful to help me to understand and find a
+> > reordering issue in vfio, for example:
+> > 
+> > qemu_mutex_lock locked mutex 0x10905ad8
+> >   vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2020c, 4)
+> > qemu_mutex_unlock unlocked mutex 0x10905ad8
+> > qemu_mutex_lock locked mutex 0x10905ad8
+> >   vfio_region_write  (0001:03:00.0:region1+0xc4, 0xa0000, 4)
+> > qemu_mutex_unlock unlocked mutex 0x10905ad8
+> > 
+> > that also helped me to see the desired result after the fix:
+> > 
+> > qemu_mutex_lock locked mutex 0x10905ad8
+> >   vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2000c, 4)
+> >   vfio_region_write  (0001:03:00.0:region1+0xc4, 0xb0000, 4)
+> > qemu_mutex_unlock unlocked mutex 0x10905ad8
+> > 
+> > So it could be a good idea to have these traces implemented. It's worth
+> > mentioning that they should be surgically enabled during the debugging,
+> > otherwise it can flood the trace logs with lock/unlock messages.
+> > 
+> > How to use it:
+> > trace-event qemu_mutex_lock on|off
+> > trace-event qemu_mutex_unlock on|off
+> > or
+> > trace-event qemu_mutex* on|off
+> > 
+> > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> 
+> Some improvements:
+> 
+> 1) handle trylock and Win32 too
+> 
+> 2) pass mutex instead of &mutex->lock, it is the same but the latter is
+> unnecessarily obfuscated
+> 
+> 3) also trace unlock/lock around cond_wait
+> 
+> 4) trace "unlocked" before calling pthread_mutex_unlock, so that it is
+> always placed before the next "locked" tracepoint.
 
-> Igor Mammedov <imammedo@redhat.com> writes:
+I'm working on it
+Thanks for your review!
+
 > 
-> > On Thu, 27 Apr 2017 07:54:31 -0500
-> > Eric Blake <eblake@redhat.com> wrote:
-> >  
-> >> On 04/26/2017 09:35 PM, He Chen wrote:  
-> >> > This patch is going to add SLIT table support in QEMU, and provides
-> >> > additional option `dist` for command `-numa` to allow user set vNUMA
-> >> > distance by QEMU command.
-> >> > 
-> >> > With this patch, when a user wants to create a guest that contains
-> >> > several vNUMA nodes and also wants to set distance among those nodes,
-> >> > the QEMU command would like:
-> >> > 
-> >> > ```
-> >> > -numa node,nodeid=0,cpus=0 \
-> >> > -numa node,nodeid=1,cpus=1 \
-> >> > -numa node,nodeid=2,cpus=2 \
-> >> > -numa node,nodeid=3,cpus=3 \
-> >> > -numa dist,src=0,dst=1,val=21 \
-> >> > -numa dist,src=0,dst=2,val=31 \
-> >> > -numa dist,src=0,dst=3,val=41 \
-> >> > -numa dist,src=1,dst=2,val=21 \
-> >> > -numa dist,src=1,dst=3,val=31 \
-> >> > -numa dist,src=2,dst=3,val=21 \
-> >> > ```
-> >> > 
-> >> > Signed-off-by: He Chen <he.chen@linux.intel.com>
-> >> > 
-> >> > ---
-> >> > Changes since v8:
-> >> > * numa_{node, distance}_parse --> parse_numa_{node, distance}
-> >> > * Comments refinement.    
-> >> 
-> >>   
-> >> > ---
-> >> >  hw/acpi/aml-build.c         |  26 +++++++++
-> >> >  hw/i386/acpi-build.c        |   4 ++
-> >> >  include/hw/acpi/aml-build.h |   1 +
-> >> >  include/sysemu/numa.h       |   2 +
-> >> >  include/sysemu/sysemu.h     |   4 ++
-> >> >  numa.c                      | 137 +++++++++++++++++++++++++++++++++++++++++++-
-> >> >  qapi-schema.json            |  30 +++++++++-
-> >> >  qemu-options.hx             |  16 +++++-
-> >> >  8 files changed, 215 insertions(+), 5 deletions(-)    
-> >> 
-> >> Markus has asked that all new QMP commands have some testsuite exposure;
-> >> he may have some advice on what test would be best to modify to give us
-> >> some coverage of this feature.  
+> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+> index bf5756763d..46f4c08e6d 100644
+> --- a/util/qemu-thread-posix.c
+> +++ b/util/qemu-thread-posix.c
+> @@ -62,7 +62,7 @@ void qemu_mutex_lock(QemuMutex *mutex)
+>      if (err)
+>          error_exit(err, __func__);
 > 
-> I can't see the QMP command here, but...
+> -    trace_qemu_mutex_lock(&mutex->lock);
+> +    trace_qemu_mutex_locked(mutex);
+>  }
 > 
-> > Since it's basically validation of SLIT table, the test case
-> > should be added to tests/bios-tables-test.c  
+>  int qemu_mutex_trylock(QemuMutex *mutex)
+> @@ -71,7 +71,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
 > 
-> ... I figure there's new stuff to test all the same.
-it could be a patch on top and doesn't have to hold this one if author promises to write testcase
+>      err = pthread_mutex_trylock(&mutex->lock);
+>      if (err == 0) {
+> -        trace_qemu_mutex_lock(&mutex->lock);
+> +        trace_qemu_mutex_locked(mutex);
+>          return 0;
+>      }
+>      if (err == EBUSY) {
+> @@ -84,11 +84,10 @@ void qemu_mutex_unlock(QemuMutex *mutex)
+>  {
+>      int err;
+> 
+> +    trace_qemu_mutex_unlocked(mutex);
+>      err = pthread_mutex_unlock(&mutex->lock);
+>      if (err)
+>          error_exit(err, __func__);
+> -
+> -    trace_qemu_mutex_unlock(&mutex->lock);
+>  }
+> 
+>  void qemu_rec_mutex_init(QemuRecMutex *mutex)
+> @@ -145,7 +144,9 @@ void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
+>  {
+>      int err;
+> 
+> +    trace_qemu_mutex_unlocked(mutex);
+>      err = pthread_cond_wait(&cond->cond, &mutex->lock);
+> +    trace_qemu_mutex_locked(mutex);
+>      if (err)
+>          error_exit(err, __func__);
+>  }
+> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+> index d3c87bc89e..0dc3ae7756 100644
+> --- a/util/qemu-thread-win32.c
+> +++ b/util/qemu-thread-win32.c
+> @@ -55,6 +55,7 @@ void qemu_mutex_destroy(QemuMutex *mutex)
+>  void qemu_mutex_lock(QemuMutex *mutex)
+>  {
+>      AcquireSRWLockExclusive(&mutex->lock);
+> +    trace_qemu_mutex_locked(mutex);
+>  }
+> 
+>  int qemu_mutex_trylock(QemuMutex *mutex)
+> @@ -64,6 +64,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
+> 
+>      owned = TryAcquireSRWLockExclusive(&mutex->lock);
+>      if (owned) {
+> +        trace_qemu_mutex_locked(mutex);
+>          return 0;
+>      }
+>      return -EBUSY;
+> @@ -72,6 +72,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
+> 
+>  void qemu_mutex_unlock(QemuMutex *mutex)
+>  {
+> +    trace_qemu_mutex_unlocked(mutex);
+>      ReleaseSRWLockExclusive(&mutex->lock);
+>  }
+> 
+> @@ -124,7 +124,9 @@ void qemu_cond_broadcast(QemuCond *cond)
+> 
+>  void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
+>  {
+> +    trace_qemu_mutex_unlocked(mutex);
+>      SleepConditionVariableSRW(&cond->var, &mutex->lock, INFINITE, 0);
+> +    trace_qemu_mutex_locked(mutex);
+>  }
+> 
+>  void qemu_sem_init(QemuSemaphore *sem, int init)
+> diff --git a/util/trace-events b/util/trace-events
+> index 70f62124e1..fa540c620b 100644
+> --- a/util/trace-events
+> +++ b/util/trace-events
+> @@ -57,5 +57,5 @@ lockcnt_futex_wait_resume(const void *lockcnt, int
+> new) "lockcnt %p after wait:
+>  lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter"
+> 
+>  # util/qemu-thread-posix.c
+> -qemu_mutex_lock(void *lock) "locked mutex %p"
+> -qemu_mutex_unlock(void *lock) "unlocked mutex %p"
+> +qemu_mutex_locked(void *lock) "locked mutex %p"
+> +qemu_mutex_unlocked(void *lock) "unlocked mutex %p"
+> 
