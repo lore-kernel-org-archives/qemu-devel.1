@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3jxy-0002g9-4Z
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:00:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3jzq-0003So-6l
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3jxu-00027C-DC
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:00:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58304)
+	(envelope-from <armbru@redhat.com>) id 1d3jzk-00039t-NF
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:02:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1d3jxu-00026r-6k
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:00:14 -0400
-Date: Thu, 27 Apr 2017 16:00:06 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170427140006.GE4805@noname.str.redhat.com>
-References: <20170421091632.30900-1-kraxel@redhat.com>
-	<20170421091632.30900-3-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3jzk-00039M-HA
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:02:08 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1493282486-28338-1-git-send-email-armbru@redhat.com>
+	<1493282486-28338-5-git-send-email-armbru@redhat.com>
+	<CAJ+F1CL2=cjEJ40tJ0nKtWD=DbG9aAmFkoRDT2y0+zaHFZbe0w@mail.gmail.com>
+	<8760hqceh7.fsf@dusky.pond.sub.org>
+	<CAJ+F1CL=BH2wqKMi3U0iZp4ujw_kHAGszL3KXJHJp9+mF3fmXg@mail.gmail.com>
+	<87lgqm83yl.fsf@dusky.pond.sub.org>
+	<ef786534-615d-da52-e506-78a0a413f18d@redhat.com>
+Date: Thu, 27 Apr 2017 16:02:05 +0200
+In-Reply-To: <ef786534-615d-da52-e506-78a0a413f18d@redhat.com> (Eric Blake's
+	message of "Thu, 27 Apr 2017 08:13:13 -0500")
+Message-ID: <878tmm2bky.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170421091632.30900-3-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/9] memory: add support getting and using
- a dirty bitmap copy.
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/4] qobject-input-visitor: Catch misuse of
+ end_struct vs. end_list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-Am 21.04.2017 um 11:16 hat Gerd Hoffmann geschrieben:
-> +bool cpu_physical_memory_snapshot_get_dirty(DirtyBitmapSnapshot *snap,
-> +                                            ram_addr_t start,
-> +                                            ram_addr_t length)
-> +{
-> +    unsigned long page, end;
-> +
-> +    assert(start >= snap->start);
-> +    assert(start + length <= snap->end);
+Eric Blake <eblake@redhat.com> writes:
 
-Not sure if this has been reported somewhere else, but I got an
-assertion failure here while booting a guest:
+> On 04/27/2017 06:50 AM, Markus Armbruster wrote:
+>
+>>>>>
+>>>>> It would be more obvious with a check for qobject_type(tos->obj), no?
+>>>>
+>>>> --verbose?
+>>>>
+>>>
+>>> Instead of assert(tos->h) assert(qobject_type(tos->obj) == QTYPE_QDICT) ?
+>> 
+>> The two conditions imply each other.  We can assert either one, or even
+>> both.  Eric, got a preference?
+>
+> Asserting both might make it easier to come up to speed when reading the
+> code a year from now.
 
-$ ~/source/qemu/x86_64-softmmu/qemu-system-x86_64 -enable-kvm -m 2G -drive file=Windows-10-20170427.0-x86_64.qcow2,snapshot=on -usbdevice tablet -vga qxl
-qemu-system-x86_64: /home/kwolf/source/qemu/exec.c:1125: cpu_physical_memory_snapshot_get_dirty: Zusicherung >>start + length <= snap->end<< nicht erf?llt.
-Abgebrochen (Speicherabzug geschrieben)
+All right, squashing this:
 
-Unfortunately, I didn't have gdb attached or core dumps enabled, and it
-doesn't seem to reproduce easily, so I don't have anything that could
-help debugging it, but I thought I'd just let you know anyway.
-
-Kevin
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 68a6742..d0f0002 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -296,7 +296,7 @@ static void qobject_input_end_struct(Visitor *v, void **obj)
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
+ 
+-    assert(tos->h);
++    assert(qobject_type(tos->obj) == QTYPE_QDICT && tos->h);
+     qobject_input_pop(v, obj);
+ }
+ 
+@@ -360,7 +360,7 @@ static void qobject_input_end_list(Visitor *v, void **obj)
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
+ 
+-    assert(!tos->h);
++    assert(qobject_type(tos->obj) == QTYPE_QLIST && !tos->h);
+     qobject_input_pop(v, obj);
+ }
+ 
