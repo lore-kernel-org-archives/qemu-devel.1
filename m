@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3a7b-0007x9-Oc
+	(envelope-from <cota@braap.org>) id 1d3a7a-0007vh-Jf
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3a7a-0001xK-H1
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:29:35 -0400
+	(envelope-from <cota@braap.org>) id 1d3a7Z-0001wV-HR
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:29:34 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 26 Apr 2017 23:29:14 -0400
-Message-Id: <1493263764-18657-2-git-send-email-cota@braap.org>
-In-Reply-To: <1493263764-18657-1-git-send-email-cota@braap.org>
-References: <1493263764-18657-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v4 01/11] exec-all: export tb_htable_lookup
+Date: Wed, 26 Apr 2017 23:29:13 -0400
+Message-Id: <1493263764-18657-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v4 00/11] TCG optimizations for 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,41 +20,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- cpu-exec.c              | 6 ++----
- include/exec/exec-all.h | 2 ++
- 2 files changed, 4 insertions(+), 4 deletions(-)
+v3 for context: https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04795.html
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 63a56d0..5b181c1 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -309,10 +309,8 @@ static bool tb_cmp(const void *p, const void *d)
-     return false;
- }
- 
--static TranslationBlock *tb_htable_lookup(CPUState *cpu,
--                                          target_ulong pc,
--                                          target_ulong cs_base,
--                                          uint32_t flags)
-+TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-+                                   target_ulong cs_base, uint32_t flags)
- {
-     tb_page_addr_t phys_pc;
-     struct tb_desc desc;
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index bcde1e6..87ae10b 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -368,6 +368,8 @@ struct TranslationBlock {
- void tb_free(TranslationBlock *tb);
- void tb_flush(CPUState *cpu);
- void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
-+TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-+                                   target_ulong cs_base, uint32_t flags);
- 
- #if defined(USE_DIRECT_JUMP)
- 
--- 
-2.7.4
+Changes from v3:
+
+- Added reviewed-by tags.
+
+- Added a couple of suggested-by tags that I forgot to add in v3
+  regarding lookup_and_goto_ptr and i386's implementation of goto_ptr.
+
+- lookup_tb_ptr
+  + Dropped the unnecessary exit_request check, as suggested by Paolo and
+    Richard.
+  + Only get the CPU state if we get a tb from the jmp_cache, as suggested
+    by Richard.
+  + Added tb_htable_lookup if we miss in tb_jmp_cache, as suggested by
+    Richard. This requires an extra patch to export tb_htable_lookup.
+
+- goto_ptr: add IMPL(has_goto_ptr), as pointed out by Richard.
+
+- target/arm: added a comment about gen_jr. See the v3 thread for why
+  it is needed.
+
+- target/i386: use TCGV_UNUSED instead of (ab)using NULL on a TCGv,
+  as suggested by Richard. Also took his suggestion to simplify
+  the addition of jr + cs_base.
+  To minimize churn I renamed gen_eob_worker to do_gen_eob_worker,
+  which takes the newly added argument.
+
+I have *not* re-run all experiments, because it takes several hours and
+performance hasn't changed much from v3, as can be seen in these two charts:
+* spec06int user-mode, test input, v2.9.0 baseline: http://imgur.com/ME2eMq1
+* spec06int softmmu, test input, v3 baseline: http://imgur.com/Clolu9Z
+The perf differences are mostly due to adding the htable check. Note that
+its impact is small, since tb_jmp_cache has a %hit rate in the high 90's.
+
+You can inspect/fetch the changes at:
+  https://github.com/cota/qemu/tree/tcg-opt-v4
+
+Thanks,
+
+		Emilio
