@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3fpX-0003fu-UW
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:21 -0400
+	(envelope-from <peterx@redhat.com>) id 1d3fpt-0003x3-CN
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3fpT-00049t-0g
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46018)
+	(envelope-from <peterx@redhat.com>) id 1d3fps-0004Np-44
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3fpS-00049J-Nm
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:14 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3fpr-0004MV-Rl
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:40 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 27 Apr 2017 17:34:16 +0800
-Message-Id: <1493285660-4470-5-git-send-email-peterx@redhat.com>
+Date: Thu, 27 Apr 2017 17:34:18 +0800
+Message-Id: <1493285660-4470-7-git-send-email-peterx@redhat.com>
 In-Reply-To: <1493285660-4470-1-git-send-email-peterx@redhat.com>
 References: <1493285660-4470-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 4/8] memory: rename *_notify_iommu*
+Subject: [Qemu-devel] [RFC PATCH 6/8] memory: introduce AddressSpaceOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,156 +26,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, Paolo Bonzini <pbonzini@redhat.com>, kevin.tian@intel.com, yi.l.liu@intel.com, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
 
-Actually it's notifying IOTLB updates (map, or unmap). Let's be explicit
-on the wording - replacing it with *_notify_iotlb*.
+This is something similar to MemoryRegionOps, it's just for address
+spaces to store arch-specific hooks.
+
+The first hook I would like to introduce is iommu_get().
+
+For systems that have IOMMUs, we will create a special address space per
+device which is different from system default address space for
+it (please refer to pci_device_iommu_address_space()). Normally when
+that happens, there will be one specific IOMMU (or say, translation
+unit) stands right behind that new address space.
+
+This iommu_get() fetches that guy behind the address space. Here, the
+guy is defined as IOMMUObject, which is currently a (void *). In the
+future, maybe we can make it a better definition, but imho it's good
+enough for now, considering it's arch-dependent.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/intel_iommu.c    |  8 ++++----
- hw/ppc/spapr_iommu.c     |  2 +-
- hw/s390x/s390-pci-inst.c |  2 +-
- include/exec/memory.h    | 12 ++++++------
- memory.c                 |  8 ++++----
- 5 files changed, 16 insertions(+), 16 deletions(-)
+ include/exec/memory.h | 30 ++++++++++++++++++++++++++++++
+ memory.c              |  8 ++++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 3306e6a..609732b 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -1205,7 +1205,7 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
- static int vtd_page_invalidate_notify_hook(IOMMUTLBEntry *entry,
-                                            void *private)
- {
--    memory_region_notify_iommu((MemoryRegion *)private, *entry);
-+    memory_region_notify_iotlb((MemoryRegion *)private, *entry);
-     return 0;
- }
- 
-@@ -1709,7 +1709,7 @@ static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
-     entry.iova = addr;
-     entry.perm = IOMMU_NONE;
-     entry.translated_addr = 0;
--    memory_region_notify_iommu(&vtd_dev_as->iommu, entry);
-+    memory_region_notify_iotlb(&vtd_dev_as->iommu, entry);
- 
- done:
-     return true;
-@@ -2752,7 +2752,7 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUMRNotifier *n)
-                              VTD_PCI_FUNC(as->devfn),
-                              entry.iova, size);
- 
--    memory_region_notify_one(n, &entry);
-+    memory_region_notify_iotlb_one(n, &entry);
- }
- 
- static void vtd_address_space_unmap_all(IntelIOMMUState *s)
-@@ -2771,7 +2771,7 @@ static void vtd_address_space_unmap_all(IntelIOMMUState *s)
- 
- static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
- {
--    memory_region_notify_one((IOMMUMRNotifier *)private, entry);
-+    memory_region_notify_iotlb_one((IOMMUMRNotifier *)private, entry);
-     return 0;
- }
- 
-diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-index 5e6e70b..9a34495 100644
---- a/hw/ppc/spapr_iommu.c
-+++ b/hw/ppc/spapr_iommu.c
-@@ -414,7 +414,7 @@ static target_ulong put_tce_emu(sPAPRTCETable *tcet, target_ulong ioba,
-     entry.translated_addr = tce & page_mask;
-     entry.addr_mask = ~page_mask;
-     entry.perm = spapr_tce_iommu_access_flags(tce);
--    memory_region_notify_iommu(&tcet->iommu, entry);
-+    memory_region_notify_iotlb(&tcet->iommu, entry);
- 
-     return H_SUCCESS;
- }
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 314a9cb..566eeda 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -635,7 +635,7 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
-             goto out;
-         }
- 
--        memory_region_notify_iommu(mr, entry);
-+        memory_region_notify_iotlb(mr, entry);
-         start += entry.addr_mask + 1;
-     }
- 
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 8d8dcb2..09188a6 100644
+index e5707b3..0b0b58b 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -673,7 +673,7 @@ static inline bool memory_region_is_iommu(MemoryRegion *mr)
- uint64_t memory_region_iommu_get_min_page_size(MemoryRegion *mr);
+@@ -183,6 +183,15 @@ struct MemoryRegionOps {
+     const MemoryRegionMmio old_mmio;
+ };
+ 
++/*
++ * This stands for an IOMMU unit. Normally it should be exactly the
++ * IOMMU device, however this can also be actually anything which is
++ * related to that translation unit. What it is should be totally
++ * arch-dependent. Maybe one day we can have something better than a
++ * (void *) here.
++ */
++typedef void *IOMMUObject;
++
+ typedef struct MemoryRegionIOMMUOps MemoryRegionIOMMUOps;
+ 
+ struct MemoryRegionIOMMUOps {
+@@ -282,6 +291,19 @@ struct MemoryListener {
+ };
  
  /**
-- * memory_region_notify_iommu: notify a change in an IOMMU translation entry.
-+ * memory_region_notify_iotlb: notify a change in an IOMMU translation entry.
-  *
-  * The notification type will be decided by entry.perm bits:
-  *
-@@ -689,12 +689,12 @@ uint64_t memory_region_iommu_get_min_page_size(MemoryRegion *mr);
-  *         replaces all old entries for the same virtual I/O address range.
-  *         Deleted entries have .@perm == 0.
++ * AddressSpaceOps: callbacks structure for address space specific operations
++ *
++ * @iommu_get: returns an IOMMU object that backs the address space.
++ *             Normally this should be NULL for generic address
++ *             spaces, and it's only used when there is one
++ *             translation unit behind this address space.
++ */
++struct AddressSpaceOps {
++    IOMMUObject *(*iommu_get)(AddressSpace *as);
++};
++typedef struct AddressSpaceOps AddressSpaceOps;
++
++/**
+  * AddressSpace: describes a mapping of addresses to #MemoryRegion objects
   */
--void memory_region_notify_iommu(MemoryRegion *mr,
-+void memory_region_notify_iotlb(MemoryRegion *mr,
-                                 IOMMUTLBEntry entry);
+ struct AddressSpace {
+@@ -302,6 +324,7 @@ struct AddressSpace {
+     MemoryListener dispatch_listener;
+     QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
+     QTAILQ_ENTRY(AddressSpace) address_spaces_link;
++    AddressSpaceOps as_ops;
+ };
  
  /**
-- * memory_region_notify_one: notify a change in an IOMMU translation
-- *                           entry to a single notifier
-+ * memory_region_notify_iotlb_one: notify a change in an IOMMU translation
-+ *                                 entry to a single notifier
-  *
-  * This works just like memory_region_notify_iommu(), but it only
-  * notifies a specific notifier, not all of them.
-@@ -704,8 +704,8 @@ void memory_region_notify_iommu(MemoryRegion *mr,
-  *         replaces all old entries for the same virtual I/O address range.
-  *         Deleted entries have .@perm == 0.
-  */
--void memory_region_notify_one(IOMMUMRNotifier *notifier,
--                              IOMMUTLBEntry *entry);
-+void memory_region_notify_iotlb_one(IOMMUMRNotifier *notifier,
-+                                    IOMMUTLBEntry *entry);
+@@ -1800,6 +1823,13 @@ address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
+     address_space_write(cache->as, cache->xlat + addr, MEMTXATTRS_UNSPECIFIED, buf, len);
+ }
  
- /**
-  * memory_region_register_iommu_notifier: register a notifier for changes to
++/**
++ * address_space_iommu_get: Get the backend IOMMU for the address space
++ *
++ * @as: the address space to fetch IOMMU from
++ */
++IOMMUObject *address_space_iommu_get(AddressSpace *as);
++
+ #endif
+ 
+ #endif
 diff --git a/memory.c b/memory.c
-index ffbd020..c6532e4 100644
+index 6af523e..6aaad45 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -1668,8 +1668,8 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
-     memory_region_update_iommu_notify_flags(mr);
+@@ -2500,6 +2500,14 @@ void address_space_destroy(AddressSpace *as)
+     call_rcu(as, do_address_space_destroy, rcu);
  }
  
--void memory_region_notify_one(IOMMUMRNotifier *notifier,
--                              IOMMUTLBEntry *entry)
-+void memory_region_notify_iotlb_one(IOMMUMRNotifier *notifier,
-+                                    IOMMUTLBEntry *entry)
++IOMMUObject *address_space_iommu_get(AddressSpace *as)
++{
++    if (!as->as_ops.iommu_get) {
++        return NULL;
++    }
++    return as->as_ops.iommu_get(as);
++}
++
+ static const char *memory_region_type(MemoryRegion *mr)
  {
-     IOMMUMREventFlags request_flags;
- 
-@@ -1693,7 +1693,7 @@ void memory_region_notify_one(IOMMUMRNotifier *notifier,
-     }
- }
- 
--void memory_region_notify_iommu(MemoryRegion *mr,
-+void memory_region_notify_iotlb(MemoryRegion *mr,
-                                 IOMMUTLBEntry entry)
- {
-     IOMMUMRNotifier *iommu_notifier;
-@@ -1701,7 +1701,7 @@ void memory_region_notify_iommu(MemoryRegion *mr,
-     assert(memory_region_is_iommu(mr));
- 
-     IOMMU_NOTIFIER_FOREACH(iommu_notifier, mr) {
--        memory_region_notify_one(iommu_notifier, &entry);
-+        memory_region_notify_iotlb_one(iommu_notifier, &entry);
-     }
- }
- 
+     if (memory_region_is_ram_device(mr)) {
 -- 
 2.7.4
