@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3cHB-0001HB-7R
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:38 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3cHF-0001Uy-Go
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3cH7-0003mH-AI
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60818
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3cHB-0003nb-Kg
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60537)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d3cH7-0003m9-3t
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:33 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3R5hdbl068951
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:47:32 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a2q9ak4t9-1
+	id 1d3cHB-0003nC-C0
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:37 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3R5hc6e090413
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:47:36 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a32j3r3jq-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:47:32 -0400
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:47:35 -0400
 Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 26 Apr 2017 23:47:31 -0600
+	Wed, 26 Apr 2017 23:47:34 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Thu, 27 Apr 2017 00:46:29 -0500
+Date: Thu, 27 Apr 2017 00:46:36 -0500
 In-Reply-To: <1493271996-23607-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1493271996-23607-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1493271996-23607-2-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL v2 1/8] qemu-ga: Make QGA VSS provider service
- run only when needed
+Message-Id: <1493271996-23607-9-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL v2 8/8] qga: Add `guest-get-timezone` command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,117 +38,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Sameeh Jubran <sameeh@daynix.com>
+Cc: peter.maydell@linaro.org, Vinzenz Feenstra <vfeenstr@redhat.com>
 
-From: Sameeh Jubran <sameeh@daynix.com>
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-Currently the service runs in background on boot even though it is not
-needed and once it is running it never stops. The service needs to be
-running only during freeze operation and it should be stopped after
-executing thaw.
+Adds a new command `guest-get-timezone` reporting the currently
+configured timezone on the system. The information on what timezone is
+currently is configured is useful in case of Windows VMs where the
+offset of the hardware clock is required to have the same offset. This
+can be used for management systems like `oVirt` to detect the timezone
+difference and warn administrators of the misconfiguration.
 
-Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+Reviewed-by: Sameeh Jubran <sameeh@daynix.com>
+Tested-by: Sameeh Jubran <sameeh@daynix.com>
+* moved stub implementation to end of function for consistency
+* document that timezone names are for informational use only.
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/vss-win32/install.cpp   | 28 ++++++++++++++++++++++++++--
- qga/vss-win32/install.h     | 20 ++++++++++++++++++++
- qga/vss-win32/requester.cpp |  2 ++
- 3 files changed, 48 insertions(+), 2 deletions(-)
- create mode 100644 qga/vss-win32/install.h
+ qga/commands.c       | 38 ++++++++++++++++++++++++++++++++++++++
+ qga/qapi-schema.json | 25 +++++++++++++++++++++++++
+ 2 files changed, 63 insertions(+)
 
-diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
-index f4160a3..f41fcdf 100644
---- a/qga/vss-win32/install.cpp
-+++ b/qga/vss-win32/install.cpp
-@@ -14,7 +14,7 @@
- 
- #include "vss-common.h"
- #include <inc/win2003/vscoordint.h>
--#include <comadmin.h>
-+#include "install.h"
- #include <wbemidl.h>
- #include <comdef.h>
- #include <comutil.h>
-@@ -276,7 +276,7 @@ STDAPI COMRegister(void)
- 
-     chk(pCatalog->CreateServiceForApplication(
-             _bstr_t(QGA_PROVIDER_LNAME), _bstr_t(QGA_PROVIDER_LNAME),
--            _bstr_t(L"SERVICE_AUTO_START"), _bstr_t(L"SERVICE_ERROR_NORMAL"),
-+            _bstr_t(L"SERVICE_DEMAND_START"), _bstr_t(L"SERVICE_ERROR_NORMAL"),
-             _bstr_t(L""), _bstr_t(L".\\localsystem"), _bstr_t(L""), FALSE));
-     chk(pCatalog->InstallComponent(_bstr_t(QGA_PROVIDER_LNAME),
-                                    _bstr_t(dllPath), _bstr_t(tlbPath),
-@@ -461,3 +461,27 @@ namespace _com_util
-         return bstr;
+diff --git a/qga/commands.c b/qga/commands.c
+index 57a31bb..3333ed5 100644
+--- a/qga/commands.c
++++ b/qga/commands.c
+@@ -510,3 +510,41 @@ GuestHostName *qmp_guest_get_host_name(Error **err)
      }
+     return result;
  }
 +
-+/* Stop QGA VSS provider service from COM+ Application Admin Catalog */
-+
-+STDAPI StopService(void)
++GuestTimezone *qmp_guest_get_timezone(Error **errp)
 +{
-+    HRESULT hr;
-+    COMInitializer initializer;
-+    COMPointer<IUnknown> pUnknown;
-+    COMPointer<ICOMAdminCatalog2> pCatalog;
++#if GLIB_CHECK_VERSION(2, 28, 0)
++    GuestTimezone *info = NULL;
++    GTimeZone *tz = NULL;
++    gint64 now = 0;
++    gint32 intv = 0;
++    gchar const *name = NULL;
 +
-+    int count = 0;
-+
-+    chk(QGAProviderFind(QGAProviderCount, (void *)&count));
-+    if (count) {
-+        chk(CoCreateInstance(CLSID_COMAdminCatalog, NULL, CLSCTX_INPROC_SERVER,
-+            IID_IUnknown, (void **)pUnknown.replace()));
-+        chk(pUnknown->QueryInterface(IID_ICOMAdminCatalog2,
-+            (void **)pCatalog.replace()));
-+        chk(pCatalog->ShutdownApplication(_bstr_t(QGA_PROVIDER_LNAME)));
++    info = g_new0(GuestTimezone, 1);
++    tz = g_time_zone_new_local();
++    if (tz == NULL) {
++        error_setg(errp, QERR_QGA_COMMAND_FAILED,
++                   "Couldn't retrieve local timezone");
++        goto error;
 +    }
 +
-+out:
-+    return hr;
-+}
-diff --git a/qga/vss-win32/install.h b/qga/vss-win32/install.h
-new file mode 100644
-index 0000000..35364af
---- /dev/null
-+++ b/qga/vss-win32/install.h
-@@ -0,0 +1,20 @@
-+/*
-+ * QEMU Guest Agent VSS requester declarations
-+ *
-+ * Copyright Hitachi Data Systems Corp. 2013
-+ *
-+ * Authors:
-+ *  Tomoki Sekiyama   <tomoki.sekiyama@hds.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
++    now = g_get_real_time() / G_USEC_PER_SEC;
++    intv = g_time_zone_find_interval(tz, G_TIME_TYPE_UNIVERSAL, now);
++    info->offset = g_time_zone_get_offset(tz, intv);
++    name = g_time_zone_get_abbreviation(tz, intv);
++    if (name != NULL) {
++        info->has_zone = true;
++        info->zone = g_strdup(name);
++    }
++    g_time_zone_unref(tz);
 +
-+#ifndef INSTALL_H
-+#define INSTALL_H
++    return info;
 +
-+#include <comadmin.h>
-+
-+STDAPI StopService(void);
-+
++error:
++    g_free(info);
++    return NULL;
++#else
++    error_setg(errp, QERR_UNSUPPORTED);
++    return NULL;
 +#endif
-diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
-index 0cd2f0e..301762d 100644
---- a/qga/vss-win32/requester.cpp
-+++ b/qga/vss-win32/requester.cpp
-@@ -13,6 +13,7 @@
- #include "qemu/osdep.h"
- #include "vss-common.h"
- #include "requester.h"
-+#include "install.h"
- #include <inc/win2003/vswriter.h>
- #include <inc/win2003/vsbackup.h>
- 
-@@ -501,4 +502,5 @@ void requester_thaw(int *num_vols, ErrorSet *errset)
-     requester_cleanup();
- 
-     CoUninitialize();
-+    StopService();
- }
++}
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index f25467a..03743ab 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -1101,3 +1101,28 @@
+ ##
+ { 'command': 'guest-get-users',
+   'returns': ['GuestUser'] }
++
++##
++# @GuestTimezone:
++#
++# @zone:    Timezone name. These values may differ depending on guest/OS and
++#           should only be used for informational purposes.
++# @offset:  Offset to UTC in seconds, negative numbers for time zones west of
++#           GMT, positive numbers for east
++#
++# Since: 2.10
++##
++{ 'struct': 'GuestTimezone',
++  'data':   { '*zone': 'str', 'offset': 'int' } }
++
++##
++# @guest-get-timezone:
++#
++# Retrieves the timezone information from the guest.
++#
++# Returns: A GuestTimezone dictionary.
++#
++# Since: 2.10
++##
++{ 'command': 'guest-get-timezone',
++  'returns': 'GuestTimezone' }
 -- 
 2.7.4
