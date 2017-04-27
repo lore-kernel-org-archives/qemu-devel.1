@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d3oVp-0005a4-Bh
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:51:34 -0400
+	(envelope-from <alistair23@gmail.com>) id 1d3oXt-0006Ww-IM
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d3oVm-0003C2-9y
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:51:33 -0400
-Received: from mail.kernel.org ([198.145.29.136]:46938)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1d3oVm-0003Ac-0w
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:51:30 -0400
-Date: Thu, 27 Apr 2017 11:51:24 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <149328636874.30266.8813988060953128881.stgit@bahia>
-Message-ID: <alpine.DEB.2.10.1704271120100.11141@sstabellini-ThinkPad-X260>
-References: <149328633283.30266.4224847428546759127.stgit@bahia>
-	<149328636874.30266.8813988060953128881.stgit@bahia>
+	(envelope-from <alistair23@gmail.com>) id 1d3oXs-0003s6-BR
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 14:53:41 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] 9pfs: handle broken transport
+In-Reply-To: <CALHRZuqgxQtiGwtPfm3qgm0ywpC4OdBkdSNKLO_Zzxtw2_cmHQ@mail.gmail.com>
+References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
+	<1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
+	<CAKmqyKMW-aTdzvTH5sir1BPx6U9XtgiZZ7TVigooXLFMY=UEQg@mail.gmail.com>
+	<CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
+	<CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
+	<CALHRZuqgxQtiGwtPfm3qgm0ywpC4OdBkdSNKLO_Zzxtw2_cmHQ@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 27 Apr 2017 11:53:08 -0700
+Message-ID: <CAKmqyKN_bMZDqZ_LXiDqcsV1Znos5bHWrapcYSA01mX+kv23aw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 1/4] msf2: Add Smartfusion2
+ System timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,212 +27,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: sundeep subbaraya <sundeep.lkml@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Thu, 27 Apr 2017, Greg Kurz wrote:
-> The 9p protocol is transport agnostic: if an error occurs when copying data
-> to/from the client, this should be handled by the transport layer [1] and
-> the 9p server should simply stop processing requests [2].
-> 
-> [1] can be implemented in the transport marshal/unmarshal handlers. In the
-> case of virtio, this means calling virtio_error() to inform the guest that
-> the device isn't functional anymore.
-> 
-> [2] means that the pdu_complete() function shouldn't send a reply back to
-> the client if the transport had a failure. This cannot be decided using the
-> current error path though, since we cannot discriminate if the error comes
-> from the transport or the backend. This patch hence introduces a flag in
-> the 9pfs state to record that the transport is broken. The device needs to
-> be reset for the flag to be unset.
-> 
-> This fixes Coverity issue CID 1348518.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> v2: - use unlikely() when checking if the transport is broken
->     - fail marshal/unmarshal if transport is broken
->     - v9fs_xattr_read() mark transport as broken if v9fs_pack() fails
-> ---
->  hw/9pfs/9p.c               |   45 ++++++++++++++++++++++++++++++++++++--------
->  hw/9pfs/9p.h               |    1 +
->  hw/9pfs/virtio-9p-device.c |   16 ++++++++++++++--
->  3 files changed, 52 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 01deffa0c3b5..406c1937ed21 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -46,10 +46,17 @@ ssize_t pdu_marshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...)
->      ssize_t ret;
->      va_list ap;
->  
-> +    if (unlikely(pdu->s->transport_broken)) {
-> +        return -EIO;
-> +    }
-> +
->      va_start(ap, fmt);
->      ret = pdu->s->transport->pdu_vmarshal(pdu, offset, fmt, ap);
->      va_end(ap);
->  
-> +    if (ret < 0) {
-> +        pdu->s->transport_broken = true;
-> +    }
->      return ret;
->  }
->  
-> @@ -58,10 +65,17 @@ ssize_t pdu_unmarshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...)
->      ssize_t ret;
->      va_list ap;
->  
-> +    if (unlikely(pdu->s->transport_broken)) {
-> +        return -EIO;
-> +    }
-> +
->      va_start(ap, fmt);
->      ret = pdu->s->transport->pdu_vunmarshal(pdu, offset, fmt, ap);
->      va_end(ap);
->  
-> +    if (ret < 0) {
-> +        pdu->s->transport_broken = true;
-> +    }
->      return ret;
->  }
->  
-> @@ -624,15 +638,15 @@ void pdu_free(V9fsPDU *pdu)
->      QLIST_INSERT_HEAD(&s->free_list, pdu, next);
->  }
->  
-> -/*
-> - * We don't do error checking for pdu_marshal/unmarshal here
-> - * because we always expect to have enough space to encode
-> - * error details
-> - */
->  static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
->  {
->      int8_t id = pdu->id + 1; /* Response */
->      V9fsState *s = pdu->s;
-> +    int ret;
-> +
-> +    if (unlikely(s->transport_broken)) {
-> +        goto out_complete;
-> +    }
->  
->      if (len < 0) {
->          int err = -len;
-> @@ -644,11 +658,19 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
->              str.data = strerror(err);
->              str.size = strlen(str.data);
->  
-> -            len += pdu_marshal(pdu, len, "s", &str);
-> +            ret = pdu_marshal(pdu, len, "s", &str);
-> +            if (ret < 0) {
-> +                goto out_complete;
-> +            }
-> +            len += ret;
->              id = P9_RERROR;
->          }
->  
-> -        len += pdu_marshal(pdu, len, "d", err);
-> +        ret = pdu_marshal(pdu, len, "d", err);
-> +        if (ret < 0) {
-> +            goto out_complete;
-> +        }
-> +        len += ret;
->  
->          if (s->proto_version == V9FS_PROTO_2000L) {
->              id = P9_RLERROR;
-> @@ -657,7 +679,10 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
->      }
->  
->      /* fill out the header */
-> -    pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag);
-> +    ret = pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag);
-> +    if (ret < 0) {
-> +        goto out_complete;
-> +    }
+On Tue, Apr 25, 2017 at 3:36 AM, sundeep subbaraya
+<sundeep.lkml@gmail.com> wrote:
+> Hi Alistair,
+>
+> On Mon, Apr 24, 2017 at 11:14 PM, Alistair Francis <alistair23@gmail.com> wrote:
+>>>>> +
+>>>>> +    isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
+>>>>> +    ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+>>>>> +
+>>>>> +    qemu_set_irq(st->irq, (ier && isr));
+>>>>> +}
+>>>>> +
+>>>>> +static uint64_t
+>>>>> +timer_read(void *opaque, hwaddr addr, unsigned int size)
+>>>>> +{
+>>>>> +    struct timerblock *t = opaque;
+>>>>> +    struct msf2_timer *st;
+>>>>> +    uint32_t r = 0;
+>>>>> +    unsigned int timer;
+>>>>> +    int isr;
+>>>>> +    int ier;
+>>>>> +
+>>>>> +    addr >>= 2;
+>>>>> +    timer = timer_from_addr(addr);
+>>>>> +    st = &t->timers[timer];
+>>>>> +
+>>>>> +    if (timer) {
+>>>>> +        addr -= 6;
+>>>>> +    }
+>>>>
+>>>> Isn't this timer logic just checking if (addr >> 2) == R_MAX and if it
+>>>> is set (addr >> 2) back to zero? This seems an overly complex way to
+>>>> check that.
+>>> I did not get you clearly. Do you want me to write like this:
+>>> unsigned int timer = 0;
+>>>
+>>> addr >>= 2;
+>>> if (addr >= R_MAX) {
+>>>     timer = 1;
+>>>     addr =  addr - R_MAX;
+>>> }
+>>
+>> Yeah, I think this is clearer then what you had earlier.
+>>
+>> Although why do you have to subtract R_MAX, shouldn't it just be an
+>> error if accessing values larger then R_MAX?
+>
+> Sorry I forgot about replying to this in earlier mail.
+> There are two independent timer blocks accessing same base address.
+> Based on offset passed in read/write functions we figure out
+> which block has to be handled.
+> 0x0 to 0x14 -> timer1
+> 0x18 to 0x2C -> timer2
+> Here R_MAX is 0x18 hence addr >= R_MAX is valid and refers to timer2.
+> Although I missed the bounds checking 0 < addr < 0x2C. I will add that
+> check in read and
+> write functions.
 
-If I am not mistaken, none of these "if (ret < 0)" are necessary in
-pdu_complete. Just like any of the other call sites of
-pdu_marshal/pdu_unmarshal, we could just let it go through the calls,
-which would actually do nothing once transport_broken is set.
+Ok, when you send the next version can you explain this in comments
+that way it's clear what you are trying to do.
 
-We could move the transport_broken check right before the call to
-push_and_notify.
+Thanks,
 
+Alistair
 
->      /* keep these in sync */
->      pdu->size = len;
-> @@ -665,6 +690,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
->  
->      pdu->s->transport->push_and_notify(pdu);
->  
-> +out_complete:
->      /* Now wakeup anybody waiting in flush for this request */
->      if (!qemu_co_queue_next(&pdu->complete)) {
->          pdu_free(pdu);
-> @@ -1702,6 +1728,7 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
->                      read_count);
->      qemu_iovec_destroy(&qiov_full);
->      if (err < 0) {
-> +        s->transport_broken = true;
->          return err;
->      }
->      offset += err;
-> @@ -3596,6 +3623,8 @@ void v9fs_reset(V9fsState *s)
->      while (!data.done) {
->          aio_poll(qemu_get_aio_context(), true);
->      }
-> +
-> +    s->transport_broken = false;
->  }
->  
->  static void __attribute__((__constructor__)) v9fs_set_fd_limit(void)
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index 5312d8a42405..145d0c87dd6a 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -246,6 +246,7 @@ typedef struct V9fsState
->      Error *migration_blocker;
->      V9fsConf fsconf;
->      V9fsQID root_qid;
-> +    bool transport_broken;
->  } V9fsState;
->  
->  /* 9p2000.L open flags */
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index c71659823fdc..9e61fbf7c63e 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -158,8 +158,14 @@ static ssize_t virtio_pdu_vmarshal(V9fsPDU *pdu, size_t offset,
->      V9fsState *s = pdu->s;
->      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem = v->elems[pdu->idx];
-> +    int ret;
->  
-> -    return v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt, ap);
-> +    ret = v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt, ap);
-> +    if (ret < 0) {
-> +        virtio_9p_error(v, pdu->idx,
-> +                        "Failed to marshal VirtFS reply type %d", pdu->id);
-> +    }
-> +    return ret;
->  }
->  
->  static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
-> @@ -168,8 +174,14 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
->      V9fsState *s = pdu->s;
->      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem = v->elems[pdu->idx];
-> +    int ret;
->  
-> -    return v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, fmt, ap);
-> +    ret = v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, fmt, ap);
-> +    if (ret < 0) {
-> +        virtio_9p_error(v, pdu->idx,
-> +                        "Failed to unmarshal VirtFS request type %d", pdu->id);
-> +    }
-> +    return ret;
->  }
->  
->  /* The size parameter is used by other transports. Do not drop it. */
+>
+> Thanks,
+> Sundeep
+>>
+>>>
+>>>>
+>>>>> +
+>>>>> +    switch (addr) {
+>>>>> +    case R_VAL:
+>>>>> +        r = ptimer_get_count(st->ptimer);
+>>>>> +        D(qemu_log("msf2_timer t=%d read counter=%x\n", timer, r));
+>>>>> +        break;
+>>>>> +
+>>>>> +    case R_MIS:
+>>>>> +        isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
+>>>>> +        ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+>>>>> +        r = ier && isr;
+>>>>> +        break;
+>>>>> +
+>>>>> +    default:
+>>>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>>>> +            r = st->regs[addr];
+>>>>> +        }
+>>>>> +        break;
+>>>>> +    }
+>>>>> +    D(fprintf(stderr, "%s timer=%d %x=%x\n", __func__, timer, addr * 4, r));
+>>>>> +    return r;
+>>>>> +}
+>>>>> +
+>>>>> +static void timer_update(struct msf2_timer *st)
+>>>>> +{
+>>>>> +    uint64_t count;
+>>>>> +
+>>>>> +    D(fprintf(stderr, "%s timer=%d\n", __func__, st->nr));
+>>>>> +
+>>>>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ENBL)) {
+>>>>> +        ptimer_stop(st->ptimer);
+>>>>> +        return;
+>>>>> +    }
+>>>>> +
+>>>>> +    count = st->regs[R_LOADVAL];
+>>>>> +    ptimer_set_limit(st->ptimer, count, 1);
+>>>>> +    ptimer_run(st->ptimer, 1);
+>>>>> +}
+>>>>
+>>>> The update function should be above the read/write functions.
+>>>>
+>>> Ok I will change
+>>>
+>>>>> +
+>>>>> +static void
+>>>>> +timer_write(void *opaque, hwaddr addr,
+>>>>> +            uint64_t val64, unsigned int size)
+>>>>> +{
+>>>>> +    struct timerblock *t = opaque;
+>>>>> +    struct msf2_timer *st;
+>>>>> +    unsigned int timer;
+>>>>> +    uint32_t value = val64;
+>>>>> +
+>>>>> +    addr >>= 2;
+>>>>> +    timer = timer_from_addr(addr);
+>>>>> +    st = &t->timers[timer];
+>>>>> +    D(fprintf(stderr, "%s addr=%x val=%x (timer=%d)\n",
+>>>>> +             __func__, addr * 4, value, timer));
+>>>>> +
+>>>>> +    if (timer) {
+>>>>> +        addr -= 6;
+>>>>> +    }
+>>>>
+>>>> Same comment from the read function.
+>>>>
+>>>>> +
+>>>>> +    switch (addr) {
+>>>>> +    case R_CTRL:
+>>>>> +        st->regs[R_CTRL] = value;
+>>>>> +        timer_update(st);
+>>>>> +        break;
+>>>>> +
+>>>>> +    case R_RIS:
+>>>>> +        if (value & TIMER_RIS_ACK) {
+>>>>> +            st->regs[R_RIS] &= ~TIMER_RIS_ACK;
+>>>>> +        }
+>>>>> +        break;
+>>>>> +
+>>>>> +    case R_LOADVAL:
+>>>>> +        st->regs[R_LOADVAL] = value;
+>>>>> +        if (st->regs[R_CTRL] & TIMER_CTRL_ENBL) {
+>>>>> +            timer_update(st);
+>>>>> +        }
+>>>>> +        break;
+>>>>> +
+>>>>> +    case R_BGLOADVAL:
+>>>>> +        st->regs[R_BGLOADVAL] = value;
+>>>>> +        st->regs[R_LOADVAL] = value;
+>>>>> +        break;
+>>>>> +
+>>>>> +    case R_VAL:
+>>>>> +    case R_MIS:
+>>>>> +        break;
+>>>>> +
+>>>>> +    default:
+>>>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>>>> +            st->regs[addr] = value;
+>>>>> +        }
+>>>>> +        break;
+>>>>> +    }
+>>>>> +    timer_update_irq(st);
+>>>>> +}
+>>>>> +
+>>>>> +static const MemoryRegionOps timer_ops = {
+>>>>> +    .read = timer_read,
+>>>>> +    .write = timer_write,
+>>>>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>>>>> +    .valid = {
+>>>>> +        .min_access_size = 4,
+>>>>> +        .max_access_size = 4
+>>>>> +    }
+>>>>> +};
+>>>>> +
+>>>>> +static void timer_hit(void *opaque)
+>>>>> +{
+>>>>> +    struct msf2_timer *st = opaque;
+>>>>> +    D(fprintf(stderr, "%s %d\n", __func__, st->nr));
+>>>>> +    st->regs[R_RIS] |= TIMER_RIS_ACK;
+>>>>> +
+>>>>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ONESHOT)) {
+>>>>> +        timer_update(st);
+>>>>> +    }
+>>>>> +    timer_update_irq(st);
+>>>>> +}
+>>>>> +
+>>>>> +static void msf2_timer_realize(DeviceState *dev, Error **errp)
+>>>>> +{
+>>>>> +    struct timerblock *t = MSF2_TIMER(dev);
+>>>>> +    unsigned int i;
+>>>>> +
+>>>>> +    /* Init all the ptimers.  */
+>>>>> +    t->timers = g_malloc0((sizeof t->timers[0]) * NUM_TIMERS);
+>>>>> +    for (i = 0; i < NUM_TIMERS; i++) {
+>>>>> +        struct msf2_timer *st = &t->timers[i];
+>>>>> +
+>>>>> +        st->parent = t;
+>>>>> +        st->nr = i;
+>>>>> +        st->bh = qemu_bh_new(timer_hit, st);
+>>>>> +        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
+>>>>> +        ptimer_set_freq(st->ptimer, t->freq_hz);
+>>>>> +        sysbus_init_irq(SYS_BUS_DEVICE(dev), &st->irq);
+>>>>> +    }
+>>>>> +
+>>>>> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, "msf2-timer",
+>>>>> +                          R_MAX * 4 * NUM_TIMERS);
+>>>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &t->mmio);
+>>>>
+>>>> This should be in the devices init() function.
+>>>
+>>> I referred Xilinx soft IP models for writing these models and used
+>>> same boilerplate code.
+>>> I am not clear about realize and init functions yet. Can you please
+>>> give a brief about them.
+>>
+>> Basically the simple explanation is that init is called when the
+>> object is created and realize is called when the object is realized.
+>>
+>> Generally for devices it will go something like this:
+>>  1. init
+>>  2. Set properties
+>>  3. Connect things
+>>  4. realize
+>>  5. Map to memory
+>>
+>>> Don't we need to use realize function for new models?
+>>
+>> AFAIK we still put things like: sysbus_init_irq(),
+>> memory_region_init_io() and sysbus_init_mmio() in the init function.
+>>
+>> I don't think we are at a stage yet to not use init functions.
+>>
+>> Thanks,
+>>
+>> Alistair
+>>
+>>>
+>>> Thanks,
+>>> Sundeep
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Alistair
+>>>>
+>>>>> +}
+>>>>> +
+>>>>> +static Property msf2_timer_properties[] = {
+>>>>> +    DEFINE_PROP_UINT32("clock-frequency", struct timerblock, freq_hz,
+>>>>> +                                                                83 * 1000000),
+>>>>> +    DEFINE_PROP_END_OF_LIST(),
+>>>>> +};
+>>>>> +
+>>>>> +static void msf2_timer_class_init(ObjectClass *klass, void *data)
+>>>>> +{
+>>>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>>>> +
+>>>>> +    dc->realize = msf2_timer_realize;
+>>>>> +    dc->props = msf2_timer_properties;
+>>>>> +}
+>>>>> +
+>>>>> +static const TypeInfo msf2_timer_info = {
+>>>>> +    .name          = TYPE_MSF2_TIMER,
+>>>>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>>>>> +    .instance_size = sizeof(struct timerblock),
+>>>>> +    .class_init    = msf2_timer_class_init,
+>>>>> +};
+>>>>> +
+>>>>> +static void msf2_timer_register_types(void)
+>>>>> +{
+>>>>> +    type_register_static(&msf2_timer_info);
+>>>>> +}
+>>>>> +
+>>>>> +type_init(msf2_timer_register_types)
+>>>>> --
+>>>>> 2.5.0
+>>>>>
+>>>>>
