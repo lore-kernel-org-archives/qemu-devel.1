@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3YVx-0007RF-7z
+	(envelope-from <eblake@redhat.com>) id 1d3YVx-0007RE-7Q
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3YVw-00042B-9T
+	(envelope-from <eblake@redhat.com>) id 1d3YVw-00042G-Ay
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:37 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 26 Apr 2017 20:46:11 -0500
-Message-Id: <20170427014626.11553-3-eblake@redhat.com>
+Date: Wed, 26 Apr 2017 20:46:10 -0500
+Message-Id: <20170427014626.11553-2-eblake@redhat.com>
 In-Reply-To: <20170427014626.11553-1-eblake@redhat.com>
 References: <20170427014626.11553-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 02/17] qcow2: Correctly report status of
- preallocated zero clusters
+Subject: [Qemu-devel] [PATCH v10 01/17] block: Update comments on
+ BDRV_BLOCK_* meanings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-We were throwing away the preallocation information associated with
-zero clusters.  But we should be matching the well-defined semantics
-in bdrv_get_block_status(), where (BDRV_BLOCK_ZERO |
-BDRV_BLOCK_OFFSET_VALID) informs the user which offset is reserved,
-while still reminding the user that reading from that offset is
-likely to read garbage.
+We had some conflicting documentation: a nice 8-way table that
+described all possible combinations of DATA, ZERO, and
+OFFSET_VALID, couple with text that implied that OFFSET_VALID
+always meant raw data could be read directly.  As the 8-way
+table is the intended semantics, simplify the rest of the text
+to get rid of the confusion.
 
-Making this change lets us see which portions of an image are zero
-but preallocated, when using qemu-img map --output=json.  The
---output=human side intentionally ignores all zero clusters, whether
-or not they are preallocated.
-
-The fact that there is no change to qemu-iotests './check -qcow2'
-merely means that we aren't yet testing this aspect of qemu-img;
-a later patch will add a test.
-
+Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
 v10: new patch
 ---
- block/qcow2-cluster.c | 32 +++++++++++++++++++++++++++-----
- 1 file changed, 27 insertions(+), 5 deletions(-)
+ include/block/block.h | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 100398c..d1063df 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -328,6 +328,10 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
- 	return i;
- }
+diff --git a/include/block/block.h b/include/block/block.h
+index 862eb56..04fcbd0 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -121,21 +121,22 @@ typedef struct HDGeometry {
 
-+/*
-+ * Checks how many consecutive clusters in a given L2 table have the same
-+ * cluster type with no corresponding allocation.
-+ */
- static int count_contiguous_clusters_by_type(int nb_clusters,
-                                              uint64_t *l2_table,
-                                              int wanted_type)
-@@ -335,9 +339,10 @@ static int count_contiguous_clusters_by_type(int nb_clusters,
-     int i;
-
-     for (i = 0; i < nb_clusters; i++) {
--        int type = qcow2_get_cluster_type(be64_to_cpu(l2_table[i]));
-+        uint64_t entry = be64_to_cpu(l2_table[i]);
-+        int type = qcow2_get_cluster_type(entry);
-
--        if (type != wanted_type) {
-+        if (type != wanted_type || entry & L2E_OFFSET_MASK) {
-             break;
-         }
-     }
-@@ -559,9 +564,26 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-             ret = -EIO;
-             goto fail;
-         }
--        c = count_contiguous_clusters_by_type(nb_clusters, &l2_table[l2_index],
--                                              QCOW2_CLUSTER_ZERO);
--        *cluster_offset = 0;
-+        /* Distinguish between pure zero clusters and pre-allocated ones */
-+        if (*cluster_offset & L2E_OFFSET_MASK) {
-+            c = count_contiguous_clusters(nb_clusters, s->cluster_size,
-+                                          &l2_table[l2_index], QCOW_OFLAG_ZERO);
-+            *cluster_offset &= L2E_OFFSET_MASK;
-+            if (offset_into_cluster(s, *cluster_offset)) {
-+                qcow2_signal_corruption(bs, true, -1, -1,
-+                                        "Preallocated zero cluster offset %#"
-+                                        PRIx64 " unaligned (L2 offset: %#"
-+                                        PRIx64 ", L2 index: %#x)",
-+                                        *cluster_offset, l2_offset, l2_index);
-+                ret = -EIO;
-+                goto fail;
-+            }
-+        } else {
-+            c = count_contiguous_clusters_by_type(nb_clusters,
-+                                                  &l2_table[l2_index],
-+                                                  QCOW2_CLUSTER_ZERO);
-+            *cluster_offset = 0;
-+        }
-         break;
-     case QCOW2_CLUSTER_UNALLOCATED:
-         /* how many empty clusters ? */
+ /*
+  * Allocation status flags
+- * BDRV_BLOCK_DATA: data is read from a file returned by bdrv_get_block_status.
++ * BDRV_BLOCK_DATA: data is read from a file returned by bdrv_get_block_status
+  * BDRV_BLOCK_ZERO: sectors read as zero
+- * BDRV_BLOCK_OFFSET_VALID: sector stored as raw data in a file returned by
+- *                          bdrv_get_block_status.
++ * BDRV_BLOCK_OFFSET_VALID: an associated offset exists for accessing raw data
+  * BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
+  *                       layer (as opposed to the backing file)
+  * BDRV_BLOCK_RAW: used internally to indicate that the request
+  *                 was answered by the raw driver and that one
+  *                 should look in bs->file directly.
+  *
+- * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 represent the offset in
+- * bs->file where sector data can be read from as raw data.
+- *
+  * DATA == 0 && ZERO == 0 means that data is read from backing_hd if present.
+  *
++ * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 represent the offset
++ * in bs->file that is allocated for the corresponding raw data;
++ * however, whether that offset actually contains data also depends on
++ * BDRV_BLOCK_DATA, as follows:
++ *
+  * DATA ZERO OFFSET_VALID
+  *  t    t        t       sectors read as zero, bs->file is zero at offset
+  *  t    f        t       sectors read as valid from bs->file at offset
 -- 
 2.9.3
