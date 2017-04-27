@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3fq7-00047h-6A
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:57 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1d3frF-00052e-Fu
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3fq5-0004YQ-3s
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3fq4-0004Xe-Qa
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:35:53 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Thu, 27 Apr 2017 17:34:20 +0800
-Message-Id: <1493285660-4470-9-git-send-email-peterx@redhat.com>
-In-Reply-To: <1493285660-4470-1-git-send-email-peterx@redhat.com>
-References: <1493285660-4470-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 8/8] iommu: introduce hw/core/iommu
+	(envelope-from <aurelien@aurel32.net>) id 1d3frD-0005NK-VF
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:37:05 -0400
+Date: Thu, 27 Apr 2017 11:36:39 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170427093639.x4ckqibxcdgj76gf@aurel32.net>
+References: <1493263764-18657-1-git-send-email-cota@braap.org>
+	<1493263764-18657-8-git-send-email-cota@braap.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493263764-18657-8-git-send-email-cota@braap.org>
+Subject: Re: [Qemu-devel] [PATCH v4 07/11] target/arm: optimize indirect
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,258 +24,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, Paolo Bonzini <pbonzini@redhat.com>, kevin.tian@intel.com, yi.l.liu@intel.com, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-Time to consider a common stuff for IOMMU. Let's start from an common
-IOMMU object (which should be inlayed in custom IOMMU implementations)
-and a notifier mechanism.
+On 2017-04-26 23:29, Emilio G. Cota wrote:
+> Speed up indirect branches by jumping to the target if it is valid.
+> 
+> Softmmu measurements (see later commit for user-mode results):
+> 
+> Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
+> 
+> - Impact on Boot time
+> 
+> | setup  | ARM debian jessie boot+shutdown time | stddev |
+> |--------+--------------------------------------+--------|
+> | v2.9.0 |                                 8.84 |   0.07 |
+> | +cross |                                 8.85 |   0.03 |
+> | +jr    |                                 8.83 |   0.06 |
+> 
+> -                            NBench, arm-softmmu (debian jessie guest). Host: Intel i7-4790K @ 4.00GHz
+> 
+>   1.3x +-+-------------------------------------------------------------------------------------------------------------+-+
+>        |                                                                                                                 |
+>        |   cross                                                          ####                                           |
+>  1.25x +cross+jr..........................................................#++#.........................................+-+
+>        |                                                        ####      #  #                                           |
+>        |                                                     +++#  #      #  #                                           |
+>        |                                      +++            ****  #      #  #                                           |
+>   1.2x +-+...................................####............*..*..#......#..#.........................................+-+
+>        |                                  ****  #            *  *  #      #  #     ####                                  |
+>        |                                  *  *  #            *  *  #      #  #     #  #                                  |
+>  1.15x +-+................................*..*..#............*..*..#......#..#.....#..#................................+-+
+>        |                                  *  *  #            *  *  #      #  #     #  #                                  |
+>        |                                  *  *  #      ####  *  *  #      #  #     #  #                                  |
+>        |                                  *  *  #      #  #  *  *  #      #  #     #  #                         ####     |
+>   1.1x +-+................................*..*..#......#..#..*..*..#......#..#.....#..#.........................#..#...+-+
+>        |                                  *  *  #      #  #  *  *  #      #  #     #  #                         #  #     |
+>        |                                  *  *  #      #  #  *  *  #      #  #     #  #                         #  #     |
+>  1.05x +-+..........................####..*..*..#......#..#..*..*..#......#..#.....#..#......+++............*****..#...+-+
+>        |                        *****  #  *  *  #      #  #  *  *  #  *****  #     #  #   +++ |    ****###  *   *  #     |
+>        |                        *+++*  #  *  *  #      #  #  *  *  #  *+++*  #  ****  #  *****###  *  *  #  *   *  #     |
+>        |     *****###  +++####  *   *  #  *  *  #  *****  #  *  *  #  *   *  #  *  *  #  * | *++#  *  *  #  *   *  #     |
+>     1x +-++-+*+++*-+#++****++#++*+-+*++#+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-++-+
+>        |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
+>        |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
+>  0.95x +-+---*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###---+-+
+>        ASSIGNMENT BITFIELD   FOURFP EMULATION   HUFFMAN   LU DECOMPOSITIONEURAL NNUMERIC SOSTRING SORT     hmean
+>   png: http://imgur.com/eOLmZNR
+> 
+> NB. 'cross' represents the previous commit.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  target/arm/translate.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 02cad96..d46a576 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -65,6 +65,7 @@ static TCGv_i32 cpu_R[16];
+>  TCGv_i32 cpu_CF, cpu_NF, cpu_VF, cpu_ZF;
+>  TCGv_i64 cpu_exclusive_addr;
+>  TCGv_i64 cpu_exclusive_val;
+> +static bool gen_jr;
+>  
+>  /* FIXME:  These should be removed.  */
+>  static TCGv_i32 cpu_F0s, cpu_F1s;
+> @@ -221,6 +222,7 @@ static void store_reg(DisasContext *s, int reg, TCGv_i32 var)
+>           */
+>          tcg_gen_andi_i32(var, var, s->thumb ? ~1 : ~3);
+>          s->is_jmp = DISAS_JUMP;
+> +        gen_jr = true;
+>      }
+>      tcg_gen_mov_i32(cpu_R[reg], var);
+>      tcg_temp_free_i32(var);
+> @@ -893,6 +895,7 @@ static inline void gen_bx_im(DisasContext *s, uint32_t addr)
+>          tcg_temp_free_i32(tmp);
+>      }
+>      tcg_gen_movi_i32(cpu_R[15], addr & ~1);
+> +    gen_jr = true;
+>  }
+>  
+>  /* Set PC and Thumb state from var.  var is marked as dead.  */
+> @@ -902,6 +905,7 @@ static inline void gen_bx(DisasContext *s, TCGv_i32 var)
+>      tcg_gen_andi_i32(cpu_R[15], var, ~1);
+>      tcg_gen_andi_i32(var, var, 1);
+>      store_cpu_field(var, thumb);
+> +    gen_jr = true;
+>  }
+>  
+>  /* Variant of store_reg which uses branch&exchange logic when storing
+> @@ -12034,6 +12038,20 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+>              gen_set_pc_im(dc, dc->pc);
+>              /* fall through */
+>          case DISAS_JUMP:
+> +            /*
+> +             * gen_jr is not set on every DISAS_JUMP because for some of those
+> +             * we do want to exit to the exec loop.
+> +             */
 
-Let VT-d IOMMU be the first user.
+What would be the reason for that? IIUC the lookup_tb_ptr helper calls
+cpu_get_tb_cpu_state to get the new TB flags go lookup from the current
+CPU state. It means it is able for example to handle a transition from
+user to privileged mode. Also the exit_req flag or its new equivalent
+is tested at the beginning of each TB in case there is an interruption.
 
-An example to use this per-iommu notifier:
+It therefore seems to be that we can replace all calls to
+tcg_gen_exit_tb by tcg_gen_lookup_and_goto_ptr with the program counter
+in argument.
 
-  (when registering)
-  iommu = address_space_iommu_get(pci_device_iommu_address_space(dev));
-  notifier = iommu_notifier_register(iommu, IOMMU_EVENT_SVM_PASID, func);
-  ...
-  (when notify)
-  IOMMUEvent event = { .type = IOMMU_EVENT_SVM_PASID ... };
-  iommu_notify(iommu, &event);
-  ...
-  (when releasing)
-  iommu_notifier_unregister(notifier);
-  notifier = NULL;
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/core/Makefile.objs         |  1 +
- hw/core/iommu.c               | 61 ++++++++++++++++++++++++++++++++++++
- hw/i386/intel_iommu.c         |  2 +-
- include/exec/memory.h         | 10 +-----
- include/hw/core/iommu.h       | 72 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/i386/intel_iommu.h |  2 ++
- 6 files changed, 138 insertions(+), 10 deletions(-)
- create mode 100644 hw/core/iommu.c
- create mode 100644 include/hw/core/iommu.h
-
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index 91450b2..85cca44 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -5,6 +5,7 @@ common-obj-y += fw-path-provider.o
- # irq.o needed for qdev GPIO handling:
- common-obj-y += irq.o
- common-obj-y += hotplug.o
-+common-obj-y += iommu.o
- obj-y += nmi.o
- 
- common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
-diff --git a/hw/core/iommu.c b/hw/core/iommu.c
-new file mode 100644
-index 0000000..e014e96
---- /dev/null
-+++ b/hw/core/iommu.c
-@@ -0,0 +1,61 @@
-+/*
-+ * QEMU emulation of IOMMU logic
-+ *
-+ * Copyright (C) 2017 Red Hat Inc.
-+ *
-+ * Authors: Peter Xu <peterx@redhat.com>,
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/core/iommu.h"
-+
-+IOMMUNotifier *iommu_notifier_register(IOMMUObject *iommu,
-+                                       IOMMUNotifyFn fn,
-+                                       uint64_t event_mask)
-+{
-+    IOMMUNotifier *notifier = g_new0(IOMMUNotifier, 1);
-+
-+    assert((event_mask & ~IOMMU_EVENT_MASK) == 0);
-+    notifier->event_mask = event_mask;
-+    notifier->iommu_notify = fn;
-+    QLIST_INSERT_HEAD(&iommu->iommu_notifiers, notifier, node);
-+
-+    return notifier;
-+}
-+
-+void iommu_notifier_unregister(IOMMUObject *iommu,
-+                               IOMMUNotifier *notifier)
-+{
-+    IOMMUNotifier *cur, *next;
-+
-+    QLIST_FOREACH_SAFE(cur, &iommu->iommu_notifiers, node, next) {
-+        if (cur == notifier) {
-+            QLIST_REMOVE(cur, node);
-+            break;
-+        }
-+    }
-+}
-+
-+void iommu_notify(IOMMUObject *iommu, IOMMUEvent *event)
-+{
-+    IOMMUNotifier *cur;
-+
-+    QLIST_FOREACH(cur, &iommu->iommu_notifiers, node) {
-+        if (cur->event_mask & event->type && cur->iommu_notify) {
-+            cur->iommu_notify(cur, event);
-+        }
-+    }
-+}
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 5131329..d6f6701 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2635,7 +2635,7 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
- static IOMMUObject *vtd_as_iommu_get(AddressSpace *as)
- {
-     VTDAddressSpace *vtd_dev_as = container_of(as, VTDAddressSpace, as);
--    return (IOMMUObject *)vtd_dev_as->iommu_state;
-+    return &vtd_dev_as->iommu_state->iommu_common;
- }
- 
- VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 0b0b58b..5ca1dd0 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -27,6 +27,7 @@
- #include "qemu/notify.h"
- #include "qom/object.h"
- #include "qemu/rcu.h"
-+#include "hw/core/iommu.h"
- 
- #define RAM_ADDR_INVALID (~(ram_addr_t)0)
- 
-@@ -183,15 +184,6 @@ struct MemoryRegionOps {
-     const MemoryRegionMmio old_mmio;
- };
- 
--/*
-- * This stands for an IOMMU unit. Normally it should be exactly the
-- * IOMMU device, however this can also be actually anything which is
-- * related to that translation unit. What it is should be totally
-- * arch-dependent. Maybe one day we can have something better than a
-- * (void *) here.
-- */
--typedef void *IOMMUObject;
--
- typedef struct MemoryRegionIOMMUOps MemoryRegionIOMMUOps;
- 
- struct MemoryRegionIOMMUOps {
-diff --git a/include/hw/core/iommu.h b/include/hw/core/iommu.h
-new file mode 100644
-index 0000000..16e6adf
---- /dev/null
-+++ b/include/hw/core/iommu.h
-@@ -0,0 +1,72 @@
-+/*
-+ * QEMU emulation of IOMMU logic
-+ *
-+ * Copyright (C) 2017 Red Hat Inc.
-+ *
-+ * Authors: Peter Xu <peterx@redhat.com>,
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef __PCI_IOMMU_H__
-+#define __PCI_IOMMU_H__
-+
-+#include "qemu/queue.h"
-+
-+#define IOMMU_EVENT_SVM_PASID      (0)
-+#define IOMMU_EVENT_MASK           (IOMMU_EVENT_SVM_PASID)
-+
-+struct IOMMUEvent {
-+    uint64_t type;
-+    union {
-+        struct {
-+            /* TODO: fill in correct stuff. */
-+            int value;
-+        } svm;
-+    } data;
-+};
-+typedef struct IOMMUEvent IOMMUEvent;
-+
-+typedef struct IOMMUNotifier IOMMUNotifier;
-+
-+typedef void (*IOMMUNotifyFn)(IOMMUNotifier *notifier, IOMMUEvent *event);
-+
-+struct IOMMUNotifier {
-+    IOMMUNotifyFn iommu_notify;
-+    /*
-+     * What events we are listening to. Let's allow multiple event
-+     * registrations from beginning.
-+     */
-+    uint64_t event_mask;
-+    QLIST_ENTRY(IOMMUNotifier) node;
-+};
-+
-+/*
-+ * This stands for an IOMMU unit. Any translation device should have
-+ * this struct inside its own structure to make sure it can leverage
-+ * common IOMMU functionalities.
-+ */
-+struct IOMMUObject {
-+    QLIST_HEAD(, IOMMUNotifier) iommu_notifiers;
-+};
-+typedef struct IOMMUObject IOMMUObject;
-+
-+IOMMUNotifier *iommu_notifier_register(IOMMUObject *iommu,
-+                                       IOMMUNotifyFn fn,
-+                                       uint64_t event_mask);
-+void iommu_notifier_unregister(IOMMUObject *iommu,
-+                               IOMMUNotifier *notifier);
-+void iommu_notify(IOMMUObject *iommu, IOMMUEvent *event);
-+
-+#endif
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index f9ac0ec..ec696f5 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -26,6 +26,7 @@
- #include "hw/i386/x86-iommu.h"
- #include "hw/i386/ioapic.h"
- #include "hw/pci/msi.h"
-+#include "hw/core/iommu.h"
- #include "hw/sysbus.h"
- 
- #define TYPE_INTEL_IOMMU_DEVICE "intel-iommu"
-@@ -258,6 +259,7 @@ struct IntelIOMMUMRNotifierNode {
- /* The iommu (DMAR) device state struct */
- struct IntelIOMMUState {
-     X86IOMMUState x86_iommu;
-+    IOMMUObject iommu_common;
-     MemoryRegion csrmem;
-     uint8_t csr[DMAR_REG_SIZE];     /* register values */
-     uint8_t wmask[DMAR_REG_SIZE];   /* R/W bytes */
 -- 
-2.7.4
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
