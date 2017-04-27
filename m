@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3gCj-0000NP-GF
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:59:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1d3gMr-0003WD-Tm
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3gCi-0001Gd-GQ
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:59:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57936)
+	(envelope-from <peterx@redhat.com>) id 1d3gMn-0006oL-01
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:09:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3gCi-0001Fs-77
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:59:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 105DAA08F4
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 09:59:15 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3gMm-0006o3-NI
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:09:40 -0400
+Date: Thu, 27 Apr 2017 18:09:29 +0800
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 27 Apr 2017 17:58:46 +0800
-Message-Id: <1493287126-19072-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1493287126-19072-1-git-send-email-peterx@redhat.com>
-References: <1493287126-19072-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] ramblock: add new hmp command "info
- ramblock"
+Message-ID: <20170427100929.GC1542@pxdev.xzpeter.org>
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-13-git-send-email-yi.l.liu@linux.intel.com>
+	<0f2966cf-4e5a-a2cc-5eb3-7e7d4f62bb85@redhat.com>
+	<20170427023719.GA14925@sky-dev>
+	<20170427061427.GA1542@pxdev.xzpeter.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170427061427.GA1542@pxdev.xzpeter.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 12/20] Memory: Add func to fire
+ pasidt_bind notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,162 +32,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, alex.williamson@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, jean-philippe.brucker@arm.com, jasowang@redhat.com, iommu@lists.linux-foundation.org, jacob.jun.pan@intel.com
 
-To dump information about ramblocks. It looks like:
+On Thu, Apr 27, 2017 at 02:14:27PM +0800, Peter Xu wrote:
+> On Thu, Apr 27, 2017 at 10:37:19AM +0800, Liu, Yi L wrote:
+> > On Wed, Apr 26, 2017 at 03:50:16PM +0200, Paolo Bonzini wrote:
+> > >=20
+> > >=20
+> > > On 26/04/2017 12:06, Liu, Yi L wrote:
+> > > > +void memory_region_notify_iommu_svm_bind(MemoryRegion *mr,
+> > > > +                                         void *data)
+> > > > +{
+> > > > +    IOMMUNotifier *iommu_notifier;
+> > > > +    IOMMUNotifierFlag request_flags;
+> > > > +
+> > > > +    assert(memory_region_is_iommu(mr));
+> > > > +
+> > > > +    /*TODO: support other bind requests with smaller gran,
+> > > > +     * e.g. bind signle pasid entry
+> > > > +     */
+> > > > +    request_flags =3D IOMMU_NOTIFIER_SVM_PASIDT_BIND;
+> > > > +
+> > > > +    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> > > > +        if (iommu_notifier->notifier_flags & request_flags) {
+> > > > +            iommu_notifier->notify(iommu_notifier, data);
+> > > > +            break;
+> > > > +        }
+> > > > +    }
+> > >=20
+> > > Peter,
+> > >=20
+> > > should this reuse ->notify, or should it be different function poin=
+ter
+> > > in IOMMUNotifier?
+> >=20
+> > Hi Paolo,
+> >=20
+> > Thx for your review.
+> >=20
+> > I think it should be =E2=80=9C->notify=E2=80=9D here. In this patchse=
+t, the new notifier
+> > is registered with the existing notifier registration API. So the all=
+ the
+> > notifiers are in the mr->iommu_notify list. And notifiers are labeled
+> > by notify flag, so it is able to differentiate the IOMMUNotifier node=
+s.
+> > When the flag meets, trigger it by =E2=80=9C->notify=E2=80=9D. The di=
+agram below shows
+> > my understanding , wish it helps to make me understood.
+> >=20
+> > VFIOContainer
+> >        |
+> >        giommu_list(VFIOGuestIOMMU)
+> >                 \
+> >                  VFIOGuestIOMMU1 ->   VFIOGuestIOMMU2 -> VFIOGuestIOM=
+MU3 ...
+> >                     |                     |                 |
+> > mr->iommu_notify: IOMMUNotifier   ->    IOMMUNotifier  ->  IOMMUNotif=
+ier
+> >                   (Flag:MAP/UNMAP)     (Flag:SVM bind)  (Flag:tlb inv=
+alidate)
+> >=20
+> >=20
+> > Actually, compared with the MAP/UNMAP notifier, the newly added notif=
+ier has
+> > no start/end check, and there may be other types of bind notfier flag=
+ in
+> > future, so I added a separate fire func for SVM bind notifier.
+>=20
+> I agree with Paolo that this interface might not be the suitable place
+> for the SVM notifiers (just like what I worried about in previous
+> discussions).
+>=20
+> The biggest problem is that, if you see current notifier mechanism,
+> it's per-memory-region. However iiuc your messages should be
+> per-iommu, or say, per translation unit. While, for each iommu, there
+> can be more than one memory regions (ppc can be an example). When
+> there are more than one MRs binded to the same iommu unit, which
+> memory region should you register to? Any one of them, or all?
+>=20
+> So my conclusion is, it just has nothing to do with memory regions...
+>=20
+> Instead of a different function pointer in IOMMUNotifer, IMHO we can
+> even move a step further, to isolate IOTLB notifications (targeted at
+> memory regions and with start/end ranges) out of SVM/other
+> notifications, since they are different in general. So we basically
+> need two notification mechanism:
+>=20
+> - one for memory regions, currently what I can see is IOTLB
+>   notifications
+>=20
+> - one for translation units, currently I see all the rest of
+>   notifications needed in virt-svm in this category
+>=20
+> Maybe some RFC patches would be good to show what I mean... I'll see
+> whether I can prepare some.
 
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used              Total
-            /objects/mem       2M  0x0000000000000000 0x0000000080000000 0x0000000080000000
-                vga.vram       4K  0x0000000080060000 0x0000000001000000 0x0000000001000000
-    /rom@etc/acpi/tables       4K  0x00000000810b0000 0x0000000000020000 0x0000000000200000
-                 pc.bios       4K  0x0000000080000000 0x0000000000040000 0x0000000000040000
-  0000:00:03.0/e1000.rom       4K  0x0000000081070000 0x0000000000040000 0x0000000000040000
-                  pc.rom       4K  0x0000000080040000 0x0000000000020000 0x0000000000020000
-    0000:00:02.0/vga.rom       4K  0x0000000081060000 0x0000000000010000 0x0000000000010000
-   /rom@etc/table-loader       4K  0x00000000812b0000 0x0000000000001000 0x0000000000001000
-      /rom@etc/acpi/rsdp       4K  0x00000000812b1000 0x0000000000001000 0x0000000000001000
+Here it is (on qemu-devel):
 
-Ramblock is something hidden internally in QEMU implementation, and this
-command should only be used by mostly QEMU developers on RAM stuff. It
-is not a command suitable for QMP interface. So only HMP interface is
-provided for it.
+[RFC PATCH 0/8] IOMMU: introduce common IOMMUObject
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- exec.c                 | 36 ++++++++++++++++++++++++++++++++++++
- hmp-commands-info.hx   | 14 ++++++++++++++
- hmp.c                  |  6 ++++++
- hmp.h                  |  1 +
- include/exec/ramlist.h |  1 +
- 5 files changed, 58 insertions(+)
+Thanks,
 
-diff --git a/exec.c b/exec.c
-index 50519ae..9b9d16e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -71,6 +71,8 @@
- #include "qemu/mmap-alloc.h"
- #endif
- 
-+#include "monitor/monitor.h"
-+
- //#define DEBUG_SUBPAGE
- 
- #if !defined(CONFIG_USER_ONLY)
-@@ -1333,6 +1335,40 @@ void qemu_mutex_unlock_ramlist(void)
-     qemu_mutex_unlock(&ram_list.mutex);
- }
- 
-+static const char *page_size_to_str(size_t psize)
-+{
-+    switch (psize) {
-+    case 0x1000:
-+        return "4K";
-+    case 0x10000:
-+        return "64K";
-+    case 0x200000:
-+        return "2M";
-+    case 0x40000000:
-+        return "1G";
-+    default:
-+        return "N/A";
-+    }
-+}
-+
-+void ram_block_dump(Monitor *mon)
-+{
-+    RAMBlock *block;
-+
-+    rcu_read_lock();
-+    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-+                   "Block Name", "PSize", "Offset", "Used", "Total");
-+    RAMBLOCK_FOREACH(block) {
-+        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
-+                       " 0x%016" PRIx64 "\n", block->idstr,
-+                       page_size_to_str(block->page_size),
-+                       (uint64_t)block->offset,
-+                       (uint64_t)block->used_length,
-+                       (uint64_t)block->max_length);
-+    }
-+    rcu_read_unlock();
-+}
-+
- #ifdef __linux__
- /*
-  * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a53f105..ae16901 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -788,6 +788,20 @@ Display the latest dump status.
- ETEXI
- 
-     {
-+        .name       = "ramblock",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Display system ramblock information",
-+        .cmd        = hmp_info_ramblock,
-+    },
-+
-+STEXI
-+@item info ramblock
-+@findex ramblock
-+Dump all the ramblocks of the system.
-+ETEXI
-+
-+    {
-         .name       = "hotpluggable-cpus",
-         .args_type  = "",
-         .params     = "",
-diff --git a/hmp.c b/hmp.c
-index ab407d6..8369388 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -37,6 +37,7 @@
- #include "qemu-io.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-+#include "exec/ramlist.h"
- #include "hw/intc/intc.h"
- 
- #ifdef CONFIG_SPICE
-@@ -2563,6 +2564,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
-     qapi_free_DumpQueryResult(result);
- }
- 
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
-+{
-+    ram_block_dump(mon);
-+}
-+
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-diff --git a/hmp.h b/hmp.h
-index 799fd37..7353b67 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -136,6 +136,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- 
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-index f1c6b45..2e2ac6c 100644
---- a/include/exec/ramlist.h
-+++ b/include/exec/ramlist.h
-@@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
- void ram_block_notify_add(void *host, size_t size);
- void ram_block_notify_remove(void *host, size_t size);
- 
-+void ram_block_dump(Monitor *mon);
- 
- #endif /* RAMLIST_H */
--- 
-2.7.4
+--=20
+Peter Xu
