@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3lyu-0002Dg-GP
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:09:25 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d3lzM-0002WP-OO
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:09:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3lyr-0005ez-R0
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:09:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44208)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d3lyr-0005eD-FG
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:09:21 -0400
-Date: Thu, 27 Apr 2017 13:09:16 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170427160916.GD3482@thinpad.lan.raisama.net>
-References: <20170427101259.13798-1-lvivier@redhat.com>
-	<20170427101259.13798-2-lvivier@redhat.com>
-	<20170427140941.GC3482@thinpad.lan.raisama.net>
-	<5f64d784-178b-9b10-68ed-51158a1af334@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1d3lzK-0005vn-2s
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:09:52 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d3lzJ-0005uo-PI
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:09:50 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id r190so23383654wme.1
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 09:09:49 -0700 (PDT)
+References: <20170427120006.20564-1-rth@twiddle.net>
+	<20170427120006.20564-4-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170427120006.20564-4-rth@twiddle.net>
+Date: Thu, 27 Apr 2017 17:10:18 +0100
+Message-ID: <874lx996hh.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f64d784-178b-9b10-68ed-51158a1af334@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] numa: introduce
- numa_auto_assign_ram() function in MachineClass
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 03/19] qemu/atomic: Loosen restrictions
+ for 64-bit ILP32 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, cota@braap.org
 
-On Thu, Apr 27, 2017 at 05:09:26PM +0200, Laurent Vivier wrote:
-> On 27/04/2017 16:09, Eduardo Habkost wrote:
-> > On Thu, Apr 27, 2017 at 12:12:58PM +0200, Laurent Vivier wrote:
-> >> We need to change the way we distribute the memory across
-> >> the nodes. To keep compatibility between machine type version
-> >> introduce a  machine type dependent function.
-> >>
-> >> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> > [...]
-> >> +static void numa_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-> >> +                                 int nb_nodes, ram_addr_t size)
-> >> +{
-> >> +    int i;
-> >> +    uint64_t usedmem = 0;
-> >> +
-> >> +    if (mc->numa_auto_assign_ram) {
-> >> +        uint64_t *mem = g_new(uint64_t, nb_nodes);
-> >> +
-> >> +        mc->numa_auto_assign_ram(mem, nb_nodes, size);
-> >> +
-> >> +        for (i = 0; i < nb_nodes; i++) {
-> >> +            nodes[i].node_mem = mem[i];
-> >> +        }
-> >> +
-> >> +        g_free(mem);
-> >> +
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    /* Align each node according to the alignment
-> >> +     * requirements of the machine class
-> >> +     */
-> >> +
-> >> +    for (i = 0; i < nb_nodes - 1; i++) {
-> >> +        nodes[i].node_mem = (size / nb_nodes) &
-> >> +                            ~((1 << mc->numa_mem_align_shift) - 1);
-> >> +        usedmem += nodes[i].node_mem;
-> >> +    }
-> >> +    nodes[i].node_mem = size - usedmem;
-> >> +}
-> > 
-> > I would prefer to make your new algorithm the default, and move
-> > this code to a legacy_auto_assign_ram() function set by the 2.9
-> > machine-types.
-> 
-> I think it's easier to do as I've done because otherwise, we need:
-> 
-> - to add the numa_mem_align_shift to the parameters list of the
->   numa_auto_assign_ram() function.
 
-You can take MachineClass or MachineState as paramter.
+Richard Henderson <rth@twiddle.net> writes:
 
-> 
-> - set the function by default to numa_auto_assign_ram in
->   hw/core/machine.c:machine_class_init()
+> We need to coordinate with the TCG_OVERSIZED_GUEST test in cputlb.c,
+> and allow 64-bit atomics even though sizeof(void *) == 4.
 
-Yep.
+Hmm you say this here but we never actually do it. But the other changes
+seem fine.
 
-> 
-> - set the pointer to NULL in 2.10 pseries machine type,
+>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  include/qemu/atomic.h | 34 ++++++++++++++++++++++++++--------
+>  1 file changed, 26 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
+> index 878fa07..8a564e9 100644
+> --- a/include/qemu/atomic.h
+> +++ b/include/qemu/atomic.h
+> @@ -88,6 +88,24 @@
+>  #define smp_read_barrier_depends()   barrier()
+>  #endif
+>
+> +/* Sanity check that the size of an atomic operation isn't "overly large".
+> + * Despite the fact that e.g. i686 has 64-bit atomic operations, we do not
+> + * want to use them because we ought not need them, and this lets us do a
+> + * bit of sanity checking that other 32-bit hosts might build.
+> + *
+> + * That said, 64-bit hosts running in ilp32 mode cannot use pointer size
+> + * as the test; we need the full register size.
+> + * ??? Testing TCG_TARGET_REG_BITS == 64 would exact, but we probably do
+> + * not want to pull in everything else TCG related.
+> + *
+> + * Note that x32 is fully detected with __x64_64__ + _ILP32, and that for
+> + * Sparc we always force the use of sparcv9 in configure.
+> + */
+> +#if defined(__x86_64__) || defined(__sparc__)
+> +# define ATOMIC_REG_SIZE  8
+> +#else
+> +# define ATOMIC_REG_SIZE  sizeof(void *)
+> +#endif
+>
+>  /* Weak atomic operations prevent the compiler moving other
+>   * loads/stores past the atomic operation load/store. However there is
+> @@ -104,7 +122,7 @@
+>
+>  #define atomic_read(ptr)                              \
+>      ({                                                \
+> -    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
+> +    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+>      atomic_read__nocheck(ptr);                        \
+>      })
+>
+> @@ -112,7 +130,7 @@
+>      __atomic_store_n(ptr, i, __ATOMIC_RELAXED)
+>
+>  #define atomic_set(ptr, i)  do {                      \
+> -    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
+> +    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+>      atomic_set__nocheck(ptr, i);                      \
+>  } while(0)
+>
+> @@ -130,27 +148,27 @@
+>
+>  #define atomic_rcu_read(ptr)                          \
+>      ({                                                \
+> -    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
+> +    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+>      typeof_strip_qual(*ptr) _val;                     \
+>      atomic_rcu_read__nocheck(ptr, &_val);             \
+>      _val;                                             \
+>      })
+>
+>  #define atomic_rcu_set(ptr, i) do {                   \
+> -    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
+> +    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+>      __atomic_store_n(ptr, i, __ATOMIC_RELEASE);       \
+>  } while(0)
+>
+>  #define atomic_load_acquire(ptr)                        \
+>      ({                                                  \
+> -    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));   \
+> +    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);  \
+>      typeof_strip_qual(*ptr) _val;                       \
+>      __atomic_load(ptr, &_val, __ATOMIC_ACQUIRE);        \
+>      _val;                                               \
+>      })
+>
+>  #define atomic_store_release(ptr, i)  do {              \
+> -    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));   \
+> +    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);  \
+>      __atomic_store_n(ptr, i, __ATOMIC_RELEASE);         \
+>  } while(0)
+>
+> @@ -162,7 +180,7 @@
+>  })
+>
+>  #define atomic_xchg(ptr, i)    ({                           \
+> -    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));       \
+> +    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);      \
+>      atomic_xchg__nocheck(ptr, i);                           \
+>  })
+>
+> @@ -175,7 +193,7 @@
+>  })
+>
+>  #define atomic_cmpxchg(ptr, old, new)    ({                             \
+> -    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));                   \
+> +    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);                  \
+>      atomic_cmpxchg__nocheck(ptr, old, new);                             \
+>  })
 
-Won't pseries-2.10 have the same behavior as all other machines
-except pc/pseries <= 2.9? pseries-2.10 and pc-2.10 would just
-reuse the default value set by machine_class_init().
 
-> 
-> - export the function to re-set the legacy function in the 2.9 pseries
->   machine type definition.
-
-Well, this is the part where I agree it's too much hassle.  :)
-
-> 
-> So, we need to add one argument to the function, export the function to
-> use it from machine.c and at least spapr.c, to set the function in
-> machine_class_init() and spapr_machine_2_9_class_options() (as we clear
-> it in 2.10 function).
-> 
-> I can do that, but is this what you want?
-
-I don't have a strong opinion. If you believe your way is
-simpler, we can keep it.
-
--- 
-Eduardo
+--
+Alex Bennée
