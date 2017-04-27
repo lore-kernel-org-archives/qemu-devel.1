@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3cHB-0001H8-7K
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3cHB-0001HB-7R
 	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3cH5-0003lk-OU
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33179
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3cH7-0003mH-AI
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60818
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d3cH5-0003lb-Ig
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:31 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1d3cH7-0003m9-3t
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:47:33 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3R5hbHT146027
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:47:30 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a32a0rvrq-1
+	v3R5hdbl068951
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:47:32 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a2q9ak4t9-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:47:30 -0400
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:47:32 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 27 Apr 2017 01:47:30 -0400
+	Wed, 26 Apr 2017 23:47:31 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Thu, 27 Apr 2017 00:46:33 -0500
+Date: Thu, 27 Apr 2017 00:46:29 -0500
 In-Reply-To: <1493271996-23607-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1493271996-23607-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1493271996-23607-6-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL v2 5/8] qga: Add 'guest-get-host-name' command
+Message-Id: <1493271996-23607-2-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL v2 1/8] qemu-ga: Make QGA VSS provider service
+ run only when needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,78 +40,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Vinzenz Feenstra <vfeenstr@redhat.com>
+Cc: peter.maydell@linaro.org, Sameeh Jubran <sameeh@daynix.com>
 
-From: Vinzenz Feenstra <vfeenstr@redhat.com>
+From: Sameeh Jubran <sameeh@daynix.com>
 
-Retrieving the guest host name is a very useful feature for virtual management
-systems. This information can help to have more user friendly VM access
-details, instead of an IP there would be the host name. Also the host name
-reported can be used to have automated checks for valid SSL certificates.
+Currently the service runs in background on boot even though it is not
+needed and once it is running it never stops. The service needs to be
+running only during freeze operation and it should be stopped after
+executing thaw.
 
-virsh # qemu-agent-command F25 '{ "execute": "guest-get-host-name" }'
-{"return":{"host-name":"F25.lab.evilissimo.net"}}
-
-Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
-* minor whitespace fix-ups
+Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/commands.c       | 11 +++++++++++
- qga/qapi-schema.json | 26 ++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+)
+ qga/vss-win32/install.cpp   | 28 ++++++++++++++++++++++++++--
+ qga/vss-win32/install.h     | 20 ++++++++++++++++++++
+ qga/vss-win32/requester.cpp |  2 ++
+ 3 files changed, 48 insertions(+), 2 deletions(-)
+ create mode 100644 qga/vss-win32/install.h
 
-diff --git a/qga/commands.c b/qga/commands.c
-index 4d92946..57a31bb 100644
---- a/qga/commands.c
-+++ b/qga/commands.c
-@@ -499,3 +499,14 @@ int ga_parse_whence(GuestFileWhence *whence, Error **errp)
-     error_setg(errp, "invalid whence code %"PRId64, whence->u.value);
-     return -1;
+diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+index f4160a3..f41fcdf 100644
+--- a/qga/vss-win32/install.cpp
++++ b/qga/vss-win32/install.cpp
+@@ -14,7 +14,7 @@
+ 
+ #include "vss-common.h"
+ #include <inc/win2003/vscoordint.h>
+-#include <comadmin.h>
++#include "install.h"
+ #include <wbemidl.h>
+ #include <comdef.h>
+ #include <comutil.h>
+@@ -276,7 +276,7 @@ STDAPI COMRegister(void)
+ 
+     chk(pCatalog->CreateServiceForApplication(
+             _bstr_t(QGA_PROVIDER_LNAME), _bstr_t(QGA_PROVIDER_LNAME),
+-            _bstr_t(L"SERVICE_AUTO_START"), _bstr_t(L"SERVICE_ERROR_NORMAL"),
++            _bstr_t(L"SERVICE_DEMAND_START"), _bstr_t(L"SERVICE_ERROR_NORMAL"),
+             _bstr_t(L""), _bstr_t(L".\\localsystem"), _bstr_t(L""), FALSE));
+     chk(pCatalog->InstallComponent(_bstr_t(QGA_PROVIDER_LNAME),
+                                    _bstr_t(dllPath), _bstr_t(tlbPath),
+@@ -461,3 +461,27 @@ namespace _com_util
+         return bstr;
+     }
  }
 +
-+GuestHostName *qmp_guest_get_host_name(Error **err)
++/* Stop QGA VSS provider service from COM+ Application Admin Catalog */
++
++STDAPI StopService(void)
 +{
-+    GuestHostName *result = NULL;
-+    gchar const *hostname = g_get_host_name();
-+    if (hostname != NULL) {
-+        result = g_new0(GuestHostName, 1);
-+        result->host_name = g_strdup(hostname);
++    HRESULT hr;
++    COMInitializer initializer;
++    COMPointer<IUnknown> pUnknown;
++    COMPointer<ICOMAdminCatalog2> pCatalog;
++
++    int count = 0;
++
++    chk(QGAProviderFind(QGAProviderCount, (void *)&count));
++    if (count) {
++        chk(CoCreateInstance(CLSID_COMAdminCatalog, NULL, CLSCTX_INPROC_SERVER,
++            IID_IUnknown, (void **)pUnknown.replace()));
++        chk(pUnknown->QueryInterface(IID_ICOMAdminCatalog2,
++            (void **)pCatalog.replace()));
++        chk(pCatalog->ShutdownApplication(_bstr_t(QGA_PROVIDER_LNAME)));
 +    }
-+    return result;
++
++out:
++    return hr;
 +}
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index a02dbf2..6307ae2 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -1042,3 +1042,29 @@
-   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
-                '*input-data': 'str', '*capture-output': 'bool' },
-   'returns': 'GuestExec' }
+diff --git a/qga/vss-win32/install.h b/qga/vss-win32/install.h
+new file mode 100644
+index 0000000..35364af
+--- /dev/null
++++ b/qga/vss-win32/install.h
+@@ -0,0 +1,20 @@
++/*
++ * QEMU Guest Agent VSS requester declarations
++ *
++ * Copyright Hitachi Data Systems Corp. 2013
++ *
++ * Authors:
++ *  Tomoki Sekiyama   <tomoki.sekiyama@hds.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
++#ifndef INSTALL_H
++#define INSTALL_H
 +
-+##
-+# @GuestHostName:
-+# @host-name: Fully qualified domain name of the guest OS
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'GuestHostName',
-+  'data':   { 'host-name': 'str' } }
++#include <comadmin.h>
 +
-+##
-+# @guest-get-host-name:
-+#
-+# Return a name for the machine.
-+#
-+# The returned name is not necessarily a fully-qualified domain name, or even
-+# present in DNS or some other name service at all. It need not even be unique
-+# on your local network or site, but usually it is.
-+#
-+# Returns: the host name of the machine on success
-+#
-+# Since: 2.10
-+##
-+{ 'command': 'guest-get-host-name',
-+  'returns': 'GuestHostName' }
++STDAPI StopService(void);
++
++#endif
+diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+index 0cd2f0e..301762d 100644
+--- a/qga/vss-win32/requester.cpp
++++ b/qga/vss-win32/requester.cpp
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "vss-common.h"
+ #include "requester.h"
++#include "install.h"
+ #include <inc/win2003/vswriter.h>
+ #include <inc/win2003/vsbackup.h>
+ 
+@@ -501,4 +502,5 @@ void requester_thaw(int *num_vols, ErrorSet *errset)
+     requester_cleanup();
+ 
+     CoUninitialize();
++    StopService();
+ }
 -- 
 2.7.4
