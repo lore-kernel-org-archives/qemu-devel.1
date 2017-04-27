@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d3lRb-0002xM-AV
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:35:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3lSz-0003ef-CY
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:36:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d3lRW-0006kY-9W
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:34:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d3lRW-0006k8-0D
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:34:54 -0400
-Date: Thu, 27 Apr 2017 18:34:49 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170427183237-mutt-send-email-mst@kernel.org>
-References: <149321107781.13002.9081643707477650100.stgit@bahia.lan>
-	<20170426151548.0b30d39c.cornelia.huck@de.ibm.com>
-	<20170426152946.5d7a4922@bahia>
-	<20170427024124-mutt-send-email-mst@kernel.org>
-	<20170427090337.47214682@bahia>
+	(envelope-from <eblake@redhat.com>) id 1d3lSx-0007P3-PL
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:36:24 -0400
+References: <20170426134649.9042-1-mreitz@redhat.com>
+	<20170426134649.9042-4-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a78836bc-8a79-6164-1101-6aa756c07a40@redhat.com>
+Date: Thu, 27 Apr 2017 10:36:14 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170427090337.47214682@bahia>
-Subject: Re: [Qemu-devel] [PATCH] virtio: allow broken device to notify guest
+In-Reply-To: <20170426134649.9042-4-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eCpKgjOn8o5N8Uv3opuDcOLigABhJVxxB"
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-img: Document backing options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Thu, Apr 27, 2017 at 09:03:37AM +0200, Greg Kurz wrote:
-> On Thu, 27 Apr 2017 02:42:56 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Wed, Apr 26, 2017 at 03:29:46PM +0200, Greg Kurz wrote:
-> > > On Wed, 26 Apr 2017 15:15:48 +0200
-> > > Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
-> > >   
-> > > > On Wed, 26 Apr 2017 14:51:17 +0200
-> > > > Greg Kurz <groug@kaod.org> wrote:
-> > > >   
-> > > > > According to section 2.1.2 of the virtio-1 specification:
-> > > > > 
-> > > > > "The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state that
-> > > > > a reset is needed. If DRIVER_OK is set, after it sets DEVICE_NEEDS_RESET,
-> > > > > the device MUST send a device configuration change notification to the
-> > > > > driver."
-> > > > > 
-> > > > > Commit "f5ed36635d8f virtio: stop virtqueue processing if device is broken"
-> > > > > introduced a virtio_error() call that just does that:
-> > > > > 
-> > > > > - internally mark the device as broken
-> > > > > - set the DEVICE_NEEDS_RESET bit in the status
-> > > > > - send a configuration change notification
-> > > > > 
-> > > > > Unfortunately, virtio_notify_vector(), called by virtio_notify_config(),
-> > > > > returns right away when the device is marked as broken and the notification
-> > > > > isn't sent in this case.
-> > > > > 
-> > > > > The spec doesn't say whether a broken device can send notifications
-> > > > > in other situations or not. But since the driver isn't supposed to do
-> > > > > anything but to reset the device, it makes sense to keep the check in
-> > > > > virtio_notify_config().
-> > > > > 
-> > > > > Marking the device as broken AFTER the configuration change notification was
-> > > > > sent is enough to fix the issue.
-> > > > > 
-> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > > ---
-> > > > >  hw/virtio/virtio.c |    4 ++--
-> > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > > > 
-> > > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > > > > index 03592c542a55..890b4d7eb751 100644
-> > > > > --- a/hw/virtio/virtio.c
-> > > > > +++ b/hw/virtio/virtio.c
-> > > > > @@ -2451,12 +2451,12 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
-> > > > >      error_vreport(fmt, ap);
-> > > > >      va_end(ap);
-> > > > > 
-> > > > > -    vdev->broken = true;
-> > > > > -
-> > > > >      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> > > > >          virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-> > > > >          virtio_notify_config(vdev);
-> > > > >      }
-> > > > > +
-> > > > > +    vdev->broken = true;
-> > > > >  }
-> > > > > 
-> > > > >  static void virtio_memory_listener_commit(MemoryListener *listener)
-> > > > >     
-> > > > 
-> > > > Good catch.
-> > > > 
-> > > > Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> > > > 
-> > > > Should this be cc:stable, as it's a spec violation?
-> > > >   
-> > > 
-> > > I don't know if this qualifies for stable, but if it does then it affects
-> > > all versions >= 2.8.0.  
-> > 
-> > 
-> > It's a SHOULD so not a violation, just a quality of implementation
-> 
-> Setting DEVICE_NEEDS_RESET is indeed a SHOULD, but failing to send the
-> configuration change notification violates a MUST statement, FWIW.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eCpKgjOn8o5N8Uv3opuDcOLigABhJVxxB
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a78836bc-8a79-6164-1101-6aa756c07a40@redhat.com>
+Subject: Re: [PATCH v2 3/3] qemu-img: Document backing options
+References: <20170426134649.9042-1-mreitz@redhat.com>
+ <20170426134649.9042-4-mreitz@redhat.com>
+In-Reply-To: <20170426134649.9042-4-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-OK I'm convinced it's a -stable material.
+On 04/26/2017 08:46 AM, Max Reitz wrote:
+> The create and convert subcommands have shorthands to set the
+> backing_file and, in the case of create, the backing_fmt options for th=
+e
+> new image. However, they have not been documented so far, which is
+> remedied by this patch.
+>=20
 
-> > issue. Seems a bit too intrusive for stable and we are yet to
-> > have drivers actually handling these errors, so let's wait a bit
-> > and see.
-> > 
-> 
-> Fair enough.
-> 
-> > I'll apply this to master for now.
-> > 
-> > 
-> 
-> Thanks.
-> 
-> --
-> Greg
+> +++ b/qemu-img.texi
+> @@ -224,7 +224,7 @@ If @code{-r} is specified, exit codes representing =
+the image state refer to the
+>  state after (the attempt at) repairing it. That is, a successful @code=
+{-r all}
+>  will yield the exit code 0, independently of the image state before.
+> =20
+> -@item create [-f @var{fmt}] [-o @var{options}] @var{filename} [@var{si=
+ze}]
+> +@item create [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_f=
+mt}] [-o @var{options}] @var{filename} [@var{size}]
+> =20
+>  Create the new disk image @var{filename} of size @var{size} and format=
+
+>  @var{fmt}. Depending on the file format, you can add one or more @var{=
+options}
+> @@ -302,7 +302,7 @@ Error on reading data
+> =20
+>  @end table
+> =20
+> -@item convert [-c] [-p] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{=
+src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id=
+_or_name}] [-l @var{snapshot_param}] [-m @var{num_coroutines}] [-W] [-S @=
+var{sparse_size}] @var{filename} [@var{filename2} [...]] @var{output_file=
+name}
+> +@item convert [-c] [-p] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{=
+src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{option=
+s}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-m @var{num=
+_coroutines}] [-W] [-S @var{sparse_size}] @var{filename} [@var{filename2}=
+ [...]] @var{output_filename}
+> =20
+>  Convert the disk image @var{filename} or a snapshot @var{snapshot_para=
+m}(@var{snapshot_id_or_name} is deprecated)
+>  to disk image @var{output_filename} using format @var{output_fmt}. It =
+can be optionally compressed (@code{-c}
+
+
+On 04/27/2017 10:25 AM, Kevin Wolf wrote:
+
+> I think originally the idea was to remove the individual special case
+> options in the long term in favour of the uniform -o. But I don't think=
+
+> the short options have fallen out of use, so we can as well document
+> them again...
+>
+> Maybe we could change the implementation, however, so that the old
+> options are really just aliases for the respective -o version.
+
+As in, a followup patch that adds a paragraph or two to the .texi file
+stating that '-B @var{backing_file}' is shorthand for '-o
+backing_file=3D@var{backing_file}'?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--eCpKgjOn8o5N8Uv3opuDcOLigABhJVxxB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZAg/uAAoJEKeha0olJ0NqaNkH/2J/MpHocHpYwCJoI/o4jvdd
+Q6tG5PwZIaAYGIQYE1LmECfOQsl2noDNtP3uqCdr355aLI6loVTpgZZFnOm1j3ry
+rNegGPQ0D5I4FSRlsvpQKNyXZ6Zx6oFjAt6xAnfkcS4L5z+UGV3N1kfUnyInVtFQ
+WXkPTIAjVfhYtTO1dlPNQsBspveSgziTFcXAWn65wh+LG1ruCaeVTAWw7gSln6D6
+l3LD2pWAW3jwORU0cDmjQWo+AeJ+TL0JwTYz7e7Jo89JyMfmV+AiwTiQotzRghK4
+Rl5Wfzb5q6eUuylwmg9DZoNBlbhUL0c0Lj0nhgHHzciFT3kqnNqc/GwzKhjrGUA=
+=GVrg
+-----END PGP SIGNATURE-----
+
+--eCpKgjOn8o5N8Uv3opuDcOLigABhJVxxB--
