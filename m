@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3a7c-0007y9-BN
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:29:37 -0400
+	(envelope-from <cota@braap.org>) id 1d3aAc-0002aa-R1
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:32:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3a7b-0001xo-2k
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:29:36 -0400
+	(envelope-from <cota@braap.org>) id 1d3aAc-0003gc-0c
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:32:42 -0400
+Date: Wed, 26 Apr 2017 23:32:39 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 26 Apr 2017 23:29:23 -0400
-Message-Id: <1493263764-18657-11-git-send-email-cota@braap.org>
-In-Reply-To: <1493263764-18657-1-git-send-email-cota@braap.org>
+Message-ID: <20170427033239.GA19380@flamenco>
 References: <1493263764-18657-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v4 10/11] target/i386: optimize indirect
- branches
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493263764-18657-1-git-send-email-cota@braap.org>
+Subject: Re: [Qemu-devel] [PATCH v4 00/11] TCG optimizations for 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +25,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-Speed up indirect branches by jumping to the target if it is valid.
+Just to avoid confusion,
 
-Softmmu measurements (see later commit for user-mode numbers):
+On Wed, Apr 26, 2017 at 23:29:13 -0400, Emilio G. Cota wrote:
+> I have *not* re-run all experiments, because it takes several hours and
+> performance hasn't changed much from v3, as can be seen in these two charts:
+> * spec06int user-mode, test input, v2.9.0 baseline: http://imgur.com/ME2eMq1
 
-Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
+Here v4 doesn't have the htable lookup. (v4+htable has it)
 
--                  SPECint06 (test set), x86_64-softmmu (Ubuntu 16.04 guest). Host: Intel i7-4790K @ 4.00GHz
+> * spec06int softmmu, test input, v3 baseline: http://imgur.com/Clolu9Z
 
- 2.4x +-+--------------------------------------------------------------------------------------------------------------+-+
-      |                                                                                                                  |
-      |   cross                                                                                                          |
- 2.2x +cross+jr..........................................................................+++...........................+-+
-      |                                                                                   |                              |
-      |                                                                               +++ |                              |
-   2x +-+..............................................................................|..|............................+-+
-      |                                                                                |  |                              |
-      |                                                                                |  |                              |
- 1.8x +-+..............................................................................|####...........................+-+
-      |                                                                                |# |#                             |
-      |                                                                              **** |#                             |
- 1.6x +-+............................................................................*.|*.|#...........................+-+
-      |                                                                              * |* |#                             |
-      |                                                                              * |* |#                             |
- 1.4x +-+.......................................................................+++..*.|*.|#...........................+-+
-      |                                                      ++++++             #### * |*++#             +++             |
-      |                        +++                            |  |              #++# *++*  #          +++ |              |
- 1.2x +-+......................###.....####....+++............|..|...........****..#.*..*..#....####...|.###.....####..+-+
-      |        +++          **** #  ****  #    ####          ***###          *++*  # *  *  #    #++#  ****|#  +++#++#    |
-      |    ****###     +++  *++* #  *++*  #  ++#  #    ####  *|* |#     +++  *  *  # *  *  #  ***  #  *| *|#  ****  #    |
-   1x +-++-*++*++#++***###++*++*+#++*+-*++#+****++#++***++#+-*+*++#-+****##++*++*-+#+*++*-+#++*+*++#++*-+*+#++*++*++#-++-+
-      |    *  *  #  * *  #  *  * #  *  *  # *  *  #  * *  #  *|* |#  *++* #  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
-      |    *  *  #  * *  #  *  * #  *  *  # *  *  #  * *  #  *+*++#  *  * #  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
- 0.8x +-+--****###--***###--****##--****###-****###--***###--***###--****##--****###-****###--***###--****##--****###--+-+
-         astar   bzip2      gcc   gobmk h264ref   hmmlibquantum      mcf omnetpperlbench   sjengxalancbmk   hmean
-  png: http://imgur.com/DU36YFU
+Here v4 does have it.
 
-NB. 'cross' represents the previous commit.
-
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- target/i386/translate.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index ea113fe..674ec96 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4996,7 +4996,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-             gen_push_v(s, cpu_T1);
-             gen_op_jmp_v(cpu_T0);
-             gen_bnd_jmp(s);
--            gen_eob(s);
-+            gen_jr(s, cpu_T0);
-             break;
-         case 3: /* lcall Ev */
-             gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
-@@ -5014,7 +5014,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-                                       tcg_const_i32(dflag - 1),
-                                       tcg_const_i32(s->pc - s->cs_base));
-             }
--            gen_eob(s);
-+            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
-+            gen_jr(s, cpu_tmp4);
-             break;
-         case 4: /* jmp Ev */
-             if (dflag == MO_16) {
-@@ -5022,7 +5023,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-             }
-             gen_op_jmp_v(cpu_T0);
-             gen_bnd_jmp(s);
--            gen_eob(s);
-+            gen_jr(s, cpu_T0);
-             break;
-         case 5: /* ljmp Ev */
-             gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
-@@ -5037,7 +5038,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-                 gen_op_movl_seg_T0_vm(R_CS);
-                 gen_op_jmp_v(cpu_T1);
-             }
--            gen_eob(s);
-+            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
-+            gen_jr(s, cpu_tmp4);
-             break;
-         case 6: /* push Ev */
-             gen_push_v(s, cpu_T0);
-@@ -6417,7 +6419,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-         /* Note that gen_pop_T0 uses a zero-extending load.  */
-         gen_op_jmp_v(cpu_T0);
-         gen_bnd_jmp(s);
--        gen_eob(s);
-+        gen_jr(s, cpu_T0);
-         break;
-     case 0xc3: /* ret */
-         ot = gen_pop_T0(s);
-@@ -6425,7 +6427,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-         /* Note that gen_pop_T0 uses a zero-extending load.  */
-         gen_op_jmp_v(cpu_T0);
-         gen_bnd_jmp(s);
--        gen_eob(s);
-+        gen_jr(s, cpu_T0);
-         break;
-     case 0xca: /* lret im */
-         val = cpu_ldsw_code(env, s->pc);
--- 
-2.7.4
+		E.
