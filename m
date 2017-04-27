@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d3jPn-0005da-Is
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:25:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3jSB-0006g0-CV
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d3jPh-0002r8-7A
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:24:59 -0400
-Date: Thu, 27 Apr 2017 15:24:31 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170427152431.5d6fc282@nial.brq.redhat.com>
-In-Reply-To: <20170426112752.r55p4rgignqungpn@kamzik.brq.redhat.com>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-15-git-send-email-imammedo@redhat.com>
-	<20170425170634.2mqfc45fujwy7qu3@kamzik.brq.redhat.com>
-	<20170426125433.428a6c1b@nial.brq.redhat.com>
-	<20170426112752.r55p4rgignqungpn@kamzik.brq.redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d3jSA-00049s-DF
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:27:27 -0400
+References: <1493298053-17140-1-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <22482bc3-73c5-e4ad-d19c-9f5795464f24@redhat.com>
+Date: Thu, 27 Apr 2017 08:27:22 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 14/23] virt-arm: get numa node
- mapping from possible_cpus instead of numa_get_node_for_cpu()
+In-Reply-To: <1493298053-17140-1-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XrJt2ktP5k6pRCmh3IJPeL0gLMbGtLkfH"
+Subject: Re: [Qemu-devel] [PATCH] replication: Make --disable-replication
+ compile again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,156 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: wencongyang@gmail.com, zhang.zhanghailiang@huawei.com, zhangchen.fnst@cn.fujitsu.com, qemu-stable@nongnu.org
 
-On Wed, 26 Apr 2017 13:27:52 +0200
-Andrew Jones <drjones@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XrJt2ktP5k6pRCmh3IJPeL0gLMbGtLkfH
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: wencongyang@gmail.com, zhang.zhanghailiang@huawei.com,
+ zhangchen.fnst@cn.fujitsu.com, qemu-stable@nongnu.org
+Message-ID: <22482bc3-73c5-e4ad-d19c-9f5795464f24@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] replication: Make --disable-replication
+ compile again
+References: <1493298053-17140-1-git-send-email-armbru@redhat.com>
+In-Reply-To: <1493298053-17140-1-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Apr 26, 2017 at 12:54:33PM +0200, Igor Mammedov wrote:
-> > On Tue, 25 Apr 2017 19:06:34 +0200
-> > Andrew Jones <drjones@redhat.com> wrote:
-> >   
-> > > On Wed, Mar 22, 2017 at 02:32:39PM +0100, Igor Mammedov wrote:  
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > ---
-> > > >  hw/arm/virt-acpi-build.c | 19 +++++++------------
-> > > >  hw/arm/virt.c            | 13 +++++++------
-> > > >  2 files changed, 14 insertions(+), 18 deletions(-)
-> > > > 
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index 0835e59..ce7499c 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -486,30 +486,25 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> > > >      AcpiSystemResourceAffinityTable *srat;
-> > > >      AcpiSratProcessorGiccAffinity *core;
-> > > >      AcpiSratMemoryAffinity *numamem;
-> > > > -    int i, j, srat_start;
-> > > > +    int i, srat_start;
-> > > >      uint64_t mem_base;
-> > > > -    uint32_t *cpu_node = g_malloc0(vms->smp_cpus * sizeof(uint32_t));
-> > > > -
-> > > > -    for (i = 0; i < vms->smp_cpus; i++) {
-> > > > -        j = numa_get_node_for_cpu(i);
-> > > > -        if (j < nb_numa_nodes) {
-> > > > -                cpu_node[i] = j;
-> > > > -        }
-> > > > -    }
-> > > > +    MachineClass *mc = MACHINE_GET_CLASS(vms);
-> > > > +    const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(MACHINE(vms));
-> > > >  
-> > > >      srat_start = table_data->len;
-> > > >      srat = acpi_data_push(table_data, sizeof(*srat));
-> > > >      srat->reserved1 = cpu_to_le32(1);
-> > > >  
-> > > > -    for (i = 0; i < vms->smp_cpus; ++i) {
-> > > > +    for (i = 0; i < cpu_list->len; ++i) {
-> > > > +        int node_id = cpu_list->cpus[i].props.has_node_id ?
-> > > > +            cpu_list->cpus[i].props.node_id : 0;
-> > > >          core = acpi_data_push(table_data, sizeof(*core));
-> > > >          core->type = ACPI_SRAT_PROCESSOR_GICC;
-> > > >          core->length = sizeof(*core);
-> > > > -        core->proximity = cpu_to_le32(cpu_node[i]);
-> > > > +        core->proximity = cpu_to_le32(node_id);
-> > > >          core->acpi_processor_uid = cpu_to_le32(i);
-> > > >          core->flags = cpu_to_le32(1);
-> > > >      }
-> > > > -    g_free(cpu_node);
-> > > >  
-> > > >      mem_base = vms->memmap[VIRT_MEM].base;
-> > > >      for (i = 0; i < nb_numa_nodes; ++i) {
-> > > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > > > index 68d44f3..0a75df5 100644
-> > > > --- a/hw/arm/virt.c
-> > > > +++ b/hw/arm/virt.c
-> > > > @@ -338,7 +338,7 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-> > > >  {
-> > > >      int cpu;
-> > > >      int addr_cells = 1;
-> > > > -    unsigned int i;
-> > > > +    const MachineState *ms = MACHINE(vms);
-> > > >  
-> > > >      /*
-> > > >       * From Documentation/devicetree/bindings/arm/cpus.txt
-> > > > @@ -369,6 +369,7 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-> > > >      for (cpu = vms->smp_cpus - 1; cpu >= 0; cpu--) {
-> > > >          char *nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-> > > >          ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(cpu));
-> > > > +        CPUState *cs = CPU(armcpu);
-> > > >  
-> > > >          qemu_fdt_add_subnode(vms->fdt, nodename);
-> > > >          qemu_fdt_setprop_string(vms->fdt, nodename, "device_type", "cpu");
-> > > > @@ -389,9 +390,9 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-> > > >                                    armcpu->mp_affinity);
-> > > >          }
-> > > >  
-> > > > -        i = numa_get_node_for_cpu(cpu);
-> > > > -        if (i < nb_numa_nodes) {
-> > > > -            qemu_fdt_setprop_cell(vms->fdt, nodename, "numa-node-id", i);
-> > > > +        if (ms->possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
-> > > > +            qemu_fdt_setprop_cell(vms->fdt, nodename, "numa-node-id",
-> > > > +                ms->possible_cpus->cpus[cs->cpu_index].props.node_id);
-> > > >          }
-> > > >  
-> > > >          g_free(nodename);
-> > > > @@ -1378,8 +1379,8 @@ static void machvirt_init(MachineState *machine)
-> > > >          cs = CPU(cpuobj);
-> > > >          cs->cpu_index = n;
-> > > >  
-> > > > -        node_id = numa_get_node_for_cpu(cs->cpu_index);
-> > > > -        if (node_id == nb_numa_nodes) {
-> > > > +        node_id = machine->possible_cpus->cpus[cs->cpu_index].props.node_id;
-> > > > +        if (!machine->possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
-> > > >              /* by default CPUState::numa_node was 0 if it's not set via CLI
-> > > >               * keep it this way for now but in future we probably should
-> > > >               * refuse to start up with incomplete numa mapping */
-> > > > -- 
-> > > > 2.7.4
-> > > > 
-> > > >    
-> > > 
-> > > We now have many machine->possible_cpus->cpus[index].props.[has_]node_id
-> > > instances. I think we need inline accessors added to include/sysemu/numa.h
-> > > like
-> > > 
-> > >  static inline bool numa_has_node_id(MachineState *ms, int index)
-> > >  {
-> > >    return ms->possible_cpus->cpus[index].props.has_node_id;
-> > >  }
-> > > 
-> > >  static inline int numa_node_id(MachineState *ms, int index)
-> > >  {
-> > >    return ms->possible_cpus->cpus[index].props.node_id;
-> > >  }
-> > > 
-> > >  ...
-> > > 
-> > > to improve readability and maintainability.  
-> > I dislike this kind of one-line wrappers as it hurts readability
-> > and maintainability of code for me as I'm forced to jump
-> > around code every time I see such wrapper to recall what and
-> > how it does. Code still fits in one line so I'd like to keep
-> > it wrapper-less in this case if you don't insist on the change.  
-> 
-> I prefer to jump around in code (jump once, read many) to going
-> blind looking for one or two char differences in 50 char long
-> variable names. So, to whatever degree I can, I insist :-)
-Ok, I'll convert it to wrapper
+On 04/27/2017 08:00 AM, Markus Armbruster wrote:
+> Broken in commit daa33c5.
+>=20
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  migration/colo.c | 12 ++++++++++++
+>  monitor.c        |  5 +++++
+>  2 files changed, 17 insertions(+)
 
-> 
-> >   
-> > > 
-> > > Or, instead, we could provide macros to allow assignments, e.g.
-> > > 
-> > >  #define NUMA_HAS_NODE_ID(ms, index) \
-> > >    ((ms)->possible_cpus->cpus[index].props.has_node_id)
-> > >  #define NUMA_NODE_ID(ms, index) \
-> > >    ((ms)->possible_cpus->cpus[index].props.node_id)  
-> > ditto + worse debuggability   
-> 
-> I prefer the functions myself. I think the assignments to these
-> properties are rare enough that we only need the read accessors.
-> 
-> Thanks,
-> drew
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--XrJt2ktP5k6pRCmh3IJPeL0gLMbGtLkfH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZAfG6AAoJEKeha0olJ0NqUA8IAKJsY6BTDnIFG3godvbQdfrV
+FVUsVlfZCpbqPUzxOgv3uMKqghhChri27Muc2pONUVLaKo4c1Ix7Kyx/hTK82czp
+TaGCqaDaEd/N1vRfRoCnBd1twxbPornQYOyLciaItd0+85ECnIYtajCHcKUmhphK
+sjUzLWwopA6SMiApDNxRkwUYAYBeA1hWQpGLfIg281V+XP4k79At2VmO01YIvL+p
+tzGPUkEYkg6wuATwKFagfQiM1crEluyKoSP7Vn4E4FWXqI4zYauUFFCaMdqaNO6q
+IwDSJj4Kx3OJATW4IYHSGkfG2IuQuqJpOzNjdQxZSK46mQlNpAikw9Mnhur0Ad0=
+=LncW
+-----END PGP SIGNATURE-----
+
+--XrJt2ktP5k6pRCmh3IJPeL0gLMbGtLkfH--
