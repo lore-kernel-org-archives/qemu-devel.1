@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3gzU-0003JR-Kz
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:49:41 -0400
+	(envelope-from <peterx@redhat.com>) id 1d3h1U-0004Rv-Vv
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3gzR-00083i-G4
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:49:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57558)
+	(envelope-from <peterx@redhat.com>) id 1d3h1R-0000Ou-SH
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:51:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3gzR-00083Z-7R
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:49:37 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 150607F6D0
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 10:49:36 +0000 (UTC)
-Date: Thu, 27 Apr 2017 11:49:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170427104930.GC2082@work-vm>
-References: <1493287126-19072-1-git-send-email-peterx@redhat.com>
-	<1493287126-19072-2-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3h1R-0000Oj-JI
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:51:41 -0400
+Date: Thu, 27 Apr 2017 18:51:32 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170427105132.GA19917@pxdev.xzpeter.org>
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-13-git-send-email-yi.l.liu@linux.intel.com>
+	<0f2966cf-4e5a-a2cc-5eb3-7e7d4f62bb85@redhat.com>
+	<20170427023719.GA14925@sky-dev>
+	<20170427061427.GA1542@pxdev.xzpeter.org>
+	<20170427102537.GE14925@sky-dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1493287126-19072-2-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] ramblock: add RAMBLOCK_FOREACH()
+In-Reply-To: <20170427102537.GE14925@sky-dev>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 12/20] Memory: Add func to fire
+ pasidt_bind notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,216 +33,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, jean-philippe.brucker@arm.com, jasowang@redhat.com, qemu-devel@nongnu.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, jacob.jun.pan@intel.com, Paolo Bonzini <pbonzini@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> So that it can simplifies the iterators.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Thu, Apr 27, 2017 at 06:25:37PM +0800, Liu, Yi L wrote:
+> On Thu, Apr 27, 2017 at 02:14:27PM +0800, Peter Xu wrote:
+> > On Thu, Apr 27, 2017 at 10:37:19AM +0800, Liu, Yi L wrote:
+> > > On Wed, Apr 26, 2017 at 03:50:16PM +0200, Paolo Bonzini wrote:
+> > > >=20
+> > > >=20
+> > > > On 26/04/2017 12:06, Liu, Yi L wrote:
+> > > > > +void memory_region_notify_iommu_svm_bind(MemoryRegion *mr,
+> > > > > +                                         void *data)
+> > > > > +{
+> > > > > +    IOMMUNotifier *iommu_notifier;
+> > > > > +    IOMMUNotifierFlag request_flags;
+> > > > > +
+> > > > > +    assert(memory_region_is_iommu(mr));
+> > > > > +
+> > > > > +    /*TODO: support other bind requests with smaller gran,
+> > > > > +     * e.g. bind signle pasid entry
+> > > > > +     */
+> > > > > +    request_flags =3D IOMMU_NOTIFIER_SVM_PASIDT_BIND;
+> > > > > +
+> > > > > +    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> > > > > +        if (iommu_notifier->notifier_flags & request_flags) {
+> > > > > +            iommu_notifier->notify(iommu_notifier, data);
+> > > > > +            break;
+> > > > > +        }
+> > > > > +    }
+> > > >=20
+> > > > Peter,
+> > > >=20
+> > > > should this reuse ->notify, or should it be different function po=
+inter
+> > > > in IOMMUNotifier?
+> > >=20
+> > > Hi Paolo,
+> > >=20
+> > > Thx for your review.
+> > >=20
+> > > I think it should be =E2=80=9C->notify=E2=80=9D here. In this patch=
+set, the new notifier
+> > > is registered with the existing notifier registration API. So the a=
+ll the
+> > > notifiers are in the mr->iommu_notify list. And notifiers are label=
+ed
+> > > by notify flag, so it is able to differentiate the IOMMUNotifier no=
+des.
+> > > When the flag meets, trigger it by =E2=80=9C->notify=E2=80=9D. The =
+diagram below shows
+> > > my understanding , wish it helps to make me understood.
+> > >=20
+> > > VFIOContainer
+> > >        |
+> > >        giommu_list(VFIOGuestIOMMU)
+> > >                 \
+> > >                  VFIOGuestIOMMU1 ->   VFIOGuestIOMMU2 -> VFIOGuestI=
+OMMU3 ...
+> > >                     |                     |                 |
+> > > mr->iommu_notify: IOMMUNotifier   ->    IOMMUNotifier  ->  IOMMUNot=
+ifier
+> > >                   (Flag:MAP/UNMAP)     (Flag:SVM bind)  (Flag:tlb i=
+nvalidate)
+> > >=20
+> > >=20
+> > > Actually, compared with the MAP/UNMAP notifier, the newly added not=
+ifier has
+> > > no start/end check, and there may be other types of bind notfier fl=
+ag in
+> > > future, so I added a separate fire func for SVM bind notifier.
+> >=20
+> > I agree with Paolo that this interface might not be the suitable plac=
+e
+> > for the SVM notifiers (just like what I worried about in previous
+> > discussions).
+> >=20
+> > The biggest problem is that, if you see current notifier mechanism,
+> > it's per-memory-region. However iiuc your messages should be
+> > per-iommu, or say, per translation unit.
+>=20
+> Hi Peter,
+>=20
+> yes, you're right. the newly added notifier is per-iommu.
+>=20
+> > While, for each iommu, there
+> > can be more than one memory regions (ppc can be an example). When
+> > there are more than one MRs binded to the same iommu unit, which
+> > memory region should you register to? Any one of them, or all?
+>=20
+> Honestly, I'm not expert on ppc. According to the current code,
+> I can only find one MR initialized with memory_region_init_iommu()
+> in spapr_tce_table_realize(). So to better get your point, let me
+> check. Do you mean there may be multiple of iommu MRs behind a iommu?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+I am not either. :)
 
-> ---
->  exec.c                 | 22 +++++++++++-----------
->  include/exec/ramlist.h |  5 +++++
->  migration/ram.c        | 15 ++++++++-------
->  3 files changed, 24 insertions(+), 18 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index eac6085..50519ae 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -978,7 +978,7 @@ static RAMBlock *qemu_get_ram_block(ram_addr_t addr)
->      if (block && addr - block->offset < block->max_length) {
->          return block;
->      }
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          if (addr - block->offset < block->max_length) {
->              goto found;
->          }
-> @@ -1578,12 +1578,12 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
->          return 0;
->      }
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          ram_addr_t end, next = RAM_ADDR_MAX;
->  
->          end = block->offset + block->max_length;
->  
-> -        QLIST_FOREACH_RCU(next_block, &ram_list.blocks, next) {
-> +        RAMBLOCK_FOREACH(next_block) {
->              if (next_block->offset >= end) {
->                  next = MIN(next, next_block->offset);
->              }
-> @@ -1609,7 +1609,7 @@ unsigned long last_ram_page(void)
->      ram_addr_t last = 0;
->  
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          last = MAX(last, block->offset + block->max_length);
->      }
->      rcu_read_unlock();
-> @@ -1659,7 +1659,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
->      pstrcat(new_block->idstr, sizeof(new_block->idstr), name);
->  
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          if (block != new_block &&
->              !strcmp(block->idstr, new_block->idstr)) {
->              fprintf(stderr, "RAMBlock \"%s\" already registered, abort!\n",
-> @@ -1693,7 +1693,7 @@ size_t qemu_ram_pagesize_largest(void)
->      RAMBlock *block;
->      size_t largest = 0;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          largest = MAX(largest, qemu_ram_pagesize(block));
->      }
->  
-> @@ -1839,7 +1839,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
->       * QLIST (which has an RCU-friendly variant) does not have insertion at
->       * tail, so save the last element in last_block.
->       */
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          last_block = block;
->          if (block->max_length < new_block->max_length) {
->              break;
-> @@ -2021,7 +2021,7 @@ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length)
->      int flags;
->      void *area, *vaddr;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          offset = addr - block->offset;
->          if (offset < block->max_length) {
->              vaddr = ramblock_ptr(block, offset);
-> @@ -2167,7 +2167,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
->          goto found;
->      }
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          /* This case append when the block is not mapped. */
->          if (block->host == NULL) {
->              continue;
-> @@ -2200,7 +2200,7 @@ RAMBlock *qemu_ram_block_by_name(const char *name)
->  {
->      RAMBlock *block;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          if (!strcmp(name, block->idstr)) {
->              return block;
->          }
-> @@ -3424,7 +3424,7 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
->      int ret = 0;
->  
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          ret = func(block->idstr, block->host, block->offset,
->                     block->used_length, opaque);
->          if (ret) {
-> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-> index c59880d..f1c6b45 100644
-> --- a/include/exec/ramlist.h
-> +++ b/include/exec/ramlist.h
-> @@ -4,6 +4,7 @@
->  #include "qemu/queue.h"
->  #include "qemu/thread.h"
->  #include "qemu/rcu.h"
-> +#include "qemu/rcu_queue.h"
->  
->  typedef struct RAMBlockNotifier RAMBlockNotifier;
->  
-> @@ -54,6 +55,10 @@ typedef struct RAMList {
->  } RAMList;
->  extern RAMList ram_list;
->  
-> +/* Should be holding either ram_list.mutex, or the RCU lock. */
-> +#define  RAMBLOCK_FOREACH(block)  \
-> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
-> +
->  void qemu_mutex_lock_ramlist(void);
->  void qemu_mutex_unlock_ramlist(void);
->  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f48664e..7ba5d7e 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -672,7 +672,7 @@ uint64_t ram_pagesize_summary(void)
->      RAMBlock *block;
->      uint64_t summary = 0;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          summary |= block->page_size;
->      }
->  
-> @@ -700,7 +700,7 @@ static void migration_bitmap_sync(RAMState *rs)
->  
->      qemu_mutex_lock(&rs->bitmap_mutex);
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          migration_bitmap_sync_range(rs, block, 0, block->used_length);
->      }
->      rcu_read_unlock();
-> @@ -1439,8 +1439,9 @@ uint64_t ram_bytes_total(void)
->      uint64_t total = 0;
->  
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
-> +    RAMBLOCK_FOREACH(block) {
->          total += block->used_length;
-> +    }
->      rcu_read_unlock();
->      return total;
->  }
-> @@ -1543,7 +1544,7 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms)
->      struct RAMBlock *block;
->      unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          unsigned long first = block->offset >> TARGET_PAGE_BITS;
->          unsigned long range = first + (block->used_length >> TARGET_PAGE_BITS);
->          unsigned long run_start = find_next_zero_bit(bitmap, range, first);
-> @@ -1624,7 +1625,7 @@ static int postcopy_each_ram_send_discard(MigrationState *ms)
->      struct RAMBlock *block;
->      int ret;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          unsigned long first = block->offset >> TARGET_PAGE_BITS;
->          PostcopyDiscardState *pds = postcopy_discard_send_init(ms,
->                                                                 first,
-> @@ -1802,7 +1803,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
->      rs->last_sent_block = NULL;
->      rs->last_page = 0;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          unsigned long first = block->offset >> TARGET_PAGE_BITS;
->  
->          PostcopyDiscardState *pds =
-> @@ -2021,7 +2022,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->  
->      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          qemu_put_byte(f, strlen(block->idstr));
->          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr));
->          qemu_put_be64(f, block->used_length);
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+But yes, that's what I mean. At least that's how I understand it.
+
+>=20
+> I admit it must be considered if there are multiple iommu MRs. I may
+> choose to register for one of them since the notifier is per-iommu as
+> you've pointed. Then vIOMMU emulator need to trigger the notifier with
+> the correct MR. Not sure if ppc vIOMMU is fine with it.
+>=20
+> > So my conclusion is, it just has nothing to do with memory regions...
+> >
+> > Instead of a different function pointer in IOMMUNotifer, IMHO we can
+> > even move a step further, to isolate IOTLB notifications (targeted at
+> > memory regions and with start/end ranges) out of SVM/other
+> > notifications, since they are different in general. So we basically
+> > need two notification mechanism:
+> >=20
+> > - one for memory regions, currently what I can see is IOTLB
+> >   notifications
+> >=20
+> > - one for translation units, currently I see all the rest of
+> >   notifications needed in virt-svm in this category
+> >=20
+> > Maybe some RFC patches would be good to show what I mean... I'll see
+> > whether I can prepare some.
+>=20
+> I agree that it would be helpful to split the two kinds of notifiers. I
+> marked it as a FIXME in patch 0006 of this series. Just saw your RFC pa=
+tch
+> for common IOMMUObject. Thx for your work, would try to review it.
+
+Thanks, looking forward to your review comments.
+
+>=20
+> Besides the notifier registration, pls also help to review the SVM
+> virtualization itself. Would be glad to know your comments.
+
+Yes. It's on my list. Thanks,
+
+--=20
+Peter Xu
