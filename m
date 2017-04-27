@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d3qnt-0005VT-9u
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:18:22 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d3qyn-000085-SF
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:29:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d3qnq-00023h-4f
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:18:21 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:34733)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d3qnp-00023H-SC
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:18:18 -0400
-Received: by mail-pf0-x243.google.com with SMTP id g23so13960722pfj.1
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 14:18:17 -0700 (PDT)
-Date: Fri, 28 Apr 2017 06:18:13 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170427211813.GD2724@lianli.shorne-pla.net>
-References: <20170418061551.196582-1-mithro@mithis.com>
-	<20170418061551.196582-2-mithro@mithis.com>
-	<20170418124711.GB2471@lianli.shorne-pla.net>
-	<CAHLUNMwOL5UgaDZZA1s8UFodfm9pmhzxp=rt6wzsjPW2+dy3Sg@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d3qym-0000wK-PE
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:29:37 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170426115826.1826-1-n54@gmx.com>
+	<20170426131604.3459-1-n54@gmx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c0cfe913-ca69-5e96-b2c8-71117df8fef9@amsat.org>
+Date: Thu, 27 Apr 2017 18:29:27 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHLUNMwOL5UgaDZZA1s8UFodfm9pmhzxp=rt6wzsjPW2+dy3Sg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] target/openrisc: Implement EVBAR
- register
+In-Reply-To: <20170426131604.3459-1-n54@gmx.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] scripts: Switch to more portable Perl
+ shebang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,222 +28,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tim Ansell <mithro@mithis.com>
-Cc: qemu-devel@nongnu.org, Jia Liu <proljc@gmail.com>, rth@twiddle.net
+To: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, armbru@redhat.com
 
-On Thu, Apr 27, 2017 at 10:55:28AM +1000, Tim Ansell wrote:
-> I'm about to add support for disabling the inbuilt or1k timer peripheral
-> (as our SoC does not have it enabled). That isn't really a CPU feature so I
-> think it still makes sense to have some type of feature field? Maybe CPU
-> features should just be a separate category and set directly on that
-> register?
-> 
-> I also thinks it makes sense to maybe define a couple of new CPU
-> configurations. I think we might want,
-> 
->  * or1k-all - OpenRISC CPU with all emulated features enabled.
->  * or1k-minimal - Only features enabled which can't be disabled.
->  * mor1k-default - Configured to match the defaults in the mor1k verilog
-> repo.
-> 
-> Then I think we also want configs for the "major users" of mor1k like,
-> 
->  * mor1k-litex - Configured to match the default config used by litex/misoc
-> (maybe mor1k-misoc as an alias?)
->  * mor1k-fusesoc - Configured to match the default of FuseSoC
->  * mor1k-minsoc - Configured to match the default of minsoc (which is
-> different to misoc)
-> 
-> Thoughts?
+On 04/26/2017 10:16 AM, Kamil Rytarowski wrote:
+> The default NetBSD package manager is pkgsrc and it installs Perl
+> along other third party programs under custom and configurable prefix.
+> The default prefix for binary prebuilt packages is /usr/pkg, and the
+> Perl executable lands in /usr/pkg/bin/perl.
+>
+> This change switches "/usr/bin/perl" to "/usr/bin/env perl" as it's
+> the most portable solution that should work for almost everybody.
+> Perl's executable is detected automatically.
+>
+> This change switches -w option passed to the executable with more
+> modern "use warnings;" approach. There is no functional change to the
+> default behavior.
+>
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
 
-I think this makes sense, we have the UPR and CPUCFGR read only SPR's to
-track many of these features.  Currently specifying a different model will
-change the cpucfgr.  We could expand to also define UPR as well to give
-something like like below.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-static void or1200_initfn(Object *obj)
-{
-    OpenRISCCPU *cpu = OPENRISC_CPU(obj);
-
-    cpu->env.cpucfgr = CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_OF32S |
-                       CPUCFGR_EVBARP;
-
-    cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP |
-                   UPR_PMP;
-
-    /* Features not supported in SPR config */
-    cpu->env.features = /* Any examples? */
-}
-
-static void or1k_minimal_initfn(Object *obj)
-{
-    OpenRISCCPU *cpu = OPENRISC_CPU(obj);
-
-    /* Nothing Enabled? */
-}
-
-
-static const OpenRISCCPUInfo openrisc_cpus[] = {
-    { .name = "or1200",      .initfn = or1200_initfn },
-    { .name = "or1k-all",    .initfn = or1200_initfn },
-    { .name = "or1k-minimal",.initfn = or1k_miniamal_initfn },
-    ...
-    { .name = "any",         .initfn = openrisc_any_initfn },
-};
-
-
-These could then be used in different parts of the code to track if we
-actually enable those features or not.  i.e:
-
-    if (cpu->env.upr & UPR_PICP) {
-        cpu_openrisc_pic_init(cpu);
-    }
-    if (cpu->env.upr & UPR_TTP) {
-        cpu_openrisc_clock_init(cpu);
-    }
-
-I think its possible and it will be a bit of work to get done.
-
-Thoughts?
-
--Stafford
-
-> Tim 'mithro' Ansell
-> 
-> On Apr 18, 2017 10:47 PM, "Stafford Horne" <shorne@gmail.com> wrote:
-> 
-> On Tue, Apr 18, 2017 at 04:15:50PM +1000, Tim 'mithro' Ansell wrote:
-> > Exception Vector Base Address Register (EVBAR) - This optional register
-> > can be used to apply an offset to the exception vector addresses.
-> >
-> > The significant bits (31-12) of the vector offset address for each
-> > exception depend on the setting of the Supervision Register (SR)'s EPH
-> > bit and the Exception Vector Base Address Register (EVBAR).
-> >
-> > Its presence is indicated by the EVBARP bit in the CPU Configuration
-> > Register (CPUCFGR).
-> >
-> > Signed-off-by: Tim 'mithro' Ansell <mithro@mithis.com>
-> > ---
-> >  target/openrisc/cpu.c        | 2 ++
-> >  target/openrisc/cpu.h        | 7 +++++++
-> >  target/openrisc/interrupt.c  | 6 +++++-
-> >  target/openrisc/sys_helper.c | 7 +++++++
-> >  4 files changed, 21 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-> > index 7fd2b9a216..1524ed981a 100644
-> > --- a/target/openrisc/cpu.c
-> > +++ b/target/openrisc/cpu.c
-> > @@ -134,6 +134,7 @@ static void or1200_initfn(Object *obj)
-> >
-> >      set_feature(cpu, OPENRISC_FEATURE_OB32S);
-> >      set_feature(cpu, OPENRISC_FEATURE_OF32S);
-> > +    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
-> >  }
-> >
-> >  static void openrisc_any_initfn(Object *obj)
-> > @@ -141,6 +142,7 @@ static void openrisc_any_initfn(Object *obj)
-> >      OpenRISCCPU *cpu = OPENRISC_CPU(obj);
-> >
-> >      set_feature(cpu, OPENRISC_FEATURE_OB32S);
-> > +    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
-> >  }
-> >
-> >  typedef struct OpenRISCCPUInfo {
-> > diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-> > index 418a0e6960..1958b72718 100644
-> > --- a/target/openrisc/cpu.h
-> > +++ b/target/openrisc/cpu.h
-> > @@ -111,6 +111,11 @@ enum {
-> >      CPUCFGR_OF32S = (1 << 7),
-> >      CPUCFGR_OF64S = (1 << 8),
-> >      CPUCFGR_OV64S = (1 << 9),
-> > +    /* CPUCFGR_ND = (1 << 10), */
-> > +    /* CPUCFGR_AVRP = (1 << 11), */
-> > +    CPUCFGR_EVBARP = (1 << 12),
-> > +    /* CPUCFGR_ISRP = (1 << 13), */
-> > +    /* CPUCFGR_AECSRP = (1 << 14), */
-> >  };
-> >
-> >  /* DMMU configure register */
-> > @@ -200,6 +205,7 @@ enum {
-> >      OPENRISC_FEATURE_OF32S = (1 << 7),
-> >      OPENRISC_FEATURE_OF64S = (1 << 8),
-> >      OPENRISC_FEATURE_OV64S = (1 << 9),
-> > +    OPENRISC_FEATURE_EVBAR = (1 << 12),
-> 
-> Does anyone know why we have to add both Features and CPUCFG bits?
-> 
-> It seems like duplication to me.
-> 
-> >  };
-> >
-> >  /* Tick Timer Mode Register */
-> > @@ -289,6 +295,7 @@ typedef struct CPUOpenRISCState {
-> >      uint32_t dmmucfgr;        /* DMMU configure register */
-> >      uint32_t immucfgr;        /* IMMU configure register */
-> >      uint32_t esr;             /* Exception supervisor register */
-> > +    uint32_t evbar;           /* Exception vector base address register
-> */
-> 
-> If we add something to CPUOpenRISCState, we ideally need to also add it to
-> machine.c vmstate definition.  However, I currently have a patch out to
-> rework the vmstate serialization.  I can add this to that patch.
-> 
-> >      uint32_t fpcsr;           /* Float register */
-> >      float_status fp_status;
-> >
-> > diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
-> > index a2eec6fb32..78f0ba9421 100644
-> > --- a/target/openrisc/interrupt.c
-> > +++ b/target/openrisc/interrupt.c
-> > @@ -65,7 +65,11 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
-> >      env->lock_addr = -1;
-> >
-> >      if (cs->exception_index > 0 && cs->exception_index < EXCP_NR) {
-> > -        env->pc = (cs->exception_index << 8);
-> > +        hwaddr vect_pc = cs->exception_index << 8;
-> > +        if (env->cpucfgr & CPUCFGR_EVBARP) {
-> > +            vect_pc |= env->evbar;
-> > +        }
-> > +        env->pc = vect_pc;
-> >      } else {
-> >          cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
-> >      }
-> > diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-> > index 60c3193656..6ba816249b 100644
-> > --- a/target/openrisc/sys_helper.c
-> > +++ b/target/openrisc/sys_helper.c
-> > @@ -39,6 +39,10 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
-> >          env->vr = rb;
-> >          break;
-> >
-> > +    case TO_SPR(0, 11): /* EVBAR */
-> > +        env->evbar = rb;
-> > +        break;
-> > +
-> >      case TO_SPR(0, 16): /* NPC */
-> >          cpu_restore_state(cs, GETPC());
-> >          /* ??? Mirror or1ksim in not trashing delayed branch state
-> > @@ -206,6 +210,9 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
-> >      case TO_SPR(0, 4): /* IMMUCFGR */
-> >          return env->immucfgr;
-> >
-> > +    case TO_SPR(0, 11): /* EVBAR */
-> > +        return env->evbar;
-> > +
-> >      case TO_SPR(0, 16): /* NPC (equals PC) */
-> >          cpu_restore_state(cs, GETPC());
-> >          return env->pc;
-> 
-> Reviewed-by: Stafford Horne <shorne@gmail.com>
-> 
-> I will pull into my branch and send PR as is unless someone has more to
-> say.
-> 
-> -Stafford
-> 
-> > --
-> > 2.12.1
-> >
+> ---
+>  scripts/checkpatch.pl           | 3 ++-
+>  scripts/clean-header-guards.pl  | 3 ++-
+>  scripts/cleanup-trace-events.pl | 2 +-
+>  scripts/disas-objdump.pl        | 4 +++-
+>  scripts/get_maintainer.pl       | 3 ++-
+>  scripts/shaderinclude.pl        | 2 +-
+>  scripts/switch-timer-api        | 2 +-
+>  scripts/texi2pod.pl             | 4 +++-
+>  8 files changed, 15 insertions(+), 8 deletions(-)
+>
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index f084542934..3bb6fc95bd 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/perl -w
+> +#!/usr/bin/env perl
+>  # (c) 2001, Dave Jones. (the file handling bit)
+>  # (c) 2005, Joel Schopp <jschopp@austin.ibm.com> (the ugly bit)
+>  # (c) 2007,2008, Andy Whitcroft <apw@uk.ibm.com> (new conditions, test suite)
+> @@ -6,6 +6,7 @@
+>  # Licensed under the terms of the GNU GPL License version 2
+>
+>  use strict;
+> +use warnings;
+>
+>  my $P = $0;
+>  $P =~ s@.*/@@g;
+> diff --git a/scripts/clean-header-guards.pl b/scripts/clean-header-guards.pl
+> index 54ab99ae29..5e67f1998c 100755
+> --- a/scripts/clean-header-guards.pl
+> +++ b/scripts/clean-header-guards.pl
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/perl -w
+> +#!/usr/bin/env perl
+>  #
+>  # Clean up include guards in headers
+>  #
+> @@ -28,6 +28,7 @@
+>  #   "cc -E -DGUARD_H -c -P -", and fed the test program on stdin.
+>
+>  use strict;
+> +use warnings;
+>  use Getopt::Std;
+>
+>  # Stuff we don't want to clean because we import it into our tree:
+> diff --git a/scripts/cleanup-trace-events.pl b/scripts/cleanup-trace-events.pl
+> index 7e808efb6a..e93abc00da 100755
+> --- a/scripts/cleanup-trace-events.pl
+> +++ b/scripts/cleanup-trace-events.pl
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/perl
+> +#!/usr/bin/env perl
+>  # Copyright (C) 2013 Red Hat, Inc.
+>  #
+>  # Authors:
+> diff --git a/scripts/disas-objdump.pl b/scripts/disas-objdump.pl
+> index 8f7e8182a1..bec905f04b 100755
+> --- a/scripts/disas-objdump.pl
+> +++ b/scripts/disas-objdump.pl
+> @@ -1,4 +1,6 @@
+> -#!/usr/bin/perl -w
+> +#!/usr/bin/env perl
+> +
+> +use warnings;
+>
+>  use File::Temp qw/ tempfile /;
+>  use Getopt::Long;
+> diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+> index 8261bcb1ad..d7c2311123 100755
+> --- a/scripts/get_maintainer.pl
+> +++ b/scripts/get_maintainer.pl
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/perl -w
+> +#!/usr/bin/env perl
+>  # (c) 2007, Joe Perches <joe@perches.com>
+>  #           created from checkpatch.pl
+>  #
+> @@ -11,6 +11,7 @@
+>  # Licensed under the terms of the GNU GPL License version 2
+>
+>  use strict;
+> +use warnings;
+>
+>  my $P = $0;
+>  my $V = '0.26';
+> diff --git a/scripts/shaderinclude.pl b/scripts/shaderinclude.pl
+> index 81b5146332..cd3bb40b12 100644
+> --- a/scripts/shaderinclude.pl
+> +++ b/scripts/shaderinclude.pl
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/perl
+> +#!/usr/bin/env perl
+>  use strict;
+>  use warnings;
+>
+> diff --git a/scripts/switch-timer-api b/scripts/switch-timer-api
+> index b0e230b9f1..41736d11dd 100755
+> --- a/scripts/switch-timer-api
+> +++ b/scripts/switch-timer-api
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/perl
+> +#!/usr/bin/env perl
+>
+>  use strict;
+>  use warnings;
+> diff --git a/scripts/texi2pod.pl b/scripts/texi2pod.pl
+> index 6e8fec41a1..39ce584a32 100755
+> --- a/scripts/texi2pod.pl
+> +++ b/scripts/texi2pod.pl
+> @@ -1,4 +1,4 @@
+> -#! /usr/bin/perl -w
+> +#! /usr/bin/env perl
+>
+>  #   Copyright (C) 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
+>
+> @@ -22,6 +22,8 @@
+>  # markup to Perl POD format.  It's intended to be used to extract
+>  # something suitable for a manpage from a Texinfo document.
+>
+> +use warnings;
+> +
+>  $output = 0;
+>  $skipping = 0;
+>  %sects = ();
+>
