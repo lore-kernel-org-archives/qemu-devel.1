@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3iwS-000461-OT
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:54:41 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d3j0V-0006Gw-TW
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3iwP-0007qI-NX
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:54:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d3iwP-0007q4-Dy
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:54:37 -0400
-References: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <24766133-5384-09fd-a24a-8acf964c9367@redhat.com>
-Date: Thu, 27 Apr 2017 07:54:31 -0500
+	(envelope-from <no-reply@patchew.org>) id 1d3j0S-0001Uj-11
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:58:52 -0400
+Resent-Message-Id: <E1d3j0S-0001Uj-11@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21408)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d3j0R-0001UX-PK
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:58:47 -0400
+In-Reply-To: <20170427120006.20564-1-rth@twiddle.net>
+Message-ID: <149329791714.111.18164819750283118507@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SFGxETbejil1vbApXHI9CERF8Tv9f05Vl"
-Subject: Re: [Qemu-devel] [PATCH v9] Allow setting NUMA distance for
- different NUMA nodes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 27 Apr 2017 05:58:37 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v5 00/19] TCG cross-tb optimizations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SFGxETbejil1vbApXHI9CERF8Tv9f05Vl
-From: Eric Blake <eblake@redhat.com>
-To: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
-Message-ID: <24766133-5384-09fd-a24a-8acf964c9367@redhat.com>
-Subject: Re: [PATCH v9] Allow setting NUMA distance for different NUMA nodes
-References: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
-In-Reply-To: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/26/2017 09:35 PM, He Chen wrote:
-> This patch is going to add SLIT table support in QEMU, and provides
-> additional option `dist` for command `-numa` to allow user set vNUMA
-> distance by QEMU command.
->=20
-> With this patch, when a user wants to create a guest that contains
-> several vNUMA nodes and also wants to set distance among those nodes,
-> the QEMU command would like:
->=20
-> ```
-> -numa node,nodeid=3D0,cpus=3D0 \
-> -numa node,nodeid=3D1,cpus=3D1 \
-> -numa node,nodeid=3D2,cpus=3D2 \
-> -numa node,nodeid=3D3,cpus=3D3 \
-> -numa dist,src=3D0,dst=3D1,val=3D21 \
-> -numa dist,src=3D0,dst=3D2,val=3D31 \
-> -numa dist,src=3D0,dst=3D3,val=3D41 \
-> -numa dist,src=3D1,dst=3D2,val=3D21 \
-> -numa dist,src=3D1,dst=3D3,val=3D31 \
-> -numa dist,src=3D2,dst=3D3,val=3D21 \
-> ```
->=20
-> Signed-off-by: He Chen <he.chen@linux.intel.com>
->=20
-> ---
-> Changes since v8:
-> * numa_{node, distance}_parse --> parse_numa_{node, distance}
-> * Comments refinement.
-
-
-> ---
->  hw/acpi/aml-build.c         |  26 +++++++++
->  hw/i386/acpi-build.c        |   4 ++
->  include/hw/acpi/aml-build.h |   1 +
->  include/sysemu/numa.h       |   2 +
->  include/sysemu/sysemu.h     |   4 ++
->  numa.c                      | 137 ++++++++++++++++++++++++++++++++++++=
-+++++++-
->  qapi-schema.json            |  30 +++++++++-
->  qemu-options.hx             |  16 +++++-
->  8 files changed, 215 insertions(+), 5 deletions(-)
-
-Markus has asked that all new QMP commands have some testsuite exposure;
-he may have some advice on what test would be best to modify to give us
-some coverage of this feature.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---SFGxETbejil1vbApXHI9CERF8Tv9f05Vl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZAeoHAAoJEKeha0olJ0Nq8m0H+wddRPy5GpN4pkkFckhIzl08
-fPtSRA95uVLbGCqPl8RmsUeEFPdhmcD7eW2z+O6zXlxP6B5osb/SLun8uFPT4Dz3
-1vyVNRgGPOVInCjwngviHZUYEvGVHhaswasUi64ySFNVWpSEtq4xFYpjOt3GI26D
-0WWfeoIrxZn/u2w4cr62BthwM1LjSSx6rwJaoD+Mf996MnoIeH1npAqfqIxK87Vs
-aBSNegNfmgH9ilDcB2fFNY+uukltW/4K1Gr37WJ9Z9i9NncMY0o7ZBs9Mztvybml
-59NbQyfhua69IAk5nyS6ye28lbEAzMChV77C4f7Ml6QpOUnGqoU5s91mqEjL8S8=
-=Y3sl
------END PGP SIGNATURE-----
-
---SFGxETbejil1vbApXHI9CERF8Tv9f05Vl--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2NSAwMC8xOV0gVENHIGNyb3NzLXRiIG9wdGltaXphdGlvbnMKTWVzc2Fn
+ZS1pZDogMjAxNzA0MjcxMjAwMDYuMjA1NjQtMS1ydGhAdHdpZGRsZS5uZXQKVHlwZTogc2VyaWVz
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
+dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2Vm
+dWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkZDAwZmYzIHRjZy9zMzkwOiBJ
+bXBsZW1lbnQgZ290b19wdHIKN2EzYmIzYiB0Y2cvc3BhcmM6IEltcGxlbWVudCBnb3RvX3B0cgpk
+MGZhZjNkIHRjZy9hYXJjaDY0OiBJbXBsZW1lbnQgZ290b19wdHIKM2U0YTNjOCB0Y2cvcHBjOiBJ
+bXBsZW1lbnQgZ290b19wdHIKNDIwMzI4NiB0Y2cvaTM4NjogaW1wbGVtZW50IGdvdG9fcHRyCjFh
+YjFiYzAgdGFyZ2V0L2FscGhhOiBVc2UgdGNnX2dlbl9nb3RvX3B0cgphYTc0YzJiIHRiLWhhc2g6
+IGltcHJvdmUgdGJfam1wX2NhY2hlIGhhc2ggZnVuY3Rpb24gaW4gdXNlciBtb2RlCjYyM2M0NjQg
+dGFyZ2V0L2kzODY6IG9wdGltaXplIGluZGlyZWN0IGJyYW5jaGVzCjgyNjVmMTUgdGFyZ2V0L2kz
+ODY6IG9wdGltaXplIGNyb3NzLXBhZ2UgZGlyZWN0IGp1bXBzIGluIHNvZnRtbXUKZTU3YjQxOSB0
+YXJnZXQvaTM4NjogaW50cm9kdWNlIGdlbl9qciBoZWxwZXIgdG8gZ2VuZXJhdGUgbG9va3VwX2Fu
+ZF9nb3RvX3B0cgpmNmY0NmY1IHRhcmdldC9hcm06IG9wdGltaXplIGluZGlyZWN0IGJyYW5jaGVz
+CmUzYTk1OWUgdGFyZ2V0L2FybTogb3B0aW1pemUgY3Jvc3MtcGFnZSBkaXJlY3QganVtcHMgaW4g
+c29mdG1tdQo1ODBiMGVmIHRjZzogZXhwb3J0IHRjZ19nZW5fbG9va3VwX2FuZF9nb3RvX3B0cgox
+MmFiNzQ5IHRjZzogaW50cm9kdWNlIGdvdG9fcHRyIG9wY29kZQowYmJmOTY1IHRjZy1ydW50aW1l
+OiBhZGQgbG9va3VwX3RiX3B0ciBoZWxwZXIKNmUyZDQ5YyBleGVjLWFsbDogZXhwb3J0IHRiX2h0
+YWJsZV9sb29rdXAKYjBiZTE0YyBxZW11L2F0b21pYzogTG9vc2VuIHJlc3RyaWN0aW9ucyBmb3Ig
+NjQtYml0IElMUDMyIGhvc3RzCjk5YmQ3N2IgdGNnL3NwYXJjOiBVc2UgdGhlIHByb3BlciBjb21w
+aWxhdGlvbiBmbGFncyBmb3IgMzItYml0CmYwZTVjNjIgdGFyZ2V0L25pb3MyOiBGaXggNjQtYml0
+IGlscDMyIGNvbXBpbGF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
+LzE5OiB0YXJnZXQvbmlvczI6IEZpeCA2NC1iaXQgaWxwMzIgY29tcGlsYXRpb24uLi4KQ2hlY2tp
+bmcgUEFUQ0ggMi8xOTogdGNnL3NwYXJjOiBVc2UgdGhlIHByb3BlciBjb21waWxhdGlvbiBmbGFn
+cyBmb3IgMzItYml0Li4uCkNoZWNraW5nIFBBVENIIDMvMTk6IHFlbXUvYXRvbWljOiBMb29zZW4g
+cmVzdHJpY3Rpb25zIGZvciA2NC1iaXQgSUxQMzIgaG9zdHMuLi4KV0FSTklORzogYXJjaGl0ZWN0
+dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzMzOiBGSUxFOiBpbmNsdWRl
+L3FlbXUvYXRvbWljLmg6MTA0OgorI2lmIGRlZmluZWQoX194ODZfNjRfXykgfHwgZGVmaW5lZChf
+X3NwYXJjX18pCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDg3IGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNC8x
+OTogZXhlYy1hbGw6IGV4cG9ydCB0Yl9odGFibGVfbG9va3VwLi4uCkNoZWNraW5nIFBBVENIIDUv
+MTk6IHRjZy1ydW50aW1lOiBhZGQgbG9va3VwX3RiX3B0ciBoZWxwZXIuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNi8xOTogdGNnOiBpbnRyb2R1Y2UgZ290b19wdHIgb3Bjb2RlLi4uCkNoZWNraW5nIFBBVENI
+IDcvMTk6IHRjZzogZXhwb3J0IHRjZ19nZW5fbG9va3VwX2FuZF9nb3RvX3B0ci4uLgpDaGVja2lu
+ZyBQQVRDSCA4LzE5OiB0YXJnZXQvYXJtOiBvcHRpbWl6ZSBjcm9zcy1wYWdlIGRpcmVjdCBqdW1w
+cyBpbiBzb2Z0bW11Li4uCkNoZWNraW5nIFBBVENIIDkvMTk6IHRhcmdldC9hcm06IG9wdGltaXpl
+IGluZGlyZWN0IGJyYW5jaGVzLi4uCkNoZWNraW5nIFBBVENIIDEwLzE5OiB0YXJnZXQvaTM4Njog
+aW50cm9kdWNlIGdlbl9qciBoZWxwZXIgdG8gZ2VuZXJhdGUgbG9va3VwX2FuZF9nb3RvX3B0ci4u
+LgpDaGVja2luZyBQQVRDSCAxMS8xOTogdGFyZ2V0L2kzODY6IG9wdGltaXplIGNyb3NzLXBhZ2Ug
+ZGlyZWN0IGp1bXBzIGluIHNvZnRtbXUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTk6IHRhcmdldC9p
+Mzg2OiBvcHRpbWl6ZSBpbmRpcmVjdCBicmFuY2hlcy4uLgpDaGVja2luZyBQQVRDSCAxMy8xOTog
+dGItaGFzaDogaW1wcm92ZSB0Yl9qbXBfY2FjaGUgaGFzaCBmdW5jdGlvbiBpbiB1c2VyIG1vZGUu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTk6IHRhcmdldC9hbHBoYTogVXNlIHRjZ19nZW5fZ290b19w
+dHIuLi4KRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5v
+dCByZXF1aXJlZAojMzE6IEZJTEU6IHRhcmdldC9hbHBoYS90cmFuc2xhdGUuYzo0NjU6CisgICAg
+cmV0dXJuICgoY3R4LT50Yi0+Y2ZsYWdzICYgQ0ZfTEFTVF9JTykKCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgMTEzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE1LzE5OiB0Y2cvaTM4NjogaW1wbGVtZW50IGdv
+dG9fcHRyLi4uCkNoZWNraW5nIFBBVENIIDE2LzE5OiB0Y2cvcHBjOiBJbXBsZW1lbnQgZ290b19w
+dHIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMTk6IHRjZy9hYXJjaDY0OiBJbXBsZW1lbnQgZ290b19w
+dHIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMTk6IHRjZy9zcGFyYzogSW1wbGVtZW50IGdvdG9fcHRy
+Li4uCkNoZWNraW5nIFBBVENIIDE5LzE5OiB0Y2cvczM5MDogSW1wbGVtZW50IGdvdG9fcHRyLi4u
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
+bGlzdHMub3Jn
