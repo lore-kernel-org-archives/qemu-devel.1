@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d3eQA-0002cD-GH
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:05:03 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eRC-0003CU-7x
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d3eQ6-0007QL-AF
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:05:02 -0400
-Resent-Message-Id: <E1d3eQ6-0007QL-AF@eggs.gnu.org>
-In-Reply-To: <20170427072843.8089-1-david@gibson.dropbear.id.au>
-Message-ID: <149328025302.96.7051025135965929590@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 27 Apr 2017 01:04:13 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCHv3 0/4] Clean up compatibility mode handling
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eR8-00080y-A3
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:06 -0400
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Thu, 27 Apr 2017 13:36:30 +0530
+Message-Id: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 0/7] Refactor DMG driver to have chunk size
+ independence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +18,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, armbru@redhat.com, qemu-ppc@nongnu.org, abologna@redhat.com
+To: stefanha@gmail.com
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, famz@redhat.com, peter@lekensteyn.nl, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA0MjcwNzI4NDMuODA4OS0xLWRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdQpTdWJqZWN0OiBb
-UWVtdS1kZXZlbF0gW1BBVENIdjMgMC80XSBDbGVhbiB1cCBjb21wYXRpYmlsaXR5IG1vZGUgaGFu
-ZGxpbmcKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
-KQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1p
-dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
-b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
-LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
-YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
-ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
-YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE3MDQyNjIyMTA0Ni40
-NTk2LTEtZWJsYWtlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDQyNjIyMTA0Ni40NTk2LTEt
-ZWJsYWtlQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyOGY4MTQ3
-IHBwYzogUmV3b3JrIENQVSBjb21wYXRpYmlsaXR5IHRlc3RpbmcgYWNyb3NzIG1pZ3JhdGlvbgow
-N2I4M2RmIHBzZXJpZXM6IFJlc2V0IENQVSBjb21wYXRpYmlsaXR5IG1vZGUKZjliMzgzNSBwc2Vy
-aWVzOiBNb3ZlIENQVSBjb21wYXRpYmlsaXR5IHByb3BlcnR5IHRvIG1hY2hpbmUKNTA0YzUwMSBx
-YXBpOiBhZGQgZXhwbGljaXQgbnVsbCB0byBzdHJpbmcgaW5wdXQgYW5kIG91dHB1dCB2aXNpdG9y
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBxYXBpOiBhZGQgZXhw
-bGljaXQgbnVsbCB0byBzdHJpbmcgaW5wdXQgYW5kIG91dHB1dCB2aXNpdG9ycy4uLgpDaGVja2lu
-ZyBQQVRDSCAyLzQ6IHBzZXJpZXM6IE1vdmUgQ1BVIGNvbXBhdGliaWxpdHkgcHJvcGVydHkgdG8g
-bWFjaGluZS4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzM3MjogRklMRTogdGFy
-Z2V0L3BwYy90cmFuc2xhdGVfaW5pdC5jOjg0MzA6CisgICAgZXJyb3JfcmVwb3J0KCJDUFUgJ2Nv
-bXBhdCcgcHJvcGVydHkgaXMgZGVwcmVjYXRlZCBhbmQgaGFzIG5vIGVmZmVjdDsgdXNlIG1heC1j
-cHUtY29tcGF0IG1hY2hpbmUgcHJvcGVydHkgaW5zdGVhZCIpOwoKdG90YWw6IDEgZXJyb3JzLCAw
-IHdhcm5pbmdzLCAzMzIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy80OiBwc2VyaWVzOiBSZXNldCBDUFUgY29tcGF0
-aWJpbGl0eSBtb2RlLi4uCkNoZWNraW5nIFBBVENIIDQvNDogcHBjOiBSZXdvcmsgQ1BVIGNvbXBh
-dGliaWxpdHkgdGVzdGluZyBhY3Jvc3MgbWlncmF0aW9uLi4uCkVSUk9SOiBicmFjZXMge30gYXJl
-IG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzk2OiBGSUxFOiB0YXJn
-ZXQvcHBjL21hY2hpbmUuYzoyMzk6CisgICAgaWYgKGNwdS0+Y29tcGF0X3B2cikgewpbLi4uXQor
-ICAgIH0gZWxzZQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDIgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Previously posted series patches:
+v1: http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg04641.html
+
+This series helps to provide chunk size independence for DMG driver to prevent
+denial-of-service in cases where untrusted files are being accessed by the user.
+
+This task is mentioned on the public block ToDo
+Here -> http://wiki.qemu.org/ToDo/Block/DmgChunkSizeIndependence
+
+Patch 1 introduces a new data structure to aid caching of random access points
+within a compressed stream.
+
+Patch 2 is an extension of patch 1 and introduces a new function to
+initialize/update/reset our cached random access point.
+
+Patch 3 limits the output buffer size to a max of 2MB to avoid QEMU allocate
+huge amounts of memory.
+
+Patch 4 is a simple preparatory patch to aid handling of various types of chunks.
+
+Patches 5 & 6 help to handle various types of chunks.
+
+Patch 7 simply refactors dmg_co_preadv() to read multiple sectors at once.
+
+Patch 8 finally removes the error messages QEMU used to throw when an image with
+chunk sizes above 64MB were accessed by the user.
+
+->Testing procedure:
+Convert a DMG file to raw format using the "qemu-img convert" tool present in
+v2.9.0
+Next convert the same image again after applying these patches.
+Compare the two images using "qemu-img compare" tool to check if they are
+identical.
+
+You can pickup any DMG image from the collection present
+Here -> https://lists.gnu.org/archive/html/qemu-devel/2014-12/msg03606.html
+
+->Important note:
+These patches assume that the terms "chunk" and "block" are synonyms of each other
+when we talk about bz2 compressed streams. Thus according to the bz2 docs[1],
+the max uncompressed size of a chunk/block can reach to 46MB which is less than
+the previously allowed size of 64MB, so we can continue decompressing the whole
+chunk/block at once instead of partial decompression just like we do now.
+
+This limitation was forced by the fact that bz2 compressed streams do not allow
+random access midway through a chunk/block as the BZ2_bzDecompress() API in bzlib
+seeks for the magic key "BZh" before starting decompression.[2] This magic key is
+present at the start of every chunk/block only and since our cached random access
+points need not necessarily point to the start of a chunk/block, BZ2_bzDecompress()
+fails with an error value BZ_DATA_ERROR_MAGIC[3]
+
+[1] https://en.wikipedia.org/wiki/Bzip2#File_format
+[2] https://blastedbio.blogspot.in/2011/11/random-access-to-bzip2.html
+[3] http://linux.math.tifr.res.in/manuals/html/manual_3.html#SEC17
+
+Special thanks to Peter Wu for helping me understand and tackle the bz2
+compressed chunks.
+
+Changes in v2:
+- limit the buffer size to 2MB after fixing the buffering problems (john/fam)
+
+Ashijeet Acharya (7):
+  dmg: Introduce a new struct to cache random access points
+  dmg: New function to help us cache random access point
+  dmg: Refactor and prepare dmg_read_chunk() to cache random access
+    points
+  dmg: Handle zlib compressed chunks
+  dmg: Handle bz2 compressed/raw/zeroed chunks
+  dmg: Refactor dmg_co_preadv() to start reading multiple sectors
+  dmg: Limit the output buffer size to a max of 2MB
+
+ block/dmg.c | 214 +++++++++++++++++++++++++++++++++++++++---------------------
+ block/dmg.h |  10 +++
+ 2 files changed, 148 insertions(+), 76 deletions(-)
+
+-- 
+2.6.2
