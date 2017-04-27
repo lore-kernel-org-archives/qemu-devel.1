@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d3ZVD-0004wp-HB
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:49:56 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3ZYX-0006JT-69
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:53:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d3ZVA-0005Zf-Ev
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:49:55 -0400
-Received: from [59.151.112.132] (port=24875 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d3ZVA-0005QQ-3W
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:49:52 -0400
-References: <1493119568-15218-1-git-send-email-jasowang@redhat.com>
-	<1493119568-15218-9-git-send-email-jasowang@redhat.com>
-	<CAFEAcA81uAqOZHiXBiQgrKO5Mziq47dRr=R_t5PLMV9qVxbSZw@mail.gmail.com>
-	<CAFEAcA8OxPhzymdFqRd78zVmLPkqXptXWUKYpmYahmwykGwamw@mail.gmail.com>
-	<4c353e1f-dfeb-a482-1e0c-6799ca295beb@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <68c0c7e9-3185-dc23-6d84-d367b660b778@cn.fujitsu.com>
-Date: Thu, 27 Apr 2017 10:50:23 +0800
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3ZYU-0007zi-4M
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:53:21 -0400
+Received: from mga07.intel.com ([134.134.136.100]:40124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1d3ZYT-0007zD-Qg
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:53:18 -0400
+Date: Thu, 27 Apr 2017 10:37:19 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20170427023719.GA14925@sky-dev>
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-13-git-send-email-yi.l.liu@linux.intel.com>
+	<0f2966cf-4e5a-a2cc-5eb3-7e7d4f62bb85@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4c353e1f-dfeb-a482-1e0c-6799ca295beb@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL V2 8/8] COLO-compare: Optimize tcp compare
- trace event
+In-Reply-To: <0f2966cf-4e5a-a2cc-5eb3-7e7d4f62bb85@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 12/20] Memory: Add func to fire
+ pasidt_bind notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, jean-philippe.brucker@arm.com, jasowang@redhat.com, iommu@lists.linux-foundation.org, jacob.jun.pan@intel.com
+
+On Wed, Apr 26, 2017 at 03:50:16PM +0200, Paolo Bonzini wrote:
+> 
+> 
+> On 26/04/2017 12:06, Liu, Yi L wrote:
+> > +void memory_region_notify_iommu_svm_bind(MemoryRegion *mr,
+> > +                                         void *data)
+> > +{
+> > +    IOMMUNotifier *iommu_notifier;
+> > +    IOMMUNotifierFlag request_flags;
+> > +
+> > +    assert(memory_region_is_iommu(mr));
+> > +
+> > +    /*TODO: support other bind requests with smaller gran,
+> > +     * e.g. bind signle pasid entry
+> > +     */
+> > +    request_flags = IOMMU_NOTIFIER_SVM_PASIDT_BIND;
+> > +
+> > +    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> > +        if (iommu_notifier->notifier_flags & request_flags) {
+> > +            iommu_notifier->notify(iommu_notifier, data);
+> > +            break;
+> > +        }
+> > +    }
+> 
+> Peter,
+> 
+> should this reuse ->notify, or should it be different function pointer
+> in IOMMUNotifier?
+
+Hi Paolo,
+
+Thx for your review.
+
+I think it should be “->notify” here. In this patchset, the new notifier
+is registered with the existing notifier registration API. So the all the
+notifiers are in the mr->iommu_notify list. And notifiers are labeled
+by notify flag, so it is able to differentiate the IOMMUNotifier nodes.
+When the flag meets, trigger it by “->notify”. The diagram below shows
+my understanding , wish it helps to make me understood.
+
+VFIOContainer
+       |
+       giommu_list(VFIOGuestIOMMU)
+                \
+                 VFIOGuestIOMMU1 ->   VFIOGuestIOMMU2 -> VFIOGuestIOMMU3 ...
+                    |                     |                 |
+mr->iommu_notify: IOMMUNotifier   ->    IOMMUNotifier  ->  IOMMUNotifier
+                  (Flag:MAP/UNMAP)     (Flag:SVM bind)  (Flag:tlb invalidate)
 
 
+Actually, compared with the MAP/UNMAP notifier, the newly added notifier has
+no start/end check, and there may be other types of bind notfier flag in
+future, so I added a separate fire func for SVM bind notifier.
 
-On 04/27/2017 10:28 AM, Jason Wang wrote:
->
->
-> On 2017年04月26日 23:55, Peter Maydell wrote:
->> On 26 April 2017 at 16:18, Peter Maydell <peter.maydell@linaro.org> 
->> wrote:
->>> On 25 April 2017 at 12:26, Jason Wang <jasowang@redhat.com> wrote:
->>>> From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>>>
->>>> Optimize two trace events as one, adjust print format make
->>>> it easy to read. rename trace_colo_compare_pkt_info_src/dst
->>>> to trace_colo_compare_tcp_info.
->>>>
->>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>> Hi. This commit has broken building with the UST backend,
->>> because it is effectively reverting commit 2dfe5113b11,
->>> which split this trace line into two events because the
->>> UST backend has a limit on the number of arguments that
->>> a UST event can take.
->>>
->>> Could you revert it, please?
->> ...actually it looks like it reverts cleanly on master, so
->> I'll just revert it directly.
->>
->> thanks
->> -- PMM
->>
->
-> Zheng Chen, consider the UST limitation, I think we can just leave the 
-> two tracepoints as is (of course you can improve readability).
+Thanks,
+Yi L
 
-OK, I will send a independent patch to improve readability.
-
-Thanks
-Zhang Chen
-
->
-> Thanks
->
->
->
-
--- 
-Thanks
-Zhang Chen
+> Paolo
+> 
