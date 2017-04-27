@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3s1f-0005aN-EO
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:36:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3s2F-00063k-BY
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d3s1b-0002Nn-I1
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:36:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42180)
+	(envelope-from <eblake@redhat.com>) id 1d3s2B-0002hP-Dl
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:37:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d3s1b-0002NA-Az
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:36:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30B1680041
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 22:36:34 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-Date: Thu, 27 Apr 2017 18:36:28 -0400
-Message-Id: <20170427223628.20893-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] qmp-shell: add persistent command history
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d3s2B-0002gO-4U
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:37:11 -0400
+References: <20170427213202.13512-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8c8261bd-d854-cf32-9fab-011c11e3afb5@redhat.com>
+Date: Thu, 27 Apr 2017 17:37:08 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170427213202.13512-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wQT7i9EAtkJXGOrlI7nJEO1cxR7BjGdHM"
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] event: Add source information to
+ SHUTDOWN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +29,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, kchamart@redhat.com, John Snow <jsnow@redhat.com>
+Cc: armbru@redhat.com, alistair.francis@xilinx.com
 
-Use the existing readline history function we are utilizing
-to provide persistent command history across instances of qmp-shell.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wQT7i9EAtkJXGOrlI7nJEO1cxR7BjGdHM
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, alistair.francis@xilinx.com
+Message-ID: <8c8261bd-d854-cf32-9fab-011c11e3afb5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] event: Add source information to
+ SHUTDOWN
+References: <20170427213202.13512-1-eblake@redhat.com>
+In-Reply-To: <20170427213202.13512-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This assists entering debug commands across sessions that may be
-interrupted by QEMU sessions terminating, where the qmp-shell has
-to be relaunched.
+On 04/27/2017 04:31 PM, Eric Blake wrote:
+> v2 was here:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg03185.html
+> v3 was here:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05515.html
+>=20
+> Since then:
+> - s/ShutdownType/ShutdownCause/ to avoid conflict with mingw header pol=
+lution
+> - fix long line
+>=20
+> Eric Blake (4):
+>   shutdown: Simplify shutdown_signal
+>   shutdown: Prepare for use of an enum in reset/shutdown_request
+>   shutdown: Add source information to SHUTDOWN and RESET
+>   RFC: shutdown: Expose full ShutdownCause across QMP
+>=20
+>  qapi-schema.json            |    26 +
+>  qapi/event.json             |    12 +-
+>  include/sysemu/sysemu.h     |     6 +-
+>  trace/generated-tracers.h   | 18523 ++++++++++++++++++++++++++++++++++=
+++++++++
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
+Bleargh. I 'git add'ed too much.  Apologies for the spam. v5 coming up.
 
-v3: Hardcoded limit of 1024 lines of history for now,
-    as setting limits in ~/.inputrc does not appear to work (Nir)
 
-v2: Adjusted the errors to whine about non-ENOENT errors, but still
-    intercept all errors as non-fatal.
-    Save history atexit() to match bash standard behavior
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
- scripts/qmp/qmp-shell | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
 
-diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index eccb88a..6ece6e7 100755
---- a/scripts/qmp/qmp-shell
-+++ b/scripts/qmp/qmp-shell
-@@ -70,6 +70,9 @@ import json
- import ast
- import readline
- import sys
-+import os
-+import errno
-+import atexit
- 
- class QMPCompleter(list):
-     def complete(self, text, state):
-@@ -109,6 +112,8 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-         self._pretty = pretty
-         self._transmode = False
-         self._actions = list()
-+        self._histfile = os.path.join(os.path.expanduser('~'),
-+                                      '.qmp-shell_history')
- 
-     def __get_address(self, arg):
-         """
-@@ -132,11 +137,27 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-     def __completer_setup(self):
-         self._completer = QMPCompleter()
-         self._fill_completion()
-+        readline.set_history_length(1024)
-         readline.set_completer(self._completer.complete)
-         readline.parse_and_bind("tab: complete")
-         # XXX: default delimiters conflict with some command names (eg. query-),
-         # clearing everything as it doesn't seem to matter
-         readline.set_completer_delims('')
-+        try:
-+            readline.read_history_file(self._histfile)
-+        except Exception as e:
-+            if isinstance(e, IOError) and e.errno == errno.ENOENT:
-+                # File not found. No problem.
-+                pass
-+            else:
-+                print "Failed to read history '%s'; %s" % (self._histfile, e)
-+        atexit.register(self.__save_history)
-+
-+    def __save_history(self):
-+        try:
-+            readline.write_history_file(self._histfile)
-+        except Exception as e:
-+            print "Failed to save history file '%s'; %s" % (self._histfile, e)
- 
-     def __parse_value(self, val):
-         try:
--- 
-2.9.3
+--wQT7i9EAtkJXGOrlI7nJEO1cxR7BjGdHM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZAnKUAAoJEKeha0olJ0Nq2v8IAIZRptt6iIuJh/TJj3gCuyXA
+yib7yqyT7Rq39of4C/GCWjL4Ks5ju6hvSu7RQS+8b59aiTA2X6VBu/ixIIUG3Y5I
+fNB4L++7K94O2zNA5+8lJed3cWvaF6MQTWVLd3LoQ/lAwaemDWsFKuwucZ2IsLsr
+SA0/5xzfsLKAS0sHpyJSDZCU+psLYNDcDlomV0Rjhz7R4TKsjg6fwiNovLknY32D
+unBH8f8WRfy/A9RQMhqJn2JR2vOhMVgkR1sdQgCaXbGJqBNBxro5DvNw7RzZTAM/
+oZxnSFsoMMVxuBKbAcn5/VwI9onLP7/MsM5dln9QGduZnHY6C7LavB77B3e4Ir0=
+=5k5D
+-----END PGP SIGNATURE-----
+
+--wQT7i9EAtkJXGOrlI7nJEO1cxR7BjGdHM--
