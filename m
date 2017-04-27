@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d3lNh-0000l2-SU
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:30:58 -0400
+	(envelope-from <mst@redhat.com>) id 1d3lRb-0002xM-AV
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:35:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d3lNc-0004yN-Rh
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:30:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53520)
+	(envelope-from <mst@redhat.com>) id 1d3lRW-0006kY-9W
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:34:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48810)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d3lNc-0004y7-Ld
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:30:52 -0400
-References: <34EFBCA9F01B0748BEB6B629CE643AE60BB3AC7D@DGGEMA505-MBS.china.huawei.com>
-	<766978f5-8eae-7293-8fb4-2a7a568d301f@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e130e60e-db1f-0355-5a7b-2ece3ae7a999@redhat.com>
-Date: Thu, 27 Apr 2017 17:30:46 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d3lRW-0006k8-0D
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:34:54 -0400
+Date: Thu, 27 Apr 2017 18:34:49 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170427183237-mutt-send-email-mst@kernel.org>
+References: <149321107781.13002.9081643707477650100.stgit@bahia.lan>
+	<20170426151548.0b30d39c.cornelia.huck@de.ibm.com>
+	<20170426152946.5d7a4922@bahia>
+	<20170427024124-mutt-send-email-mst@kernel.org>
+	<20170427090337.47214682@bahia>
 MIME-Version: 1.0
-In-Reply-To: <766978f5-8eae-7293-8fb4-2a7a568d301f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [BUG] QEMU crashes with dpdk virtio pmd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170427090337.47214682@bahia>
+Subject: Re: [Qemu-devel] [PATCH] virtio: allow broken device to notify guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, wangyunjian <wangyunjian@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: caihe <caihe@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-
-
-On 25/04/2017 14:02, Jason Wang wrote:
+On Thu, Apr 27, 2017 at 09:03:37AM +0200, Greg Kurz wrote:
+> On Thu, 27 Apr 2017 02:42:56 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> Thanks a lot for the fix.
+> > On Wed, Apr 26, 2017 at 03:29:46PM +0200, Greg Kurz wrote:
+> > > On Wed, 26 Apr 2017 15:15:48 +0200
+> > > Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+> > >   
+> > > > On Wed, 26 Apr 2017 14:51:17 +0200
+> > > > Greg Kurz <groug@kaod.org> wrote:
+> > > >   
+> > > > > According to section 2.1.2 of the virtio-1 specification:
+> > > > > 
+> > > > > "The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state that
+> > > > > a reset is needed. If DRIVER_OK is set, after it sets DEVICE_NEEDS_RESET,
+> > > > > the device MUST send a device configuration change notification to the
+> > > > > driver."
+> > > > > 
+> > > > > Commit "f5ed36635d8f virtio: stop virtqueue processing if device is broken"
+> > > > > introduced a virtio_error() call that just does that:
+> > > > > 
+> > > > > - internally mark the device as broken
+> > > > > - set the DEVICE_NEEDS_RESET bit in the status
+> > > > > - send a configuration change notification
+> > > > > 
+> > > > > Unfortunately, virtio_notify_vector(), called by virtio_notify_config(),
+> > > > > returns right away when the device is marked as broken and the notification
+> > > > > isn't sent in this case.
+> > > > > 
+> > > > > The spec doesn't say whether a broken device can send notifications
+> > > > > in other situations or not. But since the driver isn't supposed to do
+> > > > > anything but to reset the device, it makes sense to keep the check in
+> > > > > virtio_notify_config().
+> > > > > 
+> > > > > Marking the device as broken AFTER the configuration change notification was
+> > > > > sent is enough to fix the issue.
+> > > > > 
+> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > > ---
+> > > > >  hw/virtio/virtio.c |    4 ++--
+> > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > > > > index 03592c542a55..890b4d7eb751 100644
+> > > > > --- a/hw/virtio/virtio.c
+> > > > > +++ b/hw/virtio/virtio.c
+> > > > > @@ -2451,12 +2451,12 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+> > > > >      error_vreport(fmt, ap);
+> > > > >      va_end(ap);
+> > > > > 
+> > > > > -    vdev->broken = true;
+> > > > > -
+> > > > >      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+> > > > >          virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
+> > > > >          virtio_notify_config(vdev);
+> > > > >      }
+> > > > > +
+> > > > > +    vdev->broken = true;
+> > > > >  }
+> > > > > 
+> > > > >  static void virtio_memory_listener_commit(MemoryListener *listener)
+> > > > >     
+> > > > 
+> > > > Good catch.
+> > > > 
+> > > > Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > > > 
+> > > > Should this be cc:stable, as it's a spec violation?
+> > > >   
+> > > 
+> > > I don't know if this qualifies for stable, but if it does then it affects
+> > > all versions >= 2.8.0.  
+> > 
+> > 
+> > It's a SHOULD so not a violation, just a quality of implementation
 > 
-> Two questions:
+> Setting DEVICE_NEEDS_RESET is indeed a SHOULD, but failing to send the
+> configuration change notification violates a MUST statement, FWIW.
+
+OK I'm convinced it's a -stable material.
+
+> > issue. Seems a bit too intrusive for stable and we are yet to
+> > have drivers actually handling these errors, so let's wait a bit
+> > and see.
+> > 
 > 
-> - If virtio_net_set_status() is the only function that may access tx_bh,
-> it looks like setting tx_waiting to zero is sufficient?
-
-I think clearing tx_bh is better anyway, as leaving a dangling pointer
-is not very hygienic.
-
-Paolo
-
-> - Can you post a formal patch for this?
+> Fair enough.
+> 
+> > I'll apply this to master for now.
+> > 
+> > 
+> 
+> Thanks.
+> 
+> --
+> Greg
