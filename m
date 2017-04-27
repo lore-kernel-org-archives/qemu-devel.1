@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d3jV5-0007lZ-F4
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:30:28 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d3jXB-0000CG-Sf
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d3jV1-0005QU-7J
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:30:27 -0400
-References: <1493298053-17140-1-git-send-email-armbru@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <b7a05120-f94d-a99b-aab2-6208715d47ff@cn.fujitsu.com>
-Date: Thu, 27 Apr 2017 21:30:53 +0800
+	(envelope-from <imammedo@redhat.com>) id 1d3jX6-00069R-S0
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:32:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54872)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d3jX6-00069K-MM
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:32:32 -0400
+Date: Thu, 27 Apr 2017 15:32:22 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170427153222.5d991d2b@nial.brq.redhat.com>
+In-Reply-To: <24766133-5384-09fd-a24a-8acf964c9367@redhat.com>
+References: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
+	<24766133-5384-09fd-a24a-8acf964c9367@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1493298053-17140-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] replication: Make --disable-replication
- compile again
+Subject: Re: [Qemu-devel] [PATCH v9] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: zhangchen.fnst@cn.fujitsu.com, wencongyang@gmail.com, zhang.zhanghailiang@huawei.com, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org, "Michael S .
+	Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
 
+On Thu, 27 Apr 2017 07:54:31 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
+> On 04/26/2017 09:35 PM, He Chen wrote:
+> > This patch is going to add SLIT table support in QEMU, and provides
+> > additional option `dist` for command `-numa` to allow user set vNUMA
+> > distance by QEMU command.
+> > 
+> > With this patch, when a user wants to create a guest that contains
+> > several vNUMA nodes and also wants to set distance among those nodes,
+> > the QEMU command would like:
+> > 
+> > ```
+> > -numa node,nodeid=0,cpus=0 \
+> > -numa node,nodeid=1,cpus=1 \
+> > -numa node,nodeid=2,cpus=2 \
+> > -numa node,nodeid=3,cpus=3 \
+> > -numa dist,src=0,dst=1,val=21 \
+> > -numa dist,src=0,dst=2,val=31 \
+> > -numa dist,src=0,dst=3,val=41 \
+> > -numa dist,src=1,dst=2,val=21 \
+> > -numa dist,src=1,dst=3,val=31 \
+> > -numa dist,src=2,dst=3,val=21 \
+> > ```
+> > 
+> > Signed-off-by: He Chen <he.chen@linux.intel.com>
+> > 
+> > ---
+> > Changes since v8:
+> > * numa_{node, distance}_parse --> parse_numa_{node, distance}
+> > * Comments refinement.  
+> 
+> 
+> > ---
+> >  hw/acpi/aml-build.c         |  26 +++++++++
+> >  hw/i386/acpi-build.c        |   4 ++
+> >  include/hw/acpi/aml-build.h |   1 +
+> >  include/sysemu/numa.h       |   2 +
+> >  include/sysemu/sysemu.h     |   4 ++
+> >  numa.c                      | 137 +++++++++++++++++++++++++++++++++++++++++++-
+> >  qapi-schema.json            |  30 +++++++++-
+> >  qemu-options.hx             |  16 +++++-
+> >  8 files changed, 215 insertions(+), 5 deletions(-)  
+> 
+> Markus has asked that all new QMP commands have some testsuite exposure;
+> he may have some advice on what test would be best to modify to give us
+> some coverage of this feature.
 
-On 04/27/2017 09:00 PM, Markus Armbruster wrote:
-> Broken in commit daa33c5.
->
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-About this bug I remember have discussed with paolo.
-
-https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg01326.html
-
-And about this patch content.
-
-Reviewed-by:Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-
-
-Thanks
-Zhang Chen
-
-
-> ---
->   migration/colo.c | 12 ++++++++++++
->   monitor.c        |  5 +++++
->   2 files changed, 17 insertions(+)
->
-> diff --git a/migration/colo.c b/migration/colo.c
-> index c19eb3f..963c802 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -153,6 +153,7 @@ void qmp_xen_set_replication(bool enable, bool primary,
->                                bool has_failover, bool failover,
->                                Error **errp)
->   {
-> +#ifdef CONFIG_REPLICATION
->       ReplicationMode mode = primary ?
->                              REPLICATION_MODE_PRIMARY :
->                              REPLICATION_MODE_SECONDARY;
-> @@ -171,10 +172,14 @@ void qmp_xen_set_replication(bool enable, bool primary,
->           }
->           replication_stop_all(failover, failover ? NULL : errp);
->       }
-> +#else
-> +    abort();
-> +#endif
->   }
->   
->   ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
->   {
-> +#ifdef CONFIG_REPLICATION
->       Error *err = NULL;
->       ReplicationStatus *s = g_new0(ReplicationStatus, 1);
->   
-> @@ -189,11 +194,18 @@ ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
->   
->       error_free(err);
->       return s;
-> +#else
-> +    abort();
-> +#endif
->   }
->   
->   void qmp_xen_colo_do_checkpoint(Error **errp)
->   {
-> +#ifdef CONFIG_REPLICATION
->       replication_do_checkpoint_all(errp);
-> +#else
-> +    abort();
-> +#endif
->   }
->   
->   static void colo_send_message(QEMUFile *f, COLOMessage msg,
-> diff --git a/monitor.c b/monitor.c
-> index 6289e52..62c9f81 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -974,6 +974,11 @@ static void qmp_unregister_commands_hack(void)
->   #ifndef CONFIG_SPICE
->       qmp_unregister_command(&qmp_commands, "query-spice");
->   #endif
-> +#ifndef CONFIG_REPLICATION
-> +    qmp_unregister_command(&qmp_commands, "xen-set-replication");
-> +    qmp_unregister_command(&qmp_commands, "query-xen-replication-status");
-> +    qmp_unregister_command(&qmp_commands, "xen-colo-do-checkpoint");
-> +#endif
->   #ifndef TARGET_I386
->       qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
->   #endif
-
--- 
-Thanks
-Zhang Chen
+Since it's basically validation of SLIT table, the test case
+should be added to tests/bios-tables-test.c
