@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d3lcn-0008Dj-Cn
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:46:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1d3lpJ-0004fW-Iw
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d3lcm-0003Sf-BU
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:46:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3lcm-0003Rn-2K
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:46:32 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<6824abf3c4e5b865de1799c302f60e8055c8d3dc.1493191677.git.maozy.fnst@cn.fujitsu.com>
-Date: Thu, 27 Apr 2017 17:46:28 +0200
-In-Reply-To: <6824abf3c4e5b865de1799c302f60e8055c8d3dc.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	(Mao Zhongyi's message of "Wed, 26 Apr 2017 16:04:15 +0800")
-Message-ID: <874lx9yht7.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1d3lpG-0000fW-Bi
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:59:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33363)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d3lpG-0000fI-6S
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:59:26 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d3lpF-0000BS-1b
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:59:25 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EBB7F2E80C1
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:59:24 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] net/socket: Convert the
- non-blocking connection mechanism to QIOchannel
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 27 Apr 2017 15:47:26 -0000
+From: Daniel Berrange <1064631@bugs.launchpad.net>
+Reply-To: Bug 1064631 <1064631@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121009195133.2476.13072.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170427154726.2693.12828.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1064631] Re: Feature request: tls for chardev
+ socket (telnet, tcp, udp)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com
+To: qemu-devel@nongnu.org
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+This support was introduced in QEMU 2.6 last year. Some info here:
 
-> Currently, socket connection in net is realized by an old
-> mechanism which is non-blocking.
->
-> That old mechanism may cause net blocks on DNS lookups and
-> QEmu has already replaced it with QIOchannel in many features,
-> such as migration.
->
-> Convert it to QIOchannel for net as well.
->
-> CC: berrange@redhat.com, pbonzini@redhat.com, jasowang@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
-> The test steps like this:
->
->     $ qemu-system-x86_64 -net nic -net socket,listen=:1234 ~/img/test.img
->     $ qemu-system-x86_64 -net nic -net socket,connect=127.0.0.1:1234 ~/img/test.img
->
-> No exception.
->
->  net/socket.c | 30 +++++++++++++++++++-----------
->  1 file changed, 19 insertions(+), 11 deletions(-)
->
-> diff --git a/net/socket.c b/net/socket.c
-> index b8c931e..52f9dce 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -33,6 +33,7 @@
->  #include "qemu/sockets.h"
->  #include "qemu/iov.h"
->  #include "qemu/main-loop.h"
-> +#include "io/channel-socket.h"
->  
->  typedef struct NetSocketState {
->      NetClientState nc;
-> @@ -525,16 +526,22 @@ typedef struct {
->      char *name;
->  } socket_connect_data;
->  
-> -static void socket_connect_data_free(socket_connect_data *c)
-> +static void socket_connect_data_free(void *opaque)
->  {
-> +    socket_connect_data *c = opaque;
+https://www.berrange.com/posts/2016/08/16/improving-qemu-security-part-6
+-tls-support-for-character-devices/
 
-Blank line between declarations and statements, please.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-> +    if (!c) {
-> +        return;
-> +    }
-> +
->      qapi_free_SocketAddress(c->saddr);
->      g_free(c->model);
->      g_free(c->name);
->      g_free(c);
->  }
->  
-> -static void net_socket_connected(int fd, Error *err, void *opaque)
-> +static void net_socket_connected(QIOTask *task, void *opaque)
->  {
-> +    QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(qio_task_get_source(task));
->      socket_connect_data *c = opaque;
->      NetSocketState *s;
->      char *addr_str = NULL;
-> @@ -543,13 +550,13 @@ static void net_socket_connected(int fd, Error *err, void *opaque)
->      addr_str = socket_address_to_string(c->saddr, &local_error);
->      if (addr_str == NULL) {
->          error_report_err(local_error);
-> -        closesocket(fd);
-> +        closesocket(sioc->fd);
->          goto end;
->      }
->  
-> -    s = net_socket_fd_init(c->peer, c->model, c->name, fd, true);
-> +    s = net_socket_fd_init(c->peer, c->model, c->name, sioc->fd, true);
->      if (!s) {
-> -        closesocket(fd);
-> +        closesocket(sioc->fd);
->          goto end;
->      }
->  
-> @@ -567,7 +574,7 @@ static int net_socket_connect_init(NetClientState *peer,
->                                     const char *host_str)
->  {
->      socket_connect_data *c = g_new0(socket_connect_data, 1);
-> -    int fd = -1;
-> +    QIOChannelSocket *sioc;
->      Error *local_error = NULL;
->  
->      c->peer = peer;
-> @@ -578,11 +585,12 @@ static int net_socket_connect_init(NetClientState *peer,
-       c->model = g_strdup(model);
-       c->name = g_strdup(name);
-       c->saddr = socket_parse(host_str, &local_error);
-       if (c->saddr == NULL) {
->          goto err;
->      }
->  
-> -    fd = socket_connect(c->saddr, net_socket_connected, c, &local_error);
-> -    if (fd < 0) {
-> -        goto err;
-> -    }
-> -
-> +    sioc = qio_channel_socket_new();
-> +    qio_channel_socket_connect_async(sioc,
-> +                                     c->saddr,
-> +                                     net_socket_connected,
-> +                                     c,
-> +                                     NULL);
->      return 0;
->  
->  err:
-       error_report_err(local_error);
-       socket_connect_data_free(c);
-       return -1;
-   }
+-- =
 
-Ignorant question: how does this change the reporting of errors?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1064631
 
-Before the patch, errors from socket_connect() are reported with
-error_report_err(), just like errors from socket_parse().
+Title:
+  Feature request: tls for chardev socket (telnet,tcp,udp)
 
-After the patch?
+Status in QEMU:
+  Fix Released
 
-The next patch converts this function to Error.  Errors from
-socket_parse() are then propagated to the caller.  What about errors
-from socket_connect()?
+Bug description:
+  Hello,
+
+  it would be nice if chardev socket (telnet,tcp,udp) could have tls
+  support as vnc does.
+
+  This way we could have encrypted access to virtual character devices over=
+ network,
+  for example in setup: conserver -> socat+tls <-> qemu+chardev+tls.
+
+  The best would be both direction - server even client, so even the client=
+ should
+  trust remote server (trustfile, fingeprint...?).
+
+  Thank you.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1064631/+subscriptions
