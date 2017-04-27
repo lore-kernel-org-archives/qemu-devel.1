@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3a7b-0007xA-Oo
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:29:37 -0400
+	(envelope-from <cota@braap.org>) id 1d3a7b-0007wt-JI
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3a7a-0001xC-FS
+	(envelope-from <cota@braap.org>) id 1d3a7a-0001x5-Bm
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:29:35 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 26 Apr 2017 23:29:17 -0400
-Message-Id: <1493263764-18657-5-git-send-email-cota@braap.org>
+Date: Wed, 26 Apr 2017 23:29:21 -0400
+Message-Id: <1493263764-18657-9-git-send-email-cota@braap.org>
 In-Reply-To: <1493263764-18657-1-git-send-email-cota@braap.org>
 References: <1493263764-18657-1-git-send-email-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 04/11] tcg: export
- tcg_gen_lookup_and_goto_ptr
+Subject: [Qemu-devel] [PATCH v4 08/11] target/i386: introduce gen_jr helper
+ to generate lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +23,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-Instead of exporting goto_ptr directly to TCG frontends, export
-tcg_gen_lookup_and_goto_ptr(), which calls goto_ptr with the pointer
-returned by the lookup_tb_ptr() helper. This is the only use case
-we have for goto_ptr and lookup_tb_ptr, so having this function is
-very convenient. Furthermore, it trivially allows us to avoid calling
-the lookup helper if goto_ptr is not implemented by the backend.
+This helper will be used by subsequent changes.
 
-Suggested-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tcg/README   |  8 ++++++++
- tcg/tcg-op.c | 13 +++++++++++++
- tcg/tcg-op.h | 11 +++++++++++
- 3 files changed, 32 insertions(+)
+ target/i386/translate.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/tcg/README b/tcg/README
-index a9858c2..bf49e82 100644
---- a/tcg/README
-+++ b/tcg/README
-@@ -477,6 +477,14 @@ current TB was linked to this TB. Otherwise execute the next
- instructions. Only indices 0 and 1 are valid and tcg_gen_goto_tb may be issued
- at most once with each slot index per TB.
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 1d1372f..f0e48dc 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -141,6 +141,7 @@ typedef struct DisasContext {
+ } DisasContext;
  
-+* lookup_and_goto_ptr tb_addr
-+
-+Look up a TB address ('tb_addr') and jump to it if valid. If not valid,
-+jump to the TCG epilogue to go back to the exec loop.
-+
-+This operation is optional. If the TCG backend does not implement the
-+goto_ptr opcode, emitting this op is equivalent to emitting exit_tb(0).
-+
- * qemu_ld_i32/i64 t0, t1, flags, memidx
- * qemu_st_i32/i64 t0, t1, flags, memidx
+ static void gen_eob(DisasContext *s);
++static void gen_jr(DisasContext *s, TCGv dest);
+ static void gen_jmp(DisasContext *s, target_ulong eip);
+ static void gen_jmp_tb(DisasContext *s, target_ulong eip, int tb_num);
+ static void gen_op(DisasContext *s1, int op, TCGMemOp ot, int d);
+@@ -2509,7 +2510,8 @@ static void gen_bnd_jmp(DisasContext *s)
+    If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.
+    If RECHECK_TF, emit a rechecking helper for #DB, ignoring the state of
+    S->TF.  This is used by the syscall/sysret insns.  */
+-static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
++static void
++do_gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, TCGv jr)
+ {
+     gen_update_cc_op(s);
  
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 95a39b7..8ff1eaf 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2587,6 +2587,19 @@ void tcg_gen_goto_tb(unsigned idx)
-     tcg_gen_op1i(INDEX_op_goto_tb, idx);
+@@ -2530,12 +2532,27 @@ static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
+         tcg_gen_exit_tb(0);
+     } else if (s->tf) {
+         gen_helper_single_step(cpu_env);
++    } else if (!TCGV_IS_UNUSED(jr)) {
++        TCGv vaddr = tcg_temp_new();
++
++        tcg_gen_add_tl(vaddr, jr, cpu_seg_base[R_CS]);
++        tcg_gen_lookup_and_goto_ptr(vaddr);
++        tcg_temp_free(vaddr);
+     } else {
+         tcg_gen_exit_tb(0);
+     }
+     s->is_jmp = DISAS_TB_JUMP;
  }
  
-+void tcg_gen_lookup_and_goto_ptr(TCGv addr)
++static inline void
++gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
 +{
-+    if (TCG_TARGET_HAS_goto_ptr) {
-+        TCGv_ptr ptr = tcg_temp_new_ptr();
++    TCGv unused;
 +
-+        gen_helper_lookup_tb_ptr(ptr, tcg_ctx.tcg_env, addr);
-+        tcg_gen_op1i(INDEX_op_goto_ptr, GET_TCGV_PTR(ptr));
-+        tcg_temp_free_ptr(ptr);
-+    } else {
-+        tcg_gen_exit_tb(0);
-+    }
++    TCGV_UNUSED(unused);
++    do_gen_eob_worker(s, inhibit, recheck_tf, unused);
 +}
 +
- static inline TCGMemOp tcg_canonicalize_memop(TCGMemOp op, bool is64, bool st)
- {
-     /* Trigger the asserts within as early as possible.  */
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index c68e300..5d3278f 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -796,6 +796,17 @@ static inline void tcg_gen_exit_tb(uintptr_t val)
-  */
- void tcg_gen_goto_tb(unsigned idx);
+ /* End of block.
+    If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
+ static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
+@@ -2549,6 +2566,12 @@ static void gen_eob(DisasContext *s)
+     gen_eob_worker(s, false, false);
+ }
  
-+/**
-+ * tcg_gen_lookup_and_goto_ptr() - look up a TB and jump to it if valid
-+ * @addr: Guest address of the target TB
-+ *
-+ * If the TB is not valid, jump to the epilogue.
-+ *
-+ * This operation is optional. If the TCG backend does not implement goto_ptr,
-+ * this op is equivalent to calling tcg_gen_exit_tb() with 0 as the argument.
-+ */
-+void tcg_gen_lookup_and_goto_ptr(TCGv addr);
++/* Jump to register */
++static void gen_jr(DisasContext *s, TCGv dest)
++{
++    do_gen_eob_worker(s, false, false, dest);
++}
 +
- #if TARGET_LONG_BITS == 32
- #define tcg_temp_new() tcg_temp_new_i32()
- #define tcg_global_reg_new tcg_global_reg_new_i32
+ /* generate a jump to eip. No segment change must happen before as a
+    direct call to the next block may occur */
+ static void gen_jmp_tb(DisasContext *s, target_ulong eip, int tb_num)
 -- 
 2.7.4
