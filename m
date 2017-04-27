@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d3fCk-0006NN-QK
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:55:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d3fMb-0000WK-Ez
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:05:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d3fCf-0003bP-VQ
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:55:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d3fCf-0003ay-ML
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:55:09 -0400
-References: <1493054398-26013-1-git-send-email-joserz@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e0285ff8-d878-82a0-4b68-3b37b933dce6@redhat.com>
-Date: Thu, 27 Apr 2017 10:55:04 +0200
+	(envelope-from <kwolf@redhat.com>) id 1d3fMa-0000wt-C9
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:05:25 -0400
+Date: Thu, 27 Apr 2017 11:05:10 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170427090510.GB4805@noname.str.redhat.com>
+References: <20170426033413.17192-1-famz@redhat.com>
+	<20170426033413.17192-22-famz@redhat.com>
+	<20170426144948.GL4538@noname.str.redhat.com>
+	<20170427013200.GE9205@lemon.lan>
 MIME-Version: 1.0
-In-Reply-To: <1493054398-26013-1-git-send-email-joserz@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] trace: add qemu mutex lock and unlock
- trace events
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170427013200.GE9205@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH v15 21/21] qemu-iotests: Add test case 153
+ for image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,147 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, famz@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+Am 27.04.2017 um 03:32 hat Fam Zheng geschrieben:
+> On Wed, 04/26 16:49, Kevin Wolf wrote:
+> > Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > 
+> > I'll do the actual review of the test case later, but I already have a
+> > question... Can we find a way to accept the expected lock losses on
+> > systems without OFD? I'm using RHEL 7 as my main development OS, so I
+> > wouldn't like having to deal with false positives there.
+> 
+> Split the lock loss cases to a separate case and _not_run? :)
 
+You still need to find out from a shell script whether OFD locks are
+supported before you can call _not_run, but otherwise I'm fine with
+this.
 
-On 24/04/2017 19:19, Jose Ricardo Ziviani wrote:
-> These trace events were very useful to help me to understand and find a
-> reordering issue in vfio, for example:
->=20
-> qemu_mutex_lock locked mutex 0x10905ad8
->   vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2020c, 4)
-> qemu_mutex_unlock unlocked mutex 0x10905ad8
-> qemu_mutex_lock locked mutex 0x10905ad8
->   vfio_region_write  (0001:03:00.0:region1+0xc4, 0xa0000, 4)
-> qemu_mutex_unlock unlocked mutex 0x10905ad8
->=20
-> that also helped me to see the desired result after the fix:
->=20
-> qemu_mutex_lock locked mutex 0x10905ad8
->   vfio_region_write  (0001:03:00.0:region1+0xc0, 0x2000c, 4)
->   vfio_region_write  (0001:03:00.0:region1+0xc4, 0xb0000, 4)
-> qemu_mutex_unlock unlocked mutex 0x10905ad8
->=20
-> So it could be a good idea to have these traces implemented. It's worth
-> mentioning that they should be surgically enabled during the debugging,
-> otherwise it can flood the trace logs with lock/unlock messages.
->=20
-> How to use it:
-> trace-event qemu_mutex_lock on|off
-> trace-event qemu_mutex_unlock on|off
-> or
-> trace-event qemu_mutex* on|off
->=20
-> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> > Hm... And actually, printing a warning will probably invalidate all the
+> > other reference outputs, too. After all, every single invocation of
+> > qemu/qemu-img/qemu-io will print a warning. Maybe that's a bit too much
+> > even for manual users when they can't do anything about it (which is
+> > unlike the format probing warning that you can get rid of by simply
+> > changing your command line).
+> 
+> An idea: make locking=on/off/auto, and auto is on iff OFD is usable,
+> otherwise off. When user specifies locking=on but OFD is unusable, we
+> print a warning.
+> 
+> Only in this on test case the warning will be printed on RHEL, and
+> it's easy to filter it out.
 
-Some improvements:
+So POSIX locks only if you explicitly enable locking? It would be a pity
+to do even less than we could theoretically do by default, but at least
+the default wouldn't result in surprising behaviour by losing locks
+randomly.
 
-1) handle trylock and Win32 too
+The argument for it would be that being consistently unsafe is better
+than being unpredictably safe or unsafe. I always find this kind of
+decision hard to make because I can appreciate both sides of the
+argument.
 
-2) pass mutex instead of &mutex->lock, it is the same but the latter is
-unnecessarily obfuscated
-
-3) also trace unlock/lock around cond_wait
-
-4) trace "unlocked" before calling pthread_mutex_unlock, so that it is
-always placed before the next "locked" tracepoint.
-
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index bf5756763d..46f4c08e6d 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -62,7 +62,7 @@ void qemu_mutex_lock(QemuMutex *mutex)
-     if (err)
-         error_exit(err, __func__);
-
--    trace_qemu_mutex_lock(&mutex->lock);
-+    trace_qemu_mutex_locked(mutex);
- }
-
- int qemu_mutex_trylock(QemuMutex *mutex)
-@@ -71,7 +71,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
-
-     err =3D pthread_mutex_trylock(&mutex->lock);
-     if (err =3D=3D 0) {
--        trace_qemu_mutex_lock(&mutex->lock);
-+        trace_qemu_mutex_locked(mutex);
-         return 0;
-     }
-     if (err =3D=3D EBUSY) {
-@@ -84,11 +84,10 @@ void qemu_mutex_unlock(QemuMutex *mutex)
- {
-     int err;
-
-+    trace_qemu_mutex_unlocked(mutex);
-     err =3D pthread_mutex_unlock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
--
--    trace_qemu_mutex_unlock(&mutex->lock);
- }
-
- void qemu_rec_mutex_init(QemuRecMutex *mutex)
-@@ -145,7 +144,9 @@ void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
- {
-     int err;
-
-+    trace_qemu_mutex_unlocked(mutex);
-     err =3D pthread_cond_wait(&cond->cond, &mutex->lock);
-+    trace_qemu_mutex_locked(mutex);
-     if (err)
-         error_exit(err, __func__);
- }
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index d3c87bc89e..0dc3ae7756 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -55,6 +55,7 @@ void qemu_mutex_destroy(QemuMutex *mutex)
- void qemu_mutex_lock(QemuMutex *mutex)
- {
-     AcquireSRWLockExclusive(&mutex->lock);
-+    trace_qemu_mutex_locked(mutex);
- }
-
- int qemu_mutex_trylock(QemuMutex *mutex)
-@@ -64,6 +64,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
-
-     owned =3D TryAcquireSRWLockExclusive(&mutex->lock);
-     if (owned) {
-+        trace_qemu_mutex_locked(mutex);
-         return 0;
-     }
-     return -EBUSY;
-@@ -72,6 +72,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
-
- void qemu_mutex_unlock(QemuMutex *mutex)
- {
-+    trace_qemu_mutex_unlocked(mutex);
-     ReleaseSRWLockExclusive(&mutex->lock);
- }
-
-@@ -124,7 +124,9 @@ void qemu_cond_broadcast(QemuCond *cond)
-
- void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
- {
-+    trace_qemu_mutex_unlocked(mutex);
-     SleepConditionVariableSRW(&cond->var, &mutex->lock, INFINITE, 0);
-+    trace_qemu_mutex_locked(mutex);
- }
-
- void qemu_sem_init(QemuSemaphore *sem, int init)
-diff --git a/util/trace-events b/util/trace-events
-index 70f62124e1..fa540c620b 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -57,5 +57,5 @@ lockcnt_futex_wait_resume(const void *lockcnt, int
-new) "lockcnt %p after wait:
- lockcnt_futex_wake(const void *lockcnt) "lockcnt %p waking up one waiter=
-"
-
- # util/qemu-thread-posix.c
--qemu_mutex_lock(void *lock) "locked mutex %p"
--qemu_mutex_unlock(void *lock) "unlocked mutex %p"
-+qemu_mutex_locked(void *lock) "locked mutex %p"
-+qemu_mutex_unlocked(void *lock) "unlocked mutex %p"
+Kevin
