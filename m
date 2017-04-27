@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3fMb-0000WK-Ez
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:05:26 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d3fO6-0001JR-Oo
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:06:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3fMa-0000wt-C9
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:05:25 -0400
-Date: Thu, 27 Apr 2017 11:05:10 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170427090510.GB4805@noname.str.redhat.com>
-References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-22-famz@redhat.com>
-	<20170426144948.GL4538@noname.str.redhat.com>
-	<20170427013200.GE9205@lemon.lan>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d3fO5-0001tw-AT
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:06:58 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1d3fO4-0001so-Rp
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 05:06:57 -0400
+Received: by mail-lf0-x244.google.com with SMTP id x72so3331791lfb.1
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 02:06:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170427013200.GE9205@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH v15 21/21] qemu-iotests: Add test case 153
- for image locking
+References: <1493282486-28338-1-git-send-email-armbru@redhat.com>
+	<1493282486-28338-5-git-send-email-armbru@redhat.com>
+In-Reply-To: <1493282486-28338-5-git-send-email-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 27 Apr 2017 09:06:44 +0000
+Message-ID: <CAJ+F1CL2=cjEJ40tJ0nKtWD=DbG9aAmFkoRDT2y0+zaHFZbe0w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] qobject-input-visitor: Catch misuse of
+ end_struct vs. end_list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +31,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-Am 27.04.2017 um 03:32 hat Fam Zheng geschrieben:
-> On Wed, 04/26 16:49, Kevin Wolf wrote:
-> > Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
-> > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > 
-> > I'll do the actual review of the test case later, but I already have a
-> > question... Can we find a way to accept the expected lock losses on
-> > systems without OFD? I'm using RHEL 7 as my main development OS, so I
-> > wouldn't like having to deal with false positives there.
-> 
-> Split the lock loss cases to a separate case and _not_run? :)
+On Thu, Apr 27, 2017 at 12:41 PM Markus Armbruster <armbru@redhat.com>
+wrote:
 
-You still need to find out from a shell script whether OFD locks are
-supported before you can call _not_run, but otherwise I'm fine with
-this.
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
 
-> > Hm... And actually, printing a warning will probably invalidate all the
-> > other reference outputs, too. After all, every single invocation of
-> > qemu/qemu-img/qemu-io will print a warning. Maybe that's a bit too much
-> > even for manual users when they can't do anything about it (which is
-> > unlike the format probing warning that you can get rid of by simply
-> > changing your command line).
-> 
-> An idea: make locking=on/off/auto, and auto is on iff OFD is usable,
-> otherwise off. When user specifies locking=on but OFD is unusable, we
-> print a warning.
-> 
-> Only in this on test case the warning will be printed on RHEL, and
-> it's easy to filter it out.
+It would be more obvious with a check for qobject_type(tos->obj), no?
 
-So POSIX locks only if you explicitly enable locking? It would be a pity
-to do even less than we could theoretically do by default, but at least
-the default wouldn't result in surprising behaviour by losing locks
-randomly.
+In any case:
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The argument for it would be that being consistently unsafe is better
-than being unpredictably safe or unsafe. I always find this kind of
-decision hard to make because I can appreciate both sides of the
-argument.
 
-Kevin
+
+> ---
+>  qapi/qobject-input-visitor.c | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
+>
+> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+> index 2530959..68a6742 100644
+> --- a/qapi/qobject-input-visitor.c
+> +++ b/qapi/qobject-input-visitor.c
+> @@ -291,6 +291,15 @@ static void qobject_input_start_struct(Visitor *v,
+> const char *name, void **obj,
+>      }
+>  }
+>
+> +static void qobject_input_end_struct(Visitor *v, void **obj)
+> +{
+> +    QObjectInputVisitor *qiv =3D to_qiv(v);
+> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
+> +
+> +    assert(tos->h);
+> +    qobject_input_pop(v, obj);
+> +}
+> +
+>
+>  static void qobject_input_start_list(Visitor *v, const char *name,
+>                                       GenericList **list, size_t size,
+> @@ -346,6 +355,14 @@ static void qobject_input_check_list(Visitor *v,
+> Error **errp)
+>      }
+>  }
+>
+> +static void qobject_input_end_list(Visitor *v, void **obj)
+> +{
+> +    QObjectInputVisitor *qiv =3D to_qiv(v);
+> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
+> +
+> +    assert(!tos->h);
+> +    qobject_input_pop(v, obj);
+> +}
+>
+>  static void qobject_input_start_alternate(Visitor *v, const char *name,
+>                                            GenericAlternate **obj, size_t
+> size,
+> @@ -645,11 +662,11 @@ static QObjectInputVisitor
+> *qobject_input_visitor_base_new(QObject *obj)
+>      v->visitor.type =3D VISITOR_INPUT;
+>      v->visitor.start_struct =3D qobject_input_start_struct;
+>      v->visitor.check_struct =3D qobject_input_check_struct;
+> -    v->visitor.end_struct =3D qobject_input_pop;
+> +    v->visitor.end_struct =3D qobject_input_end_struct;
+>      v->visitor.start_list =3D qobject_input_start_list;
+>      v->visitor.next_list =3D qobject_input_next_list;
+>      v->visitor.check_list =3D qobject_input_check_list;
+> -    v->visitor.end_list =3D qobject_input_pop;
+> +    v->visitor.end_list =3D qobject_input_end_list;
+>      v->visitor.start_alternate =3D qobject_input_start_alternate;
+>      v->visitor.optional =3D qobject_input_optional;
+>      v->visitor.free =3D qobject_input_free;
+> --
+> 2.7.4
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
