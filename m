@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d3cy8-0005ep-SI
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:32:01 -0400
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1d3cyy-0006cl-B0
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:32:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d3cy5-0002Sw-Jp
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:32:00 -0400
-Received: from mga11.intel.com ([192.55.52.93]:12796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1d3cy5-0002SL-AX
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:31:57 -0400
-Message-ID: <590190C8.6030609@intel.com>
-Date: Thu, 27 Apr 2017 14:33:44 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1d3cyv-0003kt-8S
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:32:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56890)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
+	id 1d3cyu-0003jJ-Vc
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:32:49 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3R6TBP1081969
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 02:32:46 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a39dnc2t9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 02:32:45 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
+	Thu, 27 Apr 2017 16:32:43 +1000
+Date: Thu, 27 Apr 2017 16:31:43 +1000
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
-References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
-	<1492076108-117229-6-git-send-email-wei.w.wang@intel.com>
-	<20170413194732-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170413194732-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 5/5] virtio-balloon:
- VIRTIO_BALLOON_F_MISC_VQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Message-Id: <20170427063143.GA11487@tungsten.ozlabs.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/2] ppc/xics: preserve P and Q bits for KVM
+ IRQs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +39,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On 04/14/2017 01:08 AM, Michael S. Tsirkin wrote:
-> On Thu, Apr 13, 2017 at 05:35:08PM +0800, Wei Wang wrote:
->> Add a new vq, miscq, to handle miscellaneous requests between the device
->> and the driver.
->>
->> This patch implemnts the VIRTIO_BALLOON_MISCQ_INQUIRE_UNUSED_PAGES
-> implements
->
->> request sent from the device.
-> Commands are sent from host and handled on guest.
-> In fact how is this so different from stats?
-> How about reusing the stats vq then? You can use one buffer
-> for stats and one buffer for commands.
->
+Hi QEMU,
 
-The meaning of the two vqs is a little different. statq is used for
-reporting statistics, while miscq is intended to be used to handle
-miscellaneous requests from the guest or host (I think it can
-also be used the other way around in the future when other
-new features are added which need the guest to send requests
-and the host to provide responses).
+As explained in the notes for the second patch, this is a change to hook up
+some new bits that have been added to KVM's XICS IRQs along with a small fix
+for a problem I noticed along the way.
 
-I would prefer to have them separate, because:
-If we plan to combine them, we need to put the previous statq
-related implementation under miscq with a new command (I think
-we can't combine them without using commands to distinguish
-the two features).
-In this way, an old driver won't work with a new QEMU or a new
-driver won't work with an old QEMU. Would this be considered
-as an issue here?
+I tested by instrumenting the code directly, better ideas are welcome!
+
+Cheers,
+Sam.
 
 
+Sam Bobroff (2):
+  ppc/xics: Fix stale irq->status bits after get
+  ppc/xics: preserve P and Q bits for KVM IRQs
 
->
->> +	miscq_out_hdr->flags = 0;
->> +
->> +	for_each_populated_zone(zone) {
->> +		for (order = MAX_ORDER - 1; order > 0; order--) {
->> +			for (migratetype = 0; migratetype < MIGRATE_TYPES;
->> +			     migratetype++) {
->> +				do {
->> +					ret = inquire_unused_page_block(zone,
->> +						order, migratetype, &page);
->> +					if (!ret) {
->> +						pfn = (u64)page_to_pfn(page);
->> +						add_one_chunk(vb, vq,
->> +							PAGE_CHUNK_TYPE_UNUSED,
->> +							pfn,
->> +							(u64)(1 << order));
->> +					}
->> +				} while (!ret);
->> +			}
->> +		}
->> +	}
->> +	miscq_out_hdr->flags |= VIRTIO_BALLOON_MISCQ_F_COMPLETE;
-> And where is miscq_out_hdr used? I see no add_outbuf anywhere.
->
-> Things like this should be passed through function parameters
-> and not stuffed into device structure, fields should be
-> initialized before use and not where we happen to
-> have the data handy.
->
+ hw/intc/xics_kvm.c    | 13 +++++++++++++
+ include/hw/ppc/xics.h |  2 ++
+ 2 files changed, 15 insertions(+)
 
-miscq_out_hdr is linear with the payload (i.e. kmalloc(hdr+payload) ).
-It is the same as the use of statq - one request in-flight each time.
-
-
->
-> Also, _F_ is normally a bit number, you use it as a value here.
->
-It intends to be a bit number. Bit 0 of flags to indicate the completion
-of handling the request.
+-- 
+2.12.1.382.gc0f9c7058
