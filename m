@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3h3F-0005cS-P3
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:53:34 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d3h6F-0006ck-Dh
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:56:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d3h3A-0001CW-RU
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:53:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d3h3A-0001C2-IF
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:53:28 -0400
-Date: Thu, 27 Apr 2017 18:53:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170427105317.GE1542@pxdev.xzpeter.org>
-References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1493201210-14357-4-git-send-email-yi.l.liu@linux.intel.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d3h6E-00024R-8l
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:56:39 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:36791)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1d3h6D-00024C-UF
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:56:38 -0400
+Received: by mail-lf0-x241.google.com with SMTP id 75so3602240lfs.3
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 03:56:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1493201210-14357-4-git-send-email-yi.l.liu@linux.intel.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 03/20] intel_iommu: add "svm" option
+References: <1493282486-28338-1-git-send-email-armbru@redhat.com>
+	<1493282486-28338-5-git-send-email-armbru@redhat.com>
+	<CAJ+F1CL2=cjEJ40tJ0nKtWD=DbG9aAmFkoRDT2y0+zaHFZbe0w@mail.gmail.com>
+	<8760hqceh7.fsf@dusky.pond.sub.org>
+In-Reply-To: <8760hqceh7.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 27 Apr 2017 10:56:25 +0000
+Message-ID: <CAJ+F1CL=BH2wqKMi3U0iZp4ujw_kHAGszL3KXJHJp9+mF3fmXg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] qobject-input-visitor: Catch misuse of
+ end_struct vs. end_list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +33,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, kvm@vger.kernel.org, jasowang@redhat.com, iommu@lists.linux-foundation.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On Wed, Apr 26, 2017 at 06:06:33PM +0800, Liu, Yi L wrote:
-> Expose "Shared Virtual Memory" to guest by using "svm" option.
-> Also use "svm" to expose SVM related capabilities to guest.
-> e.g. "-device intel-iommu, svm=on"
-> 
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> ---
->  hw/i386/intel_iommu.c          | 10 ++++++++++
->  hw/i386/intel_iommu_internal.h |  5 +++++
->  include/hw/i386/intel_iommu.h  |  1 +
->  3 files changed, 16 insertions(+)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index bf98fa5..ba1e7eb 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -2453,6 +2453,7 @@ static Property vtd_properties[] = {
->      DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
->      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
->      DEFINE_PROP_BOOL("ecs", IntelIOMMUState, ecs, FALSE),
-> +    DEFINE_PROP_BOOL("svm", IntelIOMMUState, svm, FALSE),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> @@ -2973,6 +2974,15 @@ static void vtd_init(IntelIOMMUState *s)
->          s->ecap |= VTD_ECAP_ECS;
->      }
->  
-> +    if (s->svm) {
-> +        if (!s->ecs || !x86_iommu->pt_supported || !s->caching_mode) {
-> +            error_report("Need to set ecs, pt, caching-mode for svm");
-> +            exit(1);
-> +        }
-> +        s->cap |= VTD_CAP_DWD | VTD_CAP_DRD;
-> +        s->ecap |= VTD_ECAP_PRS | VTD_ECAP_PTS | VTD_ECAP_PASID28;
-> +    }
-> +
->      if (s->caching_mode) {
->          s->cap |= VTD_CAP_CM;
->      }
-> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-> index 71a1c1e..f2a7d12 100644
-> --- a/hw/i386/intel_iommu_internal.h
-> +++ b/hw/i386/intel_iommu_internal.h
-> @@ -191,6 +191,9 @@
->  #define VTD_ECAP_PT                 (1ULL << 6)
->  #define VTD_ECAP_MHMV               (15ULL << 20)
->  #define VTD_ECAP_ECS                (1ULL << 24)
-> +#define VTD_ECAP_PASID28            (1ULL << 28)
+On Thu, Apr 27, 2017 at 2:49 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
-Could I ask what's this bit? On my spec, it says this bit is reserved
-and defunct (spec version: June 2016).
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>
+> > On Thu, Apr 27, 2017 at 12:41 PM Markus Armbruster <armbru@redhat.com>
+> > wrote:
+> >
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >>
+> >
+> > It would be more obvious with a check for qobject_type(tos->obj), no?
+>
+> --verbose?
+>
 
-> +#define VTD_ECAP_PRS                (1ULL << 29)
-> +#define VTD_ECAP_PTS                (0xeULL << 35)
+Instead of assert(tos->h) assert(qobject_type(tos->obj) =3D=3D QTYPE_QDICT)=
+ ?
+similarly for the list case.
 
-Would it better we avoid using 0xe here, or at least add some comment?
-
->  
->  /* CAP_REG */
->  /* (offset >> 4) << 24 */
-> @@ -207,6 +210,8 @@
->  #define VTD_CAP_PSI                 (1ULL << 39)
->  #define VTD_CAP_SLLPS               ((1ULL << 34) | (1ULL << 35))
->  #define VTD_CAP_CM                  (1ULL << 7)
-> +#define VTD_CAP_DWD                 (1ULL << 54)
-> +#define VTD_CAP_DRD                 (1ULL << 55)
-
-Just to confirm: after this series, we should support drain read/write
-then, right?
-
-Thanks,
-
->  
->  /* Supported Adjusted Guest Address Widths */
->  #define VTD_CAP_SAGAW_SHIFT         8
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> index ae21fe5..8981615 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -267,6 +267,7 @@ struct IntelIOMMUState {
->  
->      bool caching_mode;          /* RO - is cap CM enabled? */
->      bool ecs;                       /* Extended Context Support */
-> +    bool svm;                       /* Shared Virtual Memory */
->  
->      dma_addr_t root;                /* Current root table pointer */
->      bool root_extended;             /* Type of root table (extended or not) */
-> -- 
-> 1.9.1
-> 
-
--- 
-Peter Xu
+>
+> > In any case:
+> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Thanks!
+>
+> >> ---
+> >>  qapi/qobject-input-visitor.c | 21 +++++++++++++++++++--
+> >>  1 file changed, 19 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor=
+.c
+> >> index 2530959..68a6742 100644
+> >> --- a/qapi/qobject-input-visitor.c
+> >> +++ b/qapi/qobject-input-visitor.c
+> >> @@ -291,6 +291,15 @@ static void qobject_input_start_struct(Visitor *v=
+,
+> >> const char *name, void **obj,
+> >>      }
+> >>  }
+> >>
+> >> +static void qobject_input_end_struct(Visitor *v, void **obj)
+> >> +{
+> >> +    QObjectInputVisitor *qiv =3D to_qiv(v);
+> >> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
+> >> +
+> >> +    assert(tos->h);
+> >> +    qobject_input_pop(v, obj);
+> >> +}
+> >> +
+> >>
+> >>  static void qobject_input_start_list(Visitor *v, const char *name,
+> >>                                       GenericList **list, size_t size,
+> >> @@ -346,6 +355,14 @@ static void qobject_input_check_list(Visitor *v,
+> >> Error **errp)
+> >>      }
+> >>  }
+> >>
+> >> +static void qobject_input_end_list(Visitor *v, void **obj)
+> >> +{
+> >> +    QObjectInputVisitor *qiv =3D to_qiv(v);
+> >> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
+> >> +
+> >> +    assert(!tos->h);
+> >> +    qobject_input_pop(v, obj);
+> >> +}
+> >>
+> >>  static void qobject_input_start_alternate(Visitor *v, const char *nam=
+e,
+> >>                                            GenericAlternate **obj,
+> size_t
+> >> size,
+> >> @@ -645,11 +662,11 @@ static QObjectInputVisitor
+> >> *qobject_input_visitor_base_new(QObject *obj)
+> >>      v->visitor.type =3D VISITOR_INPUT;
+> >>      v->visitor.start_struct =3D qobject_input_start_struct;
+> >>      v->visitor.check_struct =3D qobject_input_check_struct;
+> >> -    v->visitor.end_struct =3D qobject_input_pop;
+> >> +    v->visitor.end_struct =3D qobject_input_end_struct;
+> >>      v->visitor.start_list =3D qobject_input_start_list;
+> >>      v->visitor.next_list =3D qobject_input_next_list;
+> >>      v->visitor.check_list =3D qobject_input_check_list;
+> >> -    v->visitor.end_list =3D qobject_input_pop;
+> >> +    v->visitor.end_list =3D qobject_input_end_list;
+> >>      v->visitor.start_alternate =3D qobject_input_start_alternate;
+> >>      v->visitor.optional =3D qobject_input_optional;
+> >>      v->visitor.free =3D qobject_input_free;
+> >> --
+> >> 2.7.4
+> >>
+> >>
+> >> --
+> > Marc-Andr=C3=A9 Lureau
+>
+--=20
+Marc-Andr=C3=A9 Lureau
