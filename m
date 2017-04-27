@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i66-00046i-DV
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:38 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3i60-00040l-NV
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i65-0001YX-NK
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:34 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35512)
+	(envelope-from <rth7680@gmail.com>) id 1d3i5y-0001Ur-J9
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:28 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36481)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i65-0001YL-Gw
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:33 -0400
-Received: by mail-wr0-x241.google.com with SMTP id g12so3523516wrg.2
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i5y-0001UY-93
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:26 -0400
+Received: by mail-wm0-x244.google.com with SMTP id u65so4061503wmu.3
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:26 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu, 27 Apr 2017 14:00:03 +0200
-Message-Id: <20170427120006.20564-17-rth@twiddle.net>
+Date: Thu, 27 Apr 2017 13:59:56 +0200
+Message-Id: <20170427120006.20564-10-rth@twiddle.net>
 In-Reply-To: <20170427120006.20564-1-rth@twiddle.net>
 References: <20170427120006.20564-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v5 16/19] tcg/ppc: Implement goto_ptr
+Subject: [Qemu-devel] [PATCH v5 09/19] target/arm: optimize indirect branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +29,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
+From: "Emilio G. Cota" <cota@braap.org>
+
+Speed up indirect branches by jumping to the target if it is valid.
+
+Softmmu measurements (see later commit for user-mode results):
+
+Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
+
+- Impact on Boot time
+
+| setup  | ARM debian jessie boot+shutdown time | stddev |
+|--------+--------------------------------------+--------|
+| v2.9.0 |                                 8.84 |   0.07 |
+| +cross |                                 8.85 |   0.03 |
+| +jr    |                                 8.83 |   0.06 |
+
+-                            NBench, arm-softmmu (debian jessie guest). Host: Intel i7-4790K @ 4.00GHz
+
+  1.3x +-+-------------------------------------------------------------------------------------------------------------+-+
+       |                                                                                                                 |
+       |   cross                                                          ####                                           |
+ 1.25x +cross+jr..........................................................#++#.........................................+-+
+       |                                                        ####      #  #                                           |
+       |                                                     +++#  #      #  #                                           |
+       |                                      +++            ****  #      #  #                                           |
+  1.2x +-+...................................####............*..*..#......#..#.........................................+-+
+       |                                  ****  #            *  *  #      #  #     ####                                  |
+       |                                  *  *  #            *  *  #      #  #     #  #                                  |
+ 1.15x +-+................................*..*..#............*..*..#......#..#.....#..#................................+-+
+       |                                  *  *  #            *  *  #      #  #     #  #                                  |
+       |                                  *  *  #      ####  *  *  #      #  #     #  #                                  |
+       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         ####     |
+  1.1x +-+................................*..*..#......#..#..*..*..#......#..#.....#..#.........................#..#...+-+
+       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         #  #     |
+       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         #  #     |
+ 1.05x +-+..........................####..*..*..#......#..#..*..*..#......#..#.....#..#......+++............*****..#...+-+
+       |                        *****  #  *  *  #      #  #  *  *  #  *****  #     #  #   +++ |    ****###  *   *  #     |
+       |                        *+++*  #  *  *  #      #  #  *  *  #  *+++*  #  ****  #  *****###  *  *  #  *   *  #     |
+       |     *****###  +++####  *   *  #  *  *  #  *****  #  *  *  #  *   *  #  *  *  #  * | *++#  *  *  #  *   *  #     |
+    1x +-++-+*+++*-+#++****++#++*+-+*++#+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-++-+
+       |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
+       |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
+ 0.95x +-+---*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###---+-+
+       ASSIGNMENT BITFIELD   FOURFP EMULATION   HUFFMAN   LU DECOMPOSITIONEURAL NNUMERIC SOSTRING SORT     hmean
+  png: http://imgur.com/eOLmZNR
+
+NB. 'cross' represents the previous commit.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <1493263764-18657-8-git-send-email-cota@braap.org>
+[rth: Replace gen_jr global variable with DISAS_EXIT state.]
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/ppc/tcg-target.h     | 2 +-
- tcg/ppc/tcg-target.inc.c | 7 +++++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ target/arm/translate.c | 25 ++++++++++++++++---------
+ target/arm/translate.h |  4 ++++
+ 2 files changed, 20 insertions(+), 9 deletions(-)
 
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index a9aa974..5f4a40a 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -82,7 +82,7 @@ extern bool have_isa_3_00;
- #define TCG_TARGET_HAS_muls2_i32        0
- #define TCG_TARGET_HAS_muluh_i32        1
- #define TCG_TARGET_HAS_mulsh_i32        1
--#define TCG_TARGET_HAS_goto_ptr         0
-+#define TCG_TARGET_HAS_goto_ptr         1
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index facb52f..f879da6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -1178,7 +1178,7 @@ static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
+     gen_set_condexec(s);
+     gen_set_pc_im(s, s->pc - offset);
+     gen_exception_internal(excp);
+-    s->is_jmp = DISAS_JUMP;
++    s->is_jmp = DISAS_EXC;
+ }
  
- #if TCG_TARGET_REG_BITS == 64
- #define TCG_TARGET_HAS_add2_i32         0
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 64f67d2..8d50f18 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -1932,6 +1932,7 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+ static void gen_exception_insn(DisasContext *s, int offset, int excp,
+@@ -1187,14 +1187,14 @@ static void gen_exception_insn(DisasContext *s, int offset, int excp,
+     gen_set_condexec(s);
+     gen_set_pc_im(s, s->pc - offset);
+     gen_exception(excp, syn, target_el);
+-    s->is_jmp = DISAS_JUMP;
++    s->is_jmp = DISAS_EXC;
+ }
  
-     /* Epilogue */
-     tcg_debug_assert(tb_ret_addr == s->code_ptr);
-+    s->code_gen_epilogue = tb_ret_addr;
+ /* Force a TB lookup after an instruction that changes the CPU state.  */
+ static inline void gen_lookup_tb(DisasContext *s)
+ {
+     tcg_gen_movi_i32(cpu_R[15], s->pc & ~1);
+-    s->is_jmp = DISAS_JUMP;
++    s->is_jmp = DISAS_EXIT;
+ }
  
-     tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_R0, TCG_REG_R1, FRAME_SIZE+LR_OFFSET);
-     for (i = 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); ++i) {
-@@ -1986,6 +1987,11 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+ static inline void gen_hlt(DisasContext *s, int imm)
+@@ -4146,19 +4146,23 @@ static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
  #endif
-         s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-         break;
-+    case INDEX_op_goto_ptr:
-+        tcg_out32(s, MTSPR | RS(args[0]) | CTR);
-+        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R3, 0);
-+        tcg_out32(s, BCCTR | BO_ALWAYS);
-+        break;
-     case INDEX_op_br:
-         {
-             TCGLabel *l = arg_label(args[0]);
-@@ -2555,6 +2561,7 @@ static const TCGTargetOpDef ppc_op_defs[] = {
-     { INDEX_op_exit_tb, { } },
-     { INDEX_op_goto_tb, { } },
-     { INDEX_op_br, { } },
-+    { INDEX_op_goto_ptr, { "r" } },
+ }
  
-     { INDEX_op_ld8u_i32, { "r", "r" } },
-     { INDEX_op_ld8s_i32, { "r", "r" } },
+-static inline void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
++static void gen_goto_ptr(void)
++{
++    TCGv addr = tcg_temp_new();
++    tcg_gen_extu_i32_tl(addr, cpu_R[15]);
++    tcg_gen_lookup_and_goto_ptr(addr);
++    tcg_temp_free(addr);
++}
++
++static void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
+ {
+     if (use_goto_tb(s, dest)) {
+         tcg_gen_goto_tb(n);
+         gen_set_pc_im(s, dest);
+         tcg_gen_exit_tb((uintptr_t)s->tb + n);
+     } else {
+-        TCGv addr = tcg_temp_new();
+-
+         gen_set_pc_im(s, dest);
+-        tcg_gen_extu_i32_tl(addr, cpu_R[15]);
+-        tcg_gen_lookup_and_goto_ptr(addr);
+-        tcg_temp_free(addr);
++        gen_goto_ptr();
+     }
+ }
+ 
+@@ -12091,11 +12095,14 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             gen_set_pc_im(dc, dc->pc);
+             /* fall through */
+         case DISAS_JUMP:
++            gen_goto_ptr();
++            break;
+         default:
+             /* indicate that the hash table must be used to find the next TB */
+             tcg_gen_exit_tb(0);
+             break;
+         case DISAS_TB_JUMP:
++        case DISAS_EXC:
+             /* nothing more to generate */
+             break;
+         case DISAS_WFI:
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 629dab9..93de13f 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -139,6 +139,10 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+  * custom end-of-TB code)
+  */
+ #define DISAS_BX_EXCRET 11
++/* For instructions which want an immediate exit to the main loop,
++ * as opposed to attempting to use lookup_and_goto_ptr.
++ */
++#define DISAS_EXIT 12
+ 
+ #ifdef TARGET_AARCH64
+ void a64_translate_init(void);
 -- 
 2.9.3
