@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i5q-0003rJ-PG
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:19 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3i66-00046i-DV
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i5p-0001N7-0f
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:18 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33405)
+	(envelope-from <rth7680@gmail.com>) id 1d3i65-0001YX-NK
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:34 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i5o-0001Mj-QT
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:16 -0400
-Received: by mail-wr0-x244.google.com with SMTP id w50so3539818wrc.0
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:16 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i65-0001YL-Gw
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:33 -0400
+Received: by mail-wr0-x241.google.com with SMTP id g12so3523516wrg.2
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:33 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu, 27 Apr 2017 13:59:49 +0200
-Message-Id: <20170427120006.20564-3-rth@twiddle.net>
+Date: Thu, 27 Apr 2017 14:00:03 +0200
+Message-Id: <20170427120006.20564-17-rth@twiddle.net>
 In-Reply-To: <20170427120006.20564-1-rth@twiddle.net>
 References: <20170427120006.20564-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v5 02/19] tcg/sparc: Use the proper compilation
- flags for 32-bit
+Subject: [Qemu-devel] [PATCH v5 16/19] tcg/ppc: Implement goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +29,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
-We have required a v9 cpu since 9b9c37c36439ee0452632253dac7a31897f27f70.
-However, the flags we were using did not reliably enable v8plus, which
-meant that the compiler didn't know it could inline 64-bit atomics.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- configure | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tcg/ppc/tcg-target.h     | 2 +-
+ tcg/ppc/tcg-target.inc.c | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index c35acf1..55dd9c3 100755
---- a/configure
-+++ b/configure
-@@ -1206,12 +1206,12 @@ case "$cpu" in
-            LDFLAGS="-m64 $LDFLAGS"
-            ;;
-     sparc)
--           LDFLAGS="-m32 $LDFLAGS"
--           CPU_CFLAGS="-m32 -mcpu=ultrasparc"
-+           CPU_CFLAGS="-m32 -mv8plus -mcpu=ultrasparc"
-+           LDFLAGS="-m32 -mv8plus $LDFLAGS"
-            ;;
-     sparc64)
--           LDFLAGS="-m64 $LDFLAGS"
-            CPU_CFLAGS="-m64 -mcpu=ultrasparc"
-+           LDFLAGS="-m64 $LDFLAGS"
-            ;;
-     s390)
-            CPU_CFLAGS="-m31"
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index a9aa974..5f4a40a 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -82,7 +82,7 @@ extern bool have_isa_3_00;
+ #define TCG_TARGET_HAS_muls2_i32        0
+ #define TCG_TARGET_HAS_muluh_i32        1
+ #define TCG_TARGET_HAS_mulsh_i32        1
+-#define TCG_TARGET_HAS_goto_ptr         0
++#define TCG_TARGET_HAS_goto_ptr         1
+ 
+ #if TCG_TARGET_REG_BITS == 64
+ #define TCG_TARGET_HAS_add2_i32         0
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 64f67d2..8d50f18 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -1932,6 +1932,7 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+ 
+     /* Epilogue */
+     tcg_debug_assert(tb_ret_addr == s->code_ptr);
++    s->code_gen_epilogue = tb_ret_addr;
+ 
+     tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_R0, TCG_REG_R1, FRAME_SIZE+LR_OFFSET);
+     for (i = 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); ++i) {
+@@ -1986,6 +1987,11 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+ #endif
+         s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
+         break;
++    case INDEX_op_goto_ptr:
++        tcg_out32(s, MTSPR | RS(args[0]) | CTR);
++        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R3, 0);
++        tcg_out32(s, BCCTR | BO_ALWAYS);
++        break;
+     case INDEX_op_br:
+         {
+             TCGLabel *l = arg_label(args[0]);
+@@ -2555,6 +2561,7 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+     { INDEX_op_exit_tb, { } },
+     { INDEX_op_goto_tb, { } },
+     { INDEX_op_br, { } },
++    { INDEX_op_goto_ptr, { "r" } },
+ 
+     { INDEX_op_ld8u_i32, { "r", "r" } },
+     { INDEX_op_ld8s_i32, { "r", "r" } },
 -- 
 2.9.3
