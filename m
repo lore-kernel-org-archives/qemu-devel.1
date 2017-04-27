@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d3glC-0008OA-Ow
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:34:55 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3grk-0001WD-6P
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d3glB-0002Qt-ML
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:34:54 -0400
-Date: Thu, 27 Apr 2017 18:34:44 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170427103444.GA14732@lemon.lan>
-References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-22-famz@redhat.com>
-	<20170426144948.GL4538@noname.str.redhat.com>
-	<20170427013200.GE9205@lemon.lan>
-	<20170427090510.GB4805@noname.str.redhat.com>
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3grg-0005NG-W9
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:41:40 -0400
+Received: from mga07.intel.com ([134.134.136.100]:59286)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1d3grg-0005M8-L3
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:41:36 -0400
+Date: Thu, 27 Apr 2017 18:25:37 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20170427102537.GE14925@sky-dev>
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-13-git-send-email-yi.l.liu@linux.intel.com>
+	<0f2966cf-4e5a-a2cc-5eb3-7e7d4f62bb85@redhat.com>
+	<20170427023719.GA14925@sky-dev>
+	<20170427061427.GA1542@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170427090510.GB4805@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v15 21/21] qemu-iotests: Add test case 153
- for image locking
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170427061427.GA1542@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 12/20] Memory: Add func to fire
+ pasidt_bind notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +33,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, jean-philippe.brucker@arm.com, jasowang@redhat.com, qemu-devel@nongnu.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, jacob.jun.pan@intel.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, 04/27 11:05, Kevin Wolf wrote:
-> Am 27.04.2017 um 03:32 hat Fam Zheng geschrieben:
-> > On Wed, 04/26 16:49, Kevin Wolf wrote:
-> > > Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
-> > > > Signed-off-by: Fam Zheng <famz@redhat.com>
+On Thu, Apr 27, 2017 at 02:14:27PM +0800, Peter Xu wrote:
+> On Thu, Apr 27, 2017 at 10:37:19AM +0800, Liu, Yi L wrote:
+> > On Wed, Apr 26, 2017 at 03:50:16PM +0200, Paolo Bonzini wrote:
 > > > 
-> > > I'll do the actual review of the test case later, but I already have a
-> > > question... Can we find a way to accept the expected lock losses on
-> > > systems without OFD? I'm using RHEL 7 as my main development OS, so I
-> > > wouldn't like having to deal with false positives there.
+> > > 
+> > > On 26/04/2017 12:06, Liu, Yi L wrote:
+> > > > +void memory_region_notify_iommu_svm_bind(MemoryRegion *mr,
+> > > > +                                         void *data)
+> > > > +{
+> > > > +    IOMMUNotifier *iommu_notifier;
+> > > > +    IOMMUNotifierFlag request_flags;
+> > > > +
+> > > > +    assert(memory_region_is_iommu(mr));
+> > > > +
+> > > > +    /*TODO: support other bind requests with smaller gran,
+> > > > +     * e.g. bind signle pasid entry
+> > > > +     */
+> > > > +    request_flags = IOMMU_NOTIFIER_SVM_PASIDT_BIND;
+> > > > +
+> > > > +    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> > > > +        if (iommu_notifier->notifier_flags & request_flags) {
+> > > > +            iommu_notifier->notify(iommu_notifier, data);
+> > > > +            break;
+> > > > +        }
+> > > > +    }
+> > > 
+> > > Peter,
+> > > 
+> > > should this reuse ->notify, or should it be different function pointer
+> > > in IOMMUNotifier?
 > > 
-> > Split the lock loss cases to a separate case and _not_run? :)
-> 
-> You still need to find out from a shell script whether OFD locks are
-> supported before you can call _not_run, but otherwise I'm fine with
-> this.
-
-OK. Shouldn't be rocket science. Let's try.
-
-> 
-> > > Hm... And actually, printing a warning will probably invalidate all the
-> > > other reference outputs, too. After all, every single invocation of
-> > > qemu/qemu-img/qemu-io will print a warning. Maybe that's a bit too much
-> > > even for manual users when they can't do anything about it (which is
-> > > unlike the format probing warning that you can get rid of by simply
-> > > changing your command line).
+> > Hi Paolo,
 > > 
-> > An idea: make locking=on/off/auto, and auto is on iff OFD is usable,
-> > otherwise off. When user specifies locking=on but OFD is unusable, we
-> > print a warning.
+> > Thx for your review.
 > > 
-> > Only in this on test case the warning will be printed on RHEL, and
-> > it's easy to filter it out.
+> > I think it should be “->notify” here. In this patchset, the new notifier
+> > is registered with the existing notifier registration API. So the all the
+> > notifiers are in the mr->iommu_notify list. And notifiers are labeled
+> > by notify flag, so it is able to differentiate the IOMMUNotifier nodes.
+> > When the flag meets, trigger it by “->notify”. The diagram below shows
+> > my understanding , wish it helps to make me understood.
+> > 
+> > VFIOContainer
+> >        |
+> >        giommu_list(VFIOGuestIOMMU)
+> >                 \
+> >                  VFIOGuestIOMMU1 ->   VFIOGuestIOMMU2 -> VFIOGuestIOMMU3 ...
+> >                     |                     |                 |
+> > mr->iommu_notify: IOMMUNotifier   ->    IOMMUNotifier  ->  IOMMUNotifier
+> >                   (Flag:MAP/UNMAP)     (Flag:SVM bind)  (Flag:tlb invalidate)
+> > 
+> > 
+> > Actually, compared with the MAP/UNMAP notifier, the newly added notifier has
+> > no start/end check, and there may be other types of bind notfier flag in
+> > future, so I added a separate fire func for SVM bind notifier.
 > 
-> So POSIX locks only if you explicitly enable locking? It would be a pity
-> to do even less than we could theoretically do by default, but at least
-> the default wouldn't result in surprising behaviour by losing locks
-> randomly.
+> I agree with Paolo that this interface might not be the suitable place
+> for the SVM notifiers (just like what I worried about in previous
+> discussions).
 > 
-> The argument for it would be that being consistently unsafe is better
-> than being unpredictably safe or unsafe. I always find this kind of
-> decision hard to make because I can appreciate both sides of the
-> argument.
+> The biggest problem is that, if you see current notifier mechanism,
+> it's per-memory-region. However iiuc your messages should be
+> per-iommu, or say, per translation unit.
 
-For purists, consistency is perhaps more important; for pragmatists, some
-protection is better than none. I figure it's up to the right of maintainers,
-which you are.  :)
+Hi Peter,
 
-However I do think making noticable complaints about OFD missing (in the
-documentation and/or the error messages) is of greater good, and is better than
-silent yet incomplete safty.
+yes, you're right. the newly added notifier is per-iommu.
 
-We want to offer as much protection as possible to everyone but it's more
-important when there is a qcow2 corruption report (I hope there isn't :) in the
-future, we can be sure whether locking is in place or not, no iffy situation.
-POSIX locking makes this harder, a warning message is helpful.
+> While, for each iommu, there
+> can be more than one memory regions (ppc can be an example). When
+> there are more than one MRs binded to the same iommu unit, which
+> memory region should you register to? Any one of them, or all?
 
-Fam
+Honestly, I'm not expert on ppc. According to the current code,
+I can only find one MR initialized with memory_region_init_iommu()
+in spapr_tce_table_realize(). So to better get your point, let me
+check. Do you mean there may be multiple of iommu MRs behind a iommu?
+
+I admit it must be considered if there are multiple iommu MRs. I may
+choose to register for one of them since the notifier is per-iommu as
+you've pointed. Then vIOMMU emulator need to trigger the notifier with
+the correct MR. Not sure if ppc vIOMMU is fine with it.
+
+> So my conclusion is, it just has nothing to do with memory regions...
+>
+> Instead of a different function pointer in IOMMUNotifer, IMHO we can
+> even move a step further, to isolate IOTLB notifications (targeted at
+> memory regions and with start/end ranges) out of SVM/other
+> notifications, since they are different in general. So we basically
+> need two notification mechanism:
+> 
+> - one for memory regions, currently what I can see is IOTLB
+>   notifications
+> 
+> - one for translation units, currently I see all the rest of
+>   notifications needed in virt-svm in this category
+> 
+> Maybe some RFC patches would be good to show what I mean... I'll see
+> whether I can prepare some.
+
+I agree that it would be helpful to split the two kinds of notifiers. I
+marked it as a FIXME in patch 0006 of this series. Just saw your RFC patch
+for common IOMMUObject. Thx for your work, would try to review it.
+
+Besides the notifier registration, pls also help to review the SVM
+virtualization itself. Would be glad to know your comments.
+
+Thanks,
+Yi L
+
+> Thanks,
+> 
+> -- 
+> Peter Xu
+> 
