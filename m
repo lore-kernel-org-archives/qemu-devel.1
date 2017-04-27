@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d3hwC-0000ft-76
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:50:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d3hy7-0001KZ-VQ
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d3hw7-0006ie-AR
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:50:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57246)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3hw7-0006hl-1g
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:50:15 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1493282486-28338-1-git-send-email-armbru@redhat.com>
-	<1493282486-28338-5-git-send-email-armbru@redhat.com>
-	<CAJ+F1CL2=cjEJ40tJ0nKtWD=DbG9aAmFkoRDT2y0+zaHFZbe0w@mail.gmail.com>
-	<8760hqceh7.fsf@dusky.pond.sub.org>
-	<CAJ+F1CL=BH2wqKMi3U0iZp4ujw_kHAGszL3KXJHJp9+mF3fmXg@mail.gmail.com>
-Date: Thu, 27 Apr 2017 13:50:10 +0200
-In-Reply-To: <CAJ+F1CL=BH2wqKMi3U0iZp4ujw_kHAGszL3KXJHJp9+mF3fmXg@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 27 Apr 2017
-	10:56:25 +0000")
-Message-ID: <87lgqm83yl.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1d3hy6-0007HL-Vf
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:20 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34782)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d3hy6-0007H5-On
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:18 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id l9so15675386wre.1
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 04:52:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] qobject-input-visitor: Catch misuse of
- end_struct vs. end_list
+In-Reply-To: <tencent_0B0C9551621D40450A004D34@qq.com>
+References: <tencent_0B0C9551621D40450A004D34@qq.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Apr 2017 12:51:56 +0100
+Message-ID: <CAFEAcA_SX0HNMbSf-yN1Hs99RHz_ff1ieFj8i-qnWb+CAvCMHw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] qemu integrator hardware error: icp_control_write:
+ Bad offset 789688
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>
+To: heavybird <4345099@qq.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
-
-> On Thu, Apr 27, 2017 at 2:49 PM Markus Armbruster <armbru@redhat.com> wro=
-te:
+On 27 April 2017 at 04:23, heavybird <4345099@qq.com> wrote:
+> Hi Peter,
 >
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->>
->> > On Thu, Apr 27, 2017 at 12:41 PM Markus Armbruster <armbru@redhat.com>
->> > wrote:
->> >
->> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> >>
->> >
->> > It would be more obvious with a check for qobject_type(tos->obj), no?
->>
->> --verbose?
->>
+> I am using your qemu integrator to debug my application but it encouters the
+> exception below, i have no idea to figure out the message below. could you
+> give me some suggestion or show me some document to get out this issues?? i
+> noticed there is trace option in the qeumu, but don't know how to use it
+> more efficently.
 >
-> Instead of assert(tos->h) assert(qobject_type(tos->obj) =3D=3D QTYPE_QDIC=
-T) ?
-
-The two conditions imply each other.  We can assert either one, or even
-both.  Eric, got a preference?
-
-> similarly for the list case.
+> thanks.
+> jason
 >
->> > In any case:
->> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>
->> Thanks!
->>
->> >> ---
->> >>  qapi/qobject-input-visitor.c | 21 +++++++++++++++++++--
->> >>  1 file changed, 19 insertions(+), 2 deletions(-)
->> >>
->> >> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visito=
-r.c
->> >> index 2530959..68a6742 100644
->> >> --- a/qapi/qobject-input-visitor.c
->> >> +++ b/qapi/qobject-input-visitor.c
->> >> @@ -291,6 +291,15 @@ static void qobject_input_start_struct(Visitor *=
-v,
->> >> const char *name, void **obj,
->> >>      }
->> >>  }
->> >>
->> >> +static void qobject_input_end_struct(Visitor *v, void **obj)
->> >> +{
->> >> +    QObjectInputVisitor *qiv =3D to_qiv(v);
->> >> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
->> >> +
->> >> +    assert(tos->h);
->> >> +    qobject_input_pop(v, obj);
->> >> +}
->> >> +
->> >>
->> >>  static void qobject_input_start_list(Visitor *v, const char *name,
->> >>                                       GenericList **list, size_t size,
->> >> @@ -346,6 +355,14 @@ static void qobject_input_check_list(Visitor *v,
->> >> Error **errp)
->> >>      }
->> >>  }
->> >>
->> >> +static void qobject_input_end_list(Visitor *v, void **obj)
->> >> +{
->> >> +    QObjectInputVisitor *qiv =3D to_qiv(v);
->> >> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
->> >> +
->> >> +    assert(!tos->h);
->> >> +    qobject_input_pop(v, obj);
->> >> +}
->> >>
->> >>  static void qobject_input_start_alternate(Visitor *v, const char *na=
-me,
->> >>                                            GenericAlternate **obj, si=
-ze_t
->> >> size,
->> >> @@ -645,11 +662,11 @@ static QObjectInputVisitor
->> >> *qobject_input_visitor_base_new(QObject *obj)
->> >>      v->visitor.type =3D VISITOR_INPUT;
->> >>      v->visitor.start_struct =3D qobject_input_start_struct;
->> >>      v->visitor.check_struct =3D qobject_input_check_struct;
->> >> -    v->visitor.end_struct =3D qobject_input_pop;
->> >> +    v->visitor.end_struct =3D qobject_input_end_struct;
->> >>      v->visitor.start_list =3D qobject_input_start_list;
->> >>      v->visitor.next_list =3D qobject_input_next_list;
->> >>      v->visitor.check_list =3D qobject_input_check_list;
->> >> -    v->visitor.end_list =3D qobject_input_pop;
->> >> +    v->visitor.end_list =3D qobject_input_end_list;
->> >>      v->visitor.start_alternate =3D qobject_input_start_alternate;
->> >>      v->visitor.optional =3D qobject_input_optional;
->> >>      v->visitor.free =3D qobject_input_free;
->> >> --
->> >> 2.7.4
->> >>
->> >>
->> >> --
->> > Marc-Andr=C3=A9 Lureau
->>
+> qemu: hardware error: icp_control_write: Bad offset 789688
+>
+> CPU #0:
+> R00=00000000 R01=cb789688 R02=00000000 R03=00000000
+> R04=00109a0c R05=00000505 R06=00000606 R07=00000707
+> R08=00000808 R09=00000909 R10=00001010 R11=0010c46c
+> R12=0000000a R13=0007e000 R14=00000028 R15=00000004
+> PSR=600001db -ZC- A und32
+
+Looks like your guest tried to write to address
+0xcb789688, which is either part of a device we
+don't emulate, or more likely just a bogus address.
+(you can see that value in register r01 matching up
+with the offset in the error message).
+Your guest is probably buggy and I suggest debugging
+why it's writing there.
+
+thanks
+-- PMM
