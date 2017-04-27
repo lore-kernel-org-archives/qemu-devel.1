@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d3hy7-0001KZ-VQ
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d3hyc-0001lb-T8
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1d3hy6-0007HL-Vf
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:20 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1d3hy6-0007H5-On
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:18 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id l9so15675386wre.1
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 04:52:18 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1d3hyY-0007QD-V5
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3hyY-0007Pm-M3
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:52:46 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8328B7F4AF
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 11:52:45 +0000 (UTC)
+Date: Thu, 27 Apr 2017 12:52:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170427115239.GE2082@work-vm>
+References: <20170425220451.6028-1-quintela@redhat.com>
+	<20170425220451.6028-26-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <tencent_0B0C9551621D40450A004D34@qq.com>
-References: <tencent_0B0C9551621D40450A004D34@qq.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Apr 2017 12:51:56 +0100
-Message-ID: <CAFEAcA_SX0HNMbSf-yN1Hs99RHz_ff1ieFj8i-qnWb+CAvCMHw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] qemu integrator hardware error: icp_control_write:
- Bad offset 789688
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170425220451.6028-26-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 25/41] migration: Export rdma.c functions
+ in its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +34,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: heavybird <4345099@qq.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 27 April 2017 at 04:23, heavybird <4345099@qq.com> wrote:
-> Hi Peter,
->
-> I am using your qemu integrator to debug my application but it encouters the
-> exception below, i have no idea to figure out the message below. could you
-> give me some suggestion or show me some document to get out this issues?? i
-> noticed there is trace option in the qeumu, but don't know how to use it
-> more efficently.
->
-> thanks.
-> jason
->
-> qemu: hardware error: icp_control_write: Bad offset 789688
->
-> CPU #0:
-> R00=00000000 R01=cb789688 R02=00000000 R03=00000000
-> R04=00109a0c R05=00000505 R06=00000606 R07=00000707
-> R08=00000808 R09=00000909 R10=00001010 R11=0010c46c
-> R12=0000000a R13=0007e000 R14=00000028 R15=00000004
-> PSR=600001db -ZC- A und32
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  include/migration/migration.h |  4 ----
+>  migration/migration.c         |  1 +
+>  migration/rdma.c              |  1 +
+>  migration/rdma.h              | 22 ++++++++++++++++++++++
+>  4 files changed, 24 insertions(+), 4 deletions(-)
+>  create mode 100644 migration/rdma.h
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 38ba508..9063c32 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -180,10 +180,6 @@ void qemu_start_incoming_migration(const char *uri, Error **errp);
+>  
+>  uint64_t migrate_max_downtime(void);
+>  
+> -void rdma_start_outgoing_migration(void *opaque, const char *host_port, Error **errp);
+> -
+> -void rdma_start_incoming_migration(const char *host_port, Error **errp);
+> -
+>  void migrate_fd_error(MigrationState *s, const Error *error);
+>  
+>  void migrate_fd_connect(MigrationState *s);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ef966ca..394930d 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -22,6 +22,7 @@
+>  #include "fd.h"
+>  #include "socket.h"
+>  #include "ram.h"
+> +#include "rdma.h"
+>  #include "migration/migration.h"
+>  #include "savevm.h"
+>  #include "qemu-file-channel.h"
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index 96a90dd..f8fea9b 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -17,6 +17,7 @@
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+>  #include "qemu/cutils.h"
+> +#include "rdma.h"
+>  #include "migration/migration.h"
+>  #include "qemu-file.h"
+>  #include "ram.h"
+> diff --git a/migration/rdma.h b/migration/rdma.h
+> new file mode 100644
+> index 0000000..d2cf481
+> --- /dev/null
+> +++ b/migration/rdma.h
+> @@ -0,0 +1,22 @@
+> +/*
+> + * QEMU migration rdma functions
+> + *
+> + * Copyright IBM, Corp. 2008
+> + *
+> + * Authors:
+> + *  Anthony Liguori   <aliguori@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#ifndef QEMU_MIGRATION_RDMA_H
+> +#define QEMU_MIGRATION_RDMA_H
+> +
+> +void rdma_start_outgoing_migration(void *opaque, const char *host_port,
+> +                                   Error **errp);
+> +
+> +void rdma_start_incoming_migration(const char *host_port, Error **errp);
+> +
+> +#endif
 
-Looks like your guest tried to write to address
-0xcb789688, which is either part of a device we
-don't emulate, or more likely just a bogus address.
-(you can see that value in register r01 matching up
-with the offset in the error message).
-Your guest is probably buggy and I suggest debugging
-why it's writing there.
+As said before, I still don't think there's any point in having each of these
+transports in their own header.
 
-thanks
--- PMM
+However, I think the other problem is the Authors is wrong, both of these lines
+come from 2da776db484 which is Michael Hines.
+
+Dave
+
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
