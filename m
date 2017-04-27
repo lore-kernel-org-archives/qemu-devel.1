@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3bq3-0000mN-Cq
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:38 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3bq8-0000oF-DK
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3bq0-0002Xb-Dw
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52932)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3bq5-0002YG-7e
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50664)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1d3bq0-0002X0-4h
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:32 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1d3bq4-0002Y3-VR
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:37 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3R5Ick9003722
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:19:31 -0400
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2wj3xmgt-1
+	v3R5IeaX092443
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:19:35 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2vajtwwc-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:19:30 -0400
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:19:35 -0400
 Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 27 Apr 2017 15:19:28 +1000
+	Thu, 27 Apr 2017 15:19:30 +1000
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Thu, 27 Apr 2017 10:48:20 +0530
+Date: Thu, 27 Apr 2017 10:48:21 +0530
 In-Reply-To: <20170427051824.30194-1-nikunj@linux.vnet.ibm.com>
 References: <20170427051824.30194-1-nikunj@linux.vnet.ibm.com>
-Message-Id: <20170427051824.30194-3-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 2/6] cputlb: handle first atomic write to
- the page
+Message-Id: <20170427051824.30194-4-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 3/6] target/ppc: Generate fence operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,35 +40,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Cc: qemu-devel@nongnu.org, rth@twiddle.net, alex.bennee@linaro.org, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
 
-In case where the conditional write is the first write to the page,
-TLB_NOTDIRTY will be set and stop_the_world is triggered. Handle this as
-a special case and set the dirty bit. After that fall through to the
-actual atomic instruction below.
-
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- cputlb.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ target/ppc/translate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/cputlb.c b/cputlb.c
-index f5d056c..743776a 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -930,7 +930,13 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-         tlb_addr = tlbe->addr_write;
-     }
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 50b6d4d..4a1f24a 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -2971,6 +2971,7 @@ static void gen_stswx(DisasContext *ctx)
+ /* eieio */
+ static void gen_eieio(DisasContext *ctx)
+ {
++    tcg_gen_mb(TCG_MO_LD_ST | TCG_BAR_SC);
+ }
  
--    /* Notice an IO access, or a notdirty page.  */
-+    /* Check notdirty */
-+    if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
-+        tlb_set_dirty(ENV_GET_CPU(env), addr);
-+        tlb_addr = tlb_addr & ~TLB_NOTDIRTY;
-+    }
+ #if !defined(CONFIG_USER_ONLY)
+@@ -3008,6 +3009,7 @@ static void gen_isync(DisasContext *ctx)
+     if (!ctx->pr) {
+         gen_check_tlb_flush(ctx, false);
+     }
++    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+     gen_stop_exception(ctx);
+ }
+ 
+@@ -3028,6 +3030,7 @@ static void gen_##name(DisasContext *ctx)                            \
+     tcg_gen_qemu_ld_tl(gpr, t0, ctx->mem_idx, memop);                \
+     tcg_gen_mov_tl(cpu_reserve, t0);                                 \
+     tcg_gen_mov_tl(cpu_reserve_val, gpr);                            \
++    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);                           \
+     tcg_temp_free(t0);                                               \
+ }
+ 
+@@ -3177,6 +3180,10 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+     tcg_gen_br(l2);
+ 
+     gen_set_label(l1);
 +
-+    /* Notice an IO access  */
-     if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
-         /* There's really nothing that can be done to
-            support this apart from stop-the-world.  */
++    /* Address mismatch implies failure.  But we still need to provide the
++       memory barrier semantics of the instruction.  */
++    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+     tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
+ 
+     gen_set_label(l2);
+@@ -3308,6 +3315,7 @@ static void gen_sync(DisasContext *ctx)
+     if (((l == 2) || !(ctx->insns_flags & PPC_64B)) && !ctx->pr) {
+         gen_check_tlb_flush(ctx, true);
+     }
++    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+ }
+ 
+ /* wait */
 -- 
 2.9.3
