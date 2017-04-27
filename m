@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d3j0V-0006Gw-TW
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:58:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3j2b-0007Mu-9L
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:01:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d3j0S-0001Uj-11
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:58:52 -0400
-Resent-Message-Id: <E1d3j0S-0001Uj-11@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d3j0R-0001UX-PK
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:58:47 -0400
-In-Reply-To: <20170427120006.20564-1-rth@twiddle.net>
-Message-ID: <149329791714.111.18164819750283118507@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 27 Apr 2017 05:58:37 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 00/19] TCG cross-tb optimizations
+	(envelope-from <armbru@redhat.com>) id 1d3j2X-0002HU-1N
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 09:01:01 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 27 Apr 2017 15:00:53 +0200
+Message-Id: <1493298053-17140-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH] replication: Make --disable-replication
+ compile again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +18,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
+To: qemu-devel@nongnu.org
+Cc: zhangchen.fnst@cn.fujitsu.com, wencongyang@gmail.com, zhang.zhanghailiang@huawei.com, qemu-stable@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2NSAwMC8xOV0gVENHIGNyb3NzLXRiIG9wdGltaXphdGlvbnMKTWVzc2Fn
-ZS1pZDogMjAxNzA0MjcxMjAwMDYuMjA1NjQtMS1ydGhAdHdpZGRsZS5uZXQKVHlwZTogc2VyaWVz
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
-dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2Vm
-dWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
-cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
-byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
-YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
-Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkZDAwZmYzIHRjZy9zMzkwOiBJ
-bXBsZW1lbnQgZ290b19wdHIKN2EzYmIzYiB0Y2cvc3BhcmM6IEltcGxlbWVudCBnb3RvX3B0cgpk
-MGZhZjNkIHRjZy9hYXJjaDY0OiBJbXBsZW1lbnQgZ290b19wdHIKM2U0YTNjOCB0Y2cvcHBjOiBJ
-bXBsZW1lbnQgZ290b19wdHIKNDIwMzI4NiB0Y2cvaTM4NjogaW1wbGVtZW50IGdvdG9fcHRyCjFh
-YjFiYzAgdGFyZ2V0L2FscGhhOiBVc2UgdGNnX2dlbl9nb3RvX3B0cgphYTc0YzJiIHRiLWhhc2g6
-IGltcHJvdmUgdGJfam1wX2NhY2hlIGhhc2ggZnVuY3Rpb24gaW4gdXNlciBtb2RlCjYyM2M0NjQg
-dGFyZ2V0L2kzODY6IG9wdGltaXplIGluZGlyZWN0IGJyYW5jaGVzCjgyNjVmMTUgdGFyZ2V0L2kz
-ODY6IG9wdGltaXplIGNyb3NzLXBhZ2UgZGlyZWN0IGp1bXBzIGluIHNvZnRtbXUKZTU3YjQxOSB0
-YXJnZXQvaTM4NjogaW50cm9kdWNlIGdlbl9qciBoZWxwZXIgdG8gZ2VuZXJhdGUgbG9va3VwX2Fu
-ZF9nb3RvX3B0cgpmNmY0NmY1IHRhcmdldC9hcm06IG9wdGltaXplIGluZGlyZWN0IGJyYW5jaGVz
-CmUzYTk1OWUgdGFyZ2V0L2FybTogb3B0aW1pemUgY3Jvc3MtcGFnZSBkaXJlY3QganVtcHMgaW4g
-c29mdG1tdQo1ODBiMGVmIHRjZzogZXhwb3J0IHRjZ19nZW5fbG9va3VwX2FuZF9nb3RvX3B0cgox
-MmFiNzQ5IHRjZzogaW50cm9kdWNlIGdvdG9fcHRyIG9wY29kZQowYmJmOTY1IHRjZy1ydW50aW1l
-OiBhZGQgbG9va3VwX3RiX3B0ciBoZWxwZXIKNmUyZDQ5YyBleGVjLWFsbDogZXhwb3J0IHRiX2h0
-YWJsZV9sb29rdXAKYjBiZTE0YyBxZW11L2F0b21pYzogTG9vc2VuIHJlc3RyaWN0aW9ucyBmb3Ig
-NjQtYml0IElMUDMyIGhvc3RzCjk5YmQ3N2IgdGNnL3NwYXJjOiBVc2UgdGhlIHByb3BlciBjb21w
-aWxhdGlvbiBmbGFncyBmb3IgMzItYml0CmYwZTVjNjIgdGFyZ2V0L25pb3MyOiBGaXggNjQtYml0
-IGlscDMyIGNvbXBpbGF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
-LzE5OiB0YXJnZXQvbmlvczI6IEZpeCA2NC1iaXQgaWxwMzIgY29tcGlsYXRpb24uLi4KQ2hlY2tp
-bmcgUEFUQ0ggMi8xOTogdGNnL3NwYXJjOiBVc2UgdGhlIHByb3BlciBjb21waWxhdGlvbiBmbGFn
-cyBmb3IgMzItYml0Li4uCkNoZWNraW5nIFBBVENIIDMvMTk6IHFlbXUvYXRvbWljOiBMb29zZW4g
-cmVzdHJpY3Rpb25zIGZvciA2NC1iaXQgSUxQMzIgaG9zdHMuLi4KV0FSTklORzogYXJjaGl0ZWN0
-dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzMzOiBGSUxFOiBpbmNsdWRl
-L3FlbXUvYXRvbWljLmg6MTA0OgorI2lmIGRlZmluZWQoX194ODZfNjRfXykgfHwgZGVmaW5lZChf
-X3NwYXJjX18pCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDg3IGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNC8x
-OTogZXhlYy1hbGw6IGV4cG9ydCB0Yl9odGFibGVfbG9va3VwLi4uCkNoZWNraW5nIFBBVENIIDUv
-MTk6IHRjZy1ydW50aW1lOiBhZGQgbG9va3VwX3RiX3B0ciBoZWxwZXIuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNi8xOTogdGNnOiBpbnRyb2R1Y2UgZ290b19wdHIgb3Bjb2RlLi4uCkNoZWNraW5nIFBBVENI
-IDcvMTk6IHRjZzogZXhwb3J0IHRjZ19nZW5fbG9va3VwX2FuZF9nb3RvX3B0ci4uLgpDaGVja2lu
-ZyBQQVRDSCA4LzE5OiB0YXJnZXQvYXJtOiBvcHRpbWl6ZSBjcm9zcy1wYWdlIGRpcmVjdCBqdW1w
-cyBpbiBzb2Z0bW11Li4uCkNoZWNraW5nIFBBVENIIDkvMTk6IHRhcmdldC9hcm06IG9wdGltaXpl
-IGluZGlyZWN0IGJyYW5jaGVzLi4uCkNoZWNraW5nIFBBVENIIDEwLzE5OiB0YXJnZXQvaTM4Njog
-aW50cm9kdWNlIGdlbl9qciBoZWxwZXIgdG8gZ2VuZXJhdGUgbG9va3VwX2FuZF9nb3RvX3B0ci4u
-LgpDaGVja2luZyBQQVRDSCAxMS8xOTogdGFyZ2V0L2kzODY6IG9wdGltaXplIGNyb3NzLXBhZ2Ug
-ZGlyZWN0IGp1bXBzIGluIHNvZnRtbXUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTk6IHRhcmdldC9p
-Mzg2OiBvcHRpbWl6ZSBpbmRpcmVjdCBicmFuY2hlcy4uLgpDaGVja2luZyBQQVRDSCAxMy8xOTog
-dGItaGFzaDogaW1wcm92ZSB0Yl9qbXBfY2FjaGUgaGFzaCBmdW5jdGlvbiBpbiB1c2VyIG1vZGUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTk6IHRhcmdldC9hbHBoYTogVXNlIHRjZ19nZW5fZ290b19w
-dHIuLi4KRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5v
-dCByZXF1aXJlZAojMzE6IEZJTEU6IHRhcmdldC9hbHBoYS90cmFuc2xhdGUuYzo0NjU6CisgICAg
-cmV0dXJuICgoY3R4LT50Yi0+Y2ZsYWdzICYgQ0ZfTEFTVF9JTykKCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgMTEzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE1LzE5OiB0Y2cvaTM4NjogaW1wbGVtZW50IGdv
-dG9fcHRyLi4uCkNoZWNraW5nIFBBVENIIDE2LzE5OiB0Y2cvcHBjOiBJbXBsZW1lbnQgZ290b19w
-dHIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMTk6IHRjZy9hYXJjaDY0OiBJbXBsZW1lbnQgZ290b19w
-dHIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMTk6IHRjZy9zcGFyYzogSW1wbGVtZW50IGdvdG9fcHRy
-Li4uCkNoZWNraW5nIFBBVENIIDE5LzE5OiB0Y2cvczM5MDogSW1wbGVtZW50IGdvdG9fcHRyLi4u
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
-bGlzdHMub3Jn
+Broken in commit daa33c5.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ migration/colo.c | 12 ++++++++++++
+ monitor.c        |  5 +++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/migration/colo.c b/migration/colo.c
+index c19eb3f..963c802 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -153,6 +153,7 @@ void qmp_xen_set_replication(bool enable, bool primary,
+                              bool has_failover, bool failover,
+                              Error **errp)
+ {
++#ifdef CONFIG_REPLICATION
+     ReplicationMode mode = primary ?
+                            REPLICATION_MODE_PRIMARY :
+                            REPLICATION_MODE_SECONDARY;
+@@ -171,10 +172,14 @@ void qmp_xen_set_replication(bool enable, bool primary,
+         }
+         replication_stop_all(failover, failover ? NULL : errp);
+     }
++#else
++    abort();
++#endif
+ }
+ 
+ ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
+ {
++#ifdef CONFIG_REPLICATION
+     Error *err = NULL;
+     ReplicationStatus *s = g_new0(ReplicationStatus, 1);
+ 
+@@ -189,11 +194,18 @@ ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
+ 
+     error_free(err);
+     return s;
++#else
++    abort();
++#endif
+ }
+ 
+ void qmp_xen_colo_do_checkpoint(Error **errp)
+ {
++#ifdef CONFIG_REPLICATION
+     replication_do_checkpoint_all(errp);
++#else
++    abort();
++#endif
+ }
+ 
+ static void colo_send_message(QEMUFile *f, COLOMessage msg,
+diff --git a/monitor.c b/monitor.c
+index 6289e52..62c9f81 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -974,6 +974,11 @@ static void qmp_unregister_commands_hack(void)
+ #ifndef CONFIG_SPICE
+     qmp_unregister_command(&qmp_commands, "query-spice");
+ #endif
++#ifndef CONFIG_REPLICATION
++    qmp_unregister_command(&qmp_commands, "xen-set-replication");
++    qmp_unregister_command(&qmp_commands, "query-xen-replication-status");
++    qmp_unregister_command(&qmp_commands, "xen-colo-do-checkpoint");
++#endif
+ #ifndef TARGET_I386
+     qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+ #endif
+-- 
+2.7.4
