@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d3bNz-0003Jx-CX
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 00:50:36 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3bpz-0000l2-6l
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d3bNu-0006bF-II
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 00:50:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51148)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d3bNu-0006ae-Bx
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 00:50:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 04F4C81240
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 04:50:29 +0000 (UTC)
-References: <194bfbef-efad-0f2e-457c-84533e66fdb5@redhat.com>
-	<1493097407-20482-1-git-send-email-thuth@redhat.com>
-	<e95a7963-875b-efa8-95ee-f89bc6151bee@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <496789c6-2c3b-8430-7375-91e8aadf938c@redhat.com>
-Date: Thu, 27 Apr 2017 06:50:19 +0200
-MIME-Version: 1.0
-In-Reply-To: <e95a7963-875b-efa8-95ee-f89bc6151bee@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="4SIxVG8RMrIGoJ0W6ps8Jxk1lcADE5Oif"
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] tests: Add a tester for HMP commands
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d3bpw-0002Ug-38
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33659)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1d3bpv-0002U2-Q0
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 01:19:27 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3R5IdUS135667
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:19:26 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2xcmb7xg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 01:19:26 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Thu, 27 Apr 2017 15:19:23 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Thu, 27 Apr 2017 10:48:18 +0530
+Message-Id: <20170427051824.30194-1-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 0/6] The series enables Multi-Threaded TCG
+ on PPC64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, alex.bennee@linaro.org, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4SIxVG8RMrIGoJ0W6ps8Jxk1lcADE5Oif
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Patch 01: Use atomic_cmpxchg in store conditional
+      02: Handle first write to page during atomic operation
+      03: Generate memory barriers for sync/isync and load/store conditional
+      04: Fix CPU unplug in MTTCG
+      05: Enable MTTCG by default on PPC64
+      06: Fixes a bug in PPC where the reservation is reset 
+          causing atomic operations to never succeed 
 
-On 25.04.2017 15:22, Eric Blake wrote:
-> On 04/25/2017 12:16 AM, Thomas Huth wrote:
->> HMP commands do not get any automatic testing yet, so on certain
->> QEMU machines, some HMP commands were causing crashes in the past.
->> Thus we should test HMP commands in our test suite, too, to avoid
->> that such problems creep in again in the future.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  v3:
->>  - Fixed the stupid "!strcmp() =3D=3D 0" problem
->=20
-> That's why libvirt prefers the use of a STREQ() macro (it's easier to
-> read STREQ(a,b) than it is to remember if !strcmp(a,b) has the right
-> semantics).  But switching the code base to use such a nice wrapper
-> would be a task for Coccinelle, if we wanted it.
+Patches are based on ppc-for-2.10
 
-I just saw that glib seems also to have a g_str_equal() function ... I
-guess we could use that in QEMU instead. I'll try to remember that for
-future code that I write ...
+Changelog:
+v2: 
+* David found problem related to clang and "make check" that was 
+  root caused to a tcg bug and the patch is in mainline:
 
- Thomas
+  79b1af9 tcg: Initialize return value after exit_atomic
 
+* Fixed a bug in ppc_cpu_exec_enter(), which was resetting the 
+  reserve_addr, this should be done in powerpc_excp()
 
+v1:
+* Rewrote store_conditional as suggested by Richard
 
---4SIxVG8RMrIGoJ0W6ps8Jxk1lcADE5Oif
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Bharata B Rao (1):
+  cpus: Fix CPU unplug for MTTCG
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
+Nikunj A Dadhania (5):
+  target/ppc: Emulate LL/SC using cmpxchg helpers
+  cputlb: handle first atomic write to the page
+  target/ppc: Generate fence operations
+  tcg: enable MTTCG by default for PPC64 on x86
+  target/ppc: do not reset reserve_addr in exec_enter
 
-iQIcBAEBAgAGBQJZAXiQAAoJEC7Z13T+cC21Jp8P/141RA7g4AMxPld4/emffeZR
-8UGm4w++KY9veySuCWVPqd0L+Ua/yUO7NMDY3HZFCvdBDaFNIzJ7enJGahgwkqh4
-GuaE9rw2EgM4uRvTWGF2j4dbHdjXCuHRWgPQFTaJ6SYUs3IIgJ2HUfTRELRKW5df
-7erxaMjpsCMVSKbggcQPzzwIt0xk0j60OcakhYjLFvrSq3yLUaX98m4wl4ODGMkH
-pzhj0CMUJrUEKRGoVJ4iOWlJ5PRYko6vAQPEoFBWn1Qj2+9nyYQPOszH2vmtYauM
-AeTeSpDZ9XT9alwEjdUw2LfmZdzVPrhSZlBga+ZQO4UA1U3teIh6hUjjp6Lkc8Xa
-8LZqbJLomtUKzWzFZN2enmgBhuv2FC9ShFSpNGWoZFz0XpYeOu9aFMW8TogIeYQr
-ELcUfzPc4zEMJt/G6B/86EaPqYrSTH2EFHnOUKKkF5swcrs8lvqdC0gctDC9bqy2
-XwLkZPfa0Q5Tkru1DH5W2FkNifsG5gmI32BsY6WGjXE5jNId1llGFVSQfse1sVep
-l2Al2zn1oVFHVDVP8jEB/OWQQ9a3ogirWXARwLH2fCGYk3fZyTlQI+bWnpBQ0H1X
-ydbZQhubj8SfpZuhy+KP2w68qzHDhwUkhc5+CvvL2AE8747C/nseNLERRqnUD0mq
-aT/TgkXUu/3JhTOMi9U3
-=usJs
------END PGP SIGNATURE-----
+ configure                   |  2 ++
+ cpus.c                      |  6 ++++++
+ cputlb.c                    |  8 +++++++-
+ target/ppc/cpu.h            |  2 ++
+ target/ppc/excp_helper.c    |  3 +++
+ target/ppc/translate.c      | 37 +++++++++++++++++++++++++++++++------
+ target/ppc/translate_init.c |  9 ---------
+ 7 files changed, 51 insertions(+), 16 deletions(-)
 
---4SIxVG8RMrIGoJ0W6ps8Jxk1lcADE5Oif--
+-- 
+2.9.3
