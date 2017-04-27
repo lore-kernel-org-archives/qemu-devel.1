@@ -1,14 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3drD-0007jn-BL
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:28:56 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3ds5-00004v-I8
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d3drA-0005DX-8V
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:28:55 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 27 Apr 2017 17:28:39 +1000
-Message-Id: <20170427072843.8089-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv3 0/4] Clean up compatibility mode handling
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3ds4-0005t4-Qo
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 03:29:49 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170427072612.GM9205@lemon.lan>
+References: <1493150351-28918-1-git-send-email-ashijeetacharya@gmail.com>
+	<1493150351-28918-4-git-send-email-ashijeetacharya@gmail.com>
+	<5e859188-5072-ab41-c10a-82c0182406cc@redhat.com>
+	<20170427072612.GM9205@lemon.lan>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Thu, 27 Apr 2017 12:59:45 +0530
+Message-ID: <CAC2QTZaEJL-jRt-UgnLwff6g_LizsD-XJ2paDoSvKPVGid-Zyw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v1 3/8] dmg: Limit the output buffer size
+ to a max of 2MB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,141 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
-Cc: agraf@suse.de, abologna@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Fam Zheng <famz@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Peter Wu <peter@lekensteyn.nl>
 
-This is a rebased and revised version of my patches revising CPU
-compatiblity mode handling on ppc, last posted in November.  Since
-then, many of the patches have already been merged (some for 2.9, some
-since).  This is what's left.
+On Thu, Apr 27, 2017 at 12:56 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Wed, 04/26 17:30, John Snow wrote:
+>> Seems OK otherwise, but I would normally expect you to fix the buffering
+>> problems first, and then reduce the size of the buffer -- not the other
+>> way around. This version introduces new limitations that didn't exist
+>> previously (As of this commit, QEMU can't open DMG files with chunks
+>> larger than 2MB now, right?)
+>
+> Yes, each commit should _not_ introduce issues (compiling failures, functional
+> degeneration, etc.), and cannot rely on following commits to fix things screwed
+> up in this one.
+>
+> This is important for bisectability - each commit can be built and tested in the
+> whole git history.
 
- * There was conceptual confusion about what a compatibility mode
-   means, and how it interacts with the machine type.  This cleans
-   that up, clarifying that a compatibility mode (as an externally set
-   option) only makes sense on machine types that don't permit the
-   guest hypervisor privilege (i.e. 'pseries')
+Yes, understood. That's why I am gonna squash it with the last patch
+(patch 8) which removes this limitation completely.
 
- * It was previously the user's (or management layer's) responsibility
-   to determine compatibility of CPUs on either end for migration.
-   This uses the compatibility modes to check that properly during an
-   incoming migration.
-
-This hasn't been extensively tested yet.  There are quite a few
-migration cases to consider, for example:
-
-Basic:
-
-1) Boot guest with -cpu host
-        Should go into POWER8 compat mode after CAS
-        Previously would have been raw mode
-
-2) Boot guest with -machine pseries,max-cpu-compat=power7 -cpu host
-        Should go into POWER7 compat mode
-
-3) Boot guest with -cpu host,compat=power7
-        Should act as (2), but print a warning
-
-4) Boot guest via libvirt with power7 compat mode specified in XML
-        Should act as (3), (2) once we fix libvirt
-
-5) Hack guest to only advertise power7 compatibility, boot with -cpu host
-        Should go into POWER7 compat mode after CAS
-
-6) Hack guest to only advertise real PVRs
-        Should remain in POWER8 raw mode after CAS
-
-7) Hack guest to only advertise real PVRs
-   Boot with -machine pseries,max-cpu-compat=power8
-        Should fail at CAS time
-
-8) Hack guest to only advertise power7 compatibility, boot with -cpu host
-   Reboot to normal guest
-        Should go to power7 compat mode after CAS of boot 1
-        Should revert to raw mode on reboot
-        SHould go to power8 compat mode after CAS of boot 2
-
-Migration:
-
-9) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
-   Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
-        Should work, end up running in power8 raw mode
-
-10) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
-        Should work, end up running in power8 raw mode
-
-11) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=power7
-        Should work, be running in POWER7 compat after, but give warning like
-        (3)
-
-12) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=power7 -cpu host
-        Should work, be running in POWER7 compat after, no warning
-
-13) Boot to SLOF with qemu-2.6 -machine pseries-2.6 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
-
-        ?
-
-14) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
-        ?
-
-15) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=power7
-        ?
-
-16) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=power7 -cpu host
-        ?
-
-17) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
-    Migrate to qemu-2.7.z -machine pseries-2.6 -cpu host
-        Should work
-
-18) Hack guest to only advertise power7 compatibility, boot with -cpu host
-    Boot with qemu-2.8, migrate to qemu-2.8
-        Should be in power7 compat mode after CAS on source, and still
-        in power7 compat mode on destination
-
-
-Changes since RFCv2:
-  * Many patches dropped, since they're already merged
-  * Rebased, fixed conflicts
-  * Restored support for backwards migration (wasn't as complicated as
-    I thought)
-  * Updated final patch's description to more accurately reflect the
-    logic
-
-Changes since RFCv1:
-  * Change CAS logic to prefer compatibility modes over raw mode
-  * Simplified by giving up on half-hearted attempts to maintain
-    backwards migration
-  * Folded migration stream changes into a single patch
-  * Removed some preliminary patches which are already merged
-
-
-
-David Gibson (3):
-  pseries: Move CPU compatibility property to machine
-  pseries: Reset CPU compatibility mode
-  ppc: Rework CPU compatibility testing across migration
-
-Greg Kurz (1):
-  qapi: add explicit null to string input and output visitors
-
- hw/ppc/spapr.c               |  8 ++++-
- hw/ppc/spapr_cpu_core.c      | 47 +++++++++++++++++++------
- hw/ppc/spapr_hcall.c         |  2 +-
- include/hw/ppc/spapr.h       | 12 ++++---
- qapi/string-input-visitor.c  | 11 ++++++
- qapi/string-output-visitor.c | 14 ++++++++
- target/ppc/compat.c          | 65 ++++++++++++++++++++++++++++++++++
- target/ppc/cpu.h             |  6 ++--
- target/ppc/machine.c         | 71 +++++++++++++++++++++++++++++++++++--
- target/ppc/translate_init.c  | 84 ++++++++++++--------------------------------
- 10 files changed, 238 insertions(+), 82 deletions(-)
-
--- 
-2.9.3
+Ashijeet
