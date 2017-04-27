@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34092)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1d3onL-0001VO-De
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:09:40 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36432)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1d3ozd-0003fq-GB
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:22:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1d3onI-0001gh-Ei
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:09:39 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:58862 helo=mx01.kamp.de)
+	(envelope-from <eblake@redhat.com>) id 1d3ozZ-0006YT-G9
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:22:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43866)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1d3onI-0001fs-57
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:09:36 -0400
-From: Peter Lieven <pl@kamp.de>
-Message-Id: <BF634842-A623-4A75-BA50-E3EF5133C714@kamp.de>
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Date: Thu, 27 Apr 2017 21:09:33 +0200
-In-Reply-To: <1493195595-4809-1-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1493195595-4809-1-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH v3 1/1] qemu-img: wait for
- convert coroutines to complete
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d3ozZ-0006XB-7q
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:22:17 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 27 Apr 2017 14:22:07 -0500
+Message-Id: <20170427192211.30640-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] event: Add source information to
+ SHUTDOWN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +22,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, den@virtuozzo.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com
 
+v2 was here:
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg03185.html
 
-> Am 26.04.2017 um 10:33 schrieb Anton Nefedov =
-<anton.nefedov@virtuozzo.com>:
->=20
-> On error path (like i/o error in one of the coroutines), it's required =
-to
->  - wait for coroutines completion before cleaning the common =
-structures
->  - reenter dependent coroutines so they ever finish
->=20
-> Introduced in 2d9187bc65.
->=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
-> qemu-img.c | 26 +++++++++++---------------
-> 1 file changed, 11 insertions(+), 15 deletions(-)
->=20
-> diff --git a/qemu-img.c b/qemu-img.c
-> index bbe1574..8c50379 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1761,13 +1761,13 @@ static void coroutine_fn =
-convert_co_do_copy(void *opaque)
->         qemu_co_mutex_lock(&s->lock);
->         if (s->ret !=3D -EINPROGRESS || s->sector_num >=3D =
-s->total_sectors) {
->             qemu_co_mutex_unlock(&s->lock);
-> -            goto out;
-> +            break;
->         }
->         n =3D convert_iteration_sectors(s, s->sector_num);
->         if (n < 0) {
->             qemu_co_mutex_unlock(&s->lock);
->             s->ret =3D n;
-> -            goto out;
-> +            break;
->         }
->         /* save current sector and allocation status to local =
-variables */
->         sector_num =3D s->sector_num;
-> @@ -1792,7 +1792,6 @@ static void coroutine_fn convert_co_do_copy(void =
-*opaque)
->                 error_report("error while reading sector %" PRId64
->                              ": %s", sector_num, strerror(-ret));
->                 s->ret =3D ret;
-> -                goto out;
->             }
->         } else if (!s->min_sparse && status =3D=3D BLK_ZERO) {
->             status =3D BLK_DATA;
-> @@ -1801,22 +1800,20 @@ static void coroutine_fn =
-convert_co_do_copy(void *opaque)
->=20
->         if (s->wr_in_order) {
->             /* keep writes in order */
-> -            while (s->wr_offs !=3D sector_num) {
-> -                if (s->ret !=3D -EINPROGRESS) {
-> -                    goto out;
-> -                }
-> +            while (s->wr_offs !=3D sector_num && s->ret =3D=3D =
--EINPROGRESS) {
->                 s->wait_sector_num[index] =3D sector_num;
->                 qemu_coroutine_yield();
->             }
->             s->wait_sector_num[index] =3D -1;
->         }
->=20
-> -        ret =3D convert_co_write(s, sector_num, n, buf, status);
-> -        if (ret < 0) {
-> -            error_report("error while writing sector %" PRId64
-> -                         ": %s", sector_num, strerror(-ret));
-> -            s->ret =3D ret;
-> -            goto out;
-> +        if (s->ret =3D=3D -EINPROGRESS) {
-> +            ret =3D convert_co_write(s, sector_num, n, buf, status);
-> +            if (ret < 0) {
-> +                error_report("error while writing sector %" PRId64
-> +                             ": %s", sector_num, strerror(-ret));
-> +                s->ret =3D ret;
-> +            }
->         }
->=20
->         if (s->wr_in_order) {
-> @@ -1837,7 +1834,6 @@ static void coroutine_fn convert_co_do_copy(void =
-*opaque)
->         }
->     }
->=20
-> -out:
->     qemu_vfree(buf);
->     s->co[index] =3D NULL;
->     s->running_coroutines--;
-> @@ -1899,7 +1895,7 @@ static int convert_do_copy(ImgConvertState *s)
->         qemu_coroutine_enter(s->co[i]);
->     }
->=20
-> -    while (s->ret =3D=3D -EINPROGRESS) {
-> +    while (s->running_coroutines) {
->         main_loop_wait(false);
->     }
->=20
-> --=20
-> 2.7.4
->=20
->=20
+Since then:
+- turn it from one patch into a series
+- update iotests to pass (the combination of -qcow2, -file, and -nbd
+is sufficient to cover all the changed tests)
+- add cleanup patch to shutdown_signal initial value
+- use enum rather than bool to make callers more legible
+- add RFC patch to expose enum rather than bool over QMP
 
-Reviewed-by: Peter Lieven <pl@kamp.de <mailto:pl@kamp.de>>
+Eric Blake (4):
+  shutdown: Simplify shutdown_signal
+  shutdown: Prepare for use of an enum in reset/shutdown_request
+  shutdown: Add source information to SHUTDOWN and RESET
+  RFC: shutdown: Expose full ShutdownType across QMP
 
-Peter
+ qapi-schema.json            | 26 ++++++++++++++++++++
+ qapi/event.json             | 12 ++++++----
+ include/sysemu/sysemu.h     |  6 ++---
+ vl.c                        | 58 ++++++++++++++++++++++++++-------------------
+ hw/acpi/core.c              |  4 ++--
+ hw/arm/highbank.c           |  4 ++--
+ hw/arm/integratorcp.c       |  2 +-
+ hw/arm/musicpal.c           |  2 +-
+ hw/arm/omap1.c              |  6 ++---
+ hw/arm/omap2.c              |  2 +-
+ hw/arm/spitz.c              |  2 +-
+ hw/arm/stellaris.c          |  2 +-
+ hw/arm/tosa.c               |  2 +-
+ hw/i386/pc.c                |  2 +-
+ hw/i386/xen/xen-hvm.c       | 11 +++++----
+ hw/input/pckbd.c            |  4 ++--
+ hw/ipmi/ipmi.c              |  4 ++--
+ hw/isa/lpc_ich9.c           |  2 +-
+ hw/mips/boston.c            |  2 +-
+ hw/mips/mips_malta.c        |  2 +-
+ hw/mips/mips_r4k.c          |  4 ++--
+ hw/misc/arm_sysctl.c        |  8 +++----
+ hw/misc/cbus.c              |  2 +-
+ hw/misc/macio/cuda.c        |  4 ++--
+ hw/misc/slavio_misc.c       |  4 ++--
+ hw/misc/zynq_slcr.c         |  2 +-
+ hw/pci-host/apb.c           |  4 ++--
+ hw/pci-host/bonito.c        |  2 +-
+ hw/pci-host/piix.c          |  2 +-
+ hw/ppc/e500.c               |  2 +-
+ hw/ppc/mpc8544_guts.c       |  2 +-
+ hw/ppc/ppc.c                |  2 +-
+ hw/ppc/ppc405_uc.c          |  2 +-
+ hw/ppc/spapr_hcall.c        |  2 +-
+ hw/ppc/spapr_rtas.c         |  4 ++--
+ hw/s390x/ipl.c              |  2 +-
+ hw/sh4/r2d.c                |  2 +-
+ hw/timer/etraxfs_timer.c    |  2 +-
+ hw/timer/m48t59.c           |  4 ++--
+ hw/timer/milkymist-sysctl.c |  4 ++--
+ hw/timer/pxa2xx_timer.c     |  2 +-
+ hw/watchdog/watchdog.c      |  2 +-
+ hw/xenpv/xen_domainbuild.c  |  2 +-
+ hw/xtensa/xtfpga.c          |  2 +-
+ kvm-all.c                   |  6 ++---
+ migration/colo.c            |  2 +-
+ migration/savevm.c          |  2 +-
+ os-win32.c                  |  2 +-
+ qmp.c                       |  4 ++--
+ replay/replay.c             |  5 +++-
+ target/alpha/sys_helper.c   |  4 ++--
+ target/arm/psci.c           |  4 ++--
+ target/i386/excp_helper.c   |  2 +-
+ target/i386/hax-all.c       |  6 ++---
+ target/i386/helper.c        |  2 +-
+ target/i386/kvm.c           |  2 +-
+ target/s390x/helper.c       |  2 +-
+ target/s390x/kvm.c          |  4 ++--
+ target/s390x/misc_helper.c  |  4 ++--
+ target/sparc/int32_helper.c |  2 +-
+ ui/sdl.c                    |  2 +-
+ ui/sdl2.c                   |  4 ++--
+ tests/qemu-iotests/071.out  |  4 ++--
+ tests/qemu-iotests/081.out  |  2 +-
+ tests/qemu-iotests/087.out  | 12 +++++-----
+ tests/qemu-iotests/094.out  |  2 +-
+ tests/qemu-iotests/117.out  |  2 +-
+ tests/qemu-iotests/119.out  |  2 +-
+ tests/qemu-iotests/120.out  |  2 +-
+ tests/qemu-iotests/140.out  |  2 +-
+ tests/qemu-iotests/143.out  |  2 +-
+ tests/qemu-iotests/156.out  |  2 +-
+ trace-events                |  2 +-
+ ui/cocoa.m                  |  2 +-
+ 74 files changed, 182 insertions(+), 136 deletions(-)
+
+-- 
+2.9.3
