@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d3ZoB-0001rH-3O
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:09:31 -0400
+	(envelope-from <cota@braap.org>) id 1d3Zz4-0003yi-Ml
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d3ZoA-00066n-7E
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:09:31 -0400
-References: <1493107736-6608-1-git-send-email-thuth@redhat.com>
-	<f523e9f6-4e05-38a2-413a-9891033c9466@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d835d396-bff8-ec64-acf7-c751680ae1a0@redhat.com>
-Date: Thu, 27 Apr 2017 05:09:18 +0200
+	(envelope-from <cota@braap.org>) id 1d3Zz3-0006Np-Rm
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 23:20:46 -0400
+Date: Wed, 26 Apr 2017 23:20:38 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170427032038.GA5078@flamenco>
+References: <1493187803-4510-1-git-send-email-cota@braap.org>
+	<1493187803-4510-7-git-send-email-cota@braap.org>
+	<9ed31413-ddd8-b229-9731-a0433f8fbcde@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <f523e9f6-4e05-38a2-413a-9891033c9466@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Issue a deprecation warning if the user
- specifies the "-hdachs" option.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ed31413-ddd8-b229-9731-a0433f8fbcde@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v3 06/10] target/arm: optimize indirect
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-On 26.04.2017 15:44, Paolo Bonzini wrote:
+On Wed, Apr 26, 2017 at 09:54:07 +0200, Richard Henderson wrote:
+> On 04/26/2017 08:23 AM, Emilio G. Cota wrote:
+> >+static bool gen_jr;...
+> >         case DISAS_JUMP:
+> >+            if (gen_jr) {
 > 
-> 
-> On 25/04/2017 10:08, Thomas Huth wrote:
->> If the user needs to specify the disk geometry, the corresponding
->> parameters of the "-drive" option should be used instead. "-hdachs"
->> is considered as deprecated and might be removed soon.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  vl.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/vl.c b/vl.c
->> index 0b4ed52..0980213 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -3230,6 +3230,8 @@ int main(int argc, char **argv, char **envp)
->>                          }
->>                      }
->>                  }
->> +                error_report("'-hdachs' is deprecated. Please use '-drive"
->> +                             " ...,cyls=c,heads=h,secs=s,trans=t' instead.");
->>                  break;
->>              case QEMU_OPTION_numa:
->>                  opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
->>
-> 
-> Not even this, which should also be deprecated; please suggest using
-> "-device ide-hd" instead.
+> Why the variable?  Why not just try the goto_ptr for any DISAS_JUMP?
 
-D'oh, you're right, of course ... I'll send a v3 ...
+We have code that assumes DISAS_JUMP implies "go to exec loop", e.g.:
+            case 6: /* isb */
+                /* We need to break the TB after this insn to execute
+                 * self-modifying code correctly and also to take
+                 * any pending interrupts immediately.
+                 */
+                gen_lookup_tb(s);
+where gen_lookup_tb does:
 
- Thomas
+/* Force a TB lookup after an instruction that changes the CPU state.  */
+static inline void gen_lookup_tb(DisasContext *s)
+{
+    tcg_gen_movi_i32(cpu_R[15], s->pc & ~1);
+    s->is_jmp = DISAS_JUMP;
+}
+
+Also, the gen_exception_* functions set DISAS_JUMP. I suspect we want to go
+to the exec loop with those as well.
+
+Testing shows that I'm onto something; if I remove the variable,
+and note that I make sure DISAS_UPDATE is not falling through, I get
+easily reproducible (~1 out of 5) freezes and other instability
+(e.g. RCU lockup warnings) when booting + shutting down debian jessie
+in the guest.
+
+In v4 I've added a comment about this.
+
+Thanks,
+
+		E.
