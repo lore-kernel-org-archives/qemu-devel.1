@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i61-000414-3I
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:30 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3i5t-0003tU-Gp
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i60-0001WL-CM
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:29 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35505)
+	(envelope-from <rth7680@gmail.com>) id 1d3i5s-0001QC-Na
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:21 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33410)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i60-0001VW-5t
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:28 -0400
-Received: by mail-wr0-x244.google.com with SMTP id g12so3523217wrg.2
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i5s-0001Pa-Gm
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:20 -0400
+Received: by mail-wr0-x242.google.com with SMTP id w50so3540002wrc.0
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:20 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu, 27 Apr 2017 13:59:58 +0200
-Message-Id: <20170427120006.20564-12-rth@twiddle.net>
+Date: Thu, 27 Apr 2017 13:59:52 +0200
+Message-Id: <20170427120006.20564-6-rth@twiddle.net>
 In-Reply-To: <20170427120006.20564-1-rth@twiddle.net>
 References: <20170427120006.20564-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v5 11/19] target/i386: optimize cross-page
- direct jumps in softmmu
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 05/19] tcg-runtime: add lookup_tb_ptr helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +34,85 @@ Cc: cota@braap.org
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Instead of unconditionally exiting to the exec loop, use the
-gen_jr helper to jump to the target if it is valid.
-
-Perf impact: see next commit's log.
+This paves the way for upcoming work.
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <1493263764-18657-10-git-send-email-cota@braap.org>
+Message-Id: <1493263764-18657-3-git-send-email-cota@braap.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/i386/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tcg-runtime.c     | 24 ++++++++++++++++++++++++
+ tcg/tcg-runtime.h |  2 ++
+ tcg/tcg.h         |  1 +
+ 3 files changed, 27 insertions(+)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index f0e48dc..ea113fe 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -2154,9 +2154,9 @@ static inline void gen_goto_tb(DisasContext *s, int tb_num, target_ulong eip)
-         gen_jmp_im(eip);
-         tcg_gen_exit_tb((uintptr_t)s->tb + tb_num);
-     } else {
--        /* jump to another page: currently not optimized */
-+        /* jump to another page */
-         gen_jmp_im(eip);
--        gen_eob(s);
-+        gen_jr(s, cpu_tmp0);
-     }
+diff --git a/tcg-runtime.c b/tcg-runtime.c
+index 4c60c96..8a24bdd 100644
+--- a/tcg-runtime.c
++++ b/tcg-runtime.c
+@@ -27,6 +27,7 @@
+ #include "exec/helper-proto.h"
+ #include "exec/cpu_ldst.h"
+ #include "exec/exec-all.h"
++#include "exec/tb-hash.h"
+ 
+ /* 32-bit helpers */
+ 
+@@ -141,6 +142,29 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
+     return ctpop64(arg);
  }
  
++void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
++{
++    CPUState *cpu = ENV_GET_CPU(env);
++    TranslationBlock *tb;
++    target_ulong cs_base, pc;
++    uint32_t flags;
++
++    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
++    if (likely(tb)) {
++        cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
++        if (likely(tb->pc == addr && tb->cs_base == cs_base &&
++                   tb->flags == flags)) {
++            return tb->tc_ptr;
++        }
++        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
++        if (likely(tb)) {
++            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
++            return tb->tc_ptr;
++        }
++    }
++    return tcg_ctx.code_gen_epilogue;
++}
++
+ void HELPER(exit_atomic)(CPUArchState *env)
+ {
+     cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
+diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
+index 114ea6f..c41d38a 100644
+--- a/tcg/tcg-runtime.h
++++ b/tcg/tcg-runtime.h
+@@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+ DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
+ DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+ 
++DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
++
+ DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+ 
+ #ifdef CONFIG_SOFTMMU
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 6c216bb..5ec48d1 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -699,6 +699,7 @@ struct TCGContext {
+        extension that allows arithmetic on void*.  */
+     int code_gen_max_blocks;
+     void *code_gen_prologue;
++    void *code_gen_epilogue;
+     void *code_gen_buffer;
+     size_t code_gen_buffer_size;
+     void *code_gen_ptr;
 -- 
 2.9.3
