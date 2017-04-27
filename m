@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d3qVP-0001ES-7L
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:59:16 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d3qfG-0003Nk-Lp
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:09:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d3qVO-0007LA-49
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:59:15 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d3qfD-0005hO-HU
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:09:26 -0400
+Date: Thu, 27 Apr 2017 14:09:11 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1493323148-32461-1-git-send-email-brogers@suse.com>
+Message-ID: <alpine.DEB.2.10.1704271403550.2895@sstabellini-ThinkPad-X260>
+References: <1493323148-32461-1-git-send-email-brogers@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
-References: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Fri, 28 Apr 2017 02:29:12 +0530
-Message-ID: <CAC2QTZYx_i+32WzH8fhAHnSEWibUm_kGW1jFaqUmYDwa8gODYA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Refactor DMG driver to have chunk
- size independence
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] ACPI: don't call acpi_pcihp_device_plug_cb
+ on xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,59 +22,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Peter Wu <peter@lekensteyn.nl>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: Bruce Rogers <brogers@suse.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, sstabellini@kernel.org, mst@redhat.com, qemu-stable@nongnu.org
 
-On Thu, Apr 27, 2017 at 1:36 PM, Ashijeet Acharya
-<ashijeetacharya@gmail.com> wrote:
-> Previously posted series patches:
-> v1: http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg04641.html
->
-> This series helps to provide chunk size independence for DMG driver to prevent
-> denial-of-service in cases where untrusted files are being accessed by the user.
->
-> This task is mentioned on the public block ToDo
-> Here -> http://wiki.qemu.org/ToDo/Block/DmgChunkSizeIndependence
->
-> Patch 1 introduces a new data structure to aid caching of random access points
-> within a compressed stream.
->
-> Patch 2 is an extension of patch 1 and introduces a new function to
-> initialize/update/reset our cached random access point.
->
-> Patch 3 limits the output buffer size to a max of 2MB to avoid QEMU allocate
-> huge amounts of memory.
->
-> Patch 4 is a simple preparatory patch to aid handling of various types of chunks.
->
-> Patches 5 & 6 help to handle various types of chunks.
->
-> Patch 7 simply refactors dmg_co_preadv() to read multiple sectors at once.
->
-> Patch 8 finally removes the error messages QEMU used to throw when an image with
-> chunk sizes above 64MB were accessed by the user.
+On Thu, 27 Apr 2017, Bruce Rogers wrote:
+> Commit f0c9d64a exposed the issue that with a xenfv machine using
+> pci passthrough, acpi cpi hotplug code was being executed by mistake.
+> Guard calls to acpi_pcihp_device_plug_cb (and corresponding
+> acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
+> this check I am seeing an error that the bus doesn't have the
+> acpi-pcihp-bsel property set.
+> 
+> Signed-off-by: Bruce Rogers <brogers@suse.com>
+> ---
+>  hw/acpi/piix4.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index a553a7e..c409374 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+>                                  dev, errp);
+>          }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, errp);
+> +        if (!xen_enabled()) {
+> +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> +                                      errp);
+> +        }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          if (s->cpu_hotplug_legacy) {
+>              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
+> @@ -408,8 +411,10 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
+>                                        dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> -                                    errp);
+> +        if (!xen_enabled()) {
+> +            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> +                                        errp);
+> +        }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+>                 !s->cpu_hotplug_legacy) {
+>          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
 
-John, I have squashed patch 3 and 8 (as in v1) actually and that
-change is represented in patch 7 (as in v2). The cover letter here is
-quite misleading, as I forgot to update it and simply did a ctrl-c --
-ctrl-v carelessly.
+Wouldn't it be better to simply turn the error_setg("Unsupported bus...)
+in acpi_pcihp_device_plug_cb and acpi_pcihp_device_unplug_cb into debug
+printfs? After all, from this description it is clear that they are not
+an error conditions. PCI Passthough works correctly, right?
 
-Ashijeet
-
-> Ashijeet Acharya (7):
->   dmg: Introduce a new struct to cache random access points
->   dmg: New function to help us cache random access point
->   dmg: Refactor and prepare dmg_read_chunk() to cache random access
->     points
->   dmg: Handle zlib compressed chunks
->   dmg: Handle bz2 compressed/raw/zeroed chunks
->   dmg: Refactor dmg_co_preadv() to start reading multiple sectors
->   dmg: Limit the output buffer size to a max of 2MB
->
->  block/dmg.c | 214 +++++++++++++++++++++++++++++++++++++++---------------------
->  block/dmg.h |  10 +++
->  2 files changed, 148 insertions(+), 76 deletions(-)
->
-> --
-> 2.6.2
->
+I realize that I should have suggested this earlier, sorry about that.
