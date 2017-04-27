@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i5w-0003wp-Pq
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:30 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3i6A-0004AX-AE
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i5v-0001SY-Oh
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:24 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36485)
+	(envelope-from <rth7680@gmail.com>) id 1d3i66-0001Yi-DX
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:38 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36505)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i5v-0001S5-I9
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:23 -0400
-Received: by mail-wr0-x244.google.com with SMTP id v42so3520993wrc.3
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i66-0001YR-6i
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:34 -0400
+Received: by mail-wm0-x244.google.com with SMTP id u65so4062254wmu.3
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:33 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu, 27 Apr 2017 13:59:54 +0200
-Message-Id: <20170427120006.20564-8-rth@twiddle.net>
+Date: Thu, 27 Apr 2017 14:00:04 +0200
+Message-Id: <20170427120006.20564-18-rth@twiddle.net>
 In-Reply-To: <20170427120006.20564-1-rth@twiddle.net>
 References: <20170427120006.20564-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 07/19] tcg: export
- tcg_gen_lookup_and_goto_ptr
+Subject: [Qemu-devel] [PATCH v5 17/19] tcg/aarch64: Implement goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +29,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
-From: "Emilio G. Cota" <cota@braap.org>
-
-Instead of exporting goto_ptr directly to TCG frontends, export
-tcg_gen_lookup_and_goto_ptr(), which calls goto_ptr with the pointer
-returned by the lookup_tb_ptr() helper. This is the only use case
-we have for goto_ptr and lookup_tb_ptr, so having this function is
-very convenient. Furthermore, it trivially allows us to avoid calling
-the lookup helper if goto_ptr is not implemented by the backend.
-
-Suggested-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <1493263764-18657-5-git-send-email-cota@braap.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/README   |  8 ++++++++
- tcg/tcg-op.c | 13 +++++++++++++
- tcg/tcg-op.h | 11 +++++++++++
- 3 files changed, 32 insertions(+)
+ tcg/aarch64/tcg-target.h     |  2 +-
+ tcg/aarch64/tcg-target.inc.c | 22 ++++++++++++++++++++--
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/tcg/README b/tcg/README
-index a9858c2..bf49e82 100644
---- a/tcg/README
-+++ b/tcg/README
-@@ -477,6 +477,14 @@ current TB was linked to this TB. Otherwise execute the next
- instructions. Only indices 0 and 1 are valid and tcg_gen_goto_tb may be issued
- at most once with each slot index per TB.
+diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+index b82eac4..55a46ac 100644
+--- a/tcg/aarch64/tcg-target.h
++++ b/tcg/aarch64/tcg-target.h
+@@ -77,7 +77,7 @@ typedef enum {
+ #define TCG_TARGET_HAS_mulsh_i32        0
+ #define TCG_TARGET_HAS_extrl_i64_i32    0
+ #define TCG_TARGET_HAS_extrh_i64_i32    0
+-#define TCG_TARGET_HAS_goto_ptr         0
++#define TCG_TARGET_HAS_goto_ptr         1
  
-+* lookup_and_goto_ptr tb_addr
-+
-+Look up a TB address ('tb_addr') and jump to it if valid. If not valid,
-+jump to the TCG epilogue to go back to the exec loop.
-+
-+This operation is optional. If the TCG backend does not implement the
-+goto_ptr opcode, emitting this op is equivalent to emitting exit_tb(0).
-+
- * qemu_ld_i32/i64 t0, t1, flags, memidx
- * qemu_st_i32/i64 t0, t1, flags, memidx
+ #define TCG_TARGET_HAS_div_i64          1
+ #define TCG_TARGET_HAS_rem_i64          1
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 290de6d..5f18545 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -1357,8 +1357,13 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
  
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 6b1f415..660dac9 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2587,6 +2587,19 @@ void tcg_gen_goto_tb(unsigned idx)
-     tcg_gen_op1i(INDEX_op_goto_tb, idx);
- }
+     switch (opc) {
+     case INDEX_op_exit_tb:
+-        tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_X0, a0);
+-        tcg_out_goto(s, tb_ret_addr);
++        /* Reuse the zeroing that exists for goto_ptr.  */
++        if (a0 == 0) {
++            tcg_out_goto(s, s->code_gen_epilogue);
++        } else {
++            tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_X0, a0);
++            tcg_out_goto(s, tb_ret_addr);
++        }
+         break;
  
-+void tcg_gen_lookup_and_goto_ptr(TCGv addr)
-+{
-+    if (TCG_TARGET_HAS_goto_ptr) {
-+        TCGv_ptr ptr = tcg_temp_new_ptr();
-+
-+        gen_helper_lookup_tb_ptr(ptr, tcg_ctx.tcg_env, addr);
-+        tcg_gen_op1i(INDEX_op_goto_ptr, GET_TCGV_PTR(ptr));
-+        tcg_temp_free_ptr(ptr);
-+    } else {
-+        tcg_gen_exit_tb(0);
-+    }
-+}
-+
- static inline TCGMemOp tcg_canonicalize_memop(TCGMemOp op, bool is64, bool st)
- {
-     /* Trigger the asserts within as early as possible.  */
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index c68e300..5d3278f 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -796,6 +796,17 @@ static inline void tcg_gen_exit_tb(uintptr_t val)
-  */
- void tcg_gen_goto_tb(unsigned idx);
+     case INDEX_op_goto_tb:
+@@ -1374,6 +1379,10 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
+         break;
  
-+/**
-+ * tcg_gen_lookup_and_goto_ptr() - look up a TB and jump to it if valid
-+ * @addr: Guest address of the target TB
-+ *
-+ * If the TB is not valid, jump to the epilogue.
-+ *
-+ * This operation is optional. If the TCG backend does not implement goto_ptr,
-+ * this op is equivalent to calling tcg_gen_exit_tb() with 0 as the argument.
-+ */
-+void tcg_gen_lookup_and_goto_ptr(TCGv addr);
++    case INDEX_op_goto_ptr:
++        tcg_out_insn(s, 3207, BR, a0);
++        break;
 +
- #if TARGET_LONG_BITS == 32
- #define tcg_temp_new() tcg_temp_new_i32()
- #define tcg_global_reg_new tcg_global_reg_new_i32
+     case INDEX_op_br:
+         tcg_out_goto_label(s, arg_label(a0));
+         break;
+@@ -1735,6 +1744,7 @@ static const TCGTargetOpDef aarch64_op_defs[] = {
+     { INDEX_op_exit_tb, { } },
+     { INDEX_op_goto_tb, { } },
+     { INDEX_op_br, { } },
++    { INDEX_op_goto_ptr, { "r" } },
+ 
+     { INDEX_op_ld8u_i32, { "r", "r" } },
+     { INDEX_op_ld8s_i32, { "r", "r" } },
+@@ -1942,6 +1952,14 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_AREG0, tcg_target_call_iarg_regs[0]);
+     tcg_out_insn(s, 3207, BR, tcg_target_call_iarg_regs[1]);
+ 
++    /*
++     * Return path for goto_ptr. Set return value to 0, a-la exit_tb,
++     * and fall through to the rest of the epilogue.
++     */
++    s->code_gen_epilogue = s->code_ptr;
++    tcg_out_movi(s, TCG_TYPE_REG, TCG_REG_X0, 0);
++
++    /* TB epilogue */
+     tb_ret_addr = s->code_ptr;
+ 
+     /* Remove TCG locals stack space.  */
 -- 
 2.9.3
