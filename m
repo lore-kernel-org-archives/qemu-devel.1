@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d3pSE-0004Sl-FI
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:51:55 -0400
+	(envelope-from <brogers@suse.com>) id 1d3pXl-0007Xl-Ne
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:57:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d3pSC-0001T1-Tm
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:51:54 -0400
-Resent-Message-Id: <E1d3pSC-0001T1-Tm@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21349)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d3pSC-0001RN-KJ
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:51:52 -0400
-In-Reply-To: <20170427192211.30640-1-eblake@redhat.com>
-Message-ID: <149332270057.114.17250566972242208074@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 27 Apr 2017 12:51:41 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] event: Add source information to
- SHUTDOWN
+	(envelope-from <brogers@suse.com>) id 1d3pXg-00040I-TC
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 15:57:37 -0400
+Message-Id: <59024D270200004800143945@prv-mh.provo.novell.com>
+Date: Thu, 27 Apr 2017 13:57:27 -0600
+From: "Bruce Rogers" <brogers@suse.com>
+References: <1493233622-14485-1-git-send-email-brogers@suse.com>
+	<20170427111135.7a7bbfa9@nial.brq.redhat.com>
+	<590211DF02000048001438FF@prv-mh.provo.novell.com>
+	<20170427180832.55eed506@Igors-MacBook-Pro.local>
+	<5902218B0200004800143927@prv-mh.provo.novell.com>
+	<20170427193551.446a6793@Igors-MacBook-Pro.local>
+	<alpine.DEB.2.10.1704271107260.11141@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1704271107260.11141@sstabellini-ThinkPad-X260>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [PATCH] ACPI: call acpi_set_pci_info when only
+ acpi enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, alistair.francis@xilinx.com
+To: Stefano Stabellini <sstabellini@kernel.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, mst@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MyAwLzRdIGV2ZW50OiBBZGQgc291cmNlIGluZm9ybWF0aW9uIHRvIFNI
-VVRET1dOCk1lc3NhZ2UtaWQ6IDIwMTcwNDI3MTkyMjExLjMwNjQwLTEtZWJsYWtlQHJlZGhhdC5j
-b20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9
-IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21t
-aXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4g
-MSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWls
-IHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFp
-bGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWls
-ZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozZDI3
-ZGJhIFJGQzogc2h1dGRvd246IEV4cG9zZSBmdWxsIFNodXRkb3duVHlwZSBhY3Jvc3MgUU1QCmY3
-NzE2MTYgc2h1dGRvd246IEFkZCBzb3VyY2UgaW5mb3JtYXRpb24gdG8gU0hVVERPV04gYW5kIFJF
-U0VUCjNkNzc0N2Qgc2h1dGRvd246IFByZXBhcmUgZm9yIHVzZSBvZiBhbiBlbnVtIGluIHJlc2V0
-L3NodXRkb3duX3JlcXVlc3QKMWRkNmM3MCBzaHV0ZG93bjogU2ltcGxpZnkgc2h1dGRvd25fc2ln
-bmFsCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IHNodXRkb3duOiBT
-aW1wbGlmeSBzaHV0ZG93bl9zaWduYWwuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiBzaHV0ZG93bjog
-UHJlcGFyZSBmb3IgdXNlIG9mIGFuIGVudW0gaW4gcmVzZXQvc2h1dGRvd25fcmVxdWVzdC4uLgpD
-aGVja2luZyBQQVRDSCAzLzQ6IHNodXRkb3duOiBBZGQgc291cmNlIGluZm9ybWF0aW9uIHRvIFNI
-VVRET1dOIGFuZCBSRVNFVC4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE0NDog
-RklMRTogaHcvYXJtL29tYXAxLmM6MTU0OToKKyAgICAgICAgcWVtdV9zeXN0ZW1fc2h1dGRvd25f
-cmVxdWVzdChTSFVURE9XTl9UWVBFX0dVRVNUX1NIVVRET1dOKTsgLyogWFhYOiBkaXNhYmxlIHdh
-a2V1cCBmcm9tIElSUSAqLwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4ODIgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcg
-UEFUQ0ggNC80OiBSRkM6IHNodXRkb3duOiBFeHBvc2UgZnVsbCBTaHV0ZG93blR5cGUgYWNyb3Nz
-IFFNUC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
-OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+>>> On 4/27/2017 at 12:08 PM, Stefano Stabellini <sstabellini@kernel.org> =
+wrote:=20
+> On Thu, 27 Apr 2017, Igor Mammedov wrote:
+>> On Thu, 27 Apr 2017 10:51:23 -0600
+>> "Bruce Rogers" <brogers@suse.com> wrote:
+>>=20
+>> >=20
+>> >=20
+>> > >>> On 4/27/2017 at 10:08 AM, Igor Mammedov <imammedo@redhat.com> =
+wrote:=20
+>> > > On Thu, 27 Apr 2017 09:44:31 -0600
+>> > > "Bruce Rogers" <brogers@suse.com> wrote:
+>> > >=20
+>> > >> >>> On 4/27/2017 at 03:11 AM, Igor Mammedov <imammedo@redhat.com> =
+wrote:=20
+>> > >> > On Wed, 26 Apr 2017 13:07:02 -0600
+>> > >> > Bruce Rogers <brogers@suse.com> wrote:
+>> > >> >=20
+>> > >> >> Commit f0c9d64a exposed an issue with the code order in =
+acpi_setup.
+>> > >> >> As of that commit, a xenfv machine type guest will no longer =
+start
+>> > >> >> if using pci passthrough. Re-order the code in that function to
+>> > >> >> allow acpi_set_pci_info to be called before bailing on the =
+other,
+>> > >> >> non-related conditions. With this change I can again use pci
+>> > >> >> passthrough and xenfv together.
+>> > >> >>=20
+>> > >> >> Signed-off-by: Bruce Rogers <brogers@suse.com>
+>> > >> > it doesn't look right,
+>> > >> > acpi_set_pci_info() is supposed to affect only ACPI based =
+hotplug
+>> > >> >=20
+>> > >> > could you elaborate more on what's going on and
+>> > >> > what error you see at startup?
+>> > >>=20
+>> > >> I am using libvirt, driving the creation of the Xen HVM guest via
+>> > >> libxl. libxl dynamically attaches the pci device via QMP. In the
+>> > >> context of qmp_device_add(), we get a failure in hw/acpi/pcihp.c:
+>> > >> acpi_pcihp_device_plug_cb() when it checks for bsel, and errors
+>> > >> with the message: "Unsupported bus. Bus doesn't have property
+>> > >> 'acpi-pcihp-bsel' set". I guess it wasn't clear from my description=
+
+>> > >> that hotplug was involved.
+>> > >>=20
+>> > > is dev->hotplugged in acpi_pcihp_device_plug_cb() true at that =
+time?
+>> > >=20
+>> > > the point is that bsel is needed only when there is supporting ACPI =
+code
+>> > > and useless otherwise, so acpi_pcihp_device_plug_cb() probably =
+shouldn't
+>> > > run under xenfv. I'd try to add compat prop to PIIX4_PM and disable
+>> > > acpi_pcihp_device_plug_cb() for xenfv via machine compat property.
+>> >=20
+>> > So what would be wrong with simply conditionalizing the call to=20
+>> >  acpi_pcihp_device_plug_cb() with a check for xen in piix4_device_plug=
+_cb()
+>> > as follows:
+>> >=20
+>> >          }
+>> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>> > -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, =
+dev,=20
+> errp);
+>> > +        if (!xen_enabled()) {
+>> > +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotpl=
+ug, dev,
+>> > +                                      errp);
+>> > +        }
+>> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>> >          if (s->cpu_hotplug_legacy) {
+>> >              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, =
+errp);
+>> >=20
+>> > Wouldn't that be the solution?
+>> it should work
+>>=20
+>> is it possible to see unplug on that device later under xen?
+>=20
+> Yes, it would be possible. I guess we need to do the same for
+> acpi_pcihp_device_unplug_cb?
+
+Thanks guys, I'll send a new patch based on this discussion.
+
+Bruce
