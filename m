@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i62-00042n-PW
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:32 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3i69-00049m-By
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i61-0001Wq-Dv
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:30 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35507)
+	(envelope-from <rth7680@gmail.com>) id 1d3i63-0001Xv-DR
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:37 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33251)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i61-0001WP-4s
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:29 -0400
-Received: by mail-wr0-x242.google.com with SMTP id g12so3523258wrg.2
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i63-0001XE-4b
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:31 -0400
+Received: by mail-wm0-x242.google.com with SMTP id y10so4098954wmh.0
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:30 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu, 27 Apr 2017 13:59:59 +0200
-Message-Id: <20170427120006.20564-13-rth@twiddle.net>
+Date: Thu, 27 Apr 2017 14:00:01 +0200
+Message-Id: <20170427120006.20564-15-rth@twiddle.net>
 In-Reply-To: <20170427120006.20564-1-rth@twiddle.net>
 References: <20170427120006.20564-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v5 12/19] target/i386: optimize indirect
- branches
+Subject: [Qemu-devel] [PATCH v5 14/19] target/alpha: Use tcg_gen_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +29,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
-From: "Emilio G. Cota" <cota@braap.org>
-
-Speed up indirect branches by jumping to the target if it is valid.
-
-Softmmu measurements (see later commit for user-mode numbers):
-
-Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
-
--                  SPECint06 (test set), x86_64-softmmu (Ubuntu 16.04 guest). Host: Intel i7-4790K @ 4.00GHz
-
- 2.4x +-+--------------------------------------------------------------------------------------------------------------+-+
-      |                                                                                                                  |
-      |   cross                                                                                                          |
- 2.2x +cross+jr..........................................................................+++...........................+-+
-      |                                                                                   |                              |
-      |                                                                               +++ |                              |
-   2x +-+..............................................................................|..|............................+-+
-      |                                                                                |  |                              |
-      |                                                                                |  |                              |
- 1.8x +-+..............................................................................|####...........................+-+
-      |                                                                                |# |#                             |
-      |                                                                              **** |#                             |
- 1.6x +-+............................................................................*.|*.|#...........................+-+
-      |                                                                              * |* |#                             |
-      |                                                                              * |* |#                             |
- 1.4x +-+.......................................................................+++..*.|*.|#...........................+-+
-      |                                                      ++++++             #### * |*++#             +++             |
-      |                        +++                            |  |              #++# *++*  #          +++ |              |
- 1.2x +-+......................###.....####....+++............|..|...........****..#.*..*..#....####...|.###.....####..+-+
-      |        +++          **** #  ****  #    ####          ***###          *++*  # *  *  #    #++#  ****|#  +++#++#    |
-      |    ****###     +++  *++* #  *++*  #  ++#  #    ####  *|* |#     +++  *  *  # *  *  #  ***  #  *| *|#  ****  #    |
-   1x +-++-*++*++#++***###++*++*+#++*+-*++#+****++#++***++#+-*+*++#-+****##++*++*-+#+*++*-+#++*+*++#++*-+*+#++*++*++#-++-+
-      |    *  *  #  * *  #  *  * #  *  *  # *  *  #  * *  #  *|* |#  *++* #  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
-      |    *  *  #  * *  #  *  * #  *  *  # *  *  #  * *  #  *+*++#  *  * #  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
- 0.8x +-+--****###--***###--****##--****###-****###--***###--***###--****##--****###-****###--***###--****##--****###--+-+
-         astar   bzip2      gcc   gobmk h264ref   hmmlibquantum      mcf omnetpperlbench   sjengxalancbmk   hmean
-  png: http://imgur.com/DU36YFU
-
-NB. 'cross' represents the previous commit.
-
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <1493263764-18657-11-git-send-email-cota@braap.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/i386/translate.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ target/alpha/translate.c | 49 +++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 36 insertions(+), 13 deletions(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index ea113fe..674ec96 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4996,7 +4996,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-             gen_push_v(s, cpu_T1);
-             gen_op_jmp_v(cpu_T0);
-             gen_bnd_jmp(s);
--            gen_eob(s);
-+            gen_jr(s, cpu_T0);
-             break;
-         case 3: /* lcall Ev */
-             gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
-@@ -5014,7 +5014,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-                                       tcg_const_i32(dflag - 1),
-                                       tcg_const_i32(s->pc - s->cs_base));
+diff --git a/target/alpha/translate.c b/target/alpha/translate.c
+index df5d695..c1a5fbf 100644
+--- a/target/alpha/translate.c
++++ b/target/alpha/translate.c
+@@ -89,6 +89,10 @@ typedef enum {
+        updated the PC for the next instruction to be executed.  */
+     EXIT_PC_STALE,
+ 
++    /* Similarly, but force TB exit without chaining.  */
++    EXIT_PC_UPDATED_FORCE,
++    EXIT_PC_STALE_FORCE,
++
+     /* We are ending the TB with a noreturn function call, e.g. longjmp.
+        No following code will be executed.  */
+     EXIT_NORETURN,
+@@ -455,11 +459,16 @@ static bool in_superpage(DisasContext *ctx, int64_t addr)
+ #endif
+ }
+ 
++static bool use_exit_tb(DisasContext *ctx)
++{
++    /* Suppress any optimization in the case of single-steping and IO.  */
++    return ((ctx->tb->cflags & CF_LAST_IO)
++            || ctx->singlestep_enabled || singlestep);
++}
++
+ static bool use_goto_tb(DisasContext *ctx, uint64_t dest)
+ {
+-    /* Suppress goto_tb in the case of single-steping and IO.  */
+-    if ((ctx->tb->cflags & CF_LAST_IO)
+-        || ctx->singlestep_enabled || singlestep) {
++    if (use_exit_tb(ctx)) {
+         return false;
+     }
+ #ifndef CONFIG_USER_ONLY
+@@ -1257,14 +1266,14 @@ static ExitStatus gen_call_pal(DisasContext *ctx, int palcode)
+            need the page permissions check.  We'll see the existence of
+            the page when we create the TB, and we'll flush all TBs if
+            we change the PAL base register.  */
+-        if (!ctx->singlestep_enabled && !(ctx->tb->cflags & CF_LAST_IO)) {
++        if (use_exit_tb(ctx)) {
++            tcg_gen_movi_i64(cpu_pc, entry);
++            return EXIT_PC_UPDATED;
++        } else {
+             tcg_gen_goto_tb(0);
+             tcg_gen_movi_i64(cpu_pc, entry);
+             tcg_gen_exit_tb((uintptr_t)ctx->tb);
+             return EXIT_GOTO_TB;
+-        } else {
+-            tcg_gen_movi_i64(cpu_pc, entry);
+-            return EXIT_PC_UPDATED;
+         }
+     }
+ #endif
+@@ -1323,7 +1332,7 @@ static ExitStatus gen_mfpr(DisasContext *ctx, TCGv va, int regno)
+             gen_io_start();
+             helper(va);
+             gen_io_end();
+-            return EXIT_PC_STALE;
++            return EXIT_PC_STALE_FORCE;
+         } else {
+             helper(va);
+         }
+@@ -1374,7 +1383,7 @@ static ExitStatus gen_mtpr(DisasContext *ctx, TCGv vb, int regno)
+     case 252:
+         /* HALT */
+         gen_helper_halt(vb);
+-        return EXIT_PC_STALE;
++        return EXIT_PC_STALE_FORCE;
+ 
+     case 251:
+         /* ALARM */
+@@ -1388,7 +1397,7 @@ static ExitStatus gen_mtpr(DisasContext *ctx, TCGv vb, int regno)
+            that ended with a CALL_PAL.  Since the base register usually only
+            changes during boot, flushing everything works well.  */
+         gen_helper_tb_flush(cpu_env);
+-        return EXIT_PC_STALE;
++        return EXIT_PC_STALE_FORCE;
+ 
+     case 32 ... 39:
+         /* Accessing the "non-shadow" general registers.  */
+@@ -2373,7 +2382,7 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
+                 gen_io_start();
+                 gen_helper_load_pcc(va, cpu_env);
+                 gen_io_end();
+-                ret = EXIT_PC_STALE;
++                ret = EXIT_PC_STALE_FORCE;
+             } else {
+                 gen_helper_load_pcc(va, cpu_env);
              }
--            gen_eob(s);
-+            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
-+            gen_jr(s, cpu_tmp4);
-             break;
-         case 4: /* jmp Ev */
-             if (dflag == MO_16) {
-@@ -5022,7 +5023,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-             }
-             gen_op_jmp_v(cpu_T0);
-             gen_bnd_jmp(s);
--            gen_eob(s);
-+            gen_jr(s, cpu_T0);
-             break;
-         case 5: /* ljmp Ev */
-             gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
-@@ -5037,7 +5038,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-                 gen_op_movl_seg_T0_vm(R_CS);
-                 gen_op_jmp_v(cpu_T1);
-             }
--            gen_eob(s);
-+            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
-+            gen_jr(s, cpu_tmp4);
-             break;
-         case 6: /* push Ev */
-             gen_push_v(s, cpu_T0);
-@@ -6417,7 +6419,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-         /* Note that gen_pop_T0 uses a zero-extending load.  */
-         gen_op_jmp_v(cpu_T0);
-         gen_bnd_jmp(s);
--        gen_eob(s);
-+        gen_jr(s, cpu_T0);
+@@ -2990,18 +2999,32 @@ void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
+     case EXIT_GOTO_TB:
+     case EXIT_NORETURN:
          break;
-     case 0xc3: /* ret */
-         ot = gen_pop_T0(s);
-@@ -6425,7 +6427,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-         /* Note that gen_pop_T0 uses a zero-extending load.  */
-         gen_op_jmp_v(cpu_T0);
-         gen_bnd_jmp(s);
--        gen_eob(s);
-+        gen_jr(s, cpu_T0);
++
+     case EXIT_PC_STALE:
+         tcg_gen_movi_i64(cpu_pc, ctx.pc);
+-        /* FALLTHRU */
++        goto do_exit_pc_updated;
++    case EXIT_PC_STALE_FORCE:
++        tcg_gen_movi_i64(cpu_pc, ctx.pc);
++        goto do_exit_pc_updated_force;
++
+     case EXIT_PC_UPDATED:
++    do_exit_pc_updated:
++        if (!use_exit_tb(&ctx)) {
++            tcg_gen_lookup_and_goto_ptr(cpu_pc);
++            break;
++        }
++        /* FALLTHRU */
++    case EXIT_PC_UPDATED_FORCE:
++    do_exit_pc_updated_force:
+         if (ctx.singlestep_enabled) {
+             gen_excp_1(EXCP_DEBUG, 0);
+         } else {
+             tcg_gen_exit_tb(0);
+         }
          break;
-     case 0xca: /* lret im */
-         val = cpu_ldsw_code(env, s->pc);
++
+     default:
+-        abort();
++        g_assert_not_reached();
+     }
+ 
+     gen_tb_end(tb, num_insns);
 -- 
 2.9.3
