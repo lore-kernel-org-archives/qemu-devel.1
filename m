@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1d3mdg-0000Or-4j
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:51:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d3mha-0001YD-QO
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:55:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1d3mdb-0003Lm-9k
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:51:32 -0400
-Message-Id: <5902218B0200004800143927@prv-mh.provo.novell.com>
-Date: Thu, 27 Apr 2017 10:51:23 -0600
-From: "Bruce Rogers" <brogers@suse.com>
-References: <1493233622-14485-1-git-send-email-brogers@suse.com>
-	<20170427111135.7a7bbfa9@nial.brq.redhat.com>
-	<590211DF02000048001438FF@prv-mh.provo.novell.com>
-	<20170427180832.55eed506@Igors-MacBook-Pro.local>
-In-Reply-To: <20170427180832.55eed506@Igors-MacBook-Pro.local>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [PATCH] ACPI: call acpi_set_pci_info when only
- acpi enabled
+	(envelope-from <dgilbert@redhat.com>) id 1d3mhW-0004xW-Ta
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:55:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51662)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3mhW-0004xI-NN
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:55:30 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9C4BD80495
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 16:55:29 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Thu, 27 Apr 2017 17:55:26 +0100
+Message-Id: <20170427165526.19836-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] checkpatch: Disallow glib asserts in main code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: sstabellini@kernel.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org, mst@redhat.com
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
 
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+Glib commit a6a875068779 (from 2013) made many of the glib assert
+macros non-fatal if a flag is set.
+This causes two problems:
+  a) Compilers moan that your code is unsafe even though you've
+     put an assert in before the point of use.
+  b) Someone evil could, in a library, call
+     g_test_set_nonfatal_assertions() and cause our assertions in
+     important places not to fail and potentially allow memory overruns.
 
->>> On 4/27/2017 at 10:08 AM, Igor Mammedov <imammedo@redhat.com> =
-wrote:=20
-> On Thu, 27 Apr 2017 09:44:31 -0600
-> "Bruce Rogers" <brogers@suse.com> wrote:
->=20
->> >>> On 4/27/2017 at 03:11 AM, Igor Mammedov <imammedo@redhat.com> =
-wrote:=20
->> > On Wed, 26 Apr 2017 13:07:02 -0600
->> > Bruce Rogers <brogers@suse.com> wrote:
->> >=20
->> >> Commit f0c9d64a exposed an issue with the code order in acpi_setup.
->> >> As of that commit, a xenfv machine type guest will no longer start
->> >> if using pci passthrough. Re-order the code in that function to
->> >> allow acpi_set_pci_info to be called before bailing on the other,
->> >> non-related conditions. With this change I can again use pci
->> >> passthrough and xenfv together.
->> >>=20
->> >> Signed-off-by: Bruce Rogers <brogers@suse.com>
->> > it doesn't look right,
->> > acpi_set_pci_info() is supposed to affect only ACPI based hotplug
->> >=20
->> > could you elaborate more on what's going on and
->> > what error you see at startup?
->>=20
->> I am using libvirt, driving the creation of the Xen HVM guest via
->> libxl. libxl dynamically attaches the pci device via QMP. In the
->> context of qmp_device_add(), we get a failure in hw/acpi/pcihp.c:
->> acpi_pcihp_device_plug_cb() when it checks for bsel, and errors
->> with the message: "Unsupported bus. Bus doesn't have property
->> 'acpi-pcihp-bsel' set". I guess it wasn't clear from my description
->> that hotplug was involved.
->>=20
-> is dev->hotplugged in acpi_pcihp_device_plug_cb() true at that time?
->=20
-> the point is that bsel is needed only when there is supporting ACPI code
-> and useless otherwise, so acpi_pcihp_device_plug_cb() probably shouldn't
-> run under xenfv. I'd try to add compat prop to PIIX4_PM and disable
-> acpi_pcihp_device_plug_cb() for xenfv via machine compat property.
+Ban most of the glib assertion functions (basically everything except
+g_assert and g_assert_not_reached) except in tests/
 
-So what would be wrong with simply conditionalizing the call to=20
- acpi_pcihp_device_plug_cb() with a check for xen in piix4_device_plug_cb()=
+This makes checkpatch gives an error such as:
 
-as follows:
+  ERROR: Use g_assert or g_assert_not_reached
+  #77: FILE: vl.c:4725:
+  +    g_assert_cmpstr("Chocolate", >, "Cheese");
 
-         }
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
--        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, =
-errp);
-+        if (!xen_enabled()) {
-+            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, =
-dev,
-+                                      errp);
-+        }
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         if (s->cpu_hotplug_legacy) {
-             legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ scripts/checkpatch.pl | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-Wouldn't that be the solution?
-
-Bruce
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index f084542934..73cee81b79 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2571,6 +2571,27 @@ sub process {
+ 		if ($line =~ /\bbzero\(/) {
+ 			ERROR("use memset() instead of bzero()\n" . $herecurr);
+ 		}
++		my $non_exit_glib_asserts = qr{g_assert_cmpstr|
++						g_assert_cmpint|
++						g_assert_cmpuint|
++						g_assert_cmphex|
++						g_assert_cmpfloat|
++						g_assert_true|
++						g_assert_false|
++						g_assert_nonnull|
++						g_assert_null|
++						g_assert_no_error|
++						g_assert_error|
++						g_test_assert_expected_messages|
++						g_test_trap_assert_passed|
++						g_test_trap_assert_stdout|
++						g_test_trap_assert_stdout_unmatched|
++						g_test_trap_assert_stderr|
++						g_test_trap_assert_stderr_unmatched}x;
++		if ($realfile !~ /^tests\// &&
++			$line =~ /\b(?:$non_exit_glib_asserts)\(/) {
++			ERROR("Use g_assert or g_assert_not_reached\n". $herecurr);
++		}
+ 	}
+ 
+ 	# If we have no input at all, then there is nothing to report on
+-- 
+2.12.2
