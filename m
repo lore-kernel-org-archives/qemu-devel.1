@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d3m0Q-0003Kk-I9
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:11:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3m96-00066X-Da
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d3m0N-0006cW-Qf
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:10:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46192)
+	(envelope-from <armbru@redhat.com>) id 1d3m93-0002Q0-Ov
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:19:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3m0N-0006bw-G5
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:10:55 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3m93-0002Pf-Ed
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:19:53 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<6fcd733f02438a401c902e1a3b62564cb8c5c23a.1493191677.git.maozy.fnst@cn.fujitsu.com>
-Date: Thu, 27 Apr 2017 18:10:49 +0200
-In-Reply-To: <6fcd733f02438a401c902e1a3b62564cb8c5c23a.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	(Mao Zhongyi's message of "Wed, 26 Apr 2017 16:04:16 +0800")
-Message-ID: <87fugtx246.fsf@dusky.pond.sub.org>
+	<6824abf3c4e5b865de1799c302f60e8055c8d3dc.1493191677.git.maozy.fnst@cn.fujitsu.com>
+	<874lx9yht7.fsf@dusky.pond.sub.org>
+Date: Thu, 27 Apr 2017 18:19:50 +0200
+In-Reply-To: <874lx9yht7.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Thu, 27 Apr 2017 17:46:28 +0200")
+Message-ID: <87y3ulu8k9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] net/socket: Improve -net socket
- error reporting
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] net/socket: Convert the
+ non-blocking connection mechanism to QIOchannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,371 +30,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com, kraxel@redhat.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jasowang@redhat.com
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+Markus Armbruster <armbru@redhat.com> writes:
 
-> When -net socket fails, it first reports a specific error, then
-> a generic one, like this:
+> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 >
->     $ qemu-system-x86_64 -net socket,
->     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
->     qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
+>> Currently, socket connection in net is realized by an old
+>> mechanism which is non-blocking.
+>>
+>> That old mechanism may cause net blocks on DNS lookups and
+>> QEmu has already replaced it with QIOchannel in many features,
+>> such as migration.
+>>
+>> Convert it to QIOchannel for net as well.
+>>
+>> CC: berrange@redhat.com, pbonzini@redhat.com, jasowang@redhat.com
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>> The test steps like this:
+>>
+>>     $ qemu-system-x86_64 -net nic -net socket,listen=:1234 ~/img/test.img
+>>     $ qemu-system-x86_64 -net nic -net socket,connect=127.0.0.1:1234 ~/img/test.img
+>>
+>> No exception.
+>>
+>>  net/socket.c | 30 +++++++++++++++++++-----------
+>>  1 file changed, 19 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/net/socket.c b/net/socket.c
+>> index b8c931e..52f9dce 100644
+>> --- a/net/socket.c
+>> +++ b/net/socket.c
+>> @@ -33,6 +33,7 @@
+>>  #include "qemu/sockets.h"
+>>  #include "qemu/iov.h"
+>>  #include "qemu/main-loop.h"
+>> +#include "io/channel-socket.h"
+>>  
+>>  typedef struct NetSocketState {
+>>      NetClientState nc;
+>> @@ -525,16 +526,22 @@ typedef struct {
+>>      char *name;
+>>  } socket_connect_data;
+>>  
+>> -static void socket_connect_data_free(socket_connect_data *c)
+>> +static void socket_connect_data_free(void *opaque)
+>>  {
+>> +    socket_connect_data *c = opaque;
 >
-> Convert net_init_socket() to Error to get rid of the unwanted second
-> error message.
+> Blank line between declarations and statements, please.
 >
-> CC: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, jasowang@redhat.com, armbru@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  After the repair, the effect is as follows:
->
->     $ qemu-system-x86_64 -net socket,
->     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
+>> +    if (!c) {
+>> +        return;
+>> +    }
+>> +
+>>      qapi_free_SocketAddress(c->saddr);
+>>      g_free(c->model);
+>>      g_free(c->name);
+>>      g_free(c);
+>>  }
+>>  
+>> -static void net_socket_connected(int fd, Error *err, void *opaque)
+>> +static void net_socket_connected(QIOTask *task, void *opaque)
+>>  {
+>> +    QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(qio_task_get_source(task));
+>>      socket_connect_data *c = opaque;
+>>      NetSocketState *s;
+>>      char *addr_str = NULL;
+>> @@ -543,13 +550,13 @@ static void net_socket_connected(int fd, Error *err, void *opaque)
+>>      addr_str = socket_address_to_string(c->saddr, &local_error);
+>>      if (addr_str == NULL) {
+>>          error_report_err(local_error);
+>> -        closesocket(fd);
+>> +        closesocket(sioc->fd);
+>>          goto end;
+>>      }
+>>  
+>> -    s = net_socket_fd_init(c->peer, c->model, c->name, fd, true);
+>> +    s = net_socket_fd_init(c->peer, c->model, c->name, sioc->fd, true);
+>>      if (!s) {
+>> -        closesocket(fd);
+>> +        closesocket(sioc->fd);
 
-Please move this into the commit message proper.
+Actually, net_socket_fd_init() closes sioc->fd when it fails.  Closing
+it again in the caller is wrong.  None of the other callers does it.
+Please drop this line in a separate patch, before this one.
 
->
->  include/qemu/sockets.h |  2 +-
->  net/socket.c           | 57 +++++++++++++++++++++++++++++---------------------
->  util/qemu-sockets.c    |  2 +-
->  3 files changed, 35 insertions(+), 26 deletions(-)
->
-> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-> index af28532..528b802 100644
-> --- a/include/qemu/sockets.h
-> +++ b/include/qemu/sockets.h
-> @@ -118,7 +118,7 @@ SocketAddress *socket_remote_address(int fd, Error **errp);
->   *
->   * Returns: the socket address in string format, or NULL on error
->   */
-> -char *socket_address_to_string(struct SocketAddress *addr, Error **errp);
-> +char *socket_address_to_string(struct SocketAddress *addr);
->  
->  /**
->   * socket_address_crumple:
-
-I'd make this a separate patch.  Matter of taste.
-
-> diff --git a/net/socket.c b/net/socket.c
-> index 52f9dce..b0decbe 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -486,7 +486,8 @@ static void net_socket_accept(void *opaque)
->  static int net_socket_listen_init(NetClientState *peer,
->                                    const char *model,
->                                    const char *name,
-> -                                  const char *host_str)
-> +                                  const char *host_str,
-> +                                  Error **errp)
->  {
->      NetClientState *nc;
->      NetSocketState *s;
-> @@ -496,14 +497,14 @@ static int net_socket_listen_init(NetClientState *peer,
->  
->      saddr = socket_parse(host_str, &local_error);
->      if (saddr == NULL) {
-> -        error_report_err(local_error);
-> +        error_propagate(errp, local_error);
->          return -1;
->      }
-
-Simpler:
-
-  -    saddr = socket_parse(host_str, &local_error);
-  +    saddr = socket_parse(host_str, errp);
-       if (saddr == NULL) {
-  -        error_report_err(local_error);
-           return -1;
-       }
-
->  
->      ret = socket_listen(saddr, &local_error);
->      if (ret < 0) {
->          qapi_free_SocketAddress(saddr);
-> -        error_report_err(local_error);
-> +        error_propagate(errp, local_error);
->          return -1;
->      }
-
-Likewise.
-
->  
-> @@ -545,11 +546,9 @@ static void net_socket_connected(QIOTask *task, void *opaque)
->      socket_connect_data *c = opaque;
->      NetSocketState *s;
->      char *addr_str = NULL;
-> -    Error *local_error = NULL;
->  
-> -    addr_str = socket_address_to_string(c->saddr, &local_error);
-> +    addr_str = socket_address_to_string(c->saddr);
->      if (addr_str == NULL) {
-> -        error_report_err(local_error);
->          closesocket(sioc->fd);
->          goto end;
->      }
-
-On first glance, this looks like you're sweeping an error under the rug.
-Not true, as socket_address_to_string() can't actually fail.  Please
-drop the dead error handling entirely.
-
-> @@ -571,7 +570,8 @@ end:
->  static int net_socket_connect_init(NetClientState *peer,
->                                     const char *model,
->                                     const char *name,
-> -                                   const char *host_str)
-> +                                   const char *host_str,
-> +                                   Error **errp)
->  {
->      socket_connect_data *c = g_new0(socket_connect_data, 1);
->      QIOChannelSocket *sioc;
-> @@ -594,7 +594,7 @@ static int net_socket_connect_init(NetClientState *peer,
-       Error *local_error = NULL;
-
-       c->peer = peer;
-       c->model = g_strdup(model);
-       c->name = g_strdup(name);
-       c->saddr = socket_parse(host_str, &local_error);
-       if (c->saddr == NULL) {
-           goto err;
-       }
-
-       sioc = qio_channel_socket_new();
-       qio_channel_socket_connect_async(sioc,
-                                        c->saddr,
-                                        net_socket_connected,
-                                        c,
-                                        NULL);
->      return 0;
->  
->  err:
-> -    error_report_err(local_error);
-> +    error_propagate(errp, local_error);
->      socket_connect_data_free(c);
->      return -1;
->  }
-
-Since all we do with local_error is propagate it, we can eliminate it:
-pass errp directly to socket_parse(), drop error_propagate().
-
-> @@ -603,7 +603,8 @@ static int net_socket_mcast_init(NetClientState *peer,
->                                   const char *model,
->                                   const char *name,
->                                   const char *host_str,
-> -                                 const char *localaddr_str)
-> +                                 const char *localaddr_str,
-> +                                 Error **errp)
->  {
->      NetSocketState *s;
->      int fd;
-> @@ -614,8 +615,11 @@ static int net_socket_mcast_init(NetClientState *peer,
-       struct sockaddr_in saddr;
-       struct in_addr localaddr, *param_localaddr;
-
-       if (parse_host_port(&saddr, host_str) < 0)
->          return -1;
-
-Fails without setting an error.  Fixed in PATCH 4.  Recommend to do
-PATCH 4 before this one.
-
->  
->      if (localaddr_str != NULL) {
-> -        if (inet_aton(localaddr_str, &localaddr) == 0)
-> +        if (inet_aton(localaddr_str, &localaddr) == 0) {
-> +            error_setg(errp, "Convert the local address to network"
-> +                        " byte order failed");
-
-inet_aton() fails only when its first argument is not a valid IPv4
-address.  Suggest:
-
-    error_setg(errp, "localaddr '%s' is not a valid IPv4 address",
-               localaddr_str);
-
-This error message includes both the exact parameter name "localaddr"
-and the parameter value.
-
->              return -1;
-> +        }
->          param_localaddr = &localaddr;
->      } else {
->          param_localaddr = NULL;
-       }
-
-       fd = net_socket_mcast_create(&saddr, param_localaddr);
-       if (fd < 0)
-           return -1;
-
-Fails without setting an error.  Fixed in PATCH 3.  Recommend to do
-PATCH 3 before this one.
-
-       s = net_socket_fd_init(peer, model, name, fd, 0);
-       if (!s)
-           return -1;
-
-Likewise.
-
-> @@ -642,7 +646,8 @@ static int net_socket_udp_init(NetClientState *peer,
->                                   const char *model,
->                                   const char *name,
->                                   const char *rhost,
-> -                                 const char *lhost)
-> +                                 const char *lhost,
-> +                                 Error **errp)
->  {
->      NetSocketState *s;
->      int fd, ret;
-> @@ -658,7 +663,7 @@ static int net_socket_udp_init(NetClientState *peer,
-       struct sockaddr_in laddr, raddr;
-
-       if (parse_host_port(&laddr, lhost) < 0) {
-           return -1;
-
-Fails without setting an error.  Fixed in PATCH 4.  Recommend to do
-PATCH 4 before this one.
-
-       }
-
-       if (parse_host_port(&raddr, rhost) < 0) {
-           return -1;
-
-Likewise.
-
-       }
-
->  
->      fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
->      if (fd < 0) {
-> -        perror("socket(PF_INET, SOCK_DGRAM)");
-> +        error_setg_errno(errp, errno, "socket(PF_INET, SOCK_DGRAM)");
-
-Bad error message, but no worse than before.
-
->          return -1;
->      }
->  
-> @@ -669,7 +674,7 @@ static int net_socket_udp_init(NetClientState *peer,
-       ret = socket_set_fast_reuse(fd);
-       if (ret < 0) {
-           closesocket(fd);
-           return -1;
-
-Fails without setting an error.
-
->      }
->      ret = bind(fd, (struct sockaddr *)&laddr, sizeof(laddr));
->      if (ret < 0) {
-> -        perror("bind");
-> +        error_setg_errno(errp, errno, "bind");
-
-Bad error message, but no worse than before.
-
->          closesocket(fd);
->          return -1;
->      }
-> @@ -691,7 +696,6 @@ static int net_socket_udp_init(NetClientState *peer,
->  int net_init_socket(const Netdev *netdev, const char *name,
->                      NetClientState *peer, Error **errp)
->  {
-> -    /* FIXME error_setg(errp, ...) on failure */
->      Error *err = NULL;
->      const NetdevSocketOptions *sock;
->  
-> @@ -700,13 +704,13 @@ int net_init_socket(const Netdev *netdev, const char *name,
->  
->      if (sock->has_fd + sock->has_listen + sock->has_connect + sock->has_mcast +
->          sock->has_udp != 1) {
-> -        error_report("exactly one of fd=, listen=, connect=, mcast= or udp="
-> +        error_setg(errp, "exactly one of fd=, listen=, connect=, mcast= or udp="
->                       " is required");
->          return -1;
->      }
->  
->      if (sock->has_localaddr && !sock->has_mcast && !sock->has_udp) {
-> -        error_report("localaddr= is only valid with mcast= or udp=");
-> +        error_setg(errp, "localaddr= is only valid with mcast= or udp=");
->          return -1;
->      }
->  
-> @@ -715,7 +719,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
->  
->          fd = monitor_fd_param(cur_mon, sock->fd, &err);
->          if (fd == -1) {
-> -            error_report_err(err);
-> +            error_propagate(errp, err);
->              return -1;
->          }
-
-Again, pass errp instead of &err, and drop error_propagate().
-
->          qemu_set_nonblock(fd);
-           if (!net_socket_fd_init(peer, "socket", name, fd, 1)) {
-               return -1;
-
-Fails without setting an error.  Fixed in PATCH 3.  Recommend to do
-PATCH 3 before this one.
-
-           }
-           return 0;
-       }
-
-> @@ -726,15 +730,18 @@ int net_init_socket(const Netdev *netdev, const char *name,
->      }
->  
->      if (sock->has_listen) {
-> -        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
-> +        if (net_socket_listen_init(peer, "socket", name, sock->listen,
-> +            &err) == -1) {
-> +            error_propagate(errp, err);
->              return -1;
->          }
->          return 0;
->      }
->  
->      if (sock->has_connect) {
-> -        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
-> -            -1) {
-> +        if (net_socket_connect_init(peer, "socket", name, sock->connect,
-> +            &err) == -1) {
-> +            error_propagate(errp, err);
->              return -1;
->          }
->          return 0;
-> @@ -744,7 +751,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
->          /* if sock->localaddr is missing, it has been initialized to "all bits
->           * zero" */
->          if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
-> -            sock->localaddr) == -1) {
-> +            sock->localaddr, &err) == -1) {
-> +            error_propagate(errp, err);
->              return -1;
->          }
->          return 0;
-> @@ -752,11 +760,12 @@ int net_init_socket(const Netdev *netdev, const char *name,
->  
->      assert(sock->has_udp);
->      if (!sock->has_localaddr) {
-> -        error_report("localaddr= is mandatory with udp=");
-> +        error_setg(errp, "localaddr= is mandatory with udp=");
->          return -1;
->      }
-> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
-> -        -1) {
-> +    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr,
-> +        &err) == -1) {
-> +        error_propagate(errp, err);
->          return -1;
->      }
->      return 0;
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index 8188d9a..0da33d7 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -1312,7 +1312,7 @@ SocketAddress *socket_remote_address(int fd, Error **errp)
->      return socket_sockaddr_to_address(&ss, sslen, errp);
->  }
->  
-> -char *socket_address_to_string(struct SocketAddress *addr, Error **errp)
-> +char *socket_address_to_string(struct SocketAddress *addr)
->  {
->      char *buf;
->      InetSocketAddress *inet;
+>>          goto end;
+>>      }
+>>  
+[...]
