@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3pzE-0007KR-Kd
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:26:01 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d3q1q-0008QW-69
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d3pzB-0001jq-Ag
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:26:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32880)
+	(envelope-from <ehabkost@redhat.com>) id 1d3q1n-0002qb-3h
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:28:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d3pzA-0001jj-Vu
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:25:57 -0400
-Date: Thu, 27 Apr 2017 17:25:51 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d3q1m-0002qH-Qp
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 16:28:39 -0400
+Date: Thu, 27 Apr 2017 17:28:24 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170427202551.GL3482@thinpad.lan.raisama.net>
-References: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
-	<24766133-5384-09fd-a24a-8acf964c9367@redhat.com>
-	<20170427153222.5d991d2b@nial.brq.redhat.com>
-	<874lxa2bex.fsf@dusky.pond.sub.org>
-	<20170427164626.78f65611@nial.brq.redhat.com>
+Message-ID: <20170427202824.GM3482@thinpad.lan.raisama.net>
+References: <20170427101259.13798-1-lvivier@redhat.com>
+	<20170427101259.13798-2-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170427164626.78f65611@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v9] Allow setting NUMA distance for
- different NUMA nodes
+In-Reply-To: <20170427101259.13798-2-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] numa: introduce
+ numa_auto_assign_ram() function in MachineClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>, He Chen <he.chen@linux.intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, Apr 27, 2017 at 04:46:26PM +0200, Igor Mammedov wrote:
-> On Thu, 27 Apr 2017 16:05:42 +0200
-> Markus Armbruster <armbru@redhat.com> wrote:
-> > Igor Mammedov <imammedo@redhat.com> writes:
-> > > On Thu, 27 Apr 2017 07:54:31 -0500
-> > > Eric Blake <eblake@redhat.com> wrote:
-[...]
-> > >> 
-> > >> Markus has asked that all new QMP commands have some testsuite exposure;
-> > >> he may have some advice on what test would be best to modify to give us
-> > >> some coverage of this feature.  
-> > 
-> > I can't see the QMP command here, but...
-> > 
-> > > Since it's basically validation of SLIT table, the test case
-> > > should be added to tests/bios-tables-test.c  
-> > 
-> > ... I figure there's new stuff to test all the same.
-> it could be a patch on top and doesn't have to hold this one if
-> author promises to write testcase
+On Thu, Apr 27, 2017 at 12:12:58PM +0200, Laurent Vivier wrote:
+> We need to change the way we distribute the memory across
+> the nodes. To keep compatibility between machine type version
+> introduce a  machine type dependent function.
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  include/hw/boards.h |  2 ++
+>  numa.c              | 44 +++++++++++++++++++++++++++++++++-----------
+>  2 files changed, 35 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 31d9c72..e571b22 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -136,6 +136,8 @@ struct MachineClass {
+>      int minimum_page_bits;
+>      bool has_hotpluggable_cpus;
+>      int numa_mem_align_shift;
+> +    void (*numa_auto_assign_ram)(uint64_t *nodes,
+> +                                 int nb_nodes, ram_addr_t size);
+>  
 
-Agreed. I'm applying this to my machine-next branch, but I would
-like to get test cases before including it in a pull request.
+The code looks good, but I would like to have comments here
+documenting the behavior when the field is NULL.
+
+>      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>                                             DeviceState *dev);
+> diff --git a/numa.c b/numa.c
+> index 6fc2393..2770c18 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -294,6 +294,38 @@ static void validate_numa_cpus(void)
+>      g_free(seen_cpus);
+>  }
+>  
+> +static void numa_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> +                                 int nb_nodes, ram_addr_t size)
+> +{
+> +    int i;
+> +    uint64_t usedmem = 0;
+> +
+> +    if (mc->numa_auto_assign_ram) {
+> +        uint64_t *mem = g_new(uint64_t, nb_nodes);
+> +
+> +        mc->numa_auto_assign_ram(mem, nb_nodes, size);
+> +
+> +        for (i = 0; i < nb_nodes; i++) {
+> +            nodes[i].node_mem = mem[i];
+> +        }
+> +
+> +        g_free(mem);
+> +
+> +        return;
+> +    }
+> +
+> +    /* Align each node according to the alignment
+> +     * requirements of the machine class
+> +     */
+> +
+> +    for (i = 0; i < nb_nodes - 1; i++) {
+> +        nodes[i].node_mem = (size / nb_nodes) &
+> +                            ~((1 << mc->numa_mem_align_shift) - 1);
+> +        usedmem += nodes[i].node_mem;
+> +    }
+> +    nodes[i].node_mem = size - usedmem;
+> +}
+> +
+>  void parse_numa_opts(MachineClass *mc)
+>  {
+>      int i;
+> @@ -336,17 +368,7 @@ void parse_numa_opts(MachineClass *mc)
+>              }
+>          }
+>          if (i == nb_numa_nodes) {
+> -            uint64_t usedmem = 0;
+> -
+> -            /* Align each node according to the alignment
+> -             * requirements of the machine class
+> -             */
+> -            for (i = 0; i < nb_numa_nodes - 1; i++) {
+> -                numa_info[i].node_mem = (ram_size / nb_numa_nodes) &
+> -                                        ~((1 << mc->numa_mem_align_shift) - 1);
+> -                usedmem += numa_info[i].node_mem;
+> -            }
+> -            numa_info[i].node_mem = ram_size - usedmem;
+> +            numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
+>          }
+>  
+>          numa_total = 0;
+> -- 
+> 2.9.3
+> 
 
 -- 
 Eduardo
