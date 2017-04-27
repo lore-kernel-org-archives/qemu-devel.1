@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3YW1-0007Wb-Mo
+	(envelope-from <eblake@redhat.com>) id 1d3YW2-0007XE-BF
 	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3YW0-00045j-IE
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3YW0-00045r-Jj
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:42 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 26 Apr 2017 20:46:16 -0500
-Message-Id: <20170427014626.11553-8-eblake@redhat.com>
+Date: Wed, 26 Apr 2017 20:46:14 -0500
+Message-Id: <20170427014626.11553-6-eblake@redhat.com>
 In-Reply-To: <20170427014626.11553-1-eblake@redhat.com>
 References: <20170427014626.11553-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v10 07/17] qemu-io: Switch 'alloc' command to
- byte-based length
+Subject: [Qemu-devel] [PATCH v10 05/17] iotests: Add test 179 to cover write
+ zeroes with unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,132 +23,262 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-For the 'alloc' command, accepting an offset in bytes but a length
-in sectors, and reporting output in sectors, is confusing.  Do
-everything in bytes, and adjust the expected output accordingly.
+No tests were covering write zeroes with unmap.  Additionally,
+I needed to prove that my previous patches for correct status
+reporting and write zeroes optimizations actually had an impact.
+
+The test works for cluster_size between 8k and 2M (for smaller
+sizes, it fails because our allocation patterns are not contiguous
+with small clusters).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 ---
-v10: rebase to code cleanup
+v10: drop any changes to v2 files, rewrite test to work with updates
+earlier in the series, add a blkdebug probe
 v9: new patch
 ---
- qemu-io-cmds.c                    | 30 ++++++++++++++++++------------
- tests/qemu-iotests/019.out        |  8 ++++----
- tests/qemu-iotests/common.pattern |  2 +-
- 3 files changed, 23 insertions(+), 17 deletions(-)
+ tests/qemu-iotests/179     | 123 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/179.out |  90 +++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 214 insertions(+)
+ create mode 100755 tests/qemu-iotests/179
+ create mode 100644 tests/qemu-iotests/179.out
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index fabc394..34f6707 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -1760,7 +1760,7 @@ out:
- static int alloc_f(BlockBackend *blk, int argc, char **argv)
- {
-     BlockDriverState *bs =3D blk_bs(blk);
--    int64_t offset, sector_num, nb_sectors, remaining;
-+    int64_t offset, sector_num, nb_sectors, remaining, bytes;
-     char s1[64];
-     int num, ret;
-     int64_t sum_alloc;
-@@ -1776,18 +1776,24 @@ static int alloc_f(BlockBackend *blk, int argc, c=
-har **argv)
-     }
-
-     if (argc =3D=3D 3) {
--        nb_sectors =3D cvtnum(argv[2]);
--        if (nb_sectors < 0) {
--            print_cvtnum_err(nb_sectors, argv[2]);
-+        bytes =3D cvtnum(argv[2]);
-+        if (bytes < 0) {
-+            print_cvtnum_err(bytes, argv[2]);
-             return 0;
--        } else if (nb_sectors > INT_MAX) {
--            printf("length argument cannot exceed %d, given %s\n",
--                   INT_MAX, argv[2]);
-+        } else if (bytes > INT_MAX * BDRV_SECTOR_SIZE) {
-+            printf("length argument cannot exceed %llu, given %s\n",
-+                   INT_MAX * BDRV_SECTOR_SIZE, argv[2]);
-             return 0;
-         }
-     } else {
--        nb_sectors =3D 1;
-+        bytes =3D BDRV_SECTOR_SIZE;
-     }
-+    if (!QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE)) {
-+        printf("bytes %" PRId64 " is not sector aligned\n",
-+               bytes);
-+        return 0;
-+    }
-+    nb_sectors =3D bytes >> BDRV_SECTOR_BITS;
-
-     remaining =3D nb_sectors;
-     sum_alloc =3D 0;
-@@ -1811,8 +1817,8 @@ static int alloc_f(BlockBackend *blk, int argc, cha=
-r **argv)
-
-     cvtstr(offset, s1, sizeof(s1));
-
--    printf("%"PRId64"/%"PRId64" sectors allocated at offset %s\n",
--           sum_alloc, nb_sectors, s1);
-+    printf("%"PRId64"/%"PRId64" bytes allocated at offset %s\n",
-+           sum_alloc << BDRV_SECTOR_BITS, nb_sectors << BDRV_SECTOR_BITS=
-, s1);
-     return 0;
- }
-
-@@ -1822,8 +1828,8 @@ static const cmdinfo_t alloc_cmd =3D {
-     .argmin     =3D 1,
-     .argmax     =3D 2,
-     .cfunc      =3D alloc_f,
--    .args       =3D "off [sectors]",
--    .oneline    =3D "checks if a sector is present in the file",
-+    .args       =3D "offset [bytes]",
-+    .oneline    =3D "checks if offset is allocated in the file",
- };
-
-
-diff --git a/tests/qemu-iotests/019.out b/tests/qemu-iotests/019.out
-index 0124264..17a7c03 100644
---- a/tests/qemu-iotests/019.out
-+++ b/tests/qemu-iotests/019.out
-@@ -542,8 +542,8 @@ Testing conversion with -B TEST_DIR/t.IMGFMT.base
-
- Checking if backing clusters are allocated when they shouldn't
-
--0/128 sectors allocated at offset 1 MiB
--0/128 sectors allocated at offset 4.001 GiB
-+0/65536 bytes allocated at offset 1 MiB
-+0/65536 bytes allocated at offset 4.001 GiB
- Reading
-
- =3D=3D=3D IO: pattern 42
-@@ -1086,8 +1086,8 @@ Testing conversion with -o backing_file=3DTEST_DIR/=
-t.IMGFMT.base
-
- Checking if backing clusters are allocated when they shouldn't
-
--0/128 sectors allocated at offset 1 MiB
--0/128 sectors allocated at offset 4.001 GiB
-+0/65536 bytes allocated at offset 1 MiB
-+0/65536 bytes allocated at offset 4.001 GiB
- Reading
-
- =3D=3D=3D IO: pattern 42
-diff --git a/tests/qemu-iotests/common.pattern b/tests/qemu-iotests/commo=
-n.pattern
-index ddfbca1..34f4a8d 100644
---- a/tests/qemu-iotests/common.pattern
-+++ b/tests/qemu-iotests/common.pattern
-@@ -18,7 +18,7 @@
-
- function do_is_allocated() {
-     local start=3D$1
--    local size=3D$(( $2 / 512))
-+    local size=3D$2
-     local step=3D$3
-     local count=3D$4
-
---=20
+diff --git a/tests/qemu-iotests/179 b/tests/qemu-iotests/179
+new file mode 100755
+index 0000000..4e4ffce
+--- /dev/null
++++ b/tests/qemu-iotests/179
+@@ -0,0 +1,123 @@
++#!/bin/bash
++#
++# Test case for write zeroes with unmap
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=eblake@redhat.com
++
++seq="$(basename $0)"
++echo "QA output created by $seq"
++
++here="$PWD"
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++# v2 images can't mark clusters as zero
++_unsupported_imgopts compat=0.10
++
++echo
++echo '=== Testing write zeroes with unmap ==='
++echo
++
++TEST_IMG="$TEST_IMG.base" _make_test_img 64M
++_make_test_img -b "$TEST_IMG.base"
++
++# Offsets chosen at or near 2M boundaries so test works at any cluster size
++
++# Aligned writes to unallocated cluster should not allocate mapping, but must
++# mark cluster as zero, whether or not unmap was requested
++$QEMU_IO -c "write -z -u 2M 2M" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z 6M 2M" "$TEST_IMG.base" | _filter_qemu_io
++
++# Unaligned writes need not allocate mapping if the cluster already reads
++# as zero, but must mark cluster as zero, whether or not unmap was requested
++$QEMU_IO -c "write -z -u 10485761 2097150" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z 14680065 2097150" "$TEST_IMG.base" | _filter_qemu_io
++
++# Requesting unmap of normal data must deallocate; omitting unmap should
++# preserve the mapping
++$QEMU_IO -c "write 18M 14M" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z -u 20M 2M" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z 24M 6M" "$TEST_IMG.base" | _filter_qemu_io
++
++# Likewise when writing on already-mapped zero data
++$QEMU_IO -c "write -z -u 26M 2M" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z 28M 2M" "$TEST_IMG.base" | _filter_qemu_io
++
++# Writing on unmapped zeroes does not allocate
++$QEMU_IO -c "write -z 32M 8M" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z -u 34M 2M" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z 36M 2M" "$TEST_IMG.base" | _filter_qemu_io
++
++# Writing zero overrides a backing file, regardless of backing cluster type
++$QEMU_IO -c "write -z 40M 8M" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write 48M 8M" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z -u 42M 2M" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -z 44M 2M" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -z -u 50M 2M" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -z 52M 2M" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -z -u 58M 2M" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -z 60M 2M" "$TEST_IMG" | _filter_qemu_io
++
++# Final check that mappings are correct and images are still sane
++$QEMU_IO -c "map" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map |
++    sed 's/"offset": [0-9]*/"offset": OFFSET/g'
++TEST_IMG="$TEST_IMG.base" _check_test_img
++_check_test_img
++
++echo
++echo '=== Testing cache optimization ==='
++echo
++
++BLKDBG_TEST_IMG="blkdebug:$TEST_DIR/blkdebug.conf:$TEST_IMG.base"
++
++cat > "$TEST_DIR/blkdebug.conf" <<EOF
++[inject-error]
++event = "l2_update"
++errno = "5"
++immediately = "on"
++once = "off"
++EOF
++
++# None of the following writes should trigger an L2 update, because the
++# cluster already reads as zero, and we don't have to change allocation
++$QEMU_IO -c "w -z -u 20M 2M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "w -z 20M 2M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "w -z 28M 2M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
++
++# Proof that our blkdebug hook works
++$QEMU_IO -c "w -z -u 0M 2M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
++
++# success, all done
++echo '*** done'
++status=0
+diff --git a/tests/qemu-iotests/179.out b/tests/qemu-iotests/179.out
+new file mode 100644
+index 0000000..2c3071b
+--- /dev/null
++++ b/tests/qemu-iotests/179.out
+@@ -0,0 +1,90 @@
++QA output created by 179
++
++=== Testing write zeroes with unmap ===
++
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 2097152/2097152 bytes at offset 2097152
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 6291456
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097150/2097150 bytes at offset 10485761
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097150/2097150 bytes at offset 14680065
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 14680064/14680064 bytes at offset 18874368
++14 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 20971520
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 6291456/6291456 bytes at offset 25165824
++6 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 27262976
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 29360128
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 8388608/8388608 bytes at offset 33554432
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 35651584
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 37748736
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 8388608/8388608 bytes at offset 41943040
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 8388608/8388608 bytes at offset 50331648
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 44040192
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 46137344
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 52428800
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 54525952
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 60817408
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 62914560
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++[                       0]     4096/  131072 sectors not allocated at offset 0 bytes (0)
++[                 2097152]     4096/  126976 sectors     allocated at offset 2 MiB (1)
++[                 4194304]     4096/  122880 sectors not allocated at offset 4 MiB (0)
++[                 6291456]     4096/  118784 sectors     allocated at offset 6 MiB (1)
++[                 8388608]     4096/  114688 sectors not allocated at offset 8 MiB (0)
++[                10485760]     4096/  110592 sectors     allocated at offset 10 MiB (1)
++[                12582912]     4096/  106496 sectors not allocated at offset 12 MiB (0)
++[                14680064]     4096/  102400 sectors     allocated at offset 14 MiB (1)
++[                16777216]     4096/   98304 sectors not allocated at offset 16 MiB (0)
++[                18874368]    77824/   94208 sectors     allocated at offset 18 MiB (1)
++[                58720256]    16384/   16384 sectors not allocated at offset 56 MiB (0)
++[{ "start": 0, "length": 18874368, "depth": 1, "zero": true, "data": false},
++{ "start": 18874368, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 20971520, "length": 2097152, "depth": 1, "zero": true, "data": false},
++{ "start": 23068672, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 25165824, "length": 2097152, "depth": 1, "zero": true, "data": false, "offset": OFFSET},
++{ "start": 27262976, "length": 2097152, "depth": 1, "zero": true, "data": false},
++{ "start": 29360128, "length": 2097152, "depth": 1, "zero": true, "data": false, "offset": OFFSET},
++{ "start": 31457280, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 33554432, "length": 10485760, "depth": 1, "zero": true, "data": false},
++{ "start": 44040192, "length": 4194304, "depth": 0, "zero": true, "data": false},
++{ "start": 48234496, "length": 2097152, "depth": 1, "zero": true, "data": false},
++{ "start": 50331648, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 52428800, "length": 4194304, "depth": 0, "zero": true, "data": false},
++{ "start": 56623104, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 58720256, "length": 2097152, "depth": 1, "zero": true, "data": false},
++{ "start": 60817408, "length": 4194304, "depth": 0, "zero": true, "data": false},
++{ "start": 65011712, "length": 2097152, "depth": 1, "zero": true, "data": false}]
++No errors were found on the image.
++No errors were found on the image.
++
++=== Testing cache optimization ===
++
++wrote 2097152/2097152 bytes at offset 20971520
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 20971520
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 29360128
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Failed to flush the L2 table cache: Input/output error
++Failed to flush the refcount block cache: Input/output error
++wrote 2097152/2097152 bytes at offset 0
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 893962d..11ba1d9 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -169,4 +169,5 @@
+ 174 auto
+ 175 auto quick
+ 176 rw auto backing
++179 rw auto quick
+ 181 rw auto migration
+-- 
 2.9.3
