@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3YW7-0007d9-AW
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3YWA-0007gF-8h
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3YW5-00049C-0u
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3YW9-0004Cp-0K
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:50 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 26 Apr 2017 20:46:18 -0500
-Message-Id: <20170427014626.11553-10-eblake@redhat.com>
+Date: Wed, 26 Apr 2017 20:46:23 -0500
+Message-Id: <20170427014626.11553-15-eblake@redhat.com>
 In-Reply-To: <20170427014626.11553-1-eblake@redhat.com>
 References: <20170427014626.11553-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 09/17] qcow2: Optimize write zero of
- unaligned tail cluster
+Subject: [Qemu-devel] [PATCH v10 14/17] blkdebug: Add pass-through
+ write_zero and discard support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,286 +23,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-We've already improved discards to operate efficiently on the tail
-of an unaligned qcow2 image; it's time to make a similar improvement
-to write zeroes.  The special case is only valid at the tail
-cluster of a file, where we must recognize that any sectors beyond
-the image end would implicitly read as zero, and therefore should
-not penalize our logic for widening a partial cluster into writing
-the whole cluster as zero.
+In order to test the effects of artificial geometry constraints
+on operations like write zero or discard, we first need blkdebug
+to manage these actions.  It also allows us to inject errors on
+those operations, just like we can for read/write/flush.
 
-Update test 154 to cover the new scenarios, using two images of
-intentionally differing length.
+We can also test the contract promised by the block layer; namely,
+if a device has specified limits on alignment or maximum size,
+then those limits must be obeyed (for now, the blkdebug driver
+merely inherits limits from whatever it is wrapping, but the next
+patch will further enhance it to allow specific limit overrides).
 
-While at it, fix the test to gracefully skip when run as
-./check -qcow2 -o compat=0.10 154
-since the older format lacks zero clusters already required earlier
-in the test.
+This patch intentionally refuses to service requests smaller than
+the requested alignments; this is because an upcoming patch adds
+a qemu-iotest to prove that the block layer is correctly handling
+fragmentation, but the test only works if there is a way to tell
+the difference at artificial alignment boundaries when blkdebug is
+using a larger-than-default alignment.  If we let the blkdebug
+layer always defer to the underlying layer, which potentially has
+a smaller granularity, the iotest will be thwarted.
+
+Tested by setting up an NBD server with export 'foo', then invoking:
+$ ./qemu-io
+qemu-io> open -o driver=blkdebug blkdebug::nbd://localhost:10809/foo
+qemu-io> d 0 15M
+qemu-io> w -z 0 15M
+
+Pre-patch, the server never sees the discard (it was silently
+eaten by the block layer); post-patch it is passed across the
+wire.  Likewise, pre-patch the write is always passed with
+NBD_WRITE (with 15M of zeroes on the wire), while post-patch
+it can utilize NBD_WRITE_ZEROES (for less traffic).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 ---
-v10: rebase to better reporting of preallocated zero clusters
-v9: new patch
+v10: no change
+v9: no change
+v7-v8: not submitted (earlier half of series sent for 2.9)
+v6: tighten check of unaligned requests, rebase on rule check
+refactoring, drop R-b
+v5: include 2017 copyright
+v4: correct error injection to respect byte range, tweak formatting
+v3: rebase to byte-based read/write, improve docs on why no
+partial write zero passthrough
+v2: new patch
 ---
- block/qcow2.c              |   7 +++
- tests/qemu-iotests/154     | 112 ++++++++++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/154.out |  83 +++++++++++++++++++++++++++++++++
- 3 files changed, 200 insertions(+), 2 deletions(-)
+ block/blkdebug.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 5c1573c..8038793 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2449,6 +2449,10 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
-     BlockDriverState *file;
-     int64_t res;
-
-+    if (start + count > bs->total_sectors) {
-+        count = bs->total_sectors - start;
-+    }
-+
-     if (!count) {
-         return true;
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index db58db0..62d113c 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -1,6 +1,7 @@
+ /*
+  * Block protocol for I/O error injection
+  *
++ * Copyright (C) 2016-2017 Red Hat, Inc.
+  * Copyright (c) 2010 Kevin Wolf <kwolf@redhat.com>
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+@@ -382,6 +383,11 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+         goto out;
      }
-@@ -2467,6 +2471,9 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     uint32_t tail = (offset + count) % s->cluster_size;
 
-     trace_qcow2_pwrite_zeroes_start_req(qemu_coroutine_self(), offset, count);
-+    if (offset + count == bs->total_sectors * BDRV_SECTOR_SIZE) {
-+        tail = 0;
++    bs->supported_write_flags = BDRV_REQ_FUA &
++        bs->file->bs->supported_write_flags;
++    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        bs->file->bs->supported_zero_flags;
++
+     /* Set request alignment */
+     align = qemu_opt_get_size(opts, "align", 0);
+     if (align < INT_MAX && is_power_of_2(align)) {
+@@ -496,6 +502,72 @@ static int blkdebug_co_flush(BlockDriverState *bs)
+     return bdrv_co_flush(bs->file->bs);
+ }
+
++static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
++                                                  int64_t offset, int count,
++                                                  BdrvRequestFlags flags)
++{
++    uint32_t align = MAX(bs->bl.request_alignment,
++                         bs->bl.pwrite_zeroes_alignment);
++    int err;
++
++    /* Only pass through requests that are larger than requested
++     * preferred alignment (so that we test the fallback to writes on
++     * unaligned portions), and check that the block layer never hands
++     * us anything unaligned that crosses an alignment boundary.  */
++    if (count < align) {
++        assert(QEMU_IS_ALIGNED(offset, align) ||
++               QEMU_IS_ALIGNED(offset + count, align) ||
++               DIV_ROUND_UP(offset, align) ==
++               DIV_ROUND_UP(offset + count, align));
++        return -ENOTSUP;
 +    }
++    assert(QEMU_IS_ALIGNED(offset, align));
++    assert(QEMU_IS_ALIGNED(count, align));
++    if (bs->bl.max_pwrite_zeroes) {
++        assert(count <= bs->bl.max_pwrite_zeroes);
++    }
++
++    err = rule_check(bs, offset, count);
++    if (err) {
++        return err;
++    }
++
++    return bdrv_co_pwrite_zeroes(bs->file, offset, count, flags);
++}
++
++static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
++                                             int64_t offset, int count)
++{
++    uint32_t align = bs->bl.pdiscard_alignment;
++    int err;
++
++    /* Only pass through requests that are larger than requested
++     * minimum alignment, and ensure that unaligned requests do not
++     * cross optimum discard boundaries. */
++    if (count < bs->bl.request_alignment) {
++        assert(QEMU_IS_ALIGNED(offset, align) ||
++               QEMU_IS_ALIGNED(offset + count, align) ||
++               DIV_ROUND_UP(offset, align) ==
++               DIV_ROUND_UP(offset + count, align));
++        return -ENOTSUP;
++    }
++    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
++    assert(QEMU_IS_ALIGNED(count, bs->bl.request_alignment));
++    if (align && count >= align) {
++        assert(QEMU_IS_ALIGNED(offset, align));
++        assert(QEMU_IS_ALIGNED(count, align));
++    }
++    if (bs->bl.max_pdiscard) {
++        assert(count <= bs->bl.max_pdiscard);
++    }
++
++    err = rule_check(bs, offset, count);
++    if (err) {
++        return err;
++    }
++
++    return bdrv_co_pdiscard(bs->file->bs, offset, count);
++}
 
-     if (head || tail) {
-         int64_t cl_start = (offset - head) >> BDRV_SECTOR_BITS;
-diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
-index 7ca7219..005f09f 100755
---- a/tests/qemu-iotests/154
-+++ b/tests/qemu-iotests/154
-@@ -2,7 +2,7 @@
- #
- # qcow2 specific bdrv_pwrite_zeroes tests with backing files (complements 034)
- #
--# Copyright (C) 2016 Red Hat, Inc.
-+# Copyright (C) 2016-2017 Red Hat, Inc.
- #
- # This program is free software; you can redistribute it and/or modify
- # it under the terms of the GNU General Public License as published by
-@@ -42,7 +42,10 @@ _supported_proto file
- _supported_os Linux
+ static void blkdebug_close(BlockDriverState *bs)
+ {
+@@ -750,6 +822,8 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_co_preadv         = blkdebug_co_preadv,
+     .bdrv_co_pwritev        = blkdebug_co_pwritev,
+     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
++    .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
++    .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
 
- CLUSTER_SIZE=4k
--size=128M
-+size=$((128 * 1024 * 1024))
-+
-+# This test requires zero clusters, added in v3 images
-+_unsupported_imgopts compat=0.10
-
- echo
- echo == backing file contains zeros ==
-@@ -299,6 +302,111 @@ $QEMU_IO -c "read -P 0 75k 1k" "$TEST_IMG" | _filter_qemu_io
-
- $QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-
-+echo
-+echo == unaligned image tail cluster, no allocation needed ==
-+
-+CLUSTER_SIZE=1024 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+
-+# With no backing file, write to all or part of unallocated partial cluster
-+
-+# Backing file: 128m: ... | 00 --
-+$QEMU_IO -c "write -z $size 512" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | -- 00
-+$QEMU_IO -c "write -z $size 512" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | 00 00
-+$QEMU_IO -c "write -z $size 1024" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# No offset should be allocated, although the cluster itself is considered
-+# allocated due to the zero flag
-+$QEMU_IO -c "alloc $size 1024" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map
-+
-+# With backing file that reads as zero, write to all or part of entire cluster
-+
-+# Backing file: 128m: ... | 00 00
-+# Active layer: 128m: ... | 00 00 00 00
-+$QEMU_IO -c "write -z $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Backing file: 128m: ... | 00 00
-+# Active layer: 128m: ... | 00 00 -- --
-+$QEMU_IO -c "write -z $((size)) 1024" "$TEST_IMG" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | 00 00
-+# Active layer: 128m: ... | -- -- 00 00
-+$QEMU_IO -c "write -z $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | 00 00
-+# Active layer: 128m: ... | -- 00 00 --
-+$QEMU_IO -c "write -z $((size + 512)) 1024" "$TEST_IMG" | _filter_qemu_io
-+
-+# No offset should be allocated, although the cluster itself is considered
-+# allocated due to the zero flag
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Preallocated cluster is not freed when unmap is not requested
-+
-+# Backing file: 128m: ... | XX -- => ... | XX 00
-+$QEMU_IO -c "write $((size)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# Backing file: 128m: ... | XX 00 => ... | 00 00
-+$QEMU_IO -c "write -z $((size)) 1024" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map |
-+    sed 's/"offset": [0-9]*/"offset": OFFSET/g'
-+
-+echo
-+echo == unaligned image tail cluster, allocation required ==
-+
-+CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+
-+# Write beyond backing file must COW
-+# Backing file: 128m: ... | XX --
-+# Active layer: 128m: ... | -- -- 00 --
-+
-+$QEMU_IO -c "write -P 1 $((size)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 1024)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 512)) 1536" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+
-+# Writes at boundaries of (partial) cluster must not lose mid-cluster data
-+# Backing file: 128m: ... | -- XX
-+# Active layer: 128m: ... | 00 -- -- 00
-+
-+$QEMU_IO -c "write -P 1 $((size + 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+
-+# Partial write must not lose data
-+# Backing file: 128m: ... | -- --
-+# Active layer: 128m: ... | -- -- XX 00
-+
-+$QEMU_IO -c "write -P 1 $((size + 1024)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size + 1024)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/154.out b/tests/qemu-iotests/154.out
-index da9eabd..f8a09af 100644
---- a/tests/qemu-iotests/154.out
-+++ b/tests/qemu-iotests/154.out
-@@ -282,4 +282,87 @@ read 1024/1024 bytes at offset 76800
- { "start": 69632, "length": 4096, "depth": 0, "zero": true, "data": false},
- { "start": 73728, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": 24576},
- { "start": 77824, "length": 134139904, "depth": 1, "zero": true, "data": false}]
-+
-+== unaligned image tail cluster, no allocation needed ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+1024/1024 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134218752, "depth": 0, "zero": true, "data": false}]
-+wrote 2048/2048 bytes at offset 134217728
-+2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
-+wrote 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 134218752
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 134218240
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 0, "zero": true, "data": false},
-+{ "start": 134217728, "length": 1024, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+
-+== unaligned image tail cluster, allocation required ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134218752
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1536/1536 bytes at offset 134218240
-+1.500 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": 20480}]
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 134218752
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 134218752
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": 20480}]
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134218752
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218752
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": 20480}]
- *** done
+     .bdrv_debug_event           = blkdebug_debug_event,
+     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
 -- 
 2.9.3
