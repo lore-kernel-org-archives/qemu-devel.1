@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3n9D-0006uT-Hm
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 13:24:09 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d3nAt-0007iK-Ah
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 13:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d3n98-0007FA-De
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 13:24:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54639
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1d3n98-0007El-61
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 13:24:02 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3RHO0C5143189
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 13:24:00 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a3hhy2jq9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 13:24:00 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 27 Apr 2017 11:23:59 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <imammedo@redhat.com>) id 1d3nAr-00087E-ET
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 13:25:51 -0400
+Date: Thu, 27 Apr 2017 19:25:23 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170427192523.296713a6@Igors-MacBook-Pro.local>
+In-Reply-To: <20170427163225.GE3482@thinpad.lan.raisama.net>
+References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
+	<1490189568-167621-8-git-send-email-imammedo@redhat.com>
+	<20170412210239.GC27126@thinpad.lan.raisama.net>
+	<20170419131458.59e2d00e@nial.brq.redhat.com>
+	<20170426122138.GU3482@thinpad.lan.raisama.net>
+	<20170427151406.57fbfa79@nial.brq.redhat.com>
+	<20170427163225.GE3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170427072843.8089-3-david@gibson.dropbear.id.au>
-References: <20170427072843.8089-1-david@gibson.dropbear.id.au>
-	<20170427072843.8089-3-david@gibson.dropbear.id.au>
-Date: Thu, 27 Apr 2017 12:23:51 -0500
-Message-Id: <149331383157.32299.15205293262497477837@loki>
-Subject: Re: [Qemu-devel] [PATCHv3 2/4] pseries: Move CPU compatibility
- property to machine
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 07/23] pc: add node-id property to
+ CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,466 +29,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, aik@ozlabs.ru, clg@kaod.org, groug@kaod.org, nikunj@linux.vnet.ibm.com
-Cc: agraf@suse.de, abologna@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Quoting David Gibson (2017-04-27 02:28:41)
-> Server class POWER CPUs have a "compat" property, which is used to set the
-> backwards compatibility mode for the processor.  However, this only makes
-> sense for machine types which don't give the guest access to hypervisor
-> privilege - otherwise the compatibility level is under the guest's contro=
-l.
-> =
+On Thu, 27 Apr 2017 13:32:25 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> To reflect this, this removes the CPU 'compat' property and instead
-> creates a 'max-cpu-compat' property on the pseries machine.  Strictly
-> speaking this breaks compatibility, but AFAIK the 'compat' option was
-> never (directly) used with -device or device_add.
-> =
+> On Thu, Apr 27, 2017 at 03:14:06PM +0200, Igor Mammedov wrote:
+> > On Wed, 26 Apr 2017 09:21:38 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > 
+> > adding Peter to CC list
+> > 
+> > [...]
+> > 
+> > > On Wed, Apr 19, 2017 at 01:14:58PM +0200, Igor Mammedov wrote:
+> > > > On Wed, 12 Apr 2017 18:02:39 -0300
+> > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > >   
+> > > > > On Wed, Mar 22, 2017 at 02:32:32PM +0100, Igor Mammedov wrote:  
+> > > > > > it will allow switching from cpu_index to property based
+> > > > > > numa mapping in follow up patches.    
+> > > > > 
+> > > > > I am not sure I understand all the consequences of this, so I
+> > > > > will give it a try:
+> > > > > 
+> > > > > "node-id" is an existing field in CpuInstanceProperties.
+> > > > > CpuInstanceProperties is used on both query-hotpluggable-cpus
+> > > > > output and in MachineState::possible_cpus.
+> > > > > 
+> > > > > We will start using MachineState::possible_cpus to keep track of
+> > > > > NUMA CPU affinity, and that means query-hotpluggable-cpus will
+> > > > > start reporting a "node-id" property when a NUMA mapping is
+> > > > > configured.
+> > > > > 
+> > > > > To allow query-hotpluggable-cpus to report "node-id", the CPU
+> > > > > objects must have a "node-id" property that can be set. This
+> > > > > patch adds the "node-id" property to X86CPU.
+> > > > > 
+> > > > > Is this description accurate? Is the presence of "node-id" in
+> > > > > query-hotpluggable-cpus the only reason we really need this
+> > > > > patch, or is there something else that requires the "node-id"
+> > > > > property?  
+> > > > That accurate description, node-id is in the same 'address'
+> > > > properties category as socket/core/thread-id. So if you have
+> > > > numa enabled machine you'd see node-id property in
+> > > > query-hotpluggable-cpus.  
+> > > 
+> > > I agree that we can make -numa cpu affect query-hotpluggable-cpus
+> > > output (i.e. affect some field on HotpluggableCPU.props).
+> > > 
+> > > But it looks like we disagree about the purpose of
+> > > HotpluggableCPU.props:
+> > > 
+> > > I believe HotpluggableCPU.props is just an opaque identifier for
+> > > the location we want to plug the CPU, and the only requirement is
+> > > that it should be unique and have all the information device_add
+> > > needs. As socket IDs are already unique on our existing machines,
+> > > and socket<=>node mapping is already configured using -numa cpu,
+> > > node-id doesn't need to be in HotpluggableCPU.props. (see example
+> > > below)
+> > node-id is also location property which logically complements
+> > to socket/core/thread properties.  Also socket is not necessarily
+> > unique id that maps 1:1 to node-id from generic pov.
+> > BTW -numa cpu[s] is not the only way to specify mapping,
+> > it could be specified like we do with pc-dimm:
+> >    device_add pc-dimm,node=x
+> > 
+> > Looking at it more genericly, there could be the same
+> > socket-ids for different nodes, then we would have to add
+> > node-id to props anyway and end up with 2 node-id, one in props
+> > and another in the parent struct.
+> 
+> This is where my expectations are different: I think
+> HotpluggableCPU.props is just an identifier property for CPU
+> slots that is used for device_add (and will be used for -numa
+> cpu), and isn't supposed to be be interpreted by clients.
+> 
+> The problem I see is that the property has two completely
+> different purposes: identifying a given CPU slot for device_add
+> (and -numa cpu), and introspection of topology information about
+> the CPU slot. Today we are lucky and those goals don't conflict
+> with each other, but I worry this might cause trouble in the
+> future.
+> 
+> > 
+> > 
+> > > I don't think clients should assume topology information in
+> > > HotpluggableCPU.props is always present, because the field has a
+> > > different purpose: letting clients know what are the required
+> > > device_add arguments. If we need introspection of CPU topology,
+> > > we can add new fields to HotpluggableCPU, outside 'props'.
+> > looking at existing clients (libvirt), it doesn't treat 'props'
+> > as opaque set, but parses it into topology information (my guess
+> > is that because it's the sole source such info from QEMU).
+> > Actually we never forbade this, the only requirement for
+> > props was that mgmt should provide those properties to create
+> > a cpu. Property names where designed in topology/location
+> > friendly terms so that clients could make the sense from them.
+> > 
+> > So I wouldn't try now to reduce meaning of 'props' to
+> > opaque as you suggest.
+> 
+> I see. This means my expectation is not met even today. I am not
+> thrilled about it, but that's OK.
+> 
+> > 
+> > [..]
+> > > My question is: if we use:
+> > > 
+> > >  -numa cpu,socket=2,core=1,thread=0,node-id=3
+> > > 
+> > > and then:
+> > > 
+> > >  device_add ...,socket=2,core=1,thread=0
+> > >  (omitting node-id on device_add)
+> > > 
+> > > won't it work exactly the same, and place the new CPU on NUMA
+> > > node 3?
+> > yep, it's allowed for compat reasons:
+> >   1: to allow DST start with old CLI variant, that didn't have node-id
+> >      (migration)
+> >   2: to let old libvirt hotplug CPUs, it doesn't treat 'props'
+> >      as opaque set that is just replayed to device_add,
+> >      instead it composes command from topo info it got
+> >      from QEMU and unfortunately node-id is only read but is
+> >      not emitted when device_add is composed
+> >     (I consider this bug but it's out in the wild so we have to deal with it)
+> > 
+> > we can't enforce presence in these cases or at least have to
+> > keep it relaxed for old machine types.
+> 
+> I see.
+> 
+> >  
+> > > In this case, if we don't need a node-id argument on device_add,
+> > > so node-id doesn't need to be in HotpluggableCPU.props.
+> > I'd say we currently don't have to (for above reasons) but
+> > it doesn't hurt and actually allows to use pc-dimm way of
+> > mapping CPUs to nodes as David noted. i.e.:
+> >   -device cpu-foo,node-id=x,...
+> > without any of -numa cpu[s] options on CLI.
+> > It's currently explicitly disabled but should work if one
+> > doesn't care about hotplug or if target doesn't care about
+> > mapping at startup (sPAPR), it also might work for x86 as
+> > well using _PXM method in ACPI.
+> > (But that's out of scope of this series and needs more
+> > testing as some guest OSes might expect populated SRAT
+> > to work correctly).
+> 
+> Yep. I understand that setting node-id is useful, I just didn't
+> expect it to be mandatory and included on HotpluggableCPU.props.
+> 
+> > 
+> > [...]
+> > > > 
+> > > > In future to avoid starting QEMU twice we were thinking about
+> > > > configuring QEMU from QMP at runtime, that's where preconfigure
+> > > > approach could be used to help solving it in the future:
+> > > > 
+> > > >   1. introduce pause before machine_init CLI option to allow
+> > > >      preconfig machine from qmp/monitor
+> > > >   2. make query-hotpluggable-cpus usable at preconfig time
+> > > >   3. start qemu with needed number of numa nodes and default mapping:
+> > > >          #qemu -smp ... -numa node,nodeid=0 -node node,nodeid=1
+> > > >   4. get possible cpus list  
+> > > 
+> > > This is where things can get tricky: if we have the default
+> > > mapping set, step 4 would return "node-id" already set on all
+> > > possible CPUs.
+> > that would depend on impl.
+> >  - display node-id with default preset values to override
+> >  - do not set defaults and force user to do mapping
+> 
+> Right. We could choose to initialize default values much later,
+> and leave it uninitialized.
+> 
+> > 
+> > > >   5. add qmp/monitor command variant for '-numa cpu' to set numa mapping  
+> > > 
+> > > This is where I think we would make things simpler: if node-id
+> > > isn't present on 'props', we can simply document the arguments
+> > > that identify the CPU for the numa-cpu command as "just use the
+> > > properties you get on query-hotpluggable-cpus.props". Clients
+> > > would be able to treat CpuInstanceProperties as an opaque CPU
+> > > slot identifier.
+> > > 
+> > > i.e. I think this would be a better way to define and document
+> > > the interface:
+> > > 
+> > > ##
+> > > # @NumaCpuOptions:
+> > > #
+> > > # Mapping of a given CPU (or a set of CPUs) to a NUMA node.
+> > > #
+> > > # @cpu: Properties identifying the CPU(s). Use the 'props' field of
+> > > #       query-hotpluggable-cpus for possible values for this
+> > > #       field.
+> > > #       TODO: describe what happens when 'cpu' matches
+> > > #       multiple slots.
+> > > # @node-id: NUMA node where the CPUs are going to be located.
+> > > ##
+> > > { 'struct': 'NumaCpuOptions',
+> > >   'data': {
+> > >    'cpu': 'CpuInstanceProperties',
+> > >    'node-id': 'int' } }
+> > > 
+> > > This separates "what identifies the CPU slot(s) we are
+> > > configuring" from "what identifies the node ID we are binding
+> > > to".
+> > Doesn't look any simpler to me, I'd better document node-id usage
+> > in props, like
+> > 
+> 
+> Well, it still looks simpler and more intuitive to me, but just
+> because it matches my initial expectations about the semantics of
+> query-hotpluggable-cpus and CpuInstanceProperties. If your
+> alternative is very clearly documented (like below), it is not a
+> problem to me.
+> 
+> >  #
+> >  # A discriminated record of NUMA options. (for OptsVisitor)
+> >  #
+> > +# For 'cpu' type as arguments use a set of cpu properties returned
+> > +# by query-hotpluggable-cpus[].props, where node-id could be used
+> > +# to override default node mapping. Since: 2.10
+> > +#
+> >  # Since: 2.1
+> >  ##
+> >  { 'union': 'NumaOptions',
+> >    'base': { 'type': 'NumaOptionsType' },
+> >    'discriminator': 'type',
+> >    'data': {
+> > -    'node': 'NumaNodeOptions' }}
+> > +    'node': 'NumaNodeOptions',
+> > +    'cpu' : 'CpuInstanceProperties' }}
+> 
+> I worry about not being able to add extra options to "-numa cpu"
+> in the future without affecting HotpluggableCPU.props too. Being
+> able to document the semantics of -numa cpu inside a dedicated
+> NumaCpuOptions struct would be nice too.
+> 
+> I believe this can be addressed by defing "NumaCpuOptions" with
+> "CpuInstanceProperties" as base:
+> 
+>  { 'union': 'NumaOptions',
+>    'base': { 'type': 'NumaOptionsType' },
+>    'discriminator': 'type',
+>    'data': {
+>      'node': 'NumaNodeOptions',
+>      'cpu' : 'NumaCpuOptions' }}
+> 
+> ##
+> # Options for -numa cpu,...
+> #
+> # "-numa cpu" accepts the same set of cpu properties returned by
+> # query-hotpluggable-cpus[].props, where node-id could be used to
+> # override default node mapping.
+> #
+> # Since: 2.10
+> ##
+> { 'struct': 'NumaCpuOptions',
+>   'base': 'CpuInstanceProperties' }
+is it inheritance or encapsulation?
+if it's encapsulation, wouldn't look nice, but we can
+duplicate fields from CpuInstanceProperties in NumaCpuOptions
+like you proposed below and marshal them into CpuInstanceProperties
+inside of parse_numa() where needed.
 
-> The option was used with -cpu.  So, to maintain compatibility, this patch
-> adds a hack to the cpu option parsing to strip out any compat options
-> supplied with -cpu and set them on the machine property instead of the new
-> removed cpu property.
-
-"now-deprecated cpu property" maybe?
-
-> =
-
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr.c              |  6 +++-
->  hw/ppc/spapr_cpu_core.c     | 41 ++++++++++++++++++++--
->  hw/ppc/spapr_hcall.c        |  2 +-
->  include/hw/ppc/spapr.h      | 12 ++++---
->  target/ppc/compat.c         | 65 +++++++++++++++++++++++++++++++++++
->  target/ppc/cpu.h            |  6 ++--
->  target/ppc/translate_init.c | 84 +++++++++++++--------------------------=
-------
->  7 files changed, 145 insertions(+), 71 deletions(-)
-> =
-
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 80d12d0..547fa27 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2117,7 +2117,7 @@ static void ppc_spapr_init(MachineState *machine)
->          machine->cpu_model =3D kvm_enabled() ? "host" : smc->tcg_default=
-_cpu;
->      }
-> =
-
-> -    ppc_cpu_parse_features(machine->cpu_model);
-> +    spapr_cpu_parse_features(spapr);
-> =
-
->      spapr_init_cpus(spapr);
-> =
-
-> @@ -2480,6 +2480,10 @@ static void spapr_machine_initfn(Object *obj)
->                                      " place of standard EPOW events when=
- possible"
->                                      " (required for memory hot-unplug su=
-pport)",
->                                      NULL);
-> +
-> +    object_property_add(obj, "max-cpu-compat", "str",
-> +                        ppc_compat_prop_get, ppc_compat_prop_set,
-> +                        NULL, &spapr->max_compat_pvr, &error_fatal);
->  }
-> =
-
->  static void spapr_machine_finalizefn(Object *obj)
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 4389ef4..ba610bc 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -20,6 +20,43 @@
->  #include "sysemu/numa.h"
->  #include "qemu/error-report.h"
-> =
-
-> +void spapr_cpu_parse_features(sPAPRMachineState *spapr)
-> +{
-> +    /*
-> +     * Backwards compatibility hack:
-> +
-
-Missing "*"
-
-> +     *   CPUs had a "compat=3D" property which didn't make sense for
-> +     *   anything except pseries.  It was replaced by "max-cpu-compat"
-> +     *   machine option.  This supports old command lines like
-> +     *       -cpu POWER8,compat=3Dpower7
-> +     *   By stripping the compat option and applying it to the machine
-> +     *   before passing it on to the cpu level parser.
-> +     */
-> +    gchar **inpieces;
-> +    int n, i;
-> +    gchar *compat_str =3D NULL;
-> +
-> +    inpieces =3D g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
-> +    n =3D g_strv_length(inpieces);
-> +
-> +    /* inpieces[0] is the actual model string */
-
-The comment seems a bit out of place unless we start with i =3D 1
-
-> +    for (i =3D 0; i < n; i++) {
-> +        if (g_str_has_prefix(inpieces[i], "compat=3D")) {
-> +            compat_str =3D inpieces[i];
-> +        }
-> +    }
-> +
-> +    if (compat_str) {
-> +        char *val =3D compat_str + strlen("compat=3D");
-> +        object_property_set_str(OBJECT(spapr), val, "max-cpu-compat",
-> +                                &error_fatal);
-> +    }
-> +
-> +    ppc_cpu_parse_features(MACHINE(spapr)->cpu_model);
-> +
-> +    g_strfreev(inpieces);
-> +}
-> +
->  static void spapr_cpu_reset(void *opaque)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> @@ -70,10 +107,10 @@ static void spapr_cpu_init(sPAPRMachineState *spapr,=
- PowerPCCPU *cpu,
->      /* Enable PAPR mode in TCG or KVM */
->      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
-> =
-
-> -    if (cpu->max_compat) {
-> +    if (spapr->max_compat_pvr) {
->          Error *local_err =3D NULL;
-> =
-
-> -        ppc_set_compat(cpu, cpu->max_compat, &local_err);
-> +        ppc_set_compat(cpu, spapr->max_compat_pvr, &local_err);
->          if (local_err) {
->              error_propagate(errp, local_err);
->              return;
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 9f18f75..d4dc12b 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1059,7 +1059,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
->      target_ulong list =3D ppc64_phys_to_real(args[0]);
->      target_ulong ov_table;
->      bool explicit_match =3D false; /* Matched the CPU's real PVR */
-> -    uint32_t max_compat =3D cpu->max_compat;
-> +    uint32_t max_compat =3D spapr->max_compat_pvr;
->      uint32_t best_compat =3D 0;
->      int i;
->      sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 5802f88..40d5f89 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -86,16 +86,19 @@ struct sPAPRMachineState {
->      uint64_t rtc_offset; /* Now used only during incoming migration */
->      struct PPCTimebase tb;
->      bool has_graphics;
-> -    sPAPROptionVector *ov5;         /* QEMU-supported option vectors */
-> -    sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vecto=
-rs */
-> -    bool cas_reboot;
-> -    bool cas_legacy_guest_workaround;
-> =
-
->      Notifier epow_notifier;
->      QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
->      bool use_hotplug_event_source;
->      sPAPREventSource *event_sources;
-> =
-
-> +    /* ibm,client-architecture-support option negotiation */
-> +    bool cas_reboot;
-> +    bool cas_legacy_guest_workaround;
-> +    sPAPROptionVector *ov5;         /* QEMU-supported option vectors */
-> +    sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vecto=
-rs */
-> +    uint32_t max_compat_pvr;
-> +
->      /* Migration state */
->      int htab_save_index;
->      bool htab_first_pass;
-> @@ -633,6 +636,7 @@ void spapr_hotplug_req_add_by_count_indexed(sPAPRDRCo=
-nnectorType drc_type,
->                                              uint32_t count, uint32_t ind=
-ex);
->  void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_=
-type,
->                                                 uint32_t count, uint32_t =
-index);
-> +void spapr_cpu_parse_features(sPAPRMachineState *spapr);
->  void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
->                                      sPAPRMachineState *spapr);
-> =
-
-> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-> index e8ec1e1..476dead 100644
-> --- a/target/ppc/compat.c
-> +++ b/target/ppc/compat.c
-> @@ -24,9 +24,11 @@
->  #include "sysemu/cpus.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> +#include "qapi/visitor.h"
->  #include "cpu-models.h"
-> =
-
->  typedef struct {
-> +    const char *name;
->      uint32_t pvr;
->      uint64_t pcr;
->      uint64_t pcr_level;
-> @@ -38,6 +40,7 @@ static const CompatInfo compat_table[] =3D {
->       * Ordered from oldest to newest - the code relies on this
->       */
->      { /* POWER6, ISA2.05 */
-> +        .name =3D "power6",
->          .pvr =3D CPU_POWERPC_LOGICAL_2_05,
->          .pcr =3D PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
->                 PCR_COMPAT_2_05 | PCR_TM_DIS | PCR_VSX_DIS,
-> @@ -45,18 +48,21 @@ static const CompatInfo compat_table[] =3D {
->          .max_threads =3D 2,
->      },
->      { /* POWER7, ISA2.06 */
-> +        .name =3D "power7",
->          .pvr =3D CPU_POWERPC_LOGICAL_2_06,
->          .pcr =3D PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | P=
-CR_TM_DIS,
->          .pcr_level =3D PCR_COMPAT_2_06,
->          .max_threads =3D 4,
->      },
->      {
-> +        .name =3D "power7+",
->          .pvr =3D CPU_POWERPC_LOGICAL_2_06_PLUS,
->          .pcr =3D PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | P=
-CR_TM_DIS,
->          .pcr_level =3D PCR_COMPAT_2_06,
->          .max_threads =3D 4,
->      },
->      { /* POWER8, ISA2.07 */
-> +        .name =3D "power8",
->          .pvr =3D CPU_POWERPC_LOGICAL_2_07,
->          .pcr =3D PCR_COMPAT_3_00 | PCR_COMPAT_2_07,
->          .pcr_level =3D PCR_COMPAT_2_07,
-> @@ -189,3 +195,62 @@ int ppc_compat_max_threads(PowerPCCPU *cpu)
-> =
-
->      return n_threads;
->  }
-> +
-> +void ppc_compat_prop_get(Object *obj, Visitor *v, const char *name,
-> +                         void *opaque, Error **errp)
-> +{
-> +    uint32_t compat_pvr =3D *((uint32_t *)opaque);
-> +    const char *value;
-> +
-> +    if (!compat_pvr) {
-> +        value =3D "";
-> +    } else {
-> +        const CompatInfo *compat =3D compat_by_pvr(compat_pvr);
-> +
-> +        g_assert(compat);
-> +
-> +        value =3D compat->name;
-> +    }
-> +
-> +    visit_type_str(v, name, (char **)&value, errp);
-> +}
-> +
-> +void ppc_compat_prop_set(Object *obj, Visitor *v, const char *name,
-> +                         void *opaque, Error **errp)
-> +{
-> +    Error *error =3D NULL;
-> +    char *value;
-> +    uint32_t compat_pvr;
-> +
-> +    visit_type_str(v, name, &value, &error);
-> +    if (error) {
-> +        error_propagate(errp, error);
-> +        return;
-> +    }
-> +
-> +    if (strcmp(value, "") =3D=3D 0) {
-> +        compat_pvr =3D 0;
-> +    } else {
-> +        int i;
-> +        const CompatInfo *compat =3D NULL;
-> +
-> +        for (i =3D 0; i < ARRAY_SIZE(compat_table); i++) {
-> +            if (strcmp(value, compat_table[i].name) =3D=3D 0) {
-> +                compat =3D &compat_table[i];
-> +                break;
-> +
-> +            }
-> +        }
-> +
-> +        if (!compat) {
-> +            error_setg(errp, "Invalid compatibility mode \"%s\"", value);
-> +            goto out;
-> +        }
-> +        compat_pvr =3D compat->pvr;
-> +    }
-> +
-> +    *((uint32_t *)opaque) =3D compat_pvr;
-> +
-> +out:
-> +    g_free(value);
-> +}
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index e0ff041..e953e75 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1185,7 +1185,6 @@ typedef struct PPCVirtualHypervisorClass PPCVirtual=
-HypervisorClass;
->   * PowerPCCPU:
->   * @env: #CPUPPCState
->   * @cpu_dt_id: CPU index used in the device tree. KVM uses this index too
-> - * @max_compat: Maximal supported logical PVR from the command line
->   * @compat_pvr: Current logical PVR, zero if in "raw" mode
->   *
->   * A PowerPC CPU.
-> @@ -1197,7 +1196,6 @@ struct PowerPCCPU {
-> =
-
->      CPUPPCState env;
->      int cpu_dt_id;
-> -    uint32_t max_compat;
->      uint32_t compat_pvr;
->      PPCVirtualHypervisor *vhyp;
->      Object *intc;
-> @@ -1369,6 +1367,10 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t comp=
-at_pvr, Error **errp);
->  void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
->  #endif
->  int ppc_compat_max_threads(PowerPCCPU *cpu);
-> +void ppc_compat_prop_get(Object *obj, Visitor *v,
-> +                         const char *name, void *opaque, Error **err);
-> +void ppc_compat_prop_set(Object *obj, Visitor *v,
-> +                         const char *name, void *opaque, Error **err);
->  #endif /* defined(TARGET_PPC64) */
-> =
-
->  #include "exec/cpu-all.h"
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index e82e3e6..a92c825 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -8413,73 +8413,35 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *da=
-ta)
->      pcc->l1_icache_size =3D 0x10000;
->  }
-> =
-
-> -static void powerpc_get_compat(Object *obj, Visitor *v, const char *name,
-> -                               void *opaque, Error **errp)
-> -{
-> -    char *value =3D (char *)"";
-> -    Property *prop =3D opaque;
-> -    uint32_t *max_compat =3D qdev_get_prop_ptr(DEVICE(obj), prop);
-> -
-> -    switch (*max_compat) {
-> -    case CPU_POWERPC_LOGICAL_2_05:
-> -        value =3D (char *)"power6";
-> -        break;
-> -    case CPU_POWERPC_LOGICAL_2_06:
-> -        value =3D (char *)"power7";
-> -        break;
-> -    case CPU_POWERPC_LOGICAL_2_07:
-> -        value =3D (char *)"power8";
-> -        break;
-> -    case 0:
-> -        break;
-> -    default:
-> -        error_report("Internal error: compat is set to %x", *max_compat);
-> -        abort();
-> -        break;
-> -    }
-> -
-> -    visit_type_str(v, name, &value, errp);
-> -}
-> -
-> -static void powerpc_set_compat(Object *obj, Visitor *v, const char *name,
-> -                               void *opaque, Error **errp)
-> +/*
-> + * The CPU used to have a "compat" property which set the
-> + * compatibility mode PVR.  However, this was conceptually broken - it
-> + * only makes sense on the pseries machine type (otherwise the guest
-> + * owns the PCR and can control the compatibility mode itself).  It's
-> + * been replaced with the 'max-cpu-compat' property on the pseries
-> + * machine type.  For backwards compatibility, pseries specially
-> + * parses the -cpu parameter and converts old compat=3D parameters into
-> + * the appropriate machine parameters.  This stub implementation of
-> + * the parameter catches any uses on explicitly created CPUs.
-> + */
-> +static void getset_compat_deprecated(Object *obj, Visitor *v, const char=
- *name,
-> +                                     void *opaque, Error **errp)
->  {
-> -    Error *error =3D NULL;
-> -    char *value =3D NULL;
-> -    Property *prop =3D opaque;
-> -    uint32_t *max_compat =3D qdev_get_prop_ptr(DEVICE(obj), prop);
-> -
-> -    visit_type_str(v, name, &value, &error);
-> -    if (error) {
-> -        error_propagate(errp, error);
-> -        return;
-> -    }
-> -
-> -    if (strcmp(value, "power6") =3D=3D 0) {
-> -        *max_compat =3D CPU_POWERPC_LOGICAL_2_05;
-> -    } else if (strcmp(value, "power7") =3D=3D 0) {
-> -        *max_compat =3D CPU_POWERPC_LOGICAL_2_06;
-> -    } else if (strcmp(value, "power8") =3D=3D 0) {
-> -        *max_compat =3D CPU_POWERPC_LOGICAL_2_07;
-> -    } else {
-> -        error_setg(errp, "Invalid compatibility mode \"%s\"", value);
-> -    }
-> -
-> -    g_free(value);
-> +    error_report("CPU 'compat' property is deprecated and has no effect;=
- use max-cpu-compat machine property instead");
-
-Isn't the "and has no effect" portion a bit misleading? AFAICT it does
-have an effect still, it just shouldn't be used anymore.
-
-> +    visit_type_null(v, name, errp);
->  }
-> =
-
-> -static PropertyInfo powerpc_compat_propinfo =3D {
-> +static PropertyInfo ppc_compat_deprecated_propinfo =3D {
->      .name =3D "str",
-> -    .description =3D "compatibility mode, power6/power7/power8",
-> -    .get =3D powerpc_get_compat,
-> -    .set =3D powerpc_set_compat,
-> +    .description =3D "compatibility mode (deprecated)",
-> +    .get =3D getset_compat_deprecated,
-> +    .set =3D getset_compat_deprecated,
->  };
-> -
-> -#define DEFINE_PROP_POWERPC_COMPAT(_n, _s, _f) \
-> -    DEFINE_PROP(_n, _s, _f, powerpc_compat_propinfo, uint32_t)
-> -
->  static Property powerpc_servercpu_properties[] =3D {
-> -    DEFINE_PROP_POWERPC_COMPAT("compat", PowerPCCPU, max_compat),
-> +    {
-> +        .name =3D "compat",
-> +        .info =3D &ppc_compat_deprecated_propinfo,
-> +    },
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> =
-
-> -- =
-
-> 2.9.3
->=20
+> 
+> >  
+> 
+> 
+> >  ##
+> >  # @NumaNodeOptions:
+> > 
+> > 
+> > > In case we have trouble making this struct work with QemuOpts, we
+> > > could do this (temporarily?):
+> > > 
+> > > ##
+> > > # @NumaCpuOptions:
+> > > #
+> > > # Mapping of a given CPU (or a set of CPUs) to a NUMA node.
+> > > #
+> > > # @cpu: Properties identifying the CPU(s). Use the 'props' field of
+> > > #       query-hotpluggable-cpus for possible values for this
+> > > #       field.
+> > > #       TODO: describe what happens when 'cpu' matches
+> > > #       multiple slots.
+> > > # @node-id: NUMA node where the CPUs are going to be located.
+> > > #
+> > > # @socket-id: Shortcut for cpu.socket-id, to make this struct
+> > > #             friendly to QemuOpts.
+> > > # @core-id: Shortcut for cpu.core-id, to make this struct
+> > > #           friendly to QemuOpts.
+> > > # @thread-id: Shortcut for cpu.thread-id, to make this struct
+> > > #             friendly to QemuOpts.
+> > > ##
+> > > { 'struct': 'NumaCpuOptions',
+> > >   'data': {
+> > >    '*cpu': 'CpuInstanceProperties',
+> > >    '*socket-id': 'int',
+> > >    '*core-id': 'int',
+> > >    '*thread-id': 'int',
+> > >    'node-id': 'int' } }
+> > > 
+> > > >   6. optionally, set new numa mapping and get updated
+> > > >      possible cpus list with query-hotpluggable-cpus
+> > > >   7. optionally, add extra cpus with device_add using updated
+> > > >      cpus list and get updated cpus list as it's been changed again.
+> > > >   8. unpause preconfig stage and let qemu continue to execute
+> > > >      machine_init and the rest.
+> > > > 
+> > > > Since we would need to implement QMP configuration for '-device cpu',
+> > > > we as well might reuse it for custom numa mapping.
+> > > > 
+> > > >  [...]  
+> > > 
+> > 
+> 
