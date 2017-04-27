@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3mBg-0008Ki-DT
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:22:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3mDP-0000om-Bw
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:24:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d3mBd-0003dH-P5
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:22:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34568)
+	(envelope-from <armbru@redhat.com>) id 1d3mDM-0004Wh-7e
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:24:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38182)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d3mBd-0003cl-FL
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:22:33 -0400
-Date: Thu, 27 Apr 2017 17:22:27 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170427162227.GC30599@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3mDL-0004Vg-UV
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 12:24:20 -0400
+From: Markus Armbruster <armbru@redhat.com>
 References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<6824abf3c4e5b865de1799c302f60e8055c8d3dc.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<874lx9yht7.fsf@dusky.pond.sub.org>
-	<87y3ulu8k9.fsf@dusky.pond.sub.org>
+	<2bc05de0edd61cdcdd3d2b894378a874d1e12327.1493191677.git.maozy.fnst@cn.fujitsu.com>
+Date: Thu, 27 Apr 2017 18:24:17 +0200
+In-Reply-To: <2bc05de0edd61cdcdd3d2b894378a874d1e12327.1493191677.git.maozy.fnst@cn.fujitsu.com>
+	(Mao Zhongyi's message of "Wed, 26 Apr 2017 16:04:17 +0800")
+Message-ID: <87shktu8cu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87y3ulu8k9.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] net/socket: Convert the
- non-blocking connection mechanism to QIOchannel
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] net/socket: Convert error report
+ message to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, pbonzini@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com
 
-On Thu, Apr 27, 2017 at 06:19:50PM +0200, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
-> 
-> > Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
-> >
-> >> Currently, socket connection in net is realized by an old
-> >> mechanism which is non-blocking.
-> >>
-> >> That old mechanism may cause net blocks on DNS lookups and
-> >> QEmu has already replaced it with QIOchannel in many features,
-> >> such as migration.
-> >>
-> >> Convert it to QIOchannel for net as well.
-> >>
-> >> CC: berrange@redhat.com, pbonzini@redhat.com, jasowang@redhat.com
-> >> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> >> ---
-> >> The test steps like this:
-> >>
-> >>     $ qemu-system-x86_64 -net nic -net socket,listen=:1234 ~/img/test.img
-> >>     $ qemu-system-x86_64 -net nic -net socket,connect=127.0.0.1:1234 ~/img/test.img
-> >>
-> >> No exception.
-> >>
-> >>  net/socket.c | 30 +++++++++++++++++++-----------
-> >>  1 file changed, 19 insertions(+), 11 deletions(-)
-> >>
-> >> diff --git a/net/socket.c b/net/socket.c
-> >> index b8c931e..52f9dce 100644
-> >> --- a/net/socket.c
-> >> +++ b/net/socket.c
-> >> @@ -33,6 +33,7 @@
-> >>  #include "qemu/sockets.h"
-> >>  #include "qemu/iov.h"
-> >>  #include "qemu/main-loop.h"
-> >> +#include "io/channel-socket.h"
-> >>  
-> >>  typedef struct NetSocketState {
-> >>      NetClientState nc;
-> >> @@ -525,16 +526,22 @@ typedef struct {
-> >>      char *name;
-> >>  } socket_connect_data;
-> >>  
-> >> -static void socket_connect_data_free(socket_connect_data *c)
-> >> +static void socket_connect_data_free(void *opaque)
-> >>  {
-> >> +    socket_connect_data *c = opaque;
-> >
-> > Blank line between declarations and statements, please.
-> >
-> >> +    if (!c) {
-> >> +        return;
-> >> +    }
-> >> +
-> >>      qapi_free_SocketAddress(c->saddr);
-> >>      g_free(c->model);
-> >>      g_free(c->name);
-> >>      g_free(c);
-> >>  }
-> >>  
-> >> -static void net_socket_connected(int fd, Error *err, void *opaque)
-> >> +static void net_socket_connected(QIOTask *task, void *opaque)
-> >>  {
-> >> +    QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(qio_task_get_source(task));
-> >>      socket_connect_data *c = opaque;
-> >>      NetSocketState *s;
-> >>      char *addr_str = NULL;
-> >> @@ -543,13 +550,13 @@ static void net_socket_connected(int fd, Error *err, void *opaque)
-> >>      addr_str = socket_address_to_string(c->saddr, &local_error);
-> >>      if (addr_str == NULL) {
-> >>          error_report_err(local_error);
-> >> -        closesocket(fd);
-> >> +        closesocket(sioc->fd);
-> >>          goto end;
-> >>      }
-> >>  
-> >> -    s = net_socket_fd_init(c->peer, c->model, c->name, fd, true);
-> >> +    s = net_socket_fd_init(c->peer, c->model, c->name, sioc->fd, true);
-> >>      if (!s) {
-> >> -        closesocket(fd);
-> >> +        closesocket(sioc->fd);
-> 
-> Actually, net_socket_fd_init() closes sioc->fd when it fails.  Closing
-> it again in the caller is wrong.  None of the other callers does it.
-> Please drop this line in a separate patch, before this one.
+No review, just an observation.
 
-NB, technically the 'fd' is still owned by the 'sioc' object, so nothing
-should close it. If we weren't already leaking the 'sioc' object we would
-have a double close here....
+Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
+> net_socket_fd_init() use the function such as fprintf(), perror() to
+> report an error message.
+>
+> Now, convert these functions to Error.
+>
+> CC: jasowang@redhat.com, armbru@redhat.com
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+>  net/socket.c | 66 +++++++++++++++++++++++++++++++++++++-----------------------
+>  1 file changed, 41 insertions(+), 25 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index b0decbe..559e09a 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+[...]
+> @@ -433,25 +437,27 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
+>  
+>  static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>                                            const char *model, const char *name,
+> -                                          int fd, int is_connected)
+> +                                          int fd, int is_connected,
+> +                                          Error **errp)
+>  {
+>      int so_type = -1, optlen=sizeof(so_type);
+>  
+>      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
+>          (socklen_t *)&optlen)< 0) {
+> -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
+> +        error_setg(errp, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed",
+>                  fd);
+>          closesocket(fd);
+>          return NULL;
+>      }
+>      switch(so_type) {
+>      case SOCK_DGRAM:
+> -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
+> +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected, errp);
+>      case SOCK_STREAM:
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>      default:
+>          /* who knows ... this could be a eg. a pty, do warn and continue as stream */
+> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+> +        error_setg(errp, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM"
+> +                   " or SOCK_STREAM", so_type, fd);
+
+Not this patches problem: this case is odd, and the comment is bogus.
+If @fd really was a pty, getsockopt() would fail with ENOTSOCK, wouldn't
+it?  If @fd is a socket, but neither SOCK_DGRAM nor SOCK_STREAM (say
+SOCK_RAW), why is it safe to continue as if it was SOCK_STREAM?  Jason?
+
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>      }
+>      return NULL;
+
+Not reachable.  Ugly, but not your patch's concern.
+
+[...]
