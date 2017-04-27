@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1d3gQ8-0005Zq-0X
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:13:09 -0400
+	(envelope-from <groug@kaod.org>) id 1d3gSH-0007OI-Ab
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1d3gQ6-0008Rv-Ls
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:13:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59744)
+	(envelope-from <groug@kaod.org>) id 1d3gSC-0001Gr-D9
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:15:21 -0400
+Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:50760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1d3gQ6-0008R9-D1
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:13:06 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Thu, 27 Apr 2017 12:12:59 +0200
-Message-Id: <20170427101259.13798-3-lvivier@redhat.com>
-In-Reply-To: <20170427101259.13798-1-lvivier@redhat.com>
-References: <20170427101259.13798-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] numa,
- spapr: equally distribute memory on nodes
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d3gSC-0001FF-6b
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 06:15:16 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 065B1EA37B
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 12:15:12 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 27 Apr 2017 12:15:10 +0200
+Message-ID: <149328811036.1628.11119485249329354693.stgit@bahia.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] virtio-9p/xen-9p: move 9p specific bits to
+ core 9p code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,126 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Greg Kurz <groug@kaod.org>
 
-When there are more nodes than memory available to put the minimum
-allowed memory by node, all the memory is put on the last node.
+These bits aren't related to the transport so let's move them to the core
+code.
 
-This is because we put (ram_size / nb_numa_nodes) &
-~((1 << mc->numa_mem_align_shift) - 1); on each node, and in this
-case the value is 0. This is particularly true with pseries,
-as the memory must be aligned to 256MB.
-
-To avoid this problem, this patch uses an error diffusion algorithm [1]
-to distribute equally the memory on nodes.
-
-Example:
-
-qemu-system-ppc64 -S -nographic  -nodefaults -monitor stdio -m 1G -smp 8 \
-                  -numa node -numa node -numa node \
-                  -numa node -numa node -numa node
-
-Before:
-
-(qemu) info numa
-6 nodes
-node 0 cpus: 0 6
-node 0 size: 0 MB
-node 1 cpus: 1 7
-node 1 size: 0 MB
-node 2 cpus: 2
-node 2 size: 0 MB
-node 3 cpus: 3
-node 3 size: 0 MB
-node 4 cpus: 4
-node 4 size: 0 MB
-node 5 cpus: 5
-node 5 size: 1024 MB
-
-After:
-(qemu) info numa
-6 nodes
-node 0 cpus: 0 6
-node 0 size: 0 MB
-node 1 cpus: 1 7
-node 1 size: 256 MB
-node 2 cpus: 2
-node 2 size: 0 MB
-node 3 cpus: 3
-node 3 size: 256 MB
-node 4 cpus: 4
-node 4 size: 256 MB
-node 5 cpus: 5
-node 5 size: 256 MB
-
-[1] https://en.wikipedia.org/wiki/Error_diffusion
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         | 21 ++++++++++++++++++++-
- include/hw/ppc/spapr.h |  3 ++-
- 2 files changed, 22 insertions(+), 2 deletions(-)
+ hw/9pfs/9p.c               |    8 +++++++-
+ hw/9pfs/9p.h               |    2 +-
+ hw/9pfs/virtio-9p-device.c |    8 +-------
+ hw/9pfs/xen-9p-backend.c   |    6 +-----
+ 4 files changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 80d12d0..be498e2 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3106,6 +3106,23 @@ static void spapr_pic_print_info(InterruptStatsProvider *obj,
-     ics_pic_print_info(spapr->ics, mon);
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index c80ba67389ce..b40001e3dea3 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3446,12 +3446,16 @@ static inline bool is_read_only_op(V9fsPDU *pdu)
+     }
  }
  
-+static void spapr_numa_auto_assign_ram(uint64_t *nodes, int nb_nodes,
-+                                       ram_addr_t size)
-+{
-+    int i;
-+    uint64_t usedmem = 0, node_mem;
-+    uint64_t granularity = size / nb_nodes;
-+    uint64_t propagate = 0;
-+
-+    for (i = 0; i < nb_nodes - 1; i++) {
-+        node_mem = (granularity + propagate) & ~(SPAPR_MEMORY_BLOCK_SIZE - 1);
-+        propagate = granularity + propagate - node_mem;
-+        nodes[i] = node_mem;
-+        usedmem += node_mem;
-+    }
-+    nodes[i] = ram_size - usedmem;
-+}
-+
- static void spapr_machine_class_init(ObjectClass *oc, void *data)
+-void pdu_submit(V9fsPDU *pdu)
++void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
  {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -3162,7 +3179,8 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-      * SPAPR_MEMORY_BLOCK_SIZE (256M) since that's the granularity
-      * in which LMBs are represented and hot-added
-      */
--    mc->numa_mem_align_shift = 28;
-+    mc->numa_mem_align_shift = SPAPR_MEMORY_BLOCK_SIZE_SHIFT;
-+    mc->numa_auto_assign_ram = spapr_numa_auto_assign_ram;
+     Coroutine *co;
+     CoroutineEntry *handler;
+     V9fsState *s = pdu->s;
+ 
++    pdu->size = le32_to_cpu(hdr->size_le);
++    pdu->id = hdr->id;
++    pdu->tag = le16_to_cpu(hdr->tag_le);
++
+     if (pdu->id >= ARRAY_SIZE(pdu_co_handlers) ||
+         (pdu_co_handlers[pdu->id] == NULL)) {
+         handler = v9fs_op_not_supp;
+@@ -3462,6 +3466,8 @@ void pdu_submit(V9fsPDU *pdu)
+     if (is_ro_export(&s->ctx) && !is_read_only_op(pdu)) {
+         handler = v9fs_fs_ro;
+     }
++
++    qemu_co_queue_init(&pdu->complete);
+     co = qemu_coroutine_create(handler, pdu);
+     qemu_coroutine_enter(co);
  }
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index 5312d8a42405..c886ba78d2ee 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -347,7 +347,7 @@ ssize_t pdu_marshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...);
+ ssize_t pdu_unmarshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...);
+ V9fsPDU *pdu_alloc(V9fsState *s);
+ void pdu_free(V9fsPDU *pdu);
+-void pdu_submit(V9fsPDU *pdu);
++void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr);
+ void v9fs_reset(V9fsState *s);
  
- static const TypeInfo spapr_machine_info = {
-@@ -3242,6 +3260,7 @@ static void spapr_machine_2_9_class_options(MachineClass *mc)
- {
-     spapr_machine_2_10_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
-+    mc->numa_auto_assign_ram = NULL;
+ struct V9fsTransport {
+diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+index 3782f437029b..245abd8aaef1 100644
+--- a/hw/9pfs/virtio-9p-device.c
++++ b/hw/9pfs/virtio-9p-device.c
+@@ -70,13 +70,7 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQueue *vq)
+             goto out_free_req;
+         }
+ 
+-        pdu->size = le32_to_cpu(out.size_le);
+-
+-        pdu->id = out.id;
+-        pdu->tag = le16_to_cpu(out.tag_le);
+-
+-        qemu_co_queue_init(&pdu->complete);
+-        pdu_submit(pdu);
++        pdu_submit(pdu, &out);
+     }
+ 
+     return;
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index 9c7f41af99da..c0b9d534298a 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -243,14 +243,10 @@ static int xen_9pfs_receive(Xen9pfsRing *ring)
+ 
+     /* cannot fail, because we only handle one request per ring at a time */
+     pdu = pdu_alloc(&ring->priv->state);
+-    pdu->size = le32_to_cpu(h.size_le);
+-    pdu->id = h.id;
+-    pdu->tag = le32_to_cpu(h.tag_le);
+     ring->out_size = le32_to_cpu(h.size_le);
+     ring->out_cons = cons + le32_to_cpu(h.size_le);
+ 
+-    qemu_co_queue_init(&pdu->complete);
+-    pdu_submit(pdu);
++    pdu_submit(pdu, &h);
+ 
+     return 0;
  }
- 
- DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 5802f88..8f4a588 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -653,7 +653,8 @@ int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
- 
- int spapr_rng_populate_dt(void *fdt);
- 
--#define SPAPR_MEMORY_BLOCK_SIZE (1 << 28) /* 256MB */
-+#define SPAPR_MEMORY_BLOCK_SIZE_SHIFT 28 /* 256MB */
-+#define SPAPR_MEMORY_BLOCK_SIZE (1 << SPAPR_MEMORY_BLOCK_SIZE_SHIFT)
- 
- /*
-  * This defines the maximum number of DIMM slots we can have for sPAPR
--- 
-2.9.3
