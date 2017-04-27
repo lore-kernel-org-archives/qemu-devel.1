@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3k3p-0005HJ-AK
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:06:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3k5H-0006ag-5s
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:07:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d3k3o-0004ot-EG
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:06:21 -0400
-Date: Thu, 27 Apr 2017 16:06:07 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170427140607.GF4805@noname.str.redhat.com>
-References: <20170420005428.11465-1-famz@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1d3k5C-0005Mb-Tz
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 10:07:51 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1493298053-17140-1-git-send-email-armbru@redhat.com>
+	<b7a05120-f94d-a99b-aab2-6208715d47ff@cn.fujitsu.com>
+Date: Thu, 27 Apr 2017 16:07:43 +0200
+In-Reply-To: <b7a05120-f94d-a99b-aab2-6208715d47ff@cn.fujitsu.com> (Zhang
+	Chen's message of "Thu, 27 Apr 2017 21:30:53 +0800")
+Message-ID: <87zif20wr4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170420005428.11465-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] iotests: 109: Filter out "len" of
- failed jobs
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] replication: Make --disable-replication
+ compile again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +24,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, pbonzini@redhat.com
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, wencongyang@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, zhang.zhanghailiang@huawei.com, qemu-stable@nongnu.org
 
-Am 20.04.2017 um 02:54 hat Fam Zheng geschrieben:
-> Mirror calculates job len from current I/O progress:
-> 
->     s->common.len = s->common.offset +
->                     (cnt + s->sectors_in_flight) * BDRV_SECTOR_SIZE;
-> 
-> The final "len" of a failed mirror job in iotests 109 depends on the
-> subtle timing of the completion of read and write issued in the first
-> mirror iteration.  The second iteration may or may not have run when the
-> I/O error happens, resulting in non-deterministic output of the
-> BLOCK_JOB_COMPLETED event text.
-> 
-> Similar to what was done in a752e4786, filter out the field to make the
-> test robust.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+Zhang Chen <zhangchen.fnst@cn.fujitsu.com> writes:
 
-Thanks, applied to block-next.
+> On 04/27/2017 09:00 PM, Markus Armbruster wrote:
+>> Broken in commit daa33c5.
+>>
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
+> About this bug I remember have discussed with paolo.
+>
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg01326.html
 
-Kevin
+If I understand that discussion correctly, it's about replacing
+--enable-replication (and possibly other stuff) by --enable-colo.
+Sounds fair to me, patches welcome.
+
+> And about this patch content.
+>
+> Reviewed-by:Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+
+Thanks!
