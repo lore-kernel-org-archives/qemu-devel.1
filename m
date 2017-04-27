@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eRI-0003Fr-Qr
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:13 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eRJ-0003G3-2G
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eRC-00085I-UK
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:12 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1d3eRI-0008Cz-2n
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:06:13 -0400
 From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Thu, 27 Apr 2017 13:36:31 +0530
-Message-Id: <1493280397-9622-2-git-send-email-ashijeetacharya@gmail.com>
+Date: Thu, 27 Apr 2017 13:36:32 +0530
+Message-Id: <1493280397-9622-3-git-send-email-ashijeetacharya@gmail.com>
 In-Reply-To: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
 References: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 1/7] dmg: Introduce a new struct to cache
- random access points
+Subject: [Qemu-devel] [PATCH v2 2/7] dmg: New function to help us cache
+ random access point
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +23,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: stefanha@gmail.com
 Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, famz@redhat.com, peter@lekensteyn.nl, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-We need to cache the random access point while performing partial
-decompression so that we can resume decompression from that point
-onwards in our next sequential read request. Introduce a new struct
-DMGReadState which will help us do this.
+Introduce a new cache_access_point() function which will help us first
+cache a random access point inside a compressed stream and then keep
+updating it according to our requirement at appropriate times.
 
 Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 ---
- block/dmg.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/dmg.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/block/dmg.h b/block/dmg.h
-index b592d6f..ee67ae1 100644
---- a/block/dmg.h
-+++ b/block/dmg.h
-@@ -31,6 +31,15 @@
- #include "block/block_int.h"
- #include <zlib.h>
+diff --git a/block/dmg.c b/block/dmg.c
+index a7d25fc..c6fe8b0 100644
+--- a/block/dmg.c
++++ b/block/dmg.c
+@@ -128,6 +128,18 @@ static void update_max_chunk_size(BDRVDMGState *s, uint32_t chunk,
+     }
+ }
  
-+/* used to cache current position in compressed input stream */
-+typedef struct DMGReadState {
-+    uint8_t *saved_next_in;
-+    int64_t saved_avail_in;
-+    int32_t saved_chunk_type;
-+    int64_t sectors_read; /* possible sectors read in each cycle */
-+    int32_t sector_offset_in_chunk;
-+} DMGReadState;
++static void cache_access_point(DMGReadState *drs, uint8_t *next_in,
++                                int64_t avail_in, int32_t chunk,
++                                int64_t sectors_read, int32_t sector_offset)
++{
++    drs->saved_next_in = next_in;
++    drs->saved_avail_in = avail_in;
++    drs->saved_chunk_type = chunk;
++    drs->sectors_read = sectors_read;
++    drs->sector_offset_in_chunk = sector_offset;
++    return;
++}
 +
- typedef struct BDRVDMGState {
-     CoMutex lock;
-     /* each chunk contains a certain number of sectors,
-@@ -51,6 +60,7 @@ typedef struct BDRVDMGState {
-     uint8_t *compressed_chunk;
-     uint8_t *uncompressed_chunk;
-     z_stream zstream;
-+    DMGReadState *drs;
- } BDRVDMGState;
+ static int64_t dmg_find_koly_offset(BdrvChild *file, Error **errp)
+ {
+     BlockDriverState *file_bs = file->bs;
+@@ -507,6 +519,10 @@ static int dmg_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
  
- extern int (*dmg_uncompress_bz2)(char *next_in, unsigned int avail_in,
++    s->drs = g_malloc(sizeof(DMGReadState));
++    /* initialise our access point cache */
++    cache_access_point(s->drs, NULL, -1, -1, -1, -1);
++
+     if (inflateInit(&s->zstream) != Z_OK) {
+         ret = -EINVAL;
+         goto fail;
+@@ -523,6 +539,7 @@ fail:
+     g_free(s->lengths);
+     g_free(s->sectors);
+     g_free(s->sectorcounts);
++    g_free(s->drs);
+     qemu_vfree(s->compressed_chunk);
+     qemu_vfree(s->uncompressed_chunk);
+     return ret;
+@@ -685,6 +702,7 @@ static void dmg_close(BlockDriverState *bs)
+     g_free(s->lengths);
+     g_free(s->sectors);
+     g_free(s->sectorcounts);
++    g_free(s->drs);
+     qemu_vfree(s->compressed_chunk);
+     qemu_vfree(s->uncompressed_chunk);
+ 
 -- 
 2.6.2
