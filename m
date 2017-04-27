@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3YW8-0007ei-Up
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3YW4-0007a6-Se
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d3YW7-0004Bq-AE
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1d3YW2-00047F-Bp
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 21:46:44 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 26 Apr 2017 20:46:20 -0500
-Message-Id: <20170427014626.11553-12-eblake@redhat.com>
+Date: Wed, 26 Apr 2017 20:46:17 -0500
+Message-Id: <20170427014626.11553-9-eblake@redhat.com>
 In-Reply-To: <20170427014626.11553-1-eblake@redhat.com>
 References: <20170427014626.11553-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 11/17] qcow2: Discard/zero clusters by byte
- count
+Subject: [Qemu-devel] [PATCH v10 08/17] qemu-io: Switch 'map' output to
+ byte-based reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,235 +23,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-Passing a byte offset, but sector count, when we ultimately
-want to operate on cluster granularity, is madness.  Clean up
-the external interfaces to take both offset and count as bytes,
-while still keeping the assertion added previously that the
-caller must align the values to a cluster.  Then rename things
-to make sure backports don't get confused by changed units:
-instead of qcow2_discard_clusters() and qcow2_zero_clusters(),
-we now have qcow2_cluster_discard() and qcow2_cluster_zeroize().
-
-The internal functions still operate on clusters at a time, and
-return an int for number of cleared clusters; but on an image
-with 2M clusters, a single L2 table holds 256k entries that each
-represent a 2M cluster, totalling well over INT_MAX bytes if we
-ever had a request for that many bytes at once.  All our callers
-currently limit themselves to 32-bit bytes (and therefore fewer
-clusters), but by making this function 64-bit clean, we have one
-less place to clean up if we later improve the block layer to
-support 64-bit bytes through all operations (with the block layer
-auto-fragmenting on behalf of more-limited drivers), rather than
-the current state where some interfaces are artificially limited
-to INT_MAX at a time.
+Mixing byte offset and sector allocation counts is a bit
+confusing.  Also, reporting n/m sectors, where m decreases
+according to the remaining size of the file, isn't really
+adding any useful information.  Update the output to use
+byte counts, and adjust the affected tests (./check -qcow2 102,
+./check -vpc 146).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v10: squash in fixup accounting for unaligned file end
-v9: rebase to earlier changes, drop R-b
-v7, v8: only earlier half of series submitted for 2.9
-v6: rebase due to context
-v5: s/count/byte/ to make the units obvious, and rework the math
-to ensure no 32-bit integer overflow on large clusters
-v4: improve function names, split assertion additions into earlier patch
-[no v3 or v2]
-v1: https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00339.html
+v10: rebase to updated test 179
+v9: new patch
 ---
- block/qcow2.h          |  9 +++++----
- block/qcow2-cluster.c  | 40 +++++++++++++++++++++-------------------
- block/qcow2-snapshot.c |  7 +++----
- block/qcow2.c          | 21 +++++++++------------
- 4 files changed, 38 insertions(+), 39 deletions(-)
+ qemu-io-cmds.c             |  5 ++---
+ tests/qemu-iotests/102.out |  4 ++--
+ tests/qemu-iotests/146.out | 30 +++++++++++++++---------------
+ tests/qemu-iotests/179.out | 22 +++++++++++-----------
+ 4 files changed, 30 insertions(+), 31 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 8731f24..03f23bf 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -547,10 +547,11 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-                                          int compressed_size);
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 34f6707..40a3f2d 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -1895,9 +1895,8 @@ static int map_f(BlockBackend *blk, int argc, char **argv)
 
- int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
--int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
--    int nb_sectors, enum qcow2_discard_type type, bool full_discard);
--int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
--                        int flags);
-+int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, enum qcow2_discard_type type,
-+                          bool full_discard);
-+int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, int flags);
+         retstr = ret ? "    allocated" : "not allocated";
+         cvtstr(offset << 9ULL, s1, sizeof(s1));
+-        printf("[% 24" PRId64 "] % 8" PRId64 "/% 8" PRId64 " sectors %s "
+-               "at offset %s (%d)\n",
+-               offset << 9ULL, num, nb_sectors, retstr, s1, ret);
++        printf("[% 24" PRId64 "] % 16" PRId64 " bytes %s at offset %s (%d)\n",
++               offset << 9ULL, num << 9ULL, retstr, s1, ret);
 
- int qcow2_expand_zero_clusters(BlockDriverState *bs,
-                                BlockDriverAmendStatusCB *status_cb,
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 4f641a9..a47aadc 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1562,16 +1562,16 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
-     return nb_clusters;
- }
+         offset += num;
+         nb_sectors -= num;
+diff --git a/tests/qemu-iotests/102.out b/tests/qemu-iotests/102.out
+index eecde16..0e0ae4c 100644
+--- a/tests/qemu-iotests/102.out
++++ b/tests/qemu-iotests/102.out
+@@ -6,7 +6,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
+ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ Image resized.
+-[                       0]      128/     128 sectors     allocated at offset 0 bytes (1)
++[                       0]            65536 bytes     allocated at offset 0 bytes (1)
+ Offset          Length          Mapped to       File
 
--int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
--    int nb_sectors, enum qcow2_discard_type type, bool full_discard)
-+int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, enum qcow2_discard_type type,
-+                          bool full_discard)
- {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t end_offset;
-+    uint64_t end_offset = offset + bytes;
-     uint64_t nb_clusters;
-+    int64_t cleared;
-     int ret;
+ === Testing map on an image file truncated outside of qemu ===
+@@ -17,5 +17,5 @@ wrote 65536/65536 bytes at offset 0
+ Image resized.
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) qemu-io drv0 map
+-[                       0]      128/     128 sectors     allocated at offset 0 bytes (1)
++[                       0]            65536 bytes     allocated at offset 0 bytes (1)
+ *** done
+diff --git a/tests/qemu-iotests/146.out b/tests/qemu-iotests/146.out
+index 4f334d8..d4e2f62 100644
+--- a/tests/qemu-iotests/146.out
++++ b/tests/qemu-iotests/146.out
+@@ -2,39 +2,39 @@ QA output created by 146
 
--    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
--
-     /* Caller must pass aligned values, except at image end */
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
-@@ -1583,13 +1583,15 @@ int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
+ === Testing VPC Autodetect ===
 
-     /* Each L2 table is handled by its own loop iteration */
-     while (nb_clusters > 0) {
--        ret = discard_single_l2(bs, offset, nb_clusters, type, full_discard);
--        if (ret < 0) {
-+        cleared = discard_single_l2(bs, offset, nb_clusters, type,
-+                                    full_discard);
-+        if (cleared < 0) {
-+            ret = cleared;
-             goto fail;
-         }
+-[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
++[                       0]     136363130880 bytes not allocated at offset 0 bytes (0)
 
--        nb_clusters -= ret;
--        offset += (ret * s->cluster_size);
-+        nb_clusters -= cleared;
-+        offset += (cleared * s->cluster_size);
-     }
+ === Testing VPC with current_size force ===
 
-     ret = 0;
-@@ -1652,16 +1654,15 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
-     return nb_clusters;
- }
+-[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
++[                       0]     136365211648 bytes not allocated at offset 0 bytes (0)
 
--int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
--                        int flags)
-+int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, int flags)
- {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t end_offset;
-+    uint64_t end_offset = offset + bytes;
-     uint64_t nb_clusters;
-+    int64_t cleared;
-     int ret;
+ === Testing VPC with chs force ===
 
--    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
--
-     /* Caller must pass aligned values, except at image end */
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
-@@ -1673,18 +1674,19 @@ int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
-     }
+-[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
++[                       0]     136363130880 bytes not allocated at offset 0 bytes (0)
 
-     /* Each L2 table is handled by its own loop iteration */
--    nb_clusters = size_to_clusters(s, nb_sectors << BDRV_SECTOR_BITS);
-+    nb_clusters = size_to_clusters(s, bytes);
+ === Testing Hyper-V Autodetect ===
 
-     s->cache_discards = true;
+-[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
++[                       0]     136365211648 bytes not allocated at offset 0 bytes (0)
 
-     while (nb_clusters > 0) {
--        ret = zero_single_l2(bs, offset, nb_clusters, flags);
--        if (ret < 0) {
-+        cleared = zero_single_l2(bs, offset, nb_clusters, flags);
-+        if (cleared < 0) {
-+            ret = cleared;
-             goto fail;
-         }
+ === Testing Hyper-V with current_size force ===
 
--        nb_clusters -= ret;
--        offset += (ret * s->cluster_size);
-+        nb_clusters -= cleared;
-+        offset += (cleared * s->cluster_size);
-     }
+-[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
++[                       0]     136365211648 bytes not allocated at offset 0 bytes (0)
 
-     ret = 0;
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 0324243..44243e0 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -440,10 +440,9 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+ === Testing Hyper-V with chs force ===
 
-     /* The VM state isn't needed any more in the active L1 table; in fact, it
-      * hurts by causing expensive COW for the next snapshot. */
--    qcow2_discard_clusters(bs, qcow2_vm_state_offset(s),
--                           align_offset(sn->vm_state_size, s->cluster_size)
--                                >> BDRV_SECTOR_BITS,
--                           QCOW2_DISCARD_NEVER, false);
-+    qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
-+                          align_offset(sn->vm_state_size, s->cluster_size),
-+                          QCOW2_DISCARD_NEVER, false);
+-[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
++[                       0]     136363130880 bytes not allocated at offset 0 bytes (0)
 
- #ifdef DEBUG_ALLOC
-     {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 8038793..4d34610 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2508,7 +2508,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     trace_qcow2_pwrite_zeroes(qemu_coroutine_self(), offset, count);
+ === Testing d2v Autodetect ===
 
-     /* Whatever is left can use real zero clusters */
--    ret = qcow2_zero_clusters(bs, offset, count >> BDRV_SECTOR_BITS, flags);
-+    ret = qcow2_cluster_zeroize(bs, offset, count, flags);
-     qemu_co_mutex_unlock(&s->lock);
+-[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
++[                       0]        263454720 bytes     allocated at offset 0 bytes (1)
 
-     return ret;
-@@ -2531,8 +2531,8 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
-     }
+ === Testing d2v with current_size force ===
 
-     qemu_co_mutex_lock(&s->lock);
--    ret = qcow2_discard_clusters(bs, offset, count >> BDRV_SECTOR_BITS,
--                                 QCOW2_DISCARD_REQUEST, false);
-+    ret = qcow2_cluster_discard(bs, offset, count, QCOW2_DISCARD_REQUEST,
-+                                false);
-     qemu_co_mutex_unlock(&s->lock);
-     return ret;
- }
-@@ -2839,9 +2839,8 @@ fail:
- static int qcow2_make_empty(BlockDriverState *bs)
- {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t start_sector;
--    int sector_step = (QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size) /
--                       BDRV_SECTOR_SIZE);
-+    uint64_t offset, end_offset;
-+    int step = QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size);
-     int l1_clusters, ret = 0;
+-[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
++[                       0]        263454720 bytes     allocated at offset 0 bytes (1)
 
-     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
-@@ -2858,18 +2857,16 @@ static int qcow2_make_empty(BlockDriverState *bs)
+ === Testing d2v with chs force ===
 
-     /* This fallback code simply discards every active cluster; this is slow,
-      * but works in all cases */
--    for (start_sector = 0; start_sector < bs->total_sectors;
--         start_sector += sector_step)
-+    end_offset = bs->total_sectors * BDRV_SECTOR_SIZE;
-+    for (offset = 0; offset < end_offset; offset += step)
-     {
-         /* As this function is generally used after committing an external
-          * snapshot, QCOW2_DISCARD_SNAPSHOT seems appropriate. Also, the
-          * default action for this kind of discard is to pass the discard,
-          * which will ideally result in an actually smaller image file, as
-          * is probably desired. */
--        ret = qcow2_discard_clusters(bs, start_sector * BDRV_SECTOR_SIZE,
--                                     MIN(sector_step,
--                                         bs->total_sectors - start_sector),
--                                     QCOW2_DISCARD_SNAPSHOT, true);
-+        ret = qcow2_cluster_discard(bs, offset, MIN(step, end_offset - offset),
-+                                    QCOW2_DISCARD_SNAPSHOT, true);
-         if (ret < 0) {
-             break;
-         }
+-[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
++[                       0]        263454720 bytes     allocated at offset 0 bytes (1)
+
+ === Testing Image create, default ===
+
+@@ -42,15 +42,15 @@ Formatting 'TEST_DIR/IMGFMT-create-test.IMGFMT', fmt=IMGFMT size=4294967296
+
+ === Read created image, default opts ====
+
+-[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
++[                       0]       4295467008 bytes not allocated at offset 0 bytes (0)
+
+ === Read created image, force_size_calc=chs ====
+
+-[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
++[                       0]       4295467008 bytes not allocated at offset 0 bytes (0)
+
+ === Read created image, force_size_calc=current_size ====
+
+-[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
++[                       0]       4295467008 bytes not allocated at offset 0 bytes (0)
+
+ === Testing Image create, force_size ===
+
+@@ -58,13 +58,13 @@ Formatting 'TEST_DIR/IMGFMT-create-test.IMGFMT', fmt=IMGFMT size=4294967296 forc
+
+ === Read created image, default opts ====
+
+-[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
++[                       0]       4294967296 bytes not allocated at offset 0 bytes (0)
+
+ === Read created image, force_size_calc=chs ====
+
+-[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
++[                       0]       4294967296 bytes not allocated at offset 0 bytes (0)
+
+ === Read created image, force_size_calc=current_size ====
+
+-[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
++[                       0]       4294967296 bytes not allocated at offset 0 bytes (0)
+ *** done
+diff --git a/tests/qemu-iotests/179.out b/tests/qemu-iotests/179.out
+index 2c3071b..33e9e3d 100644
+--- a/tests/qemu-iotests/179.out
++++ b/tests/qemu-iotests/179.out
+@@ -44,17 +44,17 @@ wrote 2097152/2097152 bytes at offset 60817408
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 2097152/2097152 bytes at offset 62914560
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-[                       0]     4096/  131072 sectors not allocated at offset 0 bytes (0)
+-[                 2097152]     4096/  126976 sectors     allocated at offset 2 MiB (1)
+-[                 4194304]     4096/  122880 sectors not allocated at offset 4 MiB (0)
+-[                 6291456]     4096/  118784 sectors     allocated at offset 6 MiB (1)
+-[                 8388608]     4096/  114688 sectors not allocated at offset 8 MiB (0)
+-[                10485760]     4096/  110592 sectors     allocated at offset 10 MiB (1)
+-[                12582912]     4096/  106496 sectors not allocated at offset 12 MiB (0)
+-[                14680064]     4096/  102400 sectors     allocated at offset 14 MiB (1)
+-[                16777216]     4096/   98304 sectors not allocated at offset 16 MiB (0)
+-[                18874368]    77824/   94208 sectors     allocated at offset 18 MiB (1)
+-[                58720256]    16384/   16384 sectors not allocated at offset 56 MiB (0)
++[                       0]          2097152 bytes not allocated at offset 0 bytes (0)
++[                 2097152]          2097152 bytes     allocated at offset 2 MiB (1)
++[                 4194304]          2097152 bytes not allocated at offset 4 MiB (0)
++[                 6291456]          2097152 bytes     allocated at offset 6 MiB (1)
++[                 8388608]          2097152 bytes not allocated at offset 8 MiB (0)
++[                10485760]          2097152 bytes     allocated at offset 10 MiB (1)
++[                12582912]          2097152 bytes not allocated at offset 12 MiB (0)
++[                14680064]          2097152 bytes     allocated at offset 14 MiB (1)
++[                16777216]          2097152 bytes not allocated at offset 16 MiB (0)
++[                18874368]         39845888 bytes     allocated at offset 18 MiB (1)
++[                58720256]          8388608 bytes not allocated at offset 56 MiB (0)
+ [{ "start": 0, "length": 18874368, "depth": 1, "zero": true, "data": false},
+ { "start": 18874368, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
+ { "start": 20971520, "length": 2097152, "depth": 1, "zero": true, "data": false},
 -- 
 2.9.3
