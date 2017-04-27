@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3ZYX-0006JT-69
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:53:22 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d3Zdf-0007He-0k
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:58:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3ZYU-0007zi-4M
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:53:21 -0400
-Received: from mga07.intel.com ([134.134.136.100]:40124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1d3ZYT-0007zD-Qg
-	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:53:18 -0400
-Date: Thu, 27 Apr 2017 10:37:19 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20170427023719.GA14925@sky-dev>
-References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1493201210-14357-13-git-send-email-yi.l.liu@linux.intel.com>
-	<0f2966cf-4e5a-a2cc-5eb3-7e7d4f62bb85@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0f2966cf-4e5a-a2cc-5eb3-7e7d4f62bb85@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 12/20] Memory: Add func to fire
- pasidt_bind notifier
+	(envelope-from <jemmy858585@gmail.com>) id 1d3Zdb-0000hz-VQ
+	for qemu-devel@nongnu.org; Wed, 26 Apr 2017 22:58:39 -0400
+From: jemmy858585@gmail.com
+Date: Thu, 27 Apr 2017 10:58:27 +0800
+Message-Id: <1493261907-18734-1-git-send-email-lidongchen@tencent.com>
+Subject: [Qemu-devel] [PATCH v3] qemu-img: use blk_co_pwrite_zeroes for zero
+ sectors when compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +18,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, jean-philippe.brucker@arm.com, jasowang@redhat.com, iommu@lists.linux-foundation.org, jacob.jun.pan@intel.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-On Wed, Apr 26, 2017 at 03:50:16PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 26/04/2017 12:06, Liu, Yi L wrote:
-> > +void memory_region_notify_iommu_svm_bind(MemoryRegion *mr,
-> > +                                         void *data)
-> > +{
-> > +    IOMMUNotifier *iommu_notifier;
-> > +    IOMMUNotifierFlag request_flags;
-> > +
-> > +    assert(memory_region_is_iommu(mr));
-> > +
-> > +    /*TODO: support other bind requests with smaller gran,
-> > +     * e.g. bind signle pasid entry
-> > +     */
-> > +    request_flags = IOMMU_NOTIFIER_SVM_PASIDT_BIND;
-> > +
-> > +    QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
-> > +        if (iommu_notifier->notifier_flags & request_flags) {
-> > +            iommu_notifier->notify(iommu_notifier, data);
-> > +            break;
-> > +        }
-> > +    }
-> 
-> Peter,
-> 
-> should this reuse ->notify, or should it be different function pointer
-> in IOMMUNotifier?
+From: Lidong Chen <lidongchen@tencent.com>
 
-Hi Paolo,
+When the buffer is zero, blk_co_pwrite_zeroes is more effective than
+blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. This patch can reduce
+the time for converting qcow2 images with lots of zero data.
 
-Thx for your review.
+Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+---
+   v3 changelog:
+       fix some spelling errors and code style.
+   v2 changelog:
+       unify the compressed and non-compressed code paths.
+---
+ qemu-img.c | 44 ++++++++++++++------------------------------
+ 1 file changed, 14 insertions(+), 30 deletions(-)
 
-I think it should be “->notify” here. In this patchset, the new notifier
-is registered with the existing notifier registration API. So the all the
-notifiers are in the mr->iommu_notify list. And notifiers are labeled
-by notify flag, so it is able to differentiate the IOMMUNotifier nodes.
-When the flag meets, trigger it by “->notify”. The diagram below shows
-my understanding , wish it helps to make me understood.
-
-VFIOContainer
-       |
-       giommu_list(VFIOGuestIOMMU)
-                \
-                 VFIOGuestIOMMU1 ->   VFIOGuestIOMMU2 -> VFIOGuestIOMMU3 ...
-                    |                     |                 |
-mr->iommu_notify: IOMMUNotifier   ->    IOMMUNotifier  ->  IOMMUNotifier
-                  (Flag:MAP/UNMAP)     (Flag:SVM bind)  (Flag:tlb invalidate)
-
-
-Actually, compared with the MAP/UNMAP notifier, the newly added notifier has
-no start/end check, and there may be other types of bind notfier flag in
-future, so I added a separate fire func for SVM bind notifier.
-
-Thanks,
-Yi L
-
-> Paolo
-> 
+diff --git a/qemu-img.c b/qemu-img.c
+index bbe1574..872a91b7 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1661,6 +1661,8 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+ 
+     while (nb_sectors > 0) {
+         int n = nb_sectors;
++        BdrvRequestFlags flags = s->compressed ? BDRV_REQ_WRITE_COMPRESSED : 0;
++
+         switch (status) {
+         case BLK_BACKING_FILE:
+             /* If we have a backing file, leave clusters unallocated that are
+@@ -1670,43 +1672,24 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+             break;
+ 
+         case BLK_DATA:
+-            /* We must always write compressed clusters as a whole, so don't
+-             * try to find zeroed parts in the buffer. We can only save the
+-             * write if the buffer is completely zeroed and we're allowed to
+-             * keep the target sparse. */
+-            if (s->compressed) {
+-                if (s->has_zero_init && s->min_sparse &&
+-                    buffer_is_zero(buf, n * BDRV_SECTOR_SIZE))
+-                {
+-                    assert(!s->target_has_backing);
+-                    break;
+-                }
+-
+-                iov.iov_base = buf;
+-                iov.iov_len = n << BDRV_SECTOR_BITS;
+-                qemu_iovec_init_external(&qiov, &iov, 1);
+-
+-                ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
+-                                     n << BDRV_SECTOR_BITS, &qiov,
+-                                     BDRV_REQ_WRITE_COMPRESSED);
+-                if (ret < 0) {
+-                    return ret;
+-                }
+-                break;
+-            }
+-
+-            /* If there is real non-zero data or we're told to keep the target
+-             * fully allocated (-S 0), we must write it. Otherwise we can treat
+-             * it as zero sectors. */
++            /* If we're told to keep the target fully allocated (-S 0) or there
++             * is real non-zero data, we must write it. Otherwise we can treat
++             * it as zero sectors.
++             * Compressed clusters need to be written as a whole, so in that
++             * case we can only save the write if the buffer is completely
++             * zeroed. */
+             if (!s->min_sparse ||
+-                is_allocated_sectors_min(buf, n, &n, s->min_sparse))
++                (!s->compressed &&
++                 is_allocated_sectors_min(buf, n, &n, s->min_sparse)) ||
++                (s->compressed &&
++                 !buffer_is_zero(buf, n * BDRV_SECTOR_SIZE)))
+             {
+                 iov.iov_base = buf;
+                 iov.iov_len = n << BDRV_SECTOR_BITS;
+                 qemu_iovec_init_external(&qiov, &iov, 1);
+ 
+                 ret = blk_co_pwritev(s->target, sector_num << BDRV_SECTOR_BITS,
+-                                     n << BDRV_SECTOR_BITS, &qiov, 0);
++                                     n << BDRV_SECTOR_BITS, &qiov, flags);
+                 if (ret < 0) {
+                     return ret;
+                 }
+@@ -1716,6 +1699,7 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+ 
+         case BLK_ZERO:
+             if (s->has_zero_init) {
++                assert(!s->target_has_backing);
+                 break;
+             }
+             ret = blk_co_pwrite_zeroes(s->target,
+-- 
+1.8.3.1
