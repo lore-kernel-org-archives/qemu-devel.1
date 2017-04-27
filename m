@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i69-00049m-By
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:43 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d3i5q-0003rK-Px
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3i63-0001Xv-DR
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:37 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33251)
+	(envelope-from <rth7680@gmail.com>) id 1d3i5o-0001Mm-8U
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:18 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35493)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i63-0001XE-4b
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:31 -0400
-Received: by mail-wm0-x242.google.com with SMTP id y10so4098954wmh.0
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d3i5o-0001MA-1x
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 08:00:16 -0400
+Received: by mail-wr0-x244.google.com with SMTP id g12so3522661wrg.2
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 05:00:15 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu, 27 Apr 2017 14:00:01 +0200
-Message-Id: <20170427120006.20564-15-rth@twiddle.net>
+Date: Thu, 27 Apr 2017 13:59:48 +0200
+Message-Id: <20170427120006.20564-2-rth@twiddle.net>
 In-Reply-To: <20170427120006.20564-1-rth@twiddle.net>
 References: <20170427120006.20564-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v5 14/19] target/alpha: Use tcg_gen_goto_ptr
+Subject: [Qemu-devel] [PATCH v5 01/19] target/nios2: Fix 64-bit ilp32
+ compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,135 +30,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
+Avoid a "cast from pointer to integer of different size" warning
+by using the proper host type.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/alpha/translate.c | 49 +++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 36 insertions(+), 13 deletions(-)
+ target/nios2/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index df5d695..c1a5fbf 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -89,6 +89,10 @@ typedef enum {
-        updated the PC for the next instruction to be executed.  */
-     EXIT_PC_STALE,
- 
-+    /* Similarly, but force TB exit without chaining.  */
-+    EXIT_PC_UPDATED_FORCE,
-+    EXIT_PC_STALE_FORCE,
-+
-     /* We are ending the TB with a noreturn function call, e.g. longjmp.
-        No following code will be executed.  */
-     EXIT_NORETURN,
-@@ -455,11 +459,16 @@ static bool in_superpage(DisasContext *ctx, int64_t addr)
- #endif
- }
- 
-+static bool use_exit_tb(DisasContext *ctx)
-+{
-+    /* Suppress any optimization in the case of single-steping and IO.  */
-+    return ((ctx->tb->cflags & CF_LAST_IO)
-+            || ctx->singlestep_enabled || singlestep);
-+}
-+
- static bool use_goto_tb(DisasContext *ctx, uint64_t dest)
- {
--    /* Suppress goto_tb in the case of single-steping and IO.  */
--    if ((ctx->tb->cflags & CF_LAST_IO)
--        || ctx->singlestep_enabled || singlestep) {
-+    if (use_exit_tb(ctx)) {
-         return false;
-     }
- #ifndef CONFIG_USER_ONLY
-@@ -1257,14 +1266,14 @@ static ExitStatus gen_call_pal(DisasContext *ctx, int palcode)
-            need the page permissions check.  We'll see the existence of
-            the page when we create the TB, and we'll flush all TBs if
-            we change the PAL base register.  */
--        if (!ctx->singlestep_enabled && !(ctx->tb->cflags & CF_LAST_IO)) {
-+        if (use_exit_tb(ctx)) {
-+            tcg_gen_movi_i64(cpu_pc, entry);
-+            return EXIT_PC_UPDATED;
-+        } else {
-             tcg_gen_goto_tb(0);
-             tcg_gen_movi_i64(cpu_pc, entry);
-             tcg_gen_exit_tb((uintptr_t)ctx->tb);
-             return EXIT_GOTO_TB;
--        } else {
--            tcg_gen_movi_i64(cpu_pc, entry);
--            return EXIT_PC_UPDATED;
-         }
-     }
- #endif
-@@ -1323,7 +1332,7 @@ static ExitStatus gen_mfpr(DisasContext *ctx, TCGv va, int regno)
-             gen_io_start();
-             helper(va);
-             gen_io_end();
--            return EXIT_PC_STALE;
-+            return EXIT_PC_STALE_FORCE;
-         } else {
-             helper(va);
-         }
-@@ -1374,7 +1383,7 @@ static ExitStatus gen_mtpr(DisasContext *ctx, TCGv vb, int regno)
-     case 252:
-         /* HALT */
-         gen_helper_halt(vb);
--        return EXIT_PC_STALE;
-+        return EXIT_PC_STALE_FORCE;
- 
-     case 251:
-         /* ALARM */
-@@ -1388,7 +1397,7 @@ static ExitStatus gen_mtpr(DisasContext *ctx, TCGv vb, int regno)
-            that ended with a CALL_PAL.  Since the base register usually only
-            changes during boot, flushing everything works well.  */
-         gen_helper_tb_flush(cpu_env);
--        return EXIT_PC_STALE;
-+        return EXIT_PC_STALE_FORCE;
- 
-     case 32 ... 39:
-         /* Accessing the "non-shadow" general registers.  */
-@@ -2373,7 +2382,7 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
-                 gen_io_start();
-                 gen_helper_load_pcc(va, cpu_env);
-                 gen_io_end();
--                ret = EXIT_PC_STALE;
-+                ret = EXIT_PC_STALE_FORCE;
-             } else {
-                 gen_helper_load_pcc(va, cpu_env);
-             }
-@@ -2990,18 +2999,32 @@ void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
-     case EXIT_GOTO_TB:
-     case EXIT_NORETURN:
-         break;
-+
-     case EXIT_PC_STALE:
-         tcg_gen_movi_i64(cpu_pc, ctx.pc);
--        /* FALLTHRU */
-+        goto do_exit_pc_updated;
-+    case EXIT_PC_STALE_FORCE:
-+        tcg_gen_movi_i64(cpu_pc, ctx.pc);
-+        goto do_exit_pc_updated_force;
-+
-     case EXIT_PC_UPDATED:
-+    do_exit_pc_updated:
-+        if (!use_exit_tb(&ctx)) {
-+            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-+            break;
-+        }
-+        /* FALLTHRU */
-+    case EXIT_PC_UPDATED_FORCE:
-+    do_exit_pc_updated_force:
-         if (ctx.singlestep_enabled) {
-             gen_excp_1(EXCP_DEBUG, 0);
-         } else {
-             tcg_gen_exit_tb(0);
-         }
-         break;
-+
-     default:
--        abort();
-+        g_assert_not_reached();
-     }
- 
-     gen_tb_end(tb, num_insns);
+diff --git a/target/nios2/translate.c b/target/nios2/translate.c
+index cfec479..2f3c2e5 100644
+--- a/target/nios2/translate.c
++++ b/target/nios2/translate.c
+@@ -164,7 +164,7 @@ static void gen_goto_tb(DisasContext *dc, int n, uint32_t dest)
+     if (use_goto_tb(dc, dest)) {
+         tcg_gen_goto_tb(n);
+         tcg_gen_movi_tl(dc->cpu_R[R_PC], dest);
+-        tcg_gen_exit_tb((tcg_target_long)tb + n);
++        tcg_gen_exit_tb((uintptr_t)tb + n);
+     } else {
+         tcg_gen_movi_tl(dc->cpu_R[R_PC], dest);
+         tcg_gen_exit_tb(0);
 -- 
 2.9.3
