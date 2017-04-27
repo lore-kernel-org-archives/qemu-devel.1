@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d3dA2-0002EU-Ke
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:44:20 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3dHu-00058F-Om
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d3d9x-000836-OU
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:44:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33449)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1d3d9x-00082A-FK
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:44:13 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3R6cdlC030897
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 02:44:10 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a2wj4173w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 02:44:09 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 27 Apr 2017 00:44:09 -0600
-References: <20170426183721.7482-1-dgilbert@redhat.com>
-	<20170426183721.7482-2-dgilbert@redhat.com>
-	<8a107a40-073c-8181-75aa-e5700f2900a7@de.ibm.com>
-	<20170426190442.GG2394@work-vm> <20170426193743.GF3508@redhat.com>
-	<20170427032037.GE26792@pxdev.xzpeter.org>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 27 Apr 2017 08:44:03 +0200
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d3dHq-0003kg-SS
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:52:26 -0400
+Received: from mga06.intel.com ([134.134.136.31]:9969)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1d3dHq-0003h7-Ga
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 02:52:22 -0400
+Date: Thu, 27 Apr 2017 14:36:23 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20170427063623.GC14925@sky-dev>
+References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
+	<1493201525-14418-2-git-send-email-yi.l.liu@intel.com>
+	<c042bf90-d48b-4ebf-c01a-fca7c4875277@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170427032037.GE26792@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Message-Id: <750be300-6f14-cbef-4b38-f28751e28032@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] Postcopy: Force allocation of all-zero
- precopy pages
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c042bf90-d48b-4ebf-c01a-fca7c4875277@arm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/8] iommu: Introduce bind_pasid_table
+ API function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,76 +30,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, lvivier@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>
 
-On 04/27/2017 05:20 AM, Peter Xu wrote:
-> On Wed, Apr 26, 2017 at 09:37:43PM +0200, Andrea Arcangeli wrote:
->> Hello,
->>
->> On Wed, Apr 26, 2017 at 08:04:43PM +0100, Dr. David Alan Gilbert wrote:
->>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>>> On 04/26/2017 08:37 PM, Dr. David Alan Gilbert (git) wrote:
->>>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>>>
->>>>> When an all-zero page is received during the precopy
->>>>> phase of a postcopy-enabled migration we must force
->>>>> allocation otherwise accesses to the page will still
->>>>> get blocked by userfault.
->>>>>
->>>>> Symptom:
->>>>>   a) If the page is accessed by a device during device-load
->>>>>     then we get a deadlock as the source finishes sending
->>>>>     all its pages but the destination device-load is still
->>>>>     paused and so doesn't clean up.
->>>>>
->>>>>   b) If the page is accessed later, then the thread will stay
->>>>>     paused until the end of migration rather than carrying on
->>>>>     running, until we release userfault at the end.
->>>>>
->>>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>>> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>>
->>>> CC stable? after all the guest hangs on both sides
->>>>
->>>> Has survived 40 migrations (usually failed at the 2nd)
->>>> Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>
->>> Great...but.....
->>> Andrea (added to the mail) says this shouldn't be necessary.
->>> The read we were doing in the is_zero_range() should have been sufficient
->>> to get the page mapped and that zero page should have survived.
->>>
->>> So - I guess that's back a step, we need to figure out why the
->>> page disapepars for you.
->>
->> Yes reading during precopy is enough to fill the hole and prevent
->> userfault missing faults to trigger.
->>
->> Somehow the pagetable must be mapped by a zeropage or a hugezeropage
->> or a regular page allocated during a previous precopy pass or a
->> pre-zeroed subpage part of a THP.
->>
->> Even if the hugezeropage is splitted later by a MADV_DONTNEED with
->> postcopy starts, they will become 4k zeropages.
->>
->> After a read succeeds, nothing (except MADV_DONTNEED or other explicit
->> syscalls which qemu would need to invoke explicitly between
->> is_zero_range and UFFDIO_REGISTER) should be able to bring the
->> pagetable back to its "pte_none/pmd_none" state that will then trigger
->> missing userfaults during postcopy later.
-
-I have started instrumenting the kernel. I can see a set_pte_at for this address
-and I see an (to be understood) invalidation shortly after that which explains
-why I get a fault.
+On Wed, Apr 26, 2017 at 05:56:45PM +0100, Jean-Philippe Brucker wrote:
+> Hi Yi, Jacob,
 > 
-> No matter what finally the solution would be (after see Juan's
-> comment, I am curious about whether is_zero_page() behaves differently
-> in power now)... Dave, would it worth mentioning in
+> On 26/04/17 11:11, Liu, Yi L wrote:
+> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > 
+> > Virtual IOMMU was proposed to support Shared Virtual Memory (SVM) use
+> > case in the guest:
+> > https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05311.html
+> > 
+> > As part of the proposed architecture, when a SVM capable PCI
+> > device is assigned to a guest, nested mode is turned on. Guest owns the
+> > first level page tables (request with PASID) and performs GVA->GPA
+> > translation. Second level page tables are owned by the host for GPA->HPA
+> > translation for both request with and without PASID.
+> > 
+> > A new IOMMU driver interface is therefore needed to perform tasks as
+> > follows:
+> > * Enable nested translation and appropriate translation type
+> > * Assign guest PASID table pointer (in GPA) and size to host IOMMU
+> > 
+> > This patch introduces new functions called iommu_(un)bind_pasid_table()
+> > to IOMMU APIs. Architecture specific IOMMU function can be added later
+> > to perform the specific steps for binding pasid table of assigned devices.
+> > 
+> > This patch also adds model definition in iommu.h. It would be used to
+> > check if the bind request is from a compatible entity. e.g. a bind
+> > request from an intel_iommu emulator may not be supported by an ARM SMMU
+> > driver.
+> > 
+> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> > ---
+> >  drivers/iommu/iommu.c | 19 +++++++++++++++++++
+> >  include/linux/iommu.h | 31 +++++++++++++++++++++++++++++++
+> >  2 files changed, 50 insertions(+)
+> > 
+> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > index dbe7f65..f2da636 100644
+> > --- a/drivers/iommu/iommu.c
+> > +++ b/drivers/iommu/iommu.c
+> > @@ -1134,6 +1134,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+> >  }
+> >  EXPORT_SYMBOL_GPL(iommu_attach_device);
+> >  
+> > +int iommu_bind_pasid_table(struct iommu_domain *domain, struct device *dev,
+> > +			struct pasid_table_info *pasidt_binfo)
+> 
+> I guess that domain can always be deduced from dev using
+> iommu_get_domain_for_dev, and doesn't need to be passed as argument?
+> 
+> For the next version of my SVM series, I was thinking of passing group
+> instead of device to iommu_bind. Since all devices in a group are expected
+> to share the same mappings (whether they want it or not), users will have
+> to do iommu_group_for_each_dev anyway (as you do in patch 6/8). So it
+> might be simpler to let the IOMMU core take the group lock and do
+> group->domain->ops->bind_task(dev...) for each device. The question also
+> holds for iommu_do_invalidate in patch 3/8.
+> 
+> This way the prototypes would be:
+> int iommu_bind...(struct iommu_group *group, struct ... *info)
+> int iommu_unbind...(struct iommu_group *group, struct ...*info)
+> int iommu_invalidate...(struct iommu_group *group, struct ...*info)
+> 
+> For PASID table binding it might not matter much, as VFIO will most likely
+> be the only user. But task binding will be called by device drivers, which
+> by now should be encouraged to do things at iommu_group granularity.
+> Alternatively it could be done implicitly like in iommu_attach_device,
+> with "iommu_bind_device_x" calling "iommu_bind_group_x".
+> 
+> 
+> Extending this reasoning, since groups in a domain are also supposed to
+> have the same mappings, then similarly to map/unmap,
+> bind/unbind/invalidate should really be done with an iommu_domain (and
+> nothing else) as target argument. However this requires the IOMMU core to
+> keep a group list in each domain, which might complicate things a little
+> too much.
+> 
+> But "all devices in a domain share the same PASID table" is the paradigm
+> I'm currently using in the guts of arm-smmu-v3. And I wonder if, as with
+> iommu_group, it should be made more explicit to users, so they don't
+> assume that devices within a domain are isolated from each others with
+> regard to PASID DMA.
+> 
+> > +{
+> > +	if (unlikely(!domain->ops->bind_pasid_table))
+> > +		return -EINVAL;
+> > +
+> > +	return domain->ops->bind_pasid_table(domain, dev, pasidt_binfo);
+> > +}
+> > +EXPORT_SYMBOL_GPL(iommu_bind_pasid_table);
+> > +
+> > +int iommu_unbind_pasid_table(struct iommu_domain *domain, struct device *dev)
+> > +{
+> > +	if (unlikely(!domain->ops->unbind_pasid_table))
+> > +		return -EINVAL;
+> > +
+> > +	return domain->ops->unbind_pasid_table(domain, dev);
+> > +}
+> > +EXPORT_SYMBOL_GPL(iommu_unbind_pasid_table);
+> > +
+> >  static void __iommu_detach_device(struct iommu_domain *domain,
+> >  				  struct device *dev)
+> >  {
+> > diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> > index 0ff5111..491a011 100644
+> > --- a/include/linux/iommu.h
+> > +++ b/include/linux/iommu.h
+> > @@ -131,6 +131,15 @@ struct iommu_dm_region {
+> >  	int			prot;
+> >  };
+> >  
+> > +struct pasid_table_info {
+> > +	__u64	ptr;	/* PASID table ptr */
+> > +	__u64	size;	/* PASID table size*/
+> > +	__u32	model;	/* magic number */
+> > +#define INTEL_IOMMU	(1 << 0)
+> > +#define ARM_SMMU	(1 << 1)
+> 
+> Not sure if there is any advantage in this being a bitfield rather than
+> simple values (1, 2, 3, etc).
+> The names should also have a prefix, such as "PASID_TABLE_MODEL_"
 
-s390 is not power. :-)
+Hi Jean,
 
-And we fall back to the normal buffer_zero_int which reads.
+For the value, no special reason from my side. so it is fine to just
+use (1,2..).
+For the prefix, model definition may also needed for iommu tlb
+invalidate propagation. So it may be suitable to have a prefix like
+"SVM_MODEL_" or so? Does it make sense?
 
-> ram_handle_compressed() about this read side-effect? Otherwise imho it
-> might be hard for many people to quickly notice this.
+Thanks,
+Yi L
+
+> Thanks a lot for doing this,
+> Jean
