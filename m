@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3lbH-00071f-0B
+	(envelope-from <bounces@canonical.com>) id 1d3lbG-00071c-Vi
 	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:45:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d3lbD-0002xq-Rb
+	(envelope-from <bounces@canonical.com>) id 1d3lbE-0002yO-Nf
 	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:44:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59615)
+Received: from indium.canonical.com ([91.189.90.7]:59644)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d3lbD-0002xU-LV
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:44:55 -0400
+	id 1d3lbE-0002xy-IA
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 11:44:56 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d3lbC-0008HW-N7
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:44:54 +0000
+	id 1d3lbD-0008HV-JU
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:44:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 990D92E8025
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:44:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 915042E80C4
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 15:44:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Apr 2017 15:32:07 -0000
-From: Thomas Huth <1090615@bugs.launchpad.net>
-Reply-To: Bug 1090615 <1090615@bugs.launchpad.net>
+Date: Thu, 27 Apr 2017 15:31:08 -0000
+From: Thomas Huth <1090602@bugs.launchpad.net>
+Reply-To: Bug 1090602 <1090602@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20121215012237.26117.58146.malonedeb@gac.canonical.com>
-Message-Id: <20170427153208.26349.11898.launchpad@gac.canonical.com>
+References: <20121215000355.23796.95243.malonedeb@soybean.canonical.com>
+Message-Id: <20170427153108.23010.54932.launchpad@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1090615] Re: RFE: More info in qemu-img info/check
+Subject: [Qemu-devel] [Bug 1090602] Re: RFE: Allow specifying usb-host
+ device by serial number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,46 +46,28 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1090615
+https://bugs.launchpad.net/bugs/1090602
 
 Title:
-   RFE: More info in qemu-img info/check
+  RFE: Allow specifying usb-host device by serial number
 
 Status in QEMU:
   New
 
 Bug description:
-  Originally filed in Fedora bugzilla:
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D861375
+  Currently you can pass through a host USB device to the guest like
 
-  """
-  qemu-img info currently give me info like this:
+    -device usb-host,vendorid=3D0x1234,productid=3D0x5678
 
-  image: /home/alex/.local/share/gnome-boxes/images/Fedora 16
-  file format: qcow2
-  virtual size: 11G (11794287616 bytes)
-  disk size: 4.5G
-  cluster_size: 65536
+  Which is all well and good, but has problems if you are trying to
+  assign to identical USB devices to the same guest.
 
-  In order to figure out the "health" of an image there is some more
-  information I would like:
+  It would be useful if there was an additional option that allow
+  matching against the device's serial number, which should allow
+  differentiating between two devices with the same product+vendor.
 
-  in-use disk size - I.e the subset of disk size that is not marked as
-  unused due to e.g. TRIM operations
-
-  amount of compressed clusters. I.e. "is it useful to re-compress the
-  image".
-
-  Fragmentation estimation.
-
-  This would be useful to both sysadmins in general and for automated thing=
-s like
-  what we want to do in gnome-boxes:
-  https://bugzilla.gnome.org/show_bug.cgi?id=3D685032
-  """
-
-  As mentioned in the original report, qemu-img check currently has
-  fragmentation stats, but only for QED.
+  This was originally filed at
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D640332
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1090615/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1090602/+subscriptions
