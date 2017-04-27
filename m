@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3hW9-0003TD-T5
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:23:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1d3hwC-0000ft-76
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:50:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d3hW6-0005BK-Ny
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:23:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50234)
+	(envelope-from <armbru@redhat.com>) id 1d3hw7-0006ie-AR
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:50:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d3hW6-0005Az-EO
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:23:22 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8D33F64467
-	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 11:23:20 +0000 (UTC)
-Date: Thu, 27 Apr 2017 12:23:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170427112313.GD2082@work-vm>
-References: <1493287126-19072-1-git-send-email-peterx@redhat.com>
-	<1493287126-19072-3-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d3hw7-0006hl-1g
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 07:50:15 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1493282486-28338-1-git-send-email-armbru@redhat.com>
+	<1493282486-28338-5-git-send-email-armbru@redhat.com>
+	<CAJ+F1CL2=cjEJ40tJ0nKtWD=DbG9aAmFkoRDT2y0+zaHFZbe0w@mail.gmail.com>
+	<8760hqceh7.fsf@dusky.pond.sub.org>
+	<CAJ+F1CL=BH2wqKMi3U0iZp4ujw_kHAGszL3KXJHJp9+mF3fmXg@mail.gmail.com>
+Date: Thu, 27 Apr 2017 13:50:10 +0200
+In-Reply-To: <CAJ+F1CL=BH2wqKMi3U0iZp4ujw_kHAGszL3KXJHJp9+mF3fmXg@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 27 Apr 2017
+	10:56:25 +0000")
+Message-ID: <87lgqm83yl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1493287126-19072-3-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] ramblock: add new hmp command "info
- ramblock"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] qobject-input-visitor: Catch misuse of
+ end_struct vs. end_list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,183 +33,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> To dump information about ramblocks. It looks like:
-> 
-> (qemu) info ramblock
->               Block Name    PSize              Offset               Used              Total
->             /objects/mem       2M  0x0000000000000000 0x0000000080000000 0x0000000080000000
->                 vga.vram       4K  0x0000000080060000 0x0000000001000000 0x0000000001000000
->     /rom@etc/acpi/tables       4K  0x00000000810b0000 0x0000000000020000 0x0000000000200000
->                  pc.bios       4K  0x0000000080000000 0x0000000000040000 0x0000000000040000
->   0000:00:03.0/e1000.rom       4K  0x0000000081070000 0x0000000000040000 0x0000000000040000
->                   pc.rom       4K  0x0000000080040000 0x0000000000020000 0x0000000000020000
->     0000:00:02.0/vga.rom       4K  0x0000000081060000 0x0000000000010000 0x0000000000010000
->    /rom@etc/table-loader       4K  0x00000000812b0000 0x0000000000001000 0x0000000000001000
->       /rom@etc/acpi/rsdp       4K  0x00000000812b1000 0x0000000000001000 0x0000000000001000
-> 
-> Ramblock is something hidden internally in QEMU implementation, and this
-> command should only be used by mostly QEMU developers on RAM stuff. It
-> is not a command suitable for QMP interface. So only HMP interface is
-> provided for it.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  exec.c                 | 36 ++++++++++++++++++++++++++++++++++++
->  hmp-commands-info.hx   | 14 ++++++++++++++
->  hmp.c                  |  6 ++++++
->  hmp.h                  |  1 +
->  include/exec/ramlist.h |  1 +
->  5 files changed, 58 insertions(+)
-> 
-> diff --git a/exec.c b/exec.c
-> index 50519ae..9b9d16e 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -71,6 +71,8 @@
->  #include "qemu/mmap-alloc.h"
->  #endif
->  
-> +#include "monitor/monitor.h"
-> +
->  //#define DEBUG_SUBPAGE
->  
->  #if !defined(CONFIG_USER_ONLY)
-> @@ -1333,6 +1335,40 @@ void qemu_mutex_unlock_ramlist(void)
->      qemu_mutex_unlock(&ram_list.mutex);
->  }
->  
-> +static const char *page_size_to_str(size_t psize)
-> +{
-> +    switch (psize) {
-> +    case 0x1000:
-> +        return "4K";
-> +    case 0x10000:
-> +        return "64K";
-> +    case 0x200000:
-> +        return "2M";
-> +    case 0x40000000:
-> +        return "1G";
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-That's not very portable; other platforms have other sizes, for example
-I think ARM has 16kB as one option, and I'm pretty sure the huge-pages
-on Power are a different size.
-Hmm, we already have
-                     qemu-io-cmds.c:cvtstr and
-       qapi/string-output-visitor.c:print_type_size
+> On Thu, Apr 27, 2017 at 2:49 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>>
+>> > On Thu, Apr 27, 2017 at 12:41 PM Markus Armbruster <armbru@redhat.com>
+>> > wrote:
+>> >
+>> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> >>
+>> >
+>> > It would be more obvious with a check for qobject_type(tos->obj), no?
+>>
+>> --verbose?
+>>
+>
+> Instead of assert(tos->h) assert(qobject_type(tos->obj) =3D=3D QTYPE_QDIC=
+T) ?
 
-to print sizes nicely; it's a pity we can't use them somehow rather
-than having a 3rd similar function.
+The two conditions imply each other.  We can assert either one, or even
+both.  Eric, got a preference?
 
-> +    default:
-> +        return "N/A";
-> +    }
-> +}
-> +
-> +void ram_block_dump(Monitor *mon)
-> +{
-> +    RAMBlock *block;
-> +
-> +    rcu_read_lock();
-> +    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-> +                   "Block Name", "PSize", "Offset", "Used", "Total");
-> +    RAMBLOCK_FOREACH(block) {
-> +        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
-> +                       " 0x%016" PRIx64 "\n", block->idstr,
-> +                       page_size_to_str(block->page_size),
-> +                       (uint64_t)block->offset,
-> +                       (uint64_t)block->used_length,
-> +                       (uint64_t)block->max_length);
-> +    }
-
-Yes that should work, I remember there's a RAM_ADDR_FMT macro that's
-supposed to be usable for ram_addr_t, but that's fine.
-
-Dave
-
-> +    rcu_read_unlock();
-> +}
-> +
->  #ifdef __linux__
->  /*
->   * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index a53f105..ae16901 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -788,6 +788,20 @@ Display the latest dump status.
->  ETEXI
->  
->      {
-> +        .name       = "ramblock",
-> +        .args_type  = "",
-> +        .params     = "",
-> +        .help       = "Display system ramblock information",
-> +        .cmd        = hmp_info_ramblock,
-> +    },
-> +
-> +STEXI
-> +@item info ramblock
-> +@findex ramblock
-> +Dump all the ramblocks of the system.
-> +ETEXI
-> +
-> +    {
->          .name       = "hotpluggable-cpus",
->          .args_type  = "",
->          .params     = "",
-> diff --git a/hmp.c b/hmp.c
-> index ab407d6..8369388 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -37,6 +37,7 @@
->  #include "qemu-io.h"
->  #include "qemu/cutils.h"
->  #include "qemu/error-report.h"
-> +#include "exec/ramlist.h"
->  #include "hw/intc/intc.h"
->  
->  #ifdef CONFIG_SPICE
-> @@ -2563,6 +2564,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
->      qapi_free_DumpQueryResult(result);
->  }
->  
-> +void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
-> +{
-> +    ram_block_dump(mon);
-> +}
-> +
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
->  {
->      Error *err = NULL;
-> diff --git a/hmp.h b/hmp.h
-> index 799fd37..7353b67 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -136,6 +136,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
->  void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
->  void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
->  void hmp_info_dump(Monitor *mon, const QDict *qdict);
-> +void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
->  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
->  
-> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-> index f1c6b45..2e2ac6c 100644
-> --- a/include/exec/ramlist.h
-> +++ b/include/exec/ramlist.h
-> @@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
->  void ram_block_notify_add(void *host, size_t size);
->  void ram_block_notify_remove(void *host, size_t size);
->  
-> +void ram_block_dump(Monitor *mon);
->  
->  #endif /* RAMLIST_H */
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> similarly for the list case.
+>
+>> > In any case:
+>> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> Thanks!
+>>
+>> >> ---
+>> >>  qapi/qobject-input-visitor.c | 21 +++++++++++++++++++--
+>> >>  1 file changed, 19 insertions(+), 2 deletions(-)
+>> >>
+>> >> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visito=
+r.c
+>> >> index 2530959..68a6742 100644
+>> >> --- a/qapi/qobject-input-visitor.c
+>> >> +++ b/qapi/qobject-input-visitor.c
+>> >> @@ -291,6 +291,15 @@ static void qobject_input_start_struct(Visitor *=
+v,
+>> >> const char *name, void **obj,
+>> >>      }
+>> >>  }
+>> >>
+>> >> +static void qobject_input_end_struct(Visitor *v, void **obj)
+>> >> +{
+>> >> +    QObjectInputVisitor *qiv =3D to_qiv(v);
+>> >> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
+>> >> +
+>> >> +    assert(tos->h);
+>> >> +    qobject_input_pop(v, obj);
+>> >> +}
+>> >> +
+>> >>
+>> >>  static void qobject_input_start_list(Visitor *v, const char *name,
+>> >>                                       GenericList **list, size_t size,
+>> >> @@ -346,6 +355,14 @@ static void qobject_input_check_list(Visitor *v,
+>> >> Error **errp)
+>> >>      }
+>> >>  }
+>> >>
+>> >> +static void qobject_input_end_list(Visitor *v, void **obj)
+>> >> +{
+>> >> +    QObjectInputVisitor *qiv =3D to_qiv(v);
+>> >> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
+>> >> +
+>> >> +    assert(!tos->h);
+>> >> +    qobject_input_pop(v, obj);
+>> >> +}
+>> >>
+>> >>  static void qobject_input_start_alternate(Visitor *v, const char *na=
+me,
+>> >>                                            GenericAlternate **obj, si=
+ze_t
+>> >> size,
+>> >> @@ -645,11 +662,11 @@ static QObjectInputVisitor
+>> >> *qobject_input_visitor_base_new(QObject *obj)
+>> >>      v->visitor.type =3D VISITOR_INPUT;
+>> >>      v->visitor.start_struct =3D qobject_input_start_struct;
+>> >>      v->visitor.check_struct =3D qobject_input_check_struct;
+>> >> -    v->visitor.end_struct =3D qobject_input_pop;
+>> >> +    v->visitor.end_struct =3D qobject_input_end_struct;
+>> >>      v->visitor.start_list =3D qobject_input_start_list;
+>> >>      v->visitor.next_list =3D qobject_input_next_list;
+>> >>      v->visitor.check_list =3D qobject_input_check_list;
+>> >> -    v->visitor.end_list =3D qobject_input_pop;
+>> >> +    v->visitor.end_list =3D qobject_input_end_list;
+>> >>      v->visitor.start_alternate =3D qobject_input_start_alternate;
+>> >>      v->visitor.optional =3D qobject_input_optional;
+>> >>      v->visitor.free =3D qobject_input_free;
+>> >> --
+>> >> 2.7.4
+>> >>
+>> >>
+>> >> --
+>> > Marc-Andr=C3=A9 Lureau
+>>
