@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d3qfG-0003Nk-Lp
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:09:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1d3qjI-0004RG-H7
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d3qfD-0005hO-HU
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:09:26 -0400
-Date: Thu, 27 Apr 2017 14:09:11 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1493323148-32461-1-git-send-email-brogers@suse.com>
-Message-ID: <alpine.DEB.2.10.1704271403550.2895@sstabellini-ThinkPad-X260>
-References: <1493323148-32461-1-git-send-email-brogers@suse.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1d3qjH-0007Sx-OH
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:13:36 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1d3qjH-0007Ri-H2
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 17:13:35 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id u65so27380627wmu.1
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 14:13:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] ACPI: don't call acpi_pcihp_device_plug_cb
- on xen
+In-Reply-To: <1493314727-6951-1-git-send-email-wei@redhat.com>
+References: <1493314727-6951-1-git-send-email-wei@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Apr 2017 22:13:13 +0100
+Message-ID: <CAFEAcA-KKvhspYza=8TNNuFtqzco=ChhtS6Aa5hnn8=Cb036-Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix compilation dependency issues of
+ CONFIG_ARM_V7M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,55 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bruce Rogers <brogers@suse.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, sstabellini@kernel.org, mst@redhat.com, qemu-stable@nongnu.org
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 27 Apr 2017, Bruce Rogers wrote:
-> Commit f0c9d64a exposed the issue that with a xenfv machine using
-> pci passthrough, acpi cpi hotplug code was being executed by mistake.
-> Guard calls to acpi_pcihp_device_plug_cb (and corresponding
-> acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
-> this check I am seeing an error that the bus doesn't have the
-> acpi-pcihp-bsel property set.
-> 
-> Signed-off-by: Bruce Rogers <brogers@suse.com>
-> ---
->  hw/acpi/piix4.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index a553a7e..c409374 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
->                                  dev, errp);
->          }
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, errp);
-> +        if (!xen_enabled()) {
-> +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> +                                      errp);
-> +        }
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          if (s->cpu_hotplug_legacy) {
->              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
-> @@ -408,8 +411,10 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
->                                        dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> -                                    errp);
-> +        if (!xen_enabled()) {
-> +            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> +                                        errp);
-> +        }
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
->                 !s->cpu_hotplug_legacy) {
->          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
+On 27 April 2017 at 18:38, Wei Huang <wei@redhat.com> wrote:
+> CONFIG_ARM_V7M is used to control the compilation of NVIC and SysTick
+> Timer in QEMU. These two devices are not available when CONFIG_ARM_V7M
+> is un-defined. This can cause problems with ARMv7M code as it is tightly
+> integrated with NVIC for processing IRQ and exception.
+>
+> This patchset addresses the problem by introducing stub functions when
+> CONFIG_ARM_V7M is not defined. It also makes the compilation of several
+> existing v7M-profile SoCs depedent on CONFIG_ARM_V7M.
 
-Wouldn't it be better to simply turn the error_setg("Unsupported bus...)
-in acpi_pcihp_device_plug_cb and acpi_pcihp_device_unplug_cb into debug
-printfs? After all, from this description it is clear that they are not
-an error conditions. PCI Passthough works correctly, right?
+Can you explain in what situation this causes a problem?
+It's not clear to me what you're trying to fix...
 
-I realize that I should have suggested this earlier, sorry about that.
+thanks
+-- PMM
