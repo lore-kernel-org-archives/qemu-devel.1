@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3rkV-0001YF-D3
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:18:56 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d3rsg-0003P6-3G
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:27:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d3rkQ-0008Jc-RE
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:18:55 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:59177)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1d3rkQ-0008I3-Gy
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:18:50 -0400
-Date: Thu, 27 Apr 2017 18:18:48 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170427221848.GA15480@flamenco>
-References: <20170427120006.20564-1-rth@twiddle.net>
-	<20170427120006.20564-18-rth@twiddle.net>
+	(envelope-from <sstabellini@kernel.org>) id 1d3rsc-0005Uc-6T
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:27:22 -0400
+Date: Thu, 27 Apr 2017 15:27:12 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <59026477020000480014395C@prv-mh.provo.novell.com>
+Message-ID: <alpine.DEB.2.10.1704271526000.2895@sstabellini-ThinkPad-X260>
+References: <1493323148-32461-1-git-send-email-brogers@suse.com>
+	<alpine.DEB.2.10.1704271403550.2895@sstabellini-ThinkPad-X260>
+	<59026477020000480014395C@prv-mh.provo.novell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170427120006.20564-18-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v5 17/19] tcg/aarch64: Implement goto_ptr
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] ACPI: don't call acpi_pcihp_device_plug_cb
+ on xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Bruce Rogers <brogers@suse.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, imammedo@redhat.com, mst@redhat.com
 
-On Thu, Apr 27, 2017 at 14:00:04 +0200, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  tcg/aarch64/tcg-target.h     |  2 +-
->  tcg/aarch64/tcg-target.inc.c | 22 ++++++++++++++++++++--
->  2 files changed, 21 insertions(+), 3 deletions(-)
+On Thu, 27 Apr 2017, Bruce Rogers wrote:
+> >>> On 4/27/2017 at 03:09 PM, Stefano Stabellini <sstabellini@kernel.org> wrote: 
+> > On Thu, 27 Apr 2017, Bruce Rogers wrote:
+> >> Commit f0c9d64a exposed the issue that with a xenfv machine using
+> >> pci passthrough, acpi cpi hotplug code was being executed by mistake.
+> >> Guard calls to acpi_pcihp_device_plug_cb (and corresponding
+> >> acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
+> >> this check I am seeing an error that the bus doesn't have the
+> >> acpi-pcihp-bsel property set.
+> >> 
+> >> Signed-off-by: Bruce Rogers <brogers@suse.com>
+> >> ---
+> >>  hw/acpi/piix4.c | 11 ++++++++---
+> >>  1 file changed, 8 insertions(+), 3 deletions(-)
+> >> 
+> >> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> >> index a553a7e..c409374 100644
+> >> --- a/hw/acpi/piix4.c
+> >> +++ b/hw/acpi/piix4.c
+> >> @@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler 
+> > *hotplug_dev,
+> >>                                  dev, errp);
+> >>          }
+> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> >> -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, 
+> > errp);
+> >> +        if (!xen_enabled()) {
+> >> +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> >> +                                      errp);
+> >> +        }
+> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> >>          if (s->cpu_hotplug_legacy) {
+> >>              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
+> >> @@ -408,8 +411,10 @@ static void 
+> > piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> >>          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
+> >>                                        dev, errp);
+> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> >> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> >> -                                    errp);
+> >> +        if (!xen_enabled()) {
+> >> +            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, 
+> > dev,
+> >> +                                        errp);
+> >> +        }
+> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+> >>                 !s->cpu_hotplug_legacy) {
+> >>          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
+> > 
+> > Wouldn't it be better to simply turn the error_setg("Unsupported bus...)
+> > in acpi_pcihp_device_plug_cb and acpi_pcihp_device_unplug_cb into debug
+> > printfs? After all, from this description it is clear that they are not
+> > an error conditions. PCI Passthough works correctly, right?
+> > 
+> > I realize that I should have suggested this earlier, sorry about that.
+> 
+> I don't think we want to be running through qemu acpi code any more than is
+> necessary when using xen hvm.
 
-Tested-by: Emilio G. Cota <cota@braap.org>
-
-Would be nice to add to the commit log these before/after numbers
-I just got on an aarch64 host:
-
-                      SPECint06 (test set), x86_64-linux-user. Host: APM 64-bit ARMv8 (Atlas/A57) @ 2.4 GHz                  
-                                                                                                                             
- 1.45x +-+-------------------------------------------------------------------------------------------------------------+-+   
-       |                                      *****                                                                      |   
-       |      +++                             *   *                                                    +goto-ptr         |   
-  1.4x +-+...*****............................*...*....................................................................+-+   
-       |     *+++*                            *   *                            +++                                       |   
- 1.35x +-+...*...*............................*...*...........................*****....................................+-+   
-       |     *   *                            *   *                           *+++*                                      |   
-       |     *   *                            *   *                           *   *                                      |   
-  1.3x +-+...*...*............................*...*...........................*...*....................................+-+   
-       |     *   *                            *   *                           *   *                                      |   
-       |     *   *                            *   *                           *   *                    *****             |   
- 1.25x +-+...*...*...........*****............*...*...........................*...*............*****...*...*...........+-+   
-       |     *   *           *   *            *   *                           *   *            *+++*   *   *             |   
-  1.2x +-+...*...*...........*...*............*...*...........................*...*............*...*...*...*...........+-+   
-       |     *   *           *   *            *   *                           *   *            *   *   *   *             |   
-       |     *   *           *   *            *   *                           *   *            *   *   *   *   *****     |   
- 1.15x +-+...*...*...........*...*............*...*...........................*...*............*...*...*...*...*...*...+-+   
-       |     *   *           *   *            *   *                           *   *    +++     *   *   *   *   *   *     |   
-       |     *   *           *   *            *   *                           *   *   *****    *   *   *   *   *   *     |   
-  1.1x +-+...*...*...........*...*....*****...*...*...*****...................*...*...*...*....*...*...*...*...*...*...+-+   
-       |     *   *           *   *    *   *   *   *   *   *                   *   *   *   *    *   *   *   *   *   *     |   
- 1.05x +-+...*...*...........*...*....*...*...*...*...*...*...................*...*...*...*....*...*...*...*...*...*...+-+   
-       |     *   *   *****   *   *    *   *   *   *   *   *                   *   *   *   *    *   *   *   *   *   *     |   
-       |     *   *   *   *   *   *    *   *   *   *   *   *   *****   *****   *   *   *   *    *   *   *   *   *   *     |   
-    1x +-+---*****---*****---*****----*****---*****---*****---*****---*****---*****---*****----*****---*****---*****---+-+   
-          astar   bzip2     gcc    gobmk h264ref   hmmlibquantum     mcf omnetpperlbench    sjenxalancbmk   hmean            
-  png: http://imgur.com/en9HE8L
-
-Thanks,
-
-		E.
+Fair enough, but at the same time it is not good to disseminate if
+(!xen_enabled()) around. I am happy either way, I'll let Michael and
+Igor decide.
