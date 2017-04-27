@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d3rsg-0003P6-3G
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:27:23 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d3s1f-0005aN-EO
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:36:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1d3rsc-0005Uc-6T
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:27:22 -0400
-Date: Thu, 27 Apr 2017 15:27:12 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <59026477020000480014395C@prv-mh.provo.novell.com>
-Message-ID: <alpine.DEB.2.10.1704271526000.2895@sstabellini-ThinkPad-X260>
-References: <1493323148-32461-1-git-send-email-brogers@suse.com>
-	<alpine.DEB.2.10.1704271403550.2895@sstabellini-ThinkPad-X260>
-	<59026477020000480014395C@prv-mh.provo.novell.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] ACPI: don't call acpi_pcihp_device_plug_cb
- on xen
+	(envelope-from <jsnow@redhat.com>) id 1d3s1b-0002Nn-I1
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:36:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42180)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d3s1b-0002NA-Az
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 18:36:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 30B1680041
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 22:36:34 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+Date: Thu, 27 Apr 2017 18:36:28 -0400
+Message-Id: <20170427223628.20893-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] qmp-shell: add persistent command history
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bruce Rogers <brogers@suse.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, imammedo@redhat.com, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, kchamart@redhat.com, John Snow <jsnow@redhat.com>
 
-On Thu, 27 Apr 2017, Bruce Rogers wrote:
-> >>> On 4/27/2017 at 03:09 PM, Stefano Stabellini <sstabellini@kernel.org> wrote: 
-> > On Thu, 27 Apr 2017, Bruce Rogers wrote:
-> >> Commit f0c9d64a exposed the issue that with a xenfv machine using
-> >> pci passthrough, acpi cpi hotplug code was being executed by mistake.
-> >> Guard calls to acpi_pcihp_device_plug_cb (and corresponding
-> >> acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
-> >> this check I am seeing an error that the bus doesn't have the
-> >> acpi-pcihp-bsel property set.
-> >> 
-> >> Signed-off-by: Bruce Rogers <brogers@suse.com>
-> >> ---
-> >>  hw/acpi/piix4.c | 11 ++++++++---
-> >>  1 file changed, 8 insertions(+), 3 deletions(-)
-> >> 
-> >> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> >> index a553a7e..c409374 100644
-> >> --- a/hw/acpi/piix4.c
-> >> +++ b/hw/acpi/piix4.c
-> >> @@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler 
-> > *hotplug_dev,
-> >>                                  dev, errp);
-> >>          }
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> >> -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, 
-> > errp);
-> >> +        if (!xen_enabled()) {
-> >> +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> >> +                                      errp);
-> >> +        }
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> >>          if (s->cpu_hotplug_legacy) {
-> >>              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
-> >> @@ -408,8 +411,10 @@ static void 
-> > piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> >>          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
-> >>                                        dev, errp);
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> >> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> >> -                                    errp);
-> >> +        if (!xen_enabled()) {
-> >> +            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, 
-> > dev,
-> >> +                                        errp);
-> >> +        }
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
-> >>                 !s->cpu_hotplug_legacy) {
-> >>          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
-> > 
-> > Wouldn't it be better to simply turn the error_setg("Unsupported bus...)
-> > in acpi_pcihp_device_plug_cb and acpi_pcihp_device_unplug_cb into debug
-> > printfs? After all, from this description it is clear that they are not
-> > an error conditions. PCI Passthough works correctly, right?
-> > 
-> > I realize that I should have suggested this earlier, sorry about that.
-> 
-> I don't think we want to be running through qemu acpi code any more than is
-> necessary when using xen hvm.
+Use the existing readline history function we are utilizing
+to provide persistent command history across instances of qmp-shell.
 
-Fair enough, but at the same time it is not good to disseminate if
-(!xen_enabled()) around. I am happy either way, I'll let Michael and
-Igor decide.
+This assists entering debug commands across sessions that may be
+interrupted by QEMU sessions terminating, where the qmp-shell has
+to be relaunched.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+
+v3: Hardcoded limit of 1024 lines of history for now,
+    as setting limits in ~/.inputrc does not appear to work (Nir)
+
+v2: Adjusted the errors to whine about non-ENOENT errors, but still
+    intercept all errors as non-fatal.
+    Save history atexit() to match bash standard behavior
+
+ scripts/qmp/qmp-shell | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+index eccb88a..6ece6e7 100755
+--- a/scripts/qmp/qmp-shell
++++ b/scripts/qmp/qmp-shell
+@@ -70,6 +70,9 @@ import json
+ import ast
+ import readline
+ import sys
++import os
++import errno
++import atexit
+ 
+ class QMPCompleter(list):
+     def complete(self, text, state):
+@@ -109,6 +112,8 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+         self._pretty = pretty
+         self._transmode = False
+         self._actions = list()
++        self._histfile = os.path.join(os.path.expanduser('~'),
++                                      '.qmp-shell_history')
+ 
+     def __get_address(self, arg):
+         """
+@@ -132,11 +137,27 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+     def __completer_setup(self):
+         self._completer = QMPCompleter()
+         self._fill_completion()
++        readline.set_history_length(1024)
+         readline.set_completer(self._completer.complete)
+         readline.parse_and_bind("tab: complete")
+         # XXX: default delimiters conflict with some command names (eg. query-),
+         # clearing everything as it doesn't seem to matter
+         readline.set_completer_delims('')
++        try:
++            readline.read_history_file(self._histfile)
++        except Exception as e:
++            if isinstance(e, IOError) and e.errno == errno.ENOENT:
++                # File not found. No problem.
++                pass
++            else:
++                print "Failed to read history '%s'; %s" % (self._histfile, e)
++        atexit.register(self.__save_history)
++
++    def __save_history(self):
++        try:
++            readline.write_history_file(self._histfile)
++        except Exception as e:
++            print "Failed to save history file '%s'; %s" % (self._histfile, e)
+ 
+     def __parse_value(self, val):
+         try:
+-- 
+2.9.3
