@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3eXr-0000ss-NZ
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:13:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1d3ee5-0003QR-RZ
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:19:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d3eXr-0002zH-0d
-	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:12:59 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1493263764-18657-1-git-send-email-cota@braap.org>
-	<1493263764-18657-9-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <4415513e-db6d-ed35-295b-63a2ae7c8f90@twiddle.net>
-Date: Thu, 27 Apr 2017 10:12:49 +0200
+	(envelope-from <quintela@redhat.com>) id 1d3ee1-0004r2-TP
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:19:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d3ee1-0004qu-Mr
+	for qemu-devel@nongnu.org; Thu, 27 Apr 2017 04:19:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7BF3C46D09E
+	for <qemu-devel@nongnu.org>; Thu, 27 Apr 2017 08:19:20 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170313162909.GI4799@redhat.com> (Daniel P. Berrange's message
+	of "Mon, 13 Mar 2017 16:29:09 +0000")
+References: <20170313124434.1043-1-quintela@redhat.com>
+	<20170313124434.1043-2-quintela@redhat.com>
+	<20170313162909.GI4799@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Thu, 27 Apr 2017 10:19:17 +0200
+Message-ID: <87k266jm9m.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <1493263764-18657-9-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 08/11] target/i386: introduce gen_jr
- helper to generate lookup_and_goto_ptr
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 01/16] qio: create new qio_channel_write_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,18 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, Stefan Weil <sw@weilnetz.de>, qemu-arm@nongnu.org, alex.bennee@linaro.org, Pranith Kumar <bobby.prani+qemu@gmail.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, dgilbert@redhat.com
 
-On 04/27/2017 05:29 AM, Emilio G. Cota wrote:
-> This helper will be used by subsequent changes.
-> 
-> Signed-off-by: Emilio G. Cota<cota@braap.org>
-> ---
->   target/i386/translate.c | 25 ++++++++++++++++++++++++-
->   1 file changed, 24 insertions(+), 1 deletion(-)
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+> On Mon, Mar 13, 2017 at 01:44:19PM +0100, Juan Quintela wrote:
+>> The function waits until it is able to write the full iov.
+>> 
+>
+> Can you make sure this is covered in the test suite. Something added
+> or changed in tests/io-channel-helpers.c should be sufficient. eg use
+> it from test_io_thread_writer() when applicable
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Ok, I integreted together the two patches, and added tests for:
 
+qio_channel_writev - qio_channel_readv
+qio_channel_writev_all - qio_channel_readv
+qio_channel_writev - qio_channel_readv_all
+qio_channel_writev_all - qio_channel_readv_all
 
-r~
+I did it only for test-io-channel-buffer.c, though.
+
+Thanks, Juan.
