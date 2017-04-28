@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d48zm-0000nm-Dl
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:43:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d494j-0002La-Ln
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d48zj-0001AP-CO
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:43:50 -0400
-References: <20170427205100.9505-1-jsnow@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1d494i-0004Sq-My
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:48:57 -0400
+References: <20170207235757.2026-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f14b3ea0-ab40-b3db-faf4-9b4882b12065@redhat.com>
-Date: Fri, 28 Apr 2017 18:43:43 +0200
+Message-ID: <9ebd567b-0255-4935-4bc5-4bf4a10a0572@redhat.com>
+Date: Fri, 28 Apr 2017 18:48:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170427205100.9505-1-jsnow@redhat.com>
+In-Reply-To: <20170207235757.2026-1-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ckSnlhUEKE3aNG1ctJBAC1CfTNmJCxtjr"
-Subject: Re: [Qemu-devel] [PATCH 0/2] iotests: trivial fixups
+	boundary="2M8XMnFgvM1qAVlShGt0nDQjCMsBQEoWp"
+Subject: Re: [Qemu-devel] [PATCH] progress: Show current progress on SIGINFO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, kwolf@redhat.com, eblake@redhat.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ckSnlhUEKE3aNG1ctJBAC1CfTNmJCxtjr
+--2M8XMnFgvM1qAVlShGt0nDQjCMsBQEoWp
 From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, kwolf@redhat.com, eblake@redhat.com
-Message-ID: <f14b3ea0-ab40-b3db-faf4-9b4882b12065@redhat.com>
-Subject: Re: [PATCH 0/2] iotests: trivial fixups
-References: <20170427205100.9505-1-jsnow@redhat.com>
-In-Reply-To: <20170427205100.9505-1-jsnow@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <9ebd567b-0255-4935-4bc5-4bf4a10a0572@redhat.com>
+Subject: Re: [PATCH] progress: Show current progress on SIGINFO
+References: <20170207235757.2026-1-mreitz@redhat.com>
+In-Reply-To: <20170207235757.2026-1-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 27.04.2017 22:50, John Snow wrote:
-> Excised from an old patchset from 2015, just a couple of touchups.
+On 08.02.2017 00:57, Max Reitz wrote:
+> Currently we only print progress information on retrieval of SIGUSR1.
+> Some systems have a dedicated SIGINFO for this, however, so it should b=
+e
+> handled appropriately if it is available.
 >=20
-> John Snow (2):
->   iotests: clarify help text
->   iotests: fix exclusion option
->=20
->  tests/qemu-iotests/common | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1662468
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> Can anyone test this on a BSD system? O:-)
+> ---
+>  util/qemu-progress.c | 3 +++
+>  qemu-img.texi        | 3 ++-
+>  2 files changed, 5 insertions(+), 1 deletion(-)
 
-Thanks, applied to my block tree:
+Applied to my block branch.
 
-https://github.com/XanClic/qemu/commits/block
+(https://github.com/XanClic/qemu/commits/block)
 
 Max
 
 
---ckSnlhUEKE3aNG1ctJBAC1CfTNmJCxtjr
+--2M8XMnFgvM1qAVlShGt0nDQjCMsBQEoWp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDcT8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A6rwIAIOudfoVYcUIlVdbGcm/Jn3WmJ/x8nF5
-YXNSxecyBmphxgpJqcjpPCThFoANQ3FX2vlReC1865sKze2pAkYZJhMeWulbSe8X
-uy/H+E0ThfGaZJUeXZEfZLrnaQeXWVuynJA4VGcjqtxC35DxrSmaE4PQKKBT81y0
-BzC4rAqfCDBk81uMuej3o4jZjWugwI3zEyOMZPNzkv5imk07L2XI5nmi7AZ+jybu
-uiEShlRAhPkt12BQX8xmsxQjX9hvNLXeeVpunqeU7c9Kt2N6GMoVoC3+36o5a0Dz
-wursMACtjAs87ZcfK6fCzFGIKDLknpK/9ZYeawv0AU+3pEKp8EJFGSg=
-=Phur
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDcnISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AANwH/iXU57Q1xJ9jvr+BdvoFL54VFrGHKOa+
+Ds9w9WGMu4M5gB7oiKlAQQSVgp6g4ludMX4NW0e4V57boenJ3ocbo95LQ5rBBSDA
+G0a1JfpCllRUBt8VCH+xp1PULNOpxQ4nOlpAVDDricAx3Epk/ce7n1olnitehQUF
+af7IUgbzDMHYypyxt1VaV/AashaChwIa6IMEmNokFY7GuCAUE0Ov50GJJNjQn3FK
+GtzWBLbN1UsTm+BFDFI2N5tNAOOUFP/2j4y84zcG4j8wjs46bcBpRqoAPwM60hvO
+sv9MynXU4XmIuq+blSvuAHOSVYCs0V4TRSZp64wg5ZhJHU0ecir0poY=
+=IAGy
 -----END PGP SIGNATURE-----
 
---ckSnlhUEKE3aNG1ctJBAC1CfTNmJCxtjr--
+--2M8XMnFgvM1qAVlShGt0nDQjCMsBQEoWp--
