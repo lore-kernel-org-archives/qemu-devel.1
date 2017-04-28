@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d48Ek-0000f0-56
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:55:15 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d48F7-0000ol-AX
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:55:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d48Eh-0003kY-4r
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:55:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51844)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d48Eg-0003jw-Rb
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:55:11 -0400
-Date: Fri, 28 Apr 2017 16:55:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170428155501.GJ2085@work-vm>
-References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170428065753eucas1p1524aa2bd8e469e6c94a88ee80eb54a6e@eucas1p1.samsung.com>
-	<1493362658-8179-4-git-send-email-a.perevalov@samsung.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d48F5-0003sQ-K5
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:55:37 -0400
+Received: from mail-lf0-x231.google.com ([2a00:1450:4010:c07::231]:34865)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1d48F5-0003rV-6V
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:55:35 -0400
+Received: by mail-lf0-x231.google.com with SMTP id 75so36211466lfs.2
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 08:55:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1493362658-8179-4-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND V3 3/6] migration: split
- ufd_version_check onto receive/request features part
+References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
+	<87o9yv890z.fsf@dusky.pond.sub.org> <87lgqpei5d.fsf@dusky.pond.sub.org>
+	<20170425102258.GA4615@noname.redhat.com>
+In-Reply-To: <20170425102258.GA4615@noname.redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 28 Apr 2017 15:55:22 +0000
+Message-ID: <CAJ+F1CKYUbMo-3TrkNfc+H3tzLUaN00c6sGTxdnPn5qapfA_bA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/25] qmp: add async command type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +31,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, f4bug@amsat.org, peterx@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> This modification is necessary for userfault fd features which are
-> required to be requested from userspace.
-> UFFD_FEATURE_THREAD_ID is a one of such "on demand" feature, which will
-> be introduced in the next patch.
-> 
-> QEMU need to use separate userfault file descriptor, due to
-> userfault context has internal state, and after first call of
-> ioctl UFFD_API it changes its state to UFFD_STATE_RUNNING (in case of
-> success), but
-> kernel while handling ioctl UFFD_API expects UFFD_STATE_WAIT_API. So
-> only one ioctl with UFFD_API is possible per ufd.
-> 
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> ---
->  migration/postcopy-ram.c | 68 ++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 63 insertions(+), 5 deletions(-)
-> 
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 4c859b4..21e7150 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -60,15 +60,51 @@ struct PostcopyDiscardState {
->  #include <sys/eventfd.h>
->  #include <linux/userfaultfd.h>
->  
-> -static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
-> +
-> +/*
-> + * Check userfault fd features, to request only supported features in
-> + * future.
-> + * __NR_userfaultfd - should be checked before
-> + * Return obtained features
+Hi
 
-Well, it returns true on success I think, sets *features
+On Tue, Apr 25, 2017 at 2:23 PM Kevin Wolf <kwolf@redhat.com> wrote:
 
-> + */
-> +static bool receive_ufd_features(__u64 *features)
->  {
-> -    struct uffdio_api api_struct;
-> -    uint64_t ioctl_mask;
-> +    struct uffdio_api api_struct = {0};
-> +    int ufd;
-> +    bool ret = true;
->  
-> +    /* if we are here __NR_userfaultfd should exists */
-> +    ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
-> +    if (ufd == -1) {
+> Am 24.04.2017 um 21:10 hat Markus Armbruster geschrieben:
+> > With 2.9 out of the way, how can we make progress on this one?
+> >
+> > I can see two ways to get asynchronous QMP commands accepted:
+> >
+> > 1. We break QMP compatibility in QEMU 3.0 and convert all long-running
+> >    tasks from "synchronous command + event" to "asynchronous command".
+> >
+> >    This is design option 1 quoted below.  *If* we decide to leave
+> >    compatibility behind for 3.0, *and* we decide we like the
+> >    asynchronous sufficiently better to put in the work, we can do it.
+> >
+> >    I guess there's nothing to do here until we decide on breaking
+> >    compatibility in 3.0.
+> >
+> > 2. We don't break QMP compatibility, but we add asynchronous commands
+> >    anyway, because we decide that's how we want to do "jobs".
+> >
+> >    This is design option 3 quoted below.  As I said, I dislike its lack
+> >    of orthogonality.  But if asynchronous commands help us get jobs
+> >    done, I can bury my dislike.
+>
+> I don't think async commands are attractive at all for doing jobs. I
+>
 
-error_report
+It's still a bit obscure to me what we mean by "jobs".
 
-> +        return false;
-> +    }
-> +
-> +    /* ask features */
->      api_struct.api = UFFD_API;
->      api_struct.features = 0;
->      if (ioctl(ufd, UFFDIO_API, &api_struct)) {
-> -        error_report("postcopy_ram_supported_by_host: UFFDIO_API failed: %s",
-> +        error_report("receive_ufd_features: UFFDIO_API failed: %s",
-> +                strerror(errno));
+feel they bring up more questions that they answer, for example, what
+> happens if libvirt crashes and then reconnects? Which monitor connection
+> does get the reply for an async command sent on the now disconnected
+> one?
+>
 
-I've tended to use "%s: .....", __func__   - it avoids having to rename
-things later.
+The monitor to receive a reply is the one that sent the command (just like
+return today)
 
-> +        ret = false;
-> +        goto release_ufd;
-> +    }
-> +
-> +    *features = api_struct.features;
-> +
-> +release_ufd:
-> +    close(ufd);
-> +    return ret;
-> +}
-> +
-> +static bool request_ufd_features(int ufd, __u64 features)
-> +{
-> +    struct uffdio_api api_struct = {0};
-> +    uint64_t ioctl_mask;
-> +
-> +    api_struct.api = UFFD_API;
-> +    api_struct.features = features;
-> +    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
-> +        error_report("request_ufd_features: UFFDIO_API failed: %s",
->                       strerror(errno));
->          return false;
->      }
-> @@ -81,11 +117,33 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
->          return false;
->      }
->  
-> +    return true;
-> +}
-> +
-> +static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
-> +{
-> +    __u64 new_features = 0;
+As explained in the cover letter, an async command may cancel the ongoing
+operation on disconnect.
 
-Minor point; uint64_t in all qemu code please.
+If there is a global state change, a separate event should be broadcasted
+(no change proposed here)
 
-> +    /* ask features */
-> +    __u64 supported_features;
-> +
-> +    if (!receive_ufd_features(&supported_features)) {
-> +        error_report("ufd_version_check failed");
 
-Say what failed!
+> We already have a model for doing long-running jobs, and as far as I'm
+> aware, it's working and we're not fighting limitations of the design. So
+> what are we even trying to solve here? In the context of jobs, async
+> commands feel like a solution in need of a problem to me.
+>
+>
+See the cover letter for the 2 main reasons for this proposal. If your
+domain API is fine, you don't have to opt-in and you may continue to use
+the current sync model. However, I believe there is benefit in using this
+work to have a more consitent async API.
 
-> +        return false;
-> +    }
-> +
-> +    /* request features */
-> +    if (new_features && !request_ufd_features(ufd, new_features)) {
-> +        error_report("ufd_version_check failed: features %" PRIu64,
-> +                (uint64_t)new_features);
-> +        return false;
-> +    }
-> +
->      if (getpagesize() != ram_pagesize_summary()) {
->          bool have_hp = false;
->          /* We've got a huge page */
->  #ifdef UFFD_FEATURE_MISSING_HUGETLBFS
-> -        have_hp = api_struct.features & UFFD_FEATURE_MISSING_HUGETLBFS;
-> +        have_hp = supported_features & UFFD_FEATURE_MISSING_HUGETLBFS;
->  #endif
->          if (!have_hp) {
->              error_report("Userfault on this host does not support huge pages");
-> -- 
-> 1.9.1
+Things may look a bit different in typically quick, but potentially
+> long-running commands. That is, anything that we currently execute
+> synchronously while holding the BQL, but that involves I/O and could
+> therefore take a while (impacting the performance of the VM) or even
+> block indefinitely.
+>
+> The first problem (we're holding the lock too long) can be addressed by
+> making things async just inside qemu and we don't need to expose the
+> change on the QMP level. The second one (blocking indefinitely) requires
+>
 
-Dave
+That's what I propose as 1)
 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+> being async on the QMP level if we want the monitor to be responsive
+> even if we're using an image on an NFS server that went down.
+>
+
+That's the 2)
+
+
+>
+> On the other hand, using the traditional job infrastructure is way over
+> the top if all you want to do is 'query-block', so we need something
+> different for making it async. And if a client disconnects, the
+> 'query-block' result can just be thrown away, it's much simpler than
+> actual jobs.
+>
+
+I agree a fully-featured job infrastructure is way over the top, and I
+believe I propose a minimal change to make optionnally some QMP commands
+async.
+
+>
+> So where I can see advantages for a new async command type is not for
+> converting real long-running commands like block jobs, but only for the
+> typically, but not necessarily quick operations. At the same time it is
+> where you're rightfully afraid that the less common case might not
+> receive much testing in management tools.
+>
+
+I believe management tools / libvirt will want to use the async variant if
+available. (the sync version is a one-command at a time constrained version
+of 'async')
+
+>
+> In the end, I'm unsure whether async commands are a good idea, I can see
+> good arguments for both stances. But I'm almost certain that they are
+> the wrong tool for jobs.
+>
+>
+Well, we already have 'async' commands, they are just hidden. They do not
+use QAPI/QMP facility and lack consistency.
+
+This series addresses the problem 1), internal to qemu.
+
+And also proposes to replace the idiomatic:
+
+    -> { "execute": "do-foo",  "id": 42
+}
+
+    <- { "return": {}, "id": 42 }            (this is a dummy useless
+return)
+    (foo is in fact async, you may do other commands here)
+
+
+    <- { "event": "FOO_DONE" }     (this is a broadcasted event that other
+monitor may not know how to deal with, lack of consistency with naming for
+various async op, "id" field may be lost, no facilities in generated code
+etc etc)
+
+with a streamlined:
+
+    -> { "execute": "do-foo", "id": 42 }
+    (you may do other commands here)
+
+
+    <- { "return": {}, "id": 42 }       (returned only to the caller)
+    (if there is a global state change, there should also be a FOO_DONE
+event)
+
+As pointed out in the cover letter, existing client *have to* deal with
+dispatching unrelated messages when sending commands, because events may
+come before a return message. So they have facilities to handle async
+replies.
+
+But in any case, this streamlined version is behind a "async" QMP
+capability.
+
+I have been careful to not expose this change to qemu internal or qemu
+client if they don't want or need it.
+
+thanks
+
+I hope reviewing the series can help clarify the intent, and not put
+various other ideas/dreams behind the "async" term.
+--=20
+Marc-Andr=C3=A9 Lureau
