@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1d41N4-0003oM-9d
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:35:23 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d41QB-0005Fd-Lq
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:38:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1d41N1-00044i-58
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:35:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1d41N0-00044Y-VS
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:35:19 -0400
-Date: Fri, 28 Apr 2017 14:05:01 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20170424120634.12268-1-ppandit@redhat.com>
-Message-ID: <alpine.LFD.2.20.1704281403310.29240@wniryva>
-References: <20170424120634.12268-1-ppandit@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1d41Q8-0005NV-H9
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:38:35 -0400
+Date: Fri, 28 Apr 2017 10:38:26 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170428103826.676072ba@nial.brq.redhat.com>
+In-Reply-To: <1493323148-32461-1-git-send-email-brogers@suse.com>
+References: <1493323148-32461-1-git-send-email-brogers@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] scsi: avoid an off-by-one error in
- megasas_mmio_write
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ACPI: don't call acpi_pcihp_device_plug_cb
+ on xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, YY Z <bigbird475958471@gmail.com>
+To: Bruce Rogers <brogers@suse.com>
+Cc: qemu-devel@nongnu.org, sstabellini@kernel.org, qemu-stable@nongnu.org, mst@redhat.com
 
-+-- On Mon, 24 Apr 2017, P J P wrote --+
-| While reading magic sequence(MFI_SEQ) in megasas_mmio_write,
-| an off-by-one error could occur as 's->adp_reset' index is not
-| reset after reading the last sequence.
-| 
-| --- a/hw/scsi/megasas.c
-| +++ b/hw/scsi/megasas.c
-| @@ -2138,15 +2138,15 @@ static void megasas_mmio_write(void *opaque, hwaddr addr,
-|      case MFI_SEQ:
-|          trace_megasas_mmio_writel("MFI_SEQ", val);
-|          /* Magic sequence to start ADP reset */
-| -        if (adp_reset_seq[s->adp_reset] == val) {
-| -            s->adp_reset++;
-| +        if (adp_reset_seq[s->adp_reset++] == val) {
-| +            if (s->adp_reset == 6) {
-| +                s->adp_reset = 0;
-| +                s->diag = MFI_DIAG_WRITE_ENABLE;
-| +            }
-|          } else {
-|              s->adp_reset = 0;
-|              s->diag = 0;
-|          }
-| -        if (s->adp_reset == 6) {
-| -            s->diag = MFI_DIAG_WRITE_ENABLE;
-| -        }
-|          break;
+On Thu, 27 Apr 2017 13:59:08 -0600
+Bruce Rogers <brogers@suse.com> wrote:
 
-Ping...!
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+> Commit f0c9d64a exposed the issue that with a xenfv machine using
+> pci passthrough, acpi cpi hotplug code was being executed by mistake.
+s/cpi/pci/
+
+> Guard calls to acpi_pcihp_device_plug_cb (and corresponding
+> acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
+> this check I am seeing an error that the bus doesn't have the
+> acpi-pcihp-bsel property set.
+it would be better to put actual error here.
+
+> 
+> Signed-off-by: Bruce Rogers <brogers@suse.com>
+with above fixed up
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/acpi/piix4.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index a553a7e..c409374 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+>                                  dev, errp);
+>          }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, errp);
+> +        if (!xen_enabled()) {
+> +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> +                                      errp);
+> +        }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          if (s->cpu_hotplug_legacy) {
+>              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
+> @@ -408,8 +411,10 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
+>                                        dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> -                                    errp);
+> +        if (!xen_enabled()) {
+> +            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> +                                        errp);
+> +        }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+>                 !s->cpu_hotplug_legacy) {
+>          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
