@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d47rQ-0000p5-MI
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:31:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1d47sE-0001Oo-AO
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:31:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d47rP-000879-Nt
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:31:08 -0400
-Date: Fri, 28 Apr 2017 23:30:56 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170428153056.GA31788@lemon.lan>
-References: <20170426033413.17192-1-famz@redhat.com>
-	<20170426033413.17192-21-famz@redhat.com>
-	<20170428134543.GD4714@noname.redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1d47sB-0008Sc-6D
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:31:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50306)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d47sA-0008SK-VX
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:31:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E1192C057FA4
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 15:31:53 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170428121553.22408-1-berrange@redhat.com>
+	<6f1ae51f-5336-7789-66b0-c4f984b5c0cc@redhat.com>
+	<20170428145921.GG11415@redhat.com>
+Date: Fri, 28 Apr 2017 17:31:42 +0200
+In-Reply-To: <20170428145921.GG11415@redhat.com> (Daniel P. Berrange's message
+	of "Fri, 28 Apr 2017 15:59:21 +0100")
+Message-ID: <87r30c7dlt.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170428134543.GD4714@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v15 20/21] file-posix: Add image locking to
- perm operations
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] sockets: ensure we can bind to both ipv4 &
+ ipv6 separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +35,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-On Fri, 04/28 15:45, Kevin Wolf wrote:
-> Am 26.04.2017 um 05:34 hat Fam Zheng geschrieben:
-> > This extends the permission bits of op blocker API to external using
-> > Linux OFD locks.
-> > 
-> > Each permission in @perm and @shared_perm is represented by a locked
-> > byte in the image file.  Requesting a permission in @perm is translated
-> > to a shared lock of the corresponding byte; rejecting to share the same
-> > permission is translated to a shared lock of a separate byte. With that,
-> > we use 2x number of bytes of distinct permission types.
-> > 
-> > virtlockd in libvirt locks the first byte, so we do locking from a
-> > higher offset.
-> > 
-> > Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> 
-> >  BlockDriver bdrv_file = {
-> >      .format_name = "file",
-> >      .protocol_name = "file",
-> > @@ -1977,7 +2234,11 @@ BlockDriver bdrv_file = {
-> >      .bdrv_get_info = raw_get_info,
-> >      .bdrv_get_allocated_file_size
-> >                          = raw_get_allocated_file_size,
-> > -
-> > +    .bdrv_inactivate = raw_inactivate,
-> > +    .bdrv_invalidate_cache = raw_invalidate_cache,
-> > +    .bdrv_check_perm = raw_check_perm,
-> > +    .bdrv_set_perm   = raw_set_perm,
-> > +    .bdrv_abort_perm_update = raw_abort_perm_update,
-> >      .create_opts = &raw_create_opts,
-> >  };
-> 
-> By the way, is it intentional that we apply locking only to bdrv_file,
-> but not to bdrv_host_device or bdrv_host_cdrom?
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
-Good question.
+> On Fri, Apr 28, 2017 at 09:57:24AM -0500, Eric Blake wrote:
+>> On 04/28/2017 07:15 AM, Daniel P. Berrange wrote:
+>> > When binding to an IPv6 socket we currently force the
+>> > IPV6_V6ONLY flag to off. This means that the IPv6 socket
+>> > will accept both IPv4 & IPv6 sockets when QEMU is launched
+>> > with something like
+>> > 
+>> >   -vnc :::1
+>> 
+>> At first glance, I thought that was too many :.  But I guess it is
+>> parsed as host:screen, with host of '::', and port offset of '1'...
+>
+> Yeah, I was amazed when it actually worked in fact :-) I thought
+> I was going to have to use {::}:1, but it seems we reverse search
+> for the last ':'.
 
-Though CDROM is not very interesting, I am not sure about bdrv_host_device:
+I would've expected we need ":[::1]".  Too many ad hoc parsers...
 
-1) On the one hand, a host device can contain a qcow2 image so maybe locking is
-useful.  Another reason to lock is that they share the same QAPI option,
-BlockdevOptionsFile. That last reason is, it should be very easy to add it.
-
-2) On the other hand, unlike files, host devices get pretty high chances in
-being accesses by multiple readers/writers, outside of QEMU, such as partition
-detection, mount, fsck, etc.
-
-What is your opinion?
-
-Fam
+[...]
