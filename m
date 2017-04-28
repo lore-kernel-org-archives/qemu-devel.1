@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d42ME-00017Y-ND
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:38:35 -0400
+	(envelope-from <he.chen@linux.intel.com>) id 1d42Mi-0001MW-Ql
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:39:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d42MD-00052G-TM
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:38:34 -0400
-Date: Fri, 28 Apr 2017 11:38:25 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170428093825.GB4714@noname.redhat.com>
-References: <20170426134649.9042-1-mreitz@redhat.com>
-	<20170426134649.9042-4-mreitz@redhat.com>
-	<a78836bc-8a79-6164-1101-6aa756c07a40@redhat.com>
+	(envelope-from <he.chen@linux.intel.com>) id 1d42Mf-0005F3-Mr
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:39:04 -0400
+Received: from mga09.intel.com ([134.134.136.24]:53600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <he.chen@linux.intel.com>)
+	id 1d42Mf-00052o-DH
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:39:01 -0400
+Date: Fri, 28 Apr 2017 17:39:11 +0800
+From: He Chen <he.chen@linux.intel.com>
+Message-ID: <20170428093911.GA26067@he>
+References: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
+	<24766133-5384-09fd-a24a-8acf964c9367@redhat.com>
+	<20170427153222.5d991d2b@nial.brq.redhat.com>
+	<874lxa2bex.fsf@dusky.pond.sub.org>
+	<20170427164626.78f65611@nial.brq.redhat.com>
+	<20170427202551.GL3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a78836bc-8a79-6164-1101-6aa756c07a40@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-img: Document backing options
+In-Reply-To: <20170427202551.GL3482@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH v9] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-
---EVF5PPMfhYS0aIcm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 27.04.2017 um 17:36 hat Eric Blake geschrieben:
-> On 04/26/2017 08:46 AM, Max Reitz wrote:
-> > I think originally the idea was to remove the individual special case
-> > options in the long term in favour of the uniform -o. But I don't think
-> > the short options have fallen out of use, so we can as well document
-> > them again...
-> >
-> > Maybe we could change the implementation, however, so that the old
-> > options are really just aliases for the respective -o version.
->=20
-> As in, a followup patch that adds a paragraph or two to the .texi file
-> stating that '-B @var{backing_file}' is shorthand for '-o
-> backing_file=3D@var{backing_file}'?
-
-First and foremost, I meant in the C code where we have separate
-variables for all the shorthand options and then need to handle both
-ways explicitly in the code further down. Instead, -B could just
-directly add a 'backing_file' key to a QemuOpts (and -o would do the
-same instead of building a string that is parsed only later).
-
-But the documentation change that you're suggesting is probably a good
-idea as well.
-
-Kevin
-
---EVF5PPMfhYS0aIcm
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZAw2RAAoJEH8JsnLIjy/WO9oP/izVmRwjg9j7LUfqM00bTVoc
-UGE2ZCeDxrzR3PbVTCD538HawgrCvLVtpzGSS9QQ2rcAFzAERFGEqrRrKmxI45U/
-nZ4448P/p1GPz9EzLEg1xAKMGzuB4D4CYajVxnnmbqcLIf9CZoLoO3OwE2ab1aYR
-6LOyvke1l/Orl3Q4hCGyfh/Yz7rd3fJxeJZ7a/76PZhwcG0Wh/tl7KqHl7MpHcGs
-/n+xgaKvKxUEdykKfCGooQEMrcg+SDn8lFxPu5/qhigLIm6xc0NN+l+eUzNSE7Xd
-UbrIKe5g2h8XLqs9Wg6U6IE4XP7YSZ386MuDSAd9EjFd/LIjxs9fAIl83v9qpKep
-OKoa4g3dpSEnnaxKzxyz0r4bnGXZe7TDS83zVO42413Bnnog62NHiLGRyrBYgx89
-tATxiazUnrykKeYKHrQWHhnShSg5wKBLP1FVYKqP+slMake8KfRJ27QDlZmvgA+n
-qSwRzCPv/ahyr0OX8uQpaBwQqQtGDiOBjX1F6rhRxhRw0z2UFxd6lWZpjMUb6ya3
-tFhXpQ/uu4eoFhI5fNU+qoWqQYre13yfRq8AQa3tLYVpa4LBW0b5c9wkB2q3oW7F
-7rAeEJB2mdQVdMPxLdaZXC/9uVN1yvfBagVL8n0F9ESJYcUW1CRdY6wlnSy7Zo7H
-0EahcWYMHKDkQxQGKBbH
-=87r2
------END PGP SIGNATURE-----
-
---EVF5PPMfhYS0aIcm--
+On Thu, Apr 27, 2017 at 05:25:51PM -0300, Eduardo Habkost wrote:
+> On Thu, Apr 27, 2017 at 04:46:26PM +0200, Igor Mammedov wrote:
+> > On Thu, 27 Apr 2017 16:05:42 +0200
+> > Markus Armbruster <armbru@redhat.com> wrote:
+> > > Igor Mammedov <imammedo@redhat.com> writes:
+> > > > On Thu, 27 Apr 2017 07:54:31 -0500
+> > > > Eric Blake <eblake@redhat.com> wrote:
+> [...]
+> > > >> 
+> > > >> Markus has asked that all new QMP commands have some testsuite exposure;
+> > > >> he may have some advice on what test would be best to modify to give us
+> > > >> some coverage of this feature.  
+> > > 
+> > > I can't see the QMP command here, but...
+> > > 
+> > > > Since it's basically validation of SLIT table, the test case
+> > > > should be added to tests/bios-tables-test.c  
+> > > 
+> > > ... I figure there's new stuff to test all the same.
+> > it could be a patch on top and doesn't have to hold this one if
+> > author promises to write testcase
+> 
+> Agreed. I'm applying this to my machine-next branch, but I would
+> like to get test cases before including it in a pull request.
+> 
+You mean we also need a patch to add test case to
+tests/bios-tables-test.c, right? If so, I am very willing to cook and
+submit it.
