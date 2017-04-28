@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4Ecx-0006My-0I
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 18:44:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1d4Ega-0007Ms-Mk
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 18:48:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4Ect-0003HM-Tj
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 18:44:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51369)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d4Ect-0003GL-K6
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 18:44:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1d4EgZ-0007EU-OT
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 18:48:24 -0400
 References: <20170428021317.24711-1-eblake@redhat.com>
-	<20170428021317.24711-4-eblake@redhat.com>
-	<87h918bmpz.fsf@dusky.pond.sub.org>
+	<20170428021317.24711-5-eblake@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f0824e24-ea2b-4037-939b-2327435b4f24@redhat.com>
-Date: Fri, 28 Apr 2017 17:44:31 -0500
+Message-ID: <cc62148f-33b4-eeec-61d6-7eb68c1712de@redhat.com>
+Date: Fri, 28 Apr 2017 17:48:12 -0500
 MIME-Version: 1.0
-In-Reply-To: <87h918bmpz.fsf@dusky.pond.sub.org>
+In-Reply-To: <20170428021317.24711-5-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="scpFf48n2vDIicg5JPhmnUgRaEJMFN4fN"
-Subject: [Qemu-devel] replay help [was: [PATCH v5 3/4] shutdown: Add source
- information to SHUTDOWN and RESET]
+	boundary="8ee0HB2rNJXNr9tCcxlM8mG3RAKAMxMRl"
+Subject: Re: [Qemu-devel] [PATCH v5 4/4] RFC: shutdown: Expose full
+ ShutdownCause across QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, armbru@redhat.com, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, alistair.francis@xilinx.com, "Daniel P. Berrange" <berrange@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---scpFf48n2vDIicg5JPhmnUgRaEJMFN4fN
+--8ee0HB2rNJXNr9tCcxlM8mG3RAKAMxMRl
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Message-ID: <f0824e24-ea2b-4037-939b-2327435b4f24@redhat.com>
-Subject: replay help [was: [Qemu-devel] [PATCH v5 3/4] shutdown: Add source
- information to SHUTDOWN and RESET]
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>, armbru@redhat.com,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ alistair.francis@xilinx.com, "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <cc62148f-33b4-eeec-61d6-7eb68c1712de@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 4/4] RFC: shutdown: Expose full
+ ShutdownCause across QMP
 References: <20170428021317.24711-1-eblake@redhat.com>
- <20170428021317.24711-4-eblake@redhat.com>
- <87h918bmpz.fsf@dusky.pond.sub.org>
-In-Reply-To: <87h918bmpz.fsf@dusky.pond.sub.org>
+ <20170428021317.24711-5-eblake@redhat.com>
+In-Reply-To: <20170428021317.24711-5-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-[trimming cc's]
+[adding Dan in cc]
 
-On 04/28/2017 10:01 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+On 04/27/2017 09:13 PM, Eric Blake wrote:
+> Since all reset/shutdown requests have been associated with a
+> reason, we can expose the full reason rather than a simple bool
+> to the guest. Document that any future additions to the enum
+> type will still use a 'host-' or 'guest-' prefix.
 >=20
->> Libvirt would like to be able to distinguish between a SHUTDOWN
->> event triggered solely by guest request and one triggered by a
->> SIGTERM or other action on the host.  While qemu_kill_report() is
->> already able to tell whether a shutdown was triggered by a host
->> signal (but NOT by a host UI event, such as clicking the X on
->> the window), that information was then lost after being printed
->> to stderr.  The previous patch prepped things to use an enum
->> internally; now it's time to wire it up through all callers, and
->> to extend the SHUTDOWN and RESET events to report the details.
->>
-
->> The replay driver needs a followup patch if we want to be able to
->> faithfully replay the difference between a host- and guest-initiated
->> shutdown (for now, the replayed event is always attributed to host).
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 >=20
-> I'd prefer to get this right from the start, but that requires input
-> from replay guys.
+
+This is RFC because I really want to know whether libvirt and upper
+layer management apps will care about the various causes, or if exposing
+just a boolean is okay.  We can maintain backwards compatibility if we
+release with just a boolean and later decide we want to expose the enum,
+but it's easier to start with a design that meets everyone's needs that
+it is to have to add stuff later or wish that we hadn't exposed quite so
+many enum values.
+
+
+> +++ b/qapi/event.json
+> @@ -10,9 +10,7 @@
+>  # Emitted when the virtual machine has shut down, indicating that qemu=
+ is
+>  # about to exit.
+>  #
+> -# @guest: If true, the shutdown was triggered by a guest request (such=
+ as
+> -# a guest-initiated ACPI shutdown request or other hardware-specific a=
+ction)
+> -# rather than a host request (such as sending qemu a SIGINT). (since 2=
+=2E10)
+> +# @reason: What triggered the reset. (since 2.10)
+>  #
+>  # Note: If the command-line option "-no-shutdown" has been specified, =
+qemu will
+>  # not exit, and a STOP event will eventually follow the SHUTDOWN event=
+
+> @@ -21,11 +19,11 @@
+>  #
+>  # Example:
+>  #
+> -# <- { "event": "SHUTDOWN", "data": { "guest": true },
+> +# <- { "event": "SHUTDOWN", "data": { "reason": "guest-shutdown" },
+>  #      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } =
+}
+>  #
+>  ##
+> -{ 'event': 'SHUTDOWN', 'data': { 'guest': 'bool' } }
+> +{ 'event': 'SHUTDOWN', 'data': { 'reason': 'ShutdownCause' } }
 >=20
-> Scandalously, replay/ is not covered by MAINTAINERS.
-> scripts/get_maintainers.pl blames it on Pavel Dovgalyuk (cc'ed), and gi=
-t
-> shows recent activity.  Pavel, please post a suitable patch to
-> MAINTAINERS, and please help us figure out what to do about replaying
-> reset here.
 
-In particular, my questions include:
-
-How sensitive is the enum ReplayEvents in replay-internal.h to
-additions? Do we have to worry about cross-version compatibility (where
-we can only add new events at the end), or can we reorder things at
-will?  I suspect that depends on whether you ever plan to replay a
-script recorded by old qemu while running new qemu.
-
-One idea would be to carve out a range of new enums in ReplayEvents,
-similar to how you have a range of CHECKPOINT_COUNT enums carved out;
-the range would be large enough to encode each cause of shutdown, and
-then you just map the range back into a reset request with the right
-cause. Another would be to modify the replay script file format: right
-now, it records a single byte for a shutdown request, but a single new
-enum triggers that we now read a second byte for the cause (where the
-second byte is directly the cause).  If replaying old streams matters,
-we still have to burn a new enum (so that you can tell the difference
-between old stream with no cause occupying one byte, vs. new stream with
-second byte giving the cause); if cross-version qemu doesn't matter (ie.
-upgrading qemu can invalidate all previously captured replay streams),
-then this version would better be served by repurposing the existing
-EVENT_SHUTDOWN enum in-place.
-
-I'm probably up to the task of coding this, rather than waiting for a
-solution from Pavel; but I would rather have some guidance on preferred
-direction, particularly the understanding of how much we care about
-cross-version replay (which is admittedly a tougher thing than
-cross-version migration), so I don't waste time by starting coding down
-a wrong direction.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -114,7 +104,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---scpFf48n2vDIicg5JPhmnUgRaEJMFN4fN
+--8ee0HB2rNJXNr9tCcxlM8mG3RAKAMxMRl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -124,13 +114,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZA8XPAAoJEKeha0olJ0NqPuoH/2UmFrV7vBsK5OabJipJEqB/
-hwz6CFqgd2L9pT2nV0buKZNt3zvDTqmIVpeNFWT4fPEUGfdbfpjgNzpm8EECx/td
-Ve+J4ziczl18qVdKQCE/kqQTsQHGfQK+KdLjtCiw1Ut1g8qgCGW3BT1JC+wLGBop
-pEosIUbKcU2RQepZ3cjWlugTwKi+isXIcbWfO16VG7O5q4cibnZpRJPw4XwI57V1
-dFhjHP/z42cPawSVBEGDvaAHEZQ/HLrtn+A4dTbE/NgKsE2PyuJHz+HsKSAMCOMN
-xh8+vOX4hXAEMTQVqQO/4VLRZbn08se2IrcItXkrVMn3uvkwnjOEsGVftc/ASfE=
-=Nj6x
+iQEcBAEBCAAGBQJZA8asAAoJEKeha0olJ0NqzUcH+gNbnofq7puS3gq4y4+xobx9
+9+Lz5XglTU1nZx7knRXSbauNatZSH9Bu3H1VqLr00WJwMp2XNqXOZeMCp6e0DLvA
+WeH7B96lOzmShSP979HUsOfQmWnf1L8502+BMz7SAyZK3lJSwlNNbUSSCvAtoVL9
+vPlQJlEFB2tfU7FehiGqxbIP25qVYcx4B5Ut6ZL9OK/J1rSFlSQz4mMjkP68Nchp
+5c9mHZZ1dJ/ClDGqAjYzXKYKGxOO88kCbuiv+XVn3IvqIYO4ggz9aJI9pCCryMAb
+tr8TECV3VYxmZSIav7s9UcMdPYvHyQ1cQoiMWSzba6oEYB7ZHJwCQEzOofWHKLU=
+=iah4
 -----END PGP SIGNATURE-----
 
---scpFf48n2vDIicg5JPhmnUgRaEJMFN4fN--
+--8ee0HB2rNJXNr9tCcxlM8mG3RAKAMxMRl--
