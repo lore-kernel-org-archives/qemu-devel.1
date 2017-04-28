@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d41QB-0005Fd-Lq
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:38:36 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d41Qn-0005ZI-FD
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:39:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d41Q8-0005NV-H9
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:38:35 -0400
-Date: Fri, 28 Apr 2017 10:38:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170428103826.676072ba@nial.brq.redhat.com>
-In-Reply-To: <1493323148-32461-1-git-send-email-brogers@suse.com>
-References: <1493323148-32461-1-git-send-email-brogers@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ACPI: don't call acpi_pcihp_device_plug_cb
- on xen
+	(envelope-from <kraxel@redhat.com>) id 1d41Qk-0005e9-Ct
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:39:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30859)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d41Qk-0005dv-6j
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:39:10 -0400
+Message-ID: <1493368745.23357.0.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 28 Apr 2017 10:39:05 +0200
+In-Reply-To: <201704281010298396861@zte.com.cn>
+References: 201704271430117024953@zte.com.cn,
+	1493276836.31995.38.camel@redhat.com
+	<201704281010298396861@zte.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiBSZTogTmV3IGZ1bmN0aW9uOuOAgFJl?=
+ =?utf-8?q?mot_USB_support_in_qemu?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bruce Rogers <brogers@suse.com>
-Cc: qemu-devel@nongnu.org, sstabellini@kernel.org, qemu-stable@nongnu.org, mst@redhat.com
+To: yuan.zhong@zte.com.cn
+Cc: afaerber@suse.de, pbonzini@redhat.com, qemu-devel@nongnu.org, hdegoede@redhat.com
 
-On Thu, 27 Apr 2017 13:59:08 -0600
-Bruce Rogers <brogers@suse.com> wrote:
+  Hi,
 
-> Commit f0c9d64a exposed the issue that with a xenfv machine using
-> pci passthrough, acpi cpi hotplug code was being executed by mistake.
-s/cpi/pci/
+>  Although qemu has usb redirection, it can not boot from the USB
+> (install os)
 
-> Guard calls to acpi_pcihp_device_plug_cb (and corresponding
-> acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
-> this check I am seeing an error that the bus doesn't have the
-> acpi-pcihp-bsel property set.
-it would be better to put actual error here.
+Boot from redirected usb devices works just fine here.
 
-> 
-> Signed-off-by: Bruce Rogers <brogers@suse.com>
-with above fixed up
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/acpi/piix4.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index a553a7e..c409374 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
->                                  dev, errp);
->          }
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, errp);
-> +        if (!xen_enabled()) {
-> +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> +                                      errp);
-> +        }
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          if (s->cpu_hotplug_legacy) {
->              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
-> @@ -408,8 +411,10 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
->                                        dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> -                                    errp);
-> +        if (!xen_enabled()) {
-> +            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> +                                        errp);
-> +        }
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
->                 !s->cpu_hotplug_legacy) {
->          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
+cheers,
+  Gerd
