@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d47Xx-0001dI-Q7
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:11:03 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d47a6-0002ML-RY
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:13:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d47Xt-0004wx-LF
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:11:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d47Xt-0004wG-Ef
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:10:57 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5685E4AEBE
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 15:10:56 +0000 (UTC)
-Date: Fri, 28 Apr 2017 16:10:51 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170428151051.GH11415@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170427165526.19836-1-dgilbert@redhat.com>
-	<20170428134230.GB11415@redhat.com> <20170428134532.GG2085@work-vm>
+	(envelope-from <stefanha@gmail.com>) id 1d47a2-00068i-S4
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:13:14 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d47a2-00068Q-M8
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:13:10 -0400
+Received: by mail-wm0-x242.google.com with SMTP id z129so11549196wmb.1
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 08:13:10 -0700 (PDT)
+Date: Fri, 28 Apr 2017 16:13:07 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170428151307.GA10286@stefanha-x1.localdomain>
+References: <1493271996-23607-1-git-send-email-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="CE+1k2dSO48ffgeK"
 Content-Disposition: inline
-In-Reply-To: <20170428134532.GG2085@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Disallow glib asserts in main
- code
+In-Reply-To: <1493271996-23607-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PULL v2 0/8] qemu-ga patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
-
-On Fri, Apr 28, 2017 at 02:45:32PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Thu, Apr 27, 2017 at 05:55:26PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > Glib commit a6a875068779 (from 2013) made many of the glib assert
-> > > macros non-fatal if a flag is set.
-> > > This causes two problems:
-> > >   a) Compilers moan that your code is unsafe even though you've
-> > >      put an assert in before the point of use.
-> > >   b) Someone evil could, in a library, call
-> > >      g_test_set_nonfatal_assertions() and cause our assertions in
-> > >      important places not to fail and potentially allow memory overruns.
-> > > 
-> > > Ban most of the glib assertion functions (basically everything except
-> > > g_assert and g_assert_not_reached) except in tests/
-> > > 
-> > > This makes checkpatch gives an error such as:
-> > > 
-> > >   ERROR: Use g_assert or g_assert_not_reached
-> > >   #77: FILE: vl.c:4725:
-> > >   +    g_assert_cmpstr("Chocolate", >, "Cheese");
-> > 
-> > Or could we perhaps instead undo the damage via a hack like
-> > 
-> >  #define g_assert_cmpint g_assert_cmpint_orig
-> >  #define g_assert_cmpint(x, y, z) \
-> >      g_assert_cmpint_orig(x, y,x); \
-> >      abort()
-> 
-> I'd be kind of OK adding a q_assert_cmpint if you wanted,
-> but I think we shouldn't change the semantics of a public
-> name.
-
-Personally I think it would be worth having them - the whole point of
-these more specific g_assert_* macros is that they provide clearer
-error messages when they're triggered, so I prefer their use generally
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--CE+1k2dSO48ffgeK
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Apr 27, 2017 at 12:46:28AM -0500, Michael Roth wrote:
+> The following changes since commit 81b2d5ceb0cfb4cdc2163492e3169ed714b0cd=
+a9:
+>=20
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170426' into =
+staging (2017-04-26 20:50:49 +0100)
+>=20
+> are available in the git repository at:
+>=20
+>   git://github.com/mdroth/qemu.git tags/qga-pull-2017-04-25-v2-tag
+>=20
+> for you to fetch changes up to 53c58e64d0a27c59d763778faa2b5a522c544719:
+>=20
+>   qga: Add `guest-get-timezone` command (2017-04-27 00:40:25 -0500)
+>=20
+> ----------------------------------------------------------------
+> qemu-ga patch queue
+>=20
+> * new commands: guest-get-timezone, guest-get-users, guest-get-host-name
+> * fix hang on w32 when stopping qemu-ga service while fs frozen
+> * fix missing setting of can-offline in guest-get-vcpus
+> * make qemu-ga VSS w32 service on-demand rather than on-startup
+> * fix unecessary errors to EventLog on w32
+> * improvements to fsfreeze documentation
+>=20
+> v2:
+>  * document 'zone' field of guest-get-timezone as informational-only
+>    (Daniel, Eric)
+>  * fix build error for glib < 2.32 (Peter)
+>=20
+> ----------------------------------------------------------------
+> Marc-Andr=E9 Lureau (1):
+>       qga: improve fsfreeze documentations
+>=20
+> Sameeh Jubran (4):
+>       qemu-ga: Make QGA VSS provider service run only when needed
+>       qga-win: Enable 'can-offline' field in 'guest-get-vcpus' reply
+>       qga-win: Fix a bug where qemu-ga service is stuck during stop opera=
+tion
+>       qga-win: Fix Event Viewer errors caused by qemu-ga
+>=20
+> Vinzenz Feenstra (3):
+>       qga: Add 'guest-get-host-name' command
+>       qga: Add 'guest-get-users' command
+>       qga: Add `guest-get-timezone` command
+>=20
+>  configure                   |   2 +-
+>  include/glib-compat.h       |   6 +++
+>  qga/commands-posix.c        |  60 +++++++++++++++++++++++++
+>  qga/commands-win32.c        | 105 ++++++++++++++++++++++++++++++++++++++=
++++++-
+>  qga/commands.c              |  49 +++++++++++++++++++++
+>  qga/main.c                  |  23 ++++++++++
+>  qga/qapi-schema.json        |  88 ++++++++++++++++++++++++++++++++++++-
+>  qga/vss-win32.h             |   1 +
+>  qga/vss-win32/install.cpp   |  28 +++++++++++-
+>  qga/vss-win32/install.h     |  20 +++++++++
+>  qga/vss-win32/provider.cpp  |   1 -
+>  qga/vss-win32/requester.cpp |   2 +
+>  qga/vss-win32/vss-common.h  |  11 +----
+>  qga/vss-win32/vss-handles.h |  14 ++++++
+>  14 files changed, 393 insertions(+), 17 deletions(-)
+>  create mode 100644 qga/vss-win32/install.h
+>  create mode 100644 qga/vss-win32/vss-handles.h
+>=20
+>=20
+
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
+
+Stefan
+
+--CE+1k2dSO48ffgeK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZA1wDAAoJEJykq7OBq3PICKYH/0qQ/txn/Y78BEMxLLIbQwaP
+yer9BqoFvsR0ux9w8U3vsk6sASxsVKbUnvbSNRqYCNaXA+Y0ckx3eVHbzaOSR4p6
+cS+Qqu7n/pgr7ksGX8FSrki4kolPoKuS/LwXsyPlp1Oc5qMW0jwIHvKOv58LYo3f
+b/oUJfuvexyR+ekydga8t60r5uajnzIPfnYvCf/4yoy2eL5rFZS65/jFDZOMJq8c
+76942dn48nUlG0yyy8cqDQzP3BgfjqbD4iS2l4unOpw4jPk07ZIMnsdlrs6CLyo6
+BeKUwxjMUTcIuTQCkJ10IFswGrgxyLjDE61+neQUbgqN+wm3q2IRSmSALqxdXhA=
+=BjGS
+-----END PGP SIGNATURE-----
+
+--CE+1k2dSO48ffgeK--
