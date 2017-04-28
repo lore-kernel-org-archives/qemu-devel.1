@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d45fF-0002hz-TX
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:10:30 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d45fK-0002mK-Ug
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:10:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d45fE-0005oT-AI
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:10:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45566
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d45fH-0005pd-1C
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:10:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46478)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1d45fE-0005oN-3r
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:10:24 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3SDA950152967
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 09:10:23 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a45uc1qg2-1
+	id 1d45fG-0005ev-P4
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:10:26 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v3SDA5cs072133
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 09:10:06 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a3j0mpe00-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 09:10:23 -0400
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 09:10:05 -0400
 Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Fri, 28 Apr 2017 07:10:20 -0600
+	Fri, 28 Apr 2017 07:10:02 -0600
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Fri, 28 Apr 2017 15:09:43 +0200
-In-Reply-To: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
-References: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170428130951.44771-6-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v6 05/13] s390x/css: realize css_create_sch
+Date: Fri, 28 Apr 2017 15:09:38 +0200
+Message-Id: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v6 00/13] basic channel IO passthrough
+ infrastructure based on vfio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,209 +39,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
 Cc: bjsdjshi@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com
 
-The S390 virtual css support already has a mechanism to create a
-virtual subchannel and provide it to the guest. However, to
-pass-through subchannels to a guest, we need to introduce a new
-mechanism to create the subchannel according to the real device
-information. Thus we reconstruct css_create_virtual_sch to a new
-css_create_sch function to handl all these cases and do allocation
-and initialization of the subchannel according to the device type
-and machine configuration.
+The patch series introduce a basic channel I/O passthrough
+infrastructure based on vfio.
+- Focus on supporting dasd-eckd(cu_type/dev_type = 0x3990/0x3390) as
+  the target device. 
+- Support new qemu parameters in the style of:
+    -machine s390-ccw-virtio(,s390-squash-mcss=on|off) \
+    -device vfio-ccw,sysfsdev=$MDEV_PATH
+  We want to support real (i.e. not virtual) channel devices even for
+  guests that do not support MCSS-E (where guests may see devices from
+  any channel subsystem image at once). As all virtio-ccw devices are in
+  css 0xfe (and show up in the default css 0 for guests not activating
+  MCSS-E), we need an option to squash e.g. passed-through channel devices
+  from their real css (0-3, or 0 for hosts not activating MCSS-E) into
+  the default css, that is what the new machine option s390-squash-css is
+  added.
 
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
----
- hw/s390x/css-bridge.c         |  2 ++
- hw/s390x/css.c                | 45 ++++++++++++++++++++++++++++++++++++-------
- hw/s390x/s390-virtio-ccw.c    | 12 +++++++++---
- hw/s390x/virtio-ccw.c         |  6 +++++-
- include/hw/s390x/css-bridge.h |  1 +
- include/hw/s390x/css.h        | 25 ++++++++++++++++--------
- 6 files changed, 72 insertions(+), 19 deletions(-)
+Build and install:
+1. kernel configuration
+  CONFIG_S390_CCW_IOMMU=m
+  CONFIG_VFIO=m
+  CONFIG_VFIO_MDEV=m
+  CONFIG_VFIO_MDEV_DEVICE=m
+  CONFIG_VFIO_CCW=m
+2. modules required
+  modprobe vfio.ko
+  modprobe mdev.ko
+  modprobe vfio_mdev.ko
+  modprobe vfio_iommu_type1.ko
+  modprobe vfio_ccw.ko
+3. find a subchannel(0.0."%schid") of a DASD-ECKD device and bind it to
+  vfio_ccw driver
+  #find the dasd you can use with lsdasd on your host. e.g.:
+  devno="7e52"
+  schid="16ca"
+  #unbind the ccw device from the subchannel
+  echo 0.0."$devno" > /sys/bus/ccw/devices/0.0."$devno"/driver/unbind
+  #unbind the subchannel from io_subchannel driver
+  echo 0.0."$schid" > /sys/bus/css/devices/0.0."$schid"/driver/unbind
+  #bind the subchannel with vfio_ccw driver
+  echo 0.0."$schid" > /sys/bus/css/drivers/vfio_ccw/bind
+4. create a mediated device
+  #generate a uuid with uuidgen. e.g.:
+  uuid="6dfd3ec5-e8b3-4e18-a6fe-57bc9eceb920"
+  echo "$uuid" > \
+  /sys/bus/css/devices/0.0."$schid"/mdev_supported_types/vfio_ccw-io/create
+5. pass-through this device to a vm
+  -M s390-ccw-virtio,s390-squash-css=on \
+  -device vfio-ccw,sysfsdev=/sys/bus/mdev/devices/$uuid \
+  ... ...
 
-diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
-index b54ac01..823747f 100644
---- a/hw/s390x/css-bridge.c
-+++ b/hw/s390x/css-bridge.c
-@@ -17,6 +17,7 @@
- #include "hw/s390x/css.h"
- #include "ccw-device.h"
- #include "hw/s390x/css-bridge.h"
-+#include "cpu.h"
- 
- /*
-  * Invoke device-specific unplug handler, disable the subchannel
-@@ -103,6 +104,7 @@ VirtualCssBus *virtual_css_bus_init(void)
-     /* Create bus on bridge device */
-     bus = qbus_create(TYPE_VIRTUAL_CSS_BUS, dev, "virtual-css");
-     cbus = VIRTUAL_CSS_BUS(bus);
-+    cbus->squash_mcss = s390_get_squash_mcss();
- 
-     /* Enable hotplugging */
-     qbus_set_hotplug_handler(bus, dev, &error_abort);
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 748e2ad..1052eea 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -1924,28 +1924,59 @@ PropertyInfo css_devid_ro_propinfo = {
-     .get = get_css_devid,
- };
- 
--SubchDev *css_create_virtual_sch(CssDevId bus_id, Error **errp)
-+SubchDev *css_create_sch(CssDevId bus_id, bool is_virtio, bool squash_mcss,
-+                         Error **errp)
- {
-     uint16_t schid = 0;
-     SubchDev *sch;
- 
-     if (bus_id.valid) {
--        /* Enforce use of virtual cssid. */
--        if (bus_id.cssid != VIRTUAL_CSSID) {
--            error_setg(errp, "cssid %hhx not valid for virtual devices",
--                       bus_id.cssid);
-+        if (is_virtio != (bus_id.cssid == VIRTUAL_CSSID)) {
-+            error_setg(errp, "cssid %hhx not valid for %s devices",
-+                       bus_id.cssid,
-+                       (is_virtio ? "virtio" : "non-virtio"));
-             return NULL;
-         }
-+    }
-+
-+    if (bus_id.valid) {
-+        if (squash_mcss) {
-+            bus_id.cssid = channel_subsys.default_cssid;
-+        } else if (!channel_subsys.css[bus_id.cssid]) {
-+            css_create_css_image(bus_id.cssid, false);
-+        }
-+
-         if (!css_find_free_subch_for_devno(bus_id.cssid, bus_id.ssid,
-                                            bus_id.devid, &schid, errp)) {
-             return NULL;
-         }
--    } else {
--        bus_id.cssid = VIRTUAL_CSSID;
-+    } else if (squash_mcss || is_virtio) {
-+        bus_id.cssid = channel_subsys.default_cssid;
-+
-         if (!css_find_free_subch_and_devno(bus_id.cssid, &bus_id.ssid,
-                                            &bus_id.devid, &schid, errp)) {
-             return NULL;
-         }
-+    } else {
-+        for (bus_id.cssid = 0; bus_id.cssid < MAX_CSSID; ++bus_id.cssid) {
-+            if (bus_id.cssid == VIRTUAL_CSSID) {
-+                continue;
-+            }
-+
-+            if (!channel_subsys.css[bus_id.cssid]) {
-+                css_create_css_image(bus_id.cssid, false);
-+            }
-+
-+            if   (css_find_free_subch_and_devno(bus_id.cssid, &bus_id.ssid,
-+                                                &bus_id.devid, &schid,
-+                                                NULL)) {
-+                break  ;
-+            }
-+            if (bus_id.cssid == MAX_CSSID) {
-+                error_setg(errp, "Virtual channel subsystem is full!");
-+                return NULL;
-+            }
-+        }
-     }
- 
-     sch = g_malloc0(sizeof(*sch));
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index cd007ca..735d66d 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -136,10 +136,16 @@ static void ccw_init(MachineState *machine)
-         kvm_s390_enable_css_support(s390_cpu_addr2state(0));
-     }
-     /*
--     * Create virtual css and set it as default so that non mcss-e
--     * enabled guests only see virtio devices.
-+     * Non mcss-e enabled guests only see the devices from the default
-+     * css, which is determined by the value of the squash_mcss property.
-+     * Note: we must not squash non virtio devices to css 0xFE, since
-+     * it's reserved for virtio devices only.
-      */
--    ret = css_create_css_image(VIRTUAL_CSSID, true);
-+    if (css_bus->squash_mcss) {
-+        ret = css_create_css_image(0, true);
-+    } else {
-+        ret = css_create_css_image(VIRTUAL_CSSID, true);
-+    }
-     assert(ret == 0);
- 
-     /* Create VirtIO network adapters */
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index e7167e3..4e386e9 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -680,9 +680,13 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
-     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
-     CcwDevice *ccw_dev = CCW_DEVICE(dev);
-     CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
--    SubchDev *sch = css_create_virtual_sch(ccw_dev->devno, errp);
-+    DeviceState *parent = DEVICE(ccw_dev);
-+    BusState *qbus = qdev_get_parent_bus(parent);
-+    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
-+    SubchDev *sch;
-     Error *err = NULL;
- 
-+    sch = css_create_sch(ccw_dev->devno, true, cbus->squash_mcss, errp);
-     if (!sch) {
-         return;
-     }
-diff --git a/include/hw/s390x/css-bridge.h b/include/hw/s390x/css-bridge.h
-index 5a0203b..cf08604 100644
---- a/include/hw/s390x/css-bridge.h
-+++ b/include/hw/s390x/css-bridge.h
-@@ -28,6 +28,7 @@ typedef struct VirtualCssBridge {
- /* virtual css bus type */
- typedef struct VirtualCssBus {
-     BusState parent_obj;
-+    bool squash_mcss;
- } VirtualCssBus;
- 
- #define TYPE_VIRTUAL_CSS_BUS "virtual-css-bus"
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index 868c6c7..a8bf1db 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -190,16 +190,25 @@ extern PropertyInfo css_devid_ro_propinfo;
- /**
-  * Create a subchannel for the given bus id.
-  *
-- * If @p bus_id is valid, verify that it uses the virtual channel
-- * subsystem id and is not already in use, and find a free subchannel
-- * id for it. If @p bus_id is not valid, find a free subchannel id and
-- * device number across all subchannel sets. If either of the former
-- * actions succeed, allocate a subchannel structure, initialise it
-- * with the bus id, subchannel id and device number, register it with
-- * the CSS and return it. Otherwise return NULL.
-+ * If @p bus_id is valid, and @p squash_mcss is true, verify that it is
-+ * not already in use in the default css, and find a free devno from the
-+ * default css image for it.
-+ * If @p bus_id is valid, and @p squash_mcss is false, verify that it is
-+ * not already in use, and find a free devno for it.
-+ * If @p bus_id is not valid, and if either @p squash_mcss or @p is_virtio
-+ * is true, find a free subchannel id and device number across all
-+ * subchannel sets from the default css image.
-+ * If @p bus_id is not valid, and if both @p squash_mcss and @p is_virtio
-+ * are false, find a non-full css image and find a free subchannel id and
-+ * device number across all subchannel sets from it.
-+ *
-+ * If either of the former actions succeed, allocate a subchannel structure,
-+ * initialise it with the bus id, subchannel id and device number, register
-+ * it with the CSS and return it. Otherwise return NULL.
-  *
-  * The caller becomes owner of the returned subchannel structure and
-  * is responsible for unregistering and freeing it.
-  */
--SubchDev *css_create_virtual_sch(CssDevId bus_id, Error **errp);
-+SubchDev *css_create_sch(CssDevId bus_id, bool is_virtio, bool squash_mcss,
-+                         Error **errp);
- #endif
+Change log:
+v5 -> v6:
+1. Rebase against git://github.com/cohuck/qemu s390-next.
+2. Patch #6: correct error message: -vfio-ccw --> -device vfio-ccw
+3. Patch #7:
+   Rewrite vfio_ccw_get_group by:
+     - removing unnecessary checking of path existance;
+     - removing useless 'path' variable;
+   Fix a typo: s/operationis/operations/
+   In vfio_ccw_unrealize, move cdc->unrealize to the end.
+
+v4 -> v5:
+1. Rebase to git://github.com/cohuck/qemu s390-next.
+2. New patch #1: update-linux-headers.
+3. Patch #6: update s390_ccw_realize according to the new code base.
+4. New patch #13: add maintainer for vfio-ccw.
+
+v3 -> v4:
+1. Adjustments of the s-o-b chains for some patches.
+
+v2 -> v3:
+1. Move vfio_ccw.h to uapi.
+2. Adopt the vfio-ccw cmdline interface as vfio-pci with mdev devices.
+3. Rename s390-map-css to s390-squash-mcss (patch 2), and update devno
+   generation method (patch 5).
+4. Patch 7: correct the validation of num_regions.
+5. Patch 8: correct the validation of num_irqs.
+
+v1 -> v2:
+1. Rebase the implementation to the mdev framework approach.
+2. Use pread and pwrite on an I/O region to issue I/O requests and
+   receive results.
+
+Dong Jia Shi (8):
+  update-linux-headers: update for vfio-ccw
+  vfio: linux-headers update for vfio-ccw
+  s390x/css: realize css_create_sch
+  s390x/css: device support for s390-ccw passthrough
+  vfio/ccw: get io region info
+  vfio/ccw: get irqs info and set the eventfd fd
+  vfio/ccw: update sense data if a unit check is pending
+  MAINTAINERS: Add vfio-ccw maintainer
+
+Xiao Feng Ren (5):
+  s390x/css: add s390-squash-mcss machine option
+  s390x/css: realize css_sch_build_schib
+  vfio/ccw: vfio based subchannel passthrough driver
+  s390x/css: introduce and realize ccw-request callback
+  s390x/css: ccw translation infrastructure
+
+ MAINTAINERS                        |   5 +
+ default-configs/s390x-softmmu.mak  |   1 +
+ hw/s390x/Makefile.objs             |   1 +
+ hw/s390x/css-bridge.c              |   2 +
+ hw/s390x/css.c                     | 290 +++++++++++++++++++++++--
+ hw/s390x/s390-ccw.c                | 147 +++++++++++++
+ hw/s390x/s390-ccw.h                |  39 ++++
+ hw/s390x/s390-virtio-ccw.c         |  33 ++-
+ hw/s390x/virtio-ccw.c              |   7 +-
+ hw/vfio/Makefile.objs              |   1 +
+ hw/vfio/ccw.c                      | 423 +++++++++++++++++++++++++++++++++++++
+ include/hw/s390x/css-bridge.h      |   1 +
+ include/hw/s390x/css.h             |  67 +++---
+ include/hw/s390x/s390-virtio-ccw.h |   1 +
+ include/hw/vfio/vfio-common.h      |   1 +
+ linux-headers/linux/vfio.h         |  17 ++
+ linux-headers/linux/vfio_ccw.h     |  28 +++
+ qemu-options.hx                    |   6 +-
+ scripts/update-linux-headers.sh    |   2 +-
+ target/s390x/cpu.h                 |  10 +
+ target/s390x/ioinst.c              |   9 +
+ 21 files changed, 1042 insertions(+), 49 deletions(-)
+ create mode 100644 hw/s390x/s390-ccw.c
+ create mode 100644 hw/s390x/s390-ccw.h
+ create mode 100644 hw/vfio/ccw.c
+ create mode 100644 linux-headers/linux/vfio_ccw.h
+
 -- 
 2.10.2
