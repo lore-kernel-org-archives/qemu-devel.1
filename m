@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d438r-0008KT-74
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:28:50 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d43C9-0000pZ-TV
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d438n-0002JA-0b
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:28:49 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:34974)
+	(envelope-from <alex.bennee@linaro.org>) id 1d43C5-0004Z2-Nt
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:32:13 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:35910)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d438m-0002J0-Pr
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:28:44 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id w64so38454013wma.0
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 03:28:44 -0700 (PDT)
+	id 1d43C5-0004Xg-Cw
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:32:09 -0400
+Received: by mail-wm0-x230.google.com with SMTP id u65so38467853wmu.1
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 03:32:09 -0700 (PDT)
 References: <20170427120006.20564-1-rth@twiddle.net>
-	<20170427120006.20564-6-rth@twiddle.net>
+	<20170427120006.20564-7-rth@twiddle.net>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170427120006.20564-6-rth@twiddle.net>
-Date: Fri, 28 Apr 2017 11:29:14 +0100
-Message-ID: <87wpa47rlx.fsf@linaro.org>
+In-reply-to: <20170427120006.20564-7-rth@twiddle.net>
+Date: Fri, 28 Apr 2017 11:32:39 +0100
+Message-ID: <87vapo7rg8.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 05/19] tcg-runtime: add lookup_tb_ptr
- helper
+Subject: Re: [Qemu-devel] [PATCH v5 06/19] tcg: introduce goto_ptr opcode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,91 +38,144 @@ Richard Henderson <rth@twiddle.net> writes:
 
 > From: "Emilio G. Cota" <cota@braap.org>
 >
-> This paves the way for upcoming work.
->
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> Message-Id: <1493263764-18657-3-git-send-email-cota@braap.org>
+> Message-Id: <1493263764-18657-4-git-send-email-cota@braap.org>
 > Signed-off-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
 > ---
->  tcg-runtime.c     | 24 ++++++++++++++++++++++++
->  tcg/tcg-runtime.h |  2 ++
->  tcg/tcg.h         |  1 +
->  3 files changed, 27 insertions(+)
+>  tcg/aarch64/tcg-target.h | 1 +
+>  tcg/arm/tcg-target.h     | 1 +
+>  tcg/i386/tcg-target.h    | 1 +
+>  tcg/ia64/tcg-target.h    | 1 +
+>  tcg/mips/tcg-target.h    | 1 +
+>  tcg/ppc/tcg-target.h     | 1 +
+>  tcg/s390/tcg-target.h    | 1 +
+>  tcg/sparc/tcg-target.h   | 1 +
+>  tcg/tcg-opc.h            | 1 +
+>  tcg/tci/tcg-target.h     | 1 +
+>  10 files changed, 10 insertions(+)
 >
-> diff --git a/tcg-runtime.c b/tcg-runtime.c
-> index 4c60c96..8a24bdd 100644
-> --- a/tcg-runtime.c
-> +++ b/tcg-runtime.c
-> @@ -27,6 +27,7 @@
->  #include "exec/helper-proto.h"
->  #include "exec/cpu_ldst.h"
->  #include "exec/exec-all.h"
-> +#include "exec/tb-hash.h"
+> diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+> index 1a5ea23..b82eac4 100644
+> --- a/tcg/aarch64/tcg-target.h
+> +++ b/tcg/aarch64/tcg-target.h
+> @@ -77,6 +77,7 @@ typedef enum {
+>  #define TCG_TARGET_HAS_mulsh_i32        0
+>  #define TCG_TARGET_HAS_extrl_i64_i32    0
+>  #define TCG_TARGET_HAS_extrh_i64_i32    0
+> +#define TCG_TARGET_HAS_goto_ptr         0
 >
->  /* 32-bit helpers */
+>  #define TCG_TARGET_HAS_div_i64          1
+>  #define TCG_TARGET_HAS_rem_i64          1
+> diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
+> index 75ea247..c114df7 100644
+> --- a/tcg/arm/tcg-target.h
+> +++ b/tcg/arm/tcg-target.h
+> @@ -123,6 +123,7 @@ extern bool use_idiv_instructions;
+>  #define TCG_TARGET_HAS_mulsh_i32        0
+>  #define TCG_TARGET_HAS_div_i32          use_idiv_instructions
+>  #define TCG_TARGET_HAS_rem_i32          0
+> +#define TCG_TARGET_HAS_goto_ptr         0
 >
-> @@ -141,6 +142,29 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
->      return ctpop64(arg);
->  }
+>  enum {
+>      TCG_AREG0 = TCG_REG_R6,
+> diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+> index 4275787..59d9835 100644
+> --- a/tcg/i386/tcg-target.h
+> +++ b/tcg/i386/tcg-target.h
+> @@ -107,6 +107,7 @@ extern bool have_popcnt;
+>  #define TCG_TARGET_HAS_muls2_i32        1
+>  #define TCG_TARGET_HAS_muluh_i32        0
+>  #define TCG_TARGET_HAS_mulsh_i32        0
+> +#define TCG_TARGET_HAS_goto_ptr         0
 >
-> +void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
-> +{
-> +    CPUState *cpu = ENV_GET_CPU(env);
-> +    TranslationBlock *tb;
-> +    target_ulong cs_base, pc;
-> +    uint32_t flags;
-> +
-> +    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
-> +    if (likely(tb)) {
-> +        cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-> +        if (likely(tb->pc == addr && tb->cs_base == cs_base &&
-> +                   tb->flags == flags)) {
-> +            return tb->tc_ptr;
-> +        }
-> +        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
-> +        if (likely(tb)) {
-> +            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
-> +            return tb->tc_ptr;
-> +        }
-> +    }
-> +    return tcg_ctx.code_gen_epilogue;
-
-Minor comments: I did notice is given we rely on the backends to set this up
-in later patches if it is worth adding an assert (or tcg_debug_assert?)
-to catch this early if a new backend doesn't set this up?
-
-> +}
-> +
->  void HELPER(exit_atomic)(CPUArchState *env)
->  {
->      cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
-> diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
-> index 114ea6f..c41d38a 100644
-> --- a/tcg/tcg-runtime.h
-> +++ b/tcg/tcg-runtime.h
-> @@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
->  DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
->  DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+>  #if TCG_TARGET_REG_BITS == 64
+>  #define TCG_TARGET_HAS_extrl_i64_i32    0
+> diff --git a/tcg/ia64/tcg-target.h b/tcg/ia64/tcg-target.h
+> index 42aea03..901bb75 100644
+> --- a/tcg/ia64/tcg-target.h
+> +++ b/tcg/ia64/tcg-target.h
+> @@ -173,6 +173,7 @@ typedef enum {
+>  #define TCG_TARGET_HAS_mulsh_i64        0
+>  #define TCG_TARGET_HAS_extrl_i64_i32    0
+>  #define TCG_TARGET_HAS_extrh_i64_i32    0
+> +#define TCG_TARGET_HAS_goto_ptr         0
 >
-> +DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
-> +
->  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+>  #define TCG_TARGET_deposit_i32_valid(ofs, len) ((len) <= 16)
+>  #define TCG_TARGET_deposit_i64_valid(ofs, len) ((len) <= 16)
+> diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
+> index f46d64a..e3240cf 100644
+> --- a/tcg/mips/tcg-target.h
+> +++ b/tcg/mips/tcg-target.h
+> @@ -130,6 +130,7 @@ extern bool use_mips32r2_instructions;
+>  #define TCG_TARGET_HAS_muluh_i32        1
+>  #define TCG_TARGET_HAS_mulsh_i32        1
+>  #define TCG_TARGET_HAS_bswap32_i32      1
+> +#define TCG_TARGET_HAS_goto_ptr         0
 >
->  #ifdef CONFIG_SOFTMMU
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 6c216bb..5ec48d1 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -699,6 +699,7 @@ struct TCGContext {
->         extension that allows arithmetic on void*.  */
->      int code_gen_max_blocks;
->      void *code_gen_prologue;
-> +    void *code_gen_epilogue;
->      void *code_gen_buffer;
->      size_t code_gen_buffer_size;
->      void *code_gen_ptr;
+>  #if TCG_TARGET_REG_BITS == 64
+>  #define TCG_TARGET_HAS_add2_i32         0
+> diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+> index abd8b3d..a9aa974 100644
+> --- a/tcg/ppc/tcg-target.h
+> +++ b/tcg/ppc/tcg-target.h
+> @@ -82,6 +82,7 @@ extern bool have_isa_3_00;
+>  #define TCG_TARGET_HAS_muls2_i32        0
+>  #define TCG_TARGET_HAS_muluh_i32        1
+>  #define TCG_TARGET_HAS_mulsh_i32        1
+> +#define TCG_TARGET_HAS_goto_ptr         0
+>
+>  #if TCG_TARGET_REG_BITS == 64
+>  #define TCG_TARGET_HAS_add2_i32         0
+> diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
+> index cbdd2a6..6b7bcfb 100644
+> --- a/tcg/s390/tcg-target.h
+> +++ b/tcg/s390/tcg-target.h
+> @@ -92,6 +92,7 @@ extern uint64_t s390_facilities;
+>  #define TCG_TARGET_HAS_mulsh_i32      0
+>  #define TCG_TARGET_HAS_extrl_i64_i32  0
+>  #define TCG_TARGET_HAS_extrh_i64_i32  0
+> +#define TCG_TARGET_HAS_goto_ptr       0
+>
+>  #define TCG_TARGET_HAS_div2_i64       1
+>  #define TCG_TARGET_HAS_rot_i64        1
+> diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
+> index b8b74f96f..9348ddd 100644
+> --- a/tcg/sparc/tcg-target.h
+> +++ b/tcg/sparc/tcg-target.h
+> @@ -123,6 +123,7 @@ extern bool use_vis3_instructions;
+>  #define TCG_TARGET_HAS_muls2_i32        1
+>  #define TCG_TARGET_HAS_muluh_i32        0
+>  #define TCG_TARGET_HAS_mulsh_i32        0
+> +#define TCG_TARGET_HAS_goto_ptr         0
+>
+>  #define TCG_TARGET_HAS_extrl_i64_i32    1
+>  #define TCG_TARGET_HAS_extrh_i64_i32    1
+> diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
+> index f06f894..956fb1e 100644
+> --- a/tcg/tcg-opc.h
+> +++ b/tcg/tcg-opc.h
+> @@ -193,6 +193,7 @@ DEF(insn_start, 0, 0, TLADDR_ARGS * TARGET_INSN_START_WORDS,
+>      TCG_OPF_NOT_PRESENT)
+>  DEF(exit_tb, 0, 0, 1, TCG_OPF_BB_END)
+>  DEF(goto_tb, 0, 0, 1, TCG_OPF_BB_END)
+> +DEF(goto_ptr, 0, 1, 0, TCG_OPF_BB_END | IMPL(TCG_TARGET_HAS_goto_ptr))
+>
+>  DEF(qemu_ld_i32, 1, TLADDR_ARGS, 1,
+>      TCG_OPF_CALL_CLOBBER | TCG_OPF_SIDE_EFFECTS)
+> diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
+> index 838bf3a..0696328 100644
+> --- a/tcg/tci/tcg-target.h
+> +++ b/tcg/tci/tcg-target.h
+> @@ -85,6 +85,7 @@
+>  #define TCG_TARGET_HAS_muls2_i32        0
+>  #define TCG_TARGET_HAS_muluh_i32        0
+>  #define TCG_TARGET_HAS_mulsh_i32        0
+> +#define TCG_TARGET_HAS_goto_ptr         0
+>
+>  #if TCG_TARGET_REG_BITS == 64
+>  #define TCG_TARGET_HAS_extrl_i64_i32    0
 
 
 --
