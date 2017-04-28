@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d46iC-0006Da-2R
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:17:34 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1d46kC-0007WN-Ny
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:19:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d46i5-0002ZL-JT
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:17:32 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36811)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d46i5-0002XF-1m
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:17:25 -0400
-Received: by mail-lf0-x243.google.com with SMTP id 75so7267605lfs.3
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 07:17:24 -0700 (PDT)
+	(envelope-from <sundeep.lkml@gmail.com>) id 1d46kB-0003EC-Dm
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:19:36 -0400
 MIME-Version: 1.0
-References: <20170407111851.20680-1-cornelia.huck@de.ibm.com>
-	<20170407111851.20680-2-cornelia.huck@de.ibm.com>
-In-Reply-To: <20170407111851.20680-2-cornelia.huck@de.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 28 Apr 2017 14:17:12 +0000
-Message-ID: <CAJ+F1CKLUacSekNyMTohahLmMvLGFT=t7N4_cMNs-iMBw-4mTQ@mail.gmail.com>
+In-Reply-To: <CAKmqyKN_bMZDqZ_LXiDqcsV1Znos5bHWrapcYSA01mX+kv23aw@mail.gmail.com>
+References: <1491736758-19540-1-git-send-email-sundeep.lkml@gmail.com>
+	<1491736758-19540-2-git-send-email-sundeep.lkml@gmail.com>
+	<CAKmqyKMW-aTdzvTH5sir1BPx6U9XtgiZZ7TVigooXLFMY=UEQg@mail.gmail.com>
+	<CALHRZuroavWhKmiZEC6eCh0KFif0dWuQWi=QprH122QnAGjnpA@mail.gmail.com>
+	<CAKmqyKMT9Bn7OPU+h6o2Xj4DZXrVSBHr=jtR6jMSvhph0koegA@mail.gmail.com>
+	<CALHRZuqgxQtiGwtPfm3qgm0ywpC4OdBkdSNKLO_Zzxtw2_cmHQ@mail.gmail.com>
+	<CAKmqyKN_bMZDqZ_LXiDqcsV1Znos5bHWrapcYSA01mX+kv23aw@mail.gmail.com>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Fri, 28 Apr 2017 19:49:33 +0530
+Message-ID: <CALHRZuqvz8cQT=oCcAqdyP6Fyi-M4Mk=eoGBWATazS42uoV=7A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/8] chardev: Basic support for
- TN3270
+Subject: Re: [Qemu-devel] [Qemu-devel RFC v2 1/4] msf2: Add Smartfusion2
+ System timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,313 +28,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
-Cc: Jing Liu <liujbjl@linux.vnet.ibm.com>, agraf@suse.de, borntraeger@de.ibm.com, pbonzini@redhat.com, Yang Chen <bjcyang@linux.vnet.ibm.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Hi
+Hi Alistair,
 
-On Fri, Apr 7, 2017 at 3:19 PM Cornelia Huck <cornelia.huck@de.ibm.com>
-wrote:
+On Fri, Apr 28, 2017 at 12:23 AM, Alistair Francis <alistair23@gmail.com> wrote:
+> On Tue, Apr 25, 2017 at 3:36 AM, sundeep subbaraya
+> <sundeep.lkml@gmail.com> wrote:
+>> Hi Alistair,
+>>
+>> On Mon, Apr 24, 2017 at 11:14 PM, Alistair Francis <alistair23@gmail.com> wrote:
+>>>>>> +
+>>>>>> +    isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
+>>>>>> +    ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+>>>>>> +
+>>>>>> +    qemu_set_irq(st->irq, (ier && isr));
+>>>>>> +}
+>>>>>> +
+>>>>>> +static uint64_t
+>>>>>> +timer_read(void *opaque, hwaddr addr, unsigned int size)
+>>>>>> +{
+>>>>>> +    struct timerblock *t = opaque;
+>>>>>> +    struct msf2_timer *st;
+>>>>>> +    uint32_t r = 0;
+>>>>>> +    unsigned int timer;
+>>>>>> +    int isr;
+>>>>>> +    int ier;
+>>>>>> +
+>>>>>> +    addr >>= 2;
+>>>>>> +    timer = timer_from_addr(addr);
+>>>>>> +    st = &t->timers[timer];
+>>>>>> +
+>>>>>> +    if (timer) {
+>>>>>> +        addr -= 6;
+>>>>>> +    }
+>>>>>
+>>>>> Isn't this timer logic just checking if (addr >> 2) == R_MAX and if it
+>>>>> is set (addr >> 2) back to zero? This seems an overly complex way to
+>>>>> check that.
+>>>> I did not get you clearly. Do you want me to write like this:
+>>>> unsigned int timer = 0;
+>>>>
+>>>> addr >>= 2;
+>>>> if (addr >= R_MAX) {
+>>>>     timer = 1;
+>>>>     addr =  addr - R_MAX;
+>>>> }
+>>>
+>>> Yeah, I think this is clearer then what you had earlier.
+>>>
+>>> Although why do you have to subtract R_MAX, shouldn't it just be an
+>>> error if accessing values larger then R_MAX?
+>>
+>> Sorry I forgot about replying to this in earlier mail.
+>> There are two independent timer blocks accessing same base address.
+>> Based on offset passed in read/write functions we figure out
+>> which block has to be handled.
+>> 0x0 to 0x14 -> timer1
+>> 0x18 to 0x2C -> timer2
+>> Here R_MAX is 0x18 hence addr >= R_MAX is valid and refers to timer2.
+>> Although I missed the bounds checking 0 < addr < 0x2C. I will add that
+>> check in read and
+>> write functions.
+>
+> Ok, when you send the next version can you explain this in comments
+> that way it's clear what you are trying to do.
 
-> From: Jing Liu <liujbjl@linux.vnet.ibm.com>
->
-> This introduces basic support for TN3270, which needs to negotiate
-> three Telnet options during handshake:
->   - End of Record
->   - Binary Transmission
->   - Terminal-Type
->
-> As a basic implementation, this simply ignores NOP and Interrupt
-> Process(IP) commands. More work should be done for them later.
->
-> For more details, please refer to RFC 854 and 1576.
->
-Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
-> Signed-off-by: Yang Chen <bjcyang@linux.vnet.ibm.com>
-> Reviewed-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> Acked-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> ---
->  chardev/char-socket.c | 76
-> +++++++++++++++++++++++++++++++++++++--------------
->  chardev/char.c        | 11 ++++++--
->  include/sysemu/char.h |  8 ++++++
->  qapi-schema.json      |  3 ++
->  4 files changed, 76 insertions(+), 22 deletions(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 36ab0d633a..175fb8c3ec 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -55,6 +55,7 @@ typedef struct {
->      SocketAddress *addr;
->      bool is_listen;
->      bool is_telnet;
-> +    bool is_tn3270;
->
->      guint reconnect_timer;
->      int64_t reconnect_time;
-> @@ -141,19 +142,25 @@ static int tcp_chr_read_poll(void *opaque)
->      return s->max_size;
->  }
->
-> -#define IAC 255
-> -#define IAC_BREAK 243
->  static void tcp_chr_process_IAC_bytes(Chardev *chr,
->                                        SocketChardev *s,
->                                        uint8_t *buf, int *size)
->  {
-> -    /* Handle any telnet client's basic IAC options to satisfy char by
-> -     * char mode with no echo.  All IAC options will be removed from
-> -     * the buf and the do_telnetopt variable will be used to track the
-> -     * state of the width of the IAC information.
-> +    /* Handle any telnet or tn3270 client's basic IAC options.
-> +     * For telnet options, it satisfies char by char mode with no echo.
-> +     * For tn3270 options, it satisfies binary mode with EOR.
-> +     * All IAC options will be removed from the buf and the do_opt
-> +     * pointer will be used to track the state of the width of the
-> +     * IAC information.
->       *
-> -     * IAC commands come in sets of 3 bytes with the exception of the
-> -     * "IAC BREAK" command and the double IAC.
-> +     * RFC854: "All TELNET commands consist of at least a two byte
-> sequence.
-> +     * The commands dealing with option negotiation are three byte
-> sequences,
-> +     * the third byte being the code for the option referenced."
-> +     * "IAC BREAK", "IAC IP", "IAC NOP" and the double IAC are two bytes=
-.
-> +     * "IAC SB", "IAC SE" and "IAC EOR" are saved to split up data
-> boundary
-> +     * for tn3270.
-> +     * NOP, Break and Interrupt Process(IP) might be encountered during =
-a
-> TN3270
-> +     * session, and NOP and IP need to be done later.
->       */
->
->      int i;
-> @@ -174,6 +181,18 @@ static void tcp_chr_process_IAC_bytes(Chardev *chr,
->                      /* Handle IAC break commands by sending a serial
-> break */
->                      qemu_chr_be_event(chr, CHR_EVENT_BREAK);
->                      s->do_telnetopt++;
-> +                } else if (s->is_tn3270 && ((unsigned char)buf[i] =3D=3D
-> IAC_EOR
-> +                           || (unsigned char)buf[i] =3D=3D IAC_SB
-> +                           || (unsigned char)buf[i] =3D=3D IAC_SE)
-> +                           && s->do_telnetopt =3D=3D 2) {
-> +                    buf[j++] =3D IAC;
-> +                    buf[j++] =3D buf[i];
-> +                    s->do_telnetopt++;
-> +                } else if (s->is_tn3270 && ((unsigned char)buf[i] =3D=3D
-> IAC_IP
-> +                           || (unsigned char)buf[i] =3D=3D IAC_NOP)
-> +                           && s->do_telnetopt =3D=3D 2) {
-> +                    /* TODO: IP and NOP need to be implemented later. */
-> +                    s->do_telnetopt++;
->                  }
->                  s->do_telnetopt++;
->              }
-> @@ -512,7 +531,7 @@ static void tcp_chr_update_read_handler(Chardev *chr,
->
->  typedef struct {
->      Chardev *chr;
-> -    char buf[12];
-> +    char buf[21];
->      size_t buflen;
->  } TCPChardevTelnetInit;
->
-> @@ -550,9 +569,6 @@ static void tcp_chr_telnet_init(Chardev *chr)
->      TCPChardevTelnetInit *init =3D g_new0(TCPChardevTelnetInit, 1);
->      size_t n =3D 0;
->
-> -    init->chr =3D chr;
-> -    init->buflen =3D 12;
-> -
->  #define IACSET(x, a, b, c)                      \
->      do {                                        \
->          x[n++] =3D a;                             \
-> @@ -560,12 +576,26 @@ static void tcp_chr_telnet_init(Chardev *chr)
->          x[n++] =3D c;                             \
->      } while (0)
->
-> -    /* Prep the telnet negotion to put telnet in binary,
-> -     * no echo, single char mode */
-> -    IACSET(init->buf, 0xff, 0xfb, 0x01);  /* IAC WILL ECHO */
-> -    IACSET(init->buf, 0xff, 0xfb, 0x03);  /* IAC WILL Suppress go ahead =
-*/
-> -    IACSET(init->buf, 0xff, 0xfb, 0x00);  /* IAC WILL Binary */
-> -    IACSET(init->buf, 0xff, 0xfd, 0x00);  /* IAC DO Binary */
-> +    init->chr =3D chr;
-> +    if (!s->is_tn3270) {
-> +        init->buflen =3D 12;
-> +        /* Prep the telnet negotion to put telnet in binary,
-> +         * no echo, single char mode */
-> +        IACSET(init->buf, 0xff, 0xfb, 0x01);  /* IAC WILL ECHO */
-> +        IACSET(init->buf, 0xff, 0xfb, 0x03);  /* IAC WILL Suppress go
-> ahead */
-> +        IACSET(init->buf, 0xff, 0xfb, 0x00);  /* IAC WILL Binary */
-> +        IACSET(init->buf, 0xff, 0xfd, 0x00);  /* IAC DO Binary */
-> +    } else {
-> +        init->buflen =3D 21;
-> +        /* Prep the TN3270 negotion based on RFC1576 */
-> +        IACSET(init->buf, 0xff, 0xfd, 0x19);  /* IAC DO EOR */
-> +        IACSET(init->buf, 0xff, 0xfb, 0x19);  /* IAC WILL EOR */
-> +        IACSET(init->buf, 0xff, 0xfd, 0x00);  /* IAC DO BINARY */
-> +        IACSET(init->buf, 0xff, 0xfb, 0x00);  /* IAC WILL BINARY */
-> +        IACSET(init->buf, 0xff, 0xfd, 0x18);  /* IAC DO TERMINAL TYPE */
-> +        IACSET(init->buf, 0xff, 0xfa, 0x18);  /* IAC SB TERMINAL TYPE */
-> +        IACSET(init->buf, 0x01, 0xff, 0xf0);  /* SEND IAC SE */
-> +    }
->
->  #undef IACSET
->
-> @@ -585,7 +615,8 @@ static void tcp_chr_tls_handshake(QIOTask *task,
->      if (qio_task_propagate_error(task, NULL)) {
->          tcp_chr_disconnect(chr);
->      } else {
-> -        if (s->do_telnetopt) {
-> +        /* tn3270 does not support TLS yet */
-> +        if (s->do_telnetopt && !s->is_tn3270) {
->              tcp_chr_telnet_init(chr);
->          } else {
->              tcp_chr_connect(chr);
-> @@ -824,12 +855,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
->      bool do_nodelay     =3D sock->has_nodelay ? sock->nodelay : false;
->      bool is_listen      =3D sock->has_server  ? sock->server  : true;
->      bool is_telnet      =3D sock->has_telnet  ? sock->telnet  : false;
-> +    bool is_tn3270      =3D sock->has_tn3270  ? sock->tn3270  : false;
->      bool is_waitconnect =3D sock->has_wait    ? sock->wait    : false;
->      int64_t reconnect   =3D sock->has_reconnect ? sock->reconnect : 0;
->      QIOChannelSocket *sioc =3D NULL;
->
->      s->is_listen =3D is_listen;
->      s->is_telnet =3D is_telnet;
-> +    s->is_tn3270 =3D is_tn3270;
->      s->do_nodelay =3D do_nodelay;
->      if (sock->tls_creds) {
->          Object *creds;
-> @@ -879,7 +912,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
->                                           addr, is_listen, is_telnet);
->
->      if (is_listen) {
-> -        if (is_telnet) {
-> +        if (is_telnet || is_tn3270) {
->              s->do_telnetopt =3D 1;
->          }
->      } else if (reconnect > 0) {
-> @@ -933,6 +966,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts,
-> ChardevBackend *backend,
->      bool is_listen      =3D qemu_opt_get_bool(opts, "server", false);
->      bool is_waitconnect =3D is_listen && qemu_opt_get_bool(opts, "wait",
-> true);
->      bool is_telnet      =3D qemu_opt_get_bool(opts, "telnet", false);
-> +    bool is_tn3270      =3D qemu_opt_get_bool(opts, "tn3270", false);
->      bool do_nodelay     =3D !qemu_opt_get_bool(opts, "delay", true);
->      int64_t reconnect   =3D qemu_opt_get_number(opts, "reconnect", 0);
->      const char *path =3D qemu_opt_get(opts, "path");
-> @@ -968,6 +1002,8 @@ static void qemu_chr_parse_socket(QemuOpts *opts,
-> ChardevBackend *backend,
->      sock->server =3D is_listen;
->      sock->has_telnet =3D true;
->      sock->telnet =3D is_telnet;
-> +    sock->has_tn3270 =3D true;
-> +    sock->tn3270 =3D is_tn3270;
->      sock->has_wait =3D true;
->      sock->wait =3D is_waitconnect;
->      sock->has_reconnect =3D true;
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 3df116350b..309734f2b7 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -696,7 +696,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label,
-> const char *filename)
->          return opts;
->      }
->      if (strstart(filename, "tcp:", &p) ||
-> -        strstart(filename, "telnet:", &p)) {
-> +        strstart(filename, "telnet:", &p) ||
-> +        strstart(filename, "tn3270:", &p)) {
->          if (sscanf(p, "%64[^:]:%32[^,]%n", host, port, &pos) < 2) {
->              host[0] =3D 0;
->              if (sscanf(p, ":%32[^,]%n", port, &pos) < 1)
-> @@ -712,8 +713,11 @@ QemuOpts *qemu_chr_parse_compat(const char *label,
-> const char *filename)
->                  goto fail;
->              }
->          }
-> -        if (strstart(filename, "telnet:", &p))
-> +        if (strstart(filename, "telnet:", &p)) {
->              qemu_opt_set(opts, "telnet", "on", &error_abort);
-> +        } else if (strstart(filename, "tn3270:", &p)) {
-> +            qemu_opt_set(opts, "tn3270", "on", &error_abort);
-> +        }
->          return opts;
->      }
->      if (strstart(filename, "udp:", &p)) {
-> @@ -1177,6 +1181,9 @@ QemuOptsList qemu_chardev_opts =3D {
->              .name =3D "telnet",
->              .type =3D QEMU_OPT_BOOL,
->          },{
-> +            .name =3D "tn3270",
-> +            .type =3D QEMU_OPT_BOOL,
-> +        },{
->              .name =3D "tls-creds",
->              .type =3D QEMU_OPT_STRING,
->          },{
-> diff --git a/include/sysemu/char.h b/include/sysemu/char.h
-> index 450881d42c..f6d5cd0c9b 100644
-> --- a/include/sysemu/char.h
-> +++ b/include/sysemu/char.h
-> @@ -7,6 +7,14 @@
->  #include "qemu/bitmap.h"
->  #include "qom/object.h"
->
-> +#define IAC_EOR 239
-> +#define IAC_SE 240
-> +#define IAC_NOP 241
-> +#define IAC_BREAK 243
-> +#define IAC_IP 244
-> +#define IAC_SB 250
-> +#define IAC 255
-> +
->
+Sure Alistair.
 
-Those define are exposed because of a later patch.
-
-(I have pending patches to have a char/char-socket.h and friends where this
-should fit, but for now it's fine)
-
-Patch looks good to me, basic testing done
-
- /* character device */
+Thanks,
+Sundeep
 >
->  typedef enum {
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 250e4dc49b..f0302958ce 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -4874,6 +4874,8 @@
->  # @nodelay: set TCP_NODELAY socket option (default: false)
->  # @telnet: enable telnet protocol on server
->  #          sockets (default: false)
-> +# @tn3270: enable tn3270 protocol on server
-> +#          sockets (default: false) (Since: 2.10)
->  # @reconnect: For a client socket, if a socket is disconnected,
->  #          then attempt a reconnect after the given number of seconds.
->  #          Setting this to zero disables this function. (default: 0)
-> @@ -4887,6 +4889,7 @@
->                                       '*wait'      : 'bool',
->                                       '*nodelay'   : 'bool',
->                                       '*telnet'    : 'bool',
-> +                                     '*tn3270'    : 'bool',
->                                       '*reconnect' : 'int' },
->    'base': 'ChardevCommon' }
+> Thanks,
 >
-> --
-> 2.11.0
+> Alistair
 >
->
-> --
-Marc-Andr=C3=A9 Lureau
+>>
+>> Thanks,
+>> Sundeep
+>>>
+>>>>
+>>>>>
+>>>>>> +
+>>>>>> +    switch (addr) {
+>>>>>> +    case R_VAL:
+>>>>>> +        r = ptimer_get_count(st->ptimer);
+>>>>>> +        D(qemu_log("msf2_timer t=%d read counter=%x\n", timer, r));
+>>>>>> +        break;
+>>>>>> +
+>>>>>> +    case R_MIS:
+>>>>>> +        isr = !!(st->regs[R_RIS] & TIMER_RIS_ACK);
+>>>>>> +        ier = !!(st->regs[R_CTRL] & TIMER_CTRL_INTR);
+>>>>>> +        r = ier && isr;
+>>>>>> +        break;
+>>>>>> +
+>>>>>> +    default:
+>>>>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>>>>> +            r = st->regs[addr];
+>>>>>> +        }
+>>>>>> +        break;
+>>>>>> +    }
+>>>>>> +    D(fprintf(stderr, "%s timer=%d %x=%x\n", __func__, timer, addr * 4, r));
+>>>>>> +    return r;
+>>>>>> +}
+>>>>>> +
+>>>>>> +static void timer_update(struct msf2_timer *st)
+>>>>>> +{
+>>>>>> +    uint64_t count;
+>>>>>> +
+>>>>>> +    D(fprintf(stderr, "%s timer=%d\n", __func__, st->nr));
+>>>>>> +
+>>>>>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ENBL)) {
+>>>>>> +        ptimer_stop(st->ptimer);
+>>>>>> +        return;
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    count = st->regs[R_LOADVAL];
+>>>>>> +    ptimer_set_limit(st->ptimer, count, 1);
+>>>>>> +    ptimer_run(st->ptimer, 1);
+>>>>>> +}
+>>>>>
+>>>>> The update function should be above the read/write functions.
+>>>>>
+>>>> Ok I will change
+>>>>
+>>>>>> +
+>>>>>> +static void
+>>>>>> +timer_write(void *opaque, hwaddr addr,
+>>>>>> +            uint64_t val64, unsigned int size)
+>>>>>> +{
+>>>>>> +    struct timerblock *t = opaque;
+>>>>>> +    struct msf2_timer *st;
+>>>>>> +    unsigned int timer;
+>>>>>> +    uint32_t value = val64;
+>>>>>> +
+>>>>>> +    addr >>= 2;
+>>>>>> +    timer = timer_from_addr(addr);
+>>>>>> +    st = &t->timers[timer];
+>>>>>> +    D(fprintf(stderr, "%s addr=%x val=%x (timer=%d)\n",
+>>>>>> +             __func__, addr * 4, value, timer));
+>>>>>> +
+>>>>>> +    if (timer) {
+>>>>>> +        addr -= 6;
+>>>>>> +    }
+>>>>>
+>>>>> Same comment from the read function.
+>>>>>
+>>>>>> +
+>>>>>> +    switch (addr) {
+>>>>>> +    case R_CTRL:
+>>>>>> +        st->regs[R_CTRL] = value;
+>>>>>> +        timer_update(st);
+>>>>>> +        break;
+>>>>>> +
+>>>>>> +    case R_RIS:
+>>>>>> +        if (value & TIMER_RIS_ACK) {
+>>>>>> +            st->regs[R_RIS] &= ~TIMER_RIS_ACK;
+>>>>>> +        }
+>>>>>> +        break;
+>>>>>> +
+>>>>>> +    case R_LOADVAL:
+>>>>>> +        st->regs[R_LOADVAL] = value;
+>>>>>> +        if (st->regs[R_CTRL] & TIMER_CTRL_ENBL) {
+>>>>>> +            timer_update(st);
+>>>>>> +        }
+>>>>>> +        break;
+>>>>>> +
+>>>>>> +    case R_BGLOADVAL:
+>>>>>> +        st->regs[R_BGLOADVAL] = value;
+>>>>>> +        st->regs[R_LOADVAL] = value;
+>>>>>> +        break;
+>>>>>> +
+>>>>>> +    case R_VAL:
+>>>>>> +    case R_MIS:
+>>>>>> +        break;
+>>>>>> +
+>>>>>> +    default:
+>>>>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>>>>> +            st->regs[addr] = value;
+>>>>>> +        }
+>>>>>> +        break;
+>>>>>> +    }
+>>>>>> +    timer_update_irq(st);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static const MemoryRegionOps timer_ops = {
+>>>>>> +    .read = timer_read,
+>>>>>> +    .write = timer_write,
+>>>>>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>>>>>> +    .valid = {
+>>>>>> +        .min_access_size = 4,
+>>>>>> +        .max_access_size = 4
+>>>>>> +    }
+>>>>>> +};
+>>>>>> +
+>>>>>> +static void timer_hit(void *opaque)
+>>>>>> +{
+>>>>>> +    struct msf2_timer *st = opaque;
+>>>>>> +    D(fprintf(stderr, "%s %d\n", __func__, st->nr));
+>>>>>> +    st->regs[R_RIS] |= TIMER_RIS_ACK;
+>>>>>> +
+>>>>>> +    if (!(st->regs[R_CTRL] & TIMER_CTRL_ONESHOT)) {
+>>>>>> +        timer_update(st);
+>>>>>> +    }
+>>>>>> +    timer_update_irq(st);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static void msf2_timer_realize(DeviceState *dev, Error **errp)
+>>>>>> +{
+>>>>>> +    struct timerblock *t = MSF2_TIMER(dev);
+>>>>>> +    unsigned int i;
+>>>>>> +
+>>>>>> +    /* Init all the ptimers.  */
+>>>>>> +    t->timers = g_malloc0((sizeof t->timers[0]) * NUM_TIMERS);
+>>>>>> +    for (i = 0; i < NUM_TIMERS; i++) {
+>>>>>> +        struct msf2_timer *st = &t->timers[i];
+>>>>>> +
+>>>>>> +        st->parent = t;
+>>>>>> +        st->nr = i;
+>>>>>> +        st->bh = qemu_bh_new(timer_hit, st);
+>>>>>> +        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
+>>>>>> +        ptimer_set_freq(st->ptimer, t->freq_hz);
+>>>>>> +        sysbus_init_irq(SYS_BUS_DEVICE(dev), &st->irq);
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, "msf2-timer",
+>>>>>> +                          R_MAX * 4 * NUM_TIMERS);
+>>>>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &t->mmio);
+>>>>>
+>>>>> This should be in the devices init() function.
+>>>>
+>>>> I referred Xilinx soft IP models for writing these models and used
+>>>> same boilerplate code.
+>>>> I am not clear about realize and init functions yet. Can you please
+>>>> give a brief about them.
+>>>
+>>> Basically the simple explanation is that init is called when the
+>>> object is created and realize is called when the object is realized.
+>>>
+>>> Generally for devices it will go something like this:
+>>>  1. init
+>>>  2. Set properties
+>>>  3. Connect things
+>>>  4. realize
+>>>  5. Map to memory
+>>>
+>>>> Don't we need to use realize function for new models?
+>>>
+>>> AFAIK we still put things like: sysbus_init_irq(),
+>>> memory_region_init_io() and sysbus_init_mmio() in the init function.
+>>>
+>>> I don't think we are at a stage yet to not use init functions.
+>>>
+>>> Thanks,
+>>>
+>>> Alistair
+>>>
+>>>>
+>>>> Thanks,
+>>>> Sundeep
+>>>>>
+>>>>> Thanks,
+>>>>>
+>>>>> Alistair
+>>>>>
+>>>>>> +}
+>>>>>> +
+>>>>>> +static Property msf2_timer_properties[] = {
+>>>>>> +    DEFINE_PROP_UINT32("clock-frequency", struct timerblock, freq_hz,
+>>>>>> +                                                                83 * 1000000),
+>>>>>> +    DEFINE_PROP_END_OF_LIST(),
+>>>>>> +};
+>>>>>> +
+>>>>>> +static void msf2_timer_class_init(ObjectClass *klass, void *data)
+>>>>>> +{
+>>>>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>>>>> +
+>>>>>> +    dc->realize = msf2_timer_realize;
+>>>>>> +    dc->props = msf2_timer_properties;
+>>>>>> +}
+>>>>>> +
+>>>>>> +static const TypeInfo msf2_timer_info = {
+>>>>>> +    .name          = TYPE_MSF2_TIMER,
+>>>>>> +    .parent        = TYPE_SYS_BUS_DEVICE,
+>>>>>> +    .instance_size = sizeof(struct timerblock),
+>>>>>> +    .class_init    = msf2_timer_class_init,
+>>>>>> +};
+>>>>>> +
+>>>>>> +static void msf2_timer_register_types(void)
+>>>>>> +{
+>>>>>> +    type_register_static(&msf2_timer_info);
+>>>>>> +}
+>>>>>> +
+>>>>>> +type_init(msf2_timer_register_types)
+>>>>>> --
+>>>>>> 2.5.0
+>>>>>>
+>>>>>>
