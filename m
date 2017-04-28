@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d4Bqz-0000oa-AN
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:46:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1d4Bsb-0001hh-6F
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:48:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d4Bqy-0007w4-FS
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:46:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1d4Bsa-000089-2i
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:48:37 -0400
 References: <20170427014626.11553-1-eblake@redhat.com>
-	<20170427014626.11553-8-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <99e512ad-d73a-09dd-ee68-ee57dc4581af@redhat.com>
-Date: Fri, 28 Apr 2017 21:46:47 +0200
+	<20170427014626.11553-6-eblake@redhat.com>
+	<90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d25e3cc9-361a-37ba-2d6b-b08319bff7b7@redhat.com>
+Date: Fri, 28 Apr 2017 14:48:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170427014626.11553-8-eblake@redhat.com>
+In-Reply-To: <90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="xepqQFfp5j1dFFD0tTFI708iRHTnToJLW"
-Subject: Re: [Qemu-devel] [PATCH v10 07/17] qemu-io: Switch 'alloc' command
- to byte-based length
+	boundary="BHufneXjAI8HLKmH7iI5kXtqFEdQ1BQDM"
+Subject: Re: [Qemu-devel] [PATCH v10 05/17] iotests: Add test 179 to cover
+ write zeroes with unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xepqQFfp5j1dFFD0tTFI708iRHTnToJLW
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+--BHufneXjAI8HLKmH7iI5kXtqFEdQ1BQDM
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <99e512ad-d73a-09dd-ee68-ee57dc4581af@redhat.com>
-Subject: Re: [PATCH v10 07/17] qemu-io: Switch 'alloc' command to byte-based
- length
+Message-ID: <d25e3cc9-361a-37ba-2d6b-b08319bff7b7@redhat.com>
+Subject: Re: [PATCH v10 05/17] iotests: Add test 179 to cover write zeroes
+ with unmap
 References: <20170427014626.11553-1-eblake@redhat.com>
- <20170427014626.11553-8-eblake@redhat.com>
-In-Reply-To: <20170427014626.11553-8-eblake@redhat.com>
+ <20170427014626.11553-6-eblake@redhat.com>
+ <90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
+In-Reply-To: <90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 27.04.2017 03:46, Eric Blake wrote:
-> For the 'alloc' command, accepting an offset in bytes but a length
-> in sectors, and reporting output in sectors, is confusing.  Do
-> everything in bytes, and adjust the expected output accordingly.
+On 04/28/2017 02:28 PM, Max Reitz wrote:
+> On 27.04.2017 03:46, Eric Blake wrote:
+>> No tests were covering write zeroes with unmap.  Additionally,
+>> I needed to prove that my previous patches for correct status
+>> reporting and write zeroes optimizations actually had an impact.
+>>
+>> The test works for cluster_size between 8k and 2M (for smaller
+>> sizes, it fails because our allocation patterns are not contiguous
+>> with small clusters).
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> ---
+>> v10: drop any changes to v2 files, rewrite test to work with updates
+>> earlier in the series, add a blkdebug probe
+>> v9: new patch
+>> ---
+>>  tests/qemu-iotests/179     | 123 ++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  tests/qemu-iotests/179.out |  90 +++++++++++++++++++++++++++++++++
+>>  tests/qemu-iotests/group   |   1 +
+>>  3 files changed, 214 insertions(+)
+>>  create mode 100755 tests/qemu-iotests/179
+>>  create mode 100644 tests/qemu-iotests/179.out
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Can I convince you to write this test in a different way? I really have=
+
+> a hard time following all of the writes and building a mental image of
+> how the qcow2 file should look in the end so I can compare it to the ma=
+p
+> output.
 >=20
-> ---
-> v10: rebase to code cleanup
-> v9: new patch
-> ---
->  qemu-io-cmds.c                    | 30 ++++++++++++++++++------------
->  tests/qemu-iotests/019.out        |  8 ++++----
->  tests/qemu-iotests/common.pattern |  2 +-
->  3 files changed, 23 insertions(+), 17 deletions(-)
->=20
-> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-> index fabc394..34f6707 100644
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -1760,7 +1760,7 @@ out:
->  static int alloc_f(BlockBackend *blk, int argc, char **argv)
->  {
->      BlockDriverState *bs =3D blk_bs(blk);
-> -    int64_t offset, sector_num, nb_sectors, remaining;
-> +    int64_t offset, sector_num, nb_sectors, remaining, bytes;
->      char s1[64];
->      int num, ret;
->      int64_t sum_alloc;
-> @@ -1776,18 +1776,24 @@ static int alloc_f(BlockBackend *blk, int argc,=
- char **argv)
->      }
->=20
->      if (argc =3D=3D 3) {
-> -        nb_sectors =3D cvtnum(argv[2]);
-> -        if (nb_sectors < 0) {
-> -            print_cvtnum_err(nb_sectors, argv[2]);
-> +        bytes =3D cvtnum(argv[2]);
-> +        if (bytes < 0) {
-> +            print_cvtnum_err(bytes, argv[2]);
->              return 0;
-> -        } else if (nb_sectors > INT_MAX) {
-> -            printf("length argument cannot exceed %d, given %s\n",
-> -                   INT_MAX, argv[2]);
-> +        } else if (bytes > INT_MAX * BDRV_SECTOR_SIZE) {
-> +            printf("length argument cannot exceed %llu, given %s\n",
-> +                   INT_MAX * BDRV_SECTOR_SIZE, argv[2]);
->              return 0;
->          }
->      } else {
-> -        nb_sectors =3D 1;
-> +        bytes =3D BDRV_SECTOR_SIZE;
->      }
-> +    if (!QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE)) {
-> +        printf("bytes %" PRId64 " is not sector aligned\n",
+> I'd like it better if you would check the qcow2 file after each group o=
+f
+> write operations, maybe even creating a new image for every such group.=
 
-This isn't real English. :-)
+> But even just having more qemu-img map calls (and changing nothing else=
+)
+> would help me a lot.
 
-With that fixed (somehow, you know better than me how to):
+Will do.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +               bytes);
-> +        return 0;
-> +    }
-> +    nb_sectors =3D bytes >> BDRV_SECTOR_BITS;
->=20
->      remaining =3D nb_sectors;
->      sum_alloc =3D 0;
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---xepqQFfp5j1dFFD0tTFI708iRHTnToJLW
+--BHufneXjAI8HLKmH7iI5kXtqFEdQ1BQDM
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDnCcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AG3oH/i+wPiZaXS05a8Fse/0JTsxneE0YLd+g
-Bv2xpdNuQY4JbntqvLB0bcXwG/kC6/gcUY5eJ/hhxG8PBITa15bYbR+D4wobKgRc
-gh4W2R/DYAzcV3i1ltLPLuXTXG1foLcjMEUIxGFjkTQSggb8yHitUYoTzhDtKtYp
-JRc52ljXp/GfyBcLV5dLxhC+RNWk48xhqkq9Rl5wfneWAVHwFL4CVMW4BHo/Gf1v
-VNFMv8aFc2H+eiKsRJNI3sbdMvLJbWC9sPfpRucnrdjefSpvUE+Q2XeV3Tg8WBfx
-NE8KoRQkm3yiGtIxtCdYHtYiU70mfNaZyljbj75848X+/s+VCgoFC/4=
-=z3SJ
+iQEcBAEBCAAGBQJZA5yLAAoJEKeha0olJ0NqjlgH/i1TQDJLaD85fqHUyaJgDMfr
+8U5EWU/3S4HSi+aXsr9LSV67fyHx94JGHRfUuM0ifB1N9dG1dgYmvtBPtD6pgaDZ
+WzgL5bEnfZAoE2rjMJM6hqyA2+EgoWdx0hbAgG7ePguHZ9gQ4D05LgjpukwSM05R
+rsXZmae4QSXivtSw7lxU9IzncO9XEfIU/RQPoBwEwiJcJZU2DMc10YX2Nu3R7PgO
+7YI1kMSNDaa+33EiW67G5l0AXY0rX3mr5O/U+U5q0LOdOGJRspvfL4k4FQNzEPvu
+skAoEMuHQeneK1k/erSntc243O30Du/sVM/JNcIDliDGP+bW/XkkMxQ0p3nM2ak=
+=hMCH
 -----END PGP SIGNATURE-----
 
---xepqQFfp5j1dFFD0tTFI708iRHTnToJLW--
+--BHufneXjAI8HLKmH7iI5kXtqFEdQ1BQDM--
