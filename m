@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d4313-0005eV-Od
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:20:46 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d435E-0006ak-BP
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:25:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d4310-0005Ra-KU
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40778)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d4310-0005RI-EU
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:20:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d430y-0007m4-Gj
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 10:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 701BF2E80CA
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 10:20:40 +0000 (UTC)
+	(envelope-from <alex.bennee@linaro.org>) id 1d435B-0007sX-1n
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:25:04 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d435A-0007sO-Rc
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:25:00 -0400
+Received: by mail-wm0-x236.google.com with SMTP id m123so42439077wma.0
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 03:25:00 -0700 (PDT)
+References: <20170427120006.20564-1-rth@twiddle.net>
+	<20170427120006.20564-4-rth@twiddle.net>
+	<874lx996hh.fsf@linaro.org>
+	<30d66407-ad33-bc8c-55c6-0a5d7009bed4@twiddle.net>
+	<871ssd7z46.fsf@linaro.org>
+	<ee54957c-4a65-424a-72dc-0d6f742608cf@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <ee54957c-4a65-424a-72dc-0d6f742608cf@twiddle.net>
+Date: Fri, 28 Apr 2017 11:25:30 +0100
+Message-ID: <87y3uk7rs5.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 28 Apr 2017 10:14:21 -0000
-From: Richard Jones <rjones@redhat.com>
-Reply-To: Bug 1686980 <1686980@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170428101422.23122.24568.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1686980] [NEW] qemu is very slow when adding 16,
- 384 virtio-scsi drives
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 03/19] qemu/atomic: Loosen restrictions
+ for 64-bit ILP32 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,119 +35,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, cota@braap.org
 
-Public bug reported:
 
-qemu runs very slowly when adding many virtio-scsi drives.  I have
-attached a small reproducer shell script which demonstrates this.
+Richard Henderson <rth@twiddle.net> writes:
 
-Using perf shows the following stack trace taking all the time:
+> On 04/28/2017 09:47 AM, Alex Bennée wrote:
+>> So maybe the comment should be clearer for ATOMIC_REG_SIZE that it
+>> should match TCG_TARGET_REG_BITS (and therefore sync with
+>> TCG_OVERSIZED_GUEST) in the atomic.h comment.
+>
+> How about
+>
+>  * That said, we have a problem on 64-bit ILP32 hosts in that in order to
+>  * sync with TCG_OVERSIZED_GUEST, this must match TCG_TARGET_REG_BITS.
+>  * We'd prefer not want to pull in everything else TCG related, so handle
+>  * those few cases by hand.
+>
+> ?
 
-    72.42%    71.15%  qemu-system-x86  qemu-system-x86_64       [.] drive_g=
-et
-            |          =
+Sounds good to me.
 
-             --72.32%--drive_get
-                       |          =
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-                        --1.24%--__irqentry_text_start
-                                  |          =
-
-                                   --1.22%--smp_apic_timer_interrupt
-                                             |          =
-
-                                              --1.00%--local_apic_timer_int=
-errupt
-                                                        |          =
-
-                                                         --1.00%--hrtimer_i=
-nterrupt
-                                                                   |       =
-   =
-
-                                                                    --0.83%=
---__hrtimer_run_queues
-                                                                           =
-   |          =
-
-                                                                           =
-    --0.64%--tick_sched_timer
-
-    21.70%    21.34%  qemu-system-x86  qemu-system-x86_64       [.] blk_leg=
-acy_dinfo
-            |
-            ---blk_legacy_dinfo
-
-     3.65%     3.59%  qemu-system-x86  qemu-system-x86_64       [.] blk_next
-            |
-            ---blk_next
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "drives.sh"
-   https://bugs.launchpad.net/bugs/1686980/+attachment/4869097/+files/drive=
-s.sh
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1686980
-
-Title:
-  qemu is very slow when adding 16,384 virtio-scsi drives
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu runs very slowly when adding many virtio-scsi drives.  I have
-  attached a small reproducer shell script which demonstrates this.
-
-  Using perf shows the following stack trace taking all the time:
-
-      72.42%    71.15%  qemu-system-x86  qemu-system-x86_64       [.] drive=
-_get
-              |          =
-
-               --72.32%--drive_get
-                         |          =
-
-                          --1.24%--__irqentry_text_start
-                                    |          =
-
-                                     --1.22%--smp_apic_timer_interrupt
-                                               |          =
-
-                                                --1.00%--local_apic_timer_i=
-nterrupt
-                                                          |          =
-
-                                                           --1.00%--hrtimer=
-_interrupt
-                                                                     |     =
-     =
-
-                                                                      --0.8=
-3%--__hrtimer_run_queues
-                                                                           =
-     |          =
-
-                                                                           =
-      --0.64%--tick_sched_timer
-
-      21.70%    21.34%  qemu-system-x86  qemu-system-x86_64       [.] blk_l=
-egacy_dinfo
-              |
-              ---blk_legacy_dinfo
-
-       3.65%     3.59%  qemu-system-x86  qemu-system-x86_64       [.] blk_n=
-ext
-              |
-              ---blk_next
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1686980/+subscriptions
+--
+Alex Bennée
