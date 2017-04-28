@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d479D-0006MM-NE
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:45:28 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d47BL-0007iT-2p
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:47:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d479C-0008Kk-Cx
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:45:27 -0400
-References: <149336968270.4566.7770744042249761246.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f9833cd8-2f64-21d5-3bfc-9d91c178b8aa@redhat.com>
-Date: Fri, 28 Apr 2017 09:45:23 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1d47BJ-000176-Mi
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:47:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d47BJ-00016C-DQ
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:47:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 475D4C21866F
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 14:47:36 +0000 (UTC)
+Date: Fri, 28 Apr 2017 15:47:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170428144729.GB3276@work-vm>
+References: <20170425102446.4008-1-quintela@redhat.com>
+	<20170425102446.4008-7-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <149336968270.4566.7770744042249761246.stgit@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AxDJ4ooQIuEKxjcp8gvlwBUXXmV4JdnrX"
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: local: fix unlink of alien files in
- mapped-file mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170425102446.4008-7-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/6] migration: Pass Error ** argument to
+ {save, load}_vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +34,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AxDJ4ooQIuEKxjcp8gvlwBUXXmV4JdnrX
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <f9833cd8-2f64-21d5-3bfc-9d91c178b8aa@redhat.com>
-Subject: Re: [PATCH] 9pfs: local: fix unlink of alien files in mapped-file
- mode
-References: <149336968270.4566.7770744042249761246.stgit@bahia.lan>
-In-Reply-To: <149336968270.4566.7770744042249761246.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Juan Quintela (quintela@redhat.com) wrote:
+> This way we use the "normal" way of printing errors for hmp commands.
+> 
+> --
+> Paolo suggestion
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-On 04/28/2017 03:54 AM, Greg Kurz wrote:
-> When trying to remove a file from a directory, both created in non-mapp=
-ed
-> mode, the file remains and EBADF is returned to the guest.
->=20
-> This is a regression introduced by commit "df4938a6651b 9pfs: local:
-> unlinkat: don't follow symlinks" when fixing CVE-2016-9602. It changed =
-the
-> way we unlink the metadata file from
->=20
->     ret =3D remove("$dir/.virtfs_metadata/$name");
->     if (ret < 0 && errno !=3D ENOENT) {
->          /* Error out */
->     }
->     /* Ignore absence of metadata */
->=20
-> to
->=20
->     fd =3D openat("$dir/.virtfs_metadata")
->     unlinkat(fd, "$name")
+<snip>
 
-Yep, failure to check for errors. Is this something Coverity can flag?
+> +int save_vmstate(const char *name, Error **errp)
+>  {
+>      BlockDriverState *bs, *bs1;
+>      QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+> @@ -2076,29 +2076,27 @@ int save_vmstate(const char *name)
+>      uint64_t vm_state_size;
+>      qemu_timeval tv;
+>      struct tm tm;
+> -    Error *local_err = NULL;
+>      AioContext *aio_context;
+>  
+>      if (!bdrv_all_can_snapshot(&bs)) {
+> -        error_report("Device '%s' is writable but does not support snapshots",
+> -                     bdrv_get_device_name(bs));
+> +        error_setg(errp, "Device '%s' is writable but does not support "
+> +                   "snapshots", bdrv_get_device_name(bs));
+>          return ret;
+>      }
+>  
+>      /* Delete old snapshots of the same name */
+>      if (name) {
+> -        ret = bdrv_all_delete_snapshot(name, &bs1, &local_err);
+> +        ret = bdrv_all_delete_snapshot(name, &bs1, errp);
+>          if (ret < 0) {
+> -            error_reportf_err(local_err,
+> -                              "Error while deleting snapshot on device '%s': ",
+> -                              bdrv_get_device_name(bs1));
+> +            error_prepend(errp, "Error while deleting snapshot on device "
+> +                          "'%s': ", bdrv_get_device_name(bs1));
 
->=20
-> We just need to check the return of openat() and ignore ENOENT, in orde=
-r
-> to restore the behaviour we had with remove().
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p-local.c |   18 +++++++++++++-----
->  1 file changed, 13 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index f3ebca4f7a56..4e9823b08e74 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -983,12 +983,20 @@ static int local_unlinkat_common(FsContext *ctx, =
-int dirfd, const char *name,
->           * .virtfs_metadata directory.
->           */
->          map_dirfd =3D openat_dir(dirfd, VIRTFS_META_DIR);
-> -        ret =3D unlinkat(map_dirfd, name, 0);
-> -        close_preserve_errno(map_dirfd);
-> -        if (ret < 0 && errno !=3D ENOENT) {
-> +        if (map_dirfd !=3D -1) {
-> +            ret =3D unlinkat(map_dirfd, name, 0);
-> +            close_preserve_errno(map_dirfd);
-> +            if (ret < 0 && errno !=3D ENOENT) {
-> +                /*
-> +                 * We didn't had the .virtfs_metadata file. May be fil=
-e created
-> +                 * in non-mapped mode ?. Ignore ENOENT.
+I thought the rule was that you had to use a local_err and use error_propagate?
+(I hate that rule)
 
-This is code motion (in fact, the second time you've moved this
-comment), but you might as well fix the poor grammar while you are here:
+>              return ret;
+>          }
+>      }
+>  
+>      bs = bdrv_all_find_vmstate_bs();
+>      if (bs == NULL) {
+> -        error_report("No block device can accept snapshots");
+> +        error_setg(errp, "No block device can accept snapshots");
+>          return ret;
+>      }
+>      aio_context = bdrv_get_aio_context(bs);
+> @@ -2107,7 +2105,7 @@ int save_vmstate(const char *name)
+>  
+>      ret = global_state_store();
+>      if (ret) {
+> -        error_report("Error saving global state");
+> +        error_setg(errp, "Error saving global state");
+>          return ret;
+>      }
+>      vm_stop(RUN_STATE_SAVE_VM);
+> @@ -2139,21 +2137,20 @@ int save_vmstate(const char *name)
+>      /* save the VM state */
+>      f = qemu_fopen_bdrv(bs, 1);
+>      if (!f) {
+> -        error_report("Could not open VM state file");
+> +        error_setg(errp, "Could not open VM state file");
+>          goto the_end;
+>      }
+> -    ret = qemu_savevm_state(f, &local_err);
+> +    ret = qemu_savevm_state(f, errp);
+>      vm_state_size = qemu_ftell(f);
+>      qemu_fclose(f);
+>      if (ret < 0) {
+> -        error_report_err(local_err);
+>          goto the_end;
+>      }
+>  
+>      ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+>      if (ret < 0) {
+> -        error_report("Error while creating snapshot on '%s'",
+> -                     bdrv_get_device_name(bs));
+> +        error_setg(errp, "Error while creating snapshot on '%s'",
+> +                   bdrv_get_device_name(bs));
+>          goto the_end;
+>      }
+>  
+> @@ -2226,7 +2223,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+>      migration_incoming_state_destroy();
+>  }
+>  
+> -int load_vmstate(const char *name)
+> +int load_vmstate(const char *name, Error **errp)
+>  {
+>      BlockDriverState *bs, *bs_vm_state;
+>      QEMUSnapshotInfo sn;
+> @@ -2236,20 +2233,22 @@ int load_vmstate(const char *name)
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+>  
+>      if (!bdrv_all_can_snapshot(&bs)) {
+> -        error_report("Device '%s' is writable but does not support snapshots",
+> -                     bdrv_get_device_name(bs));
+> +        error_setg(errp,
+> +                   "Device '%s' is writable but does not support snapshots",
+> +                   bdrv_get_device_name(bs));
+>          return -ENOTSUP;
+>      }
+>      ret = bdrv_all_find_snapshot(name, &bs);
+>      if (ret < 0) {
+> -        error_report("Device '%s' does not have the requested snapshot '%s'",
+> -                     bdrv_get_device_name(bs), name);
+> +        error_setg(errp,
+> +                   "Device '%s' does not have the requested snapshot '%s'",
+> +                   bdrv_get_device_name(bs), name);
+>          return ret;
+>      }
+>  
+>      bs_vm_state = bdrv_all_find_vmstate_bs();
+>      if (!bs_vm_state) {
+> -        error_report("No block device supports snapshots");
+> +        error_setg(errp, "No block device supports snapshots");
+>          return -ENOTSUP;
+>      }
+>      aio_context = bdrv_get_aio_context(bs_vm_state);
+> @@ -2261,8 +2260,8 @@ int load_vmstate(const char *name)
+>      if (ret < 0) {
+>          return ret;
+>      } else if (sn.vm_state_size == 0) {
+> -        error_report("This is a disk-only snapshot. Revert to it offline "
+> -            "using qemu-img.");
+> +        error_setg(errp, "This is a disk-only snapshot. Revert to it "
+> +                   " offline using qemu-img");
+>          return -EINVAL;
+>      }
+>  
+> @@ -2271,7 +2270,7 @@ int load_vmstate(const char *name)
+>  
+>      ret = bdrv_all_goto_snapshot(name, &bs);
+>      if (ret < 0) {
+> -        error_report("Error %d while activating snapshot '%s' on '%s'",
+> +        error_setg(errp, "Error %d while activating snapshot '%s' on '%s'",
+>                       ret, name, bdrv_get_device_name(bs));
+>          return ret;
+>      }
+> @@ -2279,7 +2278,7 @@ int load_vmstate(const char *name)
+>      /* restore the VM state */
+>      f = qemu_fopen_bdrv(bs_vm_state, 0);
+>      if (!f) {
+> -        error_report("Could not open VM state file");
+> +        error_setg(errp, "Could not open VM state file");
+>          return -EINVAL;
+>      }
+>  
+> @@ -2293,7 +2292,7 @@ int load_vmstate(const char *name)
+>  
+>      migration_incoming_state_destroy();
+>      if (ret < 0) {
+> -        error_report("Error %d while loading VM state", ret);
+> +        error_setg(errp, "Error %d while loading VM state", ret);
+>          return ret;
+>      }
+>  
+> diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+> index 8cced46..fdc4353 100644
+> --- a/replay/replay-snapshot.c
+> +++ b/replay/replay-snapshot.c
+> @@ -62,14 +62,16 @@ void replay_vmstate_register(void)
+>  
+>  void replay_vmstate_init(void)
+>  {
+> +    Error *err = NULL;
+> +
+>      if (replay_snapshot) {
+>          if (replay_mode == REPLAY_MODE_RECORD) {
+> -            if (save_vmstate(replay_snapshot) != 0) {
+> +            if (save_vmstate(replay_snapshot, &err) != 0) {
+>                  error_report("Could not create snapshot for icount record");
+>                  exit(1);
+>              }
+>          } else if (replay_mode == REPLAY_MODE_PLAY) {
+> -            if (load_vmstate(replay_snapshot) != 0) {
+> +            if (load_vmstate(replay_snapshot, &err) != 0) {
+>                  error_report("Could not load snapshot for icount replay");
+>                  exit(1);
+>              }
 
-We didn't have the .virtfs_metadata file. Maybe the file was created in
-non-mapped mode? Ignore ENOENT.
+How do either of the contents of the 'err' get reported - they're not
+printed at all are they?
+(I don't like error_abort, I'd rather see the other message as well).
 
-> +                 */
-> +                goto err_out;
-> +            }
-> +        } else if (errno !=3D ENOENT) {
->              /*
-> -             * We didn't had the .virtfs_metadata file. May be file cr=
-eated
-> -             * in non-mapped mode ?. Ignore ENOENT.
-> +             * We didn't had the parent .virtfs_metadata directory. Ma=
-y be
-> +             * file created in non-mapped mode ?. Ignore ENOENT.
+Dave
 
-And certainly fix the grammar of your new comment (no need to
-copy-and-paste the poor wording):
-
-We didn't have the parent .virtfs_metadata directory. Maybe the file was
-created in non-mapped mode? Ignore ENOENT.
-
-But the code fix is correct, and a comment wording change is minor
-enough that you can add my:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---AxDJ4ooQIuEKxjcp8gvlwBUXXmV4JdnrX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZA1WDAAoJEKeha0olJ0NqEqEH/igXWbk2HqAi+ZDjhlZknOW0
-lyXpPcuSLvX1GlUemQgHk0/uKgoi9hSEq7ogUakD3swrnaXZM9Fwt+3of92ni0f0
-H2rqEH2CrFG3nlwJa87NdoKwNo1n8B8+ByU3FFLoGm8nCd6wu7q6C39j0QpMdBIA
-IqwJucPswwQT5s09NtS1lT90Y/eNMNseOIYY8cP+ny8kvzSX9f6X52EZ6TxsoRGx
-Mrlz5FU8e1WYbhicgOOoWfSbQSMwkK1werYY3cW4WV99+zZ4u5PpT9K9tM1KyRVv
-nklk7/SmtJyjC9PRPf2E33svCzXzNf8KwtsdeY88ID0Oua1x2YDCwy60haCdLho=
-=w2Vh
------END PGP SIGNATURE-----
-
---AxDJ4ooQIuEKxjcp8gvlwBUXXmV4JdnrX--
+> diff --git a/vl.c b/vl.c
+> index 0b4ed52..8b3ec2e 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4681,7 +4681,9 @@ int main(int argc, char **argv, char **envp)
+>      if (replay_mode != REPLAY_MODE_NONE) {
+>          replay_vmstate_init();
+>      } else if (loadvm) {
+> -        if (load_vmstate(loadvm) < 0) {
+> +        Error *local_err = NULL;
+> +        if (load_vmstate(loadvm, &local_err) < 0) {
+> +            error_report_err(local_err);
+>              autostart = 0;
+>          }
+>      }
+> -- 
+> 2.9.3
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
