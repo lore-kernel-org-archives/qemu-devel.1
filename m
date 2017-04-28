@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d40rN-0001ON-0z
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:02:38 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d40ul-0002PT-3l
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d40rH-0006OI-6w
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:02:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d40rG-0006O9-TV
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:02:31 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<2bc05de0edd61cdcdd3d2b894378a874d1e12327.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<87shktu8cu.fsf@dusky.pond.sub.org>
-	<20170427163025.GD30599@redhat.com>
-Date: Fri, 28 Apr 2017 10:02:26 +0200
-In-Reply-To: <20170427163025.GD30599@redhat.com> (Daniel P. Berrange's message
-	of "Thu, 27 Apr 2017 17:30:25 +0100")
-Message-ID: <87lgqlnenh.fsf@dusky.pond.sub.org>
+	(envelope-from <rth7680@gmail.com>) id 1d40ug-0007vz-1L
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:06:06 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35606)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d40uf-0007ux-MP
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:06:01 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id w64so35500258wma.0
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 01:06:01 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170427120006.20564-1-rth@twiddle.net>
+	<20170427120006.20564-4-rth@twiddle.net> <874lx996hh.fsf@linaro.org>
+	<30d66407-ad33-bc8c-55c6-0a5d7009bed4@twiddle.net>
+	<871ssd7z46.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <ee54957c-4a65-424a-72dc-0d6f742608cf@twiddle.net>
+Date: Fri, 28 Apr 2017 10:05:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] net/socket: Convert error report
- message to Error
+In-Reply-To: <871ssd7z46.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 03/19] qemu/atomic: Loosen restrictions
+ for 64-bit ILP32 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +34,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, jasowang@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, cota@braap.org
 
-"Daniel P. Berrange" <berrange@redhat.com> writes:
+On 04/28/2017 09:47 AM, Alex Bennée wrote:
+> So maybe the comment should be clearer for ATOMIC_REG_SIZE that it
+> should match TCG_TARGET_REG_BITS (and therefore sync with
+> TCG_OVERSIZED_GUEST) in the atomic.h comment.
 
-> On Thu, Apr 27, 2017 at 06:24:17PM +0200, Markus Armbruster wrote:
->> No review, just an observation.
->> 
->> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->> 
->> > Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
->> > net_socket_fd_init() use the function such as fprintf(), perror() to
->> > report an error message.
->> >
->> > Now, convert these functions to Error.
->> >
->> > CC: jasowang@redhat.com, armbru@redhat.com
->> > Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> > ---
->> >  net/socket.c | 66 +++++++++++++++++++++++++++++++++++++-----------------------
->> >  1 file changed, 41 insertions(+), 25 deletions(-)
->> >
->> > diff --git a/net/socket.c b/net/socket.c
->> > index b0decbe..559e09a 100644
->> > --- a/net/socket.c
->> > +++ b/net/socket.c
->> [...]
->> > @@ -433,25 +437,27 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
->> >  
->> >  static NetSocketState *net_socket_fd_init(NetClientState *peer,
->> >                                            const char *model, const char *name,
->> > -                                          int fd, int is_connected)
->> > +                                          int fd, int is_connected,
->> > +                                          Error **errp)
->> >  {
->> >      int so_type = -1, optlen=sizeof(so_type);
->> >  
->> >      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
->> >          (socklen_t *)&optlen)< 0) {
->> > -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
->> > +        error_setg(errp, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed",
->> >                  fd);
->> >          closesocket(fd);
->> >          return NULL;
->> >      }
->> >      switch(so_type) {
->> >      case SOCK_DGRAM:
->> > -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
->> > +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected, errp);
->> >      case SOCK_STREAM:
->> >          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->> >      default:
->> >          /* who knows ... this could be a eg. a pty, do warn and continue as stream */
->> > -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
->> > +        error_setg(errp, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM"
->> > +                   " or SOCK_STREAM", so_type, fd);
->> 
->> Not this patches problem: this case is odd, and the comment is bogus.
->> If @fd really was a pty, getsockopt() would fail with ENOTSOCK, wouldn't
->> it?  If @fd is a socket, but neither SOCK_DGRAM nor SOCK_STREAM (say
->> SOCK_RAW), why is it safe to continue as if it was SOCK_STREAM?  Jason?
->
-> IMHO it is a problem with this patch. Previously we merely printed
-> a warning & carried on, which is conceptually ok in general, though
-> dubious here for the reason you say.
->
-> Now we are filling an Error **errp object, and carrying on - this is
-> conceptually broken anywhere. If an Error ** is filled, we must return.
-> If we want to carry on, we shouldn't fill Error **.
+How about
 
-You're right.
+  * That said, we have a problem on 64-bit ILP32 hosts in that in order to
+  * sync with TCG_OVERSIZED_GUEST, this must match TCG_TARGET_REG_BITS.
+  * We'd prefer not want to pull in everything else TCG related, so handle
+  * those few cases by hand.
 
->> >          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->
-> IMHO, we just kill this and put return NULL here. If there is a genuine
-> reason to support something like SOCK_RAW, it should be explicitly
-> handled, because this default: case will certainly break SOCK_SEQPACKET
-> and SOCK_RDM which can't be treated as streams.
+?
 
-It's either magic or misguided defensive programming.  Probably the
-latter, but I'd like to hear Jason's opinion.
-
-If it's *necessary* magic, we can't use error_setg().  Else, we should
-drop the default, and insert a closesocket(fd) before the final return
-NULL.
-
->> >      }
->> >      return NULL;
->> 
->> Not reachable.  Ugly, but not your patch's concern.
->
->
-> Regards,
-> Daniel
+r~
