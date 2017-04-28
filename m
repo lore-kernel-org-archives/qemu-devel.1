@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1d3z5X-0001nE-G2
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:09:09 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3zGx-0003vp-I8
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1d3z5T-0007JI-GA
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:09:07 -0400
-Received: from mga09.intel.com ([134.134.136.24]:35996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
-	id 1d3z5T-0007HC-52
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:09:03 -0400
-References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1493201210-14357-3-git-send-email-yi.l.liu@linux.intel.com>
-	<20170427103221.GD1542@pxdev.xzpeter.org>
-From: Lan Tianyu <tianyu.lan@intel.com>
-Message-ID: <a7cd779f-2cd6-3a3f-7e73-e79a49c48961@intel.com>
-Date: Fri, 28 Apr 2017 14:00:15 +0800
-MIME-Version: 1.0
-In-Reply-To: <20170427103221.GD1542@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 02/20] intel_iommu: exposed
- extended-context mode to guest
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3zGu-00052a-BF
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:20:55 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:40067)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3zGt-0004xj-CG
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:20:52 -0400
+From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Date: Fri, 28 Apr 2017 14:19:52 +0800
+Message-Id: <1493360392-20628-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: [Qemu-devel] [PATCH v6] qga: Add support network interface
+ statistics in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,177 +22,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, kvm@vger.kernel.org, jasowang@redhat.com, iommu@lists.linux-foundation.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com
+To: mdroth@linux.vnet.ibm.com
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 
-On 2017年04月27日 18:32, Peter Xu wrote:
-> On Wed, Apr 26, 2017 at 06:06:32PM +0800, Liu, Yi L wrote:
->> VT-d implementations reporting PASID or PRS fields as "Set", must also
->> report ecap.ECS as "Set". Extended-Context is required for SVM.
->>
->> When ECS is reported, intel iommu driver would initiate extended root entry
->> and extended context entry, and also PASID table if there is any SVM capable
->> device.
->>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> ---
->>  hw/i386/intel_iommu.c          | 131 +++++++++++++++++++++++++++--------------
->>  hw/i386/intel_iommu_internal.h |   9 +++
->>  include/hw/i386/intel_iommu.h  |   2 +-
->>  3 files changed, 97 insertions(+), 45 deletions(-)
->>
->> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
->> index 400d0d1..bf98fa5 100644
->> --- a/hw/i386/intel_iommu.c
->> +++ b/hw/i386/intel_iommu.c
->> @@ -497,6 +497,11 @@ static inline bool vtd_root_entry_present(VTDRootEntry *root)
->>      return root->val & VTD_ROOT_ENTRY_P;
->>  }
->>  
->> +static inline bool vtd_root_entry_upper_present(VTDRootEntry *root)
->> +{
->> +    return root->rsvd & VTD_ROOT_ENTRY_P;
->> +}
->> +
->>  static int vtd_get_root_entry(IntelIOMMUState *s, uint8_t index,
->>                                VTDRootEntry *re)
->>  {
->> @@ -509,6 +514,9 @@ static int vtd_get_root_entry(IntelIOMMUState *s, uint8_t index,
->>          return -VTD_FR_ROOT_TABLE_INV;
->>      }
->>      re->val = le64_to_cpu(re->val);
->> +    if (s->ecs) {
->> +        re->rsvd = le64_to_cpu(re->rsvd);
->> +    }
-> 
-> I feel it slightly hacky to play with re->rsvd. How about:
-> 
-> union VTDRootEntry {
->     struct {
->         uint64_t val;
->         uint64_t rsvd;
->     } base;
->     struct {
->         uint64_t ext_lo;
->         uint64_t ext_hi;
->     } extended;
-> };
-> 
-> (Or any better way that can get rid of rsvd...)
-> 
-> Even:
-> 
-> struct VTDRootEntry {
->     union {
->         struct {
->                 uint64_t val;
->                 uint64_t rsvd;
->         } base;
->         struct {
->                 uint64_t ext_lo;
->                 uint64_t ext_hi;
->         } extended;
->     } data;
->     bool extended;
-> };
-> 
-> Then we read the entry into data, and setup extended bit. A benefit of
-> it is that we may avoid passing around IntelIOMMUState everywhere to
-> know whether we are using extended context entries.
-> 
->>      return 0;
->>  }
->>  
->> @@ -517,19 +525,30 @@ static inline bool vtd_context_entry_present(VTDContextEntry *context)
->>      return context->lo & VTD_CONTEXT_ENTRY_P;
->>  }
->>  
->> -static int vtd_get_context_entry_from_root(VTDRootEntry *root, uint8_t index,
->> -                                           VTDContextEntry *ce)
->> +static int vtd_get_context_entry_from_root(IntelIOMMUState *s,
->> +                 VTDRootEntry *root, uint8_t index, VTDContextEntry *ce)
->>  {
->> -    dma_addr_t addr;
->> +    dma_addr_t addr, ce_size;
->>  
->>      /* we have checked that root entry is present */
->> -    addr = (root->val & VTD_ROOT_ENTRY_CTP) + index * sizeof(*ce);
->> -    if (dma_memory_read(&address_space_memory, addr, ce, sizeof(*ce))) {
->> +    ce_size = (s->ecs) ? (2 * sizeof(*ce)) : (sizeof(*ce));
->> +    addr = (s->ecs && (index > 0x7f)) ?
->> +           ((root->rsvd & VTD_ROOT_ENTRY_CTP) + (index - 0x80) * ce_size) :
->> +           ((root->val & VTD_ROOT_ENTRY_CTP) + index * ce_size);
->> +
->> +    if (dma_memory_read(&address_space_memory, addr, ce, ce_size)) {
->>          trace_vtd_re_invalid(root->rsvd, root->val);
->>          return -VTD_FR_CONTEXT_TABLE_INV;
->>      }
->> -    ce->lo = le64_to_cpu(ce->lo);
->> -    ce->hi = le64_to_cpu(ce->hi);
->> +
->> +    ce[0].lo = le64_to_cpu(ce[0].lo);
->> +    ce[0].hi = le64_to_cpu(ce[0].hi);
-> 
-> Again, I feel this even hackier. :)
-> 
-> I would slightly prefer to play the same union trick to context
-> entries, just like what I proposed to the root entries above...
-> 
->> +
->> +    if (s->ecs) {
->> +        ce[1].lo = le64_to_cpu(ce[1].lo);
->> +        ce[1].hi = le64_to_cpu(ce[1].hi);
->> +    }
->> +
->>      return 0;
->>  }
->>  
->> @@ -595,9 +614,11 @@ static inline uint32_t vtd_get_agaw_from_context_entry(VTDContextEntry *ce)
->>      return 30 + (ce->hi & VTD_CONTEXT_ENTRY_AW) * 9;
->>  }
->>  
->> -static inline uint32_t vtd_ce_get_type(VTDContextEntry *ce)
->> +static inline uint32_t vtd_ce_get_type(IntelIOMMUState *s,
->> +                                       VTDContextEntry *ce)
->>  {
->> -    return ce->lo & VTD_CONTEXT_ENTRY_TT;
->> +    return s->ecs ? (ce->lo & VTD_CONTEXT_ENTRY_TT) :
->> +                    (ce->lo & VTD_EXT_CONTEXT_ENTRY_TT);
->>  }
->>  
->>  static inline uint64_t vtd_iova_limit(VTDContextEntry *ce)
->> @@ -842,16 +863,20 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
->>          return ret_fr;
->>      }
->>  
->> -    if (!vtd_root_entry_present(&re)) {
->> +    if (!vtd_root_entry_present(&re) ||
->> +        (s->ecs && (devfn > 0x7f) && (!vtd_root_entry_upper_present(&re)))) {
->>          /* Not error - it's okay we don't have root entry. */
->>          trace_vtd_re_not_present(bus_num);
->>          return -VTD_FR_ROOT_ENTRY_P;
->> -    } else if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
->> -        trace_vtd_re_invalid(re.rsvd, re.val);
->> -        return -VTD_FR_ROOT_ENTRY_RSVD;
->> +    }
->> +    if ((s->ecs && (devfn > 0x7f) && (re.rsvd & VTD_ROOT_ENTRY_RSVD)) ||
->> +        (s->ecs && (devfn < 0x80) && (re.val & VTD_ROOT_ENTRY_RSVD)) ||
->> +        ((!s->ecs) && (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)))) {
->> +            trace_vtd_re_invalid(re.rsvd, re.val);
->> +            return -VTD_FR_ROOT_ENTRY_RSVD;
-> 
-> Nit: I feel like we can better wrap these 0x7f and 0x80 into helper
-> functions, especially if with above structure change...
-> 
-> (will hold here...)
-> 
-> Thanks,
-> 
+we can get the network interface statistics inside a virtual machine by
+guest-network-get-interfaces command. it is very useful for us to monitor
+and analyze network traffic.
 
+Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qga/commands-posix.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ qga/qapi-schema.json | 38 ++++++++++++++++++++++++-
+ 2 files changed, 116 insertions(+), 2 deletions(-)
 
-It's possible to add helper macro to check bits in context entry and
-extend context entry and put the check of ecs mode into helper macro?
-
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 915df9e..233b024 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1638,6 +1638,73 @@ guest_find_interface(GuestNetworkInterfaceList *head,
+     return head;
+ }
+ 
++
++static int str_trim_off(const char *s, int off, int lmt)
++{
++    for (; off < lmt; ++off) {
++        if (!isspace(s[off])) {
++            break;
++        }
++    }
++    return off;
++}
++
++static int guest_get_network_stats(const char *name,
++                       GuestNetworkInterfaceStat *stats)
++{
++    int name_len;
++    char const *devinfo = "/proc/net/dev";
++    FILE *fp;
++    char *line = NULL, *colon;
++    size_t n;
++    fp = fopen(devinfo, "r");
++    if (!fp) {
++        return -1;
++    }
++    name_len = strlen(name);
++    while (getline(&line, &n, fp) != -1) {
++        long long dummy;
++        long long rx_bytes;
++        long long rx_packets;
++        long long rx_errs;
++        long long rx_dropped;
++        long long tx_bytes;
++        long long tx_packets;
++        long long tx_errs;
++        long long tx_dropped;
++        int trim_off;
++        colon = strchr(line, ':');
++        if (!colon) {
++            continue;
++        }
++        trim_off = str_trim_off(line, 0, strlen(line));
++        if (colon - name_len - trim_off == line &&
++           strncmp(line + trim_off, name, colon - line - trim_off) == 0) {
++            if (sscanf(colon + 1,
++                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
++                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
++                  &dummy, &dummy, &dummy, &dummy,
++                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
++                  &dummy, &dummy, &dummy, &dummy) != 16) {
++                continue;
++            }
++            stats->rx_bytes = rx_bytes;
++            stats->rx_packets = rx_packets;
++            stats->rx_errs = rx_errs;
++            stats->rx_dropped = rx_dropped;
++            stats->tx_bytes = tx_bytes;
++            stats->tx_packets = tx_packets;
++            stats->tx_errs = tx_errs;
++            stats->tx_dropped = tx_dropped;
++            fclose(fp);
++            return 0;
++        }
++    }
++    fclose(fp);
++    g_debug("/proc/net/dev: Interface not found");
++    return -1;
++}
++
+ /*
+  * Build information about guest interfaces
+  */
+@@ -1654,6 +1721,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+         GuestNetworkInterfaceList *info;
+         GuestIpAddressList **address_list = NULL, *address_item = NULL;
++        GuestNetworkInterfaceStat  *interface_stat = NULL;
+         char addr4[INET_ADDRSTRLEN];
+         char addr6[INET6_ADDRSTRLEN];
+         int sock;
+@@ -1773,7 +1841,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+ 
+         info->value->has_ip_addresses = true;
+ 
+-
++        if (!info->value->has_statistics) {
++            interface_stat = g_malloc0(sizeof(*interface_stat));
++            if (guest_get_network_stats(info->value->name,
++                interface_stat) == -1) {
++                info->value->has_statistics = false;
++                g_free(interface_stat);
++            } else {
++                info->value->statistics = interface_stat;
++                info->value->has_statistics = true;
++            }
++        }
+     }
+ 
+     freeifaddrs(ifap);
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index a02dbf2..948219b 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -635,6 +635,38 @@
+            'prefix': 'int'} }
+ 
+ ##
++# @GuestNetworkInterfaceStat:
++#
++# @rx-bytes: total bytes received
++#
++# @rx-packets: total packets received
++#
++# @rx-errs: bad packets received
++#
++# @rx-dropped: receiver dropped packets
++#
++# @tx-bytes: total bytes transmitted
++#
++# @tx-packets: total packets transmitted
++#
++# @tx-errs: packet transmit problems
++#
++# @tx-dropped: dropped packets transmitted
++#
++# Since: 2.10
++##
++{ 'struct': 'GuestNetworkInterfaceStat',
++  'data': {'rx-bytes': 'uint64',
++            'rx-packets': 'uint64',
++            'rx-errs': 'uint64',
++            'rx-dropped': 'uint64',
++            'tx-bytes': 'uint64',
++            'tx-packets': 'uint64',
++            'tx-errs': 'uint64',
++            'tx-dropped': 'uint64'
++           } }
++
++##
+ # @GuestNetworkInterface:
+ #
+ # @name: The name of interface for which info are being delivered
+@@ -643,12 +675,16 @@
+ #
+ # @ip-addresses: List of addresses assigned to @name
+ #
++# @statistics: various statistic counters related to @name
++# (since 2.10)
++#
+ # Since: 1.1
+ ##
+ { 'struct': 'GuestNetworkInterface',
+   'data': {'name': 'str',
+            '*hardware-address': 'str',
+-           '*ip-addresses': ['GuestIpAddress'] } }
++           '*ip-addresses': ['GuestIpAddress'],
++           '*statistics': 'GuestNetworkInterfaceStat' } }
+ 
+ ##
+ # @guest-network-get-interfaces:
 -- 
-Best regards
-Tianyu Lan
+1.8.3.1
