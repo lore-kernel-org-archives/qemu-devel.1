@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d48Ii-00033g-HR
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:59:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d48SR-0007ls-Hb
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:09:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d48Ie-0005DF-9U
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:59:20 -0400
-Date: Fri, 28 Apr 2017 16:59:12 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170428155912.GE10286@stefanha-x1.localdomain>
-References: <1493298053-17140-1-git-send-email-armbru@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1d48SM-0000Cl-Rl
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:09:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d48SM-0000CI-IE
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:09:18 -0400
+Date: Fri, 28 Apr 2017 17:09:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170428160901.GK2085@work-vm>
+References: <20170428021317.24711-1-eblake@redhat.com>
+	<20170428021317.24711-3-eblake@redhat.com>
+	<20170428080821.GB2085@work-vm>
+	<3a8d9f68-f30c-1191-ca80-a93f0050f011@redhat.com>
+	<20170428152729.GI2085@work-vm>
+	<550a4e37-c4b3-181d-876c-64d73e96e78c@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ey/N+yb7u/X9mFhi"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493298053-17140-1-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] replication: Make --disable-replication
- compile again
+In-Reply-To: <550a4e37-c4b3-181d-876c-64d73e96e78c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] shutdown: Prepare for use of an
+ enum in reset/shutdown_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, wencongyang@gmail.com, zhang.zhanghailiang@huawei.com, zhangchen.fnst@cn.fujitsu.com, qemu-stable@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
+
+* Eric Blake (eblake@redhat.com) wrote:
+> On 04/28/2017 10:27 AM, Dr. David Alan Gilbert wrote:
+> 
+> >>>> +# Enumeration of various causes for shutdown.
+> >>>> +#
+> >>>> +# @host-qmp: Reaction to a QMP command, such as 'quit'
+> >>>> +# @host-signal: Reaction to a signal, such as SIGINT
+> >>>> +# @host-ui: Reaction to a UI event, such as closing the window
+> >>>> +# @host-replay: The host is replaying an earlier shutdown event
+> >>>> +# @host-error: Qemu encountered an error that prevents further use of the guest
+> >>>> +# @guest-shutdown: The guest requested a shutdown, such as via ACPI or
+> >>>> +#                  other hardware-specific action
+> >>>> +# @guest-reset: The guest requested a reset, and the command line
+> >>>> +#               response to a reset is to instead trigger a shutdown
+> >>>> +# @guest-panic: The guest panicked, and the command line response to
+> >>>> +#               a panic is to trigger a shutdown
+> >>>
+> 
+> > At a higher level, using your tags, I'm not sure where a reset triggered
+> > by a fault detected by the hypervisor lives - e.g. an x86 triple fault
+> > where the guest screws up so badly that it just gets reset.  Is
+> > that a guest-reset or a guest-panic or what - neither case
+> > was actually asked for by the guest itself.
+> 
+> Wouldn't that be host-error (qemu detected an error that prevents
+> further execution of the guest without a reset - and a triple fault
+> seems to fall into the category of the guest getting itself wedged
+> rather than actually trying to reset)?  Except patch 3 only used
+> SHUTDOWN_TYPE_HOST_ERROR in the xen portion of the patch.
+> 
+> So if any x86 expert has an opinion on where triple-fault handling is
+> emulated, and what category should be used there, I'm welcome to
+> tweaking this series.
+
+It's pretty much on the border anyway, I don't think it matters too
+much; it sounds perfectly reasonable.
+
+Dave
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
 
 
---ey/N+yb7u/X9mFhi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 27, 2017 at 03:00:53PM +0200, Markus Armbruster wrote:
-> Broken in commit daa33c5.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  migration/colo.c | 12 ++++++++++++
->  monitor.c        |  5 +++++
->  2 files changed, 17 insertions(+)
-
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
-
-Stefan
-
---ey/N+yb7u/X9mFhi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZA2bQAAoJEJykq7OBq3PIpJ0IAI4tv3zjaQE6KJoAhjO0YUty
-8sLGYL0iC4PP1IC2FpbAb2f1JJaxZwLw4TiUl7PiYWb5lA6zHHRveaiiN8i1IZik
-hNadcIuVEM6Q18iCWEsyl1HZZbSNl4x/y0YPNgEnIeE0KNT0OboUcioZ0NFv0mz2
-Y9Demrz/PlUxG4Sog58aRRxDAlqjensGTxA0mFsyDSiritGH0Tyc1/kUCJiI6RUu
-ip6DYePQAyWxEjFFc1W2ThQtrB+puBXpezT6697Y+GazI5dnWrW+ETU77a/u6cah
-kQkv+FhfoJXdm/bq0Es+AzarhfUs2Gvj8cIDRTIBMGW8RpTbfyr2b322wKOn9dg=
-=eUNK
------END PGP SIGNATURE-----
-
---ey/N+yb7u/X9mFhi--
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
