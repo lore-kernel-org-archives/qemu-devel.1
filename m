@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d46VG-0001uv-N5
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:04:16 -0400
+	(envelope-from <lprosek@redhat.com>) id 1d46cs-00042B-V6
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:12:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d46VC-0004wb-JX
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:04:10 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20170426134649.9042-1-mreitz@redhat.com>
-	<20170426134649.9042-4-mreitz@redhat.com>
-	<a78836bc-8a79-6164-1101-6aa756c07a40@redhat.com>
-	<20170428093825.GB4714@noname.redhat.com>
-Message-ID: <825fdc0a-63c4-0592-6176-42cb3063b56e@redhat.com>
-Date: Fri, 28 Apr 2017 16:03:56 +0200
+	(envelope-from <lprosek@redhat.com>) id 1d46co-0008NA-B7
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:12:02 -0400
+Received: from mail-vk0-f53.google.com ([209.85.213.53]:35657)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1d46co-0008Mf-5s
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:11:58 -0400
+Received: by mail-vk0-f53.google.com with SMTP id o76so8771471vkc.2
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 07:11:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170428093825.GB4714@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SuI63AVwadQGKDEqwWh3BVuONeeA18Jvc"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-img: Document backing options
+In-Reply-To: <20170424130355.31324-1-marcandre.lureau@redhat.com>
+References: <20170424130355.31324-1-marcandre.lureau@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Fri, 28 Apr 2017 16:11:53 +0200
+Message-ID: <CABdb736pFG7yK+C_J-WWRbX+e-bk62TejQ_GtObxyFmV5t350w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] RFC: vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, anderson@redhat.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SuI63AVwadQGKDEqwWh3BVuONeeA18Jvc
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <825fdc0a-63c4-0592-6176-42cb3063b56e@redhat.com>
-Subject: Re: [PATCH v2 3/3] qemu-img: Document backing options
-References: <20170426134649.9042-1-mreitz@redhat.com>
- <20170426134649.9042-4-mreitz@redhat.com>
- <a78836bc-8a79-6164-1101-6aa756c07a40@redhat.com>
- <20170428093825.GB4714@noname.redhat.com>
-In-Reply-To: <20170428093825.GB4714@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On Mon, Apr 24, 2017 at 3:03 PM, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+> The VM coreinfo (vmcoreinfo) device is an emulated device which
+> exposes a 4k memory range to the guest to store various informations
+> useful to debug the guest OS. (it is greatly inspired by the VMGENID
+> device implementation)
+>
+> This is an early-boot alternative to the qemu-ga VMDUMP_INFO event
+> proposed in "[PATCH 00/21] WIP: dump: add kaslr support".
+>
+> If deemed more appropriate, we can consider writing to fw_cfg directly
+> instead of guest memory, now that qemu 2.9 supports it again.
+>
+> The proof-of-concept kernel module:
+> https://github.com/elmarco/vmgenid-test/blob/master/qemuvmci-test.c
 
-On 28.04.2017 11:38, Kevin Wolf wrote:
-> Am 27.04.2017 um 17:36 hat Eric Blake geschrieben:
->> On 04/26/2017 08:46 AM, Max Reitz wrote:
->>> I think originally the idea was to remove the individual special case=
+Here's a proof-of-concept Windows driver:
+https://github.com/ladipro/kvm-guest-drivers-windows/tree/vmcoreinfo/vmcore=
+info
 
->>> options in the long term in favour of the uniform -o. But I don't thi=
-nk
->>> the short options have fallen out of use, so we can as well document
->>> them again...
+I just wanted to be sure that it's possible to evaluate the ADDR
+method in Windows.
 
-Hm, I'm not really sure what the use of deprecating them would be. We
-would be able to use the single-letter options -b/-B/-F for something
-else, but would we really want to do that...?
+>From a practical point of view it is unfortunate that this would be a
+completely new device. For Windows guests it means another driver
+binary and all the overhead associated with deploying it on VMs. Would
+it be too crazy to add this functionality to the pvpanic device? The
+mechanics could stay the same but it would be done under the existing
+ACPI\QEMU0001 device.
 
-(And it should always be trivial to map these legacy parameters to
-normal options.)
+> +Storage Format:
+> +---------------
+> +
+> +The content is expected to use little-endian format.
+> +
+> +In order to implement an OVMF "SDT Header Probe Suppressor", the content=
+s of
+> +the vmcoreinfo blob has 40 bytes of padding:
+> +
+> ++-----------------------------------+
+> +| SSDT with OEM Table ID =3D VMCOREIN |
+> ++-----------------------------------+
+> +| ...                               |       TOP OF PAGE
+> +| VCIA dword object ----------------|-----> +---------------------------=
++
+> +| ...                               |       | fw-allocated array for    =
+|
+> +| _STA method referring to VCIA     |       | "etc/vmcoreinfo"          =
+|
+> +| ...                               |       +---------------------------=
++
+> +| ADDR method referring to VCIA     |       |  0: OVMF SDT Header probe =
+|
+> +| ...                               |       |     suppressor            =
+|
+> ++-----------------------------------+       | 40: uint32 version field  =
+|
+> +                                            | 44: info contents         =
+|
+> +                                            |     ....                  =
+|
+> +                                            +---------------------------=
++
+> +                                            END OF PAGE
+> +
+> +Version 0 content:
+> +
+> + uint64 paddr:
+> +  Physical address of the Linux vmcoreinfo ELF note.
 
->>> Maybe we could change the implementation, however, so that the old
->>> options are really just aliases for the respective -o version.
->>
->> As in, a followup patch that adds a paragraph or two to the .texi file=
+Or physical address of the Windows crash dump header :p
+Do we want to have an additional discriminator field to tell what kind
+of information was written by the guest or would Windows use a
+different version?
 
->> stating that '-B @var{backing_file}' is shorthand for '-o
->> backing_file=3D@var{backing_file}'?
->=20
-> First and foremost, I meant in the C code where we have separate
-> variables for all the shorthand options and then need to handle both
-> ways explicitly in the code further down. Instead, -B could just
-> directly add a 'backing_file' key to a QemuOpts (and -o would do the
-> same instead of building a string that is parsed only later).
-
-We already do that more or less for convert, actually (for -B, that is,
-not for -o). We just have to keep out_baseimg separately because we
-won't have a QemuOpts with -n.
-
-Using add_old_style_options() in img_create() should be easy enough.
-
-> But the documentation change that you're suggesting is probably a good
-> idea as well.
-
-Well, I more or less deliberately did not really document -b/-B/-F. I
-just documented them in the syntax overview and named the parameters
-backing_file and backing_fmt, both of which are valid options and are
-*as such* documented in the explanatory text. So from my point of view,
-it's already documented to be a shorthand.
-
-Max
-
-
---SuI63AVwadQGKDEqwWh3BVuONeeA18Jvc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDS8wSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ATlkH/24B05rVgNf1XKaIrcuZSkM7qDgSVg5w
-j5Ap/yWPnrOcXg25xrBs9KI/nz2qqkBTU1+/P2uq51IwzjSvq/cvHE51TWBwzCgM
-n/cGtt6fBGEogc3q0PcL0huLZ4YR/DMSWZYieCXSSWrn45ob/C/bE+L0VsQnEu5y
-fvchW6KskjVoVQov9GKfyalX6XFiatOjDvcfZ34NNTJ9x11ZoFAJWKLd4l7Ersfu
-Am5WMxk3ThFT8vPgc0577kc8SUDDK56YmeE2ZrcGAfgggaSZK1P1nsRdewk0e9fC
-Csv2H5thoSjyS3VR1qp1ueGT4ApO3vUZS6ib0B2JCN6p0Esq9v4uoRg=
-=Kt+E
------END PGP SIGNATURE-----
-
---SuI63AVwadQGKDEqwWh3BVuONeeA18Jvc--
+Thanks!
+Ladi
