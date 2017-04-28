@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d43oA-00041J-Cq
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 07:11:32 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d43zM-0006UY-Ev
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 07:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d43o7-00053k-3z
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 07:11:30 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:55402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1d43o6-00052N-Qi
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 07:11:27 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OP400DOM9QZ7K90@mailout2.w1.samsung.com> for
-	qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:11:23 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <d018d4a6-4b50-3f36-fe69-e232b63bebf0@samsung.com>
-Date: Fri, 28 Apr 2017 14:11:19 +0300
-MIME-version: 1.0
-In-reply-to: <20170428100012.GB22801@pxdev.xzpeter.org>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
-References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
-	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
-	<20170428100012.GB22801@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
- downtime on dst side
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d43zJ-0000n8-6w
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 07:23:04 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:14559 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1d43zI-0000mu-NE
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 07:23:01 -0400
+References: <20170426113038.60044-1-vsementsov@virtuozzo.com>
+	<e0e881e2-1766-705d-4dba-bc1d69e3cfbf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <ace88c93-8a5f-c12d-ab56-8f0cb8eebd7d@virtuozzo.com>
+Date: Fri, 28 Apr 2017 14:22:37 +0300
+MIME-Version: 1.0
+In-Reply-To: <e0e881e2-1766-705d-4dba-bc1d69e3cfbf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v17 00/24] qcow2: persistent dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,272 +28,422 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com, f4bug@amsat.org
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 04/28/2017 01:00 PM, Peter Xu wrote:
-> On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
->> This patch provides downtime calculation per vCPU,
->> as a summary and as a overlapped value for all vCPUs.
+27.04.2017 19:43, John Snow wrote:
+>
+> On 04/26/2017 07:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
 >>
->> This approach was suggested by Peter Xu, as an improvements of
->> previous approch where QEMU kept tree with faulted page address and cpus bitmask
->> in it. Now QEMU is keeping array with faulted page address as value and vCPU
->> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
->> list for downtime per vCPU (could be traced with page_fault_addr)
+>> There is a new update of qcow2-bitmap series - v17.
 >>
->> For more details see comments for get_postcopy_total_downtime
->> implementation.
+>> web: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=qcow2-bitmap-v17
+>> git: https://src.openvz.org/scm/~vsementsov/qemu.git (tag qcow2-bitmap-v17)
 >>
->> Downtime will not calculated if postcopy_downtime field of
->> MigrationIncomingState wasn't initialized.
->>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> ---
->>   include/migration/migration.h |   3 ++
->>   migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
->>   migration/postcopy-ram.c      |  20 +++++++-
->>   migration/trace-events        |   6 ++-
->>   4 files changed, 130 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/migration/migration.h b/include/migration/migration.h
->> index e8fb68f..a22f9ce 100644
->> --- a/include/migration/migration.h
->> +++ b/include/migration/migration.h
->> @@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
->>    * Functions to work with downtime context
->>    */
->>   struct DowntimeContext *downtime_context_new(void);
->> +void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
->> +void mark_postcopy_downtime_end(uint64_t addr);
->> +uint64_t get_postcopy_total_downtime(void);
->>   
->>   struct MigrationState
->>   {
->> diff --git a/migration/migration.c b/migration/migration.c
->> index ec76e5c..2c6f150 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
->>       return atomic_xchg(&incoming_postcopy_state, new_state);
->>   }
->>   
->> +void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
->> +{
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +    DowntimeContext *dc;
->> +    if (!mis->downtime_ctx || cpu < 0) {
->> +        return;
->> +    }
->> +    dc = mis->downtime_ctx;
->> +    dc->vcpu_addr[cpu] = addr;
->> +    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
->> +        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->> +
->> +    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
->> +            cpu);
->> +}
->> +
->> +void mark_postcopy_downtime_end(uint64_t addr)
->> +{
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +    DowntimeContext *dc;
->> +    int i;
->> +    bool all_vcpu_down = true;
->> +    int64_t now;
->> +
->> +    if (!mis->downtime_ctx) {
->> +        return;
->> +    }
->> +    dc = mis->downtime_ctx;
->> +    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->> +
->> +    /* check all vCPU down,
->> +     * QEMU has bitmap.h, but even with bitmap_and
->> +     * will be a cycle */
->> +    for (i = 0; i < smp_cpus; i++) {
->> +        if (dc->vcpu_addr[i]) {
->> +            continue;
->> +        }
->> +        all_vcpu_down = false;
->> +        break;
->> +    }
->> +
->> +    if (all_vcpu_down) {
->> +        dc->total_downtime += now - dc->last_begin;
-> Shall we do this accouting only if we are sure the copied page address
-> is one of the page faulted addresses? Can it be some other page? I
-> don't know. But since we have the loop below to make sure of it, why
-> not?
-no, the downtime implies since page fault till the
-page will be copied.
-Yes another pages could be copied as well as pagefaulted,
-and they are copied due to prefetching, but it's not a downtime.
+> Hm, what is this branch based on? My patches tools are having trouble
+> finding common ancestors -- 2d6752d38d8acda6aae674a72b72be05482a58eb I
+> guess, but that's pre-rc0, and the histories don't quite match up.
+>
+> I did a rebase myself, but I notice that patch 14/24; "qcow2: add
+> persistent dirty bitmaps support" causes a large number of iotest
+> regressions:
+>
+> Failures: 007 009 010 011 012 013 014 015 017 018 019 020 022 023 024
+> 025 026 028 029 030 031 032 034 035 037 038 039 040 041 042 043 044 046
+> 047 048 050 051 052 053 055 056 058 060 061 062 063 065 066 073 074 080
+> 082 086 089 090 095 097 098 102 104 110 112 114 115 117 121 122 124 129
+> 130 132 133 138 140 141 142 150 152 154 155 156 158 159 170 176
+>
+> Can you give that a look and if you respin, rebase on top of origin/master?
 
-> A nitpick on perf: when there are lots of vcpus, the algo might be
-> slow since we have several places that loops over the smp_vcpus. But
-> this can be totally future work on top, and current way is good enough
-> at least for me.
-
-> (for the nit: maybe add a hash, key=thread_id, value=cpu_index, then
->   get_mem_fault_cpu_index() can be faster using the hash; meanwhile
->   keep a counter A of page faulted vcpus, use atomic ops with it, then
->   here all_vcpu_down can be checked by A == smp_vcpus)
-just binary search in get_mem_fault_cpu_index will be nice too )
-also, it's good idea to keep all_vcpu_down in PostcopyDowntimeContext.
+ohh, sorry, I've not rebased. will do
 
 >
 > Thanks,
+> -John
 >
->> +    }
->> +
->> +    /* lookup cpu, to clear it */
->> +    for (i = 0; i < smp_cpus; i++) {
->> +        uint64_t vcpu_downtime;
->> +
->> +        if (dc->vcpu_addr[i] != addr) {
->> +            continue;
->> +        }
->> +
->> +        vcpu_downtime = now - dc->page_fault_vcpu_time[i];
->> +
->> +        dc->vcpu_addr[i] = 0;
->> +        dc->vcpu_downtime[i] += vcpu_downtime;
->> +    }
->> +
->> +    trace_mark_postcopy_downtime_end(addr, dc, dc->total_downtime);
->> +}
->> +
->> +/*
->> + * This function just provide calculated before downtime per cpu and trace it.
->> + * Total downtime is calculated in mark_postcopy_downtime_end.
->> + *
->> + *
->> + * Assume we have 3 CPU
->> + *
->> + *      S1        E1           S1               E1
->> + * -----***********------------xxx***************------------------------> CPU1
->> + *
->> + *             S2                E2
->> + * ------------****************xxx---------------------------------------> CPU2
->> + *
->> + *                         S3            E3
->> + * ------------------------****xxx********-------------------------------> CPU3
->> + *
->> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
->> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
->> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
->> + *            it's a part of total downtime.
->> + * S1 - here is last_begin
->> + * Legend of the picture is following:
->> + *              * - means downtime per vCPU
->> + *              x - means overlapped downtime (total downtime)
->> + */
->> +uint64_t get_postcopy_total_downtime(void)
->> +{
->> +    MigrationIncomingState *mis = migration_incoming_get_current();
->> +
->> +    if (!mis->downtime_ctx) {
->> +        return 0;
->> +    }
->> +
->> +    if (trace_event_get_state(TRACE_DOWNTIME_PER_CPU)) {
->> +        int i;
->> +        for (i = 0; i < smp_cpus; i++) {
->> +            trace_downtime_per_cpu(i, mis->downtime_ctx->vcpu_downtime[i]);
->> +        }
->> +    }
->> +    return mis->downtime_ctx->total_downtime;
->> +}
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index f3688f5..cf2b935 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -23,6 +23,7 @@
->>   #include "migration/postcopy-ram.h"
->>   #include "sysemu/sysemu.h"
->>   #include "sysemu/balloon.h"
->> +#include <sys/param.h>
->>   #include "qemu/error-report.h"
->>   #include "trace.h"
->>   
->> @@ -468,6 +469,19 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
->>       return 0;
->>   }
->>   
->> +static int get_mem_fault_cpu_index(uint32_t pid)
->> +{
->> +    CPUState *cpu_iter;
->> +
->> +    CPU_FOREACH(cpu_iter) {
->> +        if (cpu_iter->thread_id == pid) {
->> +            return cpu_iter->cpu_index;
->> +        }
->> +    }
->> +    trace_get_mem_fault_cpu_index(pid);
->> +    return -1;
->> +}
->> +
->>   /*
->>    * Handle faults detected by the USERFAULT markings
->>    */
->> @@ -545,8 +559,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
->>           rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
->>           trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
->>                                                   qemu_ram_get_idstr(rb),
->> -                                                rb_offset);
->> +                                                rb_offset,
->> +                                                msg.arg.pagefault.feat.ptid);
->>   
->> +        mark_postcopy_downtime_begin((uintptr_t)(msg.arg.pagefault.address),
->> +                         get_mem_fault_cpu_index(msg.arg.pagefault.feat.ptid));
->>           /*
->>            * Send the request to the source - we want to request one
->>            * of our host page sizes (which is >= TPS)
->> @@ -641,6 +658,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
->>   
->>           return -e;
->>       }
->> +    mark_postcopy_downtime_end((uint64_t)host);
->>   
->>       trace_postcopy_place_page(host);
->>       return 0;
->> diff --git a/migration/trace-events b/migration/trace-events
->> index b8f01a2..d338810 100644
->> --- a/migration/trace-events
->> +++ b/migration/trace-events
->> @@ -110,6 +110,9 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
->>   process_incoming_migration_co_postcopy_end_main(void) ""
->>   migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
->>   migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
->> +mark_postcopy_downtime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
->> +mark_postcopy_downtime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
->> +downtime_per_cpu(int cpu_index, int64_t downtime) "downtime cpu[%d]=%" PRId64
->>   
->>   # migration/rdma.c
->>   qemu_rdma_accept_incoming_migration(void) ""
->> @@ -186,7 +189,7 @@ postcopy_ram_enable_notify(void) ""
->>   postcopy_ram_fault_thread_entry(void) ""
->>   postcopy_ram_fault_thread_exit(void) ""
->>   postcopy_ram_fault_thread_quit(void) ""
->> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
->> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
->>   postcopy_ram_incoming_cleanup_closeuf(void) ""
->>   postcopy_ram_incoming_cleanup_entry(void) ""
->>   postcopy_ram_incoming_cleanup_exit(void) ""
->> @@ -195,6 +198,7 @@ save_xbzrle_page_skipping(void) ""
->>   save_xbzrle_page_overflow(void) ""
->>   ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
->>   ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
->> +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
->>   
->>   # migration/exec.c
->>   migration_exec_outgoing(const char *cmd) "cmd=%s"
->> -- 
->> 1.9.1
+>> v17:
+>>
+>> 08: add r-b's by Max and John
+>> 09: clear unknown autoclear features from BDRVQcow2State before calling
+>>      qcow2_load_autoloading_dirty_bitmaps(), and also do not extra update
+>>      header if it is updated by qcow2_load_autoloading_dirty_bitmaps().
+>> 11: new patch, splitted out from 16
+>> 12: rewrite commit message
+>> 14: changing bdrv_close moved to separate new patch 11
+>>      s/1/1ULL/ ; s/%u/%llu/ for two errors
+>> 16: s/No/Not/
+>>      add Max's r-b
+>> 24: new patch
+>>
+>>
+>> v16:
+>>
+>> mostly by Kevin's comments:
+>> 07: just moved here, as preparation for merging refcounts to 08
+>> 08: move "qcow2-bitmap: refcounts" staff to this patch, to not break qcow2-img check
+>>      drop r-b's
+>>      move necessary supporting static functions to this patch too (to not break compilation)
+>>      fprintf -> error_report
+>>      other small changes with error messages and comments
+>>      code style
+>>      for qcow2-bitmap.c:
+>>        'include "exec/log.h"' was dropped
+>>        s/1/(1U << 0) for BME_FLAG_IN_USE
+>>        add BME_TABLE_ENTRY_FLAG_ALL_ONES to replace magic 1
+>>        don't check 'cluster_size <= 0' in check_table_entry
+>> old "[PATCH v15 08/25] block: introduce auto-loading bitmaps" was dropped
+>> 09: was "[PATCH v15 09/25] qcow2: add .bdrv_load_autoloading_dirty_bitmaps"
+>>      drop r-b's
+>>      some staff was moved to 08
+>>      update_header_sync - error on bdrv_flush fail
+>>      rename disk_sectors_in_bitmap_cluster to sectors_covered_by_bitmap_cluster
+>>       and adjust comment.
+>>       so, variable for storing this function result: s/dsc/sbc/
+>>      s/1/BME_TABLE_ENTRY_FLAG_ALL_ONES/
+>>      also, as Qcow2BitmapTable already introduced in 08,
+>>         s/table_offset/table.offset/ and s/table_size/table.size, etc..
+>>      update_ext_header_and_dir_in_place: add comments, add additional
+>>        update_header_sync, to reduce indeterminacy in case of error.
+>>      call qcow2_load_autoloading_dirty_bitmaps directly from qcow2_open
+>>      no .bdrv_load_autoloading_dirty_bitmaps
+>> 11: drop bdrv_store_persistent_dirty_bitmaps at all.
+>>      drop r-b's
+>> 13: rename patch, rewrite commit msg
+>>      drop r-b's
+>>      move bdrv_release_named_dirty_bitmaps in bdrv_close() after drv->bdrv_close()
+>>      Qcow2BitmapTable is already introduced, so no
+>>        s/table_offset/table.offset/ and s/table_size/table.size, etc.. here
+>>      old 25 with check_constraints_on_bitmap() improvements merged here (Eric)
+>>      like in 09, s/dsc/sbc/ and s/disk_sectors_in_bitmap_cluster/sectors_covered_by_bitmap_cluster/
+>>      no .bdrv_store_persistent_dirty_bitmaps
+>>      call qcow2_store_persistent_dirty_bitmaps directly from qcow2_inactivate
+>> 15: corresponding part of 25 merged here. Add John's r-b, as 25 was also reviewed by John.
+>> 16: add John's r-b
+>>
+>>
+>> v15:
+>> 13,14: add John's r-b
+>> 15: qcow2_can_store_new_dirty_bitmap:
+>>        - check max dirty bitmaps and bitmap directory overhead
+>>        - switch to error_prepend
+>>      rm Max's r-b
+>>      not add John's r-b
+>> 17-24: add John's r-b
+>> 25: changed because 15 changed,
+>>      not add John's r-b
+>>
+>>
+>> v14:
+>>
+>> 07: use '|=' to update need_update_header
+>>      add John's r-b
+>>      add Max's r-b
+>> 09: remove unused bitmap_table_to_cpu()
+>>      left Max's r-b, hope it's ok
+>>      add John's r-b
+>> 10: remove extra new line
+>>      add John's r-b
+>> 11: add John's r-b
+>> 12: add John's r-b
+>> 13: small fixes by John's review:
+>>         - remove weird g_free of NULL pointer from
+>>             if (tb == NULL) {
+>>                 g_free(tb);
+>>                 return -EINVAL;
+>>             }
+>>         - remove extra comment "/* errp is already set */"
+>>         - s/"Too large bitmap directory"/"Bitmap directory is too large"/
+>>      left Max's r-b, hope you don't mind
+>> 22: add Max's r-b
+>> 23: add Max's r-b
+>> 24: add Max's r-b
+>> 25: new patch to improve error message on check_constraints_on_bitmap fail
+>>      
+>>
+>> v13: Just a fix for style checker.
+>> 13: line over 80
+>> 14: line over 80
+>> 22: s/if () \n{/if () {/
+>>
+>> v12:
+>> 07: do not update header in qcow2_read_extensions, instead do it in the
+>>      end of qcow2_open, where it is updated also to clear unknown
+>>      autoclear features.
+>>      Wrong bdrv_is_root_node used instead of bdrv_is_read_only is fixed
+>>      automatically.
+>> 08: add Max's r-b
+>> 09: contextual: s/raw_bsd/raw-format/
+>>      qcow2-bitmap.c: copyright s/2016/2017/
+>>      fix compilation: move update_header_sync() to this patch
+>>      add Max's r-b
+>> 13: update_header_sync() is moved to 09
+>>      add Max's r-b
+>> 15: add Max's r-b
+>> 16: As qmp-commands.txt is removed from master, remove it here too.
+>>      Sentence "For now only Qcow2 disks support persistent bitmaps.
+>>       Default is false." moved to qapi/block-core.json.
+>>      Hope that is OK, Max's r-b is not dropped.
+>> 17: qmp-commands.txt deleted, r-b is not dropped too.
+>> 18: s/is failed/has failed/, add Max's r-b
+>> 19: copyright: s/2016/2017/
+>> 21: drop "res->corruptions > 0 => ret = -EINVAL", add Max's r-b
+>> 22: actually, patch is replaced with a new one, however some parts are the same.
+>>      instead of changing bdrv_release_dirty_bitmap behaviour, create new
+>>      bdrv_remove_persistent_dirty_bitmap
+>> 23: improve comment, about not-exists is not an error
+>> 24: new patch
+>>
+>> Old 24 (qcow2-bitmap: cache bitmap list in BDRVQcow2State) will be sent
+>> separately, to be applied after these series.
+>>
+>> Also: about bdrv_dirty_bitmap_set_persistance: I've decided not change its behaviour
+>> for now and just call bdrv_remove_persistent_dirty_bitmap from
+>> qmp_block_dirty_bitmap_remove. Reasons:
+>> 1. Do not change reviewed part.
+>> 2. I'm not sure, that this complication of BdrvDirtyBitmap.persistent semantics
+>>     is good (current semantics are just: .persistent means that bitmap should be
+>>     saved on disk close). .persistent actually is not very related to "is there
+>>     stored version of the bitmap in the image".
+>> 3. It may be done later.
+>> 4. It is not actually needed for now, as the only usage is dropping bitmap in
+>>     bdrv_remove_persistent_dirty_bitmap. May be in future it will be needed,
+>>     when we will have qmp interfaces for finer control of persistent dirty bitmaps.
+>>
+>>
+>> v11:
+>>
+>> Fix automatic build test fail.
+>>
+>> 18: wording - "ASCII representation of SHA256 ..."
+>> 24: fix redeclaration error. (This is still RFC, may be not needed patch,
+>>      see description in v10 below).
+>>
+>> v10:
+>>
+>> 07: rm John's r-b
+>>      not add Max's r-b
+>>      fix subject s/dirty bitmaps/bitmaps
+>>      improve WARNING message
+>>      remove header ext if autoclear bit is unset, through qcow2_updata_header() - r-b blocking change
+>> 08: move bdrv_load_autoloading_dirty_bitmaps under asserts block (Max)
+>>      fix typo in commit message
+>>      move bdrv_load_autoloading_dirty_bitmaps after asserts
+>>      John's r-b
+>> 09: rewrite check_dir_entry
+>>      remove extra feature cluster_size=0 from check_table_entry
+>>      which clears autoclear bit before trying to update bitmap directory
+>>      bitmap_list_store - do not free old clusters if in_place=true
+>>      changes in comments, fix indents
+>>      add functions
+>>        bitmap_list_count
+>>        update_ext_header_and_dir_in_place (unset autoclear bit before trying to
+>>                                            modify bitmap directory)
+>>         (for usage in qcow2_load_autoloading_dirty_bitmaps)
+>> 11: add node name to error report
+>>      Max's r-b
+>> 13: add type Qcow2BitmapTable
+>>      move from bm.table_* to bm.table.*
+>>      rewrite check_constraints_on_bitmap
+>>      flush(bs->file) instead of flush(bs) in update_ext_header_and_dir
+>>      assert(DIV_ROUND_UP(bm_size, dsc) == tb_size);
+>>        and assert(write_size <= s->cluster_size); in store_bitmap_data
+>>      fix: s/tb_size/tb_size * sizeof(tb[0]) in store_bitmap
+>>      in qcow2_store_persistent_dirty_bitmaps:
+>>        fail if !can_write
+>>        fix counting of new_nb_bitmaps and new_dir_size
+>>        free old clusters _after_ successful directory update (aggregate old bitmap
+>>          tables into drop_tables)
+>> 2 14: rename to can_store_new_dirty_bitmap
+>>      Max's r-b
+>> 15: rename to can_store_new_dirty_bitmap
+>>      rm extra !!
+>> 16: Max's r-b
+>>      rename to can_store_new_dirty_bitmap
+>>      indenting
+>>      Since s/2.8/2.9
+>> 17: Max's r-b
+>>      Since s/2.8/2.9
+>> 18: hashing can fail in comment for qapi
+>>      Since s/2.8/2.9
+>>      remove dead comment
+>> 19: indentation
+>>      Max's r-b
+>> 20: Max's r-b
+>> 21: fix error handling
+>>      return 0 if nb_bitmaps == 0
+>> new patches:
+>> 22-23: remove bitmap from file on bdrv_release_dirty_bitmap
+>> 24: experimental, RFC: cache bitmap list to bs, to not reload it from file.
+>>      I'm not sure that is needed now, but if you want I can merge it to earlier
+>>      patches.
+>>
+>> v9:
+>>
+>> rebase on master!
+>>
+>> 01-04,06,07: John's r-b
+>> 03: rewording in comment ("The concurrent resetting ..."), John's r-b
+>> 07: reword error messages
+>>      commit message: dirty bitmap -> bitmap
+>> 09: fix uninitialized ret in bitmap_list_store() (fix compilation warning)
+>> 18: fix compilation of tests/test-hbitmap
+>>
+>> also, change constants names for qcow2: DIRTY_BITMAP -> BITMAP (as it is not
+>> dirty bitmaps extension, but just bitmaps extension), QCOW -> QCOW2 (bitmaps
+>> are only for qcow2)
+>>
+>> v8:
+>>
+>> Patches 01-06 are mostly unchanged, except for spelling and wording.
+>> 02 - add Eric's r-b
+>> 03,04 - add Max's r-b
+>>
+>> 07-09 is refactored "bitmap-read" part of the feature. Main changes:
+>> - introduce bitmap list - normal list, which represents bitmap directory.
+>>    Function bitmap_list_load loads bitmap directory, checks everything and
+>>    creates normal list.
+>> - introduce .bdrv_load_autoloading_dirty_bitmaps : instead of loading bitmaps
+>>    in qcow2_open, lets load them only in bdrv_open, to avoid reloading in
+>>    bdrv_snapshot_goto
+>> - do not delete bitmaps after read, but mark them IN_USE
+>>
+>> 10 has contextual changes and rewording of comment. I've added Max's r-b, hope it's ok.
+>>
+>> 11: add error_report("Persistent bitmaps are lost") in case of failed bitmap store
+>>
+>> 12: add Max's r-b
+>>
+>> 13 is refactored "bitmap-store" part of the feature. see 07-09 description
+>> - for now I just free old clusters and allocate new. This will be improved
+>>    with a separate patch.
+>>
+>> patch about "delete bitmaps on truncate" is removed. This case will be handled later.
+>> IN_USE, autoclear, check-constraints things are merged into other patches.
+>>
+>> 14-15 are mew patches, to early check possibility of creating persistent bitmap with
+>>    specified name and granularity in specified BDS
+>>
+>> 16-17: spelling, rewording, indenting, tiny code simplifying, check can_store (by 14-15),
+>>      s/if (autoload && !persistent)/if (has_autoload && !persistent)/,
+>>      rebase (deleted qmp-commands.hx)
+>>
+>> 18: alternative to md5 in query-block:
+>>    - separated qmp command -x-debug-block-dirty-bitmap-sha256
+>>    - as adviced by Daniel P. Berrange in my parallel thread:
+>>      - sha256 instead of md5
+>>      - use qcrypto_hash_* instead of GChecksum
+>>    - fix bug =) (size was wrong in hbitmap_md5)
+>>
+>> 19: s/3999/3fff/, use x-debug-block-dirty-bitmap-sha256
+>>
+>> 20: new patch to rename and publish inc_refcounts
+>>
+>> 21: some fixes and refactoring mostyly by Max's comments.
+>>
+>> Max, Eric, great tanks for your review!
+>> I hope, I've covered most of your comments by this update.
+>>
+>> TODO:
+>> - handle reopening image RO->RW and incoming migration, set IN_USE for existing loaded bitmaps
+>>    in these cases.
+>> - reuse old, already allocated data clusters for bitmaps storing
+>> - truncate bitmaps in the image on truncate
+>>
+>>
+>> v7:
+>>
+>> https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=refs%2Ftags%2Fqcow2-bitmap-v7
+>> based on block-next (https://github.com/XanClic/qemu/commits/block-next)
+>>
+>> - a lot of refactoring and reordering of patches.
+>> - dead code removed (bdrv_dirty_bitmap_load, etc.)
+>> - do not maintain extra data for now
+>> - do not store dirty bitmap directory in memory
+>>    (as we use it seldom, we can just reread if needed)
+>>
+>> By Kevin's review:
+>> 01 - commit message changed: fix->improvement (as it was not a bug)
+>> 03 - r-b
+>> 04 - r-b
+>> 05 - add 21 patch to fix spec, also, removed all (I hope) mentions of
+>>       "Bitmap Header", switch to one unified name for it - "Bitmap
+>>       Directory Entry", to avoid misunderstanding with Qcow2 header.
+>>       (also, add patch 22, to fix it in spec)
+>> v6.06 - improve for_each_dir_entry loop, reorder patches, other small fixes
+>> v6.07 ~> v7.09 - dead code removed, I've moved to one function
+>>          .bdrv_store_persistent_bitmaps and have wrapper and callback in one
+>>          patch (with also some other staff. If it not ok, I can split them)
+>> v6.08 - about keeping bitmap directory instead of bitmap list: no I don't keep
+>>          it at all.
+>> v6.16 - old bdrv_ bitmap-storing related functions are removed. The new one is
+>>          bdrv_store_persistent_bitmaps.
+>>
+>>
+>> v6:
+>> https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=refs%2Ftags%2Fqcow2-bitmap-v6
+>> based on block-next (https://github.com/XanClic/qemu/commits/block-next)
+>>
+>> There are a lot of changes, reorderings and additions in comparement with v5.
+>> One principal thing: now bitmaps are removed from image after loading instead
+>> of marking them in_use. It is simpler and we do not need to store superfluous data.
+>> Also, we are no more interested in command line interface to dirty bitmaps.
+>> So it is dropped.  If someone needs it I can add it later.
+>>
+>> Vladimir Sementsov-Ogievskiy (24):
+>>    specs/qcow2: fix bitmap granularity qemu-specific note
+>>    specs/qcow2: do not use wording 'bitmap header'
+>>    hbitmap: improve dirty iter
+>>    tests: add hbitmap iter test
+>>    block: fix bdrv_dirty_bitmap_granularity signature
+>>    block/dirty-bitmap: add deserialize_ones func
+>>    qcow2-refcount: rename inc_refcounts() and make it public
+>>    qcow2: add bitmaps extension
+>>    qcow2: autoloading dirty bitmaps
+>>    block/dirty-bitmap: add autoload field to BdrvDirtyBitmap
+>>    block: bdrv_close: release bitmaps after drv->bdrv_close
+>>    block: introduce persistent dirty bitmaps
+>>    block/dirty-bitmap: add bdrv_dirty_bitmap_next()
+>>    qcow2: add persistent dirty bitmaps support
+>>    block: add bdrv_can_store_new_dirty_bitmap
+>>    qcow2: add .bdrv_can_store_new_dirty_bitmap
+>>    qmp: add persistent flag to block-dirty-bitmap-add
+>>    qmp: add autoload parameter to block-dirty-bitmap-add
+>>    qmp: add x-debug-block-dirty-bitmap-sha256
+>>    iotests: test qcow2 persistent dirty bitmap
+>>    block/dirty-bitmap: add bdrv_remove_persistent_dirty_bitmap
+>>    qcow2: add .bdrv_remove_persistent_dirty_bitmap
+>>    qmp: block-dirty-bitmap-remove: remove persistent
+>>    block: release persistent bitmaps on inactivate
+>>
+>>   block.c                      |   32 +-
+>>   block/Makefile.objs          |    2 +-
+>>   block/dirty-bitmap.c         |  109 +++-
+>>   block/qcow2-bitmap.c         | 1384 ++++++++++++++++++++++++++++++++++++++++++
+>>   block/qcow2-refcount.c       |   59 +-
+>>   block/qcow2.c                |  149 ++++-
+>>   block/qcow2.h                |   41 ++
+>>   blockdev.c                   |   71 ++-
+>>   docs/specs/qcow2.txt         |    8 +-
+>>   include/block/block.h        |    3 +
+>>   include/block/block_int.h    |    8 +
+>>   include/block/dirty-bitmap.h |   22 +-
+>>   include/qemu/hbitmap.h       |   49 +-
+>>   qapi/block-core.json         |   39 +-
+>>   tests/Makefile.include       |    2 +-
+>>   tests/qemu-iotests/165       |   89 +++
+>>   tests/qemu-iotests/165.out   |    5 +
+>>   tests/qemu-iotests/group     |    1 +
+>>   tests/test-hbitmap.c         |   19 +
+>>   util/hbitmap.c               |   51 +-
+>>   20 files changed, 2070 insertions(+), 73 deletions(-)
+>>   create mode 100644 block/qcow2-bitmap.c
+>>   create mode 100755 tests/qemu-iotests/165
+>>   create mode 100644 tests/qemu-iotests/165.out
 >>
 
 
 -- 
 Best regards,
-Alexey Perevalov
+Vladimir
