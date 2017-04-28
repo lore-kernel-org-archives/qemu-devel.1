@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d46tA-0001qO-7D
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:28:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1d46zS-0003K2-2v
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:35:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d46t8-0007Y2-Ol
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:28:52 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d46t8-0007XV-C9
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:28:50 -0400
-Received: by mail-lf0-x243.google.com with SMTP id x72so7318102lfb.1
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 07:28:50 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1d46zO-0001nQ-3i
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:35:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39450)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d46zN-0001n0-Q1
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:35:18 -0400
+References: <20170428021317.24711-1-eblake@redhat.com>
+	<20170428021317.24711-3-eblake@redhat.com>
+	<20170428080821.GB2085@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3a8d9f68-f30c-1191-ca80-a93f0050f011@redhat.com>
+Date: Fri, 28 Apr 2017 09:35:04 -0500
 MIME-Version: 1.0
-References: <20170424130355.31324-1-marcandre.lureau@redhat.com>
-	<CABdb736pFG7yK+C_J-WWRbX+e-bk62TejQ_GtObxyFmV5t350w@mail.gmail.com>
-In-Reply-To: <CABdb736pFG7yK+C_J-WWRbX+e-bk62TejQ_GtObxyFmV5t350w@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 28 Apr 2017 14:28:38 +0000
-Message-ID: <CAJ+F1CJPEZNUPrYseN3JD+gAtwJ-rLQVRBLdXTQVSwaBTdNGHA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] RFC: vmcoreinfo device
+In-Reply-To: <20170428080821.GB2085@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hMdpRTDDJbeuwVRvOHPbE9RdSuJpujBxr"
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] shutdown: Prepare for use of an
+ enum in reset/shutdown_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, anderson@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hMdpRTDDJbeuwVRvOHPbE9RdSuJpujBxr
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com,
+ alistair.francis@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "open list:X86" <xen-devel@lists.xenproject.org>
+Message-ID: <3a8d9f68-f30c-1191-ca80-a93f0050f011@redhat.com>
+Subject: Re: [PATCH v5 2/4] shutdown: Prepare for use of an enum in
+ reset/shutdown_request
+References: <20170428021317.24711-1-eblake@redhat.com>
+ <20170428021317.24711-3-eblake@redhat.com> <20170428080821.GB2085@work-vm>
+In-Reply-To: <20170428080821.GB2085@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 28, 2017 at 6:12 PM Ladi Prosek <lprosek@redhat.com> wrote:
+On 04/28/2017 03:08 AM, Dr. David Alan Gilbert wrote:
+> * Eric Blake (eblake@redhat.com) wrote:
+>> We want to track why a guest was shutdown; in particular, being able
+>> to tell the difference between a guest request (such as ACPI request)
+>> and host request (such as SIGINT) will prove useful to libvirt.
+>> Since all requests eventually end up changing shutdown_requested in
+>> vl.c, the logical change is to make that value track the reason,
+>> rather than its current 0/1 contents.
+>>
 
-> On Mon, Apr 24, 2017 at 3:03 PM, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> > The VM coreinfo (vmcoreinfo) device is an emulated device which
-> > exposes a 4k memory range to the guest to store various informations
-> > useful to debug the guest OS. (it is greatly inspired by the VMGENID
-> > device implementation)
-> >
-> > This is an early-boot alternative to the qemu-ga VMDUMP_INFO event
-> > proposed in "[PATCH 00/21] WIP: dump: add kaslr support".
-> >
-> > If deemed more appropriate, we can consider writing to fw_cfg directly
-> > instead of guest memory, now that qemu 2.9 supports it again.
-> >
-> > The proof-of-concept kernel module:
-> > https://github.com/elmarco/vmgenid-test/blob/master/qemuvmci-test.c
->
-> Here's a proof-of-concept Windows driver:
->
-> https://github.com/ladipro/kvm-guest-drivers-windows/tree/vmcoreinfo/vmco=
-reinfo
->
-> I just wanted to be sure that it's possible to evaluate the ADDR
-> method in Windows.
->
-> From a practical point of view it is unfortunate that this would be a
-> completely new device. For Windows guests it means another driver
-> binary and all the overhead associated with deploying it on VMs. Would
-> it be too crazy to add this functionality to the pvpanic device? The
-> mechanics could stay the same but it would be done under the existing
-> ACPI\QEMU0001 device.
->
+>>  ##
+>> +# @ShutdownCause:
+>> +#
+>> +# Enumeration of various causes for shutdown.
+>> +#
+>> +# @host-qmp: Reaction to a QMP command, such as 'quit'
+>> +# @host-signal: Reaction to a signal, such as SIGINT
+>> +# @host-ui: Reaction to a UI event, such as closing the window
+>> +# @host-replay: The host is replaying an earlier shutdown event
+>> +# @host-error: Qemu encountered an error that prevents further use of=
+ the guest
+>> +# @guest-shutdown: The guest requested a shutdown, such as via ACPI o=
+r
+>> +#                  other hardware-specific action
+>> +# @guest-reset: The guest requested a reset, and the command line
+>> +#               response to a reset is to instead trigger a shutdown
+>> +# @guest-panic: The guest panicked, and the command line response to
+>> +#               a panic is to trigger a shutdown
+>=20
+> It's a little coarse grained;  is there anyway to pass platform specifi=
+c information
+> for debug?  I ask because I spent a while debugging a few bugs with une=
+xpected
+> resets and had to figure out which of x86's many reset causes triggered=
+ it.
 
-pvpanic is under _SB.PCI0.ISA, that could be problematic
+I'm open to any followup patches that add further enum values and
+adjusts the various callers (patch 3 shows how MANY callers use
+qemu_system_shutdown_request).  But I don't think it's necessarily in
+scope for this series - remember, my goal here was merely to distinguish
+between host- and guest-triggered resets (which libvirt and higher
+management tasks want to know), rather than which of multiple reset
+paths was taken (I agree that it is useful during a qemu debug session -
+but that's a different audience).  I also don't consider myself an
+expert in the many ways that x86 can reset - it was easy to blindly
+rewrite qemu_system_shutdown_request() into
+qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN) based solely
+on directory, but it would be harder to distinguish which of the
+multiple files should have which finer-grained cause.
 
-and _STA is a name field.
-
-Someone with more experience with ACPI could tell us if that make sense to
-merge both and how.
-
-Can't you handle 2 ACPI devices in the same windows driver instead?
-
-> +Storage Format:
-> > +---------------
-> > +
-> > +The content is expected to use little-endian format.
-> > +
-> > +In order to implement an OVMF "SDT Header Probe Suppressor", the
-> contents of
-> > +the vmcoreinfo blob has 40 bytes of padding:
-> > +
-> > ++-----------------------------------+
-> > +| SSDT with OEM Table ID =3D VMCOREIN |
-> > ++-----------------------------------+
-> > +| ...                               |       TOP OF PAGE
-> > +| VCIA dword object ----------------|----->
-> +---------------------------+
-> > +| ...                               |       | fw-allocated array for
-> |
-> > +| _STA method referring to VCIA     |       | "etc/vmcoreinfo"
-> |
-> > +| ...                               |
->  +---------------------------+
-> > +| ADDR method referring to VCIA     |       |  0: OVMF SDT Header prob=
-e
-> |
-> > +| ...                               |       |     suppressor
-> |
-> > ++-----------------------------------+       | 40: uint32 version field
-> |
-> > +                                            | 44: info contents
->  |
-> > +                                            |     ....
-> |
-> > +
-> +---------------------------+
-> > +                                            END OF PAGE
-> > +
-> > +Version 0 content:
-> > +
-> > + uint64 paddr:
-> > +  Physical address of the Linux vmcoreinfo ELF note.
->
-> Or physical address of the Windows crash dump header :p
->
-
-Is there support for Windows crash dump in qemu?
-
-
-> Do we want to have an additional discriminator field to tell what kind
-> of information was written by the guest or would Windows use a
-> different version?
->
->
-I guess a different version would be ok.
-
-Thanks a lot for looking at it!
 --=20
-Marc-Andr=C3=A9 Lureau
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--hMdpRTDDJbeuwVRvOHPbE9RdSuJpujBxr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZA1MYAAoJEKeha0olJ0NqC7UIAKsxmtLiSvvwjrUuvuYOolZ4
+Qp5aZmWeNAFn1lOGmh0tt12iRhmKPbp7bEZR9Auu1VsgIXC1lodO4ps45igNpeE8
+3aAc+vR8oC65c8Pvw6whIxcv8bwqDDs3hTD89sk+gW2VE7nAhuyFtzIUnfYdgNKq
+z90jp8pZ50GsEgw/dVFWiCyvyIq0ADjZzeuTVqZgrRc6Uz9BHP1iF615LnwftTia
+gkeRn0YwupXvVjYhpJ6JpKd7ZmerjP9B42nyJrvD6CmAJ42y7A6pm4sQrFS8qQsr
+VgRrGOhFh5wScT60JyqmbkfXrV22Tl3lvWxjj70uOA/IR61UW9TCVi2GjxDYIMU=
+=fpRb
+-----END PGP SIGNATURE-----
+
+--hMdpRTDDJbeuwVRvOHPbE9RdSuJpujBxr--
