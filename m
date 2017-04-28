@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d42Dj-0006LA-NR
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:29:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d42ME-00017Y-ND
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:38:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d42Dg-0001zG-I1
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:29:47 -0400
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:58304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d42Dg-0001w7-7z
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:29:44 -0400
-Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 61971EA9DE
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 11:29:37 +0200 (CEST)
-Date: Fri, 28 Apr 2017 11:29:22 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170428112922.6a7ecc53@bahia>
-In-Reply-To: <20170427072843.8089-1-david@gibson.dropbear.id.au>
-References: <20170427072843.8089-1-david@gibson.dropbear.id.au>
+	(envelope-from <kwolf@redhat.com>) id 1d42MD-00052G-TM
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:38:34 -0400
+Date: Fri, 28 Apr 2017 11:38:25 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170428093825.GB4714@noname.redhat.com>
+References: <20170426134649.9042-1-mreitz@redhat.com>
+	<20170426134649.9042-4-mreitz@redhat.com>
+	<a78836bc-8a79-6164-1101-6aa756c07a40@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/p+6BlpT91bbdadcmYLyZWgf";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCHv3 0/4] Clean up compatibility mode handling
+	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
+Content-Disposition: inline
+In-Reply-To: <a78836bc-8a79-6164-1101-6aa756c07a40@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-img: Document backing options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,179 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, agraf@suse.de, abologna@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
---Sig_/p+6BlpT91bbdadcmYLyZWgf
-Content-Type: text/plain; charset=US-ASCII
+
+--EVF5PPMfhYS0aIcm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 27 Apr 2017 17:28:39 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Am 27.04.2017 um 17:36 hat Eric Blake geschrieben:
+> On 04/26/2017 08:46 AM, Max Reitz wrote:
+> > I think originally the idea was to remove the individual special case
+> > options in the long term in favour of the uniform -o. But I don't think
+> > the short options have fallen out of use, so we can as well document
+> > them again...
+> >
+> > Maybe we could change the implementation, however, so that the old
+> > options are really just aliases for the respective -o version.
+>=20
+> As in, a followup patch that adds a paragraph or two to the .texi file
+> stating that '-B @var{backing_file}' is shorthand for '-o
+> backing_file=3D@var{backing_file}'?
 
-> This is a rebased and revised version of my patches revising CPU
-> compatiblity mode handling on ppc, last posted in November.  Since
-> then, many of the patches have already been merged (some for 2.9, some
-> since).  This is what's left.
->=20
->  * There was conceptual confusion about what a compatibility mode
->    means, and how it interacts with the machine type.  This cleans
->    that up, clarifying that a compatibility mode (as an externally set
->    option) only makes sense on machine types that don't permit the
->    guest hypervisor privilege (i.e. 'pseries')
->=20
->  * It was previously the user's (or management layer's) responsibility
->    to determine compatibility of CPUs on either end for migration.
->    This uses the compatibility modes to check that properly during an
->    incoming migration.
->=20
-> This hasn't been extensively tested yet.  There are quite a few
-> migration cases to consider, for example:
->=20
+First and foremost, I meant in the C code where we have separate
+variables for all the shorthand options and then need to handle both
+ways explicitly in the code further down. Instead, -B could just
+directly add a 'backing_file' key to a QemuOpts (and -o would do the
+same instead of building a string that is parsed only later).
 
-Hi David,
+But the documentation change that you're suggesting is probably a good
+idea as well.
 
-I'll rerun the tests shortly.
+Kevin
 
-Cheers,
-
---
-Greg
-
-> Basic:
->=20
-> 1) Boot guest with -cpu host
->         Should go into POWER8 compat mode after CAS
->         Previously would have been raw mode
->=20
-> 2) Boot guest with -machine pseries,max-cpu-compat=3Dpower7 -cpu host
->         Should go into POWER7 compat mode
->=20
-> 3) Boot guest with -cpu host,compat=3Dpower7
->         Should act as (2), but print a warning
->=20
-> 4) Boot guest via libvirt with power7 compat mode specified in XML
->         Should act as (3), (2) once we fix libvirt
->=20
-> 5) Hack guest to only advertise power7 compatibility, boot with -cpu host
->         Should go into POWER7 compat mode after CAS
->=20
-> 6) Hack guest to only advertise real PVRs
->         Should remain in POWER8 raw mode after CAS
->=20
-> 7) Hack guest to only advertise real PVRs
->    Boot with -machine pseries,max-cpu-compat=3Dpower8
->         Should fail at CAS time
->=20
-> 8) Hack guest to only advertise power7 compatibility, boot with -cpu host
->    Reboot to normal guest
->         Should go to power7 compat mode after CAS of boot 1
->         Should revert to raw mode on reboot
->         SHould go to power8 compat mode after CAS of boot 2
->=20
-> Migration:
->=20
-> 9) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
->    Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
->         Should work, end up running in power8 raw mode
->=20
-> 10) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host
->     Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
->         Should work, end up running in power8 raw mode
->=20
-> 11) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=3Dpowe=
-r7
->     Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=3Dpower7
->         Should work, be running in POWER7 compat after, but give warning =
-like
->         (3)
->=20
-> 12) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=3Dpowe=
-r7
->     Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=3Dpower7 -cpu=
- host
->         Should work, be running in POWER7 compat after, no warning
->=20
-> 13) Boot to SLOF with qemu-2.6 -machine pseries-2.6 -cpu host
->     Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
->=20
->         ?
->=20
-> 14) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host
->     Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
->         ?
->=20
-> 15) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=3Dpo=
-wer7
->     Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=3Dpower7
->         ?
->=20
-> 16) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=3Dpo=
-wer7
->     Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=3Dpower7 -cpu=
- host
->         ?
->=20
-> 17) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
->     Migrate to qemu-2.7.z -machine pseries-2.6 -cpu host
->         Should work
->=20
-> 18) Hack guest to only advertise power7 compatibility, boot with -cpu host
->     Boot with qemu-2.8, migrate to qemu-2.8
->         Should be in power7 compat mode after CAS on source, and still
->         in power7 compat mode on destination
->=20
->=20
-> Changes since RFCv2:
->   * Many patches dropped, since they're already merged
->   * Rebased, fixed conflicts
->   * Restored support for backwards migration (wasn't as complicated as
->     I thought)
->   * Updated final patch's description to more accurately reflect the
->     logic
->=20
-> Changes since RFCv1:
->   * Change CAS logic to prefer compatibility modes over raw mode
->   * Simplified by giving up on half-hearted attempts to maintain
->     backwards migration
->   * Folded migration stream changes into a single patch
->   * Removed some preliminary patches which are already merged
->=20
->=20
->=20
-> David Gibson (3):
->   pseries: Move CPU compatibility property to machine
->   pseries: Reset CPU compatibility mode
->   ppc: Rework CPU compatibility testing across migration
->=20
-> Greg Kurz (1):
->   qapi: add explicit null to string input and output visitors
->=20
->  hw/ppc/spapr.c               |  8 ++++-
->  hw/ppc/spapr_cpu_core.c      | 47 +++++++++++++++++++------
->  hw/ppc/spapr_hcall.c         |  2 +-
->  include/hw/ppc/spapr.h       | 12 ++++---
->  qapi/string-input-visitor.c  | 11 ++++++
->  qapi/string-output-visitor.c | 14 ++++++++
->  target/ppc/compat.c          | 65 ++++++++++++++++++++++++++++++++++
->  target/ppc/cpu.h             |  6 ++--
->  target/ppc/machine.c         | 71 +++++++++++++++++++++++++++++++++++--
->  target/ppc/translate_init.c  | 84 ++++++++++++--------------------------=
-------
->  10 files changed, 238 insertions(+), 82 deletions(-)
->=20
-
-
---Sig_/p+6BlpT91bbdadcmYLyZWgf
+--EVF5PPMfhYS0aIcm
 Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iEYEARECAAYFAlkDC3IACgkQAvw66wEB28JDFQCbBnFn/WH/NRwNhFmqy05v+t2t
-xssAmgKmwAoHqbTP3h3dkIZYVZX4maQ2
-=f3j3
+iQIcBAEBAgAGBQJZAw2RAAoJEH8JsnLIjy/WO9oP/izVmRwjg9j7LUfqM00bTVoc
+UGE2ZCeDxrzR3PbVTCD538HawgrCvLVtpzGSS9QQ2rcAFzAERFGEqrRrKmxI45U/
+nZ4448P/p1GPz9EzLEg1xAKMGzuB4D4CYajVxnnmbqcLIf9CZoLoO3OwE2ab1aYR
+6LOyvke1l/Orl3Q4hCGyfh/Yz7rd3fJxeJZ7a/76PZhwcG0Wh/tl7KqHl7MpHcGs
+/n+xgaKvKxUEdykKfCGooQEMrcg+SDn8lFxPu5/qhigLIm6xc0NN+l+eUzNSE7Xd
+UbrIKe5g2h8XLqs9Wg6U6IE4XP7YSZ386MuDSAd9EjFd/LIjxs9fAIl83v9qpKep
+OKoa4g3dpSEnnaxKzxyz0r4bnGXZe7TDS83zVO42413Bnnog62NHiLGRyrBYgx89
+tATxiazUnrykKeYKHrQWHhnShSg5wKBLP1FVYKqP+slMake8KfRJ27QDlZmvgA+n
+qSwRzCPv/ahyr0OX8uQpaBwQqQtGDiOBjX1F6rhRxhRw0z2UFxd6lWZpjMUb6ya3
+tFhXpQ/uu4eoFhI5fNU+qoWqQYre13yfRq8AQa3tLYVpa4LBW0b5c9wkB2q3oW7F
+7rAeEJB2mdQVdMPxLdaZXC/9uVN1yvfBagVL8n0F9ESJYcUW1CRdY6wlnSy7Zo7H
+0EahcWYMHKDkQxQGKBbH
+=87r2
 -----END PGP SIGNATURE-----
 
---Sig_/p+6BlpT91bbdadcmYLyZWgf--
+--EVF5PPMfhYS0aIcm--
