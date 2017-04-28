@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1d41F5-0000b4-Rt
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:27:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d41K1-0001tE-Hv
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1d41F2-0001ms-O4
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:27:07 -0400
-Received: from 9.mo1.mail-out.ovh.net ([178.32.108.172]:53752)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1d41F2-0001mB-ID
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:27:04 -0400
-Received: from player691.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 9CA326F940
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 10:26:57 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 28 Apr 2017 10:26:31 +0200
-Message-Id: <1493367991-21269-1-git-send-email-clg@kaod.org>
+	(envelope-from <imammedo@redhat.com>) id 1d41Jy-00038R-Dx
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:32:13 -0400
+Date: Fri, 28 Apr 2017 10:32:02 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170428103202.658f9f26@nial.brq.redhat.com>
+In-Reply-To: <alpine.DEB.2.10.1704271403550.2895@sstabellini-ThinkPad-X260>
+References: <1493323148-32461-1-git-send-email-brogers@suse.com>
+	<alpine.DEB.2.10.1704271403550.2895@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] ppc/pnv: restrict BMC object to the BMC
- simulator
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ACPI: don't call acpi_pcihp_device_plug_cb
+ on xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Corey Minyard <cminyard@mvista.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Bruce Rogers <brogers@suse.com>, qemu-devel@nongnu.org, mst@redhat.com, qemu-stable@nongnu.org
 
-Today, when a PowerNV guest runs, it uses the sensor definitions of
-the BMC simulator to populate the device tree. But an external IPMI
-BMC could also be used and, in that case, it is not (yet) possible to
-retrieve the sensor list. Generating the OEM SEL event for shutdown or
-reboot also does not make sense as it should be generated on the BMC
-side.
+On Thu, 27 Apr 2017 14:09:11 -0700 (PDT)
+Stefano Stabellini <sstabellini@kernel.org> wrote:
 
-This change allows a guest to use an 'ipmi-bmc-extern' backend to the
-'isa-ipmi-bt' device and a 'chardev' for transport such as :
-=20
-	-chardev socket,id=3Dipmi0,host=3Dlocalhost,port=3D9002,reconnect=3D10 \
-	-device ipmi-bmc-extern,id=3Dbmc0,chardev=3Dipmi0 \
-	-device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10
-
-and connect to a BMC simulator, the OpenIPMI ipmi_sim simulator for
-instance.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
-
- Corey,
-
- Should we externalize the TYPE_IPMI_BMC_EXTERN and TYPE_IPMI_BMC_SIMULAT=
-OR
- defines ?=20
-
- hw/ppc/pnv.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-Index: qemu-powernv-2.10.git/hw/ppc/pnv.c
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
---- qemu-powernv-2.10.git.orig/hw/ppc/pnv.c
-+++ qemu-powernv-2.10.git/hw/ppc/pnv.c
-@@ -520,7 +520,7 @@ static void ppc_powernv_reset(void)
-      * This is the internal simulator but it could also be an external
-      * BMC.
-      */
--    obj =3D object_resolve_path_type("", TYPE_IPMI_BMC, NULL);
-+    obj =3D object_resolve_path_type("", "ipmi-bmc-sim", NULL);
-     if (obj) {
-         pnv->bmc =3D IPMI_BMC(obj);
-     }
+> On Thu, 27 Apr 2017, Bruce Rogers wrote:
+> > Commit f0c9d64a exposed the issue that with a xenfv machine using
+> > pci passthrough, acpi cpi hotplug code was being executed by mistake.
+> > Guard calls to acpi_pcihp_device_plug_cb (and corresponding
+> > acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
+> > this check I am seeing an error that the bus doesn't have the
+> > acpi-pcihp-bsel property set.
+> > 
+> > Signed-off-by: Bruce Rogers <brogers@suse.com>
+> > ---
+> >  hw/acpi/piix4.c | 11 ++++++++---
+> >  1 file changed, 8 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> > index a553a7e..c409374 100644
+> > --- a/hw/acpi/piix4.c
+> > +++ b/hw/acpi/piix4.c
+> > @@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+> >                                  dev, errp);
+> >          }
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> > -        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, errp);
+> > +        if (!xen_enabled()) {
+> > +            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> > +                                      errp);
+> > +        }
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> >          if (s->cpu_hotplug_legacy) {
+> >              legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
+> > @@ -408,8 +411,10 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> >          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
+> >                                        dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> > -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> > -                                    errp);
+> > +        if (!xen_enabled()) {
+> > +            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> > +                                        errp);
+> > +        }
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+> >                 !s->cpu_hotplug_legacy) {
+> >          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);  
+> 
+> Wouldn't it be better to simply turn the error_setg("Unsupported bus...)
+> in acpi_pcihp_device_plug_cb and acpi_pcihp_device_unplug_cb into debug
+> printfs? After all, from this description it is clear that they are not
+> an error conditions. PCI Passthough works correctly, right?
+it's error condition if acpi hotplug is in use, so we should keep it
