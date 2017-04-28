@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d48qp-0005hS-OB
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:34:37 -0400
+	(envelope-from <groug@kaod.org>) id 1d48y1-0007m0-UV
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:42:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d48qm-0005L3-If
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:34:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43078)
+	(envelope-from <groug@kaod.org>) id 1d48xy-0008IH-Qc
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:42:01 -0400
+Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:55396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d48qm-0005Kn-9d
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:34:32 -0400
-Date: Fri, 28 Apr 2017 17:34:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170428163420.GF3276@work-vm>
-References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
-	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d48xy-0008Hy-Jz
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:41:58 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id E0282EA714
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 18:41:56 +0200 (CEST)
+Date: Fri, 28 Apr 2017 18:41:51 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170428184151.611e47aa@bahia>
+In-Reply-To: <f9833cd8-2f64-21d5-3bfc-9d91c178b8aa@redhat.com>
+References: <149336968270.4566.7770744042249761246.stgit@bahia.lan>
+	<f9833cd8-2f64-21d5-3bfc-9d91c178b8aa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
- downtime on dst side
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/WWCqWLm.wwT+vlQXj+vto4b";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: local: fix unlink of alien files in
+ mapped-file mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,253 +32,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, f4bug@amsat.org, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> This patch provides downtime calculation per vCPU,
-> as a summary and as a overlapped value for all vCPUs.
-> 
-> This approach was suggested by Peter Xu, as an improvements of
-> previous approch where QEMU kept tree with faulted page address and cpus bitmask
-> in it. Now QEMU is keeping array with faulted page address as value and vCPU
-> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
-> list for downtime per vCPU (could be traced with page_fault_addr)
-> 
-> For more details see comments for get_postcopy_total_downtime
-> implementation.
-> 
-> Downtime will not calculated if postcopy_downtime field of
-> MigrationIncomingState wasn't initialized.
+--Sig_/WWCqWLm.wwT+vlQXj+vto4b
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-To partly answer my last email, ah I see you switched to Peter's structure.
+On Fri, 28 Apr 2017 09:45:23 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> ---
->  include/migration/migration.h |   3 ++
->  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
->  migration/postcopy-ram.c      |  20 +++++++-
->  migration/trace-events        |   6 ++-
->  4 files changed, 130 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index e8fb68f..a22f9ce 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
->   * Functions to work with downtime context
->   */
->  struct DowntimeContext *downtime_context_new(void);
-> +void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
-> +void mark_postcopy_downtime_end(uint64_t addr);
-> +uint64_t get_postcopy_total_downtime(void);
->  
->  struct MigrationState
->  {
-> diff --git a/migration/migration.c b/migration/migration.c
-> index ec76e5c..2c6f150 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
->      return atomic_xchg(&incoming_postcopy_state, new_state);
->  }
->  
-> +void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    DowntimeContext *dc;
-> +    if (!mis->downtime_ctx || cpu < 0) {
-> +        return;
-> +    }
-> +    dc = mis->downtime_ctx;
-> +    dc->vcpu_addr[cpu] = addr;
-> +    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
-> +        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +
-> +    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
-> +            cpu);
-> +}
-> +
-> +void mark_postcopy_downtime_end(uint64_t addr)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    DowntimeContext *dc;
-> +    int i;
-> +    bool all_vcpu_down = true;
-> +    int64_t now;
-> +
-> +    if (!mis->downtime_ctx) {
-> +        return;
-> +    }
-> +    dc = mis->downtime_ctx;
-> +    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +
-> +    /* check all vCPU down,
-> +     * QEMU has bitmap.h, but even with bitmap_and
-> +     * will be a cycle */
-> +    for (i = 0; i < smp_cpus; i++) {
-> +        if (dc->vcpu_addr[i]) {
-> +            continue;
-> +        }
-> +        all_vcpu_down = false;
-> +        break;
-> +    }
-> +
-> +    if (all_vcpu_down) {
-> +        dc->total_downtime += now - dc->last_begin;
-> +    }
-> +
-> +    /* lookup cpu, to clear it */
-> +    for (i = 0; i < smp_cpus; i++) {
-> +        uint64_t vcpu_downtime;
-> +
-> +        if (dc->vcpu_addr[i] != addr) {
-> +            continue;
-> +        }
-> +
-> +        vcpu_downtime = now - dc->page_fault_vcpu_time[i];
-> +
-> +        dc->vcpu_addr[i] = 0;
-> +        dc->vcpu_downtime[i] += vcpu_downtime;
-> +    }
-> +
-> +    trace_mark_postcopy_downtime_end(addr, dc, dc->total_downtime);
-> +}
+> On 04/28/2017 03:54 AM, Greg Kurz wrote:
+> > When trying to remove a file from a directory, both created in non-mapp=
+ed
+> > mode, the file remains and EBADF is returned to the guest.
+> >=20
+> > This is a regression introduced by commit "df4938a6651b 9pfs: local:
+> > unlinkat: don't follow symlinks" when fixing CVE-2016-9602. It changed =
+the
+> > way we unlink the metadata file from
+> >=20
+> >     ret =3D remove("$dir/.virtfs_metadata/$name");
+> >     if (ret < 0 && errno !=3D ENOENT) {
+> >          /* Error out */
+> >     }
+> >     /* Ignore absence of metadata */
+> >=20
+> > to
+> >=20
+> >     fd =3D openat("$dir/.virtfs_metadata")
+> >     unlinkat(fd, "$name") =20
+>=20
+> Yep, failure to check for errors. Is this something Coverity can flag?
+>=20
 
-I don't think this is thread safe.
-postcopy_downtime_begin is called from the fault thread.
-postcopy_downtime_end is called from the listener thread; they can happen
-at about the same time.
+I guess it should if it doesn't yet.
 
-Dave
+> >=20
+> > We just need to check the return of openat() and ignore ENOENT, in order
+> > to restore the behaviour we had with remove().
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/9p-local.c |   18 +++++++++++++-----
+> >  1 file changed, 13 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> > index f3ebca4f7a56..4e9823b08e74 100644
+> > --- a/hw/9pfs/9p-local.c
+> > +++ b/hw/9pfs/9p-local.c
+> > @@ -983,12 +983,20 @@ static int local_unlinkat_common(FsContext *ctx, =
+int dirfd, const char *name,
+> >           * .virtfs_metadata directory.
+> >           */
+> >          map_dirfd =3D openat_dir(dirfd, VIRTFS_META_DIR);
+> > -        ret =3D unlinkat(map_dirfd, name, 0);
+> > -        close_preserve_errno(map_dirfd);
+> > -        if (ret < 0 && errno !=3D ENOENT) {
+> > +        if (map_dirfd !=3D -1) {
+> > +            ret =3D unlinkat(map_dirfd, name, 0);
+> > +            close_preserve_errno(map_dirfd);
+> > +            if (ret < 0 && errno !=3D ENOENT) {
+> > +                /*
+> > +                 * We didn't had the .virtfs_metadata file. May be fil=
+e created
+> > +                 * in non-mapped mode ?. Ignore ENOENT. =20
+>=20
+> This is code motion (in fact, the second time you've moved this
+> comment), but you might as well fix the poor grammar while you are here:
+>=20
+> We didn't have the .virtfs_metadata file. Maybe the file was created in
+> non-mapped mode? Ignore ENOENT.
+>=20
+> > +                 */
+> > +                goto err_out;
+> > +            }
+> > +        } else if (errno !=3D ENOENT) {
+> >              /*
+> > -             * We didn't had the .virtfs_metadata file. May be file cr=
+eated
+> > -             * in non-mapped mode ?. Ignore ENOENT.
+> > +             * We didn't had the parent .virtfs_metadata directory. Ma=
+y be
+> > +             * file created in non-mapped mode ?. Ignore ENOENT. =20
+>=20
+> And certainly fix the grammar of your new comment (no need to
+> copy-and-paste the poor wording):
+>=20
+> We didn't have the parent .virtfs_metadata directory. Maybe the file was
+> created in non-mapped mode? Ignore ENOENT.
+>=20
 
-> +/*
-> + * This function just provide calculated before downtime per cpu and trace it.
-> + * Total downtime is calculated in mark_postcopy_downtime_end.
-> + *
-> + *
-> + * Assume we have 3 CPU
-> + *
-> + *      S1        E1           S1               E1
-> + * -----***********------------xxx***************------------------------> CPU1
-> + *
-> + *             S2                E2
-> + * ------------****************xxx---------------------------------------> CPU2
-> + *
-> + *                         S3            E3
-> + * ------------------------****xxx********-------------------------------> CPU3
-> + *
-> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
-> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
-> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
-> + *            it's a part of total downtime.
-> + * S1 - here is last_begin
-> + * Legend of the picture is following:
-> + *              * - means downtime per vCPU
-> + *              x - means overlapped downtime (total downtime)
-> + */
-> +uint64_t get_postcopy_total_downtime(void)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +
-> +    if (!mis->downtime_ctx) {
-> +        return 0;
-> +    }
-> +
-> +    if (trace_event_get_state(TRACE_DOWNTIME_PER_CPU)) {
-> +        int i;
-> +        for (i = 0; i < smp_cpus; i++) {
-> +            trace_downtime_per_cpu(i, mis->downtime_ctx->vcpu_downtime[i]);
-> +        }
-> +    }
-> +    return mis->downtime_ctx->total_downtime;
-> +}
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index f3688f5..cf2b935 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -23,6 +23,7 @@
->  #include "migration/postcopy-ram.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/balloon.h"
-> +#include <sys/param.h>
->  #include "qemu/error-report.h"
->  #include "trace.h"
->  
-> @@ -468,6 +469,19 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
->      return 0;
->  }
->  
-> +static int get_mem_fault_cpu_index(uint32_t pid)
-> +{
-> +    CPUState *cpu_iter;
-> +
-> +    CPU_FOREACH(cpu_iter) {
-> +        if (cpu_iter->thread_id == pid) {
-> +            return cpu_iter->cpu_index;
-> +        }
-> +    }
-> +    trace_get_mem_fault_cpu_index(pid);
-> +    return -1;
-> +}
-> +
->  /*
->   * Handle faults detected by the USERFAULT markings
->   */
-> @@ -545,8 +559,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
->          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
->          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
->                                                  qemu_ram_get_idstr(rb),
-> -                                                rb_offset);
-> +                                                rb_offset,
-> +                                                msg.arg.pagefault.feat.ptid);
->  
-> +        mark_postcopy_downtime_begin((uintptr_t)(msg.arg.pagefault.address),
-> +                         get_mem_fault_cpu_index(msg.arg.pagefault.feat.ptid));
->          /*
->           * Send the request to the source - we want to request one
->           * of our host page sizes (which is >= TPS)
-> @@ -641,6 +658,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
->  
->          return -e;
->      }
-> +    mark_postcopy_downtime_end((uint64_t)host);
->  
->      trace_postcopy_place_page(host);
->      return 0;
-> diff --git a/migration/trace-events b/migration/trace-events
-> index b8f01a2..d338810 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -110,6 +110,9 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
->  process_incoming_migration_co_postcopy_end_main(void) ""
->  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
->  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
-> +mark_postcopy_downtime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
-> +mark_postcopy_downtime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
-> +downtime_per_cpu(int cpu_index, int64_t downtime) "downtime cpu[%d]=%" PRId64
->  
->  # migration/rdma.c
->  qemu_rdma_accept_incoming_migration(void) ""
-> @@ -186,7 +189,7 @@ postcopy_ram_enable_notify(void) ""
->  postcopy_ram_fault_thread_entry(void) ""
->  postcopy_ram_fault_thread_exit(void) ""
->  postcopy_ram_fault_thread_quit(void) ""
-> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
-> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
->  postcopy_ram_incoming_cleanup_closeuf(void) ""
->  postcopy_ram_incoming_cleanup_entry(void) ""
->  postcopy_ram_incoming_cleanup_exit(void) ""
-> @@ -195,6 +198,7 @@ save_xbzrle_page_skipping(void) ""
->  save_xbzrle_page_overflow(void) ""
->  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
->  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
-> +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
->  
->  # migration/exec.c
->  migration_exec_outgoing(const char *cmd) "cmd=%s"
-> -- 
-> 1.9.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+FYI, I've dropped the existing comments and added this instead:
+
+@@ -957,6 +957,14 @@ static int local_unlinkat_common(FsContext *ctx, int d=
+irfd,
+     if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+         int map_dirfd;
+=20
++        /* We need to remove the metadata as well:
++         * - the metadata directory if we're removing a directory
++         * - the metadata file in the parent's metadata directory
++         *
++         * If any of these are missing (ie, ENOENT) then we're probably
++         * trying to remove something that wasn't created in mapped-file
++         * mode. We just ignore the error.
++         */
+         if (flags =3D=3D AT_REMOVEDIR) {
+             int fd;
+=20
+I'll push it to my 9p-next tree.
+
+> But the code fix is correct, and a comment wording change is minor
+> enough that you can add my:
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+
+
+--Sig_/WWCqWLm.wwT+vlQXj+vto4b
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkDcM8ACgkQAvw66wEB28I1dgCfdwHGhEsZgPTGEEkpm/s1d9RC
+qm8AnR0mI2DnMAnZC6pz7RxO4e+XPOFv
+=uiyf
+-----END PGP SIGNATURE-----
+
+--Sig_/WWCqWLm.wwT+vlQXj+vto4b--
