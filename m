@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d47nx-00070h-Es
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:27:34 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d47oA-0007Af-HM
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d47nw-0005oa-7S
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:27:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41946)
+	(envelope-from <dgilbert@redhat.com>) id 1d47o7-00061B-9U
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:27:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39052)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d47nv-0005n8-Ub
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:27:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E0AFC05AD87
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 15:27:30 +0000 (UTC)
-References: <20170427165526.19836-1-dgilbert@redhat.com>
-	<20170428134230.GB11415@redhat.com> <20170428134532.GG2085@work-vm>
-	<20170428151051.GH11415@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4259934c-58f5-16b2-4e24-6a3c926ef440@redhat.com>
-Date: Fri, 28 Apr 2017 10:27:26 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d47o6-0005zp-V7
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:27:43 -0400
+Date: Fri, 28 Apr 2017 16:27:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170428152729.GI2085@work-vm>
+References: <20170428021317.24711-1-eblake@redhat.com>
+	<20170428021317.24711-3-eblake@redhat.com>
+	<20170428080821.GB2085@work-vm>
+	<3a8d9f68-f30c-1191-ca80-a93f0050f011@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170428151051.GH11415@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qR4xm4QLbuh7LMVjp2TDtvfPR1W80km6v"
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Disallow glib asserts in main
- code
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3a8d9f68-f30c-1191-ca80-a93f0050f011@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] shutdown: Prepare for use of an
+ enum in reset/shutdown_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,83 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qR4xm4QLbuh7LMVjp2TDtvfPR1W80km6v
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
-Message-ID: <4259934c-58f5-16b2-4e24-6a3c926ef440@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Disallow glib asserts in main
- code
-References: <20170427165526.19836-1-dgilbert@redhat.com>
- <20170428134230.GB11415@redhat.com> <20170428134532.GG2085@work-vm>
- <20170428151051.GH11415@redhat.com>
-In-Reply-To: <20170428151051.GH11415@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Eric Blake (eblake@redhat.com) wrote:
+> On 04/28/2017 03:08 AM, Dr. David Alan Gilbert wrote:
+> > * Eric Blake (eblake@redhat.com) wrote:
+> >> We want to track why a guest was shutdown; in particular, being able
+> >> to tell the difference between a guest request (such as ACPI request)
+> >> and host request (such as SIGINT) will prove useful to libvirt.
+> >> Since all requests eventually end up changing shutdown_requested in
+> >> vl.c, the logical change is to make that value track the reason,
+> >> rather than its current 0/1 contents.
+> >>
+> 
+> >>  ##
+> >> +# @ShutdownCause:
+> >> +#
+> >> +# Enumeration of various causes for shutdown.
+> >> +#
+> >> +# @host-qmp: Reaction to a QMP command, such as 'quit'
+> >> +# @host-signal: Reaction to a signal, such as SIGINT
+> >> +# @host-ui: Reaction to a UI event, such as closing the window
+> >> +# @host-replay: The host is replaying an earlier shutdown event
+> >> +# @host-error: Qemu encountered an error that prevents further use of the guest
+> >> +# @guest-shutdown: The guest requested a shutdown, such as via ACPI or
+> >> +#                  other hardware-specific action
+> >> +# @guest-reset: The guest requested a reset, and the command line
+> >> +#               response to a reset is to instead trigger a shutdown
+> >> +# @guest-panic: The guest panicked, and the command line response to
+> >> +#               a panic is to trigger a shutdown
+> > 
+> > It's a little coarse grained;  is there anyway to pass platform specific information
+> > for debug?  I ask because I spent a while debugging a few bugs with unexpected
+> > resets and had to figure out which of x86's many reset causes triggered it.
+> 
+> I'm open to any followup patches that add further enum values and
+> adjusts the various callers (patch 3 shows how MANY callers use
+> qemu_system_shutdown_request).  But I don't think it's necessarily in
+> scope for this series - remember, my goal here was merely to distinguish
+> between host- and guest-triggered resets (which libvirt and higher
+> management tasks want to know)
 
-On 04/28/2017 10:10 AM, Daniel P. Berrange wrote:
+Yep, that's fine.
 
->>> Or could we perhaps instead undo the damage via a hack like
->>>
->>>  #define g_assert_cmpint g_assert_cmpint_orig
->>>  #define g_assert_cmpint(x, y, z) \
->>>      g_assert_cmpint_orig(x, y,x); \
->>>      abort()
+> rather than which of multiple reset
+> paths was taken (I agree that it is useful during a qemu debug session -
+> but that's a different audience).  I also don't consider myself an
+> expert in the many ways that x86 can reset - it was easy to blindly
+> rewrite qemu_system_shutdown_request() into
+> qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN) based solely
+> on directory, but it would be harder to distinguish which of the
+> multiple files should have which finer-grained cause.
 
-Not quite the right hack (we don't want to unconditionally abort, but
-only when the condition fails).
+Yes, I'm also not an expert on x86 resets - but when I was debugging
+I just added a tag in every place it called the reset code.
 
->>
->> I'd be kind of OK adding a q_assert_cmpint if you wanted,
->> but I think we shouldn't change the semantics of a public
->> name.
+At a higher level, using your tags, I'm not sure where a reset triggered
+by a fault detected by the hypervisor lives - e.g. an x86 triple fault
+where the guest screws up so badly that it just gets reset.  Is
+that a guest-reset or a guest-panic or what - neither case
+was actually asked for by the guest itself.
 
-I tend to agree there; having our own distinct name means that we can
-see at a glance that our version will quit, no matter what the glib
-version does.
-
->=20
-> Personally I think it would be worth having them - the whole point of
-> these more specific g_assert_* macros is that they provide clearer
-> error messages when they're triggered, so I prefer their use generally
-
-I agree that the improved error messages part is worthwhile.  So maybe
-we want:
-
-#define q_assert_cmpint(x, y, z) \
-  do { \
-    g_assert_cmpint(x, y, z); \
-    assert(x y z); \
-  } while (0)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Dave
 
 
---qR4xm4QLbuh7LMVjp2TDtvfPR1W80km6v
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZA19eAAoJEKeha0olJ0NqU9QH/R1xw77bLkKi+zCEL4rSVFGD
-e1XOZkVMwvfP65CzbJuPBk7Updd5LRTBa2WhM+Zxjz841LL9lqxSzlNuLOp9hcwj
-vKbLhJLr/Qvhcv3qAfWRD3xKnrs9K/CAupOWO2SFSCERfLNRen/7ME4CJ71YZLMB
-1NegUA0RsKZ6MLoU/03oevnfEfOceoB5TdZwzWx3rq8M1EnVtN6uBCA2d5QdF0c0
-7M0NYNsqJL2dH4SsKRyqdbakMiJhBfvWfny+WfxbnEIkCLn4XKxzKlLj1YOZkH9j
-+/5xgNAL23mLhP5AfW6WJzWzSpJOmdycnXEvKD1Eb4gFfT4QKOnxNULBR85xpAg=
-=OZl4
------END PGP SIGNATURE-----
 
---qR4xm4QLbuh7LMVjp2TDtvfPR1W80km6v--
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
