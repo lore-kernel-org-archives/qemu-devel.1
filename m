@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d46zS-0003K2-2v
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:35:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1d476E-0004oA-OF
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:42:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d46zO-0001nQ-3i
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:35:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39450)
+	(envelope-from <armbru@redhat.com>) id 1d476C-0006RR-OF
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:42:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d46zN-0001n0-Q1
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:35:18 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d476C-0006Ql-Dz
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:42:20 -0400
+From: Markus Armbruster <armbru@redhat.com>
 References: <20170428021317.24711-1-eblake@redhat.com>
 	<20170428021317.24711-3-eblake@redhat.com>
-	<20170428080821.GB2085@work-vm>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3a8d9f68-f30c-1191-ca80-a93f0050f011@redhat.com>
-Date: Fri, 28 Apr 2017 09:35:04 -0500
+Date: Fri, 28 Apr 2017 16:42:11 +0200
+In-Reply-To: <20170428021317.24711-3-eblake@redhat.com> (Eric Blake's message
+	of "Thu, 27 Apr 2017 21:13:15 -0500")
+Message-ID: <87wpa4bnlo.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170428080821.GB2085@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hMdpRTDDJbeuwVRvOHPbE9RdSuJpujBxr"
+Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH v5 2/4] shutdown: Prepare for use of an
  enum in reset/shutdown_request
 List-Id: <qemu-devel.nongnu.org>
@@ -30,103 +28,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, alistair.francis@xilinx.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hMdpRTDDJbeuwVRvOHPbE9RdSuJpujBxr
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com,
- alistair.francis@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Juan Quintela <quintela@redhat.com>,
- "open list:X86" <xen-devel@lists.xenproject.org>
-Message-ID: <3a8d9f68-f30c-1191-ca80-a93f0050f011@redhat.com>
-Subject: Re: [PATCH v5 2/4] shutdown: Prepare for use of an enum in
- reset/shutdown_request
-References: <20170428021317.24711-1-eblake@redhat.com>
- <20170428021317.24711-3-eblake@redhat.com> <20170428080821.GB2085@work-vm>
-In-Reply-To: <20170428080821.GB2085@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Eric Blake <eblake@redhat.com> writes:
 
-On 04/28/2017 03:08 AM, Dr. David Alan Gilbert wrote:
-> * Eric Blake (eblake@redhat.com) wrote:
->> We want to track why a guest was shutdown; in particular, being able
->> to tell the difference between a guest request (such as ACPI request)
->> and host request (such as SIGINT) will prove useful to libvirt.
->> Since all requests eventually end up changing shutdown_requested in
->> vl.c, the logical change is to make that value track the reason,
->> rather than its current 0/1 contents.
->>
+> We want to track why a guest was shutdown; in particular, being able
+> to tell the difference between a guest request (such as ACPI request)
+> and host request (such as SIGINT) will prove useful to libvirt.
+> Since all requests eventually end up changing shutdown_requested in
+> vl.c, the logical change is to make that value track the reason,
+> rather than its current 0/1 contents.
+>
+> Since command-line options control whether a reset request is turned
+> into a shutdown request instead, the same treatment is given to
+> reset_requested.
+>
+> This patch adds a QAPI enum ShutdownCause that describes reasons
+> that a shutdown can be requested, and changes qemu_system_reset() to
+> pass the reason through, although for now it is not reported.  The
+> next patch will actually wire things up to modify events to report
+> data based on the reason, and to pass the correct enum value in from
+> various call-sites that can trigger a reset/shutdown.  Since QAPI
+> generates enums starting at 0, it's easier if we use a different
+> number as our sentinel that no request has happened yet.  Most of
+> the changes are in vl.c, but xen was using things externally.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
+> ---
+> v4: s/ShutdownType/ShutdownCause/, no thanks to mingw header pollution
+> v3: new patch
+> ---
+>  qapi-schema.json        | 23 +++++++++++++++++++++++
+>  include/sysemu/sysemu.h |  2 +-
+>  vl.c                    | 44 ++++++++++++++++++++++++++++----------------
+>  hw/i386/xen/xen-hvm.c   |  9 ++++++---
+>  migration/colo.c        |  2 +-
+>  migration/savevm.c      |  2 +-
+>  6 files changed, 60 insertions(+), 22 deletions(-)
+>
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 01b087f..a4ebdd1 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -2304,6 +2304,29 @@
+>  { 'command': 'system_powerdown' }
+>
+>  ##
+> +# @ShutdownCause:
+> +#
+> +# Enumeration of various causes for shutdown.
+> +#
+> +# @host-qmp: Reaction to a QMP command, such as 'quit'
+> +# @host-signal: Reaction to a signal, such as SIGINT
+> +# @host-ui: Reaction to a UI event, such as closing the window
+> +# @host-replay: The host is replaying an earlier shutdown event
+> +# @host-error: Qemu encountered an error that prevents further use of the guest
+> +# @guest-shutdown: The guest requested a shutdown, such as via ACPI or
+> +#                  other hardware-specific action
+> +# @guest-reset: The guest requested a reset, and the command line
+> +#               response to a reset is to instead trigger a shutdown
+> +# @guest-panic: The guest panicked, and the command line response to
+> +#               a panic is to trigger a shutdown
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'enum': 'ShutdownCause',
+> +  'data': [ 'host-qmp', 'host-signal', 'host-ui', 'host-replay', 'host-error',
+> +            'guest-shutdown', 'guest-reset', 'guest-panic' ] }
+> +
+> +##
+>  # @cpu:
+>  #
+>  # This command is a nop that is only provided for the purposes of compatibility.
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 16175f7..00a907f 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -65,7 +65,7 @@ bool qemu_vmstop_requested(RunState *r);
+>  int qemu_shutdown_requested_get(void);
+>  int qemu_reset_requested_get(void);
+>  void qemu_system_killed(int signal, pid_t pid);
+> -void qemu_system_reset(bool report);
+> +void qemu_system_reset(bool report, int reason);
+>  void qemu_system_guest_panicked(GuestPanicInformation *info);
+>  size_t qemu_target_page_size(void);
+>
+> diff --git a/vl.c b/vl.c
+> index 879786a..2b95b7f 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1597,8 +1597,8 @@ void vm_state_notify(int running, RunState state)
+>      }
+>  }
+>
+> -static int reset_requested;
+> -static int shutdown_requested, shutdown_signal;
+> +static int reset_requested = -1;
+> +static int shutdown_requested = -1, shutdown_signal;
 
->>  ##
->> +# @ShutdownCause:
->> +#
->> +# Enumeration of various causes for shutdown.
->> +#
->> +# @host-qmp: Reaction to a QMP command, such as 'quit'
->> +# @host-signal: Reaction to a signal, such as SIGINT
->> +# @host-ui: Reaction to a UI event, such as closing the window
->> +# @host-replay: The host is replaying an earlier shutdown event
->> +# @host-error: Qemu encountered an error that prevents further use of=
- the guest
->> +# @guest-shutdown: The guest requested a shutdown, such as via ACPI o=
-r
->> +#                  other hardware-specific action
->> +# @guest-reset: The guest requested a reset, and the command line
->> +#               response to a reset is to instead trigger a shutdown
->> +# @guest-panic: The guest panicked, and the command line response to
->> +#               a panic is to trigger a shutdown
->=20
-> It's a little coarse grained;  is there anyway to pass platform specifi=
-c information
-> for debug?  I ask because I spent a while debugging a few bugs with une=
-xpected
-> resets and had to figure out which of x86's many reset causes triggered=
- it.
+Peeking ahead, I see that shutdown_requested and reset_requested take
+ShutdownCause values and -1.  The latter means "no shutdown requested".
+What about adding 'none' to ShutdownCause, with value 0, und use that
+instead of literal -1?  Would avoid the unusual "negative means false,
+non-negative means true".
 
-I'm open to any followup patches that add further enum values and
-adjusts the various callers (patch 3 shows how MANY callers use
-qemu_system_shutdown_request).  But I don't think it's necessarily in
-scope for this series - remember, my goal here was merely to distinguish
-between host- and guest-triggered resets (which libvirt and higher
-management tasks want to know), rather than which of multiple reset
-paths was taken (I agree that it is useful during a qemu debug session -
-but that's a different audience).  I also don't consider myself an
-expert in the many ways that x86 can reset - it was easy to blindly
-rewrite qemu_system_shutdown_request() into
-qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN) based solely
-on directory, but it would be harder to distinguish which of the
-multiple files should have which finer-grained cause.
+PATCH 4 exposes ShutdownCause in event SHUTDOWN, and 'none' must not
+occur there.  However, if we ever add a query-shutdown to go with this
+event, we will need 'none' there.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I'd be tempted to reshuffle declarations here, because shutdown_signal's
+int is a different one than reset_requested's and shutdown_requested,
+and the latter two's "negative means false, non-negative means true" is
+unusual enough to justify a comment.
 
+>  static pid_t shutdown_pid;
+>  static int powerdown_requested;
+>  static int debug_requested;
+> @@ -1624,7 +1624,7 @@ int qemu_reset_requested_get(void)
+>
+>  static int qemu_shutdown_requested(void)
+>  {
+> -    return atomic_xchg(&shutdown_requested, 0);
+> +    return atomic_xchg(&shutdown_requested, -1);
+>  }
 
---hMdpRTDDJbeuwVRvOHPbE9RdSuJpujBxr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Hmm.  In case we stick to literal -1: consider splitting this patch into
+a part that changes @shutdown_requested from zero/non-zero to
+negative/non-negative, and a part that uses ShutdownCause for the
+non-negative values.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+>
+>  static void qemu_kill_report(void)
+> @@ -1650,11 +1650,11 @@ static void qemu_kill_report(void)
+>  static int qemu_reset_requested(void)
+>  {
+>      int r = reset_requested;
+> -    if (r && replay_checkpoint(CHECKPOINT_RESET_REQUESTED)) {
+> -        reset_requested = 0;
+> +    if (r >= 0 && replay_checkpoint(CHECKPOINT_RESET_REQUESTED)) {
+> +        reset_requested = -1;
+>          return r;
+>      }
+> -    return false;
+> +    return -1;
 
-iQEcBAEBCAAGBQJZA1MYAAoJEKeha0olJ0NqC7UIAKsxmtLiSvvwjrUuvuYOolZ4
-Qp5aZmWeNAFn1lOGmh0tt12iRhmKPbp7bEZR9Auu1VsgIXC1lodO4ps45igNpeE8
-3aAc+vR8oC65c8Pvw6whIxcv8bwqDDs3hTD89sk+gW2VE7nAhuyFtzIUnfYdgNKq
-z90jp8pZ50GsEgw/dVFWiCyvyIq0ADjZzeuTVqZgrRc6Uz9BHP1iF615LnwftTia
-gkeRn0YwupXvVjYhpJ6JpKd7ZmerjP9B42nyJrvD6CmAJ42y7A6pm4sQrFS8qQsr
-VgRrGOhFh5wScT60JyqmbkfXrV22Tl3lvWxjj70uOA/IR61UW9TCVi2GjxDYIMU=
-=fpRb
------END PGP SIGNATURE-----
+"return false" in a function returning int smells, good riddance.
 
---hMdpRTDDJbeuwVRvOHPbE9RdSuJpujBxr--
+>  }
+>
+>  static int qemu_suspend_requested(void)
+> @@ -1686,7 +1686,12 @@ static int qemu_debug_requested(void)
+>      return r;
+>  }
+>
+> -void qemu_system_reset(bool report)
+> +/*
+> + * Reset the VM. If @report is VMRESET_REPORT, issue an event, using
+> + * the @reason interpreted as ShutdownType for details.  Otherwise,
+> + * @report is VMRESET_SILENT and @reason is ignored.
+> + */
+> +void qemu_system_reset(bool report, int reason)
+
+Why int reason and not ShutdownCause?  Hmm, peeking ahead, I see you
+pass -1 with VMRESET_SILENT.  Yet another place where you use int for
+type ShutdownCause + { -1 }.  Adding 'none' to ShutdownCause looks
+even more attractive to me now.
+
+>  {
+>      MachineClass *mc;
+>
+> @@ -1700,6 +1705,7 @@ void qemu_system_reset(bool report)
+>          qemu_devices_reset();
+>      }
+>      if (report) {
+> +        assert(reason >= 0);
+>          qapi_event_send_reset(&error_abort);
+>      }
+>      cpu_synchronize_all_post_reset();
+> @@ -1738,9 +1744,10 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
+>  void qemu_system_reset_request(void)
+>  {
+>      if (no_reboot) {
+> -        shutdown_requested = 1;
+> +        /* FIXME - add a parameter to allow callers to specify reason */
+
+FIXME addressed in the next patch.  Mention in this one's commit
+message?
+
+> +        shutdown_requested = SHUTDOWN_CAUSE_GUEST_RESET;
+>      } else {
+> -        reset_requested = 1;
+> +        reset_requested = SHUTDOWN_CAUSE_GUEST_RESET;
+>      }
+>      cpu_stop_current();
+>      qemu_notify_event();
+> @@ -1807,7 +1814,7 @@ void qemu_system_killed(int signal, pid_t pid)
+>      /* Cannot call qemu_system_shutdown_request directly because
+>       * we are in a signal handler.
+>       */
+> -    shutdown_requested = 1;
+> +    shutdown_requested = SHUTDOWN_CAUSE_HOST_SIGNAL;
+>      qemu_notify_event();
+>  }
+>
+> @@ -1815,7 +1822,8 @@ void qemu_system_shutdown_request(void)
+>  {
+>      trace_qemu_system_shutdown_request();
+>      replay_shutdown_request();
+> -    shutdown_requested = 1;
+> +    /* FIXME - add a parameter to allow callers to specify reason */
+
+Likewise.
+
+> +    shutdown_requested = SHUTDOWN_CAUSE_GUEST_SHUTDOWN;
+>      qemu_notify_event();
+>  }
+>
+> @@ -1846,13 +1854,16 @@ void qemu_system_debug_request(void)
+>  static bool main_loop_should_exit(void)
+>  {
+>      RunState r;
+> +    int request;
+> +
+>      if (qemu_debug_requested()) {
+>          vm_stop(RUN_STATE_DEBUG);
+>      }
+>      if (qemu_suspend_requested()) {
+>          qemu_system_suspend();
+>      }
+> -    if (qemu_shutdown_requested()) {
+> +    request = qemu_shutdown_requested();
+> +    if (request >= 0) {
+>          qemu_kill_report();
+>          qapi_event_send_shutdown(&error_abort);
+>          if (no_shutdown) {
+> @@ -1861,9 +1872,10 @@ static bool main_loop_should_exit(void)
+>              return true;
+>          }
+>      }
+> -    if (qemu_reset_requested()) {
+> +    request = qemu_reset_requested();
+> +    if (request >= 0) {
+>          pause_all_vcpus();
+> -        qemu_system_reset(VMRESET_REPORT);
+> +        qemu_system_reset(VMRESET_REPORT, request);
+>          resume_all_vcpus();
+>          if (!runstate_check(RUN_STATE_RUNNING) &&
+>                  !runstate_check(RUN_STATE_INMIGRATE)) {
+> @@ -1872,7 +1884,7 @@ static bool main_loop_should_exit(void)
+>      }
+>      if (qemu_wakeup_requested()) {
+>          pause_all_vcpus();
+> -        qemu_system_reset(VMRESET_SILENT);
+> +        qemu_system_reset(VMRESET_SILENT, -1);
+>          notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
+>          wakeup_reason = QEMU_WAKEUP_REASON_NONE;
+>          resume_all_vcpus();
+> @@ -4684,7 +4696,7 @@ int main(int argc, char **argv, char **envp)
+>         reading from the other reads, because timer polling functions query
+>         clock values from the log. */
+>      replay_checkpoint(CHECKPOINT_RESET);
+> -    qemu_system_reset(VMRESET_SILENT);
+> +    qemu_system_reset(VMRESET_SILENT, -1);
+>      register_global_state();
+>      if (replay_mode != REPLAY_MODE_NONE) {
+>          replay_vmstate_init();
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index b1c05ff..3a6484c 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -1089,11 +1089,14 @@ static void cpu_handle_ioreq(void *opaque)
+>           * causes Xen to powerdown the domain.
+>           */
+>          if (runstate_is_running()) {
+> -            if (qemu_shutdown_requested_get()) {
+> +            int request;
+> +
+> +            if (qemu_shutdown_requested_get() >= 0) {
+>                  destroy_hvm_domain(false);
+>              }
+> -            if (qemu_reset_requested_get()) {
+> -                qemu_system_reset(VMRESET_REPORT);
+> +            request = qemu_reset_requested_get();
+> +            if (request >= 0) {
+> +                qemu_system_reset(VMRESET_REPORT, request);
+>                  destroy_hvm_domain(true);
+>              }
+>          }
+> diff --git a/migration/colo.c b/migration/colo.c
+> index c19eb3f..17a5482 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -611,7 +611,7 @@ void *colo_process_incoming_thread(void *opaque)
+>          }
+>
+>          qemu_mutex_lock_iothread();
+> -        qemu_system_reset(VMRESET_SILENT);
+> +        qemu_system_reset(VMRESET_SILENT, -1);
+>          vmstate_loading = true;
+>          if (qemu_loadvm_state(fb) < 0) {
+>              error_report("COLO: loadvm failed");
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 03ae1bd..dcbaf00 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2292,7 +2292,7 @@ int load_vmstate(const char *name)
+>          return -EINVAL;
+>      }
+>
+> -    qemu_system_reset(VMRESET_SILENT);
+> +    qemu_system_reset(VMRESET_SILENT, -1);
+>      mis->from_src_file = f;
+>
+>      aio_context_acquire(aio_context);
