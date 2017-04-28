@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d4Cau-0001kg-PM
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:34:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d4Cat-0001jq-Va
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d4Cat-0001HL-Rb
+	(envelope-from <kwolf@redhat.com>) id 1d4Cat-0001H4-4F
 	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:34:24 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 28 Apr 2017 22:33:23 +0200
-Message-Id: <1493411622-5343-16-git-send-email-kwolf@redhat.com>
+Date: Fri, 28 Apr 2017 22:33:22 +0200
+Message-Id: <1493411622-5343-15-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1493411622-5343-1-git-send-email-kwolf@redhat.com>
 References: <1493411622-5343-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/34] Issue a deprecation warning if the user
- specifies the "-hdachs" option.
+Subject: [Qemu-devel] [PULL 14/34] iotests: Launch qemu-nbd with -e 42
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +22,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-If the user needs to specify the disk geometry, the corresponding
-parameters of the "-device ide-hd" option should be used instead.
-"-hdachs" is considered as deprecated and might be removed soon.
+There is no reason for the qemu-nbd server used for tests not to accept
+an arbitrary number of clients. In fact, test 181 will require it to
+accept two clients at the same time (and thus it fails before this
+patch).
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+This patch updates common.rc to launch qemu-nbd with -e 42 which should
+be enough for all of our current and future tests.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-options.hx | 4 ++--
- vl.c            | 2 ++
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/common.rc | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 787b9c3..f68829f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -803,8 +803,8 @@ STEXI
- Force hard disk 0 physical geometry (1 <= @var{c} <= 16383, 1 <=
- @var{h} <= 16, 1 <= @var{s} <= 63) and optionally force the BIOS
- translation mode (@var{t}=none, lba or auto). Usually QEMU can guess
--all those parameters. This option is useful for old MS-DOS disk
--images.
-+all those parameters. This option is deprecated, please use
-+@code{-device ide-hd,cyls=c,heads=h,secs=s,...} instead.
- ETEXI
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 62529ee..9fd3130 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -171,7 +171,9 @@ _make_test_img()
  
- DEF("fsdev", HAS_ARG, QEMU_OPTION_fsdev,
-diff --git a/vl.c b/vl.c
-index f46e070..42d4bce 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3231,6 +3231,8 @@ int main(int argc, char **argv, char **envp)
-                         }
-                     }
-                 }
-+                error_report("'-hdachs' is deprecated, please use '-device"
-+                             " ide-hd,cyls=c,heads=h,secs=s,...' instead");
-                 break;
-             case QEMU_OPTION_numa:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
+     # Start an NBD server on the image file, which is what we'll be talking to
+     if [ $IMGPROTO = "nbd" ]; then
+-        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT  $TEST_IMG_FILE >/dev/null &"
++        # Pass a sufficiently high number to -e that should be enough for all
++        # tests
++        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT -e 42  $TEST_IMG_FILE >/dev/null &"
+         sleep 1 # FIXME: qemu-nbd needs to be listening before we continue
+     fi
+ 
 -- 
 1.8.3.1
