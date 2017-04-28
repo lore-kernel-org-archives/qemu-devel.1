@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d3zqs-0001Kq-RT
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:58:04 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1d3zqr-0001Ju-T0
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d3zqq-00037g-1F
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:58:02 -0400
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:13557)
+	(envelope-from <a.perevalov@samsung.com>) id 1d3zqo-00035u-Py
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:58:01 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:63296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1d3zqp-00035P-RQ
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:57:59 -0400
+	id 1d3zqo-00033A-KU
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:57:58 -0400
 Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout3.w1.samsung.com
+	by mailout1.w1.samsung.com
 	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OP300D23Y0LN620@mailout3.w1.samsung.com> for
-	qemu-devel@nongnu.org; Fri, 28 Apr 2017 07:57:57 +0100 (BST)
+	2014)) with ESMTP id <0OP300BA7Y0I4D20@mailout1.w1.samsung.com> for
+	qemu-devel@nongnu.org; Fri, 28 Apr 2017 07:57:54 +0100 (BST)
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Fri, 28 Apr 2017 09:57:38 +0300
-Message-id: <1493362658-8179-7-git-send-email-a.perevalov@samsung.com>
+Date: Fri, 28 Apr 2017 09:57:35 +0300
+Message-id: <1493362658-8179-4-git-send-email-a.perevalov@samsung.com>
 In-reply-to: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
 References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170428065755eucas1p1cdd0f278a235f176e9f63c40bc64a7a9@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH RESEND V3 6/6] migration: trace postcopy total
- downtime
+	<CGME20170428065753eucas1p1524aa2bd8e469e6c94a88ee80eb54a6e@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH RESEND V3 3/6] migration: split
+ ufd_version_check onto receive/request features part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +34,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, a.perevalov@samsung.com, i.maximets@samsung.com, f4bug@amsat.org, peterx@redhat.com
 
-It's not possible to transmit it back to source host,
-due to RP protocol is not expandable.
+This modification is necessary for userfault fd features which are
+required to be requested from userspace.
+UFFD_FEATURE_THREAD_ID is a one of such "on demand" feature, which will
+be introduced in the next patch.
+
+QEMU need to use separate userfault file descriptor, due to
+userfault context has internal state, and after first call of
+ioctl UFFD_API it changes its state to UFFD_STATE_RUNNING (in case of
+success), but
+kernel while handling ioctl UFFD_API expects UFFD_STATE_WAIT_API. So
+only one ioctl with UFFD_API is possible per ufd.
 
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 ---
- migration/postcopy-ram.c | 2 ++
- migration/trace-events   | 1 +
- 2 files changed, 3 insertions(+)
+ migration/postcopy-ram.c | 68 ++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 63 insertions(+), 5 deletions(-)
 
 diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index cf2b935..35e77ba 100644
+index 4c859b4..21e7150 100644
 --- a/migration/postcopy-ram.c
 +++ b/migration/postcopy-ram.c
-@@ -388,6 +388,8 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+@@ -60,15 +60,51 @@ struct PostcopyDiscardState {
+ #include <sys/eventfd.h>
+ #include <linux/userfaultfd.h>
+ 
+-static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
++
++/*
++ * Check userfault fd features, to request only supported features in
++ * future.
++ * __NR_userfaultfd - should be checked before
++ * Return obtained features
++ */
++static bool receive_ufd_features(__u64 *features)
+ {
+-    struct uffdio_api api_struct;
+-    uint64_t ioctl_mask;
++    struct uffdio_api api_struct = {0};
++    int ufd;
++    bool ret = true;
+ 
++    /* if we are here __NR_userfaultfd should exists */
++    ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
++    if (ufd == -1) {
++        return false;
++    }
++
++    /* ask features */
+     api_struct.api = UFFD_API;
+     api_struct.features = 0;
+     if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+-        error_report("postcopy_ram_supported_by_host: UFFDIO_API failed: %s",
++        error_report("receive_ufd_features: UFFDIO_API failed: %s",
++                strerror(errno));
++        ret = false;
++        goto release_ufd;
++    }
++
++    *features = api_struct.features;
++
++release_ufd:
++    close(ufd);
++    return ret;
++}
++
++static bool request_ufd_features(int ufd, __u64 features)
++{
++    struct uffdio_api api_struct = {0};
++    uint64_t ioctl_mask;
++
++    api_struct.api = UFFD_API;
++    api_struct.features = features;
++    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
++        error_report("request_ufd_features: UFFDIO_API failed: %s",
+                      strerror(errno));
+         return false;
+     }
+@@ -81,11 +117,33 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+         return false;
      }
  
-     postcopy_state_set(POSTCOPY_INCOMING_END);
-+    /* here should be downtime receiving back operation */
-+    trace_postcopy_ram_incoming_cleanup_downtime(get_postcopy_total_downtime());
-     migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
- 
-     if (mis->postcopy_tmp_page) {
-diff --git a/migration/trace-events b/migration/trace-events
-index d338810..faa1b22 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -194,6 +194,7 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
- postcopy_ram_incoming_cleanup_entry(void) ""
- postcopy_ram_incoming_cleanup_exit(void) ""
- postcopy_ram_incoming_cleanup_join(void) ""
-+postcopy_ram_incoming_cleanup_downtime(uint64_t total) "total downtime %" PRIu64
- save_xbzrle_page_skipping(void) ""
- save_xbzrle_page_overflow(void) ""
- ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
++    return true;
++}
++
++static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
++{
++    __u64 new_features = 0;
++
++    /* ask features */
++    __u64 supported_features;
++
++    if (!receive_ufd_features(&supported_features)) {
++        error_report("ufd_version_check failed");
++        return false;
++    }
++
++    /* request features */
++    if (new_features && !request_ufd_features(ufd, new_features)) {
++        error_report("ufd_version_check failed: features %" PRIu64,
++                (uint64_t)new_features);
++        return false;
++    }
++
+     if (getpagesize() != ram_pagesize_summary()) {
+         bool have_hp = false;
+         /* We've got a huge page */
+ #ifdef UFFD_FEATURE_MISSING_HUGETLBFS
+-        have_hp = api_struct.features & UFFD_FEATURE_MISSING_HUGETLBFS;
++        have_hp = supported_features & UFFD_FEATURE_MISSING_HUGETLBFS;
+ #endif
+         if (!have_hp) {
+             error_report("Userfault on this host does not support huge pages");
 -- 
 1.9.1
