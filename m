@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Ux-0004f6-6W
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:36 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Ux-0004f2-5d
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Uu-0001Vg-JZ
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Uv-0001WA-H6
 	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:35 -0400
-Received: from [59.151.112.132] (port=46892 helo=heian.cn.fujitsu.com)
+Received: from [59.151.112.132] (port=20529 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Ut-0001Qm-VJ
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:32 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Uv-0001QC-4f
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:33 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Fri, 28 Apr 2017 17:47:18 +0800
-Message-ID: <1493372840-24551-9-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Fri, 28 Apr 2017 17:47:15 +0800
+Message-ID: <1493372840-24551-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 In-Reply-To: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V3 08/10] net/colo-compare.c: Make colo-compare
- support vnet_hdr_len
+Subject: [Qemu-devel] [PATCH V3 05/10] net/net.c: Add vnet header length to
+ SocketReadState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,165 +30,74 @@ To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
 	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-COLO-compare can get vnet header length from filter,
-Add vnet_hdr_len to struct packet and output packet with
-the vnet_hdr_len.
+Address Jason Wang's comments add vnet header length to SocketReadState.
+So we change net_fill_rstate() to read
+struct  {int size; int vnet_hdr_len; const uint8_t buf[];}.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 ---
- net/colo-compare.c    | 39 ++++++++++++++++++++++++++++++++-------
- net/colo.c            |  3 ++-
- net/colo.h            |  4 +++-
- net/filter-rewriter.c |  2 +-
- 4 files changed, 38 insertions(+), 10 deletions(-)
+ include/net/net.h |  4 +++-
+ net/net.c         | 24 ++++++++++++++++++++++--
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 54e6d40..b3e933c 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -99,7 +99,8 @@ enum {
+diff --git a/include/net/net.h b/include/net/net.h
+index 402d913..865cb98 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -115,9 +115,11 @@ typedef struct NICState {
+ } NICState;
  
- static int compare_chr_send(CharBackend *out,
-                             const uint8_t *buf,
--                            uint32_t size);
-+                            uint32_t size,
-+                            uint32_t vnet_hdr_len);
- 
- static gint seq_sorter(Packet *a, Packet *b, gpointer data)
- {
-@@ -121,9 +122,13 @@ static int packet_enqueue(CompareState *s, int mode)
-     Connection *conn;
- 
-     if (mode == PRIMARY_IN) {
--        pkt = packet_new(s->pri_rs.buf, s->pri_rs.packet_len);
-+        pkt = packet_new(s->pri_rs.buf,
-+                         s->pri_rs.packet_len,
-+                         s->pri_rs.vnet_hdr_len);
-     } else {
--        pkt = packet_new(s->sec_rs.buf, s->sec_rs.packet_len);
-+        pkt = packet_new(s->sec_rs.buf,
-+                         s->sec_rs.packet_len,
-+                         s->sec_rs.vnet_hdr_len);
-     }
- 
-     if (parse_packet_early(pkt)) {
-@@ -436,7 +441,10 @@ static void colo_compare_connection(void *opaque, void *user_data)
-         }
- 
-         if (result) {
--            ret = compare_chr_send(&s->chr_out, pkt->data, pkt->size);
-+            ret = compare_chr_send(&s->chr_out,
-+                                   pkt->data,
-+                                   pkt->size,
-+                                   pkt->vnet_hdr_len);
-             if (ret < 0) {
-                 error_report("colo_send_primary_packet failed");
-             }
-@@ -459,7 +467,8 @@ static void colo_compare_connection(void *opaque, void *user_data)
- 
- static int compare_chr_send(CharBackend *out,
-                             const uint8_t *buf,
--                            uint32_t size)
-+                            uint32_t size,
-+                            uint32_t vnet_hdr_len)
- {
-     int ret = 0;
-     uint32_t len = htonl(size);
-@@ -473,6 +482,16 @@ static int compare_chr_send(CharBackend *out,
-         goto err;
-     }
- 
-+    /*
-+     * We send vnet header len make other module(like colo-compare)
-+     * know how to parse net packet correctly.
-+     */
-+    len = htonl(vnet_hdr_len);
-+    ret = qemu_chr_fe_write_all(out, (uint8_t *)&len, sizeof(len));
-+    if (ret != sizeof(len)) {
-+        goto err;
-+    }
-+
-     ret = qemu_chr_fe_write_all(out, (uint8_t *)buf, size);
-     if (ret != size) {
-         goto err;
-@@ -616,7 +635,10 @@ static void compare_pri_rs_finalize(SocketReadState *pri_rs)
- 
-     if (packet_enqueue(s, PRIMARY_IN)) {
-         trace_colo_compare_main("primary: unsupported packet in");
--        compare_chr_send(&s->chr_out, pri_rs->buf, pri_rs->packet_len);
-+        compare_chr_send(&s->chr_out,
-+                         pri_rs->buf,
-+                         pri_rs->packet_len,
-+                         pri_rs->vnet_hdr_len);
-     } else {
-         /* compare connection */
-         g_queue_foreach(&s->conn_list, colo_compare_connection, s);
-@@ -725,7 +747,10 @@ static void colo_flush_packets(void *opaque, void *user_data)
- 
-     while (!g_queue_is_empty(&conn->primary_list)) {
-         pkt = g_queue_pop_head(&conn->primary_list);
--        compare_chr_send(&s->chr_out, pkt->data, pkt->size);
-+        compare_chr_send(&s->chr_out,
-+                         pkt->data,
-+                         pkt->size,
-+                         pkt->vnet_hdr_len);
-         packet_destroy(pkt, NULL);
-     }
-     while (!g_queue_is_empty(&conn->secondary_list)) {
-diff --git a/net/colo.c b/net/colo.c
-index 8cc166b..180eaed 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -153,13 +153,14 @@ void connection_destroy(void *opaque)
-     g_slice_free(Connection, conn);
- }
- 
--Packet *packet_new(const void *data, int size)
-+Packet *packet_new(const void *data, int size, int vnet_hdr_len)
- {
-     Packet *pkt = g_slice_new(Packet);
- 
-     pkt->data = g_memdup(data, size);
-     pkt->size = size;
-     pkt->creation_ms = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-+    pkt->vnet_hdr_len = vnet_hdr_len;
- 
-     return pkt;
- }
-diff --git a/net/colo.h b/net/colo.h
-index 7c524f3..caedb0d 100644
---- a/net/colo.h
-+++ b/net/colo.h
-@@ -43,6 +43,8 @@ typedef struct Packet {
-     int size;
-     /* Time of packet creation, in wall clock ms */
-     int64_t creation_ms;
-+    /* Get vnet_hdr_len from filter */
+ struct SocketReadState {
+-    int state; /* 0 = getting length, 1 = getting data */
++    /* 0 = getting length, 1 = getting vnet header length, 2 = getting data */
++    int state;
+     uint32_t index;
+     uint32_t packet_len;
 +    uint32_t vnet_hdr_len;
- } Packet;
+     uint8_t buf[NET_BUFSIZE];
+     SocketReadStateFinalize *finalize;
+ };
+diff --git a/net/net.c b/net/net.c
+index f69260f..5a6b5ac 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1639,8 +1639,12 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
+     unsigned int l;
  
- typedef struct ConnectionKey {
-@@ -82,7 +84,7 @@ Connection *connection_get(GHashTable *connection_track_table,
-                            ConnectionKey *key,
-                            GQueue *conn_list);
- void connection_hashtable_reset(GHashTable *connection_track_table);
--Packet *packet_new(const void *data, int size);
-+Packet *packet_new(const void *data, int size, int vnet_hdr_len);
- void packet_destroy(void *opaque, void *user_data);
- 
- #endif /* QEMU_COLO_PROXY_H */
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index afa06e8..63256c7 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -158,7 +158,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
-     char *buf = g_malloc0(size);
- 
-     iov_to_buf(iov, iovcnt, 0, buf, size);
--    pkt = packet_new(buf, size);
-+    pkt = packet_new(buf, size, 0);
-     g_free(buf);
- 
-     /*
+     while (size > 0) {
+-        /* reassemble a packet from the network */
+-        switch (rs->state) { /* 0 = getting length, 1 = getting data */
++        /* Reassemble a packet from the network.
++         * 0 = getting length.
++         * 1 = getting vnet header length.
++         * 2 = getting data.
++         */
++        switch (rs->state) {
+         case 0:
+             l = 4 - rs->index;
+             if (l > size) {
+@@ -1658,6 +1662,22 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
+             }
+             break;
+         case 1:
++            l = 4 - rs->index;
++            if (l > size) {
++                l = size;
++            }
++            memcpy(rs->buf + rs->index, buf, l);
++            buf += l;
++            size -= l;
++            rs->index += l;
++            if (rs->index == 4) {
++                /* got vnet header length */
++                rs->vnet_hdr_len = ntohl(*(uint32_t *)rs->buf);
++                rs->index = 0;
++                rs->state = 2;
++            }
++            break;
++        case 2:
+             l = rs->packet_len - rs->index;
+             if (l > size) {
+                 l = size;
 -- 
 2.7.4
