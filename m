@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d40bv-0005hz-9l
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:46:40 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d40la-0000JK-7X
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d40bs-0002sI-5g
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:46:39 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36773)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d40br-0002r9-VW
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:46:36 -0400
-Received: by mail-wm0-x233.google.com with SMTP id u65so35062891wmu.1
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 00:46:35 -0700 (PDT)
-References: <20170427120006.20564-1-rth@twiddle.net>
-	<20170427120006.20564-4-rth@twiddle.net>
-	<874lx996hh.fsf@linaro.org>
-	<30d66407-ad33-bc8c-55c6-0a5d7009bed4@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <30d66407-ad33-bc8c-55c6-0a5d7009bed4@twiddle.net>
-Date: Fri, 28 Apr 2017 08:47:05 +0100
-Message-ID: <871ssd7z46.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 03/19] qemu/atomic: Loosen restrictions
- for 64-bit ILP32 hosts
+	(envelope-from <kraxel@redhat.com>) id 1d40lV-0005Av-Kr
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:56:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41562)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d40lV-0005An-FK
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:56:33 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 28 Apr 2017 09:56:12 +0200
+Message-Id: <20170428075612.9997-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] audio: release capture buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +21,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, cota@braap.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>, Huawei PSIRT <PSIRT@huawei.com>
 
+AUD_add_capture() allocates two buffers which get never released.
+Add the missing calls to AUD_del_capture().
 
-Richard Henderson <rth@twiddle.net> writes:
+Impact: Allows vnc clients to exhaust host memory by repeatly
+starting and stopping audio capture.
 
-> On 04/27/2017 06:10 PM, Alex Bennée wrote:
->>
->> Richard Henderson <rth@twiddle.net> writes:
->>
->>> We need to coordinate with the TCG_OVERSIZED_GUEST test in cputlb.c,
->>> and allow 64-bit atomics even though sizeof(void *) == 4.
->>
->> Hmm you say this here but we never actually do it. But the other changes
->> seem fine.
->
-> I don't understand this comment.
->
->>> +#if defined(__x86_64__) || defined(__sparc__)
->>> +# define ATOMIC_REG_SIZE  8
->>> +#else
->>> +# define ATOMIC_REG_SIZE  sizeof(void *)
->>> +#endif
->
-> How does this "never actually do it"?
+Cc: P J P <ppandit@redhat.com>
+Cc: Huawei PSIRT <PSIRT@huawei.com>
+Reported-by: "Jiangxin (hunter, SCC)" <jiangxin1@huawei.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ audio/audio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-I meant this is independent of the definition of TCG_OVERSIZED_GUEST:
-
-#if TARGET_LONG_BITS > TCG_TARGET_REG_BITS
-#define TCG_OVERSIZED_GUEST 1
-#else
-#define TCG_OVERSIZED_GUEST 0
-#endif
-
-So maybe the comment should be clearer for ATOMIC_REG_SIZE that it
-should match TCG_TARGET_REG_BITS (and therefore sync with
-TCG_OVERSIZED_GUEST) in the atomic.h comment.
-
---
-Alex Bennée
+diff --git a/audio/audio.c b/audio/audio.c
+index c8898d8422..beafed209b 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -2028,6 +2028,8 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
+                     sw = sw1;
+                 }
+                 QLIST_REMOVE (cap, entries);
++                g_free (cap->hw.mix_buf);
++                g_free (cap->buf);
+                 g_free (cap);
+             }
+             return;
+-- 
+2.9.3
