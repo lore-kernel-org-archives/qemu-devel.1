@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d47a6-0002ML-RY
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:13:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1d47ft-0004G1-DZ
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:19:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d47a2-00068i-S4
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:13:14 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34110)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d47a2-00068Q-M8
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:13:10 -0400
-Received: by mail-wm0-x242.google.com with SMTP id z129so11549196wmb.1
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 08:13:10 -0700 (PDT)
-Date: Fri, 28 Apr 2017 16:13:07 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170428151307.GA10286@stefanha-x1.localdomain>
-References: <1493271996-23607-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1d47fp-0000wr-DG
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:19:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d47fp-0000wW-3t
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:19:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C95AA3DBE6
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 15:19:07 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170425102446.4008-1-quintela@redhat.com>
+	<20170425102446.4008-7-quintela@redhat.com>
+	<20170428144729.GB3276@work-vm>
+Date: Fri, 28 Apr 2017 17:19:03 +0200
+In-Reply-To: <20170428144729.GB3276@work-vm> (David Alan Gilbert's message of
+	"Fri, 28 Apr 2017 15:47:30 +0100")
+Message-ID: <87y3uk8src.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="CE+1k2dSO48ffgeK"
-Content-Disposition: inline
-In-Reply-To: <1493271996-23607-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PULL v2 0/8] qemu-ga patch queue
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/6] migration: Pass Error ** argument to
+ {save, load}_vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +35,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
 
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
---CE+1k2dSO48ffgeK
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> This way we use the "normal" way of printing errors for hmp commands.
+>> 
+>> --
+>> Paolo suggestion
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>
+> <snip>
+>
+>> +int save_vmstate(const char *name, Error **errp)
+>>  {
+>>      BlockDriverState *bs, *bs1;
+>>      QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+>> @@ -2076,29 +2076,27 @@ int save_vmstate(const char *name)
+>>      uint64_t vm_state_size;
+>>      qemu_timeval tv;
+>>      struct tm tm;
+>> -    Error *local_err = NULL;
+>>      AioContext *aio_context;
+>>  
+>>      if (!bdrv_all_can_snapshot(&bs)) {
+>> -        error_report("Device '%s' is writable but does not support snapshots",
+>> -                     bdrv_get_device_name(bs));
+>> +        error_setg(errp, "Device '%s' is writable but does not support "
+>> +                   "snapshots", bdrv_get_device_name(bs));
+>>          return ret;
+>>      }
+>>  
+>>      /* Delete old snapshots of the same name */
+>>      if (name) {
+>> -        ret = bdrv_all_delete_snapshot(name, &bs1, &local_err);
+>> +        ret = bdrv_all_delete_snapshot(name, &bs1, errp);
+>>          if (ret < 0) {
+>> -            error_reportf_err(local_err,
+>> -                              "Error while deleting snapshot on device '%s': ",
+>> -                              bdrv_get_device_name(bs1));
+>> +            error_prepend(errp, "Error while deleting snapshot on device "
+>> +                          "'%s': ", bdrv_get_device_name(bs1));
+>
+> I thought the rule was that you had to use a local_err and use error_propagate?
+> (I hate that rule)
 
-On Thu, Apr 27, 2017 at 12:46:28AM -0500, Michael Roth wrote:
-> The following changes since commit 81b2d5ceb0cfb4cdc2163492e3169ed714b0cd=
-a9:
->=20
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170426' into =
-staging (2017-04-26 20:50:49 +0100)
->=20
-> are available in the git repository at:
->=20
->   git://github.com/mdroth/qemu.git tags/qga-pull-2017-04-25-v2-tag
->=20
-> for you to fetch changes up to 53c58e64d0a27c59d763778faa2b5a522c544719:
->=20
->   qga: Add `guest-get-timezone` command (2017-04-27 00:40:25 -0500)
->=20
-> ----------------------------------------------------------------
-> qemu-ga patch queue
->=20
-> * new commands: guest-get-timezone, guest-get-users, guest-get-host-name
-> * fix hang on w32 when stopping qemu-ga service while fs frozen
-> * fix missing setting of can-offline in guest-get-vcpus
-> * make qemu-ga VSS w32 service on-demand rather than on-startup
-> * fix unecessary errors to EventLog on w32
-> * improvements to fsfreeze documentation
->=20
-> v2:
->  * document 'zone' field of guest-get-timezone as informational-only
->    (Daniel, Eric)
->  * fix build error for glib < 2.32 (Peter)
->=20
-> ----------------------------------------------------------------
-> Marc-Andr=E9 Lureau (1):
->       qga: improve fsfreeze documentations
->=20
-> Sameeh Jubran (4):
->       qemu-ga: Make QGA VSS provider service run only when needed
->       qga-win: Enable 'can-offline' field in 'guest-get-vcpus' reply
->       qga-win: Fix a bug where qemu-ga service is stuck during stop opera=
-tion
->       qga-win: Fix Event Viewer errors caused by qemu-ga
->=20
-> Vinzenz Feenstra (3):
->       qga: Add 'guest-get-host-name' command
->       qga: Add 'guest-get-users' command
->       qga: Add `guest-get-timezone` command
->=20
->  configure                   |   2 +-
->  include/glib-compat.h       |   6 +++
->  qga/commands-posix.c        |  60 +++++++++++++++++++++++++
->  qga/commands-win32.c        | 105 ++++++++++++++++++++++++++++++++++++++=
-+++++-
->  qga/commands.c              |  49 +++++++++++++++++++++
->  qga/main.c                  |  23 ++++++++++
->  qga/qapi-schema.json        |  88 ++++++++++++++++++++++++++++++++++++-
->  qga/vss-win32.h             |   1 +
->  qga/vss-win32/install.cpp   |  28 +++++++++++-
->  qga/vss-win32/install.h     |  20 +++++++++
->  qga/vss-win32/provider.cpp  |   1 -
->  qga/vss-win32/requester.cpp |   2 +
->  qga/vss-win32/vss-common.h  |  11 +----
->  qga/vss-win32/vss-handles.h |  14 ++++++
->  14 files changed, 393 insertions(+), 17 deletions(-)
->  create mode 100644 qga/vss-win32/install.h
->  create mode 100644 qga/vss-win32/vss-handles.h
->=20
->=20
+Quote qapi/error.h:
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+ * Receive an error and pass it on to the caller:
+ *     Error *err = NULL;
+ *     foo(arg, &err);
+ *     if (err) {
+ *         handle the error...
+ *         error_propagate(errp, err);
+ *     }
+ * where Error **errp is a parameter, by convention the last one.
+ *
+ * Do *not* "optimize" this to
+ *     foo(arg, errp);
+ *     if (*errp) { // WRONG!
+ *         handle the error...
+ *     }
+ * because errp may be NULL!
+ *
+ * But when all you do with the error is pass it on, please use
+ *     foo(arg, errp);
+ * for readability.
 
-Stefan
+Neglects to mention you can error_prepend() and still avoid
+error_propagate(), but the comment is long enough as it is.
 
---CE+1k2dSO48ffgeK
-Content-Type: application/pgp-signature; name="signature.asc"
+>>              return ret;
+>>          }
+>>      }
+>>  
+>>      bs = bdrv_all_find_vmstate_bs();
+>>      if (bs == NULL) {
+>> -        error_report("No block device can accept snapshots");
+>> +        error_setg(errp, "No block device can accept snapshots");
+>>          return ret;
+>>      }
+>>      aio_context = bdrv_get_aio_context(bs);
+>> @@ -2107,7 +2105,7 @@ int save_vmstate(const char *name)
+>>  
+>>      ret = global_state_store();
+>>      if (ret) {
+>> -        error_report("Error saving global state");
+>> +        error_setg(errp, "Error saving global state");
+>>          return ret;
+>>      }
+>>      vm_stop(RUN_STATE_SAVE_VM);
+>> @@ -2139,21 +2137,20 @@ int save_vmstate(const char *name)
+>>      /* save the VM state */
+>>      f = qemu_fopen_bdrv(bs, 1);
+>>      if (!f) {
+>> -        error_report("Could not open VM state file");
+>> +        error_setg(errp, "Could not open VM state file");
+>>          goto the_end;
+>>      }
+>> -    ret = qemu_savevm_state(f, &local_err);
+>> +    ret = qemu_savevm_state(f, errp);
+>>      vm_state_size = qemu_ftell(f);
+>>      qemu_fclose(f);
+>>      if (ret < 0) {
+>> -        error_report_err(local_err);
+>>          goto the_end;
+>>      }
+>>  
+>>      ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+>>      if (ret < 0) {
+>> -        error_report("Error while creating snapshot on '%s'",
+>> -                     bdrv_get_device_name(bs));
+>> +        error_setg(errp, "Error while creating snapshot on '%s'",
+>> +                   bdrv_get_device_name(bs));
+>>          goto the_end;
+>>      }
+>>  
+>> @@ -2226,7 +2223,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+>>      migration_incoming_state_destroy();
+>>  }
+>>  
+>> -int load_vmstate(const char *name)
+>> +int load_vmstate(const char *name, Error **errp)
+>>  {
+>>      BlockDriverState *bs, *bs_vm_state;
+>>      QEMUSnapshotInfo sn;
+>> @@ -2236,20 +2233,22 @@ int load_vmstate(const char *name)
+>>      MigrationIncomingState *mis = migration_incoming_get_current();
+>>  
+>>      if (!bdrv_all_can_snapshot(&bs)) {
+>> -        error_report("Device '%s' is writable but does not support snapshots",
+>> -                     bdrv_get_device_name(bs));
+>> +        error_setg(errp,
+>> +                   "Device '%s' is writable but does not support snapshots",
+>> +                   bdrv_get_device_name(bs));
+>>          return -ENOTSUP;
+>>      }
+>>      ret = bdrv_all_find_snapshot(name, &bs);
+>>      if (ret < 0) {
+>> -        error_report("Device '%s' does not have the requested snapshot '%s'",
+>> -                     bdrv_get_device_name(bs), name);
+>> +        error_setg(errp,
+>> +                   "Device '%s' does not have the requested snapshot '%s'",
+>> +                   bdrv_get_device_name(bs), name);
+>>          return ret;
+>>      }
+>>  
+>>      bs_vm_state = bdrv_all_find_vmstate_bs();
+>>      if (!bs_vm_state) {
+>> -        error_report("No block device supports snapshots");
+>> +        error_setg(errp, "No block device supports snapshots");
+>>          return -ENOTSUP;
+>>      }
+>>      aio_context = bdrv_get_aio_context(bs_vm_state);
+>> @@ -2261,8 +2260,8 @@ int load_vmstate(const char *name)
+>>      if (ret < 0) {
+>>          return ret;
+>>      } else if (sn.vm_state_size == 0) {
+>> -        error_report("This is a disk-only snapshot. Revert to it offline "
+>> -            "using qemu-img.");
+>> +        error_setg(errp, "This is a disk-only snapshot. Revert to it "
+>> +                   " offline using qemu-img");
+>>          return -EINVAL;
+>>      }
+>>  
+>> @@ -2271,7 +2270,7 @@ int load_vmstate(const char *name)
+>>  
+>>      ret = bdrv_all_goto_snapshot(name, &bs);
+>>      if (ret < 0) {
+>> -        error_report("Error %d while activating snapshot '%s' on '%s'",
+>> +        error_setg(errp, "Error %d while activating snapshot '%s' on '%s'",
+>>                       ret, name, bdrv_get_device_name(bs));
+>>          return ret;
+>>      }
+>> @@ -2279,7 +2278,7 @@ int load_vmstate(const char *name)
+>>      /* restore the VM state */
+>>      f = qemu_fopen_bdrv(bs_vm_state, 0);
+>>      if (!f) {
+>> -        error_report("Could not open VM state file");
+>> +        error_setg(errp, "Could not open VM state file");
+>>          return -EINVAL;
+>>      }
+>>  
+>> @@ -2293,7 +2292,7 @@ int load_vmstate(const char *name)
+>>  
+>>      migration_incoming_state_destroy();
+>>      if (ret < 0) {
+>> -        error_report("Error %d while loading VM state", ret);
+>> +        error_setg(errp, "Error %d while loading VM state", ret);
+>>          return ret;
+>>      }
+>>  
+>> diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+>> index 8cced46..fdc4353 100644
+>> --- a/replay/replay-snapshot.c
+>> +++ b/replay/replay-snapshot.c
+>> @@ -62,14 +62,16 @@ void replay_vmstate_register(void)
+>>  
+>>  void replay_vmstate_init(void)
+>>  {
+>> +    Error *err = NULL;
+>> +
+>>      if (replay_snapshot) {
+>>          if (replay_mode == REPLAY_MODE_RECORD) {
+>> -            if (save_vmstate(replay_snapshot) != 0) {
+>> +            if (save_vmstate(replay_snapshot, &err) != 0) {
+>>                  error_report("Could not create snapshot for icount record");
+>>                  exit(1);
+>>              }
+>>          } else if (replay_mode == REPLAY_MODE_PLAY) {
+>> -            if (load_vmstate(replay_snapshot) != 0) {
+>> +            if (load_vmstate(replay_snapshot, &err) != 0) {
+>>                  error_report("Could not load snapshot for icount replay");
+>>                  exit(1);
+>>              }
+>
+> How do either of the contents of the 'err' get reported - they're not
+> printed at all are they?
+> (I don't like error_abort, I'd rather see the other message as well).
 
------BEGIN PGP SIGNATURE-----
+I guess you mean &error_fatal.
 
-iQEcBAEBAgAGBQJZA1wDAAoJEJykq7OBq3PICKYH/0qQ/txn/Y78BEMxLLIbQwaP
-yer9BqoFvsR0ux9w8U3vsk6sASxsVKbUnvbSNRqYCNaXA+Y0ckx3eVHbzaOSR4p6
-cS+Qqu7n/pgr7ksGX8FSrki4kolPoKuS/LwXsyPlp1Oc5qMW0jwIHvKOv58LYo3f
-b/oUJfuvexyR+ekydga8t60r5uajnzIPfnYvCf/4yoy2eL5rFZS65/jFDZOMJq8c
-76942dn48nUlG0yyy8cqDQzP3BgfjqbD4iS2l4unOpw4jPk07ZIMnsdlrs6CLyo6
-BeKUwxjMUTcIuTQCkJ10IFswGrgxyLjDE61+neQUbgqN+wm3q2IRSmSALqxdXhA=
-=BjGS
------END PGP SIGNATURE-----
+Consider error_report_err().
 
---CE+1k2dSO48ffgeK--
+>
+> Dave
+>
+>> diff --git a/vl.c b/vl.c
+>> index 0b4ed52..8b3ec2e 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -4681,7 +4681,9 @@ int main(int argc, char **argv, char **envp)
+>>      if (replay_mode != REPLAY_MODE_NONE) {
+>>          replay_vmstate_init();
+>>      } else if (loadvm) {
+>> -        if (load_vmstate(loadvm) < 0) {
+>> +        Error *local_err = NULL;
+>> +        if (load_vmstate(loadvm, &local_err) < 0) {
+>> +            error_report_err(local_err);
+>>              autostart = 0;
+>>          }
+>>      }
+>> -- 
+>> 2.9.3
+>> 
+>> 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
