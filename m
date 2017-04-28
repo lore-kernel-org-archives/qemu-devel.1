@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d435T-0006le-RU
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:25:21 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d438r-0008KT-74
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:28:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d435Q-0008FK-N2
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:25:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d435Q-0008EY-DT
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:25:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F6587F4A7
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 10:25:15 +0000 (UTC)
-Date: Fri, 28 Apr 2017 18:21:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170428102130.GD22801@pxdev.xzpeter.org>
-References: <1493287126-19072-1-git-send-email-peterx@redhat.com>
-	<1493287126-19072-3-git-send-email-peterx@redhat.com>
-	<20170427112313.GD2082@work-vm>
+	(envelope-from <alex.bennee@linaro.org>) id 1d438n-0002JA-0b
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:28:49 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:34974)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d438m-0002J0-Pr
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:28:44 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id w64so38454013wma.0
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 03:28:44 -0700 (PDT)
+References: <20170427120006.20564-1-rth@twiddle.net>
+	<20170427120006.20564-6-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170427120006.20564-6-rth@twiddle.net>
+Date: Fri, 28 Apr 2017 11:29:14 +0100
+Message-ID: <87wpa47rlx.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170427112313.GD2082@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] ramblock: add new hmp command "info
- ramblock"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 05/19] tcg-runtime: add lookup_tb_ptr
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,120 +31,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, cota@braap.org
 
-On Thu, Apr 27, 2017 at 12:23:14PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > To dump information about ramblocks. It looks like:
-> > 
-> > (qemu) info ramblock
-> >               Block Name    PSize              Offset               Used              Total
-> >             /objects/mem       2M  0x0000000000000000 0x0000000080000000 0x0000000080000000
-> >                 vga.vram       4K  0x0000000080060000 0x0000000001000000 0x0000000001000000
-> >     /rom@etc/acpi/tables       4K  0x00000000810b0000 0x0000000000020000 0x0000000000200000
-> >                  pc.bios       4K  0x0000000080000000 0x0000000000040000 0x0000000000040000
-> >   0000:00:03.0/e1000.rom       4K  0x0000000081070000 0x0000000000040000 0x0000000000040000
-> >                   pc.rom       4K  0x0000000080040000 0x0000000000020000 0x0000000000020000
-> >     0000:00:02.0/vga.rom       4K  0x0000000081060000 0x0000000000010000 0x0000000000010000
-> >    /rom@etc/table-loader       4K  0x00000000812b0000 0x0000000000001000 0x0000000000001000
-> >       /rom@etc/acpi/rsdp       4K  0x00000000812b1000 0x0000000000001000 0x0000000000001000
-> > 
-> > Ramblock is something hidden internally in QEMU implementation, and this
-> > command should only be used by mostly QEMU developers on RAM stuff. It
-> > is not a command suitable for QMP interface. So only HMP interface is
-> > provided for it.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  exec.c                 | 36 ++++++++++++++++++++++++++++++++++++
-> >  hmp-commands-info.hx   | 14 ++++++++++++++
-> >  hmp.c                  |  6 ++++++
-> >  hmp.h                  |  1 +
-> >  include/exec/ramlist.h |  1 +
-> >  5 files changed, 58 insertions(+)
-> > 
-> > diff --git a/exec.c b/exec.c
-> > index 50519ae..9b9d16e 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -71,6 +71,8 @@
-> >  #include "qemu/mmap-alloc.h"
-> >  #endif
-> >  
-> > +#include "monitor/monitor.h"
-> > +
-> >  //#define DEBUG_SUBPAGE
-> >  
-> >  #if !defined(CONFIG_USER_ONLY)
-> > @@ -1333,6 +1335,40 @@ void qemu_mutex_unlock_ramlist(void)
-> >      qemu_mutex_unlock(&ram_list.mutex);
-> >  }
-> >  
-> > +static const char *page_size_to_str(size_t psize)
-> > +{
-> > +    switch (psize) {
-> > +    case 0x1000:
-> > +        return "4K";
-> > +    case 0x10000:
-> > +        return "64K";
-> > +    case 0x200000:
-> > +        return "2M";
-> > +    case 0x40000000:
-> > +        return "1G";
-> 
-> That's not very portable; other platforms have other sizes, for example
-> I think ARM has 16kB as one option, and I'm pretty sure the huge-pages
-> on Power are a different size.
-> Hmm, we already have
->                      qemu-io-cmds.c:cvtstr and
->        qapi/string-output-visitor.c:print_type_size
-> 
-> to print sizes nicely; it's a pity we can't use them somehow rather
-> than having a 3rd similar function.
 
-Indeed. But it's not easy to directly leverage them. Another thing is
-that even with these two existing ones, I would still prefer one
-function tailored for translating page sizes, since page sizes are
-after all static and imho a hash is nice and fast in that case (just
-like what the switch does above).
+Richard Henderson <rth@twiddle.net> writes:
 
-Regarding to the compatibility issue - I considered that, so I had a
-"default" below. Since this command is at least currently only for
-debugging, if anyone sees "N/A" in the page size field, he/she would
-know something wrong, and possibly he/she can add the missed page size
-then (if he/she really think this command useful :-).
+> From: "Emilio G. Cota" <cota@braap.org>
+>
+> This paves the way for upcoming work.
+>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> Message-Id: <1493263764-18657-3-git-send-email-cota@braap.org>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  tcg-runtime.c     | 24 ++++++++++++++++++++++++
+>  tcg/tcg-runtime.h |  2 ++
+>  tcg/tcg.h         |  1 +
+>  3 files changed, 27 insertions(+)
+>
+> diff --git a/tcg-runtime.c b/tcg-runtime.c
+> index 4c60c96..8a24bdd 100644
+> --- a/tcg-runtime.c
+> +++ b/tcg-runtime.c
+> @@ -27,6 +27,7 @@
+>  #include "exec/helper-proto.h"
+>  #include "exec/cpu_ldst.h"
+>  #include "exec/exec-all.h"
+> +#include "exec/tb-hash.h"
+>
+>  /* 32-bit helpers */
+>
+> @@ -141,6 +142,29 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
+>      return ctpop64(arg);
+>  }
+>
+> +void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
+> +{
+> +    CPUState *cpu = ENV_GET_CPU(env);
+> +    TranslationBlock *tb;
+> +    target_ulong cs_base, pc;
+> +    uint32_t flags;
+> +
+> +    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)]);
+> +    if (likely(tb)) {
+> +        cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+> +        if (likely(tb->pc == addr && tb->cs_base == cs_base &&
+> +                   tb->flags == flags)) {
+> +            return tb->tc_ptr;
+> +        }
+> +        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
+> +        if (likely(tb)) {
+> +            atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(addr)], tb);
+> +            return tb->tc_ptr;
+> +        }
+> +    }
+> +    return tcg_ctx.code_gen_epilogue;
 
-How about I move this function into util/cutils.c? Would that be a
-solution for current series? Also, I can add translations for
-4K,8K,16K,... until 1G, if you prefer. That won't be too hard.
+Minor comments: I did notice is given we rely on the backends to set this up
+in later patches if it is worth adding an assert (or tcg_debug_assert?)
+to catch this early if a new backend doesn't set this up?
 
-> 
-> > +    default:
-> > +        return "N/A";
-> > +    }
-> > +}
-> > +
-> > +void ram_block_dump(Monitor *mon)
-> > +{
-> > +    RAMBlock *block;
-> > +
-> > +    rcu_read_lock();
-> > +    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-> > +                   "Block Name", "PSize", "Offset", "Used", "Total");
-> > +    RAMBLOCK_FOREACH(block) {
-> > +        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
-> > +                       " 0x%016" PRIx64 "\n", block->idstr,
-> > +                       page_size_to_str(block->page_size),
-> > +                       (uint64_t)block->offset,
-> > +                       (uint64_t)block->used_length,
-> > +                       (uint64_t)block->max_length);
-> > +    }
-> 
-> Yes that should work, I remember there's a RAM_ADDR_FMT macro that's
-> supposed to be usable for ram_addr_t, but that's fine.
+> +}
+> +
+>  void HELPER(exit_atomic)(CPUArchState *env)
+>  {
+>      cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
+> diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
+> index 114ea6f..c41d38a 100644
+> --- a/tcg/tcg-runtime.h
+> +++ b/tcg/tcg-runtime.h
+> @@ -24,6 +24,8 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+>  DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
+>  DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+>
+> +DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
+> +
+>  DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+>
+>  #ifdef CONFIG_SOFTMMU
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 6c216bb..5ec48d1 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -699,6 +699,7 @@ struct TCGContext {
+>         extension that allows arithmetic on void*.  */
+>      int code_gen_max_blocks;
+>      void *code_gen_prologue;
+> +    void *code_gen_epilogue;
+>      void *code_gen_buffer;
+>      size_t code_gen_buffer_size;
+>      void *code_gen_ptr;
 
-That looks better. Will switch to that. Thanks!
 
--- 
-Peter Xu
+--
+Alex Bennée
