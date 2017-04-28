@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d4BZQ-000503-Id
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:28:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d4BbB-0006JO-Mq
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:30:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d4BZP-0002RV-Mg
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:28:48 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d4BbA-00032V-SP
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:30:37 -0400
 References: <20170427014626.11553-1-eblake@redhat.com>
-	<20170427014626.11553-6-eblake@redhat.com>
+	<20170427014626.11553-7-eblake@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
-Date: Fri, 28 Apr 2017 21:28:38 +0200
+Message-ID: <df4f3b8a-63fb-28c7-61e9-60288bf50b87@redhat.com>
+Date: Fri, 28 Apr 2017 21:30:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170427014626.11553-6-eblake@redhat.com>
+In-Reply-To: <20170427014626.11553-7-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="QVSG8LCu8eaFc9TGM5uOj84Ax1HajvdxC"
-Subject: Re: [Qemu-devel] [PATCH v10 05/17] iotests: Add test 179 to cover
- write zeroes with unmap
+	boundary="TVNebA4JSOQnMisTnsrbQkLEJ0RVECdMi"
+Subject: Re: [Qemu-devel] [PATCH v10 06/17] qemu-io: Don't open-code
+ QEMU_IS_ALIGNED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +29,49 @@ To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QVSG8LCu8eaFc9TGM5uOj84Ax1HajvdxC
+--TVNebA4JSOQnMisTnsrbQkLEJ0RVECdMi
 From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
-Subject: Re: [PATCH v10 05/17] iotests: Add test 179 to cover write zeroes
- with unmap
+Message-ID: <df4f3b8a-63fb-28c7-61e9-60288bf50b87@redhat.com>
+Subject: Re: [PATCH v10 06/17] qemu-io: Don't open-code QEMU_IS_ALIGNED
 References: <20170427014626.11553-1-eblake@redhat.com>
- <20170427014626.11553-6-eblake@redhat.com>
-In-Reply-To: <20170427014626.11553-6-eblake@redhat.com>
+ <20170427014626.11553-7-eblake@redhat.com>
+In-Reply-To: <20170427014626.11553-7-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 27.04.2017 03:46, Eric Blake wrote:
-> No tests were covering write zeroes with unmap.  Additionally,
-> I needed to prove that my previous patches for correct status
-> reporting and write zeroes optimizations actually had an impact.
+> Manual comparison against 0x1ff is not as clean as using our
+> alignment macros from osdep.h.
 >=20
-> The test works for cluster_size between 8k and 2M (for smaller
-> sizes, it fails because our allocation patterns are not contiguous
-> with small clusters).
->=20
+> Suggested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 >=20
 > ---
-> v10: drop any changes to v2 files, rewrite test to work with updates
-> earlier in the series, add a blkdebug probe
-> v9: new patch
+> v10: new patch
 > ---
->  tests/qemu-iotests/179     | 123 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/179.out |  90 +++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 214 insertions(+)
->  create mode 100755 tests/qemu-iotests/179
->  create mode 100644 tests/qemu-iotests/179.out
+>  qemu-io-cmds.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-Can I convince you to write this test in a different way? I really have
-a hard time following all of the writes and building a mental image of
-how the qcow2 file should look in the end so I can compare it to the map
-output.
-
-I'd like it better if you would check the qcow2 file after each group of
-write operations, maybe even creating a new image for every such group.
-But even just having more qemu-img map calls (and changing nothing else)
-would help me a lot.
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---QVSG8LCu8eaFc9TGM5uOj84Ax1HajvdxC
+--TVNebA4JSOQnMisTnsrbQkLEJ0RVECdMi
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDl+cSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AJQwIALMBb/m/9cxdjnWGStR6n6uhlWd4O7aK
-ex6PdBlsDt/fTsOYpwj2M2x5T2lItnsgGiuh9jULHAM2VQZJBcrVcuyNftiaOuKP
-XVTnGMA74Z44PD/OEiwJ4YX7CYwaoSdbBsWK8wlTQTnF4oSCaqhYa2AmeyyL1JcL
-jxmL4H1nlnAJZORY4++jlY/4DOveWfka6GwCBuPQVd+v1ncwgumOgcgPCrMkPcOt
-Co6/f/Q0zIe1+auB8JiPs0HCRcVpuiPJ2MwjY/18opYBFZOlySDDGQCks8NI87rm
-uOUSSGkgrqA6gn3rKzim9q/CKrelTqsWWetkt8IkCsStGWmC0EaUvgs=
-=87wm
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDmFQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ApM4H/AngkqXqmHrvDdx9Uw7Xknwq1tx8VJob
+dRmEQKInDQzayjo75f2qbATLlmh68MSQorl4XmIWIUHs679ZaXg8VMNEEinWj8Qt
+VEsGJJu45P+KBwylHKmZ+8+rJ7dVI0trZI9nWQ1le4oW5HOllXchXnFdBQ0z81Q5
+Ii+MmmcNtIY8+LQA6MLv3VGhC6mC0C19/8xRboUcr2F1KGh4yk2X36f3oj4r2pzY
+1rT2DMhdFL4yh7L/bZIpAAtP/V2yFFgSRaKwUFL1yeQcH3kDKDB9axAFfy5Dk84+
+gl3fYK4aX1M9lX//1TwL94j6Llw2Vi3rytgUYhbSdzMsJb280WRsVEU=
+=pezY
 -----END PGP SIGNATURE-----
 
---QVSG8LCu8eaFc9TGM5uOj84Ax1HajvdxC--
+--TVNebA4JSOQnMisTnsrbQkLEJ0RVECdMi--
