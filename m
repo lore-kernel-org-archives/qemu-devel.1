@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d4D8K-0001I6-0j
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:08:57 -0400
+	(envelope-from <shorne@gmail.com>) id 1d4D9q-0002Kq-Jj
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d4D8I-0006m0-No
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:08:55 -0400
-References: <73ecd486-2d5c-e204-1588-a0b6324ba77b@virtuozzo.com>
-	<a18117bb-bf65-1263-48f0-72a2696cdc0b@redhat.com>
-	<754114c9-9be5-f11b-571b-2cd1c2b5d98f@virtuozzo.com>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <721fd2ee-5606-5324-5232-35143c3d5764@virtuozzo.com>
-Date: Fri, 28 Apr 2017 22:37:23 +0300
-MIME-Version: 1.0
-In-Reply-To: <754114c9-9be5-f11b-571b-2cd1c2b5d98f@virtuozzo.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] RFC: some problems with bdrv_get_block_status
+	(envelope-from <shorne@gmail.com>) id 1d4D9n-0007d6-E1
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:10:30 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34846)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d4D9n-0007cm-5b
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:10:27 -0400
+Received: by mail-pf0-x241.google.com with SMTP id o68so3871pfj.2
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 14:10:27 -0700 (PDT)
+From: Stafford Horne <shorne@gmail.com>
+Date: Sat, 29 Apr 2017 06:10:18 +0900
+Message-Id: <20170428211018.2927-1-shorne@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/openrisc: Support non-busy idle state
+ using PMR SPR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,131 +24,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, QEMU <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stephane Chazelas <stephane.chazelas@gmail.com>
+To: QEMU Development <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, Stafford Horne <shorne@gmail.com>
 
-On 04/28/2017 10:35 PM, Denis V. Lunev wrote:
-> On 04/28/2017 09:31 PM, Eric Blake wrote:
->> On 04/28/2017 11:17 AM, Denis V. Lunev wrote:
->>> Hello, All!
->>>
->>> Recently we have experienced problems with very slow
->>> bdrv_get_block_status call, which is massive called f.e.
->>> from mirror_run().
->>>
->>> The problem was narrowed down to slow lseek64() system
->>> call, which can take 1-2-3 seconds.
->> I'm guessing you meant one-to-three (the range), not one-two-three
->> (three separate digits), and just had an unfortunate abbreviation of
->> 'to' turning into the phonetically-similar '2'.
->>
-> from 1 to 3, you are correct
->
->
->>> root@s158 ~]# strace -f -p 77048 -T  -e lseek
->>> Process 77048 attached with 14 threads
->>> [pid 77053] lseek(23, 6359613440, SEEK_DATA) = 6360276992 <1.250323>
->> That sounds like a bug in your choice of filesystem.  It's been
->> mentioned before that lseek has some pathetically poor behavior (I think
->> tmpfs was one of the culprits), but I maintain that it is better to
->> hammer on the kernel folks to fix the poor behavior than it is to have
->> to implement user-space workarounds in every single affected program.
->>
->> That said, a workaround of being able to request the avoidance of lseek
->> has been brought up on this list before.
->>
->>
->>> The problem comes from this branch of the code
->>>
->>> bdrv_co_get_block_status
->>>     .......
->>>     if (bs->file &&
->>>         (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
->>>         (ret & BDRV_BLOCK_OFFSET_VALID)) {
->>>         int file_pnum;
->>>
->>>         ret2 = bdrv_co_get_block_status(bs->file, ret >> BDRV_SECTOR_BITS,
->>>                                         *pnum, &file_pnum);
->>>         if (ret2 >= 0) {
->>>             /* Ignore errors.  This is just providing extra information, it
->>>              * is useful but not necessary.
->>>              */
->>>             if (!file_pnum) {
->>>                 /* !file_pnum indicates an offset at or beyond the EOF;
->>> it is
->>>                  * perfectly valid for the format block driver to point
->>> to such
->>>                  * offsets, so catch it and mark everything as zero */
->>>                 ret |= BDRV_BLOCK_ZERO;
->>>             } else {
->>>                 /* Limit request to the range reported by the protocol
->>> driver */
->>>                 *pnum = file_pnum;
->>>                 ret |= (ret2 & BDRV_BLOCK_ZERO);
->>>             }
->>>         }
->>>     }
->> I don't see anything wrong with this code. It's nice to know that we
->> have data (qcow2 says we have allocated bytes due to this layer, so
->> don't refer to the backing files), but when the underlying file can ALSO
->> tell us that the underlying protocol is sparse and we are on a hole,
->> then we know that we have BDRV_BLOCK_ZERO condition which can in turn
->> enable other optimizations in quite a bit of the stack.  It IS valid to
->> return BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO (we don't have to limit
->> ourselves to BDRV_BLOCK_DATA), and we should probably do so any time
->> that such computation is cheap.
->>
->> I agree with your analysis that on a poor filesystem where lseek()
->> behavior sucks that it is no longer cheap to determine where the holes are.
->>
->> But the proper workaround for those filesystems should NOT be made by
->> undoing this part of bdrv_co_get_block_status(), but should rather be
->> fixed in file-posix.c by the addition of a user-controllable knob on
->> whether to skip lseek().  In other words, if we're going to work around
->> the poor filesystem performance, the workaround should live in
->> file-posix.c, not in the generic block/io.c.  Once the workaround is
->> enabled, the 'ret2 = bdrv_co_get_block_status()' nested call should be
->> lightning fast (because file-posix.c would no longer be using lseek when
->> you've requested the workaround).
->>
->>> Frankly speaking, this optimization should not give much.
->>> If upper layer format (QCOW2) says that we have data
->>> here, then nowadays in 99.9% we do have the data.
->> You are correct that we have BDRV_BLOCK_DATA; but it IS useful to ALSO
->> know if that data reads back as all zeros (so we can skip reading it).
->> Just because qcow2 reports something as data does NOT rule out whether
->> the data still reads as zeros.
->>
->>> Meanwhile this branch can cause problems. We would
->>> need block cleared entirely to get the benefit for most
->>> cases in mirror and backup operations.
->>>
->>> At my opinion it worth to drop this at all.
->>>
->>> Guys, do you have any opinion?
->> Again, my opinion is to not change this part of block/io.c.  Rather,
->> work should be expended on individual protocol drivers to quit wasting
->> unnecessary time on reporting BDRV_BLOCK_ZERO if the time spent to
->> determine that is not worth the effort (as it is when using lseek() on
->> inefficient filesystems).  It is always safe for a protocol driver to
->> report BDRV_BLOCK_DATA instead of BDRV_BLOCK_ZERO, if asking the
->> question is too expensive (treating holes as data may pessimize other
->> operations, but that's okay if the penalty for asking is worse than what
->> optimizations are able to regain).
->>
->>> Den
->>>
->>> P.S. The kernel is one based on RedHat 3.10.0-514. The same
->>>       problem was observed in 3.10.0-327 too.
->> Red Hat is always two words (I'm allowed to point that out, as they
->> employ me ;).  But if it really is a Red Hat kernel problem, be sure to
->> use your support contract to point out the kernel developers that they
->> really need to fix lseek() - and you'll need to give details on which
->> filesystem you're using (as not all filesystems have that abysmal
->> performance).
->>
-pls ignore above letter completely. I have pressed 'Send' in the wrong
-Window.
-Correct answer is above in the thread.
+The OpenRISC architecture has the Power Management Register (PMR)
+special purpose register to manage cpu power states.  The interesting
+modes are:
 
-Den
+ * Doze Mode (DME) - Stop cpu except timer & pic - wake on interrupt
+ * Sleep Mode (SME) - Stop cpu and all units - wake on interrupt
+ * Suspend Model (SUME) - Stop cpu and all units - wake on reset
+
+The linux kernel will set DME when idle.
+
+This patch implements the PMR SPR and halts the qemu cpu when there is a
+change to DME or SME.  This means that openrisc qemu in no longer peggs
+a host cpu at 100%.
+
+In order for this to work we need to kick the CPU when timers are
+expired.  Update the cpu timer to kick the cpu upon each timer event.
+
+Signed-off-by: Stafford Horne <shorne@gmail.com>
+---
+
+Changes since last RFC - none
+
+ hw/openrisc/cputimer.c       |  1 +
+ target/openrisc/cpu.c        |  3 ++-
+ target/openrisc/cpu.h        | 10 ++++++++++
+ target/openrisc/interrupt.c  |  2 ++
+ target/openrisc/machine.c    |  1 +
+ target/openrisc/sys_helper.c | 13 +++++++++++++
+ 6 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/hw/openrisc/cputimer.c b/hw/openrisc/cputimer.c
+index a98c799..febc469 100644
+--- a/hw/openrisc/cputimer.c
++++ b/hw/openrisc/cputimer.c
+@@ -61,6 +61,7 @@ void cpu_openrisc_timer_update(OpenRISCCPU *cpu)
+     }
+     next = now + (uint64_t)wait * TIMER_PERIOD;
+     timer_mod(cpu->env.timer, next);
++    qemu_cpu_kick(CPU(cpu));
+ }
+ 
+ void cpu_openrisc_count_start(OpenRISCCPU *cpu)
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index c9b3f22..1d6330c 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -51,7 +51,8 @@ static void openrisc_cpu_reset(CPUState *s)
+     cpu->env.lock_addr = -1;
+     s->exception_index = -1;
+ 
+-    cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP;
++    cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP |
++                   UPR_PMP;
+     cpu->env.dmmucfgr = (DMMUCFGR_NTW & (0 << 2)) | (DMMUCFGR_NTS & (6 << 2));
+     cpu->env.immucfgr = (IMMUCFGR_NTW & (0 << 2)) | (IMMUCFGR_NTS & (6 << 2));
+ 
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 938ccc3..2721432 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -140,6 +140,15 @@ enum {
+     IMMUCFGR_HTR = (1 << 11),
+ };
+ 
++/* Power management register */
++enum {
++    PMR_SDF = (15 << 0),
++    PMR_DME = (1 << 4),
++    PMR_SME = (1 << 5),
++    PMR_DCGE = (1 << 6),
++    PMR_SUME = (1 << 7),
++};
++
+ /* Float point control status register */
+ enum {
+     FPCSR_FPEE = 1,
+@@ -284,6 +293,7 @@ typedef struct CPUOpenRISCState {
+     uint32_t immucfgr;        /* IMMU configure register */
+     uint32_t esr;             /* Exception supervisor register */
+     uint32_t evbar;           /* Exception vector base address register */
++    uint32_t pmr;             /* Power Management Register */
+     uint32_t fpcsr;           /* Float register */
+     float_status fp_status;
+ 
+diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+index 2c91fab..3959671 100644
+--- a/target/openrisc/interrupt.c
++++ b/target/openrisc/interrupt.c
+@@ -60,6 +60,8 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     env->sr |= SR_SM;
+     env->sr &= ~SR_IEE;
+     env->sr &= ~SR_TEE;
++    env->pmr &= ~PMR_DME;
++    env->pmr &= ~PMR_SME;
+     env->tlb->cpu_openrisc_map_address_data = &cpu_openrisc_get_phys_nommu;
+     env->tlb->cpu_openrisc_map_address_code = &cpu_openrisc_get_phys_nommu;
+     env->lock_addr = -1;
+diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
+index a82be62..a20cce7 100644
+--- a/target/openrisc/machine.c
++++ b/target/openrisc/machine.c
+@@ -138,6 +138,7 @@ static const VMStateDescription vmstate_env = {
+         VMSTATE_UINT32(dmmucfgr, CPUOpenRISCState),
+         VMSTATE_UINT32(immucfgr, CPUOpenRISCState),
+         VMSTATE_UINT32(evbar, CPUOpenRISCState),
++        VMSTATE_UINT32(pmr, CPUOpenRISCState),
+         VMSTATE_UINT32(esr, CPUOpenRISCState),
+         VMSTATE_UINT32(fpcsr, CPUOpenRISCState),
+         VMSTATE_UINT64(mac, CPUOpenRISCState),
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index fa3d6a4..44acf0d 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -22,6 +22,7 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
++#include "exception.h"
+ 
+ #define TO_SPR(group, number) (((group) << 11) + (number))
+ 
+@@ -141,6 +142,15 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
+     case TO_SPR(5, 2):  /* MACHI */
+         env->mac = deposit64(env->mac, 32, 32, rb);
+         break;
++    case TO_SPR(8, 0):  /* PMR */
++        env->pmr = rb;
++        if (env->pmr & PMR_DME || env->pmr & PMR_SME) {
++            cpu_restore_state(cs, GETPC());
++            env->pc += 4;
++            cs->halted = 1;
++            raise_exception(cpu, EXCP_HLT);
++        }
++        break;
+     case TO_SPR(9, 0):  /* PICMR */
+         env->picmr |= rb;
+         break;
+@@ -287,6 +297,9 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
+         return env->mac >> 32;
+         break;
+ 
++    case TO_SPR(8, 0):  /* PMR */
++        return env->pmr;
++
+     case TO_SPR(9, 0):  /* PICMR */
+         return env->picmr;
+ 
+-- 
+2.9.3
