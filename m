@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3zGx-0003vp-I8
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:20:56 -0400
+	(envelope-from <tianyu.lan@intel.com>) id 1d3zo1-0008AU-NW
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:55:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3zGu-00052a-BF
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:20:55 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:40067)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d3zGt-0004xj-CG
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:20:52 -0400
-From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Date: Fri, 28 Apr 2017 14:19:52 +0800
-Message-Id: <1493360392-20628-1-git-send-email-lu.zhipeng@zte.com.cn>
-Subject: [Qemu-devel] [PATCH v6] qga: Add support network interface
- statistics in guest-network-get-interfaces command
+	(envelope-from <tianyu.lan@intel.com>) id 1d3znx-0001NF-Pk
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:55:05 -0400
+Received: from mga03.intel.com ([134.134.136.65]:29661)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1d3znx-0001MY-Gd
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 02:55:01 -0400
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-10-git-send-email-yi.l.liu@linux.intel.com>
+From: Lan Tianyu <tianyu.lan@intel.com>
+Message-ID: <5c64416d-7d8a-f1a6-64f9-cb0bf1d95a4a@intel.com>
+Date: Fri, 28 Apr 2017 14:46:16 +0800
+MIME-Version: 1.0
+In-Reply-To: <1493201210-14357-10-git-send-email-yi.l.liu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 09/20] Memory: introduce
+ iommu_ops->record_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,185 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: berrange@redhat.com, qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+To: "Liu, Yi L" <yi.l.liu@linux.intel.com>, qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com
+Cc: kvm@vger.kernel.org, jasowang@redhat.com, iommu@lists.linux-foundation.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com
 
-we can get the network interface statistics inside a virtual machine by
-guest-network-get-interfaces command. it is very useful for us to monitor
-and analyze network traffic.
+On 2017年04月26日 18:06, Liu, Yi L wrote:
+> With vIOMMU exposed to guest, vIOMMU emulator needs to do translation
+> between host and guest. e.g. a device-selective TLB flush, vIOMMU
+> emulator needs to replace guest SID with host SID so that to limit
+> the invalidation. This patch introduces a new callback
+> iommu_ops->record_device() to notify vIOMMU emulator to record necessary
+> information about the assigned device.
 
-Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- qga/commands-posix.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- qga/qapi-schema.json | 38 ++++++++++++++++++++++++-
- 2 files changed, 116 insertions(+), 2 deletions(-)
+This patch is to prepare to translate guest sbdf to host sbdf.
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 915df9e..233b024 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -1638,6 +1638,73 @@ guest_find_interface(GuestNetworkInterfaceList *head,
-     return head;
- }
- 
-+
-+static int str_trim_off(const char *s, int off, int lmt)
-+{
-+    for (; off < lmt; ++off) {
-+        if (!isspace(s[off])) {
-+            break;
-+        }
-+    }
-+    return off;
-+}
-+
-+static int guest_get_network_stats(const char *name,
-+                       GuestNetworkInterfaceStat *stats)
-+{
-+    int name_len;
-+    char const *devinfo = "/proc/net/dev";
-+    FILE *fp;
-+    char *line = NULL, *colon;
-+    size_t n;
-+    fp = fopen(devinfo, "r");
-+    if (!fp) {
-+        return -1;
-+    }
-+    name_len = strlen(name);
-+    while (getline(&line, &n, fp) != -1) {
-+        long long dummy;
-+        long long rx_bytes;
-+        long long rx_packets;
-+        long long rx_errs;
-+        long long rx_dropped;
-+        long long tx_bytes;
-+        long long tx_packets;
-+        long long tx_errs;
-+        long long tx_dropped;
-+        int trim_off;
-+        colon = strchr(line, ':');
-+        if (!colon) {
-+            continue;
-+        }
-+        trim_off = str_trim_off(line, 0, strlen(line));
-+        if (colon - name_len - trim_off == line &&
-+           strncmp(line + trim_off, name, colon - line - trim_off) == 0) {
-+            if (sscanf(colon + 1,
-+                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
-+                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
-+                  &dummy, &dummy, &dummy, &dummy,
-+                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
-+                  &dummy, &dummy, &dummy, &dummy) != 16) {
-+                continue;
-+            }
-+            stats->rx_bytes = rx_bytes;
-+            stats->rx_packets = rx_packets;
-+            stats->rx_errs = rx_errs;
-+            stats->rx_dropped = rx_dropped;
-+            stats->tx_bytes = tx_bytes;
-+            stats->tx_packets = tx_packets;
-+            stats->tx_errs = tx_errs;
-+            stats->tx_dropped = tx_dropped;
-+            fclose(fp);
-+            return 0;
-+        }
-+    }
-+    fclose(fp);
-+    g_debug("/proc/net/dev: Interface not found");
-+    return -1;
-+}
-+
- /*
-  * Build information about guest interfaces
-  */
-@@ -1654,6 +1721,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
-     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
-         GuestNetworkInterfaceList *info;
-         GuestIpAddressList **address_list = NULL, *address_item = NULL;
-+        GuestNetworkInterfaceStat  *interface_stat = NULL;
-         char addr4[INET_ADDRSTRLEN];
-         char addr6[INET6_ADDRSTRLEN];
-         int sock;
-@@ -1773,7 +1841,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
- 
-         info->value->has_ip_addresses = true;
- 
--
-+        if (!info->value->has_statistics) {
-+            interface_stat = g_malloc0(sizeof(*interface_stat));
-+            if (guest_get_network_stats(info->value->name,
-+                interface_stat) == -1) {
-+                info->value->has_statistics = false;
-+                g_free(interface_stat);
-+            } else {
-+                info->value->statistics = interface_stat;
-+                info->value->has_statistics = true;
-+            }
-+        }
-     }
- 
-     freeifaddrs(ifap);
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index a02dbf2..948219b 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -635,6 +635,38 @@
-            'prefix': 'int'} }
- 
- ##
-+# @GuestNetworkInterfaceStat:
-+#
-+# @rx-bytes: total bytes received
-+#
-+# @rx-packets: total packets received
-+#
-+# @rx-errs: bad packets received
-+#
-+# @rx-dropped: receiver dropped packets
-+#
-+# @tx-bytes: total bytes transmitted
-+#
-+# @tx-packets: total packets transmitted
-+#
-+# @tx-errs: packet transmit problems
-+#
-+# @tx-dropped: dropped packets transmitted
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'GuestNetworkInterfaceStat',
-+  'data': {'rx-bytes': 'uint64',
-+            'rx-packets': 'uint64',
-+            'rx-errs': 'uint64',
-+            'rx-dropped': 'uint64',
-+            'tx-bytes': 'uint64',
-+            'tx-packets': 'uint64',
-+            'tx-errs': 'uint64',
-+            'tx-dropped': 'uint64'
-+           } }
-+
-+##
- # @GuestNetworkInterface:
- #
- # @name: The name of interface for which info are being delivered
-@@ -643,12 +675,16 @@
- #
- # @ip-addresses: List of addresses assigned to @name
- #
-+# @statistics: various statistic counters related to @name
-+# (since 2.10)
-+#
- # Since: 1.1
- ##
- { 'struct': 'GuestNetworkInterface',
-   'data': {'name': 'str',
-            '*hardware-address': 'str',
--           '*ip-addresses': ['GuestIpAddress'] } }
-+           '*ip-addresses': ['GuestIpAddress'],
-+           '*statistics': 'GuestNetworkInterfaceStat' } }
- 
- ##
- # @guest-network-get-interfaces:
--- 
-1.8.3.1
+Alex:
+	Could we add a new vfio API to do such translation? This will be more
+straight forward than storing host sbdf in the vIOMMU device model.
+
+> 
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> ---
+>  include/exec/memory.h | 11 +++++++++++
+>  memory.c              | 12 ++++++++++++
+>  2 files changed, 23 insertions(+)
+> 
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 7bd13ab..49087ef 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -203,6 +203,8 @@ struct MemoryRegionIOMMUOps {
+>                                  IOMMUNotifierFlag new_flags);
+>      /* Set this up to provide customized IOMMU replay function */
+>      void (*replay)(MemoryRegion *iommu, IOMMUNotifier *notifier);
+> +    void (*record_device)(MemoryRegion *iommu,
+> +                          void *device_info);
+>  };
+>  
+>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+> @@ -708,6 +710,15 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>  void memory_region_notify_one(IOMMUNotifier *notifier,
+>                                IOMMUTLBEntry *entry);
+>  
+> +/*
+> + * memory_region_notify_device_record: notify IOMMU to record assign
+> + * device.
+> + * @mr: the memory region to notify
+> + * @ device_info: device information
+> + */
+> +void memory_region_notify_device_record(MemoryRegion *mr,
+> +                                        void *info);
+> +
+>  /**
+>   * memory_region_register_iommu_notifier: register a notifier for changes to
+>   * IOMMU translation entries.
+> diff --git a/memory.c b/memory.c
+> index 0728e62..45ef069 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1600,6 +1600,18 @@ static void memory_region_update_iommu_notify_flags(MemoryRegion *mr)
+>      mr->iommu_notify_flags = flags;
+>  }
+>  
+> +void memory_region_notify_device_record(MemoryRegion *mr,
+> +                                        void *info)
+> +{
+> +    assert(memory_region_is_iommu(mr));
+> +
+> +    if (mr->iommu_ops->record_device) {
+> +        mr->iommu_ops->record_device(mr, info);
+> +    }
+> +
+> +    return;
+> +}
+> +
+>  void memory_region_register_iommu_notifier(MemoryRegion *mr,
+>                                             IOMMUNotifier *n)
+>  {
+> 
