@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d4CsX-0000uP-7Z
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:52:38 -0400
+	(envelope-from <den@virtuozzo.com>) id 1d4D8K-0001I6-0j
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:08:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d4CsW-0008QS-3F
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:52:37 -0400
-References: <20170427014626.11553-1-eblake@redhat.com>
-	<20170427014626.11553-8-eblake@redhat.com>
-	<99e512ad-d73a-09dd-ee68-ee57dc4581af@redhat.com>
-	<03c4ac54-99fd-4316-1867-8d16e0703605@redhat.com>
-	<ed4433d0-debc-5df1-0b88-d3cafac6056e@redhat.com>
-	<a5fdea31-c4ef-81e2-b3b3-baccef969143@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <14b4d2d8-ec55-853c-6d54-10829531dfa5@redhat.com>
-Date: Fri, 28 Apr 2017 22:52:26 +0200
+	(envelope-from <den@virtuozzo.com>) id 1d4D8I-0006m0-No
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:08:55 -0400
+References: <73ecd486-2d5c-e204-1588-a0b6324ba77b@virtuozzo.com>
+	<a18117bb-bf65-1263-48f0-72a2696cdc0b@redhat.com>
+	<754114c9-9be5-f11b-571b-2cd1c2b5d98f@virtuozzo.com>
+From: "Denis V. Lunev" <den@virtuozzo.com>
+Message-ID: <721fd2ee-5606-5324-5232-35143c3d5764@virtuozzo.com>
+Date: Fri, 28 Apr 2017 22:37:23 +0300
 MIME-Version: 1.0
-In-Reply-To: <a5fdea31-c4ef-81e2-b3b3-baccef969143@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rRFvppnP3N6vlj3bRLCfaG5SAhNisTbHP"
-Subject: Re: [Qemu-devel] [PATCH v10 07/17] qemu-io: Switch 'alloc' command
- to byte-based length
+In-Reply-To: <754114c9-9be5-f11b-571b-2cd1c2b5d98f@virtuozzo.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] RFC: some problems with bdrv_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,124 +24,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, QEMU <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stephane Chazelas <stephane.chazelas@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rRFvppnP3N6vlj3bRLCfaG5SAhNisTbHP
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <14b4d2d8-ec55-853c-6d54-10829531dfa5@redhat.com>
-Subject: Re: [PATCH v10 07/17] qemu-io: Switch 'alloc' command to byte-based
- length
-References: <20170427014626.11553-1-eblake@redhat.com>
- <20170427014626.11553-8-eblake@redhat.com>
- <99e512ad-d73a-09dd-ee68-ee57dc4581af@redhat.com>
- <03c4ac54-99fd-4316-1867-8d16e0703605@redhat.com>
- <ed4433d0-debc-5df1-0b88-d3cafac6056e@redhat.com>
- <a5fdea31-c4ef-81e2-b3b3-baccef969143@redhat.com>
-In-Reply-To: <a5fdea31-c4ef-81e2-b3b3-baccef969143@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 28.04.2017 22:36, Eric Blake wrote:
-> On 04/28/2017 03:09 PM, Max Reitz wrote:
->> On 28.04.2017 21:59, Eric Blake wrote:
->>> On 04/28/2017 02:46 PM, Max Reitz wrote:
->>>> On 27.04.2017 03:46, Eric Blake wrote:
->>>>> For the 'alloc' command, accepting an offset in bytes but a length
->>>>> in sectors, and reporting output in sectors, is confusing.  Do
->>>>> everything in bytes, and adjust the expected output accordingly.
->>>>>
->>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>>>
+On 04/28/2017 10:35 PM, Denis V. Lunev wrote:
+> On 04/28/2017 09:31 PM, Eric Blake wrote:
+>> On 04/28/2017 11:17 AM, Denis V. Lunev wrote:
+>>> Hello, All!
 >>>
->>>>>      }
->>>>> +    if (!QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE)) {
->>>>> +        printf("bytes %" PRId64 " is not sector aligned\n",
->>>>
->>>> This isn't real English. :-)
+>>> Recently we have experienced problems with very slow
+>>> bdrv_get_block_status call, which is massive called f.e.
+>>> from mirror_run().
 >>>
->>> But, it's just copy-and-paste from the other instances you just revie=
-wed
->>> in 6/17!  [Translation - if I change this one, I also get to redo tha=
-t one]
+>>> The problem was narrowed down to slow lseek64() system
+>>> call, which can take 1-2-3 seconds.
+>> I'm guessing you meant one-to-three (the range), not one-two-three
+>> (three separate digits), and just had an unfortunate abbreviation of
+>> 'to' turning into the phonetically-similar '2'.
 >>
->> No, those are "offset" and "count" -- all singular. "bytes" is plural.=
- ;-)
->=20
-> Then an obvious solution: s/bytes/count/ in the parameter name :)
->=20
-> But I still get to redo those, to add the '-' in 'sector-aligned'.
-
-Oh, right! Didn't even notice. Well, in real languages stuff like that
-would have to be joined into a single word anyway.
-
->>> Which of these various alternatives (if any) looks better:
+> from 1 to 3, you are correct
+>
+>
+>>> root@s158 ~]# strace -f -p 77048 -T  -e lseek
+>>> Process 77048 attached with 14 threads
+>>> [pid 77053] lseek(23, 6359613440, SEEK_DATA) = 6360276992 <1.250323>
+>> That sounds like a bug in your choice of filesystem.  It's been
+>> mentioned before that lseek has some pathetically poor behavior (I think
+>> tmpfs was one of the culprits), but I maintain that it is better to
+>> hammer on the kernel folks to fix the poor behavior than it is to have
+>> to implement user-space workarounds in every single affected program.
+>>
+>> That said, a workaround of being able to request the avoidance of lseek
+>> has been brought up on this list before.
+>>
+>>
+>>> The problem comes from this branch of the code
 >>>
->>> bytes=3D511 is not sector-aligned
->>> 511 is not a sector-aligned value for 'bytes'
->>> requested 'bytes' of 511 is not sector-aligned
->>> alignment error: 511 bytes is not sector-aligned
->>> 'bytes' must be sector-aligned: 511
->>> your clever entry here...
+>>> bdrv_co_get_block_status
+>>>     .......
+>>>     if (bs->file &&
+>>>         (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
+>>>         (ret & BDRV_BLOCK_OFFSET_VALID)) {
+>>>         int file_pnum;
+>>>
+>>>         ret2 = bdrv_co_get_block_status(bs->file, ret >> BDRV_SECTOR_BITS,
+>>>                                         *pnum, &file_pnum);
+>>>         if (ret2 >= 0) {
+>>>             /* Ignore errors.  This is just providing extra information, it
+>>>              * is useful but not necessary.
+>>>              */
+>>>             if (!file_pnum) {
+>>>                 /* !file_pnum indicates an offset at or beyond the EOF;
+>>> it is
+>>>                  * perfectly valid for the format block driver to point
+>>> to such
+>>>                  * offsets, so catch it and mark everything as zero */
+>>>                 ret |= BDRV_BLOCK_ZERO;
+>>>             } else {
+>>>                 /* Limit request to the range reported by the protocol
+>>> driver */
+>>>                 *pnum = file_pnum;
+>>>                 ret |= (ret2 & BDRV_BLOCK_ZERO);
+>>>             }
+>>>         }
+>>>     }
+>> I don't see anything wrong with this code. It's nice to know that we
+>> have data (qcow2 says we have allocated bytes due to this layer, so
+>> don't refer to the backing files), but when the underlying file can ALSO
+>> tell us that the underlying protocol is sparse and we are on a hole,
+>> then we know that we have BDRV_BLOCK_ZERO condition which can in turn
+>> enable other optimizations in quite a bit of the stack.  It IS valid to
+>> return BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO (we don't have to limit
+>> ourselves to BDRV_BLOCK_DATA), and we should probably do so any time
+>> that such computation is cheap.
 >>
->> How about "byte count" instead of "bytes" or "bytes value", if really
->> want to have the exact spelling in there?
+>> I agree with your analysis that on a poor filesystem where lseek()
+>> behavior sucks that it is no longer cheap to determine where the holes are.
 >>
->> For your entries above: (1) and (2) work for me (I like (2) a bit
->> better), (3) doesn't sound like real English either, and it should be
->> s/is/are/ in (4) (but it still sounds off with that change). (5) I
->> mostly dislike because I dislike error message of the form "This shoul=
-d
->> be X: $foo", I like "$foo is not X" better.
->=20
-> Maybe this variation of (3) solves the singular/plural disconnect:
->=20
-> request of 511 for 'bytes' is not sector-aligned
->=20
-> which makes it obvious that the "request of 511" (singular) and not the=
+>> But the proper workaround for those filesystems should NOT be made by
+>> undoing this part of bdrv_co_get_block_status(), but should rather be
+>> fixed in file-posix.c by the addition of a user-controllable knob on
+>> whether to skip lseek().  In other words, if we're going to work around
+>> the poor filesystem performance, the workaround should live in
+>> file-posix.c, not in the generic block/io.c.  Once the workaround is
+>> enabled, the 'ret2 = bdrv_co_get_block_status()' nested call should be
+>> lightning fast (because file-posix.c would no longer be using lseek when
+>> you've requested the workaround).
+>>
+>>> Frankly speaking, this optimization should not give much.
+>>> If upper layer format (QCOW2) says that we have data
+>>> here, then nowadays in 99.9% we do have the data.
+>> You are correct that we have BDRV_BLOCK_DATA; but it IS useful to ALSO
+>> know if that data reads back as all zeros (so we can skip reading it).
+>> Just because qcow2 reports something as data does NOT rule out whether
+>> the data still reads as zeros.
+>>
+>>> Meanwhile this branch can cause problems. We would
+>>> need block cleared entirely to get the benefit for most
+>>> cases in mirror and backup operations.
+>>>
+>>> At my opinion it worth to drop this at all.
+>>>
+>>> Guys, do you have any opinion?
+>> Again, my opinion is to not change this part of block/io.c.  Rather,
+>> work should be expended on individual protocol drivers to quit wasting
+>> unnecessary time on reporting BDRV_BLOCK_ZERO if the time spent to
+>> determine that is not worth the effort (as it is when using lseek() on
+>> inefficient filesystems).  It is always safe for a protocol driver to
+>> report BDRV_BLOCK_DATA instead of BDRV_BLOCK_ZERO, if asking the
+>> question is too expensive (treating holes as data may pessimize other
+>> operations, but that's okay if the penalty for asking is worse than what
+>> optimizations are able to regain).
+>>
+>>> Den
+>>>
+>>> P.S. The kernel is one based on RedHat 3.10.0-514. The same
+>>>       problem was observed in 3.10.0-327 too.
+>> Red Hat is always two words (I'm allowed to point that out, as they
+>> employ me ;).  But if it really is a Red Hat kernel problem, be sure to
+>> use your support contract to point out the kernel developers that they
+>> really need to fix lseek() - and you'll need to give details on which
+>> filesystem you're using (as not all filesystems have that abysmal
+>> performance).
+>>
+pls ignore above letter completely. I have pressed 'Send' in the wrong
+Window.
+Correct answer is above in the thread.
 
-> parameter name (whether singular 'count' or plural 'bytes') is the
-> subject.  But it's a bit wordier than (2).  So it looks like (2) may be=
-
-> a winner in all the situations.  But I also think you convinced me to
-> rename the command parameter; in my next spin, the help text will read:=
-
->=20
-> alloc offset [count] -- checks if offset is allocated in the file
->=20
-> which starts to be non-trivial enough to drop R-b that you were willing=
-
-> to give for just an error message wording change.
-
-Well, reviewing the change will be simple enough, so it doesn't really
-matter to me. :-)
-
-(I'm still a bit upset why you think that the average qemu-io user
-cannot make the connection between "byte count" and a parameter named
-"bytes". Because I am the average qemu-io user. Huff!)
-
-Max
-
-
---rRFvppnP3N6vlj3bRLCfaG5SAhNisTbHP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDq4sSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ADo4IAISCA4Ragq15py/gGUC/j/UXqR30lEl5
-ccwaoi5cuqf8Qd1aGKj8irHqfX9quX4AL7rSp++9ws5nI7vay6NpCRWvtl7/AArV
-SWgFxXUgHIp+qH7M5BExRqVAig1sQ5gk5DiSIUCvdhxCyYK8F2PIyVT0qI2ysFYT
-DBFh7yTaN3qAh3QABjEInSgv1sp0/r8t3CPiHnZAZnTNC3luzxmumkNzn86dbMmi
-atKoeLSGEdxxfnj2zNtzRtr9WLrqD3cdoky0XFELNFWdZ+DbavCoQe0qkrb4xi17
-BMzyLRgK6L37XwcLg080XetSb4ZS3lgGBQ/sQG7u8BncJw4VxbghCHE=
-=7T2Q
------END PGP SIGNATURE-----
-
---rRFvppnP3N6vlj3bRLCfaG5SAhNisTbHP--
+Den
