@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d4CbN-00027s-Ib
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:34:54 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d4CbN-00027u-Kq
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d4CbM-0001Ug-Ab
+	(envelope-from <kwolf@redhat.com>) id 1d4CbM-0001Ul-CP
 	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:34:53 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 28 Apr 2017 22:33:35 +0200
-Message-Id: <1493411622-5343-28-git-send-email-kwolf@redhat.com>
+Date: Fri, 28 Apr 2017 22:33:34 +0200
+Message-Id: <1493411622-5343-27-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1493411622-5343-1-git-send-email-kwolf@redhat.com>
 References: <1493411622-5343-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 27/34] qcow2: Allow discard of final unaligned
- cluster
+Subject: [Qemu-devel] [PULL 26/34] block: Add .bdrv_truncate() error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +22,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-As mentioned in commit 0c1bd46, we ignored requests to
-discard the trailing cluster of an unaligned image.  While
-discard is an advisory operation from the guest standpoint,
-(and we are therefore free to ignore any request), our
-qcow2 implementation exploits the fact that a discarded
-cluster reads back as 0.  As long as we discard on cluster
-boundaries, we are fine; but that means we could observe
-non-zero data leaked at the tail of an unaligned image.
+Add missing error messages for the block driver implementations of
+.bdrv_truncate(); drop the generic one from block.c's bdrv_truncate().
 
-Enhance iotest 66 to cover this case, and fix the implementation
-to honor a discard request on the final partial cluster.
+Since one of these changes touches a mis-indented block in
+block/file-posix.c, this patch fixes that coding style issue along the
+way.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-id: 20170407013709.18440-1-eblake@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20170328205129.15138-5-mreitz@redhat.com
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c              |  7 ++++++-
- tests/qemu-iotests/066     | 12 +++++++-----
- tests/qemu-iotests/066.out | 12 ++++++++----
- 3 files changed, 21 insertions(+), 10 deletions(-)
+ block.c            |  2 --
+ block/file-posix.c | 17 ++++++++++++-----
+ block/gluster.c    |  4 +++-
+ block/iscsi.c      |  2 ++
+ block/nfs.c        | 10 +++++++++-
+ block/qcow2.c      |  2 ++
+ block/qed.c        |  4 +++-
+ block/raw-format.c |  2 ++
+ block/rbd.c        |  1 +
+ 9 files changed, 34 insertions(+), 10 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4ca4cf0..5c1573c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2515,7 +2515,12 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
+diff --git a/block.c b/block.c
+index ff232a2..76bf00f 100644
+--- a/block.c
++++ b/block.c
+@@ -3334,8 +3334,6 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
+         bdrv_dirty_bitmap_truncate(bs);
+         bdrv_parent_cb_resize(bs);
+         ++bs->write_gen;
+-    } else if (errp && !*errp) {
+-        error_setg_errno(errp, -ret, "Failed to resize image");
+     }
+     return ret;
+ }
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 9c0d701..1941fb6 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1411,20 +1411,27 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+     struct stat st;
++    int ret;
  
-     if (!QEMU_IS_ALIGNED(offset | count, s->cluster_size)) {
-         assert(count < s->cluster_size);
--        return -ENOTSUP;
-+        /* Ignore partial clusters, except for the special case of the
-+         * complete partial cluster at the end of an unaligned file */
-+        if (!QEMU_IS_ALIGNED(offset, s->cluster_size) ||
-+            offset + count != bs->total_sectors * BDRV_SECTOR_SIZE) {
-+            return -ENOTSUP;
-+        }
+     if (fstat(s->fd, &st)) {
+-        return -errno;
++        ret = -errno;
++        error_setg_errno(errp, -ret, "Failed to fstat() the file");
++        return ret;
      }
  
-     qemu_co_mutex_lock(&s->lock);
-diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-index 364166d..c2116a3 100755
---- a/tests/qemu-iotests/066
-+++ b/tests/qemu-iotests/066
-@@ -42,16 +42,18 @@ _supported_fmt qcow2
- _supported_proto generic
- _supported_os Linux
+     if (S_ISREG(st.st_mode)) {
+         if (ftruncate(s->fd, offset) < 0) {
+-            return -errno;
++            ret = -errno;
++            error_setg_errno(errp, -ret, "Failed to resize the file");
++            return ret;
+         }
+     } else if (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode)) {
+-       if (offset > raw_getlength(bs)) {
+-           return -EINVAL;
+-       }
++        if (offset > raw_getlength(bs)) {
++            error_setg(errp, "Cannot grow device files");
++            return -EINVAL;
++        }
+     } else {
++        error_setg(errp, "Resizing this file is not supported");
+         return -ENOTSUP;
+     }
  
-+# Intentionally create an unaligned image
- IMGOPTS="compat=1.1"
--IMG_SIZE=64M
-+IMG_SIZE=$((64 * 1024 * 1024 + 512))
+diff --git a/block/gluster.c b/block/gluster.c
+index be45c08..1d4e2f7 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -1100,7 +1100,9 @@ static int qemu_gluster_truncate(BlockDriverState *bs, int64_t offset,
  
- echo
--echo "=== Testing snapshotting an image with zero clusters ==="
-+echo "=== Testing cluster discards ==="
- echo
- _make_test_img $IMG_SIZE
--# Write some normal clusters, zero them (creating preallocated zero clusters)
--# and discard those
--$QEMU_IO -c "write 0 256k" -c "write -z 0 256k" -c "discard 0 256k" "$TEST_IMG" \
-+# Write some normal clusters, zero some of them (creating preallocated
-+# zero clusters) and discard everything. Everything should now read as 0.
-+$QEMU_IO -c "write 0 256k" -c "write -z 0 256k" -c "write 64M 512" \
-+	 -c "discard 0 $IMG_SIZE" -c "read -P 0 0 $IMG_SIZE" "$TEST_IMG" \
-          | _filter_qemu_io
- # Check the image (there shouldn't be any leaks)
- _check_test_img
-diff --git a/tests/qemu-iotests/066.out b/tests/qemu-iotests/066.out
-index 7bc9a10..7c1f31a 100644
---- a/tests/qemu-iotests/066.out
-+++ b/tests/qemu-iotests/066.out
-@@ -1,13 +1,17 @@
- QA output created by 066
+     ret = glfs_ftruncate(s->fd, offset);
+     if (ret < 0) {
+-        return -errno;
++        ret = -errno;
++        error_setg_errno(errp, -ret, "Failed to truncate file");
++        return ret;
+     }
  
--=== Testing snapshotting an image with zero clusters ===
-+=== Testing cluster discards ===
+     return 0;
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 1ef38cf..5daa201 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -2065,6 +2065,7 @@ static int iscsi_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     Error *local_err = NULL;
  
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67109376
- wrote 262144/262144 bytes at offset 0
- 256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 262144/262144 bytes at offset 0
- 256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--discard 262144/262144 bytes at offset 0
--256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 67108864
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+discard 67109376/67109376 bytes at offset 0
-+64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 67109376/67109376 bytes at offset 0
-+64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- No errors were found on the image.
- *** done
+     if (iscsilun->type != TYPE_DISK) {
++        error_setg(errp, "Cannot resize non-disk iSCSI devices");
+         return -ENOTSUP;
+     }
+ 
+@@ -2075,6 +2076,7 @@ static int iscsi_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     }
+ 
+     if (offset > iscsi_getlength(bs)) {
++        error_setg(errp, "Cannot grow iSCSI devices");
+         return -EINVAL;
+     }
+ 
+diff --git a/block/nfs.c b/block/nfs.c
+index 5ae665a..76572ae 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -767,7 +767,15 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
+ static int nfs_file_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+ {
+     NFSClient *client = bs->opaque;
+-    return nfs_ftruncate(client->context, client->fh, offset);
++    int ret;
++
++    ret = nfs_ftruncate(client->context, client->fh, offset);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to truncate file");
++        return ret;
++    }
++
++    return 0;
+ }
+ 
+ /* Note that this will not re-establish a connection with the NFS server
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6c34798..4ca4cf0 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2551,6 +2551,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     new_l1_size = size_to_l1(s, offset);
+     ret = qcow2_grow_l1_table(bs, new_l1_size, true);
+     if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to grow the L1 table");
+         return ret;
+     }
+ 
+@@ -2559,6 +2560,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
+                            &offset, sizeof(uint64_t));
+     if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to update the image size");
+         return ret;
+     }
+ 
+diff --git a/block/qed.c b/block/qed.c
+index fa2aeee..fd76817 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -1526,11 +1526,12 @@ static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+ 
+     if (!qed_is_image_size_valid(offset, s->header.cluster_size,
+                                  s->header.table_size)) {
++        error_setg(errp, "Invalid image size specified");
+         return -EINVAL;
+     }
+ 
+-    /* Shrinking is currently not supported */
+     if ((uint64_t)offset < s->header.image_size) {
++        error_setg(errp, "Shrinking images is currently not supported");
+         return -ENOTSUP;
+     }
+ 
+@@ -1539,6 +1540,7 @@ static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     ret = qed_write_header_sync(s);
+     if (ret < 0) {
+         s->header.image_size = old_image_size;
++        error_setg_errno(errp, -ret, "Failed to update the image size");
+     }
+     return ret;
+ }
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 9761bda..36e6503 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -332,10 +332,12 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     BDRVRawState *s = bs->opaque;
+ 
+     if (s->has_size) {
++        error_setg(errp, "Cannot resize fixed-size raw disks");
+         return -ENOTSUP;
+     }
+ 
+     if (INT64_MAX - offset < s->offset) {
++        error_setg(errp, "Disk size too large for the chosen offset");
+         return -EINVAL;
+     }
+ 
+diff --git a/block/rbd.c b/block/rbd.c
+index 3e6e73e..fbf3059 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -923,6 +923,7 @@ static int qemu_rbd_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+ 
+     r = rbd_resize(s->image, offset);
+     if (r < 0) {
++        error_setg_errno(errp, -r, "Failed to resize file");
+         return r;
+     }
+ 
 -- 
 1.8.3.1
