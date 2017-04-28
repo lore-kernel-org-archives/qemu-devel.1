@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d40la-0000JK-7X
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:56:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1d40rN-0001ON-0z
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:02:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d40lV-0005Av-Kr
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:56:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41562)
+	(envelope-from <armbru@redhat.com>) id 1d40rH-0006OI-6w
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:02:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d40lV-0005An-FK
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:56:33 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 28 Apr 2017 09:56:12 +0200
-Message-Id: <20170428075612.9997-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] audio: release capture buffers
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d40rG-0006O9-TV
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:02:31 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
+	<2bc05de0edd61cdcdd3d2b894378a874d1e12327.1493191677.git.maozy.fnst@cn.fujitsu.com>
+	<87shktu8cu.fsf@dusky.pond.sub.org>
+	<20170427163025.GD30599@redhat.com>
+Date: Fri, 28 Apr 2017 10:02:26 +0200
+In-Reply-To: <20170427163025.GD30599@redhat.com> (Daniel P. Berrange's message
+	of "Thu, 27 Apr 2017 17:30:25 +0100")
+Message-ID: <87lgqlnenh.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] net/socket: Convert error report
+ message to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,35 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>, Huawei PSIRT <PSIRT@huawei.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, jasowang@redhat.com, qemu-devel@nongnu.org
 
-AUD_add_capture() allocates two buffers which get never released.
-Add the missing calls to AUD_del_capture().
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
-Impact: Allows vnc clients to exhaust host memory by repeatly
-starting and stopping audio capture.
+> On Thu, Apr 27, 2017 at 06:24:17PM +0200, Markus Armbruster wrote:
+>> No review, just an observation.
+>> 
+>> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+>> 
+>> > Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
+>> > net_socket_fd_init() use the function such as fprintf(), perror() to
+>> > report an error message.
+>> >
+>> > Now, convert these functions to Error.
+>> >
+>> > CC: jasowang@redhat.com, armbru@redhat.com
+>> > Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> > ---
+>> >  net/socket.c | 66 +++++++++++++++++++++++++++++++++++++-----------------------
+>> >  1 file changed, 41 insertions(+), 25 deletions(-)
+>> >
+>> > diff --git a/net/socket.c b/net/socket.c
+>> > index b0decbe..559e09a 100644
+>> > --- a/net/socket.c
+>> > +++ b/net/socket.c
+>> [...]
+>> > @@ -433,25 +437,27 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
+>> >  
+>> >  static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>> >                                            const char *model, const char *name,
+>> > -                                          int fd, int is_connected)
+>> > +                                          int fd, int is_connected,
+>> > +                                          Error **errp)
+>> >  {
+>> >      int so_type = -1, optlen=sizeof(so_type);
+>> >  
+>> >      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
+>> >          (socklen_t *)&optlen)< 0) {
+>> > -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
+>> > +        error_setg(errp, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed",
+>> >                  fd);
+>> >          closesocket(fd);
+>> >          return NULL;
+>> >      }
+>> >      switch(so_type) {
+>> >      case SOCK_DGRAM:
+>> > -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
+>> > +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected, errp);
+>> >      case SOCK_STREAM:
+>> >          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>> >      default:
+>> >          /* who knows ... this could be a eg. a pty, do warn and continue as stream */
+>> > -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+>> > +        error_setg(errp, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM"
+>> > +                   " or SOCK_STREAM", so_type, fd);
+>> 
+>> Not this patches problem: this case is odd, and the comment is bogus.
+>> If @fd really was a pty, getsockopt() would fail with ENOTSOCK, wouldn't
+>> it?  If @fd is a socket, but neither SOCK_DGRAM nor SOCK_STREAM (say
+>> SOCK_RAW), why is it safe to continue as if it was SOCK_STREAM?  Jason?
+>
+> IMHO it is a problem with this patch. Previously we merely printed
+> a warning & carried on, which is conceptually ok in general, though
+> dubious here for the reason you say.
+>
+> Now we are filling an Error **errp object, and carrying on - this is
+> conceptually broken anywhere. If an Error ** is filled, we must return.
+> If we want to carry on, we shouldn't fill Error **.
 
-Cc: P J P <ppandit@redhat.com>
-Cc: Huawei PSIRT <PSIRT@huawei.com>
-Reported-by: "Jiangxin (hunter, SCC)" <jiangxin1@huawei.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- audio/audio.c | 2 ++
- 1 file changed, 2 insertions(+)
+You're right.
 
-diff --git a/audio/audio.c b/audio/audio.c
-index c8898d8422..beafed209b 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -2028,6 +2028,8 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
-                     sw = sw1;
-                 }
-                 QLIST_REMOVE (cap, entries);
-+                g_free (cap->hw.mix_buf);
-+                g_free (cap->buf);
-                 g_free (cap);
-             }
-             return;
--- 
-2.9.3
+>> >          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>
+> IMHO, we just kill this and put return NULL here. If there is a genuine
+> reason to support something like SOCK_RAW, it should be explicitly
+> handled, because this default: case will certainly break SOCK_SEQPACKET
+> and SOCK_RDM which can't be treated as streams.
+
+It's either magic or misguided defensive programming.  Probably the
+latter, but I'd like to hear Jason's opinion.
+
+If it's *necessary* magic, we can't use error_setg().  Else, we should
+drop the default, and insert a closesocket(fd) before the final return
+NULL.
+
+>> >      }
+>> >      return NULL;
+>> 
+>> Not reachable.  Ugly, but not your patch's concern.
+>
+>
+> Regards,
+> Daniel
