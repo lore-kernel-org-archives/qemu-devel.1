@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d42kn-0007z0-5B
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:03:58 -0400
+	(envelope-from <peterx@redhat.com>) id 1d42o6-0000ft-IM
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1d42kj-0006ys-6H
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:03:57 -0400
-Received: from mailout4.w1.samsung.com ([210.118.77.14]:61084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1d42ki-0006wS-U2
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:03:53 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout4.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OP400CU16MC5W70@mailout4.w1.samsung.com> for
-	qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:03:48 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
-Date: Fri, 28 Apr 2017 13:03:45 +0300
-MIME-version: 1.0
-In-reply-to: <20170428093825.GA22801@pxdev.xzpeter.org>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
+	(envelope-from <peterx@redhat.com>) id 1d42o2-00083d-Ik
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:07:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48218)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d42o2-000833-Cd
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:07:18 -0400
+Date: Fri, 28 Apr 2017 18:07:00 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170428100700.GC22801@pxdev.xzpeter.org>
 References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
 	<CGME20170428065754eucas1p1f51713373ce8c2d19945a4f91c52bd5c@eucas1p1.samsung.com>
 	<1493362658-8179-5-git-send-email-a.perevalov@samsung.com>
 	<20170428093825.GA22801@pxdev.xzpeter.org>
+	<3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
 Subject: Re: [Qemu-devel] [PATCH RESEND V3 4/6] migration: add postcopy
  downtime into MigrationIncommingState
 List-Id: <qemu-devel.nongnu.org>
@@ -36,174 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>
 Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com, f4bug@amsat.org
 
-On 04/28/2017 12:38 PM, Peter Xu wrote:
-> On Fri, Apr 28, 2017 at 09:57:36AM +0300, Alexey Perevalov wrote:
->> This patch add request to kernel space for UFFD_FEATURE_THREAD_ID,
->> in case when this feature is provided by kernel.
->>
->> DowntimeContext is incapsulated inside migration.c.
->>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> ---
->>   include/migration/migration.h | 12 ++++++++++++
->>   migration/migration.c         | 33 +++++++++++++++++++++++++++++++++
->>   migration/postcopy-ram.c      |  8 ++++++++
->>   3 files changed, 53 insertions(+)
->>
->> diff --git a/include/migration/migration.h b/include/migration/migration.h
->> index ba1a16c..e8fb68f 100644
->> --- a/include/migration/migration.h
->> +++ b/include/migration/migration.h
->> @@ -83,6 +83,8 @@ typedef enum {
->>       POSTCOPY_INCOMING_END
->>   } PostcopyState;
->>   
->> +struct DowntimeContext;
-> Nit: shall we embed something like "Postcopy" (or short form) into
-> this struct name? Since the whole thing is really tailored for
-> postcopy, only.
-Yes, that is postcopy only structure, so maybe PostcopyDowntimeContext
-is more readable.
+On Fri, Apr 28, 2017 at 01:03:45PM +0300, Alexey Perevalov wrote:
 
->
->> +
->>   /* State for the incoming migration */
->>   struct MigrationIncomingState {
->>       QEMUFile *from_src_file;
->> @@ -123,10 +125,20 @@ struct MigrationIncomingState {
->>   
->>       /* See savevm.c */
->>       LoadStateEntry_Head loadvm_handlers;
->> +
->> +    /*
->> +     * DowntimeContext to keep information for postcopy
->> +     * live migration, to calculate downtime
->> +     * */
->> +    struct DowntimeContext *downtime_ctx;
->>   };
->>   
->>   MigrationIncomingState *migration_incoming_get_current(void);
->>   void migration_incoming_state_destroy(void);
->> +/*
->> + * Functions to work with downtime context
->> + */
->> +struct DowntimeContext *downtime_context_new(void);
->>   
->>   struct MigrationState
->>   {
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 569a7f6..ec76e5c 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -77,6 +77,18 @@ static NotifierList migration_state_notifiers =
->>   
->>   static bool deferred_incoming;
->>   
->> +typedef struct DowntimeContext {
->> +    /* time when page fault initiated per vCPU */
->> +    int64_t *page_fault_vcpu_time;
->> +    /* page address per vCPU */
->> +    uint64_t *vcpu_addr;
->> +    int64_t total_downtime;
->> +    /* downtime per vCPU */
->> +    int64_t *vcpu_downtime;
->> +    /* point in time when last page fault was initiated */
->> +    int64_t last_begin;
->> +} DowntimeContext;
->> +
->>   /*
->>    * Current state of incoming postcopy; note this is not part of
->>    * MigrationIncomingState since it's state is used during cleanup
->> @@ -116,6 +128,23 @@ MigrationState *migrate_get_current(void)
->>       return &current_migration;
->>   }
->>   
->> +struct DowntimeContext *downtime_context_new(void)
->> +{
->> +    DowntimeContext *ctx = g_new0(DowntimeContext, 1);
->> +    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
->> +    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
->> +    ctx->vcpu_downtime = g_new0(int64_t, smp_cpus);
->> +    return ctx;
->> +}
->> +
->> +static void destroy_downtime_context(struct DowntimeContext *ctx)
->> +{
->> +    g_free(ctx->page_fault_vcpu_time);
->> +    g_free(ctx->vcpu_addr);
->> +    g_free(ctx->vcpu_downtime);
->> +    g_free(ctx);
->> +}
->> +
->>   MigrationIncomingState *migration_incoming_get_current(void)
->>   {
->>       static bool once;
->> @@ -138,6 +167,10 @@ void migration_incoming_state_destroy(void)
->>   
->>       qemu_event_destroy(&mis->main_thread_load_event);
->>       loadvm_free_handlers(mis);
->> +    if (mis->downtime_ctx) {
->> +        destroy_downtime_context(mis->downtime_ctx);
->> +        mis->downtime_ctx = NULL;
->> +    }
->>   }
->>   
->>   
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index 21e7150..f3688f5 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -132,6 +132,14 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
->>           return false;
->>       }
->>   
->> +#ifdef UFFD_FEATURE_THREAD_ID
->> +    if (mis && UFFD_FEATURE_THREAD_ID & supported_features) {
->> +        /* kernel supports that feature */
->> +        mis->downtime_ctx = downtime_context_new();
->> +        new_features |= UFFD_FEATURE_THREAD_ID;
-> So here I know why in patch 2 new_features == 0...
->
-> If I were you, I would like the series be done in below 4 patches:
->
-> 1. update header
-> 2. introduce THREAD_ID feature, and enable it conditionally
-> 3. squash all the downtime thing (downtime context, calculation) in
->     one patch here
-> 4. introduce trace
->
-> IMHO that's clearer and easier for review. But I'm okay with current
-> as well as long as the maintainers (Dave/Juan) won't disagree. :)
-In previous series, David asked me to split one patch into 2
-[Qemu-devel] [PATCH 3/6] migration: add UFFD_FEATURE_THREAD_ID feature 
-support
+[...]
 
- >There seem to be two parts to this:
- >  a) Adding the mis parameter to ufd_version_check
- >  b) Asking for the feature
+> >>diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> >>index 21e7150..f3688f5 100644
+> >>--- a/migration/postcopy-ram.c
+> >>+++ b/migration/postcopy-ram.c
+> >>@@ -132,6 +132,14 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+> >>          return false;
+> >>      }
+> >>+#ifdef UFFD_FEATURE_THREAD_ID
+> >>+    if (mis && UFFD_FEATURE_THREAD_ID & supported_features) {
+> >>+        /* kernel supports that feature */
+> >>+        mis->downtime_ctx = downtime_context_new();
+> >>+        new_features |= UFFD_FEATURE_THREAD_ID;
+> >So here I know why in patch 2 new_features == 0...
+> >
+> >If I were you, I would like the series be done in below 4 patches:
+> >
+> >1. update header
+> >2. introduce THREAD_ID feature, and enable it conditionally
+> >3. squash all the downtime thing (downtime context, calculation) in
+> >    one patch here
+> >4. introduce trace
+> >
+> >IMHO that's clearer and easier for review. But I'm okay with current
+> >as well as long as the maintainers (Dave/Juan) won't disagree. :)
+> In previous series, David asked me to split one patch into 2
+> [Qemu-devel] [PATCH 3/6] migration: add UFFD_FEATURE_THREAD_ID feature
+> support
+> 
+> >There seem to be two parts to this:
+> >  a) Adding the mis parameter to ufd_version_check
+> >  b) Asking for the feature
+> 
+> >Please split it into two patches.
+> 
+> So in current patch set, I also added re-factoring, which was missed before
+> "migration: split ufd_version_check onto receive/request features part"
 
- >Please split it into two patches.
-
-So in current patch set, I also added re-factoring, which was missed before
-"migration: split ufd_version_check onto receive/request features part"
-
->
-> Thanks,
->
->> +    }
->> +#endif
->> +
->>       /* request features */
->>       if (new_features && !request_ufd_features(ufd, new_features)) {
->>           error_report("ufd_version_check failed: features %" PRIu64,
->> -- 
->> 1.9.1
->>
-
+Sure. As long as Dave agrees, I'm okay with either way.
 
 -- 
-Best regards,
-Alexey Perevalov
+Peter Xu
