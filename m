@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgnyang@gmail.com>) id 1d45Un-0006yY-0d
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 08:59:37 -0400
+	(envelope-from <tgnyang@gmail.com>) id 1d45Vc-0007Zy-SE
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgnyang@gmail.com>) id 1d45Ui-0002AX-4O
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 08:59:37 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35561)
+	(envelope-from <tgnyang@gmail.com>) id 1d45VY-0002d5-1N
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:00:28 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:34580)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d45Uh-0002A3-VX
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 08:59:32 -0400
-Received: by mail-pg0-x241.google.com with SMTP id s1so2827421pgc.2
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 05:59:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <tgnyang@gmail.com>) id 1d45VX-0002cD-R6
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:00:23 -0400
+Received: by mail-pf0-x243.google.com with SMTP id g23so17395348pfj.1
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 06:00:23 -0700 (PDT)
 From: Zihan Yang <tgnyang@gmail.com>
-Date: Fri, 28 Apr 2017 20:55:08 +0800
-Message-Id: <1493384110-32060-2-git-send-email-tgnyang@gmail.com>
+Date: Fri, 28 Apr 2017 20:55:09 +0800
+Message-Id: <1493384110-32060-3-git-send-email-tgnyang@gmail.com>
 In-Reply-To: <1493384110-32060-1-git-send-email-tgnyang@gmail.com>
 References: <1493384110-32060-1-git-send-email-tgnyang@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/3] hw/char/sclp*: remove console_exit
- function in sclp
+Subject: [Qemu-devel] [PATCH 2/3] hw/s390x: make virtio_ccw_exit function in
+ virtio-ccw return void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +27,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Zihan Yang <tgnyang@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Zihan Yang <tgnyang@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-Currently the console_exit function in sclpconsole-lm.c and sclpconsole.c
-does nothing, so remove them and convert the callback in SCLPEventClass to
-void. Since there is a NULL check on the DeviceClass exit callback, it
-should be ok to simply remove them.
+Only virtio_ccw_exit and the exit callback in VirtIOCCWDeviceClass are
+converted to void in this patch. 'virtio_ccw_busdev_exit' belongs to
+DeviceClass so it still returns int, DeviceClass::exit will return
+void in future patches.
 
 Signed-off-by: Zihan Yang <tgnyang@gmail.com>
 ---
- hw/char/sclpconsole-lm.c          | 6 ------
- hw/char/sclpconsole.c             | 6 ------
- hw/s390x/event-facility.c         | 6 +-----
- include/hw/s390x/event-facility.h | 2 +-
- 4 files changed, 2 insertions(+), 18 deletions(-)
+ hw/s390x/virtio-ccw.c | 6 +++---
+ hw/s390x/virtio-ccw.h | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-index 07d6ebd..86ddda6 100644
---- a/hw/char/sclpconsole-lm.c
-+++ b/hw/char/sclpconsole-lm.c
-@@ -318,11 +318,6 @@ static int console_init(SCLPEvent *event)
-     return 0;
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index e7167e3..91b43ac 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -731,7 +731,7 @@ out_err:
+     g_free(sch);
  }
  
--static int console_exit(SCLPEvent *event)
--{
--    return 0;
--}
--
- static void console_reset(DeviceState *dev)
+-static int virtio_ccw_exit(VirtioCcwDevice *dev)
++static void virtio_ccw_exit(VirtioCcwDevice *dev)
  {
-    SCLPEvent *event = SCLP_EVENT(dev);
-@@ -349,7 +344,6 @@ static void console_class_init(ObjectClass *klass, void *data)
-     dc->reset = console_reset;
-     dc->vmsd = &vmstate_sclplmconsole;
-     ec->init = console_init;
--    ec->exit = console_exit;
-     ec->get_send_mask = send_mask;
-     ec->get_receive_mask = receive_mask;
-     ec->can_handle_event = can_handle_event;
-diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-index b78f240..e916cac 100644
---- a/hw/char/sclpconsole.c
-+++ b/hw/char/sclpconsole.c
-@@ -246,11 +246,6 @@ static void console_reset(DeviceState *dev)
-    scon->notify = false;
- }
- 
--static int console_exit(SCLPEvent *event)
--{
--    return 0;
--}
--
- static Property console_properties[] = {
-     DEFINE_PROP_CHR("chardev", SCLPConsole, chr),
-     DEFINE_PROP_END_OF_LIST(),
-@@ -265,7 +260,6 @@ static void console_class_init(ObjectClass *klass, void *data)
-     dc->reset = console_reset;
-     dc->vmsd = &vmstate_sclpconsole;
-     ec->init = console_init;
--    ec->exit = console_exit;
-     ec->get_send_mask = send_mask;
-     ec->get_receive_mask = receive_mask;
-     ec->can_handle_event = can_handle_event;
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 34b2faf..f7c509c 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -413,11 +413,7 @@ static void event_unrealize(DeviceState *qdev, Error **errp)
-     SCLPEvent *event = SCLP_EVENT(qdev);
-     SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
-     if (child->exit) {
--        int rc = child->exit(event);
--        if (rc < 0) {
--            error_setg(errp, "SCLP event exit failed.");
--            return;
--        }
-+        child->exit(event);
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     SubchDev *sch = ccw_dev->sch;
+@@ -744,7 +744,6 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+         release_indicator(&dev->routes.adapter, dev->indicators);
+         dev->indicators = NULL;
      }
+-    return 0;
  }
  
-diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-index def1bb0..1a32f3a 100644
---- a/include/hw/s390x/event-facility.h
-+++ b/include/hw/s390x/event-facility.h
-@@ -162,7 +162,7 @@ typedef struct SCLPEvent {
- typedef struct SCLPEventClass {
-     DeviceClass parent_class;
-     int (*init)(SCLPEvent *event);
--    int (*exit)(SCLPEvent *event);
-+    void (*exit)(SCLPEvent *event);
+ static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+@@ -1627,7 +1626,8 @@ static int virtio_ccw_busdev_exit(DeviceState *dev)
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+     VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
  
-     /* get SCLP's send mask */
-     unsigned int (*get_send_mask)(void);
+-    return _info->exit(_dev);
++    _info->exit(_dev);
++    return 0;
+ }
+ 
+ static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+index 41d4010..ce8baa3 100644
+--- a/hw/s390x/virtio-ccw.h
++++ b/hw/s390x/virtio-ccw.h
+@@ -74,7 +74,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+ typedef struct VirtIOCCWDeviceClass {
+     CCWDeviceClass parent_class;
+     void (*realize)(VirtioCcwDevice *dev, Error **errp);
+-    int (*exit)(VirtioCcwDevice *dev);
++    void (*exit)(VirtioCcwDevice *dev);
+ } VirtIOCCWDeviceClass;
+ 
+ /* Performance improves when virtqueue kick processing is decoupled from the
 -- 
 2.7.4
