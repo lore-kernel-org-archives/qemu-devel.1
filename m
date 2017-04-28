@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d49DL-0007uf-IV
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:57:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d49DP-0007xG-LR
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d49DG-0000Ev-LC
+	(envelope-from <alex.bennee@linaro.org>) id 1d49DL-0000Fx-QM
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:57:55 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d49DL-0000Fi-Gv
 	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:57:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39910)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d49DG-0000Er-BM
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:57:46 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D31A80062
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 16:57:45 +0000 (UTC)
-Date: Fri, 28 Apr 2017 17:57:38 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170428165738.GH3276@work-vm>
-References: <20170425103049.4073-1-quintela@redhat.com>
-	<20170425103049.4073-4-quintela@redhat.com>
+Received: by mail-wm0-x22c.google.com with SMTP id w64so47398965wma.0
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 09:57:51 -0700 (PDT)
+References: <20170427120006.20564-1-rth@twiddle.net>
+	<20170427120006.20564-13-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170427120006.20564-13-rth@twiddle.net>
+Date: Fri, 28 Apr 2017 17:58:21 +0100
+Message-ID: <87pofw79le.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170425103049.4073-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] migration: Remove old MigrationParams
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 12/19] target/i386: optimize indirect
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,211 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, cota@braap.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Not used anymore after moving block migration to use capabilities.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Richard Henderson <rth@twiddle.net> writes:
+
+> From: "Emilio G. Cota" <cota@braap.org>
+>
+> Speed up indirect branches by jumping to the target if it is valid.
+>
+> Softmmu measurements (see later commit for user-mode numbers):
+>
+> Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
+>
+> -                  SPECint06 (test set), x86_64-softmmu (Ubuntu 16.04 guest). Host: Intel i7-4790K @ 4.00GHz
+>
+>  2.4x +-+--------------------------------------------------------------------------------------------------------------+-+
+>       |                                                                                                                  |
+>       |   cross                                                                                                          |
+>  2.2x +cross+jr..........................................................................+++...........................+-+
+>       |                                                                                   |                              |
+>       |                                                                               +++ |                              |
+>    2x +-+..............................................................................|..|............................+-+
+>       |                                                                                |  |                              |
+>       |                                                                                |  |                              |
+>  1.8x +-+..............................................................................|####...........................+-+
+>       |                                                                                |# |#                             |
+>       |                                                                              **** |#                             |
+>  1.6x +-+............................................................................*.|*.|#...........................+-+
+>       |                                                                              * |* |#                             |
+>       |                                                                              * |* |#                             |
+>  1.4x +-+.......................................................................+++..*.|*.|#...........................+-+
+>       |                                                      ++++++             #### * |*++#             +++             |
+>       |                        +++                            |  |              #++# *++*  #          +++ |              |
+>  1.2x +-+......................###.....####....+++............|..|...........****..#.*..*..#....####...|.###.....####..+-+
+>       |        +++          **** #  ****  #    ####          ***###          *++*  # *  *  #    #++#  ****|#  +++#++#    |
+>       |    ****###     +++  *++* #  *++*  #  ++#  #    ####  *|* |#     +++  *  *  # *  *  #  ***  #  *| *|#  ****  #    |
+>    1x +-++-*++*++#++***###++*++*+#++*+-*++#+****++#++***++#+-*+*++#-+****##++*++*-+#+*++*-+#++*+*++#++*-+*+#++*++*++#-++-+
+>       |    *  *  #  * *  #  *  * #  *  *  # *  *  #  * *  #  *|* |#  *++* #  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
+>       |    *  *  #  * *  #  *  * #  *  *  # *  *  #  * *  #  *+*++#  *  * #  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
+>  0.8x +-+--****###--***###--****##--****###-****###--***###--***###--****##--****###-****###--***###--****##--****###--+-+
+>          astar   bzip2      gcc   gobmk h264ref   hmmlibquantum      mcf omnetpperlbench   sjengxalancbmk   hmean
+>   png: http://imgur.com/DU36YFU
+>
+> NB. 'cross' represents the previous commit.
+>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> Message-Id: <1493263764-18657-11-git-send-email-cota@braap.org>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
 > ---
->  include/migration/migration.h | 10 ++--------
->  include/migration/vmstate.h   |  1 -
->  include/qemu/typedefs.h       |  1 -
->  include/sysemu/sysemu.h       |  3 +--
->  migration/colo.c              |  2 +-
->  migration/migration.c         |  8 +++-----
->  migration/savevm.c            | 16 +++-------------
->  7 files changed, 10 insertions(+), 31 deletions(-)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 2917baa..3495162 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -41,10 +41,6 @@
->  /* for vl.c */
->  extern int only_migratable;
->  
-> -struct MigrationParams {
-> -    bool unused; /* C don't allow empty structs */
-> -};
-> -
->  /* Messages sent on the return path from destination to source */
->  enum mig_rp_message_type {
->      MIG_RP_MSG_INVALID = 0,  /* Must be 0 */
-> @@ -134,12 +130,10 @@ struct MigrationState
->      QEMUBH *cleanup_bh;
->      QEMUFile *to_dst_file;
->  
-> -    /* New style params from 'migrate-set-parameters' */
-> +    /* params from 'migrate-set-parameters' */
->      MigrationParameters parameters;
->  
->      int state;
-> -    /* Old style params from 'migrate' command */
-> -    MigrationParams params;
->  
->      /* State related to return path */
->      struct {
-> @@ -229,7 +223,7 @@ void migrate_fd_connect(MigrationState *s);
->  
->  void add_migration_state_change_notifier(Notifier *notify);
->  void remove_migration_state_change_notifier(Notifier *notify);
-> -MigrationState *migrate_init(const MigrationParams *params);
-> +MigrationState *migrate_init(void);
->  bool migration_is_blocked(Error **errp);
->  bool migration_in_setup(MigrationState *);
->  bool migration_is_idle(void);
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index 9452dec..4396d7e 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -37,7 +37,6 @@ typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
->  
->  typedef struct SaveVMHandlers {
->      /* This runs inside the iothread lock.  */
-> -    void (*set_params)(const MigrationParams *params, void * opaque);
->      SaveStateHandler *save_state;
->  
->      void (*cleanup)(void *opaque);
-> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> index f08d327..a388243 100644
-> --- a/include/qemu/typedefs.h
-> +++ b/include/qemu/typedefs.h
-> @@ -49,7 +49,6 @@ typedef struct MemoryRegion MemoryRegion;
->  typedef struct MemoryRegionCache MemoryRegionCache;
->  typedef struct MemoryRegionSection MemoryRegionSection;
->  typedef struct MigrationIncomingState MigrationIncomingState;
-> -typedef struct MigrationParams MigrationParams;
->  typedef struct MigrationState MigrationState;
->  typedef struct Monitor Monitor;
->  typedef struct MonitorDef MonitorDef;
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 058d5eb..3340202 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -102,8 +102,7 @@ enum qemu_vm_cmd {
->  #define MAX_VM_CMD_PACKAGED_SIZE (1ul << 24)
->  
->  bool qemu_savevm_state_blocked(Error **errp);
-> -void qemu_savevm_state_begin(QEMUFile *f,
-> -                             const MigrationParams *params);
-> +void qemu_savevm_state_begin(QEMUFile *f);
->  void qemu_savevm_state_header(QEMUFile *f);
->  int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
->  void qemu_savevm_state_cleanup(void);
-> diff --git a/migration/colo.c b/migration/colo.c
-> index 5c6c2f0..75e8807 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -333,7 +333,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
->      }
->  
->      qemu_savevm_state_header(fb);
-> -    qemu_savevm_state_begin(fb, &s->params);
-> +    qemu_savevm_state_begin(fb);
->      qemu_mutex_lock_iothread();
->      qemu_savevm_state_complete_precopy(fb, false);
->      qemu_mutex_unlock_iothread();
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 9b96f1a..f094079 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1102,7 +1102,7 @@ bool migration_is_idle(void)
->      return false;
->  }
->  
-> -MigrationState *migrate_init(const MigrationParams *params)
-> +MigrationState *migrate_init(void)
->  {
->      MigrationState *s = migrate_get_current();
->  
-> @@ -1116,7 +1116,6 @@ MigrationState *migrate_init(const MigrationParams *params)
->      s->cleanup_bh = 0;
->      s->to_dst_file = NULL;
->      s->state = MIGRATION_STATUS_NONE;
-> -    s->params = *params;
->      s->rp_state.from_dst_file = NULL;
->      s->rp_state.error = false;
->      s->mbps = 0.0;
-> @@ -1215,7 +1214,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->  {
->      Error *local_err = NULL;
->      MigrationState *s = migrate_get_current();
-> -    MigrationParams params;
->      const char *p;
->  
->      if (migration_is_setup_or_active(s->state) ||
-> @@ -1233,7 +1231,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->          return;
->      }
->  
-> -    s = migrate_init(&params);
-> +    s = migrate_init();
->  
->      if (has_blk && blk) {
->          migrate_set_block_enabled(s);
-> @@ -1966,7 +1964,7 @@ static void *migration_thread(void *opaque)
->          qemu_savevm_send_postcopy_advise(s->to_dst_file);
->      }
->  
-> -    qemu_savevm_state_begin(s->to_dst_file, &s->params);
-> +    qemu_savevm_state_begin(s->to_dst_file);
->  
->      s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
->      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 102b11d..97c6908 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -966,21 +966,13 @@ void qemu_savevm_state_header(QEMUFile *f)
->  
->  }
->  
-> -void qemu_savevm_state_begin(QEMUFile *f,
-> -                             const MigrationParams *params)
-> +void qemu_savevm_state_begin(QEMUFile *f)
->  {
->      SaveStateEntry *se;
->      int ret;
->  
->      trace_savevm_state_begin();
->      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> -        if (!se->ops || !se->ops->set_params) {
-> -            continue;
-> -        }
-> -        se->ops->set_params(params, se->opaque);
-> -    }
-> -
-> -    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
->          if (!se->ops || !se->ops->save_live_setup) {
->              continue;
->          }
-> @@ -1232,9 +1224,7 @@ void qemu_savevm_state_cleanup(void)
->  static int qemu_savevm_state(QEMUFile *f, Error **errp)
->  {
->      int ret;
-> -    MigrationParams params = {
-> -    };
-> -    MigrationState *ms = migrate_init(&params);
-> +    MigrationState *ms = migrate_init();
->      MigrationStatus status;
->      ms->to_dst_file = f;
->  
-> @@ -1245,7 +1235,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
->  
->      qemu_mutex_unlock_iothread();
->      qemu_savevm_state_header(f);
-> -    qemu_savevm_state_begin(f, &params);
-> +    qemu_savevm_state_begin(f);
->      qemu_mutex_lock_iothread();
->  
->      while (qemu_file_get_error(f) == 0) {
-> -- 
-> 2.9.3
-> 
+>  target/i386/translate.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+>
+> diff --git a/target/i386/translate.c b/target/i386/translate.c
+> index ea113fe..674ec96 100644
+> --- a/target/i386/translate.c
+> +++ b/target/i386/translate.c
+> @@ -4996,7 +4996,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>              gen_push_v(s, cpu_T1);
+>              gen_op_jmp_v(cpu_T0);
+>              gen_bnd_jmp(s);
+> -            gen_eob(s);
+> +            gen_jr(s, cpu_T0);
+>              break;
+>          case 3: /* lcall Ev */
+>              gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
+> @@ -5014,7 +5014,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>                                        tcg_const_i32(dflag - 1),
+>                                        tcg_const_i32(s->pc - s->cs_base));
+>              }
+> -            gen_eob(s);
+> +            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
+> +            gen_jr(s, cpu_tmp4);
+>              break;
+>          case 4: /* jmp Ev */
+>              if (dflag == MO_16) {
+> @@ -5022,7 +5023,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>              }
+>              gen_op_jmp_v(cpu_T0);
+>              gen_bnd_jmp(s);
+> -            gen_eob(s);
+> +            gen_jr(s, cpu_T0);
+>              break;
+>          case 5: /* ljmp Ev */
+>              gen_op_ld_v(s, ot, cpu_T1, cpu_A0);
+> @@ -5037,7 +5038,8 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>                  gen_op_movl_seg_T0_vm(R_CS);
+>                  gen_op_jmp_v(cpu_T1);
+>              }
+> -            gen_eob(s);
+> +            tcg_gen_ld_tl(cpu_tmp4, cpu_env, offsetof(CPUX86State, eip));
+> +            gen_jr(s, cpu_tmp4);
+>              break;
+>          case 6: /* push Ev */
+>              gen_push_v(s, cpu_T0);
+> @@ -6417,7 +6419,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>          /* Note that gen_pop_T0 uses a zero-extending load.  */
+>          gen_op_jmp_v(cpu_T0);
+>          gen_bnd_jmp(s);
+> -        gen_eob(s);
+> +        gen_jr(s, cpu_T0);
+>          break;
+>      case 0xc3: /* ret */
+>          ot = gen_pop_T0(s);
+> @@ -6425,7 +6427,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>          /* Note that gen_pop_T0 uses a zero-extending load.  */
+>          gen_op_jmp_v(cpu_T0);
+>          gen_bnd_jmp(s);
+> -        gen_eob(s);
+> +        gen_jr(s, cpu_T0);
+>          break;
+>      case 0xca: /* lret im */
+>          val = cpu_ldsw_code(env, s->pc);
+
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Bennée
