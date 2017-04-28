@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d47Sr-0006mQ-MC
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:05:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d47V8-0000DV-PF
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d47Sn-0001j7-2d
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:05:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34574)
+	(envelope-from <dgilbert@redhat.com>) id 1d47V7-0003Ta-Pk
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:08:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d47Sm-0001ia-Pf
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:05:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d47V7-0003Sc-JA
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 11:08:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 90A7680063
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 15:05:39 +0000 (UTC)
-References: <20170427165526.19836-1-dgilbert@redhat.com>
-	<87fugsfyfq.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <31823d2a-c25f-9c14-39f0-736cf46f6fbb@redhat.com>
-Date: Fri, 28 Apr 2017 10:05:37 -0500
+	by mx1.redhat.com (Postfix) with ESMTPS id 857A73DBE2
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 15:08:04 +0000 (UTC)
+Date: Fri, 28 Apr 2017 16:07:58 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170428150758.GC3276@work-vm>
+References: <20170425102446.4008-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87fugsfyfq.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AoitafIujO6buPw54nTjmexLwd88WDQAF"
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Disallow glib asserts in main
- code
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170425102446.4008-1-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/6] Move snapshots commands to hmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,122 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AoitafIujO6buPw54nTjmexLwd88WDQAF
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
-Message-ID: <31823d2a-c25f-9c14-39f0-736cf46f6fbb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Disallow glib asserts in main
- code
-References: <20170427165526.19836-1-dgilbert@redhat.com>
- <87fugsfyfq.fsf@dusky.pond.sub.org>
-In-Reply-To: <87fugsfyfq.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Juan Quintela (quintela@redhat.com) wrote:
+> Hi
+> 
+> This series:
+> - Move snapshots commands to hmp.c, as they don't have code for migration
+> - Make them work with errors in a modern way instead of writting to the monitor
+> - make paolo happy and use hmp_handle_error
+> 
+> Later, Juan.
 
-On 04/28/2017 08:34 AM, Markus Armbruster wrote:
+I'm happy with 1-5, 6 though, see comments.
 
->>
->> Ban most of the glib assertion functions (basically everything except
->> g_assert and g_assert_not_reached) except in tests/
+If you want I can merge 1-5 via my next HMP pull, otherwise
+if you want to do them via migration I agree with Laurent's Rb's so
 
-You'll also want to exclude scripts/ and possible include/glib-compat.h..=
-=2E
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-
-> If these are screwy enough to warrant rejecting them in new code,
-> they're probably screwy enough to purge them from existing code:
->=20
->     $ git-grep -E 'g_assert_cmpstr|g_assert_cmpint|g_assert_cmpuint|g_a=
-ssert_cmphex|g_assert_cmpfloat|g_assert_true|g_assert_false|g_assert_nonn=
-ull|g_assert_null|g_assert_no_error|g_assert_error|g_test_assert_expected=
-_messages|g_test_trap_assert_passed|g_test_trap_assert_stdout|g_test_trap=
-_assert_stdout_unmatched|g_test_trap_assert_stderr|g_test_trap_assert_std=
-err_unmatched' | grep -v ^tests/
->     hw/ide/ahci.c:        g_assert_cmpint(size, >, 1);
->     hw/ppc/spapr_ovec.c:    g_assert_cmpint(bitnr, <, OV_MAXBITS);
->     hw/ppc/spapr_ovec.c:    g_assert_cmpint(bitnr, <, OV_MAXBITS);
->     hw/ppc/spapr_ovec.c:    g_assert_cmpint(bitnr, <, OV_MAXBITS);
->     hw/ppc/spapr_ovec.c:    g_assert_cmpint(vector, >=3D, 1); /* vector=
- numbering starts at 1 */
->     hw/ppc/spapr_ovec.c:    g_assert_cmpint(vector_len, <=3D, OV_MAXBYT=
-ES);
->     hw/ppc/spapr_ovec.c:    g_assert_cmpint(vec_len, <=3D, OV_MAXBYTES)=
-;
-
-Those should go.
-
->     include/glib-compat.h:#ifndef g_assert_true
->     include/glib-compat.h:#define g_assert_true(expr)                  =
-                                  \
->     include/glib-compat.h:#ifndef g_assert_false
->     include/glib-compat.h:#define g_assert_false(expr)                 =
-                                  \
->     include/glib-compat.h:#ifndef g_assert_null
->     include/glib-compat.h:#define g_assert_null(expr)                  =
-                                  \
->     include/glib-compat.h:#ifndef g_assert_nonnull
->     include/glib-compat.h:#define g_assert_nonnull(expr)               =
-                                  \
-
-We still need these until we can require glib 2.38 or even 2.40.
-
->     qom/object.c:        g_assert_cmpint(parent->class_size, <=3D, ti->=
-class_size);
->     qom/object.c:    g_assert_cmpint(type->instance_size, >=3D, sizeof(=
-Object));
->     qom/object.c:    g_assert_cmpint(size, >=3D, type->instance_size);
->     qom/object.c:    g_assert_cmpint(obj->ref, =3D=3D, 0);
->     qom/object.c:    g_assert_cmpint(obj->ref, >, 0);
-
-These should go.
-
->     scripts/cocci-macro-file.h:#define g_assert_cmpint(a, op, b)   g_as=
-sert(a op b)
->     scripts/cocci-macro-file.h:#define g_assert_cmpuint(a, op, b)   g_a=
-ssert(a op b)
->     scripts/cocci-macro-file.h:#define g_assert_cmphex(a, op, b)   g_as=
-sert(a op b)
->     scripts/cocci-macro-file.h:#define g_assert_cmpstr(a, op, b)   g_as=
-sert(strcmp(a, b) op 0)
-
-These must stay permanently.
-
->     util/qht.c:    g_assert_cmpuint(new->n_buckets, !=3D, old->n_bucket=
-s);
->=20
-> Volunteers?
->=20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---AoitafIujO6buPw54nTjmexLwd88WDQAF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZA1pBAAoJEKeha0olJ0Nq8WwH/juoCKgSHs0q91OWXqUsw9OR
-Qyq/T1RCfRN4811iyduAG7/V89i+qqvK8RtMOzLJqpW3lh1N41qOlcwhsUgDuQ/i
-ZKP5nA0cr7P0S8YwoZozylfWFOp+AiupVjvBu8vJ5pepAH2CrOywiBqXw5+2/nAh
-BbZSWmVAjguIjsmJSWbukZv40z5vXHFXtmKVYLleavug0ZK2eqsxXFeN28GdWiNO
-yUIQS+HpYtBBTvIfblVXRIqKsovLsq8OkTAl3aP2HxyhOlAvBZHj/FRfi3BqAIZS
-viDsw7N+Z/gqQXilG0qJQ9+KgYcpVCFkNGKMbol0TLNuA1ZCZsaSNlIBYqtaUkM=
-=5Qpb
------END PGP SIGNATURE-----
-
---AoitafIujO6buPw54nTjmexLwd88WDQAF--
+> 
+> Juan Quintela (6):
+>   monitor: Remove monitor parameter from save_vmstate
+>   monitor: Move hmp_loadvm from monitor.c to hmp.c
+>   monitor: Move hmp_savevm from savevm.c to hmp.c
+>   monitor: Move hmp_delvm from savevm.c to hmp.c
+>   monitor: Move hmp_info_snapshots from savevm.c to hmp.c
+>   migration: Pass Error ** argument to {save,load}_vmstate
+> 
+>  hmp.c                    | 179 +++++++++++++++++++++++++++++++++++++++
+>  hmp.h                    |   4 +
+>  include/sysemu/sysemu.h  |   7 +-
+>  migration/savevm.c       | 216 ++++++-----------------------------------------
+>  monitor.c                |  13 ---
+>  replay/replay-snapshot.c |   6 +-
+>  vl.c                     |   4 +-
+>  7 files changed, 217 insertions(+), 212 deletions(-)
+> 
+> -- 
+> 2.9.3
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
