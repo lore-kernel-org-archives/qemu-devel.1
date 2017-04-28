@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d42o6-0000ft-IM
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:07:23 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d42s4-0001i1-8A
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:11:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d42o2-00083d-Ik
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:07:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48218)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d42s1-0001AK-2L
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:11:28 -0400
+Received: from mga03.intel.com ([134.134.136.65]:23394)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d42o2-000833-Cd
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:07:18 -0400
-Date: Fri, 28 Apr 2017 18:07:00 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170428100700.GC22801@pxdev.xzpeter.org>
-References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170428065754eucas1p1f51713373ce8c2d19945a4f91c52bd5c@eucas1p1.samsung.com>
-	<1493362658-8179-5-git-send-email-a.perevalov@samsung.com>
-	<20170428093825.GA22801@pxdev.xzpeter.org>
-	<3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1d42s0-0001AA-NK
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:11:24 -0400
+Date: Fri, 28 Apr 2017 17:55:26 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20170428095526.GC15484@sky-dev>
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-3-git-send-email-yi.l.liu@linux.intel.com>
+	<20170427103221.GD1542@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND V3 4/6] migration: add postcopy
- downtime into MigrationIncommingState
+In-Reply-To: <20170427103221.GD1542@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 02/20] intel_iommu: exposed
+ extended-context mode to guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +30,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com, f4bug@amsat.org
+To: Peter Xu <peterx@redhat.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, jean-philippe.brucker@arm.com, jasowang@redhat.com, iommu@lists.linux-foundation.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, jacob.jun.pan@intel.com
 
-On Fri, Apr 28, 2017 at 01:03:45PM +0300, Alexey Perevalov wrote:
-
-[...]
-
-> >>diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> >>index 21e7150..f3688f5 100644
-> >>--- a/migration/postcopy-ram.c
-> >>+++ b/migration/postcopy-ram.c
-> >>@@ -132,6 +132,14 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
-> >>          return false;
-> >>      }
-> >>+#ifdef UFFD_FEATURE_THREAD_ID
-> >>+    if (mis && UFFD_FEATURE_THREAD_ID & supported_features) {
-> >>+        /* kernel supports that feature */
-> >>+        mis->downtime_ctx = downtime_context_new();
-> >>+        new_features |= UFFD_FEATURE_THREAD_ID;
-> >So here I know why in patch 2 new_features == 0...
-> >
-> >If I were you, I would like the series be done in below 4 patches:
-> >
-> >1. update header
-> >2. introduce THREAD_ID feature, and enable it conditionally
-> >3. squash all the downtime thing (downtime context, calculation) in
-> >    one patch here
-> >4. introduce trace
-> >
-> >IMHO that's clearer and easier for review. But I'm okay with current
-> >as well as long as the maintainers (Dave/Juan) won't disagree. :)
-> In previous series, David asked me to split one patch into 2
-> [Qemu-devel] [PATCH 3/6] migration: add UFFD_FEATURE_THREAD_ID feature
-> support
+On Thu, Apr 27, 2017 at 06:32:21PM +0800, Peter Xu wrote:
+> On Wed, Apr 26, 2017 at 06:06:32PM +0800, Liu, Yi L wrote:
+> > VT-d implementations reporting PASID or PRS fields as "Set", must also
+> > report ecap.ECS as "Set". Extended-Context is required for SVM.
+> > 
+> > When ECS is reported, intel iommu driver would initiate extended root entry
+> > and extended context entry, and also PASID table if there is any SVM capable
+> > device.
+> > 
+> > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> > ---
+> >  hw/i386/intel_iommu.c          | 131 +++++++++++++++++++++++++++--------------
+> >  hw/i386/intel_iommu_internal.h |   9 +++
+> >  include/hw/i386/intel_iommu.h  |   2 +-
+> >  3 files changed, 97 insertions(+), 45 deletions(-)
+> > 
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index 400d0d1..bf98fa5 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -497,6 +497,11 @@ static inline bool vtd_root_entry_present(VTDRootEntry *root)
+> >      return root->val & VTD_ROOT_ENTRY_P;
+> >  }
+> >  
+> > +static inline bool vtd_root_entry_upper_present(VTDRootEntry *root)
+> > +{
+> > +    return root->rsvd & VTD_ROOT_ENTRY_P;
+> > +}
+> > +
+> >  static int vtd_get_root_entry(IntelIOMMUState *s, uint8_t index,
+> >                                VTDRootEntry *re)
+> >  {
+> > @@ -509,6 +514,9 @@ static int vtd_get_root_entry(IntelIOMMUState *s, uint8_t index,
+> >          return -VTD_FR_ROOT_TABLE_INV;
+> >      }
+> >      re->val = le64_to_cpu(re->val);
+> > +    if (s->ecs) {
+> > +        re->rsvd = le64_to_cpu(re->rsvd);
+> > +    }
 > 
-> >There seem to be two parts to this:
-> >  a) Adding the mis parameter to ufd_version_check
-> >  b) Asking for the feature
+> I feel it slightly hacky to play with re->rsvd. How about:
 > 
-> >Please split it into two patches.
+> union VTDRootEntry {
+>     struct {
+>         uint64_t val;
+>         uint64_t rsvd;
+>     } base;
+>     struct {
+>         uint64_t ext_lo;
+>         uint64_t ext_hi;
+>     } extended;
+> };
+
+Agree.
+ 
+> (Or any better way that can get rid of rsvd...)
 > 
-> So in current patch set, I also added re-factoring, which was missed before
-> "migration: split ufd_version_check onto receive/request features part"
+> Even:
+> 
+> struct VTDRootEntry {
+>     union {
+>         struct {
+>                 uint64_t val;
+>                 uint64_t rsvd;
+>         } base;
+>         struct {
+>                 uint64_t ext_lo;
+>                 uint64_t ext_hi;
+>         } extended;
+>     } data;
+>     bool extended;
+> };
+> 
+> Then we read the entry into data, and setup extended bit. A benefit of
+> it is that we may avoid passing around IntelIOMMUState everywhere to
+> know whether we are using extended context entries.
 
-Sure. As long as Dave agrees, I'm okay with either way.
+For this proposal, it's combining the s->ecs bit and root entry. But it
+may mislead future maintainer as it uses VTDRootEntry. maybe name it
+differently.
 
--- 
-Peter Xu
+> >      return 0;
+> >  }
+> >  
+> > @@ -517,19 +525,30 @@ static inline bool vtd_context_entry_present(VTDContextEntry *context)
+> >      return context->lo & VTD_CONTEXT_ENTRY_P;
+> >  }
+> >  
+> > -static int vtd_get_context_entry_from_root(VTDRootEntry *root, uint8_t index,
+> > -                                           VTDContextEntry *ce)
+> > +static int vtd_get_context_entry_from_root(IntelIOMMUState *s,
+> > +                 VTDRootEntry *root, uint8_t index, VTDContextEntry *ce)
+> >  {
+> > -    dma_addr_t addr;
+> > +    dma_addr_t addr, ce_size;
+> >  
+> >      /* we have checked that root entry is present */
+> > -    addr = (root->val & VTD_ROOT_ENTRY_CTP) + index * sizeof(*ce);
+> > -    if (dma_memory_read(&address_space_memory, addr, ce, sizeof(*ce))) {
+> > +    ce_size = (s->ecs) ? (2 * sizeof(*ce)) : (sizeof(*ce));
+> > +    addr = (s->ecs && (index > 0x7f)) ?
+> > +           ((root->rsvd & VTD_ROOT_ENTRY_CTP) + (index - 0x80) * ce_size) :
+> > +           ((root->val & VTD_ROOT_ENTRY_CTP) + index * ce_size);
+> > +
+> > +    if (dma_memory_read(&address_space_memory, addr, ce, ce_size)) {
+> >          trace_vtd_re_invalid(root->rsvd, root->val);
+> >          return -VTD_FR_CONTEXT_TABLE_INV;
+> >      }
+> > -    ce->lo = le64_to_cpu(ce->lo);
+> > -    ce->hi = le64_to_cpu(ce->hi);
+> > +
+> > +    ce[0].lo = le64_to_cpu(ce[0].lo);
+> > +    ce[0].hi = le64_to_cpu(ce[0].hi);
+> 
+> Again, I feel this even hackier. :)
+> 
+> I would slightly prefer to play the same union trick to context
+> entries, just like what I proposed to the root entries above...
+
+would think about it.
+
+> > +
+> > +    if (s->ecs) {
+> > +        ce[1].lo = le64_to_cpu(ce[1].lo);
+> > +        ce[1].hi = le64_to_cpu(ce[1].hi);
+> > +    }
+> > +
+> >      return 0;
+> >  }
+> >  
+> > @@ -595,9 +614,11 @@ static inline uint32_t vtd_get_agaw_from_context_entry(VTDContextEntry *ce)
+> >      return 30 + (ce->hi & VTD_CONTEXT_ENTRY_AW) * 9;
+> >  }
+> >  
+> > -static inline uint32_t vtd_ce_get_type(VTDContextEntry *ce)
+> > +static inline uint32_t vtd_ce_get_type(IntelIOMMUState *s,
+> > +                                       VTDContextEntry *ce)
+> >  {
+> > -    return ce->lo & VTD_CONTEXT_ENTRY_TT;
+> > +    return s->ecs ? (ce->lo & VTD_CONTEXT_ENTRY_TT) :
+> > +                    (ce->lo & VTD_EXT_CONTEXT_ENTRY_TT);
+> >  }
+> >  
+> >  static inline uint64_t vtd_iova_limit(VTDContextEntry *ce)
+> > @@ -842,16 +863,20 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+> >          return ret_fr;
+> >      }
+> >  
+> > -    if (!vtd_root_entry_present(&re)) {
+> > +    if (!vtd_root_entry_present(&re) ||
+> > +        (s->ecs && (devfn > 0x7f) && (!vtd_root_entry_upper_present(&re)))) {
+> >          /* Not error - it's okay we don't have root entry. */
+> >          trace_vtd_re_not_present(bus_num);
+> >          return -VTD_FR_ROOT_ENTRY_P;
+> > -    } else if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
+> > -        trace_vtd_re_invalid(re.rsvd, re.val);
+> > -        return -VTD_FR_ROOT_ENTRY_RSVD;
+> > +    }
+> > +    if ((s->ecs && (devfn > 0x7f) && (re.rsvd & VTD_ROOT_ENTRY_RSVD)) ||
+> > +        (s->ecs && (devfn < 0x80) && (re.val & VTD_ROOT_ENTRY_RSVD)) ||
+> > +        ((!s->ecs) && (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)))) {
+> > +            trace_vtd_re_invalid(re.rsvd, re.val);
+> > +            return -VTD_FR_ROOT_ENTRY_RSVD;
+> 
+> Nit: I feel like we can better wrap these 0x7f and 0x80 into helper
+> functions, especially if with above structure change...
+
+yep, would add helper function.
+
+> (will hold here...)
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
+> 
