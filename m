@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d48ca-0002LX-Qt
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:19:53 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d48ey-00037M-V2
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d48cZ-0007fs-Pr
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:19:52 -0400
-References: <1493261907-18734-1-git-send-email-lidongchen@tencent.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3684ce67-a2c0-01ee-b1d2-d96f1b45b8a2@redhat.com>
-Date: Fri, 28 Apr 2017 18:19:41 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1d48ev-00008R-0a
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:22:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d48eu-00008B-Nk
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 12:22:16 -0400
+Date: Fri, 28 Apr 2017 17:22:05 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170428162205.GE3276@work-vm>
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170428065754eucas1p1f51713373ce8c2d19945a4f91c52bd5c@eucas1p1.samsung.com>
+	<1493362658-8179-5-git-send-email-a.perevalov@samsung.com>
+	<20170428093825.GA22801@pxdev.xzpeter.org>
+	<3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
+	<20170428100700.GC22801@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <1493261907-18734-1-git-send-email-lidongchen@tencent.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="N9ARxJDmjUilaSSwKnGVQXasbAkgm8IiQ"
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-img: use blk_co_pwrite_zeroes for
- zero sectors when compressed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170428100700.GC22801@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 4/6] migration: add postcopy
+ downtime into MigrationIncommingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jemmy858585@gmail.com, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org, i.maximets@samsung.com, f4bug@amsat.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---N9ARxJDmjUilaSSwKnGVQXasbAkgm8IiQ
-From: Max Reitz <mreitz@redhat.com>
-To: jemmy858585@gmail.com, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org,
- Lidong Chen <lidongchen@tencent.com>
-Message-ID: <3684ce67-a2c0-01ee-b1d2-d96f1b45b8a2@redhat.com>
-Subject: Re: [PATCH v3] qemu-img: use blk_co_pwrite_zeroes for zero sectors
- when compressed
-References: <1493261907-18734-1-git-send-email-lidongchen@tencent.com>
-In-Reply-To: <1493261907-18734-1-git-send-email-lidongchen@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Apr 28, 2017 at 01:03:45PM +0300, Alexey Perevalov wrote:
+> 
+> [...]
+> 
+> > >>diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > >>index 21e7150..f3688f5 100644
+> > >>--- a/migration/postcopy-ram.c
+> > >>+++ b/migration/postcopy-ram.c
+> > >>@@ -132,6 +132,14 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+> > >>          return false;
+> > >>      }
+> > >>+#ifdef UFFD_FEATURE_THREAD_ID
+> > >>+    if (mis && UFFD_FEATURE_THREAD_ID & supported_features) {
+> > >>+        /* kernel supports that feature */
+> > >>+        mis->downtime_ctx = downtime_context_new();
+> > >>+        new_features |= UFFD_FEATURE_THREAD_ID;
+> > >So here I know why in patch 2 new_features == 0...
+> > >
+> > >If I were you, I would like the series be done in below 4 patches:
+> > >
+> > >1. update header
+> > >2. introduce THREAD_ID feature, and enable it conditionally
+> > >3. squash all the downtime thing (downtime context, calculation) in
+> > >    one patch here
+> > >4. introduce trace
+> > >
+> > >IMHO that's clearer and easier for review. But I'm okay with current
+> > >as well as long as the maintainers (Dave/Juan) won't disagree. :)
+> > In previous series, David asked me to split one patch into 2
+> > [Qemu-devel] [PATCH 3/6] migration: add UFFD_FEATURE_THREAD_ID feature
+> > support
+> > 
+> > >There seem to be two parts to this:
+> > >  a) Adding the mis parameter to ufd_version_check
+> > >  b) Asking for the feature
+> > 
+> > >Please split it into two patches.
+> > 
+> > So in current patch set, I also added re-factoring, which was missed before
+> > "migration: split ufd_version_check onto receive/request features part"
+> 
+> Sure. As long as Dave agrees, I'm okay with either way.
 
-On 27.04.2017 04:58, jemmy858585@gmail.com wrote:
-> From: Lidong Chen <lidongchen@tencent.com>
->=20
-> When the buffer is zero, blk_co_pwrite_zeroes is more effective than
-> blk_co_pwritev with BDRV_REQ_WRITE_COMPRESSED. This patch can reduce
-> the time for converting qcow2 images with lots of zero data.
->=20
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> ---
->    v3 changelog:
->        fix some spelling errors and code style.
->    v2 changelog:
->        unify the compressed and non-compressed code paths.
-> ---
->  qemu-img.c | 44 ++++++++++++++------------------------------
->  1 file changed, 14 insertions(+), 30 deletions(-)
+I'm OK with the split, it pretty much matches what I asked last time I think.
 
-Thank you, I have applied the patch to my block branch:
+The question I still have is how is this memory-expensive feature turned
+on and off by the user?
+Also I think Peter had some ideas for simpler data structures, how did
+that play out?
 
-https://github.com/XanClic/qemu/commits/block
-
-Max
+Dave
 
 
---N9ARxJDmjUilaSSwKnGVQXasbAkgm8IiQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDa50SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AamEH/1NTlTceY/gTQVXg3JQytJZjlZrRJCIT
-MBedKoeEKS1zGOgK/jCDr+M4PvPyR63nkE1msz6V9p8f2uRPO0ZnsSPXZctQ1e0M
-puDeGoxexhAd5jQWHc7zKLAy+rESImHmaeHAZMNF1vlspVTrXb+kAho5Mn9NVD74
-YkgeXHEo0qmuZTFjxFiGi5S7j249xhkqFW4EAo/onwpa3TT1+M07Bf3hdHQ2uCR+
-DtThRoUpkdG9s1T+lFWhyZQG9uPir2wF3cRzEuF8RkhwZWe/34tUh2sFeiqI7l3f
-OQtZS6WyDqEdLA9iYFEyDiNYz+gHKp91GD98k4mavx7omu/g2W8VCMY=
-=/HNS
------END PGP SIGNATURE-----
-
---N9ARxJDmjUilaSSwKnGVQXasbAkgm8IiQ--
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
