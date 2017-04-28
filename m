@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhiyong.yang@intel.com>) id 1d406v-0008Bc-5u
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:14:38 -0400
+	(envelope-from <yu.ning@linux.intel.com>) id 1d40LY-00026U-To
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:29:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhiyong.yang@intel.com>) id 1d406q-0003Ps-LW
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:14:37 -0400
-Received: from mga14.intel.com ([192.55.52.115]:10608)
+	(envelope-from <yu.ning@linux.intel.com>) id 1d40LU-0003x6-VR
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:29:44 -0400
+Received: from mga07.intel.com ([134.134.136.100]:56787)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhiyong.yang@intel.com>)
-	id 1d406q-0003Pe-CY
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:14:32 -0400
-From: Zhiyong Yang <zhiyong.yang@intel.com>
-Date: Fri, 28 Apr 2017 15:09:32 +0800
-Message-Id: <1493363372-16861-1-git-send-email-zhiyong.yang@intel.com>
-Subject: [Qemu-devel] [PATCH] hw/virtio: fix vhost user fails to startup
- when MQ
+	(Exim 4.71) (envelope-from <yu.ning@linux.intel.com>)
+	id 1d40LU-0003uO-Mb
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:29:40 -0400
+From: Yu Ning <yu.ning@linux.intel.com>
+Date: Fri, 28 Apr 2017 15:27:23 +0800
+Message-Id: <20170428072723.7036-1-yu.ning@linux.intel.com>
+Subject: [Qemu-devel] [PATCH] hax: Fix memory mapping de-duplication logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +23,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, Zhiyong Yang <zhiyong.yang@intel.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, vpalatin@chromium.org, sw@weilnetz.de, Yu Ning <yu.ning@linux.intel.com>
 
-   Qemu2.7~2.9 and vhost user for dpdk 17.02 release work together
-to cause failures of new connection when negotiating to set MQ.
-(one queue pair works well).
-   Because there exist some bugs in qemu code when introducing
-VHOST_USER_PROTOCOL_F_REPLY_ACK to qemu. When vhost_user_set_mem_table
-is invoked to deal with the vhost message VHOST_USER_SET_MEM_TABLE
-for the second time, qemu indeed doesn't send the messge (The message
-needs to be sent only once)but still will be waiting for dpdk's reply
-ack, then, qemu is always freezing, while DPDK is always waiting for
-next vhost message from qemu.
-  The patch aims to fix the bug, MQ can work well.
-  The same bug is found in function vhost_user_net_set_mtu, it is fixed
-at the same time.
-  DPDK related patch is as following:
-  http://www.dpdk.org/dev/patchwork/patch/23955/
+hax_update_mapping() avoids unnecessary and potentially expensive
+calls to HAX_VM_IOCTL_SET_RAM by computing the net result (i.e.
+effective mapping changes) of each MemoryRegion transaction, with
+the help of a linked list of HAXMapping objects.
 
-Signed-off-by: Zhiyong Yang <zhiyong.yang@intel.com>
+However, when processing a new mapping that overlaps with an
+existing mapping in the list, it fails to handle the case where the
+start address of the new mapping is above that of the existing
+mapping in the guest physical address space. This happens when QEMU
+is launched with "-machine q35 -enable-hax", which involves the
+following MemoryRegion transaction for digging the VGA hole:
+
+ region_del: 0x00000000->0x08000000 VA 05fa0000 ('pc.ram')
+ region_add: 0x00000000->0x000a0000 VA 05fa0000 ('pc.ram')
+ region_add: 0x000a0000->0x000c0000 VA 00000000 ('vga-lowmem')
+ region_add: 0x000c0000->0x08000000 VA 06060000 ('pc.ram')
+
+where the third MemoryRegion is MMIO and is ignored. The current
+de-duplication logic handles the last MemoryRegion incorrectly and
+produces the following result:
+
+ hax_mapping_dump_list updates:
+         + 0x000c0000->0x08000000 VA 0x06060000
+         - 0x07fe0000->0x08000000 VA 0x0df80000
+
+which is why VGA emulation does not work for Q35.
+
+With this patch, one can see VGA output as Q35 boots up. Note that
+Q35 support also requires a change to HAXM kernel module, which is
+not available in the current HAXM release (6.1.2).
+
++ Add a warning if the input MemoryRegion is a ROM device, which is
+  not supported by HAXM kernel module at this time.
+
+Signed-off-by: Yu Ning <yu.ning@linux.intel.com>
 ---
- hw/virtio/vhost-user.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ target/i386/hax-mem.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 9334a8a..c2c54ce 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -205,10 +205,11 @@ static int vhost_user_write(struct vhost_dev *dev, VhostUserMsg *msg,
-     /*
-      * For non-vring specific requests, like VHOST_USER_SET_MEM_TABLE,
-      * we just need send it once in the first time. For later such
--     * request, we just ignore it.
-+     * request, we just ignore it. In this case, return value is 1 which is
-+     * different from 0 that stands for message written successfully.
-      */
-     if (vhost_user_one_time_request(msg->request) && dev->vq_index != 0) {
--        return 0;
-+        return 1;
-     }
- 
-     if (qemu_chr_fe_set_msgfds(chr, fds, fd_num) < 0) {
-@@ -270,7 +271,7 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-                                     struct vhost_memory *mem)
+diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
+index 2884040..af09034 100644
+--- a/target/i386/hax-mem.c
++++ b/target/i386/hax-mem.c
+@@ -106,10 +106,10 @@ static void hax_update_mapping(uint64_t start_pa, uint32_t size,
+                                uint64_t host_va, uint8_t flags)
  {
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
--    int i, fd;
-+    int i, fd, ret;
-     size_t fd_num = 0;
-     bool reply_supported = virtio_has_feature(dev->protocol_features,
-                                               VHOST_USER_PROTOCOL_F_REPLY_ACK);
-@@ -315,11 +316,12 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-     msg.size += sizeof(msg.payload.memory.padding);
-     msg.size += fd_num * sizeof(VhostUserMemoryRegion);
+     uint64_t end_pa = start_pa + size;
+-    uint32_t chunk_sz;
+     HAXMapping *entry, *next;
  
--    if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
-+    ret = vhost_user_write(dev, &msg, fds, fd_num);
-+    if (ret < 0) {
-         return -1;
-     }
+     QTAILQ_FOREACH_SAFE(entry, &mappings, entry, next) {
++        uint32_t chunk_sz;
+         if (start_pa >= entry->start_pa + entry->size) {
+             continue;
+         }
+@@ -121,7 +121,16 @@ static void hax_update_mapping(uint64_t start_pa, uint32_t size,
+             start_pa += chunk_sz;
+             host_va += chunk_sz;
+             size -= chunk_sz;
++        } else if (start_pa > entry->start_pa) {
++            /* split the existing chunk at start_pa */
++            chunk_sz = start_pa - entry->start_pa;
++            hax_insert_mapping_before(entry, entry->start_pa, chunk_sz,
++                                      entry->host_va, entry->flags);
++            entry->start_pa += chunk_sz;
++            entry->host_va += chunk_sz;
++            entry->size -= chunk_sz;
+         }
++        /* now start_pa == entry->start_pa */
+         chunk_sz = MIN(size, entry->size);
+         if (chunk_sz) {
+             bool nop = hax_mapping_is_opposite(entry, host_va, flags);
+@@ -165,8 +174,14 @@ static void hax_process_section(MemoryRegionSection *section, uint8_t flags)
+     unsigned int delta;
+     uint64_t host_va;
  
--    if (reply_supported) {
-+    if (reply_supported && (ret == 0)) {
-         return process_message_reply(dev, msg.request);
-     }
- 
-@@ -691,6 +693,7 @@ static bool vhost_user_can_merge(struct vhost_dev *dev,
- static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
- {
-     VhostUserMsg msg;
-+    int ret;
-     bool reply_supported = virtio_has_feature(dev->protocol_features,
-                                               VHOST_USER_PROTOCOL_F_REPLY_ACK);
- 
-@@ -706,12 +709,13 @@ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
-         msg.flags |= VHOST_USER_NEED_REPLY_MASK;
-     }
- 
--    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+    ret = vhost_user_write(dev, &msg, NULL, 0);
-+    if (ret < 0) {
-         return -1;
-     }
- 
-     /* If reply_ack supported, slave has to ack specified MTU is valid */
--    if (reply_supported) {
-+    if (reply_supported && (ret == 0)) {
-         return process_message_reply(dev, msg.request);
+-    /* We only care about RAM pages */
++    /* We only care about RAM and ROM regions */
+     if (!memory_region_is_ram(mr)) {
++        if (memory_region_is_romd(mr)) {
++            /* HAXM kernel module does not support ROMD yet  */
++            fprintf(stderr, "%s: Warning: Ignoring ROMD region 0x%016" PRIx64
++                    "->0x%016" PRIx64 "\n", __func__, start_pa,
++                    start_pa + size);
++        }
+         return;
      }
  
 -- 
-2.7.4
+2.9.3
