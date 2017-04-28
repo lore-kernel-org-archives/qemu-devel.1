@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4Bsb-0001hh-6F
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:48:38 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d4BxT-0002ma-DD
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4Bsa-000089-2i
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:48:37 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d4BxS-0001do-KE
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:53:39 -0400
 References: <20170427014626.11553-1-eblake@redhat.com>
-	<20170427014626.11553-6-eblake@redhat.com>
-	<90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d25e3cc9-361a-37ba-2d6b-b08319bff7b7@redhat.com>
-Date: Fri, 28 Apr 2017 14:48:27 -0500
+	<20170427014626.11553-9-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f73dfa75-5a2c-234b-0eea-3ebe7dc7f507@redhat.com>
+Date: Fri, 28 Apr 2017 21:53:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
+In-Reply-To: <20170427014626.11553-9-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="BHufneXjAI8HLKmH7iI5kXtqFEdQ1BQDM"
-Subject: Re: [Qemu-devel] [PATCH v10 05/17] iotests: Add test 179 to cover
- write zeroes with unmap
+	boundary="u3m6dtNtXr8uvJWG4fHN6AI2TfAatcjED"
+Subject: Re: [Qemu-devel] [PATCH v10 08/17] qemu-io: Switch 'map' output to
+ byte-based reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BHufneXjAI8HLKmH7iI5kXtqFEdQ1BQDM
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+--u3m6dtNtXr8uvJWG4fHN6AI2TfAatcjED
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <d25e3cc9-361a-37ba-2d6b-b08319bff7b7@redhat.com>
-Subject: Re: [PATCH v10 05/17] iotests: Add test 179 to cover write zeroes
- with unmap
+Message-ID: <f73dfa75-5a2c-234b-0eea-3ebe7dc7f507@redhat.com>
+Subject: Re: [PATCH v10 08/17] qemu-io: Switch 'map' output to byte-based
+ reporting
 References: <20170427014626.11553-1-eblake@redhat.com>
- <20170427014626.11553-6-eblake@redhat.com>
- <90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
-In-Reply-To: <90b7a5bf-259b-47ef-d0cf-b64fc93bba47@redhat.com>
+ <20170427014626.11553-9-eblake@redhat.com>
+In-Reply-To: <20170427014626.11553-9-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/28/2017 02:28 PM, Max Reitz wrote:
-> On 27.04.2017 03:46, Eric Blake wrote:
->> No tests were covering write zeroes with unmap.  Additionally,
->> I needed to prove that my previous patches for correct status
->> reporting and write zeroes optimizations actually had an impact.
->>
->> The test works for cluster_size between 8k and 2M (for smaller
->> sizes, it fails because our allocation patterns are not contiguous
->> with small clusters).
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> ---
->> v10: drop any changes to v2 files, rewrite test to work with updates
->> earlier in the series, add a blkdebug probe
->> v9: new patch
->> ---
->>  tests/qemu-iotests/179     | 123 ++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  tests/qemu-iotests/179.out |  90 +++++++++++++++++++++++++++++++++
->>  tests/qemu-iotests/group   |   1 +
->>  3 files changed, 214 insertions(+)
->>  create mode 100755 tests/qemu-iotests/179
->>  create mode 100644 tests/qemu-iotests/179.out
+On 27.04.2017 03:46, Eric Blake wrote:
+> Mixing byte offset and sector allocation counts is a bit
+> confusing.  Also, reporting n/m sectors, where m decreases
+> according to the remaining size of the file, isn't really
+> adding any useful information.
+
+Since this map doesn't leave out any range in the image file -- not
+really, no. :-)
+
+>                                 Update the output to use
+> byte counts, and adjust the affected tests (./check -qcow2 102,
+> ./check -vpc 146).
 >=20
-> Can I convince you to write this test in a different way? I really have=
-
-> a hard time following all of the writes and building a mental image of
-> how the qcow2 file should look in the end so I can compare it to the ma=
-p
-> output.
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 >=20
-> I'd like it better if you would check the qcow2 file after each group o=
-f
-> write operations, maybe even creating a new image for every such group.=
+> ---
+> v10: rebase to updated test 179
+> v9: new patch
+> ---
+>  qemu-io-cmds.c             |  5 ++---
+>  tests/qemu-iotests/102.out |  4 ++--
+>  tests/qemu-iotests/146.out | 30 +++++++++++++++---------------
+>  tests/qemu-iotests/179.out | 22 +++++++++++-----------
+>  4 files changed, 30 insertions(+), 31 deletions(-)
 
-> But even just having more qemu-img map calls (and changing nothing else=
-)
-> would help me a lot.
-
-Will do.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---BHufneXjAI8HLKmH7iI5kXtqFEdQ1BQDM
+--u3m6dtNtXr8uvJWG4fHN6AI2TfAatcjED
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZA5yLAAoJEKeha0olJ0NqjlgH/i1TQDJLaD85fqHUyaJgDMfr
-8U5EWU/3S4HSi+aXsr9LSV67fyHx94JGHRfUuM0ifB1N9dG1dgYmvtBPtD6pgaDZ
-WzgL5bEnfZAoE2rjMJM6hqyA2+EgoWdx0hbAgG7ePguHZ9gQ4D05LgjpukwSM05R
-rsXZmae4QSXivtSw7lxU9IzncO9XEfIU/RQPoBwEwiJcJZU2DMc10YX2Nu3R7PgO
-7YI1kMSNDaa+33EiW67G5l0AXY0rX3mr5O/U+U5q0LOdOGJRspvfL4k4FQNzEPvu
-skAoEMuHQeneK1k/erSntc243O30Du/sVM/JNcIDliDGP+bW/XkkMxQ0p3nM2ak=
-=hMCH
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkDnbkSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A8rsH/35LOsA0sDRXACWUPpIcOVUh+julLlrQ
+IGw2RwMRAqxSEONw9U5v1slWbqj2Y+EmpmjdEP9gFgQJ8XSsxYgJQOYrmEFPNo1k
+LB4UC+LP7xJJvyK/b/5eMOzawj2/QRjB5OLXPR8D6XW5y74hxoDSHqZWN6ikMyJw
+L666VGaRrcRLhAUb5GlCfrhM3hScMrqdtZhjpzUev9PPfr1oqVv5vzdu6+ALgdO4
+zecXhoO8pvlpuaw8jKD6abC/kCfYJD8I4BZojyat3ttrXJwsIXJ04qFAyF98/No7
+M3X5FvpnerLSUMC6DYICzioUCghcfOAAuqv5k1JtaiZ4N2yrTvOKRZY=
+=fRKL
 -----END PGP SIGNATURE-----
 
---BHufneXjAI8HLKmH7iI5kXtqFEdQ1BQDM--
+--u3m6dtNtXr8uvJWG4fHN6AI2TfAatcjED--
