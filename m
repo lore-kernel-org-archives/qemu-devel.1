@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1d46cs-00042B-V6
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:12:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1d46gd-0005Cm-GK
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1d46co-0008NA-B7
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:12:02 -0400
-Received: from mail-vk0-f53.google.com ([209.85.213.53]:35657)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1d46co-0008Mf-5s
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:11:58 -0400
-Received: by mail-vk0-f53.google.com with SMTP id o76so8771471vkc.2
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 07:11:54 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1d46gY-0001v3-B1
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:15:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d46gY-0001ut-59
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 10:15:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d46gT-0006d7-W9
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 14:15:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5F4D42E80D1
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 14:15:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170424130355.31324-1-marcandre.lureau@redhat.com>
-References: <20170424130355.31324-1-marcandre.lureau@redhat.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Fri, 28 Apr 2017 16:11:53 +0200
-Message-ID: <CABdb736pFG7yK+C_J-WWRbX+e-bk62TejQ_GtObxyFmV5t350w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] RFC: vmcoreinfo device
+Date: Fri, 28 Apr 2017 14:08:54 -0000
+From: Daniel Berrange <1686980@bugs.launchpad.net>
+Reply-To: Bug 1686980 <1686980@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170428101422.23122.24568.malonedeb@wampee.canonical.com>
+Message-Id: <20170428140854.27002.394.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1686980] Re: qemu is very slow when adding 16,
+ 384 virtio-scsi drives
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +37,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, anderson@redhat.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Mon, Apr 24, 2017 at 3:03 PM, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> The VM coreinfo (vmcoreinfo) device is an emulated device which
-> exposes a 4k memory range to the guest to store various informations
-> useful to debug the guest OS. (it is greatly inspired by the VMGENID
-> device implementation)
->
-> This is an early-boot alternative to the qemu-ga VMDUMP_INFO event
-> proposed in "[PATCH 00/21] WIP: dump: add kaslr support".
->
-> If deemed more appropriate, we can consider writing to fw_cfg directly
-> instead of guest memory, now that qemu 2.9 supports it again.
->
-> The proof-of-concept kernel module:
-> https://github.com/elmarco/vmgenid-test/blob/master/qemuvmci-test.c
+I added further instrumentation and got this profile of where the
+remaining time goes
 
-Here's a proof-of-concept Windows driver:
-https://github.com/ladipro/kvm-guest-drivers-windows/tree/vmcoreinfo/vmcore=
-info
+1000x drive_new 18.347secs
+-> 1000x blockdev_init 18.328secs
+   -> 1000x monitor_add_blk 4.515secs
+      -> 1000x blk_by_name 1.545secs
+      -> 1000x bdrv_find_node 2.968secs
+   -> 1000x blk_new_open 13.786secs
+      -> 1000x bdrv_open 13.783secs
 
-I just wanted to be sure that it's possible to evaluate the ADDR
-method in Windows.
+These numbers are all increasing as we process more & more -drive args,
+so there's some O(N) factor in blk_by_name, bdrv_find_node and bdrv_open
 
->From a practical point of view it is unfortunate that this would be a
-completely new device. For Windows guests it means another driver
-binary and all the overhead associated with deploying it on VMs. Would
-it be too crazy to add this functionality to the pvpanic device? The
-mechanics could stay the same but it would be done under the existing
-ACPI\QEMU0001 device.
+-- =
 
-> +Storage Format:
-> +---------------
-> +
-> +The content is expected to use little-endian format.
-> +
-> +In order to implement an OVMF "SDT Header Probe Suppressor", the content=
-s of
-> +the vmcoreinfo blob has 40 bytes of padding:
-> +
-> ++-----------------------------------+
-> +| SSDT with OEM Table ID =3D VMCOREIN |
-> ++-----------------------------------+
-> +| ...                               |       TOP OF PAGE
-> +| VCIA dword object ----------------|-----> +---------------------------=
-+
-> +| ...                               |       | fw-allocated array for    =
-|
-> +| _STA method referring to VCIA     |       | "etc/vmcoreinfo"          =
-|
-> +| ...                               |       +---------------------------=
-+
-> +| ADDR method referring to VCIA     |       |  0: OVMF SDT Header probe =
-|
-> +| ...                               |       |     suppressor            =
-|
-> ++-----------------------------------+       | 40: uint32 version field  =
-|
-> +                                            | 44: info contents         =
-|
-> +                                            |     ....                  =
-|
-> +                                            +---------------------------=
-+
-> +                                            END OF PAGE
-> +
-> +Version 0 content:
-> +
-> + uint64 paddr:
-> +  Physical address of the Linux vmcoreinfo ELF note.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1686980
 
-Or physical address of the Windows crash dump header :p
-Do we want to have an additional discriminator field to tell what kind
-of information was written by the guest or would Windows use a
-different version?
+Title:
+  qemu is very slow when adding 16,384 virtio-scsi drives
 
-Thanks!
-Ladi
+Status in QEMU:
+  New
+
+Bug description:
+  qemu runs very slowly when adding many virtio-scsi drives.  I have
+  attached a small reproducer shell script which demonstrates this.
+
+  Using perf shows the following stack trace taking all the time:
+
+      72.42%    71.15%  qemu-system-x86  qemu-system-x86_64       [.] drive=
+_get
+              |          =
+
+               --72.32%--drive_get
+                         |          =
+
+                          --1.24%--__irqentry_text_start
+                                    |          =
+
+                                     --1.22%--smp_apic_timer_interrupt
+                                               |          =
+
+                                                --1.00%--local_apic_timer_i=
+nterrupt
+                                                          |          =
+
+                                                           --1.00%--hrtimer=
+_interrupt
+                                                                     |     =
+     =
+
+                                                                      --0.8=
+3%--__hrtimer_run_queues
+                                                                           =
+     |          =
+
+                                                                           =
+      --0.64%--tick_sched_timer
+
+      21.70%    21.34%  qemu-system-x86  qemu-system-x86_64       [.] blk_l=
+egacy_dinfo
+              |
+              ---blk_legacy_dinfo
+
+       3.65%     3.59%  qemu-system-x86  qemu-system-x86_64       [.] blk_n=
+ext
+              |
+              ---blk_next
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1686980/+subscriptions
