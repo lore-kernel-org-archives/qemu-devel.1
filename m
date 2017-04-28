@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d49Fu-0001Gn-W1
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 13:00:33 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d49PB-0004Vn-7i
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 13:10:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d49Fr-00013e-Ub
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 13:00:31 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:33243)
+	(envelope-from <alex.bennee@linaro.org>) id 1d49P6-0005fv-EM
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 13:10:05 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:38234)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d49Fr-00013P-K3
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 13:00:27 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id i137so12584995wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 10:00:27 -0700 (PDT)
+	id 1d49P6-0005fi-3y
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 13:10:00 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id r190so52875094wme.1
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 10:10:00 -0700 (PDT)
 References: <20170427120006.20564-1-rth@twiddle.net>
-	<20170427120006.20564-14-rth@twiddle.net>
+	<20170427120006.20564-15-rth@twiddle.net>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170427120006.20564-14-rth@twiddle.net>
-Date: Fri, 28 Apr 2017 18:00:57 +0100
-Message-ID: <87o9vg79h2.fsf@linaro.org>
+In-reply-to: <20170427120006.20564-15-rth@twiddle.net>
+Date: Fri, 28 Apr 2017 18:10:30 +0100
+Message-ID: <87mvb07915.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 13/19] tb-hash: improve tb_jmp_cache
- hash function in user mode
+Subject: Re: [Qemu-devel] [PATCH v5 14/19] target/alpha: Use tcg_gen_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,192 +36,201 @@ Cc: qemu-devel@nongnu.org, cota@braap.org
 
 Richard Henderson <rth@twiddle.net> writes:
 
-> From: "Emilio G. Cota" <cota@braap.org>
->
-> Optimizations to cross-page chaining and indirect branches make
-> performance more sensitive to the hit rate of tb_jmp_cache.
-> The constraint of reserving some bits for the page number
-> lowers the achievable quality of the hashing function.
->
-> However, user-mode does not have this requirement. Thus,
-> with this change we use for user-mode a hashing function that
-> is both faster and of better quality than the previous one.
->
-> Measurements:
->
-> Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
->
-> -                           SPECint06 (test set), x86_64-linux-user. Host: Intel i7-6700K @ 4.00GHz
->
->  2.2x +-+--------------------------------------------------------------------------------------------------------------+-+
->       |                                                                                                                  |
->       |         jr                                                                                                       |
->    2x +jr+multhash        +....................................................+++++...................................+-+
->       |    jr+hash                                                              |$$$                                     |
->       |                                                                         |$+$                                     |
->       |                                                                        ### $                                     |
->  1.8x +-+......................................................................#|#.$...................................+-+
->       |                                                                      ++#+# $                                     |
->       |                                                                       |# # $                                     |
->  1.6x +-+....................................................................***.#.$....................++$$$..........+-+
->       |                                         $$$                          *+* # $                     |$+$            |
->       |                       ++$$$           ### $                          * * # $                  +++|$ $            |
->       |                     ++###+$           # # $                          * * # $           ###   ****## $            |
->  1.4x +-+...................***+#.$.........***.#.$..........................*.*.#.$...........#+#$$.*++*|#.$..........+-+
->       |                     *+* # $         * * # $                          * * # $           # # $ *  *+# $            |
->       |                     * * # $   +++++ * * # $                          * * # $         *** # $ *  * # $   ###$$    |
->  1.2x +-+...................*.*.#.$.***##$$.*.*.#.$..........................*.*.#.$.........*.*.#.$.*..*.#.$.***+#+$..+-+
->       |                     * * # $ *+* # $ * * # $   +++                    * * # $ ++###$$ * * # $ *  * # $ * * # $    |
->       |    ***##$$          * * # $ * * # $ * * # $ ***##$$          ++###   * * # $ *** #+$ * * # $ *  * # $ * * # $    |
->       |    *+*+#+$ ***##$$$ * * # $ * * # $ * * # $ *+* # $ ++####$$ ***+#   * * # $ * * # $ * * # $ *  * # $ * * # $    |
->    1x +-++-*+*+#+$+*+*+#-+$+*+*-#+$+*+*+#+$+*+*+#+$+*-*+#+$+***++#+$+*+*+#$$+*+*+#+$+*+*+#+$+*+*-#+$+*+-*+#+$+*+*+#+$-++-+
->       |    * * # $ * * #  $ * * # $ * * # $ * * # $ * * # $ * *  # $ * * # $ * * # $ * * # $ * * # $ *  * # $ * * # $    |
->       |    * * # $ * * #  $ * * # $ * * # $ * * # $ * * # $ * *  # $ * * # $ * * # $ * * # $ * * # $ *  * # $ * * # $    |
->  0.8x +-+--***##$$-***##$$$-***##$$-***##$$-***##$$-***##$$-***###$$-***##$$-***##$$-***##$$-***##$$-****##$$-***##$$--+-+
->          astar   bzip2      gcc   gobmk h264ref   hmmlibquantum      mcf omnetpperlbench   sjengxalancbmk   hmean
->   png: http://imgur.com/4UXTrEc
->
-> Here I also tried the hash function suggested by Paolo ("multhash"):
->
->   return ((uint64_t) (pc * 2654435761) >> 32) & (TB_JMP_CACHE_SIZE - 1);
->
-> As you can see it is just as good as the other new function ("hash"),
-> which is what I ended up going with.
->
-> -                          SPECint06 (train set), x86_64-linux-user. Host: Intel i7-6700K @ 4.00GHz
->
->  2.6x +-+--------------------------------------------------------------------------------------------------------------+-+
->       |                                                                                                                  |
->       |     jr                                                                                           ###             |
->  2.4x +jr+hash...........................................................................................#.#...........+-+
->       |                                                                                                  # #             |
->       |                                                                                                  # #             |
->  2.2x +-+................................................................................................#.#...........+-+
->       |                                                                                                  # #             |
->       |                                                                                                  # #             |
->    2x +-+................................................................................................#.#...........+-+
->       |                                                                                               **** #             |
->       |                                                                                               *  * #             |
->  1.8x +-+.............................................................................................*..*.#...........+-+
->       |                                                                         +++                   *  * #             |
->       |                                                                         ####    ####          *  * #             |
->  1.6x +-+......................................####.............................#..#.****..#..........*..*.#...........+-+
->       |                        +++             #++#                          ****  # *  *  #    ####  *  * #             |
->       |                        ###             #  #                          *  *  # *  *  #    #  #  *  * #             |
->  1.4x +-+...................****+#..........****..#..........................*..*..#.*..*..#....#..#..*..*.#...........+-+
->       |                     *++* #          *  *  #                          *  *  # *  *  #  ***  #  *  * #     ####    |
->       |                     *  * #     #### *  *  #                          *  *  # *  *  #  * *  #  *  * #  ****  #    |
->  1.2x +-+...................*..*.#..****++#.*..*..#..........................*..*..#.*..*..#..*.*..#..*..*.#..*..*..#..+-+
->       |    ****###          *  * #  *  *  # *  *  #                          *  *  # *  *  #  * *  #  *  * #  *  *  #    |
->       |    *  *  #  ***###  *  * #  *  *  # *  *  #                  ****##  *  *  # *  *  #  * *  #  *  * #  *  *  #    |
->    1x +-+--****###--***###--****##--****###-****###--***###--***###--****##--****###-****###--***###--****##--****###--+-+
->          astar   bzip2      gcc   gobmk h264ref   hmmlibquantum      mcf omnetpperlbench   sjengxalancbmk   hmean
->   png: http://imgur.com/ArCbHqo
->
-> -                                    NBench, x86_64-linux-user. Host: Intel i7-6700K @ 4.00GHz
->
->  1.12x +-+-------------------------------------------------------------------------------------------------------------+-+
->        |                                                                                                                 |
->        |     jr                                                           +++                                            |
->   1.1x +jr+hash...........................................................####.........................................+-+
->        |                                                               +++#| #                                           |
->        |                                                                | #++#                                           |
->  1.08x +-+................................+++................+++.+++..*****..#.........................................+-+
->        |                                   |  +++             |   |   * | *  #                                           |
->        |                                   |   |              |   |   *+++*  #                                           |
->  1.06x +-+................................****###.............|...|...*...*..#.........................+++.............+-+
->        |                                  *| * |#            ****###  *   *  #                          |                |
->        |                                  *| *++#            *| * |#  *   *  #                        ####               |
->  1.04x +-+................................*++*..#............*|.*.|#..*...*..#........................#.|#.............+-+
->        |                                  *  *  #            *++*++#  *   *  #                     +++#++#               |
->        |                                  *  *  #            *  *  #  *   *  #                      | #  #   +++####     |
->  1.02x +-+................................*..*..#......+++...*..*..#..*...*..#.....................****..#..*****++#...+-+
->        |         +++                      *  *  #   +++ |    *  *  #  *   *  #  +++                *| *  #  *+++*  #     |
->        |      +++ |    +++ +++   ++++++   *  *  #  *****###  *  *  #  *   *  #   |  +++   ++++++   *++*  #  *   *  #     |
->     1x +-++-+++++####++****###++++-+####+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-+++####-+*****###++*++*++#++*+-+*++#+-++-+
->        |     *****| #  *++* |#  *****| #  *  *  #  *   *++#  *  *  #  *   *  #  **** |#  *   *  #  *  *  #  *   *  #     |
->        |     * | *| #  *  *++#  * | *++#  *  *  #  *   *  #  *  *  #  *   *  #  *| *++#  *   *  #  *  *  #  *   *  #     |
->  0.98x +-+...*.|.*++#..*..*..#..*+++*..#..*..*..#..*...*..#..*..*..#..*...*..#..*++*..#..*...*..#..*..*..#..*...*..#...+-+
->        |     *+++*  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
->        |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
->  0.96x +-+---*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###---+-+
->        ASSIGNMENT BITFIELD   FOURFP EMULATION   HUFFMAN   LU DECOMPOSITIONEURAL NNUMERIC SOSTRING SORT     hmean
->   png: http://imgur.com/ZXFX0hJ
->
-> -                                   NBench, arm-linux-user. Host: Intel i7-4790K @ 4.00GHz
->
->   1.3x +-+-------------------------------------------------------------------------------------------------------------+-+
->        |                            ####                                                                                 |
->        |     jr                     #  #                                            +++                                  |
->  1.25x +jr+hash.....................#..#...........................................####................................+-+
->        |                            #  #                                           #  #                                  |
->        |                            #  #                                           #  #                                  |
->   1.2x +-+..........................#..#...........................................#..#................................+-+
->        |                            #  #                                           #  #                                  |
->        |                            #  #                                           #  #                                  |
->  1.15x +-+..........................#..#...........................................#..#................................+-+
->        |                            #  #                                  ####     #  #                                  |
->        |                            #  #                                  #  #     #  #                                  |
->   1.1x +-+..........................#..#..................................#..#.....#..#................................+-+
->        |                            #  #                                  #  #     #  #                         +++      |
->        |                            #  #               ####               #  #     #  #                         ####     |
->  1.05x +-+..........................#..#...............#..#.....####......#..#.....#..#.........................#..#...+-+
->        |                            #  #               #  #     #  #      #  #     #  #                +++      #  #     |
->        |                   +++  *****  #     ####  *****  #     #  #   +++#  #  ****  #            ****###      #  #     |
->     1x +-++-+*****###++****+++++*+-+*++#+-****++#-+*+++*-+#+++++#++#++*****++#+-*++*++#-+*****-++++*++*++#++*****++#+-++-+
->        |     *   *  #  *  * |   *   *  #  *  *  #  *   *  #  ****  #  *   *  #  *  *  #  *   *###  *  *++#  *   *  #     |
->        |     *   *  #  *  *###  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
->  0.95x +-+...*...*..#..*..*.|#..*...*..#..*..*..#..*...*..#..*..*..#..*...*..#..*..*..#..*...*..#..*..*..#..*...*..#...+-+
->        |     *   *  #  *  * |#  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
->        |     *   *  #  *  * |#  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
->   0.9x +-+---*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###---+-+
->        ASSIGNMENT BITFIELD   FOURFP EMULATION   HUFFMAN   LU DECOMPOSITIONEURAL NNUMERIC SOSTRING SORT     hmean
->   png: http://imgur.com/FfD27ey
->
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> Message-Id: <1493263764-18657-12-git-send-email-cota@braap.org>
 > Signed-off-by: Richard Henderson <rth@twiddle.net>
 > ---
->  include/exec/tb-hash.h | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  target/alpha/translate.c | 49 +++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 36 insertions(+), 13 deletions(-)
 >
-> diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
-> index 2c27490..b1fe2d0 100644
-> --- a/include/exec/tb-hash.h
-> +++ b/include/exec/tb-hash.h
-> @@ -22,6 +22,8 @@
+> diff --git a/target/alpha/translate.c b/target/alpha/translate.c
+> index df5d695..c1a5fbf 100644
+> --- a/target/alpha/translate.c
+> +++ b/target/alpha/translate.c
+> @@ -89,6 +89,10 @@ typedef enum {
+>         updated the PC for the next instruction to be executed.  */
+>      EXIT_PC_STALE,
 >
->  #include "exec/tb-hash-xx.h"
->
-> +#ifdef CONFIG_SOFTMMU
+> +    /* Similarly, but force TB exit without chaining.  */
+> +    EXIT_PC_UPDATED_FORCE,
+> +    EXIT_PC_STALE_FORCE,
 > +
->  /* Only the bottom TB_JMP_PAGE_BITS of the jump cache hash bits vary for
->     addresses on the same page.  The top bits are the same.  This allows
->     TLB invalidation to quickly clear a subset of the hash table.  */
-> @@ -45,6 +47,16 @@ static inline unsigned int tb_jmp_cache_hash_func(target_ulong pc)
->             | (tmp & TB_JMP_ADDR_MASK));
+>      /* We are ending the TB with a noreturn function call, e.g. longjmp.
+>         No following code will be executed.  */
+>      EXIT_NORETURN,
+> @@ -455,11 +459,16 @@ static bool in_superpage(DisasContext *ctx, int64_t addr)
+>  #endif
 >  }
 >
-> +#else
-> +
-> +/* In user-mode we can get better hashing because we do not have a TLB */
-> +static inline unsigned int tb_jmp_cache_hash_func(target_ulong pc)
+> +static bool use_exit_tb(DisasContext *ctx)
 > +{
-> +    return (pc ^ (pc >> TB_JMP_CACHE_BITS)) & (TB_JMP_CACHE_SIZE - 1);
+> +    /* Suppress any optimization in the case of single-steping and IO.  */
+> +    return ((ctx->tb->cflags & CF_LAST_IO)
+> +            || ctx->singlestep_enabled || singlestep);
 > +}
 > +
-> +#endif /* CONFIG_SOFTMMU */
-> +
->  static inline
->  uint32_t tb_hash_func(tb_page_addr_t phys_pc, target_ulong pc, uint32_t flags)
+>  static bool use_goto_tb(DisasContext *ctx, uint64_t dest)
 >  {
+> -    /* Suppress goto_tb in the case of single-steping and IO.  */
+> -    if ((ctx->tb->cflags & CF_LAST_IO)
+> -        || ctx->singlestep_enabled || singlestep) {
+> +    if (use_exit_tb(ctx)) {
+>          return false;
+>      }
+>  #ifndef CONFIG_USER_ONLY
+> @@ -1257,14 +1266,14 @@ static ExitStatus gen_call_pal(DisasContext *ctx, int palcode)
+>             need the page permissions check.  We'll see the existence of
+>             the page when we create the TB, and we'll flush all TBs if
+>             we change the PAL base register.  */
+> -        if (!ctx->singlestep_enabled && !(ctx->tb->cflags & CF_LAST_IO)) {
+> +        if (use_exit_tb(ctx)) {
+> +            tcg_gen_movi_i64(cpu_pc, entry);
+> +            return EXIT_PC_UPDATED;
+> +        } else {
+>              tcg_gen_goto_tb(0);
+>              tcg_gen_movi_i64(cpu_pc, entry);
+>              tcg_gen_exit_tb((uintptr_t)ctx->tb);
+>              return EXIT_GOTO_TB;
+> -        } else {
+> -            tcg_gen_movi_i64(cpu_pc, entry);
+> -            return EXIT_PC_UPDATED;
+>          }
+>      }
+>  #endif
+> @@ -1323,7 +1332,7 @@ static ExitStatus gen_mfpr(DisasContext *ctx, TCGv va, int regno)
+>              gen_io_start();
+>              helper(va);
+>              gen_io_end();
+> -            return EXIT_PC_STALE;
+> +            return EXIT_PC_STALE_FORCE;
+>          } else {
+>              helper(va);
+>          }
+> @@ -1374,7 +1383,7 @@ static ExitStatus gen_mtpr(DisasContext *ctx, TCGv vb, int regno)
+>      case 252:
+>          /* HALT */
+>          gen_helper_halt(vb);
+> -        return EXIT_PC_STALE;
+> +        return EXIT_PC_STALE_FORCE;
+>
+>      case 251:
+>          /* ALARM */
+> @@ -1388,7 +1397,7 @@ static ExitStatus gen_mtpr(DisasContext *ctx, TCGv vb, int regno)
+>             that ended with a CALL_PAL.  Since the base register usually only
+>             changes during boot, flushing everything works well.  */
+>          gen_helper_tb_flush(cpu_env);
+> -        return EXIT_PC_STALE;
+> +        return EXIT_PC_STALE_FORCE;
+>
+>      case 32 ... 39:
+>          /* Accessing the "non-shadow" general registers.  */
+> @@ -2373,7 +2382,7 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
+>                  gen_io_start();
+>                  gen_helper_load_pcc(va, cpu_env);
+>                  gen_io_end();
+> -                ret = EXIT_PC_STALE;
+> +                ret = EXIT_PC_STALE_FORCE;
+>              } else {
+>                  gen_helper_load_pcc(va, cpu_env);
+>              }
+> @@ -2990,18 +2999,32 @@ void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
+>      case EXIT_GOTO_TB:
+>      case EXIT_NORETURN:
+>          break;
+> +
+>      case EXIT_PC_STALE:
+>          tcg_gen_movi_i64(cpu_pc, ctx.pc);
+> -        /* FALLTHRU */
+> +        goto do_exit_pc_updated;
+> +    case EXIT_PC_STALE_FORCE:
+> +        tcg_gen_movi_i64(cpu_pc, ctx.pc);
+> +        goto do_exit_pc_updated_force;
+> +
+>      case EXIT_PC_UPDATED:
+> +    do_exit_pc_updated:
+> +        if (!use_exit_tb(&ctx)) {
+> +            tcg_gen_lookup_and_goto_ptr(cpu_pc);
+> +            break;
+> +        }
+> +        /* FALLTHRU */
+> +    case EXIT_PC_UPDATED_FORCE:
+> +    do_exit_pc_updated_force:
+>          if (ctx.singlestep_enabled) {
+>              gen_excp_1(EXCP_DEBUG, 0);
+>          } else {
+>              tcg_gen_exit_tb(0);
+>          }
+>          break;
 
-I'll note when I've plotted hit-rates against the cache we don't seem to
-be making a good even use of the cache over time. But I suspect there is
-more that could be done here. That said the numbers are compelling so:
+Hmm this is ugly. You can make it a bit cleaner I think:
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+    case EXIT_PC_STALE:
+        tcg_gen_movi_i64(cpu_pc, ctx.pc);
+        /* FALLTHRU */
+    case EXIT_PC_UPDATED:
+        if (!use_exit_tb(&ctx)) {
+            tcg_gen_lookup_and_goto_ptr(cpu_pc);
+            break;
+        }
+        goto do_exit_pc_updated_force;
+
+    case EXIT_PC_STALE_FORCE:
+        tcg_gen_movi_i64(cpu_pc, ctx.pc);
+        /* FALLTHRU */
+
+    case EXIT_PC_UPDATED_FORCE:
+    do_exit_pc_updated_force:
+        if (ctx.singlestep_enabled) {
+            gen_excp_1(EXCP_DEBUG, 0);
+        } else {
+            tcg_gen_exit_tb(0);
+        }
+        break;
+
+But personally I'd be tempted to inline the force function and have:
+
+static inline gen_exit_or_excp(void)
+{
+    if (ctx.singlestep_enabled) {
+        gen_excp_1(EXCP_DEBUG, 0);
+    } else {
+        tcg_gen_exit_tb(0);
+    }
+}
+
+and:
+
+    case EXIT_PC_STALE:
+        tcg_gen_movi_i64(cpu_pc, ctx.pc);
+        /* FALLTHRU */
+    case EXIT_PC_UPDATED:
+        if (!use_exit_tb(&ctx)) {
+            tcg_gen_lookup_and_goto_ptr(cpu_pc);
+            break;
+        }
+        gen_exit_or_excp();
+        break;
+
+    case EXIT_PC_STALE_FORCE:
+        tcg_gen_movi_i64(cpu_pc, ctx.pc);
+        /* FALLTHRU */
+
+    case EXIT_PC_UPDATED_FORCE:
+        gen_exit_or_excp();
+        break;
+
+    default:
+        g_assert_not_reached();
+    }
+
+
+
+> +
+>      default:
+> -        abort();
+> +        g_assert_not_reached();
+>      }
+>
+>      gen_tb_end(tb, num_insns);
+
 
 --
 Alex Bennée
