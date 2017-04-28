@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d40xA-0003NJ-Cl
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:08:38 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d413X-0005gF-8u
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:15:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d40x5-0002CH-B9
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:08:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50806)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d413T-0008Os-3Z
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:15:11 -0400
+Received: from mga05.intel.com ([192.55.52.43]:8487)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d40x4-00029f-UP
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:08:31 -0400
-Date: Fri, 28 Apr 2017 09:08:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170428080821.GB2085@work-vm>
-References: <20170428021317.24711-1-eblake@redhat.com>
-	<20170428021317.24711-3-eblake@redhat.com>
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1d413S-0008OH-PL
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 04:15:07 -0400
+Date: Fri, 28 Apr 2017 15:59:07 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20170428075907.GA15484@sky-dev>
+References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
+	<1493201525-14418-2-git-send-email-yi.l.liu@intel.com>
+	<c042bf90-d48b-4ebf-c01a-fca7c4875277@arm.com>
+	<20170427063623.GC14925@sky-dev>
+	<772ca9de-50ba-a379-002d-5ff1f6a2e297@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170428021317.24711-3-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/4] shutdown: Prepare for use of an
- enum in reset/shutdown_request
+In-Reply-To: <772ca9de-50ba-a379-002d-5ff1f6a2e297@arm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/8] iommu: Introduce bind_pasid_table
+ API function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,290 +32,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, "Liu, Yi L" <yi.l.liu@intel.com>, ashok.raj@intel.com, kvm@vger.kernel.org, jasowang@redhat.com, alex.williamson@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org, iommu@lists.linux-foundation.org, Jacob Pan <jacob.jun.pan@linux.intel.com>, jacob.jun.pan@intel.com
 
-* Eric Blake (eblake@redhat.com) wrote:
-> We want to track why a guest was shutdown; in particular, being able
-> to tell the difference between a guest request (such as ACPI request)
-> and host request (such as SIGINT) will prove useful to libvirt.
-> Since all requests eventually end up changing shutdown_requested in
-> vl.c, the logical change is to make that value track the reason,
-> rather than its current 0/1 contents.
+On Thu, Apr 27, 2017 at 11:12:45AM +0100, Jean-Philippe Brucker wrote:
+> On 27/04/17 07:36, Liu, Yi L wrote:
+> > On Wed, Apr 26, 2017 at 05:56:45PM +0100, Jean-Philippe Brucker wrote:
+> >> Hi Yi, Jacob,
+> >>
+> >> On 26/04/17 11:11, Liu, Yi L wrote:
+> >>> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> >>>
+> >>> Virtual IOMMU was proposed to support Shared Virtual Memory (SVM) use
+> >>> case in the guest:
+> >>> https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05311.html
+> >>>
+> >>> As part of the proposed architecture, when a SVM capable PCI
+> >>> device is assigned to a guest, nested mode is turned on. Guest owns the
+> >>> first level page tables (request with PASID) and performs GVA->GPA
+> >>> translation. Second level page tables are owned by the host for GPA->HPA
+> >>> translation for both request with and without PASID.
+> >>>
+> >>> A new IOMMU driver interface is therefore needed to perform tasks as
+> >>> follows:
+> >>> * Enable nested translation and appropriate translation type
+> >>> * Assign guest PASID table pointer (in GPA) and size to host IOMMU
+> >>>
+> >>> This patch introduces new functions called iommu_(un)bind_pasid_table()
+> >>> to IOMMU APIs. Architecture specific IOMMU function can be added later
+> >>> to perform the specific steps for binding pasid table of assigned devices.
+> >>>
+> >>> This patch also adds model definition in iommu.h. It would be used to
+> >>> check if the bind request is from a compatible entity. e.g. a bind
+> >>> request from an intel_iommu emulator may not be supported by an ARM SMMU
+> >>> driver.
+> >>>
+> >>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> >>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> >>> ---
+> >>>  drivers/iommu/iommu.c | 19 +++++++++++++++++++
+> >>>  include/linux/iommu.h | 31 +++++++++++++++++++++++++++++++
+> >>>  2 files changed, 50 insertions(+)
+> >>>
+> >>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> >>> index dbe7f65..f2da636 100644
+> >>> --- a/drivers/iommu/iommu.c
+> >>> +++ b/drivers/iommu/iommu.c
+> >>> @@ -1134,6 +1134,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+> >>>  }
+> >>>  EXPORT_SYMBOL_GPL(iommu_attach_device);
+> >>>  
+> >>> +int iommu_bind_pasid_table(struct iommu_domain *domain, struct device *dev,
+> >>> +			struct pasid_table_info *pasidt_binfo)
+> >>
+> >> I guess that domain can always be deduced from dev using
+> >> iommu_get_domain_for_dev, and doesn't need to be passed as argument?
+> >>
+> >> For the next version of my SVM series, I was thinking of passing group
+> >> instead of device to iommu_bind. Since all devices in a group are expected
+> >> to share the same mappings (whether they want it or not), users will have
+> >> to do iommu_group_for_each_dev anyway (as you do in patch 6/8). So it
+> >> might be simpler to let the IOMMU core take the group lock and do
+> >> group->domain->ops->bind_task(dev...) for each device. The question also
+> >> holds for iommu_do_invalidate in patch 3/8.
+> >>
+> >> This way the prototypes would be:
+> >> int iommu_bind...(struct iommu_group *group, struct ... *info)
+> >> int iommu_unbind...(struct iommu_group *group, struct ...*info)
+> >> int iommu_invalidate...(struct iommu_group *group, struct ...*info)
+> >>
+> >> For PASID table binding it might not matter much, as VFIO will most likely
+> >> be the only user. But task binding will be called by device drivers, which
+> >> by now should be encouraged to do things at iommu_group granularity.
+> >> Alternatively it could be done implicitly like in iommu_attach_device,
+> >> with "iommu_bind_device_x" calling "iommu_bind_group_x".
+> >>
+> >>
+> >> Extending this reasoning, since groups in a domain are also supposed to
+> >> have the same mappings, then similarly to map/unmap,
+> >> bind/unbind/invalidate should really be done with an iommu_domain (and
+> >> nothing else) as target argument. However this requires the IOMMU core to
+> >> keep a group list in each domain, which might complicate things a little
+> >> too much.
+> >>
+> >> But "all devices in a domain share the same PASID table" is the paradigm
+> >> I'm currently using in the guts of arm-smmu-v3. And I wonder if, as with
+> >> iommu_group, it should be made more explicit to users, so they don't
+> >> assume that devices within a domain are isolated from each others with
+> >> regard to PASID DMA.
+> >>
+> >>> +{
+> >>> +	if (unlikely(!domain->ops->bind_pasid_table))
+> >>> +		return -EINVAL;
+> >>> +
+> >>> +	return domain->ops->bind_pasid_table(domain, dev, pasidt_binfo);
+> >>> +}
+> >>> +EXPORT_SYMBOL_GPL(iommu_bind_pasid_table);
+> >>> +
+> >>> +int iommu_unbind_pasid_table(struct iommu_domain *domain, struct device *dev)
+> >>> +{
+> >>> +	if (unlikely(!domain->ops->unbind_pasid_table))
+> >>> +		return -EINVAL;
+> >>> +
+> >>> +	return domain->ops->unbind_pasid_table(domain, dev);
+> >>> +}
+> >>> +EXPORT_SYMBOL_GPL(iommu_unbind_pasid_table);
+> >>> +
+> >>>  static void __iommu_detach_device(struct iommu_domain *domain,
+> >>>  				  struct device *dev)
+> >>>  {
+> >>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> >>> index 0ff5111..491a011 100644
+> >>> --- a/include/linux/iommu.h
+> >>> +++ b/include/linux/iommu.h
+> >>> @@ -131,6 +131,15 @@ struct iommu_dm_region {
+> >>>  	int			prot;
+> >>>  };
+> >>>  
+> >>> +struct pasid_table_info {
+> >>> +	__u64	ptr;	/* PASID table ptr */
+> >>> +	__u64	size;	/* PASID table size*/
+> >>> +	__u32	model;	/* magic number */
+> >>> +#define INTEL_IOMMU	(1 << 0)
+> >>> +#define ARM_SMMU	(1 << 1)
+> >>
+> >> Not sure if there is any advantage in this being a bitfield rather than
+> >> simple values (1, 2, 3, etc).
+> >> The names should also have a prefix, such as "PASID_TABLE_MODEL_"
+> > 
+> > Hi Jean,
+> > 
+> > For the value, no special reason from my side. so it is fine to just
+> > use (1,2..).
+> > For the prefix, model definition may also needed for iommu tlb
+> > invalidate propagation. So it may be suitable to have a prefix like
+> > "SVM_MODEL_" or so? Does it make sense?
 > 
-> Since command-line options control whether a reset request is turned
-> into a shutdown request instead, the same treatment is given to
-> reset_requested.
-> 
-> This patch adds a QAPI enum ShutdownCause that describes reasons
-> that a shutdown can be requested, and changes qemu_system_reset() to
-> pass the reason through, although for now it is not reported.  The
-> next patch will actually wire things up to modify events to report
-> data based on the reason, and to pass the correct enum value in from
-> various call-sites that can trigger a reset/shutdown.  Since QAPI
-> generates enums starting at 0, it's easier if we use a different
-> number as our sentinel that no request has happened yet.  Most of
-> the changes are in vl.c, but xen was using things externally.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v4: s/ShutdownType/ShutdownCause/, no thanks to mingw header pollution
-> v3: new patch
-> ---
->  qapi-schema.json        | 23 +++++++++++++++++++++++
->  include/sysemu/sysemu.h |  2 +-
->  vl.c                    | 44 ++++++++++++++++++++++++++++----------------
->  hw/i386/xen/xen-hvm.c   |  9 ++++++---
->  migration/colo.c        |  2 +-
->  migration/savevm.c      |  2 +-
->  6 files changed, 60 insertions(+), 22 deletions(-)
-> 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 01b087f..a4ebdd1 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -2304,6 +2304,29 @@
->  { 'command': 'system_powerdown' }
-> 
->  ##
-> +# @ShutdownCause:
-> +#
-> +# Enumeration of various causes for shutdown.
-> +#
-> +# @host-qmp: Reaction to a QMP command, such as 'quit'
-> +# @host-signal: Reaction to a signal, such as SIGINT
-> +# @host-ui: Reaction to a UI event, such as closing the window
-> +# @host-replay: The host is replaying an earlier shutdown event
-> +# @host-error: Qemu encountered an error that prevents further use of the guest
-> +# @guest-shutdown: The guest requested a shutdown, such as via ACPI or
-> +#                  other hardware-specific action
-> +# @guest-reset: The guest requested a reset, and the command line
-> +#               response to a reset is to instead trigger a shutdown
-> +# @guest-panic: The guest panicked, and the command line response to
-> +#               a panic is to trigger a shutdown
+> Sure, SVM_MODEL would do. However, once the PASID table is bound and the
+> model has been negotiated, do we need to repeat the model in each
+> invalidation? At that point user and driver already agreed on the model to
+> use (and the various structure formats), so they could just transmit
+> opaque structures and each end of the pipe would know how to interpret it.
 
-It's a little coarse grained;  is there anyway to pass platform specific information
-for debug?  I ask because I spent a while debugging a few bugs with unexpected
-resets and had to figure out which of x86's many reset causes triggered it.
+Jean,
 
-Dave
+yes, it works if this invalidate API is only for SVM. But I remember there may
+be requirement from gIOVA. If guest tries to invalidate large range of gIOVA
+mapping, using unmap is low efficiency. Tianyu Lan may provide detail about
+this case. That's why I added the model check all the same in invalidate path.
+Let's double check if the requirement is really needed from gIOVA. If no, I
+agree with you on the suggested method.
 
-> +# Since: 2.10
-> +##
-> +{ 'enum': 'ShutdownCause',
-> +  'data': [ 'host-qmp', 'host-signal', 'host-ui', 'host-replay', 'host-error',
-> +            'guest-shutdown', 'guest-reset', 'guest-panic' ] }
-> +
-> +##
->  # @cpu:
->  #
->  # This command is a nop that is only provided for the purposes of compatibility.
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 16175f7..00a907f 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -65,7 +65,7 @@ bool qemu_vmstop_requested(RunState *r);
->  int qemu_shutdown_requested_get(void);
->  int qemu_reset_requested_get(void);
->  void qemu_system_killed(int signal, pid_t pid);
-> -void qemu_system_reset(bool report);
-> +void qemu_system_reset(bool report, int reason);
->  void qemu_system_guest_panicked(GuestPanicInformation *info);
->  size_t qemu_target_page_size(void);
-> 
-> diff --git a/vl.c b/vl.c
-> index 879786a..2b95b7f 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1597,8 +1597,8 @@ void vm_state_notify(int running, RunState state)
->      }
->  }
-> 
-> -static int reset_requested;
-> -static int shutdown_requested, shutdown_signal;
-> +static int reset_requested = -1;
-> +static int shutdown_requested = -1, shutdown_signal;
->  static pid_t shutdown_pid;
->  static int powerdown_requested;
->  static int debug_requested;
-> @@ -1624,7 +1624,7 @@ int qemu_reset_requested_get(void)
-> 
->  static int qemu_shutdown_requested(void)
->  {
-> -    return atomic_xchg(&shutdown_requested, 0);
-> +    return atomic_xchg(&shutdown_requested, -1);
->  }
-> 
->  static void qemu_kill_report(void)
-> @@ -1650,11 +1650,11 @@ static void qemu_kill_report(void)
->  static int qemu_reset_requested(void)
->  {
->      int r = reset_requested;
-> -    if (r && replay_checkpoint(CHECKPOINT_RESET_REQUESTED)) {
-> -        reset_requested = 0;
-> +    if (r >= 0 && replay_checkpoint(CHECKPOINT_RESET_REQUESTED)) {
-> +        reset_requested = -1;
->          return r;
->      }
-> -    return false;
-> +    return -1;
->  }
-> 
->  static int qemu_suspend_requested(void)
-> @@ -1686,7 +1686,12 @@ static int qemu_debug_requested(void)
->      return r;
->  }
-> 
-> -void qemu_system_reset(bool report)
-> +/*
-> + * Reset the VM. If @report is VMRESET_REPORT, issue an event, using
-> + * the @reason interpreted as ShutdownType for details.  Otherwise,
-> + * @report is VMRESET_SILENT and @reason is ignored.
-> + */
-> +void qemu_system_reset(bool report, int reason)
->  {
->      MachineClass *mc;
-> 
-> @@ -1700,6 +1705,7 @@ void qemu_system_reset(bool report)
->          qemu_devices_reset();
->      }
->      if (report) {
-> +        assert(reason >= 0);
->          qapi_event_send_reset(&error_abort);
->      }
->      cpu_synchronize_all_post_reset();
-> @@ -1738,9 +1744,10 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
->  void qemu_system_reset_request(void)
->  {
->      if (no_reboot) {
-> -        shutdown_requested = 1;
-> +        /* FIXME - add a parameter to allow callers to specify reason */
-> +        shutdown_requested = SHUTDOWN_CAUSE_GUEST_RESET;
->      } else {
-> -        reset_requested = 1;
-> +        reset_requested = SHUTDOWN_CAUSE_GUEST_RESET;
->      }
->      cpu_stop_current();
->      qemu_notify_event();
-> @@ -1807,7 +1814,7 @@ void qemu_system_killed(int signal, pid_t pid)
->      /* Cannot call qemu_system_shutdown_request directly because
->       * we are in a signal handler.
->       */
-> -    shutdown_requested = 1;
-> +    shutdown_requested = SHUTDOWN_CAUSE_HOST_SIGNAL;
->      qemu_notify_event();
->  }
-> 
-> @@ -1815,7 +1822,8 @@ void qemu_system_shutdown_request(void)
->  {
->      trace_qemu_system_shutdown_request();
->      replay_shutdown_request();
-> -    shutdown_requested = 1;
-> +    /* FIXME - add a parameter to allow callers to specify reason */
-> +    shutdown_requested = SHUTDOWN_CAUSE_GUEST_SHUTDOWN;
->      qemu_notify_event();
->  }
-> 
-> @@ -1846,13 +1854,16 @@ void qemu_system_debug_request(void)
->  static bool main_loop_should_exit(void)
->  {
->      RunState r;
-> +    int request;
-> +
->      if (qemu_debug_requested()) {
->          vm_stop(RUN_STATE_DEBUG);
->      }
->      if (qemu_suspend_requested()) {
->          qemu_system_suspend();
->      }
-> -    if (qemu_shutdown_requested()) {
-> +    request = qemu_shutdown_requested();
-> +    if (request >= 0) {
->          qemu_kill_report();
->          qapi_event_send_shutdown(&error_abort);
->          if (no_shutdown) {
-> @@ -1861,9 +1872,10 @@ static bool main_loop_should_exit(void)
->              return true;
->          }
->      }
-> -    if (qemu_reset_requested()) {
-> +    request = qemu_reset_requested();
-> +    if (request >= 0) {
->          pause_all_vcpus();
-> -        qemu_system_reset(VMRESET_REPORT);
-> +        qemu_system_reset(VMRESET_REPORT, request);
->          resume_all_vcpus();
->          if (!runstate_check(RUN_STATE_RUNNING) &&
->                  !runstate_check(RUN_STATE_INMIGRATE)) {
-> @@ -1872,7 +1884,7 @@ static bool main_loop_should_exit(void)
->      }
->      if (qemu_wakeup_requested()) {
->          pause_all_vcpus();
-> -        qemu_system_reset(VMRESET_SILENT);
-> +        qemu_system_reset(VMRESET_SILENT, -1);
->          notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
->          wakeup_reason = QEMU_WAKEUP_REASON_NONE;
->          resume_all_vcpus();
-> @@ -4684,7 +4696,7 @@ int main(int argc, char **argv, char **envp)
->         reading from the other reads, because timer polling functions query
->         clock values from the log. */
->      replay_checkpoint(CHECKPOINT_RESET);
-> -    qemu_system_reset(VMRESET_SILENT);
-> +    qemu_system_reset(VMRESET_SILENT, -1);
->      register_global_state();
->      if (replay_mode != REPLAY_MODE_NONE) {
->          replay_vmstate_init();
-> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-> index b1c05ff..3a6484c 100644
-> --- a/hw/i386/xen/xen-hvm.c
-> +++ b/hw/i386/xen/xen-hvm.c
-> @@ -1089,11 +1089,14 @@ static void cpu_handle_ioreq(void *opaque)
->           * causes Xen to powerdown the domain.
->           */
->          if (runstate_is_running()) {
-> -            if (qemu_shutdown_requested_get()) {
-> +            int request;
-> +
-> +            if (qemu_shutdown_requested_get() >= 0) {
->                  destroy_hvm_domain(false);
->              }
-> -            if (qemu_reset_requested_get()) {
-> -                qemu_system_reset(VMRESET_REPORT);
-> +            request = qemu_reset_requested_get();
-> +            if (request >= 0) {
-> +                qemu_system_reset(VMRESET_REPORT, request);
->                  destroy_hvm_domain(true);
->              }
->          }
-> diff --git a/migration/colo.c b/migration/colo.c
-> index c19eb3f..17a5482 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -611,7 +611,7 @@ void *colo_process_incoming_thread(void *opaque)
->          }
-> 
->          qemu_mutex_lock_iothread();
-> -        qemu_system_reset(VMRESET_SILENT);
-> +        qemu_system_reset(VMRESET_SILENT, -1);
->          vmstate_loading = true;
->          if (qemu_loadvm_state(fb) < 0) {
->              error_report("COLO: loadvm failed");
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 03ae1bd..dcbaf00 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2292,7 +2292,7 @@ int load_vmstate(const char *name)
->          return -EINVAL;
->      }
-> 
-> -    qemu_system_reset(VMRESET_SILENT);
-> +    qemu_system_reset(VMRESET_SILENT, -1);
->      mis->from_src_file = f;
-> 
->      aio_context_acquire(aio_context);
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks,
+Yi L
