@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d4CbX-0002Km-LW
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:35:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d4Cbe-0002UI-JE
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:35:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d4CbW-0001gA-Sz
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:35:03 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d4Cbd-0001m2-N1
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:35:10 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 28 Apr 2017 22:33:41 +0200
-Message-Id: <1493411622-5343-34-git-send-email-kwolf@redhat.com>
+Date: Fri, 28 Apr 2017 22:33:42 +0200
+Message-Id: <1493411622-5343-35-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1493411622-5343-1-git-send-email-kwolf@redhat.com>
 References: <1493411622-5343-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 33/34] iotests: fix exclusion option
+Subject: [Qemu-devel] [PULL 34/34] progress: Show current progress on SIGINFO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +22,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: John Snow <jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-If you are running out-of-tree, the -x option to exclude
-a certain iotest is broken.
+Currently we only print progress information on retrieval of SIGUSR1.
+Some systems have a dedicated SIGINFO for this, however, so it should be
+handled appropriately if it is available.
 
-Replace porcelain usage of ls with a sturdier awk command.
-
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
-Message-id: 20170427205100.9505-3-jsnow@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1662468
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20170207235757.2026-1-mreitz@redhat.com
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/common | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ qemu-img.texi        | 3 ++-
+ util/qemu-progress.c | 3 +++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
-index fa8e69e..f2a7199 100644
---- a/tests/qemu-iotests/common
-+++ b/tests/qemu-iotests/common
-@@ -86,7 +86,8 @@ s/ .*//p
-     elif $xgroup
-     then
-         # arg after -x
--        [ ! -s $tmp.list ] && ls [0-9][0-9][0-9] [0-9][0-9][0-9][0-9] >$tmp.list 2>/dev/null
-+        # Populate $tmp.list with all tests
-+        awk '/^[0-9]{3,}/ {print $1}' "${source_iotests}/group" > $tmp.list 2>/dev/null
-         group_list=`sed -n <"$source_iotests/group" -e 's/$/ /' -e "/^[0-9][0-9][0-9].* $r /"'{
- s/ .*//p
- }'`
+diff --git a/qemu-img.texi b/qemu-img.texi
+index 8c573ae..50a2364 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -84,7 +84,8 @@ with or without a command shows help and lists the supported formats
+ @item -p
+ display progress bar (compare, convert and rebase commands only).
+ If the @var{-p} option is not used for a command that supports it, the
+-progress is reported when the process receives a @code{SIGUSR1} signal.
++progress is reported when the process receives a @code{SIGUSR1} or
++@code{SIGINFO} signal.
+ @item -q
+ Quiet mode - do not print any output (except errors). There's no progress bar
+ in case both @var{-q} and @var{-p} options are used.
+diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+index f745233..3c2223c 100644
+--- a/util/qemu-progress.c
++++ b/util/qemu-progress.c
+@@ -88,6 +88,9 @@ static void progress_dummy_init(void)
+     action.sa_handler = sigusr_print;
+     action.sa_flags = 0;
+     sigaction(SIGUSR1, &action, NULL);
++#ifdef SIGINFO
++    sigaction(SIGINFO, &action, NULL);
++#endif
+ 
+     /*
+      * SIGUSR1 is SIG_IPI and gets blocked in qemu_init_main_loop(). In the
 -- 
 1.8.3.1
