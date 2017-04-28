@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4BC7-0005T6-Uc
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:04:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1d4BJ7-0007fj-6r
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:11:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4BC6-0000ug-Ly
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:04:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1d4BJ6-0003yl-6W
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 15:11:57 -0400
 References: <20170427014626.11553-1-eblake@redhat.com>
-	<20170427014626.11553-3-eblake@redhat.com>
-	<de3f94c3-5941-5301-5408-93c43adc1543@redhat.com>
+	<20170427014626.11553-5-eblake@redhat.com>
+	<68eee3c7-a1b2-4011-21e6-1e12b15b90dd@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <88d9a7ed-7740-e967-2c61-21a304032cfe@redhat.com>
-Date: Fri, 28 Apr 2017 14:04:33 -0500
+Message-ID: <3b5ee0d4-a8bc-f4bb-b7be-78cfa352c236@redhat.com>
+Date: Fri, 28 Apr 2017 14:11:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <de3f94c3-5941-5301-5408-93c43adc1543@redhat.com>
+In-Reply-To: <68eee3c7-a1b2-4011-21e6-1e12b15b90dd@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="4GiQmL2cm188pj291m7j9CK0JdDAGD29S"
-Subject: Re: [Qemu-devel] [PATCH v10 02/17] qcow2: Correctly report status
- of preallocated zero clusters
+	boundary="iv2xfvosVec1a3LGpU3OOXe4lQNKwjt0u"
+Subject: Re: [Qemu-devel] [PATCH v10 04/17] qcow2: Optimize zero_single_l2()
+ to minimize L2 churn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +30,63 @@ To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4GiQmL2cm188pj291m7j9CK0JdDAGD29S
+--iv2xfvosVec1a3LGpU3OOXe4lQNKwjt0u
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <88d9a7ed-7740-e967-2c61-21a304032cfe@redhat.com>
-Subject: Re: [PATCH v10 02/17] qcow2: Correctly report status of preallocated
- zero clusters
+Message-ID: <3b5ee0d4-a8bc-f4bb-b7be-78cfa352c236@redhat.com>
+Subject: Re: [PATCH v10 04/17] qcow2: Optimize zero_single_l2() to minimize L2
+ churn
 References: <20170427014626.11553-1-eblake@redhat.com>
- <20170427014626.11553-3-eblake@redhat.com>
- <de3f94c3-5941-5301-5408-93c43adc1543@redhat.com>
-In-Reply-To: <de3f94c3-5941-5301-5408-93c43adc1543@redhat.com>
+ <20170427014626.11553-5-eblake@redhat.com>
+ <68eee3c7-a1b2-4011-21e6-1e12b15b90dd@redhat.com>
+In-Reply-To: <68eee3c7-a1b2-4011-21e6-1e12b15b90dd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/28/2017 12:35 PM, Max Reitz wrote:
+On 04/28/2017 01:00 PM, Max Reitz wrote:
 > On 27.04.2017 03:46, Eric Blake wrote:
->> We were throwing away the preallocation information associated with
->> zero clusters.  But we should be matching the well-defined semantics
->> in bdrv_get_block_status(), where (BDRV_BLOCK_ZERO |
->> BDRV_BLOCK_OFFSET_VALID) informs the user which offset is reserved,
->> while still reminding the user that reading from that offset is
->> likely to read garbage.
+>> Similar to discard_single_l2(), we should try to avoid dirtying
+>> the L2 cache when the cluster we are changing already has the
+>> right characteristics.
 >>
->> Making this change lets us see which portions of an image are zero
->> but preallocated, when using qemu-img map --output=3Djson.  The
->> --output=3Dhuman side intentionally ignores all zero clusters, whether=
 
->> or not they are preallocated.
->>
->> The fact that there is no change to qemu-iotests './check -qcow2'
->> merely means that we aren't yet testing this aspect of qemu-img;
->> a later patch will add a test.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> ---
->> v10: new patch
->> ---
->>  block/qcow2-cluster.c | 32 +++++++++++++++++++++++++++-----
->>  1 file changed, 27 insertions(+), 5 deletions(-)
->=20
-> I'd propose you split the qcow2 changes off of this series.
-
-Yeah, it's sort of morphed into a well-tested later part and an earlier
-part that is still undergoing heavy review.  I don't know how much churn
-there would be to rebase things to do the blkdebug changes first (it may
-invalidate portions of my test 177; but I could always tag such spots as
-FIXME while waiting on the qcow2 part to settle and land).  I'll see
-what I can do, as I've now got multiple series queued up, and should at
-least get SOMETHING to land to start clearing up the logjam.
-
-
->> @@ -335,9 +339,10 @@ static int count_contiguous_clusters_by_type(int =
-nb_clusters,
->>      int i;
->>
->>      for (i =3D 0; i < nb_clusters; i++) {
->> -        int type =3D qcow2_get_cluster_type(be64_to_cpu(l2_table[i]))=
+>> -        /* Update L2 entries */
+>> +        /*
+>> +         * Minimize L2 changes if the cluster already reads back as
+>> +         * zeroes with correct allocation.
+>> +         */
+>> +        if (qcow2_get_cluster_type(old_offset) =3D=3D QCOW2_CLUSTER_Z=
+ERO &&
+>> +            !(unmap && old_offset & L2E_OFFSET_MASK)) {
+>> +            continue;
+>> +        }
+>> +
+>>          qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table)=
 ;
->> +        uint64_t entry =3D be64_to_cpu(l2_table[i]);
->> +        int type =3D qcow2_get_cluster_type(entry);
+>> -        if (old_offset & QCOW_OFLAG_COMPRESSED || flags & BDRV_REQ_MA=
+Y_UNMAP) {
+>> +        if (old_offset & QCOW_OFLAG_COMPRESSED || unmap) {
+>=20
+> Works, but I'd like it better to store the cluster type somewhere and
+> then use it here instead of checking the COMPRESSED flag.
+
+Indeed, qcow2_get_cluster_type() checks QCOW_OFLAG_COMPRESSED first -
+but I like the idea of storing it in a temporary variable now that we
+are using the cluster type in more than one place.
+
+>=20
+> But it works, so it's up to you:
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+>>              l2_table[l2_index + i] =3D cpu_to_be64(QCOW_OFLAG_ZERO);
+>>              qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_=
+REQUEST);
+>>          } else {
 >>
->> -        if (type !=3D wanted_type) {
->> +        if (type !=3D wanted_type || entry & L2E_OFFSET_MASK) {
 >=20
-> This works only for wanted_type \in \{ ZERO, UNALLOCATED \} -- which is=
-
-> what the comment you added describes, but this may still warrant a
-> renaming of this function (count_contiguous_unallocated_clusters?) and
-> probably an assertion that wanted_type is ZERO or UNALLOCATED.
-
-Good idea.
-
-
->> @@ -559,9 +564,26 @@ int qcow2_get_cluster_offset(BlockDriverState *bs=
-, uint64_t offset,
->>              ret =3D -EIO;
->>              goto fail;
->>          }
->> -        c =3D count_contiguous_clusters_by_type(nb_clusters, &l2_tabl=
-e[l2_index],
->> -                                              QCOW2_CLUSTER_ZERO);
->> -        *cluster_offset =3D 0;
->> +        /* Distinguish between pure zero clusters and pre-allocated o=
-nes */
->> +        if (*cluster_offset & L2E_OFFSET_MASK) {
->> +            c =3D count_contiguous_clusters(nb_clusters, s->cluster_s=
-ize,
->> +                                          &l2_table[l2_index], QCOW_O=
-FLAG_ZERO);
 >=20
-> You should probably switch this patch and the next one -- or I just sen=
-d
-> my patches myself and you base your series on top of it...
-
-I tested with your patches in, then rebased with your patches out to see
-what broke, and...
-
->=20
-> Because before the next patch, this happens:
->=20
-
-> $ ./qemu-img map foo.qcow2
-> Offset          Length          Mapped to       File
-> qemu-img: block/qcow2-cluster.c:319: count_contiguous_clusters:
-> Assertion `qcow2_get_cluster_type(first_entry) =3D=3D QCOW2_CLUSTER_NOR=
-MAL'
-> failed.
-
-got that same assert. So I realized that your patch was necessary and
-rebased it back in, but obviously forgot to re-test at all points in the
-series. Yes, your should go first, and I'd be more than happy if you
-post yours formally and I rebase my qcow2 portions on top of yours (all
-the more reason for me to split this series into two, and get the
-blkdebug portions in now while we still hammer on the qcow2 stuff).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -152,7 +94,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---4GiQmL2cm188pj291m7j9CK0JdDAGD29S
+--iv2xfvosVec1a3LGpU3OOXe4lQNKwjt0u
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -162,13 +104,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZA5JCAAoJEKeha0olJ0Nq0JIH/iGTzXlD+567Yu8QrCYGJJo9
-43QOHQVvN5LiKvkKE/fHOTJFnWgrPigJd1jlJVtVpDoKExxVCpIT0nwrTmxl3l6A
-JReAAmtos4apQ3nIYmuldgwcLTmVXeXq9yurTWHNxHxIqHQ8rOkdQJ7KdG+mK64P
-fU0MWCR3Cuy5i+vI0RtBnNKHRZYnZ43LCTUg2INlma4poT5EcDgeLX1jGFDXwVgq
-blDaoPgXYileqpkAjdQotJ4baeA8BR2mEhznrMLSBpb2Mn1yWNXqE00UwCCDS/b5
-Av7ioDzia3fTD0GfOGV1TkXQbHPI0h4PAllvi8/POE0zOyCqEqYnZ026/pvm++8=
-=6ctA
+iQEcBAEBCAAGBQJZA5P0AAoJEKeha0olJ0NqBYUIAIXoE+tOLEZVlRT4ho1QWT8F
+RFBJJWNTTfuRP/6nyrUS+Cu7nimCqRIoT30BSDk828/5n0NWxaBWt3m9IAtZ+I83
+V2V3OdQ3ISW+jRGsymGXnA8dO10i1rXYGoTwY4gZvah7RCj9kRlqmbwuCLRaAyBz
++iITJA+Co/2lKW5oEtIy8kAXEh4RjyXc42tanaabVa4II5CwGj4UHJzmiQ3UCKsp
+/5ySZjn4VQFrK7LL11KyP8j8CdvzjsSKq+4Cna5f5nKubrI74fvH4XlS9u0ucEMx
+tCt+Y1PYuByYUPkgVpthe50ldOknLFYWqmDJenOejvmO3pLI/U+O3Cg/T0tLaIc=
+=1+Qk
 -----END PGP SIGNATURE-----
 
---4GiQmL2cm188pj291m7j9CK0JdDAGD29S--
+--iv2xfvosVec1a3LGpU3OOXe4lQNKwjt0u--
