@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d4CbT-0002F8-BT
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:35:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d4CbV-0002HF-BJ
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:35:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d4CbP-0001Xl-Dz
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:34:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d4CbU-0001cC-HX
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 16:35:01 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 28 Apr 2017 22:33:37 +0200
-Message-Id: <1493411622-5343-30-git-send-email-kwolf@redhat.com>
+Date: Fri, 28 Apr 2017 22:33:38 +0200
+Message-Id: <1493411622-5343-31-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1493411622-5343-1-git-send-email-kwolf@redhat.com>
 References: <1493411622-5343-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 29/34] block: assert no image modification under
- BDRV_O_INACTIVE
+Subject: [Qemu-devel] [PULL 30/34] qemu-img: improve
+ convert_iteration_sectors()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +23,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: "Denis V. Lunev" <den@openvz.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-As long as BDRV_O_INACTIVE is set, the image file is only opened so we
-have a file descriptor for it. We're definitely not supposed to modify
-the image, it's still owned by the migration source.
+Do not do extra call to _get_block_status()
 
-This commit is an addition to 09e0c771 but the assert() is added to
-bdrv_truncate().
-
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-Message-id: 1491405505-31620-3-git-send-email-den@openvz.org
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20170407113404.9351-1-vsementsov@virtuozzo.com
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 2 ++
- 1 file changed, 2 insertions(+)
+ qemu-img.c | 32 ++++++++++----------------------
+ 1 file changed, 10 insertions(+), 22 deletions(-)
 
-diff --git a/block.c b/block.c
-index 76bf00f..6c6bb3e 100644
---- a/block.c
-+++ b/block.c
-@@ -3328,6 +3328,8 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
-         return -EACCES;
-     }
+diff --git a/qemu-img.c b/qemu-img.c
+index 9eb8283..9b6e728 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1554,9 +1554,15 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
  
-+    assert(!(bs->open_flags & BDRV_O_INACTIVE));
-+
-     ret = drv->bdrv_truncate(bs, offset, errp);
-     if (ret == 0) {
-         ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+     if (s->sector_next_status <= sector_num) {
+         BlockDriverState *file;
+-        ret = bdrv_get_block_status(blk_bs(s->src[src_cur]),
+-                                    sector_num - src_cur_offset,
+-                                    n, &n, &file);
++        if (s->target_has_backing) {
++            ret = bdrv_get_block_status(blk_bs(s->src[src_cur]),
++                                        sector_num - src_cur_offset,
++                                        n, &n, &file);
++        } else {
++            ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
++                                              sector_num - src_cur_offset,
++                                              n, &n, &file);
++        }
+         if (ret < 0) {
+             return ret;
+         }
+@@ -1565,26 +1571,8 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
+             s->status = BLK_ZERO;
+         } else if (ret & BDRV_BLOCK_DATA) {
+             s->status = BLK_DATA;
+-        } else if (!s->target_has_backing) {
+-            /* Without a target backing file we must copy over the contents of
+-             * the backing file as well. */
+-            /* Check block status of the backing file chain to avoid
+-             * needlessly reading zeroes and limiting the iteration to the
+-             * buffer size */
+-            ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
+-                                              sector_num - src_cur_offset,
+-                                              n, &n, &file);
+-            if (ret < 0) {
+-                return ret;
+-            }
+-
+-            if (ret & BDRV_BLOCK_ZERO) {
+-                s->status = BLK_ZERO;
+-            } else {
+-                s->status = BLK_DATA;
+-            }
+         } else {
+-            s->status = BLK_BACKING_FILE;
++            s->status = s->target_has_backing ? BLK_BACKING_FILE : BLK_DATA;
+         }
+ 
+         s->sector_next_status = sector_num + n;
 -- 
 1.8.3.1
