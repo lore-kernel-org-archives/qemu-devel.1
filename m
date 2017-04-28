@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d400I-00075f-CF
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:07:47 -0400
+	(envelope-from <zhiyong.yang@intel.com>) id 1d406v-0008Bc-5u
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:14:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d400F-0000Af-6a
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:07:46 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36327)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d400E-00009V-W5
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:07:43 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id u65so34344170wmu.1
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 00:07:42 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170427120006.20564-1-rth@twiddle.net>
-	<20170427120006.20564-4-rth@twiddle.net> <874lx996hh.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <30d66407-ad33-bc8c-55c6-0a5d7009bed4@twiddle.net>
-Date: Fri, 28 Apr 2017 09:07:38 +0200
-MIME-Version: 1.0
-In-Reply-To: <874lx996hh.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 03/19] qemu/atomic: Loosen restrictions
- for 64-bit ILP32 hosts
+	(envelope-from <zhiyong.yang@intel.com>) id 1d406q-0003Ps-LW
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:14:37 -0400
+Received: from mga14.intel.com ([192.55.52.115]:10608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zhiyong.yang@intel.com>)
+	id 1d406q-0003Pe-CY
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 03:14:32 -0400
+From: Zhiyong Yang <zhiyong.yang@intel.com>
+Date: Fri, 28 Apr 2017 15:09:32 +0800
+Message-Id: <1493363372-16861-1-git-send-email-zhiyong.yang@intel.com>
+Subject: [Qemu-devel] [PATCH] hw/virtio: fix vhost user fails to startup
+ when MQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +23,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, cota@braap.org
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, Zhiyong Yang <zhiyong.yang@intel.com>
 
-On 04/27/2017 06:10 PM, Alex Bennée wrote:
-> 
-> Richard Henderson <rth@twiddle.net> writes:
-> 
->> We need to coordinate with the TCG_OVERSIZED_GUEST test in cputlb.c,
->> and allow 64-bit atomics even though sizeof(void *) == 4.
-> 
-> Hmm you say this here but we never actually do it. But the other changes
-> seem fine.
+   Qemu2.7~2.9 and vhost user for dpdk 17.02 release work together
+to cause failures of new connection when negotiating to set MQ.
+(one queue pair works well).
+   Because there exist some bugs in qemu code when introducing
+VHOST_USER_PROTOCOL_F_REPLY_ACK to qemu. When vhost_user_set_mem_table
+is invoked to deal with the vhost message VHOST_USER_SET_MEM_TABLE
+for the second time, qemu indeed doesn't send the messge (The message
+needs to be sent only once)but still will be waiting for dpdk's reply
+ack, then, qemu is always freezing, while DPDK is always waiting for
+next vhost message from qemu.
+  The patch aims to fix the bug, MQ can work well.
+  The same bug is found in function vhost_user_net_set_mtu, it is fixed
+at the same time.
+  DPDK related patch is as following:
+  http://www.dpdk.org/dev/patchwork/patch/23955/
 
-I don't understand this comment.
+Signed-off-by: Zhiyong Yang <zhiyong.yang@intel.com>
+---
+ hw/virtio/vhost-user.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
->> +#if defined(__x86_64__) || defined(__sparc__)
->> +# define ATOMIC_REG_SIZE  8
->> +#else
->> +# define ATOMIC_REG_SIZE  sizeof(void *)
->> +#endif
-
-How does this "never actually do it"?
-
-
-r~
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 9334a8a..c2c54ce 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -205,10 +205,11 @@ static int vhost_user_write(struct vhost_dev *dev, VhostUserMsg *msg,
+     /*
+      * For non-vring specific requests, like VHOST_USER_SET_MEM_TABLE,
+      * we just need send it once in the first time. For later such
+-     * request, we just ignore it.
++     * request, we just ignore it. In this case, return value is 1 which is
++     * different from 0 that stands for message written successfully.
+      */
+     if (vhost_user_one_time_request(msg->request) && dev->vq_index != 0) {
+-        return 0;
++        return 1;
+     }
+ 
+     if (qemu_chr_fe_set_msgfds(chr, fds, fd_num) < 0) {
+@@ -270,7 +271,7 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+                                     struct vhost_memory *mem)
+ {
+     int fds[VHOST_MEMORY_MAX_NREGIONS];
+-    int i, fd;
++    int i, fd, ret;
+     size_t fd_num = 0;
+     bool reply_supported = virtio_has_feature(dev->protocol_features,
+                                               VHOST_USER_PROTOCOL_F_REPLY_ACK);
+@@ -315,11 +316,12 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+     msg.size += sizeof(msg.payload.memory.padding);
+     msg.size += fd_num * sizeof(VhostUserMemoryRegion);
+ 
+-    if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
++    ret = vhost_user_write(dev, &msg, fds, fd_num);
++    if (ret < 0) {
+         return -1;
+     }
+ 
+-    if (reply_supported) {
++    if (reply_supported && (ret == 0)) {
+         return process_message_reply(dev, msg.request);
+     }
+ 
+@@ -691,6 +693,7 @@ static bool vhost_user_can_merge(struct vhost_dev *dev,
+ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
+ {
+     VhostUserMsg msg;
++    int ret;
+     bool reply_supported = virtio_has_feature(dev->protocol_features,
+                                               VHOST_USER_PROTOCOL_F_REPLY_ACK);
+ 
+@@ -706,12 +709,13 @@ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
+         msg.flags |= VHOST_USER_NEED_REPLY_MASK;
+     }
+ 
+-    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
++    ret = vhost_user_write(dev, &msg, NULL, 0);
++    if (ret < 0) {
+         return -1;
+     }
+ 
+     /* If reply_ack supported, slave has to ack specified MTU is valid */
+-    if (reply_supported) {
++    if (reply_supported && (ret == 0)) {
+         return process_message_reply(dev, msg.request);
+     }
+ 
+-- 
+2.7.4
