@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Uw-0004ey-PV
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Ux-0004f7-6p
 	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Us-0001Sd-6v
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:34 -0400
-Received: from [59.151.112.132] (port=46892 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Us-0001Sl-7d
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:35 -0400
+Received: from [59.151.112.132] (port=20529 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Ur-0001Qm-S9
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d42Ur-0001QC-SJ
 	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:47:30 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Fri, 28 Apr 2017 17:47:11 +0800
-Message-ID: <1493372840-24551-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Fri, 28 Apr 2017 17:47:10 +0800
+Message-ID: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V3 01/10] net: Add vnet_hdr_len related
- callback in NetClientInfo
+Subject: [Qemu-devel] [PATCH V3 00/10] Add COLO-proxy virtio-net support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +27,39 @@ To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
 	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Add get_vnet_hdr_len and get_using_vnet_hdr callback
-that make we get vnet_hdr_len easily.
+If user use -device virtio-net-pci, virtio-net driver will add a header
+to raw net packet that colo-proxy can't handle it. COLO-proxy just
+focus on the packet payload, so we skip the virtio-net header to compare
+the sent packet that primary guest's to secondary guest's.
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- include/net/net.h |  6 ++++++
- net/net.c         | 18 ++++++++++++++++++
- 2 files changed, 24 insertions(+)
+Zhang Chen (10):
+  net: Add vnet_hdr_len related callback in NetClientInfo
+  net/tap.c: Add tap_get_vnet_hdr_len and tap_get_using_vnet_hdr
+    function
+  net/netmap.c: Add netmap_get_vnet_hdr_len function
+  net/filter-mirror.c: Add filter-mirror and filter-redirector vnet
+    support.
+  net/net.c: Add vnet header length to SocketReadState
+  tests/e1000e-test.c : change e1000e test case send data format
+  tests/virtio-net-test.c : change virtio-net test case iov send data
+    format
+  net/colo-compare.c: Make colo-compare support vnet_hdr_len
+  net/colo.c: Add vnet packet parse feature in colo-proxy
+  net/colo-compare.c: Add vnet packet's tcp/udp/icmp compare
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 99b28d5..402d913 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -57,7 +57,9 @@ typedef RxFilterInfo *(QueryRxFilter)(NetClientState *);
- typedef bool (HasUfo)(NetClientState *);
- typedef bool (HasVnetHdr)(NetClientState *);
- typedef bool (HasVnetHdrLen)(NetClientState *, int);
-+typedef int (GetVnetHdrLen)(NetClientState *);
- typedef void (UsingVnetHdr)(NetClientState *, bool);
-+typedef bool (GetUsingVnetHdr)(NetClientState *);
- typedef void (SetOffload)(NetClientState *, int, int, int, int, int);
- typedef void (SetVnetHdrLen)(NetClientState *, int);
- typedef int (SetVnetLE)(NetClientState *, bool);
-@@ -79,7 +81,9 @@ typedef struct NetClientInfo {
-     HasUfo *has_ufo;
-     HasVnetHdr *has_vnet_hdr;
-     HasVnetHdrLen *has_vnet_hdr_len;
-+    GetVnetHdrLen *get_vnet_hdr_len;
-     UsingVnetHdr *using_vnet_hdr;
-+    GetUsingVnetHdr *get_using_vnet_hdr;
-     SetOffload *set_offload;
-     SetVnetHdrLen *set_vnet_hdr_len;
-     SetVnetLE *set_vnet_le;
-@@ -155,7 +159,9 @@ void qemu_format_nic_info_str(NetClientState *nc, uint8_t macaddr[6]);
- bool qemu_has_ufo(NetClientState *nc);
- bool qemu_has_vnet_hdr(NetClientState *nc);
- bool qemu_has_vnet_hdr_len(NetClientState *nc, int len);
-+int qemu_get_vnet_hdr_len(NetClientState *nc);
- void qemu_using_vnet_hdr(NetClientState *nc, bool enable);
-+bool qemu_get_using_vnet_hdr(NetClientState *nc);
- void qemu_set_offload(NetClientState *nc, int csum, int tso4, int tso6,
-                       int ecn, int ufo);
- void qemu_set_vnet_hdr_len(NetClientState *nc, int len);
-diff --git a/net/net.c b/net/net.c
-index 0ac3b9e..f69260f 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -466,6 +466,15 @@ bool qemu_has_vnet_hdr_len(NetClientState *nc, int len)
-     return nc->info->has_vnet_hdr_len(nc, len);
- }
- 
-+int qemu_get_vnet_hdr_len(NetClientState *nc)
-+{
-+    if (!nc || !nc->info->get_vnet_hdr_len) {
-+        return false;
-+    }
-+
-+    return nc->info->get_vnet_hdr_len(nc);
-+}
-+
- void qemu_using_vnet_hdr(NetClientState *nc, bool enable)
- {
-     if (!nc || !nc->info->using_vnet_hdr) {
-@@ -475,6 +484,15 @@ void qemu_using_vnet_hdr(NetClientState *nc, bool enable)
-     nc->info->using_vnet_hdr(nc, enable);
- }
- 
-+bool qemu_get_using_vnet_hdr(NetClientState *nc)
-+{
-+    if (!nc || !nc->info->get_using_vnet_hdr) {
-+        return false;
-+    }
-+
-+    return nc->info->get_using_vnet_hdr(nc);
-+}
-+
- void qemu_set_offload(NetClientState *nc, int csum, int tso4, int tso6,
-                           int ecn, int ufo)
- {
+ include/net/net.h       | 10 +++++++++-
+ net/colo-compare.c      | 48 +++++++++++++++++++++++++++++++++++++++---------
+ net/colo.c              |  9 +++++----
+ net/colo.h              |  4 +++-
+ net/filter-mirror.c     | 28 +++++++++++++++++++++++-----
+ net/filter-rewriter.c   |  2 +-
+ net/net.c               | 42 ++++++++++++++++++++++++++++++++++++++++--
+ net/netmap.c            |  8 ++++++++
+ net/tap-win32.c         | 12 ++++++++++++
+ net/tap.c               | 20 ++++++++++++++++++++
+ tests/e1000e-test.c     | 10 ++++++++--
+ tests/virtio-net-test.c | 18 ++++++++++++++----
+ 12 files changed, 182 insertions(+), 29 deletions(-)
+
 -- 
 2.7.4
