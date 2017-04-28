@@ -1,45 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d45nm-0001rV-MN
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:19:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d45sK-0004wL-TC
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:23:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d45ni-0001OJ-NB
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:19:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40086
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1d45ni-0001Ng-Gf
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:19:10 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v3SDDaSo095445
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 09:19:09 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a3jv3v4c4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 09:19:09 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 28 Apr 2017 09:19:08 -0400
-References: <20170426183721.7482-1-dgilbert@redhat.com>
-	<20170426183721.7482-2-dgilbert@redhat.com>
-	<8a107a40-073c-8181-75aa-e5700f2900a7@de.ibm.com>
-	<20170426190442.GG2394@work-vm> <20170426193743.GF3508@redhat.com>
-	<20170427032037.GE26792@pxdev.xzpeter.org>
-	<750be300-6f14-cbef-4b38-f28751e28032@de.ibm.com>
-	<20170427134707.GG3508@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 28 Apr 2017 15:19:03 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1d45sG-0003ES-VJ
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:23:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36358)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d45sG-0003DA-La
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 09:23:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6919561B8E
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 13:23:51 +0000 (UTC)
+Date: Fri, 28 Apr 2017 09:23:51 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1612393779.1670657.1493385831149.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170427165526.19836-1-dgilbert@redhat.com>
+References: <20170427165526.19836-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170427134707.GG3508@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <cc11d33c-8113-3895-7427-4318af1f3c82@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] Postcopy: Force allocation of all-zero
- precopy pages
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: Disallow glib asserts in main
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,61 +33,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Arcangeli <aarcange@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, lvivier@redhat.com, Martin Schwidefsky <schwidefsky@de.ibm.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-On 04/27/2017 03:47 PM, Andrea Arcangeli wrote:
-> On Thu, Apr 27, 2017 at 08:44:03AM +0200, Christian Borntraeger wrote:
->> I have started instrumenting the kernel. I can see a set_pte_at for this address
->> and I see an (to be understood) invalidation shortly after that which explains
->> why I get a fault.
+
+
+----- Original Message -----
+> From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+> To: qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
+> Sent: Thursday, April 27, 2017 6:55:26 PM
+> Subject: [Qemu-devel] [PATCH] checkpatch: Disallow glib asserts in main code
 > 
-> Sounds great that you can see an invalidation shortly after, that is
-> the real source of the problem. Can you get a stack trace of such
-> invalidation?
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Thanks!
-> Andrea
+> Glib commit a6a875068779 (from 2013) made many of the glib assert
+> macros non-fatal if a flag is set.
+> This causes two problems:
+>   a) Compilers moan that your code is unsafe even though you've
+>      put an assert in before the point of use.
+>   b) Someone evil could, in a library, call
+>      g_test_set_nonfatal_assertions() and cause our assertions in
+>      important places not to fail and potentially allow memory overruns.
+> 
+> Ban most of the glib assertion functions (basically everything except
+> g_assert and g_assert_not_reached) except in tests/
+> 
+> This makes checkpatch gives an error such as:
+> 
+>   ERROR: Use g_assert or g_assert_not_reached
+>   #77: FILE: vl.c:4725:
+>   +    g_assert_cmpstr("Chocolate", >, "Cheese");
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  scripts/checkpatch.pl | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index f084542934..73cee81b79 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2571,6 +2571,27 @@ sub process {
+>  		if ($line =~ /\bbzero\(/) {
+>  			ERROR("use memset() instead of bzero()\n" . $herecurr);
+>  		}
+> +		my $non_exit_glib_asserts = qr{g_assert_cmpstr|
+> +						g_assert_cmpint|
+> +						g_assert_cmpuint|
+> +						g_assert_cmphex|
+> +						g_assert_cmpfloat|
+> +						g_assert_true|
+> +						g_assert_false|
+> +						g_assert_nonnull|
+> +						g_assert_null|
+> +						g_assert_no_error|
+> +						g_assert_error|
+> +						g_test_assert_expected_messages|
+> +						g_test_trap_assert_passed|
+> +						g_test_trap_assert_stdout|
+> +						g_test_trap_assert_stdout_unmatched|
+> +						g_test_trap_assert_stderr|
+> +						g_test_trap_assert_stderr_unmatched}x;
+> +		if ($realfile !~ /^tests\// &&
+> +			$line =~ /\b(?:$non_exit_glib_asserts)\(/) {
+> +			ERROR("Use g_assert or g_assert_not_reached\n". $herecurr);
+> +		}
+>  	}
+>  
+>  	# If we have no input at all, then there is nothing to report on
+> --
+> 2.12.2
+> 
+> 
 > 
 
-Finally got it. I had a test module in that guest, which triggered a storage key 
-operation. Normally we no longer use the storage keys in Linux. Therefore KVM
-disables storage key support and intercepts all storage key instructions to enable
-the support for that lazily.This makes paging easier and faster to not worry about those.
-When we enable storage keys, we must not use shared pages as the storage key
-is a property of the physical page frame (and not of the virtual page).
-Therefore, this enablement makes mm_forbids_zeropage return true and removes
-all existing zero pages.
-(see commit 2faee8ff9dc6f4bfe46f6d2d110add858140fb20
-    s390/mm: prevent and break zero page mappings in case of storage keys)
-In this case it was called while migrating the storage keys (via kvm ioctl)
-resulting in zero page mappings going away. (see qemu hw/s390x/s390-skeys.c)
+Queued, thanks.
 
-
-Apr 28 14:48:43 s38lp08 kernel: ([<000000000011218a>] show_trace+0x62/0x78)
-Apr 28 14:48:43 s38lp08 kernel:  [<0000000000112278>] show_stack+0x68/0xe0 
-Apr 28 14:48:43 s38lp08 kernel:  [<000000000066f82e>] dump_stack+0x7e/0xb0 
-Apr 28 14:48:43 s38lp08 kernel:  [<0000000000123b2c>] ptep_xchg_direct+0x254/0x288 
-Apr 28 14:48:43 s38lp08 kernel:  [<0000000000127cfe>] __s390_enable_skey+0x76/0xa0 
-Apr 28 14:48:43 s38lp08 kernel:  [<00000000002e5278>] __walk_page_range+0x270/0x500 
-Apr 28 14:48:43 s38lp08 kernel:  [<00000000002e5592>] walk_page_range+0x8a/0x148 
-Apr 28 14:48:43 s38lp08 kernel:  [<0000000000127bc6>] s390_enable_skey+0x116/0x140 
-Apr 28 14:48:43 s38lp08 kernel:  [<000000000013fd92>] kvm_arch_vm_ioctl+0x11ea/0x1c70 
-Apr 28 14:48:43 s38lp08 kernel:  [<0000000000131aa2>] kvm_vm_ioctl+0xca/0x710 
-Apr 28 14:48:43 s38lp08 kernel:  [<00000000003460e8>] do_vfs_ioctl+0xa8/0x608 
-Apr 28 14:48:43 s38lp08 kernel:  [<00000000003466ec>] SyS_ioctl+0xa4/0xb8 
-Apr 28 14:48:43 s38lp08 kernel:  [<0000000000923460>] system_call+0xc4/0x23c
-
-As a result a userfault on this virtual address will indeed go back to QEMU
-and asks again for that page. And then QEMU "oh I have that page already transferred"
-(even if it was detected as zero page and just faulted in by reading from it)
-So I will not write it again.
-
-Several options:
-- let postcopy not discard a page, even it if must already be there (patch from David)
-- change s390-skeys to register_savevm_live and do the skey enablement
-very early (but this will be impossible for incoming data from old versions)
-- let kernel s390_enable_skey actually fault in (might show big memory consumption)
-- let qemu hw/s390x/s390-skeys.c tell the migration code that pages might need
-  retransmissions
-....
+Paolo
