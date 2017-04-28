@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d4DBs-0003NR-C9
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:12:37 -0400
+	(envelope-from <kchamart@redhat.com>) id 1d4DGb-0004w4-R6
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:17:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d4DBq-0000UI-Un
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:12:36 -0400
-References: <73ecd486-2d5c-e204-1588-a0b6324ba77b@virtuozzo.com>
-	<a18117bb-bf65-1263-48f0-72a2696cdc0b@redhat.com>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <9347addc-c203-f3d2-6ce9-846ad75034e0@virtuozzo.com>
-Date: Fri, 28 Apr 2017 22:38:06 +0300
+	(envelope-from <kchamart@redhat.com>) id 1d4DGY-000263-Li
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:17:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1d4DGY-000254-CJ
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 17:17:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6DED380042
+	for <qemu-devel@nongnu.org>; Fri, 28 Apr 2017 21:17:24 +0000 (UTC)
+Date: Fri, 28 Apr 2017 23:13:04 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170428211304.syetkl42juooegjl@eukaryote>
+References: <20170427223628.20893-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a18117bb-bf65-1263-48f0-72a2696cdc0b@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] RFC: some problems with bdrv_get_block_status
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170427223628.20893-1-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] qmp-shell: add persistent command
+ history
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,160 +33,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, QEMU <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Stephane Chazelas <stephane.chazelas@gmail.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-On 04/28/2017 09:31 PM, Eric Blake wrote:
-> On 04/28/2017 11:17 AM, Denis V. Lunev wrote:
->> Hello, All!
->>
->> Recently we have experienced problems with very slow
->> bdrv_get_block_status call, which is massive called f.e.
->> from mirror_run().
->>
->> The problem was narrowed down to slow lseek64() system
->> call, which can take 1-2-3 seconds.
-> I'm guessing you meant one-to-three (the range), not one-two-three
-> (three separate digits), and just had an unfortunate abbreviation of
-> 'to' turning into the phonetically-similar '2'.
-First of all, Eric, thank you very much for the prompt answer.
+On Thu, Apr 27, 2017 at 06:36:28PM -0400, John Snow wrote:
+> Use the existing readline history function we are utilizing
+> to provide persistent command history across instances of qmp-shell.
+> 
+> This assists entering debug commands across sessions that may be
+> interrupted by QEMU sessions terminating, where the qmp-shell has
+> to be relaunched.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+> 
+> v3: Hardcoded limit of 1024 lines of history for now,
+>     as setting limits in ~/.inputrc does not appear to work (Nir)
 
-yes. I have meant 1..3 seconds. Thank you for clarifying that.
+Yeah, as-is, this is strict improvement, so it's alright for now.
 
->> root@s158 ~]# strace -f -p 77048 -T  -e lseek
->> Process 77048 attached with 14 threads
->> [pid 77053] lseek(23, 6359613440, SEEK_DATA) = 6360276992 <1.250323>
-> That sounds like a bug in your choice of filesystem.  It's been
-> mentioned before that lseek has some pathetically poor behavior (I think
-> tmpfs was one of the culprits), but I maintain that it is better to
-> hammer on the kernel folks to fix the poor behavior than it is to have
-> to implement user-space workarounds in every single affected program.
+> v2: Adjusted the errors to whine about non-ENOENT errors, but still
+>     intercept all errors as non-fatal.
+>     Save history atexit() to match bash standard behavior
 >
-> That said, a workaround of being able to request the avoidance of lseek
-> has been brought up on this list before.
-I have found that letter (Feb 2017). The problem there was with ZFS.
-I have problems with EXT4. The problem comes not immediately
-but after some time under load.
+> 
+>  scripts/qmp/qmp-shell | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 
-This call will also cost a lot for the case of NFSv4, which supports
-SEEK_DATA and SEEK_HOLE, as it will require additional
-network exchange. Thus this is not cheap for at least some cases
-and thus it is dangerous to follow current way. May be other
-filesystems are also affected.
+Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
+ 
+Can confim the, expected, 'atexit' behavior -- only upon termination
+does the history file get saved:
 
->
->> The problem comes from this branch of the code
->>
->> bdrv_co_get_block_status
->>     .......
->>     if (bs->file &&
->>         (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
->>         (ret & BDRV_BLOCK_OFFSET_VALID)) {
->>         int file_pnum;
->>
->>         ret2 = bdrv_co_get_block_status(bs->file, ret >> BDRV_SECTOR_BITS,
->>                                         *pnum, &file_pnum);
->>         if (ret2 >= 0) {
->>             /* Ignore errors.  This is just providing extra information, it
->>              * is useful but not necessary.
->>              */
->>             if (!file_pnum) {
->>                 /* !file_pnum indicates an offset at or beyond the EOF;
->> it is
->>                  * perfectly valid for the format block driver to point
->> to such
->>                  * offsets, so catch it and mark everything as zero */
->>                 ret |= BDRV_BLOCK_ZERO;
->>             } else {
->>                 /* Limit request to the range reported by the protocol
->> driver */
->>                 *pnum = file_pnum;
->>                 ret |= (ret2 & BDRV_BLOCK_ZERO);
->>             }
->>         }
->>     }
-> I don't see anything wrong with this code. It's nice to know that we
-> have data (qcow2 says we have allocated bytes due to this layer, so
-> don't refer to the backing files), but when the underlying file can ALSO
-> tell us that the underlying protocol is sparse and we are on a hole,
-> then we know that we have BDRV_BLOCK_ZERO condition which can in turn
-> enable other optimizations in quite a bit of the stack.  It IS valid to
-> return BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO (we don't have to limit
-> ourselves to BDRV_BLOCK_DATA), and we should probably do so any time
-> that such computation is cheap.
->
-> I agree with your analysis that on a poor filesystem where lseek()
-> behavior sucks that it is no longer cheap to determine where the holes are.
->
-> But the proper workaround for those filesystems should NOT be made by
-> undoing this part of bdrv_co_get_block_status(), but should rather be
-> fixed in file-posix.c by the addition of a user-controllable knob on
-> whether to skip lseek().  In other words, if we're going to work around
-> the poor filesystem performance, the workaround should live in
-> file-posix.c, not in the generic block/io.c.  Once the workaround is
-> enabled, the 'ret2 = bdrv_co_get_block_status()' nested call should be
-> lightning fast (because file-posix.c would no longer be using lseek when
-> you've requested the workaround).
-I understand that it is very good to know, but what benefit we will have
-really:
-- backup will skip cluster only if the cluster is all zeroes
-- mirror skips the cluster only if it will be full zeroes
-- the same applies for 'qemu-img convert'
+    $ cat ~/.qmp-shell_history 
+    query-block
+    query-named-block-nodes
+    query-kvm
+    quit
 
-I think we should somehow measure the benefit against the loss.
-We have at least 2 (or probably 3) different filesystems which do
-not work well with that.
+Tested with:
 
-I have seen the question to try disable 'detect-zeroes' and
-this could look like a worthy option to put original behavior
-under, i.e. we could perform lseek(SEEK_DATA) only if
-'detect-zeroes' option is on, which well match the meaning
-of that option and will save the flag namespace a bit.
+  $ git describe
+  v3.9.0-304-gca7305b
 
-Other option would be to split this API to one rough call which
-works with whole blocks and one providing full details like
-now.
+Most of my test procedure is noted in my response to the earlier
+revisions:
 
->> Frankly speaking, this optimization should not give much.
->> If upper layer format (QCOW2) says that we have data
->> here, then nowadays in 99.9% we do have the data.
-> You are correct that we have BDRV_BLOCK_DATA; but it IS useful to ALSO
-> know if that data reads back as all zeros (so we can skip reading it).
-> Just because qcow2 reports something as data does NOT rule out whether
-> the data still reads as zeros.
->
->> Meanwhile this branch can cause problems. We would
->> need block cleared entirely to get the benefit for most
->> cases in mirror and backup operations.
->>
->> At my opinion it worth to drop this at all.
->>
->> Guys, do you have any opinion?
-> Again, my opinion is to not change this part of block/io.c.  Rather,
-> work should be expended on individual protocol drivers to quit wasting
-> unnecessary time on reporting BDRV_BLOCK_ZERO if the time spent to
-> determine that is not worth the effort (as it is when using lseek() on
-> inefficient filesystems).  It is always safe for a protocol driver to
-> report BDRV_BLOCK_DATA instead of BDRV_BLOCK_ZERO, if asking the
-> question is too expensive (treating holes as data may pessimize other
-> operations, but that's okay if the penalty for asking is worse than what
-> optimizations are able to regain).
->
->> Den
->>
->> P.S. The kernel is one based on RedHat 3.10.0-514. The same
->>       problem was observed in 3.10.0-327 too.
-> Red Hat is always two words (I'm allowed to point that out, as they
-> employ me ;).  But if it really is a Red Hat kernel problem, be sure to
-> use your support contract to point out the kernel developers that they
-> really need to fix lseek() - and you'll need to give details on which
-> filesystem you're using (as not all filesystems have that abysmal
-> performance).
->
-ok, I will file the Bugzilla for the case with the possible workaround
-we are
-working on right now. No problem. I just writing this as for now this
-knowledge
-(about zeroes/not zeroes) is not really used much.
+https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg00356.html
 
-Den
+> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+> index eccb88a..6ece6e7 100755
+> --- a/scripts/qmp/qmp-shell
+> +++ b/scripts/qmp/qmp-shell
+> @@ -70,6 +70,9 @@ import json
+>  import ast
+>  import readline
+>  import sys
+> +import os
+> +import errno
+> +import atexit
+>  
+>  class QMPCompleter(list):
+>      def complete(self, text, state):
+> @@ -109,6 +112,8 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+>          self._pretty = pretty
+>          self._transmode = False
+>          self._actions = list()
+> +        self._histfile = os.path.join(os.path.expanduser('~'),
+> +                                      '.qmp-shell_history')
+
+Thanks for changing the name :-)  Now the raw QMP history file
+(~/.qmp_history) and 'qmp-shell' history file (~/qmp-shell_history)
+won't collide.
+
+>      def __get_address(self, arg):
+>          """
+> @@ -132,11 +137,27 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+>      def __completer_setup(self):
+>          self._completer = QMPCompleter()
+>          self._fill_completion()
+> +        readline.set_history_length(1024)
+>          readline.set_completer(self._completer.complete)
+>          readline.parse_and_bind("tab: complete")
+>          # XXX: default delimiters conflict with some command names (eg. query-),
+>          # clearing everything as it doesn't seem to matter
+>          readline.set_completer_delims('')
+> +        try:
+> +            readline.read_history_file(self._histfile)
+> +        except Exception as e:
+> +            if isinstance(e, IOError) and e.errno == errno.ENOENT:
+> +                # File not found. No problem.
+> +                pass
+> +            else:
+> +                print "Failed to read history '%s'; %s" % (self._histfile, e)
+> +        atexit.register(self.__save_history)
+> +
+> +    def __save_history(self):
+> +        try:
+> +            readline.write_history_file(self._histfile)
+> +        except Exception as e:
+> +            print "Failed to save history file '%s'; %s" % (self._histfile, e)
+>  
+>      def __parse_value(self, val):
+>          try:
+> -- 
+> 2.9.3
+> 
+
+-- 
+/kashyap
