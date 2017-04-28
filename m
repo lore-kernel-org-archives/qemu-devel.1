@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d42cj-0002QA-Gq
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:55:38 -0400
+	(envelope-from <peterx@redhat.com>) id 1d42iJ-00069j-QW
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d42ce-0007RJ-Kp
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:55:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56764)
+	(envelope-from <peterx@redhat.com>) id 1d42iF-0005wE-St
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:01:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d42ce-0007QW-Dv
-	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 05:55:32 -0400
-Date: Fri, 28 Apr 2017 11:55:27 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170428115527.57312155@nial.brq.redhat.com>
-In-Reply-To: <20170428093911.GA26067@he>
-References: <1493260558-20728-1-git-send-email-he.chen@linux.intel.com>
-	<24766133-5384-09fd-a24a-8acf964c9367@redhat.com>
-	<20170427153222.5d991d2b@nial.brq.redhat.com>
-	<874lxa2bex.fsf@dusky.pond.sub.org>
-	<20170427164626.78f65611@nial.brq.redhat.com>
-	<20170427202551.GL3482@thinpad.lan.raisama.net>
-	<20170428093911.GA26067@he>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d42iF-0005vr-JN
+	for qemu-devel@nongnu.org; Fri, 28 Apr 2017 06:01:19 -0400
+Date: Fri, 28 Apr 2017 18:00:12 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170428100012.GB22801@pxdev.xzpeter.org>
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
+	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9] Allow setting NUMA distance for
- different NUMA nodes
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
+ downtime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +29,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: He Chen <he.chen@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrew Jones <drjones@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, i.maximets@samsung.com, f4bug@amsat.org
 
-On Fri, 28 Apr 2017 17:39:11 +0800
-He Chen <he.chen@linux.intel.com> wrote:
+On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
+> This patch provides downtime calculation per vCPU,
+> as a summary and as a overlapped value for all vCPUs.
+> 
+> This approach was suggested by Peter Xu, as an improvements of
+> previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> list for downtime per vCPU (could be traced with page_fault_addr)
+> 
+> For more details see comments for get_postcopy_total_downtime
+> implementation.
+> 
+> Downtime will not calculated if postcopy_downtime field of
+> MigrationIncomingState wasn't initialized.
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
+>  include/migration/migration.h |   3 ++
+>  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
+>  migration/postcopy-ram.c      |  20 +++++++-
+>  migration/trace-events        |   6 ++-
+>  4 files changed, 130 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index e8fb68f..a22f9ce 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
+>   * Functions to work with downtime context
+>   */
+>  struct DowntimeContext *downtime_context_new(void);
+> +void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
+> +void mark_postcopy_downtime_end(uint64_t addr);
+> +uint64_t get_postcopy_total_downtime(void);
+>  
+>  struct MigrationState
+>  {
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ec76e5c..2c6f150 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
+>      return atomic_xchg(&incoming_postcopy_state, new_state);
+>  }
+>  
+> +void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    DowntimeContext *dc;
+> +    if (!mis->downtime_ctx || cpu < 0) {
+> +        return;
+> +    }
+> +    dc = mis->downtime_ctx;
+> +    dc->vcpu_addr[cpu] = addr;
+> +    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
+> +        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +
+> +    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> +            cpu);
+> +}
+> +
+> +void mark_postcopy_downtime_end(uint64_t addr)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    DowntimeContext *dc;
+> +    int i;
+> +    bool all_vcpu_down = true;
+> +    int64_t now;
+> +
+> +    if (!mis->downtime_ctx) {
+> +        return;
+> +    }
+> +    dc = mis->downtime_ctx;
+> +    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +
+> +    /* check all vCPU down,
+> +     * QEMU has bitmap.h, but even with bitmap_and
+> +     * will be a cycle */
+> +    for (i = 0; i < smp_cpus; i++) {
+> +        if (dc->vcpu_addr[i]) {
+> +            continue;
+> +        }
+> +        all_vcpu_down = false;
+> +        break;
+> +    }
+> +
+> +    if (all_vcpu_down) {
+> +        dc->total_downtime += now - dc->last_begin;
 
-> On Thu, Apr 27, 2017 at 05:25:51PM -0300, Eduardo Habkost wrote:
-> > On Thu, Apr 27, 2017 at 04:46:26PM +0200, Igor Mammedov wrote:  
-> > > On Thu, 27 Apr 2017 16:05:42 +0200
-> > > Markus Armbruster <armbru@redhat.com> wrote:  
-> > > > Igor Mammedov <imammedo@redhat.com> writes:  
-> > > > > On Thu, 27 Apr 2017 07:54:31 -0500
-> > > > > Eric Blake <eblake@redhat.com> wrote:  
-> > [...]  
-> > > > >> 
-> > > > >> Markus has asked that all new QMP commands have some testsuite exposure;
-> > > > >> he may have some advice on what test would be best to modify to give us
-> > > > >> some coverage of this feature.    
-> > > > 
-> > > > I can't see the QMP command here, but...
-> > > >   
-> > > > > Since it's basically validation of SLIT table, the test case
-> > > > > should be added to tests/bios-tables-test.c    
-> > > > 
-> > > > ... I figure there's new stuff to test all the same.  
-> > > it could be a patch on top and doesn't have to hold this one if
-> > > author promises to write testcase  
-> > 
-> > Agreed. I'm applying this to my machine-next branch, but I would
-> > like to get test cases before including it in a pull request.
-> >   
-> You mean we also need a patch to add test case to
-> tests/bios-tables-test.c, right? If so, I am very willing to cook and
-> submit it.
-yes, an additional patch.
+Shall we do this accouting only if we are sure the copied page address
+is one of the page faulted addresses? Can it be some other page? I
+don't know. But since we have the loop below to make sure of it, why
+not?
+
+A nitpick on perf: when there are lots of vcpus, the algo might be
+slow since we have several places that loops over the smp_vcpus. But
+this can be totally future work on top, and current way is good enough
+at least for me.
+
+(for the nit: maybe add a hash, key=thread_id, value=cpu_index, then
+ get_mem_fault_cpu_index() can be faster using the hash; meanwhile
+ keep a counter A of page faulted vcpus, use atomic ops with it, then
+ here all_vcpu_down can be checked by A == smp_vcpus)
+
+Thanks,
+
+> +    }
+> +
+> +    /* lookup cpu, to clear it */
+> +    for (i = 0; i < smp_cpus; i++) {
+> +        uint64_t vcpu_downtime;
+> +
+> +        if (dc->vcpu_addr[i] != addr) {
+> +            continue;
+> +        }
+> +
+> +        vcpu_downtime = now - dc->page_fault_vcpu_time[i];
+> +
+> +        dc->vcpu_addr[i] = 0;
+> +        dc->vcpu_downtime[i] += vcpu_downtime;
+> +    }
+> +
+> +    trace_mark_postcopy_downtime_end(addr, dc, dc->total_downtime);
+> +}
+> +
+> +/*
+> + * This function just provide calculated before downtime per cpu and trace it.
+> + * Total downtime is calculated in mark_postcopy_downtime_end.
+> + *
+> + *
+> + * Assume we have 3 CPU
+> + *
+> + *      S1        E1           S1               E1
+> + * -----***********------------xxx***************------------------------> CPU1
+> + *
+> + *             S2                E2
+> + * ------------****************xxx---------------------------------------> CPU2
+> + *
+> + *                         S3            E3
+> + * ------------------------****xxx********-------------------------------> CPU3
+> + *
+> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
+> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
+> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
+> + *            it's a part of total downtime.
+> + * S1 - here is last_begin
+> + * Legend of the picture is following:
+> + *              * - means downtime per vCPU
+> + *              x - means overlapped downtime (total downtime)
+> + */
+> +uint64_t get_postcopy_total_downtime(void)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +
+> +    if (!mis->downtime_ctx) {
+> +        return 0;
+> +    }
+> +
+> +    if (trace_event_get_state(TRACE_DOWNTIME_PER_CPU)) {
+> +        int i;
+> +        for (i = 0; i < smp_cpus; i++) {
+> +            trace_downtime_per_cpu(i, mis->downtime_ctx->vcpu_downtime[i]);
+> +        }
+> +    }
+> +    return mis->downtime_ctx->total_downtime;
+> +}
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index f3688f5..cf2b935 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -23,6 +23,7 @@
+>  #include "migration/postcopy-ram.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/balloon.h"
+> +#include <sys/param.h>
+>  #include "qemu/error-report.h"
+>  #include "trace.h"
+>  
+> @@ -468,6 +469,19 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+>      return 0;
+>  }
+>  
+> +static int get_mem_fault_cpu_index(uint32_t pid)
+> +{
+> +    CPUState *cpu_iter;
+> +
+> +    CPU_FOREACH(cpu_iter) {
+> +        if (cpu_iter->thread_id == pid) {
+> +            return cpu_iter->cpu_index;
+> +        }
+> +    }
+> +    trace_get_mem_fault_cpu_index(pid);
+> +    return -1;
+> +}
+> +
+>  /*
+>   * Handle faults detected by the USERFAULT markings
+>   */
+> @@ -545,8 +559,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
+>          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+>                                                  qemu_ram_get_idstr(rb),
+> -                                                rb_offset);
+> +                                                rb_offset,
+> +                                                msg.arg.pagefault.feat.ptid);
+>  
+> +        mark_postcopy_downtime_begin((uintptr_t)(msg.arg.pagefault.address),
+> +                         get_mem_fault_cpu_index(msg.arg.pagefault.feat.ptid));
+>          /*
+>           * Send the request to the source - we want to request one
+>           * of our host page sizes (which is >= TPS)
+> @@ -641,6 +658,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+>  
+>          return -e;
+>      }
+> +    mark_postcopy_downtime_end((uint64_t)host);
+>  
+>      trace_postcopy_place_page(host);
+>      return 0;
+> diff --git a/migration/trace-events b/migration/trace-events
+> index b8f01a2..d338810 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -110,6 +110,9 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>  process_incoming_migration_co_postcopy_end_main(void) ""
+>  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+> +mark_postcopy_downtime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
+> +mark_postcopy_downtime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
+> +downtime_per_cpu(int cpu_index, int64_t downtime) "downtime cpu[%d]=%" PRId64
+>  
+>  # migration/rdma.c
+>  qemu_rdma_accept_incoming_migration(void) ""
+> @@ -186,7 +189,7 @@ postcopy_ram_enable_notify(void) ""
+>  postcopy_ram_fault_thread_entry(void) ""
+>  postcopy_ram_fault_thread_exit(void) ""
+>  postcopy_ram_fault_thread_quit(void) ""
+> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
+> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
+>  postcopy_ram_incoming_cleanup_closeuf(void) ""
+>  postcopy_ram_incoming_cleanup_entry(void) ""
+>  postcopy_ram_incoming_cleanup_exit(void) ""
+> @@ -195,6 +198,7 @@ save_xbzrle_page_skipping(void) ""
+>  save_xbzrle_page_overflow(void) ""
+>  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+>  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
+> +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
+>  
+>  # migration/exec.c
+>  migration_exec_outgoing(const char *cmd) "cmd=%s"
+> -- 
+> 1.9.1
+> 
+
+-- 
+Peter Xu
