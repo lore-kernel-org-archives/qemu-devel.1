@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d4Wg3-0005F2-2h
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:01:04 -0400
+	(envelope-from <mark.fonnemann@hexagon.com>) id 1d4Xar-0004TB-Ef
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:59:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d4Wfy-0004pg-6H
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:01:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49575)
+	(envelope-from <mark.fonnemann@hexagon.com>) id 1d4Xao-0003TA-DP
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:59:45 -0400
+Received: from mail-db5eur01on0090.outbound.protection.outlook.com
+	([104.47.2.90]:28458
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d4Wfy-0004pI-0I
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:00:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d4Wfv-000450-P9
-	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 18:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A20CC2E80C0
-	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 18:00:55 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(Exim 4.71) (envelope-from <mark.fonnemann@hexagon.com>)
+	id 1d4Xao-0003T1-4P
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:59:42 -0400
+From: FONNEMANN Mark <mark.fonnemann@hexagon.com>
+Date: Sat, 29 Apr 2017 18:25:26 +0000
+Message-ID: <VI1PR0601MB2479886B8955148FD8A2D06F9C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+References: <VI1PR0601MB247952CA06D05D5041AA450D9C130@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<VI1PR0601MB247995F01C0EC808ADEA07C49C180@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<VI1PR0601MB2479950F84BBE26A46F549FA9C110@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<VI1PR0601MB2479D2A56A202E3FD18C6DDF9C1F0@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<20170429124421.2qcthvlsiwvtqov2@var.youpi.perso.aquilenet.fr>
+	<VI1PR0601MB2479CBDA85F323A82C0CFBD99C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<20170429171002.enxmz5dtuzhrxuc6@var.youpi.perso.aquilenet.fr>
+In-Reply-To: <20170429171002.enxmz5dtuzhrxuc6@var.youpi.perso.aquilenet.fr>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 29 Apr 2017 17:53:05 -0000
-From: Alamot <1687214@bugs.launchpad.net>
-Reply-To: Bug 1687214 <1687214@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170429175305.26812.79902.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1687214] [NEW] Rapid tremendous memory hog when
- using -net nic, vlan=0 -net user, vlan=0
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
+ networking (SLIRP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>, MCDONALD Margaret <margaret.mcdonald@hexagon.com>
 
-Public bug reported:
+Hello-
 
-A rapid tremendous memory hog is occuring when I use -net nic,vlan=3D0
--net user,vlan=3D0. Tested with QEMU 2.8.0 & 2.9.0 in Gentoo. All
-available memory (8GB) + swap (over 20GB) is exhausted very rapidly.
+>And I guess these do work fine on the host.
 
-This bug is possibly related to =
+Yes:
 
-https://bugs.launchpad.net/qemu/+bug/1310714 =
+[mfonnemann@localhost ~]$ nslookup www.google.com
+Server:         4.2.2.1
+Address:        4.2.2.1#53
 
-and maybe to
-https://bugs.launchpad.net/qemu/+bug/1288620
+Non-authoritative answer:
+Name:   www.google.com
+Address: 172.217.11.4
 
-The bug IS present wheh I use -net nic,vlan=3D0 -net user,vlan=3D0 (tested
-with no model and model=3De1000 and model=3Dvirtio, with all these the bug
-is present)
+>Perhaps you should make sure that qemu does emit the DNS lookup request to=
+ these thanks to
+>tcpdump -i any host 4.2.2.1 or host 4.2.2.2
+>while you run nslookup from the guest.
 
-The bug is NOT present with I use this:
--netdev type=3Duser,id=3Dmynet0 -device virtio-net-pci,netdev=3Dmynet0
+1. Issue command as requested on linux host:
 
-I tested this bug only using windows guests (Windows XP & Windows 8).
+ [mfonnemann@localhost qemu]$ sudo tcpdump -i any host 4.2.2.1 or host 4.2.=
+2.2
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on any, link-type LINUX_SLL (Linux cooked), capture size 65535 by=
+tes
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+2. Start qemu on linux host:
 
--- =
+[mfonnemann@localhost qemu]$ /usr/local/bin/qemu-system-i386 -display curse=
+s -readconfig qemu.cfg
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1687214
+3. Do nslookup on linux guest:
 
-Title:
-  Rapid tremendous memory hog when using -net nic,vlan=3D0 -net
-  user,vlan=3D0
+root@qemu:~# nslookup www.google.com
 
-Status in QEMU:
-  New
+                    *** Unknown host
 
-Bug description:
-  A rapid tremendous memory hog is occuring when I use -net nic,vlan=3D0
-  -net user,vlan=3D0. Tested with QEMU 2.8.0 & 2.9.0 in Gentoo. All
-  available memory (8GB) + swap (over 20GB) is exhausted very rapidly.
+                    nslookup: www.google.com: Unknown host
 
-  This bug is possibly related to =
+root@qemu:~# nslookup www.google.com 10.0.2.3
+                    *** Unknown host
 
-  https://bugs.launchpad.net/qemu/+bug/1310714 =
+                    nslookup: www.google.com: Unknown host
 
-  and maybe to
-  https://bugs.launchpad.net/qemu/+bug/1288620
+4. Exit tcpdump via ctrl-c:
 
-  The bug IS present wheh I use -net nic,vlan=3D0 -net user,vlan=3D0 (tested
-  with no model and model=3De1000 and model=3Dvirtio, with all these the bug
-  is present)
+^C
+0 packets captured
+0 packets received by filter
+0 packets dropped by kernel
 
-  The bug is NOT present with I use this:
-  -netdev type=3Duser,id=3Dmynet0 -device virtio-net-pci,netdev=3Dmynet0
+Thanks for your continued assistance!
 
-  I tested this bug only using windows guests (Windows XP & Windows 8).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1687214/+subscriptions
+Mark.
