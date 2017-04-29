@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d4b1k-00084S-UL
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 18:39:46 -0400
+	(envelope-from <mark.fonnemann@hexagon.com>) id 1d4crv-0008OW-QJ
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 20:37:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d4b1k-0002LF-2b
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 18:39:45 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170429191419.30051-1-eblake@redhat.com>
-	<20170429191419.30051-2-eblake@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <092c17fb-3b2b-1779-8ea0-df6329adb4fe@amsat.org>
-Date: Sat, 29 Apr 2017 19:39:34 -0300
+	(envelope-from <mark.fonnemann@hexagon.com>) id 1d4crs-0004Ib-Ni
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 20:37:43 -0400
+Received: from mail-ve1eur01on0118.outbound.protection.outlook.com
+	([104.47.1.118]:12471
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.fonnemann@hexagon.com>)
+	id 1d4crs-0004IJ-Fa
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 20:37:40 -0400
+From: FONNEMANN Mark <mark.fonnemann@hexagon.com>
+Date: Sat, 29 Apr 2017 15:32:35 +0000
+Message-ID: <VI1PR0601MB2479CBDA85F323A82C0CFBD99C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+References: <VI1PR0601MB247952CA06D05D5041AA450D9C130@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<VI1PR0601MB247995F01C0EC808ADEA07C49C180@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<VI1PR0601MB2479950F84BBE26A46F549FA9C110@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<VI1PR0601MB2479D2A56A202E3FD18C6DDF9C1F0@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<20170429124421.2qcthvlsiwvtqov2@var.youpi.perso.aquilenet.fr>
+In-Reply-To: <20170429124421.2qcthvlsiwvtqov2@var.youpi.perso.aquilenet.fr>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20170429191419.30051-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v11 1/9] qemu-io: Improve alignment checks
+Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
+ networking (SLIRP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +35,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>, MCDONALD Margaret <margaret.mcdonald@hexagon.com>
 
-On 04/29/2017 04:14 PM, Eric Blake wrote:
-> Several copy-and-pasted alignment checks exist in qemu-io, which
-> could use some minor improvements:
->
-> - Manual comparison against 0x1ff is not as clean as using our
-> alignment macros (QEMU_IS_ALIGNED) from osdep.h.
->
-> - The error messages aren't quite grammatically correct.
->
-> Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Suggested-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->
+Hello-
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>One first thing to note: the DNS or SMB servers can not be pinged, since t=
+hat was never implemented (I'll post a patch for that), so there is no surp=
+rise on that end.
 
-> ---
-> v11: retitle [was "qemu-io: Don't open-code QEMU_IS_ALIGNED"], improve
-> error messages
-> v10: new patch
-> ---
->  qemu-io-cmds.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-> index 21af9e6..6a0024b 100644
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -740,13 +740,13 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
->      }
->
->      if (bflag) {
-> -        if (offset & 0x1ff) {
-> -            printf("offset %" PRId64 " is not sector aligned\n",
-> +        if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
-> +            printf("%" PRId64 " is not a sector-aligned value for 'offset'\n",
->                     offset);
->              return 0;
->          }
-> -        if (count & 0x1ff) {
-> -            printf("count %"PRId64" is not sector aligned\n",
-> +        if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
-> +            printf("%"PRId64" is not a sector-aligned value for 'count'\n",
->                     count);
->              return 0;
->          }
-> @@ -1050,14 +1050,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
->      }
->
->      if (bflag || cflag) {
-> -        if (offset & 0x1ff) {
-> -            printf("offset %" PRId64 " is not sector aligned\n",
-> +        if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
-> +            printf("%" PRId64 " is not a sector-aligned value for 'offset'\n",
->                     offset);
->              return 0;
->          }
->
-> -        if (count & 0x1ff) {
-> -            printf("count %"PRId64" is not sector aligned\n",
-> +        if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
-> +            printf("%"PRId64" is not a sector-aligned value for 'count'\n",
->                     count);
->              return 0;
->          }
-> @@ -1769,8 +1769,8 @@ static int alloc_f(BlockBackend *blk, int argc, char **argv)
->      if (offset < 0) {
->          print_cvtnum_err(offset, argv[1]);
->          return 0;
-> -    } else if (offset & 0x1ff) {
-> -        printf("offset %" PRId64 " is not sector aligned\n",
-> +    } else if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
-> +        printf("%" PRId64 " is not a sector-aligned value for 'offset'\n",
->                 offset);
->          return 0;
->      }
->
+OK
+
+>When running with a Linux host (since that's what I'm most familiar with),=
+ what do you have in /etc/resolv.conf?
+
+[mfonnemann@localhost ~]$ cat /etc/resolv.conf
+# Generated by NetworkManager
+nameserver 4.2.2.1
+nameserver 4.2.2.2
+
+mark.
