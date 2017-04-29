@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d4S6m-00055e-D0
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 09:08:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1d4Tti-0000gb-IB
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 11:02:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d4S6l-0001Gm-Bw
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 09:08:20 -0400
-Resent-Message-Id: <E1d4S6l-0001Gm-Bw@eggs.gnu.org>
-In-Reply-To: <20170429123707.16675-1-aik@ozlabs.ru>
-Message-ID: <149347128037.132.13757749665256357730@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1d4Ttf-0005kI-Ei
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 11:02:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46076)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d4Ttf-0005kE-62
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 11:02:55 -0400
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170428065754eucas1p1f51713373ce8c2d19945a4f91c52bd5c@eucas1p1.samsung.com>
+	<1493362658-8179-5-git-send-email-a.perevalov@samsung.com>
+	<20170428093825.GA22801@pxdev.xzpeter.org>
+	<3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
+	<20170428100700.GC22801@pxdev.xzpeter.org>
+	<20170428162205.GE3276@work-vm>
+	<20170429091634.GA6721@aperevalov-ubuntu>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <634a3b43-34f7-8fb7-5291-6b0985f1d205@redhat.com>
+Date: Sat, 29 Apr 2017 10:02:48 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 29 Apr 2017 06:08:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH qemu v5] memory/iommu: QOM'fy IOMMU
- MemoryRegion
+In-Reply-To: <20170429091634.GA6721@aperevalov-ubuntu>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0G1VprxqWSFL6Ce4eX6eduQGe1nU1sFWn"
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 4/6] migration: add postcopy
+ downtime into MigrationIncommingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +35,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: aik@ozlabs.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, peterx@redhat.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org, cornelia.huck@de.ibm.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Alexey <a.perevalov@samsung.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: i.maximets@samsung.com, f4bug@amsat.org, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBxZW11IHY1XSBtZW1vcnkvaW9tbXU6IFFPTSdmeSBJT01NVSBNZW1vcnlS
-ZWdpb24KTWVzc2FnZS1pZDogMjAxNzA0MjkxMjM3MDcuMTY2NzUtMS1haWtAb3psYWJzLnJ1ClR5
-cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
-dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
-ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
-b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
-CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOGQzY2UxMSBt
-ZW1vcnkvaW9tbXU6IFFPTSdmeSBJT01NVSBNZW1vcnlSZWdpb24KCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkNoZWNraW5nIFBBVENIIDEvMTogbWVtb3J5L2lvbW11OiBRT00nZnkgSU9NTVUgTWVtb3J5
-UmVnaW9uLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hP
-KQojMTU2OiBGSUxFOiBody9kbWEvcmM0MDMwLmM6NzIwOgorRGV2aWNlU3RhdGUgKnJjNDAzMF9p
-bml0KHJjNDAzMF9kbWEgKipkbWFzLCBJT01NVU1lbW9yeVJlZ2lvbiAqKmRtYV9tcikKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgODQ0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEBmcmVlbGlzdHMub3Jn
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0G1VprxqWSFL6Ce4eX6eduQGe1nU1sFWn
+From: Eric Blake <eblake@redhat.com>
+To: Alexey <a.perevalov@samsung.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: i.maximets@samsung.com, f4bug@amsat.org, Peter Xu <peterx@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <634a3b43-34f7-8fb7-5291-6b0985f1d205@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 4/6] migration: add postcopy
+ downtime into MigrationIncommingState
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+ <CGME20170428065754eucas1p1f51713373ce8c2d19945a4f91c52bd5c@eucas1p1.samsung.com>
+ <1493362658-8179-5-git-send-email-a.perevalov@samsung.com>
+ <20170428093825.GA22801@pxdev.xzpeter.org>
+ <3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
+ <20170428100700.GC22801@pxdev.xzpeter.org> <20170428162205.GE3276@work-vm>
+ <20170429091634.GA6721@aperevalov-ubuntu>
+In-Reply-To: <20170429091634.GA6721@aperevalov-ubuntu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/29/2017 04:16 AM, Alexey wrote:
+
+>>>>
+>>>>> There seem to be two parts to this:
+>>>>>  a) Adding the mis parameter to ufd_version_check
+>>>>>  b) Asking for the feature
+>>>>
+>>>>> Please split it into two patches.
+
+Also, fix the typo in the subject line: s/Incomming/Incoming/
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--0G1VprxqWSFL6Ce4eX6eduQGe1nU1sFWn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZBKsYAAoJEKeha0olJ0NqUbIH/0SzWe1nmMJa9MWL1xYka7O0
+bI5y7gZnhVB8VsG5A0VIpEmvqWBMA420dZsaz9w1R/tk0COkAupBvpdOSqtNZ5VS
+VIUftSA0QfYzpxSdCfp+jhdebhsNZ8QypEYDBqUGbZNbImEMU9svqxqAJzGJ/BRV
+GnHOVPYsW9WCLkQbA22n0OJry8zjA/bi6pLG/eqC0e5UX3aD0NPdkzwfXVnXADo6
+olIFsanX1kRpBJ0XCk6PVjorT5BgrVetkaYFNkynB6zgia8QLCT0ODay4FyuxH7C
+LT3L4ytifuxPH4GafM0sBfv/CbMKZrcBUbhtV4VazXDY2FH+XOTATVhojMou/k4=
+=iOyq
+-----END PGP SIGNATURE-----
+
+--0G1VprxqWSFL6Ce4eX6eduQGe1nU1sFWn--
