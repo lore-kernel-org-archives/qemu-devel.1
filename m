@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d4WAS-0008Bf-Ik
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 13:28:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1d4Wg3-0005F2-2h
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d4WAP-0004Gj-Dx
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 13:28:24 -0400
-Resent-Message-Id: <E1d4WAP-0004Gj-Dx@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21343)
+	(envelope-from <bounces@canonical.com>) id 1d4Wfy-0004pg-6H
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:01:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49575)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d4WAP-0004GD-54
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 13:28:21 -0400
-In-Reply-To: <20170429164750.17414-1-samuel.thibault@ens-lyon.org>
-Message-ID: <149348688509.135.5553875586246446578@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d4Wfy-0004pI-0I
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 14:00:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d4Wfv-000450-P9
+	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 18:00:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A20CC2E80C0
+	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 18:00:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 29 Apr 2017 10:28:05 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/9] slirp updates
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 29 Apr 2017 17:53:05 -0000
+From: Alamot <1687214@bugs.launchpad.net>
+Reply-To: Bug 1687214 <1687214@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170429175305.26812.79902.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1687214] [NEW] Rapid tremendous memory hog when
+ using -net nic, vlan=0 -net user, vlan=0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +36,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: samuel.thibault@ens-lyon.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, jan.kiszka@siemens.com
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAvOV0gc2xpcnAgdXBkYXRlcwpNZXNzYWdlLWlkOiAyMDE3MDQyOTE2NDc1
-MC4xNzQxNC0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKVHlwZTogc2VyaWVzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
-Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0
-IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
-SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
-Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
-CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
-ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5YzNhNTVlIHNsaXJwOiBWTVN0YXRpZnkg
-cmVtYWluaW5nIGV4Y2VwdCBmb3IgbG9vcAphM2YxZWNjIHNsaXJwOiBWTVN0YXRpZnkgc29ja2V0
-IGxldmVsCmNhNTdmNTYgc2xpcnA6IENvbW1vbiBsaG9zdC9maG9zdCB1bmlvbgo4N2FhOWU1IHNs
-aXJwOiBWTVN0YXRpZnkgc2J1Zgo1MmI3NTkwIHNsaXJwOiBWTVN0YXRlIGNvbnZlcnNpb247IHRj
-cGNiCjNhZTZmYjIgc2xpcnA6IGZpeCBwaW5naW5nIHRoZSB2aXJ0dWFsIGlwdjQgRE5TIHNlcnZl
-cgo4MWUwNjM3IHNsaXJwOiB0ZnRwLCBjb3B5IHNvY2thZGRyX3NpemUKYTYwZWZiYiBzbGlycC9z
-bWI6IFJlcGxhY2UgY29uc3RhbnQgc3RyaW5ncyBieSBnbGliIHN0cmluZwoxNGQwNjM5IHNsaXJw
-OiBhbGxvdyBob3N0IHBvcnQgMCBmb3IgaG9zdGZ3ZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
-Y2tpbmcgUEFUQ0ggMS85OiBzbGlycDogYWxsb3cgaG9zdCBwb3J0IDAgZm9yIGhvc3Rmd2QuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMi85OiBzbGlycC9zbWI6IFJlcGxhY2UgY29uc3RhbnQgc3RyaW5ncyBi
-eSBnbGliIHN0cmluZy4uLgpDaGVja2luZyBQQVRDSCAzLzk6IHNsaXJwOiB0ZnRwLCBjb3B5IHNv
-Y2thZGRyX3NpemUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC85OiBzbGlycDogZml4IHBpbmdpbmcgdGhl
-IHZpcnR1YWwgaXB2NCBETlMgc2VydmVyLi4uCkNoZWNraW5nIFBBVENIIDUvOTogc2xpcnA6IFZN
-U3RhdGUgY29udmVyc2lvbjsgdGNwY2IuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojMjEyOiBGSUxFOiBzbGlycC90Y3BfdmFyLmg6NTE6CiteSXVpbnQ4X3QgdF9m
-b3JjZTteSV5JLyogMSBpZiBmb3JjaW5nIG91dCBhIGJ5dGUgKi8kCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyMjI6IEZJTEU6IHNsaXJwL3RjcF92YXIuaDoxMTI6
-CiteSXVpbnQ4X3ReSXRfb29iZmxhZ3M7XkleSS8qIGhhdmUgc29tZSAqLyQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIyMzogRklMRTogc2xpcnAvdGNwX3Zhci5o
-OjExMzoKK15JdWludDhfdF5JdF9pb2JjO15JXkleSS8qIGlucHV0IGNoYXJhY3RlciAqLyQKCnRv
-dGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgMTk1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvOTogc2xpcnA6IFZN
-U3RhdGlmeSBzYnVmLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzI2OiBGSUxFOiBzbGlycC9zYnVmLmg6MTU6CiteSXVpbnQzMl90IHNiX2NjO15JXkkvKiBhY3R1
-YWwgY2hhcnMgaW4gYnVmZmVyICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojMjc6IEZJTEU6IHNsaXJwL3NidWYuaDoxNjoKK15JdWludDMyX3Qgc2JfZGF0YWxl
-bjteSS8qIExlbmd0aCBvZiBkYXRhICAqLyQKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywg
-MTU1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CkNoZWNraW5nIFBBVENIIDcvOTogc2xpcnA6IENvbW1vbiBsaG9zdC9maG9zdCB1bmlvbi4uLgpD
-aGVja2luZyBQQVRDSCA4Lzk6IHNsaXJwOiBWTVN0YXRpZnkgc29ja2V0IGxldmVsLi4uCkVSUk9S
-OiBpZiB0aGlzIGNvZGUgaXMgcmVkdW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiMxNDk6IEZJ
-TEU6IHNsaXJwL3NsaXJwLmM6MTM1NjoKKyNpZiAwCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
-Z3MsIDI2OSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgpDaGVja2luZyBQQVRDSCA5Lzk6IHNsaXJwOiBWTVN0YXRpZnkgcmVtYWluaW5nIGV4Y2Vw
-dCBmb3IgbG9vcC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Public bug reported:
+
+A rapid tremendous memory hog is occuring when I use -net nic,vlan=3D0
+-net user,vlan=3D0. Tested with QEMU 2.8.0 & 2.9.0 in Gentoo. All
+available memory (8GB) + swap (over 20GB) is exhausted very rapidly.
+
+This bug is possibly related to =
+
+https://bugs.launchpad.net/qemu/+bug/1310714 =
+
+and maybe to
+https://bugs.launchpad.net/qemu/+bug/1288620
+
+The bug IS present wheh I use -net nic,vlan=3D0 -net user,vlan=3D0 (tested
+with no model and model=3De1000 and model=3Dvirtio, with all these the bug
+is present)
+
+The bug is NOT present with I use this:
+-netdev type=3Duser,id=3Dmynet0 -device virtio-net-pci,netdev=3Dmynet0
+
+I tested this bug only using windows guests (Windows XP & Windows 8).
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1687214
+
+Title:
+  Rapid tremendous memory hog when using -net nic,vlan=3D0 -net
+  user,vlan=3D0
+
+Status in QEMU:
+  New
+
+Bug description:
+  A rapid tremendous memory hog is occuring when I use -net nic,vlan=3D0
+  -net user,vlan=3D0. Tested with QEMU 2.8.0 & 2.9.0 in Gentoo. All
+  available memory (8GB) + swap (over 20GB) is exhausted very rapidly.
+
+  This bug is possibly related to =
+
+  https://bugs.launchpad.net/qemu/+bug/1310714 =
+
+  and maybe to
+  https://bugs.launchpad.net/qemu/+bug/1288620
+
+  The bug IS present wheh I use -net nic,vlan=3D0 -net user,vlan=3D0 (tested
+  with no model and model=3De1000 and model=3Dvirtio, with all these the bug
+  is present)
+
+  The bug is NOT present with I use this:
+  -netdev type=3Duser,id=3Dmynet0 -device virtio-net-pci,netdev=3Dmynet0
+
+  I tested this bug only using windows guests (Windows XP & Windows 8).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1687214/+subscriptions
