@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d4OkN-0007GP-K1
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 05:33:00 -0400
+	(envelope-from <shorne@gmail.com>) id 1d4PNt-0005GW-Ft
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d4OkK-0003UA-HS
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 05:32:59 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:36212)
+	(envelope-from <shorne@gmail.com>) id 1d4PNq-0001wM-Cg
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:13:49 -0400
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:33337)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d4OkK-0003Tj-BE
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 05:32:56 -0400
-Received: by mail-wr0-x233.google.com with SMTP id l50so44033194wrc.3
-	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 02:32:56 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d4PNq-0001w8-70
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:13:46 -0400
+Received: by mail-pg0-x235.google.com with SMTP id y4so20686273pge.0
+	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 03:13:45 -0700 (PDT)
+Date: Sat, 29 Apr 2017 19:13:41 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20170429101341.GF2724@lianli.shorne-pla.net>
 References: <20170428211018.2927-1-shorne@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ad616d4e-a6fc-c8e3-9698-ad57762ac035@twiddle.net>
-Date: Sat, 29 Apr 2017 11:32:52 +0200
+	<ad616d4e-a6fc-c8e3-9698-ad57762ac035@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170428211018.2927-1-shorne@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad616d4e-a6fc-c8e3-9698-ad57762ac035@twiddle.net>
 Subject: Re: [Qemu-devel] [PATCH] target/openrisc: Support non-busy idle
  state using PMR SPR
 List-Id: <qemu-devel.nongnu.org>
@@ -31,19 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>, QEMU Development <qemu-devel@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Development <qemu-devel@nongnu.org>
 
-On 04/28/2017 11:10 PM, Stafford Horne wrote:
-> +            raise_exception(cpu, EXCP_HLT);
+On Sat, Apr 29, 2017 at 11:32:52AM +0200, Richard Henderson wrote:
+> On 04/28/2017 11:10 PM, Stafford Horne wrote:
+> > +            raise_exception(cpu, EXCP_HLT);
+> 
+> One minor tweak -- EXCP_HALTED.
+> 
+> HLT is, in theory, i386 specific.  Not that you'd have noticed a difference.
+> FWIW, I've just found the same error in target/alpha.
 
-One minor tweak -- EXCP_HALTED.
+Oh, I didnt notice that.
 
-HLT is, in theory, i386 specific.  Not that you'd have noticed a difference. 
-FWIW, I've just found the same error in target/alpha.
+> Otherwise,
+> 
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> 
 
-Otherwise,
+Thanks,
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-
-
-r~
+-Stafford
