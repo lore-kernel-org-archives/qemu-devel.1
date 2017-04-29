@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d4Pdp-0007We-La
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:30:18 -0400
+	(envelope-from <zxq_yx_007@163.com>) id 1d4PxA-0002At-Jc
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:50:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d4Pdk-0005Qo-Ot
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:30:17 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35451)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d4Pdk-0005Qc-Gv
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:30:12 -0400
-Received: by mail-wr0-x243.google.com with SMTP id g12so9362583wrg.2
-	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 03:30:12 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170427120006.20564-1-rth@twiddle.net>
-	<1493407045-24172-1-git-send-email-cota@braap.org>
-	<1493407045-24172-2-git-send-email-cota@braap.org>
-	<20170428192238.GA24988@flamenco>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <33f75663-0254-0274-d451-7f081bc1acf5@twiddle.net>
-Date: Sat, 29 Apr 2017 12:30:08 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170428192238.GA24988@flamenco>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 + 1/2] target/aarch64: optimize
- cross-page direct jumps in softmmu
+	(envelope-from <zxq_yx_007@163.com>) id 1d4Px5-0003iK-Lw
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:50:16 -0400
+Received: from m12-12.163.com ([220.181.12.12]:42591)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zxq_yx_007@163.com>) id 1d4Px4-0003dG-Tl
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 06:50:11 -0400
+From: xiaoqiang zhao <zxq_yx_007@163.com>
+Date: Sat, 29 Apr 2017 18:49:34 +0800
+Message-Id: <20170429104937.31341-7-zxq_yx_007@163.com>
+In-Reply-To: <20170429104937.31341-1-zxq_yx_007@163.com>
+References: <20170429104937.31341-1-zxq_yx_007@163.com>
+Subject: [Qemu-devel] [PATCH v2 6/9] hw/timer: QOM'ify m48txx_sysbus (pass 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +23,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
+Cc: mark.cave-ayland@ilande.co.uk, david@gibson.dropbear.id.au, pbonzini@redhat.com, atar4qemu@gmail.com, peter.maydell@linaro.org, edgar.iglesias@xilinx.com
 
-On 04/28/2017 09:22 PM, Emilio G. Cota wrote:
-> On Fri, Apr 28, 2017 at 15:17:24 -0400, Emilio G. Cota wrote:
->> Perf numbers in next commit's log.
->>
->> Signed-off-by: Emilio G. Cota <cota@braap.org>
->> ---
->>   target/arm/translate-a64.c | 3 +--
->>   1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
->> index 24de30d..5b691fc 100644
->> --- a/target/arm/translate-a64.c
->> +++ b/target/arm/translate-a64.c
->> @@ -373,8 +373,7 @@ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
->>           } else if (s->singlestep_enabled) {
->>               gen_exception_internal(EXCP_DEBUG);
->>           } else {
->> -            tcg_gen_exit_tb(0);
->> -            s->is_jmp = DISAS_TB_JUMP;
-> 
-> I'm not sure about removing this line though. Would it be better to leave it?
-> I can't see how TB_JUMP ends up doing anything in the rest of the file.
+assign DeviceClass::vmsd instead of using vmstate_register function
 
-Why not just replace this with
+Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
+---
+ hw/timer/m48t59.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-   s->is_jmp = DISAS_JUMP
-
-and not emit the lookup_and_goto_ptr here at all?
-
-
-r~
+diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
+index eff259ef96..3a9f541c9b 100644
+--- a/hw/timer/m48t59.c
++++ b/hw/timer/m48t59.c
+@@ -640,8 +640,6 @@ void m48t59_realize_common(M48t59State *s, Error **errp)
+         s->wd_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, &watchdog_cb, s);
+     }
+     qemu_get_timedate(&s->alarm, 0);
+-
+-    vmstate_register(NULL, -1, &vmstate_m48t59, s);
+ }
+ 
+ static void m48t59_init1(Object *obj)
+@@ -702,6 +700,7 @@ static void m48txx_sysbus_class_init(ObjectClass *klass, void *data)
+     dc->realize = m48t59_realize;
+     dc->reset = m48t59_reset_sysbus;
+     dc->props = m48t59_sysbus_properties;
++    dc->vmsd = &vmstate_m48t59;
+     nc->read = m48txx_sysbus_read;
+     nc->write = m48txx_sysbus_write;
+     nc->toggle_lock = m48txx_sysbus_toggle_lock;
+-- 
+2.11.0
