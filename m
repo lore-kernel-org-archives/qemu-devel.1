@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d4RV2-0002g1-Vk
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 08:29:22 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1d4Rbg-0004Tp-Kh
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 08:36:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d4RV1-0007dK-RI
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 08:29:20 -0400
-Resent-Message-Id: <E1d4RV1-0007dK-RI@eggs.gnu.org>
-In-Reply-To: <20170429115509.27551-1-aik@ozlabs.ru>
-Message-ID: <149346893378.132.3063923710149667629@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <aik@ozlabs.ru>) id 1d4Rbd-0001Ag-Hi
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 08:36:12 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36768)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1d4Rbd-0001AO-9D
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 08:36:09 -0400
+Received: by mail-pf0-x244.google.com with SMTP id v14so21285080pfd.3
+	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 05:36:08 -0700 (PDT)
+References: <149346893378.132.3063923710149667629@c05f1edc8ed1>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <8874ac16-9e54-7c67-8e56-8ed92942ee58@ozlabs.ru>
+Date: Sat, 29 Apr 2017 22:36:00 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 29 Apr 2017 05:28:54 -0700 (PDT)
+In-Reply-To: <149346893378.132.3063923710149667629@c05f1edc8ed1>
+Content-Type: text/plain; charset=koi8-r
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH qemu v4] memory/iommu: QOM'fy IOMMU
  MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
@@ -24,34 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: aik@ozlabs.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, peterx@redhat.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org, cornelia.huck@de.ibm.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, f4bug@amsat.org, peterx@redhat.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org, cornelia.huck@de.ibm.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBxZW11IHY0XSBtZW1vcnkvaW9tbXU6IFFPTSdmeSBJT01NVSBNZW1vcnlS
-ZWdpb24KTWVzc2FnZS1pZDogMjAxNzA0MjkxMTU1MDkuMjc1NTEtMS1haWtAb3psYWJzLnJ1ClR5
-cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
-dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
-ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
-b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
-CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzIxODdiNCBt
-ZW1vcnkvaW9tbXU6IFFPTSdmeSBJT01NVSBNZW1vcnlSZWdpb24KCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkNoZWNraW5nIFBBVENIIDEvMTogbWVtb3J5L2lvbW11OiBRT00nZnkgSU9NTVUgTWVtb3J5
-UmVnaW9uLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hP
-KQojMTU2OiBGSUxFOiBody9kbWEvcmM0MDMwLmM6NzIwOgorRGV2aWNlU3RhdGUgKnJjNDAzMF9p
-bml0KHJjNDAzMF9kbWEgKipkbWFzLCBJT01NVU1lbW9yeVJlZ2lvbiAqKmRtYV9tcikKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgODI4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEBmcmVlbGlzdHMub3Jn
+On 29/04/17 22:28, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Subject: [Qemu-devel] [PATCH qemu v4] memory/iommu: QOM'fy IOMMU MemoryRegion
+> Message-id: 20170429115509.27551-1-aik@ozlabs.ru
+> Type: series
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> # Useful git options
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 72187b4 memory/iommu: QOM'fy IOMMU MemoryRegion
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/1: memory/iommu: QOM'fy IOMMU MemoryRegion...
+> ERROR: spaces required around that '*' (ctx:WxO)
+> #156: FILE: hw/dma/rc4030.c:720:
+> +DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr)
+
+
+What does the script really want here? I am confused.
+
+
+
+>                                      ^
+> 
+> total: 1 errors, 0 warnings, 828 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
+> 
+
+
+-- 
+Alexey
