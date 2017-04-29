@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXH-0006ru-Ly
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXH-0006ry-OD
 	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 12:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXG-0001Ko-MP
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXG-0001L2-UN
 	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 12:47:55 -0400
-Received: from hera.aquilenet.fr ([2a01:474::1]:55392)
+Received: from hera.aquilenet.fr ([2a01:474::1]:55403)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXG-0001KM-FP
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXG-0001Kg-NN
 	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 12:47:54 -0400
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sat, 29 Apr 2017 18:47:41 +0200
-Message-Id: <20170429164750.17414-1-samuel.thibault@ens-lyon.org>
+Date: Sat, 29 Apr 2017 18:47:44 +0200
+Message-Id: <20170429164750.17414-4-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20170429164750.17414-1-samuel.thibault@ens-lyon.org>
+References: <20170429164750.17414-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/9] slirp updates
+Subject: [Qemu-devel] [PULL 3/9] slirp: tftp, copy sockaddr_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +27,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-The following changes since commit 81b2d5ceb0cfb4cdc2163492e3169ed714b0cd=
-a9:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170426' into =
-staging (2017-04-26 20:50:49 +0100)
+ASAN detects an "unknown-crash" when running pxe-test:
 
-are available in the git repository at:
+/ppc64/pxe/spapr-vlan: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=3D=3D7143=3D=3DERROR: AddressSanitizer: unknown-crash on address 0x7f6dc=
+d298d30 at pc 0x55e22218830d bp 0x7f6dcd2989e0 sp 0x7f6dcd2989d0
+READ of size 128 at 0x7f6dcd298d30 thread T2
+    #0 0x55e22218830c in tftp_session_allocate /home/elmarco/src/qq/slirp=
+/tftp.c:73
+    #1 0x55e22218a1f8 in tftp_handle_rrq /home/elmarco/src/qq/slirp/tftp.=
+c:289
+    #2 0x55e22218b54c in tftp_input /home/elmarco/src/qq/slirp/tftp.c:446
+    #3 0x55e2221833fe in udp6_input /home/elmarco/src/qq/slirp/udp6.c:82
+    #4 0x55e222137b17 in ip6_input /home/elmarco/src/qq/slirp/ip6_input.c=
+:67
 
-  http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+Address 0x7f6dcd298d30 is located in stack of thread T2 at offset 96 in f=
+rame
+    #0 0x55e222182420 in udp6_input /home/elmarco/src/qq/slirp/udp6.c:13
 
-for you to fetch changes up to eb5d4f5329df83ea15244b47f7fbca21adaae41b:
+  This frame has 3 object(s):
+    [32, 48) '<unknown>'
+    [96, 124) 'lhost' <=3D=3D Memory access at offset 96 partially overfl=
+ows this variable
+    [160, 200) 'save_ip' <=3D=3D Memory access at offset 96 partially und=
+erflows this variable
 
-  slirp: VMStatify remaining except for loop (2017-04-29 18:44:16 +0200)
+The sockaddr_storage pointer is the sockaddr_in6 lhost on the
+stack. Copy only the source addr size.
 
-----------------------------------------------------------------
-slirp updates
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ slirp/tftp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-----------------------------------------------------------------
-Dr. David Alan Gilbert (6):
-      slirp/smb: Replace constant strings by glib string
-      slirp: VMState conversion; tcpcb
-      slirp: VMStatify sbuf
-      slirp: Common lhost/fhost union
-      slirp: VMStatify socket level
-      slirp: VMStatify remaining except for loop
-
-Marc-Andr=C3=A9 Lureau (1):
-      slirp: tftp, copy sockaddr_size
-
-Samuel Thibault (1):
-      slirp: fix pinging the virtual ipv4 DNS server
-
-Vincent Bernat (1):
-      slirp: allow host port 0 for hostfwd
-
- net/slirp.c     |  32 ++--
- slirp/ip_icmp.c |   5 +-
- slirp/sbuf.h    |   4 +-
- slirp/slirp.c   | 494 +++++++++++++++++++++++++++++++-------------------=
-------
- slirp/socket.h  |  24 ++-
- slirp/tcp_var.h |   6 +-
- slirp/tftp.c    |   2 +-
- 7 files changed, 310 insertions(+), 257 deletions(-)
+diff --git a/slirp/tftp.c b/slirp/tftp.c
+index 50e714807d..a9bc4bb1b6 100644
+--- a/slirp/tftp.c
++++ b/slirp/tftp.c
+@@ -70,7 +70,7 @@ static int tftp_session_allocate(Slirp *slirp, struct s=
+ockaddr_storage *srcsas,
+=20
+  found:
+   memset(spt, 0, sizeof(*spt));
+-  spt->client_addr =3D *srcsas;
++  memcpy(&spt->client_addr, srcsas, sockaddr_size(srcsas));
+   spt->fd =3D -1;
+   spt->block_size =3D 512;
+   spt->client_port =3D tp->udp.uh_sport;
+--=20
+2.11.0
