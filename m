@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4Tti-0000gb-IB
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 11:02:59 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXH-0006ru-Ly
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 12:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4Ttf-0005kI-Ei
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 11:02:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d4Ttf-0005kE-62
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 11:02:55 -0400
-References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170428065754eucas1p1f51713373ce8c2d19945a4f91c52bd5c@eucas1p1.samsung.com>
-	<1493362658-8179-5-git-send-email-a.perevalov@samsung.com>
-	<20170428093825.GA22801@pxdev.xzpeter.org>
-	<3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
-	<20170428100700.GC22801@pxdev.xzpeter.org>
-	<20170428162205.GE3276@work-vm>
-	<20170429091634.GA6721@aperevalov-ubuntu>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <634a3b43-34f7-8fb7-5291-6b0985f1d205@redhat.com>
-Date: Sat, 29 Apr 2017 10:02:48 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXG-0001Ko-MP
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 12:47:55 -0400
+Received: from hera.aquilenet.fr ([2a01:474::1]:55392)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4VXG-0001KM-FP
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 12:47:54 -0400
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Sat, 29 Apr 2017 18:47:41 +0200
+Message-Id: <20170429164750.17414-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-In-Reply-To: <20170429091634.GA6721@aperevalov-ubuntu>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0G1VprxqWSFL6Ce4eX6eduQGe1nU1sFWn"
-Subject: Re: [Qemu-devel] [PATCH RESEND V3 4/6] migration: add postcopy
- downtime into MigrationIncommingState
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/9] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,64 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey <a.perevalov@samsung.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: i.maximets@samsung.com, f4bug@amsat.org, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0G1VprxqWSFL6Ce4eX6eduQGe1nU1sFWn
-From: Eric Blake <eblake@redhat.com>
-To: Alexey <a.perevalov@samsung.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: i.maximets@samsung.com, f4bug@amsat.org, Peter Xu <peterx@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <634a3b43-34f7-8fb7-5291-6b0985f1d205@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND V3 4/6] migration: add postcopy
- downtime into MigrationIncommingState
-References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
- <CGME20170428065754eucas1p1f51713373ce8c2d19945a4f91c52bd5c@eucas1p1.samsung.com>
- <1493362658-8179-5-git-send-email-a.perevalov@samsung.com>
- <20170428093825.GA22801@pxdev.xzpeter.org>
- <3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
- <20170428100700.GC22801@pxdev.xzpeter.org> <20170428162205.GE3276@work-vm>
- <20170429091634.GA6721@aperevalov-ubuntu>
-In-Reply-To: <20170429091634.GA6721@aperevalov-ubuntu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 81b2d5ceb0cfb4cdc2163492e3169ed714b0cd=
+a9:
 
-On 04/29/2017 04:16 AM, Alexey wrote:
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170426' into =
+staging (2017-04-26 20:50:49 +0100)
 
->>>>
->>>>> There seem to be two parts to this:
->>>>>  a) Adding the mis parameter to ufd_version_check
->>>>>  b) Asking for the feature
->>>>
->>>>> Please split it into two patches.
+are available in the git repository at:
 
-Also, fix the typo in the subject line: s/Incomming/Incoming/
+  http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+for you to fetch changes up to eb5d4f5329df83ea15244b47f7fbca21adaae41b:
 
+  slirp: VMStatify remaining except for loop (2017-04-29 18:44:16 +0200)
 
---0G1VprxqWSFL6Ce4eX6eduQGe1nU1sFWn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+----------------------------------------------------------------
+slirp updates
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+----------------------------------------------------------------
+Dr. David Alan Gilbert (6):
+      slirp/smb: Replace constant strings by glib string
+      slirp: VMState conversion; tcpcb
+      slirp: VMStatify sbuf
+      slirp: Common lhost/fhost union
+      slirp: VMStatify socket level
+      slirp: VMStatify remaining except for loop
 
-iQEcBAEBCAAGBQJZBKsYAAoJEKeha0olJ0NqUbIH/0SzWe1nmMJa9MWL1xYka7O0
-bI5y7gZnhVB8VsG5A0VIpEmvqWBMA420dZsaz9w1R/tk0COkAupBvpdOSqtNZ5VS
-VIUftSA0QfYzpxSdCfp+jhdebhsNZ8QypEYDBqUGbZNbImEMU9svqxqAJzGJ/BRV
-GnHOVPYsW9WCLkQbA22n0OJry8zjA/bi6pLG/eqC0e5UX3aD0NPdkzwfXVnXADo6
-olIFsanX1kRpBJ0XCk6PVjorT5BgrVetkaYFNkynB6zgia8QLCT0ODay4FyuxH7C
-LT3L4ytifuxPH4GafM0sBfv/CbMKZrcBUbhtV4VazXDY2FH+XOTATVhojMou/k4=
-=iOyq
------END PGP SIGNATURE-----
+Marc-Andr=C3=A9 Lureau (1):
+      slirp: tftp, copy sockaddr_size
 
---0G1VprxqWSFL6Ce4eX6eduQGe1nU1sFWn--
+Samuel Thibault (1):
+      slirp: fix pinging the virtual ipv4 DNS server
+
+Vincent Bernat (1):
+      slirp: allow host port 0 for hostfwd
+
+ net/slirp.c     |  32 ++--
+ slirp/ip_icmp.c |   5 +-
+ slirp/sbuf.h    |   4 +-
+ slirp/slirp.c   | 494 +++++++++++++++++++++++++++++++-------------------=
+------
+ slirp/socket.h  |  24 ++-
+ slirp/tcp_var.h |   6 +-
+ slirp/tftp.c    |   2 +-
+ 7 files changed, 310 insertions(+), 257 deletions(-)
