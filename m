@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4XpA-0007gF-Pe
-	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 15:14:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1d4XpA-0007fQ-BR
+	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 15:14:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d4Xp9-0006uj-3v
+	(envelope-from <eblake@redhat.com>) id 1d4Xp9-0006ue-2a
 	for qemu-devel@nongnu.org; Sat, 29 Apr 2017 15:14:32 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 29 Apr 2017 14:14:12 -0500
-Message-Id: <20170429191419.30051-3-eblake@redhat.com>
-In-Reply-To: <20170429191419.30051-1-eblake@redhat.com>
-References: <20170429191419.30051-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 2/9] qemu-io: Switch 'alloc' command to
- byte-based length
+Date: Sat, 29 Apr 2017 14:14:10 -0500
+Message-Id: <20170429191419.30051-1-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 0/9] add blkdebug tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,127 +23,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-For the 'alloc' command, accepting an offset in bytes but a length
-in sectors, and reporting output in sectors, is confusing.  Do
-everything in bytes, and adjust the expected output accordingly.
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v11
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Prerequisites: Kevin's block pull request:
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05799.html
 
----
-v11: s/bytes/count/ for the parameter name, drop R-b
-v10: rebase to code cleanup
-v9: new patch
----
- qemu-io-cmds.c                    | 30 ++++++++++++++++++------------
- tests/qemu-iotests/019.out        |  8 ++++----
- tests/qemu-iotests/common.pattern |  2 +-
- 3 files changed, 23 insertions(+), 17 deletions(-)
+v10 was:
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05227.html
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 6a0024b..1e0ebb4 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -1760,7 +1760,7 @@ out:
- static int alloc_f(BlockBackend *blk, int argc, char **argv)
- {
-     BlockDriverState *bs = blk_bs(blk);
--    int64_t offset, sector_num, nb_sectors, remaining;
-+    int64_t offset, sector_num, nb_sectors, remaining, count;
-     char s1[64];
-     int num, ret;
-     int64_t sum_alloc;
-@@ -1776,18 +1776,24 @@ static int alloc_f(BlockBackend *blk, int argc, char **argv)
-     }
+Since then:
+- Rebase to Kevin's block branch (patches 7, 8)
+- Split series in two - this focuses on just the (relatively stable)
+blkdebug enhancements (v10 6-8, 12-17), and saves the qcow2 fixes
+(v10 1-5, 9-11) for another day [Max]
+- further tweaks to the qemu-io alloc/map commands (patch 1 retitled,
+also affecting patch 2-3)
 
-     if (argc == 3) {
--        nb_sectors = cvtnum(argv[2]);
--        if (nb_sectors < 0) {
--            print_cvtnum_err(nb_sectors, argv[2]);
-+        count = cvtnum(argv[2]);
-+        if (count < 0) {
-+            print_cvtnum_err(count, argv[2]);
-             return 0;
--        } else if (nb_sectors > INT_MAX) {
--            printf("length argument cannot exceed %d, given %s\n",
--                   INT_MAX, argv[2]);
-+        } else if (count > INT_MAX * BDRV_SECTOR_SIZE) {
-+            printf("length argument cannot exceed %llu, given %s\n",
-+                   INT_MAX * BDRV_SECTOR_SIZE, argv[2]);
-             return 0;
-         }
-     } else {
--        nb_sectors = 1;
-+        count = BDRV_SECTOR_SIZE;
-     }
-+    if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
-+        printf("%" PRId64 " is not a sector-aligned value for 'count'\n",
-+               count);
-+        return 0;
-+    }
-+    nb_sectors = count >> BDRV_SECTOR_BITS;
+001/9:[down] 'qemu-io: Improve alignment checks'
+002/9:[0022] [FC] 'qemu-io: Switch 'alloc' command to byte-based length'
+003/9:[0066] [FC] 'qemu-io: Switch 'map' output to byte-based reporting'
+004/9:[----] [--] 'blkdebug: Sanity check block layer guarantees'
+005/9:[----] [--] 'blkdebug: Refactor error injection'
+006/9:[----] [--] 'blkdebug: Add pass-through write_zero and discard supp=
+ort'
+007/9:[0004] [FC] 'blkdebug: Simplify override logic'
+008/9:[0010] [FC] 'blkdebug: Add ability to override unmap geometries'
+009/9:[----] [-C] 'tests: Add coverage for recent block geometry fixes'
 
-     remaining = nb_sectors;
-     sum_alloc = 0;
-@@ -1811,8 +1817,8 @@ static int alloc_f(BlockBackend *blk, int argc, char **argv)
+Eric Blake (9):
+  qemu-io: Improve alignment checks
+  qemu-io: Switch 'alloc' command to byte-based length
+  qemu-io: Switch 'map' output to byte-based reporting
+  blkdebug: Sanity check block layer guarantees
+  blkdebug: Refactor error injection
+  blkdebug: Add pass-through write_zero and discard support
+  blkdebug: Simplify override logic
+  blkdebug: Add ability to override unmap geometries
+  tests: Add coverage for recent block geometry fixes
 
-     cvtstr(offset, s1, sizeof(s1));
+ qapi/block-core.json              |  33 ++++-
+ block/blkdebug.c                  | 266 +++++++++++++++++++++++++++++++-=
+------
+ qemu-io-cmds.c                    |  61 +++++----
+ tests/qemu-iotests/019.out        |   8 +-
+ tests/qemu-iotests/102.out        |   4 +-
+ tests/qemu-iotests/146.out        |  30 ++---
+ tests/qemu-iotests/177            | 114 ++++++++++++++++
+ tests/qemu-iotests/177.out        |  49 +++++++
+ tests/qemu-iotests/common.pattern |   2 +-
+ tests/qemu-iotests/group          |   1 +
+ 10 files changed, 468 insertions(+), 100 deletions(-)
+ create mode 100755 tests/qemu-iotests/177
+ create mode 100644 tests/qemu-iotests/177.out
 
--    printf("%"PRId64"/%"PRId64" sectors allocated at offset %s\n",
--           sum_alloc, nb_sectors, s1);
-+    printf("%"PRId64"/%"PRId64" bytes allocated at offset %s\n",
-+           sum_alloc << BDRV_SECTOR_BITS, nb_sectors << BDRV_SECTOR_BITS, s1);
-     return 0;
- }
-
-@@ -1822,8 +1828,8 @@ static const cmdinfo_t alloc_cmd = {
-     .argmin     = 1,
-     .argmax     = 2,
-     .cfunc      = alloc_f,
--    .args       = "off [sectors]",
--    .oneline    = "checks if a sector is present in the file",
-+    .args       = "offset [count]",
-+    .oneline    = "checks if offset is allocated in the file",
- };
-
-
-diff --git a/tests/qemu-iotests/019.out b/tests/qemu-iotests/019.out
-index 0124264..17a7c03 100644
---- a/tests/qemu-iotests/019.out
-+++ b/tests/qemu-iotests/019.out
-@@ -542,8 +542,8 @@ Testing conversion with -B TEST_DIR/t.IMGFMT.base
-
- Checking if backing clusters are allocated when they shouldn't
-
--0/128 sectors allocated at offset 1 MiB
--0/128 sectors allocated at offset 4.001 GiB
-+0/65536 bytes allocated at offset 1 MiB
-+0/65536 bytes allocated at offset 4.001 GiB
- Reading
-
- === IO: pattern 42
-@@ -1086,8 +1086,8 @@ Testing conversion with -o backing_file=TEST_DIR/t.IMGFMT.base
-
- Checking if backing clusters are allocated when they shouldn't
-
--0/128 sectors allocated at offset 1 MiB
--0/128 sectors allocated at offset 4.001 GiB
-+0/65536 bytes allocated at offset 1 MiB
-+0/65536 bytes allocated at offset 4.001 GiB
- Reading
-
- === IO: pattern 42
-diff --git a/tests/qemu-iotests/common.pattern b/tests/qemu-iotests/common.pattern
-index ddfbca1..34f4a8d 100644
---- a/tests/qemu-iotests/common.pattern
-+++ b/tests/qemu-iotests/common.pattern
-@@ -18,7 +18,7 @@
-
- function do_is_allocated() {
-     local start=$1
--    local size=$(( $2 / 512))
-+    local size=$2
-     local step=$3
-     local count=$4
-
--- 
+--=20
 2.9.3
