@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4jcu-0003o8-68
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 03:50:40 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d4lRx-0003DM-Sj
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 05:47:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4jcr-0005Yi-62
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 03:50:40 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:56250)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4jcr-0005YV-00
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 03:50:37 -0400
-Date: Sun, 30 Apr 2017 09:50:33 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170430075033.yjqj4ibssa52h4d7@var.youpi.perso.aquilenet.fr>
-References: <VI1PR0601MB2479950F84BBE26A46F549FA9C110@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<VI1PR0601MB2479D2A56A202E3FD18C6DDF9C1F0@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170429124421.2qcthvlsiwvtqov2@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479CBDA85F323A82C0CFBD99C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170429171002.enxmz5dtuzhrxuc6@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479886B8955148FD8A2D06F9C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170429191402.ebsdilnya67ispla@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479CA25619E1C66359EC3709C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170429220156.bb4hdlsaf6zzqmtw@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479F31C301B954294452CA49C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	(envelope-from <rth7680@gmail.com>) id 1d4lRs-0001Dm-R7
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 05:47:27 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33306)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d4lRs-0001DI-Kd
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 05:47:24 -0400
+Received: by mail-wm0-x241.google.com with SMTP id y10so18889282wmh.0
+	for <qemu-devel@nongnu.org>; Sun, 30 Apr 2017 02:47:22 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170427120006.20564-1-rth@twiddle.net>
+	<1493407045-24172-1-git-send-email-cota@braap.org>
+	<1493407045-24172-3-git-send-email-cota@braap.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e0573fdf-b717-8e0a-5675-664b87b1dce3@twiddle.net>
+Date: Sun, 30 Apr 2017 11:47:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR0601MB2479F31C301B954294452CA49C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+In-Reply-To: <1493407045-24172-3-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 + 2/2] target/aarch64: optimize indirect
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,13 +33,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: FONNEMANN Mark <mark.fonnemann@hexagon.com>
-Cc: Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org
 
-FONNEMANN Mark, on sam. 29 avril 2017 23:15:08 +0000, wrote:
-> [mfonnemann@desktopPC qemu]$ /usr/local/bin/qemu-system-i386 -display curses -readconfig NG.cfg --enable-kvm
+These aarch64 patches fail for me like so:
 
-Could you show us your NG.cfg, your guest /sbin/ifconfig and /sbin/route
-output and /etc/resolv.conf content for that host?
+$ ../bld/aarch64-softmmu/qemu-system-aarch64 -M virt -cpu cortex-a57 \
+     -m 1024 -nographic -kernel ./aarch64-linux-3.15rc2-buildroot.img \
+     -append console=ttyAMA0
+qemu-system-aarch64: /home/rth/work/qemu/qemu/cpu-exec.c:599: cpu_loop_exec_tb: 
+Assertion `use_icount' failed.
 
-Samuel
+
+
+r~
