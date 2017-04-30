@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1d4hS9-0006k2-NF
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 01:31:26 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d4iDa-0004ab-Fu
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 02:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1d4hS6-0001iR-LM
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 01:31:25 -0400
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Sun, 30 Apr 2017 13:35:04 +0800
-Message-ID: <1493530506-26833-2-git-send-email-gengdongjiu@huawei.com>
-In-Reply-To: <1493530506-26833-1-git-send-email-gengdongjiu@huawei.com>
-References: <1493530506-26833-1-git-send-email-gengdongjiu@huawei.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1d4iDX-00048N-9u
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 02:20:26 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:34115)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d4iDX-00047z-2O
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 02:20:23 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id r190so17593682wme.1
+	for <qemu-devel@nongnu.org>; Sat, 29 Apr 2017 23:20:22 -0700 (PDT)
+References: <20170428122444.23361-1-berrange@redhat.com>
+	<a3f22a00-1f2e-6d22-f2a2-edc233cd6c64@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <a3f22a00-1f2e-6d22-f2a2-edc233cd6c64@twiddle.net>
+Date: Sun, 30 Apr 2017 07:20:54 +0100
+Message-ID: <8737cq4drt.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 2/4] target-arm: kvm64: detect guest RAS
- EXTENSION feature
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] (RFC) remove the GThread coroutine
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,83 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, gengdongjiu@huawei.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-check if kvm supports guest RAS EXTENSION. if so, set
-corresponding feature bit for vcpu.
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
- linux-headers/asm-arm64/kvm.h | 1 +
- linux-headers/linux/kvm.h     | 1 +
- target/arm/cpu.h              | 3 +++
- target/arm/kvm64.c            | 8 ++++++++
- 4 files changed, 13 insertions(+)
+Richard Henderson <rth@twiddle.net> writes:
 
-diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
-index 651ec30..acb5c4d 100644
---- a/linux-headers/asm-arm64/kvm.h
-+++ b/linux-headers/asm-arm64/kvm.h
-@@ -97,6 +97,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
- #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-+#define KVM_ARM_VCPU_RAS_EXTENSION	4
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 4e082a8..e0fa5b8 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -883,6 +883,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_MMU_RADIX 134
- #define KVM_CAP_PPC_MMU_HASH_V3 135
- #define KVM_CAP_IMMEDIATE_EXIT 136
-+#define KVM_CAP_ARM_RAS_EXTENSION 137
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a8aabce..1cf4a5b 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -610,6 +610,8 @@ struct ARMCPU {
- 
-     /* CPU has memory protection unit */
-     bool has_mpu;
-+    /* CPU has ras extension unit */
-+    bool has_ras_extension;
-     /* PMSAv7 MPU number of supported regions */
-     uint32_t pmsav7_dregion;
- 
-@@ -1216,6 +1218,7 @@ enum arm_features {
-     ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
-     ARM_FEATURE_PMU, /* has PMU support */
-     ARM_FEATURE_VBAR, /* has cp15 VBAR */
-+    ARM_FEATURE_RAS_EXTENSION, /*has RAS extension support */
- };
- 
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 6111109..fd30a5a 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -518,6 +518,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         unset_feature(&env->features, ARM_FEATURE_PMU);
-     }
- 
-+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_RAS_EXTENSION)) {
-+        cpu->has_ras_extension = true;
-+        cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_RAS_EXTENSION;
-+    } else {
-+        cpu->has_ras_extension = false;
-+        unset_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
-+    }
-+
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-     ret = kvm_arm_vcpu_init(cs);
-     if (ret) {
--- 
-1.8.3.1
+> On 04/28/2017 02:24 PM, Daniel P. Berrange wrote:
+>> At the 2016 summit it was suggested that we delete the GThread
+>> coroutine impl since it is not fully functional, and you can
+>> debug the ucontext impl with our GDB helper script.
+>>
+>> I don't recall the subject being raised again since the summit
+>> so here's a proposal to delete the GThread impl, as a way to
+>> trigger input from anyone who thinks we need to keep it......
+>
+> The last time this was mentioned, the reason that we were keeping it
+> was to make clang's thread-sanitizer module happy.  Whether we can
+> still find relevant bugs with that, I don't know.
+
+It's been a while since I last did a ThreadSanitizer run. The correct
+fix is teaching the sanitizer about set context so we can use our normal
+build - however this has been at the bottom of a pile for such a long
+time.
+
+--
+Alex Bennée
