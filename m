@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d4y3g-0002BO-Vv
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 19:15:18 -0400
+	(envelope-from <shorne@gmail.com>) id 1d4y3c-00025d-Fk
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 19:15:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d4y3f-0006k3-Ra
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 19:15:17 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34917)
+	(envelope-from <shorne@gmail.com>) id 1d4y3b-0006g4-4p
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 19:15:12 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34181)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d4y3f-0006ig-LE
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 19:15:15 -0400
-Received: by mail-pf0-x241.google.com with SMTP id o68so6704297pfj.2
-	for <qemu-devel@nongnu.org>; Sun, 30 Apr 2017 16:15:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d4y3a-0006fT-Vw
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 19:15:11 -0400
+Received: by mail-pf0-x244.google.com with SMTP id g23so25781712pfj.1
+	for <qemu-devel@nongnu.org>; Sun, 30 Apr 2017 16:15:10 -0700 (PDT)
 From: Stafford Horne <shorne@gmail.com>
-Date: Mon,  1 May 2017 08:14:24 +0900
-Message-Id: <5466599bfa21f03ae01741580c7e3fa0fdc6800d.1493593744.git.shorne@gmail.com>
+Date: Mon,  1 May 2017 08:14:22 +0900
+Message-Id: <565b9678ec7335762a290afce68f7062bdaf0ce9.1493593744.git.shorne@gmail.com>
 In-Reply-To: <cover.1493593744.git.shorne@gmail.com>
 References: <cover.1493593744.git.shorne@gmail.com>
 In-Reply-To: <cover.1493593744.git.shorne@gmail.com>
 References: <cover.1493593744.git.shorne@gmail.com>
-Subject: [Qemu-devel] [PULL 10/11] target/openrisc: Remove duplicate
- features property
+Subject: [Qemu-devel] [PULL 08/11] migration: Add VMSTATE_STRUCT_2DARRAY()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,115 +30,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: QEMU Development <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
 
-The features property has stored the exact same thing as the cpucfgr
-spr. Remove the feature enum and property as it is not needed.
-
-In order to preserve the behavior or keeping features accross reset this
-patch moves cpucfgr into the non reset region of the state struct.  Since
-the cpucfgr is read only this means we only need to sset cpucfgr once
-during class init.
+For openrisc we implement tlb state as a 2d array of tlb entry structs.
+This is added to allow easy storing of state of 2d arrays.
 
 Signed-off-by: Stafford Horne <shorne@gmail.com>
 ---
- target/openrisc/cpu.c | 17 +++--------------
- target/openrisc/cpu.h | 16 ++--------------
- 2 files changed, 5 insertions(+), 28 deletions(-)
+ include/migration/vmstate.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index 6c1ed07..c9b3f22 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -52,7 +52,6 @@ static void openrisc_cpu_reset(CPUState *s)
-     s->exception_index = -1;
- 
-     cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP;
--    cpu->env.cpucfgr = CPUCFGR_OB32S | CPUCFGR_OF32S | CPUCFGR_NSGF;
-     cpu->env.dmmucfgr = (DMMUCFGR_NTW & (0 << 2)) | (DMMUCFGR_NTS & (6 << 2));
-     cpu->env.immucfgr = (IMMUCFGR_NTW & (0 << 2)) | (IMMUCFGR_NTS & (6 << 2));
- 
-@@ -65,12 +64,6 @@ static void openrisc_cpu_reset(CPUState *s)
- #endif
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f2dbf84..9b7dcdc 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -499,6 +499,17 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .offset       = vmstate_offset_array(_state, _field, _type, _num),\
  }
  
--static inline void set_feature(OpenRISCCPU *cpu, int feature)
--{
--    cpu->feature |= feature;
--    cpu->env.cpucfgr = cpu->feature;
--}
--
- static void openrisc_cpu_realizefn(DeviceState *dev, Error **errp)
- {
-     CPUState *cs = CPU(dev);
-@@ -132,19 +125,15 @@ static void or1200_initfn(Object *obj)
- {
-     OpenRISCCPU *cpu = OPENRISC_CPU(obj);
- 
--    set_feature(cpu, OPENRISC_FEATURE_NSGF);
--    set_feature(cpu, OPENRISC_FEATURE_OB32S);
--    set_feature(cpu, OPENRISC_FEATURE_OF32S);
--    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
-+    cpu->env.cpucfgr = CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_OF32S |
-+                       CPUCFGR_EVBARP;
- }
- 
- static void openrisc_any_initfn(Object *obj)
- {
-     OpenRISCCPU *cpu = OPENRISC_CPU(obj);
- 
--    set_feature(cpu, OPENRISC_FEATURE_NSGF);
--    set_feature(cpu, OPENRISC_FEATURE_OB32S);
--    set_feature(cpu, OPENRISC_FEATURE_EVBAR);
-+    cpu->env.cpucfgr = CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_EVBARP;
- }
- 
- typedef struct OpenRISCCPUInfo {
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index e159b22..938ccc3 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -196,18 +196,6 @@ enum {
-     SR_SCE = (1 << 17),
- };
- 
--/* OpenRISC Hardware Capabilities */
--enum {
--    OPENRISC_FEATURE_NSGF = (15 << 0),
--    OPENRISC_FEATURE_CGF = (1 << 4),
--    OPENRISC_FEATURE_OB32S = (1 << 5),
--    OPENRISC_FEATURE_OB64S = (1 << 6),
--    OPENRISC_FEATURE_OF32S = (1 << 7),
--    OPENRISC_FEATURE_OF64S = (1 << 8),
--    OPENRISC_FEATURE_OV64S = (1 << 9),
--    OPENRISC_FEATURE_EVBAR = (1 << 12),
--};
--
- /* Tick Timer Mode Register */
- enum {
-     TTMR_TP = (0xfffffff),
-@@ -292,7 +280,6 @@ typedef struct CPUOpenRISCState {
-     uint32_t sr;              /* Supervisor register, without SR_{F,CY,OV} */
-     uint32_t vr;              /* Version register */
-     uint32_t upr;             /* Unit presence register */
--    uint32_t cpucfgr;         /* CPU configure register */
-     uint32_t dmmucfgr;        /* DMMU configure register */
-     uint32_t immucfgr;        /* IMMU configure register */
-     uint32_t esr;             /* Exception supervisor register */
-@@ -311,6 +298,8 @@ typedef struct CPUOpenRISCState {
-     CPU_COMMON
- 
-     /* Fields from here on are preserved across CPU reset. */
-+    uint32_t cpucfgr;         /* CPU configure register */
++#define VMSTATE_STRUCT_2DARRAY_TEST(_field, _state, _n1, _n2, _test, _version, _vmsd, _type) { \
++    .name         = (stringify(_field)),                                    \
++    .num          = (_n1) * (_n2),                                          \
++    .field_exists = (_test),                                                \
++    .version_id   = (_version),                                             \
++    .vmsd         = &(_vmsd),                                               \
++    .size         = sizeof(_type),                                          \
++    .flags        = VMS_STRUCT|VMS_ARRAY,                                   \
++    .offset       = vmstate_offset_2darray(_state, _field, _type, _n1, _n2),\
++}
 +
- #ifndef CONFIG_USER_ONLY
-     CPUOpenRISCTLBContext * tlb;
+ #define VMSTATE_STRUCT_VARRAY_UINT8(_field, _state, _field_num, _version, _vmsd, _type) { \
+     .name       = (stringify(_field)),                               \
+     .num_offset = vmstate_offset_value(_state, _field_num, uint8_t), \
+@@ -746,6 +757,10 @@ extern const VMStateInfo vmstate_info_qtailq;
+     VMSTATE_STRUCT_ARRAY_TEST(_field, _state, _num, NULL, _version,   \
+             _vmsd, _type)
  
-@@ -337,7 +326,6 @@ typedef struct OpenRISCCPU {
- 
-     CPUOpenRISCState env;
- 
--    uint32_t feature;       /* CPU Capabilities */
- } OpenRISCCPU;
- 
- static inline OpenRISCCPU *openrisc_env_get_cpu(CPUOpenRISCState *env)
++#define VMSTATE_STRUCT_2DARRAY(_field, _state, _n1, _n2, _version, _vmsd, _type) \
++    VMSTATE_STRUCT_2DARRAY_TEST(_field, _state, _n1, _n2, NULL, _version,   \
++            _vmsd, _type)
++
+ #define VMSTATE_BUFFER_UNSAFE_INFO(_field, _state, _version, _info, _size) \
+     VMSTATE_BUFFER_UNSAFE_INFO_TEST(_field, _state, NULL, _version, _info, \
+             _size)
 -- 
 2.9.3
