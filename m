@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4oPW-0003GR-HD
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 08:57:11 -0400
+	(envelope-from <famz@redhat.com>) id 1d4odC-0004RR-Ps
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 09:11:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4oPT-0005p0-BN
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 08:57:10 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:56703)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d4oPT-0005ot-5j
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 08:57:07 -0400
-Date: Sun, 30 Apr 2017 14:57:03 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170430125703.pcp4ldw7oardptmn@var.youpi.perso.aquilenet.fr>
-References: <20170429124421.2qcthvlsiwvtqov2@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479CBDA85F323A82C0CFBD99C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170429171002.enxmz5dtuzhrxuc6@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479886B8955148FD8A2D06F9C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170429191402.ebsdilnya67ispla@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479CA25619E1C66359EC3709C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170429220156.bb4hdlsaf6zzqmtw@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479F31C301B954294452CA49C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170430075033.yjqj4ibssa52h4d7@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB247905FC4B3FEE03780CF1EE9C150@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	(envelope-from <famz@redhat.com>) id 1d4od9-0000Xp-MQ
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 09:11:18 -0400
+Date: Sun, 30 Apr 2017 21:11:04 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170430131104.GA24566@lemon.lan>
+References: <149346893378.132.3063923710149667629@c05f1edc8ed1>
+	<8874ac16-9e54-7c67-8e56-8ed92942ee58@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <VI1PR0601MB247905FC4B3FEE03780CF1EE9C150@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+In-Reply-To: <8874ac16-9e54-7c67-8e56-8ed92942ee58@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v4] memory/iommu: QOM'fy IOMMU
+ MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,16 +24,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: FONNEMANN Mark <mark.fonnemann@hexagon.com>
-Cc: Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, MCDONALD Margaret <margaret.mcdonald@hexagon.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org, peterx@redhat.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org, cornelia.huck@de.ibm.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-FONNEMANN Mark, on dim. 30 avril 2017 12:42:41 +0000, wrote:
-> root@qemu:~# nslookup www.google.com
->                    *** Unknown host
+On Sat, 04/29 22:36, Alexey Kardashevskiy wrote:
+> > === OUTPUT BEGIN ===
+> > Checking PATCH 1/1: memory/iommu: QOM'fy IOMMU MemoryRegion...
+> > ERROR: spaces required around that '*' (ctx:WxO)
+> > #156: FILE: hw/dma/rc4030.c:720:
+> > +DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr)
 > 
->                    nslookup: www.google.com: Unknown host
+> 
+> What does the script really want here? I am confused.
 
-Could you run tcpdump inside the guest so we are sure what the nslookup
-call emits?
+Must be a false positive here.
 
-Samuel
+Fam
