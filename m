@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d52R8-0006Xm-On
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 23:55:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d52Rs-0006tQ-Of
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 23:56:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d52R5-00009D-Lo
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 23:55:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47965)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d52R5-000099-89
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 23:55:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d52R3-0007bo-6t
-	for <qemu-devel@nongnu.org>; Mon, 01 May 2017 03:55:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 37EA22E80D5
-	for <qemu-devel@nongnu.org>; Mon,  1 May 2017 03:55:40 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1d52Rp-0000UG-Kg
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 23:56:32 -0400
+Received: from ozlabs.org ([103.22.144.67]:40335)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d52Ro-0000QH-VY
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 23:56:29 -0400
+Date: Mon, 1 May 2017 13:56:18 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170501035618.GB13773@umbus.fritz.box>
+References: <20170427101259.13798-1-lvivier@redhat.com>
+	<20170427101259.13798-3-lvivier@redhat.com>
+	<20170427203148.GN3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 01 May 2017 03:47:29 -0000
-From: pranith <1653384@bugs.launchpad.net>
-Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
-Message-Id: <20170501034730.26653.62123.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
- through with XHCI controller
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
+Content-Disposition: inline
+In-Reply-To: <20170427203148.GN3482@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] numa,
+ spapr: equally distribute memory on nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,108 +30,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
 
--- =
+--U+BazGySraz5kW0T
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1653384
+On Thu, Apr 27, 2017 at 05:31:48PM -0300, Eduardo Habkost wrote:
+> On Thu, Apr 27, 2017 at 12:12:59PM +0200, Laurent Vivier wrote:
+> > When there are more nodes than memory available to put the minimum
+> > allowed memory by node, all the memory is put on the last node.
+> >=20
+> > This is because we put (ram_size / nb_numa_nodes) &
+> > ~((1 << mc->numa_mem_align_shift) - 1); on each node, and in this
+> > case the value is 0. This is particularly true with pseries,
+> > as the memory must be aligned to 256MB.
+> >=20
+> > To avoid this problem, this patch uses an error diffusion algorithm [1]
+> > to distribute equally the memory on nodes.
+> >=20
+> > Example:
+> >=20
+> > qemu-system-ppc64 -S -nographic  -nodefaults -monitor stdio -m 1G -smp =
+8 \
+> >                   -numa node -numa node -numa node \
+> >                   -numa node -numa node -numa node
+> >=20
+> > Before:
+> >=20
+> > (qemu) info numa
+> > 6 nodes
+> > node 0 cpus: 0 6
+> > node 0 size: 0 MB
+> > node 1 cpus: 1 7
+> > node 1 size: 0 MB
+> > node 2 cpus: 2
+> > node 2 size: 0 MB
+> > node 3 cpus: 3
+> > node 3 size: 0 MB
+> > node 4 cpus: 4
+> > node 4 size: 0 MB
+> > node 5 cpus: 5
+> > node 5 size: 1024 MB
+> >=20
+> > After:
+> > (qemu) info numa
+> > 6 nodes
+> > node 0 cpus: 0 6
+> > node 0 size: 0 MB
+> > node 1 cpus: 1 7
+> > node 1 size: 256 MB
+> > node 2 cpus: 2
+> > node 2 size: 0 MB
+> > node 3 cpus: 3
+> > node 3 size: 256 MB
+> > node 4 cpus: 4
+> > node 4 size: 256 MB
+> > node 5 cpus: 5
+> > node 5 size: 256 MB
+> >=20
+> > [1] https://en.wikipedia.org/wiki/Error_diffusion
+> >=20
+> > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> > ---
+> >  hw/ppc/spapr.c         | 21 ++++++++++++++++++++-
+> >  include/hw/ppc/spapr.h |  3 ++-
+> >  2 files changed, 22 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 80d12d0..be498e2 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -3106,6 +3106,23 @@ static void spapr_pic_print_info(InterruptStatsP=
+rovider *obj,
+> >      ics_pic_print_info(spapr->ics, mon);
+> >  }
+> > =20
+> > +static void spapr_numa_auto_assign_ram(uint64_t *nodes, int nb_nodes,
+> > +                                       ram_addr_t size)
+> > +{
+> > +    int i;
+> > +    uint64_t usedmem =3D 0, node_mem;
+> > +    uint64_t granularity =3D size / nb_nodes;
+> > +    uint64_t propagate =3D 0;
+> > +
+> > +    for (i =3D 0; i < nb_nodes - 1; i++) {
+> > +        node_mem =3D (granularity + propagate) & ~(SPAPR_MEMORY_BLOCK_=
+SIZE - 1);
+> > +        propagate =3D granularity + propagate - node_mem;
+> > +        nodes[i] =3D node_mem;
+> > +        usedmem +=3D node_mem;
+> > +    }
+> > +    nodes[i] =3D ram_size - usedmem;
+> > +}
+>=20
+> This new algorithm is a much better default, I would like to
+> enable it for all machines by default. We could move it to
+> core/machine.c:machine_class_init(), and set numa_auto_assign_ram
+> to NULL on pc-*-2.9 and spapr-2.9.
 
-Title:
-  Assertion failed with USB pass through with XHCI controller
+Right.  So, the convention that the default is the new behaviour and
+we override to set the older behaviour on previous machine types is
+strong enough that I think we should keep it here, even though it adds
+some complications.
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Debian:
-  Fix Released
+Note that it might be simpler not to have a "NULL" behaviour.  Instead
+the core code can provide both old style and error diffusion versions
+of the assign hook.  Set it to the error difusion one in the base
+MachineClass, then override it to the old one in previous versioned
+machine types (basically just the previous pc and spapr models,
+AFAIK).
 
-Bug description:
-  Starting qemu 2.8.0 with XHCI controller and host device passed
-  through results in an assertion failure:
+>=20
+> > +
+> >  static void spapr_machine_class_init(ObjectClass *oc, void *data)
+> >  {
+> >      MachineClass *mc =3D MACHINE_CLASS(oc);
+> > @@ -3162,7 +3179,8 @@ static void spapr_machine_class_init(ObjectClass =
+*oc, void *data)
+> >       * SPAPR_MEMORY_BLOCK_SIZE (256M) since that's the granularity
+> >       * in which LMBs are represented and hot-added
+> >       */
+> > -    mc->numa_mem_align_shift =3D 28;
+> > +    mc->numa_mem_align_shift =3D SPAPR_MEMORY_BLOCK_SIZE_SHIFT;
+> > +    mc->numa_auto_assign_ram =3D spapr_numa_auto_assign_ram;
+> >  }
+> > =20
+> >  static const TypeInfo spapr_machine_info =3D {
+> > @@ -3242,6 +3260,7 @@ static void spapr_machine_2_9_class_options(Machi=
+neClass *mc)
+> >  {
+> >      spapr_machine_2_10_class_options(mc);
+> >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
+> > +    mc->numa_auto_assign_ram =3D NULL;
+> >  }
+> > =20
+> >  DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index 5802f88..8f4a588 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -653,7 +653,8 @@ int spapr_rtc_import_offset(sPAPRRTCState *rtc, int=
+64_t legacy_offset);
+> > =20
+> >  int spapr_rng_populate_dt(void *fdt);
+> > =20
+> > -#define SPAPR_MEMORY_BLOCK_SIZE (1 << 28) /* 256MB */
+> > +#define SPAPR_MEMORY_BLOCK_SIZE_SHIFT 28 /* 256MB */
+> > +#define SPAPR_MEMORY_BLOCK_SIZE (1 << SPAPR_MEMORY_BLOCK_SIZE_SHIFT)
+> > =20
+> >  /*
+> >   * This defines the maximum number of DIMM slots we can have for sPAPR
+>=20
 
-  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
-  `!usb_packet_is_inflight(p)' failed.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  Can be reproduced with the following command (passing through a Lenovo
-  keyboard):
+--U+BazGySraz5kW0T
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
-  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
-  assertion failures.
+iQIcBAEBCAAGBQJZBrHgAAoJEGw4ysog2bOSgNAP+wakh7JCFH7MNiCAaBlR+ODZ
+kv0D2vl/trga2E6mFjjlIzFp1QaVtfx5SBKrmIVU4ByOJq11KLtGinlPFBjnz087
+1FgD8sa2npdqzSl8PTiRG5pRg4gQeHucIY/DhW20lgP+KdiO1mfVu43AI1DcX5zq
+tAX6SHpQFO69h6yR7c1+cJfD/3JsNJ7tkD3LntRRNwXYze22OUUHL6bLKlXBWDnM
+bcR85OfjXX//8xLJXgNAxlYUwwfo2mmi/gSaNQ5vI7wNevyQidui7824NLi9DJmP
++MoVDAKoCDxybkyl5ln8yUWmz21vA6lHC508N8CJewNF/MruSYbMqgZrn9HmpEQ0
+OSWFd8yX1Fh0aruSBfIGUb6Nac+9kxutwK4rybJrv+gzkd1E8kyTzEt/VMcbkXQR
+L/uqMYUCu9XSUfAGFPq/aVxd8afsXIC45Z20jZng8IL88HKOw9/NaJjPfcSfs/Yw
+jLtDL/amXLQ6f6CAAc+Sy+ndifNGXb+JuoXLxI/nxVTTKLQrEWjDa0WvPjlUjwu/
+GqHg51M0fchKIBBoLc/E2vrN1TrHb62paGpq9/FlwZCMHh1912EjCAziqWZj7gHb
+EYvDL0TYdoyq105vIeXHOqcQQ14TKLt8ZnmOfsR3KiTMW68f8828t9n+nIZi/wEF
+G0OpMDhoqkZ3W9TO0CT7
+=o05K
+-----END PGP SIGNATURE-----
 
-  =
-
-  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
-
-  Bisected the issue to following commit:
-  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
-nked list for transfers
-
-  =
-
-  Backtrace from commit dbe2b65:
-
-  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:55
-          resultvar =3D 0
-          pid =3D 3453
-          selftid =3D 3453
-  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
-n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
-
-                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
-40550792, 139838573009553, 140734740550560, 139838573043008, =
-
-                139838573024160, 93876666665872, 139838702616576, 139838573=
-024160}}, sa_flags =3D 1528954938, =
-
-            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", =
-
-      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
-(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
-=3D619, =
-
-      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
-> "usb_packet_cleanup") at assert.c:92
-          str =3D 0x55615cfdf510 ""
-          total =3D 4096
-  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
-"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
-
-      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
-b_packet_cleanup") at assert.c:101
-  No locals.
-  #4  0x000055615afc385e in usb_packet_cleanup ()
-  No symbol table info available.
-  #5  0x000055615afda555 in xhci_ep_free_xfer ()
-  No symbol table info available.
-  #6  0x000055615afdc156 in xhci_kick_epctx ()
-  No symbol table info available.
-  #7  0x000055615afda099 in xhci_ep_kick_timer ()
-  No symbol table info available.
-  #8  0x000055615b08ceee in timerlist_run_timers ()
-  No symbol table info available.
-  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
-  No symbol table info available.
-  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
-  No symbol table info available.
-  #11 0x000055615b08be40 in main_loop_wait ()
-  No symbol table info available.
-  #12 0x000055615ae3870f in main_loop ()
-  No symbol table info available.
-  #13 0x000055615ae4027b in main ()
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
+--U+BazGySraz5kW0T--
