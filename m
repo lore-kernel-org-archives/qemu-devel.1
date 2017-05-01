@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d53Dt-0004Cz-Dq
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 00:46:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d53Dv-0004D5-1z
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 00:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d53Dr-0002KP-KC
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 00:46:08 -0400
-Date: Mon, 1 May 2017 14:44:21 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1d53Dr-0002Jw-3q
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 00:46:11 -0400
+Date: Mon, 1 May 2017 14:45:47 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170501044421.GF13773@umbus.fritz.box>
-References: <149346893378.132.3063923710149667629@c05f1edc8ed1>
-	<8874ac16-9e54-7c67-8e56-8ed92942ee58@ozlabs.ru>
-	<20170430131104.GA24566@lemon.lan>
+Message-ID: <20170501044547.GG13773@umbus.fritz.box>
+References: <1493367991-21269-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eDB11BtaWSyaBkpc"
+	protocol="application/pgp-signature"; boundary="eMnpOGXCMazMAbfp"
 Content-Disposition: inline
-In-Reply-To: <20170430131104.GA24566@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH qemu v4] memory/iommu: QOM'fy IOMMU
- MemoryRegion
+In-Reply-To: <1493367991-21269-1-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: restrict BMC object to the BMC
+ simulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, f4bug@amsat.org, peterx@redhat.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org, cornelia.huck@de.ibm.com, pbonzini@redhat.com
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Corey Minyard <cminyard@mvista.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---eDB11BtaWSyaBkpc
-Content-Type: text/plain; charset=us-ascii
+--eMnpOGXCMazMAbfp
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Apr 30, 2017 at 09:11:04PM +0800, Fam Zheng wrote:
-> On Sat, 04/29 22:36, Alexey Kardashevskiy wrote:
-> > > =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> > > Checking PATCH 1/1: memory/iommu: QOM'fy IOMMU MemoryRegion...
-> > > ERROR: spaces required around that '*' (ctx:WxO)
-> > > #156: FILE: hw/dma/rc4030.c:720:
-> > > +DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_=
-mr)
-> >=20
-> >=20
-> > What does the script really want here? I am confused.
+On Fri, Apr 28, 2017 at 10:26:31AM +0200, C=E9dric Le Goater wrote:
+> Today, when a PowerNV guest runs, it uses the sensor definitions of
+> the BMC simulator to populate the device tree. But an external IPMI
+> BMC could also be used and, in that case, it is not (yet) possible to
+> retrieve the sensor list. Generating the OEM SEL event for shutdown or
+> reboot also does not make sense as it should be generated on the BMC
+> side.
 >=20
-> Must be a false positive here.
+> This change allows a guest to use an 'ipmi-bmc-extern' backend to the
+> 'isa-ipmi-bt' device and a 'chardev' for transport such as :
+> =20
+> 	-chardev socket,id=3Dipmi0,host=3Dlocalhost,port=3D9002,reconnect=3D10 \
+> 	-device ipmi-bmc-extern,id=3Dbmc0,chardev=3Dipmi0 \
+> 	-device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10
+>=20
+> and connect to a BMC simulator, the OpenIPMI ipmi_sim simulator for
+> instance.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Yeah.  I think it thinks that's a multiply * rather than a pointer *.
+Applied to ppc-for-2.10.
+
+> ---
+>=20
+>  Corey,
+>=20
+>  Should we externalize the TYPE_IPMI_BMC_EXTERN and TYPE_IPMI_BMC_SIMULAT=
+OR
+>  defines ?
+
+That's a good question, though.  My inclination would be yes.
+
+>=20
+>  hw/ppc/pnv.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> Index: qemu-powernv-2.10.git/hw/ppc/pnv.c
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> --- qemu-powernv-2.10.git.orig/hw/ppc/pnv.c
+> +++ qemu-powernv-2.10.git/hw/ppc/pnv.c
+> @@ -520,7 +520,7 @@ static void ppc_powernv_reset(void)
+>       * This is the internal simulator but it could also be an external
+>       * BMC.
+>       */
+> -    obj =3D object_resolve_path_type("", TYPE_IPMI_BMC, NULL);
+> +    obj =3D object_resolve_path_type("", "ipmi-bmc-sim", NULL);
+>      if (obj) {
+>          pnv->bmc =3D IPMI_BMC(obj);
+>      }
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -57,25 +92,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---eDB11BtaWSyaBkpc
+--eMnpOGXCMazMAbfp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZBr0kAAoJEGw4ysog2bOS+nQQAJtO/mNg/dcwrNUPwhR/bT9Z
-D65EfMZdzlVdu1ycJzxsG/kLpcTx90HuquIHuf5XNSvnQJfoFXtUc9z50TlrXnoM
-QhxeyiQqFz6qsAOOQeFaTSQ0k6B9aAOm8QeFk1UU2ZaHQxn3+iG7AYd23RrLU5bt
-8azx+qgSXeco6tRbTTdrrVL/GvJ1lj6+IATEqSORyGGBPjjcb6QL/qU1UikaUCYs
-Erh4TK7tYMFUbrylN/2DoYTfukhuiCaEPCm2xtAte5gH/BSRKW6M3k9mbew5E7LL
-ttdV3+iegvxyrsq6XKikEfZhZDQd5RenT1HfoGTHGx9zSYs6uvhQYxg4fFOzYXg5
-tRIl9RCBLy1JhtaS9K0NiGpnNNlAO3eahRUosOfNh+mWCOI9ty2tiBXFebG8Ikyw
-EYe4fuymPem8T4cOveSc5euFuWEbChImh0j2uAPs4ueGULldO9XqAHr8cW2fCPBZ
-CJN8r4o0BMFtbAgO79VDYfJnj/IAOB30P74N9MPjT3FvXDAIyvriFk1mQKgrTckL
-fh0k++afx7Drmu+qJhI9Up+5KScNBu0gHZ+sUkWDBRjv7FPActSUZXUHKaU0y8aH
-MKIG5wB0UaKp6iFdRkFvanwdVinkZQqq4NbAh8dt3/SZYofwLup73rSKvm09M+Hd
-VG6KdOohx1uNgSAhWS+v
-=waaP
+iQIcBAEBCAAGBQJZBr17AAoJEGw4ysog2bOS57QP/RrDzJrybMEXXrtJ1M6ywRzO
+Vi+Ez6u8xCD2ExQfqcHpVYD6cxuppEwakEXUd0khjscpS8tfUSoQ+fq5RKaqNH4U
+EaBUc89yhtjn7nYTziGV8iEaTNVZoN3HDVM9stK/wc27kj4jWLai13Ze5c69gdTT
+J05hPUXqkQwl2Ns0tT0sPnJky0I4d3D51ZTHdgQp33RvD3u+Tim/O5byohkNy6ut
+iEqnwFiaXhJX2vyg0hz5ayTYPfqynUlry7SAKJQQSUH4vYj6zcb36PbDeRNpMCtH
+2oJvJdEFAGoXBs6xTpGSYwx7A2HyUxNfApXzea5He+l1/i083w7jhiSylcttdHgB
+lzbzJUujUNvtu2+D0t85fc7i55OgA7z7qMUaYppGxslvSV34dnpzukwdjsDU7bag
+uSScyz56Zz2YBsnAPq5SZJb4QX1R+76TbOTY2ZS9207Bgv5TPlbeeUfz43bf54Vq
+0ZzQdOfQP+7cXli0UCKy+MXNJDTRST+mFisbPkzHFwVaQHwKFajvDqTFRWMOJl0w
+9AG7QRduhEhwIHNkrciQV3u49mgcshw+opgXrm3BUea1xYLGajopg9KFnsQwToAI
+78bqRMz/WxthYCHsATwIZyaY39NqgknN0DeLWQj6rA+h87U7mgfcke7BEiG3DoRB
+Uxw9RxyC/6HyJHsgud0S
+=XZaV
 -----END PGP SIGNATURE-----
 
---eDB11BtaWSyaBkpc--
+--eMnpOGXCMazMAbfp--
