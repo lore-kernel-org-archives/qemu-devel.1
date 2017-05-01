@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d4yrg-0005eD-Nt
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 20:06:57 -0400
+	(envelope-from <eager@eagerm.com>) id 1d50br-0004nj-37
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 21:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d4yrd-0000Vq-Hr
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 20:06:56 -0400
-Resent-Message-Id: <E1d4yrd-0000Vq-Hr@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21318)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d4yrd-0000Vm-8L
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 20:06:53 -0400
-In-Reply-To: <cover.1493593744.git.shorne@gmail.com>
-Message-ID: <149359720424.147.10344126771811848741@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eager@eagerm.com>) id 1d50bo-0006V1-28
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 21:58:43 -0400
+Received: from resqmta-po-11v.sys.comcast.net ([96.114.154.170]:53670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eager@eagerm.com>) id 1d50bn-0006Ul-Sg
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 21:58:39 -0400
+From: Michael Eager <eager@eagerm.com>
+Message-ID: <5906960F.2050305@eagerm.com>
+Date: Sun, 30 Apr 2017 18:57:35 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 30 Apr 2017 17:06:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/11] Fixes and features for OpenRISC
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] cpu_io_recompile, icount, and re-issued instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: shorne@gmail.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogY292
-ZXIuMTQ5MzU5Mzc0NC5naXQuc2hvcm5lQGdtYWlsLmNvbQpUeXBlOiBzZXJpZXMKU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzExXSBGaXhlcyBhbmQgZmVhdHVyZXMgZm9yIE9wZW5SSVND
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
-dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2Vm
-dWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
-cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
-byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
-YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
-Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3OTg5MzY0IHRhcmdldC9vcGVu
-cmlzYzogU3VwcG9ydCBub24tYnVzeSBpZGxlIHN0YXRlIHVzaW5nIFBNUiBTUFIKMmI0Yjg2YiB0
-YXJnZXQvb3BlbnJpc2M6IFJlbW92ZSBkdXBsaWNhdGUgZmVhdHVyZXMgcHJvcGVydHkKZmUyMDY5
-OCB0YXJnZXQvb3BlbnJpc2M6IEltcGxlbWVudCBmdWxsIHZtc3RhdGUgc2VyaWFsaXphdGlvbgpk
-NjQ3ZWQ1IG1pZ3JhdGlvbjogQWRkIFZNU1RBVEVfU1RSVUNUXzJEQVJSQVkoKQpiMDZhMWY3IHRh
-cmdldC9vcGVucmlzYzogaW1wbGVtZW50IHNoYWRvdyByZWdpc3RlcnMKNWFjOWRmYSBtaWdyYXRp
-b246IEFkZCBWTVNUQVRFX1VJTlRUTF8yREFSUkFZKCkKNWZkOTcwZCB0YXJnZXQvb3BlbnJpc2M6
-IGFkZCBudW1jb3JlcyBhbmQgY29yZWlkIHN1cHBvcnQKNmEwMTJmYiB0YXJnZXQvb3BlbnJpc2M6
-IEZpeGVzIGZvciBtZW1vcnkgZGVidWdnaW5nCmRhMTQxYzUgdGFyZ2V0L29wZW5yaXNjOiBJbXBs
-ZW1lbnQgRVBIIGJpdAo4ZDk4M2NiIHRhcmdldC9vcGVucmlzYzogSW1wbGVtZW50IEVWQkFSIHJl
-Z2lzdGVyCjkwODg1MTggTUFJTlRBSU5FUlM6IEFkZCBteXNlbGYgYXMgb3BlbnJpc2MgbWFpbnRh
-aW5lcgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMTogTUFJTlRBSU5F
-UlM6IEFkZCBteXNlbGYgYXMgb3BlbnJpc2MgbWFpbnRhaW5lci4uLgpDaGVja2luZyBQQVRDSCAy
-LzExOiB0YXJnZXQvb3BlbnJpc2M6IEltcGxlbWVudCBFVkJBUiByZWdpc3Rlci4uLgpDaGVja2lu
-ZyBQQVRDSCAzLzExOiB0YXJnZXQvb3BlbnJpc2M6IEltcGxlbWVudCBFUEggYml0Li4uCkNoZWNr
-aW5nIFBBVENIIDQvMTE6IHRhcmdldC9vcGVucmlzYzogRml4ZXMgZm9yIG1lbW9yeSBkZWJ1Z2dp
-bmcuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ1OiBGSUxFOiB0YXJnZXQv
-b3BlbnJpc2MvbW11LmM6MjMyOgorICAgICAgICBtaXNzID0gY3B1X29wZW5yaXNjX2dldF9waHlz
-X2FkZHIoY3B1LCAmcGh5c19hZGRyLCAmcHJvdCwgYWRkciwgTU1VX0lOU1RfRkVUQ0gpOwoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDUvMTE6IHRhcmdldC9vcGVu
-cmlzYzogYWRkIG51bWNvcmVzIGFuZCBjb3JlaWQgc3VwcG9ydC4uLgpDaGVja2luZyBQQVRDSCA2
-LzExOiBtaWdyYXRpb246IEFkZCBWTVNUQVRFX1VJTlRUTF8yREFSUkFZKCkuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNy8xMTogdGFyZ2V0L29wZW5yaXNjOiBpbXBsZW1lbnQgc2hhZG93IHJlZ2lzdGVycy4u
-LgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTM1OiBGSUxFOiBsaW51eC11c2Vy
-L3NpZ25hbC5jOjQ0OTI6CisgICAgX19wdXRfdXNlcihzYXNfc3NfZmxhZ3MoY3B1X2dldF9ncHIo
-ZW52LCAxKSksICZmcmFtZS0+dWMudHVjX3N0YWNrLnNzX2ZsYWdzKTsKCnRvdGFsOiAwIGVycm9y
-cywgMSB3YXJuaW5ncywgMjMwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggOC8xMTogbWlncmF0aW9uOiBBZGQgVk1TVEFU
-RV9TVFJVQ1RfMkRBUlJBWSgpLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjA6
-IEZJTEU6IGluY2x1ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDo1MDM6CisjZGVmaW5lIFZNU1RBVEVf
-U1RSVUNUXzJEQVJSQVlfVEVTVChfZmllbGQsIF9zdGF0ZSwgX24xLCBfbjIsIF90ZXN0LCBfdmVy
-c2lvbiwgX3Ztc2QsIF90eXBlKSB7IFwKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRo
-YXQgJ3wnIChjdHg6VnhWKQojMjc6IEZJTEU6IGluY2x1ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDo1
-MTA6CisgICAgLmZsYWdzICAgICAgICA9IFZNU19TVFJVQ1R8Vk1TX0FSUkFZLCAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4OiBGSUxFOiBpbmNsdWRlL21p
-Z3JhdGlvbi92bXN0YXRlLmg6NzYxOgorI2RlZmluZSBWTVNUQVRFX1NUUlVDVF8yREFSUkFZKF9m
-aWVsZCwgX3N0YXRlLCBfbjEsIF9uMiwgX3ZlcnNpb24sIF92bXNkLCBfdHlwZSkgXAoKdG90YWw6
-IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5LzExOiB0YXJnZXQvb3BlbnJp
-c2M6IEltcGxlbWVudCBmdWxsIHZtc3RhdGUgc2VyaWFsaXphdGlvbi4uLgpDaGVja2luZyBQQVRD
-SCAxMC8xMTogdGFyZ2V0L29wZW5yaXNjOiBSZW1vdmUgZHVwbGljYXRlIGZlYXR1cmVzIHByb3Bl
-cnR5Li4uCkNoZWNraW5nIFBBVENIIDExLzExOiB0YXJnZXQvb3BlbnJpc2M6IFN1cHBvcnQgbm9u
-LWJ1c3kgaWRsZSBzdGF0ZSB1c2luZyBQTVIgU1BSLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+I'm working with an emulation for a proprietary processor on an older QEMU source base.  It looks 
+like the problem I am seeing in the old sources would still be present in the current source base.
+
+I'm seeing incorrect values when there is a write to a memory-mapped I/O device when icount is set. 
+  What I see happening is that a TB with ~20 instructions is executed which contains a write to the 
+MM I/O address.  When it gets to the io_write routine, can_do_io is false, which results in a call 
+to cpu_io_recompile.
+
+cpu_io_recompile does what it (sort of) says it is supposed to do: it builds a new TB with the I/O 
+instruction as the last instruction in the block, then re-issues the TB.  The problem is that the 
+new TB contains the instructions before the I/O instruction, so they are executed a second time.
+
+There is a note in cpu_io_recompile which mentions the situation where the I/O instruction is not 
+the first in the TB has not been handled:
+
+     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
+      * the first in the TB) then we end up generating a whole new TB and
+      *  repeating the fault, which is horribly inefficient.
+      *  Better would be to execute just this insn uncached, or generate a
+      *  second new TB.
+
+I'm a bit unclear what this is saying.  A new TB is generated which is issued setting can_do_io, and 
+which passes through io_write without a problem.  I'm not sure what fault is repeated.
+
+It seems to me that what cpu_io_recompile should do is create a new TB with the n instructions which 
+were already executed and cache it.  Then it should create a TB with only the I/O instruction, 
+setting can_do_io, and re-issue this TB.
+
+Am I understanding this correctly?
+
+This code has been around for a long, long time.  Has anyone noticed this problem in the past?
+
+
+-- 
+Michael Eager	 eager@eagercon.com
+1960 Park Blvd., Palo Alto, CA 94306  650-325-8077
+
+-- 
+Michael Eager	 eager@eagercon.com
+1960 Park Blvd., Palo Alto, CA 94306  650-325-8077
