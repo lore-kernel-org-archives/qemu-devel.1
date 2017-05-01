@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d55wI-0001rR-GC
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 03:40:11 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1d59Be-0003Sv-2R
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 07:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d55wE-0003g3-KH
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 03:40:10 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:56762
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1d55wE-0003ff-D9
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 03:40:06 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon,  1 May 2017 08:39:34 +0100
-Message-Id: <1493624375-12707-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1493624375-12707-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1493624375-12707-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 1/2] tcx: fix cut/paste error in
- update_palette_entries()
+	(envelope-from <eric.auger@redhat.com>) id 1d59Ba-0001O6-0G
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 07:08:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34590)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1d59BZ-0001Ny-NM
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 07:08:09 -0400
+References: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170428130951.44771-7-bjsdjshi@linux.vnet.ibm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b56e306d-ce61-deff-f0e9-feeae7c3b984@redhat.com>
+Date: Mon, 1 May 2017 13:08:01 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170428130951.44771-7-bjsdjshi@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 06/13] s390x/css: device support for
+ s390-ccw passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +29,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org, kraxel@redhat.com
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
+Cc: cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, agraf@suse.com
 
-Commit ee72bed0 "tcx: remove primitives for non-32-bit surfaces" accidentally
-left a trailing break in update_palette_entries() causing the palette update
-routine to exit after just one iteration. Remove it.
+Hi Dong,
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/display/tcx.c |    1 -
- 1 file changed, 1 deletion(-)
+On 28/04/2017 15:09, Dong Jia Shi wrote:
+> In order to support subchannels pass-through, we introduce a s390
+> subchannel device called "s390-ccw" to hold the real subchannel info.
+> The s390-ccw devices inherit from the abstract CcwDevice which connect
+> to the existing virtual-css-bus.
+> 
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/Makefile.objs |   1 +
+>  hw/s390x/s390-ccw.c    | 135 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-ccw.h    |  38 ++++++++++++++
+>  3 files changed, 174 insertions(+)
+>  create mode 100644 hw/s390x/s390-ccw.c
+>  create mode 100644 hw/s390x/s390-ccw.h
+> 
+> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+> index 41ac4ec..72a3d37 100644
+> --- a/hw/s390x/Makefile.objs
+> +++ b/hw/s390x/Makefile.objs
+> @@ -13,3 +13,4 @@ obj-y += ccw-device.o
+>  obj-y += s390-pci-bus.o s390-pci-inst.o
+>  obj-y += s390-skeys.o
+>  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+> +obj-y += s390-ccw.o
+> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+> new file mode 100644
+> index 0000000..8b4b9cf
+> --- /dev/null
+> +++ b/hw/s390x/s390-ccw.c
+> @@ -0,0 +1,135 @@
+> +/*
+> + * s390 CCW Assignment Support
+> + *
+> + * Copyright 2017 IBM Corp
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2
+> + * or (at your option) any later version. See the COPYING file in the
+> + * top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "libgen.h"
+> +#include "hw/s390x/css.h"
+> +#include "hw/s390x/css-bridge.h"
+> +#include "s390-ccw.h"
+> +
+> +static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
+> +                                  char *sysfsdev,
+> +                                  Error **errp)
+> +{
+> +    unsigned int cssid, ssid, devid;
+> +    char dev_path[PATH_MAX] = {0}, *tmp;
+> +
+> +    if (!sysfsdev) {
+> +        error_setg(errp, "No host device provided");
+> +        error_append_hint(errp,
+> +                          "Use -device vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
+> +        return;
+> +    }
+> +
+> +    if (!realpath(sysfsdev, dev_path)) {
+> +        error_setg(errp, "Host device '%s' not found", sysfsdev);
+nit: error_setg_errno may be used instead.
+> +        return;
+> +    }
+> +
+> +    cdev->mdevid = g_strdup(basename(dev_path));
+> +
+> +    tmp = basename(dirname(dev_path));
+> +    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
+I guess this is safe and you don't need to test the operation succeeded?
+> +
+> +    cdev->hostid.cssid = cssid;
+> +    cdev->hostid.ssid = ssid;
+> +    cdev->hostid.devid = devid;
+> +    cdev->hostid.valid = true;
+> +}
+> +
+> +static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
+> +{
+> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+> +    DeviceState *parent = DEVICE(ccw_dev);
+> +    BusState *qbus = qdev_get_parent_bus(parent);
+> +    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
+> +    SubchDev *sch;
+> +    int ret;
+> +    Error *err = NULL;
+> +
+> +    s390_ccw_get_dev_info(cdev, sysfsdev, errp);
+> +    if (*errp) {
+I was told in the past dereferencing errp is unclean in general because
+callers may pass null to ignore errors, although the qdev core doesn't.
+you may use local err in that case.
+> +        return;
+> +    }
+> +
+> +    sch = css_create_sch(ccw_dev->devno, false, cbus->squash_mcss, errp);
+> +    if (!sch) {
+> +        return;
+> +    }
+> +    sch->driver_data = cdev;
+> +
+> +    ccw_dev->sch = sch;
+> +    ret = css_sch_build_schib(sch, &cdev->hostid);
+> +    if (ret) {
+> +        error_setg(&err, "%s: Failed to build initial schib: %d",
+> +                   __func__, ret);
+> +        goto out_err;
+> +    }
+> +
+> +    ck->realize(ccw_dev, &err);
+> +    if (err) {
+> +        goto out_err;
+> +    }
+> +
+> +    css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid,
+> +                          parent->hotplugged, 1);
+> +    return;
+> +
+> +out_err:
+> +    error_propagate(errp, err);
+> +    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+> +    ccw_dev->sch = NULL;
+> +    g_free(sch);
+don't you need to free cdev->mdevid too?
 
-diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index 5a1115c..0e66dcd 100644
---- a/hw/display/tcx.c
-+++ b/hw/display/tcx.c
-@@ -145,7 +145,6 @@ static void update_palette_entries(TCXState *s, int start, int end)
-         } else {
-             s->palette[i] = rgb_to_pixel32(s->r[i], s->g[i], s->b[i]);
-         }
--        break;
-     }
-     tcx_set_dirty(s, 0, memory_region_size(&s->vram_mem));
- }
--- 
-1.7.10.4
+Thanks
+
+Eric
+> +}
+> +
+> +static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
+> +{
+> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+> +    SubchDev *sch = ccw_dev->sch;
+> +
+> +    if (sch) {
+> +        css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+> +        g_free(sch);
+> +        ccw_dev->sch = NULL;
+> +    }
+> +
+> +    g_free(cdev->mdevid);
+> +}
+> +
+> +static void s390_ccw_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_CLASS(klass);
+> +
+> +    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
+> +    cdc->realize = s390_ccw_realize;
+> +    cdc->unrealize = s390_ccw_unrealize;
+> +}
+> +
+> +static const TypeInfo s390_ccw_info = {
+> +    .name          = TYPE_S390_CCW,
+> +    .parent        = TYPE_CCW_DEVICE,
+> +    .instance_size = sizeof(S390CCWDevice),
+> +    .class_size    = sizeof(S390CCWDeviceClass),
+> +    .class_init    = s390_ccw_class_init,
+> +    .abstract      = true,
+> +};
+> +
+> +static void register_s390_ccw_type(void)
+> +{
+> +    type_register_static(&s390_ccw_info);
+> +}
+> +
+> +type_init(register_s390_ccw_type)
+> diff --git a/hw/s390x/s390-ccw.h b/hw/s390x/s390-ccw.h
+> new file mode 100644
+> index 0000000..b58d8e9
+> --- /dev/null
+> +++ b/hw/s390x/s390-ccw.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * s390 CCW Assignment Support
+> + *
+> + * Copyright 2017 IBM Corp.
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#ifndef HW_S390_CCW_H
+> +#define HW_S390_CCW_H
+> +
+> +#include "hw/s390x/ccw-device.h"
+> +
+> +#define TYPE_S390_CCW "s390-ccw"
+> +#define S390_CCW_DEVICE(obj) \
+> +    OBJECT_CHECK(S390CCWDevice, (obj), TYPE_S390_CCW)
+> +#define S390_CCW_DEVICE_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(S390CCWDeviceClass, (klass), TYPE_S390_CCW)
+> +#define S390_CCW_DEVICE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(S390CCWDeviceClass, (obj), TYPE_S390_CCW)
+> +
+> +typedef struct S390CCWDevice {
+> +    CcwDevice parent_obj;
+> +    CssDevId hostid;
+> +    char *mdevid;
+> +} S390CCWDevice;
+> +
+> +typedef struct S390CCWDeviceClass {
+> +    CCWDeviceClass parent_class;
+> +    void (*realize)(S390CCWDevice *dev, char *sysfsdev, Error **errp);
+> +    void (*unrealize)(S390CCWDevice *dev, Error **errp);
+> +} S390CCWDeviceClass;
+> +
+> +#endif
+> 
