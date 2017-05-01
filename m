@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5BOL-00013P-Cg
+	(envelope-from <bounces@canonical.com>) id 1d5BOL-00013Q-Cj
 	for qemu-devel@nongnu.org; Mon, 01 May 2017 09:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5BOG-0007Qa-Dx
+	(envelope-from <bounces@canonical.com>) id 1d5BOG-0007QM-CX
 	for qemu-devel@nongnu.org; Mon, 01 May 2017 09:29:29 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42927)
+Received: from indium.canonical.com ([91.189.90.7]:42925)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d5BOG-0007Q1-76
+	id 1d5BOG-0007Pz-6b
 	for qemu-devel@nongnu.org; Mon, 01 May 2017 09:29:24 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d5BOE-0006uZ-Jy
-	for <qemu-devel@nongnu.org>; Mon, 01 May 2017 13:29:22 +0000
+	id 1d5BOE-0006uc-W4
+	for <qemu-devel@nongnu.org>; Mon, 01 May 2017 13:29:23 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 95FA32E80C3
+	by loganberry.canonical.com (Postfix) with ESMTP id F10882E80C4
 	for <qemu-devel@nongnu.org>; Mon,  1 May 2017 13:29:22 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 01 May 2017 13:17:41 -0000
-From: Thomas Huth <965133@bugs.launchpad.net>
-Reply-To: Bug 965133 <965133@bugs.launchpad.net>
+Date: Mon, 01 May 2017 13:16:18 -0000
+From: Thomas Huth <961757@bugs.launchpad.net>
+Reply-To: Bug 961757 <961757@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120326102736.18275.22299.malonedeb@wampee.canonical.com>
-Message-Id: <20170501131741.26879.19294.malone@gac.canonical.com>
+References: <20120321231146.16169.41826.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170501131618.2931.99359.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 965133] Re: Sparc64 crash on start
+Subject: [Qemu-devel] [Bug 961757] Re: wrong error for blockdev-snapshot-sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,8 +38,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Can you still reproduce this problem with the latest version of QEMU /
-OpenBIOS?
+Which version of QEMU was this? Is this still a problem with the latest
+version of QEMU?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -48,63 +48,33 @@ OpenBIOS?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/965133
+https://bugs.launchpad.net/bugs/961757
 
 Title:
-  Sparc64 crash on start
+  wrong error for blockdev-snapshot-sync
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  qemu version 1.0.1 compiled on a Ubuntu live on a HP laptop win a x64
-  architecture.
+  From Laszlo Ersek:
 
-  With more than 4G of memory sparc64 machine crash on start.
+  >> +    proto_drv =3D bdrv_find_protocol(snapshot_file);
+  >>      if (!proto_drv) {
+  >> -        qerror_report(QERR_INVALID_BLOCK_FORMAT, format);
+  >> -        ret =3D -1;
+  >> -        goto out;
+  >> +        error_set(errp, QERR_INVALID_BLOCK_FORMAT, format);
+  >> +        return;
+  >>      }
+  > =
 
-  command line: qemu-system-sparc64 -m 4G
-
-  output:
-  VNC server running on `127.0.0.1:5900'
-  qemu: fatal: Trap 0x0064 while trap level (5) >=3D MAXTL (5), Error state
-  pc: 00000000ffd04c80  npc: 00000000ffd04c84
-  General Registers:
-  %g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-
-  Current Register Window:
-  %o0-3: 00000000ffd00000 0000000000080000 0000000000080000 000000000000000=
-0 =
-
-  %o4-7: 0000000000000000 0000000000000000 00000000fff754e1 00000000ffd144d=
-4 =
-
-  %l0-3: 0000000100000000 00000000fff75c4d 0000000000000000 000000000000000=
-0 =
-
-  %l4-7: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0 =
-
-  %i0-3: 0000000000000000 0000000000000000 0000000100000000 000000000000003=
-6 =
-
-  %i4-7: 00000000ffe87418 00000000ffe87648 00000000fff75591 00000000ffd0bf5=
-4 =
-
-
-  Floating Point Registers:
-  %f00: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f08: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f24: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f32: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f40: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f48: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f56: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  pstate: 00000414 ccr: 99 (icc: N--C xcc: N--C) asi: 00 tl: 5 pil: 0
-  cansave: 5 canrestore: 1 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 3
-  fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
-  Aborted (core dumped)
+  > I don't understand the logic here (based on the error message). We
+  > specified "format" for the case when a completely new snapshot file has
+  > to be created. If the file exists already, then bdrv_find_protocol()
+  > tries to find the driver for it. If that fails, then we must report an
+  > error indeed, but instead of referring to "format", we'd have to report
+  > the "scheme" from the beginning of "snapshot_file".
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/965133/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/961757/+subscriptions
