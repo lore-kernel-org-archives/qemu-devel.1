@@ -1,27 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1d59Rn-00076P-Qm
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 07:24:57 -0400
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1d5A66-00067U-Ul
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 08:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1d59Rk-0004Nq-K1
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 07:24:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58564)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1d59Rk-0004NX-B6
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 07:24:52 -0400
-References: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170428130951.44771-7-bjsdjshi@linux.vnet.ibm.com>
-	<a0ff3179-8161-47dc-5a28-74ddf6e2271a@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <106564bb-baaa-f04b-b8c6-d17781d576e7@redhat.com>
-Date: Mon, 1 May 2017 13:24:47 +0200
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1d5A65-000813-Nt
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 08:06:34 -0400
+Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:35297)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
+	id 1d5A65-00080n-IM
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 08:06:33 -0400
+Received: by mail-qt0-x230.google.com with SMTP id y33so88069052qta.2
+	for <qemu-devel@nongnu.org>; Mon, 01 May 2017 05:06:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a0ff3179-8161-47dc-5a28-74ddf6e2271a@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 06/13] s390x/css: device support for
- s390-ccw passthrough
+In-Reply-To: <CAJy91Cbxh8kG=76EJFHXAd+qbCH-Gx+V8-C9O7b3ytm2XNzPEw@mail.gmail.com>
+References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
+	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
+	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
+	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
+	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
+	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
+	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
+	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
+	<CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
+	<218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
+	<CAJy91CbBV97RRKr=Rze5-eYrYAvnwiDZQ0oQZi33aKR1v-UXKg@mail.gmail.com>
+	<2d7a5a9a-8a7b-1bae-feb8-80fc4ee3048a@redhat.com>
+	<CAJy91CbcV3_jVg9PTD6unka6_M65rgkKDv0KsBK=YpVd=XKqvg@mail.gmail.com>
+	<ed9e6d65-ba93-d572-861a-46926a37d42a@redhat.com>
+	<CAJy91CYfOUZ+_TrN6-tLtWuPX-3_gRc7bfNa4anW0iM42i1FTg@mail.gmail.com>
+	<d355d12a-9f37-b7ca-aab0-1fcd0d481a8f@redhat.com>
+	<CAJy91Ca+=vJtXn6dV-awqz8xKHNyAnAw0MY91Fbr9yOE2-NNPw@mail.gmail.com>
+	<CAJy91Cbxh8kG=76EJFHXAd+qbCH-Gx+V8-C9O7b3ytm2XNzPEw@mail.gmail.com>
+From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Date: Mon, 1 May 2017 14:06:32 +0200
+Message-ID: <CAJy91Cb2G7yTW1ALD2=bdh+2GbjDavg1ruDw0VfZG+wgxHvkyw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Guest application reading from pl011 without
+ device driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,235 +46,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-Hi Dong,
+Hi, can somebody help to check this host (Windows 7) to guest (Linux
+4.10) Windows named pipe data transfer?
+The method I implemented has while loops that makes qemu consume 100% CPU
+time.
+I cannot find any optimization to eliminate the loops. So sad!
 
-On 01/05/2017 13:20, Auger Eric wrote:
-> Hi Dong,
-> 
-> On 28/04/2017 15:09, Dong Jia Shi wrote:
->> In order to support subchannels pass-through, we introduce a s390
->> subchannel device called "s390-ccw" to hold the real subchannel info.
->> The s390-ccw devices inherit from the abstract CcwDevice which connect
->> to the existing virtual-css-bus.
+Anyone has time, please help.
 
-Forget that one. Thought my first reply has not been sent.
+On 24 March 2017 at 11:00, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
 
-Thanks
-
-Eric
+> Hi, now it is working with the following char-pipe_new.c.
+>
+> See the patch. Doing the "if fifo has space" polling only when there are
+> data on the pipe, and next reading from pipe.
+> The sub_thread does these three things, and the main thread only does
+> writing to UART fifo when the subthread signalled its handler.
+>
+> It is working in my case to transfer large data. Rational? Please check.
+>
+> On 24 March 2017 at 08:24, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
+>
+>> Hi, here are the patch files for char-pipe.c, char-win.c, char-win.h
 >>
->> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->> ---
->>  hw/s390x/Makefile.objs |   1 +
->>  hw/s390x/s390-ccw.c    | 135 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  hw/s390x/s390-ccw.h    |  38 ++++++++++++++
->>  3 files changed, 174 insertions(+)
->>  create mode 100644 hw/s390x/s390-ccw.c
->>  create mode 100644 hw/s390x/s390-ccw.h
 >>
->> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
->> index 41ac4ec..72a3d37 100644
->> --- a/hw/s390x/Makefile.objs
->> +++ b/hw/s390x/Makefile.objs
->> @@ -13,3 +13,4 @@ obj-y += ccw-device.o
->>  obj-y += s390-pci-bus.o s390-pci-inst.o
->>  obj-y += s390-skeys.o
->>  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
->> +obj-y += s390-ccw.o
->> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
->> new file mode 100644
->> index 0000000..8b4b9cf
->> --- /dev/null
->> +++ b/hw/s390x/s390-ccw.c
->> @@ -0,0 +1,135 @@
->> +/*
->> + * s390 CCW Assignment Support
->> + *
->> + * Copyright 2017 IBM Corp
->> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
->> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2
->> + * or (at your option) any later version. See the COPYING file in the
->> + * top-level directory.
->> + */
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "hw/sysbus.h"
->> +#include "libgen.h"
->> +#include "hw/s390x/css.h"
->> +#include "hw/s390x/css-bridge.h"
->> +#include "s390-ccw.h"
->> +
->> +static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
->> +                                  char *sysfsdev,
->> +                                  Error **errp)
->> +{
->> +    unsigned int cssid, ssid, devid;
->> +    char dev_path[PATH_MAX] = {0}, *tmp;
->> +
->> +    if (!sysfsdev) {
->> +        error_setg(errp, "No host device provided");
->> +        error_append_hint(errp,
->> +                          "Use -device vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
->> +        return;
->> +    }
->> +
->> +    if (!realpath(sysfsdev, dev_path)) {
->> +        error_setg(errp, "Host device '%s' not found", sysfsdev);
->> +        return;
->> +    }
->> +
->> +    cdev->mdevid = g_strdup(basename(dev_path));
->> +
->> +    tmp = basename(dirname(dev_path));
->> +    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
-> I guess you don't need to check sscanf succeeded?
->> +
->> +    cdev->hostid.cssid = cssid;
->> +    cdev->hostid.ssid = ssid;
->> +    cdev->hostid.devid = devid;
->> +    cdev->hostid.valid = true;
->> +}
->> +
->> +static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
->> +{
->> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
->> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
->> +    DeviceState *parent = DEVICE(ccw_dev);
->> +    BusState *qbus = qdev_get_parent_bus(parent);
->> +    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
->> +    SubchDev *sch;
->> +    int ret;
->> +    Error *err = NULL;
->> +
->> +    s390_ccw_get_dev_info(cdev, sysfsdev, errp);
->> +    if (*errp) {
-> In the past, I was told by Markus that derefencing errp was not clean in
-> general since caller could pass NULL to ignore errors (although qdev
-> core doesn't). You may use a local error instead.
->> +        return;
->> +    }
->> +
->> +    sch = css_create_sch(ccw_dev->devno, false, cbus->squash_mcss, errp);
->> +    if (!sch) {
->> +        return;
->> +    }
->> +    sch->driver_data = cdev;
->> +
->> +    ccw_dev->sch = sch;
->> +    ret = css_sch_build_schib(sch, &cdev->hostid);
->> +    if (ret) {
->> +        error_setg(&err, "%s: Failed to build initial schib: %d",
->> +                   __func__, ret);
->> +        goto out_err;
->> +    }
->> +
->> +    ck->realize(ccw_dev, &err);
->> +    if (err) {
->> +        goto out_err;
->> +    }
->> +
->> +    css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid,
->> +                          parent->hotplugged, 1);
->> +    return;
->> +
->> +out_err:
->> +    error_propagate(errp, err);
->> +    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
->> +    ccw_dev->sch = NULL;
->> +    g_free(sch);
-> don't you want to free cdev->mdevid too?
-> 
-> Thanks
-> 
-> Eric
->> +}
->> +
->> +static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
->> +{
->> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
->> +    SubchDev *sch = ccw_dev->sch;
->> +
->> +    if (sch) {
->> +        css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
->> +        g_free(sch);
->> +        ccw_dev->sch = NULL;
->> +    }
->> +
->> +    g_free(cdev->mdevid);
->> +}
->> +
->> +static void s390_ccw_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc = DEVICE_CLASS(klass);
->> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_CLASS(klass);
->> +
->> +    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
->> +    cdc->realize = s390_ccw_realize;
->> +    cdc->unrealize = s390_ccw_unrealize;
->> +}
->> +
->> +static const TypeInfo s390_ccw_info = {
->> +    .name          = TYPE_S390_CCW,
->> +    .parent        = TYPE_CCW_DEVICE,
->> +    .instance_size = sizeof(S390CCWDevice),
->> +    .class_size    = sizeof(S390CCWDeviceClass),
->> +    .class_init    = s390_ccw_class_init,
->> +    .abstract      = true,
->> +};
->> +
->> +static void register_s390_ccw_type(void)
->> +{
->> +    type_register_static(&s390_ccw_info);
->> +}
->> +
->> +type_init(register_s390_ccw_type)
->> diff --git a/hw/s390x/s390-ccw.h b/hw/s390x/s390-ccw.h
->> new file mode 100644
->> index 0000000..b58d8e9
->> --- /dev/null
->> +++ b/hw/s390x/s390-ccw.h
->> @@ -0,0 +1,38 @@
->> +/*
->> + * s390 CCW Assignment Support
->> + *
->> + * Copyright 2017 IBM Corp.
->> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
->> + * your option) any later version. See the COPYING file in the top-level
->> + * directory.
->> + */
->> +
->> +#ifndef HW_S390_CCW_H
->> +#define HW_S390_CCW_H
->> +
->> +#include "hw/s390x/ccw-device.h"
->> +
->> +#define TYPE_S390_CCW "s390-ccw"
->> +#define S390_CCW_DEVICE(obj) \
->> +    OBJECT_CHECK(S390CCWDevice, (obj), TYPE_S390_CCW)
->> +#define S390_CCW_DEVICE_CLASS(klass) \
->> +    OBJECT_CLASS_CHECK(S390CCWDeviceClass, (klass), TYPE_S390_CCW)
->> +#define S390_CCW_DEVICE_GET_CLASS(obj) \
->> +    OBJECT_GET_CLASS(S390CCWDeviceClass, (obj), TYPE_S390_CCW)
->> +
->> +typedef struct S390CCWDevice {
->> +    CcwDevice parent_obj;
->> +    CssDevId hostid;
->> +    char *mdevid;
->> +} S390CCWDevice;
->> +
->> +typedef struct S390CCWDeviceClass {
->> +    CCWDeviceClass parent_class;
->> +    void (*realize)(S390CCWDevice *dev, char *sysfsdev, Error **errp);
->> +    void (*unrealize)(S390CCWDevice *dev, Error **errp);
->> +} S390CCWDeviceClass;
->> +
->> +#endif
+>> On 23 March 2017 at 18:31, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >>
+>>>
+>>>
+>>> On 23/03/2017 18:28, Jiahuan Zhang wrote:
+>>> > Hi, the method doesn't work for pipe. It still causes the same issue.
+>>> > The only difference is that the first byte in the UART fifo can be read
+>>> > by the guest app.
+>>> > So now my guest app can immediately read 17bytes when the host is
+>>> > sending data continuously,
+>>> > then guest app is unable to read.
+>>> >
+>>> > Now there is a solution-to-be. Set the qemu pipe chardev to wait for 1
+>>> > millisecond before do a next ReadFile(),
+>>> > then the pl011 can deliver the complete large data by the 16-byte fifo
+>>> > continuously to the guest app.
+>>> >
+>>> > Is it rational? Or is this host -CPU-dependent?
+>>>
+>>> Post the patch, maybe you have a bug.
+>>>
+>>> Paolo
+>>>
+>>
+>>
+>
