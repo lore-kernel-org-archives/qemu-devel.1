@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d5GfF-0006NA-9V
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 15:07:18 -0400
+	(envelope-from <mwinslow@infoblox.com>) id 1d5ILG-0004lO-3g
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 16:54:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d5GfC-0005yr-1k
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 15:07:17 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:57676
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1d5GfB-0005yX-Q8
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 15:07:13 -0400
-References: <5a275226-bce0-4c8f-a708-063245cfe8f2@Spark>
-	<583d86e4-dc32-ca67-6157-2b4c1654a758@ilande.co.uk>
-	<1492680594151.52017@epfl.ch>
-	<9d55b0bb-3d76-4b63-52d3-9f7df1003806@ilande.co.uk>
-	<1492787538720.44490@epfl.ch>
-	<c8006ea5-9a10-9edd-7bfd-04359bfbd235@ilande.co.uk>
-	<1492904528362.73566@epfl.ch>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <77bc50a0-5f3a-4d6e-32af-9db38587cfb0@ilande.co.uk>
-Date: Mon, 1 May 2017 20:06:45 +0100
+	(envelope-from <mwinslow@infoblox.com>) id 1d5ILB-00060q-0Z
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 16:54:46 -0400
+Received: from mx2.infoblox.com ([205.234.19.214]:34798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mwinslow@infoblox.com>)
+	id 1d5ILA-00060U-Ky
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 16:54:40 -0400
+Received: from X2008CASHUB1.infoblox.com (x2008cashub1.infoblox.com
+	[205.234.19.141]) by mx2.infoblox.com with ESMTP id
+	d6tyFEeha1HcOZ39 (version=TLSv1 cipher=AES128-SHA bits=128
+	verify=NO) for <qemu-devel@nongnu.org>;
+	Mon, 01 May 2017 13:54:33 -0700 (PDT)
+From: Michael Winslow <mwinslow@infoblox.com>
+Date: Mon, 1 May 2017 20:54:31 +0000
+Message-ID: <CY4PR07MB35447D2FDE41B7140AEE27F0B8140@CY4PR07MB3544.namprd07.prod.outlook.com>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <1492904528362.73566@epfl.ch>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Help needed: Sparc 64, kernel panic
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] vpc max table entries rounding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,92 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ajallooiean Hossein <hossein.ajallooiean@epfl.ch>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 23/04/17 00:42, Ajallooiean Hossein wrote:
+I recently had a problem in uploading a dynamic vpc image created by qemu-i=
+mg to Azure.  When creating a dynamic vpc image with qemu-img, the bat size=
+ is created by rounding up PhysicalSize/BlockSize.  It needs to be rounded =
+up this way to contain the end blocks of the disk.
 
-Hi Ajallooiean,
+Uploading the image to Azure, the dynamic image gets converted to a fixed t=
+ype image (Azure VMs only work with fixed type vpc images).  In doing so, B=
+lockSize * MaxTableEntries space is allocated.  That is, the footer is plac=
+ed after that much space within the fixed image file.  This is done without=
+ changing the current size or original size fields in the image footer.  Wh=
+en Azure then goes to instantiate a VM based on this disk image, it finds t=
+hat the space allocated does not match the disk size specified in the image=
+ footer, and rejects the image on that basis.  The error I'm seeing looks l=
+ike this:
 
-> Hi Mark,
-> 
-> Thanks a lot for this. - it did work! 
-> 
-> So, now im wondering how did you install the iso on disk?
-> 
-> would you mind sharing your command line for the install please? and hacks if any
+VHD footer 'Current Size' field validation failed. VHD for disk 'cli272bc21=
+0215b6e94-os-1492546232759' with blob https://foo.blob.core.windows.net/dis=
+ks/blah.vhd specifies size (272734617600) which does not match VHD blob siz=
+e (272736715264) - VHD Footer Size (512).
 
-I simply went for something along the lines of:
+This seems to me to be a problem in the upload utility.  However qemu-img c=
+ould make dynamic vpc images that are still usable with Azure upload utilit=
+ies if the user chooses the right disk size and it made the rounding calcul=
+ation slightly differently.  The calculation is currently done in block/vpc=
+.c create_dynamic_disk() by doing this:
 
-./qemu-system-sparc64 -hda deb90.qcow2 -cdrom
-debian-9.0-sparc64-NETINST-1.iso -boot d -nographic
+    num_bat_entries =3D (total_sectors + block_size / 512) / (block_size / =
+512);
 
-i.e. no virtio devices and using the in-built device emulation. I do
-have some alpha patches that add virtio support to OpenBIOS but they are
-definitely not ready for production yet.
+This rounds up.  But if total_sectors happens to be a whole-number multiple=
+ of block_size it allocates one more bat entry than is necessary.  By chang=
+ing this calculation to:
 
-> i am now able to install and boot, but my boot hang after this line "[   22.559491] [TTM] Initializing pool allocator" - inside user space. - I did blacklist bochs_drm for installing as such "-append 'modprobe.blacklist=bochs_drm'".
+    num_bat_entries =3D (total_sectors - 1 + block_size / 512) / (block_siz=
+e / 512);
 
-Once I installed the image, I restarted QEMU as normal but this time
-booting from the qcow2 image i.e.
-
-./qemu-system-sparc64 -hda deb90.qcow2 -cdrom
-debian-9.0-sparc64-NETINST-1.iso -nographic
-
-Then at the SILO "boot: " prompt I typed:
-
-Linux modprobe.blacklist=bochs_drm
-
-That got me to a terminal login at which point I created the following
-file as /etc/modprobe.d/bochs_drm.conf:
-
-blacklist bochs_drm
-
-I then did an update-initramfs rebooted as normal, since with the module
-blacklisted there is no need to enter any custom parameters at the SILO
-boot prompt and I can simply hit Enter.
-
-> also, i have a couple of questions if you dont mind responding to them. - ill appreciate this a lot:
-> 1- did you use virtio for your install? i.e. not using the "-cdrom" command and blacklisting the pata_cmd64x and also providing your own virtio device (/dev/vdb)?
->     - i used this link for hints on how to install with virtio http://tyom.blogspot.ch/2013/03/debiansparc64-wheezy-under-qemu-how-to.html
-
-No, I just used the slower in-built CDROM emulation.
-
-> 2- i see that you used ext3 for your OS install, isnt that slower than ext4? -again im referencing this: http://tyom.blogspot.ch/2013/03/virtio-performance-and-filesystems.html
-
->From memory the installer insisted that /boot needed to be an ext3
-partition in order to work with SILO which is why I chose it.
-
-> 3- also, im noticing that you didnt define root=/dev/sda or root=/dev/vda1 for when your running qemu. and when im running your image i have to do that, otherwise ill get to the initramfs only. is there a trick behind this?
-
-No, it just seems to work for me with the inbuilt CDROM? However if you
-switch to using my image with virtio then you'll have to tweak
-/etc/fstab to use /dev/vda* rather than /dev/sda* devices and rebuild
-the initramfs once again.
-
-> 4- i dont see you defining a kernel and initrd? is there a reason for this? if i just use your cmd line, ill get this: also, are you extracting the kernel and initrd from the image or the iso?
-> 
-> OpenBIOS for Sparc64
-> Configuration device id QEMU version 1 machine id 0
-> kernel cmdline 
-> CPUs: 1 x SUNW,UltraSPARC-IIi
-> UUID: 00000000-0000-0000-0000-000000000000
-> Welcome to OpenBIOS v1.1 built on Mar 15 2017 19:37
->   Type 'help' for detailed information
-> Trying disk:a...
-> Not a bootable ELF image
-> Loading a.out image...
-> Loaded 7680 bytes
-> entry point is 0x4000
-> SILO Version 1.4.14
-> boot: 
-
-Right - all you need to do here is hit Enter and boot will continue.
-Since I'm not using virtio I'm letting SILO do the work here. Once
-you've blacklisted bochs_drm and rebuilt the initramfs with everything
-setup then you should be able to copy them from the resulting image and
-boot them directly in QEMU using -kernel and -initrd.
-
-
-ATB,
-
-Mark.
+enough bat entries continue to be allocated in the case where total_sectors=
+ is a whole-number multiple of block-size and preserves the rounding up whe=
+re it is not.  And the upload utility now will not change the disk size if =
+the user chooses a disk size that is a multiple of the block size.
