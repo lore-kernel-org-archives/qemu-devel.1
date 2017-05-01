@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eager@eagerm.com>) id 1d50br-0004nj-37
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 21:58:44 -0400
+	(envelope-from <cota@braap.org>) id 1d50nb-0006My-M9
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 22:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eager@eagerm.com>) id 1d50bo-0006V1-28
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 21:58:43 -0400
-Received: from resqmta-po-11v.sys.comcast.net ([96.114.154.170]:53670)
+	(envelope-from <cota@braap.org>) id 1d50nX-0000HZ-TP
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 22:10:51 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:60301)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eager@eagerm.com>) id 1d50bn-0006Ul-Sg
-	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 21:58:39 -0400
-From: Michael Eager <eager@eagerm.com>
-Message-ID: <5906960F.2050305@eagerm.com>
-Date: Sun, 30 Apr 2017 18:57:35 -0700
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1d50nX-0000HI-M0
+	for qemu-devel@nongnu.org; Sun, 30 Apr 2017 22:10:47 -0400
+Date: Sun, 30 Apr 2017 22:10:45 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170501021045.GA19416@flamenco>
+References: <20170427120006.20564-1-rth@twiddle.net>
+	<1493407045-24172-1-git-send-email-cota@braap.org>
+	<1493407045-24172-2-git-send-email-cota@braap.org>
+	<20170428192238.GA24988@flamenco>
+	<33f75663-0254-0274-d451-7f081bc1acf5@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] cpu_io_recompile, icount, and re-issued instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <33f75663-0254-0274-d451-7f081bc1acf5@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v5 + 1/2] target/aarch64: optimize
+ cross-page direct jumps in softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org
 
-I'm working with an emulation for a proprietary processor on an older QEMU source base.  It looks 
-like the problem I am seeing in the old sources would still be present in the current source base.
+On Sat, Apr 29, 2017 at 12:30:08 +0200, Richard Henderson wrote:
+> On 04/28/2017 09:22 PM, Emilio G. Cota wrote:
+> >On Fri, Apr 28, 2017 at 15:17:24 -0400, Emilio G. Cota wrote:
+> >>+++ b/target/arm/translate-a64.c
+> >>@@ -373,8 +373,7 @@ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
+> >>          } else if (s->singlestep_enabled) {
+> >>              gen_exception_internal(EXCP_DEBUG);
+> >>          } else {
+> >>-            tcg_gen_exit_tb(0);
+> >>-            s->is_jmp = DISAS_TB_JUMP;
+> >
+> >I'm not sure about removing this line though. Would it be better to leave it?
+> >I can't see how TB_JUMP ends up doing anything in the rest of the file.
+> 
+> Why not just replace this with
+> 
+>   s->is_jmp = DISAS_JUMP
+> 
+> and not emit the lookup_and_goto_ptr here at all?
 
-I'm seeing incorrect values when there is a write to a memory-mapped I/O device when icount is set. 
-  What I see happening is that a TB with ~20 instructions is executed which contains a write to the 
-MM I/O address.  When it gets to the io_write routine, can_do_io is false, which results in a call 
-to cpu_io_recompile.
+If we don't emit anything here, we get the error you reported
+in the other message (icount whatever in cpu-exec.c:599).
 
-cpu_io_recompile does what it (sort of) says it is supposed to do: it builds a new TB with the I/O 
-instruction as the last instruction in the block, then re-issues the TB.  The problem is that the 
-new TB contains the instructions before the I/O instruction, so they are executed a second time.
+I think this is due to callers assuming get_goto_tb does indeed
+generate code, instead of deferring it via is_jmp. For example:
 
-There is a note in cpu_io_recompile which mentions the situation where the I/O instruction is not 
-the first in the TB has not been handled:
+    if (cond < 0x0e) {
+        /* genuinely conditional branches */
+        TCGLabel *label_match = gen_new_label();
+        arm_gen_test_cc(cond, label_match);
+        gen_goto_tb(s, 0, s->pc);
+        gen_set_label(label_match);
+        gen_goto_tb(s, 1, addr);
+    } else { [...]
 
-     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
-      * the first in the TB) then we end up generating a whole new TB and
-      *  repeating the fault, which is horribly inefficient.
-      *  Better would be to execute just this insn uncached, or generate a
-      *  second new TB.
+So the simplest solution here seems to just emit the goto_ptr helper
+in gen_goto_tb().
 
-I'm a bit unclear what this is saying.  A new TB is generated which is issued setting can_do_io, and 
-which passes through io_write without a problem.  I'm not sure what fault is repeated.
+Regarding the setting of is_jmp to DISAS_TB_JUMP, after having
+looked at the code more closely, I think it shouldn't
+be removed, since this is the way we break out of the loop in
+gen_intermediate_code(), thereby marking this instruction as the
+last of the current TB.
 
-It seems to me that what cpu_io_recompile should do is create a new TB with the n instructions which 
-were already executed and cache it.  Then it should create a TB with only the I/O instruction, 
-setting can_do_io, and re-issue this TB.
+I have updated patch 1/2 accordingly. You can cherry-pick it from:
+  https://github.com/cota/qemu/tree/tcg-next-v5+
 
-Am I understanding this correctly?
+Thanks,
 
-This code has been around for a long, long time.  Has anyone noticed this problem in the past?
-
-
--- 
-Michael Eager	 eager@eagercon.com
-1960 Park Blvd., Palo Alto, CA 94306  650-325-8077
-
--- 
-Michael Eager	 eager@eagercon.com
-1960 Park Blvd., Palo Alto, CA 94306  650-325-8077
+		Emilio
