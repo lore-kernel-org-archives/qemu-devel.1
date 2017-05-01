@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d5CzY-000311-9W
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 11:12:01 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d5DkU-0004DP-5N
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 12:00:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d5CzV-0001hl-0t
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 11:12:00 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:33077)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1d5CzU-0001hg-Qs
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 11:11:56 -0400
-Received: by mail-it0-x244.google.com with SMTP id z67so12440788itb.0
-	for <qemu-devel@nongnu.org>; Mon, 01 May 2017 08:11:56 -0700 (PDT)
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <EE30EF16-5AC8-4491-A84A-91EDF99E96BA@gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1d5DkR-0008Pk-2K
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 12:00:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1d5DkQ-0008PT-T4
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 12:00:27 -0400
+References: <CAGKXQyewQkpv=KgCYt86VAvrPmFdsQvs3kev_W74OrJApUvfEg@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <464e19e7-a11e-fc28-a6ed-b6f1506658be@redhat.com>
+Date: Mon, 1 May 2017 12:00:24 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAGKXQyewQkpv=KgCYt86VAvrPmFdsQvs3kev_W74OrJApUvfEg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Mon, 1 May 2017 11:11:52 -0400
-Subject: [Qemu-devel] Help with MIPS documentation
+Subject: Re: [Qemu-devel] bytes xfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: ali saeedi <ali.saeedi56@gmail.com>, qemu-devel@nongnu.org
 
-A MIPS page has just been put up here: http://wiki.qemu.org/ 
-Documentation/Platforms/MIPS
 
-I have tried to give as much info as I could about MIPS and QEMU but  
-I am no MIPS expert. What I need are pictures of qemu-system-mips in  
-action and any other information that could be provided. Other things  
-that would be useful:
 
-Guest operating system status:
-- Windows NT 3.5
-- Windows NT 4.0
-- IRIX
-- Linux
-- Any other operating systems I may have missed
+On 04/29/2017 01:23 AM, ali saeedi wrote:
+> Hi
+> what does 'bytes_xfer' and 'xfer_limit' mean?
+> I am new in qemu.
+> thanks a lot
+> 
 
-Example command lines for running qemu-system-mips would be very  
-helpful.
+The exact meaning is going to change depending on where you are looking.
+As advice for mailing a technical list, please be prepared with code
+excerpts from the files you are investigating and provide filenames and
+line numbers so that your question can be answered.
 
-Links to MIPS software that could run in qemu-system-mips.
+As for your question:
 
-Any help would be appreciated.
+'bytes_xfer' is likely short for "Bytes Transferred" and counts the
+number of bytes sent over a socket or stream.
+
+'xfer_limit' is likely short for "Transfer Limit" and counts either a
+total or per-time-slice count of how many bytes can be transferred
+before we hit some kind of quota, to avoid saturating resources.
+
+--js
