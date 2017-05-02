@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d5a7v-000379-6U
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:12 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d5a8a-0003UP-Lw
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d5a7s-0001fT-3c
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:4955)
+	(envelope-from <pbonzini@redhat.com>) id 1d5a8X-0002N9-Ke
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d5a7r-0001eX-Tt
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:08 -0400
-References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
-	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
-	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
-	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
-	<ac13fd46-bd6e-6a8a-2c72-cc8d683d5026@redhat.com>
-	<87pofrfgl3.fsf@dusky.pond.sub.org>
-	<93de273c-9a3b-dcb8-dd6e-8b9b4fb09a65@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <176d87e9-d899-792f-536e-07cd6f5c7cb6@redhat.com>
-Date: Tue, 2 May 2017 17:53:54 +0200
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5a8X-0002MI-Ds
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:49 -0400
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59FAFBF2C4
+	for <qemu-devel@nongnu.org>; Tue,  2 May 2017 15:54:48 +0000 (UTC)
+References: <20170502083500.GA27432@redhat.com>
+	<87y3ufjpsr.fsf@dusky.pond.sub.org> <20170502145913.GF16511@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <86128a38-af03-5ee1-7de6-124384e3d2a2@redhat.com>
+Date: Tue, 2 May 2017 17:54:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <93de273c-9a3b-dcb8-dd6e-8b9b4fb09a65@redhat.com>
+In-Reply-To: <20170502145913.GF16511@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
- in favour of '-accel'
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Writing a C library to generate qemu command lines
+ and configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Vincent Palatin <vpalatin@chromium.org>
-
-On 02.05.2017 17:09, Paolo Bonzini wrote:
->=20
->=20
-> On 02/05/2017 17:01, Markus Armbruster wrote:
->>> But I really, really see no point in removing --enable-kvm.  It costs
->>> perhaps 10 lines of code that has pretty much no ramifications elsewh=
-ere
->>> in the code.  If anything I'd expect "-machine accel" to disappear
->>> before, if ever (in favor of multiple "-accel" options, e.g. "-machin=
-e
->>> accel=3Dkvm:tcg" can become "-accel kvm -accel tcg".
->> I basically agree, except I wouldn't say "no point", but "doesn't buy =
-us
->> enough to justify inconveniencing users".
->>
->> What we've done before for options that have become unloved, but not
->> harmful, is remove them just from documentation.  Grep qemu-options.hx
->> for "HXCOMM Deprecated".  Let's do that for --enable-kvm and similarly
->> weird sugared options.
->=20
-> Except that this provides no easily greppable way to find how to enable
-> KVM, as things stand.
-
-Should we then improve the description of the -accel parameter?
-
-> So the first lesson should be "no deprecation
-> without documentation" (any reference to 18th century political slogans
-> is purely coincidential :)).
-
-Would you accept my patch if I'd remove the hunks for vl.c, i.e. a patch
-that just updates the documentation?
-
- Thomas
+To: "Richard W.M. Jones" <rjones@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Development <qemu-devel@nongnu.org>
 
 
-PS: Thinking about all of this again, I think the thing that bugs me
-most is that we now have a brand new "-enable-hax" option, too, but no
-"-enable-xen" option ... that's just inconsistent. What do you think
-about removing the "-enable-hax" option again - there should only be
-very few users for this option so far, so the impact should be low. HAX
-users could simply use the "-accel hax" instead...
+
+On 02/05/2017 16:59, Richard W.M. Jones wrote:
+>> To answer your question: you have to double comma after '=', or else it
+>> terminates the value.  There is no other quoting.
+>
+> Hmm, is that really right?  It seems to me that any comma must be
+> doubled.  For example:
+> 
+> $ qemu-system-x86_64 -name foo,bar -writeconfig - -hda die
+> qemu-system-x86_64: -name foo,bar: Invalid parameter 'bar'
+
+That's because, as you found out, "-name" is not a simple option but a
+compound one; "-name foo" is short for "-name guest=foo" (compare
+"-device e1000").
+
+The grammar mentioned in util/keyval.c says that you have to double
+comma in a value, *and* comma is completely invalid in a key.
+
+If you have '=', you have to double commas after it and cannot use it
+before.
+
+If you have no '=' at all, then you have to double comma too.
+
+Paolo
+
+> $ qemu-system-x86_64 -name foo,,bar -writeconfig - -hda die
+> # qemu config file
+> 
+> [name]
+>   guest = "foo,bar"
