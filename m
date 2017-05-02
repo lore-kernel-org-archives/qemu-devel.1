@@ -1,35 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5acV-0005gy-0d
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:25:48 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d5acm-0005pA-AU
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:26:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5acR-0006DY-Pz
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:25:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60118)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d5acj-0006X0-4Z
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:26:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33844)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d5acR-0006Bs-JL
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:25:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d5acO-000302-Bt
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 16:25:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 28BB92EA02B
-	for <qemu-devel@nongnu.org>; Tue,  2 May 2017 16:25:40 +0000 (UTC)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d5aci-0006W0-R9
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:26:01 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v42GNnT1144587
+	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 12:25:59 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a6vxxjcbw-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:25:59 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 2 May 2017 17:25:55 +0100
+Date: Tue, 2 May 2017 18:25:50 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170429123707.16675-1-aik@ozlabs.ru>
+References: <20170429123707.16675-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 May 2017 16:20:10 -0000
-From: Florian Strankowski <1687653@bugs.launchpad.net>
-Reply-To: Bug 1687653 <1687653@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170502155311.4290.95799.malonedeb@soybean.canonical.com>
-Message-Id: <20170502162011.1877.51087.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1687653] Re: QEMU-KVM / detect_zeroes causes KVM
- to start unlimited number of threads on Guest-Sided High-IO with big
- Blocksize
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170502182550.5edb9565.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH qemu v5] memory/iommu: QOM'fy IOMMU
+ MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,96 +41,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-** Also affects: ubuntu
-   Importance: Undecided
-       Status: New
+On Sat, 29 Apr 2017 22:37:07 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
--- =
+> This defines new QOM object - IOMMUMemoryRegion - with MemoryRegion
+> as a parent.
+> 
+> This moves IOMMU-related fields from MR to IOMMU MR. However to avoid
+> dymanic QOM casting in fast path (address_space_translate, etc),
+> this adds an @is_iommu boolean flag to MR and provides new helper to
+> do simple cast to IOMMU MR - memory_region_get_iommu. The flag
+> is set in the instance init callback. This defines
+> memory_region_is_iommu as memory_region_get_iommu()!=NULL.
+> 
+> This switches MemoryRegion to IOMMUMemoryRegion in most places except
+> the ones where MemoryRegion may be an alias.
+> 
+> This defines memory_region_init_iommu_type() to allow creating
+> IOMMUMemoryRegion subclasses. In order to support custom QOM type,
+> this splits memory_region_init() to object_initialize() +
+> memory_region_do_init.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1687653
+>  /**
+> + * memory_region_init_iommu_type: Initialize a memory region of a custom type
+> + * that translates addresses
+> + *
+> + * An IOMMU region translates addresses and forwards accesses to a target
+> + * memory region.
+> + *
+> + * @typename: QOM class name
+> + * @iommumr: the #IOMMUMemoryRegion to be initialized
 
-Title:
-  QEMU-KVM / detect_zeroes causes KVM to start unlimited number of
-  threads on Guest-Sided High-IO with big Blocksize
+<bikeshed>
+I find "iommumr" terribly hard to read. Maybe iommu_mr is better? (Lots
+of times in this patch.)
+</bikeshed>
 
-Status in QEMU:
-  Confirmed
-Status in Ubuntu:
-  New
-
-Bug description:
-  QEMU-KVM in combination with "detect_zeroes=3Don" makes a Guest able to
-  DoS the Host. This is possible if the Host itself has "detect_zeroes"
-  enabled and the Guest writes a large Chunk of data with a huge
-  blocksize onto the drive.
-
-  E.g.: dd if=3D/dev/zero of=3D/tmp/DoS bs=3D1G count=3D1 oflag=3Ddirect
-
-  All QEMU-Versions after implementation of detect_zeroes are affected.
-  Prior are unaffected. This is absolutely critical, please fix this
-  ASAP!
-
-  #####
-
-  Provided by Dominik Csapak:
-
-  source    , bs   , count     ,    O_DIRECT, behaviour
-
-  urandom   , bs 1M, count 1024,    O_DIRECT: OK
-  file      , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
-  zero file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1G, count    1,    O_DIRECT: NOT OK
-  zero file , bs 1G, count    1,    O_DIRECT: NOT OK
-  zero file , bs 1G, count    1, no O_DIRECT: NOT OK
-  rand file , bs 1G, count    1,    O_DIRECT: OK
-  rand file , bs 1G, count    1, no O_DIRECT: OK
-
-  discard on:
-
-  urandom   , bs 1M, count 1024,    O_DIRECT: OK
-  rand file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
-  zero file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1G, count    1,    O_DIRECT: NOT OK
-  zero file , bs 1G, count    1,    O_DIRECT: NOT OK
-  zero file , bs 1G, count    1, no O_DIRECT: NOT OK
-  rand file , bs 1G, count    1,    O_DIRECT: OK
-  rand file , bs 1G, count    1, no O_DIRECT: OK
-
-  detect_zeros off:
-
-  urandom   , bs 1M, count 1024,    O_DIRECT: OK
-  rand file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
-  zero file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1G, count    1,    O_DIRECT: OK
-  zero file , bs 1G, count    1,    O_DIRECT: OK
-  zero file , bs 1G, count    1, no O_DIRECT: OK
-  rand file , bs 1G, count    1,    O_DIRECT: OK
-  rand file , bs 1G, count    1, no O_DIRECT: OK
-
-  #####
-
-  Provided by Florian Strankowski
-
-  bs   -    count   -    io-threads
-
-  512K -    2048    -    2
-  1M   -    1024    -    2
-  2M   -     512    -    4
-  4M   -     256    -    6
-  8M   -     128    -    10
-  16M  -      64    -    18
-  32M  -      32    -    uncountable
-
-  Please refer to further information here:
-
-  https://bugzilla.proxmox.com/show_bug.cgi?id=3D1368
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1687653/+subscriptions
+The s390 parts look fine.
