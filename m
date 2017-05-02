@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5gOR-0004qs-3u
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:35:40 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5gdj-0000VC-97
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:51:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5gON-0003qd-Vr
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:35:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59554)
+	(envelope-from <ehabkost@redhat.com>) id 1d5gdg-0000eb-6h
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:51:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d5gON-0003q5-2o
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:35:35 -0400
-Date: Tue, 2 May 2017 19:35:31 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d5gdf-0000dc-TR
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:51:24 -0400
+Date: Tue, 2 May 2017 19:51:19 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170502223531.GH3482@thinpad.lan.raisama.net>
+Message-ID: <20170502225119.GI3482@thinpad.lan.raisama.net>
 References: <20170502203115.22233-1-ehabkost@redhat.com>
-	<20170502203115.22233-2-ehabkost@redhat.com>
-	<0cc1a96d-c828-d055-7024-3d3296e82be1@redhat.com>
+	<20170502203115.22233-3-ehabkost@redhat.com>
+	<1153646d-848e-91ca-87f6-7d83b4963174@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0cc1a96d-c828-d055-7024-3d3296e82be1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] visitor: Add 'supported_qtypes'
- parameter to visit_start_alternate()
+In-Reply-To: <1153646d-848e-91ca-87f6-7d83b4963174@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support
+ alternate types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +32,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Tue, May 02, 2017 at 04:29:32PM -0500, Eric Blake wrote:
+On Tue, May 02, 2017 at 04:37:03PM -0500, Eric Blake wrote:
 > On 05/02/2017 03:31 PM, Eduardo Habkost wrote:
-> > This will allow visitors to make decisions based on the supported qtypes
-> > of a given alternate type. The new parameter can replace the old
-> > 'promote_int' argument, as qobject-input-visitor can simply check if
-> > QTYPE_QINT is set in supported_qtypes.
+> > When parsing alternates from a string, there are some limitations in
+> > what we can do, but it is a valid use case in some situations. We can
+> > support booleans, integer types, and enums.
+> > 
+> > This will be used to support 'feature=force' in -cpu options, while
+> > keeping 'feature=on|off|true|false' represented as boolean values.
 > > 
 > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > > ---
 > 
-> > @@ -416,7 +417,7 @@ void visit_end_list(Visitor *v, void **list);
-> >   */
-> >  void visit_start_alternate(Visitor *v, const char *name,
-> >                             GenericAlternate **obj, size_t size,
-> > -                           bool promote_int, Error **errp);
-> > +                           unsigned long supported_qtypes, Error **errp);
-> 
-> Why unsigned long (which is platform-dependent in size)? At the moment,
-> even unsigned char happens to be long enough, although I probably would
-> have used uint32_t.
-> 
-> Oh, I see, it's because you use the BIT() macros from bitops.h, which
-> are hardcoded to unsigned long.
-
-Yep. But I don't see a problem with using uint32_t or a simple
-int.
-
-> 
-> > +++ b/scripts/qapi-visit.py
-> > @@ -161,20 +161,21 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj, Error
 > >  
-> >  
-> >  def gen_visit_alternate(name, variants):
-> > -    promote_int = 'true'
-> > +    qtypes = ['BIT(%s)' % (var.type.alternate_qtype())
-> > +              for var in variants.variants]
-> > +    supported_qtypes = '|'.join(qtypes)
+> > +/* Support for alternates on string-input-visitor is limited, because
+> > + * the input string doesn't have any type information.
+> > + *
+> > + * Supported alternate member types:
+> > + * 1) enums
+> > + * 2) integer types
+> > + * 3) booleans (but only if the there's no enum variant
+> > + *    containing "on", "off", "true", or "false" as members)
+> > + *
+> > + * UNSUPPORTED alternate member types:
+> > + * 1) strings
+> > + * 2) complex types
+> > + */
+> > +static void start_alternate(Visitor *v, const char *name,
+> > +                            GenericAlternate **obj, size_t size,
+> > +                            unsigned long supported_qtypes, Error **errp)
+> > +{
+> > +    StringInputVisitor *siv = to_siv(v);
+> > +    QType t = QTYPE_QSTRING;
 > 
-> Do you want ' | '.join(qtypes), so that at least the generated code
-> still follows recommended operator spacing? (The line is long no matter
-> what, though, and that's not worth worrying about.)
+> Why do you document string as unsupported, and yet default to
+> QTYPE_QSTRING?  I don't see how a string is fundamentally different from
+> an enum (no alternate can have both at the same time, an alternate with
+> either type will have QTYPE_QSTRING set in supported_qtypes).
 
-I can do that in v2.
-
-> 
-> >      ret = ''
-> > -    for var in variants.variants:
-> > -        if var.type.alternate_qtype() == 'QTYPE_QINT':
-> > -            promote_int = 'false'
-> >  
-> >      ret += mcgen('''
-> >  
-> >  void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
-> >  {
-> >      Error *err = NULL;
-> > +    unsigned long supported_qtypes = %(supported_qtypes)s;
-> >  
-> > +    assert(QTYPE__MAX < BITS_PER_LONG);
-> 
-> Do we really have to generate a separate copy of this assert in every
-> generated function?  Especially when we know it is true by construction,
-> that seems like a lot.  Having the assertion once in a .c file rather
-> than generated in multiple functions might be acceptable, though.
-
-I will probably do this as a single QEMU_BUILD_BUG_ON near
-visit_start_alternate().
+Strings are indistinguishable from enums inside
+start_alternate(), that's true. But I wanted to explicitly
+document 'str' as unsupported by string-input-visitor because
+some string values would necessarily overlap with the string
+representation of other variants.
 
 > 
-> > +++ b/qapi/qobject-input-visitor.c
+> > +
+> > +    if (supported_qtypes & BIT(QTYPE_QBOOL)) {
+> > +        if (try_parse_bool(siv->string, NULL) == 0) {
+> > +            t = QTYPE_QBOOL;
+> > +        }
+> > +    }
+> > +
+> > +    if (supported_qtypes & BIT(QTYPE_QINT)) {
+> > +        if (parse_str(siv, name, NULL) == 0) {
+> > +            t = QTYPE_QINT;
+> > +        }
+> > +    }
+> > +
+> > +    *obj = g_malloc0(size);
+> > +    (*obj)->type = t;
 > 
-> > @@ -349,7 +351,7 @@ static void qobject_input_start_alternate(Visitor *v, const char *name,
-> >      }
-> >      *obj = g_malloc0(size);
-> >      (*obj)->type = qobject_type(qobj);
-> > -    if (promote_int && (*obj)->type == QTYPE_QINT) {
-> > +    if (!(supported_qtypes & BIT(QTYPE_QINT)) && (*obj)->type == QTYPE_QINT) {
-> 
-> Experimenting, does this read any better:
-> 
-> if (!extract32(supported_qtypes, QTYPE_QINT, 1) && ...
-> 
-> which would be another argument for uint32_t instead of unsigned long in
-> the signature.
+> Should you raise an error if you couldn't match the input with
+> supported_qtypes, rather than just blindly returning QTYPE_QSTRING?
 
-I am more used to see this written as "if (s & (1UL << n))" than
-as "if (extract32(s, n, 1))", so I'm not sure.
-
-I see some extract32(..., ..., 1) cases in the tree, so it's not
-as unusual as I thought. I will probably give it a try.
-
-> 
-> The idea makes sense, but I'm still not necessarily sold on using a long.
-
-Thanks!
+The generated visitors calling visit_start_alternate() already
+generate a (more specific and more useful) error message when
+they see unsupported types.
 
 -- 
 Eduardo
