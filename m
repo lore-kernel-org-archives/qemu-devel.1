@@ -1,21 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d5MxB-0007M0-Q5
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 21:50:15 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d5NLe-0001CZ-J1
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 22:15:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d5MxA-0007tk-RD
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 21:50:13 -0400
-Date: Tue, 2 May 2017 11:50:02 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170502015002.GD10741@umbus.fritz.box>
-References: <1493646214-3342-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d5NLb-0004LT-Cr
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 22:15:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38450
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1d5NLb-0004Kr-64
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 22:15:27 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v422DVGp032277
+	for <qemu-devel@nongnu.org>; Mon, 1 May 2017 22:15:25 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a6frwbhxc-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 01 May 2017 22:15:25 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Mon, 1 May 2017 22:15:24 -0400
+Date: Tue, 2 May 2017 10:15:19 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170428130951.44771-11-bjsdjshi@linux.vnet.ibm.com>
+	<6a3e0621-9e16-ddd4-c1d9-2a7351ebb9e6@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="n/aVsWSeQ4JHkrmm"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493646214-3342-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 0/5] Add qemu_vga.ndrv MacOS PPC VGA driver
- from QemuMacDrivers
+In-Reply-To: <6a3e0621-9e16-ddd4-c1d9-2a7351ebb9e6@redhat.com>
+Message-Id: <20170502021519.GA27968@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v6 10/13] s390x/css: introduce and realize
+ ccw-request callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,116 +44,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, benh@kernel.crashing.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, alex.williamson@redhat.com, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, cornelia.huck@de.ibm.com, agraf@suse.com
 
+* Auger Eric <eric.auger@redhat.com> [2017-05-01 19:28:23 +0200]:
 
---n/aVsWSeQ4JHkrmm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Eric,
 
-On Mon, May 01, 2017 at 02:43:29PM +0100, Mark Cave-Ayland wrote:
-> Last year Ben posted an initial set of patches for OpenBIOS which provide=
-d a
-> MacOS PPC VGA driver enabling MacOS guests to control the colour depth and
-> resolution of the QEMU stdvga device. The QemuMacDrivers repository was s=
-et up on
-> qemu-project.org [1] but due to personal circumstances in the second half=
- of last
-> year, I was unable to spend much time on it.
->=20
-> Over the last few months I've reworked the OpenBIOS patches and applied a=
-ll the
-> required dependencies upstream which makes it possible to enable the driv=
-er with
-> a fairly simple patch [2] to OpenBIOS's vga.fs (binary provided for testi=
-ng, but not
-> to be included in the final merge).
->=20
-> The main change I've made is that instead of serving the driver binary di=
-rectly
-> through the VGA PCI BAR (with the relevant binary inlined within OpenBIOS=
-), the
-> driver is now hosted by QEMU and is installed via the fw_cfg interface by=
- the
-> OpenBIOS vga.fs driver during startup. Not only does this make it possibl=
-e to
-> further develop the driver without also having to rebuild OpenBIOS every =
-time but
-> it also leaves us with the ability to serve a proper IEEE-1275 FCode ROM =
-via the
-> VGA PCI BAR later if needed.
->=20
-> In addition to this I've added a new OpenBIOS NVRAM variable "vga-ndrv?" =
-which
-> defaults to "true" but can be overidden via -prom-env to force disable the
-> driver if any incompatibilities are found. I've tested it locally against=
- my
-> OS X 10.2 and MacOS 9.2.1 images and it seems to work there, but as I don=
-'t
-> have an exhaustive set of MacOS images available I'd be grateful for some=
- more
-> testing.
->=20
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06159.html
-> [2] https://mail.coreboot.org/pipermail/openbios/2017-May/009909.html
->=20
-> This patchset can also be found on my github repository at
-> https://github.com/mcayland/qemu/tree/ppc-vga-upstream.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > diff --git a/hw/s390x/s390-ccw.h b/hw/s390x/s390-ccw.h
+> > index b58d8e9..4e2fa65 100644
+> > --- a/hw/s390x/s390-ccw.h
+> > +++ b/hw/s390x/s390-ccw.h
+> > @@ -27,6 +27,7 @@ typedef struct S390CCWDevice {
+> >      CcwDevice parent_obj;
+> >      CssDevId hostid;
+> >      char *mdevid;
+> > +    int (*handle_request) (ORB *, SCSW *, void *);
+> shouldn't this callback be part of the class instead?
+Ok. This sounds more proper.
 
-Applied to ppc-for-2.10, thanks.
+> 
+> >  } S390CCWDevice;
+> >  
+> >  typedef struct S390CCWDeviceClass {
+> > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> > index cda3057..3ff78c5 100644
+> > --- a/hw/vfio/ccw.c
+> > +++ b/hw/vfio/ccw.c
+> > @@ -47,6 +47,36 @@ struct VFIODeviceOps vfio_ccw_ops = {
+> >      .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
+> >  };
+> >  
+> > +static int vfio_ccw_handle_request(ORB *orb, SCSW *scsw, void *data)
+> > +{
+> > +    S390CCWDevice *cdev = data;
+> > +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> > +    struct ccw_io_region *region = vcdev->io_region;
+> > +    int ret;
+> > +
+> > +    QEMU_BUILD_BUG_ON(sizeof(region->orb_area) != sizeof(ORB));
+> > +    QEMU_BUILD_BUG_ON(sizeof(region->scsw_area) != sizeof(SCSW));
+> > +    QEMU_BUILD_BUG_ON(sizeof(region->irb_area) != sizeof(IRB));
+> > +
+> > +    memset(region, 0, sizeof(*region));
+> > +
+> > +    memcpy(region->orb_area, orb, sizeof(ORB));
+> > +    memcpy(region->scsw_area, scsw, sizeof(SCSW));
+> > +
+> > +again:
+> > +    ret = pwrite(vcdev->vdev.fd, region,
+> > +                 vcdev->io_region_size, vcdev->io_region_offset);
+> > +    if (ret != vcdev->io_region_size) {
+> > +        if (errno == EAGAIN) {
+> > +            goto again;
+> > +        }
+> > +        error_report("vfio-ccw: wirte I/O region failed with errno=%d", errno);
+> > +        return -errno;
+> > +    }
+> > +
+> > +    return region->ret_code;
+> > +}
+> > +
+> >  static void vfio_ccw_reset(DeviceState *dev)
+> >  {
+> >      CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> > @@ -59,10 +89,52 @@ static void vfio_ccw_reset(DeviceState *dev)
+> >  static void vfio_ccw_io_notifier_handler(void *opaque)
+> >  {
+> >      VFIOCCWDevice *vcdev = opaque;
+> > +    struct ccw_io_region *region = vcdev->io_region;
+> > +    S390CCWDevice *cdev = S390_CCW_DEVICE(vcdev);
+> > +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+> > +    SubchDev *sch = ccw_dev->sch;
+> > +    SCSW *s = &sch->curr_status.scsw;
+> > +    IRB irb;
+> >  
+> >      if (!event_notifier_test_and_clear(&vcdev->io_notifier)) {
+> >          return;
+> >      }
+> > +
+> > +    if (pread(vcdev->vdev.fd, region,
+> > +              vcdev->io_region_size, vcdev->io_region_offset) == -1) {
+> is it possible to read less bytes than requested?
+Currently, impossible. The kernel side returns either the full region,
+or an error.
+But we surely could make it more friendly for a partial return. I will
+add a check for that case, and generate a channel program check for it.
 
+> 
+> Thanks
+> 
+> Eric
+> > +        switch (errno) {
+> > +        case ENODEV:
+> > +            /* Generate a deferred cc 3 condition. */
+> > +            s->flags |= SCSW_FLAGS_MASK_CC;
+> > +            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
+> > +            s->ctrl |= (SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND);
+> > +            goto read_err;
+> > +        case EFAULT:
+> > +            /* memory problem, generate channel data check */
+> > +            s->ctrl &= ~SCSW_ACTL_START_PEND;
+> > +            s->cstat = SCSW_CSTAT_DATA_CHECK;
+> > +            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
+> > +            s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
+> > +                    SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+> > +            goto read_err;
+> > +        default:
+> > +            /* error, generate channel program check */
+> > +            s->ctrl &= ~SCSW_ACTL_START_PEND;
+> > +            s->cstat = SCSW_CSTAT_PROG_CHECK;
+> > +            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
+> > +            s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
+> > +                    SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+> > +            goto read_err;
+> > +        }
+> > +    }
+> > +
+> > +    memcpy(&irb, region->irb_area, sizeof(IRB));
+> > +
+> > +    /* Update control block via irb. */
+> > +    copy_scsw_to_guest(s, &irb.scsw);
+> > +
+> > +read_err:
+> > +    css_inject_io_interrupt(sch);
+> >  }
+> >  
+> >  static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
+[...]
 
->=20
->=20
-> Mark Cave-Ayland (5):
->   Add QemuMacDrivers as submodule
->   Add QemuMacDrivers qemu_vga.ndrv revision d4e7d7a built as submodule
->   ppc: add qemu_vga.ndrv ROM to fw_cfg interface for OldWorld Macs
->   ppc: add qemu_vga.ndrv ROM to fw_cfg interface for NewWorld Macs
->   [Testing] Provide NDRV-capable openbios-ppc binary for testing
->=20
->  .gitmodules           |    3 +++
->  Makefile              |    3 ++-
->  hw/ppc/mac_newworld.c |   18 +++++++++++++++++-
->  hw/ppc/mac_oldworld.c |   18 +++++++++++++++++-
->  pc-bios/README        |    3 +++
->  pc-bios/openbios-ppc  |  Bin 750840 -> 754936 bytes
->  pc-bios/qemu_vga.ndrv |  Bin 0 -> 14752 bytes
->  roms/QemuMacDrivers   |    1 +
->  8 files changed, 43 insertions(+), 3 deletions(-)
->  create mode 100644 pc-bios/qemu_vga.ndrv
->  create mode 160000 roms/QemuMacDrivers
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---n/aVsWSeQ4JHkrmm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZB+XKAAoJEGw4ysog2bOSPQEP/jfFNV20cGM8UEU+j2xIbYio
-0bkeRFYFb806t8OZw9qyyf+Dm0xANK8VFcC9kkYLlqDosZto2oT5EjpP8rJ3+51m
-jcw4OCbaqI81szKpk/V4G41c99MJwip0jg+ZJItjtAIrXi+jTcsCxi1auvE3dK+h
-kxsfKwpYDhB7g5CeY4CpP0BV8iP5eXKA01gDiu/fsvqa3lCaBURo8RXXgxk+VLVL
-kTNFHcW8bpwREwoDH07aHSE7goQ7vHnQDj6ll2ROfQMenJHx2NrnTxCJ05RcaVWx
-9lW6zwCON/cD+exsrFsOdNtdqyhGqXs6/DKr0wpZIATyu5nZPufPjkYRy5JzXi02
-Er7n95S38Ko/Qe8oJrF7htspWhVpe1QvuZEWtqw0kqoUFlIR6Ux+6stjQoHcfX4+
-3F+kj3H/qtwXRxYdl83VHC5xiHGbA0ReA2Kk28N6dfWfx2uzsYTvZ/qAWqwYUxic
-ibBHCuLUlppCKLwgjCPAliDu7z+3SE8+9pSeWdMy54u836J53SOUNOAG9kTbjqLt
-8M+/F8KzjEcbcrZAVN+IMBh2RDIcWPUSTm6tV6TU3gpmioG+6n7F5WYmkqSBgyu5
-IEfdx7481BDqPZ48g/2FXPVMA1UE0p7yEEZlWwUkSaLzHXmZGrR7/SY5Qfe32JKf
-kiekmCDKi3FiVfCkqkuQ
-=YN3b
------END PGP SIGNATURE-----
-
---n/aVsWSeQ4JHkrmm--
+-- 
+Dong Jia Shi
