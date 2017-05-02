@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1d5gEB-0001bj-8a
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:25:04 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5gOR-0004qs-3u
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1d5gEA-0007s2-Fs
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:25:03 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5gON-0003qd-Vr
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:35:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59554)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d5gON-0003q5-2o
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:35:35 -0400
+Date: Tue, 2 May 2017 19:35:31 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170502223531.GH3482@thinpad.lan.raisama.net>
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+	<20170502203115.22233-2-ehabkost@redhat.com>
+	<0cc1a96d-c828-d055-7024-3d3296e82be1@redhat.com>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <1493122030-32191-6-git-send-email-peter.maydell@linaro.org>
-References: <1493122030-32191-1-git-send-email-peter.maydell@linaro.org>
-	<1493122030-32191-6-git-send-email-peter.maydell@linaro.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 2 May 2017 15:24:29 -0700
-Message-ID: <CAKmqyKMwVY_wtUnwd5HggMzxrRGKwCSyad8eWPF4FoPFSqZ38g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 05/13] arm: Don't clear ARM_FEATURE_PMSA
- for no-mpu configs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0cc1a96d-c828-d055-7024-3d3296e82be1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] visitor: Add 'supported_qtypes'
+ parameter to visit_start_alternate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +29,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Patch Tracking <patches@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Tue, Apr 25, 2017 at 5:07 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Fix the handling of QOM properties for PMSA CPUs with no MPU:
->
-> Allow no-MPU to be specified by either:
->  * has-mpu = false
->  * pmsav7_dregion = 0
-> and make setting one imply the other. Don't clear the PMSA
-> feature bit in this situation.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Tue, May 02, 2017 at 04:29:32PM -0500, Eric Blake wrote:
+> On 05/02/2017 03:31 PM, Eduardo Habkost wrote:
+> > This will allow visitors to make decisions based on the supported qtypes
+> > of a given alternate type. The new parameter can replace the old
+> > 'promote_int' argument, as qobject-input-visitor can simply check if
+> > QTYPE_QINT is set in supported_qtypes.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> 
+> > @@ -416,7 +417,7 @@ void visit_end_list(Visitor *v, void **list);
+> >   */
+> >  void visit_start_alternate(Visitor *v, const char *name,
+> >                             GenericAlternate **obj, size_t size,
+> > -                           bool promote_int, Error **errp);
+> > +                           unsigned long supported_qtypes, Error **errp);
+> 
+> Why unsigned long (which is platform-dependent in size)? At the moment,
+> even unsigned char happens to be long enough, although I probably would
+> have used uint32_t.
+> 
+> Oh, I see, it's because you use the BIT() macros from bitops.h, which
+> are hardcoded to unsigned long.
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Yep. But I don't see a problem with using uint32_t or a simple
+int.
 
-Thanks,
+> 
+> > +++ b/scripts/qapi-visit.py
+> > @@ -161,20 +161,21 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj, Error
+> >  
+> >  
+> >  def gen_visit_alternate(name, variants):
+> > -    promote_int = 'true'
+> > +    qtypes = ['BIT(%s)' % (var.type.alternate_qtype())
+> > +              for var in variants.variants]
+> > +    supported_qtypes = '|'.join(qtypes)
+> 
+> Do you want ' | '.join(qtypes), so that at least the generated code
+> still follows recommended operator spacing? (The line is long no matter
+> what, though, and that's not worth worrying about.)
 
-Alistair
+I can do that in v2.
 
-> ---
->  target/arm/cpu.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index f17e279..8e57498 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -757,8 +757,14 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->          cpu->id_pfr1 &= ~0xf000;
->      }
->
-> +    /* MPU can be configured out of a PMSA CPU either by setting has-mpu
-> +     * to false or by setting pmsav7-dregion to 0.
-> +     */
->      if (!cpu->has_mpu) {
-> -        unset_feature(ARM_FEATURE_PMSA);
-> +        cpu->pmsav7_dregion = 0;
-> +    }
-> +    if (cpu->pmsav7_dregion == 0) {
-> +        cpu->has_mpu = false;
->      }
->
->      if (arm_feature(env, ARM_FEATURE_PMSA) &&
-> --
-> 2.7.4
->
->
+> 
+> >      ret = ''
+> > -    for var in variants.variants:
+> > -        if var.type.alternate_qtype() == 'QTYPE_QINT':
+> > -            promote_int = 'false'
+> >  
+> >      ret += mcgen('''
+> >  
+> >  void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
+> >  {
+> >      Error *err = NULL;
+> > +    unsigned long supported_qtypes = %(supported_qtypes)s;
+> >  
+> > +    assert(QTYPE__MAX < BITS_PER_LONG);
+> 
+> Do we really have to generate a separate copy of this assert in every
+> generated function?  Especially when we know it is true by construction,
+> that seems like a lot.  Having the assertion once in a .c file rather
+> than generated in multiple functions might be acceptable, though.
+
+I will probably do this as a single QEMU_BUILD_BUG_ON near
+visit_start_alternate().
+
+> 
+> > +++ b/qapi/qobject-input-visitor.c
+> 
+> > @@ -349,7 +351,7 @@ static void qobject_input_start_alternate(Visitor *v, const char *name,
+> >      }
+> >      *obj = g_malloc0(size);
+> >      (*obj)->type = qobject_type(qobj);
+> > -    if (promote_int && (*obj)->type == QTYPE_QINT) {
+> > +    if (!(supported_qtypes & BIT(QTYPE_QINT)) && (*obj)->type == QTYPE_QINT) {
+> 
+> Experimenting, does this read any better:
+> 
+> if (!extract32(supported_qtypes, QTYPE_QINT, 1) && ...
+> 
+> which would be another argument for uint32_t instead of unsigned long in
+> the signature.
+
+I am more used to see this written as "if (s & (1UL << n))" than
+as "if (extract32(s, n, 1))", so I'm not sure.
+
+I see some extract32(..., ..., 1) cases in the tree, so it's not
+as unusual as I thought. I will probably give it a try.
+
+> 
+> The idea makes sense, but I'm still not necessarily sold on using a long.
+
+Thanks!
+
+-- 
+Eduardo
