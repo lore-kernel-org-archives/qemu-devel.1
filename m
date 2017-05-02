@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d5ZNU-00083P-Nt
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:06:13 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d5ZR1-0001NF-VX
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:09:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1d5ZNR-0007La-8Y
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:06:12 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1d5ZNR-0007Kk-2l
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:06:09 -0400
-Received: by mail-pg0-x244.google.com with SMTP id v1so22860448pgv.3
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 08:06:08 -0700 (PDT)
-Date: Wed, 3 May 2017 00:05:59 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170502150559.GG2724@lianli.shorne-pla.net>
-References: <cover.1493593744.git.shorne@gmail.com>
-	<20170502142017.GI22502@stefanha-x1.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1d5ZQy-0002a7-N3
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:09:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43038)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5ZQy-0002ZR-GP
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:09:48 -0400
+References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
+	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
+	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
+	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
+	<ac13fd46-bd6e-6a8a-2c72-cc8d683d5026@redhat.com>
+	<87pofrfgl3.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <93de273c-9a3b-dcb8-dd6e-8b9b4fb09a65@redhat.com>
+Date: Tue, 2 May 2017 17:09:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170502142017.GI22502@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PULL 00/11] Fixes and features for OpenRISC
+In-Reply-To: <87pofrfgl3.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
+ in favour of '-accel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: peter.maydell@linaro.org, QEMU Development <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Vincent Palatin <vpalatin@chromium.org>
 
-On Tue, May 02, 2017 at 03:20:17PM +0100, Stefan Hajnoczi wrote:
-> On Mon, May 01, 2017 at 08:14:14AM +0900, Stafford Horne wrote:
-> > This are the openrisc patches I have been circulating on the mailing list
-> > of the last few months.  We have had help from a few new people and added
-> > the following:
-> >  * Fixes for gdb memory debugging
-> >  * Added support for Shadow Registers, EVBAR, EPH
-> >  * Added support for idle state, no more 100% pegged cpu's
-> >  * Fixed VM state persisting
-> > 
-> > Please consider for pull.
+
+
+On 02/05/2017 17:01, Markus Armbruster wrote:
+>> But I really, really see no point in removing --enable-kvm.  It costs
+>> perhaps 10 lines of code that has pretty much no ramifications elsewhere
+>> in the code.  If anything I'd expect "-machine accel" to disappear
+>> before, if ever (in favor of multiple "-accel" options, e.g. "-machine
+>> accel=kvm:tcg" can become "-accel kvm -accel tcg".
+> I basically agree, except I wouldn't say "no point", but "doesn't buy us
+> enough to justify inconveniencing users".
 > 
-> Hi Stafford,
-> I'm handling qemu.git pull requests while Peter Maydell is away in May.
-> 
-> Please take a look at the checkpatch.pl errors that the patchew
-> continuous integration system found (there is an email reply to this
-> thread).  Thanks!
+> What we've done before for options that have become unloved, but not
+> harmful, is remove them just from documentation.  Grep qemu-options.hx
+> for "HXCOMM Deprecated".  Let's do that for --enable-kvm and similarly
+> weird sugared options.
 
-Hello Stefan,
+Except that this provides no easily greppable way to find how to enable
+KVM, as things stand.  So the first lesson should be "no deprecation
+without documentation" (any reference to 18th century political slogans
+is purely coincidential :)).
 
-Is there one that you think is particulary important?  I had a look through
-them before submitting these patches but I thought these were ok.
-
-Example errors:
-  - include/migration/vmstate.h
-   * line over 90 characters
-   * space required around '|'
-
-If you look at the file these are consistent with the rest of the file.
-Which I thought is more important usually.
-
--Stafford
+Paolo
