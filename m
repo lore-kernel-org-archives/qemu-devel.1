@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5fMZ-0004CM-Ii
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:29:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1d5fTq-0005e5-Al
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5fMW-0001NF-9Y
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:29:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55002)
+	(envelope-from <eblake@redhat.com>) id 1d5fTn-00043s-31
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:37:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d5fMV-0001N7-WB
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:29:36 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d5fTm-00043P-QT
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:37:07 -0400
 References: <20170502203115.22233-1-ehabkost@redhat.com>
-	<20170502203115.22233-2-ehabkost@redhat.com>
+	<20170502203115.22233-3-ehabkost@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0cc1a96d-c828-d055-7024-3d3296e82be1@redhat.com>
-Date: Tue, 2 May 2017 16:29:32 -0500
+Message-ID: <1153646d-848e-91ca-87f6-7d83b4963174@redhat.com>
+Date: Tue, 2 May 2017 16:37:03 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170502203115.22233-2-ehabkost@redhat.com>
+In-Reply-To: <20170502203115.22233-3-ehabkost@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="5RiX7bXFbPnkfTAQJ4MC4aJNM2RhhDSWs"
-Subject: Re: [Qemu-devel] [PATCH 1/4] visitor: Add 'supported_qtypes'
- parameter to visit_start_alternate()
+	boundary="GaOWvc3CR7dF75mET3WgHEh5o4C3aqPJ9"
+Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support
+ alternate types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,101 +33,76 @@ To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5RiX7bXFbPnkfTAQJ4MC4aJNM2RhhDSWs
+--GaOWvc3CR7dF75mET3WgHEh5o4C3aqPJ9
 From: Eric Blake <eblake@redhat.com>
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>,
  Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <0cc1a96d-c828-d055-7024-3d3296e82be1@redhat.com>
-Subject: Re: [PATCH 1/4] visitor: Add 'supported_qtypes' parameter to
- visit_start_alternate()
+Message-ID: <1153646d-848e-91ca-87f6-7d83b4963174@redhat.com>
+Subject: Re: [PATCH 2/4] string-input-visitor: Support alternate types
 References: <20170502203115.22233-1-ehabkost@redhat.com>
- <20170502203115.22233-2-ehabkost@redhat.com>
-In-Reply-To: <20170502203115.22233-2-ehabkost@redhat.com>
+ <20170502203115.22233-3-ehabkost@redhat.com>
+In-Reply-To: <20170502203115.22233-3-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/02/2017 03:31 PM, Eduardo Habkost wrote:
-> This will allow visitors to make decisions based on the supported qtype=
-s
-> of a given alternate type. The new parameter can replace the old
-> 'promote_int' argument, as qobject-input-visitor can simply check if
-> QTYPE_QINT is set in supported_qtypes.
+> When parsing alternates from a string, there are some limitations in
+> what we can do, but it is a valid use case in some situations. We can
+> support booleans, integer types, and enums.
+>=20
+> This will be used to support 'feature=3Dforce' in -cpu options, while
+> keeping 'feature=3Don|off|true|false' represented as boolean values.
 >=20
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
 
-> @@ -416,7 +417,7 @@ void visit_end_list(Visitor *v, void **list);
->   */
->  void visit_start_alternate(Visitor *v, const char *name,
->                             GenericAlternate **obj, size_t size,
-> -                           bool promote_int, Error **errp);
-> +                           unsigned long supported_qtypes, Error **err=
-p);
-
-Why unsigned long (which is platform-dependent in size)? At the moment,
-even unsigned char happens to be long enough, although I probably would
-have used uint32_t.
-
-Oh, I see, it's because you use the BIT() macros from bitops.h, which
-are hardcoded to unsigned long.
-
-> +++ b/scripts/qapi-visit.py
-> @@ -161,20 +161,21 @@ void visit_type_%(c_name)s(Visitor *v, const char=
- *name, %(c_name)s *obj, Error
 > =20
-> =20
->  def gen_visit_alternate(name, variants):
-> -    promote_int =3D 'true'
-> +    qtypes =3D ['BIT(%s)' % (var.type.alternate_qtype())
-> +              for var in variants.variants]
-> +    supported_qtypes =3D '|'.join(qtypes)
+> +/* Support for alternates on string-input-visitor is limited, because
+> + * the input string doesn't have any type information.
+> + *
+> + * Supported alternate member types:
+> + * 1) enums
+> + * 2) integer types
+> + * 3) booleans (but only if the there's no enum variant
+> + *    containing "on", "off", "true", or "false" as members)
+> + *
+> + * UNSUPPORTED alternate member types:
+> + * 1) strings
+> + * 2) complex types
+> + */
+> +static void start_alternate(Visitor *v, const char *name,
+> +                            GenericAlternate **obj, size_t size,
+> +                            unsigned long supported_qtypes, Error **er=
+rp)
+> +{
+> +    StringInputVisitor *siv =3D to_siv(v);
+> +    QType t =3D QTYPE_QSTRING;
 
-Do you want ' | '.join(qtypes), so that at least the generated code
-still follows recommended operator spacing? (The line is long no matter
-what, though, and that's not worth worrying about.)
+Why do you document string as unsupported, and yet default to
+QTYPE_QSTRING?  I don't see how a string is fundamentally different from
+an enum (no alternate can have both at the same time, an alternate with
+either type will have QTYPE_QSTRING set in supported_qtypes).
 
->      ret =3D ''
-> -    for var in variants.variants:
-> -        if var.type.alternate_qtype() =3D=3D 'QTYPE_QINT':
-> -            promote_int =3D 'false'
-> =20
->      ret +=3D mcgen('''
-> =20
->  void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **=
-obj, Error **errp)
->  {
->      Error *err =3D NULL;
-> +    unsigned long supported_qtypes =3D %(supported_qtypes)s;
-> =20
-> +    assert(QTYPE__MAX < BITS_PER_LONG);
+> +
+> +    if (supported_qtypes & BIT(QTYPE_QBOOL)) {
+> +        if (try_parse_bool(siv->string, NULL) =3D=3D 0) {
+> +            t =3D QTYPE_QBOOL;
+> +        }
+> +    }
+> +
+> +    if (supported_qtypes & BIT(QTYPE_QINT)) {
+> +        if (parse_str(siv, name, NULL) =3D=3D 0) {
+> +            t =3D QTYPE_QINT;
+> +        }
+> +    }
+> +
+> +    *obj =3D g_malloc0(size);
+> +    (*obj)->type =3D t;
 
-Do we really have to generate a separate copy of this assert in every
-generated function?  Especially when we know it is true by construction,
-that seems like a lot.  Having the assertion once in a .c file rather
-than generated in multiple functions might be acceptable, though.
-
-> +++ b/qapi/qobject-input-visitor.c
-
-> @@ -349,7 +351,7 @@ static void qobject_input_start_alternate(Visitor *=
-v, const char *name,
->      }
->      *obj =3D g_malloc0(size);
->      (*obj)->type =3D qobject_type(qobj);
-> -    if (promote_int && (*obj)->type =3D=3D QTYPE_QINT) {
-> +    if (!(supported_qtypes & BIT(QTYPE_QINT)) && (*obj)->type =3D=3D Q=
-TYPE_QINT) {
-
-Experimenting, does this read any better:
-
-if (!extract32(supported_qtypes, QTYPE_QINT, 1) && ...
-
-which would be another argument for uint32_t instead of unsigned long in
-the signature.
-
-The idea makes sense, but I'm still not necessarily sold on using a long.=
-
+Should you raise an error if you couldn't match the input with
+supported_qtypes, rather than just blindly returning QTYPE_QSTRING?
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -135,7 +110,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---5RiX7bXFbPnkfTAQJ4MC4aJNM2RhhDSWs
+--GaOWvc3CR7dF75mET3WgHEh5o4C3aqPJ9
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -145,13 +120,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZCPo8AAoJEKeha0olJ0NqvNwH/0mQPV5ctaa2MFVsg2GpbKFZ
-b8S4D4KM2dNpcVl+npWQU5aQCdkVcKMVuwGyWJyWucs1Fccmh1NOTSKU71LTW8Sw
-szMl4RRjEEfI5HJjTrT3gEoxT1o1z2y3spXmPAX2Fhi1+T7s3RmeUZV64vF5yms9
-xyaCuZ6c4QgFZw66jMr4iLnLY4cfnEVXTXGlASUWy20/HuV41TGT5zoE2aKdifXi
-xkAcjWOqof2Fkfvq5Nw0ADgAuGD00+m7uUE/OeuBfpE7uFbH6eH58GVU/KPLY4sK
-nf9hq2eVxl5HwqlAJkYVzPg/FMsdpwbFDzndIQyl9lnKY/ycmO7oy+VDM+OO45A=
-=o/58
+iQEcBAEBCAAGBQJZCPv/AAoJEKeha0olJ0NqkEoIAI8hd3bgbnaGggMuocOfzN6o
+aG0AHIRRf4iJqHmQhxjlzsyl+Lp/xGCqRibKhXJgtRU3My/sxt9cGkGk9CgYDEbJ
+Of59x7YC691X5QSRQ1XIts2kmsBHkXLfWUZhs3kstMeT8bScbfdxRCQlzTAZPllB
+1pKv+LnmxwvPyDB4kSQOWGvZXdlNbZs9WdieX9Mnitq55mal5xF+y2lN+4XBk08w
+GOBoeeyMVyrDZitkk8KxSQT2+b9UP/Z8YgTrJpQB9r++7JGGtSyAxwxL+W+TJ14L
+RC9uyuITcPPARunkdbaWrJ0DgqBRpUVERN24fpYb12a9P8s4z29AsovlMUBkazo=
+=ZpSZ
 -----END PGP SIGNATURE-----
 
---5RiX7bXFbPnkfTAQJ4MC4aJNM2RhhDSWs--
+--GaOWvc3CR7dF75mET3WgHEh5o4C3aqPJ9--
