@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d5Qds-0006y4-Ur
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:46:34 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d5QfQ-0007hx-BB
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d5Qdn-0003w8-JI
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:46:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51580)
+	(envelope-from <jasowang@redhat.com>) id 1d5QfL-00053y-PQ
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:48:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d5Qdn-0003uX-AW
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:46:27 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d5Qf6-0004re-48
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:48:03 -0400
 References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1493372840-24551-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1493372840-24551-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <d487205d-6957-d8c1-678a-38a5668586df@redhat.com>
-Date: Tue, 2 May 2017 13:46:17 +0800
+Message-ID: <d0bb0735-7b25-5236-bbfa-45b751395e7e@redhat.com>
+Date: Tue, 2 May 2017 13:47:40 +0800
 MIME-Version: 1.0
-In-Reply-To: <1493372840-24551-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1493372840-24551-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V3 01/10] net: Add vnet_hdr_len related
- callback in NetClientInfo
+Subject: Re: [Qemu-devel] [PATCH V3 04/10] net/filter-mirror.c: Add
+ filter-mirror and filter-redirector vnet support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,101 +34,99 @@ Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawe
 
 
 On 2017=E5=B9=B404=E6=9C=8828=E6=97=A5 17:47, Zhang Chen wrote:
-> Add get_vnet_hdr_len and get_using_vnet_hdr callback
-> that make we get vnet_hdr_len easily.
+> In this patch, we change the send packet format from
+> struct {int size; const uint8_t buf[];} to {int size; int vnet_hdr_len;=
+ const uint8_t buf[];}.
+> make other module(like colo-compare) know how to parse net packet corre=
+ctly.
 >
 > Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 > ---
->   include/net/net.h |  6 ++++++
->   net/net.c         | 18 ++++++++++++++++++
->   2 files changed, 24 insertions(+)
+>   net/filter-mirror.c | 28 +++++++++++++++++++++++-----
+>   1 file changed, 23 insertions(+), 5 deletions(-)
 >
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 99b28d5..402d913 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -57,7 +57,9 @@ typedef RxFilterInfo *(QueryRxFilter)(NetClientState =
-*);
->   typedef bool (HasUfo)(NetClientState *);
->   typedef bool (HasVnetHdr)(NetClientState *);
->   typedef bool (HasVnetHdrLen)(NetClientState *, int);
-> +typedef int (GetVnetHdrLen)(NetClientState *);
->   typedef void (UsingVnetHdr)(NetClientState *, bool);
-> +typedef bool (GetUsingVnetHdr)(NetClientState *);
->   typedef void (SetOffload)(NetClientState *, int, int, int, int, int);
->   typedef void (SetVnetHdrLen)(NetClientState *, int);
->   typedef int (SetVnetLE)(NetClientState *, bool);
-> @@ -79,7 +81,9 @@ typedef struct NetClientInfo {
->       HasUfo *has_ufo;
->       HasVnetHdr *has_vnet_hdr;
->       HasVnetHdrLen *has_vnet_hdr_len;
-> +    GetVnetHdrLen *get_vnet_hdr_len;
->       UsingVnetHdr *using_vnet_hdr;
-> +    GetUsingVnetHdr *get_using_vnet_hdr;
->       SetOffload *set_offload;
->       SetVnetHdrLen *set_vnet_hdr_len;
->       SetVnetLE *set_vnet_le;
-> @@ -155,7 +159,9 @@ void qemu_format_nic_info_str(NetClientState *nc, u=
-int8_t macaddr[6]);
->   bool qemu_has_ufo(NetClientState *nc);
->   bool qemu_has_vnet_hdr(NetClientState *nc);
->   bool qemu_has_vnet_hdr_len(NetClientState *nc, int len);
-> +int qemu_get_vnet_hdr_len(NetClientState *nc);
->   void qemu_using_vnet_hdr(NetClientState *nc, bool enable);
-> +bool qemu_get_using_vnet_hdr(NetClientState *nc);
->   void qemu_set_offload(NetClientState *nc, int csum, int tso4, int tso=
-6,
->                         int ecn, int ufo);
->   void qemu_set_vnet_hdr_len(NetClientState *nc, int len);
-> diff --git a/net/net.c b/net/net.c
-> index 0ac3b9e..f69260f 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -466,6 +466,15 @@ bool qemu_has_vnet_hdr_len(NetClientState *nc, int=
- len)
->       return nc->info->has_vnet_hdr_len(nc, len);
->   }
+> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+> index 72fa7c2..bb9ecf3 100644
+> --- a/net/filter-mirror.c
+> +++ b/net/filter-mirror.c
+> @@ -43,12 +43,14 @@ typedef struct MirrorState {
+>       SocketReadState rs;
+>   } MirrorState;
 >  =20
-> +int qemu_get_vnet_hdr_len(NetClientState *nc)
-> +{
-> +    if (!nc || !nc->info->get_vnet_hdr_len) {
-> +        return false;
-> +    }
-> +
-> +    return nc->info->get_vnet_hdr_len(nc);
-> +}
-> +
->   void qemu_using_vnet_hdr(NetClientState *nc, bool enable)
+> -static int filter_mirror_send(CharBackend *chr_out,
+> +static int filter_mirror_send(MirrorState *s,
+>                                 const struct iovec *iov,
+>                                 int iovcnt)
 >   {
->       if (!nc || !nc->info->using_vnet_hdr) {
-> @@ -475,6 +484,15 @@ void qemu_using_vnet_hdr(NetClientState *nc, bool =
-enable)
->       nc->info->using_vnet_hdr(nc, enable);
->   }
+> +    NetFilterState *nf =3D NETFILTER(s);
+>       int ret =3D 0;
+>       ssize_t size =3D 0;
+> +    ssize_t vnet_hdr_len;
+>       uint32_t len =3D 0;
+>       char *buf;
 >  =20
-> +bool qemu_get_using_vnet_hdr(NetClientState *nc)
-> +{
-> +    if (!nc || !nc->info->get_using_vnet_hdr) {
-> +        return false;
+> @@ -58,14 +60,30 @@ static int filter_mirror_send(CharBackend *chr_out,
+>       }
+>  =20
+>       len =3D htonl(size);
+> -    ret =3D qemu_chr_fe_write_all(chr_out, (uint8_t *)&len, sizeof(len=
+));
+> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof=
+(len));
+> +    if (ret !=3D sizeof(len)) {
+> +        goto err;
 > +    }
 > +
-> +    return nc->info->get_using_vnet_hdr(nc);
-> +}
+> +    /*
+> +     * We send vnet header len make other module(like colo-compare)
+> +     * know how to parse net packet correctly.
+> +     */
+> +    if (qemu_get_using_vnet_hdr(nf->netdev)) {
+> +        vnet_hdr_len =3D qemu_get_vnet_hdr_len(nf->netdev);
+> +    } else {
+> +        vnet_hdr_len =3D qemu_get_vnet_hdr_len(nf->netdev->peer);
+> +    }
 
-Looks like we can do this simply by:
+Any reason to query peer here?
 
-Introduce two common fields in NetClientState:
+> +
+> +    len =3D htonl(vnet_hdr_len);
+> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof=
+(len));
+>       if (ret !=3D sizeof(len)) {
+>           goto err;
+>       }
+>  =20
+>       buf =3D g_malloc(size);
+>       iov_to_buf(iov, iovcnt, 0, buf, size);
+> -    ret =3D qemu_chr_fe_write_all(chr_out, (uint8_t *)buf, size);
+> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
+>       g_free(buf);
+>       if (ret !=3D size) {
+>           goto err;
+> @@ -141,7 +159,7 @@ static ssize_t filter_mirror_receive_iov(NetFilterS=
+tate *nf,
+>       MirrorState *s =3D FILTER_MIRROR(nf);
+>       int ret;
+>  =20
+> -    ret =3D filter_mirror_send(&s->chr_out, iov, iovcnt);
+> +    ret =3D filter_mirror_send(s, iov, iovcnt);
+>       if (ret) {
+>           error_report("filter_mirror_send failed(%s)", strerror(-ret))=
+;
+>       }
+> @@ -164,7 +182,7 @@ static ssize_t filter_redirector_receive_iov(NetFil=
+terState *nf,
+>       int ret;
+>  =20
+>       if (qemu_chr_fe_get_driver(&s->chr_out)) {
+> -        ret =3D filter_mirror_send(&s->chr_out, iov, iovcnt);
+> +        ret =3D filter_mirror_send(s, iov, iovcnt);
+>           if (ret) {
+>               error_report("filter_mirror_send failed(%s)", strerror(-r=
+et));
+>           }
 
-bool using_vnet_hdr;
-int vnet_hdr_len;
-
-And set them during qemu_using_vnet_hdr() and qemu_set_vnet_hdr_len().=20
-Then we can query them directly without introducing any new callbacks.
+Do we need to strip vnet_hdr_len in redirector_to_filter() ?
 
 Thanks
-
-> +
->   void qemu_set_offload(NetClientState *nc, int csum, int tso4, int tso=
-6,
->                             int ecn, int ufo)
->   {
