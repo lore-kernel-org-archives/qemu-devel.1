@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5fmV-0001JA-DG
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:56:28 -0400
+	(envelope-from <alistair23@gmail.com>) id 1d5fvT-0004eM-OY
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5fmS-0005Hm-Bb
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:56:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8354)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d5fmS-0005H8-1u
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:56:24 -0400
-References: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1493735386-39622-2-git-send-email-pradeep.jagadeesh@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5c4737a0-f633-8688-3711-f9ffb218a073@redhat.com>
-Date: Tue, 2 May 2017 16:56:20 -0500
+	(envelope-from <alistair23@gmail.com>) id 1d5fvS-0007LE-Mk
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 18:05:43 -0400
 MIME-Version: 1.0
-In-Reply-To: <1493735386-39622-2-git-send-email-pradeep.jagadeesh@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IcH1doiKlKCWNOKV2E61MOGAjKJ9c7dRV"
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] Throttle: Create IOThrottle
- structure
+Sender: alistair23@gmail.com
+In-Reply-To: <1493122030-32191-2-git-send-email-peter.maydell@linaro.org>
+References: <1493122030-32191-1-git-send-email-peter.maydell@linaro.org>
+	<1493122030-32191-2-git-send-email-peter.maydell@linaro.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 2 May 2017 15:05:08 -0700
+Message-ID: <CAKmqyKMPX+=acJqRKkncy=s4G3C04Q8grD9PdSiPs8f1RuVRxg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 01/13] arm: Use the mmu_idx we're passed in
+ arm_cpu_do_unaligned_access()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Patch Tracking <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IcH1doiKlKCWNOKV2E61MOGAjKJ9c7dRV
-From: Eric Blake <eblake@redhat.com>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
- alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>,
- qemu-devel@nongnu.org
-Message-ID: <5c4737a0-f633-8688-3711-f9ffb218a073@redhat.com>
-Subject: Re: [PATCH v3 1/4] Throttle: Create IOThrottle structure
-References: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
- <1493735386-39622-2-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1493735386-39622-2-git-send-email-pradeep.jagadeesh@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 25, 2017 at 5:06 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> When identifying the DFSR format for an alignment fault, use
+> the mmu index that we are passed, rather than calling cpu_mmu_index()
+> to get the mmu index for the current CPU state. This doesn't actually
+> make any difference since the only cases where the current MMU index
+> differs from the index used for the load are the "unprivileged
+> load/store" instructions, and in that case the mmu index may
+> differ but the translation regime is the same (apart from the
+> "use from Hyp mode" case which is UNPREDICTABLE).
+> However it's the more logical thing to do.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-On 05/02/2017 09:29 AM, Pradeep Jagadeesh wrote:
-> This patchset introduces a new io throttle structure. This will be
-> used in both block and fsdev devices.
->=20
-> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+
+Thanks,
+
+Alistair
+
 > ---
->  qapi/block-core.json | 76 ++------------------------------------------=
---
->  qapi/iothrottle.json | 86 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 89 insertions(+), 73 deletions(-)
->  create mode 100644 qapi/iothrottle.json
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---IcH1doiKlKCWNOKV2E61MOGAjKJ9c7dRV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZCQCEAAoJEKeha0olJ0NqvDcIALAzxaJhE9hOnk7wacHmQufG
-A7crnkvvZsTI5DmPmdJA6tHmwDxk228079YOrHUsjSseeyP5t0KbyckW9ZMasmLH
-06qQI/lQSZ145LnB8IF9IYNww44guCWuxgpGBwGzhqHjKSfl3H6lyCAmkU8/mZHK
-Sk+VpEA648l9sjSH4pXB+7ayQJqfuvqswvvXcGJUe+SYDIT2XUGVl5y2WnxxJlmF
-qnrgWOs7dUoTMrHmxFg7kyxeFIC5hF+S5TVmHpTl5ryOjfNW0ywmc/ou5LhXJqjv
-FucVkQ+dE6ymF4jbLqKJTUmC+N8xXsRNGSb9PmM+mH5bElqcE3f2uzIA5eImofs=
-=2Ls5
------END PGP SIGNATURE-----
-
---IcH1doiKlKCWNOKV2E61MOGAjKJ9c7dRV--
+>  target/arm/op_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index 156b825..de24815 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -208,7 +208,7 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
+>      /* the DFSR for an alignment fault depends on whether we're using
+>       * the LPAE long descriptor format, or the short descriptor format
+>       */
+> -    if (arm_s1_regime_using_lpae_format(env, cpu_mmu_index(env, false))) {
+> +    if (arm_s1_regime_using_lpae_format(env, mmu_idx)) {
+>          env->exception.fsr = (1 << 9) | 0x21;
+>      } else {
+>          env->exception.fsr = 0x1;
+> --
+> 2.7.4
+>
+>
