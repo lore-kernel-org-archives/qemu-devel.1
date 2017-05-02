@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5Xg6-0005bl-2A
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:17:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d5XlA-0006lq-71
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5Xg2-0007qg-QG
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:17:18 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:32921)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5Xg2-0007qO-M8
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:17:14 -0400
-Received: by mail-qk0-x243.google.com with SMTP id o85so21270336qkh.0
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 06:17:14 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170426183721.7482-1-dgilbert@redhat.com>
-	<20170426183721.7482-3-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <88f22fc5-4dd6-f181-5d2e-40a6f17c07cd@amsat.org>
-Date: Tue, 2 May 2017 10:17:10 -0300
+	(envelope-from <pbonzini@redhat.com>) id 1d5Xl6-00011e-Ux
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:22:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47292)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5Xl6-00011U-LR
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:22:28 -0400
+References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
+	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
+	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
+	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ac13fd46-bd6e-6a8a-2c72-cc8d683d5026@redhat.com>
+Date: Tue, 2 May 2017 15:22:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170426183721.7482-3-dgilbert@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration: Extra tracing
+In-Reply-To: <df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
+ in favour of '-accel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Vincent Palatin <vpalatin@chromium.org>
 
-On 04/26/2017 03:37 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> A couple more traces that would have made fixing that postcopy
-> bug a bit easier.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  migration/ram.c        | 2 ++
->  migration/trace-events | 2 ++
->  2 files changed, 4 insertions(+)
+On 02/05/2017 12:48, Christian Borntraeger wrote:
+>> I'm aware of the fact that likely a lot of users are still using
+>> -enable-kvm, and I did not mean that we should remove it soon yet. But
+>> IMHO we should start now to inform the users that they should slowly
+>> switch to the better option "-accel" instead, so that we could maybe
+>> remove this "-enable-xxx" stuff sometime in the distant future (let's
+>> say QEMU v4.0?).
 >
-> diff --git a/migration/ram.c b/migration/ram.c
-> index b4ed41c725..3ac41ccaba 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -812,6 +812,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->      ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
->
->      p = block->host + offset;
-> +    trace_ram_save_page(block->idstr, (uint64_t)offset, p);
->
->      /* In doubt sent page as normal */
->      bytes_xmit = 0;
-> @@ -2614,6 +2615,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->                  ret = -EINVAL;
->                  break;
->              }
-> +            trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
->          }
->
->          switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
-> diff --git a/migration/trace-events b/migration/trace-events
-> index b8f01a218c..5b8ccf301c 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -69,8 +69,10 @@ migration_bitmap_sync_start(void) ""
->  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
->  migration_throttle(void) ""
->  ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %" PRIx64 " %zx"
-> +ram_load_loop(const char *rbname, uint64_t addr, int flags, void *host) "%s: addr: %" PRIx64 " flags: %x host: %p"
->  ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
->  ram_postcopy_send_discard_bitmap(void) ""
-> +ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: %" PRIx64 " host: %p"
->  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: %zx len: %zx"
->
->  # migration/migration.c
->
+> I come from the Linux side, where "breaking a working setup" will result in
+> an angry Linus. We certainly have not such strict rules here and we could 
+> base the decision on the question "how expensive is the maintenance
+> of this option?". I think marking it as "legacy option" is fine, but I doubt
+> that removing it will make qemu maintenance cheaper. So my preferred variant
+> is
+
+Even for Linux the rules aren't 100% black or white.  There have been
+cases where small breakage are introduced, for example 4.12 will break
+the BLKDISCARDZEROES ioctl.
+
+We shouldn't treat things are black or white here too.
+
+"-usbdevice" makes sense to deprecate because it brings together a
+complicated parsing mechanism, though perhaps we could keep it for
+simple devices such as keyboard, mouse, tablet where it's pretty surely
+in use in the wild.
+
+"-drive cyls=..." also makes sense to deprecate because it is a very
+obscure functionality.
+
+"-drive serial=..." would be nice to deprecate, but I think it's already
+less clear that it's not in use in the wild.  Probably it's still on the
+side of wanting to eventually remove it.
+
+"-net" is more complicated still.  It's almost surely in use in the
+wild, but then probably the users are fairly advanced and (with the
+provision that documentation should be updated) I guess we could
+eventually get there.
+
+But I really, really see no point in removing --enable-kvm.  It costs
+perhaps 10 lines of code that has pretty much no ramifications elsewhere
+in the code.  If anything I'd expect "-machine accel" to disappear
+before, if ever (in favor of multiple "-accel" options, e.g. "-machine
+accel=kvm:tcg" can become "-accel kvm -accel tcg".
+
+Thanks,
+
+Paolo
