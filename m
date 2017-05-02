@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5a3Q-0008J1-KD
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:49:33 -0400
+	(envelope-from <famz@redhat.com>) id 1d5a3l-00005r-2F
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:49:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5a3P-0004bh-Ri
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:49:32 -0400
-Date: Tue, 2 May 2017 23:49:20 +0800
+	(envelope-from <famz@redhat.com>) id 1d5a3j-0004u5-VL
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:49:53 -0400
+Date: Tue, 2 May 2017 23:49:43 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170502154920.GB28344@lemon.lan>
+Message-ID: <20170502154943.GC28344@lemon.lan>
 References: <20170502081832.9546-1-famz@redhat.com>
-	<20170502081832.9546-16-famz@redhat.com>
-	<20170502141520.GD5805@noname.redhat.com>
+	<20170502081832.9546-22-famz@redhat.com>
+	<20170502145936.GF5805@noname.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170502141520.GD5805@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v16 15/22] file-posix: Add 'locking' option
+In-Reply-To: <20170502145936.GF5805@noname.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v16 21/22] qemu-iotests: Add test case 153
+ for image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +28,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Tue, 05/02 16:15, Kevin Wolf wrote:
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 1cf29a1..29d3040 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -2127,11 +2127,15 @@
-> >  #
-> >  # @filename:    path to the image file
-> >  # @aio:         AIO backend (default: threads) (since: 2.8)
-> > +# @locking:     whether to enable file locking. If set to 'auto', only enable
-> > +#               when Open File Descriptor (OFD) locking API is available
-> > +#               (default: auto, since 2.10)
-> >  #
-> >  # Since: 2.9
-> >  ##
-> >  { 'struct': 'BlockdevOptionsFile',
-> >    'data': { 'filename': 'str',
-> > +            '*locking': 'OnOffAuto',
-> >              '*aio': 'BlockdevAioOptions' } }
+On Tue, 05/02 16:59, Kevin Wolf wrote:
+> Am 02.05.2017 um 10:18 hat Fam Zheng geschrieben:
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  tests/qemu-iotests/153     | 247 ++++++++++++++++++++++++++++
+> >  tests/qemu-iotests/153.out | 390 +++++++++++++++++++++++++++++++++++++++++++++
+> >  tests/qemu-iotests/group   |   1 +
+> >  3 files changed, 638 insertions(+)
+> >  create mode 100755 tests/qemu-iotests/153
+> >  create mode 100644 tests/qemu-iotests/153.out
+> > 
+> > diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+> > new file mode 100755
+> > index 0000000..ed90f12
+> > --- /dev/null
+> > +++ b/tests/qemu-iotests/153
+> > @@ -0,0 +1,247 @@
+> > +#!/bin/bash
+> > +#
+> > +# Test image locking
+> > +#
+> > +# Copyright 2016, 2017 Red Hat, Inc.
+> > +#
+> > +# This program is free software; you can redistribute it and/or modify
+> > +# it under the terms of the GNU General Public License as published by
+> > +# the Free Software Foundation; either version 2 of the License, or
+> > +# (at your option) any later version.
+> > +#
+> > +# This program is distributed in the hope that it will be useful,
+> > +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > +# GNU General Public License for more details.
+> > +#
+> > +# You should have received a copy of the GNU General Public License
+> > +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> > +#
+> > +
+> > +# creator
+> > +owner=famz@redhat.com
+> > +
+> > +seq="$(basename $0)"
+> > +echo "QA output created by $seq"
+> > +
+> > +here="$PWD"
+> > +tmp=/tmp/$$
+> > +status=1	# failure is the default!
+> > +
+> > +_cleanup()
+> > +{
+> > +    _cleanup_test_img
+> > +    rm -f "${TEST_IMG}.base"
+> > +    rm -f "${TEST_IMG}.convert"
+> > +    rm -f "${TEST_IMG}.a"
+> > +    rm -f "${TEST_IMG}.b"
+> > +    rm -f "${TEST_IMG}.lnk"
+> > +}
+> > +trap "_cleanup; exit \$status" 0 1 2 3 15
+> > +
+> > +# get standard environment, filters and checks
+> > +. ./common.rc
+> > +. ./common.filter
+> > +. ./common.qemu
+> > +
+> > +_check_ofd()
+> > +{
+> > +    local test_source="${TEST_DIR}/ofd-test.c"
+> > +    local test_binary="${TEST_DIR}/ofd-test"
+> > +    cat > "$test_source" <<EOF
+> > +#define _GNU_SOURCE
+> > +#include <unistd.h>
+> > +#include <fcntl.h>
+> > +#include <stdio.h>
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +    int fd = open(argv[0], O_RDONLY);
+> > +    struct flock fl = {
+> > +        .l_whence = SEEK_SET,
+> > +        .l_start  = 0,
+> > +        .l_len    = 1,
+> > +        .l_type   = F_RDLCK,
+> > +    };
+> > +    return !(fd >= 0 && fcntl(fd, F_OFD_SETLK, &fl) == 0);
+> > +}
+> > +EOF
+> > +    cc "$test_source" -o "$test_binary" 2>&1 && "$test_binary"
+> > +}
 > 
-> It's unfortunate that file-posix and file-win32 share the same QAPI
-> type. Should we add a file-win32 implementation that just errors out
-> when locking=on is specified, or is it enough that block.c notices that
-> there is an option that hasn't been processed? (Even locking=off would
-> cause failure then.)
+> Hm. Not sure I like this. It requires that a compiler is even installed
+> on the test machine, it doesn't respect which compiler was selected in
+> configure, and if the libc version on test machine doesn't match the
+> build machine of the qemu binaries, it might not even give the right
+> result.
+> 
+> Wouldn't it be much easier to just start qemu-io with locking=on and
+> grep for the warning?
 
-That will make it a bit more like an oversight, maybe only error out when
-locking=on is better.
+Good idea, will do.
 
 Fam
