@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5d56-0002uW-PH
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:03:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d5dHy-00087j-9y
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5d55-0001XF-3l
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:03:28 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35650)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d5d54-0001WL-RA
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:03:27 -0400
-Received: by mail-wm0-x242.google.com with SMTP id d79so6954558wmi.2
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:03:26 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1d5dHt-0002W3-6Q
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:16:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32433)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d5dHs-0002V9-Sb
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:16:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A7EB4C20AE86
+	for <qemu-devel@nongnu.org>; Tue,  2 May 2017 19:16:39 +0000 (UTC)
+Date: Tue, 2 May 2017 20:16:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170502191630.GF5640@work-vm>
 MIME-Version: 1.0
-References: <20170424130355.31324-1-marcandre.lureau@redhat.com>
-	<CABdb736pFG7yK+C_J-WWRbX+e-bk62TejQ_GtObxyFmV5t350w@mail.gmail.com>
-	<CAJ+F1CJPEZNUPrYseN3JD+gAtwJ-rLQVRBLdXTQVSwaBTdNGHA@mail.gmail.com>
-	<20170502091723.3a3b4e42@nial.brq.redhat.com>
-In-Reply-To: <20170502091723.3a3b4e42@nial.brq.redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 02 May 2017 19:03:15 +0000
-Message-ID: <CAJ+F1CJ-tvPdX1QLYKWg6M_cattYcBDO25Hfp+rfBpnCZbwFtA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] RFC: vmcoreinfo device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] crash in vhost-user-bridge on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,139 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, anderson@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, peterx@redhat.com
+Cc: qemu-devel@nongnu.org
 
-Hi
+Hi,
+  I've started playing with vhost-user-bridge and have it
+basically up and going, but I've just tried migration and
+I've got a reliable crash for it; I'm not that sure I've
+got it set up right, so suggestions please:
 
-On Tue, May 2, 2017 at 11:17 AM Igor Mammedov <imammedo@redhat.com> wrote:
+This is with qemu head, on an f26 host running an f25-ish
+guest.
 
-> On Fri, 28 Apr 2017 14:28:38 +0000
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
->
-> > Hi
-> >
-> > On Fri, Apr 28, 2017 at 6:12 PM Ladi Prosek <lprosek@redhat.com> wrote:
-> >
-> > > On Mon, Apr 24, 2017 at 3:03 PM, Marc-Andr=C3=A9 Lureau
-> > > <marcandre.lureau@redhat.com> wrote:
-> > > > The VM coreinfo (vmcoreinfo) device is an emulated device which
-> > > > exposes a 4k memory range to the guest to store various information=
-s
-> > > > useful to debug the guest OS. (it is greatly inspired by the VMGENI=
-D
-> > > > device implementation)
-> > > >
-> > > > This is an early-boot alternative to the qemu-ga VMDUMP_INFO event
-> > > > proposed in "[PATCH 00/21] WIP: dump: add kaslr support".
-> > > >
-> > > > If deemed more appropriate, we can consider writing to fw_cfg
-> directly
-> > > > instead of guest memory, now that qemu 2.9 supports it again.
-> > > >
-> > > > The proof-of-concept kernel module:
-> > > > https://github.com/elmarco/vmgenid-test/blob/master/qemuvmci-test.c
-> > >
-> > > Here's a proof-of-concept Windows driver:
-> > >
-> > >
-> https://github.com/ladipro/kvm-guest-drivers-windows/tree/vmcoreinfo/vmco=
-reinfo
-> > >
-> > > I just wanted to be sure that it's possible to evaluate the ADDR
-> > > method in Windows.
-> > >
-> > > From a practical point of view it is unfortunate that this would be a
-> > > completely new device. For Windows guests it means another driver
-> > > binary and all the overhead associated with deploying it on VMs. Woul=
-d
-> > > it be too crazy to add this functionality to the pvpanic device? The
-> > > mechanics could stay the same but it would be done under the existing
-> > > ACPI\QEMU0001 device.
-> > >
-> >
-> > pvpanic is under _SB.PCI0.ISA, that could be problematic
-> >
-> > and _STA is a name field.
-> >
-> > Someone with more experience with ACPI could tell us if that make sense
-> to
-> > merge both and how.
-> >
-> > Can't you handle 2 ACPI devices in the same windows driver instead?
-> we use QEMU0001 to reserve IO ports for pvpanic device,
-> ASL wise there shouldn't problems with adding _ADDR method to it
->
-> but then we probably should fold vmcoreinfo into pvpanic device
-> as well (QEMU and linux driver)
->
->
-pvpanic is x86-only afaict. While I think vmcoreinfo would work fine with
-any acpi-able arch.
+Program received signal SIGSEGV, Segmentation fault.
+0x000055c414112ce4 in vring_avail_idx (vq=0x55c41582fd68, vq=0x55c41582fd68)
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
+940	    vq->shadow_avail_idx = vq->vring.avail->idx;
+(gdb) p vq
+$1 = (VuVirtq *) 0x55c41582fd68
+(gdb) p vq->vring
+$2 = {num = 0, desc = 0x0, avail = 0x0, used = 0x0, log_guest_addr = 0, flags = 0}
+(gdb) p vq->shadow_avail_idx
+$3 = 0
 
-I think I would rather modify the windows driver to support both pvpanic &
-vmcoreinfo, even if it's not typical for driver to implement several
-devices.
+#0  0x000055c414112ce4 in vring_avail_idx (vq=0x55c41582fd68, vq=0x55c41582fd68)
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
+No locals.
+#1  virtqueue_num_heads (idx=0, vq=0x55c41582fd68, dev=0x55c41582fc20)
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:960
+        num_heads = <optimized out>
+#2  vu_queue_get_avail_bytes (dev=0x55c41582fc20, vq=0x55c41582fd68, in_bytes=in_bytes@entry=0x7fffd035d7c0, 
+    out_bytes=out_bytes@entry=0x7fffd035d7c4, max_in_bytes=max_in_bytes@entry=0, 
+    max_out_bytes=max_out_bytes@entry=0) at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:1034
+        idx = 0
+        total_bufs = 0
+        in_total = 0
+        out_total = 0
+        rc = <optimized out>
+#3  0x000055c414112fbd in vu_queue_avail_bytes (dev=<optimized out>, vq=<optimized out>, in_bytes=0, out_bytes=0)
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:1116
+        in_total = 0
+        out_total = 0
+#4  0x000055c4141114da in vubr_backend_recv_cb (sock=<optimized out>, ctx=0x55c41582fc20)
+    at /home/dgilbert/git/qemu/tests/vhost-user-bridge.c:276
+        vubr = 0x55c41582fc20
+        dev = 0x55c41582fc20
+        vq = 0x55c41582fd68
+        elem = 0x0
+        mhdr_sg = {{iov_base = 0x0, iov_len = 0} <repeats 740 times>, {iov_base = 0x0, iov_len = 140512740079088}, {
+                   .....}
 
->
-> > > +Storage Format:
-> > > > +---------------
-> > > > +
-> > > > +The content is expected to use little-endian format.
-> > > > +
-> > > > +In order to implement an OVMF "SDT Header Probe Suppressor", the
-> > > contents of
-> > > > +the vmcoreinfo blob has 40 bytes of padding:
-> > > > +
-> > > > ++-----------------------------------+
-> > > > +| SSDT with OEM Table ID =3D VMCOREIN |
-> > > > ++-----------------------------------+
-> > > > +| ...                               |       TOP OF PAGE
-> > > > +| VCIA dword object ----------------|----->
-> > > +---------------------------+
-> > > > +| ...                               |       | fw-allocated array f=
-or
-> > > |
-> > > > +| _STA method referring to VCIA     |       | "etc/vmcoreinfo"
-> > > |
-> > > > +| ...                               |
-> > >  +---------------------------+
-> > > > +| ADDR method referring to VCIA     |       |  0: OVMF SDT Header
-> probe
-> > > |
-> > > > +| ...                               |       |     suppressor
-> > > |
-> > > > ++-----------------------------------+       | 40: uint32 version
-> field
-> > > |
-> > > > +                                            | 44: info contents
-> > >  |
-> > > > +                                            |     ....
-> > > |
-> > > > +
-> > > +---------------------------+
-> > > > +                                            END OF PAGE
-> > > > +
-> > > > +Version 0 content:
-> > > > +
-> > > > + uint64 paddr:
-> > > > +  Physical address of the Linux vmcoreinfo ELF note.
-> > >
-> > > Or physical address of the Windows crash dump header :p
-> > >
-> >
-> > Is there support for Windows crash dump in qemu?
-> >
-> >
-> > > Do we want to have an additional discriminator field to tell what kin=
-d
-> > > of information was written by the guest or would Windows use a
-> > > different version?
-> > >
-> > >
-> > I guess a different version would be ok.
-> >
-> > Thanks a lot for looking at it!
->
-> --
-Marc-Andr=C3=A9 Lureau
+        mhdr = {hdr = {flags = 0 '\000', gso_type = 0 '\000', hdr_len = 0, gso_size = 0, csum_start = 0, 
+            csum_offset = 0}, num_buffers = 0}
+        mhdr_cnt = 0
+        hdrlen = 0
+        i = 0
+        hdr = {flags = 0 '\000', gso_type = 0 '\000', hdr_len = 0, gso_size = 0, csum_start = 0, csum_offset = 0}
+        __PRETTY_FUNCTION__ = "vubr_backend_recv_cb"
+#5  0x000055c414110ad3 in dispatcher_wait (timeout=200000, dispr=0x55c4158300b8)
+    at /home/dgilbert/git/qemu/tests/vhost-user-bridge.c:154
+        e = 0x55c415830180
+
+That's from the destination bridge; I'm running both on a single
+host and that's happening when I just do a :
+   migrate_set_speed 1G
+   migrate tcp:localhost:8888
+
+The destination qemu spits out:
+qemu-system-x86_64: Failed to set msg fds.
+qemu-system-x86_64: vhost VQ 0 ring restore failed: -1: Resource temporarily unavailable (11)
+qemu-system-x86_64: Failed to set msg fds.
+qemu-system-x86_64: vhost VQ 1 ring restore failed: -1: Resource temporarily unavailable (11)
+
+but I'm not sure if that's before or after the seg of the bridge.
+
+I've got:
+  a) One qemu that just has the -net socket / -net user setup as per the docs - but I've got
+     two lots of sockets for either side
+  b) Two qemus for the guests, teh second with just the -incoming
+  c) The two vhost-user-bridge instances - the destination being pointed at the second set of sockets.
+
+My test is run by doing:
+#!/bin/bash -x
+SESS=vhost
+tmux -L $SESS new-session -d
+tmux -L $SESS set-option -g set-remain-on-exit on
+# Start a router using the system qemu
+tmux -L $SESS new-window -n router qemu-system-x86_64 -M none -nographic -net socket,vlan=0,udp=localhost:4444,localaddr=localhost:5555 -net socket,vlan=0,udp=localhost:4445,localaddr=localhost:5556 -net user,vlan=0
+# Start source vhost bridge
+tmux -L $SESS new-window -n srcvhostbr ./tests/vhost-user-bridge -u /tmp/vubrsrc.sock
+tmux -L $SESS new-window -n source "./x86_64-softmmu/qemu-system-x86_64 -enable-kvm -m 1G -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -chardev socket,id=char0,path=/tmp/vubrsrc.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 /home/vmimages/f25.qcow2 -net none"
+# Start dest vhost bridge
+tmux -L $SESS new-window -n destvhostbr ./tests/vhost-user-bridge -u /tmp/vubrdst.sock -l 127.0.0.1:4445 -r 127.0.0.1:5556
+tmux -L $SESS new-window -n dest "./x86_64-softmmu/qemu-system-x86_64 -enable-kvm -m 1G -smp 2 -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on -numa node,memdev=mem -mem-prealloc -chardev socket,id=char0,path=/tmp/vubrdst.sock -netdev type=vhost-user,id=mynet1,chardev=char0,vhostforce -device virtio-net-pci,netdev=mynet1 /home/vmimages/f25.qcow2 -net none -incoming tcp::8888"
+
+(I've got a few added printf's so the lines might be off by a few).
+
+Thanks,
+
+Dave
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
