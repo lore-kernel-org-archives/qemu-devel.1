@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5WTA-00065r-HK
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 07:59:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1d5WTI-00069k-GS
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:00:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5WT9-0002FH-Hq
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 07:59:52 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d5WT9-0002Eg-8J
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 07:59:51 -0400
-Received: by mail-wr0-x241.google.com with SMTP id g12so16953340wrg.2
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 04:59:51 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1d5WTH-0002Jf-8d
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:00:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40064)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d5WTG-0002JG-Vq
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 07:59:59 -0400
+Date: Tue, 2 May 2017 12:59:53 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170502115953.GJ3459@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
+	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
+	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
+	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
+	<7c69341a-9584-8208-023a-42bfeeec6dee@redhat.com>
 MIME-Version: 1.0
-References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
-	<1493725969-19518-2-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1493725969-19518-2-git-send-email-amarnath.valluri@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 02 May 2017 11:59:39 +0000
-Message-ID: <CAJ+F1C+eC7E9THJML4P2KvyV-mL+XXeE_b8z7LePCi3DCms_gQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] tpm-backend: Remove unneeded member
- variable from backend class
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7c69341a-9584-8208-023a-42bfeeec6dee@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
+ in favour of '-accel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: stefanb@linux.vnet.ibm.com, patrick.ohly@intel.com, berrange@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
 
-On Tue, May 2, 2017 at 3:52 PM Amarnath Valluri <amarnath.valluri@intel.com=
->
-wrote:
+On Tue, May 02, 2017 at 01:26:17PM +0200, Thomas Huth wrote:
+> On 02.05.2017 12:48, Christian Borntraeger wrote:
+> > On 05/02/2017 12:37 PM, Thomas Huth wrote:
+> >> On 02.05.2017 12:32, Christian Borntraeger wrote:
+> >>> On 05/02/2017 12:06 PM, Thomas Huth wrote:
+> >>>> The '-enable-...' option do not make too much sense: They do not
+> >>>> allow additional parameters, using '-accel xxx' is shorter than
+> >>>> '-enable-xxx' and we're also inconsistent here, since there is
+> >>>> no '-enable-xen' option available. So let's try to convince the
+> >>>> users to use '-accel xxx' instead.
+> >>>
+> >>> google has 36000 hits for "--enable-kvm" and 18000 hits for "--accel kvm"
+> >>> So I assume this will affect a lot of setups for only a very small benefit.
+> >>
+> >> I'm aware of the fact that likely a lot of users are still using
+> >> -enable-kvm, and I did not mean that we should remove it soon yet. But
+> >> IMHO we should start now to inform the users that they should slowly
+> >> switch to the better option "-accel" instead, so that we could maybe
+> >> remove this "-enable-xxx" stuff sometime in the distant future (let's
+> >> say QEMU v4.0?).
+> > 
+> > I come from the Linux side, where "breaking a working setup" will result in
+> > an angry Linus.
+> 
+> IMHO that's a good approach, but I think it should primarily applied for
+> the interfaces that are designed as "API" to other software layers, i.e.
+> things like QMP and the "-machine" parameter.
+> "-enable-kvm" is in my eyes rather a "syntactic sugar" convenience
+> option, so I'd not apply this rule to this option.
+> 
+> > We certainly have not such strict rules here and we could
+> > base the decision on the question "how expensive is the maintenance
+> > of this option?". I think marking it as "legacy option" is fine, but I doubt
+> > that removing it will make qemu maintenance cheaper.
+> 
+> Likely not. Actually, I have another point of view in mind here: You
+> have to consider that QEMU has a *lot* of options, and I think this is
+> very confusing for the users, especially the new ones. If we always
+> provide two or three ways to achieve a goal, especially in an
+> inconsistent way like we do it here, we likely rather create frustration
+> than joy for the normal users. Providing a clean, straightforward CLI
+> interface one day could help to improve the user experience quite a bit.
 
-> TPMDriverOps inside TPMBackend is not required, as it is supposed to be a
-> class
-> member. The only possible reason for keeping in TPMBackend was, to get th=
-e
-> backend type in tpm.c where dedicated backend api, tpm_backend_get_type()
-> is
-> present.
->
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
->
+The issue is that we have mutually exclusive requirements here. For a
+straightforward, easy to understand CLI, things like "--enable-kvm" are
+much quicker to discover & understand than "-machine accel=kvm". The
+latter gives much more flexibility since it can set all the other opts,
+but most of those are rarely used by people who are invoking QEMU
+manually/directly. We need the things like -machine for libvirt and
+similar, but they are not end user friendly. Killing all the shortcuts
+like --enable-kvm would cut down the args we expose, but forcing users
+onto more complex syntax for args like -machine is not improving their
+lives in general if they don't need that extra flexibility.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
->
-> ---
->  hw/tpm/tpm_passthrough.c     | 4 ----
->  include/sysemu/tpm_backend.h | 1 -
->  tpm.c                        | 2 +-
->  3 files changed, 1 insertion(+), 6 deletions(-)
->
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index 9234eb3..a0baf5f 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -46,8 +46,6 @@
->  #define TPM_PASSTHROUGH(obj) \
->      OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
->
-> -static const TPMDriverOps tpm_passthrough_driver;
-> -
->  /* data structures */
->  typedef struct TPMPassthruThreadParams {
->      TPMState *tpm_state;
-> @@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts
-> *opts, const char *id)
->      /* let frontend set the fe_model to proper value */
->      tb->fe_model =3D -1;
->
-> -    tb->ops =3D &tpm_passthrough_driver;
-> -
->      if (tpm_passthrough_handle_device_opts(opts, tb)) {
->          goto err_exit;
->      }
-> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-> index b58f52d..e7f590d 100644
-> --- a/include/sysemu/tpm_backend.h
-> +++ b/include/sysemu/tpm_backend.h
-> @@ -50,7 +50,6 @@ struct TPMBackend {
->      enum TpmModel fe_model;
->      char *path;
->      char *cancel_path;
-> -    const TPMDriverOps *ops;
->
->      QLIST_ENTRY(TPMBackend) list;
->  };
-> diff --git a/tpm.c b/tpm.c
-> index 9a7c711..0ee021a 100644
-> --- a/tpm.c
-> +++ b/tpm.c
-> @@ -258,7 +258,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
->      res->model =3D drv->fe_model;
->      res->options =3D g_new0(TpmTypeOptions, 1);
->
-> -    switch (drv->ops->type) {
-> +    switch (tpm_backend_get_type(drv)) {
->      case TPM_TYPE_PASSTHROUGH:
->          res->options->type =3D TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
->          tpo =3D g_new0(TPMPassthroughOptions, 1);
-> --
-> 2.7.4
->
-> --
-Marc-Andr=C3=A9 Lureau
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
