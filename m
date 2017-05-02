@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5T1w-0006Fr-6K
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:33 -0400
+	(envelope-from <famz@redhat.com>) id 1d5T21-0006LM-B5
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5T1v-0000Gc-Ai
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:32 -0400
+	(envelope-from <famz@redhat.com>) id 1d5T20-0000Lx-9z
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:37 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  2 May 2017 16:18:26 +0800
-Message-Id: <20170502081832.9546-17-famz@redhat.com>
+Date: Tue,  2 May 2017 16:18:27 +0800
+Message-Id: <20170502081832.9546-18-famz@redhat.com>
 In-Reply-To: <20170502081832.9546-1-famz@redhat.com>
 References: <20170502081832.9546-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v16 16/22] tests: Disable image lock in
- test-replication
+Subject: [Qemu-devel] [PATCH v16 17/22] block: Reuse bs as backing hd for
+ drive-backup sync=none
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +23,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-The COLO block replication architecture requires one disk to be shared
-between primary and secondary, in the test both processes use posix file
-protocol (instead of over NBD) so it is affected by image locking.
-Disable the lock.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/test-replication.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ blockdev.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index 3016c6f..cebeb79 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -179,7 +179,8 @@ static BlockBackend *start_primary(void)
-     char *cmdline;
- 
-     cmdline = g_strdup_printf("driver=replication,mode=primary,node-name=xxx,"
--                              "file.driver=qcow2,file.file.filename=%s"
-+                              "file.driver=qcow2,file.file.filename=%s,"
-+                              "file.file.locking=off"
-                               , p_local_disk);
-     opts = qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
-     g_free(cmdline);
-@@ -310,7 +311,9 @@ static BlockBackend *start_secondary(void)
+diff --git a/blockdev.c b/blockdev.c
+index 6428206..e1facf5 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3174,6 +3174,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
      Error *local_err = NULL;
+     int flags;
+     int64_t size;
++    bool set_backing_hd = false;
  
-     /* add s_local_disk and forge S_LOCAL_DISK_ID */
--    cmdline = g_strdup_printf("file.filename=%s,driver=qcow2", s_local_disk);
-+    cmdline = g_strdup_printf("file.filename=%s,driver=qcow2,"
-+                              "file.locking=off",
-+                              s_local_disk);
-     opts = qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
-     g_free(cmdline);
+     if (!backup->has_speed) {
+         backup->speed = 0;
+@@ -3224,6 +3225,8 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+     }
+     if (backup->sync == MIRROR_SYNC_MODE_NONE) {
+         source = bs;
++        flags |= BDRV_O_NO_BACKING;
++        set_backing_hd = true;
+     }
  
-@@ -331,8 +334,10 @@ static BlockBackend *start_secondary(void)
-     /* add S_(ACTIVE/HIDDEN)_DISK and forge S_ID */
-     cmdline = g_strdup_printf("driver=replication,mode=secondary,top-id=%s,"
-                               "file.driver=qcow2,file.file.filename=%s,"
-+                              "file.file.locking=off,"
-                               "file.backing.driver=qcow2,"
-                               "file.backing.file.filename=%s,"
-+                              "file.backing.file.locking=off,"
-                               "file.backing.backing=%s"
-                               , S_ID, s_active_disk, s_hidden_disk
-                               , S_LOCAL_DISK_ID);
+     size = bdrv_getlength(bs);
+@@ -3250,7 +3253,9 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+     }
+ 
+     if (backup->format) {
+-        options = qdict_new();
++        if (!options) {
++            options = qdict_new();
++        }
+         qdict_put(options, "driver", qstring_from_str(backup->format));
+     }
+ 
+@@ -3261,6 +3266,14 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+ 
+     bdrv_set_aio_context(target_bs, aio_context);
+ 
++    if (set_backing_hd) {
++        bdrv_set_backing_hd(target_bs, source, &local_err);
++        if (local_err) {
++            bdrv_unref(target_bs);
++            goto out;
++        }
++    }
++
+     if (backup->has_bitmap) {
+         bmap = bdrv_find_dirty_bitmap(bs, backup->bitmap);
+         if (!bmap) {
 -- 
 2.9.3
