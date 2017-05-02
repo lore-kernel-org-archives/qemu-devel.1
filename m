@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5Wvd-00005W-AY
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:29:19 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5Wz7-0000zw-Pt
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:32:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5Wvb-0000vq-HQ
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:29:17 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36100)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5Wz4-00035l-Kj
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:32:53 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33555)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d5Wvb-0000vR-7v
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:29:15 -0400
-Received: by mail-wm0-x241.google.com with SMTP id u65so4055110wmu.3
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 05:29:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5Wz4-00035I-Fh
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:32:50 -0400
+Received: by mail-qt0-x243.google.com with SMTP id c45so20003926qtb.0
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 05:32:50 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170501221046.9369-1-aurelien@aurel32.net>
+	<20170501221046.9369-3-aurelien@aurel32.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cd681ab5-8fde-b18d-beb8-c23993081b90@amsat.org>
+Date: Tue, 2 May 2017 09:32:47 -0300
 MIME-Version: 1.0
-References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
-	<1493725969-19518-5-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1493725969-19518-5-git-send-email-amarnath.valluri@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 02 May 2017 12:29:03 +0000
-Message-ID: <CAJ+F1CJC21gXOHuVf09NstSs278Aw9no6H51XPa8_fMgYP+AVQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] tpm-backend: Made few interface
- methods optional
+In-Reply-To: <20170501221046.9369-3-aurelien@aurel32.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 02/14] target/sh4: get rid of
+ DELAY_SLOT_CLEARME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,184 +35,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: stefanb@linux.vnet.ibm.com, patrick.ohly@intel.com, berrange@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
 
-On Tue, May 2, 2017 at 3:52 PM Amarnath Valluri <amarnath.valluri@intel.com=
+On 05/01/2017 07:10 PM, Aurelien Jarno wrote:
+> Now that ctx->flags has been split, it becomes clear that
+> DELAY_SLOT_CLEARME has not impact on the code generation: in both case
+> ctx->envflags is cleared, either by clearing all the flags, or by
+> setting it to 0. This is left-over from pre-TCG era.
 >
-wrote:
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 
-> This allows backend implementations left optional interface methods.
-> For mandatory methods assertion checks added.
->
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
----
->  backends/tpm.c           | 24 ++++++++++++++++++------
->  hw/tpm/tpm_passthrough.c | 16 ----------------
->  2 files changed, 18 insertions(+), 22 deletions(-)
+> ---
+>  target/sh4/cpu.h       |  3 +--
+>  target/sh4/helper.c    |  2 --
+>  target/sh4/translate.c | 17 +++++------------
+>  3 files changed, 6 insertions(+), 16 deletions(-)
 >
-> diff --git a/backends/tpm.c b/backends/tpm.c
-> index cf5abf1..8245426 100644
-> --- a/backends/tpm.c
-> +++ b/backends/tpm.c
-> @@ -48,7 +48,7 @@ const char *tpm_backend_get_desc(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    return k->ops->desc();
-> +    return k->ops->desc ? k->ops->desc() : "";
->  }
->
-
-If it only need to returns const, we may consider using a class field,
-defaulting to null.
-
-Who is using it? tpm_backend_get_desc() not being called anywhere. Let's
-remove it?
-
-
->  int tpm_backend_init(TPMBackend *s, TPMState *state,
-> @@ -59,7 +59,7 @@ int tpm_backend_init(TPMBackend *s, TPMState *state,
->      s->tpm_state =3D state;
->      s->recv_data_callback =3D datacb;
->
-> -    return k->ops->init(s);
-> +    return k->ops->init ? k->ops->init(s) : 0;
->  }
->
->  int tpm_backend_startup_tpm(TPMBackend *s)
-> @@ -73,13 +73,15 @@ int tpm_backend_startup_tpm(TPMBackend *s)
->                                         NULL);
->      g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_INIT,
-> NULL);
->
-> -    return k->ops->startup_tpm(s);
-> +    return k->ops->startup_tpm ? k->ops->startup_tpm(s) : 0;
->  }
->
->  bool tpm_backend_had_startup_error(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> +    assert(k->ops->had_startup_error);
-> +
->      return k->ops->had_startup_error(s);
->  }
->
-> @@ -87,6 +89,8 @@ size_t tpm_backend_realloc_buffer(TPMBackend *s,
-> TPMSizedBuffer *sb)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> +    assert(k->ops->realloc_buffer);
-> +
->      return k->ops->realloc_buffer(sb);
->  }
->
-> @@ -100,7 +104,9 @@ void tpm_backend_reset(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    k->ops->reset(s);
-> +    if (k->ops->reset) {
-> +        k->ops->reset(s);
-> +    }
->
->      tpm_backend_thread_end(s);
->  }
-> @@ -109,6 +115,8 @@ void tpm_backend_cancel_cmd(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> +    g_assert(k->ops->cancel_cmd);
->
-
-Let's use assert() for consistency in the file
-
-
-> +
->      k->ops->cancel_cmd(s);
->  }
->
-> @@ -116,20 +124,24 @@ bool tpm_backend_get_tpm_established_flag(TPMBacken=
-d
-> *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    return k->ops->get_tpm_established_flag(s);
-> +    return k->ops->get_tpm_established_flag ?
-> +           k->ops->get_tpm_established_flag(s) : false;
->  }
->
->  int tpm_backend_reset_tpm_established_flag(TPMBackend *s, uint8_t locty)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> -    return k->ops->reset_tpm_established_flag(s, locty);
-> +    return k->ops->reset_tpm_established_flag ?
-> +           k->ops->reset_tpm_established_flag(s, locty) : 0;
->  }
->
->  TPMVersion tpm_backend_get_tpm_version(TPMBackend *s)
->  {
->      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
->
-> +    assert(k->ops->get_tpm_version);
-> +
->      return k->ops->get_tpm_version(s);
->  }
->
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index 815a72e..bbe9e5a 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -227,15 +227,6 @@ static void tpm_passthrough_handle_request(TPMBacken=
-d
-> *tb, TPMBackendCmd cmd)
+> diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+> index cad8989f7e..9445cc779f 100644
+> --- a/target/sh4/cpu.h
+> +++ b/target/sh4/cpu.h
+> @@ -93,7 +93,6 @@
+>  #define DELAY_SLOT             (1 << 0)
+>  #define DELAY_SLOT_CONDITIONAL (1 << 1)
+>  #define DELAY_SLOT_TRUE        (1 << 2)
+> -#define DELAY_SLOT_CLEARME     (1 << 3)
+>  /* The dynamic value of the DELAY_SLOT_TRUE flag determines whether the jump
+>   * after the delay slot should be taken or not. It is calculated from SR_T.
+>   *
+> @@ -384,7 +383,7 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
+>      *pc = env->pc;
+>      *cs_base = 0;
+>      *flags = (env->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL
+> -                    | DELAY_SLOT_TRUE | DELAY_SLOT_CLEARME))   /* Bits  0- 3 */
+> +                    | DELAY_SLOT_TRUE))                        /* Bits  0- 2 */
+>              | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
+>              | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
+>              | (env->sr & (1u << SR_FD))                        /* Bit 15 */
+> diff --git a/target/sh4/helper.c b/target/sh4/helper.c
+> index 036c5ca56c..71bb49a670 100644
+> --- a/target/sh4/helper.c
+> +++ b/target/sh4/helper.c
+> @@ -170,8 +170,6 @@ void superh_cpu_do_interrupt(CPUState *cs)
+>  	/* Clear flags for exception/interrupt routine. */
+>  	env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL | DELAY_SLOT_TRUE);
 >      }
->  }
+> -    if (env->flags & DELAY_SLOT_CLEARME)
+> -        env->flags = 0;
 >
-> -/*
-> - * Start the TPM (thread). If it had been started before, then terminate
-> - * and start it again.
-> - */
-> -static int tpm_passthrough_startup_tpm(TPMBackend *tb)
-> -{
-> -    return 0;
-> -}
-> -
->  static void tpm_passthrough_reset(TPMBackend *tb)
->  {
->      TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-> @@ -247,11 +238,6 @@ static void tpm_passthrough_reset(TPMBackend *tb)
->      tpm_pt->had_startup_error =3D false;
->  }
+>      if (do_exp) {
+>          env->expevt = cs->exception_index;
+> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+> index 0b16ff33ea..d4cdf746dc 100644
+> --- a/target/sh4/translate.c
+> +++ b/target/sh4/translate.c
+> @@ -1804,15 +1804,9 @@ static void decode_opc(DisasContext * ctx)
+>      _decode_opc(ctx);
 >
-> -static int tpm_passthrough_init(TPMBackend *tb)
-> -{
-> -    return 0;
-> -}
-> -
->  static bool tpm_passthrough_get_tpm_established_flag(TPMBackend *tb)
->  {
->      return false;
-> @@ -455,8 +441,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
-{
->      .opts                     =3D tpm_passthrough_cmdline_opts,
->      .desc                     =3D tpm_passthrough_create_desc,
->      .create                   =3D tpm_passthrough_create,
-> -    .init                     =3D tpm_passthrough_init,
-> -    .startup_tpm              =3D tpm_passthrough_startup_tpm,
->      .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
->      .reset                    =3D tpm_passthrough_reset,
->      .had_startup_error        =3D tpm_passthrough_get_startup_error,
-> --
-> 2.7.4
+>      if (old_flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
+> -        if (ctx->envflags & DELAY_SLOT_CLEARME) {
+> -            gen_store_flags(0);
+> -        } else {
+> -	    /* go out of the delay slot */
+> -            uint32_t new_flags = ctx->envflags;
+> -	    new_flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
+> -	    gen_store_flags(new_flags);
+> -        }
+> -        ctx->envflags = 0;
+> +        /* go out of the delay slot */
+> +        ctx->envflags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
+> +        gen_store_flags(ctx->envflags);
+>          ctx->bstate = BS_BRANCH;
+>          if (old_flags & DELAY_SLOT_CONDITIONAL) {
+>  	    gen_delayed_conditional_jump(ctx);
+> @@ -1840,8 +1834,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+>      pc_start = tb->pc;
+>      ctx.pc = pc_start;
+>      ctx.tbflags = (uint32_t)tb->flags;
+> -    ctx.envflags = tb->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL |
+> -                                DELAY_SLOT_CLEARME);
+> +    ctx.envflags = tb->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
+>      ctx.bstate = BS_NONE;
+>      ctx.memidx = (ctx.tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
+>      /* We don't know if the delayed pc came from a dynamic or static branch,
+> @@ -1908,7 +1901,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+>              /* fall through */
+>          case BS_NONE:
+>              if (ctx.envflags) {
+> -                gen_store_flags(ctx.envflags | DELAY_SLOT_CLEARME);
+> +                gen_store_flags(ctx.envflags);
+>  	    }
+>              gen_goto_tb(&ctx, 0, ctx.pc);
+>              break;
 >
->
-othewise,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
---=20
-Marc-Andr=C3=A9 Lureau
