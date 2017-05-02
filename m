@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5U8j-0007g7-3V
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:30:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1d5U8y-0007oz-T9
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:30:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5U8f-00039n-KJ
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:30:37 -0400
-References: <149346893378.132.3063923710149667629@c05f1edc8ed1>
-	<8874ac16-9e54-7c67-8e56-8ed92942ee58@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2d06864f-3c80-a1bd-1c92-b5451cfc7346@redhat.com>
-Date: Tue, 2 May 2017 11:30:23 +0200
+	(envelope-from <bounces@canonical.com>) id 1d5U8v-0003Fl-P5
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:30:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41559)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d5U8v-0003FY-JT
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:30:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d5U8t-0002wY-FU
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 09:30:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 582132E80CB
+	for <qemu-devel@nongnu.org>; Tue,  2 May 2017 09:30:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <8874ac16-9e54-7c67-8e56-8ed92942ee58@ozlabs.ru>
-Content-Type: text/plain; charset=koi8-r
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v4] memory/iommu: QOM'fy IOMMU
- MemoryRegion
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 02 May 2017 09:25:42 -0000
+From: Lidong Chen <jemmy858585@gmail.com>
+Reply-To: Bug 1687578 <1687578@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170502092542.26484.80835.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1687578] [NEW] when migrate vm, reboot in guest os,
+ the guest os sometime hang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,20 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, f4bug@amsat.org, peterx@redhat.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org, cornelia.huck@de.ibm.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
+qemu version:v2.9.0-rc5 release
 
-On 29/04/2017 14:36, Alexey Kardashevskiy wrote:
->> Checking PATCH 1/1: memory/iommu: QOM'fy IOMMU MemoryRegion...
->> ERROR: spaces required around that '*' (ctx:WxO)
->> #156: FILE: hw/dma/rc4030.c:720:
->> +DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr)
-> 
-> What does the script really want here? I am confused.
+1.virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893 --copy-storage-=
+inc qemu+ssh://10.59.163.38/system
+2.run reboot in guest os, add reboot in /etc/rc.local
+3.guest os hang sometime.
 
-It's confused because rc4030_dma doesn't look like a type.  It thinks
-it's a multiplication and wants you to write "rc4030_dma * *dmas".
+strace output of qemu:
 
-Paolo
+ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, event=
+s=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=3D3=
+1, events=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 0 (Timeout)
+ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, event=
+s=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=3D3=
+1, events=3DPOLLIN}], 6, {0, 698000000}, NULL, 8) =3D 0 (Timeout)
+poll([{fd=3D20, events=3DPOLLOUT}], 1, 0)   =3D 1 ([{fd=3D20, revents=3DPOL=
+LOUT|POLLHUP}])
+ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, event=
+s=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=3D3=
+1, events=3DPOLLIN}], 6, {0, 999000000}, NULL, 8^C <unfinished ...>
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1687578
+
+Title:
+  when migrate vm, reboot in guest os, the guest os sometime hang
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu version:v2.9.0-rc5 release
+
+  1.virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893 --copy-storag=
+e-inc qemu+ssh://10.59.163.38/system
+  2.run reboot in guest os, add reboot in /etc/rc.local
+  3.guest os hang sometime.
+
+  strace output of qemu:
+
+  ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, eve=
+nts=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=
+=3D31, events=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 0 (Timeout)
+  ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, eve=
+nts=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=
+=3D31, events=3DPOLLIN}], 6, {0, 698000000}, NULL, 8) =3D 0 (Timeout)
+  poll([{fd=3D20, events=3DPOLLOUT}], 1, 0)   =3D 1 ([{fd=3D20, revents=3DP=
+OLLOUT|POLLHUP}])
+  ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, eve=
+nts=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=
+=3D31, events=3DPOLLIN}], 6, {0, 999000000}, NULL, 8^C <unfinished ...>
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1687578/+subscriptions
