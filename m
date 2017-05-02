@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5S3z-00007e-TB
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 03:17:41 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d5SPT-0004OI-SM
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 03:39:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5S3v-0005qF-Ft
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 03:17:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37770)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d5S3v-0005pi-6U
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 03:17:31 -0400
-Date: Tue, 2 May 2017 09:17:23 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170502091723.3a3b4e42@nial.brq.redhat.com>
-In-Reply-To: <CAJ+F1CJPEZNUPrYseN3JD+gAtwJ-rLQVRBLdXTQVSwaBTdNGHA@mail.gmail.com>
-References: <20170424130355.31324-1-marcandre.lureau@redhat.com>
-	<CABdb736pFG7yK+C_J-WWRbX+e-bk62TejQ_GtObxyFmV5t350w@mail.gmail.com>
-	<CAJ+F1CJPEZNUPrYseN3JD+gAtwJ-rLQVRBLdXTQVSwaBTdNGHA@mail.gmail.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1d5SPS-0000gC-OE
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 03:39:47 -0400
+References: <1493646214-3342-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170502015002.GD10741@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <8f067ee2-4e57-d514-7e6c-47dbd75a91dd@ilande.co.uk>
+Date: Tue, 2 May 2017 08:38:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] RFC: vmcoreinfo device
+In-Reply-To: <20170502015002.GD10741@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/5] Add qemu_vga.ndrv MacOS PPC VGA driver
+ from QemuMacDrivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,118 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, anderson@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, benh@kernel.crashing.org
 
-On Fri, 28 Apr 2017 14:28:38 +0000
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+On 02/05/17 02:50, David Gibson wrote:
 
-> Hi
->=20
-> On Fri, Apr 28, 2017 at 6:12 PM Ladi Prosek <lprosek@redhat.com> wrote:
->=20
-> > On Mon, Apr 24, 2017 at 3:03 PM, Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@redhat.com> wrote: =20
-> > > The VM coreinfo (vmcoreinfo) device is an emulated device which
-> > > exposes a 4k memory range to the guest to store various informations
-> > > useful to debug the guest OS. (it is greatly inspired by the VMGENID
-> > > device implementation)
-> > >
-> > > This is an early-boot alternative to the qemu-ga VMDUMP_INFO event
-> > > proposed in "[PATCH 00/21] WIP: dump: add kaslr support".
-> > >
-> > > If deemed more appropriate, we can consider writing to fw_cfg directly
-> > > instead of guest memory, now that qemu 2.9 supports it again.
-> > >
-> > > The proof-of-concept kernel module:
-> > > https://github.com/elmarco/vmgenid-test/blob/master/qemuvmci-test.c =
-=20
-> >
-> > Here's a proof-of-concept Windows driver:
-> >
-> > https://github.com/ladipro/kvm-guest-drivers-windows/tree/vmcoreinfo/vm=
-coreinfo
-> >
-> > I just wanted to be sure that it's possible to evaluate the ADDR
-> > method in Windows.
-> >
-> > From a practical point of view it is unfortunate that this would be a
-> > completely new device. For Windows guests it means another driver
-> > binary and all the overhead associated with deploying it on VMs. Would
-> > it be too crazy to add this functionality to the pvpanic device? The
-> > mechanics could stay the same but it would be done under the existing
-> > ACPI\QEMU0001 device.
-> > =20
->=20
-> pvpanic is under _SB.PCI0.ISA, that could be problematic
->=20
-> and _STA is a name field.
->=20
-> Someone with more experience with ACPI could tell us if that make sense to
-> merge both and how.
->=20
-> Can't you handle 2 ACPI devices in the same windows driver instead?
-we use QEMU0001 to reserve IO ports for pvpanic device,
-ASL wise there shouldn't problems with adding _ADDR method to it
+> On Mon, May 01, 2017 at 02:43:29PM +0100, Mark Cave-Ayland wrote:
+>> Last year Ben posted an initial set of patches for OpenBIOS which provided a
+>> MacOS PPC VGA driver enabling MacOS guests to control the colour depth and
+>> resolution of the QEMU stdvga device. The QemuMacDrivers repository was set up on
+>> qemu-project.org [1] but due to personal circumstances in the second half of last
+>> year, I was unable to spend much time on it.
+>>
+>> Over the last few months I've reworked the OpenBIOS patches and applied all the
+>> required dependencies upstream which makes it possible to enable the driver with
+>> a fairly simple patch [2] to OpenBIOS's vga.fs (binary provided for testing, but not
+>> to be included in the final merge).
+>>
+>> The main change I've made is that instead of serving the driver binary directly
+>> through the VGA PCI BAR (with the relevant binary inlined within OpenBIOS), the
+>> driver is now hosted by QEMU and is installed via the fw_cfg interface by the
+>> OpenBIOS vga.fs driver during startup. Not only does this make it possible to
+>> further develop the driver without also having to rebuild OpenBIOS every time but
+>> it also leaves us with the ability to serve a proper IEEE-1275 FCode ROM via the
+>> VGA PCI BAR later if needed.
+>>
+>> In addition to this I've added a new OpenBIOS NVRAM variable "vga-ndrv?" which
+>> defaults to "true" but can be overidden via -prom-env to force disable the
+>> driver if any incompatibilities are found. I've tested it locally against my
+>> OS X 10.2 and MacOS 9.2.1 images and it seems to work there, but as I don't
+>> have an exhaustive set of MacOS images available I'd be grateful for some more
+>> testing.
+>>
+>> [1] https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06159.html
+>> [2] https://mail.coreboot.org/pipermail/openbios/2017-May/009909.html
+>>
+>> This patchset can also be found on my github repository at
+>> https://github.com/mcayland/qemu/tree/ppc-vga-upstream.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> Applied to ppc-for-2.10, thanks.
 
-but then we probably should fold vmcoreinfo into pvpanic device
-as well (QEMU and linux driver)
+Hi David,
 
->=20
-> > +Storage Format: =20
-> > > +---------------
-> > > +
-> > > +The content is expected to use little-endian format.
-> > > +
-> > > +In order to implement an OVMF "SDT Header Probe Suppressor", the =20
-> > contents of =20
-> > > +the vmcoreinfo blob has 40 bytes of padding:
-> > > +
-> > > ++-----------------------------------+
-> > > +| SSDT with OEM Table ID =3D VMCOREIN |
-> > > ++-----------------------------------+
-> > > +| ...                               |       TOP OF PAGE
-> > > +| VCIA dword object ----------------|-----> =20
-> > +---------------------------+ =20
-> > > +| ...                               |       | fw-allocated array for=
- =20
-> > | =20
-> > > +| _STA method referring to VCIA     |       | "etc/vmcoreinfo" =20
-> > | =20
-> > > +| ...                               | =20
-> >  +---------------------------+ =20
-> > > +| ADDR method referring to VCIA     |       |  0: OVMF SDT Header pr=
-obe =20
-> > | =20
-> > > +| ...                               |       |     suppressor =20
-> > | =20
-> > > ++-----------------------------------+       | 40: uint32 version fie=
-ld =20
-> > | =20
-> > > +                                            | 44: info contents =20
-> >  | =20
-> > > +                                            |     .... =20
-> > | =20
-> > > + =20
-> > +---------------------------+ =20
-> > > +                                            END OF PAGE
-> > > +
-> > > +Version 0 content:
-> > > +
-> > > + uint64 paddr:
-> > > +  Physical address of the Linux vmcoreinfo ELF note. =20
-> >
-> > Or physical address of the Windows crash dump header :p
-> > =20
->=20
-> Is there support for Windows crash dump in qemu?
->=20
->=20
-> > Do we want to have an additional discriminator field to tell what kind
-> > of information was written by the guest or would Windows use a
-> > different version?
-> >
-> > =20
-> I guess a different version would be ok.
->=20
-> Thanks a lot for looking at it!
+I just had a look at your ppc-for-2.10 branch and I see that you've also
+included patch 5 which is a custom made OpenBIOS binary.
+
+Can you drop patch 5 from the series and then I will do a manual pull
+request to update OpenBIOS and activate the new functionality once this
+is in?
+
+
+Many thanks,
+
+Mark.
