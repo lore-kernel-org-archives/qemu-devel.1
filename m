@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d5ZwV-00044T-2N
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:42:24 -0400
+	(envelope-from <james.morse@arm.com>) id 1d5ZkE-0007wQ-N3
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:29:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d5ZwU-0004Nl-1h
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:42:23 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4f58049d-957a-a5ab-91ae-5dfa46b56a69@redhat.com>
-Date: Tue, 2 May 2017 17:42:12 +0200
+	(envelope-from <james.morse@arm.com>) id 1d5ZkD-0006vB-Tl
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:29:42 -0400
+Message-ID: <5908A5BC.1060202@arm.com>
+Date: Tue, 02 May 2017 16:29:00 +0100
+From: James Morse <james.morse@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170420120058.28404-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
+References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 00/17] Block layer thread safety,
- part 1
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] arm64: kvm: support kvmtool to
+ detect RAS extension feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
+
+Hi Dongjiu Geng,
+
+On 30/04/17 06:37, Dongjiu Geng wrote:
+> Handle kvmtool's detection for RAS extension, because sometimes
+> the APP needs to know the CPU's capacity
+
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index d9e9697..1004039 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
+>  	return !!(pfr0 & 0x20);
+>  }
+>  
+> +static bool kvm_arm_support_ras_extension(void)
+> +{
+> +	u64 pfr0;
+> +
+> +	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
+> +	return !!(pfr0 & 0x10000000);
+> +}
+
+Why are we telling user-space that the CPU has RAS extensions? EL0 can't do
+anything with this and the guest EL1 can detect it from the id registers.
 
 
+Are you using this to decide whether or not to generate a HEST for the guest?
 
-On 20/04/2017 14:00, Paolo Bonzini wrote:
-> This series uses mutexes or atomic operations around core block layer
-> operations.  The remaining parts include:
-> 
-> - drivers, though most of them are already thread safe (part 2, 8 patches,
->   depends on Kevin's conversion of QED to coroutines)
-> 
-> - block jobs, before-write notifiers, the write threshold mechanism,
->   snapshots, replication, key management (part 3, 16 patches)
-> 
-> - devices (virtio-blk/virtio-scsi, part 4, 5 patches)
-> 
-> Once these four parts are done the AioContext lock can be removed
-> together with all temporary workarounds that have accumulated.
+If Qemu/kvmtool supports handling memory-failure notifications from signals you
+should always generate a HEST. The GHES notification method could be anything
+Qemu can deliver to the guest using the KVM APIs. Notifications from Qemu to the
+guest don't depend on the RAS extensions. KVM has APIs for IRQ and SEA (you can
+use KVM_SET_ONE_REG).
 
-Ping?
 
-Paolo
+I think we need a new API for injecting SError for SEI from Qemu/kvmtool, but it
+shouldn't be related to the RAS extensions. All v8.0 CPUs have HCR_EL2.VSE, so
+we need to know KVM supports this API.
 
-> Paolo
-> 
-> Paolo Bonzini (17):
->   block: access copy_on_read with atomic ops
->   block: access quiesce_counter with atomic ops
->   block: access io_limits_disabled with atomic ops
->   block: access serialising_in_flight with atomic ops
->   block: access wakeup with atomic ops
->   block: access io_plugged with atomic ops
->   throttle-groups: do not use qemu_co_enter_next
->   throttle-groups: protect throttled requests with a CoMutex
->   util: add stats64 module
->   block: use Stat64 for wr_highest_offset
->   block: access write_gen with atomics
->   block: protect tracked_requests and flush_queue with reqs_lock
->   coroutine-lock: introduce qemu_co_mutex_lock_unlock
->   block: optimize access to reqs_lock
->   block: introduce dirty_bitmap_mutex
->   block: protect modification of dirty bitmaps with a mutex
->   block: make accounting thread-safe
-> 
->  block.c                        |  10 +-
->  block/accounting.c             |  15 +++
->  block/block-backend.c          |   5 +-
->  block/dirty-bitmap.c           | 125 ++++++++++++++++++++++--
->  block/io.c                     |  70 +++++++++-----
->  block/mirror.c                 |  14 ++-
->  block/nfs.c                    |   4 +-
->  block/qapi.c                   |   2 +-
->  block/sheepdog.c               |   3 +-
->  block/throttle-groups.c        |  76 +++++++++++++--
->  block/write-threshold.c        |  37 ++++----
->  blockdev.c                     |  46 ++-------
->  include/block/accounting.h     |   8 +-
->  include/block/block.h          |   5 +-
->  include/block/block_int.h      |  63 ++++++++-----
->  include/block/dirty-bitmap.h   |  23 ++++-
->  include/qemu/coroutine.h       |   6 ++
->  include/qemu/stats64.h         | 210 +++++++++++++++++++++++++++++++++++++++++
->  include/sysemu/block-backend.h |  10 +-
->  migration/block.c              |   6 --
->  util/Makefile.objs             |   1 +
->  util/qemu-coroutine-lock.c     |  36 +++++++
->  util/stats64.c                 | 135 ++++++++++++++++++++++++++
->  23 files changed, 763 insertions(+), 147 deletions(-)
->  create mode 100644 include/qemu/stats64.h
->  create mode 100644 util/stats64.c
-> 
+Your later patch adds code to set VSESR to make virtual RAS SErrors work, I
+think we need to expose that to user-space.
+
+
+Thanks,
+
+James
