@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d5Nip-0003fT-3T
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 22:39:28 -0400
+	(envelope-from <bharata.rao@gmail.com>) id 1d5OgB-0000NJ-RQ
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 23:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d5Nik-00088p-CO
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 22:39:27 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:36555)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d5Nii-00086j-CZ
-	for qemu-devel@nongnu.org; Mon, 01 May 2017 22:39:22 -0400
-From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Date: Tue, 2 May 2017 10:38:11 +0800
-Message-Id: <1493692691-30801-1-git-send-email-lu.zhipeng@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] hmp: add 'info virtio-pci-status id' command
+	(envelope-from <bharata.rao@gmail.com>) id 1d5Og9-0000FQ-Tz
+	for qemu-devel@nongnu.org; Mon, 01 May 2017 23:40:47 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170430172547.13415-3-danielhb@linux.vnet.ibm.com>
+References: <20170430172547.13415-1-danielhb@linux.vnet.ibm.com>
+	<20170430172547.13415-3-danielhb@linux.vnet.ibm.com>
+From: Bharata B Rao <bharata.rao@gmail.com>
+Date: Tue, 2 May 2017 09:10:44 +0530
+Message-ID: <CAGZKiBok2=HRT9BjMiDx+c20YeKhknJ0ZD_GV1Zx=BrbFSmxwA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 2/5] hw/ppc: removing spapr_drc_detach_cb
+ opaques
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,161 +23,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com, mst@redhat.com, marcel@redhat.com
-Cc: qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Add command to  query a virtio pci device status.
-we can get id of the virtio pci device by 'info pci' command.
-HMP Test case:
-    ==============
-    virsh # qemu-monitor-command --hmp 3 info pci
-      Bus  0, device   3, function 0:
-        Ethernet controller: PCI device 1af4:1000
-          IRQ 11.
-          BAR0: I/O at 0xc000 [0xc03f].
-          BAR1: 32 bit memory at 0xfebd1000 [0xfebd1fff].
-          BAR4: 64 bit prefetchable memory at 0xfe000000 [0xfe003fff].
-          BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
-          id "net0"
-      Bus  0, device   4, function 0:
-        USB controller: PCI device 8086:24cd
-          IRQ 11.
-          BAR0: 32 bit memory at 0xfebd2000 [0xfebd2fff].
-          id "usb"
-    virsh # qemu-monitor-command 3  --hmp "info virtio-pci-status net0"
-    status=15
+On Sun, Apr 30, 2017 at 10:55 PM, Daniel Henrique Barboza <
+danielhb@linux.vnet.ibm.com> wrote:
 
-    virsh # qemu-monitor-command 3  --hmp "info virtio-pci-status usb"
-    the 'info virtio_pci_status' command only supports virtio pci devices
+> Following up the previous detach_cb change, this patch removes the
+> detach_cb_opaque entirely from the code.
+>
+> The reason is that the drc->detach_cb_opaque object can't be
+> restored in the post load of the upcoming DRC migration and no detach
+> callbacks actually need this opaque. 'spapr_core_release' is
+> receiving it as NULL, 'spapr_phb_remove_pci_device_cb' is receiving
+> a phb object as opaque but is't using it. These were trivial removal
+> cases.
+>
+> However, the LM removal callback 'spapr_lmb_release' is receiving
+> and using the opaque object, a 'sPAPRDIMMState' struct. This struct
+> holds the number of LMBs the DIMM object contains and the callback
+> was using this counter as a countdown to check if all LMB DRCs were
+> release before proceeding to the DIMM unplug. To remove the need of
+> this callback we have choices such as:
+>
+> - migrate the 'sPAPRDIMMState' struct. This would require creating a
+> QTAILQ to store all DIMMStates and an additional 'dimm_id' field to
+> associate the DIMMState with the DIMM object. We could attach this
+> QTAILQ to the 'sPAPRPHBState' and retrieve it later in the callback.
+>
+> - fetch the state of the LMB DRCs directly by scanning the state of
+> them and, if all of them are released, proceed with the DIMM unplug.
+>
+> The second approach was chosen. The new 'spapr_all_lmbs_drcs_released'
+> function scans all LMBs of a given DIMM device to see if their DRC
+> state are inactive. If all of them are inactive return 'true', 'false'
+> otherwise. This function is being called inside the 'spapr_lmb_release'
+> callback, replacing the role of the 'sPAPRDIMMState' opaque. The
+> 'sPAPRDIMMState' struct was removed from the code given that there are
+> no more uses for it.
+>
+> After all these changes, there are no roles left for the 'detach_cb_opaque'
+> attribute of the 'sPAPRDRConnector' as well, so we can safely remove
+> it from the code too.
+>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> ---
+>  hw/ppc/spapr.c             | 46 ++++++++++++++++++++++++++++++
+> +++-------------
+>  hw/ppc/spapr_drc.c         | 16 +++++-----------
+>  hw/ppc/spapr_pci.c         |  4 ++--
+>  include/hw/ppc/spapr_drc.h |  6 ++----
+>  4 files changed, 42 insertions(+), 30 deletions(-)
+>
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index bc11757..8b9a6cf 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1887,21 +1887,43 @@ static void spapr_drc_reset(void *opaque)
+>      }
+>  }
+>
+> -typedef struct sPAPRDIMMState {
+> -    uint32_t nr_lmbs;
+> -} sPAPRDIMMState;
+> +static bool spapr_all_lmbs_drcs_released(PCDIMMDevice *dimm)
+> +{
+> +    Error *local_err = NULL;
+> +    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+> +    uint64_t size = memory_region_size(mr);
+> +
+> +    uint64_t addr;
+> +    addr = object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP,
+> &local_err);
+> +    if (local_err) {
+> +        error_propagate(&error_abort, local_err);
+> +        return false;
+> +    }
+> +    uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+>
+> -static void spapr_lmb_release(DeviceState *dev, void *opaque)
+> +    sPAPRDRConnector *drc;
+> +    int i = 0;
+> +    for (i = 0; i < nr_lmbs; i++) {
+> +        drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
+> +                addr / SPAPR_MEMORY_BLOCK_SIZE);
+> +        g_assert(drc);
+> +        if (drc->indicator_state != SPAPR_DR_INDICATOR_STATE_INACTIVE) {
+> +            return false;
+> +        }
+> +        addr += SPAPR_MEMORY_BLOCK_SIZE;
+> +    }
+> +    return true;
+> +}
+> +
+> +static void spapr_lmb_release(DeviceState *dev)
+>  {
+> -    sPAPRDIMMState *ds = (sPAPRDIMMState *)opaque;
+>      HotplugHandler *hotplug_ctrl;
+>
+> -    if (--ds->nr_lmbs) {
+> +    if (!spapr_all_lmbs_drcs_released(PC_DIMM(dev))) {
+>          return;
+>      }
+>
 
-Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
----
- hmp-commands-info.hx    | 14 ++++++++++++++
- hw/pci/pci-stub.c       |  6 ++++++
- hw/virtio/virtio-pci.c  | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- include/sysemu/sysemu.h |  1 +
- 4 files changed, 68 insertions(+)
+I am concerned about the number of times we walk the DRC list corresponding
+to each DIMM device. When a DIMM device is being removed,
+spapr_lmb_release() will be invoked for each of the LMBs of that DIMM. Now
+in this scheme, we end up walking through all the DRC objects of the DIMM
+from every LMB's release function.
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a53f105..7b9c4db 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -815,6 +815,20 @@ ETEXI
-         .cmd = hmp_info_vm_generation_id,
-     },
- 
-+    {
-+        .name       = "virtio-pci-status",
-+        .args_type  = "id:s",
-+        .params     = "id",
-+        .help       = "show virtio pci device  status",
-+        .cmd        = hmp_info_virtio_pci_status,
-+    },
-+
-+STEXI
-+@item info virtio-pci-status  @var{id}
-+@findex virtio-pci-status
-+Show status about virtio pci device
-+ETEXI
-+
- STEXI
- @end table
- ETEXI
-diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-index 36d2c43..3609a52 100644
---- a/hw/pci/pci-stub.c
-+++ b/hw/pci/pci-stub.c
-@@ -35,3 +35,9 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
- {
-     monitor_printf(mon, "PCI devices not supported\n");
- }
-+
-+void hmp_info_virtio_pci_status(Monitor *mon, const QDict *qdict)
-+{
-+    monitor_printf(mon, "PCI devices not supported\n");
-+}
-+
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index f9b7244..5fa862b 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -37,6 +37,7 @@
- #include "qemu/range.h"
- #include "hw/virtio/virtio-bus.h"
- #include "qapi/visitor.h"
-+#include "monitor/monitor.h"
- 
- #define VIRTIO_PCI_REGION_SIZE(dev)     VIRTIO_PCI_CONFIG_OFF(msix_present(dev))
- 
-@@ -50,6 +51,7 @@ static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
-                                VirtIOPCIProxy *dev);
- static void virtio_pci_reset(DeviceState *qdev);
- 
-+static void query_virtio_pci_status(Monitor *mon, const char *id);
- /* virtio device */
- /* DeviceState to VirtIOPCIProxy. For use off data-path. TODO: use QOM. */
- static inline VirtIOPCIProxy *to_virtio_pci_proxy(DeviceState *d)
-@@ -2556,6 +2558,51 @@ static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
-                         virtio_bus_name);
- }
- 
-+static void query_virtio_pci_status(Monitor *mon, const char *id)
-+{
-+    int ret = 0, i = 0;
-+    PCIDevice *dev = NULL;
-+    hwaddr addr = 0;
-+    uint8_t val = 0;
-+    const char *devtype = NULL;
-+
-+    ret = pci_qdev_find_device(id, &dev);
-+    if (ret) {
-+        monitor_printf(mon, "Can not find device %s\n", id);
-+        return;
-+    }
-+    devtype = object_get_typename(OBJECT(dev));
-+    if (strncmp("virtio-", devtype, 7) == 0) {
-+        for (i = 0; i < PCI_NUM_REGIONS; i++) {
-+            if (dev->io_regions[i].type == PCI_BASE_ADDRESS_SPACE_IO) {
-+                addr = dev->io_regions[i].addr;
-+                break;
-+            }
-+        }
-+        if (addr != -1 && addr != 0) {
-+            address_space_rw(&address_space_io, addr + VIRTIO_PCI_STATUS,
-+            MEMTXATTRS_UNSPECIFIED, &val, 1, 0);
-+            if (val & VIRTIO_CONFIG_S_DRIVER_OK) {
-+                fprintf(stderr, "driver is ok\n");
-+            } else {
-+                fprintf(stderr, "driver is not ok\n");
-+            }
-+            monitor_printf(mon, "status=%d", val);
-+        } else {
-+            monitor_printf(mon, "status=%d", val);
-+        }
-+    } else {
-+        monitor_printf(mon, "the 'info virtio_pci_status' command "
-+           "only supports virtio pci devices");
-+    }
-+}
-+
-+void hmp_info_virtio_pci_status(Monitor *mon, const QDict *qdict)
-+{
-+    const char *id = qdict_get_try_str(qdict, "id");
-+    query_virtio_pci_status(mon, id);
-+}
-+
- static void virtio_pci_bus_class_init(ObjectClass *klass, void *data)
- {
-     BusClass *bus_class = BUS_CLASS(klass);
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 576c7ce..de66cc0 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -238,4 +238,5 @@ extern QemuOptsList qemu_net_opts;
- extern QemuOptsList qemu_global_opts;
- extern QemuOptsList qemu_mon_opts;
- 
-+extern void hmp_info_virtio_pci_status(Monitor *mon, const QDict *qdict);
- #endif
--- 
-1.8.3.1
+Regards,
+Bharata.
