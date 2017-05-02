@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5TkL-0003yH-MP
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:05:28 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d5Twf-0005tO-KE
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:18:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5TkI-0006V0-QB
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:05:25 -0400
-Received: from mail-lf0-x22b.google.com ([2a00:1450:4010:c07::22b]:35835)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d5TkI-0006TZ-86
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:05:22 -0400
-Received: by mail-lf0-x22b.google.com with SMTP id 75so71617941lfs.2
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 02:05:21 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1d5Twa-0003xb-Qm
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:18:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51150)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d5Twa-0003wu-I1
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:18:04 -0400
+Date: Tue, 2 May 2017 10:17:55 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170502091755.GB2072@work-vm>
+References: <1493692691-30801-1-git-send-email-lu.zhipeng@zte.com.cn>
 MIME-Version: 1.0
-References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
-	<87o9yv890z.fsf@dusky.pond.sub.org> <87lgqpei5d.fsf@dusky.pond.sub.org>
-	<20170425102258.GA4615@noname.redhat.com>
-	<CAJ+F1CKYUbMo-3TrkNfc+H3tzLUaN00c6sGTxdnPn5qapfA_bA@mail.gmail.com>
-	<20170428191321.GF4714@noname.redhat.com>
-In-Reply-To: <20170428191321.GF4714@noname.redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 02 May 2017 09:05:09 +0000
-Message-ID: <CAJ+F1CLM9UzgMxNJm3T+Uaog7Ki+6Pu6bO6Z7d4Vyce3FNEj8Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/25] qmp: add async command type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493692691-30801-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH] hmp: add 'info virtio-pci-status id'
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,322 +27,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Cc: mst@redhat.com, marcel@redhat.com, qemu-devel@nongnu.org
 
-Hi
+* ZhiPeng Lu (lu.zhipeng@zte.com.cn) wrote:
 
-On Fri, Apr 28, 2017 at 11:13 PM Kevin Wolf <kwolf@redhat.com> wrote:
+Hi,
 
-> Am 28.04.2017 um 17:55 hat Marc-Andr=C3=A9 Lureau geschrieben:
-> > On Tue, Apr 25, 2017 at 2:23 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> >
-> > > Am 24.04.2017 um 21:10 hat Markus Armbruster geschrieben:
-> > > > With 2.9 out of the way, how can we make progress on this one?
-> > > >
-> > > > I can see two ways to get asynchronous QMP commands accepted:
-> > > >
-> > > > 1. We break QMP compatibility in QEMU 3.0 and convert all
-> long-running
-> > > >    tasks from "synchronous command + event" to "asynchronous
-> command".
-> > > >
-> > > >    This is design option 1 quoted below.  *If* we decide to leave
-> > > >    compatibility behind for 3.0, *and* we decide we like the
-> > > >    asynchronous sufficiently better to put in the work, we can do i=
-t.
-> > > >
-> > > >    I guess there's nothing to do here until we decide on breaking
-> > > >    compatibility in 3.0.
-> > > >
-> > > > 2. We don't break QMP compatibility, but we add asynchronous comman=
-ds
-> > > >    anyway, because we decide that's how we want to do "jobs".
-> > > >
-> > > >    This is design option 3 quoted below.  As I said, I dislike its
-> lack
-> > > >    of orthogonality.  But if asynchronous commands help us get jobs
-> > > >    done, I can bury my dislike.
-> > >
-> > > I don't think async commands are attractive at all for doing jobs. I
-> >
-> > It's still a bit obscure to me what we mean by "jobs".
->
-> I guess the best definition that we have is: Image streaming, mirroring,
-> live backup, live commit and future "similar things".
->
+> Add command to  query a virtio pci device status.
 
-What does it mean in terms of QAPI/QMP protocol ? If I need to write a new
-"job" (for something else than block op), is there some doc or guideline?
+Is this purely for debug? If it's not for debug then you'll need
+to structure it around a matching QMP command.
 
+> we can get id of the virtio pci device by 'info pci' command.
+> HMP Test case:
+>     ==============
+>     virsh # qemu-monitor-command --hmp 3 info pci
+>       Bus  0, device   3, function 0:
+>         Ethernet controller: PCI device 1af4:1000
+>           IRQ 11.
+>           BAR0: I/O at 0xc000 [0xc03f].
+>           BAR1: 32 bit memory at 0xfebd1000 [0xfebd1fff].
+>           BAR4: 64 bit prefetchable memory at 0xfe000000 [0xfe003fff].
+>           BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
+>           id "net0"
+>       Bus  0, device   4, function 0:
+>         USB controller: PCI device 8086:24cd
+>           IRQ 11.
+>           BAR0: 32 bit memory at 0xfebd2000 [0xfebd2fff].
+>           id "usb"
+>     virsh # qemu-monitor-command 3  --hmp "info virtio-pci-status net0"
+>     status=15
 
-> > feel they bring up more questions that they answer, for example, what
-> > > happens if libvirt crashes and then reconnects? Which monitor
-> connection
-> > > does get the reply for an async command sent on the now disconnected
-> > > one?
-> > >
-> >
-> > The monitor to receive a reply is the one that sent the command (just
-> > like return today)
-> >
-> > As explained in the cover letter, an async command may cancel the
-> > ongoing operation on disconnect.
->
-> But that's not what you generally want. You don't want to abort your
-> backup just because libvirt lost its monitor connection, but qemu should
-> continue to copy the data, and when libvirt reconnects it should be able
-> to get back control of this background operation and bring it to
-> successful completion.
->
+Would it be better to make this 'info virtio-pci' and perhaps then you
+might dump some more info in the future?
 
-I said "may", and I make a difference between "local" (to the client) and
-"global" (to qemu) operation.
+>     virsh # qemu-monitor-command 3  --hmp "info virtio-pci-status usb"
+>     the 'info virtio_pci_status' command only supports virtio pci devices
+> 
+> Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+> ---
+>  hmp-commands-info.hx    | 14 ++++++++++++++
+>  hw/pci/pci-stub.c       |  6 ++++++
+>  hw/virtio/virtio-pci.c  | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>  include/sysemu/sysemu.h |  1 +
+>  4 files changed, 68 insertions(+)
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index a53f105..7b9c4db 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -815,6 +815,20 @@ ETEXI
+>          .cmd = hmp_info_vm_generation_id,
+>      },
+>  
+> +    {
+> +        .name       = "virtio-pci-status",
+> +        .args_type  = "id:s",
+> +        .params     = "id",
+> +        .help       = "show virtio pci device  status",
+> +        .cmd        = hmp_info_virtio_pci_status,
+> +    },
+> +
+> +STEXI
+> +@item info virtio-pci-status  @var{id}
+> +@findex virtio-pci-status
+> +Show status about virtio pci device
+> +ETEXI
+> +
+>  STEXI
+>  @end table
+>  ETEXI
+> diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+> index 36d2c43..3609a52 100644
+> --- a/hw/pci/pci-stub.c
+> +++ b/hw/pci/pci-stub.c
+> @@ -35,3 +35,9 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
+>  {
+>      monitor_printf(mon, "PCI devices not supported\n");
+>  }
+> +
+> +void hmp_info_virtio_pci_status(Monitor *mon, const QDict *qdict)
+> +{
+> +    monitor_printf(mon, "PCI devices not supported\n");
+> +}
+> +
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index f9b7244..5fa862b 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -37,6 +37,7 @@
+>  #include "qemu/range.h"
+>  #include "hw/virtio/virtio-bus.h"
+>  #include "qapi/visitor.h"
+> +#include "monitor/monitor.h"
+>  
+>  #define VIRTIO_PCI_REGION_SIZE(dev)     VIRTIO_PCI_CONFIG_OFF(msix_present(dev))
+>  
+> @@ -50,6 +51,7 @@ static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
+>                                 VirtIOPCIProxy *dev);
+>  static void virtio_pci_reset(DeviceState *qdev);
+>  
+> +static void query_virtio_pci_status(Monitor *mon, const char *id);
+>  /* virtio device */
+>  /* DeviceState to VirtIOPCIProxy. For use off data-path. TODO: use QOM. */
+>  static inline VirtIOPCIProxy *to_virtio_pci_proxy(DeviceState *d)
+> @@ -2556,6 +2558,51 @@ static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
+>                          virtio_bus_name);
+>  }
+>  
+> +static void query_virtio_pci_status(Monitor *mon, const char *id)
+> +{
+> +    int ret = 0, i = 0;
+> +    PCIDevice *dev = NULL;
+> +    hwaddr addr = 0;
+> +    uint8_t val = 0;
+> +    const char *devtype = NULL;
+> +
+> +    ret = pci_qdev_find_device(id, &dev);
+> +    if (ret) {
+> +        monitor_printf(mon, "Can not find device %s\n", id);
+> +        return;
+> +    }
+> +    devtype = object_get_typename(OBJECT(dev));
+> +    if (strncmp("virtio-", devtype, 7) == 0) {
 
+I wonder if there's a better way to do that - something like 
+  if (object_dynamic_cast(OBJECT(dev), "virtio-pci-device")) 
 
->
-> > If there is a global state change, a separate event should be
-> > broadcasted (no change proposed here)
->
-> In a way, the existence of a block job is global state today. Not sure
-> if this is what you mean, though.
->
+although my knowledge of qom isn't that great.
 
-Yes. Global is probably the most common case.
+> +        for (i = 0; i < PCI_NUM_REGIONS; i++) {
+> +            if (dev->io_regions[i].type == PCI_BASE_ADDRESS_SPACE_IO) {
+> +                addr = dev->io_regions[i].addr;
+> +                break;
+> +            }
+> +        }
+> +        if (addr != -1 && addr != 0) {
+> +            address_space_rw(&address_space_io, addr + VIRTIO_PCI_STATUS,
+> +            MEMTXATTRS_UNSPECIFIED, &val, 1, 0);
+> +            if (val & VIRTIO_CONFIG_S_DRIVER_OK) {
+> +                fprintf(stderr, "driver is ok\n");
+> +            } else {
+> +                fprintf(stderr, "driver is not ok\n");
+> +            }
 
+Decode the value into flags that you add to the monitor_printf, not a separate fprintf.
 
->
-> > > We already have a model for doing long-running jobs, and as far as I'=
-m
-> > > aware, it's working and we're not fighting limitations of the design.
-> So
-> > > what are we even trying to solve here? In the context of jobs, async
-> > > commands feel like a solution in need of a problem to me.
-> >
-> > See the cover letter for the 2 main reasons for this proposal. If your
-> > domain API is fine, you don't have to opt-in and you may continue to us=
-e
-> > the current sync model. However, I believe there is benefit in using th=
-is
-> > work to have a more consitent async API.
->
-> I think we need a clear understanding of what the potential use cases
-> are that could make good use a new infrastructure. We don't generally
-> add infrastructure if we don't have a concrete idea what its users could
-> be. I only ruled out that the current users of block jobs are a good fit
-> for it, but there may be other use cases for which it works great.
->
->
-The proposal mainly aims to improve "local" blocking commands, the one that
-don't make qemu global state change but are still blocking.
+Dave
 
-
-> If commands can opt-in or opt-out of the new model, consistency isn't a
-> particularly good argument, though.
->
-
-The consistency is external, the client interact similarly with a sync or
-async operation, it doesn't have to know.
-
-Internally, I propose two different kind of callbacks: the sync variant is
-a helper version of the async.
-
-
->
-> > > Things may look a bit different in typically quick, but potentially
-> > > long-running commands. That is, anything that we currently execute
-> > > synchronously while holding the BQL, but that involves I/O and could
-> > > therefore take a while (impacting the performance of the VM) or even
-> > > block indefinitely.
-> > >
-> > > The first problem (we're holding the lock too long) can be addressed
-> > > by making things async just inside qemu and we don't need to expose
-> > > the change on the QMP level. The second one (blocking indefinitely)
-> > > requires
-> > >
-> >
-> > That's what I propose as 1)
-> >
-> >
-> > > being async on the QMP level if we want the monitor to be responsive
-> > > even if we're using an image on an NFS server that went down.
-> > >
-> >
-> > That's the 2)
-> >
-> > > On the other hand, using the traditional job infrastructure is way
-> > > over the top if all you want to do is 'query-block', so we need
-> > > something different for making it async. And if a client
-> > > disconnects, the 'query-block' result can just be thrown away, it's
-> > > much simpler than actual jobs.
-> >
-> > I agree a fully-featured job infrastructure is way over the top, and I
-> > believe I propose a minimal change to make optionnally some QMP
-> > commands async.
->
-> So are commands like 'query-block' (which are typically _not_ considered
-> long-running) what you're aiming for with your proposal? This is a case
-> where I think we could consider the use of async QMP commands, but I
-> didn't have the impression that this kind of commands was your primary
-> target.
->
-
-Typically, I would like to improve the case described in the cover letter
-where we have:
-
--> { "execute": "do-foo" }
-<- { "return": {} }
-<- { "event": "FOO_DONE" }
-
-Let's call this an "hidden-async" (I will refer to this pattern later). And
-do instead:
-
--> { "execute": "do-foo" }
-<- { "return": {} }
-
-(I won't repeat the flaws of the current status quo here, see cover and
-thread)
-
-But any blocking (even shortly) operation could also benefit from this
-series by using the async variant to allow reentering the loop. This is the
-1). I suppose 'query-block' is a good candidate, and typically could cancel
-itself it the client is gone.
-
-2) is an extra, if the client supports concurrent commands.
-
-
-> > > So where I can see advantages for a new async command type is not for
-> > > converting real long-running commands like block jobs, but only for t=
-he
-> > > typically, but not necessarily quick operations. At the same time it =
-is
-> > > where you're rightfully afraid that the less common case might not
-> > > receive much testing in management tools.
-> > >
-> >
-> > I believe management tools / libvirt will want to use the async variant
-> if
-> > available. (the sync version is a one-command at a time constrained
-> version
-> > of 'async')
->
-> The point here is rather that even async commands degenerate into sync
-> commands if the management tool doesn't send multiple commands in
-> parallel.
->
-> If sending only a single command at a time is the common case (which
-> appears quite plausible to me), then race conditions that exist when
-> multiple commands are used in a rarer case might go unnoticed because
-> nobody gave the scenario real testing.
->
-
-I think the problem exists today regardless of my proposal for the
-'hidden-async' commands (and block jobs?)
-
-
->
-> > > In the end, I'm unsure whether async commands are a good idea, I can
-> > > see good arguments for both stances. But I'm almost certain that
-> > > they are the wrong tool for jobs.
-> > >
-> > >
-> > Well, we already have 'async' commands, they are just hidden. They do
-> > not use QAPI/QMP facility and lack consistency.
-> >
-> > This series addresses the problem 1), internal to qemu.
-> >
-> > And also proposes to replace the idiomatic:
-> >
-> >     -> { "execute": "do-foo",  "id": 42
-> > }
-> >
-> >     <- { "return": {}, "id": 42 }            (this is a dummy useless
-> > return)
-> >     (foo is in fact async, you may do other commands here)
->
-> I know you like to insist on its uselessness, but no, it's not useless.
-> It tells the management tool that the background job has successfully
-> been started and block job management commands can be used with it now.
->
-
-Yes, some commands/API may return to indicate something started, and that
-some state change happened.
-
-But for many commands that doesn't make sense to have an intermediary
-reply, it's really a dummy/empty return. The caller waits for a result.
-
-
-> >
-> >     <- { "event": "FOO_DONE" }     (this is a broadcasted event that
-> other
-> > monitor may not know how to deal with, lack of consistency with naming
-> for
-> > various async op, "id" field may be lost, no facilities in generated co=
-de
-> > etc etc)
->
-> Are these theoretical concerns or do you see them confirmed with
-> actually existing commands?
->
->
-I think existing commands using this event pattern are all global. The
-problems raise if we start using events for local commands (such as
-screendump, dump-guest-memory, query-* etc), then various peers may
-conflict the completion event from a different client command.
-
-
-> The broadcast is actually a feature, as mentioned above, because it
-> allows libvirt to reconnect after losing the connection and continue to
-> control the background operation.
->
->
-For global state change, yes, broadcast events are necessary.
-
-
-> > with a streamlined:
-> >
-> >     -> { "execute": "do-foo", "id": 42 }
-> >     (you may do other commands here)
-> >
-> >
-> >     <- { "return": {}, "id": 42 }       (returned only to the caller)
-> >     (if there is a global state change, there should also be a FOO_DONE
-> > event)
-> >
-> > As pointed out in the cover letter, existing client *have to* deal with
-> > dispatching unrelated messages when sending commands, because events ma=
-y
-> > come before a return message. So they have facilities to handle async
-> > replies.
-> >
-> > But in any case, this streamlined version is behind a "async" QMP
-> > capability.
-> >
-> > I have been careful to not expose this change to qemu internal or qemu
-> > client if they don't want or need it.
->
-> The question is whether enough users (command implementations and
-> clients) need the change to justify maintaining another type of commands
-> long term. Just not breaking existing users doesn't justify a new
-> feature, it's only the most basic requirement for it to even be
-> considered.
->
-
-The proposal is pretty limited. It's not intended to replace the "global"
-existing commands API. It's:
-
-1) help blocking commands:
-a) internal qapi improvement to allow reentering the main-loop
-b) allow to cancel if the client is disconnected
-
-2) protocol improvement:
-a) to avoid an unnecessary dummy return and the broadcast of a potentially
-conflicting event for "local" commands
-b) if the client support 'async', allow to run concurrent async commands
-
-Your concern regarding async testing exist at a different protocol level
-when commands use the cmd + event pattern (hidden-async), regardless of
-this proposal.
-
---=20
-Marc-Andr=C3=A9 Lureau
+> +            monitor_printf(mon, "status=%d", val);
+> +        } else {
+> +            monitor_printf(mon, "status=%d", val);
+> +        }
+> +    } else {
+> +        monitor_printf(mon, "the 'info virtio_pci_status' command "
+> +           "only supports virtio pci devices");
+> +    }
+> +}
+> +
+> +void hmp_info_virtio_pci_status(Monitor *mon, const QDict *qdict)
+> +{
+> +    const char *id = qdict_get_try_str(qdict, "id");
+> +    query_virtio_pci_status(mon, id);
+> +}
+> +
+>  static void virtio_pci_bus_class_init(ObjectClass *klass, void *data)
+>  {
+>      BusClass *bus_class = BUS_CLASS(klass);
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 576c7ce..de66cc0 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -238,4 +238,5 @@ extern QemuOptsList qemu_net_opts;
+>  extern QemuOptsList qemu_global_opts;
+>  extern QemuOptsList qemu_mon_opts;
+>  
+> +extern void hmp_info_virtio_pci_status(Monitor *mon, const QDict *qdict);
+>  #endif
+> -- 
+> 1.8.3.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
