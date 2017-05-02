@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5T1Y-0005xC-4p
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:09 -0400
+	(envelope-from <famz@redhat.com>) id 1d5T1a-0005zV-Ed
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5T1U-00087q-Vz
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:08 -0400
+	(envelope-from <famz@redhat.com>) id 1d5T1Z-0008By-FJ
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:10 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  2 May 2017 16:18:19 +0800
-Message-Id: <20170502081832.9546-10-famz@redhat.com>
+Date: Tue,  2 May 2017 16:18:20 +0800
+Message-Id: <20170502081832.9546-11-famz@redhat.com>
 In-Reply-To: <20170502081832.9546-1-famz@redhat.com>
 References: <20170502081832.9546-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v16 09/22] iotests: 055: Don't attach the
- target image already for drive-backup
+Subject: [Qemu-devel] [PATCH v16 10/22] iotests: 085: Avoid image locking
+ conflict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +23,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Double attach is not a valid usage of the target image, drive-backup
-will open the blockdev itself so skip the add_drive call in this case.
+In the case where we test the expected error when a blockdev-snapshot
+target already has a backing image, the backing chain is opened multiple
+times. This will be a problem when we use image locking, so use a
+different backing file that is not already open.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/055 | 32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+ tests/qemu-iotests/085     | 33 +++++++++++++++++++--------------
+ tests/qemu-iotests/085.out |  3 ++-
+ 2 files changed, 21 insertions(+), 15 deletions(-)
 
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index aafcd24..ba4da65 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -458,17 +458,18 @@ class TestDriveCompression(iotests.QMPTestCase):
-         except OSError:
-             pass
+diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
+index c53e97f..b97adcd 100755
+--- a/tests/qemu-iotests/085
++++ b/tests/qemu-iotests/085
+@@ -45,7 +45,7 @@ _cleanup()
+         rm -f "${TEST_DIR}/${i}-${snapshot_virt0}"
+         rm -f "${TEST_DIR}/${i}-${snapshot_virt1}"
+     done
+-    rm -f "${TEST_IMG}.1" "${TEST_IMG}.2"
++    rm -f "${TEST_IMG}" "${TEST_IMG}.1" "${TEST_IMG}.2" "${TEST_IMG}.base"
  
--    def do_prepare_drives(self, fmt, args):
-+    def do_prepare_drives(self, fmt, args, attach_target):
-         self.vm = iotests.VM().add_drive(test_img)
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
+@@ -87,24 +87,26 @@ function create_group_snapshot()
+ }
  
-         qemu_img('create', '-f', fmt, blockdev_target_img,
-                  str(TestDriveCompression.image_len), *args)
--        self.vm.add_drive(blockdev_target_img, format=fmt, interface="none")
-+        if attach_target:
-+            self.vm.add_drive(blockdev_target_img, format=fmt, interface="none")
+ # ${1}: unique identifier for the snapshot filename
+-# ${2}: true: open backing images; false: don't open them (default)
++# ${2}: extra_params to the blockdev-add command
++# ${3}: filename
++function do_blockdev_add()
++{
++    cmd="{ 'execute': 'blockdev-add', 'arguments':
++           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${2}
++             'file':
++             { 'driver': 'file', 'filename': '${3}',
++               'node-name': 'file_${1}' } } }"
++    _send_qemu_cmd $h "${cmd}" "return"
++}
++
++# ${1}: unique identifier for the snapshot filename
+ function add_snapshot_image()
+ {
+-    if [ "${2}" = "true" ]; then
+-        extra_params=""
+-    else
+-        extra_params="'backing': '', "
+-    fi
+     base_image="${TEST_DIR}/$((${1}-1))-${snapshot_virt0}"
+     snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
+     _make_test_img -b "${base_image}" "$size"
+     mv "${TEST_IMG}" "${snapshot_file}"
+-    cmd="{ 'execute': 'blockdev-add', 'arguments':
+-           { 'driver': 'qcow2', 'node-name': 'snap_${1}', ${extra_params}
+-             'file':
+-             { 'driver': 'file', 'filename': '${snapshot_file}',
+-               'node-name': 'file_${1}' } } }"
+-    _send_qemu_cmd $h "${cmd}" "return"
++    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
+ }
  
-         self.vm.launch()
+ # ${1}: unique identifier for the snapshot filename
+@@ -222,7 +224,10 @@ echo === Invalid command - snapshot node has a backing image ===
+ echo
  
--    def do_test_compress_complete(self, cmd, format, **args):
--        self.do_prepare_drives(format['type'], format['args'])
-+    def do_test_compress_complete(self, cmd, format, attach_target, **args):
-+        self.do_prepare_drives(format['type'], format['args'], attach_target)
+ SNAPSHOTS=$((${SNAPSHOTS}+1))
+-add_snapshot_image ${SNAPSHOTS} true
++
++TEST_IMG="$TEST_IMG.base" _make_test_img "$size"
++_make_test_img -b "${TEST_IMG}.base" "$size"
++do_blockdev_add ${SNAPSHOTS} "" "${TEST_IMG}"
+ blockdev_snapshot ${SNAPSHOTS} error
  
-         self.assert_no_active_block_jobs()
+ echo
+diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
+index 182acb4..a5d4cc3 100644
+--- a/tests/qemu-iotests/085.out
++++ b/tests/qemu-iotests/085.out
+@@ -78,7 +78,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/
  
-@@ -484,15 +485,16 @@ class TestDriveCompression(iotests.QMPTestCase):
+ === Invalid command - snapshot node has a backing image ===
  
-     def test_complete_compress_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_complete('drive-backup', format,
-+            self.do_test_compress_complete('drive-backup', format, False,
-                                            target=blockdev_target_img, mode='existing')
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/12-snapshot-v0.IMGFMT
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "The snapshot already has a backing image"}}
  
-     def test_complete_compress_blockdev_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_complete('blockdev-backup', format, target='drive1')
-+            self.do_test_compress_complete('blockdev-backup', format, True,
-+                                           target='drive1')
- 
--    def do_test_compress_cancel(self, cmd, format, **args):
--        self.do_prepare_drives(format['type'], format['args'])
-+    def do_test_compress_cancel(self, cmd, format, attach_target, **args):
-+        self.do_prepare_drives(format['type'], format['args'], attach_target)
- 
-         self.assert_no_active_block_jobs()
- 
-@@ -506,15 +508,16 @@ class TestDriveCompression(iotests.QMPTestCase):
- 
-     def test_compress_cancel_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_cancel('drive-backup', format,
-+            self.do_test_compress_cancel('drive-backup', format, False,
-                                          target=blockdev_target_img, mode='existing')
- 
-     def test_compress_cancel_blockdev_backup(self):
-        for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_cancel('blockdev-backup', format, target='drive1')
-+            self.do_test_compress_cancel('blockdev-backup', format, True,
-+                                         target='drive1')
- 
--    def do_test_compress_pause(self, cmd, format, **args):
--        self.do_prepare_drives(format['type'], format['args'])
-+    def do_test_compress_pause(self, cmd, format, attach_target, **args):
-+        self.do_prepare_drives(format['type'], format['args'], attach_target)
- 
-         self.assert_no_active_block_jobs()
- 
-@@ -546,12 +549,13 @@ class TestDriveCompression(iotests.QMPTestCase):
- 
-     def test_compress_pause_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_pause('drive-backup', format,
-+            self.do_test_compress_pause('drive-backup', format, False,
-                                         target=blockdev_target_img, mode='existing')
- 
-     def test_compress_pause_blockdev_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_pause('blockdev-backup', format, target='drive1')
-+            self.do_test_compress_pause('blockdev-backup', format, True,
-+                                        target='drive1')
- 
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['raw', 'qcow2'])
 -- 
 2.9.3
