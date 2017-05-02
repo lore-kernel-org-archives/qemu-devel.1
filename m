@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d5dOB-0001dY-BY
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:12 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d5dOE-0001fh-17
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d5dOA-0001Uo-D9
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:11 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35792)
+	(envelope-from <rth7680@gmail.com>) id 1d5dOD-0001Wx-29
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:14 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:32957)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d5dOA-0001UI-8v
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:10 -0400
-Received: by mail-qk0-x241.google.com with SMTP id u68so7538399qkd.2
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:23:10 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d5dOC-0001Wb-TR
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:12 -0400
+Received: by mail-qk0-x244.google.com with SMTP id o85so22940158qkh.0
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:23:12 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  2 May 2017 12:22:38 -0700
-Message-Id: <20170502192300.2124-4-rth@twiddle.net>
+Date: Tue,  2 May 2017 12:22:40 -0700
+Message-Id: <20170502192300.2124-6-rth@twiddle.net>
 In-Reply-To: <20170502192300.2124-1-rth@twiddle.net>
 References: <20170502192300.2124-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 03/25] qemu/atomic: Loosen restrictions for
- 64-bit ILP32 hosts
+Subject: [Qemu-devel] [PATCH v6 05/25] tcg/i386: implement goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,111 +29,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
-We need to coordinate with the TCG_OVERSIZED_GUEST test in cputlb.c,
-and allow 64-bit atomics even though sizeof(void *) == 4.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Suggested-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <1493263764-18657-6-git-send-email-cota@braap.org>
+[rth: Reuse goto_ptr epilogue for exit_tb 0.]
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- include/qemu/atomic.h | 34 ++++++++++++++++++++++++++--------
- 1 file changed, 26 insertions(+), 8 deletions(-)
+ tcg/i386/tcg-target.h     |  2 +-
+ tcg/i386/tcg-target.inc.c | 24 ++++++++++++++++++++++--
+ 2 files changed, 23 insertions(+), 3 deletions(-)
 
-diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-index 878fa07..e07c797 100644
---- a/include/qemu/atomic.h
-+++ b/include/qemu/atomic.h
-@@ -88,6 +88,24 @@
- #define smp_read_barrier_depends()   barrier()
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 59d9835..73a15f7 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -107,7 +107,7 @@ extern bool have_popcnt;
+ #define TCG_TARGET_HAS_muls2_i32        1
+ #define TCG_TARGET_HAS_muluh_i32        0
+ #define TCG_TARGET_HAS_mulsh_i32        0
+-#define TCG_TARGET_HAS_goto_ptr         0
++#define TCG_TARGET_HAS_goto_ptr         1
+ 
+ #if TCG_TARGET_REG_BITS == 64
+ #define TCG_TARGET_HAS_extrl_i64_i32    0
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 5918008..01e3b4e 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -1882,8 +1882,13 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+ 
+     switch (opc) {
+     case INDEX_op_exit_tb:
+-        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_EAX, a0);
+-        tcg_out_jmp(s, tb_ret_addr);
++        /* Reuse the zeroing that exists for goto_ptr.  */
++        if (a0 == 0) {
++            tcg_out_jmp(s, s->code_gen_epilogue);
++        } else {
++            tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_EAX, a0);
++            tcg_out_jmp(s, tb_ret_addr);
++        }
+         break;
+     case INDEX_op_goto_tb:
+         if (s->tb_jmp_insn_offset) {
+@@ -1906,6 +1911,10 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         }
+         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
+         break;
++    case INDEX_op_goto_ptr:
++        /* jmp to the given host address (could be epilogue) */
++        tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, a0);
++        break;
+     case INDEX_op_br:
+         tcg_out_jxx(s, JCC_JMP, arg_label(a0), 0);
+         break;
+@@ -2277,6 +2286,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+ 
+ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+ {
++    static const TCGTargetOpDef r = { .args_ct_str = { "r" } };
+     static const TCGTargetOpDef ri_r = { .args_ct_str = { "ri", "r" } };
+     static const TCGTargetOpDef re_r = { .args_ct_str = { "re", "r" } };
+     static const TCGTargetOpDef qi_r = { .args_ct_str = { "qi", "r" } };
+@@ -2299,6 +2309,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+         = { .args_ct_str = { "L", "L", "L", "L" } };
+ 
+     switch (op) {
++    case INDEX_op_goto_ptr:
++        return &r;
++
+     case INDEX_op_ld8u_i32:
+     case INDEX_op_ld8u_i64:
+     case INDEX_op_ld8s_i32:
+@@ -2567,6 +2580,13 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, tcg_target_call_iarg_regs[1]);
  #endif
  
-+/* Sanity check that the size of an atomic operation isn't "overly large".
-+ * Despite the fact that e.g. i686 has 64-bit atomic operations, we do not
-+ * want to use them because we ought not need them, and this lets us do a
-+ * bit of sanity checking that other 32-bit hosts might build.
-+ *
-+ * That said, we have a problem on 64-bit ILP32 hosts in that in order to
-+ * sync with TCG_OVERSIZED_GUEST, this must match TCG_TARGET_REG_BITS.
-+ * We'd prefer not want to pull in everything else TCG related, so handle
-+ * those few cases by hand.
-+ *
-+ * Note that x32 is fully detected with __x64_64__ + _ILP32, and that for
-+ * Sparc we always force the use of sparcv9 in configure.
-+ */
-+#if defined(__x86_64__) || defined(__sparc__)
-+# define ATOMIC_REG_SIZE  8
-+#else
-+# define ATOMIC_REG_SIZE  sizeof(void *)
-+#endif
- 
- /* Weak atomic operations prevent the compiler moving other
-  * loads/stores past the atomic operation load/store. However there is
-@@ -104,7 +122,7 @@
- 
- #define atomic_read(ptr)                              \
-     ({                                                \
--    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
-+    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
-     atomic_read__nocheck(ptr);                        \
-     })
- 
-@@ -112,7 +130,7 @@
-     __atomic_store_n(ptr, i, __ATOMIC_RELAXED)
- 
- #define atomic_set(ptr, i)  do {                      \
--    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
-+    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
-     atomic_set__nocheck(ptr, i);                      \
- } while(0)
- 
-@@ -130,27 +148,27 @@
- 
- #define atomic_rcu_read(ptr)                          \
-     ({                                                \
--    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
-+    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
-     typeof_strip_qual(*ptr) _val;                     \
-     atomic_rcu_read__nocheck(ptr, &_val);             \
-     _val;                                             \
-     })
- 
- #define atomic_rcu_set(ptr, i) do {                   \
--    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
-+    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
-     __atomic_store_n(ptr, i, __ATOMIC_RELEASE);       \
- } while(0)
- 
- #define atomic_load_acquire(ptr)                        \
-     ({                                                  \
--    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));   \
-+    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);  \
-     typeof_strip_qual(*ptr) _val;                       \
-     __atomic_load(ptr, &_val, __ATOMIC_ACQUIRE);        \
-     _val;                                               \
-     })
- 
- #define atomic_store_release(ptr, i)  do {              \
--    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));   \
-+    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);  \
-     __atomic_store_n(ptr, i, __ATOMIC_RELEASE);         \
- } while(0)
- 
-@@ -162,7 +180,7 @@
- })
- 
- #define atomic_xchg(ptr, i)    ({                           \
--    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));       \
-+    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);      \
-     atomic_xchg__nocheck(ptr, i);                           \
- })
- 
-@@ -175,7 +193,7 @@
- })
- 
- #define atomic_cmpxchg(ptr, old, new)    ({                             \
--    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));                   \
-+    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);                  \
-     atomic_cmpxchg__nocheck(ptr, old, new);                             \
- })
++    /*
++     * Return path for goto_ptr. Set return value to 0, a-la exit_tb,
++     * and fall through to the rest of the epilogue.
++     */
++    s->code_gen_epilogue = s->code_ptr;
++    tcg_out_movi(s, TCG_TYPE_REG, TCG_REG_EAX, 0);
++
+     /* TB epilogue */
+     tb_ret_addr = s->code_ptr;
  
 -- 
 2.9.3
