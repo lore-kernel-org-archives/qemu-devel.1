@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5Y7N-0000UQ-9W
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:45:30 -0400
+	(envelope-from <den@openvz.org>) id 1d5Y9c-0001t0-J3
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5Y7I-0003on-CX
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:45:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42696)
+	(envelope-from <den@openvz.org>) id 1d5Y9X-0004YK-NM
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:47:48 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:11611 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d5Y7I-0003nz-4B
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:45:24 -0400
-Date: Tue, 2 May 2017 10:45:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170502134514.GC3482@thinpad.lan.raisama.net>
-References: <1493718721-29774-1-git-send-email-thuth@redhat.com>
-	<22796dd6-15ce-36c8-e7ad-3403fcc70089@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <22796dd6-15ce-36c8-e7ad-3403fcc70089@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Fix the -accel parameter and the
- documentation for 'hax'
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1d5Y9X-0004Xw-BY
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:47:43 -0400
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Tue,  2 May 2017 16:47:37 +0300
+Message-Id: <1493732857-10721-1-git-send-email-den@openvz.org>
+Subject: [Qemu-devel] [PATCH 1/1] monitor: increase amount of data for
+ monitor to read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +22,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Vincent Palatin <vpalatin@chromium.org>
+To: qemu-devel@nongnu.org
+Cc: "Denis V. Lunev" <den@openvz.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Tue, May 02, 2017 at 02:58:35PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 02/05/2017 11:52, Thomas Huth wrote:
-> > Since 'hax' is a possible accelerator nowadays, too, the '-accel'
-> > option should support it and we should mention it in the documentation,
-> > too.
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  qemu-options.hx |  8 ++++----
-> >  vl.c            | 24 ++++++++++--------------
-> >  2 files changed, 14 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 787b9c3..c7b1d2d 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -31,7 +31,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-> >      "-machine [type=]name[,prop[=value][,...]]\n"
-> >      "                selects emulated machine ('-machine help' for list)\n"
-> >      "                property accel=accel1[:accel2[:...]] selects accelerator\n"
-> > -    "                supported accelerators are kvm, xen, tcg (default: tcg)\n"
-> > +    "                supported accelerators are kvm, xen, hax or tcg (default: tcg)\n"
-> >      "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
-> >      "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
-> >      "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
-> > @@ -52,9 +52,9 @@ available machines. Supported machine properties are:
-> >  @table @option
-> >  @item accel=@var{accels1}[:@var{accels2}[:...]]
-> >  This is used to enable an accelerator. Depending on the target architecture,
-> > -kvm, xen, or tcg can be available. By default, tcg is used. If there is more
-> > -than one accelerator specified, the next one is used if the previous one fails
-> > -to initialize.
-> > +kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-> > +more than one accelerator specified, the next one is used if the previous one
-> > +fails to initialize.
-> >  @item kernel_irqchip=on|off
-> >  Controls in-kernel irqchip support for the chosen accelerator when available.
-> >  @item gfx_passthru=on|off
-> > diff --git a/vl.c b/vl.c
-> > index f46e070..d5e88fb 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -3725,26 +3725,22 @@ int main(int argc, char **argv, char **envp)
-> >                  qdev_prop_register_global(&kvm_pit_lost_tick_policy);
-> >                  break;
-> >              }
-> > -            case QEMU_OPTION_accel:
-> > +            case QEMU_OPTION_accel: {
-> > +                char *mstr;
-> > +
-> >                  accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
-> >                                                       optarg, true);
-> >                  optarg = qemu_opt_get(accel_opts, "accel");
-> > -
-> > -                olist = qemu_find_opts("machine");
-> > -                if (strcmp("kvm", optarg) == 0) {
-> > -                    qemu_opts_parse_noisily(olist, "accel=kvm", false);
-> > -                } else if (strcmp("xen", optarg) == 0) {
-> > -                    qemu_opts_parse_noisily(olist, "accel=xen", false);
-> > -                } else if (strcmp("tcg", optarg) == 0) {
-> > -                    qemu_opts_parse_noisily(olist, "accel=tcg", false);
-> > -                } else {
+Right now QMP and HMP monitors read 1 byte at a time from the socket, which
+is very inefficient. With 100+ VMs on the host this easily reasults in
+a lot of unnecessary system calls and CPU usage in the system.
 
-Getting rid of this hardcoded list is welcome.
+This patch changes the amount of data to read to 4096 bytes, which matches
+buffer size on the channel level. Fortunately, monitor protocol is
+synchronous right now thus we should not face side effects in reality.
 
-> > -                    if (!is_help_option(optarg)) {
-> > -                        error_printf("Unknown accelerator: %s", optarg);
-> > -                    }
-> > -                    error_printf("Supported accelerators: kvm, xen, tcg\n");
-> > +                if (is_help_option(optarg)) {
-> > +                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+---
+ monitor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This should be replaced by object_class_get_list()- or
-object_class_for_each()-based loop, so we don't need to maintain
-the list manually. But that's for a follow-up patch.
-
-> >                      exit(1);
-> >                  }
-> > +                mstr = g_strdup_printf("accel=%s", optarg);
-> > +                olist = qemu_find_opts("machine");
-> > +                qemu_opts_parse_noisily(olist, mstr, false);
-> 
-> Thanks for the report.  I think this has bad side effects when one
-> specifies an invalid accelerator such as -accel tcg,,usb=on.  Eduardo
-> has more plans for -accel, I think.
-
-We can use qemu_opt_set() here to avoid this problem.
-
-I wasn't even aware that we had a new -accel option. Thanks for
-CCing me. I believe -accel should be mapped to
-"-object ...-accel" eventually, but that's for the future.
-
-
-> 
-> Paolo
-> 
-> > +                g_free(mstr);
-> >                  break;
-> > +            }
-> >              case QEMU_OPTION_usb:
-> >                  olist = qemu_find_opts("machine");
-> >                  qemu_opts_parse_noisily(olist, "usb=on", false);
-> > 
-
+diff --git a/monitor.c b/monitor.c
+index be282ec..00df5d0 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3698,7 +3698,7 @@ static int monitor_can_read(void *opaque)
+ {
+     Monitor *mon = opaque;
+ 
+-    return (mon->suspend_cnt == 0) ? 1 : 0;
++    return (mon->suspend_cnt == 0) ? 4096 : 0;
+ }
+ 
+ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
 -- 
-Eduardo
+2.7.4
