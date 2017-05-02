@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5fIo-0003BM-Tv
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:25:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1d5fMZ-0004CM-Ii
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:29:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5fIk-0008Ej-SQ
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:25:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59345)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d5fIk-0008DO-Mp
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:25:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d5fIj-0003Nh-6o
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 21:25:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 057892E807D
-	for <qemu-devel@nongnu.org>; Tue,  2 May 2017 21:25:41 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1d5fMW-0001NF-9Y
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:29:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d5fMV-0001N7-WB
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:29:36 -0400
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+	<20170502203115.22233-2-ehabkost@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0cc1a96d-c828-d055-7024-3d3296e82be1@redhat.com>
+Date: Tue, 2 May 2017 16:29:32 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 May 2017 21:18:00 -0000
-From: Florian Strankowski <1687653@bugs.launchpad.net>
-Reply-To: Bug 1687653 <1687653@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170502155311.4290.95799.malonedeb@soybean.canonical.com>
-Message-Id: <20170502211800.4470.89849.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1687653] Re: QEMU-KVM / detect_zeroes causes KVM
- to start unlimited number of threads on Guest-Sided High-IO with big
- Blocksize
+In-Reply-To: <20170502203115.22233-2-ehabkost@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5RiX7bXFbPnkfTAQJ4MC4aJNM2RhhDSWs"
+Subject: Re: [Qemu-devel] [PATCH 1/4] visitor: Add 'supported_qtypes'
+ parameter to visit_start_alternate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,95 +29,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Just to make this clear: This bug affects only LVM-backed storages.
-File-based-storage is not affected. LVM-Thin and also LVM-Thick.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5RiX7bXFbPnkfTAQJ4MC4aJNM2RhhDSWs
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>,
+ Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <0cc1a96d-c828-d055-7024-3d3296e82be1@redhat.com>
+Subject: Re: [PATCH 1/4] visitor: Add 'supported_qtypes' parameter to
+ visit_start_alternate()
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+ <20170502203115.22233-2-ehabkost@redhat.com>
+In-Reply-To: <20170502203115.22233-2-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 05/02/2017 03:31 PM, Eduardo Habkost wrote:
+> This will allow visitors to make decisions based on the supported qtype=
+s
+> of a given alternate type. The new parameter can replace the old
+> 'promote_int' argument, as qobject-input-visitor can simply check if
+> QTYPE_QINT is set in supported_qtypes.
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1687653
+> @@ -416,7 +417,7 @@ void visit_end_list(Visitor *v, void **list);
+>   */
+>  void visit_start_alternate(Visitor *v, const char *name,
+>                             GenericAlternate **obj, size_t size,
+> -                           bool promote_int, Error **errp);
+> +                           unsigned long supported_qtypes, Error **err=
+p);
 
-Title:
-  QEMU-KVM / detect_zeroes causes KVM to start unlimited number of
-  threads on Guest-Sided High-IO with big Blocksize
+Why unsigned long (which is platform-dependent in size)? At the moment,
+even unsigned char happens to be long enough, although I probably would
+have used uint32_t.
 
-Status in QEMU:
-  Confirmed
-Status in Ubuntu:
-  New
+Oh, I see, it's because you use the BIT() macros from bitops.h, which
+are hardcoded to unsigned long.
 
-Bug description:
-  QEMU-KVM in combination with "detect_zeroes=3Don" makes a Guest able to
-  DoS the Host. This is possible if the Host itself has "detect_zeroes"
-  enabled and the Guest writes a large Chunk of data with a huge
-  blocksize onto the drive.
+> +++ b/scripts/qapi-visit.py
+> @@ -161,20 +161,21 @@ void visit_type_%(c_name)s(Visitor *v, const char=
+ *name, %(c_name)s *obj, Error
+> =20
+> =20
+>  def gen_visit_alternate(name, variants):
+> -    promote_int =3D 'true'
+> +    qtypes =3D ['BIT(%s)' % (var.type.alternate_qtype())
+> +              for var in variants.variants]
+> +    supported_qtypes =3D '|'.join(qtypes)
 
-  E.g.: dd if=3D/dev/zero of=3D/tmp/DoS bs=3D1G count=3D1 oflag=3Ddirect
+Do you want ' | '.join(qtypes), so that at least the generated code
+still follows recommended operator spacing? (The line is long no matter
+what, though, and that's not worth worrying about.)
 
-  All QEMU-Versions after implementation of detect_zeroes are affected.
-  Prior are unaffected. This is absolutely critical, please fix this
-  ASAP!
+>      ret =3D ''
+> -    for var in variants.variants:
+> -        if var.type.alternate_qtype() =3D=3D 'QTYPE_QINT':
+> -            promote_int =3D 'false'
+> =20
+>      ret +=3D mcgen('''
+> =20
+>  void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **=
+obj, Error **errp)
+>  {
+>      Error *err =3D NULL;
+> +    unsigned long supported_qtypes =3D %(supported_qtypes)s;
+> =20
+> +    assert(QTYPE__MAX < BITS_PER_LONG);
 
-  #####
+Do we really have to generate a separate copy of this assert in every
+generated function?  Especially when we know it is true by construction,
+that seems like a lot.  Having the assertion once in a .c file rather
+than generated in multiple functions might be acceptable, though.
 
-  Provided by Dominik Csapak:
+> +++ b/qapi/qobject-input-visitor.c
 
-  source    , bs   , count     ,    O_DIRECT, behaviour
+> @@ -349,7 +351,7 @@ static void qobject_input_start_alternate(Visitor *=
+v, const char *name,
+>      }
+>      *obj =3D g_malloc0(size);
+>      (*obj)->type =3D qobject_type(qobj);
+> -    if (promote_int && (*obj)->type =3D=3D QTYPE_QINT) {
+> +    if (!(supported_qtypes & BIT(QTYPE_QINT)) && (*obj)->type =3D=3D Q=
+TYPE_QINT) {
 
-  urandom   , bs 1M, count 1024,    O_DIRECT: OK
-  file      , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
-  zero file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1G, count    1,    O_DIRECT: NOT OK
-  zero file , bs 1G, count    1,    O_DIRECT: NOT OK
-  zero file , bs 1G, count    1, no O_DIRECT: NOT OK
-  rand file , bs 1G, count    1,    O_DIRECT: OK
-  rand file , bs 1G, count    1, no O_DIRECT: OK
+Experimenting, does this read any better:
 
-  discard on:
+if (!extract32(supported_qtypes, QTYPE_QINT, 1) && ...
 
-  urandom   , bs 1M, count 1024,    O_DIRECT: OK
-  rand file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
-  zero file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1G, count    1,    O_DIRECT: NOT OK
-  zero file , bs 1G, count    1,    O_DIRECT: NOT OK
-  zero file , bs 1G, count    1, no O_DIRECT: NOT OK
-  rand file , bs 1G, count    1,    O_DIRECT: OK
-  rand file , bs 1G, count    1, no O_DIRECT: OK
+which would be another argument for uint32_t instead of unsigned long in
+the signature.
 
-  detect_zeros off:
+The idea makes sense, but I'm still not necessarily sold on using a long.=
 
-  urandom   , bs 1M, count 1024,    O_DIRECT: OK
-  rand file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
-  zero file , bs 1M, count 1024,    O_DIRECT: OK
-  /dev/zero , bs 1G, count    1,    O_DIRECT: OK
-  zero file , bs 1G, count    1,    O_DIRECT: OK
-  zero file , bs 1G, count    1, no O_DIRECT: OK
-  rand file , bs 1G, count    1,    O_DIRECT: OK
-  rand file , bs 1G, count    1, no O_DIRECT: OK
 
-  #####
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  Provided by Florian Strankowski
 
-  bs   -    count   -    io-threads
+--5RiX7bXFbPnkfTAQJ4MC4aJNM2RhhDSWs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  512K -    2048    -    2
-  1M   -    1024    -    2
-  2M   -     512    -    4
-  4M   -     256    -    6
-  8M   -     128    -    10
-  16M  -      64    -    18
-  32M  -      32    -    uncountable
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  Please refer to further information here:
+iQEcBAEBCAAGBQJZCPo8AAoJEKeha0olJ0NqvNwH/0mQPV5ctaa2MFVsg2GpbKFZ
+b8S4D4KM2dNpcVl+npWQU5aQCdkVcKMVuwGyWJyWucs1Fccmh1NOTSKU71LTW8Sw
+szMl4RRjEEfI5HJjTrT3gEoxT1o1z2y3spXmPAX2Fhi1+T7s3RmeUZV64vF5yms9
+xyaCuZ6c4QgFZw66jMr4iLnLY4cfnEVXTXGlASUWy20/HuV41TGT5zoE2aKdifXi
+xkAcjWOqof2Fkfvq5Nw0ADgAuGD00+m7uUE/OeuBfpE7uFbH6eH58GVU/KPLY4sK
+nf9hq2eVxl5HwqlAJkYVzPg/FMsdpwbFDzndIQyl9lnKY/ycmO7oy+VDM+OO45A=
+=o/58
+-----END PGP SIGNATURE-----
 
-  https://bugzilla.proxmox.com/show_bug.cgi?id=3D1368
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1687653/+subscriptions
+--5RiX7bXFbPnkfTAQJ4MC4aJNM2RhhDSWs--
