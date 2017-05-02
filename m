@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d5PPw-0004Po-BX
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 00:28:05 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1d5Pww-0007lb-Ep
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:02:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d5PPv-0007Iv-5K
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 00:28:04 -0400
-Date: Tue, 2 May 2017 14:27:12 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170502042712.GF10741@umbus.fritz.box>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-8-git-send-email-imammedo@redhat.com>
-	<20170412210239.GC27126@thinpad.lan.raisama.net>
-	<20170419131458.59e2d00e@nial.brq.redhat.com>
-	<20170426122138.GU3482@thinpad.lan.raisama.net>
-	<20170427151406.57fbfa79@nial.brq.redhat.com>
-	<20170427163225.GE3482@thinpad.lan.raisama.net>
+	(envelope-from <sundeep.lkml@gmail.com>) id 1d5Pwu-0002aw-JU
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:02:10 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Zi0sgQQBxRFxMTsj"
-Content-Disposition: inline
-In-Reply-To: <20170427163225.GE3482@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 07/23] pc: add node-id property to
- CPU
+In-Reply-To: <1493398313-6673-4-git-send-email-sundeep.lkml@gmail.com>
+References: <1493398313-6673-1-git-send-email-sundeep.lkml@gmail.com>
+	<1493398313-6673-4-git-send-email-sundeep.lkml@gmail.com>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Tue, 2 May 2017 10:32:06 +0530
+Message-ID: <CALHRZuqUcDspfwURfTqp1CMW3qrx5tJyzhivOSzSJ1oL4Le5UA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-devel RFC v3 3/5] msf2: Add Smartfusion2 SPI
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +23,565 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
+Hi,
 
---Zi0sgQQBxRFxMTsj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Gentle Reminder.
 
-On Thu, Apr 27, 2017 at 01:32:25PM -0300, Eduardo Habkost wrote:
-> On Thu, Apr 27, 2017 at 03:14:06PM +0200, Igor Mammedov wrote:
-> > On Wed, 26 Apr 2017 09:21:38 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >=20
-> > adding Peter to CC list
-> >=20
-> > [...]
-> >=20
-> > > On Wed, Apr 19, 2017 at 01:14:58PM +0200, Igor Mammedov wrote:
-> > > > On Wed, 12 Apr 2017 18:02:39 -0300
-> > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > >  =20
-> > > > > On Wed, Mar 22, 2017 at 02:32:32PM +0100, Igor Mammedov wrote: =
-=20
-> > > > > > it will allow switching from cpu_index to property based
-> > > > > > numa mapping in follow up patches.   =20
-> > > > >=20
-> > > > > I am not sure I understand all the consequences of this, so I
-> > > > > will give it a try:
-> > > > >=20
-> > > > > "node-id" is an existing field in CpuInstanceProperties.
-> > > > > CpuInstanceProperties is used on both query-hotpluggable-cpus
-> > > > > output and in MachineState::possible_cpus.
-> > > > >=20
-> > > > > We will start using MachineState::possible_cpus to keep track of
-> > > > > NUMA CPU affinity, and that means query-hotpluggable-cpus will
-> > > > > start reporting a "node-id" property when a NUMA mapping is
-> > > > > configured.
-> > > > >=20
-> > > > > To allow query-hotpluggable-cpus to report "node-id", the CPU
-> > > > > objects must have a "node-id" property that can be set. This
-> > > > > patch adds the "node-id" property to X86CPU.
-> > > > >=20
-> > > > > Is this description accurate? Is the presence of "node-id" in
-> > > > > query-hotpluggable-cpus the only reason we really need this
-> > > > > patch, or is there something else that requires the "node-id"
-> > > > > property? =20
-> > > > That accurate description, node-id is in the same 'address'
-> > > > properties category as socket/core/thread-id. So if you have
-> > > > numa enabled machine you'd see node-id property in
-> > > > query-hotpluggable-cpus. =20
-> > >=20
-> > > I agree that we can make -numa cpu affect query-hotpluggable-cpus
-> > > output (i.e. affect some field on HotpluggableCPU.props).
-> > >=20
-> > > But it looks like we disagree about the purpose of
-> > > HotpluggableCPU.props:
-> > >=20
-> > > I believe HotpluggableCPU.props is just an opaque identifier for
-> > > the location we want to plug the CPU, and the only requirement is
-> > > that it should be unique and have all the information device_add
-> > > needs. As socket IDs are already unique on our existing machines,
-> > > and socket<=3D>node mapping is already configured using -numa cpu,
-> > > node-id doesn't need to be in HotpluggableCPU.props. (see example
-> > > below)
-> > node-id is also location property which logically complements
-> > to socket/core/thread properties.  Also socket is not necessarily
-> > unique id that maps 1:1 to node-id from generic pov.
-> > BTW -numa cpu[s] is not the only way to specify mapping,
-> > it could be specified like we do with pc-dimm:
-> >    device_add pc-dimm,node=3Dx
-> >=20
-> > Looking at it more genericly, there could be the same
-> > socket-ids for different nodes, then we would have to add
-> > node-id to props anyway and end up with 2 node-id, one in props
-> > and another in the parent struct.
->=20
-> This is where my expectations are different: I think
-> HotpluggableCPU.props is just an identifier property for CPU
-> slots that is used for device_add (and will be used for -numa
-> cpu), and isn't supposed to be be interpreted by clients.
->=20
-> The problem I see is that the property has two completely
-> different purposes: identifying a given CPU slot for device_add
-> (and -numa cpu), and introspection of topology information about
-> the CPU slot. Today we are lucky and those goals don't conflict
-> with each other, but I worry this might cause trouble in the
-> future.
+Thanks,
+Sundeep
 
-Yeah, I share your concern.  And even if we allow that the topology
-information may be read by the user, at the moment the
-socket/core/thread values are "read only" in the sense that the client
-should do nothing by read them from the query (possibly look at them
-for its own interest) and echo them back verbatim to device_add.
-
-node id is different because it's something the user/management might
-want to actually choose.  So it seems dubious to me that it's in the
-same structure.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Zi0sgQQBxRFxMTsj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZCAqgAAoJEGw4ysog2bOScG0P/jKb9yS69r2jpoR4n76IFXU8
-lfTsfCS1tWrgFtQU3rI6GCrW0CAGRKUnFCZZv0GSZupfRrzs0jnyJQviRYqcLHmr
-3LMplLaheJMajQLE0wr9EeLy3eGzas33ySelEPQjdamlwGWK75DgQIWzwcQT7ugE
-8W6JHSSHBwl/+/dzZHpS8V7I26G4J1DrCaYIlQQQjdYz2AgMzDbluI/LXTY9+NiF
-T5Z1lfKu9H8vRBwUQUEYVIIOK9IxybyzY9OxG0ZRBHHoNOvHYALg0lmATpYH2ncj
-irVTpHxnRzsnlYuhfzTo8D5lkIlyl9LrhVJo4xzyJU8VXSOTOVMjOGzRng5P3HxH
-Cn2Km/tK0iUfvAvbVsWx1QFuqXGmS6R8SvI8gxEjwXPR1ic6FWvO6O1esqvvQDem
-poAUhJhm6/UhETDgxUBSbc+nRLqQ1ow3acW0a5VCPTiEGq6c6HifWe7VBsZpqjda
-ncAN2NKFbVVHoTAf//KZeWTjVKAPLP/iV+9F36Vc1B2L094gXf/pwd9kRKWqFcBP
-CQiiqVAldERRzSoLA8Sfzt3TXsx/Mqyf4q6abJ37Fdu8Dcx5yl1bOmp2o0c0B3dB
-gvci2a2wmrWv7PetxMB7OaSLk/KD7XKxETktymVOJfCCv64nJsKIOD1DmztSvWS3
-jmPaYu2nownio4LYqqSn
-=UgsG
------END PGP SIGNATURE-----
-
---Zi0sgQQBxRFxMTsj--
+On Fri, Apr 28, 2017 at 10:21 PM, Subbaraya Sundeep
+<sundeep.lkml@gmail.com> wrote:
+> Modelled Microsemi's Smartfusion2 SPI controller.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> ---
+> Hi Peter and Alistair,
+>
+> I created two SPI controllers as per SoC spec
+> in hw/arm/msf2_soc.c. I am assuming there has to be two
+> busses spi0 and spi1 one for each controller. In board file
+> (hw/arm/msf2_som.c) attached SPI flash to SPI0 controller.
+> I am not able to understand(from hw/ssi/xilinx_spips.c)
+> how to create two busses in hw/ssi/msf2_spi.c.
+> Please help me here. Below is the output of info qtree:
+>
+> (qemu) info qtree
+> bus: main-system-bus
+>   type System
+>   dev: msf2-soc, id ""
+>     cpu-model = "cortex-m3"
+>   dev: msf2-spi, id ""
+>     gpio-out "sysbus-irq" 2
+>     mmio 0000000040011000/0000000000000040
+>     bus: spi0
+>       type SSI
+>   dev: msf2-spi, id ""
+>     gpio-out "sysbus-irq" 2
+>     mmio 0000000040001000/0000000000000040
+>     bus: spi0
+>       type SSI
+>       dev: s25sl12801, id ""
+>         gpio-in "ssi-gpio-cs" 1
+>         nonvolatile-cfg = 36863 (0x8fff)
+>         spansion-cr1nv = 0 (0x0)
+>         spansion-cr2nv = 1 (0x1)
+>         spansion-cr3nv = 2 (0x2)
+>         spansion-cr4nv = 16 (0x10)
+>         drive = "mtd0"
+>
+> Thanks,
+> Sundeep
+>
+>  hw/ssi/Makefile.objs      |   1 +
+>  hw/ssi/msf2_spi.c         | 373 ++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/ssi/msf2_spi.h | 102 +++++++++++++
+>  3 files changed, 476 insertions(+)
+>  create mode 100644 hw/ssi/msf2_spi.c
+>  create mode 100644 include/hw/ssi/msf2_spi.h
+>
+> diff --git a/hw/ssi/Makefile.objs b/hw/ssi/Makefile.objs
+> index 487add2..86445d7 100644
+> --- a/hw/ssi/Makefile.objs
+> +++ b/hw/ssi/Makefile.objs
+> @@ -4,6 +4,7 @@ common-obj-$(CONFIG_XILINX_SPI) += xilinx_spi.o
+>  common-obj-$(CONFIG_XILINX_SPIPS) += xilinx_spips.o
+>  common-obj-$(CONFIG_ASPEED_SOC) += aspeed_smc.o
+>  common-obj-$(CONFIG_STM32F2XX_SPI) += stm32f2xx_spi.o
+> +common-obj-$(CONFIG_MSF2) += msf2_spi.o
+>
+>  obj-$(CONFIG_OMAP) += omap_spi.o
+>  obj-$(CONFIG_IMX) += imx_spi.o
+> diff --git a/hw/ssi/msf2_spi.c b/hw/ssi/msf2_spi.c
+> new file mode 100644
+> index 0000000..e7ffa21
+> --- /dev/null
+> +++ b/hw/ssi/msf2_spi.c
+> @@ -0,0 +1,373 @@
+> +/*
+> + * SPI controller model of Microsemi SmartFusion2.
+> + *
+> + * Copyright (C) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/ssi/msf2_spi.h"
+> +#include "sysemu/sysemu.h"
+> +#include "qemu/log.h"
+> +
+> +#ifndef MSF2_SPI_ERR_DEBUG
+> +#define MSF2_SPI_ERR_DEBUG   0
+> +#endif
+> +
+> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> +    if (MSF2_SPI_ERR_DEBUG >= lvl) { \
+> +        qemu_log("%s: " fmt, __func__, ## args); \
+> +    } \
+> +} while (0);
+> +
+> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+> +
+> +static void txfifo_reset(MSF2SpiState *s)
+> +{
+> +    fifo32_reset(&s->tx_fifo);
+> +
+> +    s->regs[R_SPI_STATUS] &= ~S_TXFIFOFUL;
+> +    s->regs[R_SPI_STATUS] |= S_TXFIFOEMP;
+> +}
+> +
+> +static void rxfifo_reset(MSF2SpiState *s)
+> +{
+> +    fifo32_reset(&s->rx_fifo);
+> +
+> +    s->regs[R_SPI_STATUS] &= ~S_RXFIFOFUL;
+> +    s->regs[R_SPI_STATUS] |= S_RXFIFOEMP;
+> +}
+> +
+> +static void set_fifodepth(MSF2SpiState *s)
+> +{
+> +    int size = s->regs[R_SPI_DFSIZE] & FRAMESZ_MASK;
+> +
+> +    if (0 <= size && size <= 8) {
+> +        s->fifo_depth = 32;
+> +    }
+> +    if (9 <= size && size <= 16) {
+> +        s->fifo_depth = 16;
+> +    }
+> +    if (17 <= size && size <= 32) {
+> +        s->fifo_depth = 8;
+> +    }
+> +}
+> +
+> +static void msf2_spi_do_reset(MSF2SpiState *s)
+> +{
+> +    memset(s->regs, 0, sizeof s->regs);
+> +    s->regs[R_SPI_CONTROL] = 0x80000102;
+> +    s->regs[R_SPI_DFSIZE] = 0x4;
+> +    s->regs[R_SPI_STATUS] = 0x2440;
+> +    s->regs[R_SPI_CLKGEN] = 0x7;
+> +    s->regs[R_SPI_STAT8] = 0x7;
+> +    s->regs[R_SPI_RIS] = 0x0;
+> +
+> +    s->fifo_depth = 4;
+> +    s->frame_count = 1;
+> +    s->enabled = false;
+> +
+> +    rxfifo_reset(s);
+> +    txfifo_reset(s);
+> +}
+> +
+> +static void update_mis(MSF2SpiState *s)
+> +{
+> +    uint32_t reg = s->regs[R_SPI_CONTROL];
+> +    uint32_t tmp;
+> +
+> +    /*
+> +     * form the Control register interrupt enable bits
+> +     * same as RIS, MIS and Interrupt clear registers for simplicity
+> +     */
+> +    tmp = ((reg & C_INTRXOVRFLO) >> 4) | ((reg & C_INTRXDATA) >> 3) |
+> +           ((reg & C_INTTXDATA) >> 5);
+> +    s->regs[R_SPI_MIS] |= tmp & s->regs[R_SPI_RIS];
+> +}
+> +
+> +static void spi_update_irq(MSF2SpiState *s)
+> +{
+> +    int irq;
+> +
+> +    update_mis(s);
+> +    irq = !!(s->regs[R_SPI_MIS]);
+> +
+> +    qemu_set_irq(s->irq, irq);
+> +}
+> +
+> +static void msf2_spi_reset(DeviceState *d)
+> +{
+> +    msf2_spi_do_reset(MSF2_SPI(d));
+> +}
+> +
+> +static uint64_t
+> +spi_read(void *opaque, hwaddr addr, unsigned int size)
+> +{
+> +    MSF2SpiState *s = opaque;
+> +    uint32_t r = 0;
+> +
+> +    addr >>= 2;
+> +    switch (addr) {
+> +    case R_SPI_RX:
+> +        s->regs[R_SPI_STATUS] &= ~S_RXFIFOFUL;
+> +        s->regs[R_SPI_STATUS] &= ~RXCHOVRF;
+> +        r = fifo32_pop(&s->rx_fifo);
+> +        if (fifo32_is_empty(&s->rx_fifo)) {
+> +            s->regs[R_SPI_STATUS] |= S_RXFIFOEMP;
+> +        }
+> +        break;
+> +
+> +    case R_SPI_MIS:
+> +        update_mis(s);
+> +        r = s->regs[R_SPI_MIS];
+> +        break;
+> +
+> +    default:
+> +        if (addr < ARRAY_SIZE(s->regs)) {
+> +            r = s->regs[addr];
+> +        }
+> +        break;
+> +    }
+> +
+> +    DB_PRINT("addr=" TARGET_FMT_plx " = %x\n", addr * 4, r);
+> +    spi_update_irq(s);
+> +    return r;
+> +}
+> +
+> +static void assert_cs(MSF2SpiState *s)
+> +{
+> +    qemu_set_irq(s->cs_line, 0);
+> +}
+> +
+> +static void deassert_cs(MSF2SpiState *s)
+> +{
+> +    qemu_set_irq(s->cs_line, 1);
+> +}
+> +
+> +static void spi_flush_txfifo(MSF2SpiState *s)
+> +{
+> +    uint32_t tx;
+> +    uint32_t rx;
+> +    bool sps = !!(s->regs[R_SPI_CONTROL] & C_SPS);
+> +
+> +    /*
+> +     * Chip Select(CS) is automatically controlled by this controller.
+> +     * If SPS bit is set in Control register then CS is asserted
+> +     * until all the frames set in frame count of Control register are
+> +     * transferred. If SPS is not set then CS pulses between frames.
+> +     * Note that Slave Select register specifies which of the CS line
+> +     * has to be controlled automatically by controller. Bits SS[7:1] are for
+> +     * masters in FPGA fabric since we model only Microcontroller subsystem
+> +     * of Smartfusion2 we control only one CS(SS[0]) line.
+> +     */
+> +    while (!fifo32_is_empty(&s->tx_fifo) && s->frame_count) {
+> +        assert_cs(s);
+> +
+> +        s->regs[R_SPI_STATUS] &= ~TXDONE;
+> +        s->regs[R_SPI_STATUS] &= ~RXRDY;
+> +
+> +        tx = fifo32_pop(&s->tx_fifo);
+> +        DB_PRINT("data tx:%x\n", tx);
+> +        rx = ssi_transfer(s->spi, tx);
+> +        DB_PRINT("data rx:%x\n", rx);
+> +
+> +        if (fifo32_num_used(&s->rx_fifo) == s->fifo_depth) {
+> +            s->regs[R_SPI_STATUS] |= RXCHOVRF;
+> +            s->regs[R_SPI_RIS] |= RXCHOVRF;
+> +        } else {
+> +            fifo32_push(&s->rx_fifo, rx);
+> +            s->regs[R_SPI_STATUS] &= ~S_RXFIFOEMP;
+> +            if (fifo32_num_used(&s->rx_fifo) == (s->fifo_depth - 1)) {
+> +                s->regs[R_SPI_STATUS] |= S_RXFIFOFULNXT;
+> +            }
+> +            if (fifo32_num_used(&s->rx_fifo) == s->fifo_depth) {
+> +                s->regs[R_SPI_STATUS] |= S_RXFIFOFUL;
+> +            }
+> +        }
+> +        s->frame_count--;
+> +        if (!sps) {
+> +            deassert_cs(s);
+> +            assert_cs(s);
+> +        }
+> +    }
+> +
+> +    if (!sps) {
+> +        deassert_cs(s);
+> +    }
+> +
+> +    if (!s->frame_count) {
+> +        s->frame_count = (s->regs[R_SPI_CONTROL] & FMCOUNT_MASK) >>
+> +                            FMCOUNT_SHIFT;
+> +        if (sps) {
+> +            deassert_cs(s);
+> +        }
+> +        s->regs[R_SPI_RIS] |= TXDONE;
+> +        s->regs[R_SPI_RIS] |= RXRDY;
+> +        s->regs[R_SPI_STATUS] |= TXDONE;
+> +        s->regs[R_SPI_STATUS] |= RXRDY;
+> +   }
+> +}
+> +
+> +static void spi_write(void *opaque, hwaddr addr,
+> +            uint64_t val64, unsigned int size)
+> +{
+> +    MSF2SpiState *s = opaque;
+> +    uint32_t value = val64;
+> +
+> +    DB_PRINT("addr=" TARGET_FMT_plx " = %x\n", addr, value);
+> +    addr >>= 2;
+> +
+> +    switch (addr) {
+> +    case R_SPI_TX:
+> +        /* adding to already full FIFO */
+> +        if (fifo32_num_used(&s->tx_fifo) == s->fifo_depth) {
+> +            break;
+> +        }
+> +        s->regs[R_SPI_STATUS] &= ~S_TXFIFOEMP;
+> +        fifo32_push(&s->tx_fifo, value);
+> +        if (fifo32_num_used(&s->tx_fifo) == (s->fifo_depth - 1)) {
+> +            s->regs[R_SPI_STATUS] |= S_TXFIFOFULNXT;
+> +        }
+> +        if (fifo32_num_used(&s->tx_fifo) == s->fifo_depth) {
+> +            s->regs[R_SPI_STATUS] |= S_TXFIFOFUL;
+> +        }
+> +        if (s->enabled) {
+> +            spi_flush_txfifo(s);
+> +        }
+> +        break;
+> +
+> +    case R_SPI_CONTROL:
+> +        s->regs[R_SPI_CONTROL] = value;
+> +        if (value & C_BIGFIFO) {
+> +            set_fifodepth(s);
+> +        } else {
+> +            s->fifo_depth = 4;
+> +        }
+> +        if (value & C_ENABLE) {
+> +            s->enabled = true;
+> +        } else {
+> +            s->enabled = false;
+> +        }
+> +        s->frame_count = (value & FMCOUNT_MASK) >> FMCOUNT_SHIFT;
+> +        if (value & C_RESET) {
+> +            msf2_spi_do_reset(s);
+> +        }
+> +        break;
+> +
+> +    case R_SPI_DFSIZE:
+> +        if (s->enabled) {
+> +            break;
+> +        }
+> +        s->regs[R_SPI_DFSIZE] = value;
+> +        break;
+> +
+> +    case R_SPI_INTCLR:
+> +        s->regs[R_SPI_INTCLR] = value;
+> +        if (value & TXDONE) {
+> +            s->regs[R_SPI_RIS] &= ~TXDONE;
+> +        }
+> +        if (value & RXRDY) {
+> +            s->regs[R_SPI_RIS] &= ~RXRDY;
+> +        }
+> +        if (value & RXCHOVRF) {
+> +            s->regs[R_SPI_RIS] &= ~RXCHOVRF;
+> +        }
+> +        break;
+> +
+> +    case R_SPI_MIS:
+> +    case R_SPI_STATUS:
+> +    case R_SPI_RIS:
+> +        break;
+> +
+> +    default:
+> +        if (addr < ARRAY_SIZE(s->regs)) {
+> +            s->regs[addr] = value;
+> +        }
+> +        break;
+> +    }
+> +
+> +    spi_update_irq(s);
+> +}
+> +
+> +static const MemoryRegionOps spi_ops = {
+> +    .read = spi_read,
+> +    .write = spi_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 4
+> +    }
+> +};
+> +
+> +static void msf2_spi_realize(DeviceState *dev, Error **errp)
+> +{
+> +    MSF2SpiState *s = MSF2_SPI(dev);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +
+> +    DB_PRINT("\n");
+> +
+> +    s->spi = ssi_create_bus(dev, "spi0");
+> +
+> +    sysbus_init_irq(sbd, &s->irq);
+> +    ssi_auto_connect_slaves(dev, &s->cs_line, s->spi);
+> +    sysbus_init_irq(sbd, &s->cs_line);
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(s), &spi_ops, s,
+> +                          TYPE_MSF2_SPI, R_SPI_MAX * 4);
+> +    sysbus_init_mmio(sbd, &s->mmio);
+> +
+> +    fifo32_create(&s->tx_fifo, FIFO_CAPACITY);
+> +    fifo32_create(&s->rx_fifo, FIFO_CAPACITY);
+> +}
+> +
+> +static const VMStateDescription vmstate_msf2_spi = {
+> +    .name = TYPE_MSF2_SPI,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_FIFO32(tx_fifo, MSF2SpiState),
+> +        VMSTATE_FIFO32(rx_fifo, MSF2SpiState),
+> +        VMSTATE_UINT32_ARRAY(regs, MSF2SpiState, R_SPI_MAX),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void msf2_spi_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = msf2_spi_realize;
+> +    dc->reset = msf2_spi_reset;
+> +    dc->vmsd = &vmstate_msf2_spi;
+> +}
+> +
+> +static const TypeInfo msf2_spi_info = {
+> +    .name           = TYPE_MSF2_SPI,
+> +    .parent         = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size  = sizeof(MSF2SpiState),
+> +    .class_init     = msf2_spi_class_init,
+> +};
+> +
+> +static void msf2_spi_register_types(void)
+> +{
+> +    type_register_static(&msf2_spi_info);
+> +}
+> +
+> +type_init(msf2_spi_register_types)
+> diff --git a/include/hw/ssi/msf2_spi.h b/include/hw/ssi/msf2_spi.h
+> new file mode 100644
+> index 0000000..7f266c2
+> --- /dev/null
+> +++ b/include/hw/ssi/msf2_spi.h
+> @@ -0,0 +1,102 @@
+> +/*
+> + * Microsemi SmartFusion2 SPI
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_MSF2_SPI_H
+> +#define HW_MSF2_SPI_H
+> +
+> +#include "hw/sysbus.h"
+> +#include "hw/hw.h"
+> +#include "hw/ssi/ssi.h"
+> +#include "qemu/fifo32.h"
+> +
+> +#define FIFO_CAPACITY     32
+> +#define FIFO_CAPACITY     32
+> +
+> +#define R_SPI_CONTROL         0
+> +#define R_SPI_DFSIZE          1
+> +#define R_SPI_STATUS          2
+> +#define R_SPI_INTCLR          3
+> +#define R_SPI_RX              4
+> +#define R_SPI_TX              5
+> +#define R_SPI_CLKGEN          6
+> +#define R_SPI_SS              7
+> +#define R_SPI_MIS             8
+> +#define R_SPI_RIS             9
+> +#define R_SPI_STAT8           15
+> +#define R_SPI_MAX             16
+> +
+> +#define S_RXFIFOFUL       (1 << 4)
+> +#define S_RXFIFOFULNXT    (1 << 5)
+> +#define S_RXFIFOEMP       (1 << 6)
+> +#define S_RXFIFOEMPNXT    (1 << 7)
+> +#define S_TXFIFOFUL       (1 << 8)
+> +#define S_TXFIFOFULNXT    (1 << 9)
+> +#define S_TXFIFOEMP       (1 << 10)
+> +#define S_TXFIFOEMPNXT    (1 << 11)
+> +#define S_FRAMESTART      (1 << 12)
+> +#define S_SSEL            (1 << 13)
+> +#define S_ACTIVE          (1 << 14)
+> +
+> +#define C_ENABLE          (1 << 0)
+> +#define C_MODE            (1 << 1)
+> +#define C_INTRXDATA       (1 << 4)
+> +#define C_INTTXDATA       (1 << 5)
+> +#define C_INTRXOVRFLO     (1 << 6)
+> +#define C_SPS             (1 << 26)
+> +#define C_BIGFIFO         (1 << 29)
+> +#define C_RESET           (1 << 31)
+> +
+> +#define FRAMESZ_MASK      0x1F
+> +#define FMCOUNT_MASK      0x00FFFF00
+> +#define FMCOUNT_SHIFT     8
+> +
+> +#define TXDONE            (1 << 0)
+> +#define RXRDY             (1 << 1)
+> +#define RXCHOVRF          (1 << 2)
+> +
+> +#define TYPE_MSF2_SPI   "msf2-spi"
+> +#define MSF2_SPI(obj)   OBJECT_CHECK(MSF2SpiState, (obj), TYPE_MSF2_SPI)
+> +
+> +typedef struct MSF2SpiState {
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion mmio;
+> +
+> +    qemu_irq irq;
+> +
+> +    qemu_irq cs_line;
+> +
+> +    SSIBus *spi;
+> +
+> +    Fifo32 rx_fifo;
+> +    Fifo32 tx_fifo;
+> +
+> +    int fifo_depth;
+> +    uint32_t frame_count;
+> +    bool enabled;
+> +
+> +    uint32_t regs[R_SPI_MAX];
+> +} MSF2SpiState;
+> +
+> +#endif /* HW_MSF2_SPI_H */
+> --
+> 2.5.0
+>
