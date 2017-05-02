@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5fTq-0005e5-Al
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:37:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1d5fYe-000747-Jj
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:42:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5fTn-00043s-31
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:37:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46174)
+	(envelope-from <eblake@redhat.com>) id 1d5fYb-0007NP-SJ
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:42:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d5fTm-00043P-QT
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:37:07 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d5fYb-0007M0-II
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:42:05 -0400
 References: <20170502203115.22233-1-ehabkost@redhat.com>
-	<20170502203115.22233-3-ehabkost@redhat.com>
+	<20170502203115.22233-5-ehabkost@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <1153646d-848e-91ca-87f6-7d83b4963174@redhat.com>
-Date: Tue, 2 May 2017 16:37:03 -0500
+Message-ID: <27580102-61c1-63e2-bf97-1e86cb1aaf25@redhat.com>
+Date: Tue, 2 May 2017 16:42:02 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170502203115.22233-3-ehabkost@redhat.com>
+In-Reply-To: <20170502203115.22233-5-ehabkost@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="GaOWvc3CR7dF75mET3WgHEh5o4C3aqPJ9"
-Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support
- alternate types
+	boundary="wHSGbnunKpWE6DCQ2O7HF2QUp8IFi9HPt"
+Subject: Re: [Qemu-devel] [PATCH 4/4] x86: Support feature=force on the
+ command-line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +33,120 @@ To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GaOWvc3CR7dF75mET3WgHEh5o4C3aqPJ9
+--wHSGbnunKpWE6DCQ2O7HF2QUp8IFi9HPt
 From: Eric Blake <eblake@redhat.com>
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>,
  Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <1153646d-848e-91ca-87f6-7d83b4963174@redhat.com>
-Subject: Re: [PATCH 2/4] string-input-visitor: Support alternate types
+Message-ID: <27580102-61c1-63e2-bf97-1e86cb1aaf25@redhat.com>
+Subject: Re: [PATCH 4/4] x86: Support feature=force on the command-line
 References: <20170502203115.22233-1-ehabkost@redhat.com>
- <20170502203115.22233-3-ehabkost@redhat.com>
-In-Reply-To: <20170502203115.22233-3-ehabkost@redhat.com>
+ <20170502203115.22233-5-ehabkost@redhat.com>
+In-Reply-To: <20170502203115.22233-5-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/02/2017 03:31 PM, Eduardo Habkost wrote:
-> When parsing alternates from a string, there are some limitations in
-> what we can do, but it is a valid use case in some situations. We can
-> support booleans, integer types, and enums.
->=20
-> This will be used to support 'feature=3Dforce' in -cpu options, while
-> keeping 'feature=3Don|off|true|false' represented as boolean values.
+> Introduce a new CPUFeatureSetting QAPI data type, and use it to support=
+
+> feature=3Dforce on -cpu.
 >=20
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-
+>  qapi-schema.json              | 32 +++++++++++++++++++++++++
+>  target/i386/cpu.h             |  2 ++
+>  target/i386/cpu.c             | 55 +++++++++++++++++++++++++++++++++--=
+--------
+>  tests/test-x86-cpuid-compat.c | 14 ++++++++++-
+>  4 files changed, 90 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 01b087fa16..d716409114 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -4250,6 +4250,38 @@
+>  { 'command': 'query-machines', 'returns': ['MachineInfo'] }
 > =20
-> +/* Support for alternates on string-input-visitor is limited, because
-> + * the input string doesn't have any type information.
-> + *
-> + * Supported alternate member types:
-> + * 1) enums
-> + * 2) integer types
-> + * 3) booleans (but only if the there's no enum variant
-> + *    containing "on", "off", "true", or "false" as members)
-> + *
-> + * UNSUPPORTED alternate member types:
-> + * 1) strings
-> + * 2) complex types
-> + */
-> +static void start_alternate(Visitor *v, const char *name,
-> +                            GenericAlternate **obj, size_t size,
-> +                            unsigned long supported_qtypes, Error **er=
-rp)
-> +{
-> +    StringInputVisitor *siv =3D to_siv(v);
-> +    QType t =3D QTYPE_QSTRING;
-
-Why do you document string as unsupported, and yet default to
-QTYPE_QSTRING?  I don't see how a string is fundamentally different from
-an enum (no alternate can have both at the same time, an alternate with
-either type will have QTYPE_QSTRING set in supported_qtypes).
-
+>  ##
+> +# @CPUFeatureSettingEnum:
+> +#
+> +# Additional valid values for a CPUFeatureSetting property.
+> +#
+> +# @force: Force feature to be enabled, even if the accelerator
+> +#         reports the feature as unavailable. Should be used only
+> +#         for testing or debugging purposes.
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'enum': 'CPUFeatureSettingEnum',
+> +  'data': ['force'] }
 > +
-> +    if (supported_qtypes & BIT(QTYPE_QBOOL)) {
-> +        if (try_parse_bool(siv->string, NULL) =3D=3D 0) {
-> +            t =3D QTYPE_QBOOL;
+> +##
+> +# @CPUFeatureSetting:
+> +#
+> +# Values for a CPU feature property.
+> +#
+> +# @bool: If false, the feature is forcibly disabled.
+> +#        If true, QEMU will try to enable the feature. QEMU will
+> +#        refuse to start if the feature is unavailable and
+> +#        'enforce' mode is enabled in the CPU.
+> +#
+> +# @enum: See @CPUFeatureSettingEnum.
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'alternate': 'CPUFeatureSetting',
+> +  'data': { 'bool': 'bool',
+> +            'enum': 'CPUFeatureSettingEnum' } }
+> +
+
+Looks reasonable; I'm glad the suggestion for using an alternate worked.
+
+
+> -    if (value) {
+> -        cpu->env.features[fp->w] |=3D fp->mask;
+> -    } else {
+> -        cpu->env.features[fp->w] &=3D ~fp->mask;
+> +    switch (value->type) {
+> +    case QTYPE_QBOOL:
+> +        if (value->u.q_bool) {
+> +            cpu->env.features[fp->w] |=3D fp->mask;
+> +        } else {
+> +            cpu->env.features[fp->w] &=3D ~fp->mask;
 > +        }
-> +    }
-> +
-> +    if (supported_qtypes & BIT(QTYPE_QINT)) {
-> +        if (parse_str(siv, name, NULL) =3D=3D 0) {
-> +            t =3D QTYPE_QINT;
-> +        }
-> +    }
-> +
-> +    *obj =3D g_malloc0(size);
-> +    (*obj)->type =3D t;
+> +        cpu->env.forced_features[fp->w] &=3D ~fp->mask;
+> +        cpu->env.user_features[fp->w] |=3D fp->mask;
+> +    break;
 
-Should you raise an error if you couldn't match the input with
-supported_qtypes, rather than just blindly returning QTYPE_QSTRING?
+Isn't the break supposed to be indented four more spaces?
+
+> +    case QTYPE_QSTRING:
+> +        switch (value->u.q_enum) {
+> +        case CPU_FEATURE_SETTING_ENUM_FORCE:
+> +            cpu->env.features[fp->w] |=3D fp->mask;
+> +            cpu->env.forced_features[fp->w] |=3D fp->mask;
+> +        break;
+
+and again
+
+> +        default:
+> +            error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name,
+> +                       "CPUFeatureSetting");
+> +        }
+> +    break;
+
+and again
+
+> +    default:
+> +        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name,
+> +                   "CPUFeatureSetting");
+>      }
+> -    cpu->env.user_features[fp->w] |=3D fp->mask;
+> +
+> +    qapi_free_CPUFeatureSetting(value);
+>  }
+> =20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -110,7 +154,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---GaOWvc3CR7dF75mET3WgHEh5o4C3aqPJ9
+--wHSGbnunKpWE6DCQ2O7HF2QUp8IFi9HPt
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -120,13 +164,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZCPv/AAoJEKeha0olJ0NqkEoIAI8hd3bgbnaGggMuocOfzN6o
-aG0AHIRRf4iJqHmQhxjlzsyl+Lp/xGCqRibKhXJgtRU3My/sxt9cGkGk9CgYDEbJ
-Of59x7YC691X5QSRQ1XIts2kmsBHkXLfWUZhs3kstMeT8bScbfdxRCQlzTAZPllB
-1pKv+LnmxwvPyDB4kSQOWGvZXdlNbZs9WdieX9Mnitq55mal5xF+y2lN+4XBk08w
-GOBoeeyMVyrDZitkk8KxSQT2+b9UP/Z8YgTrJpQB9r++7JGGtSyAxwxL+W+TJ14L
-RC9uyuITcPPARunkdbaWrJ0DgqBRpUVERN24fpYb12a9P8s4z29AsovlMUBkazo=
-=ZpSZ
+iQEcBAEBCAAGBQJZCP0qAAoJEKeha0olJ0NqpbUH/2Y+H4vUX9NXDJruJwm9//ey
+tBrLBashZ6XFKiOrqYcIc75scYO0R/PK1A6urpvpZ2yH2+7FTsJu7wCw1rAKmwdV
+PBf701vRnafU6ZrdfyPlfbKxgXwe19RNPqWsTOhxfXAV19stoO7xK+7FZt/UL1uQ
+z9Uh7ngja9WoXtVx0bqiE9B6qWobMiZbeWyDjz+TsmT9TolLWurGMhusvbHAvaZI
+g+IjoPCvWriOIdJZ2/aPn0kFnffp3NHWZSSesObeZSkxawDSSIL795T9ZmNAuoSO
+XG0JkWU9Aecozmu2p6zvBsroe4d4/6EQOqhM5xzvsvfDA+ltoqkZEXq3tggyWXw=
+=03Op
 -----END PGP SIGNATURE-----
 
---GaOWvc3CR7dF75mET3WgHEh5o4C3aqPJ9--
+--wHSGbnunKpWE6DCQ2O7HF2QUp8IFi9HPt--
