@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5USi-00036K-BY
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:51:17 -0400
+	(envelope-from <thuth@redhat.com>) id 1d5UTa-0003ZP-TF
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:52:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5USf-0006R2-9p
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:51:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47988)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d5USf-0006Qb-4T
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:51:13 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d5USU-0003H3-IC
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 09:51:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6E6032E81A2
-	for <qemu-devel@nongnu.org>; Tue,  2 May 2017 09:50:51 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 May 2017 09:42:17 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1687578 <1687578@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170502092542.26484.80835.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170502094217.26570.4469.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1687578] Re: when migrate vm, reboot in guest os,
- the guest os sometime hang
+	(envelope-from <thuth@redhat.com>) id 1d5UTX-0007IX-RC
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:52:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46562)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d5UTX-0007GN-Hm
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:52:07 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  2 May 2017 11:52:01 +0200
+Message-Id: <1493718721-29774-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Fix the -accel parameter and the documentation
+ for 'hax'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,47 +23,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
 
-Hi,
-  What's the last thing the guest outputs before the hang?
-  Does it get back to the bios or does it hang before that?
-  Has the migration finished at that point or is it still going?
+Since 'hax' is a possible accelerator nowadays, too, the '-accel'
+option should support it and we should mention it in the documentation,
+too.
 
-Dave
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ qemu-options.hx |  8 ++++----
+ vl.c            | 24 ++++++++++--------------
+ 2 files changed, 14 insertions(+), 18 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1687578
-
-Title:
-  when migrate vm, reboot in guest os, the guest os sometime hang
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu version:v2.9.0-rc5 release
-
-  1.virsh migrate --live 165cf436-312f-47e7-90f2-f8aa63f34893 --copy-storag=
-e-inc qemu+ssh://10.59.163.38/system
-  2.run reboot in guest os, add reboot in /etc/rc.local
-  3.guest os hang sometime.
-
-  strace output of qemu:
-
-  ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, eve=
-nts=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=
-=3D31, events=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 0 (Timeout)
-  ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, eve=
-nts=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=
-=3D31, events=3DPOLLIN}], 6, {0, 698000000}, NULL, 8) =3D 0 (Timeout)
-  poll([{fd=3D20, events=3DPOLLOUT}], 1, 0)   =3D 1 ([{fd=3D20, revents=3DP=
-OLLOUT|POLLHUP}])
-  ppoll([{fd=3D9, events=3DPOLLIN}, {fd=3D8, events=3DPOLLIN}, {fd=3D4, eve=
-nts=3DPOLLIN}, {fd=3D6, events=3DPOLLIN}, {fd=3D30, events=3DPOLLIN}, {fd=
-=3D31, events=3DPOLLIN}], 6, {0, 999000000}, NULL, 8^C <unfinished ...>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1687578/+subscriptions
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 787b9c3..c7b1d2d 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -31,7 +31,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "-machine [type=]name[,prop[=value][,...]]\n"
+     "                selects emulated machine ('-machine help' for list)\n"
+     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
+-    "                supported accelerators are kvm, xen, tcg (default: tcg)\n"
++    "                supported accelerators are kvm, xen, hax or tcg (default: tcg)\n"
+     "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
+     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
+     "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
+@@ -52,9 +52,9 @@ available machines. Supported machine properties are:
+ @table @option
+ @item accel=@var{accels1}[:@var{accels2}[:...]]
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, or tcg can be available. By default, tcg is used. If there is more
+-than one accelerator specified, the next one is used if the previous one fails
+-to initialize.
++kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
++more than one accelerator specified, the next one is used if the previous one
++fails to initialize.
+ @item kernel_irqchip=on|off
+ Controls in-kernel irqchip support for the chosen accelerator when available.
+ @item gfx_passthru=on|off
+diff --git a/vl.c b/vl.c
+index f46e070..d5e88fb 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3725,26 +3725,22 @@ int main(int argc, char **argv, char **envp)
+                 qdev_prop_register_global(&kvm_pit_lost_tick_policy);
+                 break;
+             }
+-            case QEMU_OPTION_accel:
++            case QEMU_OPTION_accel: {
++                char *mstr;
++
+                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
+                                                      optarg, true);
+                 optarg = qemu_opt_get(accel_opts, "accel");
+-
+-                olist = qemu_find_opts("machine");
+-                if (strcmp("kvm", optarg) == 0) {
+-                    qemu_opts_parse_noisily(olist, "accel=kvm", false);
+-                } else if (strcmp("xen", optarg) == 0) {
+-                    qemu_opts_parse_noisily(olist, "accel=xen", false);
+-                } else if (strcmp("tcg", optarg) == 0) {
+-                    qemu_opts_parse_noisily(olist, "accel=tcg", false);
+-                } else {
+-                    if (!is_help_option(optarg)) {
+-                        error_printf("Unknown accelerator: %s", optarg);
+-                    }
+-                    error_printf("Supported accelerators: kvm, xen, tcg\n");
++                if (is_help_option(optarg)) {
++                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
+                     exit(1);
+                 }
++                mstr = g_strdup_printf("accel=%s", optarg);
++                olist = qemu_find_opts("machine");
++                qemu_opts_parse_noisily(olist, mstr, false);
++                g_free(mstr);
+                 break;
++            }
+             case QEMU_OPTION_usb:
+                 olist = qemu_find_opts("machine");
+                 qemu_opts_parse_noisily(olist, "usb=on", false);
+-- 
+1.8.3.1
