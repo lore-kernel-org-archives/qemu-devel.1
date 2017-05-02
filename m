@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d5XCS-0004wE-2J
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:46:41 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d5XDy-0005d3-CH
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:48:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d5XCN-0002FM-3A
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:46:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d5XCM-0002Et-Q3
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:46:35 -0400
-References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
-	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
-	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
-	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
-	<7c69341a-9584-8208-023a-42bfeeec6dee@redhat.com>
-	<20170502115953.GJ3459@redhat.com>
-	<69beede1-b218-2e8f-e2b7-b8225cf75a87@redhat.com>
-	<20170502121633.GK3459@redhat.com> <20170502123842.GM3459@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <435d3632-b6d6-fcfe-d7d6-382b5d389b52@redhat.com>
-Date: Tue, 2 May 2017 14:46:26 +0200
+	(envelope-from <stefanha@gmail.com>) id 1d5XDt-0003Py-H0
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:48:14 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36861)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d5XDt-0003PZ-7Y
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:48:09 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id u65so111457623wmu.1
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 05:48:09 -0700 (PDT)
+Date: Tue, 2 May 2017 13:48:04 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170502124804.GB22502@stefanha-x1.localdomain>
+References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
+	<20170419095748.GE3343@stefanha-x1.localdomain>
+	<58F73F22.50108@intel.com>
+	<CAJSP0QWUFNH4ac7-1H5PSp_psByCvXH7gq_vzuqmXRmzXGo_ww@mail.gmail.com>
+	<58F84C5C.5050701@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170502123842.GM3459@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
- in favour of '-accel'
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wq9mPyueHGvFACwf"
+Content-Disposition: inline
+In-Reply-To: <58F84C5C.5050701@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Vhost-pci RFC2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,99 +33,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Vincent Palatin <vpalatin@chromium.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
 
-On 02.05.2017 14:38, Daniel P. Berrange wrote:
-> On Tue, May 02, 2017 at 01:16:33PM +0100, Daniel P. Berrange wrote:
->> On Tue, May 02, 2017 at 02:07:15PM +0200, Thomas Huth wrote:
->>> On 02.05.2017 13:59, Daniel P. Berrange wrote:
->>>> On Tue, May 02, 2017 at 01:26:17PM +0200, Thomas Huth wrote:
->>>>> On 02.05.2017 12:48, Christian Borntraeger wrote:
->>>>>> On 05/02/2017 12:37 PM, Thomas Huth wrote:
->>>>>>> On 02.05.2017 12:32, Christian Borntraeger wrote:
->>>>>>>> On 05/02/2017 12:06 PM, Thomas Huth wrote:
->>>>>>>>> The '-enable-...' option do not make too much sense: They do not
->>>>>>>>> allow additional parameters, using '-accel xxx' is shorter than
->>>>>>>>> '-enable-xxx' and we're also inconsistent here, since there is
->>>>>>>>> no '-enable-xen' option available. So let's try to convince the
->>>>>>>>> users to use '-accel xxx' instead.
->>>>>>>>
->>>>>>>> google has 36000 hits for "--enable-kvm" and 18000 hits for "--accel kvm"
->>>>>>>> So I assume this will affect a lot of setups for only a very small benefit.
->>>>>>>
->>>>>>> I'm aware of the fact that likely a lot of users are still using
->>>>>>> -enable-kvm, and I did not mean that we should remove it soon yet. But
->>>>>>> IMHO we should start now to inform the users that they should slowly
->>>>>>> switch to the better option "-accel" instead, so that we could maybe
->>>>>>> remove this "-enable-xxx" stuff sometime in the distant future (let's
->>>>>>> say QEMU v4.0?).
->>>>>>
->>>>>> I come from the Linux side, where "breaking a working setup" will result in
->>>>>> an angry Linus.
->>>>>
->>>>> IMHO that's a good approach, but I think it should primarily applied for
->>>>> the interfaces that are designed as "API" to other software layers, i.e.
->>>>> things like QMP and the "-machine" parameter.
->>>>> "-enable-kvm" is in my eyes rather a "syntactic sugar" convenience
->>>>> option, so I'd not apply this rule to this option.
->>>>>
->>>>>> We certainly have not such strict rules here and we could
->>>>>> base the decision on the question "how expensive is the maintenance
->>>>>> of this option?". I think marking it as "legacy option" is fine, but I doubt
->>>>>> that removing it will make qemu maintenance cheaper.
->>>>>
->>>>> Likely not. Actually, I have another point of view in mind here: You
->>>>> have to consider that QEMU has a *lot* of options, and I think this is
->>>>> very confusing for the users, especially the new ones. If we always
->>>>> provide two or three ways to achieve a goal, especially in an
->>>>> inconsistent way like we do it here, we likely rather create frustration
->>>>> than joy for the normal users. Providing a clean, straightforward CLI
->>>>> interface one day could help to improve the user experience quite a bit.
->>>>
->>>> The issue is that we have mutually exclusive requirements here. For a
->>>> straightforward, easy to understand CLI, things like "--enable-kvm" are
->>>> much quicker to discover & understand than "-machine accel=kvm". The
->>>> latter gives much more flexibility since it can set all the other opts,
->>>> but most of those are rarely used by people who are invoking QEMU
->>>> manually/directly. We need the things like -machine for libvirt and
->>>> similar, but they are not end user friendly. Killing all the shortcuts
->>>> like --enable-kvm would cut down the args we expose, but forcing users
->>>> onto more complex syntax for args like -machine is not improving their
->>>> lives in general if they don't need that extra flexibility.
->>>
->>> Theoretically yes, but in this case we also have the "-accel kvm" option
->>> which is IMHO also straighforward and easy to understand, and even
->>> shorter than "-enable-kvm". If you look at my patch, I did *not* want to
->>> force the normal users to use "-machine accel=kvm" here, so I don't see
->>> the point of your argument here.
->>
->> Just looking at the -help output though we have
->>
->>   "-machine [type=]name[,prop[=value][,...]]
->>                    property accel=accel1[:accel2[:...]] selects accelerator
->>                    supported accelerators are kvm, xen, tcg (default: tcg)"
->>
->> and
->>
->>   "-enable-kvm     enable KVM full virtualization support"
->>
->> but the "-accel" option is not documented, so essentially doesn't exist,
->> unless you read the man page to see if there are other secret options
->> listed there. So from -help output, "-enable-kvm" looks like the best
->> option to pick from a novice user POV.
-> 
-> Opps, I was looking at wrong QEMU binary - it is listed
-> 
->    "-accel [accel=]accelerator[,thread=single|multi]
->                select accelerator ('-accel help for list')"
-> 
-> but it doesn't mention KVM, so I still think -enable-kvm is the more obvious
-> right answer based on what we're telling users in help
 
-Oh, right, that parameter has just been introduced with QEMU 2.9.0 ...
-so maybe it's really too early to spill out deprecation messages for
-"-enable-kvm", and we just should update the documentation instead (as
-Christian suggested)...
+--wq9mPyueHGvFACwf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- Thomas
+On Thu, Apr 20, 2017 at 01:51:24PM +0800, Wei Wang wrote:
+> On 04/19/2017 11:24 PM, Stefan Hajnoczi wrote:
+> > On Wed, Apr 19, 2017 at 11:42 AM, Wei Wang <wei.w.wang@intel.com> wrote:
+> > > On 04/19/2017 05:57 PM, Stefan Hajnoczi wrote:
+> > > > On Wed, Apr 19, 2017 at 06:38:11AM +0000, Wang, Wei W wrote:
+> > > > > We made some design changes to the original vhost-pci design, and=
+ want to
+> > > > > open
+> > > > > a discussion about the latest design (labelled 2.0) and its exten=
+sion
+> > > > > (2.1).
+> > > > > 2.0 design: One VM shares the entire memory of another VM
+> > > > > 2.1 design: One VM uses an intermediate memory shared with anothe=
+r VM for
+> > > > >                        packet transmission.
+> > > > Hi,
+> > > > Can you talk a bit about the motivation for the 2.x design and major
+> > > > changes compared to 1.x?
+> > >=20
+> > > 1.x refers to the design we presented at KVM Form before. The major
+> > > change includes:
+> > > 1) inter-VM notification support
+> > > 2) TX engine and RX engine, which is the structure built in the drive=
+r. From
+> > > the device point of view, the local rings of the engines need to be
+> > > registered.
+> > It would be great to support any virtio device type.
+>=20
+> Yes, the current design already supports the creation of devices of
+> different types.
+> The support is added to the vhost-user protocol and the vhost-user slave.
+> Once the slave handler receives the request to create the device (with
+> the specified device type), the remaining process (e.g. device realize)
+> is device specific.
+> This part remains the same as presented before
+> (i.e.Page 12 @ http://www.linux-kvm.org/images/5/55/02x07A-Wei_Wang-Desig=
+n_of-Vhost-pci.pdf).
+> >=20
+> > The use case I'm thinking of is networking and storage appliances in
+> > cloud environments (e.g. OpenStack).  vhost-user doesn't fit nicely
+> > because users may not be allowed to run host userspace processes.  VMs
+> > are first-class objects in compute clouds.  It would be natural to
+> > deploy networking and storage appliances as VMs using vhost-pci.
+> >=20
+> > In order to achieve this vhost-pci needs to be a virtio transport and
+> > not a virtio-net-specific PCI device.  It would extend the VIRTIO 1.x
+> > spec alongside virtio-pci, virtio-mmio, and virtio-ccw.
+>=20
+> Actually it is designed as a device under virtio-pci transport. I'm
+> not sure about the value of having a new transport.
+>=20
+> > When you say TX and RX I'm not sure if the design only supports
+> > virtio-net devices?
+>=20
+> Current design focuses on the vhost-pci-net device. That's the
+> reason that we have TX/RX here. As mention above, when the
+> slave invokes the device creation function, the execution
+> goes to each device specific code.
+>=20
+> The TX/RX is the design after the device creation, so it is specific
+> to vhost-pci-net. For the future vhost-pci-blk, that design can
+> have its own request queue.
+
+Here is my understanding based on your vhost-pci GitHub repo:
+
+VM1 sees a normal virtio-net-pci device.  VM1 QEMU is invoked with a
+vhost-user netdev.
+
+VM2 sees a hotplugged vhost-pci-net virtio-pci device once VM1
+initializes the device and a message is sent over vhost-user.
+
+There is no integration with Linux drivers/vhost/ code for VM2.  Instead
+you are writing a 3rd virtio-net driver specifically for vhost-pci.  Not
+sure if it's possible to reuse drivers/vhost/ cleanly but that would be
+nicer than implementing virtio-net again.
+
+Is the VM1 vhost-user netdev a normal vhost-user device or does it know
+about vhost-pci?
+
+It's hard to study code changes in your vhost-pci repo because
+everything (QEMU + Linux + your changes) was committed in a single
+commit.  Please keep your changes in separate commits so it's easy to
+find them.
+
+Stefan
+
+--wq9mPyueHGvFACwf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZCIAEAAoJEJykq7OBq3PIn9AIAL/pCPeS94MFAdUfMiNKLtMK
+33dfri99Nd0LAOm6n7D+gJjYdyhsEvOf5SIScHiSqsiuPQabcy8a/3Dznxx7ncKf
+C40awBPirBVKbyG5dg9ievmANrIdm9aeP4NVe+9kzpxXqUnjyCp4JEk36CSGYcgz
+3Ny1diIhaWooC3Lrx6Gwuoxbh9rglAgAUEMRzaTXYwv83kiK6yqhaqyrcEvYROWO
+4fr8lfAbkp3i2ZhMKJq8IzPxViIsDKGWp9wcu6mniWGv4ddfJqQIV509tR464BFV
+AGxKYvIWyQ67W5rPhbUoCV5+D6+ycEdXIdgBCHHOGRg0GXF/NPppN5hjWA+54qg=
+=Bf6r
+-----END PGP SIGNATURE-----
+
+--wq9mPyueHGvFACwf--
