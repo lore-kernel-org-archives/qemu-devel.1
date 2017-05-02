@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d5QfQ-0007hx-BB
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:48:09 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d5QkY-0000hN-4r
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:53:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d5QfL-00053y-PQ
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:48:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50876)
+	(envelope-from <jasowang@redhat.com>) id 1d5QkT-0007ra-Lz
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:53:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d5Qf6-0004re-48
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:48:03 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d5QkT-0007r3-DL
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 01:53:21 -0400
 References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1493372840-24551-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1493372840-24551-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <d0bb0735-7b25-5236-bbfa-45b751395e7e@redhat.com>
-Date: Tue, 2 May 2017 13:47:40 +0800
+Message-ID: <7bde3681-280c-764a-71df-f4a1cc4b7011@redhat.com>
+Date: Tue, 2 May 2017 13:53:13 +0800
 MIME-Version: 1.0
-In-Reply-To: <1493372840-24551-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1493372840-24551-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V3 04/10] net/filter-mirror.c: Add
- filter-mirror and filter-redirector vnet support.
+Subject: Re: [Qemu-devel] [PATCH V3 05/10] net/net.c: Add vnet header length
+ to SocketReadState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,99 +34,88 @@ Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawe
 
 
 On 2017=E5=B9=B404=E6=9C=8828=E6=97=A5 17:47, Zhang Chen wrote:
-> In this patch, we change the send packet format from
-> struct {int size; const uint8_t buf[];} to {int size; int vnet_hdr_len;=
- const uint8_t buf[];}.
-> make other module(like colo-compare) know how to parse net packet corre=
-ctly.
+> Address Jason Wang's comments add vnet header length to SocketReadState=
+.
+
+Instead of saying this, you can add "Suggested-by: Jason Wang=20
+<jasowang@redhat.com>" above your sign-off.
+
+> So we change net_fill_rstate() to read
+> struct  {int size; int vnet_hdr_len; const uint8_t buf[];}.
+
+This makes me thinking about the backward compatibility. I think we'd=20
+better try to keep it as much as possible. E.g how about pack=20
+vnet_hdr_len into higher bits of size?
+
+Thanks
+
 >
 > Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 > ---
->   net/filter-mirror.c | 28 +++++++++++++++++++++++-----
->   1 file changed, 23 insertions(+), 5 deletions(-)
+>   include/net/net.h |  4 +++-
+>   net/net.c         | 24 ++++++++++++++++++++++--
+>   2 files changed, 25 insertions(+), 3 deletions(-)
 >
-> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-> index 72fa7c2..bb9ecf3 100644
-> --- a/net/filter-mirror.c
-> +++ b/net/filter-mirror.c
-> @@ -43,12 +43,14 @@ typedef struct MirrorState {
->       SocketReadState rs;
->   } MirrorState;
+> diff --git a/include/net/net.h b/include/net/net.h
+> index 402d913..865cb98 100644
+> --- a/include/net/net.h
+> +++ b/include/net/net.h
+> @@ -115,9 +115,11 @@ typedef struct NICState {
+>   } NICState;
 >  =20
-> -static int filter_mirror_send(CharBackend *chr_out,
-> +static int filter_mirror_send(MirrorState *s,
->                                 const struct iovec *iov,
->                                 int iovcnt)
->   {
-> +    NetFilterState *nf =3D NETFILTER(s);
->       int ret =3D 0;
->       ssize_t size =3D 0;
-> +    ssize_t vnet_hdr_len;
->       uint32_t len =3D 0;
->       char *buf;
+>   struct SocketReadState {
+> -    int state; /* 0 =3D getting length, 1 =3D getting data */
+> +    /* 0 =3D getting length, 1 =3D getting vnet header length, 2 =3D g=
+etting data */
+> +    int state;
+>       uint32_t index;
+>       uint32_t packet_len;
+> +    uint32_t vnet_hdr_len;
+>       uint8_t buf[NET_BUFSIZE];
+>       SocketReadStateFinalize *finalize;
+>   };
+> diff --git a/net/net.c b/net/net.c
+> index f69260f..5a6b5ac 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -1639,8 +1639,12 @@ int net_fill_rstate(SocketReadState *rs, const u=
+int8_t *buf, int size)
+>       unsigned int l;
 >  =20
-> @@ -58,14 +60,30 @@ static int filter_mirror_send(CharBackend *chr_out,
->       }
->  =20
->       len =3D htonl(size);
-> -    ret =3D qemu_chr_fe_write_all(chr_out, (uint8_t *)&len, sizeof(len=
-));
-> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof=
-(len));
-> +    if (ret !=3D sizeof(len)) {
-> +        goto err;
-> +    }
-> +
-> +    /*
-> +     * We send vnet header len make other module(like colo-compare)
-> +     * know how to parse net packet correctly.
-> +     */
-> +    if (qemu_get_using_vnet_hdr(nf->netdev)) {
-> +        vnet_hdr_len =3D qemu_get_vnet_hdr_len(nf->netdev);
-> +    } else {
-> +        vnet_hdr_len =3D qemu_get_vnet_hdr_len(nf->netdev->peer);
-> +    }
-
-Any reason to query peer here?
-
-> +
-> +    len =3D htonl(vnet_hdr_len);
-> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof=
-(len));
->       if (ret !=3D sizeof(len)) {
->           goto err;
->       }
->  =20
->       buf =3D g_malloc(size);
->       iov_to_buf(iov, iovcnt, 0, buf, size);
-> -    ret =3D qemu_chr_fe_write_all(chr_out, (uint8_t *)buf, size);
-> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
->       g_free(buf);
->       if (ret !=3D size) {
->           goto err;
-> @@ -141,7 +159,7 @@ static ssize_t filter_mirror_receive_iov(NetFilterS=
-tate *nf,
->       MirrorState *s =3D FILTER_MIRROR(nf);
->       int ret;
->  =20
-> -    ret =3D filter_mirror_send(&s->chr_out, iov, iovcnt);
-> +    ret =3D filter_mirror_send(s, iov, iovcnt);
->       if (ret) {
->           error_report("filter_mirror_send failed(%s)", strerror(-ret))=
-;
->       }
-> @@ -164,7 +182,7 @@ static ssize_t filter_redirector_receive_iov(NetFil=
-terState *nf,
->       int ret;
->  =20
->       if (qemu_chr_fe_get_driver(&s->chr_out)) {
-> -        ret =3D filter_mirror_send(&s->chr_out, iov, iovcnt);
-> +        ret =3D filter_mirror_send(s, iov, iovcnt);
->           if (ret) {
->               error_report("filter_mirror_send failed(%s)", strerror(-r=
-et));
->           }
-
-Do we need to strip vnet_hdr_len in redirector_to_filter() ?
-
-Thanks
+>       while (size > 0) {
+> -        /* reassemble a packet from the network */
+> -        switch (rs->state) { /* 0 =3D getting length, 1 =3D getting da=
+ta */
+> +        /* Reassemble a packet from the network.
+> +         * 0 =3D getting length.
+> +         * 1 =3D getting vnet header length.
+> +         * 2 =3D getting data.
+> +         */
+> +        switch (rs->state) {
+>           case 0:
+>               l =3D 4 - rs->index;
+>               if (l > size) {
+> @@ -1658,6 +1662,22 @@ int net_fill_rstate(SocketReadState *rs, const u=
+int8_t *buf, int size)
+>               }
+>               break;
+>           case 1:
+> +            l =3D 4 - rs->index;
+> +            if (l > size) {
+> +                l =3D size;
+> +            }
+> +            memcpy(rs->buf + rs->index, buf, l);
+> +            buf +=3D l;
+> +            size -=3D l;
+> +            rs->index +=3D l;
+> +            if (rs->index =3D=3D 4) {
+> +                /* got vnet header length */
+> +                rs->vnet_hdr_len =3D ntohl(*(uint32_t *)rs->buf);
+> +                rs->index =3D 0;
+> +                rs->state =3D 2;
+> +            }
+> +            break;
+> +        case 2:
+>               l =3D rs->packet_len - rs->index;
+>               if (l > size) {
+>                   l =3D size;
