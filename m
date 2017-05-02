@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d5WaV-0000qh-KC
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:07:28 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d5Wdg-0001Yp-3T
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:10:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d5WaQ-0005oq-NC
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:07:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33046)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d5WaQ-0005oT-DY
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:07:22 -0400
-References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
-	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
-	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
-	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
-	<7c69341a-9584-8208-023a-42bfeeec6dee@redhat.com>
-	<20170502115953.GJ3459@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <69beede1-b218-2e8f-e2b7-b8225cf75a87@redhat.com>
-Date: Tue, 2 May 2017 14:07:15 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1d5Wdc-0007nS-KP
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:10:44 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1d5Wdc-0007mG-5G
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:10:40 -0400
+Received: by mail-wm0-x242.google.com with SMTP id d79so3957918wmi.2
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 05:10:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170502115953.GJ3459@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
- in favour of '-accel'
+References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
+	<1493725969-19518-3-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1493725969-19518-3-git-send-email-amarnath.valluri@intel.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 02 May 2017 12:10:28 +0000
+Message-ID: <CAJ+F1C+DG+cEYGLMCh6W9xuWpwf8px8i3Phhii7i+TNGqaH-DQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] tpm-backend: Move thread handling
+ inside TPMBackend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +31,457 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Vincent Palatin <vpalatin@chromium.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+Cc: stefanb@linux.vnet.ibm.com, patrick.ohly@intel.com, berrange@redhat.com
 
-On 02.05.2017 13:59, Daniel P. Berrange wrote:
-> On Tue, May 02, 2017 at 01:26:17PM +0200, Thomas Huth wrote:
->> On 02.05.2017 12:48, Christian Borntraeger wrote:
->>> On 05/02/2017 12:37 PM, Thomas Huth wrote:
->>>> On 02.05.2017 12:32, Christian Borntraeger wrote:
->>>>> On 05/02/2017 12:06 PM, Thomas Huth wrote:
->>>>>> The '-enable-...' option do not make too much sense: They do not
->>>>>> allow additional parameters, using '-accel xxx' is shorter than
->>>>>> '-enable-xxx' and we're also inconsistent here, since there is
->>>>>> no '-enable-xen' option available. So let's try to convince the
->>>>>> users to use '-accel xxx' instead.
->>>>>
->>>>> google has 36000 hits for "--enable-kvm" and 18000 hits for "--accel kvm"
->>>>> So I assume this will affect a lot of setups for only a very small benefit.
->>>>
->>>> I'm aware of the fact that likely a lot of users are still using
->>>> -enable-kvm, and I did not mean that we should remove it soon yet. But
->>>> IMHO we should start now to inform the users that they should slowly
->>>> switch to the better option "-accel" instead, so that we could maybe
->>>> remove this "-enable-xxx" stuff sometime in the distant future (let's
->>>> say QEMU v4.0?).
->>>
->>> I come from the Linux side, where "breaking a working setup" will result in
->>> an angry Linus.
->>
->> IMHO that's a good approach, but I think it should primarily applied for
->> the interfaces that are designed as "API" to other software layers, i.e.
->> things like QMP and the "-machine" parameter.
->> "-enable-kvm" is in my eyes rather a "syntactic sugar" convenience
->> option, so I'd not apply this rule to this option.
->>
->>> We certainly have not such strict rules here and we could
->>> base the decision on the question "how expensive is the maintenance
->>> of this option?". I think marking it as "legacy option" is fine, but I doubt
->>> that removing it will make qemu maintenance cheaper.
->>
->> Likely not. Actually, I have another point of view in mind here: You
->> have to consider that QEMU has a *lot* of options, and I think this is
->> very confusing for the users, especially the new ones. If we always
->> provide two or three ways to achieve a goal, especially in an
->> inconsistent way like we do it here, we likely rather create frustration
->> than joy for the normal users. Providing a clean, straightforward CLI
->> interface one day could help to improve the user experience quite a bit.
-> 
-> The issue is that we have mutually exclusive requirements here. For a
-> straightforward, easy to understand CLI, things like "--enable-kvm" are
-> much quicker to discover & understand than "-machine accel=kvm". The
-> latter gives much more flexibility since it can set all the other opts,
-> but most of those are rarely used by people who are invoking QEMU
-> manually/directly. We need the things like -machine for libvirt and
-> similar, but they are not end user friendly. Killing all the shortcuts
-> like --enable-kvm would cut down the args we expose, but forcing users
-> onto more complex syntax for args like -machine is not improving their
-> lives in general if they don't need that extra flexibility.
+Hi
 
-Theoretically yes, but in this case we also have the "-accel kvm" option
-which is IMHO also straighforward and easy to understand, and even
-shorter than "-enable-kvm". If you look at my patch, I did *not* want to
-force the normal users to use "-machine accel=kvm" here, so I don't see
-the point of your argument here.
+On Tue, May 2, 2017 at 3:52 PM Amarnath Valluri <amarnath.valluri@intel.com=
+>
+wrote:
 
- Thomas
+> Move thread handling inside TPMBackend, this way backend implementations
+> need
+> not to maintain their own thread life cycle, instead they needs to
+> implement
+> 'handle_request()' class method that always been called from a thread.
+>
+> This change made tpm_backend_int.h kind of useless, hence removed it.
+>
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> ---
+>  backends/tpm.c                   | 62
+> +++++++++++++++++++++++++---------------
+>  hw/tpm/tpm_passthrough.c         | 58
+> ++++++-------------------------------
+>  include/sysemu/tpm_backend.h     | 32 +++++++++++++--------
+>  include/sysemu/tpm_backend_int.h | 41 --------------------------
+>  4 files changed, 67 insertions(+), 126 deletions(-)
+>  delete mode 100644 include/sysemu/tpm_backend_int.h
+>
+> diff --git a/backends/tpm.c b/backends/tpm.c
+> index 536f262..ce56c3b 100644
+> --- a/backends/tpm.c
+> +++ b/backends/tpm.c
+> @@ -18,7 +18,24 @@
+>  #include "qapi/qmp/qerror.h"
+>  #include "sysemu/tpm.h"
+>  #include "qemu/thread.h"
+> -#include "sysemu/tpm_backend_int.h"
+> +
+> +static void tpm_backend_worker_thread(gpointer data, gpointer user_data)
+> +{
+> +    TPMBackend *s =3D TPM_BACKEND(user_data);
+> +    TPMBackendClass *k  =3D TPM_BACKEND_GET_CLASS(s);
+> +
+> +    assert(k->handle_request !=3D NULL);
+> +    k->handle_request(s, (TPMBackendCmd)data);
+> +}
+> +
+> +static void tpm_backend_thread_end(TPMBackend *s)
+> +{
+> +    if (s->thread_pool) {
+> +        g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_END=
+,
+> NULL);
+> +        g_thread_pool_free(s->thread_pool, FALSE, TRUE);
+> +        s->thread_pool =3D NULL;
+> +    }
+> +}
+>
+>  enum TpmType tpm_backend_get_type(TPMBackend *s)
+>  {
+> @@ -39,6 +56,8 @@ void tpm_backend_destroy(TPMBackend *s)
+>      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+>
+>      k->ops->destroy(s);
+> +
+> +    tpm_backend_thread_end(s);
+>  }
+>
+>  int tpm_backend_init(TPMBackend *s, TPMState *state,
+> @@ -46,13 +65,23 @@ int tpm_backend_init(TPMBackend *s, TPMState *state,
+>  {
+>      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+>
+> -    return k->ops->init(s, state, datacb);
+> +    s->tpm_state =3D state;
+> +    s->recv_data_callback =3D datacb;
+> +
+> +    return k->ops->init(s);
+>  }
+>
+>  int tpm_backend_startup_tpm(TPMBackend *s)
+>  {
+>      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+>
+> +    /* terminate a running TPM */
+> +    tpm_backend_thread_end(s);
+> +
+> +    s->thread_pool =3D g_thread_pool_new(tpm_backend_worker_thread, s, 1=
+,
+> TRUE,
+> +                                       NULL);
+> +    g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_INIT,
+> NULL);
+> +
+>      return k->ops->startup_tpm(s);
+>  }
+>
+> @@ -72,9 +101,8 @@ size_t tpm_backend_realloc_buffer(TPMBackend *s,
+> TPMSizedBuffer *sb)
+>
+>  void tpm_backend_deliver_request(TPMBackend *s)
+>  {
+> -    TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+> -
+> -    k->ops->deliver_request(s);
+> +    g_thread_pool_push(s->thread_pool,
+> (gpointer)TPM_BACKEND_CMD_PROCESS_CMD,
+> +                       NULL);
+>  }
+>
+>  void tpm_backend_reset(TPMBackend *s)
+> @@ -82,6 +110,8 @@ void tpm_backend_reset(TPMBackend *s)
+>      TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+>
+>      k->ops->reset(s);
+> +
+> +    tpm_backend_thread_end(s);
+>  }
+>
+>  void tpm_backend_cancel_cmd(TPMBackend *s)
+> @@ -156,29 +186,14 @@ static void tpm_backend_instance_init(Object *obj)
+>                               tpm_backend_prop_get_opened,
+>                               tpm_backend_prop_set_opened,
+>                               NULL);
+> -}
+>
+> -void tpm_backend_thread_deliver_request(TPMBackendThread *tbt)
+> -{
+> -   g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_PROCESS_CMD,
+> NULL);
+>  }
+>
+> -void tpm_backend_thread_create(TPMBackendThread *tbt,
+> -                               GFunc func, gpointer user_data)
+> +static void tpm_backend_instance_finalize(Object *obj)
+>  {
+> -    if (!tbt->pool) {
+> -        tbt->pool =3D g_thread_pool_new(func, user_data, 1, TRUE, NULL);
+> -        g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_INIT,
+> NULL);
+> -    }
+> -}
+> +    TPMBackend *s =3D TPM_BACKEND(obj);
+>
+> -void tpm_backend_thread_end(TPMBackendThread *tbt)
+> -{
+> -    if (tbt->pool) {
+> -        g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_END,
+> NULL);
+> -        g_thread_pool_free(tbt->pool, FALSE, TRUE);
+> -        tbt->pool =3D NULL;
+> -    }
+> +    tpm_backend_thread_end(s);
+>  }
+>
+>  static const TypeInfo tpm_backend_info =3D {
+> @@ -186,6 +201,7 @@ static const TypeInfo tpm_backend_info =3D {
+>      .parent =3D TYPE_OBJECT,
+>      .instance_size =3D sizeof(TPMBackend),
+>      .instance_init =3D tpm_backend_instance_init,
+> +    .instance_finalize =3D tpm_backend_instance_finalize,
+>      .class_size =3D sizeof(TPMBackendClass),
+>      .abstract =3D true,
+>  };
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index a0baf5f..f50d9cf 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -30,7 +30,6 @@
+>  #include "tpm_int.h"
+>  #include "hw/hw.h"
+>  #include "hw/i386/pc.h"
+> -#include "sysemu/tpm_backend_int.h"
+>  #include "tpm_tis.h"
+>  #include "tpm_util.h"
+>
+> @@ -47,20 +46,9 @@
+>      OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+>
+>  /* data structures */
+> -typedef struct TPMPassthruThreadParams {
+> -    TPMState *tpm_state;
+> -
+> -    TPMRecvDataCB *recv_data_callback;
+> -    TPMBackend *tb;
+> -} TPMPassthruThreadParams;
+> -
+>  struct TPMPassthruState {
+>      TPMBackend parent;
+>
+> -    TPMBackendThread tbt;
+> -
+> -    TPMPassthruThreadParams tpm_thread_params;
+> -
+>      char *tpm_dev;
+>      int tpm_fd;
+>      bool tpm_executing;
+> @@ -214,12 +202,9 @@ static int
+> tpm_passthrough_unix_transfer(TPMPassthruState *tpm_pt,
+>                                          selftest_done);
+>  }
+>
+> -static void tpm_passthrough_worker_thread(gpointer data,
+> -                                          gpointer user_data)
+> +static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd
+> cmd)
+>  {
+> -    TPMPassthruThreadParams *thr_parms =3D user_data;
+> -    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(thr_parms->tb);
+> -    TPMBackendCmd cmd =3D (TPMBackendCmd)data;
+> +    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+>      bool selftest_done =3D false;
+>
+>      DPRINTF("tpm_passthrough: processing command type %d\n", cmd);
+> @@ -227,12 +212,12 @@ static void tpm_passthrough_worker_thread(gpointer
+> data,
+>      switch (cmd) {
+>      case TPM_BACKEND_CMD_PROCESS_CMD:
+>          tpm_passthrough_unix_transfer(tpm_pt,
+> -                                      thr_parms->tpm_state->locty_data,
+> +                                      tb->tpm_state->locty_data,
+>                                        &selftest_done);
+>
+> -        thr_parms->recv_data_callback(thr_parms->tpm_state,
+> -                                      thr_parms->tpm_state->locty_number=
+,
+> -                                      selftest_done);
+> +        tb->recv_data_callback(tb->tpm_state,
+> +                               tb->tpm_state->locty_number,
+> +                               selftest_done);
+>          break;
+>      case TPM_BACKEND_CMD_INIT:
+>      case TPM_BACKEND_CMD_END:
+> @@ -248,15 +233,6 @@ static void tpm_passthrough_worker_thread(gpointer
+> data,
+>   */
+>  static int tpm_passthrough_startup_tpm(TPMBackend *tb)
+>  {
+> -    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+> -
+> -    /* terminate a running TPM */
+> -    tpm_backend_thread_end(&tpm_pt->tbt);
+> -
+> -    tpm_backend_thread_create(&tpm_pt->tbt,
+> -                              tpm_passthrough_worker_thread,
+> -                              &tpm_pt->tpm_thread_params);
+> -
+>      return 0;
+>  }
+>
+> @@ -268,20 +244,11 @@ static void tpm_passthrough_reset(TPMBackend *tb)
+>
+>      tpm_passthrough_cancel_cmd(tb);
+>
+> -    tpm_backend_thread_end(&tpm_pt->tbt);
+> -
+>      tpm_pt->had_startup_error =3D false;
+>  }
+>
+> -static int tpm_passthrough_init(TPMBackend *tb, TPMState *s,
+> -                                TPMRecvDataCB *recv_data_cb)
+> +static int tpm_passthrough_init(TPMBackend *tb)
+>  {
+> -    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+> -
+> -    tpm_pt->tpm_thread_params.tpm_state =3D s;
+> -    tpm_pt->tpm_thread_params.recv_data_callback =3D recv_data_cb;
+> -    tpm_pt->tpm_thread_params.tb =3D tb;
+> -
+>      return 0;
+>  }
+>
+
+I think you could get rid of the function & callback in this patch (no need
+to wait for later patch)
+
+
+>
+> @@ -315,13 +282,6 @@ static size_t
+> tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
+>      return sb->size;
+>  }
+>
+> -static void tpm_passthrough_deliver_request(TPMBackend *tb)
+> -{
+> -    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+> -
+> -    tpm_backend_thread_deliver_request(&tpm_pt->tbt);
+> -}
+> -
+>  static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
+>  {
+>      TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+> @@ -483,8 +443,6 @@ static void tpm_passthrough_destroy(TPMBackend *tb)
+>
+>      tpm_passthrough_cancel_cmd(tb);
+>
+> -    tpm_backend_thread_end(&tpm_pt->tbt);
+> -
+>      qemu_close(tpm_pt->tpm_fd);
+>      qemu_close(tpm_pt->cancel_fd);
+>
+> @@ -520,7 +478,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
+{
+>      .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
+>      .reset                    =3D tpm_passthrough_reset,
+>      .had_startup_error        =3D tpm_passthrough_get_startup_error,
+> -    .deliver_request          =3D tpm_passthrough_deliver_request,
+>      .cancel_cmd               =3D tpm_passthrough_cancel_cmd,
+>      .get_tpm_established_flag =3D tpm_passthrough_get_tpm_established_fl=
+ag,
+>      .reset_tpm_established_flag =3D
+> tpm_passthrough_reset_tpm_established_flag,
+> @@ -540,6 +497,7 @@ static void tpm_passthrough_class_init(ObjectClass
+> *klass, void *data)
+>      TPMBackendClass *tbc =3D TPM_BACKEND_CLASS(klass);
+>
+>      tbc->ops =3D &tpm_passthrough_driver;
+> +    tbc->handle_request =3D tpm_passthrough_handle_request;
+>  }
+>
+>  static const TypeInfo tpm_passthrough_info =3D {
+> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+> index e7f590d..a538a7f 100644
+> --- a/include/sysemu/tpm_backend.h
+> +++ b/include/sysemu/tpm_backend.h
+> @@ -29,22 +29,24 @@
+>
+>  typedef struct TPMBackendClass TPMBackendClass;
+>  typedef struct TPMBackend TPMBackend;
+> -
+>  typedef struct TPMDriverOps TPMDriverOps;
+> +typedef void (TPMRecvDataCB)(TPMState *, uint8_t locty, bool
+> selftest_done);
+>
+> -struct TPMBackendClass {
+> -    ObjectClass parent_class;
+> -
+> -    const TPMDriverOps *ops;
+> -
+> -    void (*opened)(TPMBackend *s, Error **errp);
+> -};
+> +typedef enum TPMBackendCmd {
+> +    TPM_BACKEND_CMD_INIT =3D 1,
+> +    TPM_BACKEND_CMD_PROCESS_CMD,
+> +    TPM_BACKEND_CMD_END,
+> +    TPM_BACKEND_CMD_TPM_RESET,
+> +} TPMBackendCmd;
+>
+>  struct TPMBackend {
+>      Object parent;
+>
+>      /*< protected >*/
+>      bool opened;
+> +    TPMState *tpm_state;
+> +    GThreadPool *thread_pool;
+> +    TPMRecvDataCB *recv_data_callback;
+>
+>      char *id;
+>      enum TpmModel fe_model;
+> @@ -54,7 +56,15 @@ struct TPMBackend {
+>      QLIST_ENTRY(TPMBackend) list;
+>  };
+>
+> -typedef void (TPMRecvDataCB)(TPMState *, uint8_t locty, bool
+> selftest_done);
+> +struct TPMBackendClass {
+> +    ObjectClass parent_class;
+> +
+> +    const TPMDriverOps *ops;
+> +
+> +    void (*opened)(TPMBackend *s, Error **errp);
+> +
+> +    void (*handle_request)(TPMBackend *s, TPMBackendCmd cmd);
+> +};
+>
+>  typedef struct TPMSizedBuffer {
+>      uint32_t size;
+> @@ -71,7 +81,7 @@ struct TPMDriverOps {
+>      void (*destroy)(TPMBackend *t);
+>
+>      /* initialize the backend */
+> -    int (*init)(TPMBackend *t, TPMState *s, TPMRecvDataCB *datacb);
+> +    int (*init)(TPMBackend *t);
+>      /* start up the TPM on the backend */
+>      int (*startup_tpm)(TPMBackend *t);
+>      /* returns true if nothing will ever answer TPM requests */
+> @@ -79,8 +89,6 @@ struct TPMDriverOps {
+>
+>      size_t (*realloc_buffer)(TPMSizedBuffer *sb);
+>
+> -    void (*deliver_request)(TPMBackend *t);
+> -
+>      void (*reset)(TPMBackend *t);
+>
+>      void (*cancel_cmd)(TPMBackend *t);
+> diff --git a/include/sysemu/tpm_backend_int.h
+> b/include/sysemu/tpm_backend_int.h
+> deleted file mode 100644
+> index 00639dd..0000000
+> --- a/include/sysemu/tpm_backend_int.h
+> +++ /dev/null
+> @@ -1,41 +0,0 @@
+> -/*
+> - *  common TPM backend driver functions
+> - *
+> - *  Copyright (c) 2012-2013 IBM Corporation
+> - *  Authors:
+> - *    Stefan Berger <stefanb@us.ibm.com>
+> - *
+> - * This library is free software; you can redistribute it and/or
+> - * modify it under the terms of the GNU Lesser General Public
+> - * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> - *
+> - * This library is distributed in the hope that it will be useful,
+> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> - * Lesser General Public License for more details.
+> - *
+> - * You should have received a copy of the GNU Lesser General Public
+> - * License along with this library; if not, see <
+> http://www.gnu.org/licenses/>
+> - */
+> -
+> -#ifndef TPM_BACKEND_INT_H
+> -#define TPM_BACKEND_INT_H
+> -
+> -typedef struct TPMBackendThread {
+> -    GThreadPool *pool;
+> -} TPMBackendThread;
+> -
+> -void tpm_backend_thread_deliver_request(TPMBackendThread *tbt);
+> -void tpm_backend_thread_create(TPMBackendThread *tbt,
+> -                               GFunc func, gpointer user_data);
+> -void tpm_backend_thread_end(TPMBackendThread *tbt);
+> -
+> -typedef enum TPMBackendCmd {
+> -    TPM_BACKEND_CMD_INIT =3D 1,
+> -    TPM_BACKEND_CMD_PROCESS_CMD,
+> -    TPM_BACKEND_CMD_END,
+> -    TPM_BACKEND_CMD_TPM_RESET,
+> -} TPMBackendCmd;
+> -
+> -#endif /* TPM_BACKEND_INT_H */
+> --
+> 2.7.4
+>
+
+anyway,
+
+ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+--=20
+Marc-Andr=C3=A9 Lureau
