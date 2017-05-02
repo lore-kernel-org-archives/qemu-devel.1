@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5eSA-0004iF-TL
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:31:24 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5eSC-0004iK-5u
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5eS9-00050L-3s
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:31:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54984)
+	(envelope-from <ehabkost@redhat.com>) id 1d5eSA-000526-PP
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:31:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d5eS8-0004ys-Q8
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:31:21 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d5eSA-00051N-G3
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:31:22 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue,  2 May 2017 17:31:12 -0300
-Message-Id: <20170502203115.22233-2-ehabkost@redhat.com>
+Date: Tue,  2 May 2017 17:31:13 -0300
+Message-Id: <20170502203115.22233-3-ehabkost@redhat.com>
 In-Reply-To: <20170502203115.22233-1-ehabkost@redhat.com>
 References: <20170502203115.22233-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/4] visitor: Add 'supported_qtypes' parameter
- to visit_start_alternate()
+Subject: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support alternate
+ types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,202 +27,253 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This will allow visitors to make decisions based on the supported qtypes
-of a given alternate type. The new parameter can replace the old
-'promote_int' argument, as qobject-input-visitor can simply check if
-QTYPE_QINT is set in supported_qtypes.
+When parsing alternates from a string, there are some limitations in
+what we can do, but it is a valid use case in some situations. We can
+support booleans, integer types, and enums.
+
+This will be used to support 'feature=force' in -cpu options, while
+keeping 'feature=on|off|true|false' represented as boolean values.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/qapi/visitor.h       |  5 +++--
- include/qapi/visitor-impl.h  |  2 +-
- scripts/qapi-visit.py        | 14 ++++++++------
- qapi/qapi-visit-core.c       |  7 ++++---
- qapi/qapi-clone-visitor.c    |  3 ++-
- qapi/qapi-dealloc-visitor.c  |  3 ++-
- qapi/qobject-input-visitor.c |  6 ++++--
- qapi/trace-events            |  2 +-
- 8 files changed, 25 insertions(+), 17 deletions(-)
+ qapi/string-input-visitor.c             | 71 ++++++++++++++++++++++----
+ tests/test-string-input-visitor.c       | 89 +++++++++++++++++++++++++++++++++
+ tests/qapi-schema/qapi-schema-test.json |  8 +++
+ 3 files changed, 158 insertions(+), 10 deletions(-)
 
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index 1a1b62012b..8c2bff4a05 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -408,7 +408,8 @@ void visit_end_list(Visitor *v, void **list);
-  * the qtype of the next thing to be visited, stored in (*@obj)->type.
-  * Other visitors will leave @obj unchanged.
-  *
-- * If @promote_int, treat integers as QTYPE_FLOAT.
-+ * @supported_qtypes is a bit mask indicating which QTypes are supported
-+ * by the alternate.
-  *
-  * If successful, this must be paired with visit_end_alternate() with
-  * the same @obj to clean up, even if visiting the contents of the
-@@ -416,7 +417,7 @@ void visit_end_list(Visitor *v, void **list);
-  */
- void visit_start_alternate(Visitor *v, const char *name,
-                            GenericAlternate **obj, size_t size,
--                           bool promote_int, Error **errp);
-+                           unsigned long supported_qtypes, Error **errp);
- 
- /*
-  * Finish visiting an alternate type.
-diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
-index e87709db5c..50c2b2feef 100644
---- a/include/qapi/visitor-impl.h
-+++ b/include/qapi/visitor-impl.h
-@@ -71,7 +71,7 @@ struct Visitor
-      * optional for output visitors. */
-     void (*start_alternate)(Visitor *v, const char *name,
-                             GenericAlternate **obj, size_t size,
--                            bool promote_int, Error **errp);
-+                            unsigned long supported_qtypes, Error **errp);
- 
-     /* Optional, needed for dealloc visitor */
-     void (*end_alternate)(Visitor *v, void **obj);
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 5737aefa05..ebf7e67109 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -161,20 +161,21 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj, Error
- 
- 
- def gen_visit_alternate(name, variants):
--    promote_int = 'true'
-+    qtypes = ['BIT(%s)' % (var.type.alternate_qtype())
-+              for var in variants.variants]
-+    supported_qtypes = '|'.join(qtypes)
-     ret = ''
--    for var in variants.variants:
--        if var.type.alternate_qtype() == 'QTYPE_QINT':
--            promote_int = 'false'
- 
-     ret += mcgen('''
- 
- void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error **errp)
- {
-     Error *err = NULL;
-+    unsigned long supported_qtypes = %(supported_qtypes)s;
- 
-+    assert(QTYPE__MAX < BITS_PER_LONG);
-     visit_start_alternate(v, name, (GenericAlternate **)obj, sizeof(**obj),
--                          %(promote_int)s, &err);
-+                          supported_qtypes, &err);
-     if (err) {
-         goto out;
-     }
-@@ -183,7 +184,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
-     }
-     switch ((*obj)->type) {
- ''',
--                 c_name=c_name(name), promote_int=promote_int)
-+                 c_name=c_name(name), supported_qtypes=supported_qtypes)
- 
-     for var in variants.variants:
-         ret += mcgen('''
-@@ -375,6 +376,7 @@ h_comment = '''
- 
- fdef.write(mcgen('''
- #include "qemu/osdep.h"
-+#include "qemu/bitmap.h"
- #include "qemu-common.h"
- #include "qapi/error.h"
- #include "%(prefix)sqapi-visit.h"
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 43a09d147d..784ba1b756 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -106,15 +106,16 @@ void visit_end_list(Visitor *v, void **obj)
- 
- void visit_start_alternate(Visitor *v, const char *name,
-                            GenericAlternate **obj, size_t size,
--                           bool promote_int, Error **errp)
-+                           unsigned long supported_qtypes,
-+                           Error **errp)
- {
-     Error *err = NULL;
- 
-     assert(obj && size >= sizeof(GenericAlternate));
-     assert(!(v->type & VISITOR_OUTPUT) || *obj);
--    trace_visit_start_alternate(v, name, obj, size, promote_int);
-+    trace_visit_start_alternate(v, name, obj, size, supported_qtypes);
-     if (v->start_alternate) {
--        v->start_alternate(v, name, obj, size, promote_int, &err);
-+        v->start_alternate(v, name, obj, size, supported_qtypes, &err);
-     }
-     if (v->type & VISITOR_INPUT) {
-         assert(v->start_alternate && !err != !*obj);
-diff --git a/qapi/qapi-clone-visitor.c b/qapi/qapi-clone-visitor.c
-index 34086cbfc0..5550871488 100644
---- a/qapi/qapi-clone-visitor.c
-+++ b/qapi/qapi-clone-visitor.c
-@@ -70,7 +70,8 @@ static GenericList *qapi_clone_next_list(Visitor *v, GenericList *tail,
- 
- static void qapi_clone_start_alternate(Visitor *v, const char *name,
-                                        GenericAlternate **obj, size_t size,
--                                       bool promote_int, Error **errp)
-+                                       unsigned long supported_qtypes,
-+                                       Error **errp)
- {
-     qapi_clone_start_struct(v, name, (void **)obj, size, errp);
- }
-diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
-index e39457bc79..ef83d1420b 100644
---- a/qapi/qapi-dealloc-visitor.c
-+++ b/qapi/qapi-dealloc-visitor.c
-@@ -38,7 +38,8 @@ static void qapi_dealloc_end_struct(Visitor *v, void **obj)
- 
- static void qapi_dealloc_start_alternate(Visitor *v, const char *name,
-                                          GenericAlternate **obj, size_t size,
--                                         bool promote_int, Error **errp)
-+                                         unsigned long supported_qtypes,
-+                                         Error **errp)
- {
- }
- 
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 865e948ac0..393220b3a6 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -22,6 +22,7 @@
- #include "qapi/qmp/types.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/cutils.h"
-+#include "qemu/bitops.h"
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index c089491c24..bf8f58748b 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -19,6 +19,7 @@
  #include "qemu/option.h"
+ #include "qemu/queue.h"
+ #include "qemu/range.h"
++#include "qemu/bitops.h"
  
- typedef struct StackObject {
-@@ -338,7 +339,8 @@ static void qobject_input_check_list(Visitor *v, Error **errp)
  
- static void qobject_input_start_alternate(Visitor *v, const char *name,
-                                           GenericAlternate **obj, size_t size,
--                                          bool promote_int, Error **errp)
-+                                          unsigned long supported_qtypes,
-+                                          Error **errp)
+ struct StringInputVisitor
+@@ -278,21 +279,34 @@ static void parse_type_size(Visitor *v, const char *name, uint64_t *obj,
+     *obj = val;
+ }
+ 
++static int try_parse_bool(const char *s, bool *result)
++{
++    if (!strcasecmp(s, "on") ||
++        !strcasecmp(s, "yes") ||
++        !strcasecmp(s, "true")) {
++        if (result) {
++            *result = true;
++        }
++        return 0;
++    }
++    if (!strcasecmp(s, "off") ||
++        !strcasecmp(s, "no") ||
++        !strcasecmp(s, "false")) {
++        if (result) {
++            *result = false;
++        }
++        return 0;
++    }
++
++    return -1;
++}
++
+ static void parse_type_bool(Visitor *v, const char *name, bool *obj,
+                             Error **errp)
  {
-     QObjectInputVisitor *qiv = to_qiv(v);
-     QObject *qobj = qobject_input_get_object(qiv, name, false, errp);
-@@ -349,7 +351,7 @@ static void qobject_input_start_alternate(Visitor *v, const char *name,
+     StringInputVisitor *siv = to_siv(v);
+ 
+-    if (!strcasecmp(siv->string, "on") ||
+-        !strcasecmp(siv->string, "yes") ||
+-        !strcasecmp(siv->string, "true")) {
+-        *obj = true;
+-        return;
+-    }
+-    if (!strcasecmp(siv->string, "off") ||
+-        !strcasecmp(siv->string, "no") ||
+-        !strcasecmp(siv->string, "false")) {
+-        *obj = false;
++    if (try_parse_bool(siv->string, obj) == 0) {
+         return;
      }
-     *obj = g_malloc0(size);
-     (*obj)->type = qobject_type(qobj);
--    if (promote_int && (*obj)->type == QTYPE_QINT) {
-+    if (!(supported_qtypes & BIT(QTYPE_QINT)) && (*obj)->type == QTYPE_QINT) {
-         (*obj)->type = QTYPE_QFLOAT;
+ 
+@@ -326,6 +340,42 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
+     *obj = val;
+ }
+ 
++/* Support for alternates on string-input-visitor is limited, because
++ * the input string doesn't have any type information.
++ *
++ * Supported alternate member types:
++ * 1) enums
++ * 2) integer types
++ * 3) booleans (but only if the there's no enum variant
++ *    containing "on", "off", "true", or "false" as members)
++ *
++ * UNSUPPORTED alternate member types:
++ * 1) strings
++ * 2) complex types
++ */
++static void start_alternate(Visitor *v, const char *name,
++                            GenericAlternate **obj, size_t size,
++                            unsigned long supported_qtypes, Error **errp)
++{
++    StringInputVisitor *siv = to_siv(v);
++    QType t = QTYPE_QSTRING;
++
++    if (supported_qtypes & BIT(QTYPE_QBOOL)) {
++        if (try_parse_bool(siv->string, NULL) == 0) {
++            t = QTYPE_QBOOL;
++        }
++    }
++
++    if (supported_qtypes & BIT(QTYPE_QINT)) {
++        if (parse_str(siv, name, NULL) == 0) {
++            t = QTYPE_QINT;
++        }
++    }
++
++    *obj = g_malloc0(size);
++    (*obj)->type = t;
++}
++
+ static void string_input_free(Visitor *v)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -353,6 +403,7 @@ Visitor *string_input_visitor_new(const char *str)
+     v->visitor.next_list = next_list;
+     v->visitor.check_list = check_list;
+     v->visitor.end_list = end_list;
++    v->visitor.start_alternate = start_alternate;
+     v->visitor.free = string_input_free;
+ 
+     v->string = str;
+diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
+index 79313a7f7a..1e867d62c9 100644
+--- a/tests/test-string-input-visitor.c
++++ b/tests/test-string-input-visitor.c
+@@ -290,6 +290,91 @@ static void test_visitor_in_enum(TestInputVisitorData *data,
      }
  }
-diff --git a/qapi/trace-events b/qapi/trace-events
-index 339cacf0ad..db42dd8353 100644
---- a/qapi/trace-events
-+++ b/qapi/trace-events
-@@ -11,7 +11,7 @@ visit_next_list(void *v, void *tail, size_t size) "v=%p tail=%p size=%zu"
- visit_check_list(void *v) "v=%p"
- visit_end_list(void *v, void *obj) "v=%p obj=%p"
  
--visit_start_alternate(void *v, const char *name, void *obj, size_t size, bool promote_int) "v=%p name=%s obj=%p size=%zu promote_int=%d"
-+visit_start_alternate(void *v, const char *name, void *obj, size_t size, unsigned long supported_qtypes) "v=%p name=%s obj=%p size=%zu supported_qtypes=0x%lx"
- visit_end_alternate(void *v, void *obj) "v=%p obj=%p"
++static void test_visitor_in_alt_bool_enum(TestInputVisitorData *data,
++                                 const void *unused)
++{
++    Error *err = NULL;
++    Visitor *v;
++    AltBoolEnum *be = NULL;
++
++    v = visitor_input_test_init(data, "true");
++    visit_type_AltBoolEnum(v, NULL, &be, &err);
++    g_assert(!err);
++    g_assert_cmpint(be->type, ==, QTYPE_QBOOL);
++    g_assert(be->u.b);
++    qapi_free_AltBoolEnum(be);
++
++    v = visitor_input_test_init(data, "off");
++    visit_type_AltBoolEnum(v, NULL, &be, &err);
++    g_assert(!err);
++    g_assert_cmpint(be->type, ==, QTYPE_QBOOL);
++    g_assert(!be->u.b);
++    qapi_free_AltBoolEnum(be);
++
++    v = visitor_input_test_init(data, "value2");
++    visit_type_AltBoolEnum(v, NULL, &be, &err);
++    g_assert(!err);
++    g_assert_cmpint(be->type, ==, QTYPE_QSTRING);
++    g_assert_cmpint(be->u.e, ==, ENUM_ONE_VALUE2);
++    qapi_free_AltBoolEnum(be);
++
++    v = visitor_input_test_init(data, "value100");
++    visit_type_AltBoolEnum(v, NULL, &be, &err);
++    error_free_or_abort(&err);
++    qapi_free_AltBoolEnum(be);
++
++    v = visitor_input_test_init(data, "10");
++    visit_type_AltBoolEnum(v, NULL, &be, &err);
++    error_free_or_abort(&err);
++    qapi_free_AltBoolEnum(be);
++}
++
++static void test_visitor_in_alt_enum_int(TestInputVisitorData *data,
++                                 const void *unused)
++{
++    Error *err = NULL;
++    Visitor *v;
++    AltOnOffInt *be = NULL;
++
++    v = visitor_input_test_init(data, "on");
++    visit_type_AltOnOffInt(v, NULL, &be, &err);
++    g_assert(!err);
++    g_assert_cmpint(be->type, ==, QTYPE_QSTRING);
++    g_assert_cmpint(be->u.o, ==, TEST_ON_OFF_AUTO_ON);
++    qapi_free_AltOnOffInt(be);
++
++    v = visitor_input_test_init(data, "off");
++    visit_type_AltOnOffInt(v, NULL, &be, &err);
++    g_assert(!err);
++    g_assert_cmpint(be->type, ==, QTYPE_QSTRING);
++    g_assert_cmpint(be->u.o, ==, TEST_ON_OFF_AUTO_OFF);
++    qapi_free_AltOnOffInt(be);
++
++    v = visitor_input_test_init(data, "auto");
++    visit_type_AltOnOffInt(v, NULL, &be, &err);
++    g_assert(!err);
++    g_assert_cmpint(be->type, ==, QTYPE_QSTRING);
++    g_assert_cmpint(be->u.o, ==, TEST_ON_OFF_AUTO_AUTO);
++    qapi_free_AltOnOffInt(be);
++
++    v = visitor_input_test_init(data, "-12345");
++    visit_type_AltOnOffInt(v, NULL, &be, &err);
++    g_assert(!err);
++    g_assert_cmpint(be->type, ==, QTYPE_QINT);
++    g_assert_cmpint(be->u.i, ==, -12345);
++    qapi_free_AltOnOffInt(be);
++
++    v = visitor_input_test_init(data, "true");
++    visit_type_AltOnOffInt(v, NULL, &be, &err);
++    error_free_or_abort(&err);
++    qapi_free_AltOnOffInt(be);
++
++    v = visitor_input_test_init(data, "value2");
++    visit_type_AltOnOffInt(v, NULL, &be, &err);
++    error_free_or_abort(&err);
++    qapi_free_AltOnOffInt(be);
++}
++
+ /* Try to crash the visitors */
+ static void test_visitor_in_fuzz(TestInputVisitorData *data,
+                                  const void *unused)
+@@ -366,6 +451,10 @@ int main(int argc, char **argv)
+                             &in_visitor_data, test_visitor_in_string);
+     input_visitor_test_add("/string-visitor/input/enum",
+                             &in_visitor_data, test_visitor_in_enum);
++    input_visitor_test_add("/string-visitor/input/alternate/bool_enum",
++                            &in_visitor_data, test_visitor_in_alt_bool_enum);
++    input_visitor_test_add("/string-visitor/input/alternate/enum_int",
++                            &in_visitor_data, test_visitor_in_alt_enum_int);
+     input_visitor_test_add("/string-visitor/input/fuzz",
+                             &in_visitor_data, test_visitor_in_fuzz);
  
- visit_optional(void *v, const char *name, bool *present) "v=%p name=%s present=%p"
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
+index 842ea3c5e3..231c8952e8 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -106,6 +106,14 @@
+ { 'alternate': 'AltIntNum', 'data': { 'i': 'int', 'n': 'number' } }
+ { 'alternate': 'AltNumInt', 'data': { 'n': 'number', 'i': 'int' } }
+ 
++
++# for testing string-input-visitor handling of alternates:
++{ 'enum': 'TestOnOffAuto',
++  'data': [ 'on', 'off', 'auto' ] }
++
++{ 'alternate': 'AltBoolEnum', 'data': { 'b': 'bool', 'e': 'EnumOne' } }
++{ 'alternate': 'AltOnOffInt', 'data': { 'o': 'TestOnOffAuto', 'i': 'int' } }
++
+ # for testing native lists
+ { 'union': 'UserDefNativeListUnion',
+   'data': { 'integer': ['int'],
 -- 
 2.11.0.259.g40922b1
