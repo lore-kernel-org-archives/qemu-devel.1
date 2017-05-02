@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d5XwQ-0000LE-9r
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:34:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1d5Xxj-0000w6-Ln
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:35:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d5XwN-00018A-7U
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:34:10 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36421)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d5XwN-00017q-0P
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:34:07 -0400
-Received: by mail-wr0-x229.google.com with SMTP id l50so80458899wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 06:34:06 -0700 (PDT)
-Date: Tue, 2 May 2017 14:34:03 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170502133403.GE22502@stefanha-x1.localdomain>
-References: <CAKAYmMJC=pTKSrLQBaU_3m33gKNoeSTxqjGFAQXC6--ZOY9JPQ@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1d5Xxg-0001ZQ-Hl
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:35:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48326)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d5Xxg-0001Yg-8A
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:35:28 -0400
+References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
+	<1493725969-19518-6-git-send-email-amarnath.valluri@intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0e67268f-46a0-c0c9-4a3b-0957bc387871@redhat.com>
+Date: Tue, 2 May 2017 08:35:24 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="3XA6nns4nE4KvaS/"
-Content-Disposition: inline
-In-Reply-To: <CAKAYmMJC=pTKSrLQBaU_3m33gKNoeSTxqjGFAQXC6--ZOY9JPQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] AccelClass initialization order question
+In-Reply-To: <1493725969-19518-6-git-send-email-amarnath.valluri@intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="s7nsf2enQf7N3gNaogPxnxmaShdb0qbSc"
+Subject: Re: [Qemu-devel] [PATCH v3 5/8] tmp backend: Add new api to read
+ backend TpmInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +29,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chuck Tuffli <ctuffli@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+Cc: patrick.ohly@intel.com, marcandre.lureau@gmail.com, stefanb@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>
 
-
---3XA6nns4nE4KvaS/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--s7nsf2enQf7N3gNaogPxnxmaShdb0qbSc
+From: Eric Blake <eblake@redhat.com>
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+Cc: patrick.ohly@intel.com, marcandre.lureau@gmail.com,
+ stefanb@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>
+Message-ID: <0e67268f-46a0-c0c9-4a3b-0957bc387871@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/8] tmp backend: Add new api to read
+ backend TpmInfo
+References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
+ <1493725969-19518-6-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1493725969-19518-6-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 20, 2017 at 08:18:51PM -0700, Chuck Tuffli wrote:
-> While debugging an issue, I ran across something in the initialization
-> sequence of hardware accelerators. Being a noobie qemu developer, it's
-> hard to tell if I simply don't understand how AccelClass works or if
-> this is a bug.
+On 05/02/2017 06:52 AM, Amarnath Valluri wrote:
+> TPM configuration options are backend implementation details and shall =
+not be
+> part of base TPMBackend object, and these shall not be accessed directl=
+y outside
+> of the class, hence added a new interface method, get_tpm_options() to
+> TPMDriverOps., which shall be implemented by the derived classes to ret=
+urn
+> configured tpm options.
 >=20
-> The init_machine function for hardware accelerators is passed a
-> MachineState pointer via configure_accelerator(), but several elements
-> of the structure (e.g. ram_size, maxram_size, etc.) are not
-> initialized until well after this call. Should hardware accelerator
-> modules not look at MachineState and instead grab the global versions
-> of variables like ram_size? TIA.
+> A new tpm backend api - tpm_backend_query_tpm() which uses _get_tpm_opt=
+ions() to
+> prepare TpmInfo.
+>=20
+> Made TPMPassthroughOptions type inherited from newly defined TPMOptions=
+ base type.
+> The TPMOptions base type is intentionally left empty and supposed to be=
 
-Machine init isn't finished when configure_accelerator() is executed.
-Perhaps existing accelerators just don't need these variables at
-configure_accelerator() time.
+> inherited by all backend implementations to define their tpm configurat=
+ion
+> options.
+>=20
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> ---
 
-What exactly are you trying to do?
+> +++ b/qapi-schema.json
+> @@ -5137,6 +5137,16 @@
+>  { 'command': 'query-tpm-types', 'returns': ['TpmType'] }
+> =20
+>  ##
+> +# @TPMOptions:
+> +#
+> +# Base type for TPM options
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'struct': 'TPMOptions',
+> +  'data': { } }
+> +
+> +##
+>  # @TPMPassthroughOptions:
+>  #
+>  # Information about the TPM passthrough type
+> @@ -5148,20 +5158,9 @@
+>  #
+>  # Since: 1.5
+>  ##
+> -{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
+> -                                             '*cancel-path' : 'str'} }=
 
-Stefan
+> +{ 'struct': 'TPMPassthroughOptions', 'base': 'TPMOptions',
+> +  'data': { '*path' : 'str', '*cancel-path' : 'str'} }
+> =20
+> -##
+> -# @TpmTypeOptions:
+> -#
+> -# A union referencing different TPM backend types' configuration optio=
+ns
+> -#
+> -# @type: 'passthrough' The configuration options for the TPM passthrou=
+gh type
+> -#
+> -# Since: 1.5
+> -##
+> -{ 'union': 'TpmTypeOptions',
+> -   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
 
---3XA6nns4nE4KvaS/
+Getting rid of a simple union is nice.  However,
+
+> =20
+>  ##
+>  # @TPMInfo:
+> @@ -5170,6 +5169,8 @@
+>  #
+>  # @id: The Id of the TPM
+>  #
+> +# @type: The TPM backend type
+> +#
+>  # @model: The TPM frontend model
+>  #
+>  # @options: The TPM (backend) type configuration options
+> @@ -5178,8 +5179,9 @@
+>  ##
+>  { 'struct': 'TPMInfo',
+>    'data': {'id': 'str',
+> +           'type': 'TpmType',
+>             'model': 'TpmModel',
+> -           'options': 'TpmTypeOptions' } }
+> +           'options': 'TPMOptions' } }
+> =20
+>  ##
+>  # @query-tpm:
+> @@ -5196,13 +5198,12 @@
+>  # <- { "return":
+>  #      [
+>  #        { "model": "tpm-tis",
+> +#          "type": "passthrough",
+>  #          "options":
+> -#            { "type": "passthrough",
+> -#              "data":
+> -#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel"=
+,
+> -#                  "path": "/dev/tpm0"
+> -#                }
+> -#            },
+> +#          {
+> +#            "cancel-path": "/sys/class/misc/tpm0/device/cancel",
+> +#            "path": "/dev/tpm0"
+> +#          },
+>  #          "id": "tpm0"
+
+Doing it in a manner that is NOT backwards-compatible (as evidenced by
+your change to the output text) is NOT good.  It will break any existing
+client that was expecting to parse information in the old layout.
+
+I'm afraid you're going to have to fix this to not break QMP wire
+compatibility.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--s7nsf2enQf7N3gNaogPxnxmaShdb0qbSc
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZCIrLAAoJEJykq7OBq3PItF0H/1+HHwOTPiK9Me9UuvvVh+TO
-YmK0VNUZu409I7ZDjr1t4teWPySME4/F2+mHPJHOiV1zl7KF3X090qupvR97Tz+l
-o3OYtZaib9SoTiVEBY6jKIuBMI9PkGfEpaqSa6eQcH2s+IH2z/boT0VsNX+OxQsJ
-9hqSSl92AESKSfvv9j0NmyIkYeB2Hcl3Y6PZSDdO9EWa8qOGnDlt85Wv1ooEK+rO
-wl8hwz9kfjZo9O4H203fyTFjtvRQ+Nr2Jo2Et1zOWj+isHyF/oq+JlcFWXqf97Y6
-geWDb0kfBjb2lyiBRZH5u3PRO0hXhyoM0lxJC7CWzAho5yte6fjhfxoJYx3qXYg=
-=/nT3
+iQEcBAEBCAAGBQJZCIscAAoJEKeha0olJ0NqsF8H/ihbmCPtCK83gYJ0Z4COK8LO
+vSAi7iAVh4R7y2TKtvrJDle4kKB6hHjzlqTqw2Bbz2ywwl9boARdSaC6E5nj27Kl
+YDfQnBUWo4rxU4j+/MjTMlwbKx71TEku1PUihR5LBghV6MqxMiG/z0+GhX02U308
+a5uzoNN9mqN1r0xolDfchbDtpYGpJbFObQAbUlttrIfpn7nZ9hvitZ8PBlCjguZg
+L0wjddYsrTRJ4KLsdDmAn+6UGZobPmCOjk3qK3eLMPJRmGToJdlJoyJTDCrhc2Oj
+rqpToRuw4WWYNXzch7MU82mQ4vBBfPffonRzwp2fUY/eZQrFM4WM+JauDk0isMY=
+=7zFw
 -----END PGP SIGNATURE-----
 
---3XA6nns4nE4KvaS/--
+--s7nsf2enQf7N3gNaogPxnxmaShdb0qbSc--
