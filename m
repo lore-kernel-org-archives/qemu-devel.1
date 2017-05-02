@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d5ei7-0002zP-2b
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:47:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5evT-0006tG-SN
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:01:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d5ei3-0004nU-SG
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:47:51 -0400
-Resent-Message-Id: <E1d5ei3-0004nU-SG@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d5ei3-0004nF-K2
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:47:47 -0400
-In-Reply-To: <20170502203115.22233-1-ehabkost@redhat.com>
-Message-ID: <149375805445.165.4703903410525387157@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <ehabkost@redhat.com>) id 1d5evP-0003Fs-PW
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:01:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d5evP-0003Fc-JK
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:01:35 -0400
+Date: Tue, 2 May 2017 18:01:30 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170502210130.GG3482@thinpad.lan.raisama.net>
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+	<149375798222.165.4208719929354027619@c05f1edc8ed1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 2 May 2017 13:47:35 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <149375798222.165.4208719929354027619@c05f1edc8ed1>
 Subject: Re: [Qemu-devel] [PATCH 0/4] x86: Support "-cpu feature=force"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,62 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com
+To: no-reply@patchew.org
 Cc: famz@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, agraf@suse.de, armbru@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSB4ODY6IFN1cHBvcnQgIi1jcHUgZmVhdHVy
-ZT1mb3JjZSIKTWVzc2FnZS1pZDogMjAxNzA1MDIyMDMxMTUuMjIyMzMtMS1laGFia29zdEByZWRo
-YXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-IyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4ZmZjNmQ0IHg4Njog
-U3VwcG9ydCBmZWF0dXJlPWZvcmNlIG9uIHRoZSBjb21tYW5kLWxpbmUKOTQxOGE4OCB0ZXN0czog
-QWRkIFsrLV1mZWF0dXJlIGFuZCBmZWF0dXJlPW9ufG9mZiB0ZXN0IGNhc2VzCmY2OTU0YTEgc3Ry
-aW5nLWlucHV0LXZpc2l0b3I6IFN1cHBvcnQgYWx0ZXJuYXRlIHR5cGVzCmVhN2RjOGQgdmlzaXRv
-cjogQWRkICdzdXBwb3J0ZWRfcXR5cGVzJyBwYXJhbWV0ZXIgdG8gdmlzaXRfc3RhcnRfYWx0ZXJu
-YXRlKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDogdmlzaXRvcjog
-QWRkICdzdXBwb3J0ZWRfcXR5cGVzJyBwYXJhbWV0ZXIgdG8gdmlzaXRfc3RhcnRfYWx0ZXJuYXRl
-KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiBzdHJpbmctaW5wdXQtdmlzaXRvcjogU3VwcG9ydCBh
-bHRlcm5hdGUgdHlwZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80OiB0ZXN0czogQWRkIFsrLV1mZWF0
-dXJlIGFuZCBmZWF0dXJlPW9ufG9mZiB0ZXN0IGNhc2VzLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojNTk6IEZJTEU6IHRlc3RzL3Rlc3QteDg2LWNwdWlkLWNvbXBhdC5jOjEwNDoK
-K3N0YXRpYyB1aW50MzJfdCBnZXRfZmVhdHVyZV93b3JkKFFMaXN0ICpmZWF0dXJlcywgdWludDMy
-X3QgZWF4LCB1aW50MzJfdCBlY3gsIGNvbnN0IGNoYXIgKnJlZykKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiM2NTogRklMRTogdGVzdHMvdGVzdC14ODYtY3B1aWQtY29tcGF0LmM6
-MTEwOgorICAgICAgICBpZiAoZWF4ID09IHFpbnRfZ2V0X2ludChxb2JqZWN0X3RvX3FpbnQocWRp
-Y3RfZ2V0KHcsICJjcHVpZC1pbnB1dC1lYXgiKSkpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojNjc6IEZJTEU6IHRlc3RzL3Rlc3QteDg2LWNwdWlkLWNvbXBhdC5jOjExMjoKKyAg
-ICAgICAgICAgICAgICB8fCBlY3ggPT0gcWludF9nZXRfaW50KHFvYmplY3RfdG9fcWludChxZGlj
-dF9nZXQodywgImNwdWlkLWlucHV0LWVjeCIpKSkpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJh
-Y3RlcnMKIzY4OiBGSUxFOiB0ZXN0cy90ZXN0LXg4Ni1jcHVpZC1jb21wYXQuYzoxMTM6CisgICAg
-ICAgICAgICAmJiAhc3RyY21wKHFzdHJpbmdfZ2V0X3N0cihxb2JqZWN0X3RvX3FzdHJpbmcocWRp
-Y3RfZ2V0KHcsICJjcHVpZC1yZWdpc3RlciIpKSksIHJlZykpIHsKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiM4NjogRklMRTogdGVzdHMvdGVzdC14ODYtY3B1aWQtY29tcGF0LmM6
-MTMxOgorICAgIHZhbHVlID0gZ2V0X2ZlYXR1cmVfd29yZChwcmVzZW50LCBhcmdzLT5pbnB1dF9l
-YXgsIGFyZ3MtPmlucHV0X2VjeCwgYXJncy0+cmVnKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiM4NzogRklMRTogdGVzdHMvdGVzdC14ODYtY3B1aWQtY29tcGF0LmM6MTMyOgor
-ICAgIHZhbHVlIHw9IGdldF9mZWF0dXJlX3dvcmQoZmlsdGVyZWQsIGFyZ3MtPmlucHV0X2VheCwg
-YXJncy0+aW5wdXRfZWN4LCBhcmdzLT5yZWcpOwoKdG90YWw6IDIgZXJyb3JzLCA0IHdhcm5pbmdz
-LCAxMzAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiB4ODY6IFN1cHBvcnQgZmVhdHVyZT1mb3JjZSBvbiB0aGUg
-Y29tbWFuZC1saW5lLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxODY6IEZJ
-TEU6IHRlc3RzL3Rlc3QteDg2LWNwdWlkLWNvbXBhdC5jOjEzNToKKyAgICAgICAgdmFsdWUgfD0g
-Z2V0X2ZlYXR1cmVfd29yZChmaWx0ZXJlZCwgYXJncy0+aW5wdXRfZWF4LCBhcmdzLT5pbnB1dF9l
-Y3gsIGFyZ3MtPnJlZyk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE2OCBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Tue, May 02, 2017 at 01:46:22PM -0700, no-reply@patchew.org wrote:
+[...]
+>   TEST    tests/qapi-schema/qapi-schema-test.out
+>   TEST    tests/qapi-schema/quoted-structural-chars.out
+>   TEST    tests/qapi-schema/redefined-builtin.out
+>   TEST    tests/qapi-schema/redefined-command.out
+> Files /tmp/qemu-test/src/tests/qapi-schema/qapi-schema-test.out and tests/qapi-schema/qapi-schema-test.test.out differ
+> make: *** [check-tests/qapi-schema/qapi-schema-test.json] Error 1
+> make: *** Waiting for unfinished jobs....
+
+Oh, I didn't know we had a qapi-schema-test.out file that had to
+be manually kept in sync. I will fix this in v2.
+
+> tests/docker/Makefile.include:118: recipe for target 'docker-run' failed
+> make[1]: *** [docker-run] Error 2
+> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-mqqq0zgw/src'
+> tests/docker/Makefile.include:149: recipe for target 'docker-run-test-quick@centos6' failed
+> make: *** [docker-run-test-quick@centos6] Error 2
+> === OUTPUT END ===
+> 
+> Test command exited with code: 2
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
+
+-- 
+Eduardo
