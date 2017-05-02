@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1d5Wmw-0004wp-Du
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:20:19 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1d5WoC-0005WM-36
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1d5Wms-0004OO-Fj
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:20:18 -0400
-References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
-	<20170502075631.GE16940@cbox>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <c3b355e7-0358-25ea-9617-80be489a3f83@huawei.com>
-Date: Tue, 2 May 2017 20:15:03 +0800
+	(envelope-from <borntraeger@de.ibm.com>) id 1d5Wo8-0005MB-5P
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:21:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1d5Wo7-0005LS-Sk
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 08:21:32 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v42C4mC7092487
+	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 08:21:30 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a6ryeu625-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 08:21:30 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 2 May 2017 08:21:29 -0400
+References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
+	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
+	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 2 May 2017 14:21:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170502075631.GE16940@cbox>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] arm64: kvm: support kvmtool to
- detect RAS extension feature
+Message-Id: <3fe13e77-94ac-a760-f717-3acdeef8d645@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
+ in favour of '-accel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +43,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christoffer Dall <cdall@linaro.org>
-Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, gengdongjiu <gengdongjiu@huawei.com>, linux-kernel@vger.kernel.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
 
-Hi Christoffer,
-   thanks for your review and comments.
+On 05/02/2017 12:37 PM, Thomas Huth wrote:
+> On 02.05.2017 12:32, Christian Borntraeger wrote:
+>> On 05/02/2017 12:06 PM, Thomas Huth wrote:
+>>> The '-enable-...' option do not make too much sense: They do not
+>>> allow additional parameters, using '-accel xxx' is shorter than
+>>> '-enable-xxx' and we're also inconsistent here, since there is
+>>> no '-enable-xen' option available. So let's try to convince the
+>>> users to use '-accel xxx' instead.
 
-On 2017/5/2 15:56, Christoffer Dall wrote:
-> Hi Dongjiu,
-> 
-> Please send a cover letter for patch series with more than a single
-> patch.
- OK, got it.
+FWIW, -enable-kvm ia not shortcut to make things easier, it predates
+the accel parameter. Maybe that is the reason why this patch does not
+feel right to me.
 
-> 
-> The subject and description of these patches are also misleading.
-> Hopefully this is in no way tied to kvmtool, but to userspace
-> generically, for example also to be used by QEMU?
-> 
-> On Sun, Apr 30, 2017 at 01:37:55PM +0800, Dongjiu Geng wrote:
->> Handle kvmtool's detection for RAS extension, because sometimes
->> the APP needs to know the CPU's capacity
-> 
-> the APP ?
-> 
-> the CPU's capacity?
-I will fix it.
 
-> 
+
 >>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  arch/arm64/kvm/reset.c   | 11 +++++++++++
->>  include/uapi/linux/kvm.h |  1 +
->>  2 files changed, 12 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->> index d9e9697..1004039 100644
->> --- a/arch/arm64/kvm/reset.c
->> +++ b/arch/arm64/kvm/reset.c
->> @@ -64,6 +64,14 @@ static bool cpu_has_32bit_el1(void)
->>  	return !!(pfr0 & 0x20);
->>  }
->>  
->> +static bool kvm_arm_support_ras_extension(void)
->> +{
->> +	u64 pfr0;
->> +
->> +	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
->> +	return !!(pfr0 & 0x10000000);
->> +}
->> +
->>  /**
->>   * kvm_arch_dev_ioctl_check_extension
->>   *
->> @@ -87,6 +95,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
->>  	case KVM_CAP_ARM_PMU_V3:
->>  		r = kvm_arm_support_pmu_v3();
->>  		break;
->> +	case KVM_CAP_ARM_RAS_EXTENSION:
->> +		r = kvm_arm_support_ras_extension();
->> +		break;
+>> google has 36000 hits for "--enable-kvm" and 18000 hits for "--accel kvm"
+>> So I assume this will affect a lot of setups for only a very small benefit.
 > 
-> You need to document this capability and API in
-> Documentation/virtual/kvm/api.txt and explain how this works.
- Ok, thanks for your suggestion.
-
+> I'm aware of the fact that likely a lot of users are still using
+> -enable-kvm, and I did not mean that we should remove it soon yet. But
+> IMHO we should start now to inform the users that they should slowly
+> switch to the better option "-accel" instead, so that we could maybe
+> remove this "-enable-xxx" stuff sometime in the distant future (let's
+> say QEMU v4.0?).
 > 
-> 
-> 
->>  	case KVM_CAP_SET_GUEST_DEBUG:
->>  	case KVM_CAP_VCPU_ATTRIBUTES:
->>  		r = 1;
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index f51d508..27fe556 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -883,6 +883,7 @@ struct kvm_ppc_resize_hpt {
->>  #define KVM_CAP_PPC_MMU_RADIX 134
->>  #define KVM_CAP_PPC_MMU_HASH_V3 135
->>  #define KVM_CAP_IMMEDIATE_EXIT 136
->> +#define KVM_CAP_ARM_RAS_EXTENSION 137
->>  
->>  #ifdef KVM_CAP_IRQ_ROUTING
->>  
->> -- 
->> 2.10.1
->>
-> 
-> Thanks,
-> -Christoffer
-> 
-> .
+>  Thomas
 > 
