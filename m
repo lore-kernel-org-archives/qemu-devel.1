@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5Yo6-0003Wo-F5
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:29:39 -0400
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1d5YpB-0004I5-Cz
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5Yo5-0005Jy-Jk
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:29:38 -0400
-References: <20170502141858.24805-1-berrange@redhat.com>
-	<20170502141858.24805-6-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <31bf6b6d-27c4-6519-e3f8-23a537e8f707@redhat.com>
-Date: Tue, 2 May 2017 09:29:24 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170502141858.24805-6-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FoTcvBiqS2xN6hWaWgiTw8MKpg1uOCReL"
-Subject: Re: [Qemu-devel] [PATCH v6 5/5] Revert "qemu-img: copy *key-secret
- opts when opening newly created files"
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1d5Yp6-00061z-7O
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:30:45 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33405)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
+	id 1d5Yp6-00061q-1D
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:30:40 -0400
+Received: by mail-wr0-x241.google.com with SMTP id w50so17842890wrc.0
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 07:30:39 -0700 (PDT)
+From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Date: Tue,  2 May 2017 10:29:42 -0400
+Message-Id: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] fsdev: qmp interface for io throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FoTcvBiqS2xN6hWaWgiTw8MKpg1uOCReL
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <31bf6b6d-27c4-6519-e3f8-23a537e8f707@redhat.com>
-Subject: Re: [PATCH v6 5/5] Revert "qemu-img: copy *key-secret opts when
- opening newly created files"
-References: <20170502141858.24805-1-berrange@redhat.com>
- <20170502141858.24805-6-berrange@redhat.com>
-In-Reply-To: <20170502141858.24805-6-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+These patches provide the qmp interface, to query the io throttle 
+status of the all fsdev devices that are present in a vm.
+also, it provides an interface to set the io throttle parameters of a
+fsdev to a required value. some of the patches also remove the duplicate
+code that was present in block and fsdev files. 
 
-On 05/02/2017 09:18 AM, Daniel P. Berrange wrote:
-> This reverts commit 37d7772f6b81613620a333862dc67e34b2fda1a9.
-> ---
->  qemu-img.c | 41 ++++++-----------------------------------
->  1 file changed, 6 insertions(+), 35 deletions(-)
+Pradeep Jagadeesh (4):
+  Throttle: Create IOThrottle structure
+  fsdev: QMP interface for throttling
+  qmp: refactor duplicate code
+  throttle: factor out duplicate code
 
-Is this intentional, given that 4/5 just installed it?
+ Makefile                        |   3 ++
+ Makefile.objs                   |   4 +-
+ blockdev.c                      |  97 ++-----------------------------------
+ fsdev/qemu-fsdev-dummy.c        |  11 +++++
+ fsdev/qemu-fsdev-throttle.c     |  90 ++++++++++++++++++----------------
+ fsdev/qemu-fsdev-throttle.h     |  13 +++++
+ fsdev/qemu-fsdev.c              |  36 ++++++++++++++
+ hmp-commands-info.hx            |  19 ++++++++
+ hmp-commands.hx                 |  19 ++++++++
+ hmp.c                           |  87 ++++++++++++++++++++++++++++++---
+ hmp.h                           |   5 ++
+ include/qemu/throttle-options.h |   7 +++
+ qapi-schema.json                |   3 ++
+ qapi/block-core.json            |  76 ++---------------------------
+ qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++++++
+ qapi/iothrottle.json            |  87 +++++++++++++++++++++++++++++++++
+ util/Makefile.objs              |   1 +
+ util/throttle-options.c         | 105 ++++++++++++++++++++++++++++++++++++++++
+ 18 files changed, 531 insertions(+), 216 deletions(-)
+ create mode 100644 qapi/fsdev.json
+ create mode 100644 qapi/iothrottle.json
+ create mode 100644 util/throttle-options.c
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+v0 -> v1:
+ Addressed comments from Eric Blake, Greg Kurz and Daniel P.Berrange
+ Mainly renaming the functions and removing the redundant code.
 
+v1 -> v2:
+ Addressed the comments from Eric Blake and Greg Kurz.
+ As per the suggestion I split the patches into smaller patches.
+ Removed some more duplicate code.
 
---FoTcvBiqS2xN6hWaWgiTw8MKpg1uOCReL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+v2 -> v3:
+ Addressed the comments from Alberto Garcia.
+ Changed the comment from block to iothrottle in the iothrottle.json 
+ Added the dummy functions in qemu-fsdev-dummy.c to address the compilation
+ issues that were observed.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZCJfEAAoJEKeha0olJ0NqFCEH/2tec5jSeUnwYMzurcpoebsc
-PNn6kd/wWMZ0v3E1Txre9AdXAhoq31/BDvuUU92bO79nI+FkG75DoQBXwbXlKRA4
-5ltuiUvtx0md5+gqW+MMnT021jtSOo9e5z8aIJrTICQYUyoSrpXKh8hDk66+AQvq
-85aNGSDjAZa9lfMENdujo279ZINU1RNnZCQ2pBGDxKB8rQrU4Giey5N0VU74KRbo
-lo8rZmGlX/0MP44YJprBOKrqtsz+9+46BIVfXRY6v0tqz95Vwe8B1RFH0sQYUtl6
-6UMUPe4IOfTLNFzy5IRjh/z3wSioh7ja2YYXq6g4WFoBJlVk5W6WLyryN1rFLdE=
-=8dof
------END PGP SIGNATURE-----
-
---FoTcvBiqS2xN6hWaWgiTw8MKpg1uOCReL--
+-- 
+1.8.3.1
