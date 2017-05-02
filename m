@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5adg-0006RE-Oc
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:27:02 -0400
+	(envelope-from <lvivier@redhat.com>) id 1d5agd-0007qB-Ko
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:30:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5adf-0007kY-Oy
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:27:00 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170427215821.19397-1-eblake@redhat.com>
-	<20170427215821.19397-7-eblake@redhat.com>
-	<87a871nd7j.fsf@dusky.pond.sub.org>
-	<20170502155620.GB26628@stefanha-x1.localdomain>
-Date: Tue, 02 May 2017 18:26:44 +0200
-In-Reply-To: <20170502155620.GB26628@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Tue, 2 May 2017 16:56:20 +0100")
-Message-ID: <87bmrbcji3.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 06/10] qobject: Use simpler QDict/QList
- scalar insertion macros
+	(envelope-from <lvivier@redhat.com>) id 1d5aga-0001zZ-Eh
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:30:03 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Tue,  2 May 2017 18:29:54 +0200
+Message-Id: <20170502162955.1610-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/1] numa: equally distribute memory on nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +17,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Alexander Graf <agraf@suse.de>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
+When there are more nodes than available memory to put the minimum
+allowed memory by node, all the memory is put on the last node.
 
-> On Fri, Apr 28, 2017 at 10:33:36AM +0200, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>=20
->> > We now have macros in place to make it less verbose to add a scalar
->> > to QDict and QList, so use them.  To make this patch smaller to
->> > review, a couple of subdirectories were done in earlier patches.
->>=20
->> Scratch the last sentence.  Can do on commit.
->>=20
->> > Patch created mechanically via:
->> >   spatch --sp-file scripts/coccinelle/qobject.cocci \
->> >     --macro-file scripts/cocci-macro-file.h --dir . --in-place
->> > then touched up manually to fix a couple of '?:' back to original
->> > spacing, as well as avoiding a long line in monitor.c.
->> >
->> > Signed-off-by: Eric Blake <eblake@redhat.com>
->> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> >
->> > ---
->> > v5: rebase to master (Coccinelle found a couple new spots), squash 3
->> > patches into 1, adjust R-b to only list Markus (while there were other
->> > reviews on the pre-squashed patches, Markus was the only one on all 3)
->>=20
->> The block: part had
->>=20
->>     Acked-by: Richard W.M. Jones <rjones@redhat.com>
->>     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>     Reviewed-by: Alberto Garcia <berto@igalia.com>
->>=20
->> The tests and qobject parts had
->>=20
->>     Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>=20
->> Richard, Stefan, Alberto, Philippe, let me know if you'd like me to
->> convert your R-by of parts to an Acked-by of the combined patch.  Feel
->> free to review the combined patch, of course.
->
-> Please keep my R-by, I have reviewed again.
+This series introduces a new MachineState function to
+distribute equally the memory across the nodes
+without breaking compatibility with previous
+machine types.
 
-Gladly.  Thanks!
+The new function uses an error diffusion algorithm to
+distribute the memory across the nodes.
+
+v4:
+- fix build: include numa.h in pc_piix.c and pc_q35.c
+
+v3:
+- by default, use the new algorithm (moved to machine.c),
+- use the legacy algorithm with pseries-2.9, pc-q35-2.9 and
+  pc-i440fx-2.9 (and previous)
+
+v2:
+- introduce the MachineState function
+- if the machine state function pointer is NULL (default),
+  use the legacy algorithm
+- use the new algorithm for pseries-2.10 only
+
+Laurent Vivier (1):
+  numa: equally distribute memory on nodes
+
+ hw/core/machine.c       |  2 ++
+ hw/i386/pc_piix.c       |  2 ++
+ hw/i386/pc_q35.c        |  2 ++
+ hw/ppc/spapr.c          |  1 +
+ include/hw/boards.h     |  2 ++
+ include/qemu/typedefs.h |  1 +
+ include/sysemu/numa.h   |  9 +++++++--
+ numa.c                  | 49 ++++++++++++++++++++++++++++++++++++++-----------
+ 8 files changed, 55 insertions(+), 13 deletions(-)
+
+-- 
+2.9.3
