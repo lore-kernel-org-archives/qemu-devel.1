@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5Z77-0007M5-Hp
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:49:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d5Z7r-0007xg-Vy
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:50:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5Z73-0003bw-Hg
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:49:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40962)
+	(envelope-from <dgilbert@redhat.com>) id 1d5Z7o-0004IJ-5U
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:50:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d5Z73-0003b9-Bc
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:49:13 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1493692691-30801-1-git-send-email-lu.zhipeng@zte.com.cn>
-Date: Tue, 02 May 2017 16:49:05 +0200
-In-Reply-To: <1493692691-30801-1-git-send-email-lu.zhipeng@zte.com.cn>
-	(ZhiPeng Lu's message of "Tue, 2 May 2017 10:38:11 +0800")
-Message-ID: <8737cngvq6.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d5Z7n-0004HV-TZ
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:50:00 -0400
+Date: Tue, 2 May 2017 15:49:52 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170502144951.GE2072@work-vm>
+References: <1493732857-10721-1-git-send-email-den@openvz.org>
+	<da1ab237-5dd0-cae9-7eb9-687203b37a64@redhat.com>
+	<20170502144426.GE16624@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] hmp: add 'info virtio-pci-status id'
- command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170502144426.GE16624@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] monitor: increase amount of data for
+ monitor to read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Cc: dgilbert@redhat.com, mst@redhat.com, marcel@redhat.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-ZhiPeng Lu <lu.zhipeng@zte.com.cn> writes:
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Tue, May 02, 2017 at 09:34:55AM -0500, Eric Blake wrote:
+> > On 05/02/2017 08:47 AM, Denis V. Lunev wrote:
+> > > Right now QMP and HMP monitors read 1 byte at a time from the socket, which
+> > > is very inefficient. With 100+ VMs on the host this easily reasults in
+> > 
+> > s/reasults/results/
+> > 
+> > > a lot of unnecessary system calls and CPU usage in the system.
+> > > 
+> > > This patch changes the amount of data to read to 4096 bytes, which matches
+> > > buffer size on the channel level. Fortunately, monitor protocol is
+> > > synchronous right now thus we should not face side effects in reality.
+> > 
+> > Do you have any easy benchmarks or measurements to prove what sort of
+> > efficiencies we get?  (I believe they exist, but quantifying them never
+> > hurts)
+> > 
+> > > 
+> > > Signed-off-by: Denis V. Lunev <den@openvz.org>
+> > > CC: Markus Armbruster <armbru@redhat.com>
+> > > CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > CC: Eric Blake <eblake@redhat.com>
+> > > ---
+> > >  monitor.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/monitor.c b/monitor.c
+> > > index be282ec..00df5d0 100644
+> > > --- a/monitor.c
+> > > +++ b/monitor.c
+> > > @@ -3698,7 +3698,7 @@ static int monitor_can_read(void *opaque)
+> > >  {
+> > >      Monitor *mon = opaque;
+> > >  
+> > > -    return (mon->suspend_cnt == 0) ? 1 : 0;
+> > > +    return (mon->suspend_cnt == 0) ? 4096 : 0;
+> > 
+> > Is a hard-coded number correct, or should we be asking the channel for
+> > an actual number?
+> 
+> There's no need - this will cause the chardev code to just do a
+> gio_channel_read() with a 4096 byte buffer. The chardev backend
+> impl will then happily return fewer bytes than this - just whatever
+> happens to be pending. IOW this is just acting as an upper bound
+> on the amount of data we read at once. So 4k seems reasonable to
+> me, given the typical size of QMP/HMP command strings.
 
-> Add command to  query a virtio pci device status.
-> we can get id of the virtio pci device by 'info pci' command.
-> HMP Test case:
->     ==============
->     virsh # qemu-monitor-command --hmp 3 info pci
->       Bus  0, device   3, function 0:
->         Ethernet controller: PCI device 1af4:1000
->           IRQ 11.
->           BAR0: I/O at 0xc000 [0xc03f].
->           BAR1: 32 bit memory at 0xfebd1000 [0xfebd1fff].
->           BAR4: 64 bit prefetchable memory at 0xfe000000 [0xfe003fff].
->           BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
->           id "net0"
->       Bus  0, device   4, function 0:
->         USB controller: PCI device 8086:24cd
->           IRQ 11.
->           BAR0: 32 bit memory at 0xfebd2000 [0xfebd2fff].
->           id "usb"
->     virsh # qemu-monitor-command 3  --hmp "info virtio-pci-status net0"
->     status=15
->
->     virsh # qemu-monitor-command 3  --hmp "info virtio-pci-status usb"
->     the 'info virtio_pci_status' command only supports virtio pci devices
->
-> Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-> ---
->  hmp-commands-info.hx    | 14 ++++++++++++++
->  hw/pci/pci-stub.c       |  6 ++++++
->  hw/virtio/virtio-pci.c  | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->  include/sysemu/sysemu.h |  1 +
->  4 files changed, 68 insertions(+)
+So there's *no* situation in which that will block?
+I'm assuming the reason it read one byte was thats the only thing
+that poll() coming back to you guarantees.
 
-You implemented this just for HMP.
-
-In general, functionality available in HMP should also available in QMP.
-Exceptions include functionality that makes no sense in QMP, or is of
-use only for human users.  If you think your command is an exception,
-please explain why in the commit message.
-
-If it isn't, you need to implement it for QMP (including suitable test
-cases), then rewrite the HMP version to reuse either the QMP command or
-a common core.
-
-Example for "makes no sense in QMP": setting the current CPU[1], because
-a QMP monitor doesn't have a current CPU.
-
-Examples for "is of use only for human users": HMP command "help", the
-integrated pocket calculator[2].
+Dave
 
 
-[1] For reasons lost in time, we added QMP command "cpu" anyway, it just
-does nothing.
-
-[2] I doubt that one is of much use to humans, either.
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
