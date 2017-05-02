@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1d5a6Q-00027c-Gw
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:52:39 -0400
+	(envelope-from <thuth@redhat.com>) id 1d5a7v-000379-6U
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1d5a6P-0008Sb-AO
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:52:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1d5a7s-0001fT-3c
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:4955)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d5a7r-0001eX-Tt
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:54:08 -0400
+References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
+	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
+	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
+	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
+	<ac13fd46-bd6e-6a8a-2c72-cc8d683d5026@redhat.com>
+	<87pofrfgl3.fsf@dusky.pond.sub.org>
+	<93de273c-9a3b-dcb8-dd6e-8b9b4fb09a65@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <176d87e9-d899-792f-536e-07cd6f5c7cb6@redhat.com>
+Date: Tue, 2 May 2017 17:53:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <1493646214-3342-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1493646214-3342-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Tue, 2 May 2017 17:52:35 +0200
-Message-ID: <CABLmASHsTpm=BG+7OK1iErc8=TGo_m50MgLiwbJxATPUUHNCmg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/5] Add qemu_vga.ndrv MacOS PPC
- VGA driver from QemuMacDrivers
+In-Reply-To: <93de273c-9a3b-dcb8-dd6e-8b9b4fb09a65@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
+ in favour of '-accel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,76 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Vincent Palatin <vpalatin@chromium.org>
 
-Hi,
+On 02.05.2017 17:09, Paolo Bonzini wrote:
+>=20
+>=20
+> On 02/05/2017 17:01, Markus Armbruster wrote:
+>>> But I really, really see no point in removing --enable-kvm.  It costs
+>>> perhaps 10 lines of code that has pretty much no ramifications elsewh=
+ere
+>>> in the code.  If anything I'd expect "-machine accel" to disappear
+>>> before, if ever (in favor of multiple "-accel" options, e.g. "-machin=
+e
+>>> accel=3Dkvm:tcg" can become "-accel kvm -accel tcg".
+>> I basically agree, except I wouldn't say "no point", but "doesn't buy =
+us
+>> enough to justify inconveniencing users".
+>>
+>> What we've done before for options that have become unloved, but not
+>> harmful, is remove them just from documentation.  Grep qemu-options.hx
+>> for "HXCOMM Deprecated".  Let's do that for --enable-kvm and similarly
+>> weird sugared options.
+>=20
+> Except that this provides no easily greppable way to find how to enable
+> KVM, as things stand.
 
-I successfully tested this patch set with a build for OSX.
-Installed versions of Mac OS 9.04, 9.1, 9.22, 10.0, 10.1, 10.2, 10.3
-and 10.4 all work. As do three images pulled from running systems with
-10.2, 10.3, 10.4 installed, including classic.
+Should we then improve the description of the -accel parameter?
 
-Best,
-Howard
+> So the first lesson should be "no deprecation
+> without documentation" (any reference to 18th century political slogans
+> is purely coincidential :)).
 
-On Mon, May 1, 2017 at 3:43 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> Last year Ben posted an initial set of patches for OpenBIOS which provided a
-> MacOS PPC VGA driver enabling MacOS guests to control the colour depth and
-> resolution of the QEMU stdvga device. The QemuMacDrivers repository was set up on
-> qemu-project.org [1] but due to personal circumstances in the second half of last
-> year, I was unable to spend much time on it.
->
-> Over the last few months I've reworked the OpenBIOS patches and applied all the
-> required dependencies upstream which makes it possible to enable the driver with
-> a fairly simple patch [2] to OpenBIOS's vga.fs (binary provided for testing, but not
-> to be included in the final merge).
->
-> The main change I've made is that instead of serving the driver binary directly
-> through the VGA PCI BAR (with the relevant binary inlined within OpenBIOS), the
-> driver is now hosted by QEMU and is installed via the fw_cfg interface by the
-> OpenBIOS vga.fs driver during startup. Not only does this make it possible to
-> further develop the driver without also having to rebuild OpenBIOS every time but
-> it also leaves us with the ability to serve a proper IEEE-1275 FCode ROM via the
-> VGA PCI BAR later if needed.
->
-> In addition to this I've added a new OpenBIOS NVRAM variable "vga-ndrv?" which
-> defaults to "true" but can be overidden via -prom-env to force disable the
-> driver if any incompatibilities are found. I've tested it locally against my
-> OS X 10.2 and MacOS 9.2.1 images and it seems to work there, but as I don't
-> have an exhaustive set of MacOS images available I'd be grateful for some more
-> testing.
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg06159.html
-> [2] https://mail.coreboot.org/pipermail/openbios/2017-May/009909.html
->
-> This patchset can also be found on my github repository at
-> https://github.com/mcayland/qemu/tree/ppc-vga-upstream.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->
->
-> Mark Cave-Ayland (5):
->   Add QemuMacDrivers as submodule
->   Add QemuMacDrivers qemu_vga.ndrv revision d4e7d7a built as submodule
->   ppc: add qemu_vga.ndrv ROM to fw_cfg interface for OldWorld Macs
->   ppc: add qemu_vga.ndrv ROM to fw_cfg interface for NewWorld Macs
->   [Testing] Provide NDRV-capable openbios-ppc binary for testing
->
->  .gitmodules           |    3 +++
->  Makefile              |    3 ++-
->  hw/ppc/mac_newworld.c |   18 +++++++++++++++++-
->  hw/ppc/mac_oldworld.c |   18 +++++++++++++++++-
->  pc-bios/README        |    3 +++
->  pc-bios/openbios-ppc  |  Bin 750840 -> 754936 bytes
->  pc-bios/qemu_vga.ndrv |  Bin 0 -> 14752 bytes
->  roms/QemuMacDrivers   |    1 +
->  8 files changed, 43 insertions(+), 3 deletions(-)
->  create mode 100644 pc-bios/qemu_vga.ndrv
->  create mode 160000 roms/QemuMacDrivers
->
-> --
-> 1.7.10.4
->
->
+Would you accept my patch if I'd remove the hunks for vl.c, i.e. a patch
+that just updates the documentation?
+
+ Thomas
+
+
+PS: Thinking about all of this again, I think the thing that bugs me
+most is that we now have a brand new "-enable-hax" option, too, but no
+"-enable-xen" option ... that's just inconsistent. What do you think
+about removing the "-enable-hax" option again - there should only be
+very few users for this option so far, so the impact should be low. HAX
+users could simply use the "-accel hax" instead...
