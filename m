@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5TAn-0005ag-9I
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:28:42 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d5TCu-0007Se-C3
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:30:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5TAm-0007hO-5L
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:28:41 -0400
-Date: Tue, 2 May 2017 10:28:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170502102826.01d2373b@nial.brq.redhat.com>
-In-Reply-To: <20170502042712.GF10741@umbus.fritz.box>
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-8-git-send-email-imammedo@redhat.com>
-	<20170412210239.GC27126@thinpad.lan.raisama.net>
-	<20170419131458.59e2d00e@nial.brq.redhat.com>
-	<20170426122138.GU3482@thinpad.lan.raisama.net>
-	<20170427151406.57fbfa79@nial.brq.redhat.com>
-	<20170427163225.GE3482@thinpad.lan.raisama.net>
-	<20170502042712.GF10741@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 07/23] pc: add node-id property to
- CPU
+	(envelope-from <kraxel@redhat.com>) id 1d5TCt-0000X2-9V
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:30:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49174)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d5TCt-0000Vu-1k
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:30:51 -0400
+Message-ID: <1493713843.8581.69.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 02 May 2017 10:30:43 +0200
+In-Reply-To: <20170428191321.GF4714@noname.redhat.com>
+References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
+	<87o9yv890z.fsf@dusky.pond.sub.org> <87lgqpei5d.fsf@dusky.pond.sub.org>
+	<20170425102258.GA4615@noname.redhat.com>
+	<CAJ+F1CKYUbMo-3TrkNfc+H3tzLUaN00c6sGTxdnPn5qapfA_bA@mail.gmail.com>
+	<20170428191321.GF4714@noname.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 00/25] qmp: add async command type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +30,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, 2 May 2017 14:27:12 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+  Hi,
 
-> On Thu, Apr 27, 2017 at 01:32:25PM -0300, Eduardo Habkost wrote:
-> > On Thu, Apr 27, 2017 at 03:14:06PM +0200, Igor Mammedov wrote:  
-> > > On Wed, 26 Apr 2017 09:21:38 -0300
-> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > 
-> > > adding Peter to CC list
-> > > 
-> > > [...]
-> > >   
-> > > > On Wed, Apr 19, 2017 at 01:14:58PM +0200, Igor Mammedov wrote:  
-> > > > > On Wed, 12 Apr 2017 18:02:39 -0300
-> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > > >     
-> > > > > > On Wed, Mar 22, 2017 at 02:32:32PM +0100, Igor Mammedov wrote:    
-> > > > > > > it will allow switching from cpu_index to property based
-> > > > > > > numa mapping in follow up patches.      
-> > > > > > 
-> > > > > > I am not sure I understand all the consequences of this, so I
-> > > > > > will give it a try:
-> > > > > > 
-> > > > > > "node-id" is an existing field in CpuInstanceProperties.
-> > > > > > CpuInstanceProperties is used on both query-hotpluggable-cpus
-> > > > > > output and in MachineState::possible_cpus.
-> > > > > > 
-> > > > > > We will start using MachineState::possible_cpus to keep track of
-> > > > > > NUMA CPU affinity, and that means query-hotpluggable-cpus will
-> > > > > > start reporting a "node-id" property when a NUMA mapping is
-> > > > > > configured.
-> > > > > > 
-> > > > > > To allow query-hotpluggable-cpus to report "node-id", the CPU
-> > > > > > objects must have a "node-id" property that can be set. This
-> > > > > > patch adds the "node-id" property to X86CPU.
-> > > > > > 
-> > > > > > Is this description accurate? Is the presence of "node-id" in
-> > > > > > query-hotpluggable-cpus the only reason we really need this
-> > > > > > patch, or is there something else that requires the "node-id"
-> > > > > > property?    
-> > > > > That accurate description, node-id is in the same 'address'
-> > > > > properties category as socket/core/thread-id. So if you have
-> > > > > numa enabled machine you'd see node-id property in
-> > > > > query-hotpluggable-cpus.    
-> > > > 
-> > > > I agree that we can make -numa cpu affect query-hotpluggable-cpus
-> > > > output (i.e. affect some field on HotpluggableCPU.props).
-> > > > 
-> > > > But it looks like we disagree about the purpose of
-> > > > HotpluggableCPU.props:
-> > > > 
-> > > > I believe HotpluggableCPU.props is just an opaque identifier for
-> > > > the location we want to plug the CPU, and the only requirement is
-> > > > that it should be unique and have all the information device_add
-> > > > needs. As socket IDs are already unique on our existing machines,
-> > > > and socket<=>node mapping is already configured using -numa cpu,
-> > > > node-id doesn't need to be in HotpluggableCPU.props. (see example
-> > > > below)  
-> > > node-id is also location property which logically complements
-> > > to socket/core/thread properties.  Also socket is not necessarily
-> > > unique id that maps 1:1 to node-id from generic pov.
-> > > BTW -numa cpu[s] is not the only way to specify mapping,
-> > > it could be specified like we do with pc-dimm:
-> > >    device_add pc-dimm,node=x
-> > > 
-> > > Looking at it more genericly, there could be the same
-> > > socket-ids for different nodes, then we would have to add
-> > > node-id to props anyway and end up with 2 node-id, one in props
-> > > and another in the parent struct.  
-> > 
-> > This is where my expectations are different: I think
-> > HotpluggableCPU.props is just an identifier property for CPU
-> > slots that is used for device_add (and will be used for -numa
-> > cpu), and isn't supposed to be be interpreted by clients.
-> > 
-> > The problem I see is that the property has two completely
-> > different purposes: identifying a given CPU slot for device_add
-> > (and -numa cpu), and introspection of topology information about
-> > the CPU slot. Today we are lucky and those goals don't conflict
-> > with each other, but I worry this might cause trouble in the
-> > future.  
-> 
-> Yeah, I share your concern.  And even if we allow that the topology
-> information may be read by the user, at the moment the
-> socket/core/thread values are "read only" in the sense that the client
-> should do nothing by read them from the query (possibly look at them
-> for its own interest) and echo them back verbatim to device_add.
-> 
-> node id is different because it's something the user/management might
-> want to actually choose.  So it seems dubious to me that it's in the
-> same structure.
-node-id is 'read only' when it comes to device_add so far.
+> > As explained in the cover letter, an async command may cancel the
+> > ongoing operation on disconnect.
+>=20
+> But that's not what you generally want. You don't want to abort your
+> backup just because libvirt lost its monitor connection, but qemu should
+> continue to copy the data, and when libvirt reconnects it should be able
+> to get back control of this background operation and bring it to
+> successful completion.
+
+Sure.  We can't move the existing block jobs to async commands, block
+jobs need more features.
+
+> I think we need a clear understanding of what the potential use cases
+> are that could make good use a new infrastructure. We don't generally
+> add infrastructure if we don't have a concrete idea what its users could
+> be. I only ruled out that the current users of block jobs are a good fit
+> for it, but there may be other use cases for which it works great.
+
+One case at hand is the screendump command, driving this discussion
+since years.
+
+Today it writes out a dump to a file, synchronously.  I wouldn't be
+surprised if this is measurable as latency spike.  Also specifically
+with qxl we have the problem that spice-server renders locally only on
+demand (because it can skip rendering altogether in many cases), so it
+would be very nice if we can ask spice-server thread to render the
+screen for us before writing the screen dump.
+
+With async qmp commands we could actually do that.  Kick spice-server
+(if needed), write out the screen dump in a separate thread so we don't
+block the main loop while writing it.
+
+There is no need to query status / progress.  Usually it'll finish in
+fractions of a second (if not we probably have bigger problems like a
+hanging nfs server ...).  Can be canceled without loosing important
+data, for example in case the monitor connection goes down, client can
+just ask for a new screen dump after reconnect.  Nobody but the client
+which submitted the command is interested in the reply.
+
+> > I agree a fully-featured job infrastructure is way over the top, and I
+> > believe I propose a minimal change to make optionnally some QMP
+> > commands async.
+>=20
+> So are commands like 'query-block' (which are typically _not_ considered
+> long-running) what you're aiming for with your proposal?
+
+I think pretty much everything in the query-* category which doesn't
+just dump out internal qemu state but has to go gather information
+before returning a reply could profit from async command support.
+
+Not sure whenever that is the case for query-block.  If it is just a
+list of block devices then no.  If it possibly does I/O to get and
+return some image statistics then yes.
+
+> The point here is rather that even async commands degenerate into sync
+> commands if the management tool doesn't send multiple commands in
+> parallel.
+
+Allowing to submit multiple commands is one (externally visible)
+benefit.  The other is internal to qemu:  We don't have to block
+main-loop while running the command.
+
+> >     -> { "execute": "do-foo",  "id": 42 }
+> >     <- { "return": {}, "id": 42 }   (this is a dummy useless return)
+
+> I know you like to insist on its uselessness, but no, it's not useless.
+> It tells the management tool that the background job has successfully
+> been started and block job management commands can be used with it now.
+
+See above, block jobs are a different story.
+
+> The question is whether enough users (command implementations and
+> clients) need the change to justify maintaining another type of commands
+> long term. Just not breaking existing users doesn't justify a new
+> feature, it's only the most basic requirement for it to even be
+> considered.
+
+I think the question is which route we want go long-term.  I basically
+see three options:
+
+  (1) continue to abuse events as async reply.
+
+  (2) implement async commands, roughly as suggested by Marc.
+
+  (3) move jobs out of the block corner so they can be used everywhere
+      in qemu (which is in discussion for a while too, don't know what
+      the current state is though).  Then implement async commands using
+      that infrastructure, as some kind of "simple job".
+
+Disclaimer: I'm not very familiar with the block jobs code base.
+
+cheers,
+  Gerd
