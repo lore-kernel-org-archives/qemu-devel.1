@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5e6h-0000FY-FG
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:09:12 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d5eK0-00030J-0a
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:22:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5e6e-0000Tq-BA
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:09:11 -0400
-Date: Tue, 2 May 2017 17:09:03 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170502200903.GE3482@thinpad.lan.raisama.net>
-References: <20170502162955.1610-1-lvivier@redhat.com>
-	<20170502162955.1610-2-lvivier@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1d5eJv-0008Bm-OR
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:22:56 -0400
+Resent-Message-Id: <E1d5eJv-0008Bm-OR@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21369)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d5eJv-0008BA-HH
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:22:51 -0400
+In-Reply-To: <20170502192300.2124-1-rth@twiddle.net>
+Message-ID: <149375655511.165.18391058579105181728@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170502162955.1610-2-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/1] numa: equally distribute memory on
- nodes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 2 May 2017 13:22:35 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v6 00/25] tcg cross-tb optimizations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
 
-On Tue, May 02, 2017 at 06:29:55PM +0200, Laurent Vivier wrote:
-[...]
-> diff --git a/numa.c b/numa.c
-> index 6fc2393..750fd95 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -294,6 +294,42 @@ static void validate_numa_cpus(void)
->      g_free(seen_cpus);
->  }
->  
-> +void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-> +                                 int nb_nodes, ram_addr_t size)
-> +{
-> +    int i;
-> +    uint64_t usedmem = 0;
-> +
-> +    /* Align each node according to the alignment
-> +     * requirements of the machine class
-> +     */
-> +
-> +    for (i = 0; i < nb_nodes - 1; i++) {
-> +        nodes[i].node_mem = (size / nb_nodes) &
-> +                            ~((1 << mc->numa_mem_align_shift) - 1);
-> +        usedmem += nodes[i].node_mem;
-> +    }
-> +    nodes[i].node_mem = size - usedmem;
-> +}
-> +
-> +void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-> +                                  int nb_nodes, ram_addr_t size)
-> +{
-> +    int i;
-> +    uint64_t usedmem = 0, node_mem;
-> +    uint64_t granularity = size / nb_nodes;
-> +    uint64_t propagate = 0;
-> +
-> +    for (i = 0; i < nb_nodes - 1; i++) {
-> +        node_mem = (granularity + propagate) &
-> +                   ~((1 << mc->numa_mem_align_shift) - 1);
-> +        propagate = granularity + propagate - node_mem;
-> +        nodes[i].node_mem = node_mem;
-> +        usedmem += node_mem;
-> +    }
-> +    nodes[i].node_mem = ram_size - usedmem;
-
-I believe you meant 'size - usedmem' here.
-
-I can fix this while applying the patch, if that's OK. The rest
-of the patch looks good to me.
-
-> +}
-> +
->  void parse_numa_opts(MachineClass *mc)
->  {
->      int i;
-> @@ -336,17 +372,8 @@ void parse_numa_opts(MachineClass *mc)
->              }
->          }
->          if (i == nb_numa_nodes) {
-> -            uint64_t usedmem = 0;
-> -
-> -            /* Align each node according to the alignment
-> -             * requirements of the machine class
-> -             */
-> -            for (i = 0; i < nb_numa_nodes - 1; i++) {
-> -                numa_info[i].node_mem = (ram_size / nb_numa_nodes) &
-> -                                        ~((1 << mc->numa_mem_align_shift) - 1);
-> -                usedmem += numa_info[i].node_mem;
-> -            }
-> -            numa_info[i].node_mem = ram_size - usedmem;
-> +            assert(mc->numa_auto_assign_ram);
-> +            mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
->          }
->  
->          numa_total = 0;
-> -- 
-> 2.9.3
-> 
-
--- 
-Eduardo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjYgMDAvMjVdIHRjZyBjcm9zcy10YiBvcHRpbWl6
+YXRpb25zCk1lc3NhZ2UtaWQ6IDIwMTcwNTAyMTkyMzAwLjIxMjQtMS1ydGhAdHdpZGRsZS5uZXQK
+Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
+YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1
+bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
+bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
+ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
+KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
+Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
+aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFn
+IHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0OTM3MzYxMDMzOC41MTQ0Ljk2MzUwNDkwMTUxNDM0NTMy
+ODguc3RnaXRAYmFoaWEubGFuIC0+IHBhdGNoZXcvMTQ5MzczNjEwMzM4LjUxNDQuOTYzNTA0OTAx
+NTE0MzQ1MzI4OC5zdGdpdEBiYWhpYS5sYW4KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+Jwo3YWE4MTY2IHRhcmdldC9taXBzOiBvcHRpbWl6ZSBpbmRpcmVjdCBicmFuY2hlcwoxM2IwYzA0
+IHRhcmdldC9taXBzOiBvcHRpbWl6ZSBjcm9zcy1wYWdlIGRpcmVjdCBqdW1wcyBpbiBzb2Z0bW11
+CmM1NmMwNzcgdGNnL21pcHM6IGltcGxlbWVudCBnb3RvX3B0cgo4MDE2N2Q5IHRhcmdldC9hYXJj
+aDY0OiBvcHRpbWl6ZSBpbmRpcmVjdCBicmFuY2hlcwowY2JlNjQ1IHRhcmdldC9hYXJjaDY0OiBv
+cHRpbWl6ZSBjcm9zcy1wYWdlIGRpcmVjdCBqdW1wcyBpbiBzb2Z0bW11CjM4NTRjMWYgdGFyZ2V0
+L2FscGhhOiBVc2UgdGNnX2dlbl9sb29rdXBfYW5kX2dvdG9fcHRyCjI5Yjc2YzYgdGFyZ2V0L2hw
+cGE6IFVzZSB0Y2dfZ2VuX2xvb2t1cF9hbmRfZ290b19wdHIKZjkwNDk0MCB0YXJnZXQvczM5MDog
+VXNlIHRjZ19nZW5fbG9va3VwX2FuZF9nb3RvX3B0cgo0MzEyOTM3IHRjZy9hcm06IEltcGxlbWVu
+dCBnb3RvX3B0cgoyMGQ4ZTA3IHRjZy9hcm06IENsYXJpZnkgdGNnX291dF9ieCBmb3IgYXJtNCBo
+b3N0CmZjYWU2ODggdGNnL3MzOTA6IEltcGxlbWVudCBnb3RvX3B0cgpmZWZmMzEwIHRjZy9zcGFy
+YzogSW1wbGVtZW50IGdvdG9fcHRyCmUxMWUxNWIgdGNnL2FhcmNoNjQ6IEltcGxlbWVudCBnb3Rv
+X3B0cgphYmE5NTYxIHRjZy9wcGM6IEltcGxlbWVudCBnb3RvX3B0cgozZDg2ZGVmIHRiLWhhc2g6
+IGltcHJvdmUgdGJfam1wX2NhY2hlIGhhc2ggZnVuY3Rpb24gaW4gdXNlciBtb2RlCjg1YzhiY2Eg
+dGFyZ2V0L2kzODY6IG9wdGltaXplIGluZGlyZWN0IGJyYW5jaGVzCjU2Y2RlMmMgdGFyZ2V0L2kz
+ODY6IG9wdGltaXplIGNyb3NzLXBhZ2UgZGlyZWN0IGp1bXBzIGluIHNvZnRtbXUKNjQyZDNhMSB0
+YXJnZXQvaTM4NjogaW50cm9kdWNlIGdlbl9qciBoZWxwZXIgdG8gZ2VuZXJhdGUgbG9va3VwX2Fu
+ZF9nb3RvX3B0cgo2NmNiZmI0IHRhcmdldC9hcm06IG9wdGltaXplIGluZGlyZWN0IGJyYW5jaGVz
+CmFjNTQ4MzEgdGFyZ2V0L2FybTogb3B0aW1pemUgY3Jvc3MtcGFnZSBkaXJlY3QganVtcHMgaW4g
+c29mdG1tdQo0ZWRhMGRlIHRjZy9pMzg2OiBpbXBsZW1lbnQgZ290b19wdHIKZDk3N2ZjYyB0Y2c6
+IEludHJvZHVjZSBnb3RvX3B0ciBvcGNvZGUgYW5kIHRjZ19nZW5fbG9va3VwX2FuZF9nb3RvX3B0
+cgpkYTY2MmEzIHFlbXUvYXRvbWljOiBMb29zZW4gcmVzdHJpY3Rpb25zIGZvciA2NC1iaXQgSUxQ
+MzIgaG9zdHMKNDQwMTE2OCB0Y2cvc3BhcmM6IFVzZSB0aGUgcHJvcGVyIGNvbXBpbGF0aW9uIGZs
+YWdzIGZvciAzMi1iaXQKN2M1OWNjYiB0YXJnZXQvbmlvczI6IEZpeCA2NC1iaXQgaWxwMzIgY29t
+cGlsYXRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjU6IHRhcmdl
+dC9uaW9zMjogRml4IDY0LWJpdCBpbHAzMiBjb21waWxhdGlvbi4uLgpDaGVja2luZyBQQVRDSCAy
+LzI1OiB0Y2cvc3BhcmM6IFVzZSB0aGUgcHJvcGVyIGNvbXBpbGF0aW9uIGZsYWdzIGZvciAzMi1i
+aXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8yNTogcWVtdS9hdG9taWM6IExvb3NlbiByZXN0cmljdGlv
+bnMgZm9yIDY0LWJpdCBJTFAzMiBob3N0cy4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lm
+aWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMzc6IEZJTEU6IGluY2x1ZGUvcWVtdS9hdG9t
+aWMuaDoxMDQ6CisjaWYgZGVmaW5lZChfX3g4Nl82NF9fKSB8fCBkZWZpbmVkKF9fc3BhcmNfXykK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA0LzI1OiB0Y2c6IElu
+dHJvZHVjZSBnb3RvX3B0ciBvcGNvZGUgYW5kIHRjZ19nZW5fbG9va3VwX2FuZF9nb3RvX3B0ci4u
+LgpDaGVja2luZyBQQVRDSCA1LzI1OiB0Y2cvaTM4NjogaW1wbGVtZW50IGdvdG9fcHRyLi4uCkNo
+ZWNraW5nIFBBVENIIDYvMjU6IHRhcmdldC9hcm06IG9wdGltaXplIGNyb3NzLXBhZ2UgZGlyZWN0
+IGp1bXBzIGluIHNvZnRtbXUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8yNTogdGFyZ2V0L2FybTogb3B0
+aW1pemUgaW5kaXJlY3QgYnJhbmNoZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yNTogdGFyZ2V0L2kz
+ODY6IGludHJvZHVjZSBnZW5fanIgaGVscGVyIHRvIGdlbmVyYXRlIGxvb2t1cF9hbmRfZ290b19w
+dHIuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yNTogdGFyZ2V0L2kzODY6IG9wdGltaXplIGNyb3NzLXBh
+Z2UgZGlyZWN0IGp1bXBzIGluIHNvZnRtbXUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjU6IHRhcmdl
+dC9pMzg2OiBvcHRpbWl6ZSBpbmRpcmVjdCBicmFuY2hlcy4uLgpDaGVja2luZyBQQVRDSCAxMS8y
+NTogdGItaGFzaDogaW1wcm92ZSB0Yl9qbXBfY2FjaGUgaGFzaCBmdW5jdGlvbiBpbiB1c2VyIG1v
+ZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjU6IHRjZy9wcGM6IEltcGxlbWVudCBnb3RvX3B0ci4u
+LgpDaGVja2luZyBQQVRDSCAxMy8yNTogdGNnL2FhcmNoNjQ6IEltcGxlbWVudCBnb3RvX3B0ci4u
+LgpDaGVja2luZyBQQVRDSCAxNC8yNTogdGNnL3NwYXJjOiBJbXBsZW1lbnQgZ290b19wdHIuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTUvMjU6IHRjZy9zMzkwOiBJbXBsZW1lbnQgZ290b19wdHIuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTYvMjU6IHRjZy9hcm06IENsYXJpZnkgdGNnX291dF9ieCBmb3IgYXJtNCBo
+b3N0Li4uCkNoZWNraW5nIFBBVENIIDE3LzI1OiB0Y2cvYXJtOiBJbXBsZW1lbnQgZ290b19wdHIu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjU6IHRhcmdldC9zMzkwOiBVc2UgdGNnX2dlbl9sb29rdXBf
+YW5kX2dvdG9fcHRyLi4uCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhl
+c2VzIGFyZSBub3QgcmVxdWlyZWQKIzIzOiBGSUxFOiB0YXJnZXQvczM5MHgvdHJhbnNsYXRlLmM6
+NjEzOgorICAgIHJldHVybiAocy0+c2luZ2xlc3RlcF9lbmFibGVkIHx8Cgp0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDMxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE5LzI1OiB0YXJnZXQvaHBwYTogVXNlIHRj
+Z19nZW5fbG9va3VwX2FuZF9nb3RvX3B0ci4uLgpDaGVja2luZyBQQVRDSCAyMC8yNTogdGFyZ2V0
+L2FscGhhOiBVc2UgdGNnX2dlbl9sb29rdXBfYW5kX2dvdG9fcHRyLi4uCkVSUk9SOiByZXR1cm4g
+aXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzI5OiBGSUxF
+OiB0YXJnZXQvYWxwaGEvdHJhbnNsYXRlLmM6NDYzOgorICAgIHJldHVybiAoKGN0eC0+dGItPmNm
+bGFncyAmIENGX0xBU1RfSU8pCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEwMCBsaW5l
+cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2lu
+ZyBQQVRDSCAyMS8yNTogdGFyZ2V0L2FhcmNoNjQ6IG9wdGltaXplIGNyb3NzLXBhZ2UgZGlyZWN0
+IGp1bXBzIGluIHNvZnRtbXUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjU6IHRhcmdldC9hYXJjaDY0
+OiBvcHRpbWl6ZSBpbmRpcmVjdCBicmFuY2hlcy4uLgpDaGVja2luZyBQQVRDSCAyMy8yNTogdGNn
+L21pcHM6IGltcGxlbWVudCBnb3RvX3B0ci4uLgpDaGVja2luZyBQQVRDSCAyNC8yNTogdGFyZ2V0
+L21pcHM6IG9wdGltaXplIGNyb3NzLXBhZ2UgZGlyZWN0IGp1bXBzIGluIHNvZnRtbXUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMjUvMjU6IHRhcmdldC9taXBzOiBvcHRpbWl6ZSBpbmRpcmVjdCBicmFuY2hl
+cy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+ZnJlZWxpc3RzLm9yZw==
