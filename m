@@ -1,28 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d5ayn-0006Mq-QG
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:48:51 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d5b64-00045W-Gu
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:56:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d5ayk-0005iH-Nt
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:48:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d5ayk-0005hL-Du
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:48:46 -0400
-Date: Tue, 2 May 2017 17:48:38 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170502164838.GL16624@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1493732857-10721-1-git-send-email-den@openvz.org>
-	<87bmrbgvzf.fsf@dusky.pond.sub.org>
-	<e90d1680-6212-862e-bd3b-fdc415ec1890@openvz.org>
-	<877f1zcjcf.fsf@dusky.pond.sub.org> <20170502163629.GA5640@work-vm>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d5b5z-0004Cv-K6
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:56:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49098)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1d5b5z-0004B6-AA
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:56:15 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v42GtAnt134835
+	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 12:56:14 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a6vfvnge4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:56:13 -0400
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 2 May 2017 10:56:12 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170502163629.GA5640@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 1/1] monitor: increase amount of data for
- monitor to read
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <149374359665.32299.11589637295145834940@loki>
+References: <20170427215821.19397-1-eblake@redhat.com>
+	<20170427215821.19397-11-eblake@redhat.com>
+	<149374359665.32299.11589637295145834940@loki>
+Date: Tue, 02 May 2017 11:56:04 -0500
+Message-Id: <149374416427.32299.10266856249198036332@loki>
+Subject: Re: [Qemu-devel] [PATCH v5 10/10] test-qga: Actually test 0xff sync
+ bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +43,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-On Tue, May 02, 2017 at 05:36:30PM +0100, Dr. David Alan Gilbert wrote:
-> * Markus Armbruster (armbru@redhat.com) wrote:
-> > "Denis V. Lunev" <den@openvz.org> writes:
-> > 
-> > > On 05/02/2017 05:43 PM, Markus Armbruster wrote:
-> > >> "Denis V. Lunev" <den@openvz.org> writes:
-> > >>
-> > >>> Right now QMP and HMP monitors read 1 byte at a time from the socket, which
-> > >>> is very inefficient. With 100+ VMs on the host this easily reasults in
-> > >>> a lot of unnecessary system calls and CPU usage in the system.
-> > >>>
-> > >>> This patch changes the amount of data to read to 4096 bytes, which matches
-> > >>> buffer size on the channel level. Fortunately, monitor protocol is
-> > >>> synchronous right now thus we should not face side effects in reality.
-> > >> Can you explain briefly why this relies on "synchronous"?  I've spent
-> > >> all of two seconds on the question myself...
-> > > Each command is processed in sequence as it appears in the
-> > > channel. The answer to the command is sent and only after that
-> > > next command is processed.
-> > 
-> > Yes, that's how QMP works.
-> > 
-> > > Theoretically tith asynchronous processing we can have some side
-> > > effects due to changed buffer size.
-> > 
-> > What kind of side effects do you have in mind?
-> > 
-> > It's quite possible that this obviously inefficient way to read had some
-> > deep reason back when it was created.  Hmm, git-blame is our friend:
-> > 
-> > commit c62313bbdc48f72e93fa8196f2fff96ba35e4e9d
-> > Author: Jan Kiszka <jan.kiszka@siemens.com>
-> > Date:   Fri Dec 4 14:05:29 2009 +0100
-> > 
-> >     monitor: Accept input only byte-wise
-> >     
-> >     This allows to suspend command interpretation and execution
-> >     synchronously, e.g. during migration.
-> >     
-> >     Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> >     Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
-> 
-> I don't think I understand why that's a problem; if we read more bytes,
-> we're not going to interpret them and execute them until after the previous
-> command returns are we?
+Quoting Michael Roth (2017-05-02 11:46:36)
+> Quoting Eric Blake (2017-04-27 16:58:21)
+> > Commit 62c39b3 introduced test-qga, and at face value, appears
+> > to be testing the 'guest-sync' behavior that is recommended for
+> > guests in sending 0xff to QGA to force the parser to reset.  But
+> > this aspect of the test has never actually done anything: the
+> > qmp_fd() call chain converts its string argument into QObject,
+> > then converts that QObject back to the actual string that is
+> > sent over the wire - and the conversion process silently drops
+> > the 0xff byte from the string sent to QGA, thus never resetting
+> > the QGA parser.
+> > =
 
-Actually it sees we might do, due to the way the "migrate" command works
-in HMP when you don't give the '-d' flag.
+> > An upcoming patch will get rid of the wasteful round trip
+> > through QObject, at which point the string in test-qga will be
+> > directly sent over the wire.
+> > =
 
-Most monitors commands will block the caller until they are finished,
-but "migrate" is different. The hmp_migrate() method will return
-immediately, but we call monitor_suspend() to block processing of
-further commands. If another command has already been read off
-the wire though (due to "monitor_read" having a buffer that contains
-multiple commands), we would in fact start processing this command
-despite having suspended the monitor.
+> > But fixing qmp_fd() to actually send 0xff over the wire is not
+> > all we have to do - the actual QMP parser loudly complains that
+> > 0xff is not valid JSON, and sends an error message _prior_ to
+> > actually parsing the 'guest-sync' or 'guest-sync-delimited'
+> > command.  With 'guest-sync', we cannot easily tell if this error
+> > message is a result of our command - which is WHY we invented
+> > the 'guest-sync-delimited' command.  So for the testsuite, fix
+> > things to only check 0xff behavior on 'guest-sync-delimited',
+> > and to loop until we've consumed all garbage prior to the
+> > requested delimiter, which matches the documented actions that
+> > a real QGA client is supposed to do.
+> =
 
-This is only a problem, however, if the client app has issued "migrate"
-followed by another command, at the same time without waiting for the
-respond to "migrate". So in practice the only way you'd hit the bug
-is probably if you just cut+paste a big chunk of commands into the
-monitor at once without waiting for completion and one of the commands
-was "migrate" without "-d".
+> The full re-sync sequence is actually to perform that process,
+> check if the response matches the client-provided sync token,
+> and then repeat the procedure if it doesn't (in the odd case
+> that a previous client initiated a guest-sync-delimited
+> sequence and never consumed the response). The current
+> implementation only performs one iteration so it's not quite
+> a full implementation of the documentation procedure.
 
-Still, I think we would need to figure out a proper fix for this before
-we could increase the buffer size.
+Well, to be more accurate it's a full implementation of the
+documented procedure, it's just that the procedure isn't
+fully documented properly. I'll send a patch to address that.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> =
+
+> For the immediate purpose of improving the handling to deal
+> with the 0xFF-generated error the patch seems sound though,
+> maybe just something worth noting in the commit msg or
+> comments so that we might eventually test the full procedure.
+> =
+
+> In any case:
+> =
+
+> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> =
+
+> > =
+
+> > Ideally, we'd fix the QGA JSON parser to silently ignore 0xff
+> > rather than sending an error message back, at which point we
+> > could enhance this test for 'guest-sync' as well as for
+> > 'guest-sync-delimited'.  But for the sake of this patch, our
+> > testing of 'guest-sync' is no worse than it was pre-patch,
+> > because we have never been sending 0xff over the wire in the
+> > first place.
+> > =
+
+> > Signed-off-by: Eric Blake <eblake@redhat.com>
+> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> > =
+
+> > ---
+> > v5: add R-b
+> > v4: no change
+> > v3: use inline \xff byte rather than %c, add comment
+> > ---
+> >  tests/libqtest.c |  8 ++++++++
+> >  tests/test-qga.c | 34 +++++++++++++++++++++++++++-------
+> >  2 files changed, 35 insertions(+), 7 deletions(-)
+> > =
+
+> > diff --git a/tests/libqtest.c b/tests/libqtest.c
+> > index 512c150..84ecbd2 100644
+> > --- a/tests/libqtest.c
+> > +++ b/tests/libqtest.c
+> > @@ -446,6 +446,14 @@ void qmp_fd_sendv(int fd, const char *fmt, va_list=
+ ap)
+> >      va_list ap_copy;
+> >      QObject *qobj;
+> > =
+
+> > +    /* qobject_from_jsonv() silently eats leading 0xff as invalid
+> > +     * JSON, but we want to test sending them over the wire to force
+> > +     * resyncs */
+> > +    if (*fmt =3D=3D '\377') {
+> > +        socket_send(fd, fmt, 1);
+> > +        fmt++;
+> > +    }
+> > +
+> >      /* Going through qobject ensures we escape strings properly.
+> >       * This seemingly unnecessary copy is required in case va_list
+> >       * is an array type.
+> > diff --git a/tests/test-qga.c b/tests/test-qga.c
+> > index c780f00..438c2e7 100644
+> > --- a/tests/test-qga.c
+> > +++ b/tests/test-qga.c
+> > @@ -146,14 +146,23 @@ static void test_qga_sync_delimited(gconstpointer=
+ fix)
+> >      QDict *ret;
+> >      gchar *cmd;
+> > =
+
+> > -    cmd =3D g_strdup_printf("%c{'execute': 'guest-sync-delimited',"
+> > -                          " 'arguments': {'id': %u } }", 0xff, r);
+> > +    cmd =3D g_strdup_printf("\xff{'execute': 'guest-sync-delimited',"
+> > +                          " 'arguments': {'id': %u } }", r);
+> >      qmp_fd_send(fixture->fd, cmd);
+> >      g_free(cmd);
+> > =
+
+> > -    v =3D read(fixture->fd, &c, 1);
+> > -    g_assert_cmpint(v, =3D=3D, 1);
+> > -    g_assert_cmpint(c, =3D=3D, 0xff);
+> > +    /*
+> > +     * Read and ignore garbage until resynchronized.
+> > +     *
+> > +     * TODO: The server shouldn't emit so much garbage (among other
+> > +     * things, it loudly complains about the client's \xff being
+> > +     * invalid JSON, even though it is a documented part of the
+> > +     * handshake.
+> > +     */
+> > +    do {
+> > +        v =3D read(fixture->fd, &c, 1);
+> > +        g_assert_cmpint(v, =3D=3D, 1);
+> > +    } while (c !=3D 0xff);
+> > =
+
+> >      ret =3D qmp_fd_receive(fixture->fd);
+> >      g_assert_nonnull(ret);
+> > @@ -172,8 +181,19 @@ static void test_qga_sync(gconstpointer fix)
+> >      QDict *ret;
+> >      gchar *cmd;
+> > =
+
+> > -    cmd =3D g_strdup_printf("%c{'execute': 'guest-sync',"
+> > -                          " 'arguments': {'id': %u } }", 0xff, r);
+> > +    /*
+> > +     * TODO guest-sync is inherently limited: we cannot distinguish
+> > +     * failure caused by reacting to garbage on the wire prior to this
+> > +     * command, from failure of this actual command. Clients are
+> > +     * supposed to be able to send a raw '\xff' byte to at least
+> > +     * re-synchronize the server's parser prior to this command, but
+> > +     * we are not in a position to test that here because (at least
+> > +     * for now) it causes the server to issue an error message about
+> > +     * invalid JSON. Testing of '\xff' handling is done in
+> > +     * guest-sync-delimited instead.
+> > +     */
+> > +    cmd =3D g_strdup_printf("{'execute': 'guest-sync',"
+> > +                          " 'arguments': {'id': %u } }", r);
+> >      ret =3D qmp_fd(fixture->fd, cmd);
+> >      g_free(cmd);
+> > =
+
+> > -- =
+
+> > 2.9.3
+> > =
+
+> >=20
