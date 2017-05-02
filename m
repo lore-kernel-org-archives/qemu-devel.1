@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5evT-0006tG-SN
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:01:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1d5fIo-0003BM-Tv
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5evP-0003Fs-PW
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:01:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d5evP-0003Fc-JK
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:01:35 -0400
-Date: Tue, 2 May 2017 18:01:30 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170502210130.GG3482@thinpad.lan.raisama.net>
-References: <20170502203115.22233-1-ehabkost@redhat.com>
-	<149375798222.165.4208719929354027619@c05f1edc8ed1>
+	(envelope-from <bounces@canonical.com>) id 1d5fIk-0008Ej-SQ
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:25:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59345)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d5fIk-0008DO-Mp
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 17:25:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d5fIj-0003Nh-6o
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 21:25:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 057892E807D
+	for <qemu-devel@nongnu.org>; Tue,  2 May 2017 21:25:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <149375798222.165.4208719929354027619@c05f1edc8ed1>
-Subject: Re: [Qemu-devel] [PATCH 0/4] x86: Support "-cpu feature=force"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 02 May 2017 21:18:00 -0000
+From: Florian Strankowski <1687653@bugs.launchpad.net>
+Reply-To: Bug 1687653 <1687653@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170502155311.4290.95799.malonedeb@soybean.canonical.com>
+Message-Id: <20170502211800.4470.89849.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1687653] Re: QEMU-KVM / detect_zeroes causes KVM
+ to start unlimited number of threads on Guest-Sided High-IO with big
+ Blocksize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +38,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: no-reply@patchew.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, agraf@suse.de, armbru@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
-On Tue, May 02, 2017 at 01:46:22PM -0700, no-reply@patchew.org wrote:
-[...]
->   TEST    tests/qapi-schema/qapi-schema-test.out
->   TEST    tests/qapi-schema/quoted-structural-chars.out
->   TEST    tests/qapi-schema/redefined-builtin.out
->   TEST    tests/qapi-schema/redefined-command.out
-> Files /tmp/qemu-test/src/tests/qapi-schema/qapi-schema-test.out and tests/qapi-schema/qapi-schema-test.test.out differ
-> make: *** [check-tests/qapi-schema/qapi-schema-test.json] Error 1
-> make: *** Waiting for unfinished jobs....
+Just to make this clear: This bug affects only LVM-backed storages.
+File-based-storage is not affected. LVM-Thin and also LVM-Thick.
 
-Oh, I didn't know we had a qapi-schema-test.out file that had to
-be manually kept in sync. I will fix this in v2.
+-- =
 
-> tests/docker/Makefile.include:118: recipe for target 'docker-run' failed
-> make[1]: *** [docker-run] Error 2
-> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-mqqq0zgw/src'
-> tests/docker/Makefile.include:149: recipe for target 'docker-run-test-quick@centos6' failed
-> make: *** [docker-run-test-quick@centos6] Error 2
-> === OUTPUT END ===
-> 
-> Test command exited with code: 2
-> 
-> 
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1687653
 
--- 
-Eduardo
+Title:
+  QEMU-KVM / detect_zeroes causes KVM to start unlimited number of
+  threads on Guest-Sided High-IO with big Blocksize
+
+Status in QEMU:
+  Confirmed
+Status in Ubuntu:
+  New
+
+Bug description:
+  QEMU-KVM in combination with "detect_zeroes=3Don" makes a Guest able to
+  DoS the Host. This is possible if the Host itself has "detect_zeroes"
+  enabled and the Guest writes a large Chunk of data with a huge
+  blocksize onto the drive.
+
+  E.g.: dd if=3D/dev/zero of=3D/tmp/DoS bs=3D1G count=3D1 oflag=3Ddirect
+
+  All QEMU-Versions after implementation of detect_zeroes are affected.
+  Prior are unaffected. This is absolutely critical, please fix this
+  ASAP!
+
+  #####
+
+  Provided by Dominik Csapak:
+
+  source    , bs   , count     ,    O_DIRECT, behaviour
+
+  urandom   , bs 1M, count 1024,    O_DIRECT: OK
+  file      , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
+  zero file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1G, count    1,    O_DIRECT: NOT OK
+  zero file , bs 1G, count    1,    O_DIRECT: NOT OK
+  zero file , bs 1G, count    1, no O_DIRECT: NOT OK
+  rand file , bs 1G, count    1,    O_DIRECT: OK
+  rand file , bs 1G, count    1, no O_DIRECT: OK
+
+  discard on:
+
+  urandom   , bs 1M, count 1024,    O_DIRECT: OK
+  rand file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
+  zero file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1G, count    1,    O_DIRECT: NOT OK
+  zero file , bs 1G, count    1,    O_DIRECT: NOT OK
+  zero file , bs 1G, count    1, no O_DIRECT: NOT OK
+  rand file , bs 1G, count    1,    O_DIRECT: OK
+  rand file , bs 1G, count    1, no O_DIRECT: OK
+
+  detect_zeros off:
+
+  urandom   , bs 1M, count 1024,    O_DIRECT: OK
+  rand file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
+  zero file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1G, count    1,    O_DIRECT: OK
+  zero file , bs 1G, count    1,    O_DIRECT: OK
+  zero file , bs 1G, count    1, no O_DIRECT: OK
+  rand file , bs 1G, count    1,    O_DIRECT: OK
+  rand file , bs 1G, count    1, no O_DIRECT: OK
+
+  #####
+
+  Provided by Florian Strankowski
+
+  bs   -    count   -    io-threads
+
+  512K -    2048    -    2
+  1M   -    1024    -    2
+  2M   -     512    -    4
+  4M   -     256    -    6
+  8M   -     128    -    10
+  16M  -      64    -    18
+  32M  -      32    -    uncountable
+
+  Please refer to further information here:
+
+  https://bugzilla.proxmox.com/show_bug.cgi?id=3D1368
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1687653/+subscriptions
