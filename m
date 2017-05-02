@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5T2I-0006dT-L9
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:56 -0400
+	(envelope-from <famz@redhat.com>) id 1d5T2M-0006f6-6D
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5T2F-0000eW-W2
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:54 -0400
+	(envelope-from <famz@redhat.com>) id 1d5T2L-0000ju-19
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:58 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  2 May 2017 16:18:30 +0800
-Message-Id: <20170502081832.9546-21-famz@redhat.com>
+Date: Tue,  2 May 2017 16:18:32 +0800
+Message-Id: <20170502081832.9546-23-famz@redhat.com>
 In-Reply-To: <20170502081832.9546-1-famz@redhat.com>
 References: <20170502081832.9546-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v16 20/22] file-posix: Add image locking to
- perm operations
+Subject: [Qemu-devel] [PATCH v16 22/22] tests: Add POSIX image locking test
+ case 182
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,372 +23,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-This extends the permission bits of op blocker API to external using
-Linux OFD locks.
-
-Each permission in @perm and @shared_perm is represented by a locked
-byte in the image file.  Requesting a permission in @perm is translated
-to a shared lock of the corresponding byte; rejecting to share the same
-permission is translated to a shared lock of a separate byte. With that,
-we use 2x number of bytes of distinct permission types.
-
-virtlockd in libvirt locks the first byte, so we do locking from a
-higher offset.
-
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/file-posix.c | 276 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 275 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/182     | 73 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/182.out |  8 +++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 82 insertions(+)
+ create mode 100755 tests/qemu-iotests/182
+ create mode 100644 tests/qemu-iotests/182.out
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 0fb3b31..8c7ce04 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -129,12 +129,23 @@ do { \
- 
- #define MAX_BLOCKSIZE	4096
- 
-+/* Posix file locking bytes. Libvirt takes byte 0, we start from higher bytes,
-+ * leaving a few more bytes for its future use. */
-+#define RAW_LOCK_PERM_BASE             100
-+#define RAW_LOCK_SHARED_BASE           200
+diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
+new file mode 100755
+index 0000000..ddc2f18
+--- /dev/null
++++ b/tests/qemu-iotests/182
+@@ -0,0 +1,73 @@
++#!/bin/bash
++#
++# Test image locking for POSIX locks
++#
++# Copyright 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
- typedef struct BDRVRawState {
-     int fd;
-+    int lock_fd;
-+    bool use_lock;
-     int type;
-     int open_flags;
-     size_t buf_align;
- 
-+    /* The current permissions. */
-+    uint64_t perm;
-+    uint64_t shared_perm;
++# creator
++owner=famz@redhat.com
 +
- #ifdef CONFIG_XFS
-     bool is_xfs:1;
- #endif
-@@ -411,6 +422,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     BlockdevAioOptions aio, aio_default;
-     int fd, ret;
-     struct stat st;
-+    OnOffAuto locking;
- 
-     opts = qemu_opts_create(&raw_runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-@@ -440,6 +452,37 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     }
-     s->use_linux_aio = (aio == BLOCKDEV_AIO_OPTIONS_NATIVE);
- 
-+    locking = qapi_enum_parse(OnOffAuto_lookup, qemu_opt_get(opts, "locking"),
-+                              ON_OFF_AUTO__MAX, ON_OFF_AUTO_AUTO, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+    switch (locking) {
-+    case ON_OFF_AUTO_ON:
-+        s->use_lock = true;
-+#ifndef F_OFD_SETLK
-+        fprintf(stderr,
-+                "File lock requested but OFD locking syscall is unavailable, "
-+                "falling back to POSIX file locks.\n"
-+                "Due to the implementation, locks can be lost unexpectedly.\n");
-+#endif
-+        break;
-+    case ON_OFF_AUTO_OFF:
-+        s->use_lock = false;
-+        break;
-+    case ON_OFF_AUTO_AUTO:
-+#ifdef F_OFD_SETLK
-+        s->use_lock = true;
-+#else
-+        s->use_lock = false;
-+#endif
-+        break;
-+    default:
-+        abort();
-+    }
++seq="$(basename $0)"
++echo "QA output created by $seq"
 +
-     s->open_flags = open_flags;
-     raw_parse_flags(bdrv_flags, &s->open_flags);
- 
-@@ -455,6 +498,21 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     }
-     s->fd = fd;
- 
-+    s->lock_fd = -1;
-+    if (s->use_lock) {
-+        fd = qemu_open(filename, s->open_flags);
-+        if (fd < 0) {
-+            ret = -errno;
-+            error_setg_errno(errp, errno, "Could not open '%s' for locking",
-+                             filename);
-+            qemu_close(s->fd);
-+            goto fail;
-+        }
-+        s->lock_fd = fd;
-+    }
-+    s->perm = 0;
-+    s->shared_perm = BLK_PERM_ALL;
++here="$PWD"
++tmp=/tmp/$$
++status=1	# failure is the default!
 +
- #ifdef CONFIG_LINUX_AIO
-      /* Currently Linux does AIO only for files opened with O_DIRECT */
-     if (s->use_linux_aio && !(s->open_flags & O_DIRECT)) {
-@@ -542,6 +600,161 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
-     return raw_open_common(bs, options, flags, 0, errp);
- }
- 
-+typedef enum {
-+    RAW_PL_PREPARE,
-+    RAW_PL_COMMIT,
-+    RAW_PL_ABORT,
-+} RawPermLockOp;
-+
-+#define PERM_FOREACH(i) \
-+    for ((i) = 0; (1ULL << (i)) <= BLK_PERM_ALL; i++)
-+
-+/* Lock bytes indicated by @perm_lock_bits and @shared_perm_lock_bits in the
-+ * file; if @unlock == true, also unlock the unneeded bytes.
-+ * @shared_perm_lock_bits is the mask of all permissions that are NOT shared.
-+ */
-+static int raw_apply_lock_bytes(BDRVRawState *s,
-+                                uint64_t perm_lock_bits,
-+                                uint64_t shared_perm_lock_bits,
-+                                bool unlock, Error **errp)
++_cleanup()
 +{
-+    int ret;
-+    int i;
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+    PERM_FOREACH(i) {
-+        int off = RAW_LOCK_PERM_BASE + i;
-+        if (perm_lock_bits & (1ULL << i)) {
-+            ret = qemu_lock_fd(s->lock_fd, off, 1, false);
-+            if (ret) {
-+                error_setg(errp, "Failed to lock byte %d", off);
-+                return ret;
-+            }
-+        } else if (unlock) {
-+            ret = qemu_unlock_fd(s->lock_fd, off, 1);
-+            if (ret) {
-+                error_setg(errp, "Failed to unlock byte %d", off);
-+                return ret;
-+            }
-+        }
-+    }
-+    PERM_FOREACH(i) {
-+        int off = RAW_LOCK_SHARED_BASE + i;
-+        if (shared_perm_lock_bits & (1ULL << i)) {
-+            ret = qemu_lock_fd(s->lock_fd, off, 1, false);
-+            if (ret) {
-+                error_setg(errp, "Failed to lock byte %d", off);
-+                return ret;
-+            }
-+        } else if (unlock) {
-+            ret = qemu_unlock_fd(s->lock_fd, off, 1);
-+            if (ret) {
-+                error_setg(errp, "Failed to unlock byte %d", off);
-+                return ret;
-+            }
-+        }
-+    }
-+    return 0;
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++size=32M
++
++_make_test_img $size
++
++_run_cmd()
++{
++    echo
++    (echo "$@"; "$@" 1>/dev/null) >&2 | _filter_testdir
 +}
 +
-+/* Check "unshared" bytes implied by @perm and ~@shared_perm in the file. */
-+static int raw_check_lock_bytes(BDRVRawState *s,
-+                                uint64_t perm, uint64_t shared_perm,
-+                                Error **errp)
-+{
-+    int ret;
-+    int i;
++echo "Starting QEMU"
++_launch_qemu -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
++    -device virtio-blk-pci,drive=drive0
 +
-+    PERM_FOREACH(i) {
-+        int off = RAW_LOCK_SHARED_BASE + i;
-+        uint64_t p = 1ULL << i;
-+        if (perm & p) {
-+            ret = qemu_lock_fd_test(s->lock_fd, off, 1, true);
-+            if (ret) {
-+                char *perm_name = bdrv_perm_names(p);
-+                error_setg(errp,
-+                           "Failed to get \"%s\" lock",
-+                           perm_name);
-+                g_free(perm_name);
-+                error_append_hint(errp,
-+                                  "Is another process using the image?\n");
-+                return ret;
-+            }
-+        }
-+    }
-+    PERM_FOREACH(i) {
-+        int off = RAW_LOCK_PERM_BASE + i;
-+        uint64_t p = 1ULL << i;
-+        if (!(shared_perm & p)) {
-+            ret = qemu_lock_fd_test(s->lock_fd, off, 1, true);
-+            if (ret) {
-+                char *perm_name = bdrv_perm_names(p);
-+                error_setg(errp,
-+                           "Failed to get shared \"%s\" lock",
-+                           perm_name);
-+                g_free(perm_name);
-+                error_append_hint(errp,
-+                                  "Is another process using the image?\n");
-+                return ret;
-+            }
-+        }
-+    }
-+    return 0;
-+}
++echo
++echo "Starting a second QEMU using the same image should fail"
++echo 'quit' | $QEMU -monitor stdio \
++    -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
++    -device virtio-blk-pci,drive=drive0 2>&1 | _filter_testdir 2>&1 |
++    sed -e '/falling back to POSIX file/d' \
++        -e '/locks can be lost unexpectedly/d'
 +
-+static int raw_handle_perm_lock(BlockDriverState *bs,
-+                                RawPermLockOp op,
-+                                uint64_t new_perm, uint64_t new_shared,
-+                                Error **errp)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    int ret = 0;
-+    Error *local_err = NULL;
++_cleanup_qemu
 +
-+    if (!s->use_lock) {
-+        return 0;
-+    }
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/182.out b/tests/qemu-iotests/182.out
+new file mode 100644
+index 0000000..b4b8f77
+--- /dev/null
++++ b/tests/qemu-iotests/182.out
+@@ -0,0 +1,8 @@
++QA output created by 182
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432
++Starting QEMU
 +
-+    if (bdrv_get_flags(bs) & BDRV_O_INACTIVE) {
-+        return 0;
-+    }
-+
-+    assert(s->lock_fd > 0);
-+
-+    switch (op) {
-+    case RAW_PL_PREPARE:
-+        ret = raw_apply_lock_bytes(s, s->perm | new_perm,
-+                                   ~s->shared_perm | ~new_shared,
-+                                   false, errp);
-+        if (!ret) {
-+            ret = raw_check_lock_bytes(s, new_perm, new_shared, errp);
-+            if (!ret) {
-+                return 0;
-+            }
-+        }
-+        op = RAW_PL_ABORT;
-+        /* fall through to unlock bytes. */
-+    case RAW_PL_ABORT:
-+        raw_apply_lock_bytes(s, s->perm, ~s->shared_perm, true, &local_err);
-+        if (local_err) {
-+            /* Theoretically the above call only unlocks bytes and it cannot
-+             * fail. Something weird happened, report it.
-+             */
-+            error_report_err(local_err);
-+        }
-+        break;
-+    case RAW_PL_COMMIT:
-+        raw_apply_lock_bytes(s, new_perm, ~new_shared, true, &local_err);
-+        if (local_err) {
-+            /* Theoretically the above call only unlocks bytes and it cannot
-+             * fail. Something weird happened, report it.
-+             */
-+            error_report_err(local_err);
-+        }
-+        break;
-+    }
-+    return ret;
-+}
-+
- static int raw_reopen_prepare(BDRVReopenState *state,
-                               BlockReopenQueue *queue, Error **errp)
- {
-@@ -1410,6 +1623,10 @@ static void raw_close(BlockDriverState *bs)
-         qemu_close(s->fd);
-         s->fd = -1;
-     }
-+    if (s->lock_fd >= 0) {
-+        qemu_close(s->lock_fd);
-+        s->lock_fd = -1;
-+    }
- }
- 
- static int raw_truncate(BlockDriverState *bs, int64_t offset)
-@@ -1947,6 +2164,54 @@ static QemuOptsList raw_create_opts = {
-     }
- };
- 
-+static int raw_check_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared,
-+                          Error **errp)
-+{
-+    return raw_handle_perm_lock(bs, RAW_PL_PREPARE, perm, shared, errp);
-+}
-+
-+static void raw_set_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    raw_handle_perm_lock(bs, RAW_PL_COMMIT, perm, shared, NULL);
-+    s->perm = perm;
-+    s->shared_perm = shared;
-+}
-+
-+static void raw_abort_perm_update(BlockDriverState *bs)
-+{
-+    raw_handle_perm_lock(bs, RAW_PL_ABORT, 0, 0, NULL);
-+}
-+
-+static int raw_inactivate(BlockDriverState *bs)
-+{
-+    int ret;
-+    uint64_t perm = 0;
-+    uint64_t shared = BLK_PERM_ALL;
-+
-+    ret = raw_handle_perm_lock(bs, RAW_PL_PREPARE, perm, shared, NULL);
-+    if (ret) {
-+        return ret;
-+    }
-+    raw_handle_perm_lock(bs, RAW_PL_COMMIT, perm, shared, NULL);
-+    return 0;
-+}
-+
-+
-+static void raw_invalidate_cache(BlockDriverState *bs, Error **errp)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    int ret;
-+
-+    assert(!(bdrv_get_flags(bs) & BDRV_O_INACTIVE));
-+    ret = raw_handle_perm_lock(bs, RAW_PL_PREPARE, s->perm, s->shared_perm,
-+                               errp);
-+    if (ret) {
-+        return;
-+    }
-+    raw_handle_perm_lock(bs, RAW_PL_COMMIT, s->perm, s->shared_perm, NULL);
-+}
-+
- BlockDriver bdrv_file = {
-     .format_name = "file",
-     .protocol_name = "file",
-@@ -1977,7 +2242,11 @@ BlockDriver bdrv_file = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
--
-+    .bdrv_inactivate = raw_inactivate,
-+    .bdrv_invalidate_cache = raw_invalidate_cache,
-+    .bdrv_check_perm = raw_check_perm,
-+    .bdrv_set_perm   = raw_set_perm,
-+    .bdrv_abort_perm_update = raw_abort_perm_update,
-     .create_opts = &raw_create_opts,
- };
- 
-@@ -2436,6 +2705,11 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
-+    .bdrv_inactivate = raw_inactivate,
-+    .bdrv_invalidate_cache = raw_invalidate_cache,
-+    .bdrv_check_perm = raw_check_perm,
-+    .bdrv_set_perm   = raw_set_perm,
-+    .bdrv_abort_perm_update = raw_abort_perm_update,
-     .bdrv_probe_blocksizes = hdev_probe_blocksizes,
-     .bdrv_probe_geometry = hdev_probe_geometry,
- 
++Starting a second QEMU using the same image should fail
++qemu-system-x86_64: -drive file=TEST_DIR/t.qcow2,if=none,id=drive0,file.locking=on: Failed to get "write" lock
++Is another process using the image?
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index c8ae60e..a4549d8 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -171,3 +171,4 @@
+ 175 auto quick
+ 176 rw auto backing
+ 181 rw auto migration
++182 rw auto quick
 -- 
 2.9.3
