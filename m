@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d5dOa-000266-V5
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:38 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d5dOc-00027I-1q
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d5dOZ-0001qs-H6
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:36 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34983)
+	(envelope-from <rth7680@gmail.com>) id 1d5dOb-0001s9-2G
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:38 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33032)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d5dOZ-0001qa-Bn
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:35 -0400
-Received: by mail-qt0-x243.google.com with SMTP id o36so21704318qtb.2
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:23:35 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d5dOa-0001rm-TM
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:36 -0400
+Received: by mail-qk0-x244.google.com with SMTP id o85so22942004qkh.0
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:23:36 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  2 May 2017 12:22:57 -0700
-Message-Id: <20170502192300.2124-23-rth@twiddle.net>
+Date: Tue,  2 May 2017 12:22:58 -0700
+Message-Id: <20170502192300.2124-24-rth@twiddle.net>
 In-Reply-To: <20170502192300.2124-1-rth@twiddle.net>
 References: <20170502192300.2124-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v6 22/25] target/aarch64: optimize indirect
- branches
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 23/25] tcg/mips: implement goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +30,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: cota@braap.org
+Cc: cota@braap.org, Aurelien Jarno <aurelien@aurel32.net>
 
-From: "Emilio G. Cota" <cota@braap.org>
+From: Aurelien Jarno <aurelien@aurel32.net>
 
-Measurements:
-
-[Baseline performance is that before applying this and the previous commit]
-
--                                    NBench, aarch64-softmmu. Host: Intel i7-4790K @ 4.00GHz
-
- 1.7x +-+--------------------------------------------------------------------------------------------------------------+-+
-      |                                                                                                                  |
-      |   cross                                                                                                          |
- 1.6x +cross+jr.................................................####...................................................+-+
-      |                                                         #++#                                                     |
-      |                                                         #  #                                                     |
- 1.5x +-+...................................................*****..#...................................................+-+
-      |                                                     *+++*  #                                                     |
-      |                                                     *   *  #                                                     |
- 1.4x +-+...................................................*...*..#...................................................+-+
-      |                                                     *   *  #                                                     |
-      |                                     #####           *   *  #                                                     |
- 1.3x +-+................................****+++#...........*...*..#...................................................+-+
-      |                                  *++*   #           *   *  #                                                     |
-      |                                  *  *   #           *   *  #                                                     |
- 1.2x +-+................................*..*...#...........*...*..#...................................................+-+
-      |                                  *  *   #           *   *  #                                                     |
-      |                            ####  *  *   #           *   *  #                                                     |
- 1.1x +-+.......................+++#..#..*..*...#...........*...*..#...................................................+-+
-      |                         ****  #  *  *   #           *   *  #                                        ****####     |
-      |                         *  *  #  *  *   #           *   *  #  ****###   +++####            ****###  *  *   #     |
-   1x +-++-++++++-++++****###++-*++*++#++*++*+-+#++****+++++*+++*++#++*++*-+#++*****++#++****###-++*++*-+#++*+-*+++#+-++-+
-      |     *****###  *  *  #   *  *  #  *  *   #  *++*###  *   *  #  *  *  #  *   *  #  *  *++#   *  *  #  *  *   #     |
-      |     *   *++#  *  *  #   *  *  #  *  *   #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #   *  *  #  *  *   #     |
- 0.9x +-+---*****###--****###---****###--****####--****###--*****###--****###--*****###--****###---****###--****####---+-+
-      ASSIGNMENT BITFIELD   FOURFP EMULATION   HUFFMAN   LU DECOMPOSITIONNEURAL NUMERIC SORSTRING SORT    hmean
-  png: http://imgur.com/qO9ubtk
-NB. cross here represents the previous commit.
-
--                            SPECint06 (test set), aarch64-linux-user. Host: Intel i7-4790K @ 4.00GHz
-
- 1.5x +-+--------------------------------------------------------------------------------------------------------------+-+
-      |                                                                       *****                                      |
-      |                                                                       *+++*                           jr         |
-      |                                                                       *   *                                      |
- 1.4x +-+.....................................................................*...*.....................+++............+-+
-      |                                                                       *   *                      |               |
-      |                                      *****                            *   *                      |               |
-      |                                      *   *                            *   *                    *****             |
- 1.3x +-+....................................*...*............................*...*....................*.|.*...........+-+
-      |                       +++            *   *                            *   *                    * | *             |
-      |                      *****           *   *                            *   *                    *+++*             |
-      |                      *   *           *   *                            *   *                    *   *             |
- 1.2x +-+....................*...*...........*...*............................*...*...........*****....*...*...........+-+
-      |     *****            *   *           *   *                            *   *           *   *    *   *    +++      |
-      |     *   *            *   *           *   *                            *   *           *   *    *   *   *****     |
-      |     *   *            *   *   *****   *   *                            *   *           *   *    *   *   *   *     |
- 1.1x +-+...*...*............*...*...*...*...*...*............................*...*....+++....*...*....*...*...*...*...+-+
-      |     *   *            *   *   *   *   *   *                            *   *   *****   *   *    *   *   *   *     |
-      |     *   *            *   *   *   *   *   *   *****                    *   *   *   *   *   *    *   *   *   *     |
-      |     *   *   *****    *   *   *   *   *   *   *   *   ******           *   *   *   *   *   *    *   *   *   *     |
-   1x +-++-+*+++*-++*+++*++++*+-+*+++*-++*+++*-++*+++*+++*++-*++++*-++*****+++*++-*+++*++-*+++*+-+*++++*+++*++-*+++*+-++-+
-      |     *   *   *   *    *   *   *   *   *   *   *   *   *    *   *+++*   *   *   *   *   *   *    *   *   *   *     |
-      |     *   *   *   *    *   *   *   *   *   *   *   *   *    *   *   *   *   *   *   *   *   *    *   *   *   *     |
-      |     *   *   *   *    *   *   *   *   *   *   *   *   *    *   *   *   *   *   *   *   *   *    *   *   *   *     |
- 0.9x +-+---*****---*****----*****---*****---*****---*****---******---*****---*****---*****---*****----*****---*****---+-+
-         astar   bzip2      gcc   gobmk h264ref   hmmlibquantum      mcf omnetpperlbench   sjengxalancbmk   hmean
-  png: http://imgur.com/3Dp4vvq
-
--                           SPECint06 (train set), aarch64-linux-user. Host: Intel i7-4790K @ 4.00GHz
-
- 1.7x +-+--------------------------------------------------------------------------------------------------------------+-+
-      |                                                                                                                  |
-      |                                                                                                       jr         |
- 1.6x +-+...............................................................................................+++............+-+
-      |                                                                                                *****             |
-      |                                                                                                *+++*             |
-      |                                                                                                *   *             |
- 1.5x +-+..............................................................................................*...*...........+-+
-      |                                                                        +++                     *   *             |
-      |                                                                       *****                    *   *             |
- 1.4x +-+.....................................................................*+++*....................*...*...........+-+
-      |                                                                       *   *                    *   *             |
-      |                                      *****                            *   *                    *   *             |
-      |                                      *   *                            *   *   *****            *   *             |
- 1.3x +-+....................................*...*............................*...*...*...*............*...*...........+-+
-      |                       +++            *   *                            *   *   *   *            *   *             |
-      |                      *****           *   *                            *   *   *   *   *****    *   *             |
- 1.2x +-+....................*...*...........*...*............................*...*...*...*...*+++*....*...*...*****...+-+
-      |                      *   *           *   *                            *   *   *   *   *   *    *   *   *+++*     |
-      |     *****            *   *   *****   *   *                            *   *   *   *   *   *    *   *   *   *     |
-      |     *   *            *   *   *+++*   *   *                            *   *   *   *   *   *    *   *   *   *     |
- 1.1x +-+...*...*............*...*...*...*...*...*............................*...*...*...*...*...*....*...*...*...*...+-+
-      |     *   *   *****    *   *   *   *   *   *                    *****   *   *   *   *   *   *    *   *   *   *     |
-      |     *   *   *   *    *   *   *   *   *   *    +++    ******   *+++*   *   *   *   *   *   *    *   *   *   *     |
-   1x +-+---*****---*****----*****---*****---*****---*****---******---*****---*****---*****---*****----*****---*****---+-+
-         astar   bzip2      gcc   gobmk h264ref   hmmlibquantum      mcf omnetpperlbench   sjengxalancbmk   hmean
-  png: http://imgur.com/vRrdc9j
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+Message-Id: <20170430145254.25616-2-aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate-a64.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tcg/mips/tcg-target.h     |  2 +-
+ tcg/mips/tcg-target.inc.c | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 1e28094..e0e8b80 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11361,8 +11361,7 @@ void gen_intermediate_code_a64(ARMCPU *cpu, TranslationBlock *tb)
-             gen_a64_set_pc_im(dc->pc);
-             /* fall through */
-         case DISAS_JUMP:
--            /* indicate that the hash table must be used to find the next TB */
--            tcg_gen_exit_tb(0);
-+            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-             break;
-         case DISAS_TB_JUMP:
-         case DISAS_EXC:
+diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
+index e3240cf..d75cb63 100644
+--- a/tcg/mips/tcg-target.h
++++ b/tcg/mips/tcg-target.h
+@@ -130,7 +130,7 @@ extern bool use_mips32r2_instructions;
+ #define TCG_TARGET_HAS_muluh_i32        1
+ #define TCG_TARGET_HAS_mulsh_i32        1
+ #define TCG_TARGET_HAS_bswap32_i32      1
+-#define TCG_TARGET_HAS_goto_ptr         0
++#define TCG_TARGET_HAS_goto_ptr         1
+ 
+ #if TCG_TARGET_REG_BITS == 64
+ #define TCG_TARGET_HAS_add2_i32         0
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index 01ac7b2..9e5b9f4 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -1747,6 +1747,11 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         tcg_out_nop(s);
+         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
+         break;
++    case INDEX_op_goto_ptr:
++        /* jmp to the given host address (could be epilogue) */
++        tcg_out_opc_reg(s, OPC_JR, 0, a0, 0);
++        tcg_out_nop(s);
++        break;
+     case INDEX_op_br:
+         tcg_out_brcond(s, TCG_COND_EQ, TCG_REG_ZERO, TCG_REG_ZERO,
+                        arg_label(a0));
+@@ -2160,6 +2165,7 @@ static const TCGTargetOpDef mips_op_defs[] = {
+     { INDEX_op_exit_tb, { } },
+     { INDEX_op_goto_tb, { } },
+     { INDEX_op_br, { } },
++    { INDEX_op_goto_ptr, { "r" } },
+ 
+     { INDEX_op_ld8u_i32, { "r", "r" } },
+     { INDEX_op_ld8s_i32, { "r", "r" } },
+@@ -2451,6 +2457,13 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     /* delay slot */
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_AREG0, tcg_target_call_iarg_regs[0]);
+ 
++    /*
++     * Return path for goto_ptr. Set return value to 0, a-la exit_tb,
++     * and fall through to the rest of the epilogue.
++     */
++    s->code_gen_epilogue = s->code_ptr;
++    tcg_out_mov(s, TCG_TYPE_REG, TCG_REG_V0, TCG_REG_ZERO);
++
+     /* TB epilogue */
+     tb_ret_addr = s->code_ptr;
+     for (i = 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); i++) {
 -- 
 2.9.3
