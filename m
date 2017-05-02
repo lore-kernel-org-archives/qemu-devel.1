@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5ZJ1-0006MF-BA
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:01:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d5ZMB-0007AA-4w
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5ZIy-00021f-5s
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:01:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55412)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d5ZIx-0001zg-TS
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:01:32 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
-	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
-	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
-	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
-	<ac13fd46-bd6e-6a8a-2c72-cc8d683d5026@redhat.com>
-Date: Tue, 02 May 2017 17:01:28 +0200
-In-Reply-To: <ac13fd46-bd6e-6a8a-2c72-cc8d683d5026@redhat.com> (Paolo
-	Bonzini's message of "Tue, 2 May 2017 15:22:22 +0200")
-Message-ID: <87pofrfgl3.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1d5ZMA-0006Ak-60
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:04:51 -0400
+Date: Tue, 2 May 2017 17:04:39 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170502150439.GG5805@noname.redhat.com>
+References: <20170502081832.9546-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
- in favour of '-accel'
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170502081832.9546-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v16 00/22] block: Image locking series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Vincent Palatin <vpalatin@chromium.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Am 02.05.2017 um 10:18 hat Fam Zheng geschrieben:
+> v16: Rebase to the latest block-next branch of Kevin.
+>      Address Kevin's comments:
+>      - on/off => on/off/auto for file.locking option
+>      - Add file.locking to QAPI schema
+>      - Fall back to POSIX file lock if OFD lock not available
+>      - Print warning when falling back, if locking=on specified
+>        (This means qemu-io/qemu-img need --image-opts to enable lock)
+>      - Drop the BLK_PERM_MAX patch and use an alternative
+>      - Use the 'TEST_IMG="$TEST_IMG.base" _make_test_img ...' idiom
+>      - Drop reopen callback changes
+>      - Don't open s->lock_fd if !s->use_lock
+>      - Use the same open flags for the lock fd
+>      - Don't leak the returned string for bdrv_perm_names
+>      - Clear up comment on raw_apply_lock_bytes
+>      - Improve error message text
+>      - Pass "0, 0" to raw_handle_perm_lock in raw_abort_perm_update
+>      - Filter out test dir in reference output
+>      - Add locking to bdrv_host_device.
 
-> On 02/05/2017 12:48, Christian Borntraeger wrote:
->>> I'm aware of the fact that likely a lot of users are still using
->>> -enable-kvm, and I did not mean that we should remove it soon yet. But
->>> IMHO we should start now to inform the users that they should slowly
->>> switch to the better option "-accel" instead, so that we could maybe
->>> remove this "-enable-xxx" stuff sometime in the distant future (let's
->>> say QEMU v4.0?).
->>
->> I come from the Linux side, where "breaking a working setup" will result in
->> an angry Linus. We certainly have not such strict rules here and we could 
->> base the decision on the question "how expensive is the maintenance
->> of this option?". I think marking it as "legacy option" is fine, but I doubt
->> that removing it will make qemu maintenance cheaper. So my preferred variant
->> is
->
-> Even for Linux the rules aren't 100% black or white.  There have been
-> cases where small breakage are introduced, for example 4.12 will break
-> the BLKDISCARDZEROES ioctl.
->
-> We shouldn't treat things are black or white here too.
->
-> "-usbdevice" makes sense to deprecate because it brings together a
-> complicated parsing mechanism, though perhaps we could keep it for
-> simple devices such as keyboard, mouse, tablet where it's pretty surely
-> in use in the wild.
->
-> "-drive cyls=..." also makes sense to deprecate because it is a very
-> obscure functionality.
->
-> "-drive serial=..." would be nice to deprecate, but I think it's already
-> less clear that it's not in use in the wild.  Probably it's still on the
-> side of wanting to eventually remove it.
->
-> "-net" is more complicated still.  It's almost surely in use in the
-> wild, but then probably the users are fairly advanced and (with the
-> provision that documentation should be updated) I guess we could
-> eventually get there.
->
-> But I really, really see no point in removing --enable-kvm.  It costs
-> perhaps 10 lines of code that has pretty much no ramifications elsewhere
-> in the code.  If anything I'd expect "-machine accel" to disappear
-> before, if ever (in favor of multiple "-accel" options, e.g. "-machine
-> accel=kvm:tcg" can become "-accel kvm -accel tcg".
+Looks like we're almost there! :-)
 
-I basically agree, except I wouldn't say "no point", but "doesn't buy us
-enough to justify inconveniencing users".
+The actual locking code looks good to me now. I had a try at cleaning up
+the BDRV_O_INACTIVE handling at the block layer level so that we don't
+need the special code in file-posix (and we definitely want to do this),
+but it's a bit harder than I thought. So let's merge your file-posix
+code as it is and clean up things on top.
 
-What we've done before for options that have become unloved, but not
-harmful, is remove them just from documentation.  Grep qemu-options.hx
-for "HXCOMM Deprecated".  Let's do that for --enable-kvm and similarly
-weird sugared options.
+Kevin
