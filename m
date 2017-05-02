@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d5XWg-0003Ba-W6
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:07:35 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5Xdg-0004OF-Dh
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:14:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d5XWc-0005ZD-TW
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:07:34 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33650)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5Xdd-00070L-4R
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:14:48 -0400
+Received: from mail-qk0-x22d.google.com ([2607:f8b0:400d:c09::22d]:33398)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d5XWc-0005Ys-MP
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:07:30 -0400
-Received: by mail-wr0-x242.google.com with SMTP id w50so17325904wrc.0
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 06:07:28 -0700 (PDT)
-Date: Tue, 2 May 2017 14:07:25 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170502130725.GC22502@stefanha-x1.localdomain>
-References: <CADuF=xUDDOoMeVvPdH3BeqOnG+RONgwyzP5aj1kDeoYL97BtOw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5Xdc-00070D-UX
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:14:45 -0400
+Received: by mail-qk0-x22d.google.com with SMTP id u68so31865924qkd.0
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 06:14:44 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1493282486-28338-1-git-send-email-armbru@redhat.com>
+	<1493282486-28338-2-git-send-email-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0df75be2-4002-ac49-5cff-41cd936325be@amsat.org>
+Date: Tue, 2 May 2017 10:14:41 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="oJ71EGRlYNjSvfq7"
-Content-Disposition: inline
-In-Reply-To: <CADuF=xUDDOoMeVvPdH3BeqOnG+RONgwyzP5aj1kDeoYL97BtOw@mail.gmail.com>
-Subject: Re: [Qemu-devel] vhost-net - virtio - multiqueue - rx queue
- selection
+In-Reply-To: <1493282486-28338-2-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] qmp: Improve QMP dispatch error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sujith Sankar <ssujith@avinetworks.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
+On 04/27/2017 05:41 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
---oJ71EGRlYNjSvfq7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On Thu, Apr 20, 2017 at 10:07:33AM +0530, Sujith Sankar wrote:
-> I have a question regarding the algorithm used to select rx queue of
-> the VM in the case of multiqueue virtio-net on KVM.
->=20
-> Given a 4-tuple, how can we calculate the index of the receive queue
-> that virtio-net is going pick for that flow?  From some of the email
-> threads in some of the relevant forums, it seems RSS is not used.  But
-> documentations/threads do not talk about how a queue is picked.
->=20
-> Could you please help me with this?
-
-CCing Jason Wang, QEMU net maintainer.
-
-Stefan
-
---oJ71EGRlYNjSvfq7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZCISNAAoJEJykq7OBq3PIbvMIAKqXf8ZAgKCI/UOymalFx+5f
-BJjgmZcB6jbpoiq0dUv+dgF/wXJlgnDBGusLae1q9iaczf/Ve5H6G/ITjDD5SMMZ
-dournlQDlflbFTX87xrWO9dWKRWncuRwGSEV5N5v409I5aVc9V3DbrmhCd3O/8nW
-lpZvuA7qhm2TAY7fex+y+W2B4a80s8EolmUZVicOSc4y7KQuCMyLLrm1O/bq7m62
-akyNdflmOd1OlgJTdupLfKwmXbnTUMb7rs9a3qsFN3YeSSiD+KOimBIWD6o4muo+
-YxOTqPKJN8IvrQXzPfQCHl4M+dyNgHeEl01fSa1Rm+eQjpawKC/UoRPCPY0op7Q=
-=SF9P
------END PGP SIGNATURE-----
-
---oJ71EGRlYNjSvfq7--
+> ---
+>  qapi/qmp-dispatch.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index dc50212..5ad36f8 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -30,7 +30,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+>
+>      dict = qobject_to_qdict(request);
+>      if (!dict) {
+> -        error_setg(errp, "Expected '%s' in QMP input", "object");
+> +        error_setg(errp, "QMP input must be a JSON object");
+>          return NULL;
+>      }
+>
+> @@ -41,26 +41,26 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+>
+>          if (!strcmp(arg_name, "execute")) {
+>              if (qobject_type(arg_obj) != QTYPE_QSTRING) {
+> -                error_setg(errp, "QMP input object member '%s' expects '%s'",
+> -                           "execute", "string");
+> +                error_setg(errp,
+> +                           "QMP input member 'execute' must be a string");
+>                  return NULL;
+>              }
+>              has_exec_key = true;
+>          } else if (!strcmp(arg_name, "arguments")) {
+>              if (qobject_type(arg_obj) != QTYPE_QDICT) {
+> -                error_setg(errp, "QMP input object member '%s' expects '%s'",
+> -                           "arguments", "object");
+> +                error_setg(errp,
+> +                           "QMP input member 'arguments' must be an object");
+>                  return NULL;
+>              }
+>          } else {
+> -            error_setg(errp, "QMP input object member '%s' is unexpected",
+> +            error_setg(errp, "QMP input member '%s' is unexpected",
+>                         arg_name);
+>              return NULL;
+>          }
+>      }
+>
+>      if (!has_exec_key) {
+> -        error_setg(errp, "Expected '%s' in QMP input", "execute");
+> +        error_setg(errp, "QMP input lacks member 'execute'");
+>          return NULL;
+>      }
+>
+>
