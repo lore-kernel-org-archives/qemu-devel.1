@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5T1R-0005pu-Kp
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:02 -0400
+	(envelope-from <famz@redhat.com>) id 1d5T1V-0005uJ-Jb
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5T1Q-00082y-HK
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:01 -0400
+	(envelope-from <famz@redhat.com>) id 1d5T1R-00084w-Ry
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 04:19:05 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  2 May 2017 16:18:17 +0800
-Message-Id: <20170502081832.9546-8-famz@redhat.com>
+Date: Tue,  2 May 2017 16:18:18 +0800
+Message-Id: <20170502081832.9546-9-famz@redhat.com>
 In-Reply-To: <20170502081832.9546-1-famz@redhat.com>
 References: <20170502081832.9546-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v16 07/22] iotests: 030: Prepare for image
+Subject: [Qemu-devel] [PATCH v16 08/22] iotests: 046: Prepare for image
  locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,70 +23,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-qemu-img and qemu-io commands when guest is running need "-U" option,
-add it.
+The qemu-img info command is executed while VM is running, add -U option
+to avoid the image locking error.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/qemu-iotests/030 | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/046 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 0d472d5..e00c11b 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -63,8 +63,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-     def test_stream_intermediate(self):
-         self.assert_no_active_block_jobs()
+diff --git a/tests/qemu-iotests/046 b/tests/qemu-iotests/046
+index e528b67..f2ebecf 100755
+--- a/tests/qemu-iotests/046
++++ b/tests/qemu-iotests/046
+@@ -192,7 +192,7 @@ echo "== Verify image content =="
  
--        self.assertNotEqual(qemu_io('-f', 'raw', '-c', 'map', backing_img),
--                            qemu_io('-f', iotests.imgfmt, '-c', 'map', mid_img),
-+        self.assertNotEqual(qemu_io('-f', 'raw', '-rU', '-c', 'map', backing_img),
-+                            qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', mid_img),
-                             'image file map matches backing file before streaming')
- 
-         result = self.vm.qmp('block-stream', device='mid', job_id='stream-mid')
-@@ -114,7 +114,7 @@ class TestSingleDrive(iotests.QMPTestCase):
-         self.assert_no_active_block_jobs()
- 
-         # The image map is empty before the operation
--        empty_map = qemu_io('-f', iotests.imgfmt, '-c', 'map', test_img)
-+        empty_map = qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', test_img)
- 
-         # This is a no-op: no data should ever be copied from the base image
-         result = self.vm.qmp('block-stream', device='drive0', base=mid_img)
-@@ -197,8 +197,8 @@ class TestParallelOps(iotests.QMPTestCase):
- 
-         # Check that the maps don't match before the streaming operations
-         for i in range(2, self.num_imgs, 2):
--            self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[i]),
--                                qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[i-1]),
-+            self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', self.imgs[i]),
-+                                qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', self.imgs[i-1]),
-                                 'image file map matches backing file before streaming')
- 
-         # Create all streaming jobs
-@@ -351,8 +351,8 @@ class TestParallelOps(iotests.QMPTestCase):
-     def test_stream_base_node_name(self):
-         self.assert_no_active_block_jobs()
- 
--        self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[4]),
--                            qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[3]),
-+        self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', self.imgs[4]),
-+                            qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', self.imgs[3]),
-                             'image file map matches backing file before streaming')
- 
-         # Error: the base node does not exist
-@@ -422,8 +422,8 @@ class TestQuorum(iotests.QMPTestCase):
-         if not iotests.supports_quorum():
-             return
- 
--        self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', self.children[0]),
--                            qemu_io('-f', iotests.imgfmt, '-c', 'map', self.backing[0]),
-+        self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', self.children[0]),
-+                            qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', self.backing[0]),
-                             'image file map matches backing file before streaming')
- 
-         self.assert_no_active_block_jobs()
+ function verify_io()
+ {
+-    if ($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" | grep "compat: 0.10" > /dev/null); then
++    if ($QEMU_IMG info -U -f "$IMGFMT" "$TEST_IMG" | grep "compat: 0.10" > /dev/null); then
+         # For v2 images, discarded clusters are read from the backing file
+         # Keep the variable empty so that the backing file value can be used as
+         # the default below
 -- 
 2.9.3
