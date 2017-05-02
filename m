@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d5Yu2-0007x2-8B
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:35:47 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d5YvS-0000bo-7Q
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:37:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d5Ytx-0003WJ-D1
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:35:46 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35606)
+	(envelope-from <stefanha@gmail.com>) id 1d5YvN-0003ru-Ja
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:37:14 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36679)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d5Ytx-0003Vy-40
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:35:41 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id w64so115064969wma.0
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 07:35:40 -0700 (PDT)
-References: <20170428122444.23361-1-berrange@redhat.com>
-	<a3f22a00-1f2e-6d22-f2a2-edc233cd6c64@twiddle.net>
-	<8737cq4drt.fsf@linaro.org>
-	<20170502140923.GF22502@stefanha-x1.localdomain>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170502140923.GF22502@stefanha-x1.localdomain>
-Date: Tue, 02 May 2017 15:36:15 +0100
-Message-ID: <87efw7nx5s.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d5YvN-0003re-CX
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 10:37:09 -0400
+Received: by mail-wr0-x242.google.com with SMTP id v42so17887206wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 07:37:09 -0700 (PDT)
+Date: Tue, 2 May 2017 15:37:06 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170502143706.GL22502@stefanha-x1.localdomain>
+References: <20170502061649.6668.93083.stgit@PASHA-ISP>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] (RFC) remove the GThread coroutine
- implementation
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="9/GiYV45wF7IL3Iq"
+Content-Disposition: inline
+In-Reply-To: <20170502061649.6668.93083.stgit@PASHA-ISP>
+Subject: Re: [Qemu-devel] [PATCH] maintainers: add maintainer for replay*
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, armbru@redhat.com
 
 
-Stefan Hajnoczi <stefanha@gmail.com> writes:
+--9/GiYV45wF7IL3Iq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Sun, Apr 30, 2017 at 07:20:54AM +0100, Alex Bennée wrote:
->>
->> Richard Henderson <rth@twiddle.net> writes:
->>
->> > On 04/28/2017 02:24 PM, Daniel P. Berrange wrote:
->> >> At the 2016 summit it was suggested that we delete the GThread
->> >> coroutine impl since it is not fully functional, and you can
->> >> debug the ucontext impl with our GDB helper script.
->> >>
->> >> I don't recall the subject being raised again since the summit
->> >> so here's a proposal to delete the GThread impl, as a way to
->> >> trigger input from anyone who thinks we need to keep it......
->> >
->> > The last time this was mentioned, the reason that we were keeping it
->> > was to make clang's thread-sanitizer module happy.  Whether we can
->> > still find relevant bugs with that, I don't know.
->>
->> It's been a while since I last did a ThreadSanitizer run. The correct
->> fix is teaching the sanitizer about set context so we can use our normal
->> build - however this has been at the bottom of a pile for such a long
->> time.
->
-> Any objections to merging this patch?
+On Tue, May 02, 2017 at 09:16:49AM +0300, Pavel Dovgalyuk wrote:
+> Updating MAINTAINERS to set Pavel Dovgalyuk as record/replay maintainer.
+>=20
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> ---
+>  MAINTAINERS |    9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a1d2b3a4d3..8be1c74ac5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1546,6 +1546,15 @@ F: net/colo*
+>  F: net/filter-rewriter.c
+>  F: net/filter-mirror.c
+> =20
+> +Record/replay
+> +M: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> +W: http://wiki.qemu.org/Features/record-replay
+> +S: Supported
+> +F: replay/*
+> +F: block/blkreplay.c
+> +F: net/filter-replay.c
+> +F: include/sysemu/replay.h
 
-I shall not stand in its way ;-)
++ F: docs/replay.txt
++ F: stubs/replay.c
 
-Acked-by: Alex Bennée <alex.bennee@linaro.org>
+Are these missing?
 
---
-Alex Bennée
+--9/GiYV45wF7IL3Iq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZCJmSAAoJEJykq7OBq3PI6SoH/12pnANxINJ0Xs8K/Dg0SYas
+kRI3t5J6A876eP4ssj7pjkVhi5BWb7eHRXzFF+Il0aZTmtsa6kk6LydUmwPqT4FS
+CSa/Qlz4BhZdoGwAA95KZ8I9GV4vDgIKo6jm4IOS4yR+95bYcDyF5ctQAhKehRa9
+B5uO+td2qFcx5Ggi2IYFbxFVaROsdxvItFE5s2nyO18dk896QE2x7cjAZctvwjXd
+e0d/acBsnXpTGcy+YMiFvWR2hwFPSXh10fGbEVPlHWC70JLAcrAPej8xxlizyunD
+9V5Hm08ZQ7Ddl8DYS/e4jdscCnzLOTcxLFua3mWt/hKa23QbdSqI57VB+iOqqUo=
+=u5sA
+-----END PGP SIGNATURE-----
+
+--9/GiYV45wF7IL3Iq--
