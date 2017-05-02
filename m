@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5a3l-00005r-2F
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:49:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1d5a5u-0001c2-6Q
+	for Qemu-devel@nongnu.org; Tue, 02 May 2017 11:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d5a3j-0004u5-VL
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 11:49:53 -0400
-Date: Tue, 2 May 2017 23:49:43 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170502154943.GC28344@lemon.lan>
-References: <20170502081832.9546-1-famz@redhat.com>
-	<20170502081832.9546-22-famz@redhat.com>
-	<20170502145936.GF5805@noname.redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d5a5r-0007jO-2u
+	for Qemu-devel@nongnu.org; Tue, 02 May 2017 11:52:06 -0400
+References: <CAKVPjOY+sK5gnMGVX18VWk5sifnasPGeO61J_7zV12GZ_3nHrw@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c9325e46-a7be-9213-76d0-c1c0a7519722@redhat.com>
+Date: Tue, 2 May 2017 10:52:00 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170502145936.GF5805@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v16 21/22] qemu-iotests: Add test case 153
- for image locking
+In-Reply-To: <CAKVPjOY+sK5gnMGVX18VWk5sifnasPGeO61J_7zV12GZ_3nHrw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Sx5BenxrmJU2dCb1duJQmFS2nSTVnCVuE"
+Subject: Re: [Qemu-devel] [Qemu-block] migration: add incremental
+ drive-mirror and blockdev-mirror with dirtymap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +24,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: =?UTF-8?Q?Daniel_Ku=c4=8dera?= <daniel.kucera@gmail.com>, qemu-block@nongnu.org, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>
 
-On Tue, 05/02 16:59, Kevin Wolf wrote:
-> Am 02.05.2017 um 10:18 hat Fam Zheng geschrieben:
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  tests/qemu-iotests/153     | 247 ++++++++++++++++++++++++++++
-> >  tests/qemu-iotests/153.out | 390 +++++++++++++++++++++++++++++++++++++++++++++
-> >  tests/qemu-iotests/group   |   1 +
-> >  3 files changed, 638 insertions(+)
-> >  create mode 100755 tests/qemu-iotests/153
-> >  create mode 100644 tests/qemu-iotests/153.out
-> > 
-> > diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-> > new file mode 100755
-> > index 0000000..ed90f12
-> > --- /dev/null
-> > +++ b/tests/qemu-iotests/153
-> > @@ -0,0 +1,247 @@
-> > +#!/bin/bash
-> > +#
-> > +# Test image locking
-> > +#
-> > +# Copyright 2016, 2017 Red Hat, Inc.
-> > +#
-> > +# This program is free software; you can redistribute it and/or modify
-> > +# it under the terms of the GNU General Public License as published by
-> > +# the Free Software Foundation; either version 2 of the License, or
-> > +# (at your option) any later version.
-> > +#
-> > +# This program is distributed in the hope that it will be useful,
-> > +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > +# GNU General Public License for more details.
-> > +#
-> > +# You should have received a copy of the GNU General Public License
-> > +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> > +#
-> > +
-> > +# creator
-> > +owner=famz@redhat.com
-> > +
-> > +seq="$(basename $0)"
-> > +echo "QA output created by $seq"
-> > +
-> > +here="$PWD"
-> > +tmp=/tmp/$$
-> > +status=1	# failure is the default!
-> > +
-> > +_cleanup()
-> > +{
-> > +    _cleanup_test_img
-> > +    rm -f "${TEST_IMG}.base"
-> > +    rm -f "${TEST_IMG}.convert"
-> > +    rm -f "${TEST_IMG}.a"
-> > +    rm -f "${TEST_IMG}.b"
-> > +    rm -f "${TEST_IMG}.lnk"
-> > +}
-> > +trap "_cleanup; exit \$status" 0 1 2 3 15
-> > +
-> > +# get standard environment, filters and checks
-> > +. ./common.rc
-> > +. ./common.filter
-> > +. ./common.qemu
-> > +
-> > +_check_ofd()
-> > +{
-> > +    local test_source="${TEST_DIR}/ofd-test.c"
-> > +    local test_binary="${TEST_DIR}/ofd-test"
-> > +    cat > "$test_source" <<EOF
-> > +#define _GNU_SOURCE
-> > +#include <unistd.h>
-> > +#include <fcntl.h>
-> > +#include <stdio.h>
-> > +
-> > +int main(int argc, char *argv[])
-> > +{
-> > +    int fd = open(argv[0], O_RDONLY);
-> > +    struct flock fl = {
-> > +        .l_whence = SEEK_SET,
-> > +        .l_start  = 0,
-> > +        .l_len    = 1,
-> > +        .l_type   = F_RDLCK,
-> > +    };
-> > +    return !(fd >= 0 && fcntl(fd, F_OFD_SETLK, &fl) == 0);
-> > +}
-> > +EOF
-> > +    cc "$test_source" -o "$test_binary" 2>&1 && "$test_binary"
-> > +}
-> 
-> Hm. Not sure I like this. It requires that a compiler is even installed
-> on the test machine, it doesn't respect which compiler was selected in
-> configure, and if the libc version on test machine doesn't match the
-> build machine of the qemu binaries, it might not even give the right
-> result.
-> 
-> Wouldn't it be much easier to just start qemu-io with locking=on and
-> grep for the warning?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Sx5BenxrmJU2dCb1duJQmFS2nSTVnCVuE
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_Ku=c4=8dera?= <daniel.kucera@gmail.com>,
+ qemu-block@nongnu.org, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>
+Message-ID: <c9325e46-a7be-9213-76d0-c1c0a7519722@redhat.com>
+Subject: Re: [Qemu-block] migration: add incremental drive-mirror and
+ blockdev-mirror with dirtymap
+References: <CAKVPjOY+sK5gnMGVX18VWk5sifnasPGeO61J_7zV12GZ_3nHrw@mail.gmail.com>
+In-Reply-To: <CAKVPjOY+sK5gnMGVX18VWk5sifnasPGeO61J_7zV12GZ_3nHrw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Good idea, will do.
+[qemu-devel added in cc]
 
-Fam
+On 05/02/2017 09:26 AM, Daniel Ku=C4=8Dera wrote:
+> added parameter bitmap which will be used instead of newly created dirt=
+ymap
+> in mirror_start_job
+>=20
+> diff --git i/block/mirror.c w/block/mirror.c
+
+All patches MUST be sent to qemu-devel@nongnu.org, in addition to
+whatever other lists (including qemu-block, which you chose) are
+specified by scripts/get_maintainer.pl.
+
+Furthermore, ALL patches must have Signed-off-by: attribution that you
+are legally able to submit the patch and agree to its proper licensing.
+Without that, we can't take it.
+
+Your patch is also missing diffstat information, which 'git
+format-patch' includes by default, and which can quickly let readers
+gauge the scope of your patch by the size of the changes to the files it
+touches.
+
+For more patch submission hints, see:
+http://wiki.qemu.org/Contribute/SubmitAPatch
+
+
+> +++ w/qapi/block-core.json
+> @@ -1502,6 +1502,10 @@
+>  #
+>  # @speed:  the maximum speed, in bytes per second
+>  #
+> +# @bitmap: the name of dirty bitmap if sync is "incremental".
+> +#          Must be present if sync is "incremental", must NOT be prese=
+nt
+> +#          otherwise. (Since 2.4)
+
+Whoa - you've missed 2.4 by 5 releases.  Now that 2.9 is released, new
+additions should be marked since 2.10.
+
+> +#
+>  # @sync: what parts of the disk image should be copied to the destinat=
+ion
+>  #        (all the disk, only the sectors allocated in the topmost imag=
+e, or
+>  #        only new I/O).
+> @@ -1533,7 +1537,7 @@
+>    'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+>              '*format': 'str', '*node-name': 'str', '*replaces': 'str',=
+
+>              'sync': 'MirrorSyncMode', '*mode': 'NewImageMode',
+> -            '*speed': 'int', '*granularity': 'uint32',
+> +            '*speed': 'int', '*bitmap': 'str', '*granularity': 'uint32=
+',
+>              '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',=
+
+>              '*on-target-error': 'BlockdevOnError',
+>              '*unmap': 'bool' } }
+> @@ -1652,6 +1656,10 @@
+>  #
+>  # @speed:  the maximum speed, in bytes per second
+>  #
+> +# @bitmap: the name of dirty bitmap if sync is "incremental".
+> +#          Must be present if sync is "incremental", must NOT be prese=
+nt
+> +#          otherwise. (Since 2.4)
+
+and again
+
+> +#
+>  # @sync: what parts of the disk image should be copied to the destinat=
+ion
+>  #        (all the disk, only the sectors allocated in the topmost imag=
+e, or
+>  #        only new I/O).
+> @@ -1694,7 +1702,7 @@
+>    'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+>              '*replaces': 'str',
+>              'sync': 'MirrorSyncMode',
+> -            '*speed': 'int', '*granularity': 'uint32',
+> +            '*speed': 'int', '*bitmap': 'str', '*granularity': 'uint32=
+',
+>              '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',=
+
+>              '*on-target-error': 'BlockdevOnError',
+>              '*filter-node-name': 'str' } }
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Sx5BenxrmJU2dCb1duJQmFS2nSTVnCVuE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZCKsgAAoJEKeha0olJ0NqnccH/jXLVz9p2Q1iyccTn7epdyGZ
+xcT+Awql3Pn0HxrehhzYQ92F8Li1f07LcJ8boZIPJ870UVEWNYVQbLbJ3O4SZx+C
+8HlXa6aOY3gbZeADfdqCtugqOY9N8cFL0KHa/cDmeKh5uSCY5SW4b6dtty3TA32h
+dTWSaNy8cNT2DlBstykPo6gIj7Jc/XQvDGMU4i8H/+g0pC+CqNeq7TF18VkpBdYZ
+dmIddBgZ0tXK5loHExyGlxuAhr9H/dHoJ+MF+ZdyoMH5X6JTW8cKIIxsyYOvc1qz
+CZ4lteNrCGQfYtpytMqd3Gm5KRJGLtL7pvCW/6oEd6l0ecuKHiMAkutRz7DZ9oU=
+=oiGl
+-----END PGP SIGNATURE-----
+
+--Sx5BenxrmJU2dCb1duJQmFS2nSTVnCVuE--
