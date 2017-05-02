@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d5UTa-0003ZP-TF
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:52:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1d5Uhn-0005mp-1P
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 06:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d5UTX-0007IX-RC
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:52:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46562)
+	(envelope-from <thuth@redhat.com>) id 1d5Uhh-0007jT-Vy
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 06:06:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d5UTX-0007GN-Hm
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 05:52:07 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d5Uhh-0007ik-QZ
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 06:06:45 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  2 May 2017 11:52:01 +0200
-Message-Id: <1493718721-29774-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] Fix the -accel parameter and the documentation
- for 'hax'
+Date: Tue,  2 May 2017 12:06:40 +0200
+Message-Id: <1493719600-30853-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax' in
+ favour of '-accel'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +25,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
 
-Since 'hax' is a possible accelerator nowadays, too, the '-accel'
-option should support it and we should mention it in the documentation,
-too.
+The '-enable-...' option do not make too much sense: They do not
+allow additional parameters, using '-accel xxx' is shorter than
+'-enable-xxx' and we're also inconsistent here, since there is
+no '-enable-xen' option available. So let's try to convince the
+users to use '-accel xxx' instead.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- qemu-options.hx |  8 ++++----
- vl.c            | 24 ++++++++++--------------
- 2 files changed, 14 insertions(+), 18 deletions(-)
+ qemu-options.hx | 5 +++--
+ vl.c            | 4 ++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 787b9c3..c7b1d2d 100644
+index c7b1d2d..eb33286 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -31,7 +31,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "-machine [type=]name[,prop[=value][,...]]\n"
-     "                selects emulated machine ('-machine help' for list)\n"
-     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
--    "                supported accelerators are kvm, xen, tcg (default: tcg)\n"
-+    "                supported accelerators are kvm, xen, hax or tcg (default: tcg)\n"
-     "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
-     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
-     "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
-@@ -52,9 +52,9 @@ available machines. Supported machine properties are:
- @table @option
- @item accel=@var{accels1}[:@var{accels2}[:...]]
- This is used to enable an accelerator. Depending on the target architecture,
--kvm, xen, or tcg can be available. By default, tcg is used. If there is more
--than one accelerator specified, the next one is used if the previous one fails
--to initialize.
-+kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-+more than one accelerator specified, the next one is used if the previous one
-+fails to initialize.
- @item kernel_irqchip=on|off
- Controls in-kernel irqchip support for the chosen accelerator when available.
- @item gfx_passthru=on|off
+@@ -3367,7 +3367,8 @@ STEXI
+ @item -enable-kvm
+ @findex -enable-kvm
+ Enable KVM full virtualization support. This option is only available
+-if KVM support is enabled when compiling.
++if KVM support is enabled when compiling. Note: This option is deprecated,
++please use @code{-accel kvm} instead.
+ ETEXI
+ 
+ DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
+@@ -3378,7 +3379,7 @@ STEXI
+ Enable HAX (Hardware-based Acceleration eXecution) support. This option
+ is only available if HAX support is enabled when compiling. HAX is only
+ applicable to MAC and Windows platform, and thus does not conflict with
+-KVM.
++KVM. Note: This option is deprecated, please use @code{-accel hax} instead.
+ ETEXI
+ 
+ DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
 diff --git a/vl.c b/vl.c
-index f46e070..d5e88fb 100644
+index d5e88fb..d5ec87e 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -3725,26 +3725,22 @@ int main(int argc, char **argv, char **envp)
-                 qdev_prop_register_global(&kvm_pit_lost_tick_policy);
-                 break;
-             }
--            case QEMU_OPTION_accel:
-+            case QEMU_OPTION_accel: {
-+                char *mstr;
-+
-                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
-                                                      optarg, true);
-                 optarg = qemu_opt_get(accel_opts, "accel");
--
--                olist = qemu_find_opts("machine");
--                if (strcmp("kvm", optarg) == 0) {
--                    qemu_opts_parse_noisily(olist, "accel=kvm", false);
--                } else if (strcmp("xen", optarg) == 0) {
--                    qemu_opts_parse_noisily(olist, "accel=xen", false);
--                } else if (strcmp("tcg", optarg) == 0) {
--                    qemu_opts_parse_noisily(olist, "accel=tcg", false);
--                } else {
--                    if (!is_help_option(optarg)) {
--                        error_printf("Unknown accelerator: %s", optarg);
--                    }
--                    error_printf("Supported accelerators: kvm, xen, tcg\n");
-+                if (is_help_option(optarg)) {
-+                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
-                     exit(1);
+@@ -3690,10 +3690,14 @@ int main(int argc, char **argv, char **envp)
                  }
-+                mstr = g_strdup_printf("accel=%s", optarg);
-+                olist = qemu_find_opts("machine");
-+                qemu_opts_parse_noisily(olist, mstr, false);
-+                g_free(mstr);
                  break;
-+            }
-             case QEMU_OPTION_usb:
+             case QEMU_OPTION_enable_kvm:
++                error_report("'-enable-kvm' is depreacted, please use "
++                             "'-accel kvm' instead");
                  olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "usb=on", false);
+                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
+                 break;
+             case QEMU_OPTION_enable_hax:
++                error_report("'-enable-hax' is depreacted, please use "
++                             "'-accel hax' instead");
+                 olist = qemu_find_opts("machine");
+                 qemu_opts_parse_noisily(olist, "accel=hax", false);
+                 break;
 -- 
 1.8.3.1
