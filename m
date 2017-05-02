@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5dkV-0003wO-Aq
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:46:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5e6h-0000FY-FG
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:09:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5dkS-0001Fe-6d
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:46:15 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33723)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5dkS-0001FP-1z
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:46:12 -0400
-Received: by mail-qt0-x243.google.com with SMTP id c45so21830158qtb.0
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:46:11 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <149373610338.5144.9635049015143453288.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4488086d-4ad7-fa66-4de2-7afcec6e0019@amsat.org>
-Date: Tue, 2 May 2017 16:46:07 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1d5e6e-0000Tq-BA
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 16:09:11 -0400
+Date: Tue, 2 May 2017 17:09:03 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170502200903.GE3482@thinpad.lan.raisama.net>
+References: <20170502162955.1610-1-lvivier@redhat.com>
+	<20170502162955.1610-2-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <149373610338.5144.9635049015143453288.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] scripts/qmp/qom-set: fix the value
- argument passed to srv.command()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170502162955.1610-2-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] numa: equally distribute memory on
+ nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 05/02/2017 11:41 AM, Greg Kurz wrote:
-> When invoking the script with -s, we end up passing a bogus value
-> to QEMU:
->
-> $ ./scripts/qmp/qom-set -s /var/tmp/qmp-sock-exp /machine.accel kvm
-> {}
-> $ ./scripts/qmp/qom-get -s /var/tmp/qmp-sock-exp /machine.accel
-> /var/tmp/qmp-sock-exp
->
-> This happens because sys.argv[2] isn't necessarily the command line
-> argument that holds the value. It is sys.argv[4] when -s was also
-> passed.
->
-> Actually, the code already has a variable to handle that. This patch
-> simply uses it.
->
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Tue, May 02, 2017 at 06:29:55PM +0200, Laurent Vivier wrote:
+[...]
+> diff --git a/numa.c b/numa.c
+> index 6fc2393..750fd95 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -294,6 +294,42 @@ static void validate_numa_cpus(void)
+>      g_free(seen_cpus);
+>  }
+>  
+> +void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> +                                 int nb_nodes, ram_addr_t size)
+> +{
+> +    int i;
+> +    uint64_t usedmem = 0;
+> +
+> +    /* Align each node according to the alignment
+> +     * requirements of the machine class
+> +     */
+> +
+> +    for (i = 0; i < nb_nodes - 1; i++) {
+> +        nodes[i].node_mem = (size / nb_nodes) &
+> +                            ~((1 << mc->numa_mem_align_shift) - 1);
+> +        usedmem += nodes[i].node_mem;
+> +    }
+> +    nodes[i].node_mem = size - usedmem;
+> +}
+> +
+> +void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> +                                  int nb_nodes, ram_addr_t size)
+> +{
+> +    int i;
+> +    uint64_t usedmem = 0, node_mem;
+> +    uint64_t granularity = size / nb_nodes;
+> +    uint64_t propagate = 0;
+> +
+> +    for (i = 0; i < nb_nodes - 1; i++) {
+> +        node_mem = (granularity + propagate) &
+> +                   ~((1 << mc->numa_mem_align_shift) - 1);
+> +        propagate = granularity + propagate - node_mem;
+> +        nodes[i].node_mem = node_mem;
+> +        usedmem += node_mem;
+> +    }
+> +    nodes[i].node_mem = ram_size - usedmem;
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+I believe you meant 'size - usedmem' here.
 
-> ---
->  scripts/qmp/qom-set |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
-> index 54ecfecc531e..94e27789224c 100755
-> --- a/scripts/qmp/qom-set
-> +++ b/scripts/qmp/qom-set
-> @@ -61,4 +61,4 @@ else:
->  srv = QEMUMonitorProtocol(socket_path)
->  srv.connect()
->
-> -print srv.command('qom-set', path=path, property=prop, value=sys.argv[2])
-> +print srv.command('qom-set', path=path, property=prop, value=value)
->
->
+I can fix this while applying the patch, if that's OK. The rest
+of the patch looks good to me.
+
+> +}
+> +
+>  void parse_numa_opts(MachineClass *mc)
+>  {
+>      int i;
+> @@ -336,17 +372,8 @@ void parse_numa_opts(MachineClass *mc)
+>              }
+>          }
+>          if (i == nb_numa_nodes) {
+> -            uint64_t usedmem = 0;
+> -
+> -            /* Align each node according to the alignment
+> -             * requirements of the machine class
+> -             */
+> -            for (i = 0; i < nb_numa_nodes - 1; i++) {
+> -                numa_info[i].node_mem = (ram_size / nb_numa_nodes) &
+> -                                        ~((1 << mc->numa_mem_align_shift) - 1);
+> -                usedmem += numa_info[i].node_mem;
+> -            }
+> -            numa_info[i].node_mem = ram_size - usedmem;
+> +            assert(mc->numa_auto_assign_ram);
+> +            mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
+>          }
+>  
+>          numa_total = 0;
+> -- 
+> 2.9.3
+> 
+
+-- 
+Eduardo
