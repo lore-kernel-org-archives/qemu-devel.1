@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d5an0-0003WV-0Q
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:36:39 -0400
+	(envelope-from <famz@redhat.com>) id 1d5an4-0003aZ-Gf
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d5amx-0008Db-Lk
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:36:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d5amx-0008C8-F4
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:36:35 -0400
-Date: Tue, 2 May 2017 17:36:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170502163629.GA5640@work-vm>
-References: <1493732857-10721-1-git-send-email-den@openvz.org>
-	<87bmrbgvzf.fsf@dusky.pond.sub.org>
-	<e90d1680-6212-862e-bd3b-fdc415ec1890@openvz.org>
-	<877f1zcjcf.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <877f1zcjcf.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 1/1] monitor: increase amount of data for
- monitor to read
+	(envelope-from <famz@redhat.com>) id 1d5an3-0008KL-4i
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 12:36:42 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed,  3 May 2017 00:35:40 +0800
+Message-Id: <20170502163558.7611-6-famz@redhat.com>
+In-Reply-To: <20170502163558.7611-1-famz@redhat.com>
+References: <20170502163558.7611-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v17 05/23] qemu-img: Update documentation for -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +19,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, famz@redhat.com, Max Reitz <mreitz@redhat.com>, eblake@redhat.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Denis V. Lunev" <den@openvz.org> writes:
-> 
-> > On 05/02/2017 05:43 PM, Markus Armbruster wrote:
-> >> "Denis V. Lunev" <den@openvz.org> writes:
-> >>
-> >>> Right now QMP and HMP monitors read 1 byte at a time from the socket, which
-> >>> is very inefficient. With 100+ VMs on the host this easily reasults in
-> >>> a lot of unnecessary system calls and CPU usage in the system.
-> >>>
-> >>> This patch changes the amount of data to read to 4096 bytes, which matches
-> >>> buffer size on the channel level. Fortunately, monitor protocol is
-> >>> synchronous right now thus we should not face side effects in reality.
-> >> Can you explain briefly why this relies on "synchronous"?  I've spent
-> >> all of two seconds on the question myself...
-> > Each command is processed in sequence as it appears in the
-> > channel. The answer to the command is sent and only after that
-> > next command is processed.
-> 
-> Yes, that's how QMP works.
-> 
-> > Theoretically tith asynchronous processing we can have some side
-> > effects due to changed buffer size.
-> 
-> What kind of side effects do you have in mind?
-> 
-> It's quite possible that this obviously inefficient way to read had some
-> deep reason back when it was created.  Hmm, git-blame is our friend:
-> 
-> commit c62313bbdc48f72e93fa8196f2fff96ba35e4e9d
-> Author: Jan Kiszka <jan.kiszka@siemens.com>
-> Date:   Fri Dec 4 14:05:29 2009 +0100
-> 
->     monitor: Accept input only byte-wise
->     
->     This allows to suspend command interpretation and execution
->     synchronously, e.g. during migration.
->     
->     Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->     Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ qemu-img-cmds.hx | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
-I don't think I understand why that's a problem; if we read more bytes,
-we're not going to interpret them and execute them until after the previous
-command returns are we?
-
-Dave
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index bf4ce59..e5bc28f 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -10,15 +10,15 @@ STEXI
+ ETEXI
+ 
+ DEF("bench", img_bench,
+-    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] filename")
++    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] [-U] filename")
+ STEXI
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [-U] @var{filename}
+ ETEXI
+ 
+ DEF("check", img_check,
+-    "check [-q] [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] filename")
++    "check [-q] [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] [-U] filename")
+ STEXI
+-@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] @var{filename}
++@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
+ ETEXI
+ 
+ DEF("create", img_create,
+@@ -34,45 +34,45 @@ STEXI
+ ETEXI
+ 
+ DEF("compare", img_compare,
+-    "compare [--object objectdef] [--image-opts] [-f fmt] [-F fmt] [-T src_cache] [-p] [-q] [-s] filename1 filename2")
++    "compare [--object objectdef] [--image-opts] [-f fmt] [-F fmt] [-T src_cache] [-p] [-q] [-s] [-U] filename1 filename2")
+ STEXI
+-@item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] @var{filename1} @var{filename2}
++@item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] [-U] @var{filename1} @var{filename2}
+ ETEXI
+ 
+ DEF("convert", img_convert,
+-    "convert [--object objectdef] [--image-opts] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
++    "convert [--object objectdef] [--image-opts] [-U] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
+ STEXI
+-@item convert [--object @var{objectdef}] [--image-opts] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
++@item convert [--object @var{objectdef}] [--image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
+ ETEXI
+ 
+ DEF("dd", img_dd,
+-    "dd [--image-opts] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
++    "dd [--image-opts] [-U] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
+ STEXI
+-@item dd [--image-opts] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
++@item dd [--image-opts] [-U] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
+ ETEXI
+ 
+ DEF("info", img_info,
+-    "info [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--backing-chain] filename")
++    "info [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--backing-chain] [-U] filename")
+ STEXI
+-@item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] @var{filename}
++@item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] [-U] @var{filename}
+ ETEXI
+ 
+ DEF("map", img_map,
+-    "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] filename")
++    "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-U] filename")
+ STEXI
+-@item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] @var{filename}
++@item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [-U] @var{filename}
+ ETEXI
+ 
+ DEF("snapshot", img_snapshot,
+-    "snapshot [--object objectdef] [--image-opts] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
++    "snapshot [--object objectdef] [--image-opts] [-U] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
+ STEXI
+-@item snapshot [--object @var{objectdef}] [--image-opts] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
++@item snapshot [--object @var{objectdef}] [--image-opts] [-U] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
+ ETEXI
+ 
+ DEF("rebase", img_rebase,
+-    "rebase [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-T src_cache] [-p] [-u] -b backing_file [-F backing_fmt] filename")
++    "rebase [--object objectdef] [--image-opts] [-U] [-q] [-f fmt] [-t cache] [-T src_cache] [-p] [-u] -b backing_file [-F backing_fmt] filename")
+ STEXI
+-@item rebase [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
++@item rebase [--object @var{objectdef}] [--image-opts] [-U] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
+ ETEXI
+ 
+ DEF("resize", img_resize,
+-- 
+2.9.3
