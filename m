@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d5dOM-0001q2-RZ
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:26 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d5dOQ-0001rc-TC
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d5dOL-0001ep-VR
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:22 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36161)
+	(envelope-from <rth7680@gmail.com>) id 1d5dOP-0001iy-Qt
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:26 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34799)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d5dOL-0001eV-SD
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:21 -0400
-Received: by mail-qt0-x244.google.com with SMTP id t52so21724850qtb.3
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:23:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d5dOP-0001iP-Mn
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 15:23:25 -0400
+Received: by mail-qt0-x242.google.com with SMTP id g60so3856234qtd.1
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 12:23:25 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  2 May 2017 12:22:47 -0700
-Message-Id: <20170502192300.2124-13-rth@twiddle.net>
+Date: Tue,  2 May 2017 12:22:50 -0700
+Message-Id: <20170502192300.2124-16-rth@twiddle.net>
 In-Reply-To: <20170502192300.2124-1-rth@twiddle.net>
 References: <20170502192300.2124-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v6 12/25] tcg/ppc: Implement goto_ptr
+Subject: [Qemu-devel] [PATCH v6 15/25] tcg/s390: Implement goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +31,57 @@ Cc: cota@braap.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/ppc/tcg-target.h     | 2 +-
- tcg/ppc/tcg-target.inc.c | 7 +++++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ tcg/s390/tcg-target.h     |  2 +-
+ tcg/s390/tcg-target.inc.c | 24 +++++++++++++++++++++---
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index a9aa974..5f4a40a 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -82,7 +82,7 @@ extern bool have_isa_3_00;
- #define TCG_TARGET_HAS_muls2_i32        0
- #define TCG_TARGET_HAS_muluh_i32        1
- #define TCG_TARGET_HAS_mulsh_i32        1
--#define TCG_TARGET_HAS_goto_ptr         0
-+#define TCG_TARGET_HAS_goto_ptr         1
+diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
+index 6b7bcfb..957f0c0 100644
+--- a/tcg/s390/tcg-target.h
++++ b/tcg/s390/tcg-target.h
+@@ -92,7 +92,7 @@ extern uint64_t s390_facilities;
+ #define TCG_TARGET_HAS_mulsh_i32      0
+ #define TCG_TARGET_HAS_extrl_i64_i32  0
+ #define TCG_TARGET_HAS_extrh_i64_i32  0
+-#define TCG_TARGET_HAS_goto_ptr       0
++#define TCG_TARGET_HAS_goto_ptr       1
  
- #if TCG_TARGET_REG_BITS == 64
- #define TCG_TARGET_HAS_add2_i32         0
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 64f67d2..8d50f18 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -1932,6 +1932,7 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+ #define TCG_TARGET_HAS_div2_i64       1
+ #define TCG_TARGET_HAS_rot_i64        1
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index a679280..5d7083e 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -1741,9 +1741,14 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
  
-     /* Epilogue */
-     tcg_debug_assert(tb_ret_addr == s->code_ptr);
-+    s->code_gen_epilogue = tb_ret_addr;
+     switch (opc) {
+     case INDEX_op_exit_tb:
+-        /* return value */
+-        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R2, args[0]);
+-        tgen_gotoi(s, S390_CC_ALWAYS, tb_ret_addr);
++        /* Reuse the zeroing that exists for goto_ptr.  */
++        a0 = args[0];
++        if (a0 == 0) {
++            tgen_gotoi(s, S390_CC_ALWAYS, s->code_gen_epilogue);
++        } else {
++            tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R2, a0);
++            tgen_gotoi(s, S390_CC_ALWAYS, tb_ret_addr);
++        }
+         break;
  
-     tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_R0, TCG_REG_R1, FRAME_SIZE+LR_OFFSET);
-     for (i = 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); ++i) {
-@@ -1986,6 +1987,11 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
- #endif
+     case INDEX_op_goto_tb:
+@@ -1767,6 +1772,10 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
          s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
          break;
+ 
 +    case INDEX_op_goto_ptr:
-+        tcg_out32(s, MTSPR | RS(args[0]) | CTR);
-+        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R3, 0);
-+        tcg_out32(s, BCCTR | BO_ALWAYS);
++        tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, args[0]);
 +        break;
-     case INDEX_op_br:
-         {
-             TCGLabel *l = arg_label(args[0]);
-@@ -2555,6 +2561,7 @@ static const TCGTargetOpDef ppc_op_defs[] = {
++
+     OP_32_64(ld8u):
+         /* ??? LLC (RXY format) is only present with the extended-immediate
+            facility, whereas LLGC is always present.  */
+@@ -2241,6 +2250,7 @@ static const TCGTargetOpDef s390_op_defs[] = {
      { INDEX_op_exit_tb, { } },
      { INDEX_op_goto_tb, { } },
      { INDEX_op_br, { } },
@@ -80,5 +89,20 @@ index 64f67d2..8d50f18 100644
  
      { INDEX_op_ld8u_i32, { "r", "r" } },
      { INDEX_op_ld8s_i32, { "r", "r" } },
+@@ -2439,6 +2449,14 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     /* br %r3 (go to TB) */
+     tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, tcg_target_call_iarg_regs[1]);
+ 
++    /*
++     * Return path for goto_ptr. Set return value to 0, a-la exit_tb,
++     * and fall through to the rest of the epilogue.
++     */
++    s->code_gen_epilogue = s->code_ptr;
++    tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R2, 0);
++
++    /* TB epilogue */
+     tb_ret_addr = s->code_ptr;
+ 
+     /* lmg %r6,%r15,fs+48(%r15) (restore registers) */
 -- 
 2.9.3
