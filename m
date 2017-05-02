@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5Xxj-0000w6-Ln
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:35:32 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d5XyR-0001Es-6V
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5Xxg-0001ZQ-Hl
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:35:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d5Xxg-0001Yg-8A
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:35:28 -0400
-References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
-	<1493725969-19518-6-git-send-email-amarnath.valluri@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0e67268f-46a0-c0c9-4a3b-0957bc387871@redhat.com>
-Date: Tue, 2 May 2017 08:35:24 -0500
-MIME-Version: 1.0
-In-Reply-To: <1493725969-19518-6-git-send-email-amarnath.valluri@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="s7nsf2enQf7N3gNaogPxnxmaShdb0qbSc"
-Subject: Re: [Qemu-devel] [PATCH v3 5/8] tmp backend: Add new api to read
- backend TpmInfo
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d5XyO-0001lN-2F
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:36:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53686
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d5XyN-0001kv-Sg
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:36:12 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v42DYHe2009694
+	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 09:36:10 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a6rrc7beu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 09:36:10 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 2 May 2017 14:36:09 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Tue,  2 May 2017 15:35:52 +0200
+Message-Id: <20170502133604.17735-1-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 00/12] next batch of s390x patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,165 +36,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: patrick.ohly@intel.com, marcandre.lureau@gmail.com, stefanb@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>
+To: peter.maydell@linaro.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---s7nsf2enQf7N3gNaogPxnxmaShdb0qbSc
-From: Eric Blake <eblake@redhat.com>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
-Cc: patrick.ohly@intel.com, marcandre.lureau@gmail.com,
- stefanb@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>
-Message-ID: <0e67268f-46a0-c0c9-4a3b-0957bc387871@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/8] tmp backend: Add new api to read
- backend TpmInfo
-References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
- <1493725969-19518-6-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1493725969-19518-6-git-send-email-amarnath.valluri@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 38bb54f323bf7c83496b6a044cfd28896e997a00:
 
-On 05/02/2017 06:52 AM, Amarnath Valluri wrote:
-> TPM configuration options are backend implementation details and shall =
-not be
-> part of base TPMBackend object, and these shall not be accessed directl=
-y outside
-> of the class, hence added a new interface method, get_tpm_options() to
-> TPMDriverOps., which shall be implemented by the derived classes to ret=
-urn
-> configured tpm options.
->=20
-> A new tpm backend api - tpm_backend_query_tpm() which uses _get_tpm_opt=
-ions() to
-> prepare TpmInfo.
->=20
-> Made TPMPassthroughOptions type inherited from newly defined TPMOptions=
- base type.
-> The TPMOptions base type is intentionally left empty and supposed to be=
+  replication: Make --disable-replication compile again (2017-04-28 16:50:16 +0100)
 
-> inherited by all backend implementations to define their tpm configurat=
-ion
-> options.
->=20
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> ---
+are available in the git repository at:
 
-> +++ b/qapi-schema.json
-> @@ -5137,6 +5137,16 @@
->  { 'command': 'query-tpm-types', 'returns': ['TpmType'] }
-> =20
->  ##
-> +# @TPMOptions:
-> +#
-> +# Base type for TPM options
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'TPMOptions',
-> +  'data': { } }
-> +
-> +##
->  # @TPMPassthroughOptions:
->  #
->  # Information about the TPM passthrough type
-> @@ -5148,20 +5158,9 @@
->  #
->  # Since: 1.5
->  ##
-> -{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
-> -                                             '*cancel-path' : 'str'} }=
+  git://github.com/cohuck/qemu tags/s390x-20170502
 
-> +{ 'struct': 'TPMPassthroughOptions', 'base': 'TPMOptions',
-> +  'data': { '*path' : 'str', '*cancel-path' : 'str'} }
-> =20
-> -##
-> -# @TpmTypeOptions:
-> -#
-> -# A union referencing different TPM backend types' configuration optio=
-ns
-> -#
-> -# @type: 'passthrough' The configuration options for the TPM passthrou=
-gh type
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'union': 'TpmTypeOptions',
-> -   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
+for you to fetch changes up to 99efaa2696caaf6182958e27d553449674894b27:
 
-Getting rid of a simple union is nice.  However,
+  hw/s390x/ipl: Fix crash with virtio-scsi-pci device (2017-05-02 15:08:54 +0200)
 
-> =20
->  ##
->  # @TPMInfo:
-> @@ -5170,6 +5169,8 @@
->  #
->  # @id: The Id of the TPM
->  #
-> +# @type: The TPM backend type
-> +#
->  # @model: The TPM frontend model
->  #
->  # @options: The TPM (backend) type configuration options
-> @@ -5178,8 +5179,9 @@
->  ##
->  { 'struct': 'TPMInfo',
->    'data': {'id': 'str',
-> +           'type': 'TpmType',
->             'model': 'TpmModel',
-> -           'options': 'TpmTypeOptions' } }
-> +           'options': 'TPMOptions' } }
-> =20
->  ##
->  # @query-tpm:
-> @@ -5196,13 +5198,12 @@
->  # <- { "return":
->  #      [
->  #        { "model": "tpm-tis",
-> +#          "type": "passthrough",
->  #          "options":
-> -#            { "type": "passthrough",
-> -#              "data":
-> -#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel"=
-,
-> -#                  "path": "/dev/tpm0"
-> -#                }
-> -#            },
-> +#          {
-> +#            "cancel-path": "/sys/class/misc/tpm0/device/cancel",
-> +#            "path": "/dev/tpm0"
-> +#          },
->  #          "id": "tpm0"
+----------------------------------------------------------------
+More s390x patches, this time boot related:
+- LOADPARM machine property, exposed to the guest via SCLP and
+  diagnose 308
+- Use LOADPARM in the s390-ccw bios to select a boot entry
+- Fix a crash in the ipl device code when a virtio-scsi-pci device
+  has been specified
 
-Doing it in a manner that is NOT backwards-compatible (as evidenced by
-your change to the output text) is NOT good.  It will break any existing
-client that was expecting to parse information in the old layout.
+----------------------------------------------------------------
 
-I'm afraid you're going to have to fix this to not break QMP wire
-compatibility.
+Cornelia Huck (1):
+  pc-bios/s390-ccw.img: update image
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eugene (jno) Dvurechenski (2):
+  pc-bios/s390-ccw: Make ebcdic/ascii conversion public
+  pc-bios/s390-ccw: add boot entry selection to El Torito routine
 
+Farhan Ali (8):
+  hw/s390x: provide loadparm property for the machine
+  hw/s390x/ipl: enable LOADPARM in IPIB for a boot device
+  hw/s390x/sclp: update LOADPARM in SCP Info
+  util/qemu-config: Add loadparm to qemu machine_opts
+  pc-bios/s390-ccw: get LOADPARM stored in SCP Read Info
+  pc-bios/s390-ccw: provide a function to interpret LOADPARM value
+  pc-bios/s390-ccw: provide entry selection on LOADPARM for SCSI disk
+  pc-bios/s390-ccw: add boot entry selection for ECKD DASD
 
---s7nsf2enQf7N3gNaogPxnxmaShdb0qbSc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Thomas Huth (1):
+  hw/s390x/ipl: Fix crash with virtio-scsi-pci device
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+ hw/s390x/ipl.c                            |  39 +++++++++++++++++++++++++++---
+ hw/s390x/ipl.h                            |   3 +++
+ hw/s390x/s390-virtio-ccw.c                |  37 ++++++++++++++++++++++++++++
+ hw/s390x/sclp.c                           |   9 +++++++
+ include/hw/s390x/s390-virtio-ccw.h        |   1 +
+ pc-bios/s390-ccw.img                      | Bin 26456 -> 26472 bytes
+ pc-bios/s390-ccw/Makefile                 |   2 +-
+ pc-bios/s390-ccw/bootmap.c                |  34 +++++++++++++++++---------
+ pc-bios/s390-ccw/bootmap.h                |  24 +-----------------
+ pc-bios/s390-ccw/main.c                   |  38 ++++++++++++++++++++++++++++-
+ pc-bios/s390-ccw/s390-ccw.h               |  17 ++++++++++++-
+ pc-bios/s390-ccw/{sclp-ascii.c => sclp.c} |  12 +++++++++
+ pc-bios/s390-ccw/sclp.h                   |   2 ++
+ util/qemu-config.c                        |   6 +++++
+ 14 files changed, 184 insertions(+), 40 deletions(-)
+ rename pc-bios/s390-ccw/{sclp-ascii.c => sclp.c} (87%)
 
-iQEcBAEBCAAGBQJZCIscAAoJEKeha0olJ0NqsF8H/ihbmCPtCK83gYJ0Z4COK8LO
-vSAi7iAVh4R7y2TKtvrJDle4kKB6hHjzlqTqw2Bbz2ywwl9boARdSaC6E5nj27Kl
-YDfQnBUWo4rxU4j+/MjTMlwbKx71TEku1PUihR5LBghV6MqxMiG/z0+GhX02U308
-a5uzoNN9mqN1r0xolDfchbDtpYGpJbFObQAbUlttrIfpn7nZ9hvitZ8PBlCjguZg
-L0wjddYsrTRJ4KLsdDmAn+6UGZobPmCOjk3qK3eLMPJRmGToJdlJoyJTDCrhc2Oj
-rqpToRuw4WWYNXzch7MU82mQ4vBBfPffonRzwp2fUY/eZQrFM4WM+JauDk0isMY=
-=7zFw
------END PGP SIGNATURE-----
-
---s7nsf2enQf7N3gNaogPxnxmaShdb0qbSc--
+-- 
+2.11.0
