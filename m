@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5XlA-0006lq-71
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:22:33 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d5Xnb-0007IM-8K
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:25:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5Xl6-00011e-Ux
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:22:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5Xl6-00011U-LR
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:22:28 -0400
-References: <1493719600-30853-1-git-send-email-thuth@redhat.com>
-	<52fc3efd-55a7-af2d-ce8c-9b4565dfe6dc@de.ibm.com>
-	<f2c35612-d2f5-0570-7cfa-66538882894e@redhat.com>
-	<df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ac13fd46-bd6e-6a8a-2c72-cc8d683d5026@redhat.com>
-Date: Tue, 2 May 2017 15:22:22 +0200
+	(envelope-from <stefanha@gmail.com>) id 1d5XnX-0003rz-UF
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:25:03 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36385)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d5XnX-0003pT-KC
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 09:24:59 -0400
+Received: by mail-wr0-x243.google.com with SMTP id v42so17426349wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 06:24:59 -0700 (PDT)
+Date: Tue, 2 May 2017 14:24:56 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170502132456.GD22502@stefanha-x1.localdomain>
+References: <20170420121639.32685-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <df5e01ee-a97f-7e28-9f95-840654bf48a5@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Deprecate '-enable-kvm' and '-enable-hax'
- in favour of '-accel'
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IMjqdzrDRly81ofr"
+Content-Disposition: inline
+In-Reply-To: <20170420121639.32685-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] dist: create separate dist with
+ bundled roms/libs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +30,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Vincent Palatin <vpalatin@chromium.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
+--IMjqdzrDRly81ofr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 02/05/2017 12:48, Christian Borntraeger wrote:
->> I'm aware of the fact that likely a lot of users are still using
->> -enable-kvm, and I did not mean that we should remove it soon yet. But
->> IMHO we should start now to inform the users that they should slowly
->> switch to the better option "-accel" instead, so that we could maybe
->> remove this "-enable-xxx" stuff sometime in the distant future (let's
->> say QEMU v4.0?).
->
-> I come from the Linux side, where "breaking a working setup" will result in
-> an angry Linus. We certainly have not such strict rules here and we could 
-> base the decision on the question "how expensive is the maintenance
-> of this option?". I think marking it as "legacy option" is fine, but I doubt
-> that removing it will make qemu maintenance cheaper. So my preferred variant
-> is
+On Thu, Apr 20, 2017 at 01:16:39PM +0100, Daniel P. Berrange wrote:
+> The qemu-XXXX.tar.bz2 currently contains bundled copies of the pixman
+> and dtc codebases, as well as pre-built ROM binaries and their sources.
+>=20
+> Many OS distros want to build & ship ROMs separately to ensure license
+> compliance. Similarly they'll build pixman/dtc code independantly to
+> allow sharing with the rest of the distro. Thus they'll never use these
+> bundled files. A further complication is that these bundled files create
+> extra auditing work for distros when applying for export compliance,
+> particularly when the bundled files contain crypto code. This burden
+> applies merely by having the files in the tar.bz2, even if they're not
+> built into the binaries. If we ever want to include UEFI ROMs for x86
+> or AArch64, then the size of the QEMU dist will increase significantly
+> more.
+>=20
+> The bundled ROMs though are fairly useful to end-users who are building
+> QEMU themselves and don't want to worry about figuring out the right
+> BIOS bits to build manually, so they shouldn't be dropped entirely.
+>=20
+> This change thus alters 'make dist' to generate two release archives
+>=20
+>  - qemu-XXX.tar.bz2 - minimal archive with only QEMU source code
+>  - qemu-bundled-XXX.tar.bz2 - QEMU source, plus bundled ROMs & libs
+>=20
+> NB1, as it stands this change breaks "make install" since that assumes
+> existance of the pre-built ROMs in tree.
 
-Even for Linux the rules aren't 100% black or white.  There have been
-cases where small breakage are introduced, for example 4.12 will break
-the BLKDISCARDZEROES ioctl.
+It would be good to fix this so that a minimal dist can build and
+install successfully.
 
-We shouldn't treat things are black or white here too.
+> NB2, an alternative approach would be:
+>=20
+>  - qemu-XXX.tar.bz2 - minimal archive with only QEMU source code
+>  - qemu-roms-XXX.tar.bz2 - only bundled ROMs
+>=20
+> and thus never ship a tar.bz2 that contains everything together,
+> and stop shipping pixman/dtc entirely.
 
-"-usbdevice" makes sense to deprecate because it brings together a
-complicated parsing mechanism, though perhaps we could keep it for
-simple devices such as keyboard, mouse, tablet where it's pretty surely
-in use in the wild.
+I'm not familiar with the reasons for the existing dist approach.
+Hopefully someone who is will speak up.
 
-"-drive cyls=..." also makes sense to deprecate because it is a very
-obscure functionality.
+The safest solution is to generate a new tarball
+qemu-minimal-XXX.tar.bz2.  That way existing build processes continue to
+work as expected.  Anyone who wants the minimal tarball can grab that
+instead of the existing dist tarball.
 
-"-drive serial=..." would be nice to deprecate, but I think it's already
-less clear that it's not in use in the wild.  Probably it's still on the
-side of wanting to eventually remove it.
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  Makefile             |  5 ++++-
+>  scripts/make-release | 36 ++++++++++++++++++++++++++++++++----
+>  2 files changed, 36 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index 6c359b2..78f7c0c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -503,7 +503,10 @@ clean:
+> =20
+>  VERSION ?=3D $(shell cat VERSION)
+> =20
+> -dist: qemu-$(VERSION).tar.bz2
+> +dist: qemu-$(VERSION).tar.bz2 qemu-bundled-$(VERSION).tar.bz2
+> +
+> +qemu-bundled-%.tar.bz2:
+> +	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-bundled=
+-%.tar.bz2,%,$@)" --bundled
+> =20
+>  qemu-%.tar.bz2:
+>  	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.b=
+z2,%,$@)"
+> diff --git a/scripts/make-release b/scripts/make-release
+> index fa6323f..8e4a653 100755
+> --- a/scripts/make-release
+> +++ b/scripts/make-release
+> @@ -12,14 +12,42 @@
+> =20
+>  src=3D"$1"
+>  version=3D"$2"
+> +shift
+> +shift
+> +bundled=3Dno
+> +
+> +for opt do
+> +  case "$opt" in
+> +      --bundled)
+> +	  bundled=3Dyes
+> +	  ;;
+> +      *)
+> +	  echo "Unknown arg '$opt'"
+> +	  exit 1
+> +  esac
+> +done
+> +
+>  destination=3Dqemu-${version}
+> +if test "$bundled" =3D "yes"
+> +then
+> +    archive=3Dqemu-bundled-${version}.tar.bz2
+> +else
+> +    archive=3Dqemu-${version}.tar.bz2
+> +fi
+> =20
+>  git clone "${src}" ${destination}
+>  pushd ${destination}
+>  git checkout "v${version}"
+> -git submodule update --init
+> -(cd roms/seabios && git describe --tags --long --dirty > .version)
+> -rm -rf .git roms/*/.git dtc/.git pixman/.git
+> +if test "$bundled" =3D "yes"
+> +then
+> +    git submodule update --init
+> +    (cd roms/seabios && git describe --tags --long --dirty > .version)
+> +    rm -rf .git roms/*/.git dtc/.git pixman/.git
+> +else
+> +    rm -rf .git roms dtc pixman
+> +    rm -f pc-bios/*.{rom,bin} pc-bios/{openbios*,u-boot.s500}
+> +fi
+> +
+>  popd
+> -tar cfj ${destination}.tar.bz2 ${destination}
+> +tar cfj ${archive} ${destination}
+>  rm -rf ${destination}
+> --=20
+> 2.9.3
+>=20
+>=20
 
-"-net" is more complicated still.  It's almost surely in use in the
-wild, but then probably the users are fairly advanced and (with the
-provision that documentation should be updated) I guess we could
-eventually get there.
+--IMjqdzrDRly81ofr
+Content-Type: application/pgp-signature; name="signature.asc"
 
-But I really, really see no point in removing --enable-kvm.  It costs
-perhaps 10 lines of code that has pretty much no ramifications elsewhere
-in the code.  If anything I'd expect "-machine accel" to disappear
-before, if ever (in favor of multiple "-accel" options, e.g. "-machine
-accel=kvm:tcg" can become "-accel kvm -accel tcg".
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
+iQEcBAEBAgAGBQJZCIioAAoJEJykq7OBq3PISDgIAIVNZNdtfpvq1eWKE9Rw9u7K
+aUuKbUTuVmUy0xVpLWQ0LhgMA9jCccOpDFSd6STVBdEYHEIK0aSS6mTtjQSqUrNj
+o7waSOE9df8/3KqnJw5sBCkU/b30BalR+j0eB3ojNblLy8WQIRMBMcEaa0vq0e9a
+jOpFz6VIuk8RjeYbTEoWct15Zhw1sqPePIuoOA9T09loXoU/GhSDCEqcv2L/nMOJ
+UVMa+Ly3jbDK+VYmBdvB+3B6EQsJxbXKCDEUICoWomNCtZM8PDjONQxFte9iAVIs
+m6KOj7PquK0498zDp73qwN69DdvpCu/O/17Na7A0T63qoQWkEPO3fLKz+AYM4LM=
+=JEq2
+-----END PGP SIGNATURE-----
 
-Paolo
+--IMjqdzrDRly81ofr--
