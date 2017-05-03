@@ -1,36 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
-	id 1d5xZ2-00007c-DH
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:55:45 -0400
+	(envelope-from <groug@kaod.org>) id 1d5xna-0003bG-Rx
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:10:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
-	id 1d5xYx-0008WO-HD
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:55:44 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:63790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
-	id 1d5xYw-0008W8-UZ
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:55:39 -0400
-Date: Wed, 3 May 2017 17:55:36 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170503165536.GC1553@perard.uk.xensource.com>
-References: <alpine.DEB.2.10.1704141429110.23677@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1704141734161.23677@sstabellini-ThinkPad-X260>
-	<03cfd81856554ecd91c0c317353e819b@AMSPEX02CL03.citrite.net>
-	<alpine.DEB.2.10.1704181038360.31486@sstabellini-ThinkPad-X260>
-	<51ac3ff38f464abfb98928e6fb959bf7@AMSPEX02CL03.citrite.net>
-	<alpine.DEB.2.10.1704191552450.31486@sstabellini-ThinkPad-X260>
-	<6738c7d96a1c476187f69616f25b28d1@AMSPEX02CL03.citrite.net>
-	<alpine.DEB.2.10.1704201035390.18403@sstabellini-ThinkPad-X260>
-	<20170503164838.GB1553@perard.uk.xensource.com>
-	<20170503165207.k4z3xwusbi4vmmf5@citrix.com>
+	(envelope-from <groug@kaod.org>) id 1d5xnW-0006nO-Oz
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:10:46 -0400
+Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:54215)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d5xnW-0006dy-EF
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:10:42 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id A21BBE4B93
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 19:10:31 +0200 (CEST)
+Date: Wed, 3 May 2017 19:10:23 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170503191023.38adef0d@bahia>
+In-Reply-To: <110bb988-4e22-1b2a-15dd-56e198d41923@huawei.com>
+References: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1493735386-39622-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170503082232.1cd2ac92@bahia>
+	<110bb988-4e22-1b2a-15dd-56e198d41923@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170503165207.k4z3xwusbi4vmmf5@citrix.com>
-Subject: Re: [Qemu-devel] QEMU build breakage on ARM against Xen 4.9 caused
- by libxendevicemodel
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/odmOgdrs2xlUhbG3eF.+no2";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] Throttle: Create IOThrottle
+ structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,78 +34,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Liu <wei.liu2@citrix.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <Paul.Durrant@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On Wed, May 03, 2017 at 05:52:07PM +0100, Wei Liu wrote:
-> On Wed, May 03, 2017 at 05:48:38PM +0100, Anthony PERARD wrote:
-> > On Thu, Apr 20, 2017 at 11:05:33AM -0700, Stefano Stabellini wrote:
-> > > On Thu, 20 Apr 2017, Paul Durrant wrote:
-> > > > I think xencall should be part of the base xen_stable_libs anyway.
-> > > 
-> > > Yes, you are right. However I noticed that -lxencall needs to come after
-> > > -lxendevicemodel. So, I'll have to move -lxendevicemodel before
-> > > $xen_stable_libs, see below. I'll merge this patch into "configure:
-> > > detect presence of libxendevicemodel", if that's OK.
-> > > 
-> > > diff --git a/configure b/configure
-> > > index 99d6cbc..3133ef8 100755
-> > > --- a/configure
-> > > +++ b/configure
-> > > @@ -1992,7 +1992,7 @@ if test "$xen" != "no" ; then
-> > >    else
-> > >  
-> > >      xen_libs="-lxenstore -lxenctrl -lxenguest"
-> > > -    xen_stable_libs="-lxenforeignmemory -lxengnttab -lxenevtchn"
-> > > +    xen_stable_libs="-lxencall -lxenforeignmemory -lxengnttab -lxenevtchn"
-> > >  
-> > >      # First we test whether Xen headers and libraries are available.
-> > >      # If no, we are done and there is no Xen support.
-> > > @@ -2027,9 +2027,9 @@ int main(void) {
-> > >    return 0;
-> > >  }
-> > >  EOF
-> > > -        compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
-> > > +        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
-> > >        then
-> > > -      xen_stable_libs="$xen_stable_libs -lxendevicemodel"
-> > > +      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
-> > >        xen_ctrl_version=40900
-> > >        xen=yes
-> > >      elif
-> > 
-> > Hey, now that this patch is merged, xen.git fail to build QEMU. (osstest
-> > qemu-mainline branch fail.)
-> > 
-> > That's because -lxencall is not found because -L$path_to_libxencall is
-> > missing in xen.git.
-> > 
-> > But I've notice something else, libxendevicemodel.so is not linked
-> > against libxencall, that might be the root of the issues on arm.
-> > (libxenctrl.so is linked against libxencall.)
-> > 
-> > Thought?
-> > 
-> > 
-> > We probably need this patch in xen:
-> > 
-> > diff --git a/tools/libs/devicemodel/Makefile b/tools/libs/devicemodel/Makefile
-> > index 55626a5049..81fa5a4ac4 100644
-> > --- a/tools/libs/devicemodel/Makefile
-> > +++ b/tools/libs/devicemodel/Makefile
-> > @@ -63,7 +63,7 @@ libxendevicemodel.so.$(MAJOR): libxendevicemodel.so.$(MAJOR).$(MINOR)
-> >         $(SYMLINK_SHLIB) $< $@
-> >  
-> >  libxendevicemodel.so.$(MAJOR).$(MINOR): $(PIC_OBJS) libxendevicemodel.map
-> > -       $(CC) $(LDFLAGS) $(PTHREAD_LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxendevicemodel.so.$(MAJOR) $(SHLIB_LDFLAGS) -o $@ $(PIC_OBJS) $(LDLIBS_libxentoollog) $(APPEND_LDFLAGS)
-> > +       $(CC) $(LDFLAGS) $(PTHREAD_LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxendevicemodel.so.$(MAJOR) $(SHLIB_LDFLAGS) -o $@ $(PIC_OBJS) $(LDLIBS_libxentoollog) $(LDLIBS_libxencall) $(APPEND_LDFLAGS)
-> >  
-> 
-> Isn't the dependency already encoded in tools/Rules.mk?
+--Sig_/odmOgdrs2xlUhbG3eF.+no2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-How? Which makefile variable would include -lxencall in the abrove line?
+On Wed, 3 May 2017 16:19:20 +0200
+Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> wrote:
 
-Also ldd libxendevicemodel.so does not list libxencall.so.
+> On 5/3/2017 8:22 AM, Greg Kurz wrote:
+> > s/Throttle/throttle
+> >
+> > On Tue,  2 May 2017 10:29:43 -0400
+> > Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
+> > =20
+> >> This patchset introduces a new io throttle structure. This will be =20
+> >
+> > s/patchset/patch =20
+> OK
+> > =20
+> >> used in both block and fsdev devices.
+> >>
+> >> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> >> --- =20
+> >
+> > Reviewed-by: Greg Kurz <groug@kaod.org> =20
+> OK
+> > =20
+> >>  qapi/block-core.json | 76 ++-----------------------------------------=
+---
+> >>  qapi/iothrottle.json | 86 +++++++++++++++++++++++++++++++++++++++++++=
++++++++++
+> >>  2 files changed, 89 insertions(+), 73 deletions(-)
+> >>  create mode 100644 qapi/iothrottle.json
+> >>
+> >> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> >> index 87fb747..93d346b 100644
+> >> --- a/qapi/block-core.json
+> >> +++ b/qapi/block-core.json
+> >> @@ -6,6 +6,7 @@
+> >>
+> >>  # QAPI common definitions
+> >>  { 'include': 'common.json' }
+> >> +{ 'include': 'iothrottle.json' }
+> >>
+> >>  ##
+> >>  # @SnapshotInfo:
+> >> @@ -1760,84 +1761,13 @@
+> >>  #
+> >>  # @device: Block device name (deprecated, use @id instead)
+> >>  #
+> >> -# @id: The name or QOM path of the guest device (since: 2.8)
+> >> -#
+> >> -# @bps: total throughput limit in bytes per second
+> >> -#
+> >> -# @bps_rd: read throughput limit in bytes per second
+> >> -#
+> >> -# @bps_wr: write throughput limit in bytes per second
+> >> -#
+> >> -# @iops: total I/O operations per second
+> >> -#
+> >> -# @iops_rd: read I/O operations per second
+> >> -#
+> >> -# @iops_wr: write I/O operations per second
+> >> -#
+> >> -# @bps_max: total throughput limit during bursts,
+> >> -#                     in bytes (Since 1.7)
+> >> -#
+> >> -# @bps_rd_max: read throughput limit during bursts,
+> >> -#                        in bytes (Since 1.7)
+> >> -#
+> >> -# @bps_wr_max: write throughput limit during bursts,
+> >> -#                        in bytes (Since 1.7)
+> >> -#
+> >> -# @iops_max: total I/O operations per second during bursts,
+> >> -#                      in bytes (Since 1.7)
+> >> -#
+> >> -# @iops_rd_max: read I/O operations per second during bursts,
+> >> -#                         in bytes (Since 1.7)
+> >> -#
+> >> -# @iops_wr_max: write I/O operations per second during bursts,
+> >> -#                         in bytes (Since 1.7)
+> >> -#
+> >> -# @bps_max_length: maximum length of the @bps_max burst
+> >> -#                            period, in seconds. It must only
+> >> -#                            be set if @bps_max is set as well.
+> >> -#                            Defaults to 1. (Since 2.6)
+> >> -#
+> >> -# @bps_rd_max_length: maximum length of the @bps_rd_max
+> >> -#                               burst period, in seconds. It must only
+> >> -#                               be set if @bps_rd_max is set as well.
+> >> -#                               Defaults to 1. (Since 2.6)
+> >> -#
+> >> -# @bps_wr_max_length: maximum length of the @bps_wr_max
+> >> -#                               burst period, in seconds. It must only
+> >> -#                               be set if @bps_wr_max is set as well.
+> >> -#                               Defaults to 1. (Since 2.6)
+> >> -#
+> >> -# @iops_max_length: maximum length of the @iops burst
+> >> -#                             period, in seconds. It must only
+> >> -#                             be set if @iops_max is set as well.
+> >> -#                             Defaults to 1. (Since 2.6)
+> >> -#
+> >> -# @iops_rd_max_length: maximum length of the @iops_rd_max
+> >> -#                                burst period, in seconds. It must on=
+ly
+> >> -#                                be set if @iops_rd_max is set as wel=
+l.
+> >> -#                                Defaults to 1. (Since 2.6)
+> >> -#
+> >> -# @iops_wr_max_length: maximum length of the @iops_wr_max
+> >> -#                                burst period, in seconds. It must on=
+ly
+> >> -#                                be set if @iops_wr_max is set as wel=
+l.
+> >> -#                                Defaults to 1. (Since 2.6)
+> >> -#
+> >> -# @iops_size: an I/O size in bytes (Since 1.7)
+> >> -#
+> >>  # @group: throttle group name (Since 2.4)
+> >>  #
+> >>  # Since: 1.1
+> >>  ##
+> >>  { 'struct': 'BlockIOThrottle',
+> >> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': '=
+int',
+> >> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_w=
+r': 'int',
+> >> -            '*bps_max': 'int', '*bps_rd_max': 'int',
+> >> -            '*bps_wr_max': 'int', '*iops_max': 'int',
+> >> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+> >> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+> >> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+> >> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int=
+',
+> >> -            '*iops_size': 'int', '*group': 'str' } }
+> >> +  'base': 'IOThrottle',
+> >> +  'data': { '*device': 'str', '*group': 'str' } }
+> >>
+> >>  ##
+> >>  # @block-stream:
+> >> diff --git a/qapi/iothrottle.json b/qapi/iothrottle.json
+> >> new file mode 100644
+> >> index 0000000..124ab40
+> >> --- /dev/null
+> >> +++ b/qapi/iothrottle.json
+> >> @@ -0,0 +1,86 @@
+> >> +# -*- Mode: Python -*-
+> >> +
+> >> +##
+> >> +# =3D=3D QAPI IOThrottle definitions
+> >> +##
+> >> +# @IOThrottle:
+> >> +#
+> >> +# A set of parameters describing iothrottle =20
+> >
+> > s/iothrottle/IO throttling/ =20
+> I completely taken off that sentence.
 
--- 
-Anthony PERARD
+Hmm... I guess we still want a short description, like any other structure.
+
+> > =20
+> >> +#
+> >> +# @id: The name or QOM path of the guest device (since: 2.8)
+> >> +#
+> >> +# @bps: total throughput limit in bytes per second
+> >> +#
+> >> +# @bps_rd: read throughput limit in bytes per second
+> >> +#
+> >> +# @bps_wr: write throughput limit in bytes per second
+> >> +#
+> >> +# @iops: total I/O operations per second
+> >> +#
+> >> +# @iops_rd: read I/O operations per second
+> >> +#
+> >> +# @iops_wr: write I/O operations per second
+> >> +#
+> >> +# @bps_max: total throughput limit during bursts,
+> >> +#                     in bytes (Since 1.7)
+> >> +#
+> >> +# @bps_rd_max: read throughput limit during bursts,
+> >> +#                        in bytes (Since 1.7)
+> >> +#
+> >> +# @bps_wr_max: write throughput limit during bursts,
+> >> +#                        in bytes (Since 1.7)
+> >> +#
+> >> +# @iops_max: total I/O operations per second during bursts,
+> >> +#                      in bytes (Since 1.7)
+> >> +#
+> >> +# @iops_rd_max: read I/O operations per second during bursts,
+> >> +#                         in bytes (Since 1.7)
+> >> +#
+> >> +# @iops_wr_max: write I/O operations per second during bursts,
+> >> +#                         in bytes (Since 1.7)
+> >> +#
+> >> +# @bps_max_length: maximum length of the @bps_max burst
+> >> +#                            period, in seconds. It must only
+> >> +#                            be set if @bps_max is set as well.
+> >> +#                            Defaults to 1. (Since 2.6)
+> >> +#
+> >> +# @bps_rd_max_length: maximum length of the @bps_rd_max
+> >> +#                               burst period, in seconds. It must only
+> >> +#                               be set if @bps_rd_max is set as well.
+> >> +#                               Defaults to 1. (Since 2.6)
+> >> +#
+> >> +# @bps_wr_max_length: maximum length of the @bps_wr_max
+> >> +#                               burst period, in seconds. It must only
+> >> +#                               be set if @bps_wr_max is set as well.
+> >> +#                               Defaults to 1. (Since 2.6)
+> >> +#
+> >> +# @iops_max_length: maximum length of the @iops burst
+> >> +#                             period, in seconds. It must only
+> >> +#                             be set if @iops_max is set as well.
+> >> +#                             Defaults to 1. (Since 2.6)
+> >> +#
+> >> +# @iops_rd_max_length: maximum length of the @iops_rd_max
+> >> +#                                burst period, in seconds. It must on=
+ly
+> >> +#                                be set if @iops_rd_max is set as wel=
+l.
+> >> +#                                Defaults to 1. (Since 2.6)
+> >> +#
+> >> +# @iops_wr_max_length: maximum length of the @iops_wr_max
+> >> +#                                burst period, in seconds. It must on=
+ly
+> >> +#                                be set if @iops_wr_max is set as wel=
+l.
+> >> +#                                Defaults to 1. (Since 2.6)
+> >> +#
+> >> +# @iops_size: an I/O size in bytes (Since 1.7)
+> >> +#
+> >> +#
+> >> +# Since: 2.10
+> >> +##
+> >> +{ 'struct': 'IOThrottle',
+> >> +  'data': { '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+> >> +            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_w=
+r': 'int',
+> >> +            '*bps_max': 'int', '*bps_rd_max': 'int',
+> >> +            '*bps_wr_max': 'int', '*iops_max': 'int',
+> >> +            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+> >> +            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+> >> +            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+> >> +            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int=
+',
+> >> +            '*iops_size': 'int' } } =20
+> > =20
+
+
+--Sig_/odmOgdrs2xlUhbG3eF.+no2
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkKDv8ACgkQAvw66wEB28JCbgCghWpGtvqR5GMvBFDLppkbFGbQ
+0GgAniO3yZpBj6NfmOKKC1c5M6tRETfn
+=+LCW
+-----END PGP SIGNATURE-----
+
+--Sig_/odmOgdrs2xlUhbG3eF.+no2--
