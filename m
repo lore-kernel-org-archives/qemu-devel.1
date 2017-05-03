@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5tXL-0002pG-H7
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:37:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1d5tZE-0004Nx-0s
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:39:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d5tXK-0005ca-0S
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:37:43 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36199)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d5tXJ-0005cK-LH
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:37:41 -0400
-Received: by mail-wm0-x243.google.com with SMTP id u65so12427632wmu.3
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 05:37:41 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1d5tZA-0006KU-RS
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:39:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50410)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d5tZA-0006Jy-Ku
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:39:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d5tZ6-0000cE-Vl
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 12:39:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CEA1C2E80C6
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 12:39:32 +0000 (UTC)
 MIME-Version: 1.0
-References: <1493363372-16861-1-git-send-email-zhiyong.yang@intel.com>
-	<4b14ac87-f96b-0dac-73b7-b3209b01120a@redhat.com>
-	<E182254E98A5DA4EB1E657AC7CB9BD2A3EBAB599@BGSMSX101.gar.corp.intel.com>
-In-Reply-To: <E182254E98A5DA4EB1E657AC7CB9BD2A3EBAB599@BGSMSX101.gar.corp.intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 03 May 2017 12:37:28 +0000
-Message-ID: <CAJ+F1C+JLDqs97=9m9kDksh5u=Vdi9Kjun-PPLROWePkKjKjdg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/virtio: fix vhost user fails to startup
- when MQ
+Date: Wed, 03 May 2017 12:28:34 -0000
+From: Ubuntu Foundations Team Bug Bot <1581936@bugs.launchpad.net>
+Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
+Message-Id: <20170503122834.13634.55344.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
+ CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +37,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Yang, Zhiyong" <zhiyong.yang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Liu, Yuanhan" <yuanhan.liu@intel.com>, "mst@redhat.com" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi
+The attachment "Proposed fix for trusty" seems to be a debdiff.  The
+ubuntu-sponsors team has been subscribed to the bug report so that they
+can review and hopefully sponsor the debdiff.  If the attachment isn't a
+patch, please remove the "patch" flag from the attachment, remove the
+"patch" tag, and if you are member of the ~ubuntu-sponsors, unsubscribe
+the team.
 
-On Wed, May 3, 2017 at 7:09 AM Yang, Zhiyong <zhiyong.yang@intel.com> wrote=
-:
+[This is an automated message performed by a Launchpad user owned by
+~brian-murray, for any issue please contact him.]
 
-> Hi=EF=BC=8CMaxime:
->
-> > -----Original Message-----
-> > From: Maxime Coquelin [mailto:maxime.coquelin@redhat.com]
-> > Sent: Tuesday, May 2, 2017 8:23 PM
-> > To: Yang, Zhiyong <zhiyong.yang@intel.com>; qemu-devel@nongnu.org
-> > Cc: mst@redhat.com
-> > Subject: Re: [Qemu-devel] [PATCH] hw/virtio: fix vhost user fails to
-> startup when
-> > MQ
-> >
-> >
-> >
-> > On 04/28/2017 09:09 AM, Zhiyong Yang wrote:
-> > >     Qemu2.7~2.9 and vhost user for dpdk 17.02 release work together t=
-o
-> > > cause failures of new connection when negotiating to set MQ.
-> > > (one queue pair works well).
-> > >     Because there exist some bugs in qemu code when introducing
-> > > VHOST_USER_PROTOCOL_F_REPLY_ACK to qemu. When
-> > vhost_user_set_mem_table
-> > > is invoked to deal with the vhost message VHOST_USER_SET_MEM_TABLE fo=
-r
-> > > the second time, qemu indeed doesn't send the messge (The message
-> > > needs to be sent only once)but still will be waiting for dpdk's reply
-> > > ack, then, qemu is always freezing, while DPDK is always waiting for
-> > > next vhost message from qemu.
-> > >    The patch aims to fix the bug, MQ can work well.
-> > >    The same bug is found in function vhost_user_net_set_mtu, it is
-> > > fixed at the same time.
-> > >    DPDK related patch is as following:
-> > >    http://www.dpdk.org/dev/patchwork/patch/23955/
-> > >
-> > > Signed-off-by: Zhiyong Yang <zhiyong.yang@intel.com>
-> > > ---
-> > >   hw/virtio/vhost-user.c | 18 +++++++++++-------
-> > >   1 file changed, 11 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c index
-> > > 9334a8a..c2c54ce 100644
-> > > --- a/hw/virtio/vhost-user.c
-> > > +++ b/hw/virtio/vhost-user.c
-> > > @@ -205,10 +205,11 @@ static int vhost_user_write(struct vhost_dev
-> *dev,
-> > VhostUserMsg *msg,
-> > >       /*
-> > >        * For non-vring specific requests, like
-> VHOST_USER_SET_MEM_TABLE,
-> > >        * we just need send it once in the first time. For later such
-> > > -     * request, we just ignore it.
-> > > +     * request, we just ignore it. In this case, return value is 1
-> which is
-> > > +     * different from 0 that stands for message written successfully=
-.
-> > >        */
-> > >       if (vhost_user_one_time_request(msg->request) && dev->vq_index
-> !=3D 0) {
-> > > -        return 0;
-> > > +        return 1;
-> >
-> > I personally prefer the fix I suggested in the DPDK mail thread, as
-> returning a
-> > random positive value does look like a workaround:
->
-> I think that for vhost_user_write(), it's behaving in a different way for
-> some specific vhost messages.
-> So, it should not return the same returen value 0 which stands for succes=
-s.
->
+** Tags added: patch
 
-But you need to do the special handling for every caller.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1581936
 
-> >
-> > "
-> > I think the problem must be fixed generally and not per request.
-> > Maybe in vhost_user_write() if one-time request, just clear the
-> > VHOST_USER_NEED_REPLY flag. Then, in process_message_reply(), return
-> early
-> > if this flag isn't set.
-> > "
-> It's another choise. Either this one nor that one,  not a big deal. :)
-> Fixing these  existing bugs is the most important.
->
->
-While the suggestion from Maxime would work transparently, similar to
-one-time request are transparent to caller today. I also prefer that
-solution.
+Title:
+  Frozen Windows 7 VMs with VGA CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
 
-thanks
---=20
-Marc-Andr=C3=A9 Lureau
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  Hi,
+
+  As already posted on the QEMU devel list [1] I stumbled upon a problem
+  with QEMU in version 2.5.1.1 and 2.6.0.
+
+  the VM shows Windows loading
+  files for the installation, then the "Starting Windows" screen appears
+  here it hangs and never continues.
+
+  Changing the "-vga" option to cirrus solves this, the installation can
+  proceed and finish. When changing back to std (or also qxl, vmware) the
+  installed VM also hangs on the "Starting Windows" screen while qemu
+  showing a little but no excessive load.
+
+  This phenomena appears also with QEMU 2.6.0 but not with 2.6.0-rc4, a
+  git bisect shows fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7 (vga: make
+  sure vga register setup for vbe stays intact (CVE-2016-3712)) as the
+  culprit for this regression, as its a fix for a DoS its not an option to
+  just revert it, I guess.
+
+  The bisect log is:
+
+  git bisect start
+  # bad: [bfc766d38e1fae5767d43845c15c79ac8fa6d6af] Update version for v2.6=
+.0 release
+  git bisect bad bfc766d38e1fae5767d43845c15c79ac8fa6d6af
+  # good: [975eb6a547f809608ccb08c221552f666611af25] Update version for v2.=
+6.0-rc4 release
+  git bisect good 975eb6a547f809608ccb08c221552f666611af25
+  # good: [2068192dcccd8a80dddfcc8df6164cf9c26e0fc4] vga: update vga regist=
+er setup on vbe changes
+  git bisect good 2068192dcccd8a80dddfcc8df6164cf9c26e0fc4
+  # bad: [53db932604dfa7bb9241d132e0173894cf54261c] Merge remote-tracking b=
+ranch 'remotes/kraxel/tags/pull-vga-20160509-1' into staging
+  git bisect bad 53db932604dfa7bb9241d132e0173894cf54261c
+  # bad: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make sure vga regi=
+ster setup for vbe stays intact (CVE-2016-3712).
+  git bisect bad fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7
+  # first bad commit: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make =
+sure vga register setup for vbe stays intact (CVE-2016-3712).
+
+  =
+
+  I could reproduce that with QEMU 2.5.1 and QEMU 2.6 on a Debian derivate
+  (Promox VE) with 4.4 Kernel and also with QEMU 2.6 on an Arch Linux
+  System with a 4.5 Kernel, so it should not be host distro depended. Both
+  machines have Intel x86_64 processors.
+  The problem should be reproducible with said Versions or a build from
+  git including the above mentioned commit (fd3c136) by starting a VM with
+  an Windows 7 ISO, e.g.:
+
+  Freezing installation (as vga defaults to std I marked it as optional):
+  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 [-vga=
+ (std|qxl|vmware)]
+
+  Working installation:
+  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 -vga =
+cirrus
+
+  If someone has already an installed Windows 7 VM this behaviour should be
+  also observable when trying to start it with the new versions of QEMU.
+
+  Noteworthy may be that Windows 10 is working, I do not had time to get
+  other Windows versions and test them, I'll do that as soon as possible.
+  Various Linux system also seems do work fine, at least I did not ran
+  into an issue there yet.
+
+  I also tried testing with SeaBIOS and OVMF as firmware, as initially I
+  had no idea what broke, both lead to the same result - without the =
+
+  CVE-2016-3712 fix they both work, with not.
+  Further, KVM enabled and disabled does not make any difference.
+
+  =
+
+  [1] http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg02416.html
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1581936/+subscriptions
