@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d5pr0-0006YX-7Z
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:41:47 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5pth-0007Th-9u
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:44:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d5pqx-0001fy-35
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:41:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d5pqw-0001fl-QJ
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:41:43 -0400
-Date: Wed, 3 May 2017 09:41:36 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170503084136.GC4121@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
-	<1493725969-19518-9-git-send-email-amarnath.valluri@intel.com>
-	<CAJ+F1C+gLTVpZZeKtxuLFUgs6nJ0KbgnJp4VdAuuM4JK2RbYMA@mail.gmail.com>
-	<38a2aa2e-6270-63af-3dec-bd666d56780d@linux.vnet.ibm.com>
-	<CAJ+F1CKcZvWE4OQOMKuDqNvKGEQK3DdihM6Eyx-piqtQtSbXGQ@mail.gmail.com>
-	<5ee48b85-0404-a810-95b5-4b19b197373e@linux.vnet.ibm.com>
-	<1493749518.4241.225.camel@intel.com>
-	<CAJ+F1CK4jN2Nb6eKB1x9Km0xnurs976=Kb0idFpPgtH+JHYTcQ@mail.gmail.com>
-	<b6e0d6d2-d276-c66d-ae5e-c6502cbe0b5c@linux.vnet.ibm.com>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5ptc-0002rM-OB
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:44:33 -0400
+Received: from [59.151.112.132] (port=4311 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5ptb-0002q1-RZ
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:44:28 -0400
+References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
+	<2bc05de0edd61cdcdd3d2b894378a874d1e12327.1493191677.git.maozy.fnst@cn.fujitsu.com>
+	<87shktu8cu.fsf@dusky.pond.sub.org> <20170427163025.GD30599@redhat.com>
+	<87lgqlnenh.fsf@dusky.pond.sub.org>
+	<23e5dc02-3e69-2166-c18b-786fc75172ff@cn.fujitsu.com>
+	<20170503083735.GB4121@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <6814cf0b-c38c-57d8-0890-e71d3c6b44c7@cn.fujitsu.com>
+Date: Wed, 3 May 2017 16:37:37 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b6e0d6d2-d276-c66d-ae5e-c6502cbe0b5c@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] tpm: Added support for TPM emulator
+In-Reply-To: <20170503083735.GB4121@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] net/socket: Convert error report
+ message to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,116 +32,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Patrick Ohly <patrick.ohly@intel.com>, Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, jasowang@redhat.com, qemu-devel@nongnu.org
 
-On Tue, May 02, 2017 at 03:35:48PM -0400, Stefan Berger wrote:
-> On 05/02/2017 02:50 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >=20
-> > On Tue, May 2, 2017 at 10:25 PM Patrick Ohly <patrick.ohly@intel.com
-> > <mailto:patrick.ohly@intel.com>> wrote:
-> >=20
-> >     On Tue, 2017-05-02 at 13:19 -0400, Stefan Berger wrote:
-> >     > On 05/02/2017 01:09 PM, Marc-Andr=C3=A9 Lureau wrote:
-> >     > > On Tue, May 2, 2017 at 8:59 PM Stefan Berger
-> >     <stefanb@linux.vnet.ibm.com <mailto:stefanb@linux.vnet.ibm.com>>
-> >     > > wrote:
-> >     > >
-> >     > >> And who is going to implement that qemu-swtpm? Obviously thi=
-s
-> >     discussion
-> >     > >> doesn't contribute to progress if nobody is doing that in th=
-e
-> >     end.
-> >     > >>
-> >     > > The same persons who try to push for that emulated TPM code.
-> >     The easiest
-> >     > > approach would be to copy/adapt the swtpm code in qemu, if th=
-e
-> >     licence is
-> >     > > compatible. I can help with that if there is a consensus it's
-> >     a better
-> >     > > approach.
-> >     >
-> >     >
-> >     > It's a matter of time and at least I don't have time for that.
-> >=20
-> >     Neither do I, and nor (I believe) does Amarnath. The approach wit=
-h
-> >     using
-> >     the existing swtpm project seemed attractive to us exactly becaus=
-e it
-> >     avoids having to write and maintain more than just the glue code
-> >     between
-> >     the two projects.
-> >=20
-> >=20
-> > The main argument is not about having more or less code in qemu to
-> > maintain, but yes this is a concern (although giving up that maintena=
-nce
-> > to a seperate project with mostly Stefan-alone isn't a much better
-> > alternative). btw, is the project actually used by something else tha=
-n
-> > qemu? (I am not talking about developpers/testing). If not, then it
-> > makes sense to make it part of qemu.
->=20
-> The intention would be to use it for RunC as well (plus higher layers
-> afterwards): https://github.com/opencontainers/runc/pull/1082
->=20
-> >=20
-> > But it's mostly a technical reason, to avoid having to rely on a fore=
-ign
-> > protocol and project with all the compatibility constrains.
->=20
-> I understand. Ideally swtpm-0.1 would be equivalent to 1.0 with all fea=
-tures
-> available and no further protocol extensions necessary. In practice tha=
-t may
-> look different.
->=20
-> >=20
-> > In the end, we may decide to start with a separate project, and chang=
-e
-> > it in the future if it's problematic (that would break some cases, su=
-ch
-> > as being able to freely switch the helper). Tbh, I am not so happy wi=
-th
-> > the code quality of swtpm, and I haven't looked closely at libtpms.
-> > Having a qemu-swtpm as part of qemu would probably help improve it to=
-o,
-> > and bring a few more developers for maintainance...
->=20
-> libtpms combines a few source codes with some glue around it. The codin=
-g
-> style is different for TPM 1.2 and TPM 2 code for example and the code =
-bases
-> are in the 10s of thousands of line. In the case of TPM 2 it 'lives fro=
-m'
-> TCG code drops and thus there is no reformatting of source code etc.
->=20
-> If someone wants to get started on qemu-swtpm that's certainly cool but=
- over
-> the years it's just been quite difficult to find developers for it to s=
-hare
-> the burden. All that said, someone should state whether this series is =
-a go
-> or no-go because of the external project it requires.
 
-I think it is *good* that it uses the external swtpm project and do not
-want to see it reimplemented inside QEMU, particularly with the interest
-for swtpm to be used in container contexts via RunC. Such common infrastr=
-ucture
-for both containers & QEMU will be important given the increasing converg=
-ance
-of technology across containers & VMs.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+On 05/03/2017 04:37 PM, Daniel P. Berrange wrote:
+> On Wed, May 03, 2017 at 03:09:57PM +0800, Mao Zhongyi wrote:
+>> Hi, Markus,Daniel
+>>
+>> On 04/28/2017 04:02 PM, Markus Armbruster wrote:
+>>> "Daniel P. Berrange" <berrange@redhat.com> writes:
+>>>
+>>>> On Thu, Apr 27, 2017 at 06:24:17PM +0200, Markus Armbruster wrote:
+>>>>> No review, just an observation.
+>>>>>
+>>>>> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+>>>>>
+>>>>>> Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
+>>>>>> net_socket_fd_init() use the function such as fprintf(), perror() to
+>>>>>> report an error message.
+>>>>>>
+>>>>>> Now, convert these functions to Error.
+>>>>>>
+>>>>>> CC: jasowang@redhat.com, armbru@redhat.com
+>>>>>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>>>>>> ---
+>>>>>>  net/socket.c | 66 +++++++++++++++++++++++++++++++++++++-----------------------
+>>>>>>  1 file changed, 41 insertions(+), 25 deletions(-)
+>>>>>>
+>>>>>> diff --git a/net/socket.c b/net/socket.c
+>>>>>> index b0decbe..559e09a 100644
+>>>>>> --- a/net/socket.c
+>>>>>> +++ b/net/socket.c
+>>>>> [...]
+>>>>>> @@ -433,25 +437,27 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
+>>>>>>
+>>>>>>  static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>>>>>>                                            const char *model, const char *name,
+>>>>>> -                                          int fd, int is_connected)
+>>>>>> +                                          int fd, int is_connected,
+>>>>>> +                                          Error **errp)
+>>>>>>  {
+>>>>>>      int so_type = -1, optlen=sizeof(so_type);
+>>>>>>
+>>>>>>      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
+>>>>>>          (socklen_t *)&optlen)< 0) {
+>>>>>> -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
+>>>>>> +        error_setg(errp, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed",
+>>>>>>                  fd);
+>>>>>>          closesocket(fd);
+>>>>>>          return NULL;
+>>>>>>      }
+>>>>>>      switch(so_type) {
+>>>>>>      case SOCK_DGRAM:
+>>>>>> -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
+>>>>>> +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected, errp);
+>>>>>>      case SOCK_STREAM:
+>>>>>>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>>>>>>      default:
+>>>>>>          /* who knows ... this could be a eg. a pty, do warn and continue as stream */
+>>>>>> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+>>>>>> +        error_setg(errp, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM"
+>>>>>> +                   " or SOCK_STREAM", so_type, fd);
+>>>>>
+>>>>> Not this patches problem: this case is odd, and the comment is bogus.
+>>>>> If @fd really was a pty, getsockopt() would fail with ENOTSOCK, wouldn't
+>>>>> it?  If @fd is a socket, but neither SOCK_DGRAM nor SOCK_STREAM (say
+>>>>> SOCK_RAW), why is it safe to continue as if it was SOCK_STREAM?  Jason?
+>>>>
+>>>> IMHO it is a problem with this patch. Previously we merely printed
+>>>> a warning & carried on, which is conceptually ok in general, though
+>>>> dubious here for the reason you say.
+>>>>
+>>>> Now we are filling an Error **errp object, and carrying on - this is
+>>>> conceptually broken anywhere. If an Error ** is filled, we must return.
+>>>> If we want to carry on, we shouldn't fill Error **.
+>>>
+>>> You're right.
+>>>
+>>>>>>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>>>>
+>>>> IMHO, we just kill this and put return NULL here. If there is a genuine
+>>>> reason to support something like SOCK_RAW, it should be explicitly
+>>>> handled, because this default: case will certainly break SOCK_SEQPACKET
+>>>> and SOCK_RDM which can't be treated as streams.
+>>>
+>>> It's either magic or misguided defensive programming.  Probably the
+>>> latter, but I'd like to hear Jason's opinion.
+>>>
+>>> If it's *necessary* magic, we can't use error_setg().  Else, we should
+>>> drop the default, and insert a closesocket(fd) before the final return
+>>> NULL.
+>>
+>> As Daniel said, although the previous printed warning message is
+>> dubious, but it is conceptually ok in general. Simply filling it to
+>> Error ** is problematic. Of course, as you said drop the default case,
+>> there will be no problem. But really to do that?
+>
+> Yes, please drop that 'default' case since it is broken already.
+>
+> BTW, drop the default case in a separate patch at the start of
+> your series, before changing the error code, so the functional
+> change is clear in git history.
+>
+>
+> Regards,
+> Daniel
+>
+
+OK，I see.
+Thank you very much.
+
+Mao
