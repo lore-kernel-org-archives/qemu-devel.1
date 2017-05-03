@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d63Qb-0001wf-Qb
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:11:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d63Qi-0001yz-Kg
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:11:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d63QY-0005iS-LC
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:11:25 -0400
-Resent-Message-Id: <E1d63QY-0005iS-LC@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21327)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d63QY-0005da-De
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:11:22 -0400
-In-Reply-To: <20170503223846.6559-1-marcandre.lureau@redhat.com>
-Message-ID: <149385307125.177.11384096570285681464@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 3 May 2017 16:11:11 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Memory leak fixes
+	(envelope-from <mreitz@redhat.com>) id 1d63Qh-0005vs-RE
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:11:32 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Thu,  4 May 2017 01:11:16 +0200
+Message-Id: <20170503231120.23507-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] qcow2: Some fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +17,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2NSAwLzVdIE1lbW9yeSBsZWFrIGZpeGVzCk1lc3NhZ2UtaWQ6IDIwMTcw
-NTAzMjIzODQ2LjY1NTktMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20KVHlwZTogc2VyaWVz
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
-dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0Jwo4NDc2MmUyIGR1bXA6IGZpeCBtZW1vcnlfbWFwcGluZ19maWx0ZXIg
-bGVhawozNDVhNWQ4IHNsaXJwOiBmaXggbGVhawozZjFhZTI4IGF1ZGlvOiBmaXggV0FWU3RhdGUg
-bGVhawo1NjVlMDcxIGF1ZGlvOiBmaXggY2FwdHVyZSBidWZmZXIgbGVha3MKMmNlNTk4NCB0ZXN0
-LWtleXZhbDogZml4IGxlYWtzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
-LzU6IHRlc3Qta2V5dmFsOiBmaXggbGVha3MuLi4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBhdWRpbzog
-Zml4IGNhcHR1cmUgYnVmZmVyIGxlYWtzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
-ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIyOiBGSUxFOiBhdWRp
-by9hdWRpby5jOjIwMzE6CisgICAgICAgICAgICAgICAgZ19mcmVlIChjYXAtPmh3Lm1peF9idWYp
-OwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVu
-IHBhcmVudGhlc2lzICcoJwojMjM6IEZJTEU6IGF1ZGlvL2F1ZGlvLmM6MjAzMjoKKyAgICAgICAg
-ICAgICAgICBnX2ZyZWUgKGNhcC0+YnVmKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywg
-OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
-aGVja2luZyBQQVRDSCAzLzU6IGF1ZGlvOiBmaXggV0FWU3RhdGUgbGVhay4uLgpFUlJPUjogc3Bh
-Y2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMg
-JygnCiMyMjogRklMRTogYXVkaW8vd2F2Y2FwdHVyZS5jOjkxOgorICAgIGdfZnJlZSAod2F2KTsK
-CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzU6IHNsaXJwOiBm
-aXggbGVhay4uLgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3Rh
-dGVtZW50cyAoMiwgNikKIzM3OiBGSUxFOiBzbGlycC9zb2NrZXQuYzoxMDM6CisgIGlmIChzby0+
-c29fdGNwY2IpIHsKKyAgICAgIGZyZWUoc28tPnNvX3RjcGNiKTsKCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgOSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzU6IGR1bXA6IGZpeCBtZW1vcnlfbWFwcGluZ19m
-aWx0ZXIgbGVhay4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This series contains some fixes for issues reported by Eric.
+
+
+Max Reitz (4):
+  qcow2: Fix preallocation size formula
+  qcow2: Reuse preallocated zero clusters
+  qcow2: Discard preallocated zero clusters
+  iotests: Extend test 066
+
+ block/qcow2.h              |   3 ++
+ block/qcow2-cluster.c      |  83 ++++++++++++++++++++---------
+ block/qcow2.c              |   9 ++--
+ tests/qemu-iotests/066     | 128 ++++++++++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/066.out |  46 ++++++++++++++++
+ 5 files changed, 239 insertions(+), 30 deletions(-)
+
+-- 
+2.12.2
