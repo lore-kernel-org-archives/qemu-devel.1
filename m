@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5sTt-00082x-0E
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:30:06 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d5sVs-000188-6O
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:32:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5sTp-00082D-Mc
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:30:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28969)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d5sTp-00081q-EP
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:30:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1493732857-10721-1-git-send-email-den@openvz.org>
-	<87bmrbgvzf.fsf@dusky.pond.sub.org>
-	<e90d1680-6212-862e-bd3b-fdc415ec1890@openvz.org>
-	<877f1zcjcf.fsf@dusky.pond.sub.org> <20170502163629.GA5640@work-vm>
-	<20170502164838.GL16624@redhat.com>
-	<1dda0b40-e473-638e-7a89-891f578d3186@openvz.org>
-Date: Wed, 03 May 2017 13:29:57 +0200
-In-Reply-To: <1dda0b40-e473-638e-7a89-891f578d3186@openvz.org> (Denis
-	V. Lunev's message of "Tue, 2 May 2017 20:07:26 +0300")
-Message-ID: <87shkm2n62.fsf@dusky.pond.sub.org>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d5sVn-0000jI-8q
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:32:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41882)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d5sVn-0000hq-0c
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:32:03 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v43BU5TI033427
+	for <qemu-devel@nongnu.org>; Wed, 3 May 2017 07:32:01 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a7ecfg1vr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 07:32:01 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Wed, 3 May 2017 12:31:57 +0100
+Date: Wed, 3 May 2017 13:31:53 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <CAJ+F1CKLUacSekNyMTohahLmMvLGFT=t7N4_cMNs-iMBw-4mTQ@mail.gmail.com>
+References: <20170407111851.20680-1-cornelia.huck@de.ibm.com>
+	<20170407111851.20680-2-cornelia.huck@de.ibm.com>
+	<CAJ+F1CKLUacSekNyMTohahLmMvLGFT=t7N4_cMNs-iMBw-4mTQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/1] monitor: increase amount of data for
- monitor to read
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <20170503133153.7b999ee3.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/8] chardev: Basic support for
+ TN3270
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,132 +43,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, agraf@suse.de, borntraeger@de.ibm.com, pbonzini@redhat.com, Yang Chen <bjcyang@linux.vnet.ibm.com>
 
-"Denis V. Lunev" <den@openvz.org> writes:
+On Fri, 28 Apr 2017 14:17:12 +0000
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 
-> On 05/02/2017 07:48 PM, Daniel P. Berrange wrote:
->> On Tue, May 02, 2017 at 05:36:30PM +0100, Dr. David Alan Gilbert wrote:
->>> * Markus Armbruster (armbru@redhat.com) wrote:
->>>> "Denis V. Lunev" <den@openvz.org> writes:
->>>>
->>>>> On 05/02/2017 05:43 PM, Markus Armbruster wrote:
->>>>>> "Denis V. Lunev" <den@openvz.org> writes:
->>>>>>
->>>>>>> Right now QMP and HMP monitors read 1 byte at a time from the socket, which
->>>>>>> is very inefficient. With 100+ VMs on the host this easily reasults in
->>>>>>> a lot of unnecessary system calls and CPU usage in the system.
->>>>>>>
->>>>>>> This patch changes the amount of data to read to 4096 bytes, which matches
->>>>>>> buffer size on the channel level. Fortunately, monitor protocol is
->>>>>>> synchronous right now thus we should not face side effects in reality.
->>>>>> Can you explain briefly why this relies on "synchronous"?  I've spent
->>>>>> all of two seconds on the question myself...
->>>>> Each command is processed in sequence as it appears in the
->>>>> channel. The answer to the command is sent and only after that
->>>>> next command is processed.
->>>> Yes, that's how QMP works.
->>>>
->>>>> Theoretically tith asynchronous processing we can have some side
->>>>> effects due to changed buffer size.
->>>> What kind of side effects do you have in mind?
->>>>
->>>> It's quite possible that this obviously inefficient way to read had some
->>>> deep reason back when it was created.  Hmm, git-blame is our friend:
->>>>
->>>> commit c62313bbdc48f72e93fa8196f2fff96ba35e4e9d
->>>> Author: Jan Kiszka <jan.kiszka@siemens.com>
->>>> Date:   Fri Dec 4 14:05:29 2009 +0100
->>>>
->>>>     monitor: Accept input only byte-wise
->>>>     
->>>>     This allows to suspend command interpretation and execution
->>>>     synchronously, e.g. during migration.
->>>>     
->>>>     Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->>>>     Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
->>> I don't think I understand why that's a problem; if we read more bytes,
->>> we're not going to interpret them and execute them until after the previous
->>> command returns are we?
->> Actually it sees we might do, due to the way the "migrate" command works
->> in HMP when you don't give the '-d' flag.
->>
->> Most monitors commands will block the caller until they are finished,
->> but "migrate" is different. The hmp_migrate() method will return
->> immediately, but we call monitor_suspend() to block processing of
->> further commands. If another command has already been read off
->> the wire though (due to "monitor_read" having a buffer that contains
->> multiple commands), we would in fact start processing this command
->> despite having suspended the monitor.
->>
->> This is only a problem, however, if the client app has issued "migrate"
->> followed by another command, at the same time without waiting for the
->> respond to "migrate". So in practice the only way you'd hit the bug
->> is probably if you just cut+paste a big chunk of commands into the
->> monitor at once without waiting for completion and one of the commands
->> was "migrate" without "-d".
->>
->> Still, I think we would need to figure out a proper fix for this before
->> we could increase the buffer size.
->>
->> Regards,
->> Daniel
->
-> There is one thing, which simplifies things a lot.
-> - suspend_cnt can be increased only from 2 places:
->   1) monitor_event(), which is called for real HMP monitor only
->
->   2) monitor_suspend(), which can increment suspend_cnt
->       only if mon->rs != NULL, which also means that the
->       monitor is specifically configured HMP monitor.
+> Hi
+>=20
+> On Fri, Apr 7, 2017 at 3:19 PM Cornelia Huck <cornelia.huck@de.ibm.com>
+> wrote:
+>=20
+> > From: Jing Liu <liujbjl@linux.vnet.ibm.com>
+> >
+> > This introduces basic support for TN3270, which needs to negotiate
+> > three Telnet options during handshake:
+> >   - End of Record
+> >   - Binary Transmission
+> >   - Terminal-Type
+> >
+> > As a basic implementation, this simply ignores NOP and Interrupt
+> > Process(IP) commands. More work should be done for them later.
+> >
+> > For more details, please refer to RFC 854 and 1576.
+> >
+> Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+> > Signed-off-by: Yang Chen <bjcyang@linux.vnet.ibm.com>
+> > Reviewed-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> > Acked-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > ---
+> >  chardev/char-socket.c | 76
+> > +++++++++++++++++++++++++++++++++++++--------------
+> >  chardev/char.c        | 11 ++++++--
+> >  include/sysemu/char.h |  8 ++++++
+> >  qapi-schema.json      |  3 ++
+> >  4 files changed, 76 insertions(+), 22 deletions(-)
 
-I think you're right.  Monitor member suspend_cnt could use a comment.
+> > diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+> > index 450881d42c..f6d5cd0c9b 100644
+> > --- a/include/sysemu/char.h
+> > +++ b/include/sysemu/char.h
+> > @@ -7,6 +7,14 @@
+> >  #include "qemu/bitmap.h"
+> >  #include "qom/object.h"
+> >
+> > +#define IAC_EOR 239
+> > +#define IAC_SE 240
+> > +#define IAC_NOP 241
+> > +#define IAC_BREAK 243
+> > +#define IAC_IP 244
+> > +#define IAC_SB 250
+> > +#define IAC 255
+> > +
+> >
+>=20
+> Those define are exposed because of a later patch.
+>=20
+> (I have pending patches to have a char/char-socket.h and friends where th=
+is
+> should fit, but for now it's fine)
 
-If there are more members that apply only to HMP, we should collect them
-in a MonitorHMP struct, similar to MonitorQMP.
+OK. FWIW, I plan to send a pull req for 3270 this week.
 
-> So, we can improve the patch (for now) with the following
-> tweak:
->
-> static int monitor_can_read(void *opaque)
-> {
->     Monitor *mon = opaque;
->    
->     if (monitor_is_qmp(mon))
->         return 4096;   
->     return (mon->suspend_cnt == 0) ? 1 : 0;
-> }
+>=20
+> Patch looks good to me, basic testing done
 
-Instead of adding the conditional, I'd split this into two functions,
-one for HMP and one for QMP, just like we split the other two callbacks.
-
-> This will solve my case completely and does not break any
-> backward compatibility.
-
-No change for HMP.  Okay.
-
-For QMP, monitor_qmp_read() feeds whatever it gets to the JSON lexer.
-It currently gets one character at a time, because that's how much
-monitor_can_read() returns.  With your change, it gets up to 4KiB.
-
-The JSON lexer feeds tokens to the JSON streamer one at a time until it
-has consumed everything it was fed.
-
-The JSON streamer accumulates tokens, parsing them just enough to know
-when it has a complete expression.  It pushes the expression to the QMP
-expression handler immediately.
-
-The QMP expression handler calls the JSON parser to parse the tokens
-into a QObject, then dispatches to QMP command handlers accordingly.
-
-Everything's synchronous.  When a QMP command handler runs, the calling
-JSON streamer invocation is handling the command's final closing brace,
-and so is the calling JSON lexer.  After the QMP command handler
-returns, the JSON streamer returns.  The JSON lexer then looks at the
-next character if there are more, else it returns.
-
-The only difference to before that I can see is that we can read ahead.
-That's a feature.
-
-Looks safe to me.  Opinions?
+Cool, thanks. May I count that as an ack? :)
