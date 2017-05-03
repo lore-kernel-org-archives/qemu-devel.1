@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5vL3-0005nW-U4
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:33:13 -0400
+	(envelope-from <lvivier@redhat.com>) id 1d5vLx-0006NO-Gw
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5vL3-0005Xi-5b
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:33:09 -0400
-Date: Wed, 3 May 2017 11:32:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170503143257.GK3482@thinpad.lan.raisama.net>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-2-git-send-email-imammedo@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1d5vLr-0005tr-NJ
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:34:05 -0400
+References: <20170430172547.13415-1-danielhb@linux.vnet.ibm.com>
+	<20170430172547.13415-3-danielhb@linux.vnet.ibm.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <820e7037-13a7-c478-e119-ed64599cb3cb@redhat.com>
+Date: Wed, 3 May 2017 16:33:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1493816238-33120-2-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 01/24] tests: add CPUs to numa node
- mapping test
+In-Reply-To: <20170430172547.13415-3-danielhb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/5] hw/ppc: removing spapr_drc_detach_cb
+ opaques
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,14 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Wed, May 03, 2017 at 02:56:55PM +0200, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+On 30/04/2017 19:25, Daniel Henrique Barboza wrote:
+> Following up the previous detach_cb change, this patch removes the
+> detach_cb_opaque entirely from the code.
+> 
+> The reason is that the drc->detach_cb_opaque object can't be
+> restored in the post load of the upcoming DRC migration and no detach
+> callbacks actually need this opaque. 'spapr_core_release' is
+> receiving it as NULL, 'spapr_phb_remove_pci_device_cb' is receiving
+> a phb object as opaque but is't using it. These were trivial removal
+> cases.
+> 
+> However, the LM removal callback 'spapr_lmb_release' is receiving
+> and using the opaque object, a 'sPAPRDIMMState' struct. This struct
+> holds the number of LMBs the DIMM object contains and the callback
+> was using this counter as a countdown to check if all LMB DRCs were
+> release before proceeding to the DIMM unplug. To remove the need of
+> this callback we have choices such as:
+> 
+> - migrate the 'sPAPRDIMMState' struct. This would require creating a
+> QTAILQ to store all DIMMStates and an additional 'dimm_id' field to
+> associate the DIMMState with the DIMM object. We could attach this
+> QTAILQ to the 'sPAPRPHBState' and retrieve it later in the callback.
+> 
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Did you think about adding the nr_lmbs into PCDIMMDevice structure?
+Or to create a SPAPRPCDIMMDevice with PCDIMMDevice parent_obj and
+nr_lmbs field we can retrieve from the DeviceState pointer?
 
--- 
-Eduardo
+I don't know if it is a good idea or an acceptable way to do that, but
+I'd like to know if you have thought about that.
+
+Thanks,
+Laurent
