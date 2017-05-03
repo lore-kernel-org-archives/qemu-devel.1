@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d5wYc-000554-DT
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:51:15 -0400
+	(envelope-from <rjones@redhat.com>) id 1d5wd7-0007fd-7r
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1d5wYY-0004au-E5
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:51:14 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:32953)
+	(envelope-from <rjones@redhat.com>) id 1d5wd3-0007vp-7M
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:55:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1d5wYY-0004Ze-4c
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:51:10 -0400
-Date: Wed, 3 May 2017 11:51:07 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170503155107.GA13895@flamenco>
-References: <20170502192300.2124-1-rth@twiddle.net>
-	<6d583a19-0134-3332-e116-dba4ed2e758e@twiddle.net>
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1d5wd2-0007tk-V9
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:55:49 -0400
+Date: Wed, 3 May 2017 16:55:44 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20170503155544.GE27432@redhat.com>
+References: <20170227163447.20428-1-stefanha@redhat.com>
+	<20170227163447.20428-2-stefanha@redhat.com>
+	<20170503145418.GB27432@redhat.com>
+	<182d640c-c892-993e-06d4-a9cdd9f363d6@redhat.com>
+	<20170503153400.GD27432@redhat.com>
+	<9489b184-019a-c644-a54f-b795f56f22a1@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6d583a19-0134-3332-e116-dba4ed2e758e@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v6 00/25] tcg cross-tb optimizations
+In-Reply-To: <9489b184-019a-c644-a54f-b795f56f22a1@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 1/4] curl: do not use
+ aio_context_acquire/release
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, May 02, 2017 at 20:36:52 -0700, Richard Henderson wrote:
-> On 05/02/2017 12:22 PM, Richard Henderson wrote:
-> >Changes since v5:
-> ...
-> >   * Alpha frontend patch rewritten; the former patch appears to
-> >     drop clock interrupts, not exiting the kernel's idle loop.
-> >     I never *really* figured out why, since both patches seem
-> >     to annotate the same TBs in the same way.
+On Wed, May 03, 2017 at 05:46:49PM +0200, Paolo Bonzini wrote:
+> Please test this:
 > 
-> There's definitely something odd going on.
+> diff --git a/block/curl.c b/block/curl.c
+> index 2708d57c2f..cfe02bfd79 100644
+> --- a/block/curl.c
+> +++ b/block/curl.c
+> @@ -467,7 +467,9 @@ static CURLState *curl_init_state(BlockDriverState
+> *bs, BDRVCURLState *s)
+>              break;
+>          }
+>          if (!state) {
+> +            qemu_mutex_unlock(&s->mutex);
+>              aio_poll(bdrv_get_aio_context(bs), true);
+> +            qemu_mutex_lock(&s->mutex);
+>          }
+>      } while(!state);
 > 
-> With a rebuild from scratch, the same symptoms have re-appeared for Alpha.
-> So it really had nothing to do with the original patch.  I'm at a bit of a
-> loss...
+> 
 
-I can reliably reproduce a freeze upon booting.
+Yes, this fixes it, thanks Paolo.
 
-Not sure this can help much (this is the first time I run an Alpha
-guest), but here are some findings.
+Reported-by: Kun Wei <kuwei@redhat.com>
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
 
-In my testing, if I disable the lookup for JMP/JSR/ret, I can boot OK.
-This works:
+Rich.
 
-+++ b/target/alpha/translate.c
-@@ -2435,12 +2435,16 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
-         if (ra != 31) {
-             tcg_gen_movi_i64(ctx->ir[ra], ctx->pc);
-         }
-+#if 0
-         if (use_exit_tb(ctx)) {
-             ret = EXIT_PC_UPDATED;
-         } else {
-             tcg_gen_lookup_and_goto_ptr(cpu_pc);
-             ret = EXIT_GOTO_TB;
-         }
-+#else
-+        ret = EXIT_PC_UPDATED;
-+#endif
-         break;
-
-However, this doesn't tell us much, since these jumps are pretty common.
-
-Interestingly, if I leave the lookup_and_goto_ptr above (s/#if 0/#if 1/), but
-change the lookup_ptr helper to bypass tb_jmp_cache and directly check the
-htable, it boots OK.
-
-Could it be that we're forgetting to clear (or set) tb_jmp_cache somewhere?
-
-		Emilio
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-df lists disk usage of guests without needing to install any
+software inside the virtual machine.  Supports Linux and Windows.
+http://people.redhat.com/~rjones/virt-df/
