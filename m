@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1d5tSk-00074o-4L
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:32:59 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d5tVo-00014f-HM
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1d5tSh-000470-01
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:32:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42168)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1d5tSg-00045y-NY
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:32:54 -0400
-Date: Wed, 3 May 2017 08:32:48 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <873732298.6521406.1493814768361.JavaMail.zimbra@redhat.com>
-In-Reply-To: <f2d892bd-9a95-a470-0490-042c98d8b0d9@amsat.org>
-References: <20170503121143.14925-1-marcandre.lureau@redhat.com>
-	<f2d892bd-9a95-a470-0490-042c98d8b0d9@amsat.org>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d5tVl-0005AK-8M
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:36:08 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36059)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1d5tVl-0005A6-1s
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:36:05 -0400
+Received: by mail-wr0-x243.google.com with SMTP id v42so22586570wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 05:36:04 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170227134202.2991-1-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d10fe946-b664-48cf-2a0f-cffd902b0d25@redhat.com>
+Date: Wed, 3 May 2017 14:36:00 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170227134202.2991-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] libvhost-user: fix
- vu_queue_get_avail_bytes() crash
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/21] chardev clean-ups & tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, mst@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-Hi
 
------ Original Message -----
-> Hi Marc-Andr=C3=A9,
->=20
-> On 05/03/2017 09:11 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > Calling vu_queue_get_avail_bytes() when the queue doesn't yet have
-> > addresses will result in the following crash:
-> >
-> > Program received signal SIGSEGV, Segmentation fault.
-> > 0x000055c414112ce4 in vring_avail_idx (vq=3D0x55c41582fd68,
-> > vq=3D0x55c41582fd68)
-> >     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:94=
-0
-> > 940            vq->shadow_avail_idx =3D vq->vring.avail->idx;
-> > (gdb) p vq
-> > $1 =3D (VuVirtq *) 0x55c41582fd68
-> > (gdb) p vq->vring
-> > $2 =3D {num =3D 0, desc =3D 0x0, avail =3D 0x0, used =3D 0x0, log_guest=
-_addr =3D 0,
-> > flags =3D 0}
-> >
-> >     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:94=
-0
-> > No locals.
-> >     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:96=
-0
-> >         num_heads =3D <optimized out>
-> >     out_bytes=3Dout_bytes@entry=3D0x7fffd035d7c4,
-> >     max_in_bytes=3Dmax_in_bytes@entry=3D0,
-> >     max_out_bytes=3Dmax_out_bytes@entry=3D0) at
-> >     /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:1034
-> >
-> > Check if vring.avail !=3D null before accessing it.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  contrib/libvhost-user/libvhost-user.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/contrib/libvhost-user/libvhost-user.c
-> > b/contrib/libvhost-user/libvhost-user.c
-> > index af4faad60b..f9680b6279 100644
-> > --- a/contrib/libvhost-user/libvhost-user.c
-> > +++ b/contrib/libvhost-user/libvhost-user.c
-> > @@ -1031,6 +1031,10 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq=
-,
-> > unsigned int *in_bytes,
-> >      idx =3D vq->last_avail_idx;
-> >
-> >      total_bufs =3D in_total =3D out_total =3D 0;
-> > +    if (!vq->vring.avail) {
-> > +        goto done;
-> > +    }
-> > +
-> >      while ((rc =3D virtqueue_num_heads(dev, vq, idx)) > 0) {
-> >          unsigned int max, num_bufs, indirect =3D 0;
-> >          struct vring_desc *desc;
-> >
->=20
-> It seems to me safer to fix instead vring_avail_ring(), and fix
-> neighbours vring_avail_flags() and vring_avail_idx() while here.
 
-Those are internal/static functions, possibly on hot paths. So I would rath=
-er keep the check on the external/public functions only.
+On 27/02/2017 14:41, Marc-André Lureau wrote:
+> Hi,
+> 
+> The following series contains various patches:
+> - replace "chardevs" list for a /chardevs container object
+> - add a few read-only socket properties mainly useful for testing
+> - some chardev related clean-ups
+> - add various chardev tests
+> 
+> This series is part of a larger refactoring series that I try to keep
+> up to date here: https://github.com/elmarco/qemu/commits/chrfe
+> 
+> v2:
+> - replaced root container unref with a TODO
+> - call object_unparent() directly instead of qemu_chr_delete()
+> - remove bad qcow2 NULL check removal
+> - rebased
+
+Nice, thanks!
+
+> Marc-André Lureau (21):
+>   char: remove qemu_chr_be_generic_open
+>   mux: simplfy muxes_realize_done
+>   xen: use a better chardev type check
+>   container: don't leak container reference
+>   char: add a /chardevs container
+>   vl: add todo note about root container cleanup
+>   char: use /chardevs container instead of chardevs list
+>   char: remove qemu_chardev_add
+>   char: remove chardevs list
+>   char: useless NULL check
+>   char-socket: introduce update_disconnected_filename()
+>   char-socket: update local address after listen
+>   char-socket: add 'addr' property
+>   char-socket: add 'connected' property
+>   char-udp: flush as much buffer as possible
+>   tests: add alias check in /char/ringbuf
+>   tests: add /char/pipe test
+>   tests: add /char/file test
+>   tests: add /char/socket test
+>   tests: add /char/udp test
+>   tests: add /char/console test
+> 
+>  chardev/char-mux.h          |   2 +-
+>  include/sysemu/char.h       |  10 --
+>  chardev/char-mux.c          |  11 +-
+>  chardev/char-pty.c          |   2 +-
+>  chardev/char-socket.c       |  46 +++++-
+>  chardev/char-udp.c          |  26 ++--
+>  chardev/char.c              | 155 +++++++++----------
+>  gdbstub.c                   |   4 +-
+>  hw/usb/ccid-card-passthru.c |   2 +-
+>  hw/usb/redirect.c           |   2 +-
+>  net/vhost-user.c            |   2 +-
+>  qom/container.c             |   1 +
+>  tests/test-char.c           | 366 +++++++++++++++++++++++++++++++++++++++++++-
+>  tests/vhost-user-test.c     |   2 +-
+>  ui/console.c                |   2 +-
+>  ui/gtk.c                    |   2 +-
+>  vl.c                        |   1 +
+>  xen-common.c                |   2 +-
+>  18 files changed, 511 insertions(+), 127 deletions(-)
+> 
