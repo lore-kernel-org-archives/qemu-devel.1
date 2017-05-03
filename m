@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5trZ-0000Z3-Ps
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:58:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1d5tsg-0001WD-0g
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5trY-0001Je-L7
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:58:37 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed,  3 May 2017 14:57:18 +0200
-Message-Id: <1493816238-33120-25-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 24/24] tests: check -numa node,
- cpu=props_list usecase
+	(envelope-from <bounces@canonical.com>) id 1d5tsb-0001hM-5f
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d5tsa-0001h9-Vk
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d5tsZ-0002lj-7s
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 12:59:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B7BB72E80E8
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 12:59:38 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 03 May 2017 12:47:19 -0000
+From: ChristianEhrhardt <1581936@bugs.launchpad.net>
+Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
+Message-Id: <20170503124719.10051.13592.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
+ CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,180 +38,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- tests/numa-test.c | 151 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 151 insertions(+)
+I checked and this is in 2.6.1 via a backport as [1] not as the original
+[2].
 
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index 2722687..c3475d6 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -131,6 +131,144 @@ static void test_query_cpus(const void *data)
-     g_free(cli);
- }
- 
-+static void pc_numa_cpu(const void *data)
-+{
-+    char *cli;
-+    QDict *resp;
-+    QList *cpus;
-+    const QObject *e;
-+
-+    cli = make_cli(data, "-cpu pentium -smp 8,sockets=2,cores=2,threads=2 "
-+        "-numa node,nodeid=0 -numa node,nodeid=1 "
-+        "-numa cpu,node-id=1,socket-id=0 "
-+        "-numa cpu,node-id=0,socket-id=1,core-id=0 "
-+        "-numa cpu,node-id=0,socket-id=1,core-id=1,thread-id=0 "
-+        "-numa cpu,node-id=1,socket-id=1,core-id=1,thread-id=1");
-+    qtest_start(cli);
-+    cpus = get_cpus(&resp);
-+    g_assert(cpus);
-+
-+    while ((e = qlist_pop(cpus))) {
-+        QDict *cpu, *props;
-+        int64_t socket, core, thread, node;
-+
-+        cpu = qobject_to_qdict(e);
-+        g_assert(qdict_haskey(cpu, "props"));
-+        props = qdict_get_qdict(cpu, "props");
-+
-+        g_assert(qdict_haskey(props, "node-id"));
-+        node = qdict_get_int(props, "node-id");
-+        g_assert(qdict_haskey(props, "socket-id"));
-+        socket = qdict_get_int(props, "socket-id");
-+        g_assert(qdict_haskey(props, "core-id"));
-+        core = qdict_get_int(props, "core-id");
-+        g_assert(qdict_haskey(props, "thread-id"));
-+        thread = qdict_get_int(props, "thread-id");
-+
-+        if (socket == 0) {
-+            g_assert_cmpint(node, ==, 1);
-+        } else if (socket == 1 && core == 0) {
-+            g_assert_cmpint(node, ==, 0);
-+        } else if (socket == 1 && core == 1 && thread == 0) {
-+            g_assert_cmpint(node, ==, 0);
-+        } else if (socket == 1 && core == 1 && thread == 1) {
-+            g_assert_cmpint(node, ==, 1);
-+        } else {
-+            g_assert(false);
-+        }
-+    }
-+
-+    QDECREF(resp);
-+    qtest_end();
-+    g_free(cli);
-+}
-+
-+static void spapr_numa_cpu(const void *data)
-+{
-+    char *cli;
-+    QDict *resp;
-+    QList *cpus;
-+    const QObject *e;
-+
-+    cli = make_cli(data, "-smp 4,cores=4 "
-+        "-numa node,nodeid=0 -numa node,nodeid=1 "
-+        "-numa cpu,node-id=0,core-id=0 "
-+        "-numa cpu,node-id=0,core-id=1 "
-+        "-numa cpu,node-id=0,core-id=2 "
-+        "-numa cpu,node-id=1,core-id=3");
-+    qtest_start(cli);
-+    cpus = get_cpus(&resp);
-+    g_assert(cpus);
-+
-+    while ((e = qlist_pop(cpus))) {
-+        QDict *cpu, *props;
-+        int64_t core, node;
-+
-+        cpu = qobject_to_qdict(e);
-+        g_assert(qdict_haskey(cpu, "props"));
-+        props = qdict_get_qdict(cpu, "props");
-+
-+        g_assert(qdict_haskey(props, "node-id"));
-+        node = qdict_get_int(props, "node-id");
-+        g_assert(qdict_haskey(props, "core-id"));
-+        core = qdict_get_int(props, "core-id");
-+
-+        if (core >= 0 && core < 3) {
-+            g_assert_cmpint(node, ==, 0);
-+        } else if (core == 3) {
-+            g_assert_cmpint(node, ==, 1);
-+        } else {
-+            g_assert(false);
-+        }
-+    }
-+
-+    QDECREF(resp);
-+    qtest_end();
-+    g_free(cli);
-+}
-+
-+static void aarch64_numa_cpu(const void *data)
-+{
-+    char *cli;
-+    QDict *resp;
-+    QList *cpus;
-+    const QObject *e;
-+
-+    cli = make_cli(data, "-smp 2 "
-+        "-numa node,nodeid=0 -numa node,nodeid=1 "
-+        "-numa cpu,node-id=1,thread-id=0 "
-+        "-numa cpu,node-id=0,thread-id=1");
-+    qtest_start(cli);
-+    cpus = get_cpus(&resp);
-+    g_assert(cpus);
-+
-+    while ((e = qlist_pop(cpus))) {
-+        QDict *cpu, *props;
-+        int64_t thread, node;
-+
-+        cpu = qobject_to_qdict(e);
-+        g_assert(qdict_haskey(cpu, "props"));
-+        props = qdict_get_qdict(cpu, "props");
-+
-+        g_assert(qdict_haskey(props, "node-id"));
-+        node = qdict_get_int(props, "node-id");
-+        g_assert(qdict_haskey(props, "thread-id"));
-+        thread = qdict_get_int(props, "thread-id");
-+
-+        if (thread == 0) {
-+            g_assert_cmpint(node, ==, 1);
-+        } else if (thread == 1) {
-+            g_assert_cmpint(node, ==, 0);
-+        } else {
-+            g_assert(false);
-+        }
-+    }
-+
-+    QDECREF(resp);
-+    qtest_end();
-+    g_free(cli);
-+}
-+
- int main(int argc, char **argv)
- {
-     const char *args = NULL;
-@@ -147,5 +285,18 @@ int main(int argc, char **argv)
-     qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial);
-     qtest_add_data_func("/numa/qmp/cpus/query-cpus", args, test_query_cpus);
- 
-+    if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
-+        qtest_add_data_func("/numa/pc/cpu/explicit", args, pc_numa_cpu);
-+    }
-+
-+    if (!strcmp(arch, "ppc64")) {
-+        qtest_add_data_func("/numa/spapr/cpu/explicit", args, spapr_numa_cpu);
-+    }
-+
-+    if (!strcmp(arch, "aarch64")) {
-+        qtest_add_data_func("/numa/aarch64/cpu/explicit", args,
-+                            aarch64_numa_cpu);
-+    }
-+
-     return g_test_run();
- }
--- 
-2.7.4
+But that means >=3DYakkety is good and Xenial/Trusty are bad since the rela=
+ted Security SRUs.
+Updating bug tasks accordingly.
+
+[1]: http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D7ff5dc445d6bb392f9fb3=
+d0a254ef9071304780b
+[2]: http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D94ef4f337fb614f18b765=
+a8e0e878a4c23cdedcd
+
+** Also affects: qemu (Ubuntu Xenial)
+   Importance: Undecided
+       Status: New
+
+** Also affects: qemu (Ubuntu Trusty)
+   Importance: Undecided
+       Status: New
+
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Fix Released
+
+** Changed in: qemu (Ubuntu Trusty)
+       Status: New =3D> Triaged
+
+** Changed in: qemu (Ubuntu Xenial)
+       Status: New =3D> Triaged
+
+** Changed in: qemu (Ubuntu Trusty)
+   Importance: Undecided =3D> High
+
+** Changed in: qemu (Ubuntu Xenial)
+   Importance: Undecided =3D> High
+
+** Tags added: server-next
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1581936
+
+Title:
+  Frozen Windows 7 VMs with VGA CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Trusty:
+  Triaged
+Status in qemu source package in Xenial:
+  Triaged
+
+Bug description:
+  Hi,
+
+  As already posted on the QEMU devel list [1] I stumbled upon a problem
+  with QEMU in version 2.5.1.1 and 2.6.0.
+
+  the VM shows Windows loading
+  files for the installation, then the "Starting Windows" screen appears
+  here it hangs and never continues.
+
+  Changing the "-vga" option to cirrus solves this, the installation can
+  proceed and finish. When changing back to std (or also qxl, vmware) the
+  installed VM also hangs on the "Starting Windows" screen while qemu
+  showing a little but no excessive load.
+
+  This phenomena appears also with QEMU 2.6.0 but not with 2.6.0-rc4, a
+  git bisect shows fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7 (vga: make
+  sure vga register setup for vbe stays intact (CVE-2016-3712)) as the
+  culprit for this regression, as its a fix for a DoS its not an option to
+  just revert it, I guess.
+
+  The bisect log is:
+
+  git bisect start
+  # bad: [bfc766d38e1fae5767d43845c15c79ac8fa6d6af] Update version for v2.6=
+.0 release
+  git bisect bad bfc766d38e1fae5767d43845c15c79ac8fa6d6af
+  # good: [975eb6a547f809608ccb08c221552f666611af25] Update version for v2.=
+6.0-rc4 release
+  git bisect good 975eb6a547f809608ccb08c221552f666611af25
+  # good: [2068192dcccd8a80dddfcc8df6164cf9c26e0fc4] vga: update vga regist=
+er setup on vbe changes
+  git bisect good 2068192dcccd8a80dddfcc8df6164cf9c26e0fc4
+  # bad: [53db932604dfa7bb9241d132e0173894cf54261c] Merge remote-tracking b=
+ranch 'remotes/kraxel/tags/pull-vga-20160509-1' into staging
+  git bisect bad 53db932604dfa7bb9241d132e0173894cf54261c
+  # bad: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make sure vga regi=
+ster setup for vbe stays intact (CVE-2016-3712).
+  git bisect bad fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7
+  # first bad commit: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make =
+sure vga register setup for vbe stays intact (CVE-2016-3712).
+
+  =
+
+  I could reproduce that with QEMU 2.5.1 and QEMU 2.6 on a Debian derivate
+  (Promox VE) with 4.4 Kernel and also with QEMU 2.6 on an Arch Linux
+  System with a 4.5 Kernel, so it should not be host distro depended. Both
+  machines have Intel x86_64 processors.
+  The problem should be reproducible with said Versions or a build from
+  git including the above mentioned commit (fd3c136) by starting a VM with
+  an Windows 7 ISO, e.g.:
+
+  Freezing installation (as vga defaults to std I marked it as optional):
+  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 [-vga=
+ (std|qxl|vmware)]
+
+  Working installation:
+  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 -vga =
+cirrus
+
+  If someone has already an installed Windows 7 VM this behaviour should be
+  also observable when trying to start it with the new versions of QEMU.
+
+  Noteworthy may be that Windows 10 is working, I do not had time to get
+  other Windows versions and test them, I'll do that as soon as possible.
+  Various Linux system also seems do work fine, at least I did not ran
+  into an issue there yet.
+
+  I also tried testing with SeaBIOS and OVMF as firmware, as initially I
+  had no idea what broke, both lead to the same result - without the =
+
+  CVE-2016-3712 fix they both work, with not.
+  Further, KVM enabled and disabled does not make any difference.
+
+  =
+
+  [1] http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg02416.html
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1581936/+subscriptions
