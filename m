@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLv-0000b2-PR
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLw-0000bC-0d
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:26:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLq-00007m-Nm
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLq-00007H-JJ
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:55 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:31495 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:21269 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1d5tLq-0008Vj-AI
+	id 1d5tLq-0008Ut-59
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:50 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  3 May 2017 15:25:38 +0300
-Message-Id: <20170503122539.282182-25-vsementsov@virtuozzo.com>
+Date: Wed,  3 May 2017 15:25:27 +0300
+Message-Id: <20170503122539.282182-14-vsementsov@virtuozzo.com>
 In-Reply-To: <20170503122539.282182-1-vsementsov@virtuozzo.com>
 References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 24/25] qmp: block-dirty-bitmap-remove: remove
- persistent
+Subject: [Qemu-devel] [PATCH 13/25] block: introduce persistent dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +27,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Remove persistent bitmap from the storage on block-dirty-bitmap-remove.
+New field BdrvDirtyBitmap.persistent means, that bitmap should be saved
+by format driver in .bdrv_close and .bdrv_inactivate. No format driver
+supports it for now.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c           | 10 ++++++++++
- qapi/block-core.json |  3 ++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ block/dirty-bitmap.c         | 26 ++++++++++++++++++++++++++
+ block/qcow2-bitmap.c         |  1 +
+ include/block/dirty-bitmap.h |  5 +++++
+ 3 files changed, 32 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index c49d414891..0ad1a658b9 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2802,6 +2802,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-     AioContext *aio_context;
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
-+    Error *local_err = NULL;
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index bdbfb01cd7..bac4fe3008 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -48,6 +48,7 @@ struct BdrvDirtyBitmap {
+                                    by deserialize* functions */
+     bool autoload;              /* For persistent bitmaps: bitmap must be
+                                    autoloaded on image opening */
++    bool persistent;            /* bitmap must be saved to owner disk image */
+     QLIST_ENTRY(BdrvDirtyBitmap) list;
+ };
  
-     bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
-     if (!bitmap || !bs) {
-@@ -2814,6 +2815,15 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-                    name);
-         goto out;
-     }
+@@ -74,6 +75,7 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
+     assert(!bdrv_dirty_bitmap_frozen(bitmap));
+     g_free(bitmap->name);
+     bitmap->name = NULL;
++    bitmap->persistent = false;
+     bitmap->autoload = false;
+ }
+ 
+@@ -243,6 +245,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+     bitmap->name = NULL;
+     successor->name = name;
+     bitmap->successor = NULL;
++    successor->persistent = bitmap->persistent;
++    bitmap->persistent = false;
+     successor->autoload = bitmap->autoload;
+     bitmap->autoload = false;
+     bdrv_release_dirty_bitmap(bs, bitmap);
+@@ -571,3 +575,25 @@ bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
+ {
+     return bitmap->autoload;
+ }
 +
-+    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
-+        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-+        if (local_err != NULL) {
-+            error_propagate(errp, local_err);
-+            goto out;
++void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool persistent)
++{
++    bitmap->persistent = persistent;
++}
++
++bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap)
++{
++    return bitmap->persistent;
++}
++
++bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs)
++{
++    BdrvDirtyBitmap *bm;
++    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
++        if (bm->persistent && !bm->readonly) {
++            return true;
 +        }
 +    }
 +
-     bdrv_dirty_bitmap_make_anon(bitmap);
-     bdrv_release_dirty_bitmap(bs, bitmap);
++    return false;
++}
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index ecaac57778..f0887cc8ff 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -793,6 +793,7 @@ bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+                 goto fail;
+             }
  
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e9523b4b8c..933b1a5fe5 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1600,7 +1600,8 @@
- # @block-dirty-bitmap-remove:
- #
- # Stop write tracking and remove the dirty bitmap that was created
--# with block-dirty-bitmap-add.
-+# with block-dirty-bitmap-add. If bitmap is persistent, remove it from it's
-+# storage too.
- #
- # Returns: nothing on success
- #          If @node is not a valid block device or node, DeviceNotFound
++            bdrv_dirty_bitmap_set_persistance(bitmap, true);
+             bdrv_dirty_bitmap_set_autoload(bitmap, true);
+             bm->flags |= BME_FLAG_IN_USE;
+             created_dirty_bitmaps =
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 60e2853d48..a48e4df246 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -81,4 +81,9 @@ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap);
+ void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload);
+ bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+ 
++void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
++                                                bool persistent);
++bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
++bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
++
+ #endif
 -- 
 2.11.1
