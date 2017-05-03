@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d5wNj-0008Ci-2H
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:40:00 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5wP3-0000eP-LP
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d5wNe-0007XP-5s
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:39:59 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36466)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1d5wNd-0007Wv-S5
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:39:54 -0400
-Received: by mail-wr0-x244.google.com with SMTP id v42so23507917wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 08:39:53 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
-	<20170412095111.11728-5-xiaoguangrong@tencent.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7df8de22-9ee9-00b5-f21b-ad7ec27f63c3@redhat.com>
-Date: Wed, 3 May 2017 17:39:48 +0200
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5wOy-00007W-UP
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:41:21 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:12723)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5wOy-00006V-Ib
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:41:16 -0400
+References: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1493735386-39622-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<4ccaf863-4c73-e168-3c09-c916a6aaa75e@redhat.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <25938992-bdea-4f0c-0b9c-0467b8684b98@huawei.com>
+Date: Wed, 3 May 2017 17:40:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170412095111.11728-5-xiaoguangrong@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] mc146818rtc: move x86 specific code
- out of periodic_timer_update
+In-Reply-To: <4ccaf863-4c73-e168-3c09-c916a6aaa75e@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,199 +28,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, yunfangtai@tencent.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
+Cc: alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-
-
-On 12/04/2017 11:51, guangrong.xiao@gmail.com wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> 
-> Move the x86 specific code in periodic_timer_update() to a common place,
-> the actual logic is not changed
-> 
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> ---
->  hw/timer/mc146818rtc.c | 112 +++++++++++++++++++++++++++++--------------------
->  1 file changed, 66 insertions(+), 46 deletions(-)
-> 
-> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-> index 3bf559d..d7b7c56 100644
-> --- a/hw/timer/mc146818rtc.c
-> +++ b/hw/timer/mc146818rtc.c
-> @@ -144,6 +144,63 @@ static void rtc_coalesced_timer(void *opaque)
->  
->      rtc_coalesced_timer_update(s);
->  }
-> +
-> +static int64_t
-> +arch_periodic_timer_update(RTCState *s, int period, int64_t lost_clock)
-> +{
-> +    if (period != s->period) {
-> +        int64_t scale_lost_clock;
-> +        int current_irq_coalesced = s->irq_coalesced;
-> +
-> +        s->irq_coalesced = (current_irq_coalesced * s->period) / period;
-> +
-> +        /*
-> +         * calculate the lost clock after it is scaled which should be
-> +         * compensated in the next interrupt.
-> +         */
-> +        scale_lost_clock = current_irq_coalesced * s->period -
-> +                            s->irq_coalesced * period;
-> +        DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, %ld clocks "
-> +                  "are compensated.\n", current_irq_coalesced,
-> +                  s->irq_coalesced, scale_lost_clock);
-> +        lost_clock += scale_lost_clock;
-> +        s->period = period;
-
-This should be moved up to the caller.
-
-Also, if s->lost_tick_policy is not SLEW, s->irq_coalesced on input is
-zero.  So I *think* what you get is equivalent to
-
-   if (s->lost_tick_policy != LOST_TICK_POLICY_SLEW) {
-       return;
-   }
-
-   /* ... comment ... */
-   lost_interrupt = (s->irq_coalesced * s->period) / period;
-   lost_clock += (s->irq_coalesced * s->period) % period;
-   lost_interrupt += lost_clock / period;
-   lost_clock %= period;
-
-   s->irq_coalesced = load_interrupt;
-   rtc_coalesced_timer_update(s);
-
-or equivalently:
-
-   lost_clock += s->irq_coalesced * s->period;
-
-   s->irq_coalesced = lost_clock / period;
-   lost_clock %= period;
-   rtc_coalesced_timer_update(s);
-
-I think you should probably merge these three patches and document the
-resulting logic, because it's simpler than building it a patch at a time.
-
-Thanks,
-
-Paolo
-
-> +    }
-> +
-> +    /*
-> +     * if more than period clocks were passed, i.e, the timer interrupt
-> +     * has been lost, we should catch up the time.
-> +     */
-> +    if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW &&
-> +       (lost_clock / period)) {
-> +        int lost_interrupt = lost_clock / period;
-> +
-> +        s->irq_coalesced += lost_interrupt;
-> +        lost_clock -= lost_interrupt * period;
-> +        if (lost_interrupt) {
-> +            DPRINTF_C("cmos: compensate %d interrupts, coalesced irqs "
-> +                      "increased to %d\n", lost_interrupt, s->irq_coalesced);
-> +            rtc_coalesced_timer_update(s);
-> +        }
-> +    }
-> +
-> +    return lost_clock;
-> +}
-> +
-> +static void arch_periodic_timer_disable(RTCState *s)
-> +{
-> +    s->irq_coalesced = 0;
-> +}
-> +#else
-> +static int64_t
-> +arch_periodic_timer_update(RTCState *s, int period, int64_t lost_clock)
-> +{
-> +    return lost_clock;
-> +}
-> +
-> +static void arch_periodic_timer_disable(RTCState *s)
-> +{
-> +}
->  #endif
->  
->  static int period_code_to_clock(int period_code)
-> @@ -175,24 +232,7 @@ periodic_timer_update(RTCState *s, int64_t current_time, int old_period)
->      if (period_code != 0
->          && (s->cmos_data[RTC_REG_B] & REG_B_PIE)) {
->          period = period_code_to_clock(period_code);
-> -#ifdef TARGET_I386
-> -        if (period != s->period) {
-> -            int current_irq_coalesced = s->irq_coalesced;
-> -
-> -            s->irq_coalesced = (current_irq_coalesced * s->period) / period;
->  
-> -            /*
-> -             * calculate the lost clock after it is scaled which should be
-> -             * compensated in the next interrupt.
-> -             */
-> -            lost_clock += current_irq_coalesced * s->period -
-> -                            s->irq_coalesced * period;
-> -            DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, %ld clocks "
-> -                      "are compensated.\n",
-> -                      current_irq_coalesced, s->irq_coalesced, lost_clock);
-> -        }
-> -        s->period = period;
-> -#endif
->          /* compute 32 khz clock */
->          cur_clock =
->              muldiv64(current_time, RTC_CLOCK_RATE, NANOSECONDS_PER_SECOND);
-> @@ -219,42 +259,22 @@ periodic_timer_update(RTCState *s, int64_t current_time, int old_period)
->  
->              /* calculate the clock since last interrupt. */
->              lost_clock += cur_clock - last_periodic_clock;
-> -
-> -#ifdef TARGET_I386
-> -            /*
-> -             * if more than period clocks were passed, i.e, the timer interrupt
-> -             * has been lost, we should catch up the time.
-> -             */
-> -            if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW &&
-> -                (lost_clock / period)) {
-> -                int lost_interrupt = lost_clock / period;
-> -
-> -                s->irq_coalesced += lost_interrupt;
-> -                lost_clock -= lost_interrupt * period;
-> -                if (lost_interrupt) {
-> -                    DPRINTF_C("cmos: compensate %d interrupts, coalesced irqs "
-> -                              "increased to %d\n", lost_interrupt,
-> -                              s->irq_coalesced);
-> -                    rtc_coalesced_timer_update(s);
-> -                }
-> -            } else
-> -#endif
-> -            /*
-> -             * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
-> -             * is not used, we should make the time progress anyway.
-> -             */
-> -            lost_clock = MIN(lost_clock, period);
-> -            assert(lost_clock >= 0);
->          }
->  
-> +        lost_clock = arch_periodic_timer_update(s, period, lost_clock);
-> +
-> +        /*
-> +         * we should make the time progress anyway.
-> +         */
-> +        lost_clock = MIN(lost_clock, period);
-> +        assert(lost_clock >= 0);
-> +
->          next_irq_clock = cur_clock + period - lost_clock;
->          s->next_periodic_time = muldiv64(next_irq_clock, NANOSECONDS_PER_SECOND,
->                                           RTC_CLOCK_RATE) + 1;
->          timer_mod(s->periodic_timer, s->next_periodic_time);
->      } else {
-> -#ifdef TARGET_I386
-> -        s->irq_coalesced = 0;
-> -#endif
-> +        arch_periodic_timer_disable(s);
->          timer_del(s->periodic_timer);
->      }
->  }
-> 
+On 5/3/2017 12:13 AM, Eric Blake wrote:
+> On 05/02/2017 09:29 AM, Pradeep Jagadeesh wrote:
+>> This patchset enables qmp interfaces for the fsdev
+>> devices. This provides two interfaces one
+>> for querying info of all the fsdev devices. The second one
+>> to set the IO limits for the required fsdev device.
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>> ---
+>
+>> +++ b/fsdev/qemu-fsdev-throttle.c
+>> @@ -29,6 +29,102 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
+>>      qemu_co_enter_next(&fst->throttled_reqs[true]);
+>>  }
+>>
+>> +void fsdev_set_io_throttle(IOThrottle *arg, FsThrottle *fst, Error **errp)
+>> +{
+>> +    ThrottleConfig cfg;
+>> +
+>> +    throttle_config_init(&cfg);
+>> +    cfg.buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
+>> +    cfg.buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
+>> +    cfg.buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
+>> +
+>> +    cfg.buckets[THROTTLE_OPS_TOTAL].avg = arg->iops;
+>> +    cfg.buckets[THROTTLE_OPS_READ].avg  = arg->iops_rd;
+>> +    cfg.buckets[THROTTLE_OPS_WRITE].avg = arg->iops_wr;
+>> +
+>> +    if (arg->has_bps_max) {
+>> +        cfg.buckets[THROTTLE_BPS_TOTAL].max = arg->bps_max;
+>> +    }
+>
+> Should the bulk of this be replaced by a call to a common IOThrottle
+> helper function, rather than open-coded duplication?
+If we can reduce the duplicate code with a helper function its a good 
+idea. But I can not think of any ways of doing it. Any suggestions?
+>
+>
+>> +
+>> +void fsdev_get_io_throttle(FsThrottle *fst, IOThrottle **fs9pcfg,
+>> +                           char *fsdevice, Error **errp)
+>> +{
+>> +
+>> +    ThrottleConfig cfg = fst->cfg;
+>> +    IOThrottle *fscfg = g_malloc0(sizeof(*fscfg));
+>> +
+>> +    fscfg->has_id = true;
+>> +    fscfg->id = g_strdup(fsdevice);
+>> +    fscfg->bps = cfg.buckets[THROTTLE_BPS_TOTAL].avg;
+>> +    fscfg->bps_rd = cfg.buckets[THROTTLE_BPS_READ].avg;
+>> +    fscfg->bps_wr = cfg.buckets[THROTTLE_BPS_WRITE].avg;
+>
+> Shouldn't you be setting has_bps, has_bps_rd, has_bps_wr, and so on, to
+> true?
+Yes, I need to set, but its only for max values, I mean has_bps_max..etc
+>
+>
+>> +++ b/fsdev/qemu-fsdev-throttle.h
+>> @@ -19,7 +19,14 @@
+>>  #include "qemu/main-loop.h"
+>>  #include "qemu/coroutine.h"
+>>  #include "qapi/error.h"
+>> +#include "qapi/qmp/qerror.h"
+>>  #include "qemu/throttle.h"
+>> +#include "qapi/qmp/types.h"
+>> +#include "qapi-visit.h"
+>> +#include "qapi/qobject-output-visitor.h"
+>> +#include "qapi/util.h"
+>> +#include "qmp-commands.h"
+>> +#include "qemu/throttle-options.h"
+>>
+>>  typedef struct FsThrottle {
+>>      ThrottleState ts;
+>> @@ -36,4 +43,10 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *, bool ,
+>>                                              struct iovec *, int);
+>>
+>>  void fsdev_throttle_cleanup(FsThrottle *);
+>> +
+>> +void fsdev_set_io_throttle(IOThrottle *, FsThrottle *, Error **);
+>
+> Even though it's not necessary per C, we tend to spell parameter names
+> in function declarations as it aids legibility.  (Seeing 'Error **' is
+> weird compared to the usual 'Error **errp')
+OK, I will fix it.
+>
+>
+>> @@ -1570,6 +1571,80 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+>>      hmp_handle_error(mon, &err);
+>>  }
+>>
+>> +#ifdef CONFIG_VIRTFS
+>> +
+>> +void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
+>> +{
+>> +    Error *err = NULL;
+>> +    IOThrottle throttle = {
+>> +        .has_id = true,
+>> +        .id = (char *) qdict_get_str(qdict, "id"),
+>> +        .bps = qdict_get_int(qdict, "bps"),
+>> +        .bps_rd = qdict_get_int(qdict, "bps_rd"),
+>> +        .bps_wr = qdict_get_int(qdict, "bps_wr"),
+>> +        .iops = qdict_get_int(qdict, "iops"),
+>> +        .iops_rd = qdict_get_int(qdict, "iops_rd"),
+>> +        .iops_wr = qdict_get_int(qdict, "iops_wr"),
+>
+> Again, don't you need to be setting .has_bps=true and so on?
+Same as above. I have not set any max burst values here, because I 
+wanted to keep it in line with the block device.
+May be there is a room to enable these max values in both in future.
+>
+>
+>> +++ b/qapi/fsdev.json
+>> @@ -0,0 +1,84 @@
+>> +# -*- Mode: Python -*-
+>> +
+>> +##
+>> +# == QAPI fsdev definitions
+>> +##
+>> +
+>> +# QAPI common definitions
+>> +{ 'include': 'iothrottle.json' }
+>> +
+>> +##
+>> +# @fsdev-set-io-throttle:
+>> +#
+>> +# Change I/O limits for a 9p/fsdev device.
+>> +#
+>> +# I/O limits can be enabled by setting throttle value to non-zero number.
+>> +#
+>> +# I/O limits can be disabled by setting all throttle values to 0.
+>> +#
+>> +# Returns: Nothing on success
+>> +#          If @device is not a valid fsdev device, DeviceNotFound
+>> +#
+>> +# Since: 2.10
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "fsdev-set-io-throttle",
+>> +#      "arguments": { "id": "id0-1-0",
+>> +#                     "bps": 1000000,
+>> +#                     "bps_rd": 0,
+>> +#                     "bps_wr": 0,
+>> +#                     "iops": 0,
+>> +#                     "iops_rd": 0,
+>> +#                     "iops_wr": 0,
+>> +#                     "bps_max": 8000000,
+>> +#                     "bps_rd_max": 0,
+>> +#                     "bps_wr_max": 0,
+>> +#                     "iops_max": 0,
+>> +#                     "iops_rd_max": 0,
+>> +#                     "iops_wr_max": 0,
+>> +#                     "bps_max_length": 60,
+>> +#                     "iops_size": 0 } }
+>> +# <- { "returns": {} }
+>> +##
+>> +{ 'command': 'fsdev-set-io-throttle', 'boxed': true,
+>> +  'data': 'IOThrottle' }
+>
+> This part looks okay.
+>
+>> +##
+>> +# @query-fsdev-io-throttle:
+>> +#
+>> +# Returns: a list of @IOThrottle describing io throttle values of each fsdev device
+>> +#
+>> +# Since: 2.10
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "Execute": "query-fsdev-io-throttle" }
+>> +# <- { "returns" : [
+>> +#          {
+>> +#             "id": "id0-hd0",
+>> +#              "bps":1000000,
+>> +#              "bps_rd":0,
+>> +#              "bps_wr":0,
+>> +#              "iops":1000000,
+>> +#              "iops_rd":0,
+>> +#              "iops_wr":0,
+>> +#              "bps_max": 8000000,
+>> +#              "bps_rd_max": 0,
+>> +#              "bps_wr_max": 0,
+>> +#              "iops_max": 0,
+>> +#              "iops_rd_max": 0,
+>> +#              "iops_wr_max": 0,
+>> +#              "bps_max_length": 0,
+>> +#              "bps_rd_max_length": 0,
+>> +#              "bps_wr_max_length": 0,
+>> +#              "iops_max_length": 0,
+>> +#              "iops_rd_max_length": 0,
+>> +#              "iops_wr_max_length": 0,
+>> +#              "iops_size": 0
+>> +#            }
+>> +#          ]
+>> +#      }
+>> +#
+>> +##
+>> +{ 'command': 'query-fsdev-io-throttle', 'returns': [ 'IOThrottle' ] }
+>> +
+>> diff --git a/qapi/iothrottle.json b/qapi/iothrottle.json
+>> index 124ab40..698d4bc 100644
+>> --- a/qapi/iothrottle.json
+>> +++ b/qapi/iothrottle.json
+>> @@ -3,6 +3,7 @@
+>>  ##
+>>  # == QAPI IOThrottle definitions
+>>  ##
+>> +##
+>>  # @IOThrottle:
+>
+> This looks like a spurious change
+You mean the below sentence is not required?
+I will remove it. Its not really required.
+>
+>>  #
+>>  # A set of parameters describing iothrottle
+>>
+>
