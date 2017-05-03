@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d61DQ-0005lv-Ou
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:49:43 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d61OB-000345-SA
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 17:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d61DP-0006oT-TI
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:49:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33978)
+	(envelope-from <sstabellini@kernel.org>) id 1d61O4-0001FJ-Aj
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 17:00:47 -0400
+Received: from mail.kernel.org ([198.145.29.136]:48338)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d61DP-0006nb-Mp
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:49:39 -0400
-Date: Wed, 3 May 2017 23:49:35 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170503234930-mutt-send-email-mst@kernel.org>
-References: <20170503203604.31462-1-ehabkost@redhat.com>
-	<20170503203604.31462-5-ehabkost@redhat.com>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1d61O3-0001ET-V1
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 17:00:40 -0400
+Date: Wed, 3 May 2017 14:00:35 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1705031359390.9240@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170503203604.31462-5-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND v2 04/21] iommu: Remove FIXME
- comment about user_creatable=true
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] [PATCH v2] xen/mapcache: store dma information in
+ revmapcache entries for debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +25,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: anthony.perard@citrix.com
+Cc: sstabellini@kernel.org, qemu-devel@nongnu.org, xen-devel@lists.xensource.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, hrgstephen@gmail.com, x1917x@gmail.com
 
-On Wed, May 03, 2017 at 05:35:47PM -0300, Eduardo Habkost wrote:
-> amd-iommu and intel-iommu are really meant to be used with
-> -device, so they need user_creatable=true. Remove the FIXME
-> comment.
-> 
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> Acked-by: Marcel Apfelbaum <marcel@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+The Xen mapcache is able to create long term mappings, they are called
+"locked" mappings. The third parameter of the xen_map_cache call
+specifies if a mapping is a "locked" mapping.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-> ---
-> Changes v1 -> v2:
-> * (none)
-> ---
->  hw/i386/amd_iommu.c   | 5 +----
->  hw/i386/intel_iommu.c | 5 +----
->  2 files changed, 2 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-> index 7b92c8c15a..efcc93cbfd 100644
-> --- a/hw/i386/amd_iommu.c
-> +++ b/hw/i386/amd_iommu.c
-> @@ -1186,10 +1186,7 @@ static void amdvi_class_init(ObjectClass *klass, void* data)
->      dc->vmsd = &vmstate_amdvi;
->      dc->hotpluggable = false;
->      dc_class->realize = amdvi_realize;
-> -    /*
-> -     * FIXME: Set only because we are not sure yet if this device
-> -     * will be outside the q35 sysbus whitelist.
-> -     */
-> +    /* Supported by the pc-q35-* machine types */
->      dc->user_creatable = true;
->  }
->  
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 54187a04a4..327a46cd19 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3009,10 +3009,7 @@ static void vtd_class_init(ObjectClass *klass, void *data)
->      dc->hotpluggable = false;
->      x86_class->realize = vtd_realize;
->      x86_class->int_remap = vtd_int_remap;
-> -    /*
-> -     * FIXME: Set only because we are not sure yet if this device
-> -     * will be outside the q35 sysbus whitelist.
-> -     */
-> +    /* Supported by the pc-q35-* machine types */
->      dc->user_creatable = true;
->  }
->  
-> -- 
-> 2.11.0.259.g40922b1
+>From the QEMU point of view there are two kinds of long term mappings:
+
+[a] device memory mappings, such as option roms and video memory
+[b] dma mappings, created by dma_memory_map & friends
+
+After certain operations, ballooning a VM in particular, Xen asks QEMU
+kindly to destroy all mappings. However, certainly [a] mappings are
+present and cannot be removed. That's not a problem as they are not
+affected by balloonning. The *real* problem is that if there are any
+mappings of type [b], any outstanding dma operations could fail. This is
+a known shortcoming. In other words, when Xen asks QEMU to destroy all
+mappings, it is an error if any [b] mappings exist.
+
+However today we have no way of distinguishing [a] from [b]. Because of
+that, we cannot even print a decent warning.
+
+This patch introduces a new "dma" bool field to MapCacheRev entires, to
+remember if a given mapping is for dma or is a long term device memory
+mapping. When xen_invalidate_map_cache is called, we print a warning if
+any [b] mappings exist. We ignore [a] mappings.
+
+Mappings created by qemu_map_ram_ptr are assumed to be [a], while
+mappings created by address_space_map->qemu_ram_ptr_length are assumed
+to be [b].
+
+The goal of the patch is to make debugging and system understanding
+easier.
+
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+---
+
+Changes in v2:
+- add acked-by
+- fix code style problem
+
+diff --git a/exec.c b/exec.c
+index eac6085..85769e1 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2084,10 +2084,10 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
+          * In that case just map until the end of the page.
+          */
+         if (block->offset == 0) {
+-            return xen_map_cache(addr, 0, 0);
++            return xen_map_cache(addr, 0, 0, false);
+         }
+ 
+-        block->host = xen_map_cache(block->offset, block->max_length, 1);
++        block->host = xen_map_cache(block->offset, block->max_length, 1, false);
+     }
+     return ramblock_ptr(block, addr);
+ }
+@@ -2117,10 +2117,10 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+          * In that case just map the requested area.
+          */
+         if (block->offset == 0) {
+-            return xen_map_cache(addr, *size, 1);
++            return xen_map_cache(addr, *size, 1, true);
+         }
+ 
+-        block->host = xen_map_cache(block->offset, block->max_length, 1);
++        block->host = xen_map_cache(block->offset, block->max_length, 1, true);
+     }
+ 
+     return ramblock_ptr(block, addr);
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+index 31debdf..e60156c 100644
+--- a/hw/i386/xen/xen-mapcache.c
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -62,6 +62,7 @@ typedef struct MapCacheRev {
+     hwaddr paddr_index;
+     hwaddr size;
+     QTAILQ_ENTRY(MapCacheRev) next;
++    bool dma;
+ } MapCacheRev;
+ 
+ typedef struct MapCache {
+@@ -202,7 +203,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+ }
+ 
+ static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
+-                                       uint8_t lock)
++                                       uint8_t lock, bool dma)
+ {
+     MapCacheEntry *entry, *pentry = NULL;
+     hwaddr address_index;
+@@ -289,6 +290,7 @@ tryagain:
+     if (lock) {
+         MapCacheRev *reventry = g_malloc0(sizeof(MapCacheRev));
+         entry->lock++;
++        reventry->dma = dma;
+         reventry->vaddr_req = mapcache->last_entry->vaddr_base + address_offset;
+         reventry->paddr_index = mapcache->last_entry->paddr_index;
+         reventry->size = entry->size;
+@@ -300,12 +302,12 @@ tryagain:
+ }
+ 
+ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+-                       uint8_t lock)
++                       uint8_t lock, bool dma)
+ {
+     uint8_t *p;
+ 
+     mapcache_lock();
+-    p = xen_map_cache_unlocked(phys_addr, size, lock);
++    p = xen_map_cache_unlocked(phys_addr, size, lock, dma);
+     mapcache_unlock();
+     return p;
+ }
+@@ -426,8 +428,11 @@ void xen_invalidate_map_cache(void)
+     mapcache_lock();
+ 
+     QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
+-        DPRINTF("There should be no locked mappings at this time, "
+-                "but "TARGET_FMT_plx" -> %p is present\n",
++        if (!reventry->dma) {
++            continue;
++        }
++        fprintf(stderr, "Locked DMA mapping while invalidating mapcache!"
++                " "TARGET_FMT_plx" -> %p is present\n",
+                 reventry->paddr_index, reventry->vaddr_req);
+     }
+ 
+diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+index b8c93b9..01daaad 100644
+--- a/include/sysemu/xen-mapcache.h
++++ b/include/sysemu/xen-mapcache.h
+@@ -17,7 +17,7 @@ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr start_addr,
+ void xen_map_cache_init(phys_offset_to_gaddr_t f,
+                         void *opaque);
+ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+-                       uint8_t lock);
++                       uint8_t lock, bool dma);
+ ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
+ void xen_invalidate_map_cache_entry(uint8_t *buffer);
+ void xen_invalidate_map_cache(void);
+@@ -31,7 +31,8 @@ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+ 
+ static inline uint8_t *xen_map_cache(hwaddr phys_addr,
+                                      hwaddr size,
+-                                     uint8_t lock)
++                                     uint8_t lock,
++                                     bool dma)
+ {
+     abort();
+ }
