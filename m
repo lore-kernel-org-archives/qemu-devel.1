@@ -1,45 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d60yS-0001NX-8f
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:34:14 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d610R-0002B8-IQ
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d60yO-0007mJ-68
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:34:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34557
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1d60yO-0007lg-06
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:34:08 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v43KXdaJ031816
-	for <qemu-devel@nongnu.org>; Wed, 3 May 2017 16:34:06 -0400
-Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a7p6fgc7r-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 16:34:05 -0400
-Received: from localhost
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 3 May 2017 17:34:02 -0300
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-References: <20170430172547.13415-1-danielhb@linux.vnet.ibm.com>
-	<20170430172547.13415-3-danielhb@linux.vnet.ibm.com>
-	<CAGZKiBok2=HRT9BjMiDx+c20YeKhknJ0ZD_GV1Zx=BrbFSmxwA@mail.gmail.com>
-	<c890eaba-6d61-4e82-c771-1476cd3df0f2@linux.vnet.ibm.com>
-	<CAGZKiBrEihUiYSNRetQzWVjOgrAQdTHze0_9Ec3XtGxk2LYhmw@mail.gmail.com>
-	<e73ca259-9535-da41-0c21-3e4d6c1b8f63@linux.vnet.ibm.com>
-Date: Wed, 3 May 2017 17:33:54 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1d610N-0001Qa-J7
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:36:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45840)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d610N-0001Os-AA
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 16:36:11 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Wed,  3 May 2017 17:35:43 -0300
+Message-Id: <20170503203604.31462-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e73ca259-9535-da41-0c21-3e4d6c1b8f63@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <783051ae-b92c-3679-ca25-979db6d2d7d6@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/5] hw/ppc: removing
- spapr_drc_detach_cb opaques
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH RESEND v2 00/21] qdev/sysbus: Set
+ user_creatable=false by default on sysbus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,314 +25,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata.rao@gmail.com>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Update: I have talked with Michael Roth about the spapr_release_lmb 
-callback, the flow
-of the LMB releases and so on. He clarified to me that it is not 
-possible to get rid of
-the callback and put its code in the spapr_del_lmbs function.
+No code changes since v2, just a rebase to latest qemu.git
+master, a trivial commit message fix at patch 1, and added
+Acked-by and Reviewed-by tags.
 
-The reason is that the callback is being executed by the guest via 
-spapr_rtas.c:rtas_set_indicator(),
-which in turn will follow the flow of the DRC releases and eventually 
-will hit the spapr_release_lmb
-callback, but this will not necessarily happen in the spam of the 
-spapr_del_lmbs function. This means that
-my idea of putting the cb code in the spapr_del_lmbs and removing the 
-callback not possible.
+Changes v1 -> v2
+----------------
 
-On the other hand, Bharata raised the issue about the scan function in 
-the callback being a problem.
-My tests with a 1 Gb unplug didn't show any noticeable delay increase 
-but in theory we support memory
-unplugs of 1 Terabyte. With 1Gb of RAM we need 4 DRCs, so 1 Tb would 
-require 4000 DRCs. Then we
-would scan through them 4000 times. I don't think the scan inside the 
-callback is feasible in this scenario
-either.
+* Rewrote series name and cover letter completely to not pretend
+  we're fixing the q35 lack-of-sysbus-whitelist bug, and explain
+  the motivation for the series.
+  * Previous series name was:
+    "sysbus: Don't allow -device/device_add by default"
+  * Rewrote description of patch 02/21, too
+  * (I really hope people read this cover letter before
+    commenting on individual patches.)
+* Rewrote FIXME comments to make it clear that we just set
+  user_creatable=3Dtrue temporarily because we don't know yet if
+  the device should be in the q35 whitelist.
+* Set user_creatable=3Dtrue on xen-backend also
+  (I didn't notice it was missing because I was building QEMU
+  without xen support)
+  * New patches:
+    * "xen-backend: Remove FIXME comment about user_creatable flag"
+    * "xen-sysdev: Remove user_creatable flag"
+* Patch:
+    "s390: Add FIXME for unexplained user_creatable=3Dfalse line"
+  replaced with:
+    "s390-pcibus: No need to set user_creatable=3Dfalse explicitly"
 
-In the v9 I'll migrate the sPAPRDIMMState structure like Michael Roth 
-mentioned somewhere in the
-v6 review to use it inside the spapr_lmb_release callback - looks like 
-the best option we have.
+Description
+-----------
 
+This series refactor the cannot_instantiate_with_device_add code
+for sysbus. First, the cannot_instantiate_with_device_add field
+is replaced by !user_creatable.
 
-Thanks,
+Then, we change TYPE_SYS_BUS_DEVICE to set user_creatable=3Dfalse
+by default, and we set user_creatable=3Dtrue explicitly only on the
+devices that are really supposed to be user-creatable on some
+machines.
 
+Motivation
+----------
 
-Daniel
+First of all, this makes the code less fragile: setting
+user_creatable=3Dfalse or cannot_instantiate_with_device_add=3Dtrue
+on all sysbus devices is incorrect, and makes code that looks at
+cannot_instantiate_with_device_add/user_creatable easy to break.
 
+This also fixes a regression introduced by commit
+33cd52b5d7b9adfd009e95f07e6c64dd88ae2a31, that makes all sysbus
+devices appear on "-device help" and lack the "no-user" flag on
+"info qdm"[1].
 
+This will also make it possible for automatic test code (like the
+device-crash-test.py script I sent a while ago[2]) skip devices
+that are not supposed to be user-creatable on any machine.
 
-On 05/03/2017 10:56 AM, Daniel Henrique Barboza wrote:
->
->
-> On 05/03/2017 12:26 AM, Bharata B Rao wrote:
->> On Tue, May 2, 2017 at 1:13 PM, Daniel Henrique Barboza 
->> <danielhb@linux.vnet.ibm.com <mailto:danielhb@linux.vnet.ibm.com>> 
->> wrote:
->>
->>
->>
->>     On 05/02/2017 12:40 AM, Bharata B Rao wrote:
->>>     On Sun, Apr 30, 2017 at 10:55 PM, Daniel Henrique Barboza
->>>     <danielhb@linux.vnet.ibm.com
->>>     <mailto:danielhb@linux.vnet.ibm.com>> wrote:
->>>
->>>         Following up the previous detach_cb change, this patch
->>>         removes the
->>>         detach_cb_opaque entirely from the code.
->>>
->>>         The reason is that the drc->detach_cb_opaque object can't be
->>>         restored in the post load of the upcoming DRC migration and
->>>         no detach
->>>         callbacks actually need this opaque. 'spapr_core_release' is
->>>         receiving it as NULL, 'spapr_phb_remove_pci_device_cb' is
->>>         receiving
->>>         a phb object as opaque but is't using it. These were trivial
->>>         removal
->>>         cases.
->>>
->>>         However, the LM removal callback 'spapr_lmb_release' is 
->>> receiving
->>>         and using the opaque object, a 'sPAPRDIMMState' struct. This
->>>         struct
->>>         holds the number of LMBs the DIMM object contains and the
->>>         callback
->>>         was using this counter as a countdown to check if all LMB
->>>         DRCs were
->>>         release before proceeding to the DIMM unplug. To remove the
->>>         need of
->>>         this callback we have choices such as:
->>>
->>>         - migrate the 'sPAPRDIMMState' struct. This would require
->>>         creating a
->>>         QTAILQ to store all DIMMStates and an additional 'dimm_id'
->>>         field to
->>>         associate the DIMMState with the DIMM object. We could attach
->>>         this
->>>         QTAILQ to the 'sPAPRPHBState' and retrieve it later in the
->>>         callback.
->>>
->>>         - fetch the state of the LMB DRCs directly by scanning the
->>>         state of
->>>         them and, if all of them are released, proceed with the DIMM
->>>         unplug.
->>>
->>>         The second approach was chosen. The new
->>>         'spapr_all_lmbs_drcs_released'
->>>         function scans all LMBs of a given DIMM device to see if
->>>         their DRC
->>>         state are inactive. If all of them are inactive return
->>>         'true', 'false'
->>>         otherwise. This function is being called inside the
->>>         'spapr_lmb_release'
->>>         callback, replacing the role of the 'sPAPRDIMMState' opaque. 
->>> The
->>>         'sPAPRDIMMState' struct was removed from the code given that
->>>         there are
->>>         no more uses for it.
->>>
->>>         After all these changes, there are no roles left for the
->>>         'detach_cb_opaque'
->>>         attribute of the 'sPAPRDRConnector' as well, so we can safely
->>>         remove
->>>         it from the code too.
->>>
->>>         Signed-off-by: Daniel Henrique Barboza
->>>         <danielhb@linux.vnet.ibm.com
->>>         <mailto:danielhb@linux.vnet.ibm.com>>
->>>         ---
->>>          hw/ppc/spapr.c             | 46
->>>         +++++++++++++++++++++++++++++++++-------------
->>>          hw/ppc/spapr_drc.c         | 16 +++++-----------
->>>          hw/ppc/spapr_pci.c         |  4 ++--
->>>          include/hw/ppc/spapr_drc.h |  6 ++----
->>>          4 files changed, 42 insertions(+), 30 deletions(-)
->>>
->>>         diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>         index bc11757..8b9a6cf 100644
->>>         --- a/hw/ppc/spapr.c
->>>         +++ b/hw/ppc/spapr.c
->>>         @@ -1887,21 +1887,43 @@ static void spapr_drc_reset(void 
->>> *opaque)
->>>              }
->>>          }
->>>
->>>         -typedef struct sPAPRDIMMState {
->>>         -    uint32_t nr_lmbs;
->>>         -} sPAPRDIMMState;
->>>         +static bool spapr_all_lmbs_drcs_released(PCDIMMDevice *dimm)
->>>         +{
->>>         +    Error *local_err = NULL;
->>>         +    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
->>>         +    MemoryRegion *mr = ddc->get_memory_region(dimm);
->>>         +    uint64_t size = memory_region_size(mr);
->>>         +
->>>         +    uint64_t addr;
->>>         +    addr = object_property_get_int(OBJECT(dimm),
->>>         PC_DIMM_ADDR_PROP, &local_err);
->>>         +    if (local_err) {
->>>         +        error_propagate(&error_abort, local_err);
->>>         +        return false;
->>>         +    }
->>>         +    uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
->>>
->>>         -static void spapr_lmb_release(DeviceState *dev, void *opaque)
->>>         +    sPAPRDRConnector *drc;
->>>         +    int i = 0;
->>>         +    for (i = 0; i < nr_lmbs; i++) {
->>>         +        drc =
->>>         spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
->>>         +                addr / SPAPR_MEMORY_BLOCK_SIZE);
->>>         +        g_assert(drc);
->>>         +        if (drc->indicator_state !=
->>>         SPAPR_DR_INDICATOR_STATE_INACTIVE) {
->>>         +            return false;
->>>         +        }
->>>         +        addr += SPAPR_MEMORY_BLOCK_SIZE;
->>>         +    }
->>>         +    return true;
->>>         +}
->>>         +
->>>         +static void spapr_lmb_release(DeviceState *dev)
->>>          {
->>>         -    sPAPRDIMMState *ds = (sPAPRDIMMState *)opaque;
->>>              HotplugHandler *hotplug_ctrl;
->>>
->>>         -    if (--ds->nr_lmbs) {
->>>         +    if (!spapr_all_lmbs_drcs_released(PC_DIMM(dev))) {
->>>                  return;
->>>              }
->>>
->>>
->>>     I am concerned about the number of times we walk the DRC list
->>>     corresponding to each DIMM device. When a DIMM device is being
->>>     removed, spapr_lmb_release() will be invoked for each of the LMBs
->>>     of that DIMM. Now in this scheme, we end up walking through all
->>>     the DRC objects of the DIMM from every LMB's release function.
->>
->>     Hi Bharata,
->>
->>
->>     I agree, this is definitely a poorer performance than simply
->>     decrementing ds->nr_lmbs.
->>     The reasons why I went on with it:
->>
->>     - hot unplug isn't an operation that happens too often, so it's
->>     not terrible
->>     to have a delay increase here;
->>
->>     - it didn't increased the unplug delay in an human noticeable way,
->>     at least in
->>     my tests;
->>
->>     - apart from migrating the information, there is nothing much we
->>     can do in the
->>     callback side about it. The callback isn't aware of the current
->>     state of the DIMM
->>     removal process, so the scanning is required every time.
->>
->>
->>     All that said, assuming that the process of DIMM removal will
->>     always go through
->>     'spapr_del_lmbs', why do we need this callback? Can't we simply do
->>     something
->>     like this in spapr_del_lmbs?
->>
->>
->>     diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>     index cd42449..e443fea 100644
->>     --- a/hw/ppc/spapr.c
->>     +++ b/hw/ppc/spapr.c
->>     @@ -2734,6 +2734,20 @@ static void spapr_del_lmbs(DeviceState
->>     *dev, uint64_t addr_start, uint64_t size,
->>              addr += SPAPR_MEMORY_BLOCK_SIZE;
->>          }
->>
->>     +    if (!spapr_all_lmbs_drcs_released(PC_DIMM(dev))) {
->>     +        // something went wrong in the removal of the LMBs.
->>     +        // propagate error and return
->>     +        throw_error_code;
->>     +        return;
->>     +    }
->>
->>
->> spapr_del_lmbs() is called from ->unplug_request(). Here we notify 
->> the guest about the unplug request. We have to wait till the guest 
->> gives us a go ahead so that we can cleanup the DIMM device. The 
->> cleanup is done as part of release callback (spapr_lmb_release) at 
->> which point we are sure that the given LMB has been indeed removed by 
->> the guest.
->
-> I wasn't clear enough in my last comment. Let me rephrase. Is there 
-> any other use for
-> the 'spapr_lmb_release' callback function other than being called by 
-> the spapr_del_lmbs()
-> in the flow you've stated above? Searching the master code now I've 
-> found:
->
->
-> $ grep -R 'spapr_lmb_release' .
-> ./spapr.c:static void spapr_lmb_release(DeviceState *dev, void *opaque)
-> ./spapr.c:        drck->detach(drc, dev, spapr_lmb_release, ds, errp);
->
->
-> Note that all the callback is doing is asserting that a nr_lmb counter 
-> will be zero after
-> a decrement and, if true,  execute the following:
->
->
->     hotplug_ctrl = qdev_get_hotplug_handler(dev);
->     hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
->
->
-> So, if the callback spapr_lmb_release is only being called in the 
-> following for loop of spapr_del_lmbs()
-> to clean up each LMB DRC, can't we get rid of it and do the following 
-> after this for loop?
->
->     for (i = 0; i < nr_lmbs; i++) {
->         drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
->                 addr / SPAPR_MEMORY_BLOCK_SIZE);
->         g_assert(drc);
->
->         drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
->         drck->detach(drc, dev, ds, errp);
->         addr += SPAPR_MEMORY_BLOCK_SIZE;
->     }
->
->     if (!spapr_all_lmbs_drcs_released(PC_DIMM(dev))) {
->         // All LMBs were cleared, proceed with detach
->         hotplug_ctrl = qdev_get_hotplug_handler(dev);
->         hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
->    }
->    // proceed with spapr_del_lmbs code
->
->
-> Doesn't this code does exactly the same thing that the callback does 
-> today? Note that we can
-> even use that conditional to block the remaining spapr_del_lmbs code 
-> from executing if the
-> LMBs weren't properly cleansed - something that today isn't done.
->
->
-> If removing this callback is too problematic or can somehow cause 
-> problems that I am unable to
-> foresee, then the alternative would be to either deal with the 
-> scanning inside the callback
-> (as it is being done in this patch) or migrate the nr_lmbs information 
-> for late retrieval in
-> the callback. I am fine with any alternative, we just need to agree on 
-> what makes more
-> sense.
->
->
-> Daniel
->
->>
->> Regards,
->> Bharata.
->
+A note about the lack of sysbus whitelist on q35
+------------------------------------------------
+
+This series won't make the per-machine whitelist of sysbus
+devices unnecessary, but just makes the user_creatable field
+consistent on the sys-bus-device classes. This means q35 and xen
+still need to be fixed to implemented a sysbus device whitelist.
+
+However, despite not being strictly necessary for fixing the q35
+bug, reducing the list of user_creatable=3Dtrue devices will help
+us be more confident when building the q35 whitelist.
+
+Full list of user_creatable=3Dtrue sysbus devices
+-----------------------------------------------
+
+In the end of this series, the only remaining sysbus devices with
+user_creatable=3Dtrue will be:
+
+* vfio-amd-xgbe (arm)
+* vfio-calxeda-xgmac (arm)
+* amd-iommu (x86)
+* intel-iommu (x86)
+* xen-backend (x86)
+* spapr-pci-host-bridge (ppc)
+* spapr-pci-vfio-host-bridge (ppc)
+* eTSEC (ppc)
+
+References/Notes
+----------------
+
+[1] For example, before this series, we had 174 sysbus devices
+    listed on qemu-system-arm -device help:
+      $ qemu-system-arm -machine none -device help 2>&1 | grep 'bus Syste=
+m' | wc -l
+      174
+      $
+    after this series, we now have:
+      $ ./arm-softmmu/qemu-system-arm -machine none -device help 2>&1 | g=
+rep 'bus System'
+      name "vfio-amd-xgbe", bus System, desc "VFIO AMD XGBE"
+      name "vfio-calxeda-xgmac", bus System, desc "VFIO Calxeda XGMAC"
+      $
+
+[2] Subject: [PATCH 0/3] script for crash-testing -device
+
+---
+Cc: Alexander Graf <agraf@suse.de>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+
+Eduardo Habkost (21):
+  qdev: Replace cannot_instantiate_with_device_add_yet with
+    !user_creatable
+  sysbus: Set user_creatable=3Dfalse by default on TYPE_SYS_BUS_DEVICE
+  xen-backend: Remove FIXME comment about user_creatable flag
+  iommu: Remove FIXME comment about user_creatable=3Dtrue
+  fdc: Remove user_creatable flag from sysbus-fdc & SUNW,fdtwo
+  pflash_cfi01: Remove user_creatable flag
+  kvmclock: Remove user_creatable flag
+  ioapic: Remove user_creatable flag
+  kvmvapic: Remove user_creatable flag
+  sysbus-ahci: Remove user_creatable flag
+  allwinner-ahci: Remove user_creatable flag
+  isabus-bridge: Remove user_creatable flag
+  unimplemented-device: Remove user_creatable flag
+  fw_cfg: Remove user_creatable flag
+  esp: Remove user_creatable flag
+  generic-sdhci: Remove user_creatable flag
+  hpet: Remove user_creatable flag
+  sysbus-ohci: Remove user_creatable flag
+  virtio-mmio: Remove user_creatable flag
+  xen-sysdev: Remove user_creatable flag
+  s390-pcibus: No need to set user_creatable=3Dfalse explicitly
+
+ include/hw/qdev-core.h              | 10 +++++-----
+ include/hw/qdev-properties.h        |  4 ++--
+ hw/acpi/piix4.c                     |  2 +-
+ hw/arm/spitz.c                      |  2 +-
+ hw/audio/marvell_88w8618.c          |  2 +-
+ hw/audio/pcspk.c                    |  2 +-
+ hw/core/or-irq.c                    |  2 +-
+ hw/core/qdev.c                      |  1 +
+ hw/core/register.c                  |  2 +-
+ hw/core/sysbus.c                    | 11 +++++++++++
+ hw/dma/i8257.c                      |  2 +-
+ hw/dma/sparc32_dma.c                |  2 +-
+ hw/gpio/omap_gpio.c                 |  4 ++--
+ hw/i2c/omap_i2c.c                   |  2 +-
+ hw/i2c/smbus_eeprom.c               |  2 +-
+ hw/i2c/smbus_ich9.c                 |  2 +-
+ hw/i386/amd_iommu.c                 |  2 ++
+ hw/i386/intel_iommu.c               |  2 ++
+ hw/i386/pc.c                        |  2 +-
+ hw/input/vmmouse.c                  |  2 +-
+ hw/intc/apic_common.c               |  2 +-
+ hw/intc/etraxfs_pic.c               |  2 +-
+ hw/intc/grlib_irqmp.c               |  2 +-
+ hw/intc/i8259_common.c              |  2 +-
+ hw/intc/nios2_iic.c                 |  2 +-
+ hw/intc/omap_intc.c                 |  4 ++--
+ hw/isa/lpc_ich9.c                   |  2 +-
+ hw/isa/piix4.c                      |  2 +-
+ hw/isa/vt82c686.c                   |  2 +-
+ hw/mips/gt64xxx_pci.c               |  2 +-
+ hw/misc/vmport.c                    |  2 +-
+ hw/net/dp8393x.c                    |  2 +-
+ hw/net/etraxfs_eth.c                |  2 +-
+ hw/net/fsl_etsec/etsec.c            |  2 ++
+ hw/net/lance.c                      |  2 +-
+ hw/pci-bridge/dec.c                 |  2 +-
+ hw/pci-bridge/pci_expander_bridge.c |  2 +-
+ hw/pci-host/apb.c                   |  2 +-
+ hw/pci-host/bonito.c                |  2 +-
+ hw/pci-host/gpex.c                  |  2 +-
+ hw/pci-host/grackle.c               |  2 +-
+ hw/pci-host/piix.c                  |  6 +++---
+ hw/pci-host/ppce500.c               |  2 +-
+ hw/pci-host/prep.c                  |  2 +-
+ hw/pci-host/q35.c                   |  4 ++--
+ hw/pci-host/uninorth.c              |  8 ++++----
+ hw/pci-host/versatile.c             |  2 +-
+ hw/pci-host/xilinx-pcie.c           |  2 +-
+ hw/ppc/ppc4xx_pci.c                 |  2 +-
+ hw/ppc/spapr_drc.c                  |  2 +-
+ hw/ppc/spapr_pci.c                  |  2 ++
+ hw/s390x/s390-pci-bus.c             |  1 -
+ hw/sd/milkymist-memcard.c           |  2 +-
+ hw/sd/pl181.c                       |  2 +-
+ hw/sh4/sh_pci.c                     |  2 +-
+ hw/timer/i8254_common.c             |  2 +-
+ hw/timer/mc146818rtc.c              |  2 +-
+ hw/vfio/amd-xgbe.c                  |  2 ++
+ hw/vfio/calxeda-xgmac.c             |  2 ++
+ hw/xen/xen_backend.c                |  2 ++
+ monitor.c                           |  2 +-
+ qdev-monitor.c                      |  6 +++---
+ qom/cpu.c                           |  2 +-
+ target/i386/cpu.c                   |  2 +-
+ 64 files changed, 95 insertions(+), 70 deletions(-)
+
+--=20
+2.11.0.259.g40922b1
