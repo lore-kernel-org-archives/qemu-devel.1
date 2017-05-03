@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLu-0000at-2q
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLu-0000as-26
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLq-00006D-8L
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLq-00005v-6X
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:53 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:46345 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:23662 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1d5tLp-0008V4-Qp
+	id 1d5tLp-0008UY-Jl
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:50 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  3 May 2017 15:25:16 +0300
-Message-Id: <20170503122539.282182-3-vsementsov@virtuozzo.com>
+Date: Wed,  3 May 2017 15:25:21 +0300
+Message-Id: <20170503122539.282182-8-vsementsov@virtuozzo.com>
 In-Reply-To: <20170503122539.282182-1-vsementsov@virtuozzo.com>
 References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 02/25] specs/qcow2: do not use wording 'bitmap
- header'
+Subject: [Qemu-devel] [PATCH 07/25] qcow2-refcount: rename inc_refcounts()
+ and make it public
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-A bitmap directory entry is sometimes called a 'bitmap header'. This
-patch leaves only one name - 'bitmap directory entry'. The name 'bitmap
-header' creates misunderstandings with 'qcow2 header' and 'qcow2 bitmap
-header extension' (which is extension of qcow2 header)
+This is needed for the following patch, which will introduce refcounts
+checking for qcow2 bitmaps.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- docs/specs/qcow2.txt | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ block/qcow2-refcount.c | 53 ++++++++++++++++++++++++++------------------------
+ block/qcow2.h          |  4 ++++
+ 2 files changed, 32 insertions(+), 25 deletions(-)
 
-diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
-index dda53dd2a3..8874e8c774 100644
---- a/docs/specs/qcow2.txt
-+++ b/docs/specs/qcow2.txt
-@@ -201,7 +201,7 @@ The fields of the bitmaps extension are:
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 9e96f64c8b..3562697527 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1325,11 +1325,10 @@ static int realloc_refcount_array(BDRVQcow2State *s, void **array,
+  *
+  * Modifies the number of errors in res.
+  */
+-static int inc_refcounts(BlockDriverState *bs,
+-                         BdrvCheckResult *res,
+-                         void **refcount_table,
+-                         int64_t *refcount_table_size,
+-                         int64_t offset, int64_t size)
++int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
++                             void **refcount_table,
++                             int64_t *refcount_table_size,
++                             int64_t offset, int64_t size)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t start, last, cluster_offset, k, refcount;
+@@ -1422,8 +1421,9 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+             nb_csectors = ((l2_entry >> s->csize_shift) &
+                            s->csize_mask) + 1;
+             l2_entry &= s->cluster_offset_mask;
+-            ret = inc_refcounts(bs, res, refcount_table, refcount_table_size,
+-                                l2_entry & ~511, nb_csectors * 512);
++            ret = qcow2_inc_refcounts_imrt(bs, res,
++                                           refcount_table, refcount_table_size,
++                                           l2_entry & ~511, nb_csectors * 512);
+             if (ret < 0) {
+                 goto fail;
+             }
+@@ -1461,8 +1461,9 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+             }
  
-           8 - 15:  bitmap_directory_size
-                    Size of the bitmap directory in bytes. It is the cumulative
--                   size of all (nb_bitmaps) bitmap headers.
-+                   size of all (nb_bitmaps) bitmap directory entries.
+             /* Mark cluster as used */
+-            ret = inc_refcounts(bs, res, refcount_table, refcount_table_size,
+-                                offset, s->cluster_size);
++            ret = qcow2_inc_refcounts_imrt(bs, res,
++                                           refcount_table, refcount_table_size,
++                                           offset, s->cluster_size);
+             if (ret < 0) {
+                 goto fail;
+             }
+@@ -1514,8 +1515,8 @@ static int check_refcounts_l1(BlockDriverState *bs,
+     l1_size2 = l1_size * sizeof(uint64_t);
  
-          16 - 23:  bitmap_directory_offset
-                    Offset into the image file at which the bitmap directory
-@@ -426,8 +426,7 @@ Each bitmap saved in the image is described in a bitmap directory entry. The
- bitmap directory is a contiguous area in the image file, whose starting offset
- and length are given by the header extension fields bitmap_directory_offset and
- bitmap_directory_size. The entries of the bitmap directory have variable
--length, depending on the lengths of the bitmap name and extra data. These
--entries are also called bitmap headers.
-+length, depending on the lengths of the bitmap name and extra data.
+     /* Mark L1 table as used */
+-    ret = inc_refcounts(bs, res, refcount_table, refcount_table_size,
+-                        l1_table_offset, l1_size2);
++    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
++                                   l1_table_offset, l1_size2);
+     if (ret < 0) {
+         goto fail;
+     }
+@@ -1544,8 +1545,9 @@ static int check_refcounts_l1(BlockDriverState *bs,
+         if (l2_offset) {
+             /* Mark L2 table as used */
+             l2_offset &= L1E_OFFSET_MASK;
+-            ret = inc_refcounts(bs, res, refcount_table, refcount_table_size,
+-                                l2_offset, s->cluster_size);
++            ret = qcow2_inc_refcounts_imrt(bs, res,
++                                           refcount_table, refcount_table_size,
++                                           l2_offset, s->cluster_size);
+             if (ret < 0) {
+                 goto fail;
+             }
+@@ -1760,14 +1762,15 @@ static int check_refblocks(BlockDriverState *bs, BdrvCheckResult *res,
+                 }
  
- Structure of a bitmap directory entry:
+                 res->corruptions_fixed++;
+-                ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
+-                                    offset, s->cluster_size);
++                ret = qcow2_inc_refcounts_imrt(bs, res,
++                                               refcount_table, nb_clusters,
++                                               offset, s->cluster_size);
+                 if (ret < 0) {
+                     return ret;
+                 }
+                 /* No need to check whether the refcount is now greater than 1:
+                  * This area was just allocated and zeroed, so it can only be
+-                 * exactly 1 after inc_refcounts() */
++                 * exactly 1 after qcow2_inc_refcounts_imrt() */
+                 continue;
  
+ resize_fail:
+@@ -1782,8 +1785,8 @@ resize_fail:
+         }
+ 
+         if (offset != 0) {
+-            ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
+-                                offset, s->cluster_size);
++            ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
++                                           offset, s->cluster_size);
+             if (ret < 0) {
+                 return ret;
+             }
+@@ -1823,8 +1826,8 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+     }
+ 
+     /* header */
+-    ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
+-                        0, s->cluster_size);
++    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
++                                   0, s->cluster_size);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -1845,16 +1848,16 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+             return ret;
+         }
+     }
+-    ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
+-                        s->snapshots_offset, s->snapshots_size);
++    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
++                                   s->snapshots_offset, s->snapshots_size);
+     if (ret < 0) {
+         return ret;
+     }
+ 
+     /* refcount data */
+-    ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
+-                        s->refcount_table_offset,
+-                        s->refcount_table_size * sizeof(uint64_t));
++    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
++                                   s->refcount_table_offset,
++                                   s->refcount_table_size * sizeof(uint64_t));
+     if (ret < 0) {
+         return ret;
+     }
+diff --git a/block/qcow2.h b/block/qcow2.h
+index f8aeb08794..5d1763dba1 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -520,6 +520,10 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+                                  int64_t size);
+ int qcow2_pre_write_overlap_check(BlockDriverState *bs, int ign, int64_t offset,
+                                   int64_t size);
++int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
++                             void **refcount_table,
++                             int64_t *refcount_table_size,
++                             int64_t offset, int64_t size);
+ 
+ int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
+                                 BlockDriverAmendStatusCB *status_cb,
 -- 
 2.11.1
