@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5weq-00006h-Px
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:57:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1d5wog-0006iU-AE
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:07:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5wep-0000wV-N4
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:57:40 -0400
-Date: Wed, 3 May 2017 17:57:24 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170503175724.69a5a4e3@nial.brq.redhat.com>
-In-Reply-To: <20170503144240.GL3482@thinpad.lan.raisama.net>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-6-git-send-email-imammedo@redhat.com>
-	<20170503144240.GL3482@thinpad.lan.raisama.net>
+	(envelope-from <armbru@redhat.com>) id 1d5wod-0005Mr-1o
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:07:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46710)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d5woc-0005Lu-OK
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:07:46 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+	<20170502203115.22233-3-ehabkost@redhat.com>
+Date: Wed, 03 May 2017 18:07:43 +0200
+In-Reply-To: <20170502203115.22233-3-ehabkost@redhat.com> (Eduardo Habkost's
+	message of "Tue, 2 May 2017 17:31:13 -0300")
+Message-ID: <87y3udsz3k.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/24] numa: move source of default CPUs
- to NUMA node mapping into boards
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support
+ alternate types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +29,302 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 3 May 2017 11:42:40 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> On Wed, May 03, 2017 at 02:56:59PM +0200, Igor Mammedov wrote:
-> > Originally CPU threads were by default assigned in
-> > round-robin fashion. However it was causing issues in
-> > guest since CPU threads from the same socket/core could
-> > be placed on different NUMA nodes.
-> > Commit fb43b73b (pc: fix default VCPU to NUMA node mapping)
-> > fixed it by grouping threads within a socket on the same node
-> > introducing cpu_index_to_socket_id() callback and commit
-> > 20bb648d (spapr: Fix default NUMA node allocation for threads)
-> > reused callback to fix similar issues for SPAPR machine
-> > even though socket doesn't make much sense there.
-> > 
-> > As result QEMU ended up having 3 default distribution rules
-> > used by 3 targets /virt-arm, spapr, pc/.
-> > 
-> > In effort of moving NUMA mapping for CPUs into possible_cpus,
-> > generalize default mapping in numa.c by making boards decide
-> > on default mapping and let them explicitly tell generic
-> > numa code to which node a CPU thread belongs to by replacing
-> > cpu_index_to_socket_id() with @cpu_index_to_instance_props()
-> > which provides default node_id assigned by board to specified
-> > cpu_index.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> 
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> Just two extra comments below:
-> 
-> [...]
-> > +static CpuInstanceProperties
-> > +virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-> > +{
-> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> > +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
-> > +
-> > +    assert(cpu_index < possible_cpus->len);
-> > +    return possible_cpus->cpus[cpu_index].props;;
-> > +}
-> > +  
-> [...]
-> > +static CpuInstanceProperties
-> > +pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-> >  {
-> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> > +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
-> > +
-> > +    assert(cpu_index < possible_cpus->len);
-> > +    return possible_cpus->cpus[cpu_index].props;;
-> >  }  
-> 
-> The fact that these two implementations look exactly the same
-> made me wonder:
-> 
-> 1) Why this isn't the default implementation;
-> 2) Why exactly spapr needs a different implementation.
-> 
-> Then I noticed that there's nothing in the common machine code
-> that specifies that possible_cpus->cpus[] is indexed by
-> cpu_index. This means it is indeed safer to require each machine
-> to provide its own cpu_index_to_props implementation than having
-> a default implementation that can unexpectedly break (e.g. if
-> granularity at possible_cpus is not at VCPU/thread level).
-> 
-> I would still like to have an abstraction that wouldn't require
-> writing machine-specific code (e.g. cpu_index ranges to
-> possible_cpus like David suggested), but that's for a follow-up
-> series.
-I've left generalizing this part until we have defined/stable
-topology for aarch64.
-Also I hope, that instead of generalizing we might
-depricate/drop -numa node,cpus=0,1,... in future and just drop
-this hooks altogether as they are there only for compatibility
-with old cpu_index based mapping
+> When parsing alternates from a string, there are some limitations in
+> what we can do, but it is a valid use case in some situations. We can
+> support booleans, integer types, and enums.
+>
+> This will be used to support 'feature=force' in -cpu options, while
+> keeping 'feature=on|off|true|false' represented as boolean values.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  qapi/string-input-visitor.c             | 71 ++++++++++++++++++++++----
+>  tests/test-string-input-visitor.c       | 89 +++++++++++++++++++++++++++++++++
+>  tests/qapi-schema/qapi-schema-test.json |  8 +++
+>  3 files changed, 158 insertions(+), 10 deletions(-)
+>
+> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+> index c089491c24..bf8f58748b 100644
+> --- a/qapi/string-input-visitor.c
+> +++ b/qapi/string-input-visitor.c
+> @@ -19,6 +19,7 @@
+>  #include "qemu/option.h"
+>  #include "qemu/queue.h"
+>  #include "qemu/range.h"
+> +#include "qemu/bitops.h"
+>  
+>  
+>  struct StringInputVisitor
+> @@ -278,21 +279,34 @@ static void parse_type_size(Visitor *v, const char *name, uint64_t *obj,
+>      *obj = val;
+>  }
+>  
+> +static int try_parse_bool(const char *s, bool *result)
+> +{
+> +    if (!strcasecmp(s, "on") ||
+> +        !strcasecmp(s, "yes") ||
+> +        !strcasecmp(s, "true")) {
+> +        if (result) {
+> +            *result = true;
+> +        }
+> +        return 0;
+> +    }
+> +    if (!strcasecmp(s, "off") ||
+> +        !strcasecmp(s, "no") ||
+> +        !strcasecmp(s, "false")) {
+> +        if (result) {
+> +            *result = false;
+> +        }
+> +        return 0;
+> +    }
+> +
+> +    return -1;
+> +}
+> +
+>  static void parse_type_bool(Visitor *v, const char *name, bool *obj,
+>                              Error **errp)
+>  {
+>      StringInputVisitor *siv = to_siv(v);
+>  
+> -    if (!strcasecmp(siv->string, "on") ||
+> -        !strcasecmp(siv->string, "yes") ||
+> -        !strcasecmp(siv->string, "true")) {
+> -        *obj = true;
+> -        return;
+> -    }
+> -    if (!strcasecmp(siv->string, "off") ||
+> -        !strcasecmp(siv->string, "no") ||
+> -        !strcasecmp(siv->string, "false")) {
+> -        *obj = false;
+> +    if (try_parse_bool(siv->string, obj) == 0) {
+>          return;
+>      }
+>  
+> @@ -326,6 +340,42 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
+>      *obj = val;
+>  }
+>  
+> +/* Support for alternates on string-input-visitor is limited, because
 
+Please wing both ends of your comments, like this:
 
-> [...]
-> > +static CpuInstanceProperties
-> > +spapr_cpu_index_to_props(MachineState *machine, unsigned cpu_index)
-> >  {
-> > +    CPUArchId *core_slot;
-> > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> > +
-> > +    /* make sure possible_cpu are intialized */
-> > +    mc->possible_cpu_arch_ids(machine);
-> > +    core_slot = spapr_find_cpu_slot(machine, cpu_index, NULL);
-> > +    assert(core_slot);
-> > +    return core_slot->props;
-> >  }  
-> 
-> If you need to submit v3, maybe a comment here explaining why
-> spapr needs a different cpu_index_to_props implementation would
-> be helpful. I took a while to figure it out.
-I'll add comment if series is respinned.
+   /*
+    * Comment text
+    */
+
+> + * the input string doesn't have any type information.
+> + *
+> + * Supported alternate member types:
+> + * 1) enums
+> + * 2) integer types
+
+Better add "(but only if there 's no enum member consisting only of
+digits)".
+
+> + * 3) booleans (but only if the there's no enum variant
+
+Make that "(but only if there's no enum member".
+
+> + *    containing "on", "off", "true", or "false" as members)
+
+Begs the question what happens when you violate these restrictions.
+
+> + *
+> + * UNSUPPORTED alternate member types:
+> + * 1) strings
+> + * 2) complex types
+> + */
+
+This comment explains the visitor's restrictions for alternate types.
+It does not explain how the function works.  The proper place for
+explaining the visitor's restriction is the comment in
+string-input-visitor.h, which you need to update anyway, because right
+now it claims visiting alternates isn't implemented.
+
+> +static void start_alternate(Visitor *v, const char *name,
+> +                            GenericAlternate **obj, size_t size,
+> +                            unsigned long supported_qtypes, Error **errp)
+> +{
+> +    StringInputVisitor *siv = to_siv(v);
+> +    QType t = QTYPE_QSTRING;
+
+We usually call such variables @type or @qtype.
+
+QTYPE_QSTRING means enum here.  Worth a comment, I think.
+
+> +
+> +    if (supported_qtypes & BIT(QTYPE_QBOOL)) {
+> +        if (try_parse_bool(siv->string, NULL) == 0) {
+> +            t = QTYPE_QBOOL;
+> +        }
+> +    }
+> +
+> +    if (supported_qtypes & BIT(QTYPE_QINT)) {
+> +        if (parse_str(siv, name, NULL) == 0) {
+
+parse_str() alters *siv.  Why is that harmless?
+
+Aside: parse_str() is basically horrible, but that's not your fault.
+
+> +            t = QTYPE_QINT;
+> +        }
+> +    }
+> +
+> +    *obj = g_malloc0(size);
+> +    (*obj)->type = t;
+> +}
+> +
+>  static void string_input_free(Visitor *v)
+>  {
+>      StringInputVisitor *siv = to_siv(v);
+> @@ -353,6 +403,7 @@ Visitor *string_input_visitor_new(const char *str)
+>      v->visitor.next_list = next_list;
+>      v->visitor.check_list = check_list;
+>      v->visitor.end_list = end_list;
+> +    v->visitor.start_alternate = start_alternate;
+>      v->visitor.free = string_input_free;
+>  
+>      v->string = str;
+> diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
+> index 79313a7f7a..1e867d62c9 100644
+> --- a/tests/test-string-input-visitor.c
+> +++ b/tests/test-string-input-visitor.c
+> @@ -290,6 +290,91 @@ static void test_visitor_in_enum(TestInputVisitorData *data,
+>      }
+>  }
+>  
+> +static void test_visitor_in_alt_bool_enum(TestInputVisitorData *data,
+> +                                 const void *unused)
+
+Indentation's off.
+
+> +{
+> +    Error *err = NULL;
+> +    Visitor *v;
+> +    AltBoolEnum *be = NULL;
+> +
+> +    v = visitor_input_test_init(data, "true");
+> +    visit_type_AltBoolEnum(v, NULL, &be, &err);
+> +    g_assert(!err);
+
+What's wrong with &error_abort?  More of the same below.
+
+> +    g_assert_cmpint(be->type, ==, QTYPE_QBOOL);
+> +    g_assert(be->u.b);
+> +    qapi_free_AltBoolEnum(be);
+> +
+> +    v = visitor_input_test_init(data, "off");
+> +    visit_type_AltBoolEnum(v, NULL, &be, &err);
+> +    g_assert(!err);
+> +    g_assert_cmpint(be->type, ==, QTYPE_QBOOL);
+> +    g_assert(!be->u.b);
+> +    qapi_free_AltBoolEnum(be);
+> +
+> +    v = visitor_input_test_init(data, "value2");
+> +    visit_type_AltBoolEnum(v, NULL, &be, &err);
+> +    g_assert(!err);
+> +    g_assert_cmpint(be->type, ==, QTYPE_QSTRING);
+> +    g_assert_cmpint(be->u.e, ==, ENUM_ONE_VALUE2);
+> +    qapi_free_AltBoolEnum(be);
+> +
+> +    v = visitor_input_test_init(data, "value100");
+> +    visit_type_AltBoolEnum(v, NULL, &be, &err);
+> +    error_free_or_abort(&err);
+> +    qapi_free_AltBoolEnum(be);
+> +
+> +    v = visitor_input_test_init(data, "10");
+> +    visit_type_AltBoolEnum(v, NULL, &be, &err);
+> +    error_free_or_abort(&err);
+> +    qapi_free_AltBoolEnum(be);
+> +}
+> +
+> +static void test_visitor_in_alt_enum_int(TestInputVisitorData *data,
+> +                                 const void *unused)
+
+Indentation's off.
+
+> +{
+> +    Error *err = NULL;
+> +    Visitor *v;
+> +    AltOnOffInt *be = NULL;
+> +
+> +    v = visitor_input_test_init(data, "on");
+> +    visit_type_AltOnOffInt(v, NULL, &be, &err);
+> +    g_assert(!err);
+> +    g_assert_cmpint(be->type, ==, QTYPE_QSTRING);
+> +    g_assert_cmpint(be->u.o, ==, TEST_ON_OFF_AUTO_ON);
+> +    qapi_free_AltOnOffInt(be);
+> +
+> +    v = visitor_input_test_init(data, "off");
+> +    visit_type_AltOnOffInt(v, NULL, &be, &err);
+> +    g_assert(!err);
+> +    g_assert_cmpint(be->type, ==, QTYPE_QSTRING);
+> +    g_assert_cmpint(be->u.o, ==, TEST_ON_OFF_AUTO_OFF);
+> +    qapi_free_AltOnOffInt(be);
+> +
+> +    v = visitor_input_test_init(data, "auto");
+> +    visit_type_AltOnOffInt(v, NULL, &be, &err);
+> +    g_assert(!err);
+> +    g_assert_cmpint(be->type, ==, QTYPE_QSTRING);
+> +    g_assert_cmpint(be->u.o, ==, TEST_ON_OFF_AUTO_AUTO);
+> +    qapi_free_AltOnOffInt(be);
+> +
+> +    v = visitor_input_test_init(data, "-12345");
+> +    visit_type_AltOnOffInt(v, NULL, &be, &err);
+> +    g_assert(!err);
+> +    g_assert_cmpint(be->type, ==, QTYPE_QINT);
+> +    g_assert_cmpint(be->u.i, ==, -12345);
+> +    qapi_free_AltOnOffInt(be);
+> +
+> +    v = visitor_input_test_init(data, "true");
+> +    visit_type_AltOnOffInt(v, NULL, &be, &err);
+> +    error_free_or_abort(&err);
+> +    qapi_free_AltOnOffInt(be);
+> +
+> +    v = visitor_input_test_init(data, "value2");
+> +    visit_type_AltOnOffInt(v, NULL, &be, &err);
+> +    error_free_or_abort(&err);
+> +    qapi_free_AltOnOffInt(be);
+> +}
+> +
+
+Could we use tests covering alternates that don't satisfy the string
+visitor's restrictions?  Like OnOffAuto + bool.
+
+>  /* Try to crash the visitors */
+>  static void test_visitor_in_fuzz(TestInputVisitorData *data,
+>                                   const void *unused)
+> @@ -366,6 +451,10 @@ int main(int argc, char **argv)
+>                              &in_visitor_data, test_visitor_in_string);
+>      input_visitor_test_add("/string-visitor/input/enum",
+>                              &in_visitor_data, test_visitor_in_enum);
+> +    input_visitor_test_add("/string-visitor/input/alternate/bool_enum",
+> +                            &in_visitor_data, test_visitor_in_alt_bool_enum);
+> +    input_visitor_test_add("/string-visitor/input/alternate/enum_int",
+> +                            &in_visitor_data, test_visitor_in_alt_enum_int);
+>      input_visitor_test_add("/string-visitor/input/fuzz",
+>                              &in_visitor_data, test_visitor_in_fuzz);
+>  
+> diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
+> index 842ea3c5e3..231c8952e8 100644
+> --- a/tests/qapi-schema/qapi-schema-test.json
+> +++ b/tests/qapi-schema/qapi-schema-test.json
+> @@ -106,6 +106,14 @@
+>  { 'alternate': 'AltIntNum', 'data': { 'i': 'int', 'n': 'number' } }
+>  { 'alternate': 'AltNumInt', 'data': { 'n': 'number', 'i': 'int' } }
+>  
+> +
+> +# for testing string-input-visitor handling of alternates:
+> +{ 'enum': 'TestOnOffAuto',
+> +  'data': [ 'on', 'off', 'auto' ] }
+> +
+> +{ 'alternate': 'AltBoolEnum', 'data': { 'b': 'bool', 'e': 'EnumOne' } }
+> +{ 'alternate': 'AltOnOffInt', 'data': { 'o': 'TestOnOffAuto', 'i': 'int' } }
+> +
+>  # for testing native lists
+>  { 'union': 'UserDefNativeListUnion',
+>    'data': { 'integer': ['int'],
