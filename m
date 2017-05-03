@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhiyong.yang@intel.com>) id 1d5kf2-0000eJ-8E
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 23:09:05 -0400
+	(envelope-from <bharata.rao@gmail.com>) id 1d5kvo-0003Pe-1Z
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 23:26:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhiyong.yang@intel.com>) id 1d5kex-0000Ff-Oj
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 23:09:04 -0400
-Received: from mga06.intel.com ([134.134.136.31]:49690)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhiyong.yang@intel.com>)
-	id 1d5kex-0000FK-F3
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 23:08:59 -0400
-From: "Yang, Zhiyong" <zhiyong.yang@intel.com>
-Date: Wed, 3 May 2017 03:07:49 +0000
-Message-ID: <E182254E98A5DA4EB1E657AC7CB9BD2A3EBAB599@BGSMSX101.gar.corp.intel.com>
-References: <1493363372-16861-1-git-send-email-zhiyong.yang@intel.com>
-	<4b14ac87-f96b-0dac-73b7-b3209b01120a@redhat.com>
-In-Reply-To: <4b14ac87-f96b-0dac-73b7-b3209b01120a@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bharata.rao@gmail.com>) id 1d5kvm-0006Wt-4h
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 23:26:24 -0400
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] hw/virtio: fix vhost user fails to startup
- when MQ
+In-Reply-To: <c890eaba-6d61-4e82-c771-1476cd3df0f2@linux.vnet.ibm.com>
+References: <20170430172547.13415-1-danielhb@linux.vnet.ibm.com>
+	<20170430172547.13415-3-danielhb@linux.vnet.ibm.com>
+	<CAGZKiBok2=HRT9BjMiDx+c20YeKhknJ0ZD_GV1Zx=BrbFSmxwA@mail.gmail.com>
+	<c890eaba-6d61-4e82-c771-1476cd3df0f2@linux.vnet.ibm.com>
+From: Bharata B Rao <bharata.rao@gmail.com>
+Date: Wed, 3 May 2017 08:56:16 +0530
+Message-ID: <CAGZKiBrEihUiYSNRetQzWVjOgrAQdTHze0_9Ec3XtGxk2LYhmw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/5] hw/ppc: removing
+ spapr_drc_detach_cb opaques
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +25,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "Liu, Yuanhan" <yuanhan.liu@intel.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-SGnvvIxNYXhpbWU6DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWF4
-aW1lIENvcXVlbGluIFttYWlsdG86bWF4aW1lLmNvcXVlbGluQHJlZGhhdC5jb21dDQo+IFNlbnQ6
-IFR1ZXNkYXksIE1heSAyLCAyMDE3IDg6MjMgUE0NCj4gVG86IFlhbmcsIFpoaXlvbmcgPHpoaXlv
-bmcueWFuZ0BpbnRlbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IG1zdEByZWRo
-YXQuY29tDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1BBVENIXSBody92aXJ0aW86IGZp
-eCB2aG9zdCB1c2VyIGZhaWxzIHRvIHN0YXJ0dXAgd2hlbg0KPiBNUQ0KPiANCj4gDQo+IA0KPiBP
-biAwNC8yOC8yMDE3IDA5OjA5IEFNLCBaaGl5b25nIFlhbmcgd3JvdGU6DQo+ID4gICAgIFFlbXUy
-Ljd+Mi45IGFuZCB2aG9zdCB1c2VyIGZvciBkcGRrIDE3LjAyIHJlbGVhc2Ugd29yayB0b2dldGhl
-ciB0bw0KPiA+IGNhdXNlIGZhaWx1cmVzIG9mIG5ldyBjb25uZWN0aW9uIHdoZW4gbmVnb3RpYXRp
-bmcgdG8gc2V0IE1RLg0KPiA+IChvbmUgcXVldWUgcGFpciB3b3JrcyB3ZWxsKS4NCj4gPiAgICAg
-QmVjYXVzZSB0aGVyZSBleGlzdCBzb21lIGJ1Z3MgaW4gcWVtdSBjb2RlIHdoZW4gaW50cm9kdWNp
-bmcNCj4gPiBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfUkVQTFlfQUNLIHRvIHFlbXUuIFdoZW4NCj4g
-dmhvc3RfdXNlcl9zZXRfbWVtX3RhYmxlDQo+ID4gaXMgaW52b2tlZCB0byBkZWFsIHdpdGggdGhl
-IHZob3N0IG1lc3NhZ2UgVkhPU1RfVVNFUl9TRVRfTUVNX1RBQkxFIGZvcg0KPiA+IHRoZSBzZWNv
-bmQgdGltZSwgcWVtdSBpbmRlZWQgZG9lc24ndCBzZW5kIHRoZSBtZXNzZ2UgKFRoZSBtZXNzYWdl
-DQo+ID4gbmVlZHMgdG8gYmUgc2VudCBvbmx5IG9uY2UpYnV0IHN0aWxsIHdpbGwgYmUgd2FpdGlu
-ZyBmb3IgZHBkaydzIHJlcGx5DQo+ID4gYWNrLCB0aGVuLCBxZW11IGlzIGFsd2F5cyBmcmVlemlu
-Zywgd2hpbGUgRFBESyBpcyBhbHdheXMgd2FpdGluZyBmb3INCj4gPiBuZXh0IHZob3N0IG1lc3Nh
-Z2UgZnJvbSBxZW11Lg0KPiA+ICAgIFRoZSBwYXRjaCBhaW1zIHRvIGZpeCB0aGUgYnVnLCBNUSBj
-YW4gd29yayB3ZWxsLg0KPiA+ICAgIFRoZSBzYW1lIGJ1ZyBpcyBmb3VuZCBpbiBmdW5jdGlvbiB2
-aG9zdF91c2VyX25ldF9zZXRfbXR1LCBpdCBpcw0KPiA+IGZpeGVkIGF0IHRoZSBzYW1lIHRpbWUu
-DQo+ID4gICAgRFBESyByZWxhdGVkIHBhdGNoIGlzIGFzIGZvbGxvd2luZzoNCj4gPiAgICBodHRw
-Oi8vd3d3LmRwZGsub3JnL2Rldi9wYXRjaHdvcmsvcGF0Y2gvMjM5NTUvDQo+ID4NCj4gPiBTaWdu
-ZWQtb2ZmLWJ5OiBaaGl5b25nIFlhbmcgPHpoaXlvbmcueWFuZ0BpbnRlbC5jb20+DQo+ID4gLS0t
-DQo+ID4gICBody92aXJ0aW8vdmhvc3QtdXNlci5jIHwgMTggKysrKysrKysrKystLS0tLS0tDQo+
-ID4gICAxIGZpbGUgY2hhbmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkNCj4g
-Pg0KPiA+IGRpZmYgLS1naXQgYS9ody92aXJ0aW8vdmhvc3QtdXNlci5jIGIvaHcvdmlydGlvL3Zo
-b3N0LXVzZXIuYyBpbmRleA0KPiA+IDkzMzRhOGEuLmMyYzU0Y2UgMTAwNjQ0DQo+ID4gLS0tIGEv
-aHcvdmlydGlvL3Zob3N0LXVzZXIuYw0KPiA+ICsrKyBiL2h3L3ZpcnRpby92aG9zdC11c2VyLmMN
-Cj4gPiBAQCAtMjA1LDEwICsyMDUsMTEgQEAgc3RhdGljIGludCB2aG9zdF91c2VyX3dyaXRlKHN0
-cnVjdCB2aG9zdF9kZXYgKmRldiwNCj4gVmhvc3RVc2VyTXNnICptc2csDQo+ID4gICAgICAgLyoN
-Cj4gPiAgICAgICAgKiBGb3Igbm9uLXZyaW5nIHNwZWNpZmljIHJlcXVlc3RzLCBsaWtlIFZIT1NU
-X1VTRVJfU0VUX01FTV9UQUJMRSwNCj4gPiAgICAgICAgKiB3ZSBqdXN0IG5lZWQgc2VuZCBpdCBv
-bmNlIGluIHRoZSBmaXJzdCB0aW1lLiBGb3IgbGF0ZXIgc3VjaA0KPiA+IC0gICAgICogcmVxdWVz
-dCwgd2UganVzdCBpZ25vcmUgaXQuDQo+ID4gKyAgICAgKiByZXF1ZXN0LCB3ZSBqdXN0IGlnbm9y
-ZSBpdC4gSW4gdGhpcyBjYXNlLCByZXR1cm4gdmFsdWUgaXMgMSB3aGljaCBpcw0KPiA+ICsgICAg
-ICogZGlmZmVyZW50IGZyb20gMCB0aGF0IHN0YW5kcyBmb3IgbWVzc2FnZSB3cml0dGVuIHN1Y2Nl
-c3NmdWxseS4NCj4gPiAgICAgICAgKi8NCj4gPiAgICAgICBpZiAodmhvc3RfdXNlcl9vbmVfdGlt
-ZV9yZXF1ZXN0KG1zZy0+cmVxdWVzdCkgJiYgZGV2LT52cV9pbmRleCAhPSAwKSB7DQo+ID4gLSAg
-ICAgICAgcmV0dXJuIDA7DQo+ID4gKyAgICAgICAgcmV0dXJuIDE7DQo+IA0KPiBJIHBlcnNvbmFs
-bHkgcHJlZmVyIHRoZSBmaXggSSBzdWdnZXN0ZWQgaW4gdGhlIERQREsgbWFpbCB0aHJlYWQsIGFz
-IHJldHVybmluZyBhDQo+IHJhbmRvbSBwb3NpdGl2ZSB2YWx1ZSBkb2VzIGxvb2sgbGlrZSBhIHdv
-cmthcm91bmQ6DQoNCkkgdGhpbmsgdGhhdCBmb3Igdmhvc3RfdXNlcl93cml0ZSgpLCBpdCdzIGJl
-aGF2aW5nIGluIGEgZGlmZmVyZW50IHdheSBmb3Igc29tZSBzcGVjaWZpYyB2aG9zdCBtZXNzYWdl
-cy4gIA0KU28sIGl0IHNob3VsZCBub3QgcmV0dXJuIHRoZSBzYW1lIHJldHVyZW4gdmFsdWUgMCB3
-aGljaCBzdGFuZHMgZm9yIHN1Y2Nlc3MuIA0KDQo+IA0KPiAiDQo+IEkgdGhpbmsgdGhlIHByb2Js
-ZW0gbXVzdCBiZSBmaXhlZCBnZW5lcmFsbHkgYW5kIG5vdCBwZXIgcmVxdWVzdC4NCj4gTWF5YmUg
-aW4gdmhvc3RfdXNlcl93cml0ZSgpIGlmIG9uZS10aW1lIHJlcXVlc3QsIGp1c3QgY2xlYXIgdGhl
-DQo+IFZIT1NUX1VTRVJfTkVFRF9SRVBMWSBmbGFnLiBUaGVuLCBpbiBwcm9jZXNzX21lc3NhZ2Vf
-cmVwbHkoKSwgcmV0dXJuIGVhcmx5DQo+IGlmIHRoaXMgZmxhZyBpc24ndCBzZXQuDQo+ICINCkl0
-J3MgYW5vdGhlciBjaG9pc2UuIEVpdGhlciB0aGlzIG9uZSBub3IgdGhhdCBvbmUsICBub3QgYSBi
-aWcgZGVhbC4gOikNCkZpeGluZyB0aGVzZSAgZXhpc3RpbmcgYnVncyBpcyB0aGUgbW9zdCBpbXBv
-cnRhbnQuDQoNCnRoYW5rcw0KWmhpeW9uZyBZYW5nDQoNCg==
+On Tue, May 2, 2017 at 1:13 PM, Daniel Henrique Barboza <
+danielhb@linux.vnet.ibm.com> wrote:
+
+>
+>
+> On 05/02/2017 12:40 AM, Bharata B Rao wrote:
+>
+> On Sun, Apr 30, 2017 at 10:55 PM, Daniel Henrique Barboza <
+> danielhb@linux.vnet.ibm.com> wrote:
+>
+>> Following up the previous detach_cb change, this patch removes the
+>> detach_cb_opaque entirely from the code.
+>>
+>> The reason is that the drc->detach_cb_opaque object can't be
+>> restored in the post load of the upcoming DRC migration and no detach
+>> callbacks actually need this opaque. 'spapr_core_release' is
+>> receiving it as NULL, 'spapr_phb_remove_pci_device_cb' is receiving
+>> a phb object as opaque but is't using it. These were trivial removal
+>> cases.
+>>
+>> However, the LM removal callback 'spapr_lmb_release' is receiving
+>> and using the opaque object, a 'sPAPRDIMMState' struct. This struct
+>> holds the number of LMBs the DIMM object contains and the callback
+>> was using this counter as a countdown to check if all LMB DRCs were
+>> release before proceeding to the DIMM unplug. To remove the need of
+>> this callback we have choices such as:
+>>
+>> - migrate the 'sPAPRDIMMState' struct. This would require creating a
+>> QTAILQ to store all DIMMStates and an additional 'dimm_id' field to
+>> associate the DIMMState with the DIMM object. We could attach this
+>> QTAILQ to the 'sPAPRPHBState' and retrieve it later in the callback.
+>>
+>> - fetch the state of the LMB DRCs directly by scanning the state of
+>> them and, if all of them are released, proceed with the DIMM unplug.
+>>
+>> The second approach was chosen. The new 'spapr_all_lmbs_drcs_released'
+>> function scans all LMBs of a given DIMM device to see if their DRC
+>> state are inactive. If all of them are inactive return 'true', 'false'
+>> otherwise. This function is being called inside the 'spapr_lmb_release'
+>> callback, replacing the role of the 'sPAPRDIMMState' opaque. The
+>> 'sPAPRDIMMState' struct was removed from the code given that there are
+>> no more uses for it.
+>>
+>> After all these changes, there are no roles left for the
+>> 'detach_cb_opaque'
+>> attribute of the 'sPAPRDRConnector' as well, so we can safely remove
+>> it from the code too.
+>>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>> ---
+>>  hw/ppc/spapr.c             | 46 ++++++++++++++++++++++++++++++
+>> +++-------------
+>>  hw/ppc/spapr_drc.c         | 16 +++++-----------
+>>  hw/ppc/spapr_pci.c         |  4 ++--
+>>  include/hw/ppc/spapr_drc.h |  6 ++----
+>>  4 files changed, 42 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index bc11757..8b9a6cf 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1887,21 +1887,43 @@ static void spapr_drc_reset(void *opaque)
+>>      }
+>>  }
+>>
+>> -typedef struct sPAPRDIMMState {
+>> -    uint32_t nr_lmbs;
+>> -} sPAPRDIMMState;
+>> +static bool spapr_all_lmbs_drcs_released(PCDIMMDevice *dimm)
+>> +{
+>> +    Error *local_err = NULL;
+>> +    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+>> +    uint64_t size = memory_region_size(mr);
+>> +
+>> +    uint64_t addr;
+>> +    addr = object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP,
+>> &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(&error_abort, local_err);
+>> +        return false;
+>> +    }
+>> +    uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+>>
+>> -static void spapr_lmb_release(DeviceState *dev, void *opaque)
+>> +    sPAPRDRConnector *drc;
+>> +    int i = 0;
+>> +    for (i = 0; i < nr_lmbs; i++) {
+>> +        drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
+>> +                addr / SPAPR_MEMORY_BLOCK_SIZE);
+>> +        g_assert(drc);
+>> +        if (drc->indicator_state != SPAPR_DR_INDICATOR_STATE_INACTIVE) {
+>> +            return false;
+>> +        }
+>> +        addr += SPAPR_MEMORY_BLOCK_SIZE;
+>> +    }
+>> +    return true;
+>> +}
+>> +
+>> +static void spapr_lmb_release(DeviceState *dev)
+>>  {
+>> -    sPAPRDIMMState *ds = (sPAPRDIMMState *)opaque;
+>>      HotplugHandler *hotplug_ctrl;
+>>
+>> -    if (--ds->nr_lmbs) {
+>> +    if (!spapr_all_lmbs_drcs_released(PC_DIMM(dev))) {
+>>          return;
+>>      }
+>>
+>
+> I am concerned about the number of times we walk the DRC list
+> corresponding to each DIMM device. When a DIMM device is being removed,
+> spapr_lmb_release() will be invoked for each of the LMBs of that DIMM. Now
+> in this scheme, we end up walking through all the DRC objects of the DIMM
+> from every LMB's release function.
+>
+>
+> Hi Bharata,
+>
+>
+> I agree, this is definitely a poorer performance than simply decrementing
+> ds->nr_lmbs.
+> The reasons why I went on with it:
+>
+> - hot unplug isn't an operation that happens too often, so it's not
+> terrible
+> to have a delay increase here;
+>
+> - it didn't increased the unplug delay in an human noticeable way, at
+> least in
+> my tests;
+>
+> - apart from migrating the information, there is nothing much we can do in
+> the
+> callback side about it. The callback isn't aware of the current state of
+> the DIMM
+> removal process, so the scanning is required every time.
+>
+>
+> All that said, assuming that the process of DIMM removal will always go
+> through
+> 'spapr_del_lmbs', why do we need this callback? Can't we simply do
+> something
+> like this in spapr_del_lmbs?
+>
+>
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index cd42449..e443fea 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2734,6 +2734,20 @@ static void spapr_del_lmbs(DeviceState *dev,
+> uint64_t addr_start, uint64_t size,
+>          addr += SPAPR_MEMORY_BLOCK_SIZE;
+>      }
+>
+> +    if (!spapr_all_lmbs_drcs_released(PC_DIMM(dev))) {
+> +        // something went wrong in the removal of the LMBs.
+> +        // propagate error and return
+> +        throw_error_code;
+> +        return;
+> +    }
+>
+
+spapr_del_lmbs() is called from ->unplug_request(). Here we notify the
+guest about the unplug request. We have to wait till the guest gives us a
+go ahead so that we can cleanup the DIMM device. The cleanup is done as
+part of release callback (spapr_lmb_release) at which point we are sure
+that the given LMB has been indeed removed by the guest.
+
+Regards,
+Bharata.
