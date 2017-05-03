@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLu-0000ao-01
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:59 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLw-0000bS-MT
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLp-000051-Si
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:53 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:10127 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d5tLp-00005G-Vt
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:56 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:2774 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1d5tLp-0008TL-HE
+	id 1d5tLp-0008TO-JF
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:25:49 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed,  3 May 2017 15:25:20 +0300
-Message-Id: <20170503122539.282182-7-vsementsov@virtuozzo.com>
+Date: Wed,  3 May 2017 15:25:32 +0300
+Message-Id: <20170503122539.282182-19-vsementsov@virtuozzo.com>
 In-Reply-To: <20170503122539.282182-1-vsementsov@virtuozzo.com>
 References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 06/25] block/dirty-bitmap: add deserialize_ones
- func
+Subject: [Qemu-devel] [PATCH 18/25] qmp: add persistent flag to
+ block-dirty-bitmap-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +28,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Add bdrv_dirty_bitmap_deserialize_ones() function, which is needed for
-qcow2 bitmap loading, to handle unallocated bitmap parts, marked as
-all-ones.
+Add optional 'persistent' flag to qmp command block-dirty-bitmap-add.
+Default is false.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c         |  7 +++++++
- include/block/dirty-bitmap.h |  3 +++
- include/qemu/hbitmap.h       | 15 +++++++++++++++
- util/hbitmap.c               | 17 +++++++++++++++++
- 4 files changed, 42 insertions(+)
+ blockdev.c           | 18 +++++++++++++++++-
+ qapi/block-core.json |  8 +++++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 186941cfc3..90af37287f 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -499,6 +499,13 @@ void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-     hbitmap_deserialize_zeroes(bitmap->bitmap, start, count, finish);
- }
+diff --git a/blockdev.c b/blockdev.c
+index 64282065d8..9e5206867c 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1985,6 +1985,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+     /* AIO context taken and released within qmp_block_dirty_bitmap_add */
+     qmp_block_dirty_bitmap_add(action->node, action->name,
+                                action->has_granularity, action->granularity,
++                               action->has_persistent, action->persistent,
+                                &local_err);
  
-+void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-+                                        uint64_t start, uint64_t count,
-+                                        bool finish)
-+{
-+    hbitmap_deserialize_ones(bitmap->bitmap, start, count, finish);
-+}
-+
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
+     if (!local_err) {
+@@ -2731,10 +2732,12 @@ out:
+ 
+ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+                                 bool has_granularity, uint32_t granularity,
++                                bool has_persistent, bool persistent,
+                                 Error **errp)
  {
-     hbitmap_deserialize_finish(bitmap->bitmap);
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 7cbe623ba7..1e17729ac2 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -70,6 +70,9 @@ void bdrv_dirty_bitmap_deserialize_part(BdrvDirtyBitmap *bitmap,
- void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-                                           uint64_t start, uint64_t count,
-                                           bool finish);
-+void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-+                                        uint64_t start, uint64_t count,
-+                                        bool finish);
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+     AioContext *aio_context;
+     BlockDriverState *bs;
++    BdrvDirtyBitmap *bitmap;
  
- #endif
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 6b04391266..b52304ac29 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -229,6 +229,21 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
-                                 bool finish);
- 
- /**
-+ * hbitmap_deserialize_ones
-+ * @hb: HBitmap to operate on.
-+ * @start: First bit to restore.
-+ * @count: Number of bits to restore.
-+ * @finish: Whether to call hbitmap_deserialize_finish automatically.
-+ *
-+ * Fills the bitmap with ones.
-+ *
-+ * If @finish is false, caller must call hbitmap_serialize_finish before using
-+ * the bitmap.
-+ */
-+void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
-+                              bool finish);
-+
-+/**
-  * hbitmap_deserialize_finish
-  * @hb: HBitmap to operate on.
-  *
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 0b38817505..0c1591a594 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -551,6 +551,23 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
+     if (!name || name[0] == '\0') {
+         error_setg(errp, "Bitmap name cannot be empty");
+@@ -2760,7 +2763,20 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+         granularity = bdrv_get_default_bitmap_granularity(bs);
      }
- }
  
-+void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
-+                              bool finish)
-+{
-+    uint64_t el_count;
-+    unsigned long *first;
-+
-+    if (!count) {
-+        return;
+-    bdrv_create_dirty_bitmap(bs, granularity, name, errp);
++    if (!has_persistent) {
++        persistent = false;
 +    }
-+    serialization_chunk(hb, start, count, &first, &el_count);
 +
-+    memset(first, 0xff, el_count * sizeof(unsigned long));
-+    if (finish) {
-+        hbitmap_deserialize_finish(hb);
++    if (persistent &&
++        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
++    {
++        goto out;
 +    }
-+}
 +
- void hbitmap_deserialize_finish(HBitmap *bitmap)
- {
-     int64_t i, size, prev_size;
++    bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
++    if (bitmap != NULL) {
++        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
++    }
+ 
+  out:
+     aio_context_release(aio_context);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 87fb747ab6..499e0e32aa 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1560,10 +1560,16 @@
+ # @granularity: the bitmap granularity, default is 64k for
+ #               block-dirty-bitmap-add
+ #
++# @persistent: the bitmap is persistent, i.e. it will be saved to the
++#              corresponding block device image file on its close. For now only
++#              Qcow2 disks support persistent bitmaps. Default is false for
++#              block-dirty-bitmap-add. (Since: 2.10)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'BlockDirtyBitmapAdd',
+-  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32' } }
++  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
++            '*persistent': 'bool' } }
+ 
+ ##
+ # @block-dirty-bitmap-add:
 -- 
 2.11.1
