@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5t7P-0004o9-6n
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:10:56 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d5t8W-0005Jo-Cu
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:12:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5t7K-0001NP-7m
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:10:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d5t7K-0001Ma-0U
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:10:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d5t7I-00073m-F0
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 12:10:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 699AA2E80D2
-	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 12:10:48 +0000 (UTC)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d5t8R-0002rF-F7
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:12:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1d5t8R-0002lL-8z
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:11:59 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4F91980B20
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 12:11:56 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed,  3 May 2017 16:11:42 +0400
+Message-Id: <20170503121143.14925-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 May 2017 11:55:52 -0000
-From: Matthias Schiffer <1581936@bugs.launchpad.net>
-Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170503115553.13634.21049.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
- CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+Subject: [Qemu-devel] [PATCH 1/2] libvhost-user: fix
+ vu_queue_get_avail_bytes() crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,104 +33,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, mst@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
+Calling vu_queue_get_avail_bytes() when the queue doesn't yet have
+addresses will result in the following crash:
 
-** Tags added: regression-update
+Program received signal SIGSEGV, Segmentation fault.
+0x000055c414112ce4 in vring_avail_idx (vq=3D0x55c41582fd68, vq=3D0x55c415=
+82fd68)
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
+940            vq->shadow_avail_idx =3D vq->vring.avail->idx;
+(gdb) p vq
+$1 =3D (VuVirtq *) 0x55c41582fd68
+(gdb) p vq->vring
+$2 =3D {num =3D 0, desc =3D 0x0, avail =3D 0x0, used =3D 0x0, log_guest_a=
+ddr =3D 0, flags =3D 0}
 
--- =
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
+No locals.
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:960
+        num_heads =3D <optimized out>
+    out_bytes=3Dout_bytes@entry=3D0x7fffd035d7c4, max_in_bytes=3Dmax_in_b=
+ytes@entry=3D0,
+    max_out_bytes=3Dmax_out_bytes@entry=3D0) at /home/dgilbert/git/qemu/c=
+ontrib/libvhost-user/libvhost-user.c:1034
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1581936
+Check if vring.avail !=3D null before accessing it.
 
-Title:
-  Frozen Windows 7 VMs with VGA CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  Hi,
-
-  As already posted on the QEMU devel list [1] I stumbled upon a problem
-  with QEMU in version 2.5.1.1 and 2.6.0.
-
-  the VM shows Windows loading
-  files for the installation, then the "Starting Windows" screen appears
-  here it hangs and never continues.
-
-  Changing the "-vga" option to cirrus solves this, the installation can
-  proceed and finish. When changing back to std (or also qxl, vmware) the
-  installed VM also hangs on the "Starting Windows" screen while qemu
-  showing a little but no excessive load.
-
-  This phenomena appears also with QEMU 2.6.0 but not with 2.6.0-rc4, a
-  git bisect shows fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7 (vga: make
-  sure vga register setup for vbe stays intact (CVE-2016-3712)) as the
-  culprit for this regression, as its a fix for a DoS its not an option to
-  just revert it, I guess.
-
-  The bisect log is:
-
-  git bisect start
-  # bad: [bfc766d38e1fae5767d43845c15c79ac8fa6d6af] Update version for v2.6=
-.0 release
-  git bisect bad bfc766d38e1fae5767d43845c15c79ac8fa6d6af
-  # good: [975eb6a547f809608ccb08c221552f666611af25] Update version for v2.=
-6.0-rc4 release
-  git bisect good 975eb6a547f809608ccb08c221552f666611af25
-  # good: [2068192dcccd8a80dddfcc8df6164cf9c26e0fc4] vga: update vga regist=
-er setup on vbe changes
-  git bisect good 2068192dcccd8a80dddfcc8df6164cf9c26e0fc4
-  # bad: [53db932604dfa7bb9241d132e0173894cf54261c] Merge remote-tracking b=
-ranch 'remotes/kraxel/tags/pull-vga-20160509-1' into staging
-  git bisect bad 53db932604dfa7bb9241d132e0173894cf54261c
-  # bad: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make sure vga regi=
-ster setup for vbe stays intact (CVE-2016-3712).
-  git bisect bad fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7
-  # first bad commit: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make =
-sure vga register setup for vbe stays intact (CVE-2016-3712).
-
-  =
-
-  I could reproduce that with QEMU 2.5.1 and QEMU 2.6 on a Debian derivate
-  (Promox VE) with 4.4 Kernel and also with QEMU 2.6 on an Arch Linux
-  System with a 4.5 Kernel, so it should not be host distro depended. Both
-  machines have Intel x86_64 processors.
-  The problem should be reproducible with said Versions or a build from
-  git including the above mentioned commit (fd3c136) by starting a VM with
-  an Windows 7 ISO, e.g.:
-
-  Freezing installation (as vga defaults to std I marked it as optional):
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 [-vga=
- (std|qxl|vmware)]
-
-  Working installation:
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 -vga =
-cirrus
-
-  If someone has already an installed Windows 7 VM this behaviour should be
-  also observable when trying to start it with the new versions of QEMU.
-
-  Noteworthy may be that Windows 10 is working, I do not had time to get
-  other Windows versions and test them, I'll do that as soon as possible.
-  Various Linux system also seems do work fine, at least I did not ran
-  into an issue there yet.
-
-  I also tried testing with SeaBIOS and OVMF as firmware, as initially I
-  had no idea what broke, both lead to the same result - without the =
-
-  CVE-2016-3712 fix they both work, with not.
-  Further, KVM enabled and disabled does not make any difference.
-
-  =
-
-  [1] http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg02416.html
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1581936/+subscriptions
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index af4faad60b..f9680b6279 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -1031,6 +1031,10 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, =
+unsigned int *in_bytes,
+     idx =3D vq->last_avail_idx;
+=20
+     total_bufs =3D in_total =3D out_total =3D 0;
++    if (!vq->vring.avail) {
++        goto done;
++    }
++
+     while ((rc =3D virtqueue_num_heads(dev, vq, idx)) > 0) {
+         unsigned int max, num_bufs, indirect =3D 0;
+         struct vring_desc *desc;
+--=20
+2.12.0.191.gc5d8de91d
