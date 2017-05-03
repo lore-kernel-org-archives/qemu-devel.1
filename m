@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d5wI5-0005yo-Uj
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:34:11 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d5wNj-0008Ci-2H
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:40:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d5wI0-00023O-V8
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:34:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59224)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1d5wI0-00022c-M6
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:34:04 -0400
-Date: Wed, 3 May 2017 16:34:00 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170503153400.GD27432@redhat.com>
-References: <20170227163447.20428-1-stefanha@redhat.com>
-	<20170227163447.20428-2-stefanha@redhat.com>
-	<20170503145418.GB27432@redhat.com>
-	<182d640c-c892-993e-06d4-a9cdd9f363d6@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d5wNe-0007XP-5s
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:39:59 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36466)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1d5wNd-0007Wv-S5
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:39:54 -0400
+Received: by mail-wr0-x244.google.com with SMTP id v42so23507917wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 08:39:53 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
+	<20170412095111.11728-5-xiaoguangrong@tencent.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7df8de22-9ee9-00b5-f21b-ad7ec27f63c3@redhat.com>
+Date: Wed, 3 May 2017 17:39:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <182d640c-c892-993e-06d4-a9cdd9f363d6@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 1/4] curl: do not use
- aio_context_acquire/release
+In-Reply-To: <20170412095111.11728-5-xiaoguangrong@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] mc146818rtc: move x86 specific code
+ out of periodic_timer_update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +32,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: guangrong.xiao@gmail.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, yunfangtai@tencent.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
-Same backtrace, but with some more symbols:
 
-__lll_lock_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
-135		2: movl	%edx, %eax
+On 12/04/2017 11:51, guangrong.xiao@gmail.com wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Move the x86 specific code in periodic_timer_update() to a common place,
+> the actual logic is not changed
+> 
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> ---
+>  hw/timer/mc146818rtc.c | 112 +++++++++++++++++++++++++++++--------------------
+>  1 file changed, 66 insertions(+), 46 deletions(-)
+> 
+> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+> index 3bf559d..d7b7c56 100644
+> --- a/hw/timer/mc146818rtc.c
+> +++ b/hw/timer/mc146818rtc.c
+> @@ -144,6 +144,63 @@ static void rtc_coalesced_timer(void *opaque)
+>  
+>      rtc_coalesced_timer_update(s);
+>  }
+> +
+> +static int64_t
+> +arch_periodic_timer_update(RTCState *s, int period, int64_t lost_clock)
+> +{
+> +    if (period != s->period) {
+> +        int64_t scale_lost_clock;
+> +        int current_irq_coalesced = s->irq_coalesced;
+> +
+> +        s->irq_coalesced = (current_irq_coalesced * s->period) / period;
+> +
+> +        /*
+> +         * calculate the lost clock after it is scaled which should be
+> +         * compensated in the next interrupt.
+> +         */
+> +        scale_lost_clock = current_irq_coalesced * s->period -
+> +                            s->irq_coalesced * period;
+> +        DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, %ld clocks "
+> +                  "are compensated.\n", current_irq_coalesced,
+> +                  s->irq_coalesced, scale_lost_clock);
+> +        lost_clock += scale_lost_clock;
+> +        s->period = period;
 
-(gdb) t a a bt
+This should be moved up to the caller.
 
-Thread 3 (Thread 0x7f1d49967700 (LWP 29949)):
-#0  0x00007f1d53a39bf9 in syscall ()
-    at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
-#1  0x000055ea5c358856 in qemu_event_wait (val=<optimized out>, f=<optimized out>) at /home/rjones/d/qemu/include/qemu/futex.h:26
-#2  0x000055ea5c358856 in qemu_event_wait (ev=ev@entry=0x55ea5cde4ac4 <rcu_call_ready_event>) at util/qemu-thread-posix.c:399
-#3  0x000055ea5c3680fe in call_rcu_thread (opaque=<optimized out>)
-    at util/rcu.c:249
-#4  0x00007f1d57f7fdc5 in start_thread (arg=0x7f1d49967700)
-    at pthread_create.c:308
-#5  0x00007f1d53a3f73d in clone ()
-    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:113
+Also, if s->lost_tick_policy is not SLEW, s->irq_coalesced on input is
+zero.  So I *think* what you get is equivalent to
 
-Thread 2 (Thread 0x7f1d46987700 (LWP 29955)):
-#0  0x00007f1d57f861bd in __lll_lock_wait ()
-    at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
-#1  0x00007f1d57f81d02 in _L_lock_791 () at /lib64/libpthread.so.0
-#2  0x00007f1d57f81c08 in __GI___pthread_mutex_lock (mutex=mutex@entry=0x55ea5c9a2400 <qemu_global_mutex>) at pthread_mutex_lock.c:64
-#3  0x000055ea5c3583e9 in qemu_mutex_lock (mutex=mutex@entry=0x55ea5c9a2400 <qemu_global_mutex>) at util/qemu-thread-posix.c:60
-#4  0x000055ea5bff512c in qemu_mutex_lock_iothread ()
-    at /home/rjones/d/qemu/cpus.c:1565
-#5  0x000055ea5c0081c7 in kvm_cpu_exec (cpu=cpu@entry=0x55ea5e7df020)
-    at /home/rjones/d/qemu/kvm-all.c:2096
-#6  0x000055ea5bff5332 in qemu_kvm_cpu_thread_fn (arg=0x55ea5e7df020)
-    at /home/rjones/d/qemu/cpus.c:1118
-#7  0x00007f1d57f7fdc5 in start_thread (arg=0x7f1d46987700)
-    at pthread_create.c:308
-#8  0x00007f1d53a3f73d in clone ()
-    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:113
+   if (s->lost_tick_policy != LOST_TICK_POLICY_SLEW) {
+       return;
+   }
 
-Thread 1 (Thread 0x7f1d5a4e2c00 (LWP 29947)):
-#0  0x00007f1d57f861bd in __lll_lock_wait ()
-    at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
-#1  0x00007f1d57f81d02 in _L_lock_791 () at /lib64/libpthread.so.0
-#2  0x00007f1d57f81c08 in __GI___pthread_mutex_lock (mutex=mutex@entry=0x55ea5e5ac178) at pthread_mutex_lock.c:64
-#3  0x000055ea5c3583e9 in qemu_mutex_lock (mutex=mutex@entry=0x55ea5e5ac178)
-    at util/qemu-thread-posix.c:60
-#4  0x000055ea5c2fb2d1 in curl_readv_bh_cb (p=0x55ea6013c620)
-    at block/curl.c:824
-#5  0x000055ea5c352fe1 in aio_bh_poll (bh=0x55ea60eb99d0) at util/async.c:90
-#6  0x000055ea5c352fe1 in aio_bh_poll (ctx=ctx@entry=0x55ea5e555970)
-    at util/async.c:118
-#7  0x000055ea5c3563c4 in aio_poll (ctx=0x55ea5e555970, blocking=blocking@entry=true) at util/aio-posix.c:682
-#8  0x000055ea5c2fb09e in curl_init_state (bs=0x55ea5e5a56b0, s=s@entry=0x55ea5e5ab100) at block/curl.c:470
-#9  0x000055ea5c2fb39b in curl_readv_bh_cb (p=0x55ea5f650c30)
-    at block/curl.c:839
-#10 0x000055ea5c352fe1 in aio_bh_poll (bh=0x55ea60eb1910) at util/async.c:90
-#11 0x000055ea5c352fe1 in aio_bh_poll (ctx=ctx@entry=0x55ea5e555970)
-    at util/async.c:118
-#12 0x000055ea5c355f80 in aio_dispatch (ctx=0x55ea5e555970)
-    at util/aio-posix.c:429
-#13 0x000055ea5c352ebe in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
-#14 0x00007f1d55489d7a in g_main_context_dispatch (context=0x55ea5e555d40)
-    at gmain.c:3152
-#15 0x00007f1d55489d7a in g_main_context_dispatch (context=context@entry=0x55ea5e555d40) at gmain.c:3767
-#16 0x000055ea5c35523c in main_loop_wait () at util/main-loop.c:213
-#17 0x000055ea5c35523c in main_loop_wait (timeout=<optimized out>)
-    at util/main-loop.c:261
-#18 0x000055ea5c35523c in main_loop_wait (nonblocking=nonblocking@entry=0)
-    at util/main-loop.c:517
-#19 0x000055ea5bfb44a7 in main () at vl.c:1899
-#20 0x000055ea5bfb44a7 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4717
+   /* ... comment ... */
+   lost_interrupt = (s->irq_coalesced * s->period) / period;
+   lost_clock += (s->irq_coalesced * s->period) % period;
+   lost_interrupt += lost_clock / period;
+   lost_clock %= period;
 
+   s->irq_coalesced = load_interrupt;
+   rtc_coalesced_timer_update(s);
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-top is 'top' for virtual machines.  Tiny program with many
-powerful monitoring features, net stats, disk stats, logging, etc.
-http://people.redhat.com/~rjones/virt-top
+or equivalently:
+
+   lost_clock += s->irq_coalesced * s->period;
+
+   s->irq_coalesced = lost_clock / period;
+   lost_clock %= period;
+   rtc_coalesced_timer_update(s);
+
+I think you should probably merge these three patches and document the
+resulting logic, because it's simpler than building it a patch at a time.
+
+Thanks,
+
+Paolo
+
+> +    }
+> +
+> +    /*
+> +     * if more than period clocks were passed, i.e, the timer interrupt
+> +     * has been lost, we should catch up the time.
+> +     */
+> +    if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW &&
+> +       (lost_clock / period)) {
+> +        int lost_interrupt = lost_clock / period;
+> +
+> +        s->irq_coalesced += lost_interrupt;
+> +        lost_clock -= lost_interrupt * period;
+> +        if (lost_interrupt) {
+> +            DPRINTF_C("cmos: compensate %d interrupts, coalesced irqs "
+> +                      "increased to %d\n", lost_interrupt, s->irq_coalesced);
+> +            rtc_coalesced_timer_update(s);
+> +        }
+> +    }
+> +
+> +    return lost_clock;
+> +}
+> +
+> +static void arch_periodic_timer_disable(RTCState *s)
+> +{
+> +    s->irq_coalesced = 0;
+> +}
+> +#else
+> +static int64_t
+> +arch_periodic_timer_update(RTCState *s, int period, int64_t lost_clock)
+> +{
+> +    return lost_clock;
+> +}
+> +
+> +static void arch_periodic_timer_disable(RTCState *s)
+> +{
+> +}
+>  #endif
+>  
+>  static int period_code_to_clock(int period_code)
+> @@ -175,24 +232,7 @@ periodic_timer_update(RTCState *s, int64_t current_time, int old_period)
+>      if (period_code != 0
+>          && (s->cmos_data[RTC_REG_B] & REG_B_PIE)) {
+>          period = period_code_to_clock(period_code);
+> -#ifdef TARGET_I386
+> -        if (period != s->period) {
+> -            int current_irq_coalesced = s->irq_coalesced;
+> -
+> -            s->irq_coalesced = (current_irq_coalesced * s->period) / period;
+>  
+> -            /*
+> -             * calculate the lost clock after it is scaled which should be
+> -             * compensated in the next interrupt.
+> -             */
+> -            lost_clock += current_irq_coalesced * s->period -
+> -                            s->irq_coalesced * period;
+> -            DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, %ld clocks "
+> -                      "are compensated.\n",
+> -                      current_irq_coalesced, s->irq_coalesced, lost_clock);
+> -        }
+> -        s->period = period;
+> -#endif
+>          /* compute 32 khz clock */
+>          cur_clock =
+>              muldiv64(current_time, RTC_CLOCK_RATE, NANOSECONDS_PER_SECOND);
+> @@ -219,42 +259,22 @@ periodic_timer_update(RTCState *s, int64_t current_time, int old_period)
+>  
+>              /* calculate the clock since last interrupt. */
+>              lost_clock += cur_clock - last_periodic_clock;
+> -
+> -#ifdef TARGET_I386
+> -            /*
+> -             * if more than period clocks were passed, i.e, the timer interrupt
+> -             * has been lost, we should catch up the time.
+> -             */
+> -            if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW &&
+> -                (lost_clock / period)) {
+> -                int lost_interrupt = lost_clock / period;
+> -
+> -                s->irq_coalesced += lost_interrupt;
+> -                lost_clock -= lost_interrupt * period;
+> -                if (lost_interrupt) {
+> -                    DPRINTF_C("cmos: compensate %d interrupts, coalesced irqs "
+> -                              "increased to %d\n", lost_interrupt,
+> -                              s->irq_coalesced);
+> -                    rtc_coalesced_timer_update(s);
+> -                }
+> -            } else
+> -#endif
+> -            /*
+> -             * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
+> -             * is not used, we should make the time progress anyway.
+> -             */
+> -            lost_clock = MIN(lost_clock, period);
+> -            assert(lost_clock >= 0);
+>          }
+>  
+> +        lost_clock = arch_periodic_timer_update(s, period, lost_clock);
+> +
+> +        /*
+> +         * we should make the time progress anyway.
+> +         */
+> +        lost_clock = MIN(lost_clock, period);
+> +        assert(lost_clock >= 0);
+> +
+>          next_irq_clock = cur_clock + period - lost_clock;
+>          s->next_periodic_time = muldiv64(next_irq_clock, NANOSECONDS_PER_SECOND,
+>                                           RTC_CLOCK_RATE) + 1;
+>          timer_mod(s->periodic_timer, s->next_periodic_time);
+>      } else {
+> -#ifdef TARGET_I386
+> -        s->irq_coalesced = 0;
+> -#endif
+> +        arch_periodic_timer_disable(s);
+>          timer_del(s->periodic_timer);
+>      }
+>  }
+> 
