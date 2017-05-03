@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5to0-0006SG-1K
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:54:56 -0400
+	(envelope-from <armbru@redhat.com>) id 1d5tpp-00073D-Hm
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:56:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5tnw-0007nc-WA
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:54:56 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33485)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5tnw-0007nM-Qj
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:54:52 -0400
-Received: by mail-qk0-x244.google.com with SMTP id o85so2511908qkh.0
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 05:54:52 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170502120350.3368.92338.stgit@PASHA-ISP>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <84b9ea39-f5ff-7340-4e5f-3685d6cadc53@amsat.org>
-Date: Wed, 3 May 2017 09:54:48 -0300
+	(envelope-from <armbru@redhat.com>) id 1d5tpm-0000CR-H1
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:56:49 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170503104441.1349-1-pbonzini@redhat.com>
+	<874lx21880.fsf@dusky.pond.sub.org>
+	<8e6b18bc-eb3e-c77f-2b9a-c797c3c15680@redhat.com>
+Date: Wed, 03 May 2017 14:56:41 +0200
+In-Reply-To: <8e6b18bc-eb3e-c77f-2b9a-c797c3c15680@redhat.com> (Paolo
+	Bonzini's message of "Wed, 3 May 2017 13:54:30 +0200")
+Message-ID: <87pofqxfna.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170502120350.3368.92338.stgit@PASHA-ISP>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] mips: set CP0 Debug DExcCode for SDBBP
- instruction
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] jazz_led: fix bad snprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: yongbok.kim@imgtec.com, aurelien@aurel32.net
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, leon.alrae@imgtec.com, qemu-devel@nongnu.org
 
-On 05/02/2017 09:03 AM, Pavel Dovgalyuk wrote:
-> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> This patch fixes setting DExcCode field of CP0 Debug register
-> when SDBBP instruction is executed. According to EJTAG specification,
-> this field must be set to the value 9 (Bp).
->
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> On 03/05/2017 13:38, Markus Armbruster wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> 
+>>> Detected by GCC 7's -Wformat-truncation.  snprintf writes at most
+>>> 2 bytes here including the terminating NUL, so the result is
+>>> truncated.  In addition, the newline at the end is pointless.
+>>> Fix the buffer size and the format string.
+>>> ---
+>>>  hw/display/jazz_led.c | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/hw/display/jazz_led.c b/hw/display/jazz_led.c
+>>> index b72fdb1717..3c97d56434 100644
+>>> --- a/hw/display/jazz_led.c
+>>> +++ b/hw/display/jazz_led.c
+>>> @@ -227,13 +227,13 @@ static void jazz_led_invalidate_display(void *opaque)
+>>>  static void jazz_led_text_update(void *opaque, console_ch_t *chardata)
+>>>  {
+>>>      LedState *s = opaque;
+>>> -    char buf[2];
+>>> +    char buf[3];
+>>>  
+>>>      dpy_text_cursor(s->con, -1, -1);
+>>>      qemu_console_resize(s->con, 2, 1);
+>>>  
+>>>      /* TODO: draw the segments */
+>>> -    snprintf(buf, 2, "%02hhx\n", s->segments);
+>>> +    snprintf(buf, 3, "%02hhx", s->segments);
+>>>      console_write_ch(chardata++, ATTR2CHTYPE(buf[0], QEMU_COLOR_BLUE,
+>>>                                               QEMU_COLOR_BLACK, 1));
+>>>      console_write_ch(chardata++, ATTR2CHTYPE(buf[1], QEMU_COLOR_BLUE,
+>> 
+>> Since we're only every interested in the first two characters, the
+>> truncation is totally harmless.  Thus, your patch cleans doesn't really
+>> "fix bad snprintf", it cleans up an unclean one.  Consider rewording the
+>> commit message accordingly.
+>
+> My reading is that buf[1] is always '\0' in the current code: "snprintf
+> writes at most 2 bytes here including the terminating NUL, so the result
+> is truncated".
 
-> ---
->  target/mips/helper.c |    2 ++
->  1 file changed, 2 insertions(+)
+You're right; I forgot that snprintf() always adds a NUL.  So this *is*
+broken: we write NUL instead of the second digit.  Mentioning this in
+the commit message wouldn't hurt.
+
 >
-> diff --git a/target/mips/helper.c b/target/mips/helper.c
-> index e359ca3b44..166f0d1243 100644
-> --- a/target/mips/helper.c
-> +++ b/target/mips/helper.c
-> @@ -627,6 +627,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
->          goto set_DEPC;
->      case EXCP_DBp:
->          env->CP0_Debug |= 1 << CP0DB_DBp;
-> +        /* Setup DExcCode - SDBBP instruction */
-> +        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) | 9 << CP0DB_DEC;
->          goto set_DEPC;
->      case EXCP_DDBS:
->          env->CP0_Debug |= 1 << CP0DB_DDBS;
+> Paolo
 >
->
+>> Regardless,
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> 
