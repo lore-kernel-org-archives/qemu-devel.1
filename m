@@ -1,16 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d63Qs-00026F-BG
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:11:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d63bp-00076r-8s
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:23:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d63Qr-00063C-1n
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:11:42 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Thu,  4 May 2017 01:11:20 +0200
-Message-Id: <20170503231120.23507-5-mreitz@redhat.com>
-In-Reply-To: <20170503231120.23507-1-mreitz@redhat.com>
-References: <20170503231120.23507-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] iotests: Extend test 066
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d63bk-0000aC-As
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:23:01 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36539)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d63bk-0000Zo-6X
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 19:22:56 -0400
+Received: by mail-qk0-x243.google.com with SMTP id o4so663080qkb.3
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 16:22:56 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170503223846.6559-1-marcandre.lureau@redhat.com>
+	<20170503223846.6559-3-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <db56ebe4-597a-8f9e-35a1-4ed0ca06678b@amsat.org>
+Date: Wed, 3 May 2017 20:22:52 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170503223846.6559-3-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] audio: fix capture buffer leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,224 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-066 was supposed to be a test "for discarding preallocated zero
-clusters", but it did so incompletely: While it did check the image
-file's integrity after the operation, it did not confirm that the
-clusters are indeed freed. This patch adds this test.
+Gerd already sent this one few days ago ;)
 
-In addition, new cases for writing to preallocated zero clusters are
-added.
+http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg05587.html
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/066     | 128 ++++++++++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/066.out |  46 ++++++++++++++++
- 2 files changed, 173 insertions(+), 1 deletion(-)
-
-diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-index c2116a3088..8638217736 100755
---- a/tests/qemu-iotests/066
-+++ b/tests/qemu-iotests/066
-@@ -1,6 +1,6 @@
- #!/bin/bash
- #
--# Test case for discarding preallocated zero clusters in qcow2
-+# Test case for preallocated zero clusters in qcow2
- #
- # Copyright (C) 2013 Red Hat, Inc.
- #
-@@ -55,8 +55,134 @@ _make_test_img $IMG_SIZE
- $QEMU_IO -c "write 0 256k" -c "write -z 0 256k" -c "write 64M 512" \
- 	 -c "discard 0 $IMG_SIZE" -c "read -P 0 0 $IMG_SIZE" "$TEST_IMG" \
-          | _filter_qemu_io
-+
- # Check the image (there shouldn't be any leaks)
- _check_test_img
-+# Map the image (we want all clusters to be gone)
-+$QEMU_IMG map "$TEST_IMG"
-+
-+_cleanup_test_img
-+
-+
-+echo
-+echo '=== Writing to preallocated zero clusters ==='
-+echo
-+
-+_make_test_img $IMG_SIZE
-+
-+# Create data clusters (not aligned to an L2 table)
-+$QEMU_IO -c 'write -P 42 1M 256k' "$TEST_IMG" | _filter_qemu_io
-+orig_map=$($QEMU_IMG map --output=json "$TEST_IMG")
-+
-+# Convert the data clusters to preallocated zero clusters
-+$QEMU_IO -c 'write -z 1M 256k' "$TEST_IMG" | _filter_qemu_io
-+
-+# Now write to them (with a COW needed for the head and tail)
-+$QEMU_IO -c "write -P 23 $(((1024 + 32) * 1024)) 192k" "$TEST_IMG" \
-+    | _filter_qemu_io
-+
-+# Check metadata correctness
-+_check_test_img
-+
-+# Check data correctness
-+$QEMU_IO -c "read -P  0 $(( 1024             * 1024)) 32k" \
-+         -c "read -P 23 $(((1024 + 32)       * 1024)) 192k" \
-+         -c "read -P  0 $(((1024 + 32 + 192) * 1024)) 32k" \
-+         "$TEST_IMG" \
-+         | _filter_qemu_io
-+
-+# Check that we have actually reused the original area
-+new_map=$($QEMU_IMG map --output=json "$TEST_IMG")
-+if [ "$new_map" = "$orig_map" ]; then
-+    echo 'Successfully reused original clusters.'
-+else
-+    echo 'Failed to reuse original clusters.'
-+    echo 'Original map:'
-+    echo "$orig_map"
-+    echo 'New map:'
-+    echo "$new_map"
-+fi
-+
-+_cleanup_test_img
-+
-+
-+echo
-+echo '=== Writing to a snapshotted preallocated zero cluster ==='
-+echo
-+
-+_make_test_img 64k
-+
-+# Create a preallocated zero cluster
-+$QEMU_IO -c 'write -P 42 0 64k' -c 'write -z 0 64k' "$TEST_IMG" \
-+    | _filter_qemu_io
-+
-+# Snapshot it
-+$QEMU_IMG snapshot -c foo "$TEST_IMG"
-+
-+# Write to the cluster
-+$QEMU_IO -c 'write -P 23 0 64k' "$TEST_IMG" | _filter_qemu_io
-+
-+# Check metadata correctness
-+_check_test_img
-+
-+# Check data correctness
-+$QEMU_IO -c 'read -P 23 0 64k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG snapshot -a foo "$TEST_IMG"
-+$QEMU_IO -c 'read -P 0 0 64k' "$TEST_IMG" | _filter_qemu_io
-+
-+_cleanup_test_img
-+
-+
-+echo
-+echo '=== Consecutive write to a preallocated zero cluster ==='
-+echo
-+
-+_make_test_img 192k
-+
-+# Create three normal clusters
-+$QEMU_IO -c 'write -P 42 0 192k' "$TEST_IMG" | _filter_qemu_io
-+orig_map=$($QEMU_IMG map --output=json "$TEST_IMG")
-+
-+# Make the middle cluster a preallocated zero cluster
-+$QEMU_IO -c 'write -z 64k 64k' "$TEST_IMG" | _filter_qemu_io
-+
-+# Try to overwrite everything: This should reuse the whole range. To test that
-+# this only issues a single continuous write request, use blkdebug.
-+$QEMU_IO -c 'write -P 42 0 192k' \
-+    "json:{
-+        'driver': '$IMGFMT',
-+        'file': {
-+            'driver': 'blkdebug',
-+            'image.filename': '$TEST_IMG',
-+            'set-state': [{
-+                'event': 'write_aio',
-+                'new_state': 2
-+            }],
-+            'inject-error': [{
-+                'event': 'write_aio',
-+                'state': 2
-+            }]
-+        }
-+    }" \
-+    | _filter_qemu_io
-+
-+# Check metadata correctness
-+_check_test_img
-+
-+# Check that we have actually reused the original area
-+new_map=$($QEMU_IMG map --output=json "$TEST_IMG")
-+if [ "$new_map" = "$orig_map" ]; then
-+    echo 'Successfully reused original clusters.'
-+else
-+    echo 'Failed to reuse original clusters.'
-+    echo 'Original map:'
-+    echo "$orig_map"
-+    echo 'New map:'
-+    echo "$new_map"
-+fi
-+
-+_cleanup_test_img
-+
- 
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/066.out b/tests/qemu-iotests/066.out
-index 7c1f31a1b1..3d9da9bd0b 100644
---- a/tests/qemu-iotests/066.out
-+++ b/tests/qemu-iotests/066.out
-@@ -14,4 +14,50 @@ discard 67109376/67109376 bytes at offset 0
- read 67109376/67109376 bytes at offset 0
- 64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- No errors were found on the image.
-+Offset          Length          Mapped to       File
-+
-+=== Writing to preallocated zero clusters ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67109376
-+wrote 262144/262144 bytes at offset 1048576
-+256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 262144/262144 bytes at offset 1048576
-+256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 196608/196608 bytes at offset 1081344
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+No errors were found on the image.
-+read 32768/32768 bytes at offset 1048576
-+32 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 196608/196608 bytes at offset 1081344
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 32768/32768 bytes at offset 1277952
-+32 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Successfully reused original clusters.
-+
-+=== Writing to a snapshotted preallocated zero cluster ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+No errors were found on the image.
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Consecutive write to a preallocated zero cluster ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=196608
-+wrote 196608/196608 bytes at offset 0
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 65536
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 196608/196608 bytes at offset 0
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+No errors were found on the image.
-+Successfully reused original clusters.
- *** done
--- 
-2.12.2
+On 05/03/2017 07:38 PM, Marc-André Lureau wrote:
+> Spotted by ASAN.
+>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  audio/audio.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/audio/audio.c b/audio/audio.c
+> index c8898d8422..beafed209b 100644
+> --- a/audio/audio.c
+> +++ b/audio/audio.c
+> @@ -2028,6 +2028,8 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
+>                      sw = sw1;
+>                  }
+>                  QLIST_REMOVE (cap, entries);
+> +                g_free (cap->hw.mix_buf);
+> +                g_free (cap->buf);
+>                  g_free (cap);
+>              }
+>              return;
+>
