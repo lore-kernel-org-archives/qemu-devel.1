@@ -1,26 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5jjz-00062f-7J
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:10:10 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d5jsb-0007Ze-2V
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5jjv-00087N-NU
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:10:07 -0400
-Received: from [59.151.112.132] (port=59724 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5jju-000855-QK
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:10:03 -0400
-References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1493372840-24551-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<d487205d-6957-d8c1-678a-38a5668586df@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <aaf193ca-42fc-9117-71c7-d8520639b406@cn.fujitsu.com>
-Date: Wed, 3 May 2017 10:08:40 +0700
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d5jsY-0002Ih-AK
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:19:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43126
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1d5jsY-0002Ib-4Q
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:18:58 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v432IbNY059139
+	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 22:18:56 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a765b89u6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 22:18:56 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 2 May 2017 22:18:55 -0400
+Date: Wed, 3 May 2017 10:18:50 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170428130951.44771-11-bjsdjshi@linux.vnet.ibm.com>
+	<6a3e0621-9e16-ddd4-c1d9-2a7351ebb9e6@redhat.com>
+	<20170502021519.GA27968@bjsdjshi@linux.vnet.ibm.com>
+	<20170502180407.33a8f468.cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <d487205d-6957-d8c1-678a-38a5668586df@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V3 01/10] net: Add vnet_hdr_len related
- callback in NetClientInfo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170502180407.33a8f468.cornelia.huck@de.ibm.com>
+Message-Id: <20170503021850.GG27968@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v6 10/13] s390x/css: introduce and realize
+ ccw-request callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,125 +46,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
-	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, borntraeger@de.ibm.com, qemu-devel@nongnu.org, Auger Eric <eric.auger@redhat.com>, alex.williamson@redhat.com, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, agraf@suse.com
 
+* Cornelia Huck <cornelia.huck@de.ibm.com> [2017-05-02 18:04:07 +0200]:
 
+> On Tue, 2 May 2017 10:15:19 +0800
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > * Auger Eric <eric.auger@redhat.com> [2017-05-01 19:28:23 +0200]:
+> 
+> > > >  static void vfio_ccw_io_notifier_handler(void *opaque)
+> > > >  {
+> > > >      VFIOCCWDevice *vcdev = opaque;
+> > > > +    struct ccw_io_region *region = vcdev->io_region;
+> > > > +    S390CCWDevice *cdev = S390_CCW_DEVICE(vcdev);
+> > > > +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+> > > > +    SubchDev *sch = ccw_dev->sch;
+> > > > +    SCSW *s = &sch->curr_status.scsw;
+> > > > +    IRB irb;
+> > > >  
+> > > >      if (!event_notifier_test_and_clear(&vcdev->io_notifier)) {
+> > > >          return;
+> > > >      }
+> > > > +
+> > > > +    if (pread(vcdev->vdev.fd, region,
+> > > > +              vcdev->io_region_size, vcdev->io_region_offset) == -1) {
+> > > is it possible to read less bytes than requested?
+> > Currently, impossible. The kernel side returns either the full region,
+> > or an error.
+> > But we surely could make it more friendly for a partial return. I will
+> > add a check for that case, and generate a channel program check for it.
+> 
+> I think a channel-control check would be more appropriate here.
 
-On 05/02/2017 12:46 PM, Jason Wang wrote:
->
->
-> On 2017年04月28日 17:47, Zhang Chen wrote:
->> Add get_vnet_hdr_len and get_using_vnet_hdr callback
->> that make we get vnet_hdr_len easily.
->>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   include/net/net.h |  6 ++++++
->>   net/net.c         | 18 ++++++++++++++++++
->>   2 files changed, 24 insertions(+)
->>
->> diff --git a/include/net/net.h b/include/net/net.h
->> index 99b28d5..402d913 100644
->> --- a/include/net/net.h
->> +++ b/include/net/net.h
->> @@ -57,7 +57,9 @@ typedef RxFilterInfo 
->> *(QueryRxFilter)(NetClientState *);
->>   typedef bool (HasUfo)(NetClientState *);
->>   typedef bool (HasVnetHdr)(NetClientState *);
->>   typedef bool (HasVnetHdrLen)(NetClientState *, int);
->> +typedef int (GetVnetHdrLen)(NetClientState *);
->>   typedef void (UsingVnetHdr)(NetClientState *, bool);
->> +typedef bool (GetUsingVnetHdr)(NetClientState *);
->>   typedef void (SetOffload)(NetClientState *, int, int, int, int, int);
->>   typedef void (SetVnetHdrLen)(NetClientState *, int);
->>   typedef int (SetVnetLE)(NetClientState *, bool);
->> @@ -79,7 +81,9 @@ typedef struct NetClientInfo {
->>       HasUfo *has_ufo;
->>       HasVnetHdr *has_vnet_hdr;
->>       HasVnetHdrLen *has_vnet_hdr_len;
->> +    GetVnetHdrLen *get_vnet_hdr_len;
->>       UsingVnetHdr *using_vnet_hdr;
->> +    GetUsingVnetHdr *get_using_vnet_hdr;
->>       SetOffload *set_offload;
->>       SetVnetHdrLen *set_vnet_hdr_len;
->>       SetVnetLE *set_vnet_le;
->> @@ -155,7 +159,9 @@ void qemu_format_nic_info_str(NetClientState *nc, 
->> uint8_t macaddr[6]);
->>   bool qemu_has_ufo(NetClientState *nc);
->>   bool qemu_has_vnet_hdr(NetClientState *nc);
->>   bool qemu_has_vnet_hdr_len(NetClientState *nc, int len);
->> +int qemu_get_vnet_hdr_len(NetClientState *nc);
->>   void qemu_using_vnet_hdr(NetClientState *nc, bool enable);
->> +bool qemu_get_using_vnet_hdr(NetClientState *nc);
->>   void qemu_set_offload(NetClientState *nc, int csum, int tso4, int 
->> tso6,
->>                         int ecn, int ufo);
->>   void qemu_set_vnet_hdr_len(NetClientState *nc, int len);
->> diff --git a/net/net.c b/net/net.c
->> index 0ac3b9e..f69260f 100644
->> --- a/net/net.c
->> +++ b/net/net.c
->> @@ -466,6 +466,15 @@ bool qemu_has_vnet_hdr_len(NetClientState *nc, 
->> int len)
->>       return nc->info->has_vnet_hdr_len(nc, len);
->>   }
->>   +int qemu_get_vnet_hdr_len(NetClientState *nc)
->> +{
->> +    if (!nc || !nc->info->get_vnet_hdr_len) {
->> +        return false;
->> +    }
->> +
->> +    return nc->info->get_vnet_hdr_len(nc);
->> +}
->> +
->>   void qemu_using_vnet_hdr(NetClientState *nc, bool enable)
->>   {
->>       if (!nc || !nc->info->using_vnet_hdr) {
->> @@ -475,6 +484,15 @@ void qemu_using_vnet_hdr(NetClientState *nc, 
->> bool enable)
->>       nc->info->using_vnet_hdr(nc, enable);
->>   }
->>   +bool qemu_get_using_vnet_hdr(NetClientState *nc)
->> +{
->> +    if (!nc || !nc->info->get_using_vnet_hdr) {
->> +        return false;
->> +    }
->> +
->> +    return nc->info->get_using_vnet_hdr(nc);
->> +}
->
-> Looks like we can do this simply by:
->
-> Introduce two common fields in NetClientState:
->
-> bool using_vnet_hdr;
-> int vnet_hdr_len;
->
-> And set them during qemu_using_vnet_hdr() and qemu_set_vnet_hdr_len(). 
-> Then we can query them directly without introducing any new callbacks.
+Hi Conny,
 
-Good idea~
-I will implement in next version.
+After reading PoP 14-43, I think you are right.
 
-Thanks
-Zhang Chen
+Quotation from PoP:
+------------------8<-----------------------------------
+Channel-control check is caused by any machine
+malfunction affecting channel-subsystem controls.
+... ...
 
->
-> Thanks
->
->> +
->>   void qemu_set_offload(NetClientState *nc, int csum, int tso4, int 
->> tso6,
->>                             int ecn, int ufo)
->>   {
->
->
->
-> .
->
+Channel-control check may also indicate that an
+error has been detected in the information trans-
+ferred to or from main storage during an I/O opera-
+tion.
+... ...
+
+Detection of the channel-control-check condition
+causes the current operation, if any, to be terminated
+immediately. The subchannel is made status pending
+with primary and alert status or with primary, second-
+ary, and alert status as a function of the type of termi-
+nation, the current subchannel state, and the device
+status presented, if any. When the channel sub-
+system recognizes a channel-control-check condi-
+tion, any previously existing intermediate interruption
+condition may or may not be recognized by the chan-
+nel subsystem.
+------------------>8-----------------------------------
+
+So I decide to add this piece of code:
+if (size != vcdev->io_region_size) {
+    /* Information transfer error, generate channel-control check. */
+    s->ctrl &= ~SCSW_ACTL_START_PEND;
+    s->cstat = SCSW_CSTAT_CHN_CTRL_CHK;
+    s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
+    s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
+               SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+    goto read_err;
+}
 
 -- 
-Thanks
-Zhang Chen
+Dong Jia Shi
