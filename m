@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d5v26-0007Pq-Vg
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:13:36 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5v8N-0002li-HD
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:20:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d5v22-0006IH-Vx
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:13:34 -0400
-Received: from mail-db5eur01on0109.outbound.protection.outlook.com
-	([104.47.2.109]:12749
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1d5v22-0006Hr-50
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:13:30 -0400
-References: <1493732857-10721-1-git-send-email-den@openvz.org>
-	<87bmrbgvzf.fsf@dusky.pond.sub.org>
-	<e90d1680-6212-862e-bd3b-fdc415ec1890@openvz.org>
-	<877f1zcjcf.fsf@dusky.pond.sub.org> <20170502163629.GA5640@work-vm>
-	<20170502164838.GL16624@redhat.com>
-	<1dda0b40-e473-638e-7a89-891f578d3186@openvz.org>
-	<87shkm2n62.fsf@dusky.pond.sub.org> <20170503113507.GB3985@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <e9423ea7-8d41-e8f1-6f8a-3467b06168ca@openvz.org>
-Date: Wed, 3 May 2017 14:39:24 +0300
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5v8K-0003si-Ad
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:20:03 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:12722)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5v8J-0003nN-L0
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:20:00 -0400
+References: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1493735386-39622-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170503082232.1cd2ac92@bahia>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <110bb988-4e22-1b2a-15dd-56e198d41923@huawei.com>
+Date: Wed, 3 May 2017 16:19:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170503113507.GB3985@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170503082232.1cd2ac92@bahia>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] monitor: increase amount of data for
- monitor to read
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] Throttle: Create IOThrottle
+ structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,156 +29,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, alberto garcia <berto@igalia.com>, jani
+	kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On 05/03/2017 02:35 PM, Daniel P. Berrange wrote:
-> On Wed, May 03, 2017 at 01:29:57PM +0200, Markus Armbruster wrote:
->> "Denis V. Lunev" <den@openvz.org> writes:
->>
->>> On 05/02/2017 07:48 PM, Daniel P. Berrange wrote:
->>>> On Tue, May 02, 2017 at 05:36:30PM +0100, Dr. David Alan Gilbert wrote:
->>>>> * Markus Armbruster (armbru@redhat.com) wrote:
->>>>>> "Denis V. Lunev" <den@openvz.org> writes:
->>>>>>
->>>>>>> On 05/02/2017 05:43 PM, Markus Armbruster wrote:
->>>>>>>> "Denis V. Lunev" <den@openvz.org> writes:
->>>>>>>>
->>>>>>>>> Right now QMP and HMP monitors read 1 byte at a time from the socket, which
->>>>>>>>> is very inefficient. With 100+ VMs on the host this easily reasults in
->>>>>>>>> a lot of unnecessary system calls and CPU usage in the system.
->>>>>>>>>
->>>>>>>>> This patch changes the amount of data to read to 4096 bytes, which matches
->>>>>>>>> buffer size on the channel level. Fortunately, monitor protocol is
->>>>>>>>> synchronous right now thus we should not face side effects in reality.
->>>>>>>> Can you explain briefly why this relies on "synchronous"?  I've spent
->>>>>>>> all of two seconds on the question myself...
->>>>>>> Each command is processed in sequence as it appears in the
->>>>>>> channel. The answer to the command is sent and only after that
->>>>>>> next command is processed.
->>>>>> Yes, that's how QMP works.
->>>>>>
->>>>>>> Theoretically tith asynchronous processing we can have some side
->>>>>>> effects due to changed buffer size.
->>>>>> What kind of side effects do you have in mind?
->>>>>>
->>>>>> It's quite possible that this obviously inefficient way to read had some
->>>>>> deep reason back when it was created.  Hmm, git-blame is our friend:
->>>>>>
->>>>>> commit c62313bbdc48f72e93fa8196f2fff96ba35e4e9d
->>>>>> Author: Jan Kiszka <jan.kiszka@siemens.com>
->>>>>> Date:   Fri Dec 4 14:05:29 2009 +0100
->>>>>>
->>>>>>     monitor: Accept input only byte-wise
->>>>>>     
->>>>>>     This allows to suspend command interpretation and execution
->>>>>>     synchronously, e.g. during migration.
->>>>>>     
->>>>>>     Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->>>>>>     Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
->>>>> I don't think I understand why that's a problem; if we read more bytes,
->>>>> we're not going to interpret them and execute them until after the previous
->>>>> command returns are we?
->>>> Actually it sees we might do, due to the way the "migrate" command works
->>>> in HMP when you don't give the '-d' flag.
->>>>
->>>> Most monitors commands will block the caller until they are finished,
->>>> but "migrate" is different. The hmp_migrate() method will return
->>>> immediately, but we call monitor_suspend() to block processing of
->>>> further commands. If another command has already been read off
->>>> the wire though (due to "monitor_read" having a buffer that contains
->>>> multiple commands), we would in fact start processing this command
->>>> despite having suspended the monitor.
->>>>
->>>> This is only a problem, however, if the client app has issued "migrate"
->>>> followed by another command, at the same time without waiting for the
->>>> respond to "migrate". So in practice the only way you'd hit the bug
->>>> is probably if you just cut+paste a big chunk of commands into the
->>>> monitor at once without waiting for completion and one of the commands
->>>> was "migrate" without "-d".
->>>>
->>>> Still, I think we would need to figure out a proper fix for this before
->>>> we could increase the buffer size.
->>>>
->>>> Regards,
->>>> Daniel
->>> There is one thing, which simplifies things a lot.
->>> - suspend_cnt can be increased only from 2 places:
->>>   1) monitor_event(), which is called for real HMP monitor only
->>>
->>>   2) monitor_suspend(), which can increment suspend_cnt
->>>       only if mon->rs != NULL, which also means that the
->>>       monitor is specifically configured HMP monitor.
->> I think you're right.  Monitor member suspend_cnt could use a comment.
->>
->> If there are more members that apply only to HMP, we should collect them
->> in a MonitorHMP struct, similar to MonitorQMP.
->>
->>> So, we can improve the patch (for now) with the following
->>> tweak:
->>>
->>> static int monitor_can_read(void *opaque)
->>> {
->>>     Monitor *mon = opaque;
->>>    
->>>     if (monitor_is_qmp(mon))
->>>         return 4096;   
->>>     return (mon->suspend_cnt == 0) ? 1 : 0;
->>> }
->> Instead of adding the conditional, I'd split this into two functions,
->> one for HMP and one for QMP, just like we split the other two callbacks.
->>
->>> This will solve my case completely and does not break any
->>> backward compatibility.
->> No change for HMP.  Okay.
->>
->> For QMP, monitor_qmp_read() feeds whatever it gets to the JSON lexer.
->> It currently gets one character at a time, because that's how much
->> monitor_can_read() returns.  With your change, it gets up to 4KiB.
->>
->> The JSON lexer feeds tokens to the JSON streamer one at a time until it
->> has consumed everything it was fed.
->>
->> The JSON streamer accumulates tokens, parsing them just enough to know
->> when it has a complete expression.  It pushes the expression to the QMP
->> expression handler immediately.
->>
->> The QMP expression handler calls the JSON parser to parse the tokens
->> into a QObject, then dispatches to QMP command handlers accordingly.
->>
->> Everything's synchronous.  When a QMP command handler runs, the calling
->> JSON streamer invocation is handling the command's final closing brace,
->> and so is the calling JSON lexer.  After the QMP command handler
->> returns, the JSON streamer returns.  The JSON lexer then looks at the
->> next character if there are more, else it returns.
->>
->> The only difference to before that I can see is that we can read ahead.
->> That's a feature.
->>
->> Looks safe to me.  Opinions?
-> Yes, I concur, it looks safe for QMP.
+On 5/3/2017 8:22 AM, Greg Kurz wrote:
+> s/Throttle/throttle
 >
-> I might suggest putting an assert(!qmp) in monitor_suspend() to guarantee
-> no one accidentally introduces usage of the suspend feature in QMP in
-> future.
+> On Tue,  2 May 2017 10:29:43 -0400
+> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
 >
+>> This patchset introduces a new io throttle structure. This will be
 >
-> I think we could make it safe for HMP too, eventually, if we really wanted
-> to. In monitor_read(), we feed bytes 1 at a time into the parser. After
-> each byte is processed, we would need to check whether the monitor is now
-> suspended or not. If it is suspended, we would have to stop feeding bytes
-> into the parser, and stash them in the Monitor object for later use. When
-> the monitor_resume was triggered, then we could carry on processing the
-> stashed bytes.
+> s/patchset/patch
+OK
 >
-> Of course, that's not a blocker for doing the quick change for QMP only
-> right now.
+>> used in both block and fsdev devices.
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>> ---
 >
-> Regards,
-> Daniel
-I have though on this but fear about the context. Are we really able to
-start
-QMP processing from it? Usage of bottom-half is also unclear.
-What about locking and other interesting stuff?
-
-Den
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+OK
+>
+>>  qapi/block-core.json | 76 ++--------------------------------------------
+>>  qapi/iothrottle.json | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 89 insertions(+), 73 deletions(-)
+>>  create mode 100644 qapi/iothrottle.json
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 87fb747..93d346b 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -6,6 +6,7 @@
+>>
+>>  # QAPI common definitions
+>>  { 'include': 'common.json' }
+>> +{ 'include': 'iothrottle.json' }
+>>
+>>  ##
+>>  # @SnapshotInfo:
+>> @@ -1760,84 +1761,13 @@
+>>  #
+>>  # @device: Block device name (deprecated, use @id instead)
+>>  #
+>> -# @id: The name or QOM path of the guest device (since: 2.8)
+>> -#
+>> -# @bps: total throughput limit in bytes per second
+>> -#
+>> -# @bps_rd: read throughput limit in bytes per second
+>> -#
+>> -# @bps_wr: write throughput limit in bytes per second
+>> -#
+>> -# @iops: total I/O operations per second
+>> -#
+>> -# @iops_rd: read I/O operations per second
+>> -#
+>> -# @iops_wr: write I/O operations per second
+>> -#
+>> -# @bps_max: total throughput limit during bursts,
+>> -#                     in bytes (Since 1.7)
+>> -#
+>> -# @bps_rd_max: read throughput limit during bursts,
+>> -#                        in bytes (Since 1.7)
+>> -#
+>> -# @bps_wr_max: write throughput limit during bursts,
+>> -#                        in bytes (Since 1.7)
+>> -#
+>> -# @iops_max: total I/O operations per second during bursts,
+>> -#                      in bytes (Since 1.7)
+>> -#
+>> -# @iops_rd_max: read I/O operations per second during bursts,
+>> -#                         in bytes (Since 1.7)
+>> -#
+>> -# @iops_wr_max: write I/O operations per second during bursts,
+>> -#                         in bytes (Since 1.7)
+>> -#
+>> -# @bps_max_length: maximum length of the @bps_max burst
+>> -#                            period, in seconds. It must only
+>> -#                            be set if @bps_max is set as well.
+>> -#                            Defaults to 1. (Since 2.6)
+>> -#
+>> -# @bps_rd_max_length: maximum length of the @bps_rd_max
+>> -#                               burst period, in seconds. It must only
+>> -#                               be set if @bps_rd_max is set as well.
+>> -#                               Defaults to 1. (Since 2.6)
+>> -#
+>> -# @bps_wr_max_length: maximum length of the @bps_wr_max
+>> -#                               burst period, in seconds. It must only
+>> -#                               be set if @bps_wr_max is set as well.
+>> -#                               Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_max_length: maximum length of the @iops burst
+>> -#                             period, in seconds. It must only
+>> -#                             be set if @iops_max is set as well.
+>> -#                             Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_rd_max_length: maximum length of the @iops_rd_max
+>> -#                                burst period, in seconds. It must only
+>> -#                                be set if @iops_rd_max is set as well.
+>> -#                                Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_wr_max_length: maximum length of the @iops_wr_max
+>> -#                                burst period, in seconds. It must only
+>> -#                                be set if @iops_wr_max is set as well.
+>> -#                                Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_size: an I/O size in bytes (Since 1.7)
+>> -#
+>>  # @group: throttle group name (Since 2.4)
+>>  #
+>>  # Since: 1.1
+>>  ##
+>>  { 'struct': 'BlockIOThrottle',
+>> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+>> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+>> -            '*bps_max': 'int', '*bps_rd_max': 'int',
+>> -            '*bps_wr_max': 'int', '*iops_max': 'int',
+>> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>> -            '*iops_size': 'int', '*group': 'str' } }
+>> +  'base': 'IOThrottle',
+>> +  'data': { '*device': 'str', '*group': 'str' } }
+>>
+>>  ##
+>>  # @block-stream:
+>> diff --git a/qapi/iothrottle.json b/qapi/iothrottle.json
+>> new file mode 100644
+>> index 0000000..124ab40
+>> --- /dev/null
+>> +++ b/qapi/iothrottle.json
+>> @@ -0,0 +1,86 @@
+>> +# -*- Mode: Python -*-
+>> +
+>> +##
+>> +# == QAPI IOThrottle definitions
+>> +##
+>> +# @IOThrottle:
+>> +#
+>> +# A set of parameters describing iothrottle
+>
+> s/iothrottle/IO throttling/
+I completely taken off that sentence.
+>
+>> +#
+>> +# @id: The name or QOM path of the guest device (since: 2.8)
+>> +#
+>> +# @bps: total throughput limit in bytes per second
+>> +#
+>> +# @bps_rd: read throughput limit in bytes per second
+>> +#
+>> +# @bps_wr: write throughput limit in bytes per second
+>> +#
+>> +# @iops: total I/O operations per second
+>> +#
+>> +# @iops_rd: read I/O operations per second
+>> +#
+>> +# @iops_wr: write I/O operations per second
+>> +#
+>> +# @bps_max: total throughput limit during bursts,
+>> +#                     in bytes (Since 1.7)
+>> +#
+>> +# @bps_rd_max: read throughput limit during bursts,
+>> +#                        in bytes (Since 1.7)
+>> +#
+>> +# @bps_wr_max: write throughput limit during bursts,
+>> +#                        in bytes (Since 1.7)
+>> +#
+>> +# @iops_max: total I/O operations per second during bursts,
+>> +#                      in bytes (Since 1.7)
+>> +#
+>> +# @iops_rd_max: read I/O operations per second during bursts,
+>> +#                         in bytes (Since 1.7)
+>> +#
+>> +# @iops_wr_max: write I/O operations per second during bursts,
+>> +#                         in bytes (Since 1.7)
+>> +#
+>> +# @bps_max_length: maximum length of the @bps_max burst
+>> +#                            period, in seconds. It must only
+>> +#                            be set if @bps_max is set as well.
+>> +#                            Defaults to 1. (Since 2.6)
+>> +#
+>> +# @bps_rd_max_length: maximum length of the @bps_rd_max
+>> +#                               burst period, in seconds. It must only
+>> +#                               be set if @bps_rd_max is set as well.
+>> +#                               Defaults to 1. (Since 2.6)
+>> +#
+>> +# @bps_wr_max_length: maximum length of the @bps_wr_max
+>> +#                               burst period, in seconds. It must only
+>> +#                               be set if @bps_wr_max is set as well.
+>> +#                               Defaults to 1. (Since 2.6)
+>> +#
+>> +# @iops_max_length: maximum length of the @iops burst
+>> +#                             period, in seconds. It must only
+>> +#                             be set if @iops_max is set as well.
+>> +#                             Defaults to 1. (Since 2.6)
+>> +#
+>> +# @iops_rd_max_length: maximum length of the @iops_rd_max
+>> +#                                burst period, in seconds. It must only
+>> +#                                be set if @iops_rd_max is set as well.
+>> +#                                Defaults to 1. (Since 2.6)
+>> +#
+>> +# @iops_wr_max_length: maximum length of the @iops_wr_max
+>> +#                                burst period, in seconds. It must only
+>> +#                                be set if @iops_wr_max is set as well.
+>> +#                                Defaults to 1. (Since 2.6)
+>> +#
+>> +# @iops_size: an I/O size in bytes (Since 1.7)
+>> +#
+>> +#
+>> +# Since: 2.10
+>> +##
+>> +{ 'struct': 'IOThrottle',
+>> +  'data': { '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+>> +            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+>> +            '*bps_max': 'int', '*bps_rd_max': 'int',
+>> +            '*bps_wr_max': 'int', '*iops_max': 'int',
+>> +            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>> +            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>> +            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>> +            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>> +            '*iops_size': 'int' } }
+>
