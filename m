@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5u7V-0006eC-CZ
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:15:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1d5u7a-0006lK-4c
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:15:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5u7R-0002r8-D6
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:15:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58828)
+	(envelope-from <bounces@canonical.com>) id 1d5u7Y-0002xk-Kb
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:15:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59025)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d5u7R-0002qn-75
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:15:01 -0400
+	id 1d5u7Y-0002xA-F1
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:15:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d5u7P-0005Ku-8Q
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 13:14:59 +0000
+	id 1d5u7W-0005TC-Rz
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 13:15:06 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EC5BA2E80DE
-	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 13:14:58 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D31012E80C7
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 13:15:06 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 May 2017 13:00:47 -0000
+Date: Wed, 03 May 2017 13:00:51 -0000
 From: Marc Deslauriers <marc.deslauriers@canonical.com>
 Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170503130048.9393.20961.launchpad@gac.canonical.com>
+Message-Id: <20170503130052.2107.5283.launchpad@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
  CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
@@ -39,7 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: qemu (Ubuntu Trusty)
+** Changed in: qemu (Ubuntu Xenial)
      Assignee: (unassigned) =3D> Marc Deslauriers (mdeslaur)
 
 -- =
