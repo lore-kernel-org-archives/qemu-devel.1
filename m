@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5tsg-0001WD-0g
+	(envelope-from <bounces@canonical.com>) id 1d5tsd-0001U1-9O
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5tsb-0001hM-5f
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55608)
+	(envelope-from <bounces@canonical.com>) id 1d5tsY-0001gV-EU
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55518)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d5tsa-0001h9-Vk
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:41 -0400
+	id 1d5tsY-0001g4-5L
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d5tsZ-0002lj-7s
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 12:59:39 +0000
+	id 1d5tsV-0002m3-Fw
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 12:59:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B7BB72E80E8
-	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 12:59:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4E5092E80CB
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 12:59:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 May 2017 12:47:19 -0000
+Date: Wed, 03 May 2017 12:45:55 -0000
 From: ChristianEhrhardt <1581936@bugs.launchpad.net>
 Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170503124719.10051.13592.malone@gac.canonical.com>
+Message-Id: <20170503124555.3943.31728.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
  CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
@@ -39,42 +39,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I checked and this is in 2.6.1 via a backport as [1] not as the original
-[2].
+Hi,
+thanks for marking Qemu(Ubuntu) so I could see it - and thanks for the prew=
+ork on the patches.
+We need to clear a few in progress SRUs before that but other than that thi=
+ngs look nice.
+We can work on the patches a bit until that happened.
 
-But that means >=3DYakkety is good and Xenial/Trusty are bad since the rela=
-ted Security SRUs.
-Updating bug tasks accordingly.
+We will need somewhat proper Dep3 headers in [1] the patches - I can add
+those if you want me to do so.
 
-[1]: http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D7ff5dc445d6bb392f9fb3=
-d0a254ef9071304780b
-[2]: http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D94ef4f337fb614f18b765=
-a8e0e878a4c23cdedcd
-
-** Also affects: qemu (Ubuntu Xenial)
-   Importance: Undecided
-       Status: New
-
-** Also affects: qemu (Ubuntu Trusty)
-   Importance: Undecided
-       Status: New
-
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> Fix Released
-
-** Changed in: qemu (Ubuntu Trusty)
-       Status: New =3D> Triaged
-
-** Changed in: qemu (Ubuntu Xenial)
-       Status: New =3D> Triaged
-
-** Changed in: qemu (Ubuntu Trusty)
-   Importance: Undecided =3D> High
-
-** Changed in: qemu (Ubuntu Xenial)
-   Importance: Undecided =3D> High
-
-** Tags added: server-next
+[1]: http://dep.debian.net/deps/dep3/
 
 -- =
 
