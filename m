@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d5vfh-00067a-Cb
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:54:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d5vhu-0006zn-2H
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d5vfc-0004u7-Oz
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:54:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42120)
+	(envelope-from <dgilbert@redhat.com>) id 1d5vhp-0006eB-6u
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:56:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56776)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1d5vfc-0004t7-Fd
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:54:24 -0400
-Date: Wed, 3 May 2017 15:54:19 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170503145418.GB27432@redhat.com>
-References: <20170227163447.20428-1-stefanha@redhat.com>
-	<20170227163447.20428-2-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d5vho-0006cq-Uz
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:56:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C256581229
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 14:56:39 +0000 (UTC)
+Date: Wed, 3 May 2017 15:56:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170503145631.GE2657@work-vm>
+References: <20170503121143.14925-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170227163447.20428-2-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 1/4] curl: do not use
- aio_context_acquire/release
+In-Reply-To: <20170503121143.14925-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] libvhost-user: fix
+ vu_queue_get_avail_bytes() crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +34,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-On Mon, Feb 27, 2017 at 04:34:44PM +0000, Stefan Hajnoczi wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Now that all bottom halves and callbacks take care of taking the
-> AioContext lock, we can migrate some users away from it and to a
-> specific QemuMutex or CoMutex.
-> 
-> Protect BDRVCURLState access with a QemuMutex.
->
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-id: 20170222180725.28611-2-pbonzini@redhat.com
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Calling vu_queue_get_avail_bytes() when the queue doesn't yet have
+> addresses will result in the following crash:
+>=20
+> Program received signal SIGSEGV, Segmentation fault.
+> 0x000055c414112ce4 in vring_avail_idx (vq=3D0x55c41582fd68, vq=3D0x55c4=
+1582fd68)
+>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:94=
+0
+> 940            vq->shadow_avail_idx =3D vq->vring.avail->idx;
+> (gdb) p vq
+> $1 =3D (VuVirtq *) 0x55c41582fd68
+> (gdb) p vq->vring
+> $2 =3D {num =3D 0, desc =3D 0x0, avail =3D 0x0, used =3D 0x0, log_guest=
+_addr =3D 0, flags =3D 0}
+>=20
+>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:94=
+0
+> No locals.
+>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:96=
+0
+>         num_heads =3D <optimized out>
+>     out_bytes=3Dout_bytes@entry=3D0x7fffd035d7c4, max_in_bytes=3Dmax_in=
+_bytes@entry=3D0,
+>     max_out_bytes=3Dmax_out_bytes@entry=3D0) at /home/dgilbert/git/qemu=
+/contrib/libvhost-user/libvhost-user.c:1034
+>=20
+> Check if vring.avail !=3D null before accessing it.
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1447590
 
-I've been tracking down a bug in the curl driver which affects
-virt-v2v, and this commit is implicated.
+This doesn't seem to fully solve it, it's now failing at:
 
-It manifests itself as a hang while downloading a certain file within
-a remotely located disk image accessed over https.
+#0  vring_used_idx_set (val=3D0, vq=3D0x5570fcb49d68, dev=3D0x5570fcb49c2=
+0)
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:1472
+No locals.
+#1  vu_queue_flush (dev=3D0x5570fcb49c20, vq=3D0x5570fcb49d68, count=3D0)
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:1494
+        old =3D 0
+        new =3D 0
+#2  0x00005570fb8d9639 in vubr_backend_recv_cb (sock=3D<optimized out>, c=
+tx=3D0x5570fcb49c20)
+    at /home/dgilbert/git/qemu/tests/vhost-user-bridge.c:349
+        vubr =3D 0x5570fcb49c20
+        dev =3D 0x5570fcb49c20
+        vq =3D 0x5570fcb49d68
+        elem =3D <optimized out>
+        mhdr_sg =3D {{iov_base =3D 0x0, iov_len =3D 0} <repeats 740 times=
+>, {iov_base =3D 0x0, iov_len =3D 139877843420656}, {
 
-Unfortunately the bug environment is extremely difficult to reproduce
-(not the bug itself -- that is very easy to reproduce once you've set
-up the environment).  Anyway I don't have a simple reproducer which
-anyone could try.  I'll try to work on that next.
+            iov_len =3D 0}...}
+        mhdr =3D {hdr =3D {flags =3D 0 '\000', gso_type =3D 0 '\000', hdr=
+_len =3D 0, gso_size =3D 0, csum_start =3D 0,=20
+            csum_offset =3D 0}, num_buffers =3D 0}
+        mhdr_cnt =3D <optimized out>
+        hdrlen =3D 0
+        i =3D <optimized out>
+        hdr =3D {flags =3D 0 '\000', gso_type =3D 0 '\000', hdr_len =3D 0=
+, gso_size =3D 0, csum_start =3D 0, csum_offset =3D 0}
+        __PRETTY_FUNCTION__ =3D "vubr_backend_recv_cb"
+#3  0x00005570fb8d8ad3 in dispatcher_wait (timeout=3D200000, dispr=3D0x55=
+70fcb4a0b8)
+    at /home/dgilbert/git/qemu/tests/vhost-user-bridge.c:154
+        e =3D 0x5570fcb4a180
+        tv =3D {tv_sec =3D 0, tv_usec =3D 199998}
+        fdset =3D {fds_bits =3D {48, 0 <repeats 15 times>}}
+        rc =3D <optimized out>
+        sock =3D 4
+#4  vubr_run (dev=3D<optimized out>) at /home/dgilbert/git/qemu/tests/vho=
+st-user-bridge.c:624
+No locals.
+#5  main (argc=3D<optimized out>, argv=3D<optimized out>) at /home/dgilbe=
+rt/git/qemu/tests/vhost-user-bridge.c:697
+        opt =3D <optimized out>
+        client =3D <optimized out>
 
-However I bisected it and it is caused by this commit.  The hang
-affects qemu from master.  Reverting this commit on top of qemu from
-master fixes the hang.
+Dave
 
-Is there anything obviously wrong with the commit?
-
-Rich.
-
->  block/curl.c | 24 +++++++++++++++---------
->  1 file changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/block/curl.c b/block/curl.c
-> index 2939cc7..e83dcd8 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -135,6 +135,7 @@ typedef struct BDRVCURLState {
->      char *cookie;
->      bool accept_range;
->      AioContext *aio_context;
-> +    QemuMutex mutex;
->      char *username;
->      char *password;
->      char *proxyusername;
-> @@ -333,6 +334,7 @@ static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
->      return FIND_RET_NONE;
->  }
->  
-> +/* Called with s->mutex held.  */
->  static void curl_multi_check_completion(BDRVCURLState *s)
->  {
->      int msgs_in_queue;
-> @@ -374,7 +376,9 @@ static void curl_multi_check_completion(BDRVCURLState *s)
->                          continue;
->                      }
->  
-> +                    qemu_mutex_unlock(&s->mutex);
->                      acb->common.cb(acb->common.opaque, -EPROTO);
-> +                    qemu_mutex_lock(&s->mutex);
->                      qemu_aio_unref(acb);
->                      state->acb[i] = NULL;
->                  }
-> @@ -386,6 +390,7 @@ static void curl_multi_check_completion(BDRVCURLState *s)
->      }
->  }
->  
-> +/* Called with s->mutex held.  */
->  static void curl_multi_do_locked(CURLState *s)
->  {
->      CURLSocket *socket, *next_socket;
-> @@ -409,19 +414,19 @@ static void curl_multi_do(void *arg)
->  {
->      CURLState *s = (CURLState *)arg;
->  
-> -    aio_context_acquire(s->s->aio_context);
-> +    qemu_mutex_lock(&s->s->mutex);
->      curl_multi_do_locked(s);
-> -    aio_context_release(s->s->aio_context);
-> +    qemu_mutex_unlock(&s->s->mutex);
->  }
->  
->  static void curl_multi_read(void *arg)
->  {
->      CURLState *s = (CURLState *)arg;
->  
-> -    aio_context_acquire(s->s->aio_context);
-> +    qemu_mutex_lock(&s->s->mutex);
->      curl_multi_do_locked(s);
->      curl_multi_check_completion(s->s);
-> -    aio_context_release(s->s->aio_context);
-> +    qemu_mutex_unlock(&s->s->mutex);
->  }
->  
->  static void curl_multi_timeout_do(void *arg)
-> @@ -434,11 +439,11 @@ static void curl_multi_timeout_do(void *arg)
->          return;
->      }
->  
-> -    aio_context_acquire(s->aio_context);
-> +    qemu_mutex_lock(&s->mutex);
->      curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running);
->  
->      curl_multi_check_completion(s);
-> -    aio_context_release(s->aio_context);
-> +    qemu_mutex_unlock(&s->mutex);
->  #else
->      abort();
->  #endif
-> @@ -771,6 +776,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      curl_easy_cleanup(state->curl);
->      state->curl = NULL;
->  
-> +    qemu_mutex_init(&s->mutex);
->      curl_attach_aio_context(bs, bdrv_get_aio_context(bs));
->  
->      qemu_opts_del(opts);
-> @@ -801,12 +807,11 @@ static void curl_readv_bh_cb(void *p)
->      CURLAIOCB *acb = p;
->      BlockDriverState *bs = acb->common.bs;
->      BDRVCURLState *s = bs->opaque;
-> -    AioContext *ctx = bdrv_get_aio_context(bs);
->  
->      size_t start = acb->sector_num * BDRV_SECTOR_SIZE;
->      size_t end;
->  
-> -    aio_context_acquire(ctx);
-> +    qemu_mutex_lock(&s->mutex);
->  
->      // In case we have the requested data already (e.g. read-ahead),
->      // we can just call the callback and be done.
-> @@ -854,7 +859,7 @@ static void curl_readv_bh_cb(void *p)
->      curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running);
->  
->  out:
-> -    aio_context_release(ctx);
-> +    qemu_mutex_unlock(&s->mutex);
->      if (ret != -EINPROGRESS) {
->          acb->common.cb(acb->common.opaque, ret);
->          qemu_aio_unref(acb);
-> @@ -883,6 +888,7 @@ static void curl_close(BlockDriverState *bs)
->  
->      DPRINTF("CURL: Close\n");
->      curl_detach_aio_context(bs);
-> +    qemu_mutex_destroy(&s->mutex);
->  
->      g_free(s->cookie);
->      g_free(s->url);
-> -- 
-> 2.9.3
-> 
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+> ---
+>  contrib/libvhost-user/libvhost-user.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-u=
+ser/libvhost-user.c
+> index af4faad60b..f9680b6279 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -1031,6 +1031,10 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq=
+, unsigned int *in_bytes,
+>      idx =3D vq->last_avail_idx;
+> =20
+>      total_bufs =3D in_total =3D out_total =3D 0;
+> +    if (!vq->vring.avail) {
+> +        goto done;
+> +    }
+> +
+>      while ((rc =3D virtqueue_num_heads(dev, vq, idx)) > 0) {
+>          unsigned int max, num_bufs, indirect =3D 0;
+>          struct vring_desc *desc;
+> --=20
+> 2.12.0.191.gc5d8de91d
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
