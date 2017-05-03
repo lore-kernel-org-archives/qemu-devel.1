@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d5iM5-00013y-Ex
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 20:41:22 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1d5j2l-0008B1-Fm
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 21:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d5iM2-0000Sv-BJ
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 20:41:21 -0400
-Resent-Message-Id: <E1d5iM2-0000Sv-BJ@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21305)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d5iM2-0000Sc-2X
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 20:41:18 -0400
-In-Reply-To: <alpine.DEB.2.10.1705021646310.8859@sstabellini-ThinkPad-X260>
-Message-ID: <149377204349.168.2323234965726314465@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <aik@ozlabs.ru>) id 1d5j2i-0000Su-AZ
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 21:25:27 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34022)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1d5j2i-0000Sj-1j
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 21:25:24 -0400
+Received: by mail-pf0-x241.google.com with SMTP id g23so1816415pfj.1
+	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 18:25:23 -0700 (PDT)
+References: <20170429123707.16675-1-aik@ozlabs.ru>
+	<20170502182550.5edb9565.cornelia.huck@de.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <e6d90400-3bcd-77c5-dbe6-24dc14d6bcd3@ozlabs.ru>
+Date: Wed, 3 May 2017 11:25:16 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 2 May 2017 17:40:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH RFC] xen/mapcache: store dma information in
- revmapcache entries for debugging
+In-Reply-To: <20170502182550.5edb9565.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=koi8-r
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v5] memory/iommu: QOM'fy IOMMU
+ MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sstabellini@kernel.org
-Cc: famz@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xensource.com, crosthwaite.peter@gmail.com, qemu-devel@nongnu.org, x1917x@gmail.com, pbonzini@redhat.com, hrgstephen@gmail.com, rth@twiddle.net
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBSRkNdIHhlbi9tYXBjYWNoZTogc3RvcmUgZG1hIGluZm9ybWF0aW9uIGlu
-IHJldm1hcGNhY2hlIGVudHJpZXMgZm9yIGRlYnVnZ2luZwpNZXNzYWdlLWlkOiBhbHBpbmUuREVC
-LjIuMTAuMTcwNTAyMTY0NjMxMC44ODU5QHNzdGFiZWxsaW5pLVRoaW5rUGFkLVgyNjAKVHlwZTog
-c2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-IyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4NjhmZjU1IHhlbi9t
-YXBjYWNoZTogc3RvcmUgZG1hIGluZm9ybWF0aW9uIGluIHJldm1hcGNhY2hlIGVudHJpZXMgZm9y
-IGRlYnVnZ2luZwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiB4ZW4v
-bWFwY2FjaGU6IHN0b3JlIGRtYSBpbmZvcm1hdGlvbiBpbiByZXZtYXBjYWNoZSBlbnRyaWVzIGZv
-ciBkZWJ1Z2dpbmcuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
-cyBvZiB0aGlzIHN0YXRlbWVudAojMTIzOiBGSUxFOiBody9pMzg2L3hlbi94ZW4tbWFwY2FjaGUu
-Yzo0MzE6CisgICAgICAgIGlmICghcmV2ZW50cnktPmRtYSkKWy4uLl0KCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgODkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
-IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On 03/05/17 02:25, Cornelia Huck wrote:
+> On Sat, 29 Apr 2017 22:37:07 +1000
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> This defines new QOM object - IOMMUMemoryRegion - with MemoryRegion
+>> as a parent.
+>>
+>> This moves IOMMU-related fields from MR to IOMMU MR. However to avoid
+>> dymanic QOM casting in fast path (address_space_translate, etc),
+>> this adds an @is_iommu boolean flag to MR and provides new helper to
+>> do simple cast to IOMMU MR - memory_region_get_iommu. The flag
+>> is set in the instance init callback. This defines
+>> memory_region_is_iommu as memory_region_get_iommu()!=NULL.
+>>
+>> This switches MemoryRegion to IOMMUMemoryRegion in most places except
+>> the ones where MemoryRegion may be an alias.
+>>
+>> This defines memory_region_init_iommu_type() to allow creating
+>> IOMMUMemoryRegion subclasses. In order to support custom QOM type,
+>> this splits memory_region_init() to object_initialize() +
+>> memory_region_do_init.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+>>  /**
+>> + * memory_region_init_iommu_type: Initialize a memory region of a custom type
+>> + * that translates addresses
+>> + *
+>> + * An IOMMU region translates addresses and forwards accesses to a target
+>> + * memory region.
+>> + *
+>> + * @typename: QOM class name
+>> + * @iommumr: the #IOMMUMemoryRegion to be initialized
+> 
+> <bikeshed>
+> I find "iommumr" terribly hard to read. Maybe iommu_mr is better? (Lots
+> of times in this patch.)
+> </bikeshed>
+
+Terribly? Really? :) Seriously, since linux uses underscores in typenames,
+I kind of developed resistance to underscores in variable names which look
+like typenames (even though c allows using same token for a type and a
+variable). May be just "iommu"? I need one more vote for "iommu" vs.
+"iommumr" vs. "iommu_mr" to respin v6 :)
+
+
+> 
+> The s390 parts look fine.
+> 
+
+
+-- 
+Alexey
