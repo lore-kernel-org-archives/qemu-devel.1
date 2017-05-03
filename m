@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5oWh-0007jH-B9
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 03:16:44 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5oYo-0000Bv-MR
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 03:18:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5oWe-0001GT-3C
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 03:16:43 -0400
-Received: from [59.151.112.132] (port=34327 helo=heian.cn.fujitsu.com)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5oYl-0001xW-IE
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 03:18:54 -0400
+Received: from [59.151.112.132] (port=30181 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5oWc-0001Dp-6I
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 03:16:40 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1d5oYl-0001xK-6C
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 03:18:51 -0400
 References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<2bc05de0edd61cdcdd3d2b894378a874d1e12327.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<87shktu8cu.fsf@dusky.pond.sub.org> <20170427163025.GD30599@redhat.com>
-	<87lgqlnenh.fsf@dusky.pond.sub.org>
+	<87o9vhu8av.fsf@dusky.pond.sub.org>
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <23e5dc02-3e69-2166-c18b-786fc75172ff@cn.fujitsu.com>
-Date: Wed, 3 May 2017 15:09:57 +0800
+Message-ID: <1d9ca059-5f68-b677-4faa-8689c37c5f57@cn.fujitsu.com>
+Date: Wed, 3 May 2017 15:12:10 +0800
 MIME-Version: 1.0
-In-Reply-To: <87lgqlnenh.fsf@dusky.pond.sub.org>
+In-Reply-To: <87o9vhu8av.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] net/socket: Convert error report
- message to Error
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Convert non-blocking connect and
+ fix its error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: pbonzini@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
 
-Hi, Markus,Daniel
 
-On 04/28/2017 04:02 PM, Markus Armbruster wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> writes:
->
->> On Thu, Apr 27, 2017 at 06:24:17PM +0200, Markus Armbruster wrote:
->>> No review, just an observation.
->>>
->>> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->>>
->>>> Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
->>>> net_socket_fd_init() use the function such as fprintf(), perror() to
->>>> report an error message.
->>>>
->>>> Now, convert these functions to Error.
->>>>
->>>> CC: jasowang@redhat.com, armbru@redhat.com
->>>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->>>> ---
->>>>  net/socket.c | 66 +++++++++++++++++++++++++++++++++++++-----------------------
->>>>  1 file changed, 41 insertions(+), 25 deletions(-)
->>>>
->>>> diff --git a/net/socket.c b/net/socket.c
->>>> index b0decbe..559e09a 100644
->>>> --- a/net/socket.c
->>>> +++ b/net/socket.c
->>> [...]
->>>> @@ -433,25 +437,27 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
->>>>
->>>>  static NetSocketState *net_socket_fd_init(NetClientState *peer,
->>>>                                            const char *model, const char *name,
->>>> -                                          int fd, int is_connected)
->>>> +                                          int fd, int is_connected,
->>>> +                                          Error **errp)
->>>>  {
->>>>      int so_type = -1, optlen=sizeof(so_type);
->>>>
->>>>      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
->>>>          (socklen_t *)&optlen)< 0) {
->>>> -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
->>>> +        error_setg(errp, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed",
->>>>                  fd);
->>>>          closesocket(fd);
->>>>          return NULL;
->>>>      }
->>>>      switch(so_type) {
->>>>      case SOCK_DGRAM:
->>>> -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
->>>> +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected, errp);
->>>>      case SOCK_STREAM:
->>>>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->>>>      default:
->>>>          /* who knows ... this could be a eg. a pty, do warn and continue as stream */
->>>> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
->>>> +        error_setg(errp, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM"
->>>> +                   " or SOCK_STREAM", so_type, fd);
->>>
->>> Not this patches problem: this case is odd, and the comment is bogus.
->>> If @fd really was a pty, getsockopt() would fail with ENOTSOCK, wouldn't
->>> it?  If @fd is a socket, but neither SOCK_DGRAM nor SOCK_STREAM (say
->>> SOCK_RAW), why is it safe to continue as if it was SOCK_STREAM?  Jason?
->>
->> IMHO it is a problem with this patch. Previously we merely printed
->> a warning & carried on, which is conceptually ok in general, though
->> dubious here for the reason you say.
->>
->> Now we are filling an Error **errp object, and carrying on - this is
->> conceptually broken anywhere. If an Error ** is filled, we must return.
->> If we want to carry on, we shouldn't fill Error **.
->
-> You're right.
->
->>>>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->>
->> IMHO, we just kill this and put return NULL here. If there is a genuine
->> reason to support something like SOCK_RAW, it should be explicitly
->> handled, because this default: case will certainly break SOCK_SEQPACKET
->> and SOCK_RDM which can't be treated as streams.
->
-> It's either magic or misguided defensive programming.  Probably the
-> latter, but I'd like to hear Jason's opinion.
->
-> If it's *necessary* magic, we can't use error_setg().  Else, we should
-> drop the default, and insert a closesocket(fd) before the final return
-> NULL.
 
-As Daniel said, although the previous printed warning message is
-dubious, but it is conceptually ok in general. Simply filling it to
-Error ** is problematic. Of course, as you said drop the default case,
-there will be no problem. But really to do that?
+On 04/28/2017 12:25 AM, Markus Armbruster wrote:
+> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+>
+>> v2:
+>> * PATCH 02 reworking of patch 2 following Markus's suggestion that convert error_report()
+>>   in the function called by net_socket_*_init() to Error. Also add many error handling
+>>   information.
+>> * PATCH 03 net_socket_mcast_create(), net_socket_fd_init_dgram() and net_socket_fd_init()
+>>   use the function such as fprintf, perror to report an error message. Convert it to Error.
+>> * PATCH 04 parse_host_port() may fail without reporting an error. Now, fix it to set an
+>>   error when it fails.
+>
+> Needs a bit more work.  I'll continue review with v3.
+
+Hi, Markus,
+
+Thanks for your kind reply very much.
+I will fix it in the v3 as soon as.
 
 Thanks
 Mao
-
->
->>>>      }
->>>>      return NULL;
->>>
->>> Not reachable.  Ugly, but not your patch's concern.
->>
->>
->> Regards,
->> Daniel
 >
 >
 >
