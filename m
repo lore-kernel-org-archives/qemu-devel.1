@@ -1,48 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d5kEI-0003xm-0C
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:41:26 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5kHS-0004rJ-SA
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:44:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d5kED-0003we-SD
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:41:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45684)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1d5kED-0003wB-Jr
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:41:21 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v432cg8t016553
-	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 22:41:19 -0400
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a76c70fs8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 22:41:19 -0400
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 2 May 2017 23:41:16 -0300
-Received: from d24av01.br.ibm.com (d24av01.br.ibm.com [9.8.31.91])
-	by d24relay03.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v432fD9n34078918
-	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 23:41:14 -0300
-Received: from d24av01.br.ibm.com (localhost [127.0.0.1])
-	by d24av01.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v432fDFI024522
-	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 23:41:13 -0300
-Date: Tue, 2 May 2017 23:41:01 -0300
-From: joserz@linux.vnet.ibm.com
-References: <1492631083-23965-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<a8eb495d-7c03-2d6f-c8df-3970f08bc05d@twiddle.net>
-	<20170420100301.51a7f10c@t450s.home>
-	<07d71898-c392-c14a-9901-87ad4287bd5d@redhat.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5kHP-0004m0-Ik
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:44:42 -0400
+Received: from [59.151.112.132] (port=56544 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5kHO-0004lL-Eh
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:44:39 -0400
+References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1493372840-24551-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<7bde3681-280c-764a-71df-f4a1cc4b7011@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <4cc14276-55bc-2981-cbdd-4d66ae6be59e@cn.fujitsu.com>
+Date: Wed, 3 May 2017 10:43:31 +0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <07d71898-c392-c14a-9901-87ad4287bd5d@redhat.com>
-Message-Id: <20170503024101.GA31494@pacoca>
-Subject: Re: [Qemu-devel] [PATCH 0/2] VFIO: Make 8-byte accesses atomic
+In-Reply-To: <7bde3681-280c-764a-71df-f4a1cc4b7011@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH V3 05/10] net/net.c: Add vnet header length
+ to SocketReadState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,51 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
+	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Fri, Apr 21, 2017 at 12:06:15PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 20/04/2017 18:03, Alex Williamson wrote:
-> > On Thu, 20 Apr 2017 00:19:23 -0700
-> > Richard Henderson <rth@twiddle.net> wrote:
-> > 
-> >> On 04/19/2017 12:44 PM, Jose Ricardo Ziviani wrote:
-> >>> This patchset has two patches:
-> >>> [1] 8-byte writes to non-mapped MMIO are broken into pairs of 4-byte writes, this patch makes such pairs atomic.
-> >>>
-> >>> [2] Enable 8-byte accesses in vfio_region_write and vfio_region_read.
-> >>>
-> >>> Patches based on master.
-> >>>
-> >>> Jose Ricardo Ziviani (2):
-> >>>   vfio: Set MemoryRegionOps:max_access_size and min_access_size
-> >>>   vfio: enable 8-byte reads/writes to vfio
-> >>>
-> >>>  hw/vfio/common.c | 14 ++++++++++++++
-> >>>  1 file changed, 14 insertions(+)
-> >>>  
-> >>
-> >> I think these patches need to be squashed to be bisectable.
-> > 
-> > No, I think it's fine.  The point of patch 1/2 is to indicate that the
-> > hardware supports 8-byte accesses, which will still be broken into 2
-> > 4-byte accesses because we don't yet set the implemented width beyond
-> > the default.  The important part is that the mutex will now group the 4
-> > byte access pair together rather than letting them get re-ordered.
-> > Patch 2/2 then implements native 8-byte access.  I appreciate them
-> > being separate for this subtle nuance, but maybe I'm not seeing the
-> > same issue as you.  Thanks,
-> '
-> I agree, the patches looks fine as is.
-> 
-> Paolo
-> 
 
-Hello!
 
-Thank you all for your review but I have a quick question: is it ok for
-merge? :)
+On 05/02/2017 12:53 PM, Jason Wang wrote:
+>
+>
+> On 2017年04月28日 17:47, Zhang Chen wrote:
+>> Address Jason Wang's comments add vnet header length to SocketReadState.
+>
+> Instead of saying this, you can add "Suggested-by: Jason Wang 
+> <jasowang@redhat.com>" above your sign-off.
+
+OK.
+
+>
+>> So we change net_fill_rstate() to read
+>> struct  {int size; int vnet_hdr_len; const uint8_t buf[];}.
+>
+> This makes me thinking about the backward compatibility. I think we'd 
+> better try to keep it as much as possible. E.g how about pack 
+> vnet_hdr_len into higher bits of size?
+>
+
+Do you means split uint32_t size to uint16_t size and uint16_t 
+vnet_hdr_len ?
+If yes, we also can't keep compatibility with old version.
+Old code send a uint32_t size, we read it as uint16_t size is always wrong.
 
 Thanks
+Zhang Chen
+
+
+> Thanks
+>
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>   include/net/net.h |  4 +++-
+>>   net/net.c         | 24 ++++++++++++++++++++++--
+>>   2 files changed, 25 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/net/net.h b/include/net/net.h
+>> index 402d913..865cb98 100644
+>> --- a/include/net/net.h
+>> +++ b/include/net/net.h
+>> @@ -115,9 +115,11 @@ typedef struct NICState {
+>>   } NICState;
+>>     struct SocketReadState {
+>> -    int state; /* 0 = getting length, 1 = getting data */
+>> +    /* 0 = getting length, 1 = getting vnet header length, 2 = 
+>> getting data */
+>> +    int state;
+>>       uint32_t index;
+>>       uint32_t packet_len;
+>> +    uint32_t vnet_hdr_len;
+>>       uint8_t buf[NET_BUFSIZE];
+>>       SocketReadStateFinalize *finalize;
+>>   };
+>> diff --git a/net/net.c b/net/net.c
+>> index f69260f..5a6b5ac 100644
+>> --- a/net/net.c
+>> +++ b/net/net.c
+>> @@ -1639,8 +1639,12 @@ int net_fill_rstate(SocketReadState *rs, const 
+>> uint8_t *buf, int size)
+>>       unsigned int l;
+>>         while (size > 0) {
+>> -        /* reassemble a packet from the network */
+>> -        switch (rs->state) { /* 0 = getting length, 1 = getting data */
+>> +        /* Reassemble a packet from the network.
+>> +         * 0 = getting length.
+>> +         * 1 = getting vnet header length.
+>> +         * 2 = getting data.
+>> +         */
+>> +        switch (rs->state) {
+>>           case 0:
+>>               l = 4 - rs->index;
+>>               if (l > size) {
+>> @@ -1658,6 +1662,22 @@ int net_fill_rstate(SocketReadState *rs, const 
+>> uint8_t *buf, int size)
+>>               }
+>>               break;
+>>           case 1:
+>> +            l = 4 - rs->index;
+>> +            if (l > size) {
+>> +                l = size;
+>> +            }
+>> +            memcpy(rs->buf + rs->index, buf, l);
+>> +            buf += l;
+>> +            size -= l;
+>> +            rs->index += l;
+>> +            if (rs->index == 4) {
+>> +                /* got vnet header length */
+>> +                rs->vnet_hdr_len = ntohl(*(uint32_t *)rs->buf);
+>> +                rs->index = 0;
+>> +                rs->state = 2;
+>> +            }
+>> +            break;
+>> +        case 2:
+>>               l = rs->packet_len - rs->index;
+>>               if (l > size) {
+>>                   l = size;
+>
+>
+>
+> .
+>
+
+-- 
+Thanks
+Zhang Chen
