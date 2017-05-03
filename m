@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5qKM-0006Ko-Th
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 05:12:08 -0400
+	(envelope-from <he.chen@linux.intel.com>) id 1d5qP6-0007iv-Ue
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 05:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5qKI-0006ib-Uo
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 05:12:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44292)
+	(envelope-from <he.chen@linux.intel.com>) id 1d5qP3-00016B-QI
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 05:17:00 -0400
+Received: from mga05.intel.com ([192.55.52.43]:65530)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5qKI-0006iD-Od
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 05:12:02 -0400
-References: <20170502061649.6668.93083.stgit@PASHA-ISP>
-	<20170502143706.GL22502@stefanha-x1.localdomain>
-	<96fe9706-4846-488e-9e72-a37949f87444@ispras.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2cf2894e-5b88-b19d-a30b-374dcadc8aa2@redhat.com>
-Date: Wed, 3 May 2017 11:11:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <96fe9706-4846-488e-9e72-a37949f87444@ispras.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] maintainers: add maintainer for replay*
- files
+	(Exim 4.71) (envelope-from <he.chen@linux.intel.com>)
+	id 1d5qP3-00010x-GP
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 05:16:57 -0400
+From: He Chen <he.chen@linux.intel.com>
+Date: Wed,  3 May 2017 17:17:16 +0800
+Message-Id: <1493803036-4048-1-git-send-email-he.chen@linux.intel.com>
+Subject: [Qemu-devel] [PATCH] tests: acpi: extend cphp and memhp testcase
+ with numa distance check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
 
+Signed-off-by: He Chen <he.chen@linux.intel.com>
+---
+ tests/bios-tables-test.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-
-On 03/05/2017 07:07, Pavel Dovgalyuk wrote:
-> Indeed. I missed these ones.
-
-Please also add myself as reviewer (R:).
-
-get_maintainers.pl doesn't support reviewers yet, but I'll backport it
-from Linux today.
-
-Paolo
-
-> =E2=81=A3=D0=9E=D1=82=D0=BF=D1=80=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD=D0=BE =D1=
-=81 =D0=BF=D0=BE=D0=BC=D0=BE=D1=89=D1=8C=D1=8E BlueMail =E2=80=8B
->=20
-> =D0=9D=D0=B0 2 =D0=9C=D0=B0=D0=B9 2017 =D0=B3., 17:37, =D0=B2 17:37, St=
-efan Hajnoczi <stefanha@gmail.com> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BB:=D0=BF>On Tue, May 02, 2017 at 09:16:49AM +0300, Pavel Dovgalyuk wrot=
-e:
->>> Updating MAINTAINERS to set Pavel Dovgalyuk as record/replay
->> maintainer.
->>>
->>> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->>> ---
->>>  MAINTAINERS |    9 +++++++++
->>>  1 file changed, 9 insertions(+)
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index a1d2b3a4d3..8be1c74ac5 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -1546,6 +1546,15 @@ F: net/colo*
->>>  F: net/filter-rewriter.c
->>>  F: net/filter-mirror.c
->>> =20
->>> +Record/replay
->>> +M: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->>> +W: http://wiki.qemu.org/Features/record-replay
->>> +S: Supported
->>> +F: replay/*
->>> +F: block/blkreplay.c
->>> +F: net/filter-replay.c
->>> +F: include/sysemu/replay.h
->>
->> + F: docs/replay.txt
->> + F: stubs/replay.c
->>
->> Are these missing?
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 88dbf97..c593165 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -710,7 +710,8 @@ static void test_acpi_piix4_tcg_cphp(void)
+     data.machine = MACHINE_PC;
+     data.variant = ".cphp";
+     test_acpi_one("-smp 2,cores=3,sockets=2,maxcpus=6"
+-                  " -numa node -numa node",
++                  " -numa node -numa node"
++                  " -numa dist,src=0,dst=1,val=21",
+                   &data);
+     free_test_data(&data);
+ }
+@@ -723,7 +724,8 @@ static void test_acpi_q35_tcg_cphp(void)
+     data.machine = MACHINE_Q35;
+     data.variant = ".cphp";
+     test_acpi_one(" -smp 2,cores=3,sockets=2,maxcpus=6"
+-                  " -numa node -numa node",
++                  " -numa node -numa node"
++                  " -numa dist,src=0,dst=1,val=21",
+                   &data);
+     free_test_data(&data);
+ }
+@@ -772,7 +774,10 @@ static void test_acpi_q35_tcg_memhp(void)
+     memset(&data, 0, sizeof(data));
+     data.machine = MACHINE_Q35;
+     data.variant = ".memhp";
+-    test_acpi_one(" -m 128,slots=3,maxmem=1G -numa node", &data);
++    test_acpi_one(" -m 128,slots=3,maxmem=1G"
++                  " -numa node -numa node"
++                  " -numa dist,src=0,dst=1,val=21",
++                  &data);
+     free_test_data(&data);
+ }
+ 
+@@ -783,7 +788,10 @@ static void test_acpi_piix4_tcg_memhp(void)
+     memset(&data, 0, sizeof(data));
+     data.machine = MACHINE_PC;
+     data.variant = ".memhp";
+-    test_acpi_one(" -m 128,slots=3,maxmem=1G -numa node", &data);
++    test_acpi_one(" -m 128,slots=3,maxmem=1G"
++                  " -numa node -numa node"
++                  " -numa dist,src=0,dst=1,val=21",
++                  &data);
+     free_test_data(&data);
+ }
+ 
+-- 
+2.7.4
