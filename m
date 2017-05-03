@@ -1,31 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d5yLJ-0004sn-11
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:45:38 -0400
+	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
+	id 1d5yRN-0006G1-6O
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d5yLF-0004cG-OS
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:45:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60348)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d5yLF-0004bO-En
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:45:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2E3B970721
-	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 17:45:32 +0000 (UTC)
-Date: Wed, 3 May 2017 18:45:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170503174524.GI2657@work-vm>
-References: <20170503165412.27766-1-marcandre.lureau@redhat.com>
+	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
+	id 1d5yRK-00075N-3V
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:51:53 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:17603)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
+	id 1d5yRJ-00074n-Rb
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:51:50 -0400
+Date: Wed, 3 May 2017 18:51:40 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170503175140.GD1553@perard.uk.xensource.com>
+References: <alpine.DEB.2.10.1704141429110.23677@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1704141734161.23677@sstabellini-ThinkPad-X260>
+	<03cfd81856554ecd91c0c317353e819b@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704181038360.31486@sstabellini-ThinkPad-X260>
+	<51ac3ff38f464abfb98928e6fb959bf7@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704191552450.31486@sstabellini-ThinkPad-X260>
+	<6738c7d96a1c476187f69616f25b28d1@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704201035390.18403@sstabellini-ThinkPad-X260>
+	<20170503164838.GB1553@perard.uk.xensource.com>
+	<alpine.DEB.2.10.1705031019140.9240@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20170503165412.27766-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] libvhost-user: fix crash when rings
- aren't ready
+In-Reply-To: <alpine.DEB.2.10.1705031019140.9240@sstabellini-ThinkPad-X260>
+Subject: Re: [Qemu-devel] QEMU build breakage on ARM against Xen 4.9 caused
+ by libxendevicemodel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,162 +39,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <Paul.Durrant@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Wei Liu <wei.liu2@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Calling libvhost-user functions like vu_queue_get_avail_bytes() when th=
-e
-> queue doesn't yet have addresses will result in the crashes like the
-> following:
->=20
-> Program received signal SIGSEGV, Segmentation fault.
-> 0x000055c414112ce4 in vring_avail_idx (vq=3D0x55c41582fd68, vq=3D0x55c4=
-1582fd68)
->     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:94=
-0
-> 940            vq->shadow_avail_idx =3D vq->vring.avail->idx;
-> (gdb) p vq
-> $1 =3D (VuVirtq *) 0x55c41582fd68
-> (gdb) p vq->vring
-> $2 =3D {num =3D 0, desc =3D 0x0, avail =3D 0x0, used =3D 0x0, log_guest=
-_addr =3D 0, flags =3D 0}
->=20
->     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:94=
-0
-> No locals.
->     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:96=
-0
->         num_heads =3D <optimized out>
->     out_bytes=3Dout_bytes@entry=3D0x7fffd035d7c4, max_in_bytes=3Dmax_in=
-_bytes@entry=3D0,
->     max_out_bytes=3Dmax_out_bytes@entry=3D0) at /home/dgilbert/git/qemu=
-/contrib/libvhost-user/libvhost-user.c:1034
->=20
-> Add a pre-condition checks on vring.avail before accessing it.
->=20
-> Fix documentation and return type of vu_queue_empty() while at it.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+On Wed, May 03, 2017 at 10:20:59AM -0700, Stefano Stabellini wrote:
+> On Wed, 3 May 2017, Anthony PERARD wrote:
+> > On Thu, Apr 20, 2017 at 11:05:33AM -0700, Stefano Stabellini wrote:
+> > > On Thu, 20 Apr 2017, Paul Durrant wrote:
+> > > > I think xencall should be part of the base xen_stable_libs anyway.
+> > > 
+> > > Yes, you are right. However I noticed that -lxencall needs to come after
+> > > -lxendevicemodel. So, I'll have to move -lxendevicemodel before
+> > > $xen_stable_libs, see below. I'll merge this patch into "configure:
+> > > detect presence of libxendevicemodel", if that's OK.
+> > > 
+> > > diff --git a/configure b/configure
+> > > index 99d6cbc..3133ef8 100755
+> > > --- a/configure
+> > > +++ b/configure
+> > > @@ -1992,7 +1992,7 @@ if test "$xen" != "no" ; then
+> > >    else
+> > >  
+> > >      xen_libs="-lxenstore -lxenctrl -lxenguest"
+> > > -    xen_stable_libs="-lxenforeignmemory -lxengnttab -lxenevtchn"
+> > > +    xen_stable_libs="-lxencall -lxenforeignmemory -lxengnttab -lxenevtchn"
+> > >  
+> > >      # First we test whether Xen headers and libraries are available.
+> > >      # If no, we are done and there is no Xen support.
+> > > @@ -2027,9 +2027,9 @@ int main(void) {
+> > >    return 0;
+> > >  }
+> > >  EOF
+> > > -        compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
+> > > +        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
+> > >        then
+> > > -      xen_stable_libs="$xen_stable_libs -lxendevicemodel"
+> > > +      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
+> > >        xen_ctrl_version=40900
+> > >        xen=yes
+> > >      elif
+> > 
+> > Hey, now that this patch is merged, xen.git fail to build QEMU. (osstest
+> > qemu-mainline branch fail.)
+> > 
+> > That's because -lxencall is not found because -L$path_to_libxencall is
+> > missing in xen.git.
+> > 
+> > But I've notice something else, libxendevicemodel.so is not linked
+> > against libxencall, that might be the root of the issues on arm.
+> > (libxenctrl.so is linked against libxencall.)
+> > 
+> > Thought?
+> > 
+> > 
+> > We probably need this patch in xen:
+> 
+> We also need to add -L$path_to_libxencall and -I$path_to_libxencall to
+> tools/Makefile:subdir-all-qemu-xen-dir.
 
-Yep, that's much happier.
-I've succesfully done a migrate while running some guest networking so:
+I don't think that needed because:
+for -I, QEMU does not use anything from xencall, and any other includes
+does not use xencall.h.
 
-Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+for -L, I think that would be usefull only if QEMU is built staticly.
 
-Thanks,
+Also, I don't think -lxencall is needed at all, if libxendevicemodel is
+fixed. libxencall will only be a runtime dependency.
 
-Dave
 
-> ---
->  contrib/libvhost-user/libvhost-user.h |  6 +++---
->  contrib/libvhost-user/libvhost-user.c | 26 ++++++++++++++++++++------
->  2 files changed, 23 insertions(+), 9 deletions(-)
->=20
-> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-u=
-ser/libvhost-user.h
-> index 156b50e989..af02a31ebe 100644
-> --- a/contrib/libvhost-user/libvhost-user.h
-> +++ b/contrib/libvhost-user/libvhost-user.h
-> @@ -327,13 +327,13 @@ void vu_queue_set_notification(VuDev *dev, VuVirt=
-q *vq, int enable);
->  bool vu_queue_enabled(VuDev *dev, VuVirtq *vq);
-> =20
->  /**
-> - * vu_queue_enabled:
-> + * vu_queue_empty:
->   * @dev: a VuDev context
->   * @vq: a VuVirtq queue
->   *
-> - * Returns: whether the queue is empty.
-> + * Returns: true if the queue is empty or not ready.
->   */
-> -int vu_queue_empty(VuDev *dev, VuVirtq *vq);
-> +bool vu_queue_empty(VuDev *dev, VuVirtq *vq);
-> =20
->  /**
->   * vu_queue_notify:
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-u=
-ser/libvhost-user.c
-> index af4faad60b..e1bf9644b5 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -1031,6 +1031,11 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq=
-, unsigned int *in_bytes,
->      idx =3D vq->last_avail_idx;
-> =20
->      total_bufs =3D in_total =3D out_total =3D 0;
-> +    if (unlikely(dev->broken) ||
-> +        unlikely(!vq->vring.avail)) {
-> +        goto done;
-> +    }
-> +
->      while ((rc =3D virtqueue_num_heads(dev, vq, idx)) > 0) {
->          unsigned int max, num_bufs, indirect =3D 0;
->          struct vring_desc *desc;
-> @@ -1121,11 +1126,16 @@ vu_queue_avail_bytes(VuDev *dev, VuVirtq *vq, u=
-nsigned int in_bytes,
-> =20
->  /* Fetch avail_idx from VQ memory only when we really need to know if
->   * guest has added some buffers. */
-> -int
-> +bool
->  vu_queue_empty(VuDev *dev, VuVirtq *vq)
->  {
-> +    if (unlikely(dev->broken) ||
-> +        unlikely(!vq->vring.avail)) {
-> +        return true;
-> +    }
-> +
->      if (vq->shadow_avail_idx !=3D vq->last_avail_idx) {
-> -        return 0;
-> +        return false;
->      }
-> =20
->      return vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
-> @@ -1174,7 +1184,8 @@ vring_notify(VuDev *dev, VuVirtq *vq)
->  void
->  vu_queue_notify(VuDev *dev, VuVirtq *vq)
->  {
-> -    if (unlikely(dev->broken)) {
-> +    if (unlikely(dev->broken) ||
-> +        unlikely(!vq->vring.avail)) {
->          return;
->      }
-> =20
-> @@ -1291,7 +1302,8 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
->      struct vring_desc *desc;
->      int rc;
-> =20
-> -    if (unlikely(dev->broken)) {
-> +    if (unlikely(dev->broken) ||
-> +        unlikely(!vq->vring.avail)) {
->          return NULL;
->      }
-> =20
-> @@ -1445,7 +1457,8 @@ vu_queue_fill(VuDev *dev, VuVirtq *vq,
->  {
->      struct vring_used_elem uelem;
-> =20
-> -    if (unlikely(dev->broken)) {
-> +    if (unlikely(dev->broken) ||
-> +        unlikely(!vq->vring.avail)) {
->          return;
->      }
-> =20
-> @@ -1474,7 +1487,8 @@ vu_queue_flush(VuDev *dev, VuVirtq *vq, unsigned =
-int count)
->  {
->      uint16_t old, new;
-> =20
-> -    if (unlikely(dev->broken)) {
-> +    if (unlikely(dev->broken) ||
-> +        unlikely(!vq->vring.avail)) {
->          return;
->      }
-> =20
-> --=20
-> 2.12.0.191.gc5d8de91d
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > diff --git a/tools/libs/devicemodel/Makefile b/tools/libs/devicemodel/Makefile
+> > index 55626a5049..81fa5a4ac4 100644
+> > --- a/tools/libs/devicemodel/Makefile
+> > +++ b/tools/libs/devicemodel/Makefile
+> > @@ -63,7 +63,7 @@ libxendevicemodel.so.$(MAJOR): libxendevicemodel.so.$(MAJOR).$(MINOR)
+> >         $(SYMLINK_SHLIB) $< $@
+> >  
+> >  libxendevicemodel.so.$(MAJOR).$(MINOR): $(PIC_OBJS) libxendevicemodel.map
+> > -       $(CC) $(LDFLAGS) $(PTHREAD_LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxendevicemodel.so.$(MAJOR) $(SHLIB_LDFLAGS) -o $@ $(PIC_OBJS) $(LDLIBS_libxentoollog) $(APPEND_LDFLAGS)
+> > +       $(CC) $(LDFLAGS) $(PTHREAD_LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxendevicemodel.so.$(MAJOR) $(SHLIB_LDFLAGS) -o $@ $(PIC_OBJS) $(LDLIBS_libxentoollog) $(LDLIBS_libxencall) $(APPEND_LDFLAGS)
+> >  
+> >  .PHONY: install
+> >  install: build
+> > 
+> > -- 
+> > Anthony PERARD
+> > 
+
+-- 
+Anthony PERARD
