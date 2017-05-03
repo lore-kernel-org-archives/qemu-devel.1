@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5q4X-0001j7-He
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:55:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1d5q4o-0001uA-1G
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5q4S-00076V-K8
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:55:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5q4S-00075Q-4p
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:55:40 -0400
-References: <alpine.DEB.2.10.1705021646310.8859@sstabellini-ThinkPad-X260>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <84b6b9c8-274c-5387-5bcd-d34584dd398c@redhat.com>
-Date: Wed, 3 May 2017 10:55:31 +0200
+	(envelope-from <bounces@canonical.com>) id 1d5q4j-0007JK-6h
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:56:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33942)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d5q4j-0007J9-0M
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:55:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d5q4g-000367-8I
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 08:55:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C43A82E80DE
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 08:55:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1705021646310.8859@sstabellini-ThinkPad-X260>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] xen/mapcache: store dma information in
- revmapcache entries for debugging
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 03 May 2017 08:45:54 -0000
+From: Launchpad Bug Tracker <1687653@bugs.launchpad.net>
+Reply-To: Bug 1687653 <1687653@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170502155311.4290.95799.malonedeb@soybean.canonical.com>
+Message-Id: <20170503084554.2252.49286.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1687653] Re: QEMU-KVM / detect_zeroes causes KVM
+ to start unlimited number of threads on Guest-Sided High-IO with big
+ Blocksize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,161 +38,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, anthony.perard@citrix.com
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xensource.com, crosthwaite.peter@gmail.com, rth@twiddle.net, hrgstephen@gmail.com, x1917x@gmail.com
+To: qemu-devel@nongnu.org
 
+Status changed to 'Confirmed' because the bug affects multiple users.
 
+** Changed in: ubuntu
+       Status: New =3D> Confirmed
 
-On 03/05/2017 02:08, Stefano Stabellini wrote:
-> The Xen mapcache is able to create long term mappings, they are called
-> "locked" mappings. The third parameter of the xen_map_cache call
-> specifies if a mapping is a "locked" mapping.
-> 
-> 
-> From the QEMU point of view there are two kinds of long term mappings:
-> 
-> [a] device memory mappings, such as option roms and video memory
-> [b] dma mappings, created by dma_memory_map & friends
-> 
-> After certain operations, ballooning a VM in particular, Xen asks QEMU
-> kindly to destroy all mappings. However, certainly [a] mappings are
-> present and cannot be removed. That's not a problem as they are not
-> affected by balloonning. The *real* problem is that if there are any
-> mappings of type [b], any outstanding dma operations could fail. This is
-> a known shortcoming. In other words, when Xen asks QEMU to destroy all
-> mappings, it is an error if any [b] mappings exist.
-> 
-> However today we have no way of distinguishing [a] from [b]. Because of
-> that, we cannot even print a decent warning.
-> 
-> This patch introduces a new "dma" bool field to MapCacheRev entires, to
-> remember if a given mapping is for dma or is a long term device memory
-> mapping. When xen_invalidate_map_cache is called, we print a warning if
-> any [b] mappings exist. We ignore [a] mappings.
-> 
-> Mappings created by qemu_map_ram_ptr are assumed to be [a], while
-> mappings created by address_space_map->qemu_ram_ptr_length are assumed
-> to be [b].
-> 
-> The goal of the patch is to make debugging and system understanding
-> easier.
+-- =
 
-Sure, why not.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1687653
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Title:
+  QEMU-KVM / detect_zeroes causes KVM to start unlimited number of
+  threads on Guest-Sided High-IO with big Blocksize
 
-Paolo
+Status in QEMU:
+  Confirmed
+Status in Ubuntu:
+  Confirmed
 
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> 
-> diff --git a/exec.c b/exec.c
-> index eac6085..85769e1 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2084,10 +2084,10 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
->           * In that case just map until the end of the page.
->           */
->          if (block->offset == 0) {
-> -            return xen_map_cache(addr, 0, 0);
-> +            return xen_map_cache(addr, 0, 0, false);
->          }
->  
-> -        block->host = xen_map_cache(block->offset, block->max_length, 1);
-> +        block->host = xen_map_cache(block->offset, block->max_length, 1, false);
->      }
->      return ramblock_ptr(block, addr);
->  }
-> @@ -2117,10 +2117,10 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
->           * In that case just map the requested area.
->           */
->          if (block->offset == 0) {
-> -            return xen_map_cache(addr, *size, 1);
-> +            return xen_map_cache(addr, *size, 1, true);
->          }
->  
-> -        block->host = xen_map_cache(block->offset, block->max_length, 1);
-> +        block->host = xen_map_cache(block->offset, block->max_length, 1, true);
->      }
->  
->      return ramblock_ptr(block, addr);
-> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-> index 31debdf..fa4282a 100644
-> --- a/hw/i386/xen/xen-mapcache.c
-> +++ b/hw/i386/xen/xen-mapcache.c
-> @@ -62,6 +62,7 @@ typedef struct MapCacheRev {
->      hwaddr paddr_index;
->      hwaddr size;
->      QTAILQ_ENTRY(MapCacheRev) next;
-> +    bool dma;
->  } MapCacheRev;
->  
->  typedef struct MapCache {
-> @@ -202,7 +203,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
->  }
->  
->  static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
-> -                                       uint8_t lock)
-> +                                       uint8_t lock, bool dma)
->  {
->      MapCacheEntry *entry, *pentry = NULL;
->      hwaddr address_index;
-> @@ -289,6 +290,7 @@ tryagain:
->      if (lock) {
->          MapCacheRev *reventry = g_malloc0(sizeof(MapCacheRev));
->          entry->lock++;
-> +        reventry->dma = dma;
->          reventry->vaddr_req = mapcache->last_entry->vaddr_base + address_offset;
->          reventry->paddr_index = mapcache->last_entry->paddr_index;
->          reventry->size = entry->size;
-> @@ -300,12 +302,12 @@ tryagain:
->  }
->  
->  uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
-> -                       uint8_t lock)
-> +                       uint8_t lock, bool dma)
->  {
->      uint8_t *p;
->  
->      mapcache_lock();
-> -    p = xen_map_cache_unlocked(phys_addr, size, lock);
-> +    p = xen_map_cache_unlocked(phys_addr, size, lock, dma);
->      mapcache_unlock();
->      return p;
->  }
-> @@ -426,8 +428,10 @@ void xen_invalidate_map_cache(void)
->      mapcache_lock();
->  
->      QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
-> -        DPRINTF("There should be no locked mappings at this time, "
-> -                "but "TARGET_FMT_plx" -> %p is present\n",
-> +        if (!reventry->dma)
-> +            continue;
-> +        fprintf(stderr, "Locked DMA mapping while invalidating mapcache!"
-> +                " "TARGET_FMT_plx" -> %p is present\n",
->                  reventry->paddr_index, reventry->vaddr_req);
->      }
->  
-> diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
-> index b8c93b9..01daaad 100644
-> --- a/include/sysemu/xen-mapcache.h
-> +++ b/include/sysemu/xen-mapcache.h
-> @@ -17,7 +17,7 @@ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr start_addr,
->  void xen_map_cache_init(phys_offset_to_gaddr_t f,
->                          void *opaque);
->  uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
-> -                       uint8_t lock);
-> +                       uint8_t lock, bool dma);
->  ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
->  void xen_invalidate_map_cache_entry(uint8_t *buffer);
->  void xen_invalidate_map_cache(void);
-> @@ -31,7 +31,8 @@ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
->  
->  static inline uint8_t *xen_map_cache(hwaddr phys_addr,
->                                       hwaddr size,
-> -                                     uint8_t lock)
-> +                                     uint8_t lock,
-> +                                     bool dma)
->  {
->      abort();
->  }
-> 
+Bug description:
+  QEMU-KVM in combination with "detect_zeroes=3Don" makes a Guest able to
+  DoS the Host. This is possible if the Host itself has "detect_zeroes"
+  enabled and the Guest writes a large Chunk of data with a huge
+  blocksize onto the drive.
+
+  E.g.: dd if=3D/dev/zero of=3D/tmp/DoS bs=3D1G count=3D1 oflag=3Ddirect
+
+  All QEMU-Versions after implementation of detect_zeroes are affected.
+  Prior are unaffected. This is absolutely critical, please fix this
+  ASAP!
+
+  #####
+
+  Provided by Dominik Csapak:
+
+  source    , bs   , count     ,    O_DIRECT, behaviour
+
+  urandom   , bs 1M, count 1024,    O_DIRECT: OK
+  file      , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
+  zero file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1G, count    1,    O_DIRECT: NOT OK
+  zero file , bs 1G, count    1,    O_DIRECT: NOT OK
+  zero file , bs 1G, count    1, no O_DIRECT: NOT OK
+  rand file , bs 1G, count    1,    O_DIRECT: OK
+  rand file , bs 1G, count    1, no O_DIRECT: OK
+
+  discard on:
+
+  urandom   , bs 1M, count 1024,    O_DIRECT: OK
+  rand file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
+  zero file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1G, count    1,    O_DIRECT: NOT OK
+  zero file , bs 1G, count    1,    O_DIRECT: NOT OK
+  zero file , bs 1G, count    1, no O_DIRECT: NOT OK
+  rand file , bs 1G, count    1,    O_DIRECT: OK
+  rand file , bs 1G, count    1, no O_DIRECT: OK
+
+  detect_zeros off:
+
+  urandom   , bs 1M, count 1024,    O_DIRECT: OK
+  rand file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1M, count 1024,    O_DIRECT: OK
+  zero file , bs 1M, count 1024,    O_DIRECT: OK
+  /dev/zero , bs 1G, count    1,    O_DIRECT: OK
+  zero file , bs 1G, count    1,    O_DIRECT: OK
+  zero file , bs 1G, count    1, no O_DIRECT: OK
+  rand file , bs 1G, count    1,    O_DIRECT: OK
+  rand file , bs 1G, count    1, no O_DIRECT: OK
+
+  #####
+
+  Provided by Florian Strankowski
+
+  bs   -    count   -    io-threads
+
+  512K -    2048    -    2
+  1M   -    1024    -    2
+  2M   -     512    -    4
+  4M   -     256    -    6
+  8M   -     128    -    10
+  16M  -      64    -    18
+  32M  -      32    -    uncountable
+
+  Please refer to further information here:
+
+  https://bugzilla.proxmox.com/show_bug.cgi?id=3D1368
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1687653/+subscriptions
