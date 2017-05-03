@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d5wd7-0007fd-7r
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:55:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d5weq-00006h-Px
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:57:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d5wd3-0007vp-7M
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:55:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36582)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1d5wd2-0007tk-V9
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:55:49 -0400
-Date: Wed, 3 May 2017 16:55:44 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170503155544.GE27432@redhat.com>
-References: <20170227163447.20428-1-stefanha@redhat.com>
-	<20170227163447.20428-2-stefanha@redhat.com>
-	<20170503145418.GB27432@redhat.com>
-	<182d640c-c892-993e-06d4-a9cdd9f363d6@redhat.com>
-	<20170503153400.GD27432@redhat.com>
-	<9489b184-019a-c644-a54f-b795f56f22a1@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1d5wep-0000wV-N4
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:57:40 -0400
+Date: Wed, 3 May 2017 17:57:24 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170503175724.69a5a4e3@nial.brq.redhat.com>
+In-Reply-To: <20170503144240.GL3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-6-git-send-email-imammedo@redhat.com>
+	<20170503144240.GL3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9489b184-019a-c644-a54f-b795f56f22a1@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 1/4] curl: do not use
- aio_context_acquire/release
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/24] numa: move source of default CPUs
+ to NUMA node mapping into boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +25,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, May 03, 2017 at 05:46:49PM +0200, Paolo Bonzini wrote:
-> Please test this:
+On Wed, 3 May 2017 11:42:40 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Wed, May 03, 2017 at 02:56:59PM +0200, Igor Mammedov wrote:
+> > Originally CPU threads were by default assigned in
+> > round-robin fashion. However it was causing issues in
+> > guest since CPU threads from the same socket/core could
+> > be placed on different NUMA nodes.
+> > Commit fb43b73b (pc: fix default VCPU to NUMA node mapping)
+> > fixed it by grouping threads within a socket on the same node
+> > introducing cpu_index_to_socket_id() callback and commit
+> > 20bb648d (spapr: Fix default NUMA node allocation for threads)
+> > reused callback to fix similar issues for SPAPR machine
+> > even though socket doesn't make much sense there.
+> > 
+> > As result QEMU ended up having 3 default distribution rules
+> > used by 3 targets /virt-arm, spapr, pc/.
+> > 
+> > In effort of moving NUMA mapping for CPUs into possible_cpus,
+> > generalize default mapping in numa.c by making boards decide
+> > on default mapping and let them explicitly tell generic
+> > numa code to which node a CPU thread belongs to by replacing
+> > cpu_index_to_socket_id() with @cpu_index_to_instance_props()
+> > which provides default node_id assigned by board to specified
+> > cpu_index.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
 > 
-> diff --git a/block/curl.c b/block/curl.c
-> index 2708d57c2f..cfe02bfd79 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -467,7 +467,9 @@ static CURLState *curl_init_state(BlockDriverState
-> *bs, BDRVCURLState *s)
->              break;
->          }
->          if (!state) {
-> +            qemu_mutex_unlock(&s->mutex);
->              aio_poll(bdrv_get_aio_context(bs), true);
-> +            qemu_mutex_lock(&s->mutex);
->          }
->      } while(!state);
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 > 
+> Just two extra comments below:
 > 
+> [...]
+> > +static CpuInstanceProperties
+> > +virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+> > +{
+> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> > +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+> > +
+> > +    assert(cpu_index < possible_cpus->len);
+> > +    return possible_cpus->cpus[cpu_index].props;;
+> > +}
+> > +  
+> [...]
+> > +static CpuInstanceProperties
+> > +pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+> >  {
+> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> > +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+> > +
+> > +    assert(cpu_index < possible_cpus->len);
+> > +    return possible_cpus->cpus[cpu_index].props;;
+> >  }  
+> 
+> The fact that these two implementations look exactly the same
+> made me wonder:
+> 
+> 1) Why this isn't the default implementation;
+> 2) Why exactly spapr needs a different implementation.
+> 
+> Then I noticed that there's nothing in the common machine code
+> that specifies that possible_cpus->cpus[] is indexed by
+> cpu_index. This means it is indeed safer to require each machine
+> to provide its own cpu_index_to_props implementation than having
+> a default implementation that can unexpectedly break (e.g. if
+> granularity at possible_cpus is not at VCPU/thread level).
+> 
+> I would still like to have an abstraction that wouldn't require
+> writing machine-specific code (e.g. cpu_index ranges to
+> possible_cpus like David suggested), but that's for a follow-up
+> series.
+I've left generalizing this part until we have defined/stable
+topology for aarch64.
+Also I hope, that instead of generalizing we might
+depricate/drop -numa node,cpus=0,1,... in future and just drop
+this hooks altogether as they are there only for compatibility
+with old cpu_index based mapping
 
-Yes, this fixes it, thanks Paolo.
 
-Reported-by: Kun Wei <kuwei@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Tested-by: Richard W.M. Jones <rjones@redhat.com>
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-df lists disk usage of guests without needing to install any
-software inside the virtual machine.  Supports Linux and Windows.
-http://people.redhat.com/~rjones/virt-df/
+> [...]
+> > +static CpuInstanceProperties
+> > +spapr_cpu_index_to_props(MachineState *machine, unsigned cpu_index)
+> >  {
+> > +    CPUArchId *core_slot;
+> > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> > +
+> > +    /* make sure possible_cpu are intialized */
+> > +    mc->possible_cpu_arch_ids(machine);
+> > +    core_slot = spapr_find_cpu_slot(machine, cpu_index, NULL);
+> > +    assert(core_slot);
+> > +    return core_slot->props;
+> >  }  
+> 
+> If you need to submit v3, maybe a comment here explaining why
+> spapr needs a different cpu_index_to_props implementation would
+> be helpful. I took a while to figure it out.
+I'll add comment if series is respinned.
