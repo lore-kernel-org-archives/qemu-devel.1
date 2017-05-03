@@ -1,16 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5tql-00088i-EB
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5tqn-0008BF-NT
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d5tqk-0000kq-J7
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:47 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed,  3 May 2017 14:57:01 +0200
-Message-Id: <1493816238-33120-8-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 07/24] pc: add node-id property to CPU
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5tqk-0000l3-Ni
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:49 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36155)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d5tqk-0000kf-JY
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:46 -0400
+Received: by mail-qt0-x242.google.com with SMTP id t52so24496669qtb.3
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 05:57:46 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170503121143.14925-1-marcandre.lureau@redhat.com>
+	<f2d892bd-9a95-a470-0490-042c98d8b0d9@amsat.org>
+	<873732298.6521406.1493814768361.JavaMail.zimbra@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0347058a-f91e-9595-ba2d-bfae31fa8528@amsat.org>
+Date: Wed, 3 May 2017 09:57:43 -0300
+MIME-Version: 1.0
+In-Reply-To: <873732298.6521406.1493814768361.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] libvhost-user: fix
+ vu_queue_get_avail_bytes() crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,64 +36,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, mst@redhat.com
 
-it will allow switching from cpu_index to property based
-numa mapping in follow up patches.
+>> On 05/03/2017 09:11 AM, Marc-André Lureau wrote:
+>>> Calling vu_queue_get_avail_bytes() when the queue doesn't yet have
+>>> addresses will result in the following crash:
+>>>
+>>> Program received signal SIGSEGV, Segmentation fault.
+>>> 0x000055c414112ce4 in vring_avail_idx (vq=0x55c41582fd68,
+>>> vq=0x55c41582fd68)
+>>>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
+>>> 940            vq->shadow_avail_idx = vq->vring.avail->idx;
+>>> (gdb) p vq
+>>> $1 = (VuVirtq *) 0x55c41582fd68
+>>> (gdb) p vq->vring
+>>> $2 = {num = 0, desc = 0x0, avail = 0x0, used = 0x0, log_guest_addr = 0,
+>>> flags = 0}
+>>>
+>>>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
+>>> No locals.
+>>>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:960
+>>>         num_heads = <optimized out>
+>>>     out_bytes=out_bytes@entry=0x7fffd035d7c4,
+>>>     max_in_bytes=max_in_bytes@entry=0,
+>>>     max_out_bytes=max_out_bytes@entry=0) at
+>>>     /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:1034
+>>>
+>>> Check if vring.avail != null before accessing it.
+>>>
+>>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>  contrib/libvhost-user/libvhost-user.c | 4 ++++
+>>>  1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/contrib/libvhost-user/libvhost-user.c
+>>> b/contrib/libvhost-user/libvhost-user.c
+>>> index af4faad60b..f9680b6279 100644
+>>> --- a/contrib/libvhost-user/libvhost-user.c
+>>> +++ b/contrib/libvhost-user/libvhost-user.c
+>>> @@ -1031,6 +1031,10 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq,
+>>> unsigned int *in_bytes,
+>>>      idx = vq->last_avail_idx;
+>>>
+>>>      total_bufs = in_total = out_total = 0;
+>>> +    if (!vq->vring.avail) {
+>>> +        goto done;
+>>> +    }
+>>> +
+>>>      while ((rc = virtqueue_num_heads(dev, vq, idx)) > 0) {
+>>>          unsigned int max, num_bufs, indirect = 0;
+>>>          struct vring_desc *desc;
+>>>
+>>
+>> It seems to me safer to fix instead vring_avail_ring(), and fix
+>> neighbours vring_avail_flags() and vring_avail_idx() while here.
+>
+> Those are internal/static functions, possibly on hot paths. So I would rather keep the check on the external/public functions only.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/i386/pc.c      | 17 +++++++++++++++++
- target/i386/cpu.c |  1 +
- 2 files changed, 18 insertions(+)
+Fair enough.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 9cec0c1..4a4fb1c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1893,6 +1893,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-                             DeviceState *dev, Error **errp)
- {
-     int idx;
-+    int node_id;
-     CPUState *cs;
-     CPUArchId *cpu_slot;
-     X86CPUTopoInfo topo;
-@@ -1982,6 +1983,22 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
- 
-     cs = CPU(cpu);
-     cs->cpu_index = idx;
-+
-+    node_id = numa_get_node_for_cpu(cs->cpu_index);
-+    if (node_id == nb_numa_nodes) {
-+        /* by default CPUState::numa_node was 0 if it's not set via CLI
-+         * keep it this way for now but in future we probably should
-+         * refuse to start up with incomplete numa mapping */
-+        node_id = 0;
-+    }
-+    if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
-+        cs->numa_node = node_id;
-+    } else if (cs->numa_node != node_id) {
-+            error_setg(errp, "node-id %d must match numa node specified"
-+                "with -numa option for cpu-index %d",
-+                cs->numa_node, cs->cpu_index);
-+            return;
-+    }
- }
- 
- static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 13c0985..007a5bd 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3982,6 +3982,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
-     DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
- #endif
-+    DEFINE_PROP_INT32("node-id", CPUState, numa_node, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
-     { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
-     DEFINE_PROP_BOOL("hv-relaxed", X86CPU, hyperv_relaxed_timing, false),
--- 
-2.7.4
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
