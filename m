@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5tqn-0008BF-NT
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:50 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d5tqp-0008Dy-Jb
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5tqk-0000l3-Ni
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:49 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36155)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d5tqk-0000kf-JY
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:46 -0400
-Received: by mail-qt0-x242.google.com with SMTP id t52so24496669qtb.3
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 05:57:46 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170503121143.14925-1-marcandre.lureau@redhat.com>
-	<f2d892bd-9a95-a470-0490-042c98d8b0d9@amsat.org>
-	<873732298.6521406.1493814768361.JavaMail.zimbra@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0347058a-f91e-9595-ba2d-bfae31fa8528@amsat.org>
-Date: Wed, 3 May 2017 09:57:43 -0300
-MIME-Version: 1.0
-In-Reply-To: <873732298.6521406.1493814768361.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] libvhost-user: fix
- vu_queue_get_avail_bytes() crash
+	(envelope-from <imammedo@redhat.com>) id 1d5tqo-0000oo-OR
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:57:51 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Wed,  3 May 2017 14:57:03 +0200
+Message-Id: <1493816238-33120-10-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 09/24] numa: add check that board supports
+ cpu_index to node mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,64 +20,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
->> On 05/03/2017 09:11 AM, Marc-André Lureau wrote:
->>> Calling vu_queue_get_avail_bytes() when the queue doesn't yet have
->>> addresses will result in the following crash:
->>>
->>> Program received signal SIGSEGV, Segmentation fault.
->>> 0x000055c414112ce4 in vring_avail_idx (vq=0x55c41582fd68,
->>> vq=0x55c41582fd68)
->>>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
->>> 940            vq->shadow_avail_idx = vq->vring.avail->idx;
->>> (gdb) p vq
->>> $1 = (VuVirtq *) 0x55c41582fd68
->>> (gdb) p vq->vring
->>> $2 = {num = 0, desc = 0x0, avail = 0x0, used = 0x0, log_guest_addr = 0,
->>> flags = 0}
->>>
->>>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
->>> No locals.
->>>     at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:960
->>>         num_heads = <optimized out>
->>>     out_bytes=out_bytes@entry=0x7fffd035d7c4,
->>>     max_in_bytes=max_in_bytes@entry=0,
->>>     max_out_bytes=max_out_bytes@entry=0) at
->>>     /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:1034
->>>
->>> Check if vring.avail != null before accessing it.
->>>
->>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  contrib/libvhost-user/libvhost-user.c | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>>
->>> diff --git a/contrib/libvhost-user/libvhost-user.c
->>> b/contrib/libvhost-user/libvhost-user.c
->>> index af4faad60b..f9680b6279 100644
->>> --- a/contrib/libvhost-user/libvhost-user.c
->>> +++ b/contrib/libvhost-user/libvhost-user.c
->>> @@ -1031,6 +1031,10 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq,
->>> unsigned int *in_bytes,
->>>      idx = vq->last_avail_idx;
->>>
->>>      total_bufs = in_total = out_total = 0;
->>> +    if (!vq->vring.avail) {
->>> +        goto done;
->>> +    }
->>> +
->>>      while ((rc = virtqueue_num_heads(dev, vq, idx)) > 0) {
->>>          unsigned int max, num_bufs, indirect = 0;
->>>          struct vring_desc *desc;
->>>
->>
->> It seems to me safer to fix instead vring_avail_ring(), and fix
->> neighbours vring_avail_flags() and vring_avail_idx() while here.
->
-> Those are internal/static functions, possibly on hot paths. So I would rather keep the check on the external/public functions only.
+Default node mapping initialization already checks that board
+supports cpu_index to node mapping and refuses to start if
+it's not supported. Do the same for explicitly provided
+mapping "-numa node,cpus=..."
 
-Fair enough.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ numa.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+diff --git a/numa.c b/numa.c
+index ab1661d..b517870 100644
+--- a/numa.c
++++ b/numa.c
+@@ -140,10 +140,12 @@ uint32_t numa_get_node(ram_addr_t addr, Error **errp)
+     return -1;
+ }
+ 
+-static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
++static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
++                            QemuOpts *opts, Error **errp)
+ {
+     uint16_t nodenr;
+     uint16List *cpus = NULL;
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
+ 
+     if (node->has_nodeid) {
+         nodenr = node->nodeid;
+@@ -162,6 +164,10 @@ static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
+         return;
+     }
+ 
++    if (!mc->cpu_index_to_instance_props) {
++        error_report("CPUs to NUMA node mapping isn't supported");
++        exit(1);
++    }
+     for (cpus = node->cpus; cpus; cpus = cpus->next) {
+         if (cpus->value >= max_cpus) {
+             error_setg(errp,
+@@ -215,6 +221,7 @@ static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
+ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     NumaOptions *object = NULL;
++    MachineState *ms = opaque;
+     Error *err = NULL;
+ 
+     {
+@@ -229,7 +236,7 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+ 
+     switch (object->type) {
+     case NUMA_OPTIONS_TYPE_NODE:
+-        numa_node_parse(&object->u.node, opts, &err);
++        numa_node_parse(ms, &object->u.node, opts, &err);
+         if (err) {
+             goto end;
+         }
+@@ -303,7 +310,7 @@ void parse_numa_opts(MachineState *ms)
+         numa_info[i].node_cpu = bitmap_new(max_cpus);
+     }
+ 
+-    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, NULL, NULL)) {
++    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
+         exit(1);
+     }
+ 
+-- 
+2.7.4
