@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5xJB-0002Oj-E8
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:39:25 -0400
+	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
+	id 1d5xSM-0005Nb-1K
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:48:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d5xJA-0001xC-Em
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:39:21 -0400
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-24-git-send-email-imammedo@redhat.com>
-	<20170503163543.GR3482@thinpad.lan.raisama.net>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5f71cfda-2a73-77e3-0bf7-85e2aed53811@redhat.com>
-Date: Wed, 3 May 2017 11:39:10 -0500
+	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
+	id 1d5xSH-0005FR-45
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:48:50 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:42709)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=2890391ed=anthony.perard@citrix.com>)
+	id 1d5xSG-0005CT-UK
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:48:45 -0400
+Date: Wed, 3 May 2017 17:48:38 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170503164838.GB1553@perard.uk.xensource.com>
+References: <alpine.DEB.2.10.1704141429110.23677@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1704141734161.23677@sstabellini-ThinkPad-X260>
+	<03cfd81856554ecd91c0c317353e819b@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704181038360.31486@sstabellini-ThinkPad-X260>
+	<51ac3ff38f464abfb98928e6fb959bf7@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704191552450.31486@sstabellini-ThinkPad-X260>
+	<6738c7d96a1c476187f69616f25b28d1@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704201035390.18403@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-In-Reply-To: <20170503163543.GR3482@thinpad.lan.raisama.net>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lhfCCggt5jSkqBv6uUkQLmEV9JVLJumRN"
-Subject: Re: [Qemu-devel] [PATCH v2 23/24] numa: add '-numa cpu,
- ...' option for property based node mapping
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.10.1704201035390.18403@sstabellini-ThinkPad-X260>
+Subject: Re: [Qemu-devel] QEMU build breakage on ARM against Xen 4.9 caused
+ by libxendevicemodel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <Paul.Durrant@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Wei Liu <wei.liu2@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lhfCCggt5jSkqBv6uUkQLmEV9JVLJumRN
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- Andrew Jones <drjones@redhat.com>, David Gibson
- <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
- Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <5f71cfda-2a73-77e3-0bf7-85e2aed53811@redhat.com>
-Subject: Re: [PATCH v2 23/24] numa: add '-numa cpu,...' option for property
- based node mapping
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
- <1493816238-33120-24-git-send-email-imammedo@redhat.com>
- <20170503163543.GR3482@thinpad.lan.raisama.net>
-In-Reply-To: <20170503163543.GR3482@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Apr 20, 2017 at 11:05:33AM -0700, Stefano Stabellini wrote:
+> On Thu, 20 Apr 2017, Paul Durrant wrote:
+> > I think xencall should be part of the base xen_stable_libs anyway.
+> 
+> Yes, you are right. However I noticed that -lxencall needs to come after
+> -lxendevicemodel. So, I'll have to move -lxendevicemodel before
+> $xen_stable_libs, see below. I'll merge this patch into "configure:
+> detect presence of libxendevicemodel", if that's OK.
+> 
+> diff --git a/configure b/configure
+> index 99d6cbc..3133ef8 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1992,7 +1992,7 @@ if test "$xen" != "no" ; then
+>    else
+>  
+>      xen_libs="-lxenstore -lxenctrl -lxenguest"
+> -    xen_stable_libs="-lxenforeignmemory -lxengnttab -lxenevtchn"
+> +    xen_stable_libs="-lxencall -lxenforeignmemory -lxengnttab -lxenevtchn"
+>  
+>      # First we test whether Xen headers and libraries are available.
+>      # If no, we are done and there is no Xen support.
+> @@ -2027,9 +2027,9 @@ int main(void) {
+>    return 0;
+>  }
+>  EOF
+> -        compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
+> +        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
+>        then
+> -      xen_stable_libs="$xen_stable_libs -lxendevicemodel"
+> +      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
+>        xen_ctrl_version=40900
+>        xen=yes
+>      elif
 
-On 05/03/2017 11:35 AM, Eduardo Habkost wrote:
+Hey, now that this patch is merged, xen.git fail to build QEMU. (osstest
+qemu-mainline branch fail.)
 
->> +
->> +        memset(&cpu, 0, sizeof(cpu));
->> +        cpu.has_node_id =3D object->u.cpu.has_node_id;
->> +        cpu.node_id =3D object->u.cpu.node_id;
->> +        cpu.has_socket_id =3D object->u.cpu.has_socket_id;
->> +        cpu.socket_id =3D object->u.cpu.socket_id;
->> +        cpu.has_core_id =3D object->u.cpu.has_core_id;
->> +        cpu.core_id =3D object->u.cpu.core_id;
->> +        cpu.has_thread_id =3D object->u.cpu.has_thread_id;
->> +        cpu.thread_id =3D object->u.cpu.thread_id;
->=20
-> We don't have a way to avoid copying each field individually?
-> Some visitor trick, maybe?
->=20
-> Eric, Markus, Michael, do you have any suggestions?
+That's because -lxencall is not found because -L$path_to_libxencall is
+missing in xen.git.
 
-Markus just added QAPI_CLONE_MEMBERS(), which sounds like what you want:
+But I've notice something else, libxendevicemodel.so is not linked
+against libxencall, that might be the root of the issues on arm.
+(libxenctrl.so is linked against libxencall.)
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04867.html
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thought?
 
 
---lhfCCggt5jSkqBv6uUkQLmEV9JVLJumRN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+We probably need this patch in xen:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+diff --git a/tools/libs/devicemodel/Makefile b/tools/libs/devicemodel/Makefile
+index 55626a5049..81fa5a4ac4 100644
+--- a/tools/libs/devicemodel/Makefile
++++ b/tools/libs/devicemodel/Makefile
+@@ -63,7 +63,7 @@ libxendevicemodel.so.$(MAJOR): libxendevicemodel.so.$(MAJOR).$(MINOR)
+        $(SYMLINK_SHLIB) $< $@
+ 
+ libxendevicemodel.so.$(MAJOR).$(MINOR): $(PIC_OBJS) libxendevicemodel.map
+-       $(CC) $(LDFLAGS) $(PTHREAD_LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxendevicemodel.so.$(MAJOR) $(SHLIB_LDFLAGS) -o $@ $(PIC_OBJS) $(LDLIBS_libxentoollog) $(APPEND_LDFLAGS)
++       $(CC) $(LDFLAGS) $(PTHREAD_LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxendevicemodel.so.$(MAJOR) $(SHLIB_LDFLAGS) -o $@ $(PIC_OBJS) $(LDLIBS_libxentoollog) $(LDLIBS_libxencall) $(APPEND_LDFLAGS)
+ 
+ .PHONY: install
+ install: build
 
-iQEcBAEBCAAGBQJZCgeuAAoJEKeha0olJ0NqJfIIAKao90LOyCfH9uPw+ovOQ47U
-liLX8Hjs42ox2oZg348a8TN3xPpO1cXnjE7e7n6toCZAcm4nUFUf4ThUL4xdrFd3
-qD6rujsM678A7mnnKvFBWh3gGLmxnNVz1Fm2But0S9BxQzvBycoZrg5S39YbMOZ8
-c4IrtOtwf+jGr/gW2cNqt7MIIJbU4ELdSy1mmoVBHOM8C/jHooXGHZ+TppMFOebA
-A2nu8uoyDM3+6ELS00tvx10rReaCLt0RwH1PKMJzJK5DyWwP0I4Wbg/F1ZJi3uJ2
-I6E7yb53a9bO+GATGWTGrw6baVRtpl9cHwqyWTkKHrlzHfBxa6XscN5cmd8dUxk=
-=d6MN
------END PGP SIGNATURE-----
-
---lhfCCggt5jSkqBv6uUkQLmEV9JVLJumRN--
+-- 
+Anthony PERARD
