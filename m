@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5v8N-0002li-HD
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:20:08 -0400
+	(envelope-from <flypie@rocketmail.com>) id 1d5v9J-0003Fo-UA
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5v8K-0003si-Ad
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:20:03 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:12722)
+	(envelope-from <flypie@rocketmail.com>) id 1d5v9G-0004Y0-NZ
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:21:01 -0400
+Received: from nm5-vm4.bullet.mail.ir2.yahoo.com ([212.82.96.111]:58126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d5v8J-0003nN-L0
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:20:00 -0400
-References: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1493735386-39622-2-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20170503082232.1cd2ac92@bahia>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <110bb988-4e22-1b2a-15dd-56e198d41923@huawei.com>
-Date: Wed, 3 May 2017 16:19:20 +0200
+	(envelope-from <flypie@rocketmail.com>) id 1d5v9G-0004W7-DI
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:20:58 -0400
+Date: Wed, 3 May 2017 14:20:55 +0000 (UTC)
+From: John Bradley <flypie@rocketmail.com>
+Reply-To: John Bradley <flypie1@yahoo.com>
+Message-ID: <1618105799.2706822.1493821255206@mail.yahoo.com>
 MIME-Version: 1.0
-In-Reply-To: <20170503082232.1cd2ac92@bahia>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+References: <1618105799.2706822.1493821255206.ref@mail.yahoo.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] Throttle: Create IOThrottle
- structure
+Subject: [Qemu-devel] Dummy Panel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,227 +26,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: eric blake <eblake@redhat.com>, alberto garcia <berto@igalia.com>, jani
-	kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 5/3/2017 8:22 AM, Greg Kurz wrote:
-> s/Throttle/throttle
->
-> On Tue,  2 May 2017 10:29:43 -0400
-> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
->
->> This patchset introduces a new io throttle structure. This will be
->
-> s/patchset/patch
-OK
->
->> used in both block and fsdev devices.
->>
->> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->> ---
->
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-OK
->
->>  qapi/block-core.json | 76 ++--------------------------------------------
->>  qapi/iothrottle.json | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 89 insertions(+), 73 deletions(-)
->>  create mode 100644 qapi/iothrottle.json
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 87fb747..93d346b 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -6,6 +6,7 @@
->>
->>  # QAPI common definitions
->>  { 'include': 'common.json' }
->> +{ 'include': 'iothrottle.json' }
->>
->>  ##
->>  # @SnapshotInfo:
->> @@ -1760,84 +1761,13 @@
->>  #
->>  # @device: Block device name (deprecated, use @id instead)
->>  #
->> -# @id: The name or QOM path of the guest device (since: 2.8)
->> -#
->> -# @bps: total throughput limit in bytes per second
->> -#
->> -# @bps_rd: read throughput limit in bytes per second
->> -#
->> -# @bps_wr: write throughput limit in bytes per second
->> -#
->> -# @iops: total I/O operations per second
->> -#
->> -# @iops_rd: read I/O operations per second
->> -#
->> -# @iops_wr: write I/O operations per second
->> -#
->> -# @bps_max: total throughput limit during bursts,
->> -#                     in bytes (Since 1.7)
->> -#
->> -# @bps_rd_max: read throughput limit during bursts,
->> -#                        in bytes (Since 1.7)
->> -#
->> -# @bps_wr_max: write throughput limit during bursts,
->> -#                        in bytes (Since 1.7)
->> -#
->> -# @iops_max: total I/O operations per second during bursts,
->> -#                      in bytes (Since 1.7)
->> -#
->> -# @iops_rd_max: read I/O operations per second during bursts,
->> -#                         in bytes (Since 1.7)
->> -#
->> -# @iops_wr_max: write I/O operations per second during bursts,
->> -#                         in bytes (Since 1.7)
->> -#
->> -# @bps_max_length: maximum length of the @bps_max burst
->> -#                            period, in seconds. It must only
->> -#                            be set if @bps_max is set as well.
->> -#                            Defaults to 1. (Since 2.6)
->> -#
->> -# @bps_rd_max_length: maximum length of the @bps_rd_max
->> -#                               burst period, in seconds. It must only
->> -#                               be set if @bps_rd_max is set as well.
->> -#                               Defaults to 1. (Since 2.6)
->> -#
->> -# @bps_wr_max_length: maximum length of the @bps_wr_max
->> -#                               burst period, in seconds. It must only
->> -#                               be set if @bps_wr_max is set as well.
->> -#                               Defaults to 1. (Since 2.6)
->> -#
->> -# @iops_max_length: maximum length of the @iops burst
->> -#                             period, in seconds. It must only
->> -#                             be set if @iops_max is set as well.
->> -#                             Defaults to 1. (Since 2.6)
->> -#
->> -# @iops_rd_max_length: maximum length of the @iops_rd_max
->> -#                                burst period, in seconds. It must only
->> -#                                be set if @iops_rd_max is set as well.
->> -#                                Defaults to 1. (Since 2.6)
->> -#
->> -# @iops_wr_max_length: maximum length of the @iops_wr_max
->> -#                                burst period, in seconds. It must only
->> -#                                be set if @iops_wr_max is set as well.
->> -#                                Defaults to 1. (Since 2.6)
->> -#
->> -# @iops_size: an I/O size in bytes (Since 1.7)
->> -#
->>  # @group: throttle group name (Since 2.4)
->>  #
->>  # Since: 1.1
->>  ##
->>  { 'struct': 'BlockIOThrottle',
->> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
->> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
->> -            '*bps_max': 'int', '*bps_rd_max': 'int',
->> -            '*bps_wr_max': 'int', '*iops_max': 'int',
->> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
->> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
->> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->> -            '*iops_size': 'int', '*group': 'str' } }
->> +  'base': 'IOThrottle',
->> +  'data': { '*device': 'str', '*group': 'str' } }
->>
->>  ##
->>  # @block-stream:
->> diff --git a/qapi/iothrottle.json b/qapi/iothrottle.json
->> new file mode 100644
->> index 0000000..124ab40
->> --- /dev/null
->> +++ b/qapi/iothrottle.json
->> @@ -0,0 +1,86 @@
->> +# -*- Mode: Python -*-
->> +
->> +##
->> +# == QAPI IOThrottle definitions
->> +##
->> +# @IOThrottle:
->> +#
->> +# A set of parameters describing iothrottle
->
-> s/iothrottle/IO throttling/
-I completely taken off that sentence.
->
->> +#
->> +# @id: The name or QOM path of the guest device (since: 2.8)
->> +#
->> +# @bps: total throughput limit in bytes per second
->> +#
->> +# @bps_rd: read throughput limit in bytes per second
->> +#
->> +# @bps_wr: write throughput limit in bytes per second
->> +#
->> +# @iops: total I/O operations per second
->> +#
->> +# @iops_rd: read I/O operations per second
->> +#
->> +# @iops_wr: write I/O operations per second
->> +#
->> +# @bps_max: total throughput limit during bursts,
->> +#                     in bytes (Since 1.7)
->> +#
->> +# @bps_rd_max: read throughput limit during bursts,
->> +#                        in bytes (Since 1.7)
->> +#
->> +# @bps_wr_max: write throughput limit during bursts,
->> +#                        in bytes (Since 1.7)
->> +#
->> +# @iops_max: total I/O operations per second during bursts,
->> +#                      in bytes (Since 1.7)
->> +#
->> +# @iops_rd_max: read I/O operations per second during bursts,
->> +#                         in bytes (Since 1.7)
->> +#
->> +# @iops_wr_max: write I/O operations per second during bursts,
->> +#                         in bytes (Since 1.7)
->> +#
->> +# @bps_max_length: maximum length of the @bps_max burst
->> +#                            period, in seconds. It must only
->> +#                            be set if @bps_max is set as well.
->> +#                            Defaults to 1. (Since 2.6)
->> +#
->> +# @bps_rd_max_length: maximum length of the @bps_rd_max
->> +#                               burst period, in seconds. It must only
->> +#                               be set if @bps_rd_max is set as well.
->> +#                               Defaults to 1. (Since 2.6)
->> +#
->> +# @bps_wr_max_length: maximum length of the @bps_wr_max
->> +#                               burst period, in seconds. It must only
->> +#                               be set if @bps_wr_max is set as well.
->> +#                               Defaults to 1. (Since 2.6)
->> +#
->> +# @iops_max_length: maximum length of the @iops burst
->> +#                             period, in seconds. It must only
->> +#                             be set if @iops_max is set as well.
->> +#                             Defaults to 1. (Since 2.6)
->> +#
->> +# @iops_rd_max_length: maximum length of the @iops_rd_max
->> +#                                burst period, in seconds. It must only
->> +#                                be set if @iops_rd_max is set as well.
->> +#                                Defaults to 1. (Since 2.6)
->> +#
->> +# @iops_wr_max_length: maximum length of the @iops_wr_max
->> +#                                burst period, in seconds. It must only
->> +#                                be set if @iops_wr_max is set as well.
->> +#                                Defaults to 1. (Since 2.6)
->> +#
->> +# @iops_size: an I/O size in bytes (Since 1.7)
->> +#
->> +#
->> +# Since: 2.10
->> +##
->> +{ 'struct': 'IOThrottle',
->> +  'data': { '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
->> +            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
->> +            '*bps_max': 'int', '*bps_rd_max': 'int',
->> +            '*bps_wr_max': 'int', '*iops_max': 'int',
->> +            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
->> +            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
->> +            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->> +            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->> +            '*iops_size': 'int' } }
->
+Hi
+I have created a new fork on GitHub https://github.com/flypie/flypie-pi-qemu and an associated project https://github.com/flypie/GDummyPanel the idea as well as getting the Original PI emulation working is to add some facility for simulated IO. This is a demonstration of the latest version, running the QEMU demo from https://github.com/rsta2/circle. I took the idea from an implementation for the BIFFboard but only the socket number is left, the commuications is all via IP. The code is only really Alpha level at the moment and needs some refing to reduce bandwidth. I could also extend the code so that the connection can be to a remote machine rather than via the local host.
+
+I intend to generalise the code, to work with several different boards other than the PI, could anyone suggest a board that would benefit from such an add on.
+Is this a worth while addon? 
+John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge Hill Liverpool L7 7AF
