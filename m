@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5tsd-0001U1-9O
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d5tzw-0007pm-E0
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d5tsY-0001gV-EU
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55518)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d5tsY-0001g4-5L
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 08:59:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d5tsV-0002m3-Fw
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 12:59:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4E5092E80CB
-	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 12:59:35 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1d5tzr-0005ti-OB
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:07:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d5tzr-0005tD-EU
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 09:07:11 -0400
+Date: Wed, 3 May 2017 15:07:05 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170503150705.7a55ca5c@nial.brq.redhat.com>
+In-Reply-To: <1493803036-4048-1-git-send-email-he.chen@linux.intel.com>
+References: <1493803036-4048-1-git-send-email-he.chen@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 May 2017 12:45:55 -0000
-From: ChristianEhrhardt <1581936@bugs.launchpad.net>
-Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170503124555.3943.31728.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
- CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: acpi: extend cphp and memhp
+ testcase with numa distance check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,115 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: He Chen <he.chen@linux.intel.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-Hi,
-thanks for marking Qemu(Ubuntu) so I could see it - and thanks for the prew=
-ork on the patches.
-We need to clear a few in progress SRUs before that but other than that thi=
-ngs look nice.
-We can work on the patches a bit until that happened.
+On Wed,  3 May 2017 17:17:16 +0800
+He Chen <he.chen@linux.intel.com> wrote:
 
-We will need somewhat proper Dep3 headers in [1] the patches - I can add
-those if you want me to do so.
+> Signed-off-by: He Chen <he.chen@linux.intel.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-[1]: http://dep.debian.net/deps/dep3/
+Eduardo,
 
--- =
+could you take it through your tree as well and
+add as part of this patch SLIT tables blobs for
+piix4/q35 that tests/acpi-test-data/rebuild-expected-aml.sh
+will generate.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1581936
-
-Title:
-  Frozen Windows 7 VMs with VGA CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Trusty:
-  Triaged
-Status in qemu source package in Xenial:
-  Triaged
-
-Bug description:
-  Hi,
-
-  As already posted on the QEMU devel list [1] I stumbled upon a problem
-  with QEMU in version 2.5.1.1 and 2.6.0.
-
-  the VM shows Windows loading
-  files for the installation, then the "Starting Windows" screen appears
-  here it hangs and never continues.
-
-  Changing the "-vga" option to cirrus solves this, the installation can
-  proceed and finish. When changing back to std (or also qxl, vmware) the
-  installed VM also hangs on the "Starting Windows" screen while qemu
-  showing a little but no excessive load.
-
-  This phenomena appears also with QEMU 2.6.0 but not with 2.6.0-rc4, a
-  git bisect shows fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7 (vga: make
-  sure vga register setup for vbe stays intact (CVE-2016-3712)) as the
-  culprit for this regression, as its a fix for a DoS its not an option to
-  just revert it, I guess.
-
-  The bisect log is:
-
-  git bisect start
-  # bad: [bfc766d38e1fae5767d43845c15c79ac8fa6d6af] Update version for v2.6=
-.0 release
-  git bisect bad bfc766d38e1fae5767d43845c15c79ac8fa6d6af
-  # good: [975eb6a547f809608ccb08c221552f666611af25] Update version for v2.=
-6.0-rc4 release
-  git bisect good 975eb6a547f809608ccb08c221552f666611af25
-  # good: [2068192dcccd8a80dddfcc8df6164cf9c26e0fc4] vga: update vga regist=
-er setup on vbe changes
-  git bisect good 2068192dcccd8a80dddfcc8df6164cf9c26e0fc4
-  # bad: [53db932604dfa7bb9241d132e0173894cf54261c] Merge remote-tracking b=
-ranch 'remotes/kraxel/tags/pull-vga-20160509-1' into staging
-  git bisect bad 53db932604dfa7bb9241d132e0173894cf54261c
-  # bad: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make sure vga regi=
-ster setup for vbe stays intact (CVE-2016-3712).
-  git bisect bad fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7
-  # first bad commit: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make =
-sure vga register setup for vbe stays intact (CVE-2016-3712).
-
-  =
-
-  I could reproduce that with QEMU 2.5.1 and QEMU 2.6 on a Debian derivate
-  (Promox VE) with 4.4 Kernel and also with QEMU 2.6 on an Arch Linux
-  System with a 4.5 Kernel, so it should not be host distro depended. Both
-  machines have Intel x86_64 processors.
-  The problem should be reproducible with said Versions or a build from
-  git including the above mentioned commit (fd3c136) by starting a VM with
-  an Windows 7 ISO, e.g.:
-
-  Freezing installation (as vga defaults to std I marked it as optional):
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 [-vga=
- (std|qxl|vmware)]
-
-  Working installation:
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 -vga =
-cirrus
-
-  If someone has already an installed Windows 7 VM this behaviour should be
-  also observable when trying to start it with the new versions of QEMU.
-
-  Noteworthy may be that Windows 10 is working, I do not had time to get
-  other Windows versions and test them, I'll do that as soon as possible.
-  Various Linux system also seems do work fine, at least I did not ran
-  into an issue there yet.
-
-  I also tried testing with SeaBIOS and OVMF as firmware, as initially I
-  had no idea what broke, both lead to the same result - without the =
-
-  CVE-2016-3712 fix they both work, with not.
-  Further, KVM enabled and disabled does not make any difference.
-
-  =
-
-  [1] http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg02416.html
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1581936/+subscriptions
+> ---
+>  tests/bios-tables-test.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 88dbf97..c593165 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -710,7 +710,8 @@ static void test_acpi_piix4_tcg_cphp(void)
+>      data.machine = MACHINE_PC;
+>      data.variant = ".cphp";
+>      test_acpi_one("-smp 2,cores=3,sockets=2,maxcpus=6"
+> -                  " -numa node -numa node",
+> +                  " -numa node -numa node"
+> +                  " -numa dist,src=0,dst=1,val=21",
+>                    &data);
+>      free_test_data(&data);
+>  }
+> @@ -723,7 +724,8 @@ static void test_acpi_q35_tcg_cphp(void)
+>      data.machine = MACHINE_Q35;
+>      data.variant = ".cphp";
+>      test_acpi_one(" -smp 2,cores=3,sockets=2,maxcpus=6"
+> -                  " -numa node -numa node",
+> +                  " -numa node -numa node"
+> +                  " -numa dist,src=0,dst=1,val=21",
+>                    &data);
+>      free_test_data(&data);
+>  }
+> @@ -772,7 +774,10 @@ static void test_acpi_q35_tcg_memhp(void)
+>      memset(&data, 0, sizeof(data));
+>      data.machine = MACHINE_Q35;
+>      data.variant = ".memhp";
+> -    test_acpi_one(" -m 128,slots=3,maxmem=1G -numa node", &data);
+> +    test_acpi_one(" -m 128,slots=3,maxmem=1G"
+> +                  " -numa node -numa node"
+> +                  " -numa dist,src=0,dst=1,val=21",
+> +                  &data);
+>      free_test_data(&data);
+>  }
+>  
+> @@ -783,7 +788,10 @@ static void test_acpi_piix4_tcg_memhp(void)
+>      memset(&data, 0, sizeof(data));
+>      data.machine = MACHINE_PC;
+>      data.variant = ".memhp";
+> -    test_acpi_one(" -m 128,slots=3,maxmem=1G -numa node", &data);
+> +    test_acpi_one(" -m 128,slots=3,maxmem=1G"
+> +                  " -numa node -numa node"
+> +                  " -numa dist,src=0,dst=1,val=21",
+> +                  &data);
+>      free_test_data(&data);
+>  }
+>  
