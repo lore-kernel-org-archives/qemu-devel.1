@@ -1,22 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d60Ih-0003w3-Uz
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:51:05 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d60KY-0004bV-7d
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:52:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d60Ig-0005UB-Vc
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:51:04 -0400
-References: <20170502144744.26815-1-berrange@redhat.com>
-	<20170502144744.26815-4-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2f99bd19-4a9d-850e-ed56-7b998797c6a6@redhat.com>
-Date: Wed, 3 May 2017 21:50:49 +0200
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1d60KV-0007NT-4H
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:52:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33458)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1d60KU-0007Ly-Rh
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:52:55 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v43JmxdW004183
+	for <qemu-devel@nongnu.org>; Wed, 3 May 2017 15:52:52 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a7hbj4fc3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 15:52:52 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 3 May 2017 15:52:51 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170502144744.26815-4-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MUxq0woJM9qrGcgsaM5wrij7jhgNCrqTE"
-Subject: Re: [Qemu-devel] [PATCH v7 3/4] qemu-img: introduce
- --target-image-opts for 'convert' command
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <87a86u48sa.fsf@dusky.pond.sub.org>
+References: <20170427215821.19397-1-eblake@redhat.com>
+	<20170427215821.19397-11-eblake@redhat.com>
+	<149374359665.32299.11589637295145834940@loki>
+	<149374416427.32299.10266856249198036332@loki>
+	<87a86u48sa.fsf@dusky.pond.sub.org>
+Date: Wed, 03 May 2017 14:52:42 -0500
+Message-Id: <149384116260.9473.5031989947486335691@loki>
+Subject: Re: [Qemu-devel] [PATCH v5 10/10] test-qga: Actually test 0xff sync
+ bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,131 +45,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MUxq0woJM9qrGcgsaM5wrij7jhgNCrqTE
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
-Message-ID: <2f99bd19-4a9d-850e-ed56-7b998797c6a6@redhat.com>
-Subject: Re: [PATCH v7 3/4] qemu-img: introduce --target-image-opts for
- 'convert' command
-References: <20170502144744.26815-1-berrange@redhat.com>
- <20170502144744.26815-4-berrange@redhat.com>
-In-Reply-To: <20170502144744.26815-4-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Quoting Markus Armbruster (2017-05-03 03:57:41)
+> Michael Roth <mdroth@linux.vnet.ibm.com> writes:
+> =
 
-On 02.05.2017 16:47, Daniel P. Berrange wrote:
-> The '--image-opts' flag indicates whether the source filename
-> includes options. The target filename has to remain in the
-> plain filename format though, since it needs to be passed to
-> bdrv_create().  When using --skip-create though, it would be
-> possible to use image-opts syntax. This adds --target-image-opts
-> to indicate that the target filename includes options. Currently
-> this mandates use of the --skip-create flag too.
+> > Quoting Michael Roth (2017-05-02 11:46:36)
+> >> Quoting Eric Blake (2017-04-27 16:58:21)
+> >> > Commit 62c39b3 introduced test-qga, and at face value, appears
+> >> > to be testing the 'guest-sync' behavior that is recommended for
+> >> > guests in sending 0xff to QGA to force the parser to reset.  But
+> >> > this aspect of the test has never actually done anything: the
+> >> > qmp_fd() call chain converts its string argument into QObject,
+> >> > then converts that QObject back to the actual string that is
+> >> > sent over the wire - and the conversion process silently drops
+> >> > the 0xff byte from the string sent to QGA, thus never resetting
+> >> > the QGA parser.
+> >> > =
+
+> >> > An upcoming patch will get rid of the wasteful round trip
+> >> > through QObject, at which point the string in test-qga will be
+> >> > directly sent over the wire.
+> >> > =
+
+> >> > But fixing qmp_fd() to actually send 0xff over the wire is not
+> >> > all we have to do - the actual QMP parser loudly complains that
+> >> > 0xff is not valid JSON, and sends an error message _prior_ to
+> >> > actually parsing the 'guest-sync' or 'guest-sync-delimited'
+> >> > command.  With 'guest-sync', we cannot easily tell if this error
+> >> > message is a result of our command - which is WHY we invented
+> >> > the 'guest-sync-delimited' command.  So for the testsuite, fix
+> >> > things to only check 0xff behavior on 'guest-sync-delimited',
+> >> > and to loop until we've consumed all garbage prior to the
+> >> > requested delimiter, which matches the documented actions that
+> >> > a real QGA client is supposed to do.
+> >> =
+
+> >> The full re-sync sequence is actually to perform that process,
+> >> check if the response matches the client-provided sync token,
+> >> and then repeat the procedure if it doesn't (in the odd case
+> >> that a previous client initiated a guest-sync-delimited
+> >> sequence and never consumed the response). The current
+> >> implementation only performs one iteration so it's not quite
+> >> a full implementation of the documentation procedure.
+> >
+> > Well, to be more accurate it's a full implementation of the
+> > documented procedure, it's just that the procedure isn't
+> > fully documented properly. I'll send a patch to address that.
+> =
+
+> Good.
+> =
+
+> >> For the immediate purpose of improving the handling to deal
+> >> with the 0xFF-generated error the patch seems sound though,
+> >> maybe just something worth noting in the commit msg or
+> >> comments so that we might eventually test the full procedure.
+> =
+
+> Feel free to suggest something for me to add to the commit message.
+
+Maybe change:
+
+  "which matches the documented actions that a real QGA client
+   is supposed to do."
+
+to
+
+  "which is compatible with the documented actions that a real
+   QGA client is supposed to do."
+
+and add the following comment to test_qga_sync_delimited
+
+  /* =
+
+   * Note that the full reset sequence would involve checking the
+   * response of guest-sync-delimited and repeating the loop if
+   * 'id' field of the response does not match the 'id' field of =
+
+   * the request. Testing this fully would require inserting
+   * garbage in the response stream and is left as a future test
+   * to implement.
+   */
+
+> =
+
+> >> In any case:
+> >> =
+
+> >> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> =
+
+> Noted, thanks!
 >=20
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Sure you want to keep this, considering that there are quite some
-changes since v5?
-
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-img-cmds.hx |  4 +--
->  qemu-img.c       | 77 +++++++++++++++++++++++++++++++++++++-----------=
---------
->  qemu-img.texi    | 12 +++++++--
->  3 files changed, 63 insertions(+), 30 deletions(-)
-
-[...]
-
-> diff --git a/qemu-img.c b/qemu-img.c
-> index d8fdcb1..94c8cea 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-
-[...]
-
-> @@ -1900,7 +1901,7 @@ static int img_convert(int argc, char **argv)
->      char *options =3D NULL;
->      Error *local_err =3D NULL;
->      bool writethrough, src_writethrough, quiet =3D false, image_opts =3D=
- false,
-> -         skip_create =3D false, progress =3D false;
-> +        skip_create =3D false, progress =3D false, tgt_image_opts =3D =
-false;
-
-Not sure about the indentation here. (I personally don't like spanning
-the declaration over multiple lines in the first place, but that's a
-different topic.) Indenting consecutive lines by four spaces is
-standard, but the indentation by five spaces had a reason.
-
-I guess I'd personally rather keep the five-space indentation...
-
->      int64_t ret =3D -EINVAL;
-> =20
->      ImgConvertState s =3D (ImgConvertState) {
-
-[...]
-
-> @@ -2047,12 +2056,22 @@ static int img_convert(int argc, char **argv)
->          goto fail_getopt;
->      }
-> =20
-> +    if (tgt_image_opts && !skip_create) {
-> +        error_report("--target-image-opts requires use of -n flag");
-> +        goto fail_getopt;
-> +    }
-> +
->      s.src_num =3D argc - optind - 1;
->      out_filename =3D s.src_num >=3D 1 ? argv[argc - 1] : NULL;
-> =20
->      if (options && has_help_option(options)) {
-> -        ret =3D print_block_option_help(out_filename, out_fmt);
-> -        goto fail_getopt;
-> +        if (out_fmt) {
-> +            ret =3D print_block_option_help(out_filename, out_fmt);
-> +            goto out;
-
-Shouldn't this remain goto fail_getopt;?
-
-> +        } else {
-> +            error_report("Option help requires a format be specified")=
-;
-> +            goto fail_getopt;
-> +        }
->      }
-> =20
->      if (s.src_num < 1) {
-
-[...]
-
-Why did you remove the compress &&
-!out_bs->drv->bdrv_co_pwritev_compressed check? I liked it. :-(
-
-Max
-
-
---MUxq0woJM9qrGcgsaM5wrij7jhgNCrqTE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkKNJkSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A9iUIAJOVA5OEA2AA9BEkZu4jm+vw/rQ2VpfQ
-/l00j4P4gjeDjLx/l5n5DXwxmEfBcm7yYssLu20KSL/DohYenb9jH4Iw2ne1Y9On
-MXh/p/x4Gh2ONUyyiaGt0Cd9Pf1dFfYblJKuQTtVpTzpSOccZOFnWax4CFT4S/06
-CMfEakdcQ2q8kf6lRy5qGWzeavKnNRC22yBVOQPZaVymY6peSBgl6kvdF8RytGcZ
-jrIZIffF9cXvL4LKxKV7J1UJm8yXUuK3nCCReJFGB6Pcf2cioGYJBVX1tPEibDgG
-hnyMZBBZBmfuic5BU3G1wSbCG1dHoYXdlsmHVTUxlrgQlcfVJbUOCKI=
-=Fy+v
------END PGP SIGNATURE-----
-
---MUxq0woJM9qrGcgsaM5wrij7jhgNCrqTE--
