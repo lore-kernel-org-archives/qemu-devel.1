@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5vUP-0000JS-Mn
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:42:50 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5vYS-0002Sz-B0
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5vUO-0004VZ-KK
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:42:49 -0400
-Date: Wed, 3 May 2017 11:42:40 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1d5vYR-0000Pw-4s
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:47:00 -0400
+Date: Wed, 3 May 2017 11:46:44 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170503144240.GL3482@thinpad.lan.raisama.net>
+Message-ID: <20170503144644.GM3482@thinpad.lan.raisama.net>
 References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-6-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-7-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493816238-33120-6-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 05/24] numa: move source of default CPUs
- to NUMA node mapping into boards
+In-Reply-To: <1493816238-33120-7-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 06/24] spapr: add node-id property to
+ sPAPR core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,92 +27,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-On Wed, May 03, 2017 at 02:56:59PM +0200, Igor Mammedov wrote:
-> Originally CPU threads were by default assigned in
-> round-robin fashion. However it was causing issues in
-> guest since CPU threads from the same socket/core could
-> be placed on different NUMA nodes.
-> Commit fb43b73b (pc: fix default VCPU to NUMA node mapping)
-> fixed it by grouping threads within a socket on the same node
-> introducing cpu_index_to_socket_id() callback and commit
-> 20bb648d (spapr: Fix default NUMA node allocation for threads)
-> reused callback to fix similar issues for SPAPR machine
-> even though socket doesn't make much sense there.
-> 
-> As result QEMU ended up having 3 default distribution rules
-> used by 3 targets /virt-arm, spapr, pc/.
-> 
-> In effort of moving NUMA mapping for CPUs into possible_cpus,
-> generalize default mapping in numa.c by making boards decide
-> on default mapping and let them explicitly tell generic
-> numa code to which node a CPU thread belongs to by replacing
-> cpu_index_to_socket_id() with @cpu_index_to_instance_props()
-> which provides default node_id assigned by board to specified
-> cpu_index.
+On Wed, May 03, 2017 at 02:57:00PM +0200, Igor Mammedov wrote:
+> it will allow switching from cpu_index to core based numa
+> mapping in follow up patches.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Have you considered adding this to TYPE_CPU instead of
+duplicating the same code on multiple architectures/boards?
 
-Just two extra comments below:
-
-[...]
-> +static CpuInstanceProperties
-> +virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-> +{
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+> ---
+>  include/hw/ppc/spapr_cpu_core.h |  1 +
+>  include/qom/cpu.h               |  2 ++
+>  hw/ppc/spapr.c                  | 17 +++++++++++++++++
+>  hw/ppc/spapr_cpu_core.c         | 11 ++++++++---
+>  4 files changed, 28 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+> index 3c35665..93051e9 100644
+> --- a/include/hw/ppc/spapr_cpu_core.h
+> +++ b/include/hw/ppc/spapr_cpu_core.h
+> @@ -27,6 +27,7 @@ typedef struct sPAPRCPUCore {
+>  
+>      /*< public >*/
+>      void *threads;
+> +    int node_id;
+>  } sPAPRCPUCore;
+>  
+>  typedef struct sPAPRCPUCoreClass {
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 5d10359..55214ce 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -258,6 +258,8 @@ typedef void (*run_on_cpu_func)(CPUState *cpu, run_on_cpu_data data);
+>  
+>  struct qemu_work_item;
+>  
+> +#define CPU_UNSET_NUMA_NODE_ID -1
 > +
-> +    assert(cpu_index < possible_cpus->len);
-> +    return possible_cpus->cpus[cpu_index].props;;
-> +}
+>  /**
+>   * CPUState:
+>   * @cpu_index: CPU index (informative).
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 33405a0..7f58ee4 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2824,9 +2824,11 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+>      Error *local_err = NULL;
+>      CPUCore *cc = CPU_CORE(dev);
+> +    sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
+>      char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
+>      const char *type = object_get_typename(OBJECT(dev));
+>      CPUArchId *core_slot;
+> +    int node_id;
+>      int index;
+>  
+>      if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
+> @@ -2861,6 +2863,21 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          goto out;
+>      }
+>  
+> +    node_id = numa_get_node_for_cpu(cc->core_id);
+> +    if (node_id == nb_numa_nodes) {
+> +        /* by default CPUState::numa_node was 0 if it's not set via CLI
+> +         * keep it this way for now but in future we probably should
+> +         * refuse to start up with incomplete numa mapping */
+> +        node_id = 0;
+> +    }
+> +    if (sc->node_id == CPU_UNSET_NUMA_NODE_ID) {
+> +        sc->node_id = node_id;
+> +    } else if (sc->node_id != node_id) {
+> +        error_setg(&local_err, "node-id %d must match numa node specified"
+> +            "with -numa option for cpu-index %d", sc->node_id, cc->core_id);
+> +        goto out;
+> +    }
 > +
-[...]
-> +static CpuInstanceProperties
-> +pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+>  out:
+>      g_free(base_core_type);
+>      error_propagate(errp, local_err);
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 4389ef4..9de7a56 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -176,7 +176,6 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+>      const char *typename = object_class_get_name(scc->cpu_class);
+>      size_t size = object_type_get_instance_size(typename);
+>      Error *local_err = NULL;
+> -    int core_node_id = numa_get_node_for_cpu(cc->core_id);;
+>      void *obj;
+>      int i, j;
+>  
+> @@ -194,10 +193,10 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+>  
+>          /* Set NUMA node for the added CPUs  */
+>          node_id = numa_get_node_for_cpu(cs->cpu_index);
+> -        if (node_id != core_node_id) {
+> +        if (node_id != sc->node_id) {
+>              error_setg(&local_err, "Invalid node-id=%d of thread[cpu-index: %d]"
+>                  " on CPU[core-id: %d, node-id: %d], node-id must be the same",
+> -                 node_id, cs->cpu_index, cc->core_id, core_node_id);
+> +                 node_id, cs->cpu_index, cc->core_id, sc->node_id);
+>              goto err;
+>          }
+>          if (node_id < nb_numa_nodes) {
+> @@ -263,6 +262,11 @@ static const char *spapr_core_models[] = {
+>      "POWER9_v1.0",
+>  };
+>  
+> +static Property spapr_cpu_core_properties[] = {
+> +    DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
+> +    DEFINE_PROP_END_OF_LIST()
+> +};
+> +
+>  void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
 >  {
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
-> +
-> +    assert(cpu_index < possible_cpus->len);
-> +    return possible_cpus->cpus[cpu_index].props;;
+>      DeviceClass *dc = DEVICE_CLASS(oc);
+> @@ -270,6 +274,7 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+>  
+>      dc->realize = spapr_cpu_core_realize;
+>      dc->unrealize = spapr_cpu_core_unrealizefn;
+> +    dc->props = spapr_cpu_core_properties;
+>      scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
+>      g_assert(scc->cpu_class);
 >  }
-
-The fact that these two implementations look exactly the same
-made me wonder:
-
-1) Why this isn't the default implementation;
-2) Why exactly spapr needs a different implementation.
-
-Then I noticed that there's nothing in the common machine code
-that specifies that possible_cpus->cpus[] is indexed by
-cpu_index. This means it is indeed safer to require each machine
-to provide its own cpu_index_to_props implementation than having
-a default implementation that can unexpectedly break (e.g. if
-granularity at possible_cpus is not at VCPU/thread level).
-
-I would still like to have an abstraction that wouldn't require
-writing machine-specific code (e.g. cpu_index ranges to
-possible_cpus like David suggested), but that's for a follow-up
-series.
-
-[...]
-> +static CpuInstanceProperties
-> +spapr_cpu_index_to_props(MachineState *machine, unsigned cpu_index)
->  {
-> +    CPUArchId *core_slot;
-> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> +
-> +    /* make sure possible_cpu are intialized */
-> +    mc->possible_cpu_arch_ids(machine);
-> +    core_slot = spapr_find_cpu_slot(machine, cpu_index, NULL);
-> +    assert(core_slot);
-> +    return core_slot->props;
->  }
-
-If you need to submit v3, maybe a comment here explaining why
-spapr needs a different cpu_index_to_props implementation would
-be helpful. I took a while to figure it out.
+> -- 
+> 2.7.4
+> 
 
 -- 
 Eduardo
