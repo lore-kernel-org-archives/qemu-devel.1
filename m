@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5q3e-0001EC-C5
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:54:51 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d5q4X-0001j7-He
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d5q3Z-0006ks-Sb
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:54:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33454)
+	(envelope-from <pbonzini@redhat.com>) id 1d5q4S-00076V-K8
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:55:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d5q3Z-0006kW-Ju
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:54:45 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<2bc05de0edd61cdcdd3d2b894378a874d1e12327.1493191677.git.maozy.fnst@cn.fujitsu.com>
-	<87shktu8cu.fsf@dusky.pond.sub.org>
-	<20170427163025.GD30599@redhat.com>
-	<87lgqlnenh.fsf@dusky.pond.sub.org>
-	<23e5dc02-3e69-2166-c18b-786fc75172ff@cn.fujitsu.com>
-Date: Wed, 03 May 2017 10:54:42 +0200
-In-Reply-To: <23e5dc02-3e69-2166-c18b-786fc75172ff@cn.fujitsu.com> (Mao
-	Zhongyi's message of "Wed, 3 May 2017 15:09:57 +0800")
-Message-ID: <87efw648x9.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5q4S-00075Q-4p
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 04:55:40 -0400
+References: <alpine.DEB.2.10.1705021646310.8859@sstabellini-ThinkPad-X260>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <84b6b9c8-274c-5387-5bcd-d34584dd398c@redhat.com>
+Date: Wed, 3 May 2017 10:55:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] net/socket: Convert error report
- message to Error
+In-Reply-To: <alpine.DEB.2.10.1705021646310.8859@sstabellini-ThinkPad-X260>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] xen/mapcache: store dma information in
+ revmapcache entries for debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,101 +27,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, jasowang@redhat.com, qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>, anthony.perard@citrix.com
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xensource.com, crosthwaite.peter@gmail.com, rth@twiddle.net, hrgstephen@gmail.com, x1917x@gmail.com
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-> Hi, Markus,Daniel
->
-> On 04/28/2017 04:02 PM, Markus Armbruster wrote:
->> "Daniel P. Berrange" <berrange@redhat.com> writes:
->>
->>> On Thu, Apr 27, 2017 at 06:24:17PM +0200, Markus Armbruster wrote:
->>>> No review, just an observation.
->>>>
->>>> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->>>>
->>>>> Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
->>>>> net_socket_fd_init() use the function such as fprintf(), perror() to
->>>>> report an error message.
->>>>>
->>>>> Now, convert these functions to Error.
->>>>>
->>>>> CC: jasowang@redhat.com, armbru@redhat.com
->>>>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->>>>> ---
->>>>>  net/socket.c | 66 +++++++++++++++++++++++++++++++++++++-----------------------
->>>>>  1 file changed, 41 insertions(+), 25 deletions(-)
->>>>>
->>>>> diff --git a/net/socket.c b/net/socket.c
->>>>> index b0decbe..559e09a 100644
->>>>> --- a/net/socket.c
->>>>> +++ b/net/socket.c
->>>> [...]
->>>>> @@ -433,25 +437,27 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
->>>>>
->>>>>  static NetSocketState *net_socket_fd_init(NetClientState *peer,
->>>>>                                            const char *model, const char *name,
->>>>> -                                          int fd, int is_connected)
->>>>> +                                          int fd, int is_connected,
->>>>> +                                          Error **errp)
->>>>>  {
->>>>>      int so_type = -1, optlen=sizeof(so_type);
->>>>>
->>>>>      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
->>>>>          (socklen_t *)&optlen)< 0) {
->>>>> -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
->>>>> +        error_setg(errp, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed",
->>>>>                  fd);
->>>>>          closesocket(fd);
->>>>>          return NULL;
->>>>>      }
->>>>>      switch(so_type) {
->>>>>      case SOCK_DGRAM:
->>>>> -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
->>>>> +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected, errp);
->>>>>      case SOCK_STREAM:
->>>>>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->>>>>      default:
->>>>>          /* who knows ... this could be a eg. a pty, do warn and continue as stream */
->>>>> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
->>>>> +        error_setg(errp, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM"
->>>>> +                   " or SOCK_STREAM", so_type, fd);
->>>>
->>>> Not this patches problem: this case is odd, and the comment is bogus.
->>>> If @fd really was a pty, getsockopt() would fail with ENOTSOCK, wouldn't
->>>> it?  If @fd is a socket, but neither SOCK_DGRAM nor SOCK_STREAM (say
->>>> SOCK_RAW), why is it safe to continue as if it was SOCK_STREAM?  Jason?
->>>
->>> IMHO it is a problem with this patch. Previously we merely printed
->>> a warning & carried on, which is conceptually ok in general, though
->>> dubious here for the reason you say.
->>>
->>> Now we are filling an Error **errp object, and carrying on - this is
->>> conceptually broken anywhere. If an Error ** is filled, we must return.
->>> If we want to carry on, we shouldn't fill Error **.
->>
->> You're right.
->>
->>>>>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->>>
->>> IMHO, we just kill this and put return NULL here. If there is a genuine
->>> reason to support something like SOCK_RAW, it should be explicitly
->>> handled, because this default: case will certainly break SOCK_SEQPACKET
->>> and SOCK_RDM which can't be treated as streams.
->>
->> It's either magic or misguided defensive programming.  Probably the
->> latter, but I'd like to hear Jason's opinion.
->>
->> If it's *necessary* magic, we can't use error_setg().  Else, we should
->> drop the default, and insert a closesocket(fd) before the final return
->> NULL.
->
-> As Daniel said, although the previous printed warning message is
-> dubious, but it is conceptually ok in general. Simply filling it to
-> Error ** is problematic. Of course, as you said drop the default case,
-> there will be no problem. But really to do that?
 
-Since Jason hasn't spoken up, I suggest you follow Dan's recommendation
-and insert a patch to drop the default case before your error rework.
+On 03/05/2017 02:08, Stefano Stabellini wrote:
+> The Xen mapcache is able to create long term mappings, they are called
+> "locked" mappings. The third parameter of the xen_map_cache call
+> specifies if a mapping is a "locked" mapping.
+> 
+> 
+> From the QEMU point of view there are two kinds of long term mappings:
+> 
+> [a] device memory mappings, such as option roms and video memory
+> [b] dma mappings, created by dma_memory_map & friends
+> 
+> After certain operations, ballooning a VM in particular, Xen asks QEMU
+> kindly to destroy all mappings. However, certainly [a] mappings are
+> present and cannot be removed. That's not a problem as they are not
+> affected by balloonning. The *real* problem is that if there are any
+> mappings of type [b], any outstanding dma operations could fail. This is
+> a known shortcoming. In other words, when Xen asks QEMU to destroy all
+> mappings, it is an error if any [b] mappings exist.
+> 
+> However today we have no way of distinguishing [a] from [b]. Because of
+> that, we cannot even print a decent warning.
+> 
+> This patch introduces a new "dma" bool field to MapCacheRev entires, to
+> remember if a given mapping is for dma or is a long term device memory
+> mapping. When xen_invalidate_map_cache is called, we print a warning if
+> any [b] mappings exist. We ignore [a] mappings.
+> 
+> Mappings created by qemu_map_ram_ptr are assumed to be [a], while
+> mappings created by address_space_map->qemu_ram_ptr_length are assumed
+> to be [b].
+> 
+> The goal of the patch is to make debugging and system understanding
+> easier.
+
+Sure, why not.
+
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Paolo
+
+> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+> 
+> diff --git a/exec.c b/exec.c
+> index eac6085..85769e1 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2084,10 +2084,10 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
+>           * In that case just map until the end of the page.
+>           */
+>          if (block->offset == 0) {
+> -            return xen_map_cache(addr, 0, 0);
+> +            return xen_map_cache(addr, 0, 0, false);
+>          }
+>  
+> -        block->host = xen_map_cache(block->offset, block->max_length, 1);
+> +        block->host = xen_map_cache(block->offset, block->max_length, 1, false);
+>      }
+>      return ramblock_ptr(block, addr);
+>  }
+> @@ -2117,10 +2117,10 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+>           * In that case just map the requested area.
+>           */
+>          if (block->offset == 0) {
+> -            return xen_map_cache(addr, *size, 1);
+> +            return xen_map_cache(addr, *size, 1, true);
+>          }
+>  
+> -        block->host = xen_map_cache(block->offset, block->max_length, 1);
+> +        block->host = xen_map_cache(block->offset, block->max_length, 1, true);
+>      }
+>  
+>      return ramblock_ptr(block, addr);
+> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+> index 31debdf..fa4282a 100644
+> --- a/hw/i386/xen/xen-mapcache.c
+> +++ b/hw/i386/xen/xen-mapcache.c
+> @@ -62,6 +62,7 @@ typedef struct MapCacheRev {
+>      hwaddr paddr_index;
+>      hwaddr size;
+>      QTAILQ_ENTRY(MapCacheRev) next;
+> +    bool dma;
+>  } MapCacheRev;
+>  
+>  typedef struct MapCache {
+> @@ -202,7 +203,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+>  }
+>  
+>  static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
+> -                                       uint8_t lock)
+> +                                       uint8_t lock, bool dma)
+>  {
+>      MapCacheEntry *entry, *pentry = NULL;
+>      hwaddr address_index;
+> @@ -289,6 +290,7 @@ tryagain:
+>      if (lock) {
+>          MapCacheRev *reventry = g_malloc0(sizeof(MapCacheRev));
+>          entry->lock++;
+> +        reventry->dma = dma;
+>          reventry->vaddr_req = mapcache->last_entry->vaddr_base + address_offset;
+>          reventry->paddr_index = mapcache->last_entry->paddr_index;
+>          reventry->size = entry->size;
+> @@ -300,12 +302,12 @@ tryagain:
+>  }
+>  
+>  uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+> -                       uint8_t lock)
+> +                       uint8_t lock, bool dma)
+>  {
+>      uint8_t *p;
+>  
+>      mapcache_lock();
+> -    p = xen_map_cache_unlocked(phys_addr, size, lock);
+> +    p = xen_map_cache_unlocked(phys_addr, size, lock, dma);
+>      mapcache_unlock();
+>      return p;
+>  }
+> @@ -426,8 +428,10 @@ void xen_invalidate_map_cache(void)
+>      mapcache_lock();
+>  
+>      QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
+> -        DPRINTF("There should be no locked mappings at this time, "
+> -                "but "TARGET_FMT_plx" -> %p is present\n",
+> +        if (!reventry->dma)
+> +            continue;
+> +        fprintf(stderr, "Locked DMA mapping while invalidating mapcache!"
+> +                " "TARGET_FMT_plx" -> %p is present\n",
+>                  reventry->paddr_index, reventry->vaddr_req);
+>      }
+>  
+> diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+> index b8c93b9..01daaad 100644
+> --- a/include/sysemu/xen-mapcache.h
+> +++ b/include/sysemu/xen-mapcache.h
+> @@ -17,7 +17,7 @@ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr start_addr,
+>  void xen_map_cache_init(phys_offset_to_gaddr_t f,
+>                          void *opaque);
+>  uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+> -                       uint8_t lock);
+> +                       uint8_t lock, bool dma);
+>  ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
+>  void xen_invalidate_map_cache_entry(uint8_t *buffer);
+>  void xen_invalidate_map_cache(void);
+> @@ -31,7 +31,8 @@ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+>  
+>  static inline uint8_t *xen_map_cache(hwaddr phys_addr,
+>                                       hwaddr size,
+> -                                     uint8_t lock)
+> +                                     uint8_t lock,
+> +                                     bool dma)
+>  {
+>      abort();
+>  }
+> 
