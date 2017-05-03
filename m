@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d5xy6-0006Rt-8O
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:21:39 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1d5xyt-0006vw-GD
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d5xy3-0002yu-4c
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:21:38 -0400
-Received: from 10.mo5.mail-out.ovh.net ([46.105.52.148]:37037)
+	(envelope-from <sstabellini@kernel.org>) id 1d5xyq-0003t1-BE
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:22:27 -0400
+Received: from mail.kernel.org ([198.145.29.136]:47598)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d5xy2-0002yS-TZ
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:21:35 -0400
-Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 53341EAAE1
-	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 19:21:33 +0200 (CEST)
-Date: Wed, 3 May 2017 19:21:26 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170503192126.0d4964a9@bahia>
-In-Reply-To: <c3224a61-cc45-c419-6aff-a3cc43ffed80@redhat.com>
-References: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1493735386-39622-4-git-send-email-pradeep.jagadeesh@huawei.com>
-	<c3224a61-cc45-c419-6aff-a3cc43ffed80@redhat.com>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1d5xyq-0003sG-37
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:22:24 -0400
+Date: Wed, 3 May 2017 10:20:59 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20170503164838.GB1553@perard.uk.xensource.com>
+Message-ID: <alpine.DEB.2.10.1705031019140.9240@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1704141429110.23677@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1704141734161.23677@sstabellini-ThinkPad-X260>
+	<03cfd81856554ecd91c0c317353e819b@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704181038360.31486@sstabellini-ThinkPad-X260>
+	<51ac3ff38f464abfb98928e6fb959bf7@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704191552450.31486@sstabellini-ThinkPad-X260>
+	<6738c7d96a1c476187f69616f25b28d1@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1704201035390.18403@sstabellini-ThinkPad-X260>
+	<20170503164838.GB1553@perard.uk.xensource.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/LX4vFhGEJuP7dN/utgfZ_Kq";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] qmp: refactor duplicate code
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] QEMU build breakage on ARM against Xen 4.9 caused
+ by libxendevicemodel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +35,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <Paul.Durrant@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Wei Liu <wei.liu2@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
---Sig_/LX4vFhGEJuP7dN/utgfZ_Kq
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, 3 May 2017, Anthony PERARD wrote:
+> On Thu, Apr 20, 2017 at 11:05:33AM -0700, Stefano Stabellini wrote:
+> > On Thu, 20 Apr 2017, Paul Durrant wrote:
+> > > I think xencall should be part of the base xen_stable_libs anyway.
+> > 
+> > Yes, you are right. However I noticed that -lxencall needs to come after
+> > -lxendevicemodel. So, I'll have to move -lxendevicemodel before
+> > $xen_stable_libs, see below. I'll merge this patch into "configure:
+> > detect presence of libxendevicemodel", if that's OK.
+> > 
+> > diff --git a/configure b/configure
+> > index 99d6cbc..3133ef8 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -1992,7 +1992,7 @@ if test "$xen" != "no" ; then
+> >    else
+> >  
+> >      xen_libs="-lxenstore -lxenctrl -lxenguest"
+> > -    xen_stable_libs="-lxenforeignmemory -lxengnttab -lxenevtchn"
+> > +    xen_stable_libs="-lxencall -lxenforeignmemory -lxengnttab -lxenevtchn"
+> >  
+> >      # First we test whether Xen headers and libraries are available.
+> >      # If no, we are done and there is no Xen support.
+> > @@ -2027,9 +2027,9 @@ int main(void) {
+> >    return 0;
+> >  }
+> >  EOF
+> > -        compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
+> > +        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
+> >        then
+> > -      xen_stable_libs="$xen_stable_libs -lxendevicemodel"
+> > +      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
+> >        xen_ctrl_version=40900
+> >        xen=yes
+> >      elif
+> 
+> Hey, now that this patch is merged, xen.git fail to build QEMU. (osstest
+> qemu-mainline branch fail.)
+> 
+> That's because -lxencall is not found because -L$path_to_libxencall is
+> missing in xen.git.
+> 
+> But I've notice something else, libxendevicemodel.so is not linked
+> against libxencall, that might be the root of the issues on arm.
+> (libxenctrl.so is linked against libxencall.)
+> 
+> Thought?
+> 
+> 
+> We probably need this patch in xen:
 
-On Tue, 2 May 2017 17:15:02 -0500
-Eric Blake <eblake@redhat.com> wrote:
-
-> On 05/02/2017 09:29 AM, Pradeep Jagadeesh wrote:
-> > This patchset factor out the duplicate qmp throttle interface code
-> > that was present in both block and fsdev device files. =20
->=20
-> Instead of adding the duplicate code in patch 2 then cleaning it out
-> here, you should refactor this patch to be first (fix existing code in
-> blockdev.c to make use of the new interfaces), then add the new fsdev
-> code that uses this code right away.
->=20
-
-Yeah I second that.
-
-Pradeep,
-
-When you worked on the command line version for 2.9, I didn't really know
-what we would be able to share between fsdev and blockdev... I had hence
-asked to code it separately and then factor out. The situation is different
-here: the core throttling code is in place for both fsdev and blockdev. We
-really want to share as much code as possible. So you probably should move
-this patch and maybe the next one in front and then have fsdev to use the
-new code as Eric is suggesting.
-
-Cheers,
-
---
-Greg
-
-> >=20
-> > Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-> > ---
-> >  blockdev.c                      | 53 +++------------------------------=
-----
-> >  fsdev/qemu-fsdev-throttle.c     | 51 +--------------------------------=
----
-> >  fsdev/qemu-fsdev.c              |  1 -
-> >  hmp.c                           | 34 ++++++++++++------------
-> >  include/qemu/throttle-options.h |  5 ++++
-> >  util/Makefile.objs              |  1 +
-> >  util/throttle-options.c         | 58 +++++++++++++++++++++++++++++++++=
-++++++++
-> >  7 files changed, 85 insertions(+), 118 deletions(-)
-> >  create mode 100644 util/throttle-options.c
-> >  =20
->=20
+We also need to add -L$path_to_libxencall and -I$path_to_libxencall to
+tools/Makefile:subdir-all-qemu-xen-dir.
 
 
---Sig_/LX4vFhGEJuP7dN/utgfZ_Kq
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkKEZYACgkQAvw66wEB28J4EQCgidIRiExhaoKVae4O9pcTMgRT
-S+gAn3WFIjV+1DVmKJHCagChGnMD9809
-=jRME
------END PGP SIGNATURE-----
-
---Sig_/LX4vFhGEJuP7dN/utgfZ_Kq--
+> diff --git a/tools/libs/devicemodel/Makefile b/tools/libs/devicemodel/Makefile
+> index 55626a5049..81fa5a4ac4 100644
+> --- a/tools/libs/devicemodel/Makefile
+> +++ b/tools/libs/devicemodel/Makefile
+> @@ -63,7 +63,7 @@ libxendevicemodel.so.$(MAJOR): libxendevicemodel.so.$(MAJOR).$(MINOR)
+>         $(SYMLINK_SHLIB) $< $@
+>  
+>  libxendevicemodel.so.$(MAJOR).$(MINOR): $(PIC_OBJS) libxendevicemodel.map
+> -       $(CC) $(LDFLAGS) $(PTHREAD_LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxendevicemodel.so.$(MAJOR) $(SHLIB_LDFLAGS) -o $@ $(PIC_OBJS) $(LDLIBS_libxentoollog) $(APPEND_LDFLAGS)
+> +       $(CC) $(LDFLAGS) $(PTHREAD_LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxendevicemodel.so.$(MAJOR) $(SHLIB_LDFLAGS) -o $@ $(PIC_OBJS) $(LDLIBS_libxentoollog) $(LDLIBS_libxencall) $(APPEND_LDFLAGS)
+>  
+>  .PHONY: install
+>  install: build
+> 
+> -- 
+> Anthony PERARD
+> 
