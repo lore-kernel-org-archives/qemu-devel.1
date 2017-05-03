@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5y7T-0000x6-Dm
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:31:20 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5yEq-0003EF-Sr
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:39:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d5y7S-0007Qz-ES
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:31:19 -0400
-Date: Wed, 3 May 2017 14:31:09 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1d5yEl-0002N6-EX
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 13:38:52 -0400
+Date: Wed, 3 May 2017 14:38:41 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170503173109.GS3482@thinpad.lan.raisama.net>
+Message-ID: <20170503173841.GT3482@thinpad.lan.raisama.net>
 References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-10-git-send-email-imammedo@redhat.com>
-	<20170503150429.GO3482@thinpad.lan.raisama.net>
-	<20170503181950.3aed0972@nial.brq.redhat.com>
+	<1493816238-33120-24-git-send-email-imammedo@redhat.com>
+	<20170503163543.GR3482@thinpad.lan.raisama.net>
+	<5f71cfda-2a73-77e3-0bf7-85e2aed53811@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170503181950.3aed0972@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 09/24] numa: add check that board
- supports cpu_index to node mapping
+In-Reply-To: <5f71cfda-2a73-77e3-0bf7-85e2aed53811@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 23/24] numa: add '-numa cpu,
+ ...' option for property based node mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, May 03, 2017 at 06:19:50PM +0200, Igor Mammedov wrote:
-> On Wed, 3 May 2017 12:04:29 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Wed, May 03, 2017 at 11:39:10AM -0500, Eric Blake wrote:
+> On 05/03/2017 11:35 AM, Eduardo Habkost wrote:
 > 
-> > On Wed, May 03, 2017 at 02:57:03PM +0200, Igor Mammedov wrote:
-> > > Default node mapping initialization already checks that board
-> > > supports cpu_index to node mapping and refuses to start if
-> > > it's not supported. Do the same for explicitly provided
-> > > mapping "-numa node,cpus=..."
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > >  numa.c | 13 ++++++++++---
-> > >  1 file changed, 10 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/numa.c b/numa.c
-> > > index ab1661d..b517870 100644
-> > > --- a/numa.c
-> > > +++ b/numa.c
-> > > @@ -140,10 +140,12 @@ uint32_t numa_get_node(ram_addr_t addr, Error **errp)
-> > >      return -1;
-> > >  }
-> > >  
-> > > -static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
-> > > +static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
-> > > +                            QemuOpts *opts, Error **errp)
-> > >  {
-> > >      uint16_t nodenr;
-> > >      uint16List *cpus = NULL;
-> > > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> > >  
-> > >      if (node->has_nodeid) {
-> > >          nodenr = node->nodeid;
-> > > @@ -162,6 +164,10 @@ static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
-> > >          return;
-> > >      }
-> > >  
-> > > +    if (!mc->cpu_index_to_instance_props) {
-> > > +        error_report("CPUs to NUMA node mapping isn't supported");
-> > > +        exit(1);
-> > > +    }  
+> >> +
+> >> +        memset(&cpu, 0, sizeof(cpu));
+> >> +        cpu.has_node_id = object->u.cpu.has_node_id;
+> >> +        cpu.node_id = object->u.cpu.node_id;
+> >> +        cpu.has_socket_id = object->u.cpu.has_socket_id;
+> >> +        cpu.socket_id = object->u.cpu.socket_id;
+> >> +        cpu.has_core_id = object->u.cpu.has_core_id;
+> >> +        cpu.core_id = object->u.cpu.core_id;
+> >> +        cpu.has_thread_id = object->u.cpu.has_thread_id;
+> >> +        cpu.thread_id = object->u.cpu.thread_id;
 > > 
-> > The error message sounds very confusing me. Maybe this could
-> > become just: "NUMA is not supported by the %s machine-type"?
-> If I replace this specific error message with a generic one and do
-> the same in 5/24, it will be harder for us/user to figure out
-> where exactly error happened.
-
-I don't think we need to change the message in 5/24 if we change
-this one.
-
+> > We don't have a way to avoid copying each field individually?
+> > Some visitor trick, maybe?
+> > 
+> > Eric, Markus, Michael, do you have any suggestions?
 > 
-> Would be following clearer:
-> "option -numa node,cpus= is not supported by the %s machine-type"
+> Markus just added QAPI_CLONE_MEMBERS(), which sounds like what you want:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04867.html
 
-It would work if this was really the case. But the error message
-is unconditional here, appearing even if cpus= is not set:
+Not sure if it would work in this case. Note that cpu and
+object->u.cpu have different types. 'cpu' is CpuInstanceProps,
+but object->u.cpu is NodeCpuOptions.
 
-  $ qemu-system-x86_64 -m 1G -smp 1 -numa node,mem=1G -machine none
-  qemu-system-x86_64: -numa node,mem=1G: CPUs to NUMA node mapping isn't supported
+NodeCpuOptions has { 'base': 'CpuInstanceProps' }, and
+CpuInstanceProps field declarations are duplicated in struct
+NodeCpuOptions. Do you know why struct inheritance is implemented
+by duplicating the fields of the base struct instead of embedding
+the base struct?
 
 -- 
 Eduardo
