@@ -1,43 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d5jsb-0007Ze-2V
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:19:02 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5jt6-0007lF-Gl
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d5jsY-0002Ih-AK
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:19:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43126
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1d5jsY-0002Ib-4Q
-	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:18:58 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v432IbNY059139
-	for <qemu-devel@nongnu.org>; Tue, 2 May 2017 22:18:56 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a765b89u6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 02 May 2017 22:18:56 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 2 May 2017 22:18:55 -0400
-Date: Wed, 3 May 2017 10:18:50 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170428130951.44771-11-bjsdjshi@linux.vnet.ibm.com>
-	<6a3e0621-9e16-ddd4-c1d9-2a7351ebb9e6@redhat.com>
-	<20170502021519.GA27968@bjsdjshi@linux.vnet.ibm.com>
-	<20170502180407.33a8f468.cornelia.huck@de.ibm.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5jt3-0002Y4-Q7
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:19:32 -0400
+Received: from [59.151.112.132] (port=24799 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d5jt2-0002Xs-Tq
+	for qemu-devel@nongnu.org; Tue, 02 May 2017 22:19:29 -0400
+References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1493372840-24551-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<d0bb0735-7b25-5236-bbfa-45b751395e7e@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <c05b73cc-fb91-abc4-2dee-27576df0add7@cn.fujitsu.com>
+Date: Wed, 3 May 2017 10:18:20 +0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170502180407.33a8f468.cornelia.huck@de.ibm.com>
-Message-Id: <20170503021850.GG27968@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v6 10/13] s390x/css: introduce and realize
- ccw-request callback
+In-Reply-To: <d0bb0735-7b25-5236-bbfa-45b751395e7e@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH V3 04/10] net/filter-mirror.c: Add
+ filter-mirror and filter-redirector vnet support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,79 +29,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, borntraeger@de.ibm.com, qemu-devel@nongnu.org, Auger Eric <eric.auger@redhat.com>, alex.williamson@redhat.com, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, agraf@suse.com
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
+	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-* Cornelia Huck <cornelia.huck@de.ibm.com> [2017-05-02 18:04:07 +0200]:
 
-> On Tue, 2 May 2017 10:15:19 +0800
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
-> > * Auger Eric <eric.auger@redhat.com> [2017-05-01 19:28:23 +0200]:
-> 
-> > > >  static void vfio_ccw_io_notifier_handler(void *opaque)
-> > > >  {
-> > > >      VFIOCCWDevice *vcdev = opaque;
-> > > > +    struct ccw_io_region *region = vcdev->io_region;
-> > > > +    S390CCWDevice *cdev = S390_CCW_DEVICE(vcdev);
-> > > > +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
-> > > > +    SubchDev *sch = ccw_dev->sch;
-> > > > +    SCSW *s = &sch->curr_status.scsw;
-> > > > +    IRB irb;
-> > > >  
-> > > >      if (!event_notifier_test_and_clear(&vcdev->io_notifier)) {
-> > > >          return;
-> > > >      }
-> > > > +
-> > > > +    if (pread(vcdev->vdev.fd, region,
-> > > > +              vcdev->io_region_size, vcdev->io_region_offset) == -1) {
-> > > is it possible to read less bytes than requested?
-> > Currently, impossible. The kernel side returns either the full region,
-> > or an error.
-> > But we surely could make it more friendly for a partial return. I will
-> > add a check for that case, and generate a channel program check for it.
-> 
-> I think a channel-control check would be more appropriate here.
 
-Hi Conny,
+On 05/02/2017 12:47 PM, Jason Wang wrote:
+>
+>
+> On 2017年04月28日 17:47, Zhang Chen wrote:
+>> In this patch, we change the send packet format from
+>> struct {int size; const uint8_t buf[];} to {int size; int 
+>> vnet_hdr_len; const uint8_t buf[];}.
+>> make other module(like colo-compare) know how to parse net packet 
+>> correctly.
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>   net/filter-mirror.c | 28 +++++++++++++++++++++++-----
+>>   1 file changed, 23 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+>> index 72fa7c2..bb9ecf3 100644
+>> --- a/net/filter-mirror.c
+>> +++ b/net/filter-mirror.c
+>> @@ -43,12 +43,14 @@ typedef struct MirrorState {
+>>       SocketReadState rs;
+>>   } MirrorState;
+>>   -static int filter_mirror_send(CharBackend *chr_out,
+>> +static int filter_mirror_send(MirrorState *s,
+>>                                 const struct iovec *iov,
+>>                                 int iovcnt)
+>>   {
+>> +    NetFilterState *nf = NETFILTER(s);
+>>       int ret = 0;
+>>       ssize_t size = 0;
+>> +    ssize_t vnet_hdr_len;
+>>       uint32_t len = 0;
+>>       char *buf;
+>>   @@ -58,14 +60,30 @@ static int filter_mirror_send(CharBackend 
+>> *chr_out,
+>>       }
+>>         len = htonl(size);
+>> -    ret = qemu_chr_fe_write_all(chr_out, (uint8_t *)&len, sizeof(len));
+>> +    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, 
+>> sizeof(len));
+>> +    if (ret != sizeof(len)) {
+>> +        goto err;
+>> +    }
+>> +
+>> +    /*
+>> +     * We send vnet header len make other module(like colo-compare)
+>> +     * know how to parse net packet correctly.
+>> +     */
+>> +    if (qemu_get_using_vnet_hdr(nf->netdev)) {
+>> +        vnet_hdr_len = qemu_get_vnet_hdr_len(nf->netdev);
+>> +    } else {
+>> +        vnet_hdr_len = qemu_get_vnet_hdr_len(nf->netdev->peer);
+>> +    }
+>
+> Any reason to query peer here?
 
-After reading PoP 14-43, I think you are right.
+That's depend on using NetClientState, If we using nf->netdev that need 
+to query,
+Otherwise we query nf->netdev->peer, then we can get the real 
+vnet_hdr_len in my test.
 
-Quotation from PoP:
-------------------8<-----------------------------------
-Channel-control check is caused by any machine
-malfunction affecting channel-subsystem controls.
-... ...
+Thanks
+Zhang Chen
 
-Channel-control check may also indicate that an
-error has been detected in the information trans-
-ferred to or from main storage during an I/O opera-
-tion.
-... ...
-
-Detection of the channel-control-check condition
-causes the current operation, if any, to be terminated
-immediately. The subchannel is made status pending
-with primary and alert status or with primary, second-
-ary, and alert status as a function of the type of termi-
-nation, the current subchannel state, and the device
-status presented, if any. When the channel sub-
-system recognizes a channel-control-check condi-
-tion, any previously existing intermediate interruption
-condition may or may not be recognized by the chan-
-nel subsystem.
------------------->8-----------------------------------
-
-So I decide to add this piece of code:
-if (size != vcdev->io_region_size) {
-    /* Information transfer error, generate channel-control check. */
-    s->ctrl &= ~SCSW_ACTL_START_PEND;
-    s->cstat = SCSW_CSTAT_CHN_CTRL_CHK;
-    s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
-    s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
-               SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
-    goto read_err;
-}
+>
+>> +
+>> +    len = htonl(vnet_hdr_len);
+>> +    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, 
+>> sizeof(len));
+>>       if (ret != sizeof(len)) {
+>>           goto err;
+>>       }
+>>         buf = g_malloc(size);
+>>       iov_to_buf(iov, iovcnt, 0, buf, size);
+>> -    ret = qemu_chr_fe_write_all(chr_out, (uint8_t *)buf, size);
+>> +    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
+>>       g_free(buf);
+>>       if (ret != size) {
+>>           goto err;
+>> @@ -141,7 +159,7 @@ static ssize_t 
+>> filter_mirror_receive_iov(NetFilterState *nf,
+>>       MirrorState *s = FILTER_MIRROR(nf);
+>>       int ret;
+>>   -    ret = filter_mirror_send(&s->chr_out, iov, iovcnt);
+>> +    ret = filter_mirror_send(s, iov, iovcnt);
+>>       if (ret) {
+>>           error_report("filter_mirror_send failed(%s)", strerror(-ret));
+>>       }
+>> @@ -164,7 +182,7 @@ static ssize_t 
+>> filter_redirector_receive_iov(NetFilterState *nf,
+>>       int ret;
+>>         if (qemu_chr_fe_get_driver(&s->chr_out)) {
+>> -        ret = filter_mirror_send(&s->chr_out, iov, iovcnt);
+>> +        ret = filter_mirror_send(s, iov, iovcnt);
+>>           if (ret) {
+>>               error_report("filter_mirror_send failed(%s)", 
+>> strerror(-ret));
+>>           }
+>
+> Do we need to strip vnet_hdr_len in redirector_to_filter() ?
+>
+> Thanks
+>
+>
+>
+> .
+>
 
 -- 
-Dong Jia Shi
+Thanks
+Zhang Chen
