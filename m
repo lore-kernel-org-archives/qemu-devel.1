@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1d61rk-00011C-TV
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 17:31:22 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1d61yu-0003Xn-9z
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 17:38:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1d61rj-000663-PJ
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 17:31:20 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1d61yt-000417-AG
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 17:38:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1d61yt-00040V-49
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 17:38:43 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2BD9804EC
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 21:38:41 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Wed, 03 May 2017 15:38:39 -0600
+Message-ID: <20170503213659.11828.39423.stgit@gimli.home>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <1493122030-32191-9-git-send-email-peter.maydell@linaro.org>
-References: <1493122030-32191-1-git-send-email-peter.maydell@linaro.org>
-	<1493122030-32191-9-git-send-email-peter.maydell@linaro.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 3 May 2017 14:30:46 -0700
-Message-ID: <CAKmqyKPTXPZUkWsTzTV7rZ02QNAC2j9h_1eWqNs67KHM1Jkgrw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 08/13] armv7m: Improve "-d mmu" tracing for
- PMSAv7 MPU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PULL 0/3] VFIO fixes 2017-05-03
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,122 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Patch Tracking <patches@linaro.org>
+To: qemu-devel@nongnu.org
 
-On Tue, Apr 25, 2017 at 5:07 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> From: Michael Davidsaver <mdavidsaver@gmail.com>
->
-> Improve the "-d mmu" tracing for the PMSAv7 MPU translation
-> process as an aid in debugging guest MPU configurations:
->  * fix a missing newline for a guest-error log
->  * report the region number with guest-error or unimp
->    logs of bad region register values
->  * add a log message for the overall result of the lookup
->  * print "0x" prefix for hex values
->
-> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-> [PMM: a little tidyup, report region number in all messages
->  rather than just one]
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+The following changes since commit e619b14746e5d8c0e53061661fd0e1da01fd4d60:
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+  Merge remote-tracking branch 'sthibault/tags/samuel-thibault' into staging (2017-05-02 15:16:29 +0100)
 
-Thanks,
+are available in the git repository at:
 
-Alistair
 
-> ---
->  target/arm/helper.c | 39 +++++++++++++++++++++++++++------------
->  1 file changed, 27 insertions(+), 12 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 5c044d0..9e1ed1c 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -8169,16 +8169,18 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
->              }
->
->              if (!rsize) {
-> -                qemu_log_mask(LOG_GUEST_ERROR, "DRSR.Rsize field can not be 0");
-> +                qemu_log_mask(LOG_GUEST_ERROR,
-> +                              "DRSR[%d]: Rsize field cannot be 0\n", n);
->                  continue;
->              }
->              rsize++;
->              rmask = (1ull << rsize) - 1;
->
->              if (base & rmask) {
-> -                qemu_log_mask(LOG_GUEST_ERROR, "DRBAR %" PRIx32 " misaligned "
-> -                              "to DRSR region size, mask = %" PRIx32,
-> -                              base, rmask);
-> +                qemu_log_mask(LOG_GUEST_ERROR,
-> +                              "DRBAR[%d]: 0x%" PRIx32 " misaligned "
-> +                              "to DRSR region size, mask = 0x%" PRIx32 "\n",
-> +                              n, base, rmask);
->                  continue;
->              }
->
-> @@ -8215,9 +8217,10 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
->                  }
->              }
->              if (rsize < TARGET_PAGE_BITS) {
-> -                qemu_log_mask(LOG_UNIMP, "No support for MPU (sub)region"
-> +                qemu_log_mask(LOG_UNIMP,
-> +                              "DRSR[%d]: No support for MPU (sub)region "
->                                "alignment of %" PRIu32 " bits. Minimum is %d\n",
-> -                              rsize, TARGET_PAGE_BITS);
-> +                              n, rsize, TARGET_PAGE_BITS);
->                  continue;
->              }
->              if (srdis) {
-> @@ -8251,8 +8254,8 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
->                      break;
->                  default:
->                      qemu_log_mask(LOG_GUEST_ERROR,
-> -                                  "Bad value for AP bits in DRACR %"
-> -                                  PRIx32 "\n", ap);
-> +                                  "DRACR[%d]: Bad value for AP bits: 0x%"
-> +                                  PRIx32 "\n", n, ap);
->                  }
->              } else { /* Priv. mode AP bits decoding */
->                  switch (ap) {
-> @@ -8269,8 +8272,8 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
->                      break;
->                  default:
->                      qemu_log_mask(LOG_GUEST_ERROR,
-> -                                  "Bad value for AP bits in DRACR %"
-> -                                  PRIx32 "\n", ap);
-> +                                  "DRACR[%d]: Bad value for AP bits: 0x%"
-> +                                  PRIx32 "\n", n, ap);
->                  }
->              }
->
-> @@ -8448,9 +8451,21 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
->       */
->      if (arm_feature(env, ARM_FEATURE_PMSA) &&
->          arm_feature(env, ARM_FEATURE_V7)) {
-> +        bool ret;
->          *page_size = TARGET_PAGE_SIZE;
-> -        return get_phys_addr_pmsav7(env, address, access_type, mmu_idx,
-> -                                    phys_ptr, prot, fsr);
-> +        ret = get_phys_addr_pmsav7(env, address, access_type, mmu_idx,
-> +                                   phys_ptr, prot, fsr);
-> +        qemu_log_mask(CPU_LOG_MMU, "PMSAv7 MPU lookup for %s at 0x%08" PRIx32
-> +                      " mmu_idx %u -> %s (prot %c%c%c)\n",
-> +                      access_type == 1 ? "reading" :
-> +                      (access_type == 2 ? "writing" : "execute"),
-> +                      (uint32_t)address, mmu_idx,
-> +                      ret ? "Miss" : "Hit",
-> +                      *prot & PAGE_READ ? 'r' : '-',
-> +                      *prot & PAGE_WRITE ? 'w' : '-',
-> +                      *prot & PAGE_EXEC ? 'x' : '-');
-> +
-> +        return ret;
->      }
->
->      if (regime_translation_disabled(env, mmu_idx)) {
-> --
-> 2.7.4
->
->
+  git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20170503.0
+
+for you to fetch changes up to 6e4e6f0d403b1fb25f9dfdbe17754c643997753d:
+
+  vfio/pci: Fix incorrect error message (2017-05-03 14:52:35 -0600)
+
+----------------------------------------------------------------
+VFIO fixes 2017-05-03
+
+ - Enable 8-byte memory region accesses (Jose Ricardo Ziviani)
+ - Fix vfio-pci error message (Dong Jia Shi)
+
+----------------------------------------------------------------
+Dong Jia Shi (1):
+      vfio/pci: Fix incorrect error message
+
+Jose Ricardo Ziviani (2):
+      vfio: Set MemoryRegionOps:max_access_size and min_access_size
+      vfio: enable 8-byte reads/writes to vfio
+
+ hw/vfio/common.c | 14 ++++++++++++++
+ hw/vfio/pci.c    |  4 ++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
