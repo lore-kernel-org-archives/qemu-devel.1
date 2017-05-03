@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d5w0A-0006ED-FA
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:15:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d5w4y-0007O2-1g
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d5w07-0004JZ-8w
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:15:38 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33910)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1d5w06-0004IR-Vh
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:15:35 -0400
-Received: by mail-wr0-x232.google.com with SMTP id l9so110856312wre.1
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 08:15:34 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
-	<20170412095111.11728-3-xiaoguangrong@tencent.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <46377b3a-d06e-2119-eb97-5384013b0ac8@redhat.com>
-Date: Wed, 3 May 2017 17:15:30 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1d5w4w-00086j-IO
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 11:20:36 -0400
+Date: Wed, 3 May 2017 12:20:22 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170503152022.GQ3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-11-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170412095111.11728-3-xiaoguangrong@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] mc146818rtc: fix clock lost after
- scaling coalesced irq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493816238-33120-11-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 10/24] numa: mirror cpu to node mapping
+ in MachineState::possible_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +24,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, yunfangtai@tencent.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-
-
-On 12/04/2017 11:51, guangrong.xiao@gmail.com wrote:
-> +            int current_irq_coalesced = s->irq_coalesced;
-> +
-> +            s->irq_coalesced = (current_irq_coalesced * s->period) / period;
-> +
-> +            /*
-> +             * calculate the lost clock after it is scaled which should be
-> +             * compensated in the next interrupt.
-> +             */
-> +            lost_clock += current_irq_coalesced * s->period -
-> +                            s->irq_coalesced * period;
-
-This is:
-
-   lost_clock = current_irq_coalesced * s->period -
-	(current_irq_coalesced * s->period) / period * period;
-
-i.e.
-
-   /* When switching from a shorter to a longer period, scale down the
-    * missing ticks since we expect the OS handler to treat the delayed
-    * ticks as longer.  Any leftovers are put back into next_irq_clock.
-    *
-    * When switching to a shorter period, scale up the missing ticks
-    * since we expect the OS handler to treat the delayed ticks as
-    * shorter.
-    */
-   lost_clock = (s->irq_coalesced * s->period) % period;
-   s->irq_coalesced = (s->irq_coalesced * s->period) / period;
-
-Is this correct?
-
-Paolo
-
-> +            DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, %ld clocks "
-> +                      "are compensated.\n",
-> +                      current_irq_coalesced, s->irq_coalesced, lost_clock);
->          }
->          s->period = period;
->  #endif
-> @@ -170,7 +193,7 @@ static void periodic_timer_update(RTCState *s, int64_t current_time)
->          cur_clock =
->              muldiv64(current_time, RTC_CLOCK_RATE, NANOSECONDS_PER_SECOND);
+On Wed, May 03, 2017 at 02:57:04PM +0200, Igor Mammedov wrote:
+> Introduce machine_set_cpu_numa_node() helper that stores
+> node mapping for CPU in MachineState::possible_cpus.
+> CPU and node it belongs to is specified by 'props' argument.
+> 
+> Patch doesn't remove old way of storing mapping in
+> numa_info[X].node_cpu as removing it at the same time
+> makes patch rather big. Instead it just mirrors mapping
+> in possible_cpus and follow up per target patches will
+> switch to possible_cpus and numa_info[X].node_cpu will
+> be removed once there isn't any users left.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  include/hw/boards.h |  2 ++
+>  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  numa.c              |  8 +++++++
+>  3 files changed, 78 insertions(+)
+> 
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 5d6af21..1f518a1 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
+>  bool machine_mem_merge(MachineState *machine);
+>  void machine_register_compat_props(MachineState *machine);
+>  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
+> +void machine_set_cpu_numa_node(MachineState *machine,
+> +                               CpuInstanceProperties *props, Error **errp);
 >  
-> -        next_irq_clock = (cur_clock & ~(period - 1)) + period;
-> +        next_irq_clock = cur_clock + period - lost_clock;
->          s->next_periodic_time = muldiv64(next_irq_clock, NANOSECONDS_PER_SECOND,
->                                           RTC_CLOCK_RATE) + 1;
->          timer_mod(s->periodic_timer, s->next_periodic_time);
+>  /**
+>   * CPUArchId:
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index ada9eea..a63f17b 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
+>      return head;
+>  }
+>  
+> +void machine_set_cpu_numa_node(MachineState *machine,
+> +                               CpuInstanceProperties *props, Error **errp)
+
+As the semantics of this function aren't trivial, it would be
+nice to have a comment explaining what exactly this function do.
+
+e.g.:
+* make it clear that it could affect multiple CPU slots;
+* make it clear what does it mean to have props->has_node_id=false as
+  argument (is it really valid?);
+* make it clear that it will refuse to change an existing mapping.
+
+
+> +{
+> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> +    bool match = false;
+> +    int i;
+> +
+> +    if (!mc->possible_cpu_arch_ids) {
+> +        error_setg(errp, "mapping of CPUs to NUMA node is not supported");
+> +        return;
+> +    }
+> +
+> +    /* force board to initialize possible_cpus if it hasn't been done yet */
+> +    mc->possible_cpu_arch_ids(machine);
+> +
+> +    for (i = 0; i < machine->possible_cpus->len; i++) {
+> +        CPUArchId *slot = &machine->possible_cpus->cpus[i];
+> +
+> +        /* reject unsupported by board properties */
+> +        if (props->has_thread_id && !slot->props.has_thread_id) {
+> +            error_setg(errp, "thread-id is not supported");
+> +            return;
+> +        }
+> +
+> +        if (props->has_core_id && !slot->props.has_core_id) {
+> +            error_setg(errp, "core-id is not supported");
+> +            return;
+> +        }
+> +
+> +        if (props->has_socket_id && !slot->props.has_socket_id) {
+> +            error_setg(errp, "socket-id is not supported");
+> +            return;
+> +        }
+> +
+> +        /* skip slots with explicit mismatch */
+> +        if (props->has_thread_id && props->thread_id != slot->props.thread_id) {
+> +                continue;
+> +        }
+> +
+> +        if (props->has_core_id && props->core_id != slot->props.core_id) {
+> +                continue;
+> +        }
+> +
+> +        if (props->has_socket_id && props->socket_id != slot->props.socket_id) {
+> +                continue;
+> +        }
+> +
+> +        /* reject assignment if slot is already assigned, for compatibility
+> +         * of legacy cpu_index mapping with SPAPR core based mapping do not
+> +         * error out if cpu thread and matched core have the same node-id */
+> +        if (slot->props.has_node_id &&
+> +            slot->props.node_id != props->node_id) {
+> +            error_setg(errp, "CPU is already assigned to node-id: %" PRId64,
+> +                       slot->props.node_id);
+> +            return;
+> +        }
+> +
+> +        /* assign slot to node as it's matched '-numa cpu' key */
+> +        match = true;
+> +        slot->props.node_id = props->node_id;
+> +        slot->props.has_node_id = props->has_node_id;
+
+Is it really valid to have has_node_id=false? Maybe an
+assert(props->has_node_id) at the beginning of the function would
+be useful.
+
+> +    }
+> +
+> +    if (!match) {
+> +        error_setg(errp, "no match found");
+> +    }
+> +}
+> +
+>  static void machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> diff --git a/numa.c b/numa.c
+> index b517870..5ff1212 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -169,6 +169,7 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
+>          exit(1);
+>      }
+>      for (cpus = node->cpus; cpus; cpus = cpus->next) {
+> +        CpuInstanceProperties props;
+>          if (cpus->value >= max_cpus) {
+>              error_setg(errp,
+>                         "CPU index (%" PRIu16 ")"
+> @@ -177,6 +178,10 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
+>              return;
+>          }
+>          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
+> +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
+> +        props.node_id = nodenr;
+> +        props.has_node_id = true;
+> +        machine_set_cpu_numa_node(ms, &props, &error_fatal);
+>      }
+>  
+>      if (node->has_mem && node->has_memdev) {
+> @@ -393,9 +398,12 @@ void parse_numa_opts(MachineState *ms)
+>          if (i == nb_numa_nodes) {
+>              for (i = 0; i < max_cpus; i++) {
+>                  CpuInstanceProperties props;
+> +                /* fetch default mapping from board and enable it */
+>                  props = mc->cpu_index_to_instance_props(ms, i);
+> +                props.has_node_id = true;
+>  
+>                  set_bit(i, numa_info[props.node_id].node_cpu);
+> +                machine_set_cpu_numa_node(ms, &props, &error_fatal);
+>              }
+>          }
+>  
 > -- 
+> 2.7.4
+> 
+
+-- 
+Eduardo
