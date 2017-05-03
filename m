@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5wpv-0007SP-Rc
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:09:08 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d5wqC-0007bq-BK
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5wps-00065P-Nr
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:09:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47880)
+	(envelope-from <dgilbert@redhat.com>) id 1d5wq9-0006MY-62
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:09:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5wps-00064u-Hf
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:09:04 -0400
-References: <20170227163447.20428-1-stefanha@redhat.com>
-	<20170227163447.20428-2-stefanha@redhat.com>
-	<20170503145418.GB27432@redhat.com>
-	<182d640c-c892-993e-06d4-a9cdd9f363d6@redhat.com>
-	<20170503153400.GD27432@redhat.com>
-	<9489b184-019a-c644-a54f-b795f56f22a1@redhat.com>
-	<20170503155544.GE27432@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6f1866f5-a36c-77f4-884b-093ee935ec1b@redhat.com>
-Date: Wed, 3 May 2017 18:08:57 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d5wq8-0006Kz-W9
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 12:09:21 -0400
+Date: Wed, 3 May 2017 17:09:16 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170503160916.GD2077@work-vm>
+References: <20170426212303.27961-1-danielhb@linux.vnet.ibm.com>
+	<20170426212303.27961-3-danielhb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170503155544.GE27432@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 1/4] curl: do not use
- aio_context_acquire/release
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170426212303.27961-3-danielhb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] hw/ppc: migrating the DRC state of
+ hotplugged devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
+* Daniel Henrique Barboza (danielhb@linux.vnet.ibm.com) wrote:
 
+<snip>
 
-On 03/05/2017 17:55, Richard W.M. Jones wrote:
-> On Wed, May 03, 2017 at 05:46:49PM +0200, Paolo Bonzini wrote:
->> Please test this:
->>
->> diff --git a/block/curl.c b/block/curl.c
->> index 2708d57c2f..cfe02bfd79 100644
->> --- a/block/curl.c
->> +++ b/block/curl.c
->> @@ -467,7 +467,9 @@ static CURLState *curl_init_state(BlockDriverState
->> *bs, BDRVCURLState *s)
->>              break;
->>          }
->>          if (!state) {
->> +            qemu_mutex_unlock(&s->mutex);
->>              aio_poll(bdrv_get_aio_context(bs), true);
->> +            qemu_mutex_lock(&s->mutex);
->>          }
->>      } while(!state);
->>
->>
+>  static void realize(DeviceState *d, Error **errp)
+>  {
+>      sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(d);
+> @@ -540,6 +598,8 @@ static void realize(DeviceState *d, Error **errp)
+>          object_unref(OBJECT(drc));
+>      }
+>      g_free(child_name);
+> +    vmstate_register(DEVICE(drc), drck->get_index(drc), &vmstate_spapr_drc,
+> +                     drc);
+>      trace_spapr_drc_realize_complete(drck->get_index(drc));
+>  }
+>  
+> @@ -658,6 +718,7 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+>      dk->reset = reset;
+>      dk->realize = realize;
+>      dk->unrealize = unrealize;
+> +    dk->vmsd = &vmstate_spapr_drc;
+
+Are you sure this is right - isn't it unusual to have both
+a ->vmsd entry AND a vmstate_register?
+
+a ->vmsd =   is the preferable way I think, but I see you're
+doing something with the 2nd parameter of vmstate_register;
+if you *need* to do that then I think it's the only way.
+
+Dave
+
+>      drck->set_isolation_state = set_isolation_state;
+>      drck->set_indicator_state = set_indicator_state;
+>      drck->set_allocation_state = set_allocation_state;
+> -- 
+> 2.9.3
 > 
-> Yes, this fixes it, thanks Paolo.
 > 
-> Reported-by: Kun Wei <kuwei@redhat.com>
-> Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-> Tested-by: Richard W.M. Jones <rjones@redhat.com>
-
-Ok, will submit tomorrow formally.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
