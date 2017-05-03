@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d601S-0006ek-G1
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:33:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d60Ih-0003w3-Uz
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d601O-0003RI-FV
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:33:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d601O-0003QH-6z
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:33:10 -0400
-Date: Wed, 3 May 2017 16:33:04 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170503193304.GW3482@thinpad.lan.raisama.net>
-References: <1493803036-4048-1-git-send-email-he.chen@linux.intel.com>
-	<20170503150705.7a55ca5c@nial.brq.redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1d60Ig-0005UB-Vc
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 15:51:04 -0400
+References: <20170502144744.26815-1-berrange@redhat.com>
+	<20170502144744.26815-4-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <2f99bd19-4a9d-850e-ed56-7b998797c6a6@redhat.com>
+Date: Wed, 3 May 2017 21:50:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170503150705.7a55ca5c@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests: acpi: extend cphp and memhp
- testcase with numa distance check
+In-Reply-To: <20170502144744.26815-4-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MUxq0woJM9qrGcgsaM5wrij7jhgNCrqTE"
+Subject: Re: [Qemu-devel] [PATCH v7 3/4] qemu-img: introduce
+ --target-image-opts for 'convert' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +25,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Wed, May 03, 2017 at 03:07:05PM +0200, Igor Mammedov wrote:
-> On Wed,  3 May 2017 17:17:16 +0800
-> He Chen <he.chen@linux.intel.com> wrote:
-> 
-> > Signed-off-by: He Chen <he.chen@linux.intel.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MUxq0woJM9qrGcgsaM5wrij7jhgNCrqTE
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
+Message-ID: <2f99bd19-4a9d-850e-ed56-7b998797c6a6@redhat.com>
+Subject: Re: [PATCH v7 3/4] qemu-img: introduce --target-image-opts for
+ 'convert' command
+References: <20170502144744.26815-1-berrange@redhat.com>
+ <20170502144744.26815-4-berrange@redhat.com>
+In-Reply-To: <20170502144744.26815-4-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks!
+On 02.05.2017 16:47, Daniel P. Berrange wrote:
+> The '--image-opts' flag indicates whether the source filename
+> includes options. The target filename has to remain in the
+> plain filename format though, since it needs to be passed to
+> bdrv_create().  When using --skip-create though, it would be
+> possible to use image-opts syntax. This adds --target-image-opts
+> to indicate that the target filename includes options. Currently
+> this mandates use of the --skip-create flag too.
+>=20
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> 
-> Eduardo,
-> 
-> could you take it through your tree as well and
-> add as part of this patch SLIT tables blobs for
-> piix4/q35 that tests/acpi-test-data/rebuild-expected-aml.sh
-> will generate.
+Sure you want to keep this, considering that there are quite some
+changes since v5?
 
-Queued to numa-next, updated SRAT and SLIT blobs. diffstat of commit fixup:
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qemu-img-cmds.hx |  4 +--
+>  qemu-img.c       | 77 +++++++++++++++++++++++++++++++++++++-----------=
+--------
+>  qemu-img.texi    | 12 +++++++--
+>  3 files changed, 63 insertions(+), 30 deletions(-)
 
- tests/acpi-test-data/pc/SLIT.cphp   | Bin 0 -> 48 bytes
- tests/acpi-test-data/pc/SLIT.memhp  | Bin 0 -> 48 bytes
- tests/acpi-test-data/pc/SRAT.memhp  | Bin 224 -> 264 bytes
- tests/acpi-test-data/q35/SLIT.cphp  | Bin 0 -> 48 bytes
- tests/acpi-test-data/q35/SLIT.memhp | Bin 0 -> 48 bytes
- tests/acpi-test-data/q35/SRAT.memhp | Bin 224 -> 264 bytes
- 6 files changed, 0 insertions(+), 0 deletions(-)
+[...]
 
-Are you able to explain why SRAT.memhp changed, but SRAT.cphp didn't?
+> diff --git a/qemu-img.c b/qemu-img.c
+> index d8fdcb1..94c8cea 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
 
-> 
-> > ---
-> >  tests/bios-tables-test.c | 16 ++++++++++++----
-> >  1 file changed, 12 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> > index 88dbf97..c593165 100644
-> > --- a/tests/bios-tables-test.c
-> > +++ b/tests/bios-tables-test.c
-> > @@ -710,7 +710,8 @@ static void test_acpi_piix4_tcg_cphp(void)
-> >      data.machine = MACHINE_PC;
-> >      data.variant = ".cphp";
-> >      test_acpi_one("-smp 2,cores=3,sockets=2,maxcpus=6"
-> > -                  " -numa node -numa node",
-> > +                  " -numa node -numa node"
-> > +                  " -numa dist,src=0,dst=1,val=21",
-> >                    &data);
-> >      free_test_data(&data);
-> >  }
-> > @@ -723,7 +724,8 @@ static void test_acpi_q35_tcg_cphp(void)
-> >      data.machine = MACHINE_Q35;
-> >      data.variant = ".cphp";
-> >      test_acpi_one(" -smp 2,cores=3,sockets=2,maxcpus=6"
-> > -                  " -numa node -numa node",
-> > +                  " -numa node -numa node"
-> > +                  " -numa dist,src=0,dst=1,val=21",
-> >                    &data);
-> >      free_test_data(&data);
-> >  }
-> > @@ -772,7 +774,10 @@ static void test_acpi_q35_tcg_memhp(void)
-> >      memset(&data, 0, sizeof(data));
-> >      data.machine = MACHINE_Q35;
-> >      data.variant = ".memhp";
-> > -    test_acpi_one(" -m 128,slots=3,maxmem=1G -numa node", &data);
-> > +    test_acpi_one(" -m 128,slots=3,maxmem=1G"
-> > +                  " -numa node -numa node"
-> > +                  " -numa dist,src=0,dst=1,val=21",
-> > +                  &data);
-> >      free_test_data(&data);
-> >  }
-> >  
-> > @@ -783,7 +788,10 @@ static void test_acpi_piix4_tcg_memhp(void)
-> >      memset(&data, 0, sizeof(data));
-> >      data.machine = MACHINE_PC;
-> >      data.variant = ".memhp";
-> > -    test_acpi_one(" -m 128,slots=3,maxmem=1G -numa node", &data);
-> > +    test_acpi_one(" -m 128,slots=3,maxmem=1G"
-> > +                  " -numa node -numa node"
-> > +                  " -numa dist,src=0,dst=1,val=21",
-> > +                  &data);
-> >      free_test_data(&data);
-> >  }
-> >  
-> 
+[...]
 
--- 
-Eduardo
+> @@ -1900,7 +1901,7 @@ static int img_convert(int argc, char **argv)
+>      char *options =3D NULL;
+>      Error *local_err =3D NULL;
+>      bool writethrough, src_writethrough, quiet =3D false, image_opts =3D=
+ false,
+> -         skip_create =3D false, progress =3D false;
+> +        skip_create =3D false, progress =3D false, tgt_image_opts =3D =
+false;
+
+Not sure about the indentation here. (I personally don't like spanning
+the declaration over multiple lines in the first place, but that's a
+different topic.) Indenting consecutive lines by four spaces is
+standard, but the indentation by five spaces had a reason.
+
+I guess I'd personally rather keep the five-space indentation...
+
+>      int64_t ret =3D -EINVAL;
+> =20
+>      ImgConvertState s =3D (ImgConvertState) {
+
+[...]
+
+> @@ -2047,12 +2056,22 @@ static int img_convert(int argc, char **argv)
+>          goto fail_getopt;
+>      }
+> =20
+> +    if (tgt_image_opts && !skip_create) {
+> +        error_report("--target-image-opts requires use of -n flag");
+> +        goto fail_getopt;
+> +    }
+> +
+>      s.src_num =3D argc - optind - 1;
+>      out_filename =3D s.src_num >=3D 1 ? argv[argc - 1] : NULL;
+> =20
+>      if (options && has_help_option(options)) {
+> -        ret =3D print_block_option_help(out_filename, out_fmt);
+> -        goto fail_getopt;
+> +        if (out_fmt) {
+> +            ret =3D print_block_option_help(out_filename, out_fmt);
+> +            goto out;
+
+Shouldn't this remain goto fail_getopt;?
+
+> +        } else {
+> +            error_report("Option help requires a format be specified")=
+;
+> +            goto fail_getopt;
+> +        }
+>      }
+> =20
+>      if (s.src_num < 1) {
+
+[...]
+
+Why did you remove the compress &&
+!out_bs->drv->bdrv_co_pwritev_compressed check? I liked it. :-(
+
+Max
+
+
+--MUxq0woJM9qrGcgsaM5wrij7jhgNCrqTE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkKNJkSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A9iUIAJOVA5OEA2AA9BEkZu4jm+vw/rQ2VpfQ
+/l00j4P4gjeDjLx/l5n5DXwxmEfBcm7yYssLu20KSL/DohYenb9jH4Iw2ne1Y9On
+MXh/p/x4Gh2ONUyyiaGt0Cd9Pf1dFfYblJKuQTtVpTzpSOccZOFnWax4CFT4S/06
+CMfEakdcQ2q8kf6lRy5qGWzeavKnNRC22yBVOQPZaVymY6peSBgl6kvdF8RytGcZ
+jrIZIffF9cXvL4LKxKV7J1UJm8yXUuK3nCCReJFGB6Pcf2cioGYJBVX1tPEibDgG
+hnyMZBBZBmfuic5BU3G1wSbCG1dHoYXdlsmHVTUxlrgQlcfVJbUOCKI=
+=Fy+v
+-----END PGP SIGNATURE-----
+
+--MUxq0woJM9qrGcgsaM5wrij7jhgNCrqTE--
