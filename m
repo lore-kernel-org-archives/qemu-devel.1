@@ -1,44 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d5sF3-0004pL-33
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:14:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d5sHN-0005o9-SC
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d5sEz-0000YO-TR
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:14:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43873
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d5sEz-0000Y8-O0
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:14:41 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v43BE3ag048489
-	for <qemu-devel@nongnu.org>; Wed, 3 May 2017 07:14:40 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a7b7f0dxx-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 07:14:40 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 3 May 2017 12:14:37 +0100
-Date: Wed, 3 May 2017 13:14:32 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170503021850.GG27968@bjsdjshi@linux.vnet.ibm.com>
-References: <20170428130951.44771-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170428130951.44771-11-bjsdjshi@linux.vnet.ibm.com>
-	<6a3e0621-9e16-ddd4-c1d9-2a7351ebb9e6@redhat.com>
-	<20170502021519.GA27968@bjsdjshi@linux.vnet.ibm.com>
-	<20170502180407.33a8f468.cornelia.huck@de.ibm.com>
-	<20170503021850.GG27968@bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <dgilbert@redhat.com>) id 1d5sHK-0002FT-Kl
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:17:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39262)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d5sHK-0002E8-BD
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:17:06 -0400
+Date: Wed, 3 May 2017 12:17:00 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170503111659.GA2077@work-vm>
+References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
+	<1493725969-19518-9-git-send-email-amarnath.valluri@intel.com>
+	<CAJ+F1C+gLTVpZZeKtxuLFUgs6nJ0KbgnJp4VdAuuM4JK2RbYMA@mail.gmail.com>
+	<38a2aa2e-6270-63af-3dec-bd666d56780d@linux.vnet.ibm.com>
+	<CAJ+F1CKcZvWE4OQOMKuDqNvKGEQK3DdihM6Eyx-piqtQtSbXGQ@mail.gmail.com>
+	<5ee48b85-0404-a810-95b5-4b19b197373e@linux.vnet.ibm.com>
+	<1493749518.4241.225.camel@intel.com>
+	<CAJ+F1CK4jN2Nb6eKB1x9Km0xnurs976=Kb0idFpPgtH+JHYTcQ@mail.gmail.com>
+	<b6e0d6d2-d276-c66d-ae5e-c6502cbe0b5c@linux.vnet.ibm.com>
+	<20170503084136.GC4121@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170503131432.1a2ecf40.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v6 10/13] s390x/css: introduce and realize
- ccw-request callback
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170503084136.GC4121@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 8/8] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,58 +36,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, borntraeger@de.ibm.com, qemu-devel@nongnu.org, Auger Eric <eric.auger@redhat.com>, alex.williamson@redhat.com, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, agraf@suse.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Amarnath Valluri <amarnath.valluri@intel.com>, Patrick Ohly <patrick.ohly@intel.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
 
-On Wed, 3 May 2017 10:18:50 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Tue, May 02, 2017 at 03:35:48PM -0400, Stefan Berger wrote:
+> > On 05/02/2017 02:50 PM, Marc-Andr=E9 Lureau wrote:
+> > > Hi
+> > >=20
+> > > On Tue, May 2, 2017 at 10:25 PM Patrick Ohly <patrick.ohly@intel.co=
+m
+> > > <mailto:patrick.ohly@intel.com>> wrote:
+> > >=20
+> > >     On Tue, 2017-05-02 at 13:19 -0400, Stefan Berger wrote:
+> > >     > On 05/02/2017 01:09 PM, Marc-Andr=E9 Lureau wrote:
+> > >     > > On Tue, May 2, 2017 at 8:59 PM Stefan Berger
+> > >     <stefanb@linux.vnet.ibm.com <mailto:stefanb@linux.vnet.ibm.com>=
+>
+> > >     > > wrote:
+> > >     > >
+> > >     > >> And who is going to implement that qemu-swtpm? Obviously t=
+his
+> > >     discussion
+> > >     > >> doesn't contribute to progress if nobody is doing that in =
+the
+> > >     end.
+> > >     > >>
+> > >     > > The same persons who try to push for that emulated TPM code=
+.
+> > >     The easiest
+> > >     > > approach would be to copy/adapt the swtpm code in qemu, if =
+the
+> > >     licence is
+> > >     > > compatible. I can help with that if there is a consensus it=
+'s
+> > >     a better
+> > >     > > approach.
+> > >     >
+> > >     >
+> > >     > It's a matter of time and at least I don't have time for that=
+.
+> > >=20
+> > >     Neither do I, and nor (I believe) does Amarnath. The approach w=
+ith
+> > >     using
+> > >     the existing swtpm project seemed attractive to us exactly beca=
+use it
+> > >     avoids having to write and maintain more than just the glue cod=
+e
+> > >     between
+> > >     the two projects.
+> > >=20
+> > >=20
+> > > The main argument is not about having more or less code in qemu to
+> > > maintain, but yes this is a concern (although giving up that mainte=
+nance
+> > > to a seperate project with mostly Stefan-alone isn't a much better
+> > > alternative). btw, is the project actually used by something else t=
+han
+> > > qemu? (I am not talking about developpers/testing). If not, then it
+> > > makes sense to make it part of qemu.
+> >=20
+> > The intention would be to use it for RunC as well (plus higher layers
+> > afterwards): https://github.com/opencontainers/runc/pull/1082
+> >=20
+> > >=20
+> > > But it's mostly a technical reason, to avoid having to rely on a fo=
+reign
+> > > protocol and project with all the compatibility constrains.
+> >=20
+> > I understand. Ideally swtpm-0.1 would be equivalent to 1.0 with all f=
+eatures
+> > available and no further protocol extensions necessary. In practice t=
+hat may
+> > look different.
+> >=20
+> > >=20
+> > > In the end, we may decide to start with a separate project, and cha=
+nge
+> > > it in the future if it's problematic (that would break some cases, =
+such
+> > > as being able to freely switch the helper). Tbh, I am not so happy =
+with
+> > > the code quality of swtpm, and I haven't looked closely at libtpms.
+> > > Having a qemu-swtpm as part of qemu would probably help improve it =
+too,
+> > > and bring a few more developers for maintainance...
+> >=20
+> > libtpms combines a few source codes with some glue around it. The cod=
+ing
+> > style is different for TPM 1.2 and TPM 2 code for example and the cod=
+e bases
+> > are in the 10s of thousands of line. In the case of TPM 2 it 'lives f=
+rom'
+> > TCG code drops and thus there is no reformatting of source code etc.
+> >=20
+> > If someone wants to get started on qemu-swtpm that's certainly cool b=
+ut over
+> > the years it's just been quite difficult to find developers for it to=
+ share
+> > the burden. All that said, someone should state whether this series i=
+s a go
+> > or no-go because of the external project it requires.
+>=20
+> I think it is *good* that it uses the external swtpm project and do not
+> want to see it reimplemented inside QEMU, particularly with the interes=
+t
+> for swtpm to be used in container contexts via RunC. Such common infras=
+tructure
+> for both containers & QEMU will be important given the increasing conve=
+rgance
+> of technology across containers & VMs.
 
-> * Cornelia Huck <cornelia.huck@de.ibm.com> [2017-05-02 18:04:07 +0200]:
-> 
-> > On Tue, 2 May 2017 10:15:19 +0800
-> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> > 
-> > > * Auger Eric <eric.auger@redhat.com> [2017-05-01 19:28:23 +0200]:
-> > 
-> > > > >  static void vfio_ccw_io_notifier_handler(void *opaque)
-> > > > >  {
-> > > > >      VFIOCCWDevice *vcdev = opaque;
-> > > > > +    struct ccw_io_region *region = vcdev->io_region;
-> > > > > +    S390CCWDevice *cdev = S390_CCW_DEVICE(vcdev);
-> > > > > +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
-> > > > > +    SubchDev *sch = ccw_dev->sch;
-> > > > > +    SCSW *s = &sch->curr_status.scsw;
-> > > > > +    IRB irb;
-> > > > >  
-> > > > >      if (!event_notifier_test_and_clear(&vcdev->io_notifier)) {
-> > > > >          return;
-> > > > >      }
-> > > > > +
-> > > > > +    if (pread(vcdev->vdev.fd, region,
-> > > > > +              vcdev->io_region_size, vcdev->io_region_offset) == -1) {
-> > > > is it possible to read less bytes than requested?
-> > > Currently, impossible. The kernel side returns either the full region,
-> > > or an error.
-> > > But we surely could make it more friendly for a partial return. I will
-> > > add a check for that case, and generate a channel program check for it.
-> > 
-> > I think a channel-control check would be more appropriate here.
-> 
-> Hi Conny,
-> 
-> After reading PoP 14-43, I think you are right.
+I agree; there aren't that many people who understand the details of TPMs=
+,
+reimplementing one in QEMU isn't something you'd want to do.
 
-(...)
+Dave
 
-> So I decide to add this piece of code:
-> if (size != vcdev->io_region_size) {
->     /* Information transfer error, generate channel-control check. */
->     s->ctrl &= ~SCSW_ACTL_START_PEND;
->     s->cstat = SCSW_CSTAT_CHN_CTRL_CHK;
->     s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
->     s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
->                SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
->     goto read_err;
-> }
-
-Looks good.
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
