@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d5vic-0007Rp-Ro
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:57:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d5vkd-0008SP-3j
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:59:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d5viY-0007Fn-0s
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:57:30 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36150)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1d5viX-0007FO-PS
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:57:25 -0400
-Received: by mail-wr0-x243.google.com with SMTP id v42so23295021wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 07:57:25 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170503105224.19049-1-xiaoguangrong@tencent.com>
-	<e186ce8d-52fc-3eca-1343-1a2f18331a76@redhat.com>
-	<ff732c49-de24-eebd-ae8e-2de00281f211@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1d5vkY-0000c6-7N
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:59:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5vkX-0000bf-TQ
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 10:59:30 -0400
+References: <20170227163447.20428-1-stefanha@redhat.com>
+	<20170227163447.20428-2-stefanha@redhat.com>
+	<20170503145418.GB27432@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <878cbc47-316c-d508-a5a3-22029dee2203@redhat.com>
-Date: Wed, 3 May 2017 16:57:19 +0200
+Message-ID: <182d640c-c892-993e-06d4-a9cdd9f363d6@redhat.com>
+Date: Wed, 3 May 2017 16:59:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <ff732c49-de24-eebd-ae8e-2de00281f211@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170503145418.GB27432@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/7] KVM: MMU: fast write protect
+Subject: Re: [Qemu-devel] [PULL 1/4] curl: do not use
+ aio_context_acquire/release
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +29,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>, mtosatti@redhat.com, avi.kivity@gmail.com, rkrcmar@redhat.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
 
 
-On 03/05/2017 16:50, Xiao Guangrong wrote:
-> Furthermore, userspace has no knowledge about if PML is enable (it
-> can be required from sysfs, but it is a good way in QEMU), so it is
-> difficult for the usespace to know when to use write-protect-all.
-> Maybe we can make KVM_CAP_X86_WRITE_PROTECT_ALL_MEM return false if
-> PML is enabled?
-
-Yes, that's a good idea.  Though it's a pity that, with PML, setting the
-dirty bit will still do the massive walk of the rmap.  At least with
-reset_dirty_pages it's done a little bit at a time.
-
->> Also, I wonder how the alternative write protection mechanism would
->> affect performance of the dirty page ring buffer patches.  You would do
->> the write protection of all memory at the end of
->> kvm_vm_ioctl_reset_dirty_pages.  You wouldn't even need a separate
->> ioctl, which is nice.  On the other hand, checkpoints would be more
->> frequent and most pages would be write-protected, so it would be more
->> expensive to rebuild the shadow page tables...
+On 03/05/2017 16:54, Richard W.M. Jones wrote:
+> On Mon, Feb 27, 2017 at 04:34:44PM +0000, Stefan Hajnoczi wrote:
+>> From: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> Now that all bottom halves and callbacks take care of taking the
+>> AioContext lock, we can migrate some users away from it and to a
+>> specific QemuMutex or CoMutex.
+>>
+>> Protect BDRVCURLState access with a QemuMutex.
+>>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Message-id: 20170222180725.28611-2-pbonzini@redhat.com
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > 
-> Yup, write-protect-all can improve reset_dirty_pages indeed, i will
-> apply your idea after reset_dirty_pages is merged.
+> https://bugzilla.redhat.com/show_bug.cgi?id=1447590
 > 
-> However, we still prefer to have a separate ioctl for write-protect-all
-> which cooperates with KVM_GET_DIRTY_LOG to improve live migration that
-> should not always depend on checkpoint. 
+> I've been tracking down a bug in the curl driver which affects
+> virt-v2v, and this commit is implicated.
+> 
+> It manifests itself as a hang while downloading a certain file within
+> a remotely located disk image accessed over https.
+> 
+> Unfortunately the bug environment is extremely difficult to reproduce
+> (not the bug itself -- that is very easy to reproduce once you've set
+> up the environment).  Anyway I don't have a simple reproducer which
+> anyone could try.  I'll try to work on that next.
+> 
+> However I bisected it and it is caused by this commit.  The hang
+> affects qemu from master.  Reverting this commit on top of qemu from
+> master fixes the hang.
+> 
+> Is there anything obviously wrong with the commit?
 
-Ok, I plan to merge the dirty ring pages early in 4.13 development.
+Maybe there is, can you grab an all-threads backtrace via gdb?
 
 Paolo
+
+> Rich.
+> 
+>>  block/curl.c | 24 +++++++++++++++---------
+>>  1 file changed, 15 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/block/curl.c b/block/curl.c
+>> index 2939cc7..e83dcd8 100644
+>> --- a/block/curl.c
+>> +++ b/block/curl.c
+>> @@ -135,6 +135,7 @@ typedef struct BDRVCURLState {
+>>      char *cookie;
+>>      bool accept_range;
+>>      AioContext *aio_context;
+>> +    QemuMutex mutex;
+>>      char *username;
+>>      char *password;
+>>      char *proxyusername;
+>> @@ -333,6 +334,7 @@ static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
+>>      return FIND_RET_NONE;
+>>  }
+>>  
+>> +/* Called with s->mutex held.  */
+>>  static void curl_multi_check_completion(BDRVCURLState *s)
+>>  {
+>>      int msgs_in_queue;
+>> @@ -374,7 +376,9 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+>>                          continue;
+>>                      }
+>>  
+>> +                    qemu_mutex_unlock(&s->mutex);
+>>                      acb->common.cb(acb->common.opaque, -EPROTO);
+>> +                    qemu_mutex_lock(&s->mutex);
+>>                      qemu_aio_unref(acb);
+>>                      state->acb[i] = NULL;
+>>                  }
+>> @@ -386,6 +390,7 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+>>      }
+>>  }
+>>  
+>> +/* Called with s->mutex held.  */
+>>  static void curl_multi_do_locked(CURLState *s)
+>>  {
+>>      CURLSocket *socket, *next_socket;
+>> @@ -409,19 +414,19 @@ static void curl_multi_do(void *arg)
+>>  {
+>>      CURLState *s = (CURLState *)arg;
+>>  
+>> -    aio_context_acquire(s->s->aio_context);
+>> +    qemu_mutex_lock(&s->s->mutex);
+>>      curl_multi_do_locked(s);
+>> -    aio_context_release(s->s->aio_context);
+>> +    qemu_mutex_unlock(&s->s->mutex);
+>>  }
+>>  
+>>  static void curl_multi_read(void *arg)
+>>  {
+>>      CURLState *s = (CURLState *)arg;
+>>  
+>> -    aio_context_acquire(s->s->aio_context);
+>> +    qemu_mutex_lock(&s->s->mutex);
+>>      curl_multi_do_locked(s);
+>>      curl_multi_check_completion(s->s);
+>> -    aio_context_release(s->s->aio_context);
+>> +    qemu_mutex_unlock(&s->s->mutex);
+>>  }
+>>  
+>>  static void curl_multi_timeout_do(void *arg)
+>> @@ -434,11 +439,11 @@ static void curl_multi_timeout_do(void *arg)
+>>          return;
+>>      }
+>>  
+>> -    aio_context_acquire(s->aio_context);
+>> +    qemu_mutex_lock(&s->mutex);
+>>      curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running);
+>>  
+>>      curl_multi_check_completion(s);
+>> -    aio_context_release(s->aio_context);
+>> +    qemu_mutex_unlock(&s->mutex);
+>>  #else
+>>      abort();
+>>  #endif
+>> @@ -771,6 +776,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>>      curl_easy_cleanup(state->curl);
+>>      state->curl = NULL;
+>>  
+>> +    qemu_mutex_init(&s->mutex);
+>>      curl_attach_aio_context(bs, bdrv_get_aio_context(bs));
+>>  
+>>      qemu_opts_del(opts);
+>> @@ -801,12 +807,11 @@ static void curl_readv_bh_cb(void *p)
+>>      CURLAIOCB *acb = p;
+>>      BlockDriverState *bs = acb->common.bs;
+>>      BDRVCURLState *s = bs->opaque;
+>> -    AioContext *ctx = bdrv_get_aio_context(bs);
+>>  
+>>      size_t start = acb->sector_num * BDRV_SECTOR_SIZE;
+>>      size_t end;
+>>  
+>> -    aio_context_acquire(ctx);
+>> +    qemu_mutex_lock(&s->mutex);
+>>  
+>>      // In case we have the requested data already (e.g. read-ahead),
+>>      // we can just call the callback and be done.
+>> @@ -854,7 +859,7 @@ static void curl_readv_bh_cb(void *p)
+>>      curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running);
+>>  
+>>  out:
+>> -    aio_context_release(ctx);
+>> +    qemu_mutex_unlock(&s->mutex);
+>>      if (ret != -EINPROGRESS) {
+>>          acb->common.cb(acb->common.opaque, ret);
+>>          qemu_aio_unref(acb);
+>> @@ -883,6 +888,7 @@ static void curl_close(BlockDriverState *bs)
+>>  
+>>      DPRINTF("CURL: Close\n");
+>>      curl_detach_aio_context(bs);
+>> +    qemu_mutex_destroy(&s->mutex);
+>>  
+>>      g_free(s->cookie);
+>>      g_free(s->url);
+>> -- 
+>> 2.9.3
+>>
+> 
