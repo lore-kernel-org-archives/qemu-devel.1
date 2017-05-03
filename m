@@ -1,50 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d5yek-00049Z-ND
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 14:05:43 -0400
+	(envelope-from <quintela@redhat.com>) id 1d5yfi-0004ao-T6
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 14:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d5yef-0004tS-JH
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 14:05:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45859
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1d5yef-0004tB-1z
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 14:05:37 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v43I33EJ094033
-	for <qemu-devel@nongnu.org>; Wed, 3 May 2017 14:05:35 -0400
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a7jp9m69t-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 14:05:34 -0400
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 3 May 2017 15:05:32 -0300
-Received: from d24av04.br.ibm.com (d24av04.br.ibm.com [9.8.31.97])
-	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v43I5Sab56557698
-	for <qemu-devel@nongnu.org>; Wed, 3 May 2017 15:05:29 -0300
-Received: from d24av04.br.ibm.com (localhost [127.0.0.1])
-	by d24av04.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v43I5SnM006354
-	for <qemu-devel@nongnu.org>; Wed, 3 May 2017 15:05:28 -0300
-References: <20170426212303.27961-1-danielhb@linux.vnet.ibm.com>
-	<20170426212303.27961-3-danielhb@linux.vnet.ibm.com>
-	<20170503160916.GD2077@work-vm>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed, 3 May 2017 15:05:24 -0300
+	(envelope-from <quintela@redhat.com>) id 1d5yfd-0005CS-NY
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 14:06:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36741)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d5yfd-0005CI-Hh
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 14:06:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 92FC480C17
+	for <qemu-devel@nongnu.org>; Wed,  3 May 2017 18:06:35 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170503104257.5127-1-dgilbert@redhat.com> (David Alan Gilbert's
+	message of "Wed, 3 May 2017 11:42:57 +0100")
+References: <20170503104257.5127-1-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 03 May 2017 20:06:28 +0200
+Message-ID: <87pofpizmj.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170503160916.GD2077@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <fc06bf7f-050b-2bd1-5184-802f36cd8ca3@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] hw/ppc: migrating the DRC state of
- hotplugged devices
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] block migration: Allow compile time disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,58 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, jcody@redhat.com, kwolf@redhat.com, kashyap@redhat.com
 
-
-
-On 05/03/2017 01:09 PM, Dr. David Alan Gilbert wrote:
-> * Daniel Henrique Barboza (danielhb@linux.vnet.ibm.com) wrote:
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> <snip>
+> Many users now prefer to use drive_mirror over NBD as an
+> alternative to the older migrate -b option; drive_mirror is
+> more complex to setup but gives you more options (e.g. only
+> migrating some of the disks if some of them are shared).
 >
->>   static void realize(DeviceState *d, Error **errp)
->>   {
->>       sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(d);
->> @@ -540,6 +598,8 @@ static void realize(DeviceState *d, Error **errp)
->>           object_unref(OBJECT(drc));
->>       }
->>       g_free(child_name);
->> +    vmstate_register(DEVICE(drc), drck->get_index(drc), &vmstate_spapr_drc,
->> +                     drc);
->>       trace_spapr_drc_realize_complete(drck->get_index(drc));
->>   }
->>   
->> @@ -658,6 +718,7 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
->>       dk->reset = reset;
->>       dk->realize = realize;
->>       dk->unrealize = unrealize;
->> +    dk->vmsd = &vmstate_spapr_drc;
-> Are you sure this is right - isn't it unusual to have both
-> a ->vmsd entry AND a vmstate_register?
-
-I've changed the code to use vmstate_register but forgot to remove the
-->vmsd entry that was being used in v6.
-
-Thanks for pointing it out Dave. I'll fix it in v9.
-
-
-Daniel
-
+> Allow the large chunk of block migration code to be compiled
+> out for those who don't use it.
 >
-> a ->vmsd =   is the preferable way I think, but I see you're
-> doing something with the 2nd parameter of vmstate_register;
-> if you *need* to do that then I think it's the only way.
+> Based on a downstream-patch we've had for a while by Jeff Cody.
 >
-> Dave
->
->>       drck->set_isolation_state = set_isolation_state;
->>       drck->set_indicator_state = set_indicator_state;
->>       drck->set_allocation_state = set_allocation_state;
->> -- 
->> 2.9.3
->>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 353f2728cf..ffce72aabc 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -692,6 +692,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+>  
+>          populate_ram_info(info, s);
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_MIGRATION
+>          if (blk_mig_active()) {
+>              info->has_disk = true;
+>              info->disk = g_malloc0(sizeof(*info->disk));
+> @@ -699,6 +700,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+>              info->disk->remaining = blk_mig_bytes_remaining();
+>              info->disk->total = blk_mig_bytes_total();
+>          }
+> +#endif
+
+I think it can be cleaner to move this inside block.c and just export a
+function that is empty in case it is compiled out, but that it is just
+me, so you got the revieweb by anyways.
+
+>          }
+>      }
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_MIGRATION
+>      blk_mig_init();
+> +#endif
+>      ram_mig_init();
+>  
+>      /* If the currently selected machine wishes to override the units-per-bus
+
+Same here, I preffer the ifdef in the header than here.
+
+Later, Juan.
