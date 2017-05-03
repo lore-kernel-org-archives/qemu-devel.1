@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5sqH-0007cQ-Na
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:53:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d5srg-0008SM-JK
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d5sqE-00027y-MM
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:53:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d5sqE-00027h-EW
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:53:10 -0400
-References: <20170503094351.5040-1-pbonzini@redhat.com>
-	<20170503094351.5040-3-pbonzini@redhat.com>
-	<e3916e2f-d41a-7920-3256-1a386f05e527@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1d5srd-0002j1-Gy
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 07:54:40 -0400
+References: <20170503104441.1349-1-pbonzini@redhat.com>
+	<874lx21880.fsf@dusky.pond.sub.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d392e456-1882-bef0-9fd5-553b3ccd598f@redhat.com>
-Date: Wed, 3 May 2017 13:53:04 +0200
+Message-ID: <8e6b18bc-eb3e-c77f-2b9a-c797c3c15680@redhat.com>
+Date: Wed, 3 May 2017 13:54:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <e3916e2f-d41a-7920-3256-1a386f05e527@redhat.com>
+In-Reply-To: <874lx21880.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] get_maintainer: Teach
- get_maintainer.pl about the new "R:" tag
+Subject: Re: [Qemu-devel] [PATCH] jazz_led: fix bad snprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pavel.dovgaluk@ispras.ru
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, leon.alrae@imgtec.com
 
 
 
-On 03/05/2017 12:45, Thomas Huth wrote:
-> On 03.05.2017 11:43, Paolo Bonzini wrote:
->> From: Joe Perches <joe@perches.com>
->>
->> We can now designate reviewers in the MAINTAINERS file with the new
->> "R:" tag, so this commit teaches get_maintainers.pl to add their
->> email addresses.
->>
->> Cherry picked from Linux commit c1c3f2c906e35bcb6e4cdf5b8e077660fead14fe,
->> with fixes to avoid \C as in QEMU commit ba10f729f1 ("get_maintainer.pl:
->> \C is deprecated", 2015-09-25).
+On 03/05/2017 13:38, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 > 
-> Upstream linux.git changed it to [A-Z] in commit ce8155f7a ... so maybe
-> use that in QEMU, too, so we stay closer to the Linux version?
+>> Detected by GCC 7's -Wformat-truncation.  snprintf writes at most
+>> 2 bytes here including the terminating NUL, so the result is
+>> truncated.  In addition, the newline at the end is pointless.
+>> Fix the buffer size and the format string.
+>> ---
+>>  hw/display/jazz_led.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/display/jazz_led.c b/hw/display/jazz_led.c
+>> index b72fdb1717..3c97d56434 100644
+>> --- a/hw/display/jazz_led.c
+>> +++ b/hw/display/jazz_led.c
+>> @@ -227,13 +227,13 @@ static void jazz_led_invalidate_display(void *opaque)
+>>  static void jazz_led_text_update(void *opaque, console_ch_t *chardata)
+>>  {
+>>      LedState *s = opaque;
+>> -    char buf[2];
+>> +    char buf[3];
+>>  
+>>      dpy_text_cursor(s->con, -1, -1);
+>>      qemu_console_resize(s->con, 2, 1);
+>>  
+>>      /* TODO: draw the segments */
+>> -    snprintf(buf, 2, "%02hhx\n", s->segments);
+>> +    snprintf(buf, 3, "%02hhx", s->segments);
+>>      console_write_ch(chardata++, ATTR2CHTYPE(buf[0], QEMU_COLOR_BLUE,
+>>                                               QEMU_COLOR_BLACK, 1));
+>>      console_write_ch(chardata++, ATTR2CHTYPE(buf[1], QEMU_COLOR_BLUE,
+> 
+> Since we're only every interested in the first two characters, the
+> truncation is totally harmless.  Thus, your patch cleans doesn't really
+> "fix bad snprintf", it cleans up an unclean one.  Consider rewording the
+> commit message accordingly.
 
-We used "." in ba10f729f1, so I stayed consistent with that one.  But we
-could also change those periods to [A-Z] en masse.
+My reading is that buf[1] is always '\0' in the current code: "snprintf
+writes at most 2 bytes here including the terminating NUL, so the result
+is truncated".
 
 Paolo
+
+> Regardless,
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
