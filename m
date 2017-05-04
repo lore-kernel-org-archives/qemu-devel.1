@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d6H6z-0002PK-NM
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:48:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1d6H9B-0003ND-1b
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d6H6w-00036K-Lq
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:48:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46832)
+	(envelope-from <eblake@redhat.com>) id 1d6H97-0003zR-WB
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:50:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40843)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d6H6w-00035c-FM
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:48:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6H97-0003z7-MN
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:50:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 31D72C01C71E
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 13:48:01 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1493888311-30839-1-git-send-email-thuth@redhat.com>
-	<87vapgg7vh.fsf@dusky.pond.sub.org>
-	<b5440248-708b-780c-791c-451cfdadfef4@redhat.com>
-Date: Thu, 04 May 2017 15:47:57 +0200
-In-Reply-To: <b5440248-708b-780c-791c-451cfdadfef4@redhat.com> (Thomas Huth's
-	message of "Thu, 4 May 2017 14:09:16 +0200")
-Message-ID: <87wp9wbunm.fsf@dusky.pond.sub.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 99CAD26B09
+	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 13:50:16 +0000 (UTC)
+References: <20170504125432.21653-1-marcandre.lureau@redhat.com>
+	<20170504125432.21653-3-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <471cdc89-855f-889b-a83f-baadc62e5c84@redhat.com>
+Date: Thu, 4 May 2017 08:50:13 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Update to use the new way of
- attaching USB devices
+In-Reply-To: <20170504125432.21653-3-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wkGQEXCdlqJdxTdkHlQu9gcx44nQ70NeT"
+Subject: Re: [Qemu-devel] [PATCH 2/4] qmp-shell: ignore query-commands error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +34,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
-Thomas Huth <thuth@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wkGQEXCdlqJdxTdkHlQu9gcx44nQ70NeT
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
+Message-ID: <471cdc89-855f-889b-a83f-baadc62e5c84@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] qmp-shell: ignore query-commands error
+References: <20170504125432.21653-1-marcandre.lureau@redhat.com>
+ <20170504125432.21653-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20170504125432.21653-3-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 04.05.2017 13:48, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
-[...]
->>>  For instance, user-mode networking can be used with
->>>  @example
->>> -qemu-system-i386 [...OPTIONS...] -net user,vlan=0 -usbdevice net:vlan=0
->>> -@end example
->>> -Currently this cannot be used in machines that support PCI NICs.
->>> -@item bt[:@var{hci-type}]
->>> -Bluetooth dongle whose type is specified in the same format as with
->>> -the @option{-bt hci} option, @pxref{bt-hcis,,allowed HCI types}.  If
->>> -no type is given, the HCI logic corresponds to @code{-bt hci,vlan=0}.
->>> -This USB device implements the USB Transport Layer of HCI.  Example
->>> -usage:
->>> -@example
->>> -@command{qemu-system-i386} [...@var{OPTIONS}...] @option{-usbdevice} bt:hci,vlan=3 @option{-bt} device:keyboard,vlan=3
->>> +qemu-system-i386 [...OPTIONS...] -netdev user,id=id0 -device usb-net,netdev=id0
->> 
->> Suggest to use net0 instead of id0 here.
->
-> Ok.
->
->>>  @end example
->>> +@item usb-bt-dongle
->>> +Bluetooth dongle which implements the USB Transport Layer of HCI.
->>> +It is connected to HCI scatternet 0 by default (corresponds to
->>> +@code{-bt hci,vlan=0}).
->> 
->> The Bluetooth documentation you replace is confusing.  Ignorant
->> question: is -device ... as expressive as -usbdevice bt:...?
->
-> I don't really have a clue about bluetooth in QEMU, too, but from what
-> I've seen so far, it does not sound as expressive as the old syntax.
+On 05/04/2017 07:54 AM, Marc-Andr=C3=A9 Lureau wrote:
+> qemu-ga doesn't implement it.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qmp/qmp-shell | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
 
-In that case, deprecating -usbdevice bt:... is problematic.  However, we
-could bring down the big "qdevify or else" hammer: deprecate the
-non-qdevified Bluetooth devices with intent to drop unless someone steps
-up and does the work they need.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
->> docs/qdev-device-use.txt needs an update for this one.
->
-> Ok.
-[...]
+> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+> index f80d02312a..04b8fa3eae 100755
+> --- a/scripts/qmp/qmp-shell
+> +++ b/scripts/qmp/qmp-shell
+> @@ -126,7 +126,10 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+>          return arg
+> =20
+>      def _fill_completion(self):
+> -        for cmd in self.cmd('query-commands')['return']:
+> +        cmds =3D self.cmd('query-commands')
+> +        if cmds.has_key('error'):
+> +            return
+> +        for cmd in cmds['return']:
+>              self._completer.append(cmd['name'])
+> =20
+>      def __completer_setup(self):
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--wkGQEXCdlqJdxTdkHlQu9gcx44nQ70NeT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZCzGVAAoJEKeha0olJ0Nq5GsIAJsBVKm1XA2BDNQsgxcCwBT6
+fHmDfhesmV+fwJ668BWyQt0fWYjKSzJM2kbDNRznfAWENJaMmHJXGwd+ORdOkT3M
+35U2ioBgGBr62dcbpaqj9O5PqHS/Toe3pcWzd6ghX9LEMS82Y8xsiY+KSUOXzohs
+hWZg+a+SLus+hxGytA94P2AfkSlVKLsUzIK1+yqqNm9cEZY6kuutB0QEp4lbR0QY
+PhNOiRJh9cPBNb01r3IIIQamaxHwZjfpMCzAetssgUjilSVkDVM8AyhzA0PcoMXZ
+j8KIauEMljsxiMorl9NzKJ0i0kv0mIKuaWkHnyfBFWJlugxEn/bNSkdYhHqENBc=
+=nVjh
+-----END PGP SIGNATURE-----
+
+--wkGQEXCdlqJdxTdkHlQu9gcx44nQ70NeT--
