@@ -1,42 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d6HEZ-0006w1-CJ
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:55:56 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6HFR-0007NI-OO
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:56:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d6HEW-0006DF-AI
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:55:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33838
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1d6HEV-0006Cw-IU
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:55:52 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v44Ds5P6130057
-	for <qemu-devel@nongnu.org>; Thu, 4 May 2017 09:55:48 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2a7m0rk6a4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 09:55:48 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 4 May 2017 14:55:45 +0100
-References: <1492842231-223720-1-git-send-email-arei.gonglei@huawei.com>
-	<1492842231-223720-2-git-send-email-arei.gonglei@huawei.com>
-	<38d13582-47f4-2a03-efef-064063c8852f@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA263F82@DGGEMA505-MBX.china.huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 4 May 2017 15:55:35 +0200
+	(envelope-from <stefanha@gmail.com>) id 1d6HFO-0006iW-OP
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:56:49 -0400
+Date: Thu, 4 May 2017 14:56:43 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170504135642.GN32376@stefanha-x1.localdomain>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-9-pbonzini@redhat.com>
+	<20170504065748.GC19184@lemon.lan>
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA263F82@DGGEMA505-MBX.china.huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <17594b34-62c0-bc4e-2fda-fc54837e0732@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v18 1/2] virtio-crypto: Add virtio crypto
- device specification
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Y4VYWfdFdHwFhC6D"
+Content-Disposition: inline
+In-Reply-To: <20170504065748.GC19184@lemon.lan>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 08/17] throttle-groups:
+ protect throttled requests with a CoMutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,43 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Zhanghuimin (Amy)" <amy.zhanghuimin@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "lixiao (H)" <lixiao91@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Zhbzg <zhbzg@huawei.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, Linqiangmin <linqiangmin@huawei.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Chenshanxi (Eety Chen, Euler)" <eety.chen@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 
+--Y4VYWfdFdHwFhC6D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 05/04/2017 03:33 PM, Gonglei (Arei) wrote:
->>> +\begin{description}
->>> +\item[VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE] Requires
->> VIRTIO_CRYPTO_F_STATELESS_MODE.
->>> +\item[VIRTIO_CRYPTO_F_HASH_STATELESS_MODE] Requires
->> VIRTIO_CRYPTO_F_STATELESS_MODE.
->>> +\item[VIRTIO_CRYPTO_F_MAC_STATELESS_MODE] Requires
->> VIRTIO_CRYPTO_F_STATELESS_MODE.
->>> +\item[VIRTIO_CRYPTO_F_AEAD_STATELESS_MODE] Requires
->> VIRTIO_CRYPTO_F_STATELESS_MODE.
->>> +\end{description}
->>
->> I find feature bit 0 redundant and bit confusing. We had a discussion
->> in v15 and v16.
->>
->> Could you answer:
->> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03214.html
->> (Message-ID: <1fbe30cc-87ec-32bc-4c57-85f9b03b3034@linux.vnet.ibm.com>)
->>
->>
-> Please see my reply:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03186.html
-> 
-> The main reason is we should keep compatibility to pre-existing driver and
-> support some function that different services have different modes.
-> We have only one unique crypto request named structure virtio_crypto_op_data_req_mux. 
-> Please continue to see the sepc, you'll find the truth.
-> 
+On Thu, May 04, 2017 at 02:57:48PM +0800, Fam Zheng wrote:
+> On Thu, 04/20 14:00, Paolo Bonzini wrote:
+> > diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-back=
+end.h
+> > index 87a43b0..e9529fb 100644
+> > --- a/include/sysemu/block-backend.h
+> > +++ b/include/sysemu/block-backend.h
+> > @@ -72,11 +72,8 @@ typedef struct BlockDevOps {
+> >   * fields that must be public. This is in particular for QLIST_ENTRY()=
+ and
+> >   * friends so that BlockBackends can be kept in lists outside block-ba=
+ckend.c */
+> >  typedef struct BlockBackendPublic {
+> > -    /* I/O throttling has its own locking, but also some fields are
+> > -     * protected by the AioContext lock.
+> > -     */
+> > -
+> > -    /* Protected by AioContext lock.  */
+> > +    /* reqs_lock protects the CoQueues for throttled requests.  */
+> > +    CoMutex      reqs_lock;
+>=20
+> Bikeshedding: will it be more readable if it's called throttled_reqs_lock=
+ or
+> throttled_lock?
 
-Sorry, I still do not understand why can't we drop VIRTIO_CRYPTO_F_STATELESS_MODE
-and just keep the four service specific modes.
+Yes, please.
 
-Can you point me to the (published) code where  VIRTIO_CRYPTO_F_STATELESS_MODE is
-used (that's what I'm missing -- preferably state the repository, the commit
-a file and a line using VIRTIO_CRYPTO_F_STATELESS_MODE)?
+Stefan
+
+--Y4VYWfdFdHwFhC6D
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZCzMaAAoJEJykq7OBq3PILuoH/jTATt6CIMJFY64htLunueRM
+/JI/bmsZjXsbKs5pU4XzRQd8WukE/pnFvPISIo/+sIcmXeFQ4scBC8jaZJaHnZRO
+PPN+McsAQTtmeR8cWysekHoMJ2E9MvHQDdqS+U9sQH/ucs7gaXJaQSFWqVlK2TPC
+QWoACTKheGwmmGMDIwwSpS38y3GiCI6lTz7OE6uI0JXUR5eBdXPMQ2J66dWWxwB1
+PXPtPU8+JTP5vCeBo76rfwXLf/wgKVkPVHet+YVkK5ZH6hyhOu4BMDjRIHPFrDq0
+JfKUlh3pPet5l1BUv3iJwX+MjuViK9WTph5+0YzGtzbcNBr+Qa07rb7mK+nA56w=
+=E0mO
+-----END PGP SIGNATURE-----
+
+--Y4VYWfdFdHwFhC6D--
