@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6GYF-0003jO-Nd
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:12:12 -0400
+	(envelope-from <drjones@redhat.com>) id 1d6GcG-0005RJ-9A
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:16:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6GYB-0004wI-P1
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:12:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6GYB-0004vk-IT
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:12:07 -0400
-References: <20170504084135.7488.24715.stgit@PASHA-ISP>
-	<20170504084210.7488.37561.stgit@PASHA-ISP>
-	<b365904f-21ae-85a7-a3a6-bbe21c62e35a@redhat.com>
-	<000401d2c4c7$6d5b6d50$481247f0$@ru>
-	<b44f8aa8-e42f-4b94-ccfa-d80adb60de35@redhat.com>
-	<000801d2c4cd$3d3af720$b7b0e560$@ru>
-	<58398574-88b5-3382-65e2-7208beccc09a@redhat.com>
-	<000f01d2c4cf$7479f630$5d6de290$@ru>
-	<c6f5e430-fa98-124f-146b-6c3de79448cd@redhat.com>
-	<001101d2c4d2$bb44a4e0$31cdeea0$@ru>
-	<e6c5885d-855b-288e-68c8-5665be284d78@redhat.com>
-	<001201d2c4d6$c26bdd20$47439760$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bf930126-426b-b208-8fcb-76adda3bd9f5@redhat.com>
-Date: Thu, 4 May 2017 15:12:01 +0200
+	(envelope-from <drjones@redhat.com>) id 1d6GcA-0007NB-GV
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:16:20 -0400
+Date: Thu, 4 May 2017 15:16:02 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170504131602.4v5pbh6t2skrjici@kamzik.brq.redhat.com>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-4-git-send-email-imammedo@redhat.com>
+	<20170504093822.2u4p7z7qjcyorbto@kamzik.brq.redhat.com>
+	<20170504145509.394ce832@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <001201d2c4d6$c26bdd20$47439760$@ru>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 06/10] replay: fix save/load vm for
- non-empty queue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170504145509.394ce832@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 03/24] hw/arm/virt: use
+ machine->possible_cpus for storing possible topology info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,25 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-
-
-On 04/05/2017 15:02, Pavel Dovgalyuk wrote:
->> Understood.  And what checkpoint will you be waiting for during drain,
->> causing a deadlock?
-> Every checkpoint processes the queue, but none of them are invoked,
-> because iothread (which invokes all the checkpoints) is waiting for the end of the drain.
+On Thu, May 04, 2017 at 02:55:09PM +0200, Igor Mammedov wrote:
+> On Thu, 4 May 2017 11:38:22 +0200
+> Andrew Jones <drjones@redhat.com> wrote:
 > 
-> And we cannot add a checkpoint into the drain, because then vmstop will
-> affect the behavior of the guest.
+> > On Wed, May 03, 2017 at 02:56:57PM +0200, Igor Mammedov wrote:
+> > > for now precalculate and store mp_afinity in possible_cpus
+> > > as ARM cpus don't have socket/core/thread-id properties yet.
+> > > In follow patches possible_cpus will be used for storing
+> > > and setting NUMA node mapping and replace legacy bitmap
+> > > based numa_info[node_id].node_cpu/numa_get_node_for_cpu()
+> > > 
+> > > For the lack of better idea, this patch cannibalizes
+> > > possible_cpus.cpus[x].props.thread_id so that
+> > > *_cpu_index_to_props() callback could return addressable
+> > > by props CPU which will be used by machine_set_cpu_numa_node()
+> > > in follow up patches to assign a CPU to node. But
+> > > cannibalizing is fine for now as that thread_id isn't exposed
+> > > to users (no hotpluggable_cpus callback support for ARM yet)
+> > > and it will be used only internally until 'device_add cpu'
+> > > is supported where we can decide on which properties to use.
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > > v2:
+> > >   (Drew)
+> > >     - discarding result of possible_cpu_arch_ids() makes
+> > >       call not obvious and is confusing. Instead assign
+> > >       possible_cpu_arch_ids() result to local var and use
+> > >       it instead of direct access to machine->possible_cpus
+> > >       field, as it's done in pc.c
+> > > ---
+> > >  hw/arm/virt.c | 40 +++++++++++++++++++++++++++++++++++++---
+> > >  1 file changed, 37 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > > index 61ae437..e2c5626 100644
+> > > --- a/hw/arm/virt.c
+> > > +++ b/hw/arm/virt.c
+> > > @@ -1221,6 +1221,8 @@ static void machvirt_init(MachineState *machine)
+> > >  {
+> > >      VirtMachineState *vms = VIRT_MACHINE(machine);
+> > >      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(machine);
+> > > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> > > +    const CPUArchIdList *possible_cpus;
+> > >      qemu_irq pic[NUM_IRQS];
+> > >      MemoryRegion *sysmem = get_system_memory();
+> > >      MemoryRegion *secure_sysmem = NULL;
+> > > @@ -1344,10 +1346,16 @@ static void machvirt_init(MachineState *machine)
+> > >          exit(1);
+> > >      }
+> > >  
+> > > -    for (n = 0; n < smp_cpus; n++) {
+> > > -        Object *cpuobj = object_new(typename);
+> > > +    possible_cpus = mc->possible_cpu_arch_ids(machine);
+> > > +    for (n = 0; n < possible_cpus->len; n++) {
+> > > +        Object *cpuobj;
+> > >  
+> > > -        object_property_set_int(cpuobj, virt_cpu_mp_affinity(vms, n),
+> > > +        if (n >= smp_cpus) {
+> > > +            break;
+> > > +        }  
+> > 
+> > Why the break instead of just looping 'n < smp_cpus' like x86 does? Is
+> > there some future work where looping up to possible_cpus->len (aka
+> > max_cpus) is what we'll eventually want? If so, then we need a TODO
+> > comment here. If not, then we should clean this up by removing the break.
+> There is no plans to loop here upto possible_cpus->len.
+> 
+> It seemed to me more consistent/safer to use index limited
+> by possible_cpus->len to index possible_cpus->cpus[n] array
+> than index limited by smp_cpus though the former currently is
+> always less than smp_cpus.
+         ^ greater than or equal to
+> 
+> If you prefer 'n < smp_cpus' loop, then I can switch to it.
 
-But it does affect the behavior already when RR is off.  And it
-shouldn't be a problem if it does in record mode (as long as the effect
-can be replayed).
+I just don't like the 'if (n >= smp_cpus) { break; }' - the whole thing
+would look much nicer without it. And, if there's a valid concern that
+possible_cpus->len can be < smp_cpus, then we should check it in x86
+too. Anyway we can check both conditions in the 'for', which would
+look a bit more pleasing to me...
 
-If RR cannot do drain reliably, not even in record mode, that is a huge
-problem because a lot of block layer operations assume they can.
+ for (n = 0; n < possible_cpus->len && n < smp_cpus; n++) {
+     Object *cpuobj = object_new(typename);
+     object_property_set_int(cpuobj, possible_cpus->cpus[n].arch_id,
+                             "mp-affinity", NULL);
+     ...
 
-Paolo
+All that said, it's just a nit in the end, so
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
