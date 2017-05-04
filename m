@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6G6b-0002c4-VY
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:43:38 -0400
+	(envelope-from <drjones@redhat.com>) id 1d6G8O-0003qU-Jb
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:45:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6G6b-0001cM-3M
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:43:37 -0400
-Date: Thu, 4 May 2017 14:43:27 +0200
+	(envelope-from <drjones@redhat.com>) id 1d6G8N-0002AB-Gq
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:45:28 -0400
+Date: Thu, 4 May 2017 14:45:18 +0200
 From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170504124327.kn5jpivkomijohwi@kamzik.brq.redhat.com>
+Message-ID: <20170504124518.5qui4pcvamfmbsuw@kamzik.brq.redhat.com>
 References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-21-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-23-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493816238-33120-21-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 20/24] machine: call machine init from
- wrapper
+In-Reply-To: <1493816238-33120-23-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 22/24] numa: remove node_cpu bitmaps as
+ they are no longer used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +27,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-On Wed, May 03, 2017 at 02:57:14PM +0200, Igor Mammedov wrote:
-> add machine_run_board_init() wrapper that calls machine
-> init for now but in follow up patches it will be used
-> to run generic machine code that should run before
-> machine init.
+On Wed, May 03, 2017 at 02:57:16PM +0200, Igor Mammedov wrote:
+> Postfactum "CPU(s) present in multiple NUMA nodes" check
+> was the last user of node_cpu bitmaps, but it's not need
+> as machine_set_cpu_numa_node() does the similar check at
+> the time mapping is set for cpus (i.e. when -numa cpus=
+> is parsed) and ensures that cpu can be mapped only to
+> one node.
+> 
+> Remove duplicate check based on node_cpu bitmaps and
+> since the last user is gone remove node_cpu as well,
+> which completes internal transition from legacy bitmap
+> based mapping storage to possible_cpus storage.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  include/hw/boards.h | 1 +
->  hw/core/machine.c   | 6 ++++++
->  vl.c                | 2 +-
->  3 files changed, 8 insertions(+), 1 deletion(-)
+>  include/sysemu/numa.h |  1 -
+>  numa.c                | 42 ------------------------------------------
+>  2 files changed, 43 deletions(-)
 > 
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 1f518a1..0e74484 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -32,6 +32,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
->  MachineClass *find_default_machine(void);
->  extern MachineState *current_machine;
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 0b0a044..7f2d397 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -17,7 +17,6 @@ struct numa_addr_range {
 >  
-> +void machine_run_board_init(MachineState *machine);
->  bool machine_usb(MachineState *machine);
->  bool machine_kernel_irqchip_allowed(MachineState *machine);
->  bool machine_kernel_irqchip_required(MachineState *machine);
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index a63f17b..217b4f4 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -648,6 +648,12 @@ bool machine_mem_merge(MachineState *machine)
->      return machine->mem_merge;
+>  typedef struct node_info {
+>      uint64_t node_mem;
+> -    unsigned long *node_cpu;
+>      struct HostMemoryBackend *node_memdev;
+>      bool present;
+>      QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
+> diff --git a/numa.c b/numa.c
+> index d7aa662..40e9f44 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -177,7 +177,6 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
+>                         cpus->value, max_cpus);
+>              return;
+>          }
+> -        bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
+>          props = mc->cpu_index_to_instance_props(ms, cpus->value);
+>          props.node_id = nodenr;
+>          props.has_node_id = true;
+> @@ -261,51 +260,12 @@ end:
+>      return 0;
 >  }
 >  
-> +void machine_run_board_init(MachineState *machine)
-> +{
-> +    MachineClass *machine_class = MACHINE_GET_CLASS(machine);
-> +    machine_class->init(machine);
-> +}
-> +
->  static void machine_class_finalize(ObjectClass *klass, void *data)
+> -static char *enumerate_cpus(unsigned long *cpus, int max_cpus)
+> -{
+> -    int cpu;
+> -    bool first = true;
+> -    GString *s = g_string_new(NULL);
+> -
+> -    for (cpu = find_first_bit(cpus, max_cpus);
+> -        cpu < max_cpus;
+> -        cpu = find_next_bit(cpus, max_cpus, cpu + 1)) {
+> -        g_string_append_printf(s, "%s%d", first ? "" : " ", cpu);
+> -        first = false;
+> -    }
+> -    return g_string_free(s, FALSE);
+> -}
+> -
+> -static void validate_numa_cpus(void)
+> -{
+> -    int i;
+> -    unsigned long *seen_cpus = bitmap_new(max_cpus);
+> -
+> -    for (i = 0; i < nb_numa_nodes; i++) {
+> -        if (bitmap_intersects(seen_cpus, numa_info[i].node_cpu, max_cpus)) {
+> -            bitmap_and(seen_cpus, seen_cpus,
+> -                       numa_info[i].node_cpu, max_cpus);
+> -            error_report("CPU(s) present in multiple NUMA nodes: %s",
+> -                         enumerate_cpus(seen_cpus, max_cpus));
+> -            g_free(seen_cpus);
+> -            exit(EXIT_FAILURE);
+> -        }
+> -        bitmap_or(seen_cpus, seen_cpus,
+> -                  numa_info[i].node_cpu, max_cpus);
+> -    }
+> -    g_free(seen_cpus);
+> -}
+> -
+>  void parse_numa_opts(MachineState *ms)
 >  {
->      MachineClass *mc = MACHINE_CLASS(klass);
-> diff --git a/vl.c b/vl.c
-> index fe4741d..ac46d6e 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4562,7 +4562,7 @@ int main(int argc, char **argv, char **envp)
->      current_machine->boot_order = boot_order;
->      current_machine->cpu_model = cpu_model;
+>      int i;
+>      const CPUArchIdList *possible_cpus;
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
 >  
-> -    machine_class->init(current_machine);
-> +    machine_run_board_init(current_machine);
+> -    for (i = 0; i < MAX_NODES; i++) {
+> -        numa_info[i].node_cpu = bitmap_new(max_cpus);
+> -    }
+> -
+>      if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
+>          exit(1);
+>      }
+> @@ -397,12 +357,10 @@ void parse_numa_opts(MachineState *ms)
+>                  props = mc->cpu_index_to_instance_props(ms, i);
+>                  props.has_node_id = true;
 >  
->      realtime_init();
+> -                set_bit(i, numa_info[props.node_id].node_cpu);
+>                  machine_set_cpu_numa_node(ms, &props, &error_fatal);
+>              }
+>          }
 >  
+> -        validate_numa_cpus();
+>      } else {
+>          numa_set_mem_node_id(0, ram_size, 0);
+>      }
 > -- 
 > 2.7.4
 >
