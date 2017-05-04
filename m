@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6GT7-0001Ay-8D
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:06:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d6GW7-00029i-B1
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:10:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6GT6-0002Oq-1Y
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:06:53 -0400
-Date: Thu, 4 May 2017 15:06:31 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170504150631.7841566c@nial.brq.redhat.com>
-In-Reply-To: <20170504124312.tbvwxgmws2asjgko@kamzik.brq.redhat.com>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-22-git-send-email-imammedo@redhat.com>
-	<20170504124312.tbvwxgmws2asjgko@kamzik.brq.redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1d6GW6-00046e-Hv
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:09:59 -0400
+Date: Thu, 4 May 2017 15:09:47 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170504130947.GB5238@noname.redhat.com>
+References: <20170502163558.7611-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 21/24] numa: use possible_cpus for not
- mapped CPUs check
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170502163558.7611-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v17 00/23] block: Image locking series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,145 +22,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, eblake@redhat.com
 
-On Thu, 4 May 2017 14:43:12 +0200
-Andrew Jones <drjones@redhat.com> wrote:
+Am 02.05.2017 um 18:35 hat Fam Zheng geschrieben:
+> v17: Fixes addressing comments by Kevin:
+>      - Rebase on top of kevin/block
+>      - In test case 153, don't compile test program, just try locking=on and
+>        catch warning message
+>      - Add a missing space in comment
+>      - Error out if locking=on is used for file-win
+>      - Add commit message and Cc qemu-stable for patch 17 (now 18)
+>      - Don't add duplicated -U in the documentation
 
-> On Wed, May 03, 2017 at 02:57:15PM +0200, Igor Mammedov wrote:
-> > and remove corresponding part in numa.c that uses
-> > node_cpu bitmaps.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> > It's one more less user of node_cpu bitmpas, following
-> > commit will remove the last user along with
-> > node_cpu itself.
-> > ---
-> >  hw/core/machine.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  numa.c            | 10 ----------
-> >  2 files changed, 58 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index 217b4f4..4229054 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -19,6 +19,7 @@
-> >  #include "sysemu/sysemu.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/cutils.h"
-> > +#include "sysemu/numa.h"
-> >  
-> >  static char *machine_get_accel(Object *obj, Error **errp)
-> >  {
-> > @@ -648,9 +649,66 @@ bool machine_mem_merge(MachineState *machine)
-> >      return machine->mem_merge;
-> >  }
-> >  
-> > +static char *cpu_slot_to_string(const CPUArchId *cpu)
-> > +{
-> > +    GString *s = g_string_new(NULL);
-> > +    if (cpu->props.has_socket_id) {
-> > +        g_string_append_printf(s, "socket-id: %"PRId64, cpu->props.socket_id);
-> > +    }
-> > +    if (cpu->props.has_core_id) {
-> > +        if (s->len) {
-> > +            g_string_append_printf(s, ", ");
-> > +        }
-> > +        g_string_append_printf(s, "core-id: %"PRId64, cpu->props.core_id);
-> > +    }
-> > +    if (cpu->props.has_thread_id) {
-> > +        if (s->len) {
-> > +            g_string_append_printf(s, ", ");
-> > +        }
-> > +        g_string_append_printf(s, "thread-id: %"PRId64, cpu->props.thread_id);
-> > +    }
-> > +    return g_string_free(s, false);
-> > +}
-> > +
-> > +static void machine_numa_validate(MachineState *machine)
-> > +{
-> > +    int i;
-> > +    GString *s = g_string_new(NULL);
-> > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> > +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
-> > +
-> > +    assert(nb_numa_nodes);  
-> 
-> Can't this be
-> 
->  if (!nb_numa_nodes)
->    return;
-> 
-> instead? And then..
-> 
-> > +    for (i = 0; i < possible_cpus->len; i++) {
-> > +        const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
-> > +
-> > +        /* at this point numa mappings are initilized by CLI options
-> > +         * or with default mappings so it's sufficient to list
-> > +         * all not yet mapped CPUs here */
-> > +        /* TODO: make it hard error in future */
-> > +        if (!cpu_slot->props.has_node_id) {
-> > +            char *cpu_str = cpu_slot_to_string(cpu_slot);
-> > +            g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
-> > +                                   cpu_str);
-> > +            g_free(cpu_str);
-> > +        }
-> > +    }
-> > +    if (s->len) {
-> > +        error_report("warning: CPU(s) not present in any NUMA nodes: %s",
-> > +                     s->str);
-> > +        error_report("warning: All CPU(s) up to maxcpus should be described "
-> > +                     "in NUMA config, ability to start up with partial NUMA "
-> > +                     "mappings is obsoleted and will be removed in future");
-> > +    }
-> > +    g_string_free(s, true);
-> > +}
-> > +
-> >  void machine_run_board_init(MachineState *machine)
-> >  {
-> >      MachineClass *machine_class = MACHINE_GET_CLASS(machine);
-> > +
-> > +    if (nb_numa_nodes) {
-> > +        machine_numa_validate(machine);
-> > +    }  
-> 
-> ...this condition wouldn't be necessary.
-I prefer to keep such conditions in the caller as during review/reading
-it allows to exclude jumping into called function if condition is not
-relevant for considered usecase.
+Thanks, applied to the block branch.
 
-> 
-> >      machine_class->init(machine);
-> >  }
-> >  
-> > diff --git a/numa.c b/numa.c
-> > index f8c849d..d7aa662 100644
-> > --- a/numa.c
-> > +++ b/numa.c
-> > @@ -293,16 +293,6 @@ static void validate_numa_cpus(void)
-> >          bitmap_or(seen_cpus, seen_cpus,
-> >                    numa_info[i].node_cpu, max_cpus);
-> >      }
-> > -
-> > -    if (!bitmap_full(seen_cpus, max_cpus)) {
-> > -        char *msg;
-> > -        bitmap_complement(seen_cpus, seen_cpus, max_cpus);
-> > -        msg = enumerate_cpus(seen_cpus, max_cpus);
-> > -        error_report("warning: CPU(s) not present in any NUMA nodes: %s", msg);
-> > -        error_report("warning: All CPU(s) up to maxcpus should be described "
-> > -                     "in NUMA config");
-> > -        g_free(msg);
-> > -    }
-> >      g_free(seen_cpus);
-> >  }
-> >  
-> > -- 
-> > 2.7.4
-> >  
-> 
-> Otherwise
-> Reviewed-by: Andrew Jones <drjones@redhat.com> 
+Kevin
