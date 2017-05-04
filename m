@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6GFb-00076h-Dy
+	(envelope-from <kchamart@redhat.com>) id 1d6GFb-00076g-Du
 	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6GFW-0005Oh-Hz
+	(envelope-from <kchamart@redhat.com>) id 1d6GFX-0005P8-2T
 	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:52:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62115)
+Received: from mx1.redhat.com ([209.132.183.28]:46838)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6GFW-0005OL-Au
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1d6GFW-0005OV-Rw
 	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:52:50 -0400
-References: <20170504084135.7488.24715.stgit@PASHA-ISP>
-	<20170504084210.7488.37561.stgit@PASHA-ISP>
-	<b365904f-21ae-85a7-a3a6-bbe21c62e35a@redhat.com>
-	<000401d2c4c7$6d5b6d50$481247f0$@ru>
-	<b44f8aa8-e42f-4b94-ccfa-d80adb60de35@redhat.com>
-	<000801d2c4cd$3d3af720$b7b0e560$@ru>
-	<58398574-88b5-3382-65e2-7208beccc09a@redhat.com>
-	<000f01d2c4cf$7479f630$5d6de290$@ru>
-	<c6f5e430-fa98-124f-146b-6c3de79448cd@redhat.com>
-	<001101d2c4d2$bb44a4e0$31cdeea0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e6c5885d-855b-288e-68c8-5665be284d78@redhat.com>
-Date: Thu, 4 May 2017 14:52:44 +0200
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC9113DBC5
+	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 12:52:49 +0000 (UTC)
+Date: Thu, 4 May 2017 14:52:46 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170504125246.mfkghiglgpj4qoix@eukaryote>
+References: <20170503104257.5127-1-dgilbert@redhat.com>
+	<20170504100853.umbq3zaxqbbrbsw2@eukaryote>
+	<20170504102523.GB2078@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <001101d2c4d2$bb44a4e0$31cdeea0$@ru>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 06/10] replay: fix save/load vm for
- non-empty queue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170504102523.GB2078@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] block migration: Allow compile time disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, jcody@redhat.com, kwolf@redhat.com
 
+On Thu, May 04, 2017 at 11:25:25AM +0100, Dr. David Alan Gilbert wrote:
+> * Kashyap Chamarthy (kchamart@redhat.com) wrote:
+> > On Wed, May 03, 2017 at 11:42:57AM +0100, Dr. David Alan Gilbert (git) wrote:
 
+[...]
 
-On 04/05/2017 14:34, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 04/05/2017 14:10, Pavel Dovgalyuk wrote:
->>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->>>> On 04/05/2017 13:54, Pavel Dovgalyuk wrote:
->>>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->>>>>> On 04/05/2017 13:13, Pavel Dovgalyuk wrote:
->>>>>>>>> This patch does not allows saving/loading vmstate when
->>>>>>>>> replay events queue is not empty. There is no reliable
->>>>>>>>> way to save events queue, because it describes internal
->>>>>>>>> coroutine state. Therefore saving and loading operations
->>>>>>>>> should be deferred to another record/replay step.
->>>>>>>>
->>>>>>>> Can it actually be non-empty after bdrv_drain_all?
->>>>>>>
->>>>>>> drain/flush cannot succeed, because started requests are
->>>>>>> prisoned in the replay events queue.
->>>>>>
->>>>>> But that would apply to loading only.  Saving should still be always
->>>>>> possible.
->>>>>
->>>>> We can save it. But it wouldn't load correctly - replay queue will be empty after loading.
->>>>
->>>> When saving you can drain, and then the events queue should be empty.
->>>> Or I am misunderstanding how it works, which is possible too.
->>>
->>> Drain will wait until the queue becomes empty.
->>> Queue is processed only at checkpoints.
->>> Checkpoints are met in iothread (at timers processing and so on).
->>> But iothread is waiting for finishing the drain.
->>
->> What checkpoint can hang the drain during a save?
+> > > +#ifndef CONFIG_LIVE_BLOCK_MIGRATION
+> > > +    if (params.blk || params.shared) {
+> > > +        error_setg(errp, "QEMU compiled without old-style block migration. "
+> > > +                         "Use drive_mirror+NBD.");
+> > 
+> > Is it worth spelling out briefly what the "old-style block
+> > migration" is?  Something like:
+> > 
+> >     "QEMU compiled without old-style (i.e. QMP `migrate` with
+> >     "inc":true) block migration. Use `drive-mirror`+NBD")
+> >  
+> > But I also wonder if it's needlessly wordy, so your call to
+> > incorporate it or not.
 > 
-> No one. There are no checkpoins during vmsave and during drain.
-> Therefore the queue will never become empty.
+> I was trying to find a short way to say it, and that's the closest I
+> got to.
 
-Understood.  And what checkpoint will you be waiting for during drain,
-causing a deadlock?
+Fair enough.
 
-Paolo
+> > I spelled out the QMP equivalent (as opposed to HMP: 'migrate -b')
+> > because, that's what users of higher layers (libvirt, OpenStack etc)
+> > see in their QMP interactions with QEMU, when the old-style approach
+> > is used:
+> > 
+> >     {"execute":"migrate","arguments":{{"detach":true,"blk":false,"inc":true,"uri":"fd:migrate"}
+> 
+> But would openstack users even know about QMP?
+
+No, they're not expected to know of it.  Only developers digging into
+Nova Vir driver issues that trickle down to QEMU normally know about it.
+
+-- 
+/kashyap
