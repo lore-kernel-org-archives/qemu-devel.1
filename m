@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashok.raj@intel.com>) id 1d6NYt-0007Vg-7E
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 16:41:20 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d6NtA-0004bp-5K
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 17:02:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashok.raj@intel.com>) id 1d6NYp-0001RL-9J
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 16:41:19 -0400
-Received: from mga06.intel.com ([134.134.136.31]:45285)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ashok.raj@intel.com>) id 1d6NYp-0001Qz-0R
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 16:41:15 -0400
-Date: Thu, 4 May 2017 13:37:50 -0700
-From: "Raj, Ashok" <ashok.raj@intel.com>
-Message-ID: <20170504203750.GA7308@otc-nc-03>
-References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1493201210-14357-4-git-send-email-yi.l.liu@linux.intel.com>
-	<20170427105317.GE1542@pxdev.xzpeter.org>
-	<20170504142853.1537028c@t450s.home>
+	(envelope-from <jsnow@redhat.com>) id 1d6Nt8-00029R-Sl
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 17:02:16 -0400
+References: <20170504193044.16303-1-jsnow@redhat.com>
+	<d4850849-597b-ed09-ea43-b09621c0f5f0@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e070fda5-61d5-3324-e45f-85e7020670a3@redhat.com>
+Date: Thu, 4 May 2017 17:02:06 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170504142853.1537028c@t450s.home>
-Subject: Re: [Qemu-devel] [RFC PATCH 03/20] intel_iommu: add "svm" option
+In-Reply-To: <d4850849-597b-ed09-ea43-b09621c0f5f0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Check for backing image if
+ specified during create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +25,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, jasowang@redhat.com, iommu@lists.linux-foundation.org, kevin.tian@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Thu, May 04, 2017 at 02:28:53PM -0600, Alex Williamson wrote:
-> On Thu, 27 Apr 2017 18:53:17 +0800
-> Peter Xu <peterx@redhat.com> wrote:
+
+
+On 05/04/2017 03:58 PM, Eric Blake wrote:
+> On 05/04/2017 02:30 PM, John Snow wrote:
+>> Or, rather, force the open of a backing image if one was specified
+>> for creation. Using a similar -unsafe option as rebase, allow qemu-img
+>> to ignore the backing file validation if possible.
+>>
+>> It may not always be possible, as in the existing case of if a filesize
 > 
-> > On Wed, Apr 26, 2017 at 06:06:33PM +0800, Liu, Yi L wrote:
-> > > Expose "Shared Virtual Memory" to guest by using "svm" option.
-> > > Also use "svm" to expose SVM related capabilities to guest.
-> > > e.g. "-device intel-iommu, svm=on"
-> > > 
-> > > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c          | 10 ++++++++++
-> > >  hw/i386/intel_iommu_internal.h |  5 +++++
-> > >  include/hw/i386/intel_iommu.h  |  1 +
-> > >  3 files changed, 16 insertions(+)
-> > > 
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index bf98fa5..ba1e7eb 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -2453,6 +2453,7 @@ static Property vtd_properties[] = {
-> > >      DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
-> > >      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
-> > >      DEFINE_PROP_BOOL("ecs", IntelIOMMUState, ecs, FALSE),
-> > > +    DEFINE_PROP_BOOL("svm", IntelIOMMUState, svm, FALSE),
-> > >      DEFINE_PROP_END_OF_LIST(),
-> > >  };
-> > >  
-> > > @@ -2973,6 +2974,15 @@ static void vtd_init(IntelIOMMUState *s)
-> > >          s->ecap |= VTD_ECAP_ECS;
-> > >      }
-> > >  
-> > > +    if (s->svm) {
-> > > +        if (!s->ecs || !x86_iommu->pt_supported || !s->caching_mode) {
-> > > +            error_report("Need to set ecs, pt, caching-mode for svm");
-> > > +            exit(1);
-> > > +        }
-> > > +        s->cap |= VTD_CAP_DWD | VTD_CAP_DRD;
-> > > +        s->ecap |= VTD_ECAP_PRS | VTD_ECAP_PTS | VTD_ECAP_PASID28;
-> > > +    }
-> > > +
-> > >      if (s->caching_mode) {
-> > >          s->cap |= VTD_CAP_CM;
-> > >      }
-> > > diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-> > > index 71a1c1e..f2a7d12 100644
-> > > --- a/hw/i386/intel_iommu_internal.h
-> > > +++ b/hw/i386/intel_iommu_internal.h
-> > > @@ -191,6 +191,9 @@
-> > >  #define VTD_ECAP_PT                 (1ULL << 6)
-> > >  #define VTD_ECAP_MHMV               (15ULL << 20)
-> > >  #define VTD_ECAP_ECS                (1ULL << 24)
-> > > +#define VTD_ECAP_PASID28            (1ULL << 28)  
-> > 
-> > Could I ask what's this bit? On my spec, it says this bit is reserved
-> > and defunct (spec version: June 2016).
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d42fde70849c5ba2f00c37a0666305eb507a47b8
-> 
-> Do we really need to emulate the buggy implementation?  Seems like we
-> could just pretend bit28 never happened here and use bit40 instead.
+> s/of if/when/
 > 
 
-Agree, bit28 can be gone.  
+That makes sense!
+
+>> for the new image was not specified.
+>>
+>> This is accomplished by shifting around the conditionals in
+>> bdrv_img_create, such that a backing file is always opened unless we
+>> provide BDRV_O_NO_BACKING. qemu-img is adjusted to pass this new flag
+>> when -u is provided to create.
+>>
+>> Sorry for the heinous looking diffstat, but it's mostly whitespace.
+>>
+> 
+> Indeed, reviewing under 'git diff -b' proved fruitful.
+> 
+>> Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=1213786
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  block.c                    | 75 +++++++++++++++++++++++-----------------------
+>>  qemu-img-cmds.hx           |  4 +--
+> 
+> Conflicts with the documentation patch for [-b backing_file] (already on
+> PULL request:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05816.html
+> 
+> so you'll have to rebase, but it shouldn't be too difficult.
+> 
+
+OK, not a problem.
+
+>>  qemu-img.c                 | 15 ++++++----
+>>  tests/qemu-iotests/082     |  4 +--
+>>  tests/qemu-iotests/082.out |  4 +--
+>>  5 files changed, 54 insertions(+), 48 deletions(-)
+>>
+>> diff --git a/block.c b/block.c
+>> index 5db266b..da28052 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -4280,38 +4280,38 @@ void bdrv_img_create(const char *filename, const char *fmt,
+>>      // The size for the image must always be specified, with one exception:
+>>      // If we are using a backing file, we can obtain the size from there
+>>      size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
+>> -    if (size == -1) {
+> 
+> Wait. How does this even work?  qemu_opt_get_size() returns an unsigned
+> value, either what was specified by the option, or else the default
+> parameter (which  we passed as 0), so how can size ever be -1?  It might
+> make sense if we had called:
+> 
+> size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, -1);
+> 
+> with the intent of allowing an explicit size of 0.  But I'm lost as to
+> how this code ever worked pre-patch...
+> 
+> 
+>> +
+>> +        if (size == -1) {
+> 
+> ...which therefore carries over to the state of things post-patch.
+> 
+> /me goes and reads code
+> 
+> What?
+> if (desc && desc->def_value_str) {
+>   parse_option_size(name, desc->def_value_str, &ret, &error_abort);
+>   return ret;
+> 
+> Oh - so THAT's how: qemu_opt_get_size_helper() ignores the 'defval'
+> input and instead returns a DIFFERENT default associated with the
+> QemuOpts. UGLY.  But not your fault.
+> 
+
+It's certainly not ideal.
+
+>> +++ b/qemu-img.c
+>> @@ -145,9 +145,10 @@ static void QEMU_NORETURN help(void)
+>>             "  'snapshot_id_or_name' is deprecated, use 'snapshot_param'\n"
+>>             "    instead\n"
+>>             "  '-c' indicates that target image must be compressed (qcow format only)\n"
+>> -           "  '-u' enables unsafe rebasing. It is assumed that old and new backing file\n"
+>> -           "       match exactly. The image doesn't need a working backing file before\n"
+>> -           "       rebasing in this case (useful for renaming the backing file)\n"
+>> +           "  '-u' allows unsafe backing chains. For rebasing, it is assumed that old and new \n"
+>> +           "       backing file match exactly. The image doesn't need a working backing file \n"
+>> +           "       before rebasing in this case (useful for renaming the backing file)\n"
+>> +           "       For image creation, allow creating without attempting to open the file.\n"
+> 
+> maybe s/to open the file/to open the backing file/
+> 
+
+Yeah, this is a little messy, so I am relying on feedback on the
+documentation.
+
+>> +++ b/tests/qemu-iotests/082
+>> @@ -85,8 +85,8 @@ run_qemu_img create -f $IMGFMT -o cluster_size=4k -o help "$TEST_IMG" $size
+>>  run_qemu_img create -f $IMGFMT -o cluster_size=4k -o \? "$TEST_IMG" $size
+>>  
+>>  # Looks like a help option, but is part of the backing file name
+>> -run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG",,help "$TEST_IMG" $size
+>> -run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG",,\? "$TEST_IMG" $size
+>> +run_qemu_img create -f $IMGFMT -u -o backing_file="$TEST_IMG",,help "$TEST_IMG" $size
+>> +run_qemu_img create -f $IMGFMT -u -o backing_file="$TEST_IMG",,\? "$TEST_IMG" $size
+> 
+> Nice test of the new usage.
+> > I like where it's headed.  It will need a v2 to rebase and fix the
+> things I pointed out, but I'm looking forward to it.
+> 
+
+Sure. Only concern I have is I am not actually sure if passing
+BDRV_O_NO_BACKING through has any other effect -- I don't THINK it does,
+but there's a lot of things I think sometimes.
+
+Thanks,
+--js
