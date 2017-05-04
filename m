@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d6M21-0002j6-5A
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:03:19 -0400
+	(envelope-from <groug@kaod.org>) id 1d6ML0-0000Ya-PI
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d6M1x-0007y6-S6
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:03:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39982)
+	(envelope-from <groug@kaod.org>) id 1d6MKw-0007p0-NZ
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:22:54 -0400
+Received: from 1.mo5.mail-out.ovh.net ([188.165.57.91]:60499)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d6M1x-0007wh-F9
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:03:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B2A76198D
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 19:03:12 +0000 (UTC)
-Date: Thu, 4 May 2017 20:03:06 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170504190306.GB2611@work-vm>
-References: <20170425220451.6028-1-quintela@redhat.com>
-	<20170425220451.6028-9-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d6MKw-0007oP-Gv
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:22:50 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 84ADFEADB4
+	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 21:22:48 +0200 (CEST)
+Date: Thu, 4 May 2017 21:22:37 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170504212237.341bf8ef@bahia>
+In-Reply-To: <1493908379.4214.8.camel@redhat.com>
+References: <20170427072843.8089-1-david@gibson.dropbear.id.au>
+	<1493908379.4214.8.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170425220451.6028-9-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/41] migration: Move page_cache.c to
- migration/
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/+9PD+CfrVxQ/Ta=7JnzivGI";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv3 0/4] Clean up compatibility
+ mode handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +32,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, armbru@redhat.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> It is only used by migration, so move it there.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+--Sig_/+9PD+CfrVxQ/Ta=7JnzivGI
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Thu, 04 May 2017 16:32:59 +0200
+Andrea Bolognani <abologna@redhat.com> wrote:
 
-> ---
->  Makefile.objs                                 | 1 -
->  migration/Makefile.objs                       | 2 +-
->  page_cache.c => migration/page_cache.c        | 0
->  {include/migration => migration}/page_cache.h | 0
->  tests/Makefile.include                        | 2 +-
->  5 files changed, 2 insertions(+), 3 deletions(-)
->  rename page_cache.c => migration/page_cache.c (100%)
->  rename {include/migration => migration}/page_cache.h (100%)
-> 
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 6167e7b..2100845 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -49,7 +49,6 @@ common-obj-$(CONFIG_POSIX) += os-posix.o
->  common-obj-$(CONFIG_LINUX) += fsdev/
->  
->  common-obj-y += migration/
-> -common-obj-y += page_cache.o #aio.o
->  
->  common-obj-$(CONFIG_SPICE) += spice-qemu-char.o
->  
-> diff --git a/migration/Makefile.objs b/migration/Makefile.objs
-> index c83ca92..ce8ce12 100644
-> --- a/migration/Makefile.objs
-> +++ b/migration/Makefile.objs
-> @@ -1,7 +1,7 @@
->  common-obj-y += migration.o socket.o fd.o exec.o
->  common-obj-y += tls.o channel.o
->  common-obj-y += colo-comm.o colo.o colo-failover.o
-> -common-obj-y += vmstate.o
-> +common-obj-y += vmstate.o page_cache.o
->  common-obj-y += qemu-file.o
->  common-obj-y += qemu-file-channel.o
->  common-obj-y += xbzrle.o postcopy-ram.o
-> diff --git a/page_cache.c b/migration/page_cache.c
-> similarity index 100%
-> rename from page_cache.c
-> rename to migration/page_cache.c
-> diff --git a/include/migration/page_cache.h b/migration/page_cache.h
-> similarity index 100%
-> rename from include/migration/page_cache.h
-> rename to migration/page_cache.h
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 579ec07..0f98c04 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -549,7 +549,7 @@ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
->  tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
->  tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
->  tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
-> -tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o page_cache.o $(test-util-obj-y)
-> +tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-util-obj-y)
->  tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
->  tests/test-int128$(EXESUF): tests/test-int128.o
->  tests/rcutorture$(EXESUF): tests/rcutorture.o $(test-util-obj-y)
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> On Thu, 2017-04-27 at 17:28 +1000, David Gibson wrote:
+> > This is a rebased and revised version of my patches revising CPU
+> > compatiblity mode handling on ppc, last posted in November.=C2=A0=C2=A0=
+Since
+> > then, many of the patches have already been merged (some for 2.9, some
+> > since).=C2=A0=C2=A0This is what's left.
+> >=C2=A0
+> >=C2=A0=C2=A0* There was conceptual confusion about what a compatibility =
+mode
+> >=C2=A0=C2=A0=C2=A0=C2=A0means, and how it interacts with the machine typ=
+e.=C2=A0=C2=A0This cleans
+> >=C2=A0=C2=A0=C2=A0=C2=A0that up, clarifying that a compatibility mode (a=
+s an externally set
+> >=C2=A0=C2=A0=C2=A0=C2=A0option) only makes sense on machine types that d=
+on't permit the
+> >=C2=A0=C2=A0=C2=A0=C2=A0guest hypervisor privilege (i.e. 'pseries')
+> >=C2=A0
+> >=C2=A0=C2=A0* It was previously the user's (or management layer's) respo=
+nsibility
+> >=C2=A0=C2=A0=C2=A0=C2=A0to determine compatibility of CPUs on either end=
+ for migration.
+> >=C2=A0=C2=A0=C2=A0=C2=A0This uses the compatibility modes to check that =
+properly during an
+> >=C2=A0=C2=A0=C2=A0=C2=A0incoming migration. =20
+>=20
+> I started playing with this, mostly with libvirt integration
+> in mind of course, and quickly ran into a behavior that I
+> believe was not intentional and unfortunately managed to slip
+> into 2.9, I assume through the patches which were initially
+> part of this series (mentioned above).
+>=20
+> More specifically, when I run a guest with
+>=20
+> =C2=A0 -M pseries-2.8 -cpu host
+>=20
+> using QEMU 2.8, the CPU in the guest is reported as
+>=20
+> =C2=A0 POWER8E (raw), altivec supported
+>=20
+> However, when using QEMU 2.9 with the very same command line,
+> including explicitly using the pseries-2.8 machine type, I
+> get
+>=20
+> =C2=A0 POWER8 (architected), altivec supported
+>=20
+
+The goal of this series is indeed to switch from raw to architected but I
+agree that it shouldn't affect existing machine types. This probably calls
+for some compat prop.
+
+> instead. The same happens with current master + your patches
+> applied on top.
+>=20
+> I'm not sure how much real trouble that will actually cause
+> for guests, but it's a guest-visible change as a result of
+> upgrading QEMU, which should just not happen.
+>=20
+>=20
+> I'll keep testing your series and get back to you as soon as
+> I have more feedback or questions.
+>=20
+> --=C2=A0
+> Andrea Bolognani / Red Hat / Virtualization
+>=20
+
+
+--Sig_/+9PD+CfrVxQ/Ta=7JnzivGI
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkLf30ACgkQAvw66wEB28IpQgCfSejn80qzOcyUf4UFf1ERbwB7
+nNEAnAhe66nNGCKYhJPjjKV+7cnI8IYI
+=5U8P
+-----END PGP SIGNATURE-----
+
+--Sig_/+9PD+CfrVxQ/Ta=7JnzivGI--
