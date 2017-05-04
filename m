@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d6DRN-00026E-3j
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:52:54 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d6DRM-0008GO-BU
+	(envelope-from <imammedo@redhat.com>) id 1d6DRM-00025J-4y
 	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:52:53 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-14-pbonzini@redhat.com>
-	<20170504073949.GA4725@lemon.lan>
-	<6c794eeb-3128-80a8-a8c4-0573be9a643c@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d84712c7-aef5-bea9-d0a2-1ffe397c6c57@redhat.com>
-Date: Thu, 4 May 2017 11:52:41 +0200
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <imammedo@redhat.com>) id 1d6DRL-0008FP-2M
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:52:52 -0400
+Date: Thu, 4 May 2017 11:52:39 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170504115239.3bae3732@nial.brq.redhat.com>
+In-Reply-To: <20170503175802.GU3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-24-git-send-email-imammedo@redhat.com>
+	<20170503163543.GR3482@thinpad.lan.raisama.net>
+	<5f71cfda-2a73-77e3-0bf7-85e2aed53811@redhat.com>
+	<20170503173841.GT3482@thinpad.lan.raisama.net>
+	<20170503175802.GU3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <6c794eeb-3128-80a8-a8c4-0573be9a643c@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 13/17] coroutine-lock: introduce
- qemu_co_mutex_lock_unlock
+Subject: Re: [Qemu-devel] [PATCH v2 23/24] numa: add '-numa cpu,
+ ...' option for property based node mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
+On Wed, 3 May 2017 14:58:02 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-
-On 04/05/2017 11:47, Paolo Bonzini wrote:
+> On Wed, May 03, 2017 at 02:38:41PM -0300, Eduardo Habkost wrote:
+> > On Wed, May 03, 2017 at 11:39:10AM -0500, Eric Blake wrote:  
+> > > On 05/03/2017 11:35 AM, Eduardo Habkost wrote:
+> > >   
+> > > >> +
+> > > >> +        memset(&cpu, 0, sizeof(cpu));
+> > > >> +        cpu.has_node_id = object->u.cpu.has_node_id;
+> > > >> +        cpu.node_id = object->u.cpu.node_id;
+> > > >> +        cpu.has_socket_id = object->u.cpu.has_socket_id;
+> > > >> +        cpu.socket_id = object->u.cpu.socket_id;
+> > > >> +        cpu.has_core_id = object->u.cpu.has_core_id;
+> > > >> +        cpu.core_id = object->u.cpu.core_id;
+> > > >> +        cpu.has_thread_id = object->u.cpu.has_thread_id;
+> > > >> +        cpu.thread_id = object->u.cpu.thread_id;  
+> > > > 
+> > > > We don't have a way to avoid copying each field individually?
+> > > > Some visitor trick, maybe?
+> > > > 
+> > > > Eric, Markus, Michael, do you have any suggestions?  
+> > > 
+> > > Markus just added QAPI_CLONE_MEMBERS(), which sounds like what you want:
+> > > 
+> > > https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04867.html  
+> > 
+> > Not sure if it would work in this case. Note that cpu and
+> > object->u.cpu have different types. 'cpu' is CpuInstanceProps,
+> > but object->u.cpu is NodeCpuOptions.
+> > 
+> > NodeCpuOptions has { 'base': 'CpuInstanceProps' }, and
+> > CpuInstanceProps field declarations are duplicated in struct
+> > NodeCpuOptions. Do you know why struct inheritance is implemented
+> > by duplicating the fields of the base struct instead of embedding
+> > the base struct?  
 > 
+> Nevermind, I just found out that QAPI generates a
+> qapi_NumaCpuOptions_base() upcast helper. So this can be solved
+> with no data copying at all:
 > 
-> On 04/05/2017 09:39, Fam Zheng wrote:
->> On Thu, 04/20 14:00, Paolo Bonzini wrote:
->>> +    if (atomic_cmpxchg(&mutex->locked, waiters, waiters + 1) != waiters) {
->>
->> Is it still useful to try the fast path again if there are now even more
->> waiters, i.e.  "atomic_cmpxchg(...) > waiters"?
+>  machine_set_cpu_numa_nodes(ms, qapi_NumaCpuOptions_base(&object->u.cpu), &err);
 > 
-> Probably not.
 
-... but when this happens, we don't enter the fast path loop:
-
- retry_fast_path:
-    waiters = atomic_read(&mutex->locked);
-    if (waiters == 0) {
-        /* Provide same memory ordering semantics as mutex lock/unlock.  */
-        smp_mb_acquire();
-        smp_mb_release();
-        return;
-    }
-
-    i = 0;
-    while (waiters == 1 && ++i < 1000) {
-        if (atomic_read(&mutex->ctx) == ctx) {
-            break;
-        }
-        waiters = atomic_read(&mutex->locked);
-        if (waiters == 0) {
-            smp_mb_acquire();
-            smp_mb_release();
-            return;
-        }
-        cpu_relax();
-    }
-
-    if (atomic_cmpxchg(&mutex->locked, waiters, waiters + 1) != waiters) {
-        goto retry_fast_path;
-    }
-
-    qemu_co_mutex_lock_slowpath(ctx, mutex);
-    qemu_co_mutex_unlock(mutex);
-
-The "if (waiters == 0)" fails, and the "while (waiters == 1 && ...)" won't
-happen either if atomic_cmpxchg returns > 1.  So really what you get is
-a retry of the atomic_cmpxchg.
-
-We should introduce atomic_try_cmpxchg.  Linux added it recently, too,
-and it simplifies the code because you don't need to redo the atomic_read.
-Like this:
-
-    waiters = atomic_read(&mutex->locked);
- retry_fast_path:
-    if (waiters == 0) {
-        ...
-    }
-    i = 0;
-    while (waiters == 1 && ++i < 1000) {
-        ...
-    }
-    if (!atomic_cmpxchg(&mutex->locked, &waiters, waiters + 1)) {
-        goto retry_fast_path;
-    }
-
-    qemu_co_mutex_lock_slowpath(ctx, mutex);
-    qemu_co_mutex_unlock(mutex);
-
-
-Paolo
-
-
-> Paolo
-> 
->>> +        goto retry_fast_path;
->>> +    }
->>> +
->>> +    qemu_co_mutex_lock_slowpath(ctx, mutex);
->>> +    qemu_co_mutex_unlock(mutex);
->>> +}
->>> +
->>>  void coroutine_fn qemu_co_mutex_unlock(CoMutex *mutex)
->>>  {
->>>      Coroutine *self = qemu_coroutine_self();
->>> -- 
->>> 2.9.3
->>>
->>>
->>>
-> 
-> 
+Thanks for finding out, I'll try it this way
