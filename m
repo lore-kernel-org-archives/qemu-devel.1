@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d6K00-0008Cv-4T
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d6K01-0008Es-Nl
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d6Jzx-0003rR-Bq
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d6K00-0003wQ-LA
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:05 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  4 May 2017 18:52:39 +0200
-Message-Id: <1493916761-32319-5-git-send-email-kwolf@redhat.com>
+Date: Thu,  4 May 2017 18:52:40 +0200
+Message-Id: <1493916761-32319-6-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
 References: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/6] block: Inactivate parents before children
+Subject: [Qemu-devel] [PATCH 5/6] block: Fix write/resize permissions for
+ inactive images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,86 +23,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
 
-The proper order for inactivating block nodes is that first the parents
-get inactivated and then the children. If we do things in this order, we
-can assert that we didn't accidentally leave a parent activated when one
-of its child nodes is inactive.
+Format drivers for inactive nodes don't need write/resize permissions on
+their bs->file and can share write/resize with another VM (in fact, this
+is the whole point of keeping images inactive). Represent this fact in
+the op blocker system, so that image locking does the right thing
+without special-casing inactive images.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ block.c               | 35 +++++++++++++++++++++++++++++++++--
+ include/block/block.h |  1 +
+ 2 files changed, 34 insertions(+), 2 deletions(-)
 
 diff --git a/block.c b/block.c
-index c3e7ebd..773bd64 100644
+index 773bd64..cd89467 100644
 --- a/block.c
 +++ b/block.c
-@@ -762,6 +762,13 @@ static void bdrv_child_cb_drained_end(BdrvChild *child)
-     bdrv_drained_end(bs);
+@@ -192,11 +192,20 @@ void path_combine(char *dest, int dest_size,
+     }
  }
  
-+static int bdrv_child_cb_inactivate(BdrvChild *child)
++/* Returns whether the image file is opened as read-only. Note that this can
++ * return false and writing to the image file is still not possible because the
++ * image is inactivated. */
+ bool bdrv_is_read_only(BlockDriverState *bs)
+ {
+     return bs->read_only;
+ }
+ 
++/* Returns whether the image file can be written to right now */
++bool bdrv_is_writable(BlockDriverState *bs)
 +{
-+    BlockDriverState *bs = child->opaque;
-+    assert(bs->open_flags & BDRV_O_INACTIVE);
-+    return 0;
++    return !bdrv_is_read_only(bs) && !(bs->open_flags & BDRV_O_INACTIVE);
 +}
 +
- /*
-  * Returns the options and flags that a temporary snapshot should get, based on
-  * the originally requested flags (the originally requested image will have
-@@ -822,6 +829,7 @@ const BdrvChildRole child_file = {
-     .inherit_options = bdrv_inherited_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-+    .inactivate      = bdrv_child_cb_inactivate,
- };
+ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+ {
+     /* Do not set read_only if copy_on_read is enabled */
+@@ -1512,7 +1521,7 @@ static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
  
- /*
-@@ -843,6 +851,7 @@ const BdrvChildRole child_format = {
-     .inherit_options = bdrv_inherited_fmt_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-+    .inactivate      = bdrv_child_cb_inactivate,
- };
+     /* Write permissions never work with read-only images */
+     if ((cumulative_perms & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED)) &&
+-        bdrv_is_read_only(bs))
++        !bdrv_is_writable(bs))
+     {
+         error_setg(errp, "Block node is read-only");
+         return -EPERM;
+@@ -1797,7 +1806,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+         bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, &shared);
  
- static void bdrv_backing_attach(BdrvChild *c)
-@@ -928,6 +937,7 @@ const BdrvChildRole child_backing = {
-     .inherit_options = bdrv_backing_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-+    .inactivate      = bdrv_child_cb_inactivate,
- };
- 
- static int bdrv_open_flags(BlockDriverState *bs, int flags)
-@@ -4038,13 +4048,6 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
+         /* Format drivers may touch metadata even if the guest doesn't write */
+-        if (!bdrv_is_read_only(bs)) {
++        if (bdrv_is_writable(bs)) {
+             perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
          }
+ 
+@@ -1823,6 +1832,10 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+                   BLK_PERM_WRITE_UNCHANGED;
      }
  
--    QLIST_FOREACH(child, &bs->children, next) {
--        ret = bdrv_inactivate_recurse(child->bs, setting_flag);
--        if (ret < 0) {
--            return ret;
--        }
--    }
--
-     if (setting_flag) {
-         bs->open_flags |= BDRV_O_INACTIVE;
- 
-@@ -4058,6 +4061,14 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
-             }
-         }
-     }
-+
-+    QLIST_FOREACH(child, &bs->children, next) {
-+        ret = bdrv_inactivate_recurse(child->bs, setting_flag);
-+        if (ret < 0) {
-+            return ret;
-+        }
++    if (bs->open_flags & BDRV_O_INACTIVE) {
++        shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
 +    }
 +
-     return 0;
+     *nperm = perm;
+     *nshared = shared;
  }
+@@ -3969,6 +3982,7 @@ void bdrv_init_with_whitelist(void)
+ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+ {
+     BdrvChild *child, *parent;
++    uint64_t perm, shared_perm;
+     Error *local_err = NULL;
+     int ret;
  
+@@ -4005,6 +4019,16 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+         return;
+     }
+ 
++    /* Update permissions, they may differ for inactive nodes */
++    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
++    ret = bdrv_check_perm(bs, perm, shared_perm, NULL, &local_err);
++    if (ret < 0) {
++        bs->open_flags |= BDRV_O_INACTIVE;
++        error_propagate(errp, local_err);
++        return;
++    }
++    bdrv_set_perm(bs, perm, shared_perm);
++
+     QLIST_FOREACH(parent, &bs->parents, next_parent) {
+         if (parent->role->activate) {
+             parent->role->activate(parent, &local_err);
+@@ -4049,6 +4073,8 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
+     }
+ 
+     if (setting_flag) {
++        uint64_t perm, shared_perm;
++
+         bs->open_flags |= BDRV_O_INACTIVE;
+ 
+         QLIST_FOREACH(parent, &bs->parents, next_parent) {
+@@ -4060,6 +4086,11 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
+                 }
+             }
+         }
++
++        /* Update permissions, they may differ for inactive nodes */
++        bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
++        bdrv_check_perm(bs, perm, shared_perm, NULL, &error_abort);
++        bdrv_set_perm(bs, perm, shared_perm);
+     }
+ 
+     QLIST_FOREACH(child, &bs->children, next) {
+diff --git a/include/block/block.h b/include/block/block.h
+index 80d51d8..90932b4 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -435,6 +435,7 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
+                             int64_t sector_num, int nb_sectors, int *pnum);
+ 
+ bool bdrv_is_read_only(BlockDriverState *bs);
++bool bdrv_is_writable(BlockDriverState *bs);
+ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+ bool bdrv_is_sg(BlockDriverState *bs);
 -- 
 1.8.3.1
