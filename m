@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6EjY-0000Kv-8M
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:15:49 -0400
+	(envelope-from <bounces@canonical.com>) id 1d6Eob-0002QC-G3
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6EjU-0003pu-9K
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:15:44 -0400
-Date: Thu, 4 May 2017 12:15:36 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170504111536.GG32376@stefanha-x1.localdomain>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-2-pbonzini@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1d6EoY-00012N-AL
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:20:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48163)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d6EoY-000125-42
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:20:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d6EoS-0002b9-6a
+	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 11:20:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5E49A2E80CD
+	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 11:20:44 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OFj+1YLvsEfSXdCH"
-Content-Disposition: inline
-In-Reply-To: <20170420120058.28404-2-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 01/17] block: access
- copy_on_read with atomic ops
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 04 May 2017 11:06:26 -0000
+From: Balamuruhan S <1688231@bugs.launchpad.net>
+Reply-To: Bug 1688231 <1688231@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170504110626.10123.22333.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1688231] [NEW] [Qemu-ppc] sendkey is not working
+ for any of the keystrokes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +36,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+
+Public bug reported:
+
+sendkey option is not working for any of the keystrokes in ppc64le,
+
+Qemu version:
+# qemu-img --version
+qemu-img version 2.9.50 (v2.9.0-303-g81b2d5c-dirty)
+
+Qemu command line:
+# qemu-system-ppc64 --enable-kvm --nographic -vga none -machine pseries -m =
+4G,slots=3D32,maxmem=3D32G -smp 16,maxcpus=3D32 -device virtio-blk-pci,driv=
+e=3Drootdisk -drive file=3D/var/lib/libvirt/images/f25-upstream-ppc64le.qco=
+w2,if=3Dnone,cache=3Dnone,format=3Dqcow2,id=3Drootdisk -monitor telnet:127.=
+0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net user -redir tcp:2000:=
+:22
+
+Guest booted successfully and logged in
+Fedora 25 (Twenty Five)
+Kernel 4.11.0-rc4 on an ppc64le (hvc0)
+
+atest-guest login: updatedb (5582) used greatest stack depth: 9568 bytes le=
+ft
+root
+Password: =
+
+Last login: Mon Mar 27 01:57:51 on hvc0
+[root@atest-guest ~]# =
 
 
---OFj+1YLvsEfSXdCH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Qemu monitor:
+# telnet 127.0.0.1 1234
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+QEMU 2.9.50 monitor - type 'help' for more information
+(qemu) sendkey a
+(qemu) sendkey ret
 
-On Thu, Apr 20, 2017 at 02:00:42PM +0200, Paolo Bonzini wrote:
->  void bdrv_disable_copy_on_read(BlockDriverState *bs)
->  {
-> -    assert(bs->copy_on_read > 0);
-> -    bs->copy_on_read--;
-> +    assert(atomic_read(&bs->copy_on_read) > 0);
-> +    atomic_dec(&bs->copy_on_read);
->  }
+But from the console, I couldn't observe the keystroke a or return.
 
-To make this truly thread-safe:
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-  old = atomic_dec_fetch(&bs->copy_on_read);
-  assert(old > 0);
+-- =
 
---OFj+1YLvsEfSXdCH
-Content-Type: application/pgp-signature; name="signature.asc"
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1688231
 
------BEGIN PGP SIGNATURE-----
+Title:
+  [Qemu-ppc] sendkey is not working for any of the keystrokes
 
-iQEcBAEBAgAGBQJZCw1YAAoJEJykq7OBq3PIKgoH/A6LZoLUwGOhXZ/Ma1ZjRDzI
-C+MZq13Fq+NSxFEIjAsz+z+4Tf8QpfpVeQPAfQMGr72YXYPzrtfBAB60IrmpiZmX
-kn+/oiXO6o1Rlu0MkYaEdxXdDAwjBl1mKrhkSNKG5OyJ/W/qsdHpHRVhktY3QKGb
-aoL3gIbqLu2QGhY5Mh6CICm9/Q42b+kQd1L/Yq5C8tGcQMTy28BRT6MjWJNDo4/5
-JSJMSlgEH+36/k+CrWi+YFZW/Dqx0SWKa93IF5gx3pEPBzn/GTcLyPfIntEvjUS8
-1eqlNyC+3smMvR+PUz/xyegZblT8HvwFvYAf1jGZT5n7KSiA/R7dUnYCNMmFrTM=
-=KrkO
------END PGP SIGNATURE-----
+Status in QEMU:
+  New
 
---OFj+1YLvsEfSXdCH--
+Bug description:
+  sendkey option is not working for any of the keystrokes in ppc64le,
+
+  Qemu version:
+  # qemu-img --version
+  qemu-img version 2.9.50 (v2.9.0-303-g81b2d5c-dirty)
+
+  Qemu command line:
+  # qemu-system-ppc64 --enable-kvm --nographic -vga none -machine pseries -=
+m 4G,slots=3D32,maxmem=3D32G -smp 16,maxcpus=3D32 -device virtio-blk-pci,dr=
+ive=3Drootdisk -drive file=3D/var/lib/libvirt/images/f25-upstream-ppc64le.q=
+cow2,if=3Dnone,cache=3Dnone,format=3Dqcow2,id=3Drootdisk -monitor telnet:12=
+7.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net user -redir tcp:200=
+0::22
+
+  Guest booted successfully and logged in
+  Fedora 25 (Twenty Five)
+  Kernel 4.11.0-rc4 on an ppc64le (hvc0)
+
+  atest-guest login: updatedb (5582) used greatest stack depth: 9568 bytes =
+left
+  root
+  Password: =
+
+  Last login: Mon Mar 27 01:57:51 on hvc0
+  [root@atest-guest ~]# =
+
+
+  Qemu monitor:
+  # telnet 127.0.0.1 1234
+  Trying 127.0.0.1...
+  Connected to 127.0.0.1.
+  Escape character is '^]'.
+  QEMU 2.9.50 monitor - type 'help' for more information
+  (qemu) sendkey a
+  (qemu) sendkey ret
+
+  But from the console, I couldn't observe the keystroke a or return.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1688231/+subscriptions
