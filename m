@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6HmB-0002HU-Kc
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:30:40 -0400
+	(envelope-from <abologna@redhat.com>) id 1d6Hob-0003yq-VQ
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:33:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6HmA-0004WL-P6
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:30:39 -0400
-Date: Thu, 4 May 2017 22:30:04 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170504143004.GC6865@lemon.lan>
-References: <20170502163558.7611-1-famz@redhat.com>
-	<20170504130947.GB5238@noname.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170504130947.GB5238@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v17 00/23] block: Image locking series
+	(envelope-from <abologna@redhat.com>) id 1d6HoY-0005ch-21
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:33:09 -0400
+Message-ID: <1493908379.4214.8.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Thu, 04 May 2017 16:32:59 +0200
+In-Reply-To: <20170427072843.8089-1-david@gibson.dropbear.id.au>
+References: <20170427072843.8089-1-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCHv3 0/4] Clean up compatibility mode handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,22 +22,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, eblake@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
+Cc: agraf@suse.de, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Thu, 05/04 15:09, Kevin Wolf wrote:
-> Am 02.05.2017 um 18:35 hat Fam Zheng geschrieben:
-> > v17: Fixes addressing comments by Kevin:
-> >      - Rebase on top of kevin/block
-> >      - In test case 153, don't compile test program, just try locking=on and
-> >        catch warning message
-> >      - Add a missing space in comment
-> >      - Error out if locking=on is used for file-win
-> >      - Add commit message and Cc qemu-stable for patch 17 (now 18)
-> >      - Don't add duplicated -U in the documentation
-> 
-> Thanks, applied to the block branch.
+On Thu, 2017-04-27 at 17:28 +1000, David Gibson wrote:
+> This is a rebased and revised version of my patches revising CPU
+> compatiblity mode handling on ppc, last posted in November.=C2=A0=C2=A0=
+Since
+> then, many of the patches have already been merged (some for 2.9, some
+> since).=C2=A0=C2=A0This is what's left.
+>=C2=A0
+>=C2=A0=C2=A0* There was conceptual confusion about what a compatibility =
+mode
+>=C2=A0=C2=A0=C2=A0=C2=A0means, and how it interacts with the machine typ=
+e.=C2=A0=C2=A0This cleans
+>=C2=A0=C2=A0=C2=A0=C2=A0that up, clarifying that a compatibility mode (a=
+s an externally set
+>=C2=A0=C2=A0=C2=A0=C2=A0option) only makes sense on machine types that d=
+on't permit the
+>=C2=A0=C2=A0=C2=A0=C2=A0guest hypervisor privilege (i.e. 'pseries')
+>=C2=A0
+>=C2=A0=C2=A0* It was previously the user's (or management layer's) respo=
+nsibility
+>=C2=A0=C2=A0=C2=A0=C2=A0to determine compatibility of CPUs on either end=
+ for migration.
+>=C2=A0=C2=A0=C2=A0=C2=A0This uses the compatibility modes to check that =
+properly during an
+>=C2=A0=C2=A0=C2=A0=C2=A0incoming migration.
 
-Thanks, Kevin!
+I started playing with this, mostly with libvirt integration
+in mind of course, and quickly ran into a behavior that I
+believe was not intentional and unfortunately managed to slip
+into 2.9, I assume through the patches which were initially
+part of this series (mentioned above).
 
-Fam
+More specifically, when I run a guest with
+
+=C2=A0 -M pseries-2.8 -cpu host
+
+using QEMU 2.8, the CPU in the guest is reported as
+
+=C2=A0 POWER8E (raw), altivec supported
+
+However, when using QEMU 2.9 with the very same command line,
+including explicitly using the pseries-2.8 machine type, I
+get
+
+=C2=A0 POWER8 (architected), altivec supported
+
+instead. The same happens with current master + your patches
+applied on top.
+
+I'm not sure how much real trouble that will actually cause
+for guests, but it's a guest-visible change as a result of
+upgrading QEMU, which should just not happen.
+
+
+I'll keep testing your series and get back to you as soon as
+I have more feedback or questions.
+
+--=C2=A0
+Andrea Bolognani / Red Hat / Virtualization
