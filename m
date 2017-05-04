@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6HKQ-0001U9-Ri
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:01:59 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6HKr-0001wI-M7
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:02:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6HKN-00081V-Ug
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:01:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55078)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6HKN-000814-PE
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:01:55 -0400
-Message-ID: <1493906512.371.19.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 04 May 2017 16:01:52 +0200
-In-Reply-To: <1493894491-26130-1-git-send-email-vip-ak47@yandex.ru>
-References: <1493894491-26130-1-git-send-email-vip-ak47@yandex.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] Video and sound capture to a videofile
- through ffmpeg
+	(envelope-from <stefanha@gmail.com>) id 1d6HKk-0008BZ-9E
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:02:25 -0400
+Date: Thu, 4 May 2017 15:02:14 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170504140214.GO32376@stefanha-x1.localdomain>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-11-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="AKkMM/tm2Mk6Yn/s"
+Content-Disposition: inline
+In-Reply-To: <20170420120058.28404-11-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 10/17] block: use Stat64 for
+ wr_highest_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex K <vip-ak47@yandex.ru>
-Cc: qemu-devel@nongnu.org, aliguori@amazon.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Do, 2017-05-04 at 13:41 +0300, Alex K wrote:
-> Hello everyone,
->=20
-> I've made a patch that adds ability to record video of what's going on
-> inside qemu. It uses ffmpeg libraries. Basically, the patch adds
-> 2 new commands to the console:
-> capture_start path framerate
-> capture_stop
->=20
-> path is required
-> framerate could be 24, 25, 30 or 60. Default is 60
-> video codec is always h264
->=20
-> The patch uses ffmpeg so you will need to install these packages:
-> ffmpeg libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
->=20
-> This is my first time posting here, so please correct me if I'm doing
-> something wrong
 
-First, as others already mentioned, it would be better to do this
-outside qemu, as vnc or spice client.  spice is probably the better
-choice as spice supports passing the guest display as dma-buf, which
-saves the encode-as-spice and decode-spice steps.  And the dma-bufs can
-be passed to a hardware encoder.
+--AKkMM/tm2Mk6Yn/s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Second, this must be a compile time option.  Breaking the build in case
-ffmpeg is not installed isn't an option.
+On Thu, Apr 20, 2017 at 02:00:51PM +0200, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/io.c                | 4 +---
+>  block/qapi.c              | 2 +-
+>  include/block/block_int.h | 7 ++++---
+>  3 files changed, 6 insertions(+), 7 deletions(-)
 
-Third, supporting H.264 only is a non-starter too.  Due to the patent
-situation you can't expect distros shipping ffmpeg with H.264 support
-enabled.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-cheers,
-  Gerd
+--AKkMM/tm2Mk6Yn/s
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZCzRmAAoJEJykq7OBq3PIZCIIAKGNn3ctlm7cKlOql25I06ca
+qppWJRtzmRZ8pou+0g5xctDCsUO2PsjqvTTPPPe5ulPrpawSVcz+iFAos8nnt0z9
+fwX1QfFarREdqIj2Dz5fU640AveSY69IDqhowz18wqAY5kDF6qEJaVGkf/ZWi/ZR
+/YMV40yz8XtEnaWpRjd7coCZsJQVmztjKxqUwEh2eo7uC5pqEgOFuWruX8WCwLDI
+s/RK2Tf5MY6Qac74PxEIDZjwVwO+9T758dlzQpg40E9C0bjb4hgVI4gXiAAqb+b/
+arvk9RtJ7teFvxmxQnp3Spya1yuLKY9SK6DeMM2npeWa7qY0sRRShZES4x2xdTc=
+=vO25
+-----END PGP SIGNATURE-----
+
+--AKkMM/tm2Mk6Yn/s--
