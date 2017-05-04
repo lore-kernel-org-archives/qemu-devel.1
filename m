@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6HAE-0004NJ-HQ
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:51:27 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d6HCp-0006E1-Ei
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6HAD-0004Wf-8c
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:51:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6HAC-0004Vn-VW
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:51:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B66097575D
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 13:51:23 +0000 (UTC)
-References: <20170504125432.21653-1-marcandre.lureau@redhat.com>
-	<20170504125432.21653-5-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3bee3200-b3b7-9a6a-7aa7-4cfb53de37a6@redhat.com>
-Date: Thu, 4 May 2017 08:51:20 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1d6HCm-0005ga-FE
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:54:07 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3919)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d6HCl-0005fs-SG
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:54:04 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Thu, 4 May 2017 13:53:29 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA263FC5@DGGEMA505-MBX.china.huawei.com>
+References: <1492842231-223720-1-git-send-email-arei.gonglei@huawei.com>
+	<1492842231-223720-2-git-send-email-arei.gonglei@huawei.com>
+	<38d13582-47f4-2a03-efef-064063c8852f@linux.vnet.ibm.com>
+In-Reply-To: <38d13582-47f4-2a03-efef-064063c8852f@linux.vnet.ibm.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20170504125432.21653-5-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TV0o9DNMpCpRwpHx4UBAJ51MF4gNhOJkv"
-Subject: Re: [Qemu-devel] [PATCH 4/4] qmp-shell: improve help
+Subject: Re: [Qemu-devel] [PATCH v18 1/2] virtio-crypto: Add virtio crypto
+ device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "agraf@suse.de" <agraf@suse.de>, "jasowang@redhat.com" <jasowang@redhat.com>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Wubin (H)" <wu.wubin@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, Linqiangmin <linqiangmin@huawei.com>, Zhbzg <zhbzg@huawei.com>, "Chenshanxi (Eety Chen,
+	Euler)" <eety.chen@huawei.com>, "Zhanghuimin (Amy)" <amy.zhanghuimin@huawei.com>, "lixiao (H)" <lixiao91@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TV0o9DNMpCpRwpHx4UBAJ51MF4gNhOJkv
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>
-Message-ID: <3bee3200-b3b7-9a6a-7aa7-4cfb53de37a6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] qmp-shell: improve help
-References: <20170504125432.21653-1-marcandre.lureau@redhat.com>
- <20170504125432.21653-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20170504125432.21653-5-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/04/2017 07:54 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Describe the arguments & fix the tool name.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qmp/qmp-shell | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Sorry, I missed one comment in the previous reply.
 
 >=20
-> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-> index db24c87cdd..fce1ab6c49 100755
-> --- a/scripts/qmp/qmp-shell
-> +++ b/scripts/qmp/qmp-shell
-> @@ -375,7 +375,11 @@ def die(msg):
->  def fail_cmdline(option=3DNone):
->      if option:
->          sys.stderr.write('ERROR: bad command-line option \'%s\'\n' % o=
-ption)
-> -    sys.stderr.write('qemu-shell [ -v ] [ -p ] [ -H ] [ -N ] < UNIX so=
-cket path> | < TCP address:port >\n')
-> +    sys.stderr.write('qmp-shell [ -v ] [ -p ] [ -H ] [ -N ] < UNIX soc=
-ket path> | < TCP address:port >\n')
-> +    sys.stderr.write('    -v     Verbose (echo command sent and receiv=
-ed)\n')
-> +    sys.stderr.write('    -p     Pretty-print JSON\n')
-> +    sys.stderr.write('    -H     Use HMP interface\n')
-> +    sys.stderr.write('    -N     Skip negotiate (for qemu-ga)\n')
->      sys.exit(1)
-> =20
->  def main():
+> > +\end{itemize*}
+> > +
 >=20
+> What about extensibility regarding "detailed algorithms"? Is the driver
+> required ignore algorithms
+> it does not "know about"? Should we reserve the not (yet) defined bits?
+>=20
+I mean the device MUST set the algorithms mask bits based on supported
+algorithms by the device, and the driver read them to get the capacity.
+I don't think we should care about the not defined bits.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---TV0o9DNMpCpRwpHx4UBAJ51MF4gNhOJkv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZCzHYAAoJEKeha0olJ0NqhukH/0UhFNbkxbxg0y/asFSiBxeN
-V7l/5Spku8ygGg2OjZ1/fQ5r4GiRz1j8JCQ/uZgVFYhbrYt31tGfbiOi57r2rqPT
-NkwNdkZeCfnkDpxsV6Ex1z50agU6uXSsWehsAUqwSYjAG3TqXxIO+lYtTYYPjQy/
-fImWMOI+n4Xo9I01NhLfEWsRvwoPu/KYPQyTrwjbCSGSocJkb3NNujaDup5iUOYJ
-WHMqAKFqw1DG09l+CFxmkjXlLNGMEqS99RBSFoN2llDrhVuzGeVaw0oSRzvmMger
-HmmS5i2adih0cMtCgjTKxmS6fDHZA/v0E9CmwNihsVfLGd5oNDRBXt368BTMNpM=
-=y/HD
------END PGP SIGNATURE-----
-
---TV0o9DNMpCpRwpHx4UBAJ51MF4gNhOJkv--
+Thanks,
+-Gonglei
