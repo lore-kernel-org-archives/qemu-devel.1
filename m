@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d6ML0-0000Ya-PI
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:22:55 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d6MSp-0002RI-3n
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d6MKw-0007p0-NZ
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:22:54 -0400
-Received: from 1.mo5.mail-out.ovh.net ([188.165.57.91]:60499)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d6MKw-0007oP-Gv
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:22:50 -0400
-Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 84ADFEADB4
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 21:22:48 +0200 (CEST)
-Date: Thu, 4 May 2017 21:22:37 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170504212237.341bf8ef@bahia>
-In-Reply-To: <1493908379.4214.8.camel@redhat.com>
-References: <20170427072843.8089-1-david@gibson.dropbear.id.au>
-	<1493908379.4214.8.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/+9PD+CfrVxQ/Ta=7JnzivGI";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv3 0/4] Clean up compatibility
- mode handling
+	(envelope-from <jsnow@redhat.com>) id 1d6MSn-0002rK-2p
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:30:59 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Thu,  4 May 2017 15:30:44 -0400
+Message-Id: <20170504193044.16303-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-img: Check for backing image if specified
+ during create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +18,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, armbru@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
---Sig_/+9PD+CfrVxQ/Ta=7JnzivGI
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Or, rather, force the open of a backing image if one was specified
+for creation. Using a similar -unsafe option as rebase, allow qemu-img
+to ignore the backing file validation if possible.
 
-On Thu, 04 May 2017 16:32:59 +0200
-Andrea Bolognani <abologna@redhat.com> wrote:
+It may not always be possible, as in the existing case of if a filesize
+for the new image was not specified.
 
-> On Thu, 2017-04-27 at 17:28 +1000, David Gibson wrote:
-> > This is a rebased and revised version of my patches revising CPU
-> > compatiblity mode handling on ppc, last posted in November.=C2=A0=C2=A0=
-Since
-> > then, many of the patches have already been merged (some for 2.9, some
-> > since).=C2=A0=C2=A0This is what's left.
-> >=C2=A0
-> >=C2=A0=C2=A0* There was conceptual confusion about what a compatibility =
-mode
-> >=C2=A0=C2=A0=C2=A0=C2=A0means, and how it interacts with the machine typ=
-e.=C2=A0=C2=A0This cleans
-> >=C2=A0=C2=A0=C2=A0=C2=A0that up, clarifying that a compatibility mode (a=
-s an externally set
-> >=C2=A0=C2=A0=C2=A0=C2=A0option) only makes sense on machine types that d=
-on't permit the
-> >=C2=A0=C2=A0=C2=A0=C2=A0guest hypervisor privilege (i.e. 'pseries')
-> >=C2=A0
-> >=C2=A0=C2=A0* It was previously the user's (or management layer's) respo=
-nsibility
-> >=C2=A0=C2=A0=C2=A0=C2=A0to determine compatibility of CPUs on either end=
- for migration.
-> >=C2=A0=C2=A0=C2=A0=C2=A0This uses the compatibility modes to check that =
-properly during an
-> >=C2=A0=C2=A0=C2=A0=C2=A0incoming migration. =20
->=20
-> I started playing with this, mostly with libvirt integration
-> in mind of course, and quickly ran into a behavior that I
-> believe was not intentional and unfortunately managed to slip
-> into 2.9, I assume through the patches which were initially
-> part of this series (mentioned above).
->=20
-> More specifically, when I run a guest with
->=20
-> =C2=A0 -M pseries-2.8 -cpu host
->=20
-> using QEMU 2.8, the CPU in the guest is reported as
->=20
-> =C2=A0 POWER8E (raw), altivec supported
->=20
-> However, when using QEMU 2.9 with the very same command line,
-> including explicitly using the pseries-2.8 machine type, I
-> get
->=20
-> =C2=A0 POWER8 (architected), altivec supported
->=20
+This is accomplished by shifting around the conditionals in
+bdrv_img_create, such that a backing file is always opened unless we
+provide BDRV_O_NO_BACKING. qemu-img is adjusted to pass this new flag
+when -u is provided to create.
 
-The goal of this series is indeed to switch from raw to architected but I
-agree that it shouldn't affect existing machine types. This probably calls
-for some compat prop.
+Sorry for the heinous looking diffstat, but it's mostly whitespace.
 
-> instead. The same happens with current master + your patches
-> applied on top.
->=20
-> I'm not sure how much real trouble that will actually cause
-> for guests, but it's a guest-visible change as a result of
-> upgrading QEMU, which should just not happen.
->=20
->=20
-> I'll keep testing your series and get back to you as soon as
-> I have more feedback or questions.
->=20
-> --=C2=A0
-> Andrea Bolognani / Red Hat / Virtualization
->=20
+Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=1213786
 
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block.c                    | 75 +++++++++++++++++++++++-----------------------
+ qemu-img-cmds.hx           |  4 +--
+ qemu-img.c                 | 15 ++++++----
+ tests/qemu-iotests/082     |  4 +--
+ tests/qemu-iotests/082.out |  4 +--
+ 5 files changed, 54 insertions(+), 48 deletions(-)
 
---Sig_/+9PD+CfrVxQ/Ta=7JnzivGI
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkLf30ACgkQAvw66wEB28IpQgCfSejn80qzOcyUf4UFf1ERbwB7
-nNEAnAhe66nNGCKYhJPjjKV+7cnI8IYI
-=5U8P
------END PGP SIGNATURE-----
-
---Sig_/+9PD+CfrVxQ/Ta=7JnzivGI--
+diff --git a/block.c b/block.c
+index 5db266b..da28052 100644
+--- a/block.c
++++ b/block.c
+@@ -4280,38 +4280,38 @@ void bdrv_img_create(const char *filename, const char *fmt,
+     // The size for the image must always be specified, with one exception:
+     // If we are using a backing file, we can obtain the size from there
+     size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
+-    if (size == -1) {
+-        if (backing_file) {
+-            BlockDriverState *bs;
+-            char *full_backing = g_new0(char, PATH_MAX);
+-            int64_t size;
+-            int back_flags;
+-            QDict *backing_options = NULL;
+-
+-            bdrv_get_full_backing_filename_from_filename(filename, backing_file,
+-                                                         full_backing, PATH_MAX,
+-                                                         &local_err);
+-            if (local_err) {
+-                g_free(full_backing);
+-                goto out;
+-            }
+-
+-            /* backing files always opened read-only */
+-            back_flags = flags;
+-            back_flags &= ~(BDRV_O_RDWR | BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING);
+-
+-            if (backing_fmt) {
+-                backing_options = qdict_new();
+-                qdict_put(backing_options, "driver",
+-                          qstring_from_str(backing_fmt));
+-            }
+-
+-            bs = bdrv_open(full_backing, NULL, backing_options, back_flags,
+-                           &local_err);
++    if (backing_file && !(flags & BDRV_O_NO_BACKING)) {
++        BlockDriverState *bs;
++        char *full_backing = g_new0(char, PATH_MAX);
++        int back_flags;
++        QDict *backing_options = NULL;
++
++        bdrv_get_full_backing_filename_from_filename(filename, backing_file,
++                                                     full_backing, PATH_MAX,
++                                                     &local_err);
++        if (local_err) {
+             g_free(full_backing);
+-            if (!bs) {
+-                goto out;
+-            }
++            goto out;
++        }
++
++        /* backing files always opened read-only */
++        back_flags = flags;
++        back_flags &= ~(BDRV_O_RDWR | BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING);
++
++        if (backing_fmt) {
++            backing_options = qdict_new();
++            qdict_put(backing_options, "driver",
++                      qstring_from_str(backing_fmt));
++        }
++
++        bs = bdrv_open(full_backing, NULL, backing_options, back_flags,
++                       &local_err);
++        g_free(full_backing);
++        if (!bs) {
++            goto out;
++        }
++
++        if (size == -1) {
+             size = bdrv_getlength(bs);
+             if (size < 0) {
+                 error_setg_errno(errp, -size, "Could not get size of '%s'",
+@@ -4319,14 +4319,15 @@ void bdrv_img_create(const char *filename, const char *fmt,
+                 bdrv_unref(bs);
+                 goto out;
+             }
+-
+             qemu_opt_set_number(opts, BLOCK_OPT_SIZE, size, &error_abort);
+-
+-            bdrv_unref(bs);
+-        } else {
+-            error_setg(errp, "Image creation needs a size parameter");
+-            goto out;
+         }
++
++        bdrv_unref(bs);
++    }
++
++    if (size == -1) {
++        error_setg(errp, "Image creation needs a size parameter");
++        goto out;
+     }
+ 
+     if (!quiet) {
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 8ac7822..a3f82f3 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -22,9 +22,9 @@ STEXI
+ ETEXI
+ 
+ DEF("create", img_create,
+-    "create [-q] [--object objectdef] [-f fmt] [-o options] filename [size]")
++    "create [-q] [--object objectdef] [-f fmt] [-u] [-o options] filename [size]")
+ STEXI
+-@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-o @var{options}] @var{filename} [@var{size}]
++@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
+ ETEXI
+ 
+ DEF("commit", img_commit,
+diff --git a/qemu-img.c b/qemu-img.c
+index bbe1574..2bfc422 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -145,9 +145,10 @@ static void QEMU_NORETURN help(void)
+            "  'snapshot_id_or_name' is deprecated, use 'snapshot_param'\n"
+            "    instead\n"
+            "  '-c' indicates that target image must be compressed (qcow format only)\n"
+-           "  '-u' enables unsafe rebasing. It is assumed that old and new backing file\n"
+-           "       match exactly. The image doesn't need a working backing file before\n"
+-           "       rebasing in this case (useful for renaming the backing file)\n"
++           "  '-u' allows unsafe backing chains. For rebasing, it is assumed that old and new \n"
++           "       backing file match exactly. The image doesn't need a working backing file \n"
++           "       before rebasing in this case (useful for renaming the backing file)\n"
++           "       For image creation, allow creating without attempting to open the file.\n"
+            "  '-h' with or without a command shows this help and lists the supported formats\n"
+            "  '-p' show progress of command (only certain commands)\n"
+            "  '-q' use Quiet mode - do not print any output (except errors)\n"
+@@ -409,6 +410,7 @@ static int img_create(int argc, char **argv)
+     char *options = NULL;
+     Error *local_err = NULL;
+     bool quiet = false;
++    int flags = 0;
+ 
+     for(;;) {
+         static const struct option long_options[] = {
+@@ -416,7 +418,7 @@ static int img_create(int argc, char **argv)
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":F:b:f:he6o:q",
++        c = getopt_long(argc, argv, ":F:b:f:he6o:qu",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -464,6 +466,9 @@ static int img_create(int argc, char **argv)
+         case 'q':
+             quiet = true;
+             break;
++        case 'u':
++            flags |= BDRV_O_NO_BACKING;
++            break;
+         case OPTION_OBJECT: {
+             QemuOpts *opts;
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+@@ -516,7 +521,7 @@ static int img_create(int argc, char **argv)
+     }
+ 
+     bdrv_img_create(filename, fmt, base_filename, base_fmt,
+-                    options, img_size, 0, quiet, &local_err);
++                    options, img_size, flags, quiet, &local_err);
+     if (local_err) {
+         error_reportf_err(local_err, "%s: ", filename);
+         goto fail;
+diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
+index ad1d9fa..d5c83d4 100755
+--- a/tests/qemu-iotests/082
++++ b/tests/qemu-iotests/082
+@@ -85,8 +85,8 @@ run_qemu_img create -f $IMGFMT -o cluster_size=4k -o help "$TEST_IMG" $size
+ run_qemu_img create -f $IMGFMT -o cluster_size=4k -o \? "$TEST_IMG" $size
+ 
+ # Looks like a help option, but is part of the backing file name
+-run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG",,help "$TEST_IMG" $size
+-run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG",,\? "$TEST_IMG" $size
++run_qemu_img create -f $IMGFMT -u -o backing_file="$TEST_IMG",,help "$TEST_IMG" $size
++run_qemu_img create -f $IMGFMT -u -o backing_file="$TEST_IMG",,\? "$TEST_IMG" $size
+ 
+ # Try to trick qemu-img into creating escaped commas
+ run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG", -o help "$TEST_IMG" $size
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index a952330..f2732e4 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -146,10 +146,10 @@ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+-Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
++Testing: create -f qcow2 -u -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
+ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,help encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+ 
+-Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,? TEST_DIR/t.qcow2 128M
++Testing: create -f qcow2 -u -o backing_file=TEST_DIR/t.qcow2,,? TEST_DIR/t.qcow2 128M
+ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,? encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+ 
+ Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2, -o help TEST_DIR/t.qcow2 128M
+-- 
+2.9.3
