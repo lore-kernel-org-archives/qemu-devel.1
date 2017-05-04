@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6Mw0-0004IZ-Us
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 16:01:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1d6MyY-0006HU-BG
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 16:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6Mvx-0007q1-S5
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 16:01:09 -0400
-Resent-Message-Id: <E1d6Mvx-0007q1-S5@eggs.gnu.org>
-In-Reply-To: <20170504193044.16303-1-jsnow@redhat.com>
-Message-ID: <149392805433.183.9639384449879728354@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1d6MyV-0000O9-6y
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 16:03:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6MyU-0000Np-Tx
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 16:03:43 -0400
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+	<20170502203115.22233-3-ehabkost@redhat.com>
+	<87y3udsz3k.fsf@dusky.pond.sub.org>
+	<20170503183037.GV3482@thinpad.lan.raisama.net>
+	<87vaphm4fs.fsf@dusky.pond.sub.org>
+	<0778f9a5-d974-9beb-ae94-b8e46de7b75d@redhat.com>
+	<871ss4d9gc.fsf@dusky.pond.sub.org>
+	<20170504141056.GZ3482@thinpad.lan.raisama.net>
+	<20170504194234.GC11869@thinpad.lan.raisama.net>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2a02a111-a6fa-06b4-f053-41217cfd8be1@redhat.com>
+Date: Thu, 4 May 2017 15:03:36 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 4 May 2017 13:00:54 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Check for backing image if
- specified during create
+In-Reply-To: <20170504194234.GC11869@thinpad.lan.raisama.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oXUlF9C06hA23rNevhTWUqPdE6hhTR4Cs"
+Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support
+ alternate types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +36,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gcWVtdS1pbWc6IENoZWNrIGZvciBiYWNraW5nIGltYWdlIGlmIHNwZWNp
-ZmllZCBkdXJpbmcgY3JlYXRlCk1lc3NhZ2UtaWQ6IDIwMTcwNTA0MTkzMDQ0LjE2MzAzLTEtanNu
-b3dAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9n
-IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
-ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
-PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
-ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjE4M2I3ODQgcWVtdS1p
-bWc6IENoZWNrIGZvciBiYWNraW5nIGltYWdlIGlmIHNwZWNpZmllZCBkdXJpbmcgY3JlYXRlCgo9
-PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHFlbXUtaW1nOiBDaGVjayBm
-b3IgYmFja2luZyBpbWFnZSBpZiBzcGVjaWZpZWQgZHVyaW5nIGNyZWF0ZS4uLgpFUlJPUjogdW5u
-ZWNlc3Nhcnkgd2hpdGVzcGFjZSBiZWZvcmUgYSBxdW90ZWQgbmV3bGluZQojMTQ2OiBGSUxFOiBx
-ZW11LWltZy5jOjE0ODoKKyAgICAgICAgICAgIiAgJy11JyBhbGxvd3MgdW5zYWZlIGJhY2tpbmcg
-Y2hhaW5zLiBGb3IgcmViYXNpbmcsIGl0IGlzIGFzc3VtZWQgdGhhdCBvbGQgYW5kIG5ldyBcbiIK
-CkVSUk9SOiB1bm5lY2Vzc2FyeSB3aGl0ZXNwYWNlIGJlZm9yZSBhIHF1b3RlZCBuZXdsaW5lCiMx
-NDc6IEZJTEU6IHFlbXUtaW1nLmM6MTQ5OgorICAgICAgICAgICAiICAgICAgIGJhY2tpbmcgZmls
-ZSBtYXRjaCBleGFjdGx5LiBUaGUgaW1hZ2UgZG9lc24ndCBuZWVkIGEgd29ya2luZyBiYWNraW5n
-IGZpbGUgXG4iCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDE2NiBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9
-PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oXUlF9C06hA23rNevhTWUqPdE6hhTR4Cs
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Message-ID: <2a02a111-a6fa-06b4-f053-41217cfd8be1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support alternate
+ types
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+ <20170502203115.22233-3-ehabkost@redhat.com>
+ <87y3udsz3k.fsf@dusky.pond.sub.org>
+ <20170503183037.GV3482@thinpad.lan.raisama.net>
+ <87vaphm4fs.fsf@dusky.pond.sub.org>
+ <0778f9a5-d974-9beb-ae94-b8e46de7b75d@redhat.com>
+ <871ss4d9gc.fsf@dusky.pond.sub.org>
+ <20170504141056.GZ3482@thinpad.lan.raisama.net>
+ <20170504194234.GC11869@thinpad.lan.raisama.net>
+In-Reply-To: <20170504194234.GC11869@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/04/2017 02:42 PM, Eduardo Habkost wrote:
+
+>>>> As in: we forbid the combination of a scalar (whether 'int', 'number=
+',
+>>>> 'bool', and perhaps 'null') with a plain 'str' (since there's no way=
+ to
+>>>> tell whether '1' should parse as an integer or the string "1"); and
+>>>> combining a scalar with an 'enum' requires that all enum members be
+>>>> distinct from what could otherwise be parsed as a scalar?
+>>>
+>>> Exactly.
+>>>
+>>>>                                                            I can liv=
+e
+>>>> with such a restriction.
+>>>
+>>> Then let's do it.
+>>>
+>>> Eduardo, are you comfortable implementing this, or would you like me =
+to
+>>> do it?
+>>
+>> I will give it a try and include it in the next version. Thanks!
+>=20
+> So, I made qapi.py detect ambiguous alternates[1]. The bad news
+> is that lots of the alternates in qapi-schema-test.json already
+> break those rules.
+
+I'm not surprised, but if test code gets in the way of real life, I'm in
+favor of simplifying test code (change what is currently positive tests
+of "does this corner case work even though no one uses it" to instead be
+negative tests "do we properly reject this alternate as ambiguous").
+
+> This will require changing the schema and
+> rewriting tests in test-clone-visitor and qobject-input-visitor.
+
+Yes, and Markus or I could help do some of that work, if you don't feel
+up to it.
+
+>=20
+> I think there's a small risk we will want to support some of
+> those forbidden alternate combinations again in the future.
+
+Maybe, but 'git revert' is powerfully easy, and whoever adds the
+(now-ambiguous) use case should be able to justify their need at the
+time they (re-)add support.
+
+> If
+> that happens, detecting them at runtime in string-input-visitor
+> will keep us safe.
+
+I still much prefer compile-time rejections ("we don't support this, and
+we're telling you up front") over runtime rejections ("it compiled, and
+only if you get lucky will you discover that you had a problem").
+
+>=20
+> I plan to submit v2 with code to detect ambiguous alternates at
+> runtime, only, because it seems simpler than rewriting the test
+> code.
+
+Simpler, maybe. But harder to maintain, so it may STILL be worth going
+the more complex way and updating the testsuite to comply with the new
+rules.  Perhaps it can be done as followups (again, where Markus or I
+may step in and do the rest on top of your initial work).
+
+> After that, we can still make QAPI reject them at compile
+> time too, if we really want to.
+>=20
+> [1] https://github.com/ehabkost/qemu-hacks/commit/cda70a2e1c30c8dadb36f=
+d46095a4f6ee3d89737
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--oXUlF9C06hA23rNevhTWUqPdE6hhTR4Cs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZC4kYAAoJEKeha0olJ0NqnZMIAIPjj+w4rm8mquHI7wUImggD
+K8t35dcq8MbVjMYLHTscR2LRIsN5+owoKloEIYpK2gIw7cEw3GGqyMtcKBa9U86R
+LdPwy94O74jTDEeIYagBaj9HXDgxG7ElT4ozCYglXe/JKnpoNcX7mCozwREMr3bc
+kF7Pjtsi6yKr12kTPloDjyxllUkrkvYaem42FdibWyTDXtMHCBcpSq7myTIPjpJC
+bYz4wtVs1CaMYDii3/P0JoezVuYv+P5lsJvyJiqMgUOza4U0PfjFVly4LL8ex8QW
+d5DIbFnOZpEVE2ZCO/UIc1QSbztViTQz5WV+KfTHoQMc8eW4rnT5BxPTRhepXbk=
+=lWYK
+-----END PGP SIGNATURE-----
+
+--oXUlF9C06hA23rNevhTWUqPdE6hhTR4Cs--
