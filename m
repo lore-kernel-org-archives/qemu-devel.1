@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6B1t-0001UB-Ve
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:29 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d6B1v-0001UV-30
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6B1p-0004Xu-Dt
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40446)
+	(envelope-from <kraxel@redhat.com>) id 1d6B1s-0004ay-3s
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33130)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6B1p-0004XT-5W
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6B1r-0004Zv-UN
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D55783F45
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 07:18:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 015FF4DD62
+	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 07:18:23 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  4 May 2017 09:17:41 +0200
-Message-Id: <20170504071811.3547-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/30] audio patch queue
+Date: Thu,  4 May 2017 09:18:06 +0200
+Message-Id: <20170504071811.3547-26-kraxel@redhat.com>
+In-Reply-To: <20170504071811.3547-1-kraxel@redhat.com>
+References: <20170504071811.3547-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 25/30] audio: OPLSetUpdateHandler is not used
+ anywhere
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +31,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-  Hi,
+From: Juan Quintela <quintela@redhat.com>
 
-First audio pull for 2.10, with a bunch of cleanups sent during the
-freeze, and two memory leak fixes.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Message-id: 20170425223739.6703-22-quintela@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/audio/fmopl.h | 1 -
+ hw/audio/fmopl.c | 6 +-----
+ 2 files changed, 1 insertion(+), 6 deletions(-)
 
-please pull,
-  Gerd
-
-The following changes since commit e619b14746e5d8c0e53061661fd0e1da01fd4d=
-60:
-
-  Merge remote-tracking branch 'sthibault/tags/samuel-thibault' into stag=
-ing (2017-05-02 15:16:29 +0100)
-
-are available in the git repository at:
-
-  git://git.kraxel.org/qemu tags/pull-audio-20170504-1
-
-for you to fetch changes up to 9ea5ada76f34a0ef048b131c3a166d8564199bdb:
-
-  audio: Use ARRAY_SIZE from qemu/osdep.h (2017-05-04 09:16:05 +0200)
-
-----------------------------------------------------------------
-audio: cleanups, bugfixes (memory leaks).
-
-----------------------------------------------------------------
-Gerd Hoffmann (1):
-      audio: release capture buffers
-
-Juan Quintela (26):
-      adlib: Remove support for YMF262
-      audio: remove Y8950 configuration
-      audio: Remove YM3526 support
-      audio: YM3812 was always defined
-      audio: Remove UINT8
-      audio: remove UINT16
-      audio: remove UINT32
-      audio: Remove INT8
-      audio: remove INT16
-      audio: Remove INT32
-      audio: Unfold OPLSAMPLE
-      audio: Remove Unused OPL_TYPE_*
-      audio: Remove type field
-      audio: Remove unused fields
-      audio: GUSbyte is uint8_t
-      audio: remove GUSchar
-      audio: GUSword is uint16_t
-      audio: GUSword is uint16_t
-      audio: GUSsample is int16_t
-      audio: OPLSetIRQHandler is not used anywhere
-      audio: OPLSetUpdateHandler is not used anywhere
-      audio: IRQHandler is not used anymore
-      audio: UpdateHandler is not used anymore
-      audio: Remove unused typedefs
-      audio: un-export OPLResetChip
-      audio: Use ARRAY_SIZE from qemu/osdep.h
-
-Marc-Andr=C3=A9 Lureau (1):
-      audio: fix WAVState leak
-
-Zihan Yang (2):
-      hw/audio: replace exit with unrealize in hda_codec_device_class_ini=
-t
-      hw/audio: convert exit callback in HDACodecDeviceClass to void
-
- hw/audio/fmopl.h        | 175 +++++++++---------------------
- hw/audio/gusemu.h       |  22 +---
- hw/audio/intel-hda.h    |   2 +-
- audio/audio.c           |   2 +
- audio/wavcapture.c      |   1 +
- hw/audio/adlib.c        |  47 +-------
- hw/audio/fmopl.c        | 277 ++++++++----------------------------------=
-------
- hw/audio/gus.c          |   2 +-
- hw/audio/gusemu_hal.c   |  74 ++++++-------
- hw/audio/gusemu_mixer.c |  28 ++---
- hw/audio/hda-codec.c    |   3 +-
- hw/audio/intel-hda.c    |   5 +-
- hw/audio/Makefile.objs  |   2 -
- 13 files changed, 160 insertions(+), 480 deletions(-)
+diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
+index 375f971b4d..446de08d15 100644
+--- a/hw/audio/fmopl.h
++++ b/hw/audio/fmopl.h
+@@ -102,7 +102,6 @@ typedef struct fm_opl_f {
+ FM_OPL *OPLCreate(int clock, int rate);
+ void OPLDestroy(FM_OPL *OPL);
+ void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER TimerHandler,int channelOffset);
+-void OPLSetUpdateHandler(FM_OPL *OPL,OPL_UPDATEHANDLER UpdateHandler,int param);
+ 
+ void OPLResetChip(FM_OPL *OPL);
+ int OPLWrite(FM_OPL *OPL,int a,int v);
+diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
+index f91e700bf9..694a77b229 100644
+--- a/hw/audio/fmopl.c
++++ b/hw/audio/fmopl.c
+@@ -1141,11 +1141,7 @@ void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER TimerHandler,int channelOff
+ 	OPL->TimerHandler   = TimerHandler;
+ 	OPL->TimerParam = channelOffset;
+ }
+-void OPLSetUpdateHandler(FM_OPL *OPL,OPL_UPDATEHANDLER UpdateHandler,int param)
+-{
+-	OPL->UpdateHandler = UpdateHandler;
+-	OPL->UpdateParam = param;
+-}
++
+ /* ---------- YM3812 I/O interface ---------- */
+ int OPLWrite(FM_OPL *OPL,int a,int v)
+ {
+-- 
+2.9.3
