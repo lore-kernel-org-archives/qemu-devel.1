@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6Fyg-0004pW-RQ
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:35:29 -0400
+	(envelope-from <drjones@redhat.com>) id 1d6Fyq-0004yc-Kg
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6Fyf-0006Ww-OH
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:35:26 -0400
-Date: Thu, 4 May 2017 14:34:58 +0200
+	(envelope-from <drjones@redhat.com>) id 1d6Fyp-0006gS-Jl
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:35:36 -0400
+Date: Thu, 4 May 2017 14:35:27 +0200
 From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170504123458.sehggkxpci3w2emq@kamzik.brq.redhat.com>
+Message-ID: <20170504123527.nu5hwlxjarifboni@kamzik.brq.redhat.com>
 References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-19-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-20-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493816238-33120-19-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 18/24] numa: remove no longer used
- numa_get_node_for_cpu()
+In-Reply-To: <1493816238-33120-20-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 19/24] numa: remove no longer need
+ numa_post_machine_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +27,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-On Wed, May 03, 2017 at 02:57:12PM +0200, Igor Mammedov wrote:
-> it's been replaced by fetching mapping info from possible_cpus
+On Wed, May 03, 2017 at 02:57:13PM +0200, Igor Mammedov wrote:
+> CPUState::numa_node is still in use but now it's set by
+> board when it creates CPU objects. So there isn't any
+> need to set it again after all CPU's are created,
+> since it's been already set.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  include/sysemu/numa.h |  4 ----
->  numa.c                | 14 --------------
->  2 files changed, 18 deletions(-)
+>  include/sysemu/numa.h |  1 -
+>  numa.c                | 15 ---------------
+>  vl.c                  |  2 --
+>  3 files changed, 18 deletions(-)
 > 
 > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index 98d01e6..9077bb2 100644
+> index 9077bb2..0b0a044 100644
 > --- a/include/sysemu/numa.h
 > +++ b/include/sysemu/numa.h
-> @@ -32,10 +32,6 @@ void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
->  void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
->  uint32_t numa_get_node(ram_addr_t addr, Error **errp);
+> @@ -25,7 +25,6 @@ typedef struct node_info {
 >  
-> -/* on success returns node index in numa_info,
-> - * on failure returns nb_numa_nodes */
-> -int numa_get_node_for_cpu(int idx);
-> -
->  static inline bool numa_has_node_id(const CPUArchIdList *possible_cpus, int idx)
->  {
->      return possible_cpus->cpus[idx].props.has_node_id;
+>  extern NodeInfo numa_info[MAX_NODES];
+>  void parse_numa_opts(MachineState *ms);
+> -void numa_post_machine_init(void);
+>  void query_numa_node_mem(uint64_t node_mem[]);
+>  extern QemuOptsList qemu_numa_opts;
+>  void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
 > diff --git a/numa.c b/numa.c
-> index 872ee0d..06c42e9 100644
+> index 06c42e9..f8c849d 100644
 > --- a/numa.c
 > +++ b/numa.c
-> @@ -583,20 +583,6 @@ MemdevList *qmp_query_memdev(Error **errp)
->      return list;
+> @@ -418,21 +418,6 @@ void parse_numa_opts(MachineState *ms)
+>      }
 >  }
 >  
-> -int numa_get_node_for_cpu(int idx)
+> -void numa_post_machine_init(void)
 > -{
+> -    CPUState *cpu;
 > -    int i;
 > -
-> -    assert(idx < max_cpus);
-> -
-> -    for (i = 0; i < nb_numa_nodes; i++) {
-> -        if (test_bit(idx, numa_info[i].node_cpu)) {
-> -            break;
+> -    CPU_FOREACH(cpu) {
+> -        for (i = 0; i < nb_numa_nodes; i++) {
+> -            assert(cpu->cpu_index < max_cpus);
+> -            if (test_bit(cpu->cpu_index, numa_info[i].node_cpu)) {
+> -                cpu->numa_node = i;
+> -            }
 > -        }
 > -    }
-> -    return i;
 > -}
 > -
->  void ram_block_notifier_add(RAMBlockNotifier *n)
->  {
->      QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
+>  static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+>                                             const char *name,
+>                                             uint64_t ram_size)
+> diff --git a/vl.c b/vl.c
+> index c63f4d5..fe4741d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4595,8 +4595,6 @@ int main(int argc, char **argv, char **envp)
+>  
+>      cpu_synchronize_all_post_init();
+>  
+> -    numa_post_machine_init();
+> -
+>      rom_reset_order_override();
+>  
+>      /*
 > -- 
 > 2.7.4
 >
