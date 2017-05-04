@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6G2N-0008Ue-BX
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:39:16 -0400
+	(envelope-from <drjones@redhat.com>) id 1d6G6O-0002Rx-M8
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:43:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6G2K-0000E9-95
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:39:15 -0400
-Date: Thu, 4 May 2017 13:39:08 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170504123908.GJ32376@stefanha-x1.localdomain>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-5-pbonzini@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1d6G6N-0001WG-JW
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:43:24 -0400
+Date: Thu, 4 May 2017 14:43:12 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170504124312.tbvwxgmws2asjgko@kamzik.brq.redhat.com>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-22-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="1y6imfT/xHuCvpN0"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170420120058.28404-5-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 04/17] block: access
- serialising_in_flight with atomic ops
+In-Reply-To: <1493816238-33120-22-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 21/24] numa: use possible_cpus for not
+ mapped CPUs check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +24,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-
---1y6imfT/xHuCvpN0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Thu, Apr 20, 2017 at 02:00:45PM +0200, Paolo Bonzini wrote:
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Wed, May 03, 2017 at 02:57:15PM +0200, Igor Mammedov wrote:
+> and remove corresponding part in numa.c that uses
+> node_cpu bitmaps.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  block/io.c                |  6 +++---
->  include/block/block_int.h | 10 ++++++----
->  2 files changed, 9 insertions(+), 7 deletions(-)
+> It's one more less user of node_cpu bitmpas, following
+> commit will remove the last user along with
+> node_cpu itself.
+> ---
+>  hw/core/machine.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  numa.c            | 10 ----------
+>  2 files changed, 58 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 217b4f4..4229054 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -19,6 +19,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/cutils.h"
+> +#include "sysemu/numa.h"
+>  
+>  static char *machine_get_accel(Object *obj, Error **errp)
+>  {
+> @@ -648,9 +649,66 @@ bool machine_mem_merge(MachineState *machine)
+>      return machine->mem_merge;
+>  }
+>  
+> +static char *cpu_slot_to_string(const CPUArchId *cpu)
+> +{
+> +    GString *s = g_string_new(NULL);
+> +    if (cpu->props.has_socket_id) {
+> +        g_string_append_printf(s, "socket-id: %"PRId64, cpu->props.socket_id);
+> +    }
+> +    if (cpu->props.has_core_id) {
+> +        if (s->len) {
+> +            g_string_append_printf(s, ", ");
+> +        }
+> +        g_string_append_printf(s, "core-id: %"PRId64, cpu->props.core_id);
+> +    }
+> +    if (cpu->props.has_thread_id) {
+> +        if (s->len) {
+> +            g_string_append_printf(s, ", ");
+> +        }
+> +        g_string_append_printf(s, "thread-id: %"PRId64, cpu->props.thread_id);
+> +    }
+> +    return g_string_free(s, false);
+> +}
+> +
+> +static void machine_numa_validate(MachineState *machine)
+> +{
+> +    int i;
+> +    GString *s = g_string_new(NULL);
+> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
+> +
+> +    assert(nb_numa_nodes);
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Can't this be
 
---1y6imfT/xHuCvpN0
-Content-Type: application/pgp-signature; name="signature.asc"
+ if (!nb_numa_nodes)
+   return;
 
------BEGIN PGP SIGNATURE-----
+instead? And then..
 
-iQEcBAEBAgAGBQJZCyDsAAoJEJykq7OBq3PIzpQIALKYr51ffgz9YeMoEa63ExYj
-+HtAgi1F3mDjUxi4PIoYSqG7wquszW5J9LV6x9VNJROcVHEsgkBMpnCX91fOnjsk
-wFh0rq2DnALT/LCjLWK0/PVdwqaekGt+VF3hOnjX636twgH9AwyCsb7Sa4m2wZ0j
-b+HQffypbm7zJ703LKP3S1Lvf9NvvfMHTSKQWYF7ZmbyppvqQP5Rs82zP0U3QUiB
-CilmMRZ2L+FedrtAJQepipozCO8aDowBiRfFgiA4C5G1gtdZpDd1b1bjFt/MpUBg
-xgX8sBi6TbZreOoVH1RZhEm4Bu8IUr9VJjrnvEqiD941RwhOa7OJWtxTM29EPBk=
-=ExFI
------END PGP SIGNATURE-----
+> +    for (i = 0; i < possible_cpus->len; i++) {
+> +        const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
+> +
+> +        /* at this point numa mappings are initilized by CLI options
+> +         * or with default mappings so it's sufficient to list
+> +         * all not yet mapped CPUs here */
+> +        /* TODO: make it hard error in future */
+> +        if (!cpu_slot->props.has_node_id) {
+> +            char *cpu_str = cpu_slot_to_string(cpu_slot);
+> +            g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
+> +                                   cpu_str);
+> +            g_free(cpu_str);
+> +        }
+> +    }
+> +    if (s->len) {
+> +        error_report("warning: CPU(s) not present in any NUMA nodes: %s",
+> +                     s->str);
+> +        error_report("warning: All CPU(s) up to maxcpus should be described "
+> +                     "in NUMA config, ability to start up with partial NUMA "
+> +                     "mappings is obsoleted and will be removed in future");
+> +    }
+> +    g_string_free(s, true);
+> +}
+> +
+>  void machine_run_board_init(MachineState *machine)
+>  {
+>      MachineClass *machine_class = MACHINE_GET_CLASS(machine);
+> +
+> +    if (nb_numa_nodes) {
+> +        machine_numa_validate(machine);
+> +    }
 
---1y6imfT/xHuCvpN0--
+...this condition wouldn't be necessary.
+
+>      machine_class->init(machine);
+>  }
+>  
+> diff --git a/numa.c b/numa.c
+> index f8c849d..d7aa662 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -293,16 +293,6 @@ static void validate_numa_cpus(void)
+>          bitmap_or(seen_cpus, seen_cpus,
+>                    numa_info[i].node_cpu, max_cpus);
+>      }
+> -
+> -    if (!bitmap_full(seen_cpus, max_cpus)) {
+> -        char *msg;
+> -        bitmap_complement(seen_cpus, seen_cpus, max_cpus);
+> -        msg = enumerate_cpus(seen_cpus, max_cpus);
+> -        error_report("warning: CPU(s) not present in any NUMA nodes: %s", msg);
+> -        error_report("warning: All CPU(s) up to maxcpus should be described "
+> -                     "in NUMA config");
+> -        g_free(msg);
+> -    }
+>      g_free(seen_cpus);
+>  }
+>  
+> -- 
+> 2.7.4
+>
+
+Otherwise
+Reviewed-by: Andrew Jones <drjones@redhat.com> 
