@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6DBL-0006EL-3c
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:36:20 -0400
+	(envelope-from <drjones@redhat.com>) id 1d6DDW-00075h-Tp
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:38:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6DBH-00057f-Uf
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:36:19 -0400
-Resent-Message-Id: <E1d6DBH-00057f-Uf@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21393)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d6DBH-00055v-M2
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:36:15 -0400
-In-Reply-To: <20170504084135.7488.24715.stgit@PASHA-ISP>
-Message-ID: <149389055776.177.11088287320328202007@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <drjones@redhat.com>) id 1d6DDV-00078U-Tf
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:38:34 -0400
+Date: Thu, 4 May 2017 11:38:22 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170504093822.2u4p7z7qjcyorbto@kamzik.brq.redhat.com>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-4-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 4 May 2017 02:35:58 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v9 00/10] replay additions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493816238-33120-4-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 03/24] hw/arm/virt: use
+ machine->possible_cpus for storing possible topology info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +24,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pavel.dovgaluk@ispras.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2OSAwMC8xMF0gcmVwbGF5IGFkZGl0aW9ucwpNZXNzYWdlLWlkOiAyMDE3
-MDUwNDA4NDEzNS43NDg4LjI0NzE1LnN0Z2l0QFBBU0hBLUlTUApUeXBlOiBzZXJpZXMKCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
-aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
-Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
-ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
-bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
-bS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0OTM4
-MTYyMzgtMzMxMjAtMS1naXQtc2VuZC1lbWFpbC1pbWFtbWVkb0ByZWRoYXQuY29tIC0+IHBhdGNo
-ZXcvMTQ5MzgxNjIzOC0zMzEyMC0xLWdpdC1zZW5kLWVtYWlsLWltYW1tZWRvQHJlZGhhdC5jb20K
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDkzODg4MzExLTMwODM5LTEtZ2l0LXNlbmQt
-ZW1haWwtdGh1dGhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0OTM4ODgzMTEtMzA4MzktMS1naXQt
-c2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKYmYzY2ZjMCBpY291bnQ6IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2YgaWNvdW50IHdhcnAg
-dGltZXJzCjM3YjM2MzcgcmVwbGF5OiBzYXZlIHByaW9yIHZhbHVlIG9mIHRoZSBob3N0IGNsb2Nr
-CjBhODc2NmIgcmVwbGF5OiBtYWtlIHNhZmUgdm1zdG9wIGF0IHJlY29yZC9yZXBsYXkKM2FlY2Q4
-YyByZXBsYXk6IGFkZGVkIHJlcGxheSBsb2cgZm9ybWF0IGRlc2NyaXB0aW9uCjBkODk2M2QgcmVw
-bGF5OiBmaXggc2F2ZS9sb2FkIHZtIGZvciBub24tZW1wdHkgcXVldWUKOWMxNGUxMyByZXBsYXk6
-IGZpeGVkIHJlcGxheV9lbmFibGVfZXZlbnRzCjcwYzljZDEgcmVwbGF5OiBmaXggcHJvY2Vzc2lu
-ZyBhc3luYyBldmVudHMKMzcyOTJjMyByZXBsYXk6IGRpc2FibGUgZGVmYXVsdCBzbmFwc2hvdCBm
-b3IgcmVjb3JkL3JlcGxheQo1OTczODEzIGJsa3JlcGxheTogY3JlYXRlIHRlbXBvcmFyeSBvdmVy
-bGF5IGZvciB1bmRlcmxheWluZyBkZXZpY2VzCmYzNGExM2IgYmxvY2s6IGltcGxlbWVudCBiZHJ2
-X3NuYXBzaG90X2dvdG8gZm9yIGJsa3JlcGxheQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
-bmcgUEFUQ0ggMS8xMDogYmxvY2s6IGltcGxlbWVudCBiZHJ2X3NuYXBzaG90X2dvdG8gZm9yIGJs
-a3JlcGxheS4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBibGtyZXBsYXk6IGNyZWF0ZSB0ZW1wb3Jh
-cnkgb3ZlcmxheSBmb3IgdW5kZXJsYXlpbmcgZGV2aWNlcy4uLgpDaGVja2luZyBQQVRDSCAzLzEw
-OiByZXBsYXk6IGRpc2FibGUgZGVmYXVsdCBzbmFwc2hvdCBmb3IgcmVjb3JkL3JlcGxheS4uLgpD
-aGVja2luZyBQQVRDSCA0LzEwOiByZXBsYXk6IGZpeCBwcm9jZXNzaW5nIGFzeW5jIGV2ZW50cy4u
-LgpDaGVja2luZyBQQVRDSCA1LzEwOiByZXBsYXk6IGZpeGVkIHJlcGxheV9lbmFibGVfZXZlbnRz
-Li4uCkNoZWNraW5nIFBBVENIIDYvMTA6IHJlcGxheTogZml4IHNhdmUvbG9hZCB2bSBmb3Igbm9u
-LWVtcHR5IHF1ZXVlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0NTogRklM
-RTogbWlncmF0aW9uL3NhdmV2bS5jOjIwODg6CisgICAgICAgIG1vbml0b3JfcHJpbnRmKG1vbiwg
-IlJlY29yZC9yZXBsYXkgZG9lcyBub3QgYWxsb3cgbWFraW5nIHNuYXBzaG90IHJpZ2h0IG5vdy4g
-IgoKRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXdsaW5lcwojNTk6
-IEZJTEU6IG1pZ3JhdGlvbi9zYXZldm0uYzoyMjU2OgorICAgICAgICAgICAgICAgICAgICAgIlRy
-eSBzdG9wcGluZyBhdCBhbm90aGVyIHN0ZXAuXG4iKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJu
-aW5ncywgNDggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy8xMDogcmVwbGF5OiBhZGRlZCByZXBsYXkgbG9nIGZvcm1h
-dCBkZXNjcmlwdGlvbi4uLgpDaGVja2luZyBQQVRDSCA4LzEwOiByZXBsYXk6IG1ha2Ugc2FmZSB2
-bXN0b3AgYXQgcmVjb3JkL3JlcGxheS4uLgpDaGVja2luZyBQQVRDSCA5LzEwOiByZXBsYXk6IHNh
-dmUgcHJpb3IgdmFsdWUgb2YgdGhlIGhvc3QgY2xvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTA6
-IGljb3VudDogZml4ZWQgc2F2aW5nL3Jlc3RvcmluZyBvZiBpY291bnQgd2FycCB0aW1lcnMuLi4K
-RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM5ODogRklMRTogY3B1cy5jOjU5NToKKyAg
-ICAgICAgICAgIGlmICh0aW1lcnNfc3RhdGUudm1fY2xvY2tfd2FycF9zdGFydCA9PSAtMSB8fCB0
-aW1lcnNfc3RhdGUudm1fY2xvY2tfd2FycF9zdGFydCA+IGNsb2NrKSB7CgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojMTAzOiBGSUxFOiBjcHVzLmM6NTk5OgorICAgICAgICAgICAg
-dGltZXJfbW9kX2FudGljaXBhdGUodGltZXJzX3N0YXRlLmljb3VudF93YXJwX3RpbWVyLCBjbG9j
-ayArIGRlYWRsaW5lKTsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChj
-dHg6VnhWKQojMTY4OiBGSUxFOiBjcHVzLmM6Njg1OgorICAgIC5zdWJzZWN0aW9ucyA9IChjb25z
-dCBWTVN0YXRlRGVzY3JpcHRpb24qW10pIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNzIgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, May 03, 2017 at 02:56:57PM +0200, Igor Mammedov wrote:
+> for now precalculate and store mp_afinity in possible_cpus
+> as ARM cpus don't have socket/core/thread-id properties yet.
+> In follow patches possible_cpus will be used for storing
+> and setting NUMA node mapping and replace legacy bitmap
+> based numa_info[node_id].node_cpu/numa_get_node_for_cpu()
+> 
+> For the lack of better idea, this patch cannibalizes
+> possible_cpus.cpus[x].props.thread_id so that
+> *_cpu_index_to_props() callback could return addressable
+> by props CPU which will be used by machine_set_cpu_numa_node()
+> in follow up patches to assign a CPU to node. But
+> cannibalizing is fine for now as that thread_id isn't exposed
+> to users (no hotpluggable_cpus callback support for ARM yet)
+> and it will be used only internally until 'device_add cpu'
+> is supported where we can decide on which properties to use.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>   (Drew)
+>     - discarding result of possible_cpu_arch_ids() makes
+>       call not obvious and is confusing. Instead assign
+>       possible_cpu_arch_ids() result to local var and use
+>       it instead of direct access to machine->possible_cpus
+>       field, as it's done in pc.c
+> ---
+>  hw/arm/virt.c | 40 +++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 37 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 61ae437..e2c5626 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1221,6 +1221,8 @@ static void machvirt_init(MachineState *machine)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(machine);
+>      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(machine);
+> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> +    const CPUArchIdList *possible_cpus;
+>      qemu_irq pic[NUM_IRQS];
+>      MemoryRegion *sysmem = get_system_memory();
+>      MemoryRegion *secure_sysmem = NULL;
+> @@ -1344,10 +1346,16 @@ static void machvirt_init(MachineState *machine)
+>          exit(1);
+>      }
+>  
+> -    for (n = 0; n < smp_cpus; n++) {
+> -        Object *cpuobj = object_new(typename);
+> +    possible_cpus = mc->possible_cpu_arch_ids(machine);
+> +    for (n = 0; n < possible_cpus->len; n++) {
+> +        Object *cpuobj;
+>  
+> -        object_property_set_int(cpuobj, virt_cpu_mp_affinity(vms, n),
+> +        if (n >= smp_cpus) {
+> +            break;
+> +        }
+
+Why the break instead of just looping 'n < smp_cpus' like x86 does? Is
+there some future work where looping up to possible_cpus->len (aka
+max_cpus) is what we'll eventually want? If so, then we need a TODO
+comment here. If not, then we should clean this up by removing the break.
+
+Thanks,
+drew
+
+> +
+> +        cpuobj = object_new(typename);
+> +        object_property_set_int(cpuobj, possible_cpus->cpus[n].arch_id,
+>                                  "mp-affinity", NULL);
+>  
+>          if (!vms->secure) {
+> @@ -1527,6 +1535,31 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
+>      }
+>  }
+>  
+> +static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+> +{
+> +    int n;
+> +    VirtMachineState *vms = VIRT_MACHINE(ms);
+> +
+> +    if (ms->possible_cpus) {
+> +        assert(ms->possible_cpus->len == max_cpus);
+> +        return ms->possible_cpus;
+> +    }
+> +
+> +    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+> +                                  sizeof(CPUArchId) * max_cpus);
+> +    ms->possible_cpus->len = max_cpus;
+> +    for (n = 0; n < ms->possible_cpus->len; n++) {
+> +        ms->possible_cpus->cpus[n].arch_id =
+> +            virt_cpu_mp_affinity(vms, n);
+> +        ms->possible_cpus->cpus[n].props.has_thread_id = true;
+> +        ms->possible_cpus->cpus[n].props.thread_id = n;
+> +
+> +        /* TODO: add 'has_node/node' here to describe
+> +           to which node core belongs */
+> +    }
+> +    return ms->possible_cpus;
+> +}
+> +
+>  static void virt_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> @@ -1543,6 +1576,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      mc->pci_allow_0_address = true;
+>      /* We know we will never create a pre-ARMv7 CPU which needs 1K pages */
+>      mc->minimum_page_bits = 12;
+> +    mc->possible_cpu_arch_ids = virt_possible_cpu_arch_ids;
+>  }
+>  
+>  static const TypeInfo virt_machine_info = {
+> -- 
+> 2.7.4
+> 
