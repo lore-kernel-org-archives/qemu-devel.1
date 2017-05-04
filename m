@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d6D8L-00055Z-Lj
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:33:14 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d6DBL-0006EL-3c
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d6D8H-0003T2-OD
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:33:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36456)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d6D8H-0003Rs-IE
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:33:09 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170504084210.7488.37561.stgit@PASHA-ISP> (Pavel Dovgalyuk's
-	message of "Thu, 04 May 2017 11:42:10 +0300")
-References: <20170504084135.7488.24715.stgit@PASHA-ISP>
-	<20170504084210.7488.37561.stgit@PASHA-ISP>
-Reply-To: quintela@redhat.com
-Date: Thu, 04 May 2017 11:33:03 +0200
-Message-ID: <874lx1t19s.fsf@secure.mitica>
+	(envelope-from <no-reply@patchew.org>) id 1d6DBH-00057f-Uf
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:36:19 -0400
+Resent-Message-Id: <E1d6DBH-00057f-Uf@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21393)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d6DBH-00055v-M2
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:36:15 -0400
+In-Reply-To: <20170504084135.7488.24715.stgit@PASHA-ISP>
+Message-ID: <149389055776.177.11088287320328202007@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 06/10] replay: fix save/load vm for
- non-empty queue
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 4 May 2017 02:35:58 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v9 00/10] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
+To: pavel.dovgaluk@ispras.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
 
-Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru> wrote:
-> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> This patch does not allows saving/loading vmstate when
-> replay events queue is not empty. There is no reliable
-> way to save events queue, because it describes internal
-> coroutine state. Therefore saving and loading operations
-> should be deferred to another record/replay step.
->
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-
-This functions have changed, see last series (but change is trivial from
-monitor_printf to error_<something>)
-
-> @@ -2083,6 +2084,12 @@ int save_vmstate(Monitor *mon, const char *name)
->      Error *local_err = NULL;
->      AioContext *aio_context;
->  
-> +    if (!replay_can_snapshot()) {
-> +        monitor_printf(mon, "Record/replay does not allow making snapshot right now. "
-> +                        "Try stopping at another step.\n");
-> +        return ret;
-> +    }
-> +
-
-To issue a savevm/loadvm the user don't have to stop qemu, so I think we
-can improve the message to something les in both places?
-
-"Try saving/loading later"?
-
-Thanks, Juan.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2OSAwMC8xMF0gcmVwbGF5IGFkZGl0aW9ucwpNZXNzYWdlLWlkOiAyMDE3
+MDUwNDA4NDEzNS43NDg4LjI0NzE1LnN0Z2l0QFBBU0hBLUlTUApUeXBlOiBzZXJpZXMKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
+aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0OTM4
+MTYyMzgtMzMxMjAtMS1naXQtc2VuZC1lbWFpbC1pbWFtbWVkb0ByZWRoYXQuY29tIC0+IHBhdGNo
+ZXcvMTQ5MzgxNjIzOC0zMzEyMC0xLWdpdC1zZW5kLWVtYWlsLWltYW1tZWRvQHJlZGhhdC5jb20K
+ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDkzODg4MzExLTMwODM5LTEtZ2l0LXNlbmQt
+ZW1haWwtdGh1dGhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0OTM4ODgzMTEtMzA4MzktMS1naXQt
+c2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
+dCcKYmYzY2ZjMCBpY291bnQ6IGZpeGVkIHNhdmluZy9yZXN0b3Jpbmcgb2YgaWNvdW50IHdhcnAg
+dGltZXJzCjM3YjM2MzcgcmVwbGF5OiBzYXZlIHByaW9yIHZhbHVlIG9mIHRoZSBob3N0IGNsb2Nr
+CjBhODc2NmIgcmVwbGF5OiBtYWtlIHNhZmUgdm1zdG9wIGF0IHJlY29yZC9yZXBsYXkKM2FlY2Q4
+YyByZXBsYXk6IGFkZGVkIHJlcGxheSBsb2cgZm9ybWF0IGRlc2NyaXB0aW9uCjBkODk2M2QgcmVw
+bGF5OiBmaXggc2F2ZS9sb2FkIHZtIGZvciBub24tZW1wdHkgcXVldWUKOWMxNGUxMyByZXBsYXk6
+IGZpeGVkIHJlcGxheV9lbmFibGVfZXZlbnRzCjcwYzljZDEgcmVwbGF5OiBmaXggcHJvY2Vzc2lu
+ZyBhc3luYyBldmVudHMKMzcyOTJjMyByZXBsYXk6IGRpc2FibGUgZGVmYXVsdCBzbmFwc2hvdCBm
+b3IgcmVjb3JkL3JlcGxheQo1OTczODEzIGJsa3JlcGxheTogY3JlYXRlIHRlbXBvcmFyeSBvdmVy
+bGF5IGZvciB1bmRlcmxheWluZyBkZXZpY2VzCmYzNGExM2IgYmxvY2s6IGltcGxlbWVudCBiZHJ2
+X3NuYXBzaG90X2dvdG8gZm9yIGJsa3JlcGxheQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
+bmcgUEFUQ0ggMS8xMDogYmxvY2s6IGltcGxlbWVudCBiZHJ2X3NuYXBzaG90X2dvdG8gZm9yIGJs
+a3JlcGxheS4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBibGtyZXBsYXk6IGNyZWF0ZSB0ZW1wb3Jh
+cnkgb3ZlcmxheSBmb3IgdW5kZXJsYXlpbmcgZGV2aWNlcy4uLgpDaGVja2luZyBQQVRDSCAzLzEw
+OiByZXBsYXk6IGRpc2FibGUgZGVmYXVsdCBzbmFwc2hvdCBmb3IgcmVjb3JkL3JlcGxheS4uLgpD
+aGVja2luZyBQQVRDSCA0LzEwOiByZXBsYXk6IGZpeCBwcm9jZXNzaW5nIGFzeW5jIGV2ZW50cy4u
+LgpDaGVja2luZyBQQVRDSCA1LzEwOiByZXBsYXk6IGZpeGVkIHJlcGxheV9lbmFibGVfZXZlbnRz
+Li4uCkNoZWNraW5nIFBBVENIIDYvMTA6IHJlcGxheTogZml4IHNhdmUvbG9hZCB2bSBmb3Igbm9u
+LWVtcHR5IHF1ZXVlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0NTogRklM
+RTogbWlncmF0aW9uL3NhdmV2bS5jOjIwODg6CisgICAgICAgIG1vbml0b3JfcHJpbnRmKG1vbiwg
+IlJlY29yZC9yZXBsYXkgZG9lcyBub3QgYWxsb3cgbWFraW5nIHNuYXBzaG90IHJpZ2h0IG5vdy4g
+IgoKRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXdsaW5lcwojNTk6
+IEZJTEU6IG1pZ3JhdGlvbi9zYXZldm0uYzoyMjU2OgorICAgICAgICAgICAgICAgICAgICAgIlRy
+eSBzdG9wcGluZyBhdCBhbm90aGVyIHN0ZXAuXG4iKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJu
+aW5ncywgNDggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy8xMDogcmVwbGF5OiBhZGRlZCByZXBsYXkgbG9nIGZvcm1h
+dCBkZXNjcmlwdGlvbi4uLgpDaGVja2luZyBQQVRDSCA4LzEwOiByZXBsYXk6IG1ha2Ugc2FmZSB2
+bXN0b3AgYXQgcmVjb3JkL3JlcGxheS4uLgpDaGVja2luZyBQQVRDSCA5LzEwOiByZXBsYXk6IHNh
+dmUgcHJpb3IgdmFsdWUgb2YgdGhlIGhvc3QgY2xvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTA6
+IGljb3VudDogZml4ZWQgc2F2aW5nL3Jlc3RvcmluZyBvZiBpY291bnQgd2FycCB0aW1lcnMuLi4K
+RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM5ODogRklMRTogY3B1cy5jOjU5NToKKyAg
+ICAgICAgICAgIGlmICh0aW1lcnNfc3RhdGUudm1fY2xvY2tfd2FycF9zdGFydCA9PSAtMSB8fCB0
+aW1lcnNfc3RhdGUudm1fY2xvY2tfd2FycF9zdGFydCA+IGNsb2NrKSB7CgpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojMTAzOiBGSUxFOiBjcHVzLmM6NTk5OgorICAgICAgICAgICAg
+dGltZXJfbW9kX2FudGljaXBhdGUodGltZXJzX3N0YXRlLmljb3VudF93YXJwX3RpbWVyLCBjbG9j
+ayArIGRlYWRsaW5lKTsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChj
+dHg6VnhWKQojMTY4OiBGSUxFOiBjcHVzLmM6Njg1OgorICAgIC5zdWJzZWN0aW9ucyA9IChjb25z
+dCBWTVN0YXRlRGVzY3JpcHRpb24qW10pIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNzIgbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
