@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d6K02-0008Fr-C7
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d6K4n-0004Nv-DQ
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:58:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d6K01-0003xZ-Eq
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:06 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  4 May 2017 18:52:41 +0200
-Message-Id: <1493916761-32319-7-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
-References: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/6] file-posix: Remove
- .bdrv_inactivate/invalidate_cache
+	(envelope-from <dgilbert@redhat.com>) id 1d6K4k-0006oU-Cf
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:58:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46822)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d6K4k-0006o1-6h
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:57:58 -0400
+Date: Thu, 4 May 2017 17:57:53 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170504165753.GD2078@work-vm>
+References: <VI1PR05MB167887445F80A38FED81EFABC9EA0@VI1PR05MB1678.eurprd05.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <VI1PR05MB167887445F80A38FED81EFABC9EA0@VI1PR05MB1678.eurprd05.prod.outlook.com>
+Subject: Re: [Qemu-devel] Issue with a manually compiled QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,75 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
+To: Fabien GREGOIRE <fabien.gregoire@outlook.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Now that the block layer takes care to request a lot less permissions
-for inactive nodes, the special-casing in file-posix isn't necessary any
-more.
+* Fabien GREGOIRE (fabien.gregoire@outlook.com) wrote:
+> Hello,
+> 
+> 
+> 
+> I have an issue with a manually compiled QEMU working with virt-manager/libvirt :
+> 
+> Internal Error: process exited while connecting to monitor:
+> 
+> qemu could not load PC BIOS 'bios-256k.bin'.
+> 
+> 
+> 
+> Here are the steps in order to reproduce :
+> 
+> - QEMU was previously installed from an "apt-get" : QEMU version is 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.11)
+> 
+> - To compile QEMU I use the following arguments :
+> 
+> --target-list=x86_64-softmmu --disable-vnc --enable-sdl --enable-spice --enable-usb-redir --enable-kvm
+> 
+> with this version : https://github.com/qemu/qemu/archive/v2.5.0.zip
+> 
+> - I replace the QEMU binary (/usr/bin/qemu-system-x86_64-spice) and I have the issue with error message written above.
+> 
+> 
+> 
+> Do you have any advice / information about this error ? Any workaround ?
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/file-posix.c | 33 ---------------------------------
- 1 file changed, 33 deletions(-)
+You need to get a seabios binary from somewhere - the PC bios for the
+emulator to run;  you should find one somewhere in your existing
+install previously had a qemu install.
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index f1f924b..90a5f53 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -2190,35 +2190,6 @@ static void raw_abort_perm_update(BlockDriverState *bs)
-     raw_handle_perm_lock(bs, RAW_PL_ABORT, 0, 0, NULL);
- }
- 
--static int raw_inactivate(BlockDriverState *bs)
--{
--    int ret;
--    uint64_t perm = 0;
--    uint64_t shared = BLK_PERM_ALL;
--
--    ret = raw_handle_perm_lock(bs, RAW_PL_PREPARE, perm, shared, NULL);
--    if (ret) {
--        return ret;
--    }
--    raw_handle_perm_lock(bs, RAW_PL_COMMIT, perm, shared, NULL);
--    return 0;
--}
--
--
--static void raw_invalidate_cache(BlockDriverState *bs, Error **errp)
--{
--    BDRVRawState *s = bs->opaque;
--    int ret;
--
--    assert(!(bdrv_get_flags(bs) & BDRV_O_INACTIVE));
--    ret = raw_handle_perm_lock(bs, RAW_PL_PREPARE, s->perm, s->shared_perm,
--                               errp);
--    if (ret) {
--        return;
--    }
--    raw_handle_perm_lock(bs, RAW_PL_COMMIT, s->perm, s->shared_perm, NULL);
--}
--
- BlockDriver bdrv_file = {
-     .format_name = "file",
-     .protocol_name = "file",
-@@ -2249,8 +2220,6 @@ BlockDriver bdrv_file = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
--    .bdrv_inactivate = raw_inactivate,
--    .bdrv_invalidate_cache = raw_invalidate_cache,
-     .bdrv_check_perm = raw_check_perm,
-     .bdrv_set_perm   = raw_set_perm,
-     .bdrv_abort_perm_update = raw_abort_perm_update,
-@@ -2712,8 +2681,6 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
--    .bdrv_inactivate = raw_inactivate,
--    .bdrv_invalidate_cache = raw_invalidate_cache,
-     .bdrv_check_perm = raw_check_perm,
-     .bdrv_set_perm   = raw_set_perm,
-     .bdrv_abort_perm_update = raw_abort_perm_update,
--- 
-1.8.3.1
+Dave
+
+> 
+> 
+> Kind regards,
+> 
+> 
+> 
+> Fabien
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
