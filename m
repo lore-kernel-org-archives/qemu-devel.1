@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6G6O-0002Rx-M8
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:43:25 -0400
+	(envelope-from <drjones@redhat.com>) id 1d6G6b-0002c4-VY
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6G6N-0001WG-JW
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:43:24 -0400
-Date: Thu, 4 May 2017 14:43:12 +0200
+	(envelope-from <drjones@redhat.com>) id 1d6G6b-0001cM-3M
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:43:37 -0400
+Date: Thu, 4 May 2017 14:43:27 +0200
 From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170504124312.tbvwxgmws2asjgko@kamzik.brq.redhat.com>
+Message-ID: <20170504124327.kn5jpivkomijohwi@kamzik.brq.redhat.com>
 References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-22-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-21-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493816238-33120-22-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 21/24] numa: use possible_cpus for not
- mapped CPUs check
+In-Reply-To: <1493816238-33120-21-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 20/24] machine: call machine init from
+ wrapper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,135 +27,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-On Wed, May 03, 2017 at 02:57:15PM +0200, Igor Mammedov wrote:
-> and remove corresponding part in numa.c that uses
-> node_cpu bitmaps.
+On Wed, May 03, 2017 at 02:57:14PM +0200, Igor Mammedov wrote:
+> add machine_run_board_init() wrapper that calls machine
+> init for now but in follow up patches it will be used
+> to run generic machine code that should run before
+> machine init.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
-> It's one more less user of node_cpu bitmpas, following
-> commit will remove the last user along with
-> node_cpu itself.
-> ---
->  hw/core/machine.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  numa.c            | 10 ----------
->  2 files changed, 58 insertions(+), 10 deletions(-)
+>  include/hw/boards.h | 1 +
+>  hw/core/machine.c   | 6 ++++++
+>  vl.c                | 2 +-
+>  3 files changed, 8 insertions(+), 1 deletion(-)
 > 
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 1f518a1..0e74484 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -32,6 +32,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+>  MachineClass *find_default_machine(void);
+>  extern MachineState *current_machine;
+>  
+> +void machine_run_board_init(MachineState *machine);
+>  bool machine_usb(MachineState *machine);
+>  bool machine_kernel_irqchip_allowed(MachineState *machine);
+>  bool machine_kernel_irqchip_required(MachineState *machine);
 > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 217b4f4..4229054 100644
+> index a63f17b..217b4f4 100644
 > --- a/hw/core/machine.c
 > +++ b/hw/core/machine.c
-> @@ -19,6 +19,7 @@
->  #include "sysemu/sysemu.h"
->  #include "qemu/error-report.h"
->  #include "qemu/cutils.h"
-> +#include "sysemu/numa.h"
->  
->  static char *machine_get_accel(Object *obj, Error **errp)
->  {
-> @@ -648,9 +649,66 @@ bool machine_mem_merge(MachineState *machine)
+> @@ -648,6 +648,12 @@ bool machine_mem_merge(MachineState *machine)
 >      return machine->mem_merge;
 >  }
 >  
-> +static char *cpu_slot_to_string(const CPUArchId *cpu)
+> +void machine_run_board_init(MachineState *machine)
 > +{
-> +    GString *s = g_string_new(NULL);
-> +    if (cpu->props.has_socket_id) {
-> +        g_string_append_printf(s, "socket-id: %"PRId64, cpu->props.socket_id);
-> +    }
-> +    if (cpu->props.has_core_id) {
-> +        if (s->len) {
-> +            g_string_append_printf(s, ", ");
-> +        }
-> +        g_string_append_printf(s, "core-id: %"PRId64, cpu->props.core_id);
-> +    }
-> +    if (cpu->props.has_thread_id) {
-> +        if (s->len) {
-> +            g_string_append_printf(s, ", ");
-> +        }
-> +        g_string_append_printf(s, "thread-id: %"PRId64, cpu->props.thread_id);
-> +    }
-> +    return g_string_free(s, false);
+> +    MachineClass *machine_class = MACHINE_GET_CLASS(machine);
+> +    machine_class->init(machine);
 > +}
 > +
-> +static void machine_numa_validate(MachineState *machine)
-> +{
-> +    int i;
-> +    GString *s = g_string_new(NULL);
-> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
-> +
-> +    assert(nb_numa_nodes);
-
-Can't this be
-
- if (!nb_numa_nodes)
-   return;
-
-instead? And then..
-
-> +    for (i = 0; i < possible_cpus->len; i++) {
-> +        const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
-> +
-> +        /* at this point numa mappings are initilized by CLI options
-> +         * or with default mappings so it's sufficient to list
-> +         * all not yet mapped CPUs here */
-> +        /* TODO: make it hard error in future */
-> +        if (!cpu_slot->props.has_node_id) {
-> +            char *cpu_str = cpu_slot_to_string(cpu_slot);
-> +            g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
-> +                                   cpu_str);
-> +            g_free(cpu_str);
-> +        }
-> +    }
-> +    if (s->len) {
-> +        error_report("warning: CPU(s) not present in any NUMA nodes: %s",
-> +                     s->str);
-> +        error_report("warning: All CPU(s) up to maxcpus should be described "
-> +                     "in NUMA config, ability to start up with partial NUMA "
-> +                     "mappings is obsoleted and will be removed in future");
-> +    }
-> +    g_string_free(s, true);
-> +}
-> +
->  void machine_run_board_init(MachineState *machine)
+>  static void machine_class_finalize(ObjectClass *klass, void *data)
 >  {
->      MachineClass *machine_class = MACHINE_GET_CLASS(machine);
-> +
-> +    if (nb_numa_nodes) {
-> +        machine_numa_validate(machine);
-> +    }
-
-...this condition wouldn't be necessary.
-
->      machine_class->init(machine);
->  }
+>      MachineClass *mc = MACHINE_CLASS(klass);
+> diff --git a/vl.c b/vl.c
+> index fe4741d..ac46d6e 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4562,7 +4562,7 @@ int main(int argc, char **argv, char **envp)
+>      current_machine->boot_order = boot_order;
+>      current_machine->cpu_model = cpu_model;
 >  
-> diff --git a/numa.c b/numa.c
-> index f8c849d..d7aa662 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -293,16 +293,6 @@ static void validate_numa_cpus(void)
->          bitmap_or(seen_cpus, seen_cpus,
->                    numa_info[i].node_cpu, max_cpus);
->      }
-> -
-> -    if (!bitmap_full(seen_cpus, max_cpus)) {
-> -        char *msg;
-> -        bitmap_complement(seen_cpus, seen_cpus, max_cpus);
-> -        msg = enumerate_cpus(seen_cpus, max_cpus);
-> -        error_report("warning: CPU(s) not present in any NUMA nodes: %s", msg);
-> -        error_report("warning: All CPU(s) up to maxcpus should be described "
-> -                     "in NUMA config");
-> -        g_free(msg);
-> -    }
->      g_free(seen_cpus);
->  }
+> -    machine_class->init(current_machine);
+> +    machine_run_board_init(current_machine);
+>  
+>      realtime_init();
 >  
 > -- 
 > 2.7.4
 >
 
-Otherwise
 Reviewed-by: Andrew Jones <drjones@redhat.com> 
