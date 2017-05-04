@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1d6F0J-0007QT-Vv
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:33:13 -0400
+	(envelope-from <famz@redhat.com>) id 1d6F2j-0008Ke-Ug
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1d6F0F-000693-Q4
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:33:04 -0400
-Received: from mga06.intel.com ([134.134.136.31]:44962)
+	(envelope-from <famz@redhat.com>) id 1d6F2e-0007tV-SJ
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:35:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28557)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1d6F0F-00068c-9N
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:32:59 -0400
-From: Amarnath Valluri <amarnath.valluri@intel.com>
-Date: Thu,  4 May 2017 14:35:03 +0300
-Message-Id: <1493897703-27581-1-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <149372791126.162.5190122051569740331@c05f1edc8ed1>
-References: <149372791126.162.5190122051569740331@c05f1edc8ed1>
-Subject: [Qemu-devel] [PATCH v4 8/8] tpm: Added support for TPM emulator
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d6F2e-0007qV-ES
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:35:28 -0400
+Date: Thu, 4 May 2017 19:35:22 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170504113522.GB6865@lemon.lan>
+References: <1493894491-26130-1-git-send-email-vip-ak47@yandex.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493894491-26130-1-git-send-email-vip-ak47@yandex.ru>
+Subject: Re: [Qemu-devel] [PATCH] Video and sound capture to a videofile
+ through ffmpeg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,1509 +27,1090 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>
+To: Alex K <vip-ak47@yandex.ru>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, aliguori@amazon.com
 
-This change introduces a new TPM backend driver that can communicate with
-swtpm(software TPM emulator) using unix domain socket interface.
+On Thu, 05/04 13:41, Alex K wrote:
+> Hello everyone,
 
-Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
-for out-of-band control messages.
+Hi Alex, thanks for posting the patch! I don't know much about display and sound
+in QEMU, so just making some superficial points.
+> 
+> I've made a patch that adds ability to record video of what's going on
+> inside qemu. It uses ffmpeg libraries. Basically, the patch adds
+> 2 new commands to the console:
+> capture_start path framerate
+> capture_stop
 
-The swtpm and associated tools can be found here:
-    https://github.com/stefanberger/swtpm
+Sounds like a good idea. In addition, I think it's worth to be added to QMP too.
 
-The swtpm's control channel protocol specification can be found here:
-    https://github.com/stefanberger/swtpm/wiki/Control-Channel-Specification
+> 
+> path is required
+> framerate could be 24, 25, 30 or 60. Default is 60
+> video codec is always h264
+> 
+> The patch uses ffmpeg so you will need to install these packages:
+> ffmpeg libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
+> 
+> This is my first time posting here, so please correct me if I'm doing
+> something wrong
 
-Usage:
-    # setup TPM state directory
-    mkdir /tmp/mytpm
-    chown -R tss:root /tmp/mytpm
-    /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
+This line can be moved after a '---' line following the 'signed-off-by' line,
+taht way it doesn't go into the git history when your patch is applied by
+maintainers, as it is useless there.
 
-    # Ask qemu to use TPM emulator with given tpm state directory
-    qemu-system-x86_64 \
-        [...] \
-        -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
-        -device tpm-tis,tpmdev=tpm0 \
-        [...]
+> 
+> Signed-off-by: Alex K <vip-ak47@yandex.ru>
+> ---
+>  configure                          |  20 +
+>  default-configs/i386-softmmu.mak   |   1 +
+>  default-configs/x86_64-softmmu.mak |   1 +
+>  hmp-commands.hx                    |  34 ++
+>  hmp.h                              |   2 +
+>  hw/display/Makefile.objs           |   2 +
+>  hw/display/capture.c               | 761 +++++++++++++++++++++++++++++++++++++
+>  hw/display/capture.h               |  78 ++++
+>  8 files changed, 899 insertions(+)
+>  create mode 100644 hw/display/capture.c
+>  create mode 100644 hw/display/capture.h
+> 
+> diff --git a/configure b/configure
+> index 48a9370..a6ddbf0 100755
+> --- a/configure
+> +++ b/configure
+> @@ -281,6 +281,7 @@ opengl=""
+>  opengl_dmabuf="no"
+>  avx2_opt="no"
+>  zlib="yes"
+> +libav="yes"
+>  lzo=""
+>  snappy=""
+>  bzip2=""
+> @@ -1993,6 +1994,25 @@ if test "$seccomp" != "no" ; then
+>          seccomp="no"
+>      fi
+>  fi
+> +#########################################
+> +# libav check
+> +
 
-Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
----
- configure             |  15 +-
- hmp.c                 |  21 ++
- hw/tpm/Makefile.objs  |   1 +
- hw/tpm/tpm_emulator.c | 950 ++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/tpm/tpm_ioctl.h    | 243 +++++++++++++
- qapi-schema.json      |  41 ++-
- qemu-options.hx       |  53 ++-
- tpm.c                 |   2 +-
- 8 files changed, 1316 insertions(+), 10 deletions(-)
- create mode 100644 hw/tpm/tpm_emulator.c
- create mode 100644 hw/tpm/tpm_ioctl.h
+Use $pkg_config?
 
-diff --git a/configure b/configure
-index 48a9370..37a94d9 100755
---- a/configure
-+++ b/configure
-@@ -3404,10 +3404,15 @@ fi
- ##########################################
- # TPM passthrough is only on x86 Linux
- 
--if test "$targetos" = Linux && test "$cpu" = i386 -o "$cpu" = x86_64; then
--  tpm_passthrough=$tpm
-+if test "$targetos" = Linux; then
-+  tpm_emulator=$tpm
-+  if test "$cpu" = i386 -o "$cpu" = x86_64; then
-+    tpm_passthrough=$tpm
-+  else
-+    tpm_passthrough=no
-+  fi
- else
--  tpm_passthrough=no
-+  tpm_emulator=no
- fi
- 
- ##########################################
-@@ -5209,6 +5214,7 @@ echo "gcov enabled      $gcov"
- echo "TPM support       $tpm"
- echo "libssh2 support   $libssh2"
- echo "TPM passthrough   $tpm_passthrough"
-+echo "TPM emulator      $tpm_emulator"
- echo "QOM debugging     $qom_cast_debug"
- echo "lzo support       $lzo"
- echo "snappy support    $snappy"
-@@ -5789,6 +5795,9 @@ if test "$tpm" = "yes"; then
-   if test "$tpm_passthrough" = "yes"; then
-     echo "CONFIG_TPM_PASSTHROUGH=y" >> $config_host_mak
-   fi
-+  if test "$tpm_emulator" = "yes"; then
-+    echo "CONFIG_TPM_EMULATOR=y" >> $config_host_mak
-+  fi
- fi
- 
- echo "TRACE_BACKENDS=$trace_backends" >> $config_host_mak
-diff --git a/hmp.c b/hmp.c
-index 728422c..be97d3d 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -936,6 +936,7 @@ void hmp_info_tpm(Monitor *mon, const QDict *qdict)
-     Error *err = NULL;
-     unsigned int c = 0;
-     TPMPassthroughOptions *tpo;
-+    TPMEmulatorOptions *teo;
- 
-     info_list = qmp_query_tpm(&err);
-     if (err) {
-@@ -965,6 +966,26 @@ void hmp_info_tpm(Monitor *mon, const QDict *qdict)
-                            tpo->has_cancel_path ? ",cancel-path=" : "",
-                            tpo->has_cancel_path ? tpo->cancel_path : "");
-             break;
-+        case TPM_TYPE_EMULATOR:
-+            teo = ti->options->u.emulator.data;
-+            monitor_printf(mon, ",tmpstatedir=%s", teo->tpmstatedir);
-+            monitor_printf(mon, ",spawn=%s", teo->spawn ? "on" : "off");
-+            if (teo->has_path) {
-+                monitor_printf(mon, ",path=%s", teo->path);
-+            }
-+            if (teo->has_data_path) {
-+                monitor_printf(mon, ",data-path=%s", teo->data_path);
-+            }
-+            if (teo->has_ctrl_path) {
-+                monitor_printf(mon, ",ctrl-path=%s", teo->ctrl_path);
-+            }
-+            if (teo->has_logfile) {
-+                monitor_printf(mon, ",logfile=%s", teo->logfile);
-+            }
-+            if (teo->has_loglevel) {
-+                monitor_printf(mon, ",loglevel=%u", teo->loglevel);
-+            }
-+            break;
-         default:
-             break;
-         }
-diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-index 64cecc3..41f0b7a 100644
---- a/hw/tpm/Makefile.objs
-+++ b/hw/tpm/Makefile.objs
-@@ -1,2 +1,3 @@
- common-obj-$(CONFIG_TPM_TIS) += tpm_tis.o
- common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o tpm_util.o
-+common-obj-$(CONFIG_TPM_EMULATOR) += tpm_emulator.o tpm_util.o
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-new file mode 100644
-index 0000000..2ad63be
---- /dev/null
-+++ b/hw/tpm/tpm_emulator.c
-@@ -0,0 +1,950 @@
-+/*
-+ *  emulator TPM driver
-+ *
-+ *  Copyright (c) 2017 Intel Corporation
-+ *  Author: Amarnath Valluri <amarnath.valluri@intel.com>
-+ *
-+ *  Copyright (c) 2010 - 2013 IBM Corporation
-+ *  Authors:
-+ *    Stefan Berger <stefanb@us.ibm.com>
-+ *
-+ *  Copyright (C) 2011 IAIK, Graz University of Technology
-+ *    Author: Andreas Niederl
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qemu/sockets.h"
-+#include "io/channel-socket.h"
-+#include "sysemu/tpm_backend.h"
-+#include "tpm_int.h"
-+#include "hw/hw.h"
-+#include "hw/i386/pc.h"
-+#include "tpm_util.h"
-+#include "tpm_ioctl.h"
-+#include "qapi/error.h"
-+
-+#include <fcntl.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <stdio.h>
-+
-+#define DEBUG_TPM 0
-+
-+#define DPRINT(fmt, ...) do { \
-+    if (DEBUG_TPM) { \
-+        fprintf(stderr, fmt, ## __VA_ARGS__); \
-+    } \
-+} while (0);
-+
-+#define DPRINTF(fmt, ...) DPRINT("tpm-emulator: "fmt"\n", __VA_ARGS__)
-+
-+#define TYPE_TPM_EMULATOR "tpm-emulator"
-+#define TPM_EMULATOR(obj) \
-+    OBJECT_CHECK(TPMEmulator, (obj), TYPE_TPM_EMULATOR)
-+
-+static const TPMDriverOps tpm_emulator_driver;
-+
-+/* data structures */
-+typedef struct TPMEmulator {
-+    TPMBackend parent;
-+
-+    TPMEmulatorOptions *ops;
-+    QIOChannel *data_ioc;
-+    QIOChannel *ctrl_ioc;
-+    bool op_executing;
-+    bool op_canceled;
-+    bool child_running;
-+    TPMVersion tpm_version;
-+    ptm_cap caps; /* capabilities of the TPM */
-+    uint8_t cur_locty_number; /* last set locality */
-+    QemuMutex state_lock;
-+} TPMEmulator;
-+
-+#define TPM_DEFAULT_EMULATOR "swtpm"
-+#define TPM_DEFAULT_LOGLEVEL 5
-+#define TPM_EMULATOR_PIDFILE "/tmp/qemu-tpm.pid"
-+#define TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(S, cap) (((S)->caps & (cap)) == (cap))
-+
-+static int tpm_emulator_ctrlcmd(QIOChannel *ioc, unsigned long cmd, void *msg,
-+                                size_t msg_len_in, size_t msg_len_out)
-+{
-+    ssize_t n;
-+
-+    uint32_t cmd_no = cpu_to_be32(cmd);
-+    struct iovec iov[2] = {
-+        { .iov_base = &cmd_no, .iov_len = sizeof(cmd_no), },
-+        { .iov_base = msg, .iov_len = msg_len_in, },
-+    };
-+
-+    n = qio_channel_writev(ioc, iov, 2, NULL);
-+    if (n > 0) {
-+        if (msg_len_out > 0) {
-+            n = qio_channel_read(ioc, (char *)msg, msg_len_out, NULL);
-+            /* simulate ioctl return value */
-+            if (n > 0) {
-+                n = 0;
-+            }
-+        } else {
-+            n = 0;
-+        }
-+    }
-+    return n;
-+}
-+
-+static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_pt,
-+                                     const uint8_t *in, uint32_t in_len,
-+                                     uint8_t *out, uint32_t out_len,
-+                                     bool *selftest_done)
-+{
-+    ssize_t ret;
-+    bool is_selftest;
-+    const struct tpm_resp_hdr *hdr;
-+
-+    if (!tpm_pt->child_running) {
-+        return -1;
-+    }
-+
-+    tpm_pt->op_canceled = false;
-+    tpm_pt->op_executing = true;
-+    *selftest_done = false;
-+
-+    is_selftest = tpm_util_is_selftest(in, in_len);
-+
-+    ret = qio_channel_write(tpm_pt->data_ioc, (const char *)in, (size_t)in_len,
-+                            NULL);
-+    if (ret != in_len) {
-+        if (!tpm_pt->op_canceled || errno != ECANCELED) {
-+            error_report("tpm-emulator: error while transmitting data "
-+                         "to TPM: %s (%i)", strerror(errno), errno);
-+        }
-+        goto err_exit;
-+    }
-+
-+    tpm_pt->op_executing = false;
-+
-+    ret = qio_channel_read(tpm_pt->data_ioc, (char *)out, (size_t)out_len,
-+                           NULL);
-+    if (ret < 0) {
-+        if (!tpm_pt->op_canceled || errno != ECANCELED) {
-+            error_report("tpm-emulator: error while reading data from "
-+                         "TPM: %s (%i)", strerror(errno), errno);
-+        }
-+    } else if (ret < sizeof(struct tpm_resp_hdr) ||
-+               be32_to_cpu(((struct tpm_resp_hdr *)out)->len) != ret) {
-+        ret = -1;
-+        error_report("tpm-emulator: received invalid response "
-+                     "packet from TPM");
-+    }
-+
-+    if (is_selftest && (ret >= sizeof(struct tpm_resp_hdr))) {
-+        hdr = (struct tpm_resp_hdr *)out;
-+        *selftest_done = (be32_to_cpu(hdr->errcode) == 0);
-+    }
-+
-+err_exit:
-+    if (ret < 0) {
-+        tpm_util_write_fatal_error_response(out, out_len);
-+    }
-+
-+    tpm_pt->op_executing = false;
-+
-+    return ret;
-+}
-+
-+static int tpm_emulator_set_locality(TPMEmulator *tpm_pt,
-+                                     uint8_t locty_number)
-+{
-+    ptm_loc loc;
-+
-+    if (!tpm_pt->child_running) {
-+        return -1;
-+    }
-+
-+    DPRINTF("%s : locality: 0x%x", __func__, locty_number);
-+
-+    if (tpm_pt->cur_locty_number != locty_number) {
-+        DPRINTF("setting locality : 0x%x", locty_number);
-+        loc.u.req.loc = locty_number;
-+        if (tpm_emulator_ctrlcmd(tpm_pt->ctrl_ioc, CMD_SET_LOCALITY, &loc,
-+                             sizeof(loc), sizeof(loc)) < 0) {
-+            error_report("tpm-emulator: could not set locality : %s",
-+                         strerror(errno));
-+            return -1;
-+        }
-+        loc.u.resp.tpm_result = be32_to_cpu(loc.u.resp.tpm_result);
-+        if (loc.u.resp.tpm_result != 0) {
-+            error_report("tpm-emulator: TPM result for set locality : 0x%x",
-+                         loc.u.resp.tpm_result);
-+            return -1;
-+        }
-+        tpm_pt->cur_locty_number = locty_number;
-+    }
-+    return 0;
-+}
-+
-+static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd cmd)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(tb);
-+    TPMLocality *locty = NULL;
-+    bool selftest_done = false;
-+
-+    DPRINTF("processing command type %d", cmd);
-+
-+    switch (cmd) {
-+    case TPM_BACKEND_CMD_PROCESS_CMD:
-+        qemu_mutex_lock(&tpm_pt->state_lock);
-+        locty = tb->tpm_state->locty_data;
-+        if (tpm_emulator_set_locality(tpm_pt,
-+                                      tb->tpm_state->locty_number) < 0) {
-+            tpm_util_write_fatal_error_response(locty->r_buffer.buffer,
-+                                           locty->r_buffer.size);
-+        } else {
-+            tpm_emulator_unix_tx_bufs(tpm_pt, locty->w_buffer.buffer,
-+                                  locty->w_offset, locty->r_buffer.buffer,
-+                                  locty->r_buffer.size, &selftest_done);
-+        }
-+        tb->recv_data_callback(tb->tpm_state, tb->tpm_state->locty_number,
-+                               selftest_done);
-+        qemu_mutex_unlock(&tpm_pt->state_lock);
-+        break;
-+    case TPM_BACKEND_CMD_INIT:
-+    case TPM_BACKEND_CMD_END:
-+    case TPM_BACKEND_CMD_TPM_RESET:
-+        /* nothing to do */
-+        break;
-+    }
-+}
-+
-+/*
-+ * Gracefully shut down the external unixio TPM
-+ */
-+static void tpm_emulator_shutdown(TPMEmulator *tpm_pt)
-+{
-+    ptm_res res;
-+
-+    if (!tpm_pt->child_running) {
-+        return;
-+    }
-+
-+    if (tpm_emulator_ctrlcmd(tpm_pt->ctrl_ioc, CMD_SHUTDOWN, &res, 0,
-+                         sizeof(res)) < 0) {
-+        error_report("tpm-emulator: Could not cleanly shutdown the TPM: %s",
-+                     strerror(errno));
-+    } else if (res != 0) {
-+        error_report("tpm-emulator: TPM result for sutdown: 0x%x",
-+                     be32_to_cpu(res));
-+    }
-+}
-+
-+static int tpm_emulator_probe_caps(TPMEmulator *tpm_pt)
-+{
-+    if (!tpm_pt->child_running) {
-+        return -1;
-+    }
-+
-+    DPRINTF("%s", __func__);
-+    if (tpm_emulator_ctrlcmd(tpm_pt->ctrl_ioc, CMD_GET_CAPABILITY,
-+                         &tpm_pt->caps, 0, sizeof(tpm_pt->caps)) < 0) {
-+        error_report("tpm-emulator: probing failed : %s", strerror(errno));
-+        return -1;
-+    }
-+
-+    tpm_pt->caps = be64_to_cpu(tpm_pt->caps);
-+
-+    DPRINTF("capbilities : 0x%lx", tpm_pt->caps);
-+
-+    return 0;
-+}
-+
-+static int tpm_emulator_check_caps(TPMEmulator *tpm_pt)
-+{
-+    ptm_cap caps = 0;
-+    const char *tpm = NULL;
-+
-+    /* check for min. required capabilities */
-+    switch (tpm_pt->tpm_version) {
-+    case TPM_VERSION_1_2:
-+        caps = PTM_CAP_INIT | PTM_CAP_SHUTDOWN | PTM_CAP_GET_TPMESTABLISHED |
-+               PTM_CAP_SET_LOCALITY;
-+        tpm = "1.2";
-+        break;
-+    case TPM_VERSION_2_0:
-+        caps = PTM_CAP_INIT | PTM_CAP_SHUTDOWN | PTM_CAP_GET_TPMESTABLISHED |
-+               PTM_CAP_SET_LOCALITY | PTM_CAP_RESET_TPMESTABLISHED;
-+        tpm = "2";
-+        break;
-+    case TPM_VERSION_UNSPEC:
-+        error_report("tpm-emulator: TPM version has not been set");
-+        return -1;
-+    }
-+
-+    if (!TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(tpm_pt, caps)) {
-+        error_report("tpm-emulator: TPM does not implement minimum set of "
-+                     "required capabilities for TPM %s (0x%x)", tpm, (int)caps);
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static int tpm_emulator_init_tpm(TPMEmulator *tpm_pt)
-+{
-+    ptm_init init;
-+    ptm_res res;
-+
-+    if (!tpm_pt->child_running) {
-+        return -1;
-+    }
-+
-+    DPRINTF("%s", __func__);
-+    if (tpm_emulator_ctrlcmd(tpm_pt->ctrl_ioc, CMD_INIT, &init, sizeof(init),
-+                         sizeof(init)) < 0) {
-+        error_report("tpm-emulator: could not send INIT: %s",
-+                     strerror(errno));
-+        return -1;
-+    }
-+
-+    res = be32_to_cpu(init.u.resp.tpm_result);
-+    if (res) {
-+        error_report("tpm-emulator: TPM result for CMD_INIT: 0x%x", res);
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static int tpm_emulator_startup_tpm(TPMBackend *tb)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(tb);
-+
-+    DPRINTF("%s", __func__);
-+
-+    tpm_emulator_init_tpm(tpm_pt) ;
-+
-+    return 0;
-+}
-+
-+static bool tpm_emulator_get_tpm_established_flag(TPMBackend *tb)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(tb);
-+    ptm_est est;
-+
-+    DPRINTF("%s", __func__);
-+    if (tpm_emulator_ctrlcmd(tpm_pt->ctrl_ioc, CMD_GET_TPMESTABLISHED, &est, 0,
-+                         sizeof(est)) < 0) {
-+        error_report("tpm-emulator: Could not get the TPM established flag: %s",
-+                     strerror(errno));
-+        return false;
-+    }
-+    DPRINTF("established flag: %0x", est.u.resp.bit);
-+
-+    return (est.u.resp.bit != 0);
-+}
-+
-+static int tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
-+                                                   uint8_t locty)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(tb);
-+    ptm_reset_est reset_est;
-+    ptm_res res;
-+
-+    /* only a TPM 2.0 will support this */
-+    if (tpm_pt->tpm_version == TPM_VERSION_2_0) {
-+        reset_est.u.req.loc = tpm_pt->cur_locty_number;
-+
-+        if (tpm_emulator_ctrlcmd(tpm_pt->ctrl_ioc, CMD_RESET_TPMESTABLISHED,
-+                                 &reset_est, sizeof(reset_est),
-+                                 sizeof(reset_est)) < 0) {
-+            error_report("tpm-emulator: Could not reset the establishment bit: "
-+                          "%s", strerror(errno));
-+            return -1;
-+        }
-+
-+        res = be32_to_cpu(reset_est.u.resp.tpm_result);
-+        if (res) {
-+            error_report("tpm-emulator: TPM result for rest establixhed flag: "
-+                         "0x%x", res);
-+            return -1;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static bool tpm_emulator_had_startup_error(TPMBackend *tb)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(tb);
-+
-+    return !tpm_pt->child_running;
-+}
-+
-+static void tpm_emulator_cancel_cmd(TPMBackend *tb)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(tb);
-+    ptm_res res;
-+
-+    /*
-+     * As of Linux 3.7 the tpm_tis driver does not properly cancel
-+     * commands on all TPM manufacturers' TPMs.
-+     * Only cancel if we're busy so we don't cancel someone else's
-+     * command, e.g., a command executed on the host.
-+     */
-+    if (tpm_pt->op_executing) {
-+        if (TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(tpm_pt, PTM_CAP_CANCEL_TPM_CMD)) {
-+            if (tpm_emulator_ctrlcmd(tpm_pt->ctrl_ioc, CMD_CANCEL_TPM_CMD, &res,
-+                                 0, sizeof(res)) < 0) {
-+                error_report("tpm-emulator: Could not cancel command: %s",
-+                             strerror(errno));
-+            } else if (res != 0) {
-+                error_report("tpm-emulator: Failed to cancel TPM: 0x%x",
-+                             be32_to_cpu(res));
-+            } else {
-+                tpm_pt->op_canceled = true;
-+            }
-+        }
-+    }
-+}
-+
-+static void tpm_emulator_reset(TPMBackend *tb)
-+{
-+    DPRINTF("%s", __func__);
-+
-+    tpm_emulator_cancel_cmd(tb);
-+}
-+
-+static TPMVersion tpm_emulator_get_tpm_version(TPMBackend *tb)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(tb);
-+
-+    return tpm_pt->tpm_version;
-+}
-+
-+static gboolean tpm_emulator_fd_handler(QIOChannel *ioc, GIOCondition cnd,
-+                                        void *opaque)
-+{
-+    TPMEmulator *tpm_pt = opaque;
-+
-+    if (cnd & G_IO_ERR || cnd & G_IO_HUP) {
-+        error_report("TPM backend disappeared");
-+        tpm_pt->child_running = false;
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
-+static QIOChannel *_iochannel_new(const char *path, int fd, Error **err)
-+{
-+    int socket = path ?  unix_connect(path, err) : fd;
-+    if (socket < 0) {
-+        return NULL;
-+    }
-+
-+    return QIO_CHANNEL(qio_channel_socket_new_fd(socket, err));
-+}
-+
-+static int tpm_emulator_spawn_emulator(TPMEmulator *tpm_pt)
-+{
-+    int fds[2] = { -1, -1 };
-+    int ctrl_fds[2] = { -1, -1 };
-+    pid_t cpid;
-+
-+    if (!tpm_pt->ops->has_data_path) {
-+        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, fds) < 0) {
-+            return -1;
-+        }
-+    }
-+
-+    if (!tpm_pt->ops->has_ctrl_path) {
-+        if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, ctrl_fds) < 0) {
-+            if (!tpm_pt->ops->has_data_path) {
-+                closesocket(fds[0]);
-+                closesocket(fds[1]);
-+            }
-+            return -1;
-+        }
-+    }
-+
-+    cpid = qemu_fork(NULL);
-+    if (cpid < 0) {
-+        error_report("tpm-emulator: Fork failure: %s", strerror(errno));
-+        if (!tpm_pt->ops->has_data_path) {
-+            closesocket(fds[0]);
-+            closesocket(fds[1]);
-+        }
-+        if (!tpm_pt->ops->has_ctrl_path) {
-+            closesocket(ctrl_fds[0]);
-+            closesocket(ctrl_fds[1]);
-+        }
-+        return -1;
-+    }
-+
-+    unlink(TPM_EMULATOR_PIDFILE);
-+
-+    if (cpid == 0) { /* CHILD */
-+        enum {
-+            PARAM_PATH,
-+            PARAM_IFACE,
-+            PARAM_SERVER,  PARAM_SERVER_ARGS,
-+            PARAM_CTRL,    PARAM_CTRL_ARGS,
-+            PARAM_STATE,   PARAM_STATE_ARGS,
-+            PARAM_PIDFILE, PARAM_PIDFILE_ARGS,
-+            PARAM_LOG,     PARAM_LOG_ARGS,
-+            PARAM_MAX
-+        };
-+
-+        int i;
-+        int data_fd = -1, ctrl_fd = -1;
-+        char *argv[PARAM_MAX + 1];
-+
-+        /* close all unused inherited sockets */
-+        if (fds[0] >= 0) {
-+            closesocket(fds[0]);
-+        }
-+        if (ctrl_fds[0] >= 0) {
-+            closesocket(ctrl_fds[0]);
-+        }
-+
-+        i = STDERR_FILENO + 1;
-+        if (fds[1] >= 0) {
-+            data_fd = dup2(fds[1], i++);
-+            if (data_fd < 0) {
-+                error_report("tpm-emulator: dup2() failure - %s",
-+                             strerror(errno));
-+                goto exit_child;
-+            }
-+        }
-+        if (ctrl_fds[1] >= 0) {
-+            ctrl_fd = dup2(ctrl_fds[1], i++);
-+            if (ctrl_fd < 0) {
-+                error_report("tpm-emulator: dup2() failure - %s",
-+                             strerror(errno));
-+                goto exit_child;
-+            }
-+        }
-+        for ( ; i < sysconf(_SC_OPEN_MAX); i++) {
-+            close(i);
-+        }
-+
-+        argv[PARAM_MAX] = NULL;
-+        argv[PARAM_PATH] = g_strdup(tpm_pt->ops->path);
-+        argv[PARAM_IFACE] = g_strdup("socket");
-+        if (tpm_pt->ops->has_data_path) {
-+            argv[PARAM_SERVER] = g_strdup("--server");
-+            argv[PARAM_SERVER_ARGS] = g_strdup_printf("type=unixio,path=%s",
-+                                               tpm_pt->ops->data_path);
-+        } else {
-+            argv[PARAM_SERVER] = g_strdup("--fd");
-+            argv[PARAM_SERVER_ARGS] = g_strdup_printf("%d", data_fd);
-+        }
-+
-+        argv[PARAM_CTRL] = g_strdup("--ctrl");
-+        if (tpm_pt->ops->has_ctrl_path) {
-+            argv[PARAM_CTRL_ARGS] = g_strdup_printf("type=unixio,path=%s",
-+                                                    tpm_pt->ops->ctrl_path);
-+        } else {
-+            argv[PARAM_CTRL_ARGS] = g_strdup_printf("type=unixio,clientfd=%d",
-+                                                    ctrl_fd);
-+        }
-+
-+        argv[PARAM_STATE] = g_strdup("--tpmstate");
-+        argv[PARAM_STATE_ARGS] = g_strdup_printf("dir=%s",
-+                                        tpm_pt->ops->tpmstatedir);
-+        argv[PARAM_PIDFILE] = g_strdup("--pid");
-+        argv[PARAM_PIDFILE_ARGS] = g_strdup_printf("file=%s",
-+                                            TPM_EMULATOR_PIDFILE);
-+        if (tpm_pt->ops->has_logfile) {
-+            argv[PARAM_LOG] = g_strdup("--log");
-+            argv[PARAM_LOG_ARGS] = g_strdup_printf("file=%s,level=%d",
-+                    tpm_pt->ops->logfile, (int)tpm_pt->ops->loglevel);
-+        } else {
-+            /* truncate logs */
-+            argv[PARAM_LOG] = NULL;
-+        }
-+        DPRINTF("%s", "Running cmd: ")
-+        for (i = 0; argv[i]; i++) {
-+            DPRINT(" %s", argv[i])
-+        }
-+        DPRINT("\n")
-+        if (execv(tpm_pt->ops->path, (char * const *)argv) < 0) {
-+            error_report("execv() failure : %s", strerror(errno));
-+        }
-+
-+exit_child:
-+        g_strfreev(argv);
-+        if (data_fd >= 0) {
-+            closesocket(data_fd);
-+        }
-+        if (ctrl_fd >= 0) {
-+            closesocket(ctrl_fd);
-+        }
-+
-+        _exit(1);
-+    } else { /* self */
-+        struct stat st;
-+        DPRINTF("child pid: %d", cpid);
-+        int rc;
-+        useconds_t usec = 100 * 1000L; /* wait for 100 milliseconds */
-+        useconds_t timeout = 10; /* max 1 second */
-+
-+        /* close unused sockets */
-+        if (fds[1] >= 0) {
-+            closesocket(fds[1]);
-+        }
-+        if (ctrl_fds[1] >= 0) {
-+            closesocket(ctrl_fds[1]);
-+        }
-+
-+        tpm_pt->data_ioc = _iochannel_new(tpm_pt->ops->data_path, fds[0], NULL);
-+        if (!tpm_pt->data_ioc) {
-+            error_report("tpm-emulator: Unable to connect socket : %s",
-+                          tpm_pt->ops->data_path);
-+            goto err_kill_child;
-+        }
-+
-+        tpm_pt->ctrl_ioc = _iochannel_new(tpm_pt->ops->ctrl_path, ctrl_fds[0],
-+                                          NULL);
-+        if (!tpm_pt->ctrl_ioc) {
-+            error_report("tpm-emulator: Unable to connect socket : %s",
-+                          tpm_pt->ops->ctrl_path);
-+            goto err_kill_child;
-+        }
-+
-+        qemu_add_child_watch(cpid);
-+
-+        qio_channel_add_watch(tpm_pt->data_ioc, G_IO_HUP | G_IO_ERR,
-+                              tpm_emulator_fd_handler, tpm_pt, NULL);
-+
-+        while ((rc = stat(TPM_EMULATOR_PIDFILE, &st)) < 0 && timeout--) {
-+            usleep(usec);
-+        }
-+
-+        if (timeout == -1) {
-+            error_report("tpm-emulator: pid file not ready: %s",
-+                         strerror(errno));
-+            goto err_kill_child;
-+        }
-+
-+        /* check if child really running */
-+        if (kill(cpid, 0) < 0 && errno == ESRCH) {
-+            goto err_no_child;
-+        }
-+
-+        tpm_pt->child_running = true;
-+    }
-+
-+    return 0;
-+
-+err_kill_child:
-+    kill(cpid, SIGTERM);
-+    /* wait for 10 mill-seconds */
-+    usleep(10 * 1000);
-+    /* force kill if still reachable */
-+    if (kill(cpid, 0) == 0) {
-+        kill(cpid, SIGKILL);
-+    }
-+
-+err_no_child:
-+    tpm_pt->child_running = false;
-+
-+    return -1;
-+}
-+
-+static int tpm_emulator_handle_device_opts(TPMEmulator *tpm_pt, QemuOpts *opts)
-+{
-+    const char *value;
-+
-+    value = qemu_opt_get(opts, "tpmstatedir");
-+    if (!value) {
-+        error_report("tpm-emulator: Missing tpm state directory");
-+        return -1;
-+    }
-+    tpm_pt->ops->tpmstatedir = g_strdup(value);
-+
-+    tpm_pt->ops->spawn = qemu_opt_get_bool(opts, "spawn", false);
-+
-+    value = qemu_opt_get(opts, "path");
-+    if (!value) {
-+        value = TPM_DEFAULT_EMULATOR;
-+        tpm_pt->ops->has_path = false;
-+    } else {
-+        tpm_pt->ops->has_path = true;
-+        if (value[0] == '/') {
-+            struct stat st;
-+            if (stat(value, &st) < 0 || !(S_ISREG(st.st_mode)
-+                || S_ISLNK(st.st_mode))) {
-+                error_report("tpm-emulator: Invalid emulator path: %s", value);
-+                return -1;
-+            }
-+        }
-+    }
-+    tpm_pt->ops->path = g_strdup(value);
-+
-+    value = qemu_opt_get(opts, "data-path");
-+    if (value) {
-+        tpm_pt->ops->has_data_path = true;
-+        tpm_pt->ops->data_path = g_strdup(value);
-+    } else {
-+        tpm_pt->ops->has_data_path = false;
-+        if (!tpm_pt->ops->spawn) {
-+            error_report("tpm-emulator: missing mandatory data-path");
-+            return -1;
-+        }
-+    }
-+
-+    value = qemu_opt_get(opts, "ctrl-path");
-+    if (value) {
-+        tpm_pt->ops->has_ctrl_path = true;
-+        tpm_pt->ops->ctrl_path = g_strdup(value);
-+    } else {
-+        tpm_pt->ops->has_ctrl_path = false;
-+        if (!tpm_pt->ops->spawn) {
-+            error_report("tpm-emulator: missing mandatory ctrl-path");
-+            return -1;
-+        }
-+    }
-+
-+    value = qemu_opt_get(opts, "logfile");
-+    if (value) {
-+        tpm_pt->ops->has_logfile = true;
-+        tpm_pt->ops->logfile = g_strdup(value);
-+        tpm_pt->ops->loglevel = qemu_opt_get_number(opts, "loglevel",
-+                                                   TPM_DEFAULT_LOGLEVEL);
-+        tpm_pt->ops->has_loglevel = tpm_pt->ops->loglevel !=
-+                                     TPM_DEFAULT_LOGLEVEL;
-+    }
-+
-+    if (tpm_pt->ops->spawn) {
-+        if (tpm_emulator_spawn_emulator(tpm_pt) < 0) {
-+            goto err_close_dev;
-+        }
-+    } else {
-+        tpm_pt->data_ioc = _iochannel_new(tpm_pt->ops->data_path, -1, NULL);
-+        if (tpm_pt->data_ioc  == NULL) {
-+            error_report("tpm-emulator: Failed to connect data socket: %s",
-+                         tpm_pt->ops->data_path);
-+            goto err_close_dev;
-+        }
-+        tpm_pt->ctrl_ioc = _iochannel_new(tpm_pt->ops->ctrl_path, -1, NULL);
-+        if (tpm_pt->ctrl_ioc == NULL) {
-+            DPRINTF("Failed to connect control socket: %s",
-+                    strerror(errno));
-+            goto err_close_dev;
-+        }
-+        tpm_pt->child_running = true;
-+    }
-+
-+    /* FIXME: tpm_util_test_tpmdev() accepts only on socket fd, as it also used
-+     * by passthrough driver, which not yet using GIOChannel.
-+     */
-+    if (tpm_util_test_tpmdev(QIO_CHANNEL_SOCKET(tpm_pt->data_ioc)->fd,
-+                             &tpm_pt->tpm_version)) {
-+        error_report("'%s' is not emulating TPM device.", tpm_pt->ops->path);
-+        goto err_close_dev;
-+    }
-+
-+    DPRINTF("TPM Version %s", tpm_pt->tpm_version == TPM_VERSION_1_2 ? "1.2" :
-+             (tpm_pt->tpm_version == TPM_VERSION_2_0 ?  "2.0" : "Unspecified"));
-+
-+    if (tpm_emulator_probe_caps(tpm_pt) ||
-+        tpm_emulator_check_caps(tpm_pt)) {
-+        goto err_close_dev;
-+    }
-+
-+    return 0;
-+
-+err_close_dev:
-+    DPRINT("Startup error\n");
-+    return -1;
-+}
-+
-+static TPMBackend *tpm_emulator_create(QemuOpts *opts, const char *id)
-+{
-+    TPMBackend *tb = TPM_BACKEND(object_new(TYPE_TPM_EMULATOR));
-+
-+    tb->id = g_strdup(id);
-+
-+    if (tpm_emulator_handle_device_opts(TPM_EMULATOR(tb), opts)) {
-+        goto err_exit;
-+    }
-+
-+    return tb;
-+
-+err_exit:
-+    object_unref(OBJECT(tb));
-+
-+    return NULL;
-+}
-+
-+static TpmTypeOptions *tpm_emulator_get_tpm_options(TPMBackend *tb)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(tb);
-+    TpmTypeOptions *ops = NULL;
-+    TPMEmulatorOptions *eops = NULL;
-+
-+    eops = g_new0(TPMEmulatorOptions, 1);
-+    if (!eops) {
-+        return NULL;
-+    }
-+    DPRINTF("%s", __func__);
-+
-+    eops->tpmstatedir = g_strdup(tpm_pt->ops->tpmstatedir);
-+    eops->spawn = tpm_pt->ops->spawn;
-+    if (tpm_pt->ops->has_path) {
-+        eops->has_path = true;
-+        eops->path = g_strdup(tpm_pt->ops->path);
-+    }
-+    if (tpm_pt->ops->has_data_path) {
-+        eops->has_data_path = true;
-+        eops->data_path = g_strdup(tpm_pt->ops->data_path);
-+    }
-+    if (tpm_pt->ops->has_ctrl_path) {
-+        eops->has_ctrl_path = true;
-+        eops->ctrl_path = g_strdup(tpm_pt->ops->ctrl_path);
-+    }
-+    if (tpm_pt->ops->has_logfile) {
-+        eops->has_logfile = true;
-+        eops->logfile = g_strdup(tpm_pt->ops->logfile);
-+    }
-+    if (tpm_pt->ops->has_loglevel) {
-+        eops->has_loglevel = true;
-+        eops->loglevel = tpm_pt->ops->loglevel;
-+    }
-+
-+    ops = g_new0(TpmTypeOptions, 1);
-+    if (!ops) {
-+        qapi_free_TPMEmulatorOptions(eops);
-+        return NULL;
-+    }
-+
-+    ops->type = TPM_TYPE_EMULATOR;
-+    ops->u.emulator.data = eops;
-+
-+    return ops;
-+}
-+
-+static const QemuOptDesc tpm_emulator_cmdline_opts[] = {
-+    TPM_STANDARD_CMDLINE_OPTS,
-+    {
-+        .name = "tpmstatedir",
-+        .type = QEMU_OPT_STRING,
-+        .help = "TPM state directroy",
-+    },
-+    {
-+        .name = "spawn",
-+        .type = QEMU_OPT_BOOL,
-+        .help = "Wether to spwan given emlatory binary",
-+    },
-+    {
-+        .name = "path",
-+        .type = QEMU_OPT_STRING,
-+        .help = "Path to TPM emulator binary",
-+    },
-+    {
-+        .name = "data-path",
-+        .type = QEMU_OPT_STRING,
-+        .help = "Socket path to use for data exhange",
-+    },
-+    {
-+        .name = "ctrl-path",
-+        .type = QEMU_OPT_STRING,
-+        .help = "Socket path to use for out-of-band control messages",
-+    },
-+    {
-+        .name = "logfile",
-+        .type = QEMU_OPT_STRING,
-+        .help = "Path to log file",
-+    },
-+    {
-+        .name = "loglevel",
-+        .type = QEMU_OPT_NUMBER,
-+        .help = "Log level number",
-+    },
-+    { /* end of list */ },
-+};
-+
-+static const TPMDriverOps tpm_emulator_driver = {
-+    .type                     = TPM_TYPE_EMULATOR,
-+    .opts                     = tpm_emulator_cmdline_opts,
-+    .desc                     = "TPM emulator backend driver",
-+
-+    .create                   = tpm_emulator_create,
-+    .startup_tpm              = tpm_emulator_startup_tpm,
-+    .reset                    = tpm_emulator_reset,
-+    .had_startup_error        = tpm_emulator_had_startup_error,
-+    .cancel_cmd               = tpm_emulator_cancel_cmd,
-+    .get_tpm_established_flag = tpm_emulator_get_tpm_established_flag,
-+    .reset_tpm_established_flag = tpm_emulator_reset_tpm_established_flag,
-+    .get_tpm_version          = tpm_emulator_get_tpm_version,
-+    .get_tpm_options          = tpm_emulator_get_tpm_options,
-+};
-+
-+static void tpm_emulator_inst_init(Object *obj)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(obj);
-+
-+    DPRINTF("%s", __func__);
-+    tpm_pt->ops = g_new0(TPMEmulatorOptions, 1);
-+    tpm_pt->data_ioc = tpm_pt->ctrl_ioc = NULL;
-+    tpm_pt->op_executing = tpm_pt->op_canceled = false;
-+    tpm_pt->child_running = false;
-+    tpm_pt->cur_locty_number = ~0;
-+    qemu_mutex_init(&tpm_pt->state_lock);
-+}
-+
-+static void tpm_emulator_inst_finalize(Object *obj)
-+{
-+    TPMEmulator *tpm_pt = TPM_EMULATOR(obj);
-+
-+    tpm_emulator_cancel_cmd(TPM_BACKEND(obj));
-+    tpm_emulator_shutdown(tpm_pt);
-+
-+    if (tpm_pt->data_ioc) {
-+        qio_channel_close(tpm_pt->data_ioc, NULL);
-+    }
-+    if (tpm_pt->ctrl_ioc) {
-+        qio_channel_close(tpm_pt->ctrl_ioc, NULL);
-+    }
-+    if (tpm_pt->ops) {
-+        qapi_free_TPMEmulatorOptions(tpm_pt->ops);
-+    }
-+}
-+
-+static void tpm_emulator_class_init(ObjectClass *klass, void *data)
-+{
-+    TPMBackendClass *tbc = TPM_BACKEND_CLASS(klass);
-+    tbc->ops = &tpm_emulator_driver;
-+    tbc->handle_request = tpm_emulator_handle_request;
-+}
-+
-+static const TypeInfo tpm_emulator_info = {
-+    .name = TYPE_TPM_EMULATOR,
-+    .parent = TYPE_TPM_BACKEND,
-+    .instance_size = sizeof(TPMEmulator),
-+    .class_init = tpm_emulator_class_init,
-+    .instance_init = tpm_emulator_inst_init,
-+    .instance_finalize = tpm_emulator_inst_finalize,
-+};
-+
-+static void tpm_emulator_register(void)
-+{
-+    type_register_static(&tpm_emulator_info);
-+    tpm_register_driver(&tpm_emulator_driver);
-+}
-+
-+type_init(tpm_emulator_register)
-diff --git a/hw/tpm/tpm_ioctl.h b/hw/tpm/tpm_ioctl.h
-new file mode 100644
-index 0000000..af49708
---- /dev/null
-+++ b/hw/tpm/tpm_ioctl.h
-@@ -0,0 +1,243 @@
-+/*
-+ * tpm_ioctl.h
-+ *
-+ * (c) Copyright IBM Corporation 2014, 2015.
-+ *
-+ * This file is licensed under the terms of the 3-clause BSD license
-+ */
-+#ifndef _TPM_IOCTL_H_
-+#define _TPM_IOCTL_H_
-+
-+#include <stdint.h>
-+#include <sys/uio.h>
-+#include <sys/types.h>
-+#include <sys/ioctl.h>
-+
-+/*
-+ * Every response from a command involving a TPM command execution must hold
-+ * the ptm_res as the first element.
-+ * ptm_res corresponds to the error code of a command executed by the TPM.
-+ */
-+
-+typedef uint32_t ptm_res;
-+
-+/* PTM_GET_TPMESTABLISHED: get the establishment bit */
-+struct ptm_est {
-+    union {
-+        struct {
-+            ptm_res tpm_result;
-+            unsigned char bit; /* TPM established bit */
-+        } resp; /* response */
-+    } u;
-+};
-+
-+/* PTM_RESET_TPMESTABLISHED: reset establishment bit */
-+struct ptm_reset_est {
-+    union {
-+        struct {
-+            uint8_t loc; /* locality to use */
-+        } req; /* request */
-+        struct {
-+            ptm_res tpm_result;
-+        } resp; /* response */
-+    } u;
-+};
-+
-+/* PTM_INIT */
-+struct ptm_init {
-+    union {
-+        struct {
-+            uint32_t init_flags; /* see definitions below */
-+        } req; /* request */
-+        struct {
-+            ptm_res tpm_result;
-+        } resp; /* response */
-+    } u;
-+};
-+
-+/* above init_flags */
-+#define PTM_INIT_FLAG_DELETE_VOLATILE (1 << 0)
-+    /* delete volatile state file after reading it */
-+
-+/* PTM_SET_LOCALITY */
-+struct ptm_loc {
-+    union {
-+        struct {
-+            uint8_t loc; /* locality to set */
-+        } req; /* request */
-+        struct {
-+            ptm_res tpm_result;
-+        } resp; /* response */
-+    } u;
-+};
-+
-+/* PTM_HASH_DATA: hash given data */
-+struct ptm_hdata {
-+    union {
-+        struct {
-+            uint32_t length;
-+            uint8_t data[4096];
-+        } req; /* request */
-+        struct {
-+            ptm_res tpm_result;
-+        } resp; /* response */
-+    } u;
-+};
-+
-+/*
-+ * size of the TPM state blob to transfer; x86_64 can handle 8k,
-+ * ppc64le only ~7k; keep the response below a 4k page size
-+ */
-+#define PTM_STATE_BLOB_SIZE (3 * 1024)
-+
-+/*
-+ * The following is the data structure to get state blobs from the TPM.
-+ * If the size of the state blob exceeds the PTM_STATE_BLOB_SIZE, multiple reads
-+ * with this ioctl and with adjusted offset are necessary. All bytes
-+ * must be transferred and the transfer is done once the last byte has been
-+ * returned.
-+ * It is possible to use the read() interface for reading the data; however, the
-+ * first bytes of the state blob will be part of the response to the ioctl(); a
-+ * subsequent read() is only necessary if the total length (totlength) exceeds
-+ * the number of received bytes. seek() is not supported.
-+ */
-+struct ptm_getstate {
-+    union {
-+        struct {
-+            uint32_t state_flags; /* may be: PTM_STATE_FLAG_DECRYPTED */
-+            uint32_t type;        /* which blob to pull */
-+            uint32_t offset;      /* offset from where to read */
-+        } req; /* request */
-+        struct {
-+            ptm_res tpm_result;
-+            uint32_t state_flags; /* may be: PTM_STATE_FLAG_ENCRYPTED */
-+            uint32_t totlength;   /* total length that will be transferred */
-+            uint32_t length;      /* number of bytes in following buffer */
-+            uint8_t  data[PTM_STATE_BLOB_SIZE];
-+        } resp; /* response */
-+    } u;
-+};
-+
-+/* TPM state blob types */
-+#define PTM_BLOB_TYPE_PERMANENT  1
-+#define PTM_BLOB_TYPE_VOLATILE   2
-+#define PTM_BLOB_TYPE_SAVESTATE  3
-+
-+/* state_flags above : */
-+#define PTM_STATE_FLAG_DECRYPTED     1 /* on input:  get decrypted state */
-+#define PTM_STATE_FLAG_ENCRYPTED     2 /* on output: state is encrypted */
-+
-+/*
-+ * The following is the data structure to set state blobs in the TPM.
-+ * If the size of the state blob exceeds the PTM_STATE_BLOB_SIZE, multiple
-+ * 'writes' using this ioctl are necessary. The last packet is indicated
-+ * by the length being smaller than the PTM_STATE_BLOB_SIZE.
-+ * The very first packet may have a length indicator of '0' enabling
-+ * a write() with all the bytes from a buffer. If the write() interface
-+ * is used, a final ioctl with a non-full buffer must be made to indicate
-+ * that all data were transferred (a write with 0 bytes would not work).
-+ */
-+struct ptm_setstate {
-+    union {
-+        struct {
-+            uint32_t state_flags; /* may be PTM_STATE_FLAG_ENCRYPTED */
-+            uint32_t type;        /* which blob to set */
-+            uint32_t length;      /* length of the data;
-+                                     use 0 on the first packet to
-+                                     transfer using write() */
-+            uint8_t data[PTM_STATE_BLOB_SIZE];
-+        } req; /* request */
-+        struct {
-+            ptm_res tpm_result;
-+        } resp; /* response */
-+    } u;
-+};
-+
-+/*
-+ * PTM_GET_CONFIG: Data structure to get runtime configuration information
-+ * such as which keys are applied.
-+ */
-+struct ptm_getconfig {
-+    union {
-+        struct {
-+            ptm_res tpm_result;
-+            uint32_t flags;
-+        } resp; /* response */
-+    } u;
-+};
-+
-+#define PTM_CONFIG_FLAG_FILE_KEY        0x1
-+#define PTM_CONFIG_FLAG_MIGRATION_KEY   0x2
-+
-+
-+typedef uint64_t ptm_cap;
-+typedef struct ptm_est ptm_est;
-+typedef struct ptm_reset_est ptm_reset_est;
-+typedef struct ptm_loc ptm_loc;
-+typedef struct ptm_hdata ptm_hdata;
-+typedef struct ptm_init ptm_init;
-+typedef struct ptm_getstate ptm_getstate;
-+typedef struct ptm_setstate ptm_setstate;
-+typedef struct ptm_getconfig ptm_getconfig;
-+
-+/* capability flags returned by PTM_GET_CAPABILITY */
-+#define PTM_CAP_INIT               (1)
-+#define PTM_CAP_SHUTDOWN           (1 << 1)
-+#define PTM_CAP_GET_TPMESTABLISHED (1 << 2)
-+#define PTM_CAP_SET_LOCALITY       (1 << 3)
-+#define PTM_CAP_HASHING            (1 << 4)
-+#define PTM_CAP_CANCEL_TPM_CMD     (1 << 5)
-+#define PTM_CAP_STORE_VOLATILE     (1 << 6)
-+#define PTM_CAP_RESET_TPMESTABLISHED (1 << 7)
-+#define PTM_CAP_GET_STATEBLOB      (1 << 8)
-+#define PTM_CAP_SET_STATEBLOB      (1 << 9)
-+#define PTM_CAP_STOP               (1 << 10)
-+#define PTM_CAP_GET_CONFIG         (1 << 11)
-+
-+enum {
-+    PTM_GET_CAPABILITY     = _IOR('P', 0, ptm_cap),
-+    PTM_INIT               = _IOWR('P', 1, ptm_init),
-+    PTM_SHUTDOWN           = _IOR('P', 2, ptm_res),
-+    PTM_GET_TPMESTABLISHED = _IOR('P', 3, ptm_est),
-+    PTM_SET_LOCALITY       = _IOWR('P', 4, ptm_loc),
-+    PTM_HASH_START         = _IOR('P', 5, ptm_res),
-+    PTM_HASH_DATA          = _IOWR('P', 6, ptm_hdata),
-+    PTM_HASH_END           = _IOR('P', 7, ptm_res),
-+    PTM_CANCEL_TPM_CMD     = _IOR('P', 8, ptm_res),
-+    PTM_STORE_VOLATILE     = _IOR('P', 9, ptm_res),
-+    PTM_RESET_TPMESTABLISHED = _IOWR('P', 10, ptm_reset_est),
-+    PTM_GET_STATEBLOB      = _IOWR('P', 11, ptm_getstate),
-+    PTM_SET_STATEBLOB      = _IOWR('P', 12, ptm_setstate),
-+    PTM_STOP               = _IOR('P', 13, ptm_res),
-+    PTM_GET_CONFIG         = _IOR('P', 14, ptm_getconfig),
-+};
-+
-+/*
-+ * Commands used by the non-CUSE TPMs
-+ *
-+ * All messages container big-endian data.
-+ *
-+ * The return messages only contain the 'resp' part of the unions
-+ * in the data structures above. Besides that the limits in the
-+ * buffers above (ptm_hdata:u.req.data and ptm_get_state:u.resp.data
-+ * and ptm_set_state:u.req.data) are 0xffffffff.
-+ */
-+enum {
-+    CMD_GET_CAPABILITY = 1,
-+    CMD_INIT,
-+    CMD_SHUTDOWN,
-+    CMD_GET_TPMESTABLISHED,
-+    CMD_SET_LOCALITY,
-+    CMD_HASH_START,
-+    CMD_HASH_DATA,
-+    CMD_HASH_END,
-+    CMD_CANCEL_TPM_CMD,
-+    CMD_STORE_VOLATILE,
-+    CMD_RESET_TPMESTABLISHED,
-+    CMD_GET_STATEBLOB,
-+    CMD_SET_STATEBLOB,
-+    CMD_STOP,
-+    CMD_GET_CONFIG,
-+};
-+
-+#endif /* _TPM_IOCTL_H */
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 01b087f..89dd9fc 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -5117,10 +5117,12 @@
- # An enumeration of TPM types
- #
- # @passthrough: TPM passthrough type
-+# @emulator: Software Emulator TPM type
-+#            Since: 2.10
- #
- # Since: 1.5
- ##
--{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
-+{ 'enum': 'TpmType', 'data': [ 'passthrough', 'emulator' ] }
- 
- ##
- # @query-tpm-types:
-@@ -5134,7 +5136,7 @@
- # Example:
- #
- # -> { "execute": "query-tpm-types" }
--# <- { "return": [ "passthrough" ] }
-+# <- { "return": [ "passthrough", "emulator" ] }
- #
- ##
- { 'command': 'query-tpm-types', 'returns': ['TpmType'] }
-@@ -5155,16 +5157,49 @@
-                                              '*cancel-path' : 'str'} }
- 
- ##
-+# @TPMEmulatorOptions:
-+#
-+# Information about the TPM emulator
-+#
-+# @tpmstatedir: TPM emulator state directory
-+# @spawn: true if, qemu has to spawn a new emulator process with given @path,
-+#         otherwise it connects to already rinning emulator with given @data-path
-+#         and @ctrl-path sockets. (default: 'false')
-+# @path: TPM emulator binary path to spawn.(default: 'swtpm')
-+# @data-path: path of the unix socket to use for exchanging data messages, if
-+#             not provided socket pairs are used when @sapwn is true.
-+# @ctrl-path: path of the unix socket file to use for exchagning out-of-band
-+#             control messages, if not provided socket pairs are used when
-+#             @spawn is true.
-+# @logfile: file to use to place TPM emulator logs, if not provided logging is
-+#           disabled.
-+# @loglevel: optional log level number, loglevel is ignored if no logfile
-+#            provided. (default: 5)
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'TPMEmulatorOptions',
-+  'data': { 'tpmstatedir' : 'str',
-+            'spawn': 'bool',
-+            '*path': 'str',
-+            '*data-path': 'str',
-+            '*ctrl-path': 'str',
-+            '*logfile': 'str',
-+            '*loglevel': 'uint8' } }
-+
-+##
- # @TpmTypeOptions:
- #
- # A union referencing different TPM backend types' configuration options
- #
- # @type: 'passthrough' The configuration options for the TPM passthrough type
-+#        'emulator' The configuration options for TPM emulator backend type
- #
- # Since: 1.5
- ##
- { 'union': 'TpmTypeOptions',
--   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
-+  'data': { 'passthrough': 'TPMPassthroughOptions',
-+            'emulator': 'TPMEmulatorOptions' } }
- 
- ##
- # @TPMInfo:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 787b9c3..726841e 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2883,7 +2883,15 @@ DEF("tpmdev", HAS_ARG, QEMU_OPTION_tpmdev, \
-     "-tpmdev passthrough,id=id[,path=path][,cancel-path=path]\n"
-     "                use path to provide path to a character device; default is /dev/tpm0\n"
-     "                use cancel-path to provide path to TPM's cancel sysfs entry; if\n"
--    "                not provided it will be searched for in /sys/class/misc/tpm?/device\n",
-+    "                not provided it will be searched for in /sys/class/misc/tpm?/device\n"
-+    "-tpmdev emulator,id=id,spawn=on|off,tpmstatedir=dir[,path=emulator-path,data-path=path,ctrl-path=path,logfile=path,loglevel=level]\n"
-+    "                spawn=on|off controls spawning support\n"
-+    "                use tpmstatedir to provide path to the tpm state dirctory\n"
-+    "                use path to provide the emulator binary to launch; default is 'swtpm'\n"
-+    "                use data-path to provide the socket path for exchanging data messages\n"
-+    "                use ctrl-path to provide the socket path for sending control messages to software emulator\n"
-+    "                use logfile to provide where to place the swtpm logs\n"
-+    "                use loglevel to controls the swtpm log level\n",
-     QEMU_ARCH_ALL)
- STEXI
- 
-@@ -2892,8 +2900,8 @@ The general form of a TPM device option is:
- 
- @item -tpmdev @var{backend} ,id=@var{id} [,@var{options}]
- @findex -tpmdev
--Backend type must be:
--@option{passthrough}.
-+Backend type must be either one of the following:
-+@option{passthrough}, @option{emulator}.
- 
- The specific backend type will determine the applicable options.
- The @code{-tpmdev} option creates the TPM backend and requires a
-@@ -2943,6 +2951,45 @@ To create a passthrough TPM use the following two options:
- Note that the @code{-tpmdev} id is @code{tpm0} and is referenced by
- @code{tpmdev=tpm0} in the device option.
- 
-+@item -tpmdev emulator, id=@var{id}, tpmstatedir=@var{path}, spawn=@var{on|off}, path=@var{emulator-binary-path}, data-path=@var{path}, ctrl-path=@var{path}, logfile=@var{path}, loglevel=@var{level}
-+
-+(Linux-host only) Enable access to a TPM emulator using unix domain sockets.
-+
-+@option{tpmstatedir} specifies the tpm state directory
-+
-+@option{spawn} specifies if qemu should spawn new emulator process with given @option{path}
-+
-+@option{path} specifies the emulator binary path to use for spawning
-+
-+@option{data-path} optional socket path to use for exchanging TPM data with emulator
-+
-+@option{ctrl-path} optional socket path to use for sending control data to emulator
-+
-+@option{logfile} optional log file to use to place log messages
-+
-+@option{loglevel} specifies the log level to use
-+
-+To create TPM emulator backend device that spawns new swtpm binary and communicate with socket pairs:
-+@example
-+
-+-tpmdev emulator,id=tpm0,tpmstatedir=/tmp/my-tpm,spawn=on,path=/usr/local/bin/swtpm,logfile=/tmp/qemu-tpm.log,loglevel=5 -device tpm-tis,tpmdev=tpm0
-+
-+@end example
-+
-+To create TPM emulator backend device that spawns new swtpm binary and communicate using unix file system sockets:
-+@example
-+
-+-tpmdev emulator,id=tpm0,tpmstatedir=/tmp/my-tpm,spawn=on,path=/usr/local/bin/swtpm,data-path=/tmp/swtpm-data.socket,ctrl-path=/tmp/swtpm-ctrl.socket,logfile=/tmp/qemu-tpm.log,loglevel=5 -device tpm-tis,tpmdev=tpm0
-+
-+@end example
-+
-+To create a TOM emulator backend device that connects to already running swtpm binary using file system sockets:
-+@example
-+
-+-tpmdev emulator,id=tpm0,tpmstatedir=/tmp/my-tpm,spawn=off,data-path=/tmp/swtpm-data.socket,ctrl-path=/tmp/swtpm-ctrl.socket,logfile=/tmp/qemu-tpm.log,loglevel=5 -device tpm-tis,tpmdev=tpm0
-+
-+@end example
-+
- @end table
- 
- ETEXI
-diff --git a/tpm.c b/tpm.c
-index 84e9667..6d2513c 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -25,7 +25,7 @@ static QLIST_HEAD(, TPMBackend) tpm_backends =
- 
- 
- #define TPM_MAX_MODELS      1
--#define TPM_MAX_DRIVERS     1
-+#define TPM_MAX_DRIVERS     2
- 
- static TPMDriverOps const *be_drivers[TPM_MAX_DRIVERS] = {
-     NULL,
--- 
-2.7.4
+> +if test "$libav" != "no" ; then
+> +    cat > $TMPC << EOF
+> +#include <libavcodec/avcodec.h>
+> +#include <libavformat/avformat.h>
+> +
+> +int main(void){ av_register_all(); avcodec_register_all(); return 0; }
+> +EOF
+> +    if compile_prog "" "-lm -lpthread -lavformat -lavcodec -lavutil -lswscale -lswresample" ; then
+> +        :
+> +    else
+> +        error_exit "libav check failed" \
+> +            "Make sure to have the libav libs and headers installed."
+
+Please don't make this an error - the dependency should be optional.
+
+> +    fi
+> +fi
+> +LIBS="$LIBS -lm -lpthread -lavformat -lavcodec -lavutil -lswscale -lswresample"
+> +
+
+Please don't extend $LIBS, use something like AV_LIBS and only add it to the
+object that uses the library, with per object flags.
+
+Also, add AV_CFLAGS if necessary.
+
+See also how $curl_libs and friends are created and used in configure and
+Makefile.
+
+
+>  ##########################################
+>  # xen probe
+>  
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index d2ab2f6..35ce513 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -59,3 +59,4 @@ CONFIG_SMBIOS=y
+>  CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+>  CONFIG_PXB=y
+>  CONFIG_ACPI_VMGENID=y
+> +CONFIG_CAPTURE=y
+> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+> index 9bde2f1..b9a7175 100644
+> --- a/default-configs/x86_64-softmmu.mak
+> +++ b/default-configs/x86_64-softmmu.mak
+> @@ -59,3 +59,4 @@ CONFIG_SMBIOS=y
+>  CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+>  CONFIG_PXB=y
+>  CONFIG_ACPI_VMGENID=y
+> +CONFIG_CAPTURE=y
+
+These two hunks are wrong. Probe and generate it in configure, and config.h.
+
+See how CONFIG_CURL is handled in configure and Makefiles.
+
+For more information, see docs/build-system.txt. But I believe following the
+libcurl example is enough.
+
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 0aca984..9066aac 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1809,3 +1809,37 @@ ETEXI
+>  STEXI
+>  @end table
+>  ETEXI
+> +
+> +    {
+> +        .name       = "capture_start",
+> +        .args_type  = "filename:F,fps:i?",
+> +        .params     = "filename [framerate]",
+> +        .help       = "Start video capture",
+> +        .cmd        = hmp_capture_start,
+> +    },
+> +
+> +STEXI
+> +@item capture_start @var{filename} [@var{framerate}]
+> +@findex capture_start
+> +Start video capture.
+> +Capture video into @var{filename} with framerate @var{framerate}.
+
+Is there an fps limit? Is it possible to do 0.5 fps?
+
+> +
+> +Defaults:
+> +@itemize @minus
+> +@item framerate = 60
+> +@end itemize
+> +ETEXI
+> +
+> +    {
+> +        .name       = "capture_stop",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "Stop video capture",
+> +        .cmd        = hmp_capture_stop,
+> +    },
+> +
+> +STEXI
+> +@item capture_stop
+> +@findex capture_stop
+> +Stop video capture.
+> +ETEXI
+> diff --git a/hmp.h b/hmp.h
+> index 799fd37..36c7a4d 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -138,5 +138,7 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
+>  void hmp_info_dump(Monitor *mon, const QDict *qdict);
+>  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+> +void hmp_capture_start(Monitor *mon, const QDict *qdict);
+> +void hmp_capture_stop(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+> index 551c050..a918896 100644
+> --- a/hw/display/Makefile.objs
+> +++ b/hw/display/Makefile.objs
+> @@ -20,6 +20,8 @@ common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
+>  
+>  common-obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
+>  
+> +obj-$(CONFIG_CAPTURE) += capture.o
+> +
+>  obj-$(CONFIG_OMAP) += omap_dss.o
+>  obj-$(CONFIG_OMAP) += omap_lcdc.o
+>  obj-$(CONFIG_PXA2XX) += pxa2xx_lcd.o
+> diff --git a/hw/display/capture.c b/hw/display/capture.c
+> new file mode 100644
+> index 0000000..c89aaa0
+> --- /dev/null
+> +++ b/hw/display/capture.c
+> @@ -0,0 +1,761 @@
+
+A copy right header is mandatory for this source file.
+
+Please also include "qemu/osdep.h" before any other headers.
+
+> +#include "capture.h"
+> +
+> +static void sound_capture_notify(void *opaque, audcnotification_e cmd)
+> +{
+> +    (void) opaque;
+> +    (void) cmd;
+
+These lines are not needed per QEMU's compiler warning level.
+
+> +}
+> +
+> +static void sound_capture_destroy(void *opaque)
+> +{
+> +    (void) opaque;
+
+This one too.
+
+> +}
+> +
+> +static void write_empty_sound(void *opaque, struct CaptureThreadWorkerData *data)
+> +{
+> +    AVFormatContext *oc = data->oc;
+> +    OutputStream *ost = &data->audio_stream;
+> +
+> +    AVFrame *tmp = ost->tmp_frame;
+> +    ost->tmp_frame = ost->empty_frame;
+> +    double newlen = write_audio_frame(oc, ost);
+> +    ost->tmp_frame = tmp;
+> +
+> +    if (newlen >= 0.0) {
+> +        data->video_len = newlen;
+> +    }
+> +}
+> +
+> +static void sound_capture_capture(void *opaque, void *buf, int size)
+> +{
+> +    int bufsize = size;
+> +    SoundCapture *wav = opaque;
+> +    AVFrame *frame;
+> +    int sampleCount;
+> +    double len1, len2, delta;
+> +    int8_t *q;
+> +    int buffpos;
+> +
+> +    /*int32_t n = 0;
+> +    int i = 0;
+> +    for(i=0;i<size;i++) {
+> +        int8_t a = ((int8_t*)buf)[i];
+> +        n+=a;
+> +    }
+> +    wav->bytes += size;
+> +    if(n==0)
+> +        return;
+> +    printf("%d\n",n);*/
+> +    frame = wav->data->audio_stream.tmp_frame;
+> +    sampleCount = frame->nb_samples * 4;
+> +
+> +    len1 = wav->data->video_len;
+> +    len2 = wav->data->video_len2;
+> +    delta = len1 - len2;
+> +
+> +    while (delta < 0.0) {
+> +        write_empty_sound(opaque, wav->data);
+> +
+> +        len1 = wav->data->video_len;
+> +        len2 = wav->data->video_len2;
+> +        delta = len1 - len2;
+> +    }
+> +
+> +    q = (int8_t *)frame->data[0];
+> +
+> +    buffpos = 0;
+> +    while (bufsize > 0) {
+> +        int start = wav->bufferPos;
+> +        int freeSpace = sampleCount - start;
+> +
+> +        int willWrite = freeSpace;
+> +        if (willWrite > bufsize) {
+> +            willWrite = bufsize;
+> +        }
+> +
+> +        memcpy(q + start, buf + buffpos, willWrite);
+> +        bufsize -= willWrite;
+> +        buffpos += willWrite;
+> +
+> +        freeSpace = sampleCount - start - willWrite;
+> +
+> +        if (freeSpace == 0) {
+> +            double newlen = write_audio_frame(wav->data->oc, &wav->data->audio_stream);
+> +
+> +            if (newlen >= 0.0) {
+> +                wav->data->video_len = newlen;
+> +            }
+> +            wav->bufferPos = 0;
+> +        } else {
+> +            wav->bufferPos = start + willWrite;
+> +        }
+> +    }
+> +}
+> +
+> +static void sound_capture_capture_destroy(void *opaque)
+> +{
+> +    SoundCapture *wav = opaque;
+> +
+> +    AUD_del_capture (wav->cap, wav);
+> +}
+> +
+> +static int sound_capture_start_capture(struct CaptureThreadWorkerData *data)
+> +{
+> +    Monitor *mon = cur_mon;
+> +    SoundCapture *wav;
+> +    struct audsettings as;
+> +    struct audio_capture_ops ops;
+> +    CaptureVoiceOut *cap;
+> +
+> +    as.freq = 44100;
+> +    as.nchannels = 2;
+> +    as.fmt = AUD_FMT_S16;
+> +    as.endianness = 0;
+> +
+> +    ops.notify = sound_capture_notify;
+> +    ops.capture = sound_capture_capture;
+> +    ops.destroy = sound_capture_destroy;
+> +
+> +    wav = g_malloc0(sizeof(*wav));
+> +
+> +
+> +    cap = AUD_add_capture(&as, &ops, wav);
+> +    if (!cap) {
+> +        monitor_printf(mon, "Failed to add audio capture\n");
+> +        goto error_free;
+> +    }
+> +
+> +    wav->bufferPos = 0;
+> +    wav->data = data;
+> +    wav->cap = cap;
+> +    data->soundCapture = wav;
+> +    return 0;
+> +
+> +error_free:
+> +    g_free(wav);
+> +    return -1;
+> +}
+> +
+> +static int write_frame(AVFormatContext *fmt_ctx, const AVRational *time_base,
+> +                        AVStream *st, AVPacket *pkt)
+
+Parameter list is off by one column.
+
+> +{
+> +    /* rescale output packet timestamp values from codec to stream timebase */
+> +    av_packet_rescale_ts(pkt, *time_base, st->time_base);
+> +    pkt->stream_index = st->index;
+> +    /* Write the compressed frame to the media file. */
+> +    return av_interleaved_write_frame(fmt_ctx, pkt);
+> +}
+> +
+> +/* Add an output stream. */
+> +static void add_video_stream(OutputStream *ost, AVFormatContext *oc,
+> +                       AVCodec **codec,
+> +                       enum AVCodecID codec_id,
+> +                       int w, int h, int bit_rate, int framerate)
+
+Parameter list indentation is off.
+> +{
+> +    AVCodecContext *c;
+> +    /* find the encoder */
+> +    *codec = avcodec_find_encoder(codec_id);
+> +    if (!(*codec)) {
+> +        fprintf(stderr, "Could not find encoder for '%s'\n",
+> +                avcodec_get_name(codec_id));
+> +        exit(1);
+
+Can this be handled more gracefully instead of exit? (The same question to all
+other 'exits' in this patch).
+
+> +    }
+> +    ost->st = avformat_new_stream(oc, *codec);
+> +    if (!ost->st) {
+> +        fprintf(stderr, "Could not allocate stream\n");
+> +        exit(1);
+> +    }
+> +    ost->st->id = oc->nb_streams - 1;
+> +    c = ost->st->codec;
+> +    if ((*codec)->type == AVMEDIA_TYPE_VIDEO) {
+> +        c->codec_id = codec_id;
+> +        c->bit_rate = bit_rate;
+> +        /* Resolution must be a multiple of two. */
+> +        c->width    = w;
+> +        c->height   = h;
+> +        /* timebase: This is the fundamental unit of time (in seconds) in terms
+> +         * of which frame timestamps are represented. For fixed-fps content,
+> +         * timebase should be 1/framerate and timestamp increments should be
+> +         * identical to 1. */
+> +        ost->st->time_base = (AVRational){ 1, framerate };
+> +        c->time_base = ost->st->time_base;
+> +        c->gop_size  = 12; /* emit one intra frame every 12 frames at most */
+> +        c->pix_fmt   = AV_PIX_FMT_YUV420P;
+> +        if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
+> +            /* just for testing, we also add B frames */
+> +            c->max_b_frames = 2;
+> +        }
+> +        if (c->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
+> +            /* Needed to avoid using macroblocks in which some coeffs overflow.
+> +             * This does not happen with normal video, it just happens here as
+> +             * the motion of the chroma plane does not match the luma plane. */
+> +            c->mb_decision = 2;
+> +        }
+> +    } else {
+> +        fprintf(stderr, "Wrong stream type\n");
+> +        exit(1);
+> +    }
+> +    /* Some formats want stream headers to be separate. */
+> +    if (oc->oformat->flags & AVFMT_GLOBALHEADER) {
+> +        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+> +    }
+> +}
+> +
+> +static void add_audio_stream(OutputStream *ost, AVFormatContext *oc,
+> +                             AVCodec **codec,
+> +                             enum AVCodecID codec_id)
+> +{
+> +    AVCodecContext *c;
+> +    int i;
+> +    /* find the encoder */
+> +    *codec = avcodec_find_encoder(codec_id);
+> +    if (!(*codec)) {
+> +        fprintf(stderr, "Could not find encoder for '%s'\n",
+> +                avcodec_get_name(codec_id));
+> +        exit(1);
+> +    }
+> +    ost->st = avformat_new_stream(oc, *codec);
+> +    if (!ost->st) {
+> +        fprintf(stderr, "Could not allocate stream\n");
+> +        exit(1);
+> +    }
+> +    ost->st->id = oc->nb_streams - 1;
+> +    c = ost->st->codec;
+> +    if ((*codec)->type == AVMEDIA_TYPE_AUDIO) {
+> +        c->sample_fmt = AV_SAMPLE_FMT_FLTP;
+> +        c->bit_rate    = 128000;
+> +        c->sample_rate = 44100;
+> +        c->channels    = av_get_channel_layout_nb_channels(c->channel_layout);
+> +        c->channel_layout = AV_CH_LAYOUT_STEREO;
+> +        if ((*codec)->channel_layouts) {
+> +            c->channel_layout = (*codec)->channel_layouts[0];
+> +            for (i = 0; (*codec)->channel_layouts[i]; i++) {
+> +                if ((*codec)->channel_layouts[i] == AV_CH_LAYOUT_STEREO) {
+> +                    c->channel_layout = AV_CH_LAYOUT_STEREO;
+> +                }
+> +            }
+> +        }
+> +        c->channels   = av_get_channel_layout_nb_channels(c->channel_layout);
+> +        ost->st->time_base = (AVRational){ 1, c->sample_rate };
+> +    } else {
+> +        fprintf(stderr, "Wrong stream type\n");
+> +        exit(1);
+> +    }
+> +    /* Some formats want stream headers to be separate. */
+> +    if (oc->oformat->flags & AVFMT_GLOBALHEADER) {
+> +        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+> +    }
+> +}
+> +/**************************************************************/
+> +/* audio output */
+> +static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
+> +                                  uint64_t channel_layout,
+> +                                  int sample_rate, int nb_samples)
+> +{
+> +    AVFrame *frame = av_frame_alloc();
+> +    int ret;
+> +    if (!frame) {
+> +        fprintf(stderr, "Error allocating an audio frame\n");
+> +        exit(1);
+> +    }
+> +    frame->format = sample_fmt;
+> +    frame->channel_layout = channel_layout;
+> +    frame->sample_rate = sample_rate;
+> +    frame->nb_samples = nb_samples;
+> +    if (nb_samples) {
+> +        ret = av_frame_get_buffer(frame, 0);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Error allocating an audio buffer\n");
+> +            exit(1);
+> +        }
+> +    }
+> +    return frame;
+> +}
+> +
+> +static void open_audio(AVFormatContext *oc, AVCodec *codec,
+> +                       OutputStream *ost, AVDictionary *opt_arg)
+> +{
+> +    AVCodecContext *c;
+> +    int nb_samples;
+> +    int ret;
+> +    AVDictionary *opt = NULL;
+> +    c = ost->st->codec;
+> +    /* open it */
+> +    av_dict_copy(&opt, opt_arg, 0);
+> +    ret = avcodec_open2(c, codec, &opt);
+> +    av_dict_free(&opt);
+> +    if (ret < 0) {
+> +        fprintf(stderr, "Could not open audio codec: %s\n", av_err2str(ret));
+> +        exit(1);
+> +    }
+> +    nb_samples = c->frame_size;
+> +    ost->frame     = alloc_audio_frame(c->sample_fmt, c->channel_layout,
+> +                                       c->sample_rate, nb_samples);
+> +
+> +    ost->tmp_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, c->channel_layout,
+> +                                       c->sample_rate, nb_samples);
+> +    ost->tmp_frame->pts = 0;
+> +
+> +    ost->empty_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, c->channel_layout,
+> +                                       c->sample_rate, nb_samples);
+> +    int sampleCount = nb_samples * 4;
+> +    int8_t *q = (int8_t *)ost->empty_frame->data[0];
+> +    memset(q, 0, sampleCount);
+> +
+> +    /* create resampler context */
+> +    ost->swr_ctx = swr_alloc();
+> +    if (!ost->swr_ctx) {
+> +        fprintf(stderr, "Could not allocate resampler context\n");
+> +        exit(1);
+> +    }
+> +    /* set options */
+> +    av_opt_set_int       (ost->swr_ctx, "in_channel_count",  c->channels,       0);
+> +    av_opt_set_int       (ost->swr_ctx, "in_sample_rate",    c->sample_rate,    0);
+> +    av_opt_set_sample_fmt(ost->swr_ctx, "in_sample_fmt",     AV_SAMPLE_FMT_S16, 0);
+> +    av_opt_set_int       (ost->swr_ctx, "out_channel_count", c->channels,       0);
+> +    av_opt_set_int       (ost->swr_ctx, "out_sample_rate",   c->sample_rate,    0);
+> +    av_opt_set_sample_fmt(ost->swr_ctx, "out_sample_fmt",    c->sample_fmt,     0);
+> +    /* initialize the resampling context */
+> +    if (swr_init(ost->swr_ctx) < 0) {
+> +        fprintf(stderr, "Failed to initialize the resampling context\n");
+> +        exit(1);
+> +    }
+> +}
+> +
+> +/*
+> + * encode one audio frame and send it to the muxer
+> + */
+> +static double write_audio_frame(AVFormatContext *oc, OutputStream *ost)
+> +{
+> +    AVCodecContext *c;
+> +    AVPacket pkt = { 0 };
+> +    AVFrame *frame;
+> +    int ret;
+> +    int got_packet;
+> +    int dst_nb_samples;
+> +    av_init_packet(&pkt);
+> +    c = ost->st->codec;
+> +    frame = ost->tmp_frame;
+> +    frame->pts = frame->pts + 1;
+> +    double videolen = -1.0;
+> +    if (frame) {
+> +        /* convert samples from native format to destination codec format,
+> +         * using the resampler */
+> +        /* compute destination number of samples */
+> +        dst_nb_samples = av_rescale_rnd(
+> +            swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples,
+> +            c->sample_rate, c->sample_rate, AV_ROUND_UP);
+> +        av_assert0(dst_nb_samples == frame->nb_samples);
+> +        /* when we pass a frame to the encoder, it may keep a reference to it
+> +         * internally;
+> +         * make sure we do not overwrite it here
+> +         */
+> +        ret = av_frame_make_writable(ost->frame);
+> +        if (ret < 0) {
+> +            exit(1);
+> +        }
+> +        /* convert to destination format */
+> +        ret = swr_convert(ost->swr_ctx,
+> +                          ost->frame->data, dst_nb_samples,
+> +                          (const uint8_t **)frame->data, frame->nb_samples);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Error while converting\n");
+> +            exit(1);
+> +        }
+> +        frame = ost->frame;
+> +        frame->pts = av_rescale_q(ost->samples_count,
+> +                                  (AVRational){1, c->sample_rate},
+> +                                  c->time_base);
+> +
+> +        videolen = (double)frame->pts / c->sample_rate;
+> +        ost->samples_count += dst_nb_samples;
+> +    }
+> +    ret = avcodec_encode_audio2(c, &pkt, frame, &got_packet);
+> +    if (ret < 0) {
+> +        fprintf(stderr, "Error encoding audio frame: %s\n", av_err2str(ret));
+> +        exit(1);
+> +    }
+> +    if (got_packet) {
+> +        ret = write_frame(oc, &c->time_base, ost->st, &pkt);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Error while writing audio frame: %s\n",
+> +                    av_err2str(ret));
+> +            exit(1);
+> +        }
+> +    }
+> +    return videolen;
+> +}
+
+Add a blank line?
+
+> +static void write_delayed_audio_frames(void)
+> +{
+> +    struct CaptureThreadWorkerData *data = capture_get_data();
+> +    AVFormatContext *oc = data->oc;
+> +    OutputStream *ost = &data->audio_stream;
+> +    AVCodecContext *c = ost->st->codec;
+> +
+> +    AVPacket pkt = { 0 };
+> +    pkt.data = NULL;
+> +    pkt.size = 0;
+> +    av_init_packet(&pkt);
+> +    int got_output = 1;
+> +    int ret;
+> +    while (got_output) {
+> +
+> +        ret = avcodec_encode_audio2(c, &pkt, NULL, &got_output);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Error encoding frame\n");
+> +            exit(1);
+> +        }
+> +
+> +        if (got_output) {
+> +            ret = write_frame(oc, &c->time_base, ost->st, &pkt);
+> +            av_free_packet(&pkt);
+> +        }
+> +    }
+> +}
+
+Blank line.
+
+> +/**************************************************************/
+> +/* video output */
+> +static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt, int width, int height)
+> +{
+> +    AVFrame *picture;
+> +    int ret;
+> +    picture = av_frame_alloc();
+> +    if (!picture) {
+> +        return NULL;
+> +    }
+> +    picture->format = pix_fmt;
+> +    picture->width  = width;
+> +    picture->height = height;
+> +    /* allocate the buffers for the frame data */
+> +    ret = av_frame_get_buffer(picture, 32);
+> +    if (ret < 0) {
+> +        fprintf(stderr, "Could not allocate frame data.\n");
+> +        exit(1);
+> +    }
+> +    return picture;
+> +}
+> +
+> +static void open_video(AVFormatContext *oc, AVCodec *codec,
+> +                       OutputStream *ost, AVDictionary *opt_arg)
+> +{
+> +    int ret;
+> +    AVCodecContext *c = ost->st->codec;
+> +    AVDictionary *opt = NULL;
+> +    av_dict_copy(&opt, opt_arg, 0);
+> +    /* open the codec */
+> +    ret = avcodec_open2(c, codec, &opt);
+> +    av_dict_free(&opt);
+> +    if (ret < 0) {
+> +        fprintf(stderr, "Could not open video codec: %s\n", av_err2str(ret));
+> +        exit(1);
+> +    }
+> +    /* allocate and init a re-usable frame */
+> +    ost->frame = alloc_picture(c->pix_fmt, c->width, c->height);
+> +    if (!ost->frame) {
+> +        fprintf(stderr, "Could not allocate video frame\n");
+> +        exit(1);
+> +    }
+> +}
+> +
+> +static AVFrame *get_filled_image(void)
+> +{
+> +    QemuConsole *con = qemu_console_lookup_by_index(0);
+> +    DisplaySurface *surface;
+> +    surface = qemu_console_surface(con);
+> +
+> +    if (con == NULL) {
+> +        fprintf(stderr, "There is no QemuConsole I can screendump from.\n");
+> +        return NULL;
+> +    }
+> +
+> +    int ourW = pixman_image_get_width(surface->image);
+> +    int ourH = pixman_image_get_height(surface->image);
+> +
+> +    AVFrame *pict = alloc_picture(AV_PIX_FMT_RGB32, ourW, ourH);
+> +    av_frame_make_writable(pict);
+> +
+> +    uint8_t* picdata = (uint8_t *)pixman_image_get_data(surface->image);
+> +
+> +    memcpy(pict->data[0], picdata, ourW * ourH * 4);
+> +    return pict;
+> +}
+> +
+> +static AVFrame *get_video_frame(OutputStream *ost, int64_t frame)
+> +{
+> +    AVCodecContext *c = ost->st->codec;
+> +
+> +    AVFrame *pict = get_filled_image();
+> +    if (pict == NULL) {
+> +        return NULL;
+> +    }
+> +
+> +    struct SwsContext *swsContext = sws_getContext(
+> +        pict->width, pict->height, pict->format,
+> +        ost->frame->width, ost->frame->height,
+> +        ost->frame->format, SWS_BICUBIC, NULL, NULL, NULL);
+> +    sws_scale(swsContext, (const uint8_t * const *)pict->data,
+> +              pict->linesize , 0, c->height, ost->frame->data,
+> +              ost->frame->linesize);
+> +
+> +    av_frame_free(&pict);
+> +    sws_freeContext(swsContext);
+> +
+> +    if (frame <= ost->frame->pts) {
+> +        ost->frame->pts = ost->frame->pts + 1;
+> +    } else {
+> +        ost->frame->pts = frame;
+> +    }
+> +
+> +    return ost->frame;
+> +}
+
+Blank line.
+
+> +/*
+> + * encode one video frame and send it to the muxer
+> + */
+> +static void write_video_frame(AVFormatContext *oc,
+> +                              OutputStream *ost, int frameNumber)
+> +{
+> +    int ret;
+> +    AVCodecContext *c;
+> +    AVFrame *frame;
+> +    int got_packet = 0;
+> +    AVPacket pkt = { 0 };
+> +
+> +    frame = get_video_frame(ost, frameNumber);
+> +    if (frame == NULL) {
+> +        return;
+> +    }
+> +
+> +    c = ost->st->codec;
+> +    av_init_packet(&pkt);
+> +    /* encode the image */
+> +    ret = avcodec_encode_video2(c, &pkt, frame, &got_packet);
+> +    if (ret < 0) {
+> +        fprintf(stderr, "Error encoding video frame: %s\n", av_err2str(ret));
+> +        exit(1);
+> +    }
+> +    if (got_packet) {
+> +        ret = write_frame(oc, &c->time_base, ost->st, &pkt);
+> +    } else {
+> +        ret = 0;
+> +    }
+> +    if (ret < 0) {
+> +        fprintf(stderr, "Error while writing video frame: %s\n", av_err2str(ret));
+> +        return;
+> +    }
+> +}
+> +
+> +static void write_delayed_video_frames(void)
+> +{
+> +    struct CaptureThreadWorkerData *data = capture_get_data();
+> +    AVFormatContext *oc = data->oc;
+> +    OutputStream *ost = &data->stream;
+> +    AVCodecContext *c = ost->st->codec;
+> +
+> +    AVPacket pkt = { 0 };
+> +    pkt.data = NULL;
+> +    pkt.size = 0;
+> +    av_init_packet(&pkt);
+> +    int got_output = 1;
+> +    int ret;
+> +    while (got_output) {
+> +        ret = avcodec_encode_video2(c, &pkt, NULL, &got_output);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Error encoding frame\n");
+> +            exit(1);
+> +        }
+> +
+> +        if (got_output) {
+> +            ret = write_frame(oc, &c->time_base, ost->st, &pkt);
+> +            av_free_packet(&pkt);
+> +        }
+> +    }
+> +}
+> +
+> +static void close_stream(AVFormatContext *oc, OutputStream *ost)
+> +{
+> +    avcodec_close(ost->st->codec);
+> +    av_frame_free(&ost->frame);
+> +    av_frame_free(&ost->tmp_frame);
+> +    sws_freeContext(ost->sws_ctx);
+> +    swr_free(&ost->swr_ctx);
+> +}
+> +
+> +static int ends_with(const char *str, const char *suffix)
+> +{
+> +    if (!str || !suffix) {
+> +        return 0;
+> +    }
+> +    size_t lenstr = strlen(str);
+> +    size_t lensuffix = strlen(suffix);
+> +    if (lensuffix >  lenstr) {
+> +        return 0;
+> +    }
+> +    return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
+> +}
+> +
+> +static struct CaptureThreadWorkerData *capture_get_data(void)
+> +{
+> +    static struct CaptureThreadWorkerData data = {0};
+> +    return &data;
+> +}
+> +
+> +static void capture_timer(void *p)
+> +{
+> +    struct CaptureThreadWorkerData *data = (struct CaptureThreadWorkerData *)p;
+> +    if (!data->is_capturing) {
+> +        return;
+> +    }
+> +
+> +    int64_t n = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> +    int64_t intdelta = (n - data->time) / 100000;
+> +    double delta = (double)intdelta / 10000;
+> +    data->delta += delta;
+> +    data->time   = n;
+> +
+> +    while (data->delta > (1.0 / data->framerate)) {
+> +        data->delta -= 1.0 / data->framerate;
+> +
+> +        av_frame_make_writable(data->stream.frame);
+> +        write_video_frame(data->oc, &data->stream,
+> +            (int)(floor(data->video_len * (double)data->framerate + 0.5)));
+> +    }
+> +    data->video_len2 = data->video_len2 + delta;
+> +
+> +    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> +    if (data->is_capturing) {
+> +        timer_mod_ns(data->timer, now + 10000000);
+> +    }
+> +}
+> +
+> +static void capture_powerdown_req(void)
+> +{
+> +    if (capture_stop()) {
+> +        printf("Capture stoped\n");
+> +    }
+> +}
+> +
+> +void hmp_capture_start(Monitor *mon, const QDict *qdict)
+> +{
+> +    const char *filename = qdict_get_str(qdict, "filename");
+> +    int framerate = qdict_get_try_int(qdict, "fps", 60);
+> +
+> +    struct CaptureThreadWorkerData *data = capture_get_data();
+> +    if (!data->is_loaded) {
+> +        av_register_all();
+> +        avcodec_register_all();
+> +        data->codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+> +        if (!data->codec) {
+> +            fprintf(stderr, "codec not found\n");
+> +            return;
+> +        }
+> +        data->c = NULL;
+> +        data->is_loaded = 1;
+> +        atexit(capture_powerdown_req);
+> +    }
+> +
+> +    if (data->is_capturing == 0) {
+> +        if (!ends_with(filename, ".mp4")
+> +         && !ends_with(filename, ".mpg")
+> +         && !ends_with(filename, ".avi")) {
+> +            monitor_printf(mon, "Invalid file format, use .mp4 or .mpg\n");
+> +            return;
+> +        }
+> +        if (framerate != 60 && framerate != 30
+> +         && framerate != 24 && framerate != 25) {
+> +            monitor_printf(mon, "Invalid framerate, valid values are: 24, 25, 30, 60\n");
+> +            return;
+> +        }
+> +        monitor_printf(mon, "Capture started to file: %s\n", filename);
+> +
+> +        data->framerate = framerate;
+> +        data->frame = 0;
+> +
+> +        data->delta = 0.0;
+> +        data->time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> +
+> +        data->video_len = 0.0;
+> +        data->video_len2 = 0.0;
+> +
+> +        QemuConsole *con = qemu_console_lookup_by_index(0);
+> +        DisplaySurface *surface;
+> +        surface = qemu_console_surface(con);
+> +        int resW = pixman_image_get_width(surface->image);
+> +        int resH = pixman_image_get_height(surface->image);
+> +
+> +        OutputStream video_st = { 0 };
+> +        data->stream = video_st;
+> +        OutputStream audio_st = { 0 };
+> +        data->audio_stream = audio_st;
+> +
+> +        avformat_alloc_output_context2(&data->oc, NULL, "avi", filename);
+> +        AVOutputFormat *fmt;
+> +        fmt = data->oc->oformat;
+> +
+> +        add_video_stream(&data->stream, data->oc, &data->codec,
+> +                         fmt->video_codec, resW, resH, 4000000, framerate);
+> +        add_audio_stream(&data->audio_stream, data->oc, &data->audio_codec,
+> +                         fmt->audio_codec);
+> +
+> +        open_video(data->oc, data->codec, &data->stream, NULL);
+> +        open_audio(data->oc, data->audio_codec, &data->audio_stream, NULL);
+> +
+> +        int ret = avio_open(&data->oc->pb, filename, AVIO_FLAG_WRITE);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Could not open '%s': %s\n", filename,
+> +                    av_err2str(ret));
+> +            return;
+> +        }
+> +        ret = avformat_write_header(data->oc, NULL);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Error occurred when opening output file: %s\n",
+> +                    av_err2str(ret));
+> +            return;
+> +        }
+> +
+> +        data->is_capturing = 1;
+> +
+> +        if (data->timer) {
+> +            timer_free(data->timer);
+> +        }
+> +        data->timer = timer_new_ns(QEMU_CLOCK_REALTIME, capture_timer, data);
+> +        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> +        timer_mod_ns(data->timer, now + 1000000000 / data->framerate);
+> +
+> +        sound_capture_start_capture(data);
+> +    } else {
+> +        monitor_printf(mon, "Already capturing\n");
+> +    }
+> +}
+> +
+> +static int capture_stop(void)
+> +{
+> +    struct CaptureThreadWorkerData *data = capture_get_data();
+> +    if (!data->is_loaded) {
+> +        return 0;
+> +    }
+> +
+> +    if (data->is_capturing) {
+> +        data->is_capturing = 0;
+> +
+> +        write_delayed_video_frames();
+> +        write_delayed_audio_frames();
+> +
+> +        av_write_trailer(data->oc);
+> +        close_stream(data->oc, &data->stream);
+> +        close_stream(data->oc, &data->audio_stream);
+> +        avio_closep(&data->oc->pb);
+> +        avformat_free_context(data->oc);
+> +
+> +        sound_capture_capture_destroy(data->soundCapture);
+> +        return 1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +void hmp_capture_stop(Monitor *mon, const QDict *qdict)
+> +{
+> +    if (capture_stop()) {
+> +        monitor_printf(mon, "Capture stopped\n");
+> +    } else {
+> +        monitor_printf(mon, "Not capturing\n");
+> +    }
+> +}
+> diff --git a/hw/display/capture.h b/hw/display/capture.h
+> new file mode 100644
+> index 0000000..73c79f1
+> --- /dev/null
+> +++ b/hw/display/capture.h
+> @@ -0,0 +1,78 @@
+> +#ifndef CAPTURE_H
+> +#define CAPTURE_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "monitor/monitor.h"
+> +#include "ui/console.h"
+> +#include "qemu/timer.h"
+> +#include "audio/audio.h"
+> +
+> +#include <libavcodec/avcodec.h>
+> +#include <libavformat/avformat.h>
+> +#include "libavutil/frame.h"
+> +#include "libavutil/imgutils.h"
+> +#include <libswscale/swscale.h>
+> +#include <libavutil/avassert.h>
+> +#include <libavutil/channel_layout.h>
+> +#include <libavutil/opt.h>
+> +#include <libavutil/mathematics.h>
+> +#include <libavutil/timestamp.h>
+> +#include <libswresample/swresample.h>
+> +
+> +void hmp_capture_start(Monitor *mon, const QDict *qdict);
+> +void hmp_capture_stop(Monitor *mon, const QDict *qdict);
+> +
+> +typedef struct OutputStream {
+> +    AVStream *st;
+> +    int samples_count;
+> +    AVFrame *frame;
+> +    AVFrame *tmp_frame;
+> +    AVFrame *empty_frame;
+> +    struct SwsContext *sws_ctx;
+> +    struct SwrContext *swr_ctx;
+> +} OutputStream;
+> +
+> +struct CaptureThreadWorkerData {
+> +    QEMUTimer *timer;
+> +    int frame;
+> +    int is_loaded;
+> +    int is_capturing;
+> +    int framerate;
+> +    double video_len;
+> +    double video_len2;
+> +    CaptureState *wavCapture;
+> +
+> +    AVCodec *codec;
+> +    AVCodecContext *c;
+> +
+> +    AVFrame *picture;
+> +    AVPacket pkt;
+> +
+> +    AVCodec *audio_codec;
+> +    OutputStream stream;
+> +    OutputStream audio_stream;
+> +    AVFormatContext *oc;
+> +
+> +    int64_t time;
+> +    double delta;
+> +
+> +    void *soundCapture;
+> +};
+> +
+> +typedef struct {
+> +    int bytes;
+> +    CaptureVoiceOut *cap;
+> +    struct CaptureThreadWorkerData *data;
+> +    int bufferPos;
+> +} SoundCapture;
+> +
+> +static int sound_capture_start_capture(struct CaptureThreadWorkerData *data);
+> +static int ends_with(const char *str, const char *suffix);
+> +static struct CaptureThreadWorkerData *capture_get_data(void);
+> +static void write_delayed_audio_frames(void);
+> +static void write_delayed_video_frames(void);
+> +static int capture_stop(void);
+> +static double write_audio_frame(AVFormatContext *oc, OutputStream *ost);
+> +static void write_empty_sound(void *opaque, struct CaptureThreadWorkerData* data);
+
+What's the point of these prototypes? 'static' means they are private functions
+so they needn't be listed in the header.
+
+> +
+> +#endif
+> -- 
+> 2.7.4
+> 
+> 
+
+Fam
