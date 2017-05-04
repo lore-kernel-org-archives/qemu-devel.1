@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d677q-000365-61
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1d677r-000379-8D
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d677n-0001LX-NN
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1d677o-0001M9-MX
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:19 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  3 May 2017 22:07:52 -0500
-Message-Id: <20170504030755.1001-8-eblake@redhat.com>
+Date: Wed,  3 May 2017 22:07:53 -0500
+Message-Id: <20170504030755.1001-9-eblake@redhat.com>
 In-Reply-To: <20170504030755.1001-1-eblake@redhat.com>
 References: <20170504030755.1001-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 07/10] iotests: Add test 179 to cover write
- zeroes with unmap
+Subject: [Qemu-devel] [PATCH v12 08/10] qcow2: Optimize write zero of
+ unaligned tail cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,355 +23,394 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-No tests were covering write zeroes with unmap.  Additionally,
-I needed to prove that my previous patches for correct status
-reporting and write zeroes optimizations actually had an impact.
+We've already improved discards to operate efficiently on the tail
+of an unaligned qcow2 image; it's time to make a similar improvement
+to write zeroes.  The special case is only valid at the tail
+cluster of a file, where we must recognize that any sectors beyond
+the image end would implicitly read as zero, and therefore should
+not penalize our logic for widening a partial cluster into writing
+the whole cluster as zero.
 
-The test works for cluster_size between 8k and 2M (for smaller
-sizes, it fails because our allocation patterns are not contiguous
-with small clusters - in part, the largest consecutive allocation
-we tend to get is often bounded by the size covered by one L2
-table).
+However, note that for now, the special case of end-of-file is only
+recognized if there is no backing file, or if the backing file has
+the same length; that's because when the backing file is shorter
+than the active layer, we don't have code in place to recognize
+that reads of a sector unallocated at the top and beyond the backing
+end-of-file are implicitly zero.  It's not much of a real loss,
+because most people don't use images that aren't cluster-aligned,
+or where the active layer is a different size than the backing
+layer (especially where the difference falls within a single cluster).
 
-Note that testing for zero clusters is tricky: 'qemu-io map'
-reports whether data comes from the current layer of the image
-(useful for sniffing out which regions of the file have
-QCOW_OFLAG_ZERO) - but doesn't show which clusters have mappings;
-while 'qemu-img map' sees "zero":true for both unallocated and
-zero clusters for any qcow2 with no backing layer (so less useful
-at detecting true zero clusters), but reliably shows mappings.
-So we have to rely on both queries side-by-side at each point of
-the test.
+Update test 154 to cover the new scenarios, using two images of
+intentionally differing length.
+
+While at it, fix the test to gracefully skip when run as
+./check -qcow2 -o compat=0.10 154
+since the older format lacks zero clusters already required earlier
+in the test.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v12: probe the map in more places, to make test easier to follow
+v12: fix testsuite problems, document shortcoming of differing
 v11: reserved for blkdebug half of v10
-v10: drop any changes to v2 files, rewrite test to work with updates
-earlier in the series, add a blkdebug probe
+size of backing file
+
+v10: rebase to better reporting of preallocated zero clusters
 v9: new patch
 ---
- tests/qemu-iotests/179     | 132 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/179.out | 160 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 293 insertions(+)
- create mode 100755 tests/qemu-iotests/179
- create mode 100644 tests/qemu-iotests/179.out
+ block/qcow2.c              |   7 ++
+ tests/qemu-iotests/154     | 160 ++++++++++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/154.out | 129 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 294 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/179 b/tests/qemu-iotests/179
-new file mode 100755
-index 0000000..124666f
---- /dev/null
-+++ b/tests/qemu-iotests/179
-@@ -0,0 +1,132 @@
-+#!/bin/bash
-+#
-+# Test case for write zeroes with unmap
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/block/qcow2.c b/block/qcow2.c
+index dded5a0..3478bb6 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2451,6 +2451,10 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
+     BlockDriverState *file;
+     int64_t res;
+
++    if (start + count > bs->total_sectors) {
++        count = bs->total_sectors - start;
++    }
 +
-+# creator
-+owner=eblake@redhat.com
+     if (!count) {
+         return true;
+     }
+@@ -2469,6 +2473,9 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+     uint32_t tail = (offset + count) % s->cluster_size;
+
+     trace_qcow2_pwrite_zeroes_start_req(qemu_coroutine_self(), offset, count);
++    if (offset + count == bs->total_sectors * BDRV_SECTOR_SIZE) {
++        tail = 0;
++    }
+
+     if (head || tail) {
+         int64_t cl_start = (offset - head) >> BDRV_SECTOR_BITS;
+diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
+index 7ca7219..687b8f3 100755
+--- a/tests/qemu-iotests/154
++++ b/tests/qemu-iotests/154
+@@ -2,7 +2,7 @@
+ #
+ # qcow2 specific bdrv_pwrite_zeroes tests with backing files (complements 034)
+ #
+-# Copyright (C) 2016 Red Hat, Inc.
++# Copyright (C) 2016-2017 Red Hat, Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -42,7 +42,10 @@ _supported_proto file
+ _supported_os Linux
+
+ CLUSTER_SIZE=4k
+-size=128M
++size=$((128 * 1024 * 1024))
 +
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+here="$PWD"
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+# v2 images can't mark clusters as zero
++# This test requires zero clusters, added in v3 images
 +_unsupported_imgopts compat=0.10
-+
+
+ echo
+ echo == backing file contains zeros ==
+@@ -299,6 +302,159 @@ $QEMU_IO -c "read -P 0 75k 1k" "$TEST_IMG" | _filter_qemu_io
+
+ $QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
+
 +echo
-+echo '=== Testing write zeroes with unmap ==='
-+echo
++echo == unaligned image tail cluster, no allocation needed ==
 +
-+TEST_IMG="$TEST_IMG.base" _make_test_img 64M
-+_make_test_img -b "$TEST_IMG.base"
++# With no backing file, write to all or part of unallocated partial cluster
++# will mark the cluster as zero, but does not allocate.
++# Re-create the image each time to get back to unallocated clusters.
 +
-+# Offsets chosen at or near 2M boundaries so test works at any cluster size
-+
-+# Aligned writes to unallocated cluster should not allocate mapping, but must
-+# mark cluster as zero, whether or not unmap was requested
-+$QEMU_IO -c "write -z -u 2M 2M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z 6M 2M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "map" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map
-+
-+# Unaligned writes need not allocate mapping if the cluster already reads
-+# as zero, but must mark cluster as zero, whether or not unmap was requested
-+$QEMU_IO -c "write -z -u 10485761 2097150" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z 14680065 2097150" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "map" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map
-+
-+# Requesting unmap of normal data must deallocate; omitting unmap should
-+# preserve the mapping
-+$QEMU_IO -c "write 18M 14M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z -u 20M 2M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z 24M 6M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "map" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map
-+
-+# Likewise when writing on already-mapped zero data
-+$QEMU_IO -c "write -z -u 26M 2M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z 28M 2M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "map" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map
-+
-+# Writing on unmapped zeroes does not allocate
-+$QEMU_IO -c "write -z 32M 8M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z -u 34M 2M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z 36M 2M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "map" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG.base" | _filter_qemu_img_map
-+
-+# Writing zero overrides a backing file, regardless of backing cluster type
-+$QEMU_IO -c "write -z 40M 8M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write 48M 8M" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z -u 42M 2M" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z 44M 2M" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z -u 50M 2M" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z 52M 2M" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z -u 58M 2M" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z 60M 2M" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "map" "$TEST_IMG" | _filter_qemu_io
++# Write at the front: sector-wise, the request is: 128m... | 00 -- -- --
++_make_test_img $((size + 2048))
++$QEMU_IO -c "write -z $size 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
 +$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
 +
-+# Final check that mappings are correct and images are still sane
-+TEST_IMG="$TEST_IMG.base" _check_test_img
-+_check_test_img
++# Write at the back: sector-wise, the request is: 128m... | -- -- -- 00
++_make_test_img $((size + 2048))
++$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Write at middle: sector-wise, the request is: 128m... | -- 00 00 --
++_make_test_img $((size + 2048))
++$QEMU_IO -c "write -z $((size + 512)) 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Write entire cluster: sector-wise, the request is: 128m... | 00 00 00 00
++_make_test_img $((size + 2048))
++$QEMU_IO -c "write -z $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Repeat with backing file holding unallocated cluster.
++# TODO: Note that this forces an allocation, because we aren't yet able to
++# quickly detect that reads beyond EOF of the backing file are always zero
++CLUSTER_SIZE=2048 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
++
++# Write at the front: sector-wise, the request is:
++# backing: 128m... | -- --
++# active:  128m... | 00 -- -- --
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -z $size 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Write at the back: sector-wise, the request is:
++# backing: 128m... | -- --
++# active:  128m... | -- -- -- 00
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Write at middle: sector-wise, the request is:
++# backing: 128m... | -- --
++# active:  128m... | -- 00 00 --
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -z $((size + 512)) 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Write entire cluster: sector-wise, the request is:
++# backing: 128m... | -- --
++# active:  128m... | 00 00 00 00
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -z $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Repeat with backing file holding zero'd cluster
++# TODO: Note that this forces an allocation, because we aren't yet able to
++# quickly detect that reads beyond EOF of the backing file are always zero
++$QEMU_IO -c "write -z $size 512" "$TEST_IMG.base" | _filter_qemu_io
++
++# Write at the front: sector-wise, the request is:
++# backing: 128m... | 00 00
++# active:  128m... | 00 -- -- --
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -z $size 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Write at the back: sector-wise, the request is:
++# backing: 128m... | 00 00
++# active:  128m... | -- -- -- 00
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Write at middle: sector-wise, the request is:
++# backing: 128m... | 00 00
++# active:  128m... | -- 00 00 --
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -z $((size + 512)) 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# Write entire cluster: sector-wise, the request is:
++# backing: 128m... | 00 00
++# active:  128m... | 00 00 00 00
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -z $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# A preallocated cluster maintains its allocation, whether it stays as
++# data due to a partial write:
++# Convert 128m... | XX XX => ... | XX 00
++_make_test_img $((size + 1024))
++$QEMU_IO -c "write -P 1 $((size)) 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -z $((size + 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "read -P 1 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
++
++# or because it is the entire cluster and can use the zero flag:
++# Convert 128m... | XX XX => ... | 00 00
++$QEMU_IO -c "write -z $((size)) 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "alloc $size 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0 $size 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
 +
 +echo
-+echo '=== Testing cache optimization ==='
-+echo
++echo == unaligned image tail cluster, allocation required ==
 +
-+BLKDBG_TEST_IMG="blkdebug:$TEST_DIR/blkdebug.conf:$TEST_IMG.base"
++# Write beyond backing file must COW
++# Backing file: 128m... | XX --
++# Active layer: 128m... | -- -- 00 --
++CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -P 1 $((size)) 512" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z $((size + 1024)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 1 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0 $((size + 512)) 1536" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
 +
-+cat > "$TEST_DIR/blkdebug.conf" <<EOF
-+[inject-error]
-+event = "l2_update"
-+errno = "5"
-+immediately = "on"
-+once = "off"
-+EOF
++# Writes at boundaries of (partial) cluster must not lose mid-cluster data
++# Backing file: 128m: ... | -- XX
++# Active layer: 128m: ... | 00 -- -- 00
++CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
++_make_test_img -b "$TEST_IMG.base" $((size + 2048))
++$QEMU_IO -c "write -P 1 $((size + 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
++$QEMU_IO -c "write -z $((size)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 1 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0 $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 1 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0 $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
 +
-+# None of the following writes should trigger an L2 update, because the
-+# cluster already reads as zero, and we don't have to change allocation
-+$QEMU_IO -c "w -z -u 20M 2M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "w -z 20M 2M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "w -z 28M 2M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/154.out b/tests/qemu-iotests/154.out
+index d3b68e7..b86f074 100644
+--- a/tests/qemu-iotests/154.out
++++ b/tests/qemu-iotests/154.out
+@@ -282,4 +282,133 @@ read 1024/1024 bytes at offset 76800
+ { "start": 69632, "length": 4096, "depth": 0, "zero": true, "data": false},
+ { "start": 73728, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+ { "start": 77824, "length": 134139904, "depth": 1, "zero": true, "data": false}]
 +
-+# Proof that our blkdebug hook works
-+$QEMU_IO -c "w -z -u 0M 2M" "$BLKDBG_TEST_IMG" | _filter_qemu_io
++== unaligned image tail cluster, no allocation needed ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776
++wrote 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134219776, "depth": 0, "zero": true, "data": false}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776
++wrote 512/512 bytes at offset 134219264
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134219776, "depth": 0, "zero": true, "data": false}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776
++wrote 1024/1024 bytes at offset 134218240
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134219776, "depth": 0, "zero": true, "data": false}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776
++wrote 2048/2048 bytes at offset 134217728
++2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134219776, "depth": 0, "zero": true, "data": false}]
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 512/512 bytes at offset 134219264
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 1024/1024 bytes at offset 134218240
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 2048/2048 bytes at offset 134217728
++2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
++wrote 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 512/512 bytes at offset 134219264
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 1024/1024 bytes at offset 134218240
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 2048/2048 bytes at offset 134217728
++2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++2048/2048 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134218752
++wrote 1024/1024 bytes at offset 134217728
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 134218240
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Pattern verification failed at offset 134218240, 512 bytes
++read 512/512 bytes at offset 134218240
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++1024/1024 bytes allocated at offset 128 MiB
++[{ "start": 0, "length": 134217728, "depth": 0, "zero": true, "data": false},
++{ "start": 134217728, "length": 1024, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++wrote 1024/1024 bytes at offset 134217728
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++1024/1024 bytes allocated at offset 128 MiB
++read 1024/1024 bytes at offset 134217728
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++[{ "start": 0, "length": 134217728, "depth": 0, "zero": true, "data": false},
++{ "start": 134217728, "length": 1024, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
 +
-+# success, all done
-+echo '*** done'
-+status=0
-diff --git a/tests/qemu-iotests/179.out b/tests/qemu-iotests/179.out
-new file mode 100644
-index 0000000..d66b24e
---- /dev/null
-+++ b/tests/qemu-iotests/179.out
-@@ -0,0 +1,160 @@
-+QA output created by 179
-+
-+=== Testing write zeroes with unmap ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 2097152/2097152 bytes at offset 2097152
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 6291456
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2 MiB (0x200000) bytes not allocated at offset 0 bytes (0x0)
-+2 MiB (0x200000) bytes     allocated at offset 2 MiB (0x200000)
-+2 MiB (0x200000) bytes not allocated at offset 4 MiB (0x400000)
-+2 MiB (0x200000) bytes     allocated at offset 6 MiB (0x600000)
-+56 MiB (0x3800000) bytes not allocated at offset 8 MiB (0x800000)
-+[{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": false}]
-+wrote 2097150/2097150 bytes at offset 10485761
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097150/2097150 bytes at offset 14680065
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2 MiB (0x200000) bytes not allocated at offset 0 bytes (0x0)
-+2 MiB (0x200000) bytes     allocated at offset 2 MiB (0x200000)
-+2 MiB (0x200000) bytes not allocated at offset 4 MiB (0x400000)
-+2 MiB (0x200000) bytes     allocated at offset 6 MiB (0x600000)
-+2 MiB (0x200000) bytes not allocated at offset 8 MiB (0x800000)
-+2 MiB (0x200000) bytes     allocated at offset 10 MiB (0xa00000)
-+2 MiB (0x200000) bytes not allocated at offset 12 MiB (0xc00000)
-+2 MiB (0x200000) bytes     allocated at offset 14 MiB (0xe00000)
-+48 MiB (0x3000000) bytes not allocated at offset 16 MiB (0x1000000)
-+[{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": false}]
-+wrote 14680064/14680064 bytes at offset 18874368
-+14 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 20971520
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 6291456/6291456 bytes at offset 25165824
-+6 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2 MiB (0x200000) bytes not allocated at offset 0 bytes (0x0)
-+2 MiB (0x200000) bytes     allocated at offset 2 MiB (0x200000)
-+2 MiB (0x200000) bytes not allocated at offset 4 MiB (0x400000)
-+2 MiB (0x200000) bytes     allocated at offset 6 MiB (0x600000)
-+2 MiB (0x200000) bytes not allocated at offset 8 MiB (0x800000)
-+2 MiB (0x200000) bytes     allocated at offset 10 MiB (0xa00000)
-+2 MiB (0x200000) bytes not allocated at offset 12 MiB (0xc00000)
-+2 MiB (0x200000) bytes     allocated at offset 14 MiB (0xe00000)
-+2 MiB (0x200000) bytes not allocated at offset 16 MiB (0x1000000)
-+14 MiB (0xe00000) bytes     allocated at offset 18 MiB (0x1200000)
-+32 MiB (0x2000000) bytes not allocated at offset 32 MiB (0x2000000)
-+[{ "start": 0, "length": 18874368, "depth": 0, "zero": true, "data": false},
-+{ "start": 18874368, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 20971520, "length": 2097152, "depth": 0, "zero": true, "data": false},
-+{ "start": 23068672, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 25165824, "length": 6291456, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 31457280, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 33554432, "length": 33554432, "depth": 0, "zero": true, "data": false}]
-+wrote 2097152/2097152 bytes at offset 27262976
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 29360128
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2 MiB (0x200000) bytes not allocated at offset 0 bytes (0x0)
-+2 MiB (0x200000) bytes     allocated at offset 2 MiB (0x200000)
-+2 MiB (0x200000) bytes not allocated at offset 4 MiB (0x400000)
-+2 MiB (0x200000) bytes     allocated at offset 6 MiB (0x600000)
-+2 MiB (0x200000) bytes not allocated at offset 8 MiB (0x800000)
-+2 MiB (0x200000) bytes     allocated at offset 10 MiB (0xa00000)
-+2 MiB (0x200000) bytes not allocated at offset 12 MiB (0xc00000)
-+2 MiB (0x200000) bytes     allocated at offset 14 MiB (0xe00000)
-+2 MiB (0x200000) bytes not allocated at offset 16 MiB (0x1000000)
-+14 MiB (0xe00000) bytes     allocated at offset 18 MiB (0x1200000)
-+32 MiB (0x2000000) bytes not allocated at offset 32 MiB (0x2000000)
-+[{ "start": 0, "length": 18874368, "depth": 0, "zero": true, "data": false},
-+{ "start": 18874368, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 20971520, "length": 2097152, "depth": 0, "zero": true, "data": false},
-+{ "start": 23068672, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 25165824, "length": 2097152, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 27262976, "length": 2097152, "depth": 0, "zero": true, "data": false},
-+{ "start": 29360128, "length": 2097152, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 31457280, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 33554432, "length": 33554432, "depth": 0, "zero": true, "data": false}]
-+wrote 8388608/8388608 bytes at offset 33554432
-+8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 35651584
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 37748736
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2 MiB (0x200000) bytes not allocated at offset 0 bytes (0x0)
-+2 MiB (0x200000) bytes     allocated at offset 2 MiB (0x200000)
-+2 MiB (0x200000) bytes not allocated at offset 4 MiB (0x400000)
-+2 MiB (0x200000) bytes     allocated at offset 6 MiB (0x600000)
-+2 MiB (0x200000) bytes not allocated at offset 8 MiB (0x800000)
-+2 MiB (0x200000) bytes     allocated at offset 10 MiB (0xa00000)
-+2 MiB (0x200000) bytes not allocated at offset 12 MiB (0xc00000)
-+2 MiB (0x200000) bytes     allocated at offset 14 MiB (0xe00000)
-+2 MiB (0x200000) bytes not allocated at offset 16 MiB (0x1000000)
-+22 MiB (0x1600000) bytes     allocated at offset 18 MiB (0x1200000)
-+24 MiB (0x1800000) bytes not allocated at offset 40 MiB (0x2800000)
-+[{ "start": 0, "length": 18874368, "depth": 0, "zero": true, "data": false},
-+{ "start": 18874368, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 20971520, "length": 2097152, "depth": 0, "zero": true, "data": false},
-+{ "start": 23068672, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 25165824, "length": 2097152, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 27262976, "length": 2097152, "depth": 0, "zero": true, "data": false},
-+{ "start": 29360128, "length": 2097152, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 31457280, "length": 2097152, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 33554432, "length": 33554432, "depth": 0, "zero": true, "data": false}]
-+wrote 8388608/8388608 bytes at offset 41943040
-+8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 8388608/8388608 bytes at offset 50331648
-+8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 44040192
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 46137344
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 52428800
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 54525952
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 60817408
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 62914560
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+42 MiB (0x2a00000) bytes not allocated at offset 0 bytes (0x0)
-+4 MiB (0x400000) bytes     allocated at offset 42 MiB (0x2a00000)
-+4 MiB (0x400000) bytes not allocated at offset 46 MiB (0x2e00000)
-+4 MiB (0x400000) bytes     allocated at offset 50 MiB (0x3200000)
-+4 MiB (0x400000) bytes not allocated at offset 54 MiB (0x3600000)
-+4 MiB (0x400000) bytes     allocated at offset 58 MiB (0x3a00000)
-+2 MiB (0x200000) bytes not allocated at offset 62 MiB (0x3e00000)
-+[{ "start": 0, "length": 18874368, "depth": 1, "zero": true, "data": false},
-+{ "start": 18874368, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 20971520, "length": 2097152, "depth": 1, "zero": true, "data": false},
-+{ "start": 23068672, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 25165824, "length": 2097152, "depth": 1, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 27262976, "length": 2097152, "depth": 1, "zero": true, "data": false},
-+{ "start": 29360128, "length": 2097152, "depth": 1, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 31457280, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 33554432, "length": 10485760, "depth": 1, "zero": true, "data": false},
-+{ "start": 44040192, "length": 4194304, "depth": 0, "zero": true, "data": false},
-+{ "start": 48234496, "length": 2097152, "depth": 1, "zero": true, "data": false},
-+{ "start": 50331648, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 52428800, "length": 4194304, "depth": 0, "zero": true, "data": false},
-+{ "start": 56623104, "length": 2097152, "depth": 1, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 58720256, "length": 2097152, "depth": 1, "zero": true, "data": false},
-+{ "start": 60817408, "length": 4194304, "depth": 0, "zero": true, "data": false},
-+{ "start": 65011712, "length": 2097152, "depth": 1, "zero": true, "data": false}]
-+No errors were found on the image.
-+No errors were found on the image.
-+
-+=== Testing cache optimization ===
-+
-+wrote 2097152/2097152 bytes at offset 20971520
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 20971520
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 2097152/2097152 bytes at offset 29360128
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Failed to flush the L2 table cache: Input/output error
-+Failed to flush the refcount block cache: Input/output error
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 9b9bb4c..395c72a 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -170,4 +170,5 @@
- 175 auto quick
- 176 rw auto backing
- 177 rw auto quick
-+179 rw auto quick
- 181 rw auto migration
++== unaligned image tail cluster, allocation required ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 134218752
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1536/1536 bytes at offset 134218240
++1.500 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 512/512 bytes at offset 134218240
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 134218240
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1024/1024 bytes at offset 134218752
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 512/512 bytes at offset 134219264
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 134217728
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 134218240
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1024/1024 bytes at offset 134218752
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
+ *** done
 -- 
 2.9.3
