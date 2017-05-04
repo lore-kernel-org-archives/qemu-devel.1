@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6F9j-0002H6-JV
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:48 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d6F9s-0002Sa-R5
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6F9i-0004Dj-Gr
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50378)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d6F9n-0004G0-Qs
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1d6F9i-0004DZ-7b
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:46 -0400
+	id 1d6F9n-0004Fj-Hi
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:51 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  4 May 2017 15:42:12 +0400
-Message-Id: <20170504114232.20318-2-marcandre.lureau@redhat.com>
+Date: Thu,  4 May 2017 15:42:13 +0400
+Message-Id: <20170504114232.20318-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20170504114232.20318-1-marcandre.lureau@redhat.com>
 References: <20170504114232.20318-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/21] char: remove qemu_chr_be_generic_open
+Subject: [Qemu-devel] [PULL 02/21] mux: simplfy muxes_realize_done
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +28,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: stefanha@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-The function simply alias and hides the real event function.
+mux_chr_event() already send events to all backends, rename it,
+export it, and use it from muxes_realize_done. This should help abstract
+away mux implementation.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- include/sysemu/char.h |  1 -
- chardev/char-pty.c    |  2 +-
- chardev/char-socket.c |  2 +-
- chardev/char.c        | 10 ++--------
- ui/console.c          |  2 +-
- ui/gtk.c              |  2 +-
- 6 files changed, 6 insertions(+), 13 deletions(-)
+ chardev/char-mux.h |  2 +-
+ chardev/char-mux.c | 11 ++++++++---
+ chardev/char.c     |  9 ++-------
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/include/sysemu/char.h b/include/sysemu/char.h
-index 450881d42c..a30ff3fa80 100644
---- a/include/sysemu/char.h
-+++ b/include/sysemu/char.h
-@@ -427,7 +427,6 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-  */
- void qemu_chr_fe_take_focus(CharBackend *b);
+diff --git a/chardev/char-mux.h b/chardev/char-mux.h
+index 9a2fffce91..3f41dfcfd2 100644
+--- a/chardev/char-mux.h
++++ b/chardev/char-mux.h
+@@ -58,6 +58,6 @@ typedef struct MuxChardev {
 =20
--void qemu_chr_be_generic_open(Chardev *s);
- void qemu_chr_fe_accept_input(CharBackend *be);
- int qemu_chr_add_client(Chardev *s, int fd);
- Chardev *qemu_chr_find(const char *name);
-diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-index a6337be8aa..aa9d0cb2c3 100644
---- a/chardev/char-pty.c
-+++ b/chardev/char-pty.c
-@@ -185,7 +185,7 @@ static gboolean qemu_chr_be_generic_open_func(gpointe=
-r opaque)
-     PtyChardev *s =3D PTY_CHARDEV(opaque);
+ void mux_chr_set_handlers(Chardev *chr, GMainContext *context);
+ void mux_set_focus(Chardev *chr, int focus);
+-void mux_chr_send_event(MuxChardev *d, int mux_nr, int event);
++void mux_chr_send_all_event(Chardev *chr, int event);
 =20
-     s->open_tag =3D 0;
--    qemu_chr_be_generic_open(chr);
-+    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
-     return FALSE;
- }
-=20
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 36ab0d633a..2789eb1f40 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -489,7 +489,7 @@ static void tcp_chr_connect(void *opaque)
-                                            tcp_chr_read,
-                                            chr, NULL);
+ #endif /* CHAR_MUX_H */
+diff --git a/chardev/char-mux.c b/chardev/char-mux.c
+index 5547a36a0a..37d42c65c6 100644
+--- a/chardev/char-mux.c
++++ b/chardev/char-mux.c
+@@ -114,7 +114,7 @@ static void mux_print_help(Chardev *chr)
      }
--    qemu_chr_be_generic_open(chr);
-+    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
  }
 =20
- static void tcp_chr_update_read_handler(Chardev *chr,
+-void mux_chr_send_event(MuxChardev *d, int mux_nr, int event)
++static void mux_chr_send_event(MuxChardev *d, int mux_nr, int event)
+ {
+     CharBackend *be =3D d->backends[mux_nr];
+=20
+@@ -222,9 +222,9 @@ static void mux_chr_read(void *opaque, const uint8_t =
+*buf, int size)
+=20
+ bool muxes_realized;
+=20
+-static void mux_chr_event(void *opaque, int event)
++void mux_chr_send_all_event(Chardev *chr, int event)
+ {
+-    MuxChardev *d =3D MUX_CHARDEV(opaque);
++    MuxChardev *d =3D MUX_CHARDEV(chr);
+     int i;
+=20
+     if (!muxes_realized) {
+@@ -237,6 +237,11 @@ static void mux_chr_event(void *opaque, int event)
+     }
+ }
+=20
++static void mux_chr_event(void *opaque, int event)
++{
++    mux_chr_send_all_event(CHARDEV(opaque), event);
++}
++
+ static GSource *mux_chr_add_watch(Chardev *s, GIOCondition cond)
+ {
+     MuxChardev *d =3D MUX_CHARDEV(s);
 diff --git a/chardev/char.c b/chardev/char.c
-index 3df116350b..aad639b620 100644
+index aad639b620..674c097fbe 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -66,12 +66,6 @@ void qemu_chr_be_event(Chardev *s, int event)
-     be->chr_event(be->opaque, event);
- }
+@@ -451,22 +451,17 @@ static void muxes_realize_done(Notifier *notifier, =
+void *unused)
+ {
+     Chardev *chr;
 =20
--void qemu_chr_be_generic_open(Chardev *s)
--{
--    qemu_chr_be_event(s, CHR_EVENT_OPENED);
--}
++    muxes_realized =3D true;
+     QTAILQ_FOREACH(chr, &chardevs, next) {
+         if (CHARDEV_IS_MUX(chr)) {
+-            MuxChardev *d =3D MUX_CHARDEV(chr);
+-            int i;
 -
--
- /* Not reporting errors from writing to logfile, as logs are
-  * defined to be "best effort" only */
- static void qemu_chr_fe_write_log(Chardev *s,
-@@ -469,7 +463,7 @@ static void muxes_realize_done(Notifier *notifier, vo=
-id *unused)
+             /* send OPENED to all already-attached FEs */
+-            for (i =3D 0; i < d->mux_cnt; i++) {
+-                mux_chr_send_event(d, i, CHR_EVENT_OPENED);
+-            }
++            mux_chr_send_all_event(CHARDEV(chr), CHR_EVENT_OPENED);
              /* mark mux as OPENED so any new FEs will immediately receiv=
 e
               * OPENED event
               */
--            qemu_chr_be_generic_open(chr);
-+            qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+             qemu_chr_be_event(chr, CHR_EVENT_OPENED);
          }
      }
-     muxes_realized =3D true;
-@@ -581,7 +575,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-         /* We're connecting to an already opened device, so let's make s=
-ure we
-            also get the open event */
-         if (s->be_open) {
--            qemu_chr_be_generic_open(s);
-+            qemu_chr_be_event(s, CHR_EVENT_OPENED);
-         }
-     }
-=20
-diff --git a/ui/console.c b/ui/console.c
-index 189eecfd29..ac66b3c910 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -2076,7 +2076,7 @@ static void text_console_do_init(Chardev *chr, Disp=
-layState *ds)
-         s->t_attrib =3D s->t_attrib_default;
-     }
-=20
--    qemu_chr_be_generic_open(chr);
-+    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+-    muxes_realized =3D true;
  }
 =20
- static void vc_chr_open(Chardev *chr,
-diff --git a/ui/gtk.c b/ui/gtk.c
-index a86848f3b0..7479ceef35 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1868,7 +1868,7 @@ static GSList *gd_vc_vte_init(GtkDisplayState *s, V=
-irtualConsole *vc,
-     gtk_notebook_append_page(GTK_NOTEBOOK(s->notebook), vc->tab_item,
-                              gtk_label_new(vc->label));
-=20
--    qemu_chr_be_generic_open(vc->vte.chr);
-+    qemu_chr_be_event(vc->vte.chr, CHR_EVENT_OPENED);
-=20
-     return group;
- }
+ static Notifier muxes_realize_notify =3D {
 --=20
 2.12.0.191.gc5d8de91d
