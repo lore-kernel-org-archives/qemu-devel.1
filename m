@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6EJq-0007gZ-2n
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:49:11 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6ELI-0000hR-Pz
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6EJl-0006qN-V0
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:49:10 -0400
-Resent-Message-Id: <E1d6EJl-0006qN-V0@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d6EJl-0006pz-M2
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:49:05 -0400
-In-Reply-To: <1493894491-26130-1-git-send-email-vip-ak47@yandex.ru>
-Message-ID: <149389491757.177.8168543105532797325@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <stefanha@gmail.com>) id 1d6ELD-0007Zx-TB
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:50:40 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35683)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d6ELD-0007Z7-Mk
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:50:35 -0400
+Received: by mail-wm0-x243.google.com with SMTP id d79so2455452wmi.2
+	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 03:50:35 -0700 (PDT)
+Date: Thu, 4 May 2017 11:50:32 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170504105032.GA32376@stefanha-x1.localdomain>
+References: <20170419144219.20371-1-pbonzini@redhat.com>
+	<20170419144219.20371-6-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 4 May 2017 03:48:38 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] Video and sound capture to a videofile
- through ffmpeg
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="u3/rZRmxL6MmkK24"
+Content-Disposition: inline
+In-Reply-To: <20170419144219.20371-6-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/11] blockjob: separate monitor and
+ blockjob APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vip-ak47@yandex.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, aliguori@amazon.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
-IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
-IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
-CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBWaWRlbyBhbmQgc291bmQgY2FwdHVyZSB0
-byBhIHZpZGVvZmlsZSB0aHJvdWdoIGZmbXBlZwpNZXNzYWdlLWlkOiAxNDkzODk0NDkxLTI2MTMw
-LTEtZ2l0LXNlbmQtZW1haWwtdmlwLWFrNDdAeWFuZGV4LnJ1ClR5cGU6IHNlcmllcwoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRh
-dGUgLS1pbml0IGR0YwojIExldCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4
-cG9ydCBTSE9XX0VOVj0xCmV4cG9ydCBKPTgKbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M2
-Cm1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhCm1ha2UgZG9ja2VyLXRlc3QtYnVpbGRAbWlu
-LWdsaWIKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDkzODk0NDkxLTI2MTMw
-LTEtZ2l0LXNlbmQtZW1haWwtdmlwLWFrNDdAeWFuZGV4LnJ1IC0+IHBhdGNoZXcvMTQ5Mzg5NDQ5
-MS0yNjEzMC0xLWdpdC1zZW5kLWVtYWlsLXZpcC1hazQ3QHlhbmRleC5ydQpTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCjgyN2ZjZGMgVmlkZW8gYW5kIHNvdW5kIGNhcHR1cmUgdG8gYSB2
-aWRlb2ZpbGUgdGhyb3VnaCBmZm1wZWcKCj09PSBPVVRQVVQgQkVHSU4gPT09ClN1Ym1vZHVsZSAn
-ZHRjJyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
-cGF0aCAnZHRjJwpDbG9uaW5nIGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC15OWtx
-NjZtMC9zcmMvZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzU1OGNk
-ODFiZGQ0MzI3NjliNTliZmYwMTI0MGM0NGY4MmNmYjFhOWQnCiAgQlVJTEQgICBjZW50b3M2Cm1h
-a2VbMV06IEVudGVyaW5nIGRpcmVjdG9yeSAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXk5
-a3E2Nm0wL3NyYycKICBBUkNISVZFIHFlbXUudGd6CiAgQVJDSElWRSBkdGMudGd6CiAgQ09QWSAg
-ICBSVU5ORVIKICAgIFJVTiB0ZXN0LXF1aWNrIGluIHFlbXU6Y2VudG9zNiAKUGFja2FnZXMgaW5z
-dGFsbGVkOgpTREwtZGV2ZWwtMS4yLjE0LTcuZWw2XzcuMS54ODZfNjQKY2NhY2hlLTMuMS42LTIu
-ZWw2Lng4Nl82NAplcGVsLXJlbGVhc2UtNi04Lm5vYXJjaApnY2MtNC40LjctMTcuZWw2Lng4Nl82
-NApnaXQtMS43LjEtNC5lbDZfNy4xLng4Nl82NApnbGliMi1kZXZlbC0yLjI4LjgtNS5lbDYueDg2
-XzY0CmxpYmZkdC1kZXZlbC0xLjQuMC0xLmVsNi54ODZfNjQKbWFrZS0zLjgxLTIzLmVsNi54ODZf
-NjQKcGFja2FnZSBnKysgaXMgbm90IGluc3RhbGxlZApwaXhtYW4tZGV2ZWwtMC4zMi44LTEuZWw2
-Lng4Nl82NAp0YXItMS4yMy0xNS5lbDZfOC54ODZfNjQKemxpYi1kZXZlbC0xLjIuMy0yOS5lbDYu
-eDg2XzY0CgpFbnZpcm9ubWVudCB2YXJpYWJsZXM6ClBBQ0tBR0VTPWxpYmZkdC1kZXZlbCBjY2Fj
-aGUgICAgIHRhciBnaXQgbWFrZSBnY2MgZysrICAgICB6bGliLWRldmVsIGdsaWIyLWRldmVsIFNE
-TC1kZXZlbCBwaXhtYW4tZGV2ZWwgICAgIGVwZWwtcmVsZWFzZQpIT1NUTkFNRT1mNzQ4OTQ3Mzcx
-OTkKVEVSTT14dGVybQpNQUtFRkxBR1M9IC1qOApISVNUU0laRT0xMDAwCko9OApVU0VSPXJvb3QK
-Q0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUKRVhUUkFfQ09ORklHVVJFX09QVFM9ClY9ClNIT1df
-RU5WPTEKTUFJTD0vdmFyL3Nwb29sL21haWwvcm9vdApQQVRIPS91c3IvbGliL2NjYWNoZTovdXNy
-L2xpYjY0L2NjYWNoZTovdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91
-c3IvYmluOi9zYmluOi9iaW4KUFdEPS8KTEFORz1lbl9VUy5VVEYtOApUQVJHRVRfTElTVD0KSElT
-VENPTlRST0w9aWdub3JlZHVwcwpTSExWTD0xCkhPTUU9L3Jvb3QKVEVTVF9ESVI9L3RtcC9xZW11
-LXRlc3QKTE9HTkFNRT1yb290CkxFU1NPUEVOPXx8L3Vzci9iaW4vbGVzc3BpcGUuc2ggJXMKRkVB
-VFVSRVM9IGR0YwpERUJVRz0KR19CUk9LRU5fRklMRU5BTUVTPTEKQ0NBQ0hFX0hBU0hESVI9Cl89
-L3Vzci9iaW4vZW52CgpDb25maWd1cmUgb3B0aW9uczoKLS1lbmFibGUtd2Vycm9yIC0tdGFyZ2V0
-LWxpc3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2NC1zb2Z0bW11IC0tcHJlZml4PS92YXIvdG1wL3Fl
-bXUtYnVpbGQvaW5zdGFsbApObyBDKysgY29tcGlsZXIgYXZhaWxhYmxlOyBkaXNhYmxpbmcgQysr
-IHNwZWNpZmljIG9wdGlvbmFsIGNvZGUKCkVSUk9SOiBsaWJhdiBjaGVjayBmYWlsZWQKICAgICAg
-IE1ha2Ugc3VyZSB0byBoYXZlIHRoZSBsaWJhdiBsaWJzIGFuZCBoZWFkZXJzIGluc3RhbGxlZC4K
-CnRlc3RzL2RvY2tlci9NYWtlZmlsZS5pbmNsdWRlOjExODogcmVjaXBlIGZvciB0YXJnZXQgJ2Rv
-Y2tlci1ydW4nIGZhaWxlZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsx
-XTogTGVhdmluZyBkaXJlY3RvcnkgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC15OWtxNjZt
-MC9zcmMnCnRlc3RzL2RvY2tlci9NYWtlZmlsZS5pbmNsdWRlOjE0OTogcmVjaXBlIGZvciB0YXJn
-ZXQgJ2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M2JyBmYWlsZWQKbWFrZTogKioqIFtkb2Nr
-ZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zNl0gRXJyb3IgMgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAyCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+--u3/rZRmxL6MmkK24
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Apr 19, 2017 at 04:42:13PM +0200, Paolo Bonzini wrote:
+> We have two different headers for block job operations, blockjob.h
+> and blockjob_int.h.  The former contains APIs called by the monitor,
+> the latter contains APIs called by the block job drivers and the
+> block layer itself.
+>=20
+> Keep the two APIs separate in the blockjob.c file too.  This will
+> be useful when transitioning away from the AioContext lock, because
+> there will be locking policies for the two categories, too---the
+> monitor will have to call new block_job_lock/unlock APIs, while blockjob
+> APIs will take care of this for the users.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2: move blockjob_create in the blockjob_int.h category,
+>         rewrite commit message [John]
+>=20
+>  blockjob.c | 390 ++++++++++++++++++++++++++++++++-----------------------=
+------
+>  1 file changed, 205 insertions(+), 185 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--u3/rZRmxL6MmkK24
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZCwd4AAoJEJykq7OBq3PIZqcH/iVXkicJxUMCYQfnr5jIUgXR
+cK9Ujb69fHnQkPUmjpj/ohSsPtvIG7/zMZA+6rrS3xbLP7/T08eHOPo/2kx1r8/5
+DhSeKTROtQyXKPnx0EVHqrc5pfWdSZw8s1T2VcqFaV1TYpG300ztQWIljYgfTuHt
+lykKdpeTtaZDLh+o+aXkubCT6nqbJBaXRohOrERBKsfcI5cPRoz3UeKsD8RQCRwZ
+avS2z6JAh60bHsdvrRbPz6hp+bfeIA9msNnG4p1Is5e0y2WBil0pfpYEM/WWN50g
+ZGuFx/ZdMGXPwecJkZFdaPhMgvtMtgpp37cvV3ZLX67U7bhg1e8Du7AOdePTrsE=
+=uF5b
+-----END PGP SIGNATURE-----
+
+--u3/rZRmxL6MmkK24--
