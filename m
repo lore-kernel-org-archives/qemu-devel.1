@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6Fvw-00021e-T2
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:32:37 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6FwD-0002Gt-BM
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6Fvt-0005Ba-Qy
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:32:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6Fvt-0005BC-KG
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:32:33 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6FwA-0005Hl-8I
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:32:53 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:37744)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6FwA-0005HJ-0e
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:32:50 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
 References: <20170504084135.7488.24715.stgit@PASHA-ISP>
-	<20170504084210.7488.37561.stgit@PASHA-ISP>
-	<b365904f-21ae-85a7-a3a6-bbe21c62e35a@redhat.com>
-	<000401d2c4c7$6d5b6d50$481247f0$@ru>
-	<b44f8aa8-e42f-4b94-ccfa-d80adb60de35@redhat.com>
-	<000801d2c4cd$3d3af720$b7b0e560$@ru>
-	<58398574-88b5-3382-65e2-7208beccc09a@redhat.com>
-	<000f01d2c4cf$7479f630$5d6de290$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c6f5e430-fa98-124f-146b-6c3de79448cd@redhat.com>
-Date: Thu, 4 May 2017 14:32:27 +0200
+	<20170504084159.7488.97487.stgit@PASHA-ISP>
+	<45373040-0232-a324-5965-2a70d17e5c08@redhat.com>
+In-Reply-To: <45373040-0232-a324-5965-2a70d17e5c08@redhat.com>
+Date: Thu, 4 May 2017 15:32:53 +0300
+Message-ID: <001001d2c4d2$8cec2c30$a6c48490$@ru>
 MIME-Version: 1.0
-In-Reply-To: <000f01d2c4cf$7479f630$5d6de290$@ru>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 06/10] replay: fix save/load vm for
- non-empty queue
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v9 04/10] replay: fix processing async
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
 
-
-
-On 04/05/2017 14:10, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 04/05/2017 13:54, Pavel Dovgalyuk wrote:
->>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->>>> On 04/05/2017 13:13, Pavel Dovgalyuk wrote:
->>>>>>> This patch does not allows saving/loading vmstate when
->>>>>>> replay events queue is not empty. There is no reliable
->>>>>>> way to save events queue, because it describes internal
->>>>>>> coroutine state. Therefore saving and loading operations
->>>>>>> should be deferred to another record/replay step.
->>>>>>
->>>>>> Can it actually be non-empty after bdrv_drain_all?
->>>>>
->>>>> drain/flush cannot succeed, because started requests are
->>>>> prisoned in the replay events queue.
->>>>
->>>> But that would apply to loading only.  Saving should still be always
->>>> possible.
->>>
->>> We can save it. But it wouldn't load correctly - replay queue will be empty after loading.
->>
->> When saving you can drain, and then the events queue should be empty.
->> Or I am misunderstanding how it works, which is possible too.
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 04/05/2017 10:41, Pavel Dovgalyuk wrote:
+> > From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> >
+> > Asynchronous events saved at checkpoints may invoke
+> > callbacks when processed. These callbacks may also generate/read
+> > new events (e.g. clock reads). Therefore event processing flag must be
+> > reset before callback invocation.
+> >
+> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> > ---
+> >  replay/replay-events.c |    4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/replay/replay-events.c b/replay/replay-events.c
+> > index 94a6dcccfc..768b505f3d 100644
+> > --- a/replay/replay-events.c
+> > +++ b/replay/replay-events.c
+> > @@ -295,13 +295,13 @@ void replay_read_events(int checkpoint)
+> >          if (!event) {
+> >              break;
+> >          }
+> > +        replay_finish_event();
+> > +        read_event_kind = -1;
+> >          replay_mutex_unlock();
+> >          replay_run_event(event);
+> >          replay_mutex_lock();
+> >
+> >          g_free(event);
+> > -        replay_finish_event();
+> > -        read_event_kind = -1;
 > 
-> Drain will wait until the queue becomes empty.
-> Queue is processed only at checkpoints.
-> Checkpoints are met in iothread (at timers processing and so on).
-> But iothread is waiting for finishing the drain.
+> While at it, g_free can be moved outside the lock.
 
-What checkpoint can hang the drain during a save?
+There is no difference where to free the memory.
+The only reason for unlocking and locking again is that replay_run_event may
+try to read more data from the log.
 
-Paolo
+> Also, replay_flush_events and replay_save_events are leaving the event
+> in events_list while releasing the lock, and only doing QTAILQ_REMOVE
+> after taking it back.  This can cause events to be processed twice.
+
+How this could happen? If something will try to call replay_save_events again,
+while in replay_save_events, then we'll have an infinite loop and notice it.
+But it couldn't, because saving only occurs at checkpoints and there are no
+recursive ones.
+
+Pavel Dovgalyuk
