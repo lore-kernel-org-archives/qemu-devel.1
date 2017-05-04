@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6KRu-00005C-Lt
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 13:21:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1d6KU2-0000tg-G0
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 13:24:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6KRt-00068O-P4
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 13:21:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1d6KU1-0007Pu-Fs
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 13:24:06 -0400
 References: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
-	<1493916761-32319-4-git-send-email-kwolf@redhat.com>
+	<1493916761-32319-5-git-send-email-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <4a775c24-d244-55d3-3b81-42fa1ab1eeca@redhat.com>
-Date: Thu, 4 May 2017 12:21:43 -0500
+Message-ID: <78ab2bbd-3dab-360c-3fb2-47cc250d8088@redhat.com>
+Date: Thu, 4 May 2017 12:23:54 -0500
 MIME-Version: 1.0
-In-Reply-To: <1493916761-32319-4-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1493916761-32319-5-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="iMAS1TUJqljoxQv63Gri6rDkPHTGrvqae"
-Subject: Re: [Qemu-devel] [PATCH 3/6] block: Drop permissions when migration
- completes
+	boundary="gtIrq6Sg36K4SKal0GHIb6O9savRAdPJ3"
+Subject: Re: [Qemu-devel] [PATCH 4/6] block: Inactivate parents before
+ children
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +29,32 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iMAS1TUJqljoxQv63Gri6rDkPHTGrvqae
+--gtIrq6Sg36K4SKal0GHIb6O9savRAdPJ3
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
-Message-ID: <4a775c24-d244-55d3-3b81-42fa1ab1eeca@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/6] block: Drop permissions when migration
- completes
+Message-ID: <78ab2bbd-3dab-360c-3fb2-47cc250d8088@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/6] block: Inactivate parents before
+ children
 References: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
- <1493916761-32319-4-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1493916761-32319-4-git-send-email-kwolf@redhat.com>
+ <1493916761-32319-5-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1493916761-32319-5-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/04/2017 11:52 AM, Kevin Wolf wrote:
-> With image locking, permissions affect other qemu processes as well. We=
+> The proper order for inactivating block nodes is that first the parents=
 
-> want to be sure that the destination can run, so let's drop permissions=
-
-> on the source when migration completes.
+> get inactivated and then the children. If we do things in this order, w=
+e
+> can assert that we didn't accidentally leave a parent activated when on=
+e
+> of its child nodes is inactive.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block.c                   | 12 +++++++++++-
->  block/block-backend.c     | 25 +++++++++++++++++++++++++
->  include/block/block_int.h |  7 ++++---
->  3 files changed, 40 insertions(+), 4 deletions(-)
+>  block.c | 25 ++++++++++++++++++-------
+>  1 file changed, 18 insertions(+), 7 deletions(-)
 >=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
@@ -65,7 +65,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---iMAS1TUJqljoxQv63Gri6rDkPHTGrvqae
+--gtIrq6Sg36K4SKal0GHIb6O9savRAdPJ3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -75,13 +75,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZC2MoAAoJEKeha0olJ0Nq9oAH/RCSyaqmaoQzH6+26OsVunmN
-A24ddeqpwBd5wsmPZNqwNodls8b3AICAy5K97xC1puIAY/UuzxogD6LdtYBw02j4
-+mXBT4TaCMgU7BfblHq7sYmEzedPDwgb7WTANHBGXGWQBJD9eB88Jc5HiO/8wQLs
-pCuisELm6izv5K8ohAtT04sj9tCKmx0SRT0vxj5oU5fDSrDLIPL4jOpnF7w3BeCy
-n55poz6qXFApaSioJ0IXeMY9mralnoTqoHd5xp1bAEUeblJ2oel12P/YWIR6N9mb
-pWikwhQCasTG5MerDkFN0wvXUv2WYkq5nHT4QyggTnZAtqikHuZp24ksndQ9FJI=
-=tU3D
+iQEcBAEBCAAGBQJZC2OqAAoJEKeha0olJ0NqZYYH/RLfWrZvVgibhReA767TmTr6
+Tjq7tEKYaXfxquQvMYvnr3/YcVwZQh8gHBcAXxlpH/EZ3Kub+IJU+5vZhC/LqYkI
+UwmOQSSooFYJr0DjLDeyHLqj6NBBPptFIfr4Ds7F8eXcQrxyLzi+Ie51LiTkscd7
+uTTeqCI/1uDgusgMxjwZ0Zc+A7zay8MVNUaJgYD+ChqmnsgOizTv9vaS+k25FPqf
+5f1WyTBN1roddXmwXJC9IkSblwhQPxUOIcmoqVLWBs861yWvPrEHK3USTIm2rCJp
+X/VP0DQsBNdU+PyKrF+ET5qy625F9t/QN5HJS8IMzo1CNUfTFDodFGNAU/Z1v24=
+=72x5
 -----END PGP SIGNATURE-----
 
---iMAS1TUJqljoxQv63Gri6rDkPHTGrvqae--
+--gtIrq6Sg36K4SKal0GHIb6O9savRAdPJ3--
