@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fabien.gregoire@outlook.com>) id 1d6Iav-00018J-JL
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 11:23:06 -0400
+	(envelope-from <james.morse@arm.com>) id 1d6J0n-0002ki-RM
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 11:49:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fabien.gregoire@outlook.com>) id 1d6Ias-0007T8-B0
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 11:23:05 -0400
-Received: from mail-oln040092067078.outbound.protection.outlook.com
-	([40.92.67.78]:54352
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fabien.gregoire@outlook.com>)
-	id 1d6Iar-0007Mb-VV
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 11:23:02 -0400
-From: Fabien GREGOIRE <fabien.gregoire@outlook.com>
-Date: Thu, 4 May 2017 08:49:20 +0000
-Message-ID: <VI1PR05MB167887445F80A38FED81EFABC9EA0@VI1PR05MB1678.eurprd05.prod.outlook.com>
-Content-Language: fr-FR
+	(envelope-from <james.morse@arm.com>) id 1d6J0n-0003e2-0l
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 11:49:49 -0400
+Message-ID: <590B4D73.60000@arm.com>
+Date: Thu, 04 May 2017 16:49:07 +0100
+From: James Morse <james.morse@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Issue with a manually compiled QEMU
+References: <1493530677-4919-1-git-send-email-gengdongjiu@huawei.com>
+	<5908A5BC.1060202@arm.com>
+In-Reply-To: <5908A5BC.1060202@arm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] arm64: kvm: support kvmtool to
+ detect RAS extension feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, lersek@redhat.com, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, xiexiuqi@huawei.com, wangxiongfeng2@huawei.com, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com
 
-Hello,
+Hi Dongjiu Geng,
 
+On 02/05/17 16:29, James Morse wrote:
+> I think we need a new API for injecting SError for SEI from Qemu/kvmtool, but it
+> shouldn't be related to the RAS extensions. All v8.0 CPUs have HCR_EL2.VSE, so
+> we need to know KVM supports this API.
 
+Thinking about this some more, it is slightly more nuanced, KVM can always
+provide an API to inject SError, but it can only set the VSESR if the CPU has
+the RAS Extensions.
 
-I have an issue with a manually compiled QEMU working with virt-manager/lib=
-virt :
+Only offering the inject-SError API call if we can also set the VSESR looks a
+bit funny, but no-one has needed the no-ESR version so far.
 
-Internal Error: process exited while connecting to monitor:
+I still don't think we should let user-space make the 'RAS Extensions means
+VSESR' logical step.
 
-qemu could not load PC BIOS 'bios-256k.bin'.
+So my comments on this patch become:
+Don't read id registers directly, use cpus_have_cap() which handles features
+that differ across CPUs or were turned off at compile time.
 
-
-
-Here are the steps in order to reproduce :
-
-- QEMU was previously installed from an "apt-get" : QEMU version is 2.5.0 (=
-Debian 1:2.5+dfsg-5ubuntu10.11)
-
-- To compile QEMU I use the following arguments :
-
---target-list=3Dx86_64-softmmu --disable-vnc --enable-sdl --enable-spice --=
-enable-usb-redir --enable-kvm
-
-with this version : https://github.com/qemu/qemu/archive/v2.5.0.zip
-
-- I replace the QEMU binary (/usr/bin/qemu-system-x86_64-spice) and I have =
-the issue with error message written above.
+Please don't call this 'KVM_CAP_ARM_RAS_EXTENSION', if we are building an API to
+inject SError, call it that instead.
 
 
+Thanks,
 
-Do you have any advice / information about this error ? Any workaround ?
-
-
-
-Kind regards,
-
-
-
-Fabien
+James
