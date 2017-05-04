@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d66nc-0005rd-Tc
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 22:47:25 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1d66rQ-00072A-1S
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 22:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d66nb-0006q1-So
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 22:47:24 -0400
-References: <20170427014626.11553-1-eblake@redhat.com>
-	<20170427014626.11553-10-eblake@redhat.com>
-	<7f062c75-44bb-7305-c519-26471da74b3d@redhat.com>
-	<c942db16-1bd7-57d5-2553-11c9d31c3b50@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2fa232fd-2a86-20a0-3d82-cd046f23e151@redhat.com>
-Date: Wed, 3 May 2017 21:47:16 -0500
+	(envelope-from <guangrong.xiao@gmail.com>) id 1d66rN-00085T-0W
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 22:51:20 -0400
+Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:35882)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1d66rM-000858-Qy
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 22:51:16 -0400
+Received: by mail-pg0-x22f.google.com with SMTP id t7so823694pgt.3
+	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 19:51:16 -0700 (PDT)
+References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
+	<20170412095111.11728-3-xiaoguangrong@tencent.com>
+	<46377b3a-d06e-2119-eb97-5384013b0ac8@redhat.com>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <5872c8da-35ee-fa38-802b-b865dc170c3f@gmail.com>
+Date: Thu, 4 May 2017 10:51:18 +0800
 MIME-Version: 1.0
-In-Reply-To: <c942db16-1bd7-57d5-2553-11c9d31c3b50@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8Tx5WhXH6F1xkEpdx2HaWI0NRTwHRcT1t"
-Subject: Re: [Qemu-devel] [PATCH v10 09/17] qcow2: Optimize write zero of
- unaligned tail cluster
+In-Reply-To: <46377b3a-d06e-2119-eb97-5384013b0ac8@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/5] mc146818rtc: fix clock lost after
+ scaling coalesced irq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8Tx5WhXH6F1xkEpdx2HaWI0NRTwHRcT1t
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <2fa232fd-2a86-20a0-3d82-cd046f23e151@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 09/17] qcow2: Optimize write zero of
- unaligned tail cluster
-References: <20170427014626.11553-1-eblake@redhat.com>
- <20170427014626.11553-10-eblake@redhat.com>
- <7f062c75-44bb-7305-c519-26471da74b3d@redhat.com>
- <c942db16-1bd7-57d5-2553-11c9d31c3b50@redhat.com>
-In-Reply-To: <c942db16-1bd7-57d5-2553-11c9d31c3b50@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/28/2017 04:24 PM, Eric Blake wrote:
-
->>> +echo
->>> +echo =3D=3D unaligned image tail cluster, no allocation needed =3D=3D=
-
->>> +
->>> +CLUSTER_SIZE=3D1024 TEST_IMG=3D"$TEST_IMG.base" _make_test_img $((si=
-ze + 1024))
->>
->> Any reason for the CLUSTER_SIZE? It passes with 64 kB as well, and I
->> actually think that would be a better test because as it is, the image=
-'s
->> "unaligned" tail is exactly one cluster (so it isn't really unaligned)=
-=2E
->=20
-> Uhhh - copy-and-paste?  You're right, that 1024 is too small for what
-> I'm actually doing with it.  :(
-
-Actually, the whole test defaults to 4k clusters except when overridden,
-but I did learn while hammering at things that we don't have a nice way
-to tell that a backing file slightly shorter than the active file
-behaves as though we read all zeros for the difference. I'm thinking of
-proposing an RFC patch introducing BDRV_BLOCK_EOF, which gets set any
-time bdrv_get_block_status() clamps the returns *pnum because it hit
-EOF, to see what optimizations fall out elsewhere in the tree as a
-result.  (It may not be worth it in the end, but we'll see).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, yunfangtai@tencent.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
---8Tx5WhXH6F1xkEpdx2HaWI0NRTwHRcT1t
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 05/03/2017 11:15 PM, Paolo Bonzini wrote:
+> 
+> 
+> On 12/04/2017 11:51, guangrong.xiao@gmail.com wrote:
+>> +            int current_irq_coalesced = s->irq_coalesced;
+>> +
+>> +            s->irq_coalesced = (current_irq_coalesced * s->period) / period;
+>> +
+>> +            /*
+>> +             * calculate the lost clock after it is scaled which should be
+>> +             * compensated in the next interrupt.
+>> +             */
+>> +            lost_clock += current_irq_coalesced * s->period -
+>> +                            s->irq_coalesced * period;
+> 
+> This is:
+> 
+>     lost_clock = current_irq_coalesced * s->period -
+> 	(current_irq_coalesced * s->period) / period * period;
+> 
+> i.e.
+> 
+>     /* When switching from a shorter to a longer period, scale down the
+>      * missing ticks since we expect the OS handler to treat the delayed
+>      * ticks as longer.  Any leftovers are put back into next_irq_clock.
+>      *
+>      * When switching to a shorter period, scale up the missing ticks
+>      * since we expect the OS handler to treat the delayed ticks as
+>      * shorter.
+>      */
+>     lost_clock = (s->irq_coalesced * s->period) % period;
+>     s->irq_coalesced = (s->irq_coalesced * s->period) / period;
+> 
+> Is this correct?
+> 
 
-iQEcBAEBCAAGBQJZCpY0AAoJEKeha0olJ0Nq78UH/16ixEfbyhbvUJdI8s1FwRgm
-QCMciYafFeoTu2zGJyQDcoCQNjvveVOtrucN4k/X+3XB9gY2yD415dzUFS8ZSjh7
-ifFJX2Z2BezeGPFgOfx1LNVQTwIAz8o8An3TySM7TOgadPpCPwcO7wa5e0xQChZw
-XawM0XNhxTLf7JsHRmeBwxwTb06LpQlz2VarmyEQxwmk7IlCQZxvKp0k8pIPpxys
-0ELgqMAph1pLqIWj3Lhu/JwfyHG8cpncy6fgcJaosgOIh/onY47ncXd4aOfw9Xic
-9buNBS5Q+SW7QqjAPk4Hiug91Ht2CuvjZiEAirwiPEqTCmtC9NaVudNK4vIer34=
-=eHqz
------END PGP SIGNATURE-----
+Yes, it is correct, it looks smarter, will apply it in the next version.
 
---8Tx5WhXH6F1xkEpdx2HaWI0NRTwHRcT1t--
+Thanks!
