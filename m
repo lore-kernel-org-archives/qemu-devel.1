@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FAY-0003TU-9v
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:39 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FAa-0003Vb-B3
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FAT-0004Tn-Ao
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40468)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FAZ-0004Vq-Ku
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1d6FAT-0004TU-2o
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:33 -0400
+	id 1d6FAZ-0004VV-EI
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:39 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  4 May 2017 15:42:19 +0400
-Message-Id: <20170504114232.20318-9-marcandre.lureau@redhat.com>
+Date: Thu,  4 May 2017 15:42:20 +0400
+Message-Id: <20170504114232.20318-10-marcandre.lureau@redhat.com>
 In-Reply-To: <20170504114232.20318-1-marcandre.lureau@redhat.com>
 References: <20170504114232.20318-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/21] char: remove qemu_chardev_add
+Subject: [Qemu-devel] [PULL 09/21] char: remove chardevs list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +30,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-qemu_chardev_new() now uses object_new_with_props() with /chardevs
-parent container. It will fail to insert the object if the same "id"
-already exists. "chardevs" list usage has been removed in previous
-commits.
+The list is now empty, the chardev cleanup is taken care of by the unref
+of the root container.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char.c | 27 ++++-----------------------
- 1 file changed, 4 insertions(+), 23 deletions(-)
+ include/sysemu/char.h | 1 -
+ chardev/char.c        | 6 ------
+ 2 files changed, 7 deletions(-)
 
+diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+index 98903f31e4..729d186d01 100644
+--- a/include/sysemu/char.h
++++ b/include/sysemu/char.h
+@@ -95,7 +95,6 @@ struct Chardev {
+     int be_open;
+     guint fd_in_tag;
+     DECLARE_BITMAP(features, QEMU_CHAR_FEATURE_LAST);
+-    QTAILQ_ENTRY(Chardev) next;
+ };
+=20
+ /**
 diff --git a/chardev/char.c b/chardev/char.c
-index 1859680bea..276d27f403 100644
+index 276d27f403..aee8b4555d 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -805,26 +805,6 @@ static const ChardevClass *char_get_class(const char=
- *driver, Error **errp)
-     return cc;
- }
+@@ -42,9 +42,6 @@
+ /***********************************************************/
+ /* character device */
 =20
--static Chardev *qemu_chardev_add(const char *id, const char *typename,
--                                 ChardevBackend *backend, Error **errp)
--{
--    Chardev *chr;
+-static QTAILQ_HEAD(ChardevHead, Chardev) chardevs =3D
+-    QTAILQ_HEAD_INITIALIZER(chardevs);
 -
--    chr =3D qemu_chr_find(id);
--    if (chr) {
--        error_setg(errp, "Chardev '%s' already exists", id);
--        return NULL;
+ static Object *get_chardevs_root(void)
+ {
+     return container_get(object_get_root(), "/chardevs");
+@@ -418,9 +415,6 @@ static void char_finalize(Object *obj)
+ {
+     Chardev *chr =3D CHARDEV(obj);
+=20
+-    if (QTAILQ_IN_USE(chr, next)) {
+-        QTAILQ_REMOVE(&chardevs, chr, next);
 -    }
--
--    chr =3D qemu_chardev_new(id, typename, backend, errp);
--    if (!chr) {
--        return NULL;
--    }
--
--    QTAILQ_INSERT_TAIL(&chardevs, chr, next);
--    return chr;
--}
--
- static const struct ChardevAlias {
-     const char *typename;
-     const char *alias;
-@@ -941,9 +921,10 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
-         backend->u.null.data =3D ccom; /* Any ChardevCommon member would=
- work */
+     if (chr->be) {
+         chr->be->chr =3D NULL;
      }
-=20
--    chr =3D qemu_chardev_add(bid ? bid : id,
-+    chr =3D qemu_chardev_new(bid ? bid : id,
-                            object_class_get_name(OBJECT_CLASS(cc)),
-                            backend, errp);
-+
-     if (chr =3D=3D NULL) {
-         goto out;
-     }
-@@ -955,7 +936,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
-         backend->type =3D CHARDEV_BACKEND_KIND_MUX;
-         backend->u.mux.data =3D g_new0(ChardevMux, 1);
-         backend->u.mux.data->chardev =3D g_strdup(bid);
--        mux =3D qemu_chardev_add(id, TYPE_CHARDEV_MUX, backend, errp);
-+        mux =3D qemu_chardev_new(id, TYPE_CHARDEV_MUX, backend, errp);
-         if (mux =3D=3D NULL) {
-             object_unparent(OBJECT(chr));
-             chr =3D NULL;
-@@ -1289,7 +1270,7 @@ ChardevReturn *qmp_chardev_add(const char *id, Char=
-devBackend *backend,
-         return NULL;
-     }
-=20
--    chr =3D qemu_chardev_add(id, object_class_get_name(OBJECT_CLASS(cc))=
-,
-+    chr =3D qemu_chardev_new(id, object_class_get_name(OBJECT_CLASS(cc))=
-,
-                            backend, errp);
-     if (!chr) {
-         return NULL;
 --=20
 2.12.0.191.gc5d8de91d
