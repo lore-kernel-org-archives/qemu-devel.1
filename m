@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d677g-0002tr-Nz
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1d677j-0002xC-Mb
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d677f-0001FN-1W
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1d677i-0001Ht-Ip
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:11 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  3 May 2017 22:07:46 -0500
-Message-Id: <20170504030755.1001-2-eblake@redhat.com>
+Date: Wed,  3 May 2017 22:07:50 -0500
+Message-Id: <20170504030755.1001-6-eblake@redhat.com>
 In-Reply-To: <20170504030755.1001-1-eblake@redhat.com>
 References: <20170504030755.1001-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 01/10] qcow2: Use consistent switch
- indentation
+Subject: [Qemu-devel] [PATCH v12 05/10] qcow2: Optimize zero_single_l2() to
+ minimize L2 churn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,189 +23,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-Fix a couple of inconsistent indentations, before an upcoming
-patch further tweaks the switch statements.  While at it, make
-some tweaks for shorter lines to keep checkpatch happy (best
-viewed with 'git diff -b').
+Similar to discard_single_l2(), we should try to avoid dirtying
+the L2 cache when the cluster we are changing already has the
+right characteristics.
+
+Note that by the time we get to zero_single_l2(), BDRV_REQ_MAY_UNMAP
+is a requirement to unallocate a cluster (this is because the block
+layer clears that flag if discard.* flags during open requested that
+we never punch holes - see the conversation around commit 170f4b2e,
+https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg07306.html).
+Therefore, this patch can only reuse a zero cluster as-is if either
+unmapping is not requested, or if the zero cluster was not associated
+with an allocation.
+
+Technically, there are some cases where an unallocated cluster
+already reads as all zeroes (namely, when there is no backing file
+[easy: check bs->backing], or when the backing file also reads as
+zeroes [harder: we can't check bdrv_get_block_status since we are
+already holding the lock]), where the guest would not immediately see
+a difference if we left that cluster unallocated.  But if the user
+did not request unmapping, leaving an unallocated cluster is wrong;
+and even if the user DID request unmapping, keeping a cluster
+unallocated risks a subtle semantic change of guest-visible contents
+if a backing file is later added, and it is not worth auditing
+whether all internal uses such as mirror properly avoid an unmap
+request.  Thus, this patch is intentionally limited to just clusters
+that are already marked as zero.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v12: new patch
+v12: store cluster type in temporary
+v11: reserved for blkdebug half of v10
+v10: new patch, replacing earlier attempt to use unallocated clusters,
+and ditching any optimization of v2 files
 ---
- block/qcow2-cluster.c  | 32 ++++++++---------
- block/qcow2-refcount.c | 96 ++++++++++++++++++++++++++------------------------
- 2 files changed, 65 insertions(+), 63 deletions(-)
+ block/qcow2-cluster.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 31077d8..335a505 100644
+index 14e2086..78fbe34 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1504,25 +1504,25 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
-          * but rather fall through to the backing file.
-          */
-         switch (qcow2_get_cluster_type(old_l2_entry)) {
--            case QCOW2_CLUSTER_UNALLOCATED:
--                if (full_discard || !bs->backing) {
--                    continue;
--                }
--                break;
-+        case QCOW2_CLUSTER_UNALLOCATED:
-+            if (full_discard || !bs->backing) {
-+                continue;
-+            }
-+            break;
+@@ -1599,6 +1599,7 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
+     int l2_index;
+     int ret;
+     int i;
++    bool unmap = !!(flags & BDRV_REQ_MAY_UNMAP);
 
--            case QCOW2_CLUSTER_ZERO:
--                /* Preallocated zero clusters should be discarded in any case */
--                if (!full_discard && (old_l2_entry & L2E_OFFSET_MASK) == 0) {
--                    continue;
--                }
--                break;
-+        case QCOW2_CLUSTER_ZERO:
-+            /* Preallocated zero clusters should be discarded in any case */
-+            if (!full_discard && (old_l2_entry & L2E_OFFSET_MASK) == 0) {
-+                continue;
-+            }
-+            break;
+     ret = get_cluster_table(bs, offset, &l2_table, &l2_index);
+     if (ret < 0) {
+@@ -1611,12 +1612,22 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
 
--            case QCOW2_CLUSTER_NORMAL:
--            case QCOW2_CLUSTER_COMPRESSED:
--                break;
-+        case QCOW2_CLUSTER_NORMAL:
-+        case QCOW2_CLUSTER_COMPRESSED:
-+            break;
+     for (i = 0; i < nb_clusters; i++) {
+         uint64_t old_offset;
++        int cluster_type;
 
--            default:
--                abort();
-+        default:
-+            abort();
-         }
+         old_offset = be64_to_cpu(l2_table[l2_index + i]);
 
-         /* First remove L2 entries */
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 4efca7e..a5a0076 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1117,70 +1117,72 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                 goto fail;
-             }
-
--            for(j = 0; j < s->l2_size; j++) {
-+            for (j = 0; j < s->l2_size; j++) {
-                 uint64_t cluster_index;
-+                uint64_t offset_masked;
-
-                 offset = be64_to_cpu(l2_table[j]);
-                 old_offset = offset;
-+                offset_masked = offset & L2E_OFFSET_MASK;
-                 offset &= ~QCOW_OFLAG_COPIED;
-
-                 switch (qcow2_get_cluster_type(offset)) {
--                    case QCOW2_CLUSTER_COMPRESSED:
--                        nb_csectors = ((offset >> s->csize_shift) &
--                                       s->csize_mask) + 1;
--                        if (addend != 0) {
--                            ret = update_refcount(bs,
--                                (offset & s->cluster_offset_mask) & ~511,
--                                nb_csectors * 512, abs(addend), addend < 0,
--                                QCOW2_DISCARD_SNAPSHOT);
--                            if (ret < 0) {
--                                goto fail;
--                            }
--                        }
--                        /* compressed clusters are never modified */
--                        refcount = 2;
--                        break;
--
--                    case QCOW2_CLUSTER_NORMAL:
--                    case QCOW2_CLUSTER_ZERO:
--                        if (offset_into_cluster(s, offset & L2E_OFFSET_MASK)) {
--                            qcow2_signal_corruption(bs, true, -1, -1, "Data "
--                                                    "cluster offset %#llx "
--                                                    "unaligned (L2 offset: %#"
--                                                    PRIx64 ", L2 index: %#x)",
--                                                    offset & L2E_OFFSET_MASK,
--                                                    l2_offset, j);
--                            ret = -EIO;
-+                case QCOW2_CLUSTER_COMPRESSED:
-+                    nb_csectors = ((offset >> s->csize_shift) &
-+                                   s->csize_mask) + 1;
-+                    if (addend != 0) {
-+                        ret = update_refcount(bs,
-+                            (offset & s->cluster_offset_mask) & ~511,
-+                            nb_csectors * 512, abs(addend), addend < 0,
-+                            QCOW2_DISCARD_SNAPSHOT);
-+                        if (ret < 0) {
-                             goto fail;
-                         }
-+                    }
-+                    /* compressed clusters are never modified */
-+                    refcount = 2;
-+                    break;
-
--                        cluster_index = (offset & L2E_OFFSET_MASK) >> s->cluster_bits;
--                        if (!cluster_index) {
--                            /* unallocated */
--                            refcount = 0;
--                            break;
--                        }
--                        if (addend != 0) {
--                            ret = qcow2_update_cluster_refcount(bs,
-+                case QCOW2_CLUSTER_NORMAL:
-+                case QCOW2_CLUSTER_ZERO:
-+                    if (offset_into_cluster(s, offset_masked)) {
-+                        qcow2_signal_corruption(bs, true, -1, -1, "Data "
-+                                                "cluster offset %#" PRIx64
-+                                                " unaligned (L2 offset: %#"
-+                                                PRIx64 ", L2 index: %#x)",
-+                                                offset_masked,
-+                                                l2_offset, j);
-+                        ret = -EIO;
-+                        goto fail;
-+                    }
+-        /* Update L2 entries */
++        /*
++         * Minimize L2 changes if the cluster already reads back as
++         * zeroes with correct allocation.
++         */
++        cluster_type = qcow2_get_cluster_type(old_offset);
++        if (cluster_type == QCOW2_CLUSTER_ZERO_PLAIN ||
++            (cluster_type == QCOW2_CLUSTER_ZERO_ALLOC && !unmap)) {
++            continue;
++        }
 +
-+                    cluster_index = offset_masked >> s->cluster_bits;
-+                    if (!cluster_index) {
-+                        /* unallocated */
-+                        refcount = 0;
-+                        break;
-+                    }
-+                    if (addend != 0) {
-+                        ret = qcow2_update_cluster_refcount(bs,
-                                     cluster_index, abs(addend), addend < 0,
-                                     QCOW2_DISCARD_SNAPSHOT);
--                            if (ret < 0) {
--                                goto fail;
--                            }
--                        }
--
--                        ret = qcow2_get_refcount(bs, cluster_index, &refcount);
-                         if (ret < 0) {
-                             goto fail;
-                         }
--                        break;
-+                    }
-
--                    case QCOW2_CLUSTER_UNALLOCATED:
--                        refcount = 0;
--                        break;
-+                    ret = qcow2_get_refcount(bs, cluster_index, &refcount);
-+                    if (ret < 0) {
-+                        goto fail;
-+                    }
-+                    break;
-
--                    default:
--                        abort();
-+                case QCOW2_CLUSTER_UNALLOCATED:
-+                    refcount = 0;
-+                    break;
-+
-+                default:
-+                    abort();
-                 }
-
-                 if (refcount == 1) {
+         qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
+-        if (old_offset & QCOW_OFLAG_COMPRESSED || flags & BDRV_REQ_MAY_UNMAP) {
++        if (cluster_type == QCOW2_CLUSTER_COMPRESSED || unmap) {
+             l2_table[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
+             qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQUEST);
+         } else {
 -- 
 2.9.3
