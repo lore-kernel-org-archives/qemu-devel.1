@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6DON-0007lF-Gs
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:49:48 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d6DRN-00026E-3j
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6DOI-0006S7-JF
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:49:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d6DOI-0006Rh-9q
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:49:42 -0400
-Date: Thu, 4 May 2017 11:49:38 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170504114938.3c58ebf0@nial.brq.redhat.com>
-In-Reply-To: <20170502203115.22233-5-ehabkost@redhat.com>
-References: <20170502203115.22233-1-ehabkost@redhat.com>
-	<20170502203115.22233-5-ehabkost@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d6DRM-0008GO-BU
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:52:53 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-14-pbonzini@redhat.com>
+	<20170504073949.GA4725@lemon.lan>
+	<6c794eeb-3128-80a8-a8c4-0573be9a643c@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d84712c7-aef5-bea9-d0a2-1ffe397c6c57@redhat.com>
+Date: Thu, 4 May 2017 11:52:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <6c794eeb-3128-80a8-a8c4-0573be9a643c@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] x86: Support feature=force on the
- command-line
+Subject: Re: [Qemu-devel] [PATCH 13/17] coroutine-lock: introduce
+ qemu_co_mutex_lock_unlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +27,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-
-On Tue,  2 May 2017 17:31:15 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> Introduce a new CPUFeatureSetting QAPI data type, and use it to support
-> feature=force on -cpu.
-commit message lacks rationale why it's needed.
-I suspect that it's to enable forced mwait.
-It would be nice to put here answer to what
-motivated to write this patch and reference commit ids
-of kernel patches if there are/needed any to make it work.
-
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-[...]
-> @@ -3717,25 +3727,46 @@ static void x86_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
->      X86CPU *cpu = X86_CPU(obj);
->      BitProperty *fp = opaque;
->      Error *local_err = NULL;
-> -    bool value;
-> +    CPUFeatureSetting *value = NULL;
->  
->      if (dev->realized) {
->          qdev_prop_set_after_realize(dev, name, errp);
->          return;
->      }
->  
-> -    visit_type_bool(v, name, &value, &local_err);
-> +    visit_type_CPUFeatureSetting(v, name, &value, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
->      }
->  
-> -    if (value) {
-> -        cpu->env.features[fp->w] |= fp->mask;
-> -    } else {
-> -        cpu->env.features[fp->w] &= ~fp->mask;
-> +    switch (value->type) {
-> +    case QTYPE_QBOOL:
-> +        if (value->u.q_bool) {
-> +            cpu->env.features[fp->w] |= fp->mask;
-> +        } else {
-> +            cpu->env.features[fp->w] &= ~fp->mask;
-> +        }
-> +        cpu->env.forced_features[fp->w] &= ~fp->mask;
-> +        cpu->env.user_features[fp->w] |= fp->mask;
-> +    break;
-> +    case QTYPE_QSTRING:
-> +        switch (value->u.q_enum) {
-> +        case CPU_FEATURE_SETTING_ENUM_FORCE:
-> +            cpu->env.features[fp->w] |= fp->mask;
-> +            cpu->env.forced_features[fp->w] |= fp->mask;
-> +        break;
-> +        default:
-> +            error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name,
-> +                       "CPUFeatureSetting");
-> +        }
-> +    break;
-> +    default:
-> +        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name,
-> +                   "CPUFeatureSetting");
->      }
-> -    cpu->env.user_features[fp->w] |= fp->mask;
-that's the only place it was set and then used by x86_cpu_expand_features()
-Is it correct to remove setter?
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 
-> +
-> +    qapi_free_CPUFeatureSetting(value);
->  }
->  
->  static void x86_cpu_release_bit_prop(Object *obj, const char *name,
+
+On 04/05/2017 11:47, Paolo Bonzini wrote:
+> 
+> 
+> On 04/05/2017 09:39, Fam Zheng wrote:
+>> On Thu, 04/20 14:00, Paolo Bonzini wrote:
+>>> +    if (atomic_cmpxchg(&mutex->locked, waiters, waiters + 1) != waiters) {
+>>
+>> Is it still useful to try the fast path again if there are now even more
+>> waiters, i.e.  "atomic_cmpxchg(...) > waiters"?
+> 
+> Probably not.
+
+... but when this happens, we don't enter the fast path loop:
+
+ retry_fast_path:
+    waiters = atomic_read(&mutex->locked);
+    if (waiters == 0) {
+        /* Provide same memory ordering semantics as mutex lock/unlock.  */
+        smp_mb_acquire();
+        smp_mb_release();
+        return;
+    }
+
+    i = 0;
+    while (waiters == 1 && ++i < 1000) {
+        if (atomic_read(&mutex->ctx) == ctx) {
+            break;
+        }
+        waiters = atomic_read(&mutex->locked);
+        if (waiters == 0) {
+            smp_mb_acquire();
+            smp_mb_release();
+            return;
+        }
+        cpu_relax();
+    }
+
+    if (atomic_cmpxchg(&mutex->locked, waiters, waiters + 1) != waiters) {
+        goto retry_fast_path;
+    }
+
+    qemu_co_mutex_lock_slowpath(ctx, mutex);
+    qemu_co_mutex_unlock(mutex);
+
+The "if (waiters == 0)" fails, and the "while (waiters == 1 && ...)" won't
+happen either if atomic_cmpxchg returns > 1.  So really what you get is
+a retry of the atomic_cmpxchg.
+
+We should introduce atomic_try_cmpxchg.  Linux added it recently, too,
+and it simplifies the code because you don't need to redo the atomic_read.
+Like this:
+
+    waiters = atomic_read(&mutex->locked);
+ retry_fast_path:
+    if (waiters == 0) {
+        ...
+    }
+    i = 0;
+    while (waiters == 1 && ++i < 1000) {
+        ...
+    }
+    if (!atomic_cmpxchg(&mutex->locked, &waiters, waiters + 1)) {
+        goto retry_fast_path;
+    }
+
+    qemu_co_mutex_lock_slowpath(ctx, mutex);
+    qemu_co_mutex_unlock(mutex);
+
+
+Paolo
+
+
+> Paolo
+> 
+>>> +        goto retry_fast_path;
+>>> +    }
+>>> +
+>>> +    qemu_co_mutex_lock_slowpath(ctx, mutex);
+>>> +    qemu_co_mutex_unlock(mutex);
+>>> +}
+>>> +
+>>>  void coroutine_fn qemu_co_mutex_unlock(CoMutex *mutex)
+>>>  {
+>>>      Coroutine *self = qemu_coroutine_self();
+>>> -- 
+>>> 2.9.3
+>>>
+>>>
+>>>
+> 
+> 
