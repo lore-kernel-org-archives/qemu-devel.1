@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6Fyq-0004yc-Kg
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:35:39 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6G1m-0007zn-RR
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6Fyp-0006gS-Jl
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:35:36 -0400
-Date: Thu, 4 May 2017 14:35:27 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170504123527.nu5hwlxjarifboni@kamzik.brq.redhat.com>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-20-git-send-email-imammedo@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1d6G1j-00008B-OS
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:38:38 -0400
+Date: Thu, 4 May 2017 13:38:32 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170504123832.GI32376@stefanha-x1.localdomain>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-4-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="6b3yLyRKT1M6kiA0"
 Content-Disposition: inline
-In-Reply-To: <1493816238-33120-20-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 19/24] numa: remove no longer need
- numa_post_machine_init()
+In-Reply-To: <20170420120058.28404-4-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 03/17] block: access
+ io_limits_disabled with atomic ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Wed, May 03, 2017 at 02:57:13PM +0200, Igor Mammedov wrote:
-> CPUState::numa_node is still in use but now it's set by
-> board when it creates CPU objects. So there isn't any
-> need to set it again after all CPU's are created,
-> since it's been already set.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+--6b3yLyRKT1M6kiA0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Apr 20, 2017 at 02:00:44PM +0200, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  include/sysemu/numa.h |  1 -
->  numa.c                | 15 ---------------
->  vl.c                  |  2 --
->  3 files changed, 18 deletions(-)
-> 
-> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index 9077bb2..0b0a044 100644
-> --- a/include/sysemu/numa.h
-> +++ b/include/sysemu/numa.h
-> @@ -25,7 +25,6 @@ typedef struct node_info {
->  
->  extern NodeInfo numa_info[MAX_NODES];
->  void parse_numa_opts(MachineState *ms);
-> -void numa_post_machine_init(void);
->  void query_numa_node_mem(uint64_t node_mem[]);
->  extern QemuOptsList qemu_numa_opts;
->  void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
-> diff --git a/numa.c b/numa.c
-> index 06c42e9..f8c849d 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -418,21 +418,6 @@ void parse_numa_opts(MachineState *ms)
->      }
->  }
->  
-> -void numa_post_machine_init(void)
-> -{
-> -    CPUState *cpu;
-> -    int i;
-> -
-> -    CPU_FOREACH(cpu) {
-> -        for (i = 0; i < nb_numa_nodes; i++) {
-> -            assert(cpu->cpu_index < max_cpus);
-> -            if (test_bit(cpu->cpu_index, numa_info[i].node_cpu)) {
-> -                cpu->numa_node = i;
-> -            }
-> -        }
-> -    }
-> -}
-> -
->  static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
->                                             const char *name,
->                                             uint64_t ram_size)
-> diff --git a/vl.c b/vl.c
-> index c63f4d5..fe4741d 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4595,8 +4595,6 @@ int main(int argc, char **argv, char **envp)
->  
->      cpu_synchronize_all_post_init();
->  
-> -    numa_post_machine_init();
-> -
->      rom_reset_order_override();
->  
->      /*
-> -- 
-> 2.7.4
->
+>  block/block-backend.c          | 4 ++--
+>  block/throttle-groups.c        | 2 +-
+>  include/sysemu/block-backend.h | 3 ++-
+>  3 files changed, 5 insertions(+), 4 deletions(-)
 
-Reviewed-by: Andrew Jones <drjones@redhat.com> 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--6b3yLyRKT1M6kiA0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZCyDIAAoJEJykq7OBq3PIJqYIAJVsyh3iMwFMwUR2rf+5RRY7
+a7oJvn36DCm8Xr9SzSZvglQBroK1fq6enXU1oU45HR0iW3LojEAR+c7S1KBH9bVJ
+BDioeAAjTV9LO5xERQwByi/J3Obp/A0p+mMiQVpPovYOFKnVg844W6lJgha3B9Pg
+DCiC/b0AYFqAEy49fFzytgc5aIhYWqRPRSnSv0Bgh5r/LDMMuG/6FUeg31wZLHnL
+zkp0u6/3S5eLkBswHkFkbY9zjDXLZIVBjH/pRwMykxYc4Cw+CGW481ye8g6FX2wZ
+lOV24XhzROKdoKKzI0ac90/n8EbR4xsscdqwcR/rIculW5BsL2lgnjB1xd8oB5M=
+=JRZd
+-----END PGP SIGNATURE-----
+
+--6b3yLyRKT1M6kiA0--
