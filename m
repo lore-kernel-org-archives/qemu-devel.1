@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6HJR-0000jG-0Z
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:01:01 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d6HKQ-0001U9-Ri
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:01:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6HJM-0007gR-2u
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:00:57 -0400
-Resent-Message-Id: <E1d6HJM-0007gR-2u@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21479)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d6HJL-0007gJ-RL
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:00:52 -0400
-In-Reply-To: <20170504115948.3048-1-xiaoguangrong@tencent.com>
-Message-ID: <149390642062.180.6884539785981176274@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 4 May 2017 07:00:21 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] mc146818rtc: fix Windows VM clock
- faster
+	(envelope-from <kraxel@redhat.com>) id 1d6HKN-00081V-Ug
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:01:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55078)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6HKN-000814-PE
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:01:55 -0400
+Message-ID: <1493906512.371.19.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 04 May 2017 16:01:52 +0200
+In-Reply-To: <1493894491-26130-1-git-send-email-vip-ak47@yandex.ru>
+References: <1493894491-26130-1-git-send-email-vip-ak47@yandex.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] Video and sound capture to a videofile
+ through ffmpeg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: famz@redhat.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, yunfangtai@tencent.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: Alex K <vip-ak47@yandex.ru>
+Cc: qemu-devel@nongnu.org, aliguori@amazon.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MiAwLzVdIG1jMTQ2ODE4cnRjOiBmaXggV2luZG93cyBWTSBjbG9jayBm
-YXN0ZXIKTWVzc2FnZS1pZDogMjAxNzA1MDQxMTU5NDguMzA0OC0xLXhpYW9ndWFuZ3JvbmdAdGVu
-Y2VudC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
-IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
-cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
-byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
-YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
-Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3Rh
-ZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE3MDUwNDEyNTQzMi4yMTY1My0xLW1hcmNhbmRyZS5s
-dXJlYXVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwNTA0MTI1NDMyLjIxNjUzLTEtbWFyY2Fu
-ZHJlLmx1cmVhdUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjYx
-ZTA3MSBtYzE0NjgxOHJ0YzogZW1icmFjZSBhbGwgeDg2IHNwZWNpZmljIGNvZGUKZGVjMTA5MSBt
-YzE0NjgxOHJ0YzogZHJvcCB1bm5lY2Vzc2FyeSAnI2lmZGVmIFRBUkdFVF9JMzg2Jwo5ZDUwYWQx
-IG1jMTQ2ODE4cnRjOiBlbnN1cmUgTE9TVF9USUNLX1BPTElDWV9TTEVXIGlzIG9ubHkgZW5hYmxl
-ZCBvbiBUQVJHRVRfSTM4NgpkMTkyYTBmIG1jMTQ2ODE4cnRjOiBwcmVjaXNlbHkgY291bnQgdGhl
-IGNsb2NrIGZvciBwZXJpb2RpYyB0aW1lcgoyMWIyOGU3IG1jMTQ2ODE4cnRjOiB1cGRhdGUgcGVy
-aW9kaWMgdGltZXIgb25seSBpZiBpdCBpcyBuZWVkZWQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvNTogbWMxNDY4MThydGM6IHVwZGF0ZSBwZXJpb2RpYyB0aW1lciBvbmx5
-IGlmIGl0IGlzIG5lZWRlZC4uLgpDaGVja2luZyBQQVRDSCAyLzU6IG1jMTQ2ODE4cnRjOiBwcmVj
-aXNlbHkgY291bnQgdGhlIGNsb2NrIGZvciBwZXJpb2RpYyB0aW1lci4uLgpFUlJPUjogZG8gbm90
-IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMTQzOiBGSUxFOiBody90aW1lci9tYzE0
-NjgxOHJ0Yy5jOjIzMDoKKyAgICAgICAgICAgIGlmICgoY3VyX2lycV9jb2FsZXNjZWQgIT0gcy0+
-aXJxX2NvYWxlc2NlZCkgfHwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTc0IGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
-IFBBVENIIDMvNTogbWMxNDY4MThydGM6IGVuc3VyZSBMT1NUX1RJQ0tfUE9MSUNZX1NMRVcgaXMg
-b25seSBlbmFibGVkIG9uIFRBUkdFVF9JMzg2Li4uCkNoZWNraW5nIFBBVENIIDQvNTogbWMxNDY4
-MThydGM6IGRyb3AgdW5uZWNlc3NhcnkgJyNpZmRlZiBUQVJHRVRfSTM4NicuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNS81OiBtYzE0NjgxOHJ0YzogZW1icmFjZSBhbGwgeDg2IHNwZWNpZmljIGNvZGUuLi4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
-aXN0cy5vcmc=
+On Do, 2017-05-04 at 13:41 +0300, Alex K wrote:
+> Hello everyone,
+>=20
+> I've made a patch that adds ability to record video of what's going on
+> inside qemu. It uses ffmpeg libraries. Basically, the patch adds
+> 2 new commands to the console:
+> capture_start path framerate
+> capture_stop
+>=20
+> path is required
+> framerate could be 24, 25, 30 or 60. Default is 60
+> video codec is always h264
+>=20
+> The patch uses ffmpeg so you will need to install these packages:
+> ffmpeg libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
+>=20
+> This is my first time posting here, so please correct me if I'm doing
+> something wrong
+
+First, as others already mentioned, it would be better to do this
+outside qemu, as vnc or spice client.  spice is probably the better
+choice as spice supports passing the guest display as dma-buf, which
+saves the encode-as-spice and decode-spice steps.  And the dma-bufs can
+be passed to a hardware encoder.
+
+Second, this must be a compile time option.  Breaking the build in case
+ffmpeg is not installed isn't an option.
+
+Third, supporting H.264 only is a non-starter too.  Due to the patent
+situation you can't expect distros shipping ffmpeg with H.264 support
+enabled.
+
+cheers,
+  Gerd
