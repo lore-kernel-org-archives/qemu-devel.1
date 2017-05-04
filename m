@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d6ETX-0000e9-2H
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:59:12 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6EU9-00014q-Mv
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:59:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1d6ETS-00045k-7S
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:59:11 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:38339 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1d6ETR-0003ys-Rl
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:59:06 -0400
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-	<20170203154757.36140-4-vsementsov@virtuozzo.com>
-	<e55d7819-db41-3077-3fe5-ecad88ab2c47@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <9392b02d-e251-d3f7-dbf5-b2bce1aa7620@virtuozzo.com>
-Date: Thu, 4 May 2017 13:58:45 +0300
+	(envelope-from <stefanha@gmail.com>) id 1d6EU4-0004JA-Rq
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:59:49 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d6EU4-0004Ii-KW
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:59:44 -0400
+Received: by mail-wm0-x241.google.com with SMTP id y10so2499040wmh.0
+	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 03:59:44 -0700 (PDT)
+Date: Thu, 4 May 2017 11:59:41 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170504105941.GD32376@stefanha-x1.localdomain>
+References: <20170419144219.20371-1-pbonzini@redhat.com>
+	<20170419144219.20371-11-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e55d7819-db41-3077-3fe5-ecad88ab2c47@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/18] nbd: Minimal structured read for
- server
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="76DTJ5CE0DCVQemd"
+Content-Disposition: inline
+In-Reply-To: <20170419144219.20371-11-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 10/11] blockjob: reorganize
+ block_job_completed_txn_abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
-
-07.02.2017 02:01, Eric Blake wrote:
-> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Minimal implementation of structured read: one data chunk + finishing
->> none chunk. No segmentation.
->> Minimal structured error implementation: no text message.
->> Support DF flag, but just ignore it, as there is no segmentation any
->> way.
-> Might be worth adding that this is still an experimental extension to
-> the NBD spec, and therefore that this implementation serves as proof of
-> concept and may still need tweaking if anything major turns up before
-> promoting it to stable.  It might also be worth a link to:
->
-> https://github.com/NetworkBlockDevice/nbd/blob/extension-structured-reply/doc/proto.md
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/block/nbd.h |  31 +++++++++++++
->>   nbd/nbd-internal.h  |   2 +
->>   nbd/server.c        | 125 ++++++++++++++++++++++++++++++++++++++++++++++++++--
->>   3 files changed, 154 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/block/nbd.h b/include/block/nbd.h
->> index 3c65cf8d87..58b864f145 100644
->> --- a/include/block/nbd.h
->> +++ b/include/block/nbd.h
->> @@ -70,6 +70,25 @@ struct NBDSimpleReply {
->>   };
->>   typedef struct NBDSimpleReply NBDSimpleReply;
->>   
->> +typedef struct NBDStructuredReplyChunk {
->> +    uint32_t magic;
->> +    uint16_t flags;
->> +    uint16_t type;
->> +    uint64_t handle;
->> +    uint32_t length;
->> +} QEMU_PACKED NBDStructuredReplyChunk;
->> +
->> +typedef struct NBDStructuredRead {
->> +    NBDStructuredReplyChunk h;
->> +    uint64_t offset;
->> +} QEMU_PACKED NBDStructuredRead;
->> +
->> +typedef struct NBDStructuredError {
->> +    NBDStructuredReplyChunk h;
->> +    uint32_t error;
->> +    uint16_t message_length;
->> +} QEMU_PACKED NBDStructuredError;
-> Definitely a subset of all types added in the NBD protocol extension,
-> but reasonable for a minimal implementation.  Might be worth adding
-> comments to the types...
-
-Hmm, for me their names looks descriptive enough, but my sight may be 
-biased.. What kind of comments do you want?
-
-[...]
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
--- 
-Best regards,
-Vladimir
+--76DTJ5CE0DCVQemd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Apr 19, 2017 at 04:42:18PM +0200, Paolo Bonzini wrote:
+> This splits the part that touches job states from the part that invokes
+> callbacks.  It will make the code simpler to understand once job states w=
+ill
+> be protected by a different mutex than the AioContext lock.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  blockjob.c | 35 ++++++++++++++++++++++-------------
+>  1 file changed, 22 insertions(+), 13 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--76DTJ5CE0DCVQemd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZCwmdAAoJEJykq7OBq3PIMHQH/0c66Aqm3pPsqcjBKHesbQmP
+5VLAict6SFgPzTrnr5YDumQ+VTqN/fu3f3JrrVZAGtNdvmKF1U2KY0XN2uxOBsia
+7IrgWPzjbPLmy0P/yGKBRzTOCV2I1YooBDAMktWvvEpkJjnXWRXhHsqFgfZHtX7G
+zjAebNnfPur6QxL6k7BBpbqWCILTpH0MgLv+2zWQlsP3Sd+l9xTNjkej2+Oyopn/
+B7UkqTa7xWPEsntNJ+QZjiJ1yWh3LTXNYmEcdqv6j4qSG2/LN5Uw2M0+WILxpVTA
+A1CSYi0fwKKgr3v0lhYORvj1Ckt8bdEA9ZxG/tiEoJtE6pVi3kDc0wHga3Je79A=
+=rS0T
+-----END PGP SIGNATURE-----
+
+--76DTJ5CE0DCVQemd--
