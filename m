@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6E7f-0002fX-PR
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:36:36 -0400
+	(envelope-from <vip-ak47@yandex.ru>) id 1d6ED7-0004tM-Of
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6E7e-0005Mh-UQ
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:36:35 -0400
-References: <20170504102339.31971-1-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <22096620-8f3b-88b2-3e6d-e40869b567c2@redhat.com>
-Date: Thu, 4 May 2017 12:36:25 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170504102339.31971-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] aio: add missing aio_notify() to
- aio_enable_external()
+	(envelope-from <vip-ak47@yandex.ru>) id 1d6ED4-0002IG-EE
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:42:13 -0400
+Received: from forward9o.cmail.yandex.net ([37.9.109.56]:47838)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vip-ak47@yandex.ru>) id 1d6ED3-0002F9-Pq
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:42:10 -0400
+From: Alex K <vip-ak47@yandex.ru>
+Date: Thu,  4 May 2017 13:41:31 +0300
+Message-Id: <1493894491-26130-1-git-send-email-vip-ak47@yandex.ru>
+Subject: [Qemu-devel] [PATCH] Video and sound capture to a videofile through
+ ffmpeg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +22,1014 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: aliguori@amazon.com, kraxel@redhat.com, Alex K <vip-ak47@yandex.ru>
 
+Hello everyone,
 
+I've made a patch that adds ability to record video of what's going on
+inside qemu. It uses ffmpeg libraries. Basically, the patch adds
+2 new commands to the console:
+capture_start path framerate
+capture_stop
 
-On 04/05/2017 12:23, Stefan Hajnoczi wrote:
-> The main loop uses aio_disable_external()/aio_enable_external() to
-> temporarily disable processing of external AioContext clients like
-> device emulation.
-> 
-> This allows monitor commands to quiesce I/O and prevent the guest from
-> submitting new requests while a monitor command is in progress.
-> 
-> The aio_enable_external() API is currently broken when an IOThread is in
-> aio_poll() waiting for fd activity when the main loop re-enables
-> external clients.  Incrementing ctx->external_disable_cnt does not wake
-> the IOThread from ppoll(2) so fd processing remains suspended and leads
-> to unresponsive emulated devices.
-> 
-> This patch adds an aio_notify() call to aio_enable_external() so the
-> IOThread is kicked out of ppoll(2) and will re-arm the file descriptors.
-> 
-> The bug can be reproduced as follows:
-> 
->   $ qemu -M accel=kvm -m 1024 \
->          -object iothread,id=iothread0 \
->          -device virtio-scsi-pci,iothread=iothread0,id=virtio-scsi-pci0 \
->          -drive if=none,id=drive0,aio=native,cache=none,format=raw,file=test.img \
->          -device scsi-hd,id=scsi-hd0,drive=drive0 \
->          -qmp tcp::5555,server,nowait
-> 
->   $ scripts/qmp/qmp-shell localhost:5555
->   (qemu) blockdev-snapshot-sync device=drive0 snapshot-file=sn1.qcow2
->          mode=absolute-paths format=qcow2
-> 
-> After blockdev-snapshot-sync completes the SCSI disk will be
-> unresponsive.  This leads to request timeouts inside the guest.
+path is required
+framerate could be 24, 25, 30 or 60. Default is 60
+video codec is always h264
 
-I agree this is the minimal fix and is the right thing to do.  The
-bdrv_drained_begin/end device callbacks would also make it possible to
-remove disable/enable external altogether, but that's more invasive.
+The patch uses ffmpeg so you will need to install these packages:
+ffmpeg libavformat-dev libavcodec-dev libavutil-dev libswscale-dev
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-stable@nongnu.org
+This is my first time posting here, so please correct me if I'm doing
+something wrong
 
-> Reported-by: Qianqian Zhu <qizhu@redhat.com>
-> Suggested-by: Fam Zheng <famz@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  include/block/aio.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/block/aio.h b/include/block/aio.h
-> index 406e323..5294b04 100644
-> --- a/include/block/aio.h
-> +++ b/include/block/aio.h
-> @@ -456,6 +456,7 @@ static inline void aio_enable_external(AioContext *ctx)
->  {
->      assert(ctx->external_disable_cnt > 0);
->      atomic_dec(&ctx->external_disable_cnt);
-> +    aio_notify(ctx);
->  }
->  
->  /**
-> 
+Signed-off-by: Alex K <vip-ak47@yandex.ru>
+---
+ configure                          |  20 +
+ default-configs/i386-softmmu.mak   |   1 +
+ default-configs/x86_64-softmmu.mak |   1 +
+ hmp-commands.hx                    |  34 ++
+ hmp.h                              |   2 +
+ hw/display/Makefile.objs           |   2 +
+ hw/display/capture.c               | 761 +++++++++++++++++++++++++++++++++++++
+ hw/display/capture.h               |  78 ++++
+ 8 files changed, 899 insertions(+)
+ create mode 100644 hw/display/capture.c
+ create mode 100644 hw/display/capture.h
+
+diff --git a/configure b/configure
+index 48a9370..a6ddbf0 100755
+--- a/configure
++++ b/configure
+@@ -281,6 +281,7 @@ opengl=""
+ opengl_dmabuf="no"
+ avx2_opt="no"
+ zlib="yes"
++libav="yes"
+ lzo=""
+ snappy=""
+ bzip2=""
+@@ -1993,6 +1994,25 @@ if test "$seccomp" != "no" ; then
+         seccomp="no"
+     fi
+ fi
++#########################################
++# libav check
++
++if test "$libav" != "no" ; then
++    cat > $TMPC << EOF
++#include <libavcodec/avcodec.h>
++#include <libavformat/avformat.h>
++
++int main(void){ av_register_all(); avcodec_register_all(); return 0; }
++EOF
++    if compile_prog "" "-lm -lpthread -lavformat -lavcodec -lavutil -lswscale -lswresample" ; then
++        :
++    else
++        error_exit "libav check failed" \
++            "Make sure to have the libav libs and headers installed."
++    fi
++fi
++LIBS="$LIBS -lm -lpthread -lavformat -lavcodec -lavutil -lswscale -lswresample"
++
+ ##########################################
+ # xen probe
+ 
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index d2ab2f6..35ce513 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -59,3 +59,4 @@ CONFIG_SMBIOS=y
+ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+ CONFIG_PXB=y
+ CONFIG_ACPI_VMGENID=y
++CONFIG_CAPTURE=y
+diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+index 9bde2f1..b9a7175 100644
+--- a/default-configs/x86_64-softmmu.mak
++++ b/default-configs/x86_64-softmmu.mak
+@@ -59,3 +59,4 @@ CONFIG_SMBIOS=y
+ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+ CONFIG_PXB=y
+ CONFIG_ACPI_VMGENID=y
++CONFIG_CAPTURE=y
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 0aca984..9066aac 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1809,3 +1809,37 @@ ETEXI
+ STEXI
+ @end table
+ ETEXI
++
++    {
++        .name       = "capture_start",
++        .args_type  = "filename:F,fps:i?",
++        .params     = "filename [framerate]",
++        .help       = "Start video capture",
++        .cmd        = hmp_capture_start,
++    },
++
++STEXI
++@item capture_start @var{filename} [@var{framerate}]
++@findex capture_start
++Start video capture.
++Capture video into @var{filename} with framerate @var{framerate}.
++
++Defaults:
++@itemize @minus
++@item framerate = 60
++@end itemize
++ETEXI
++
++    {
++        .name       = "capture_stop",
++        .args_type  = "",
++        .params     = "",
++        .help       = "Stop video capture",
++        .cmd        = hmp_capture_stop,
++    },
++
++STEXI
++@item capture_stop
++@findex capture_stop
++Stop video capture.
++ETEXI
+diff --git a/hmp.h b/hmp.h
+index 799fd37..36c7a4d 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -138,5 +138,7 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
+ void hmp_info_dump(Monitor *mon, const QDict *qdict);
+ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
++void hmp_capture_start(Monitor *mon, const QDict *qdict);
++void hmp_capture_stop(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index 551c050..a918896 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -20,6 +20,8 @@ common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
+ 
+ common-obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
+ 
++obj-$(CONFIG_CAPTURE) += capture.o
++
+ obj-$(CONFIG_OMAP) += omap_dss.o
+ obj-$(CONFIG_OMAP) += omap_lcdc.o
+ obj-$(CONFIG_PXA2XX) += pxa2xx_lcd.o
+diff --git a/hw/display/capture.c b/hw/display/capture.c
+new file mode 100644
+index 0000000..c89aaa0
+--- /dev/null
++++ b/hw/display/capture.c
+@@ -0,0 +1,761 @@
++#include "capture.h"
++
++static void sound_capture_notify(void *opaque, audcnotification_e cmd)
++{
++    (void) opaque;
++    (void) cmd;
++}
++
++static void sound_capture_destroy(void *opaque)
++{
++    (void) opaque;
++}
++
++static void write_empty_sound(void *opaque, struct CaptureThreadWorkerData *data)
++{
++    AVFormatContext *oc = data->oc;
++    OutputStream *ost = &data->audio_stream;
++
++    AVFrame *tmp = ost->tmp_frame;
++    ost->tmp_frame = ost->empty_frame;
++    double newlen = write_audio_frame(oc, ost);
++    ost->tmp_frame = tmp;
++
++    if (newlen >= 0.0) {
++        data->video_len = newlen;
++    }
++}
++
++static void sound_capture_capture(void *opaque, void *buf, int size)
++{
++    int bufsize = size;
++    SoundCapture *wav = opaque;
++    AVFrame *frame;
++    int sampleCount;
++    double len1, len2, delta;
++    int8_t *q;
++    int buffpos;
++
++    /*int32_t n = 0;
++    int i = 0;
++    for(i=0;i<size;i++) {
++        int8_t a = ((int8_t*)buf)[i];
++        n+=a;
++    }
++    wav->bytes += size;
++    if(n==0)
++        return;
++    printf("%d\n",n);*/
++    frame = wav->data->audio_stream.tmp_frame;
++    sampleCount = frame->nb_samples * 4;
++
++    len1 = wav->data->video_len;
++    len2 = wav->data->video_len2;
++    delta = len1 - len2;
++
++    while (delta < 0.0) {
++        write_empty_sound(opaque, wav->data);
++
++        len1 = wav->data->video_len;
++        len2 = wav->data->video_len2;
++        delta = len1 - len2;
++    }
++
++    q = (int8_t *)frame->data[0];
++
++    buffpos = 0;
++    while (bufsize > 0) {
++        int start = wav->bufferPos;
++        int freeSpace = sampleCount - start;
++
++        int willWrite = freeSpace;
++        if (willWrite > bufsize) {
++            willWrite = bufsize;
++        }
++
++        memcpy(q + start, buf + buffpos, willWrite);
++        bufsize -= willWrite;
++        buffpos += willWrite;
++
++        freeSpace = sampleCount - start - willWrite;
++
++        if (freeSpace == 0) {
++            double newlen = write_audio_frame(wav->data->oc, &wav->data->audio_stream);
++
++            if (newlen >= 0.0) {
++                wav->data->video_len = newlen;
++            }
++            wav->bufferPos = 0;
++        } else {
++            wav->bufferPos = start + willWrite;
++        }
++    }
++}
++
++static void sound_capture_capture_destroy(void *opaque)
++{
++    SoundCapture *wav = opaque;
++
++    AUD_del_capture (wav->cap, wav);
++}
++
++static int sound_capture_start_capture(struct CaptureThreadWorkerData *data)
++{
++    Monitor *mon = cur_mon;
++    SoundCapture *wav;
++    struct audsettings as;
++    struct audio_capture_ops ops;
++    CaptureVoiceOut *cap;
++
++    as.freq = 44100;
++    as.nchannels = 2;
++    as.fmt = AUD_FMT_S16;
++    as.endianness = 0;
++
++    ops.notify = sound_capture_notify;
++    ops.capture = sound_capture_capture;
++    ops.destroy = sound_capture_destroy;
++
++    wav = g_malloc0(sizeof(*wav));
++
++
++    cap = AUD_add_capture(&as, &ops, wav);
++    if (!cap) {
++        monitor_printf(mon, "Failed to add audio capture\n");
++        goto error_free;
++    }
++
++    wav->bufferPos = 0;
++    wav->data = data;
++    wav->cap = cap;
++    data->soundCapture = wav;
++    return 0;
++
++error_free:
++    g_free(wav);
++    return -1;
++}
++
++static int write_frame(AVFormatContext *fmt_ctx, const AVRational *time_base,
++                        AVStream *st, AVPacket *pkt)
++{
++    /* rescale output packet timestamp values from codec to stream timebase */
++    av_packet_rescale_ts(pkt, *time_base, st->time_base);
++    pkt->stream_index = st->index;
++    /* Write the compressed frame to the media file. */
++    return av_interleaved_write_frame(fmt_ctx, pkt);
++}
++
++/* Add an output stream. */
++static void add_video_stream(OutputStream *ost, AVFormatContext *oc,
++                       AVCodec **codec,
++                       enum AVCodecID codec_id,
++                       int w, int h, int bit_rate, int framerate)
++{
++    AVCodecContext *c;
++    /* find the encoder */
++    *codec = avcodec_find_encoder(codec_id);
++    if (!(*codec)) {
++        fprintf(stderr, "Could not find encoder for '%s'\n",
++                avcodec_get_name(codec_id));
++        exit(1);
++    }
++    ost->st = avformat_new_stream(oc, *codec);
++    if (!ost->st) {
++        fprintf(stderr, "Could not allocate stream\n");
++        exit(1);
++    }
++    ost->st->id = oc->nb_streams - 1;
++    c = ost->st->codec;
++    if ((*codec)->type == AVMEDIA_TYPE_VIDEO) {
++        c->codec_id = codec_id;
++        c->bit_rate = bit_rate;
++        /* Resolution must be a multiple of two. */
++        c->width    = w;
++        c->height   = h;
++        /* timebase: This is the fundamental unit of time (in seconds) in terms
++         * of which frame timestamps are represented. For fixed-fps content,
++         * timebase should be 1/framerate and timestamp increments should be
++         * identical to 1. */
++        ost->st->time_base = (AVRational){ 1, framerate };
++        c->time_base = ost->st->time_base;
++        c->gop_size  = 12; /* emit one intra frame every 12 frames at most */
++        c->pix_fmt   = AV_PIX_FMT_YUV420P;
++        if (c->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
++            /* just for testing, we also add B frames */
++            c->max_b_frames = 2;
++        }
++        if (c->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
++            /* Needed to avoid using macroblocks in which some coeffs overflow.
++             * This does not happen with normal video, it just happens here as
++             * the motion of the chroma plane does not match the luma plane. */
++            c->mb_decision = 2;
++        }
++    } else {
++        fprintf(stderr, "Wrong stream type\n");
++        exit(1);
++    }
++    /* Some formats want stream headers to be separate. */
++    if (oc->oformat->flags & AVFMT_GLOBALHEADER) {
++        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
++    }
++}
++
++static void add_audio_stream(OutputStream *ost, AVFormatContext *oc,
++                             AVCodec **codec,
++                             enum AVCodecID codec_id)
++{
++    AVCodecContext *c;
++    int i;
++    /* find the encoder */
++    *codec = avcodec_find_encoder(codec_id);
++    if (!(*codec)) {
++        fprintf(stderr, "Could not find encoder for '%s'\n",
++                avcodec_get_name(codec_id));
++        exit(1);
++    }
++    ost->st = avformat_new_stream(oc, *codec);
++    if (!ost->st) {
++        fprintf(stderr, "Could not allocate stream\n");
++        exit(1);
++    }
++    ost->st->id = oc->nb_streams - 1;
++    c = ost->st->codec;
++    if ((*codec)->type == AVMEDIA_TYPE_AUDIO) {
++        c->sample_fmt = AV_SAMPLE_FMT_FLTP;
++        c->bit_rate    = 128000;
++        c->sample_rate = 44100;
++        c->channels    = av_get_channel_layout_nb_channels(c->channel_layout);
++        c->channel_layout = AV_CH_LAYOUT_STEREO;
++        if ((*codec)->channel_layouts) {
++            c->channel_layout = (*codec)->channel_layouts[0];
++            for (i = 0; (*codec)->channel_layouts[i]; i++) {
++                if ((*codec)->channel_layouts[i] == AV_CH_LAYOUT_STEREO) {
++                    c->channel_layout = AV_CH_LAYOUT_STEREO;
++                }
++            }
++        }
++        c->channels   = av_get_channel_layout_nb_channels(c->channel_layout);
++        ost->st->time_base = (AVRational){ 1, c->sample_rate };
++    } else {
++        fprintf(stderr, "Wrong stream type\n");
++        exit(1);
++    }
++    /* Some formats want stream headers to be separate. */
++    if (oc->oformat->flags & AVFMT_GLOBALHEADER) {
++        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
++    }
++}
++/**************************************************************/
++/* audio output */
++static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
++                                  uint64_t channel_layout,
++                                  int sample_rate, int nb_samples)
++{
++    AVFrame *frame = av_frame_alloc();
++    int ret;
++    if (!frame) {
++        fprintf(stderr, "Error allocating an audio frame\n");
++        exit(1);
++    }
++    frame->format = sample_fmt;
++    frame->channel_layout = channel_layout;
++    frame->sample_rate = sample_rate;
++    frame->nb_samples = nb_samples;
++    if (nb_samples) {
++        ret = av_frame_get_buffer(frame, 0);
++        if (ret < 0) {
++            fprintf(stderr, "Error allocating an audio buffer\n");
++            exit(1);
++        }
++    }
++    return frame;
++}
++
++static void open_audio(AVFormatContext *oc, AVCodec *codec,
++                       OutputStream *ost, AVDictionary *opt_arg)
++{
++    AVCodecContext *c;
++    int nb_samples;
++    int ret;
++    AVDictionary *opt = NULL;
++    c = ost->st->codec;
++    /* open it */
++    av_dict_copy(&opt, opt_arg, 0);
++    ret = avcodec_open2(c, codec, &opt);
++    av_dict_free(&opt);
++    if (ret < 0) {
++        fprintf(stderr, "Could not open audio codec: %s\n", av_err2str(ret));
++        exit(1);
++    }
++    nb_samples = c->frame_size;
++    ost->frame     = alloc_audio_frame(c->sample_fmt, c->channel_layout,
++                                       c->sample_rate, nb_samples);
++
++    ost->tmp_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, c->channel_layout,
++                                       c->sample_rate, nb_samples);
++    ost->tmp_frame->pts = 0;
++
++    ost->empty_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, c->channel_layout,
++                                       c->sample_rate, nb_samples);
++    int sampleCount = nb_samples * 4;
++    int8_t *q = (int8_t *)ost->empty_frame->data[0];
++    memset(q, 0, sampleCount);
++
++    /* create resampler context */
++    ost->swr_ctx = swr_alloc();
++    if (!ost->swr_ctx) {
++        fprintf(stderr, "Could not allocate resampler context\n");
++        exit(1);
++    }
++    /* set options */
++    av_opt_set_int       (ost->swr_ctx, "in_channel_count",  c->channels,       0);
++    av_opt_set_int       (ost->swr_ctx, "in_sample_rate",    c->sample_rate,    0);
++    av_opt_set_sample_fmt(ost->swr_ctx, "in_sample_fmt",     AV_SAMPLE_FMT_S16, 0);
++    av_opt_set_int       (ost->swr_ctx, "out_channel_count", c->channels,       0);
++    av_opt_set_int       (ost->swr_ctx, "out_sample_rate",   c->sample_rate,    0);
++    av_opt_set_sample_fmt(ost->swr_ctx, "out_sample_fmt",    c->sample_fmt,     0);
++    /* initialize the resampling context */
++    if (swr_init(ost->swr_ctx) < 0) {
++        fprintf(stderr, "Failed to initialize the resampling context\n");
++        exit(1);
++    }
++}
++
++/*
++ * encode one audio frame and send it to the muxer
++ */
++static double write_audio_frame(AVFormatContext *oc, OutputStream *ost)
++{
++    AVCodecContext *c;
++    AVPacket pkt = { 0 };
++    AVFrame *frame;
++    int ret;
++    int got_packet;
++    int dst_nb_samples;
++    av_init_packet(&pkt);
++    c = ost->st->codec;
++    frame = ost->tmp_frame;
++    frame->pts = frame->pts + 1;
++    double videolen = -1.0;
++    if (frame) {
++        /* convert samples from native format to destination codec format,
++         * using the resampler */
++        /* compute destination number of samples */
++        dst_nb_samples = av_rescale_rnd(
++            swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples,
++            c->sample_rate, c->sample_rate, AV_ROUND_UP);
++        av_assert0(dst_nb_samples == frame->nb_samples);
++        /* when we pass a frame to the encoder, it may keep a reference to it
++         * internally;
++         * make sure we do not overwrite it here
++         */
++        ret = av_frame_make_writable(ost->frame);
++        if (ret < 0) {
++            exit(1);
++        }
++        /* convert to destination format */
++        ret = swr_convert(ost->swr_ctx,
++                          ost->frame->data, dst_nb_samples,
++                          (const uint8_t **)frame->data, frame->nb_samples);
++        if (ret < 0) {
++            fprintf(stderr, "Error while converting\n");
++            exit(1);
++        }
++        frame = ost->frame;
++        frame->pts = av_rescale_q(ost->samples_count,
++                                  (AVRational){1, c->sample_rate},
++                                  c->time_base);
++
++        videolen = (double)frame->pts / c->sample_rate;
++        ost->samples_count += dst_nb_samples;
++    }
++    ret = avcodec_encode_audio2(c, &pkt, frame, &got_packet);
++    if (ret < 0) {
++        fprintf(stderr, "Error encoding audio frame: %s\n", av_err2str(ret));
++        exit(1);
++    }
++    if (got_packet) {
++        ret = write_frame(oc, &c->time_base, ost->st, &pkt);
++        if (ret < 0) {
++            fprintf(stderr, "Error while writing audio frame: %s\n",
++                    av_err2str(ret));
++            exit(1);
++        }
++    }
++    return videolen;
++}
++static void write_delayed_audio_frames(void)
++{
++    struct CaptureThreadWorkerData *data = capture_get_data();
++    AVFormatContext *oc = data->oc;
++    OutputStream *ost = &data->audio_stream;
++    AVCodecContext *c = ost->st->codec;
++
++    AVPacket pkt = { 0 };
++    pkt.data = NULL;
++    pkt.size = 0;
++    av_init_packet(&pkt);
++    int got_output = 1;
++    int ret;
++    while (got_output) {
++
++        ret = avcodec_encode_audio2(c, &pkt, NULL, &got_output);
++        if (ret < 0) {
++            fprintf(stderr, "Error encoding frame\n");
++            exit(1);
++        }
++
++        if (got_output) {
++            ret = write_frame(oc, &c->time_base, ost->st, &pkt);
++            av_free_packet(&pkt);
++        }
++    }
++}
++/**************************************************************/
++/* video output */
++static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt, int width, int height)
++{
++    AVFrame *picture;
++    int ret;
++    picture = av_frame_alloc();
++    if (!picture) {
++        return NULL;
++    }
++    picture->format = pix_fmt;
++    picture->width  = width;
++    picture->height = height;
++    /* allocate the buffers for the frame data */
++    ret = av_frame_get_buffer(picture, 32);
++    if (ret < 0) {
++        fprintf(stderr, "Could not allocate frame data.\n");
++        exit(1);
++    }
++    return picture;
++}
++
++static void open_video(AVFormatContext *oc, AVCodec *codec,
++                       OutputStream *ost, AVDictionary *opt_arg)
++{
++    int ret;
++    AVCodecContext *c = ost->st->codec;
++    AVDictionary *opt = NULL;
++    av_dict_copy(&opt, opt_arg, 0);
++    /* open the codec */
++    ret = avcodec_open2(c, codec, &opt);
++    av_dict_free(&opt);
++    if (ret < 0) {
++        fprintf(stderr, "Could not open video codec: %s\n", av_err2str(ret));
++        exit(1);
++    }
++    /* allocate and init a re-usable frame */
++    ost->frame = alloc_picture(c->pix_fmt, c->width, c->height);
++    if (!ost->frame) {
++        fprintf(stderr, "Could not allocate video frame\n");
++        exit(1);
++    }
++}
++
++static AVFrame *get_filled_image(void)
++{
++    QemuConsole *con = qemu_console_lookup_by_index(0);
++    DisplaySurface *surface;
++    surface = qemu_console_surface(con);
++
++    if (con == NULL) {
++        fprintf(stderr, "There is no QemuConsole I can screendump from.\n");
++        return NULL;
++    }
++
++    int ourW = pixman_image_get_width(surface->image);
++    int ourH = pixman_image_get_height(surface->image);
++
++    AVFrame *pict = alloc_picture(AV_PIX_FMT_RGB32, ourW, ourH);
++    av_frame_make_writable(pict);
++
++    uint8_t* picdata = (uint8_t *)pixman_image_get_data(surface->image);
++
++    memcpy(pict->data[0], picdata, ourW * ourH * 4);
++    return pict;
++}
++
++static AVFrame *get_video_frame(OutputStream *ost, int64_t frame)
++{
++    AVCodecContext *c = ost->st->codec;
++
++    AVFrame *pict = get_filled_image();
++    if (pict == NULL) {
++        return NULL;
++    }
++
++    struct SwsContext *swsContext = sws_getContext(
++        pict->width, pict->height, pict->format,
++        ost->frame->width, ost->frame->height,
++        ost->frame->format, SWS_BICUBIC, NULL, NULL, NULL);
++    sws_scale(swsContext, (const uint8_t * const *)pict->data,
++              pict->linesize , 0, c->height, ost->frame->data,
++              ost->frame->linesize);
++
++    av_frame_free(&pict);
++    sws_freeContext(swsContext);
++
++    if (frame <= ost->frame->pts) {
++        ost->frame->pts = ost->frame->pts + 1;
++    } else {
++        ost->frame->pts = frame;
++    }
++
++    return ost->frame;
++}
++/*
++ * encode one video frame and send it to the muxer
++ */
++static void write_video_frame(AVFormatContext *oc,
++                              OutputStream *ost, int frameNumber)
++{
++    int ret;
++    AVCodecContext *c;
++    AVFrame *frame;
++    int got_packet = 0;
++    AVPacket pkt = { 0 };
++
++    frame = get_video_frame(ost, frameNumber);
++    if (frame == NULL) {
++        return;
++    }
++
++    c = ost->st->codec;
++    av_init_packet(&pkt);
++    /* encode the image */
++    ret = avcodec_encode_video2(c, &pkt, frame, &got_packet);
++    if (ret < 0) {
++        fprintf(stderr, "Error encoding video frame: %s\n", av_err2str(ret));
++        exit(1);
++    }
++    if (got_packet) {
++        ret = write_frame(oc, &c->time_base, ost->st, &pkt);
++    } else {
++        ret = 0;
++    }
++    if (ret < 0) {
++        fprintf(stderr, "Error while writing video frame: %s\n", av_err2str(ret));
++        return;
++    }
++}
++
++static void write_delayed_video_frames(void)
++{
++    struct CaptureThreadWorkerData *data = capture_get_data();
++    AVFormatContext *oc = data->oc;
++    OutputStream *ost = &data->stream;
++    AVCodecContext *c = ost->st->codec;
++
++    AVPacket pkt = { 0 };
++    pkt.data = NULL;
++    pkt.size = 0;
++    av_init_packet(&pkt);
++    int got_output = 1;
++    int ret;
++    while (got_output) {
++        ret = avcodec_encode_video2(c, &pkt, NULL, &got_output);
++        if (ret < 0) {
++            fprintf(stderr, "Error encoding frame\n");
++            exit(1);
++        }
++
++        if (got_output) {
++            ret = write_frame(oc, &c->time_base, ost->st, &pkt);
++            av_free_packet(&pkt);
++        }
++    }
++}
++
++static void close_stream(AVFormatContext *oc, OutputStream *ost)
++{
++    avcodec_close(ost->st->codec);
++    av_frame_free(&ost->frame);
++    av_frame_free(&ost->tmp_frame);
++    sws_freeContext(ost->sws_ctx);
++    swr_free(&ost->swr_ctx);
++}
++
++static int ends_with(const char *str, const char *suffix)
++{
++    if (!str || !suffix) {
++        return 0;
++    }
++    size_t lenstr = strlen(str);
++    size_t lensuffix = strlen(suffix);
++    if (lensuffix >  lenstr) {
++        return 0;
++    }
++    return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
++}
++
++static struct CaptureThreadWorkerData *capture_get_data(void)
++{
++    static struct CaptureThreadWorkerData data = {0};
++    return &data;
++}
++
++static void capture_timer(void *p)
++{
++    struct CaptureThreadWorkerData *data = (struct CaptureThreadWorkerData *)p;
++    if (!data->is_capturing) {
++        return;
++    }
++
++    int64_t n = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++    int64_t intdelta = (n - data->time) / 100000;
++    double delta = (double)intdelta / 10000;
++    data->delta += delta;
++    data->time   = n;
++
++    while (data->delta > (1.0 / data->framerate)) {
++        data->delta -= 1.0 / data->framerate;
++
++        av_frame_make_writable(data->stream.frame);
++        write_video_frame(data->oc, &data->stream,
++            (int)(floor(data->video_len * (double)data->framerate + 0.5)));
++    }
++    data->video_len2 = data->video_len2 + delta;
++
++    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++    if (data->is_capturing) {
++        timer_mod_ns(data->timer, now + 10000000);
++    }
++}
++
++static void capture_powerdown_req(void)
++{
++    if (capture_stop()) {
++        printf("Capture stoped\n");
++    }
++}
++
++void hmp_capture_start(Monitor *mon, const QDict *qdict)
++{
++    const char *filename = qdict_get_str(qdict, "filename");
++    int framerate = qdict_get_try_int(qdict, "fps", 60);
++
++    struct CaptureThreadWorkerData *data = capture_get_data();
++    if (!data->is_loaded) {
++        av_register_all();
++        avcodec_register_all();
++        data->codec = avcodec_find_encoder(AV_CODEC_ID_H264);
++        if (!data->codec) {
++            fprintf(stderr, "codec not found\n");
++            return;
++        }
++        data->c = NULL;
++        data->is_loaded = 1;
++        atexit(capture_powerdown_req);
++    }
++
++    if (data->is_capturing == 0) {
++        if (!ends_with(filename, ".mp4")
++         && !ends_with(filename, ".mpg")
++         && !ends_with(filename, ".avi")) {
++            monitor_printf(mon, "Invalid file format, use .mp4 or .mpg\n");
++            return;
++        }
++        if (framerate != 60 && framerate != 30
++         && framerate != 24 && framerate != 25) {
++            monitor_printf(mon, "Invalid framerate, valid values are: 24, 25, 30, 60\n");
++            return;
++        }
++        monitor_printf(mon, "Capture started to file: %s\n", filename);
++
++        data->framerate = framerate;
++        data->frame = 0;
++
++        data->delta = 0.0;
++        data->time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++
++        data->video_len = 0.0;
++        data->video_len2 = 0.0;
++
++        QemuConsole *con = qemu_console_lookup_by_index(0);
++        DisplaySurface *surface;
++        surface = qemu_console_surface(con);
++        int resW = pixman_image_get_width(surface->image);
++        int resH = pixman_image_get_height(surface->image);
++
++        OutputStream video_st = { 0 };
++        data->stream = video_st;
++        OutputStream audio_st = { 0 };
++        data->audio_stream = audio_st;
++
++        avformat_alloc_output_context2(&data->oc, NULL, "avi", filename);
++        AVOutputFormat *fmt;
++        fmt = data->oc->oformat;
++
++        add_video_stream(&data->stream, data->oc, &data->codec,
++                         fmt->video_codec, resW, resH, 4000000, framerate);
++        add_audio_stream(&data->audio_stream, data->oc, &data->audio_codec,
++                         fmt->audio_codec);
++
++        open_video(data->oc, data->codec, &data->stream, NULL);
++        open_audio(data->oc, data->audio_codec, &data->audio_stream, NULL);
++
++        int ret = avio_open(&data->oc->pb, filename, AVIO_FLAG_WRITE);
++        if (ret < 0) {
++            fprintf(stderr, "Could not open '%s': %s\n", filename,
++                    av_err2str(ret));
++            return;
++        }
++        ret = avformat_write_header(data->oc, NULL);
++        if (ret < 0) {
++            fprintf(stderr, "Error occurred when opening output file: %s\n",
++                    av_err2str(ret));
++            return;
++        }
++
++        data->is_capturing = 1;
++
++        if (data->timer) {
++            timer_free(data->timer);
++        }
++        data->timer = timer_new_ns(QEMU_CLOCK_REALTIME, capture_timer, data);
++        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++        timer_mod_ns(data->timer, now + 1000000000 / data->framerate);
++
++        sound_capture_start_capture(data);
++    } else {
++        monitor_printf(mon, "Already capturing\n");
++    }
++}
++
++static int capture_stop(void)
++{
++    struct CaptureThreadWorkerData *data = capture_get_data();
++    if (!data->is_loaded) {
++        return 0;
++    }
++
++    if (data->is_capturing) {
++        data->is_capturing = 0;
++
++        write_delayed_video_frames();
++        write_delayed_audio_frames();
++
++        av_write_trailer(data->oc);
++        close_stream(data->oc, &data->stream);
++        close_stream(data->oc, &data->audio_stream);
++        avio_closep(&data->oc->pb);
++        avformat_free_context(data->oc);
++
++        sound_capture_capture_destroy(data->soundCapture);
++        return 1;
++    }
++    return 0;
++}
++
++void hmp_capture_stop(Monitor *mon, const QDict *qdict)
++{
++    if (capture_stop()) {
++        monitor_printf(mon, "Capture stopped\n");
++    } else {
++        monitor_printf(mon, "Not capturing\n");
++    }
++}
+diff --git a/hw/display/capture.h b/hw/display/capture.h
+new file mode 100644
+index 0000000..73c79f1
+--- /dev/null
++++ b/hw/display/capture.h
+@@ -0,0 +1,78 @@
++#ifndef CAPTURE_H
++#define CAPTURE_H
++
++#include "qemu/osdep.h"
++#include "monitor/monitor.h"
++#include "ui/console.h"
++#include "qemu/timer.h"
++#include "audio/audio.h"
++
++#include <libavcodec/avcodec.h>
++#include <libavformat/avformat.h>
++#include "libavutil/frame.h"
++#include "libavutil/imgutils.h"
++#include <libswscale/swscale.h>
++#include <libavutil/avassert.h>
++#include <libavutil/channel_layout.h>
++#include <libavutil/opt.h>
++#include <libavutil/mathematics.h>
++#include <libavutil/timestamp.h>
++#include <libswresample/swresample.h>
++
++void hmp_capture_start(Monitor *mon, const QDict *qdict);
++void hmp_capture_stop(Monitor *mon, const QDict *qdict);
++
++typedef struct OutputStream {
++    AVStream *st;
++    int samples_count;
++    AVFrame *frame;
++    AVFrame *tmp_frame;
++    AVFrame *empty_frame;
++    struct SwsContext *sws_ctx;
++    struct SwrContext *swr_ctx;
++} OutputStream;
++
++struct CaptureThreadWorkerData {
++    QEMUTimer *timer;
++    int frame;
++    int is_loaded;
++    int is_capturing;
++    int framerate;
++    double video_len;
++    double video_len2;
++    CaptureState *wavCapture;
++
++    AVCodec *codec;
++    AVCodecContext *c;
++
++    AVFrame *picture;
++    AVPacket pkt;
++
++    AVCodec *audio_codec;
++    OutputStream stream;
++    OutputStream audio_stream;
++    AVFormatContext *oc;
++
++    int64_t time;
++    double delta;
++
++    void *soundCapture;
++};
++
++typedef struct {
++    int bytes;
++    CaptureVoiceOut *cap;
++    struct CaptureThreadWorkerData *data;
++    int bufferPos;
++} SoundCapture;
++
++static int sound_capture_start_capture(struct CaptureThreadWorkerData *data);
++static int ends_with(const char *str, const char *suffix);
++static struct CaptureThreadWorkerData *capture_get_data(void);
++static void write_delayed_audio_frames(void);
++static void write_delayed_video_frames(void);
++static int capture_stop(void);
++static double write_audio_frame(AVFormatContext *oc, OutputStream *ost);
++static void write_empty_sound(void *opaque, struct CaptureThreadWorkerData* data);
++
++#endif
+-- 
+2.7.4
