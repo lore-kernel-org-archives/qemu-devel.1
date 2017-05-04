@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FAn-0003gt-Kv
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:54 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FAy-0003r1-9M
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:44:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FAm-0004bS-NP
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40802)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FAt-0004dc-6o
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:44:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47405)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1d6FAm-0004b2-H4
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:52 -0400
+	id 1d6FAt-0004dR-0q
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:43:59 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  4 May 2017 15:42:22 +0400
-Message-Id: <20170504114232.20318-12-marcandre.lureau@redhat.com>
+Date: Thu,  4 May 2017 15:42:23 +0400
+Message-Id: <20170504114232.20318-13-marcandre.lureau@redhat.com>
 In-Reply-To: <20170504114232.20318-1-marcandre.lureau@redhat.com>
 References: <20170504114232.20318-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/21] char-socket: introduce
- update_disconnected_filename()
+Subject: [Qemu-devel] [PULL 12/21] char-socket: update local address after
+ listen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +31,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This helper will be used in yet another place in the following patch.
+This is mainly useful to know the actual bound port when using port 0.
+
+For example, when starting qemu with socket on port 0, before:
+QEMU waiting for connection on: disconnected:tcp:localhost:0,server
+After:
+QEMU waiting for connection on: disconnected:tcp:localhost:32454,server
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- chardev/char-socket.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ chardev/char-socket.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 2789eb1f40..511a82960d 100644
+index 511a82960d..f24961ad16 100644
 --- a/chardev/char-socket.c
 +++ b/chardev/char-socket.c
-@@ -366,6 +366,15 @@ static char *SocketAddress_to_str(const char *prefix=
-, SocketAddress *addr,
-     }
- }
-=20
-+static void update_disconnected_filename(SocketChardev *s)
-+{
-+    Chardev *chr =3D CHARDEV(s);
-+
-+    g_free(chr->filename);
-+    chr->filename =3D SocketAddress_to_str("disconnected:", s->addr,
-+                                         s->is_listen, s->is_telnet);
-+}
-+
- static void tcp_chr_disconnect(Chardev *chr)
+@@ -911,6 +911,11 @@ static void qmp_chardev_open_socket(Chardev *chr,
+             if (qio_channel_socket_listen_sync(sioc, s->addr, errp) < 0)=
  {
-     SocketChardev *s =3D SOCKET_CHARDEV(chr);
-@@ -380,8 +389,7 @@ static void tcp_chr_disconnect(Chardev *chr)
-         s->listen_tag =3D qio_channel_add_watch(
-             QIO_CHANNEL(s->listen_ioc), G_IO_IN, tcp_chr_accept, chr, NU=
-LL);
-     }
--    chr->filename =3D SocketAddress_to_str("disconnected:", s->addr,
--                                         s->is_listen, s->is_telnet);
-+    update_disconnected_filename(s);
-     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-     if (s->reconnect_time) {
-         qemu_chr_socket_restart_timer(chr);
-@@ -875,8 +883,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-     /* be isn't opened until we get a connection */
-     *be_opened =3D false;
-=20
--    chr->filename =3D SocketAddress_to_str("disconnected:",
--                                         addr, is_listen, is_telnet);
-+    update_disconnected_filename(s);
-=20
-     if (is_listen) {
-         if (is_telnet) {
+                 goto error;
+             }
++
++            qapi_free_SocketAddress(s->addr);
++            s->addr =3D socket_local_address(sioc->fd, errp);
++            update_disconnected_filename(s);
++
+             s->listen_ioc =3D sioc;
+             if (is_waitconnect &&
+                 qemu_chr_wait_connected(chr, errp) < 0) {
 --=20
 2.12.0.191.gc5d8de91d
