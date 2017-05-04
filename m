@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d6MbK-0005MK-O7
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:39:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d6Me8-0007E6-T3
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:42:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d6MbH-0005yh-ME
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:39:46 -0400
-Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:33276)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1d6MbH-0005yN-GM
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:39:43 -0400
-Received: by mail-io0-x22a.google.com with SMTP id p24so35537107ioi.0
-	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 12:39:43 -0700 (PDT)
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <4E2A0E2A-7A9D-4340-8FC8-A2B0C9DB8271@gmail.com>
-Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Thu, 4 May 2017 15:39:38 -0400
-Subject: [Qemu-devel] risugen: test only instructions that begin with the
- letter F
+	(envelope-from <ehabkost@redhat.com>) id 1d6Me5-0007CS-Q3
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:42:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d6Me5-0007CK-GY
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 15:42:37 -0400
+Date: Thu, 4 May 2017 16:42:34 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170504194234.GC11869@thinpad.lan.raisama.net>
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+	<20170502203115.22233-3-ehabkost@redhat.com>
+	<87y3udsz3k.fsf@dusky.pond.sub.org>
+	<20170503183037.GV3482@thinpad.lan.raisama.net>
+	<87vaphm4fs.fsf@dusky.pond.sub.org>
+	<0778f9a5-d974-9beb-ae94-b8e46de7b75d@redhat.com>
+	<871ss4d9gc.fsf@dusky.pond.sub.org>
+	<20170504141056.GZ3482@thinpad.lan.raisama.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170504141056.GZ3482@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support
+ alternate types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,9 +34,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-I'm trying to test all the floating point instructions only. They  
-tend to begin with the letter f. Is there a way to have risugen only  
-use instructions that begin with the letter F?
+On Thu, May 04, 2017 at 11:10:56AM -0300, Eduardo Habkost wrote:
+> On Thu, May 04, 2017 at 03:42:59PM +0200, Markus Armbruster wrote:
+> > Eric Blake <eblake@redhat.com> writes:
+> > 
+> > > On 05/04/2017 03:06 AM, Markus Armbruster wrote:
+> > >> Eduardo Habkost <ehabkost@redhat.com> writes:
+> > >> 
+> > >>> On Wed, May 03, 2017 at 06:07:43PM +0200, Markus Armbruster wrote:
+> > >>>> Eduardo Habkost <ehabkost@redhat.com> writes:
+> > >>>>
+> > >>>>> When parsing alternates from a string, there are some limitations in
+> > >>>>> what we can do, but it is a valid use case in some situations. We can
+> > >>>>> support booleans, integer types, and enums.
+> > >> 
+> > >> By the way, the same restrictions apply to the "keyval" variant of the
+> > >> QObject input visitor.  It's a known problem stated here:
+> > >> 
+> > >>     Message-ID: <8737exuz6u.fsf@dusky.pond.sub.org>
+> > >>     https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00046.html
+> > >> 
+> > >> However, I failed to document it properly in the source.
+> > >> 
+> > >
+> > >>>> Begs the question what happens when you violate these restrictions.
+> > >>>
+> > >>> Right now, we don't detect those cases and behavior is undefined.
+> > >>> I think it will be a good idea to give start_alternate() enough
+> > >>> information to detect those cases (by adding a 'const char *const
+> > >>> enum_table[]' parameter).
+> > >> 
+> > >> Alternate types that won't work with the string input visitor can be
+> > >> detected at compile time (by qapi.py), but not their actual use.  Pity.
+> > >> 
+> > >> Do we actually use alternates that violate the restrictions?  If not, we
+> > >> could simply restrict alternates so they work with *all* visitors.  If
+> > >> we ever run into an actual need for alternates that don't, we'll be no
+> > >> worse off than now.
+> > >> 
+> > >> Let's review existing alternates outside tests:
+> > >> 
+> > >> * Qcow2OverlapChecks: struct + enum
+> > >> * BlockdevRef: struct + str
+> > >> * GuestFileWhence: int + enum (all enum members start with a letter)
+> > >> 
+> > >> Restricting alternates looks practical to me.  Eric, what do you think?
+> > >
+> > > As in: we forbid the combination of a scalar (whether 'int', 'number',
+> > > 'bool', and perhaps 'null') with a plain 'str' (since there's no way to
+> > > tell whether '1' should parse as an integer or the string "1"); and
+> > > combining a scalar with an 'enum' requires that all enum members be
+> > > distinct from what could otherwise be parsed as a scalar?
+> > 
+> > Exactly.
+> > 
+> > >                                                            I can live
+> > > with such a restriction.
+> > 
+> > Then let's do it.
+> > 
+> > Eduardo, are you comfortable implementing this, or would you like me to
+> > do it?
+> 
+> I will give it a try and include it in the next version. Thanks!
+
+So, I made qapi.py detect ambiguous alternates[1]. The bad news
+is that lots of the alternates in qapi-schema-test.json already
+break those rules. This will require changing the schema and
+rewriting tests in test-clone-visitor and qobject-input-visitor.
+
+I think there's a small risk we will want to support some of
+those forbidden alternate combinations again in the future. If
+that happens, detecting them at runtime in string-input-visitor
+will keep us safe.
+
+I plan to submit v2 with code to detect ambiguous alternates at
+runtime, only, because it seems simpler than rewriting the test
+code. After that, we can still make QAPI reject them at compile
+time too, if we really want to.
+
+[1] https://github.com/ehabkost/qemu-hacks/commit/cda70a2e1c30c8dadb36fd46095a4f6ee3d89737
+
+-- 
+Eduardo
