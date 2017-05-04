@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6HFR-0007NI-OO
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:56:50 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1d6HJM-0000j4-P4
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6HFO-0006iW-OP
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:56:49 -0400
-Date: Thu, 4 May 2017 14:56:43 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170504135642.GN32376@stefanha-x1.localdomain>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-9-pbonzini@redhat.com>
-	<20170504065748.GC19184@lemon.lan>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Y4VYWfdFdHwFhC6D"
-Content-Disposition: inline
-In-Reply-To: <20170504065748.GC19184@lemon.lan>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 08/17] throttle-groups:
- protect throttled requests with a CoMutex
+	(envelope-from <pkrempa@redhat.com>) id 1d6HJH-0007fs-3D
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:00:52 -0400
+From: Peter Krempa <pkrempa@redhat.com>
+Date: Thu,  4 May 2017 16:00:06 +0200
+Message-Id: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: curl: Allow passing cookies via
+ QCryptoSecret
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +18,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, berrange@redhat.com, Peter Krempa <pkrempa@redhat.com>
 
+Since cookies can contain sensitive data (session ID, etc ...) it is
+desired to hide them from the prying eyes of users. Add a possibility to
+pass them via the secret infrastructure.
 
---Y4VYWfdFdHwFhC6D
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1447413
 
-On Thu, May 04, 2017 at 02:57:48PM +0800, Fam Zheng wrote:
-> On Thu, 04/20 14:00, Paolo Bonzini wrote:
-> > diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-back=
-end.h
-> > index 87a43b0..e9529fb 100644
-> > --- a/include/sysemu/block-backend.h
-> > +++ b/include/sysemu/block-backend.h
-> > @@ -72,11 +72,8 @@ typedef struct BlockDevOps {
-> >   * fields that must be public. This is in particular for QLIST_ENTRY()=
- and
-> >   * friends so that BlockBackends can be kept in lists outside block-ba=
-ckend.c */
-> >  typedef struct BlockBackendPublic {
-> > -    /* I/O throttling has its own locking, but also some fields are
-> > -     * protected by the AioContext lock.
-> > -     */
-> > -
-> > -    /* Protected by AioContext lock.  */
-> > +    /* reqs_lock protects the CoQueues for throttled requests.  */
-> > +    CoMutex      reqs_lock;
->=20
-> Bikeshedding: will it be more readable if it's called throttled_reqs_lock=
- or
-> throttled_lock?
+Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+---
+ block/curl.c         | 24 +++++++++++++++++++++++-
+ qapi/block-core.json | 12 ++++++++++--
+ 2 files changed, 33 insertions(+), 3 deletions(-)
 
-Yes, please.
+diff --git a/block/curl.c b/block/curl.c
+index 2708d57c2f..483640b14a 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -85,6 +85,7 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+ #define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
+ #define CURL_BLOCK_OPT_TIMEOUT "timeout"
+ #define CURL_BLOCK_OPT_COOKIE    "cookie"
++#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
+ #define CURL_BLOCK_OPT_USERNAME "username"
+ #define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
+ #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
+@@ -624,6 +625,11 @@ static QemuOptsList runtime_opts = {
+             .help = "Pass the cookie or list of cookies with each request"
+         },
+         {
++            .name = CURL_BLOCK_OPT_COOKIE_SECRET,
++            .type = QEMU_OPT_STRING,
++            .help = "ID of secret used as cookie passed with each request"
++        },
++        {
+             .name = CURL_BLOCK_OPT_USERNAME,
+             .type = QEMU_OPT_STRING,
+             .help = "Username for HTTP auth"
+@@ -657,6 +663,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     Error *local_err = NULL;
+     const char *file;
+     const char *cookie;
++    const char *cookie_secret;
+     double d;
+     const char *secretid;
+     const char *protocol_delimiter;
+@@ -693,7 +700,22 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY, true);
 
-Stefan
+     cookie = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE);
+-    s->cookie = g_strdup(cookie);
++    cookie_secret = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE_SECRET);
++
++    if (cookie && cookie_secret) {
++        error_setg(errp,
++                   "curl driver cannot handle both cookie and cookie secret");
++        goto out_noclean;
++    }
++
++    if (cookie_secret) {
++        s->cookie = qcrypto_secret_lookup_as_utf8(cookie_secret, errp);
++        if (!s->cookie) {
++            goto out_noclean;
++        }
++    } else {
++        s->cookie = g_strdup(cookie);
++    }
 
---Y4VYWfdFdHwFhC6D
-Content-Type: application/pgp-signature; name="signature.asc"
+     file = qemu_opt_get(opts, CURL_BLOCK_OPT_URL);
+     if (file == NULL) {
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 87fb747ab6..b1643d2032 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2782,11 +2782,15 @@
+ #               "name1=content1; name2=content2;" as explained by
+ #               CURLOPT_COOKIE(3). Defaults to no cookies.
+ #
++# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
++#                 secure way. See @cookie for the format. (since 2.10)
++#
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsCurlHttp',
+   'base': 'BlockdevOptionsCurlBase',
+-  'data': { '*cookie': 'str' } }
++  'data': { '*cookie': 'str',
++            '*cookie-secret': 'str'} }
 
------BEGIN PGP SIGNATURE-----
+ ##
+ # @BlockdevOptionsCurlHttps:
+@@ -2801,12 +2805,16 @@
+ # @sslverify:   Whether to verify the SSL certificate's validity (defaults to
+ #               true)
+ #
++# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
++#                 secure way. See @cookie for the format. (since 2.10)
++#
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsCurlHttps',
+   'base': 'BlockdevOptionsCurlBase',
+   'data': { '*cookie': 'str',
+-            '*sslverify': 'bool' } }
++            '*sslverify': 'bool',
++            '*cookie-secret': 'str'} }
 
-iQEcBAEBAgAGBQJZCzMaAAoJEJykq7OBq3PILuoH/jTATt6CIMJFY64htLunueRM
-/JI/bmsZjXsbKs5pU4XzRQd8WukE/pnFvPISIo/+sIcmXeFQ4scBC8jaZJaHnZRO
-PPN+McsAQTtmeR8cWysekHoMJ2E9MvHQDdqS+U9sQH/ucs7gaXJaQSFWqVlK2TPC
-QWoACTKheGwmmGMDIwwSpS38y3GiCI6lTz7OE6uI0JXUR5eBdXPMQ2J66dWWxwB1
-PXPtPU8+JTP5vCeBo76rfwXLf/wgKVkPVHet+YVkK5ZH6hyhOu4BMDjRIHPFrDq0
-JfKUlh3pPet5l1BUv3iJwX+MjuViK9WTph5+0YzGtzbcNBr+Qa07rb7mK+nA56w=
-=E0mO
------END PGP SIGNATURE-----
-
---Y4VYWfdFdHwFhC6D--
+ ##
+ # @BlockdevOptionsCurlFtp:
+-- 
+2.12.2
