@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6EPf-0004w2-DJ
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:55:12 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d6ETA-0000Nd-HP
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:58:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6EPe-0001YD-Gu
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:55:11 -0400
-Date: Thu, 4 May 2017 18:54:58 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170504105458.GA6865@lemon.lan>
-References: <20170504102339.31971-1-stefanha@redhat.com>
-	<22096620-8f3b-88b2-3e6d-e40869b567c2@redhat.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1d6ET5-0003s9-R9
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:58:48 -0400
+Received: from mga06.intel.com ([134.134.136.31]:39830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1d6ET5-0003qj-GE
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 06:58:43 -0400
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Thu, 4 May 2017 10:58:37 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F7391FDD30@shsmsx102.ccr.corp.intel.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <22096620-8f3b-88b2-3e6d-e40869b567c2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] aio: add missing aio_notify() to
- aio_enable_external()
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] virtio-net: configurable TX queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Jan Scheurich <jan.scheurich@ericsson.com>
 
-On Thu, 05/04 12:36, Paolo Bonzini wrote:
-> 
-> 
-> On 04/05/2017 12:23, Stefan Hajnoczi wrote:
-> > The main loop uses aio_disable_external()/aio_enable_external() to
-> > temporarily disable processing of external AioContext clients like
-> > device emulation.
-> > 
-> > This allows monitor commands to quiesce I/O and prevent the guest from
-> > submitting new requests while a monitor command is in progress.
-> > 
-> > The aio_enable_external() API is currently broken when an IOThread is in
-> > aio_poll() waiting for fd activity when the main loop re-enables
-> > external clients.  Incrementing ctx->external_disable_cnt does not wake
-> > the IOThread from ppoll(2) so fd processing remains suspended and leads
-> > to unresponsive emulated devices.
-> > 
-> > This patch adds an aio_notify() call to aio_enable_external() so the
-> > IOThread is kicked out of ppoll(2) and will re-arm the file descriptors.
-> > 
-> > The bug can be reproduced as follows:
-> > 
-> >   $ qemu -M accel=kvm -m 1024 \
-> >          -object iothread,id=iothread0 \
-> >          -device virtio-scsi-pci,iothread=iothread0,id=virtio-scsi-pci0 \
-> >          -drive if=none,id=drive0,aio=native,cache=none,format=raw,file=test.img \
-> >          -device scsi-hd,id=scsi-hd0,drive=drive0 \
-> >          -qmp tcp::5555,server,nowait
-> > 
-> >   $ scripts/qmp/qmp-shell localhost:5555
-> >   (qemu) blockdev-snapshot-sync device=drive0 snapshot-file=sn1.qcow2
-> >          mode=absolute-paths format=qcow2
-> > 
-> > After blockdev-snapshot-sync completes the SCSI disk will be
-> > unresponsive.  This leads to request timeouts inside the guest.
-> 
-> I agree this is the minimal fix and is the right thing to do.  The
-> bdrv_drained_begin/end device callbacks would also make it possible to
-> remove disable/enable external altogether, but that's more invasive.
-> 
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: qemu-stable@nongnu.org
-> 
-> > Reported-by: Qianqian Zhu <qizhu@redhat.com>
-> > Suggested-by: Fam Zheng <famz@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  include/block/aio.h | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/include/block/aio.h b/include/block/aio.h
-> > index 406e323..5294b04 100644
-> > --- a/include/block/aio.h
-> > +++ b/include/block/aio.h
-> > @@ -456,6 +456,7 @@ static inline void aio_enable_external(AioContext *ctx)
-> >  {
-> >      assert(ctx->external_disable_cnt > 0);
-> >      atomic_dec(&ctx->external_disable_cnt);
+Hi,
 
-This can be changed to atomic_fetch_dec and only call aio_notify if it returned
-1, which is cleaner.
+I want to re-open the discussion left long time ago:
+https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg06194.html
+, and discuss the possibility of changing the hardcoded (256) TX  queue
+size to be configurable between 256 and 1024.
 
-> > +    aio_notify(ctx);
-> >  }
-> >  
-> >  /**
-> > 
+The reason to propose this request is that a severe issue of packet drops i=
+n
+TX direction was observed with the existing hardcoded 256 queue size,
+which causes performance issues for packet drop sensitive guest
+applications that cannot use indirect descriptor tables. The issue goes awa=
+y
+with 1K queue size.
+
+The concern mentioned in the previous discussion (please check the link
+above) is that the number of chained descriptors would exceed
+UIO_MAXIOV (1024) supported by the Linux.
+
+>From the code,  I think the number of the chained descriptors is limited to
+MAX_SKB_FRAGS + 2 (~18), which is much less than UIO_MAXIOV.
+Please point out if I missed anything. Thanks.
+
+Best,
+Wei
