@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d677h-0002u4-55
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1d677g-0002tr-Nz
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d677f-0001Fz-US
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1d677f-0001FN-1W
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:08 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  3 May 2017 22:07:47 -0500
-Message-Id: <20170504030755.1001-3-eblake@redhat.com>
+Date: Wed,  3 May 2017 22:07:46 -0500
+Message-Id: <20170504030755.1001-2-eblake@redhat.com>
 In-Reply-To: <20170504030755.1001-1-eblake@redhat.com>
 References: <20170504030755.1001-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 02/10] block: Update comments on
- BDRV_BLOCK_* meanings
+Subject: [Qemu-devel] [PATCH v12 01/10] qcow2: Use consistent switch
+ indentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,103 +23,189 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-We had some conflicting documentation: a nice 8-way table that
-described all possible combinations of DATA, ZERO, and
-OFFSET_VALID, contrasted with text that implied that OFFSET_VALID
-always meant raw data could be read directly.  Furthermore, the
-text refers a lot to bs->file, even though the interface was
-updated back in 67a0fd2a to let the driver pass back which BDS (not
-necessarily bs->file).  As the 8-way table is the intended
-semantics, simplify the rest of the text to get rid of the
-confusion.
+Fix a couple of inconsistent indentations, before an upcoming
+patch further tweaks the switch statements.  While at it, make
+some tweaks for shorter lines to keep checkpatch happy (best
+viewed with 'git diff -b').
 
-ALLOCATED is always set by the block layer for convenience (drivers
-do not have to worry about it). RAW is used only internally, but
-by more than the raw driver.  Document these additional items on
-the driver callback.
-
-Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v12: even more wording tweaks
-v11: reserved for blkdebug half of v10
-v10: new patch
+v12: new patch
 ---
- include/block/block.h     | 35 +++++++++++++++++++----------------
- include/block/block_int.h |  7 +++++++
- 2 files changed, 26 insertions(+), 16 deletions(-)
+ block/qcow2-cluster.c  | 32 ++++++++---------
+ block/qcow2-refcount.c | 96 ++++++++++++++++++++++++++------------------------
+ 2 files changed, 65 insertions(+), 63 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 862eb56..c8bec7d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -120,29 +120,32 @@ typedef struct HDGeometry {
- #define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS)
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 31077d8..335a505 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1504,25 +1504,25 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
+          * but rather fall through to the backing file.
+          */
+         switch (qcow2_get_cluster_type(old_l2_entry)) {
+-            case QCOW2_CLUSTER_UNALLOCATED:
+-                if (full_discard || !bs->backing) {
+-                    continue;
+-                }
+-                break;
++        case QCOW2_CLUSTER_UNALLOCATED:
++            if (full_discard || !bs->backing) {
++                continue;
++            }
++            break;
 
- /*
-- * Allocation status flags
-- * BDRV_BLOCK_DATA: data is read from a file returned by bdrv_get_block_status.
-- * BDRV_BLOCK_ZERO: sectors read as zero
-- * BDRV_BLOCK_OFFSET_VALID: sector stored as raw data in a file returned by
-- *                          bdrv_get_block_status.
-+ * Allocation status flags for bdrv_get_block_status() and friends.
-+ *
-+ * Public flags:
-+ * BDRV_BLOCK_DATA: allocation for data at offset is tied to this layer
-+ * BDRV_BLOCK_ZERO: offset reads as zero
-+ * BDRV_BLOCK_OFFSET_VALID: an associated offset exists for accessing raw data
-  * BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
-- *                       layer (as opposed to the backing file)
-- * BDRV_BLOCK_RAW: used internally to indicate that the request
-- *                 was answered by the raw driver and that one
-- *                 should look in bs->file directly.
-+ *                       layer (short for DATA || ZERO), set by block layer
-  *
-- * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 represent the offset in
-- * bs->file where sector data can be read from as raw data.
-+ * Internal flag:
-+ * BDRV_BLOCK_RAW: used internally to indicate that the request was
-+ *                 answered by a passthrough driver such as raw and that the
-+ *                 block layer should recompute the answer from bs->file.
-  *
-- * DATA == 0 && ZERO == 0 means that data is read from backing_hd if present.
-+ * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK)
-+ * represent the offset in the returned BDS that is allocated for the
-+ * corresponding raw data; however, whether that offset actually contains
-+ * data also depends on BDRV_BLOCK_DATA and BDRV_BLOCK_ZERO, as follows:
-  *
-  * DATA ZERO OFFSET_VALID
-- *  t    t        t       sectors read as zero, bs->file is zero at offset
-- *  t    f        t       sectors read as valid from bs->file at offset
-- *  f    t        t       sectors preallocated, read as zero, bs->file not
-+ *  t    t        t       sectors read as zero, returned file is zero at offset
-+ *  t    f        t       sectors read as valid from file at offset
-+ *  f    t        t       sectors preallocated, read as zero, returned file not
-  *                        necessarily zero at offset
-  *  f    f        t       sectors preallocated but read from backing_hd,
-- *                        bs->file contains garbage at offset
-+ *                        returned file contains garbage at offset
-  *  t    t        f       sectors preallocated, read as zero, unknown offset
-  *  t    f        f       sectors read from unknown file or offset
-  *  f    t        f       not allocated or unknown offset, read as zero
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8773940..1fdfff7 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -165,6 +165,13 @@ struct BlockDriver {
-         int64_t offset, int count, BdrvRequestFlags flags);
-     int coroutine_fn (*bdrv_co_pdiscard)(BlockDriverState *bs,
-         int64_t offset, int count);
+-            case QCOW2_CLUSTER_ZERO:
+-                /* Preallocated zero clusters should be discarded in any case */
+-                if (!full_discard && (old_l2_entry & L2E_OFFSET_MASK) == 0) {
+-                    continue;
+-                }
+-                break;
++        case QCOW2_CLUSTER_ZERO:
++            /* Preallocated zero clusters should be discarded in any case */
++            if (!full_discard && (old_l2_entry & L2E_OFFSET_MASK) == 0) {
++                continue;
++            }
++            break;
+
+-            case QCOW2_CLUSTER_NORMAL:
+-            case QCOW2_CLUSTER_COMPRESSED:
+-                break;
++        case QCOW2_CLUSTER_NORMAL:
++        case QCOW2_CLUSTER_COMPRESSED:
++            break;
+
+-            default:
+-                abort();
++        default:
++            abort();
+         }
+
+         /* First remove L2 entries */
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 4efca7e..a5a0076 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1117,70 +1117,72 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
+                 goto fail;
+             }
+
+-            for(j = 0; j < s->l2_size; j++) {
++            for (j = 0; j < s->l2_size; j++) {
+                 uint64_t cluster_index;
++                uint64_t offset_masked;
+
+                 offset = be64_to_cpu(l2_table[j]);
+                 old_offset = offset;
++                offset_masked = offset & L2E_OFFSET_MASK;
+                 offset &= ~QCOW_OFLAG_COPIED;
+
+                 switch (qcow2_get_cluster_type(offset)) {
+-                    case QCOW2_CLUSTER_COMPRESSED:
+-                        nb_csectors = ((offset >> s->csize_shift) &
+-                                       s->csize_mask) + 1;
+-                        if (addend != 0) {
+-                            ret = update_refcount(bs,
+-                                (offset & s->cluster_offset_mask) & ~511,
+-                                nb_csectors * 512, abs(addend), addend < 0,
+-                                QCOW2_DISCARD_SNAPSHOT);
+-                            if (ret < 0) {
+-                                goto fail;
+-                            }
+-                        }
+-                        /* compressed clusters are never modified */
+-                        refcount = 2;
+-                        break;
+-
+-                    case QCOW2_CLUSTER_NORMAL:
+-                    case QCOW2_CLUSTER_ZERO:
+-                        if (offset_into_cluster(s, offset & L2E_OFFSET_MASK)) {
+-                            qcow2_signal_corruption(bs, true, -1, -1, "Data "
+-                                                    "cluster offset %#llx "
+-                                                    "unaligned (L2 offset: %#"
+-                                                    PRIx64 ", L2 index: %#x)",
+-                                                    offset & L2E_OFFSET_MASK,
+-                                                    l2_offset, j);
+-                            ret = -EIO;
++                case QCOW2_CLUSTER_COMPRESSED:
++                    nb_csectors = ((offset >> s->csize_shift) &
++                                   s->csize_mask) + 1;
++                    if (addend != 0) {
++                        ret = update_refcount(bs,
++                            (offset & s->cluster_offset_mask) & ~511,
++                            nb_csectors * 512, abs(addend), addend < 0,
++                            QCOW2_DISCARD_SNAPSHOT);
++                        if (ret < 0) {
+                             goto fail;
+                         }
++                    }
++                    /* compressed clusters are never modified */
++                    refcount = 2;
++                    break;
+
+-                        cluster_index = (offset & L2E_OFFSET_MASK) >> s->cluster_bits;
+-                        if (!cluster_index) {
+-                            /* unallocated */
+-                            refcount = 0;
+-                            break;
+-                        }
+-                        if (addend != 0) {
+-                            ret = qcow2_update_cluster_refcount(bs,
++                case QCOW2_CLUSTER_NORMAL:
++                case QCOW2_CLUSTER_ZERO:
++                    if (offset_into_cluster(s, offset_masked)) {
++                        qcow2_signal_corruption(bs, true, -1, -1, "Data "
++                                                "cluster offset %#" PRIx64
++                                                " unaligned (L2 offset: %#"
++                                                PRIx64 ", L2 index: %#x)",
++                                                offset_masked,
++                                                l2_offset, j);
++                        ret = -EIO;
++                        goto fail;
++                    }
 +
-+    /*
-+     * Building block for bdrv_block_status[_above]. The driver should
-+     * answer only according to the current layer, and should not
-+     * set BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
-+     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.
-+     */
-     int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
-         int64_t sector_num, int nb_sectors, int *pnum,
-         BlockDriverState **file);
++                    cluster_index = offset_masked >> s->cluster_bits;
++                    if (!cluster_index) {
++                        /* unallocated */
++                        refcount = 0;
++                        break;
++                    }
++                    if (addend != 0) {
++                        ret = qcow2_update_cluster_refcount(bs,
+                                     cluster_index, abs(addend), addend < 0,
+                                     QCOW2_DISCARD_SNAPSHOT);
+-                            if (ret < 0) {
+-                                goto fail;
+-                            }
+-                        }
+-
+-                        ret = qcow2_get_refcount(bs, cluster_index, &refcount);
+                         if (ret < 0) {
+                             goto fail;
+                         }
+-                        break;
++                    }
+
+-                    case QCOW2_CLUSTER_UNALLOCATED:
+-                        refcount = 0;
+-                        break;
++                    ret = qcow2_get_refcount(bs, cluster_index, &refcount);
++                    if (ret < 0) {
++                        goto fail;
++                    }
++                    break;
+
+-                    default:
+-                        abort();
++                case QCOW2_CLUSTER_UNALLOCATED:
++                    refcount = 0;
++                    break;
++
++                default:
++                    abort();
+                 }
+
+                 if (refcount == 1) {
 -- 
 2.9.3
