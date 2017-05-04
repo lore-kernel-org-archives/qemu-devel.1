@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d6Hpt-0004lm-Eq
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:34:30 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d6HqU-0005E6-64
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:35:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d6Hps-0006B4-8Z
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:34:29 -0400
-Date: Thu, 4 May 2017 15:34:18 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170504143418.GE13354@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1d6HqR-0006Yp-1i
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:35:06 -0400
+Date: Thu, 4 May 2017 16:34:53 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170504163453.38c4b98e@nial.brq.redhat.com>
+In-Reply-To: <20170504134155.GY3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<20170504134155.GY3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: curl: Allow passing cookies via
- QCryptoSecret
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/24] numa: add '-numa cpu' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,127 +23,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-On Thu, May 04, 2017 at 04:00:06PM +0200, Peter Krempa wrote:
-> Since cookies can contain sensitive data (session ID, etc ...) it is
-> desired to hide them from the prying eyes of users. Add a possibility to
-> pass them via the secret infrastructure.
-> 
-> Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1447413
-> 
-> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
-> ---
->  block/curl.c         | 24 +++++++++++++++++++++++-
->  qapi/block-core.json | 12 ++++++++++--
->  2 files changed, 33 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/curl.c b/block/curl.c
-> index 2708d57c2f..483640b14a 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -85,6 +85,7 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
->  #define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
->  #define CURL_BLOCK_OPT_TIMEOUT "timeout"
->  #define CURL_BLOCK_OPT_COOKIE    "cookie"
-> +#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
->  #define CURL_BLOCK_OPT_USERNAME "username"
->  #define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
->  #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
-> @@ -624,6 +625,11 @@ static QemuOptsList runtime_opts = {
->              .help = "Pass the cookie or list of cookies with each request"
->          },
->          {
-> +            .name = CURL_BLOCK_OPT_COOKIE_SECRET,
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "ID of secret used as cookie passed with each request"
-> +        },
-> +        {
->              .name = CURL_BLOCK_OPT_USERNAME,
->              .type = QEMU_OPT_STRING,
->              .help = "Username for HTTP auth"
-> @@ -657,6 +663,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      Error *local_err = NULL;
->      const char *file;
->      const char *cookie;
-> +    const char *cookie_secret;
->      double d;
->      const char *secretid;
->      const char *protocol_delimiter;
-> @@ -693,7 +700,22 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY, true);
-> 
->      cookie = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE);
-> -    s->cookie = g_strdup(cookie);
-> +    cookie_secret = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE_SECRET);
-> +
-> +    if (cookie && cookie_secret) {
-> +        error_setg(errp,
-> +                   "curl driver cannot handle both cookie and cookie secret");
-> +        goto out_noclean;
-> +    }
-> +
-> +    if (cookie_secret) {
-> +        s->cookie = qcrypto_secret_lookup_as_utf8(cookie_secret, errp);
-> +        if (!s->cookie) {
-> +            goto out_noclean;
-> +        }
-> +    } else {
-> +        s->cookie = g_strdup(cookie);
-> +    }
-> 
->      file = qemu_opt_get(opts, CURL_BLOCK_OPT_URL);
->      if (file == NULL) {
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 87fb747ab6..b1643d2032 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2782,11 +2782,15 @@
->  #               "name1=content1; name2=content2;" as explained by
->  #               CURLOPT_COOKIE(3). Defaults to no cookies.
->  #
-> +# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
-> +#                 secure way. See @cookie for the format. (since 2.10)
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttp',
->    'base': 'BlockdevOptionsCurlBase',
-> -  'data': { '*cookie': 'str' } }
-> +  'data': { '*cookie': 'str',
-> +            '*cookie-secret': 'str'} }
-> 
->  ##
->  # @BlockdevOptionsCurlHttps:
-> @@ -2801,12 +2805,16 @@
->  # @sslverify:   Whether to verify the SSL certificate's validity (defaults to
->  #               true)
->  #
-> +# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
-> +#                 secure way. See @cookie for the format. (since 2.10)
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttps',
->    'base': 'BlockdevOptionsCurlBase',
->    'data': { '*cookie': 'str',
-> -            '*sslverify': 'bool' } }
-> +            '*sslverify': 'bool',
-> +            '*cookie-secret': 'str'} }
-> 
->  ##
->  # @BlockdevOptionsCurlFtp:
+On Thu, 4 May 2017 10:41:55 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-This proposed approach for 'cookie-secret' is consistent with how we deal
-with the existing 'cookie' parameter (even though that is itself somewhat
-unpleasantly designed for QAPI).
+> On Wed, May 03, 2017 at 02:56:54PM +0200, Igor Mammedov wrote:
+> [...]
+> > Igor Mammedov (24):
+> >   tests: add CPUs to numa node mapping test
+> >   hw/arm/virt: extract mp-affinity calculation in separate function
+> >   hw/arm/virt: use machine->possible_cpus for storing possible topology
+> >     info
+> >   hw/arm/virt: explicitly allocate cpu_index for cpus  
+> 
+> Patches 1-4 (above) queued on numa-next. Thanks!
+> 
 
- Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks, I'll rebase on top of it and re-post remaining patches.
