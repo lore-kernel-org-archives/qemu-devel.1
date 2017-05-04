@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6DDW-00075h-Tp
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:38:36 -0400
+	(envelope-from <quintela@redhat.com>) id 1d6DFt-0008Bs-JP
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6DDV-00078U-Tf
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:38:34 -0400
-Date: Thu, 4 May 2017 11:38:22 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170504093822.2u4p7z7qjcyorbto@kamzik.brq.redhat.com>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-4-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1493816238-33120-4-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 03/24] hw/arm/virt: use
- machine->possible_cpus for storing possible topology info
+	(envelope-from <quintela@redhat.com>) id 1d6DFq-0000at-Ed
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:41:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42084)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d6DFq-0000ab-8M
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:40:58 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 353F43D948
+	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 09:40:57 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Thu,  4 May 2017 11:40:43 +0200
+Message-Id: <20170504094053.2329-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 00/10] Migration PULL requset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,121 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Wed, May 03, 2017 at 02:56:57PM +0200, Igor Mammedov wrote:
-> for now precalculate and store mp_afinity in possible_cpus
-> as ARM cpus don't have socket/core/thread-id properties yet.
-> In follow patches possible_cpus will be used for storing
-> and setting NUMA node mapping and replace legacy bitmap
-> based numa_info[node_id].node_cpu/numa_get_node_for_cpu()
-> 
-> For the lack of better idea, this patch cannibalizes
-> possible_cpus.cpus[x].props.thread_id so that
-> *_cpu_index_to_props() callback could return addressable
-> by props CPU which will be used by machine_set_cpu_numa_node()
-> in follow up patches to assign a CPU to node. But
-> cannibalizing is fine for now as that thread_id isn't exposed
-> to users (no hotpluggable_cpus callback support for ARM yet)
-> and it will be used only internally until 'device_add cpu'
-> is supported where we can decide on which properties to use.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> v2:
->   (Drew)
->     - discarding result of possible_cpu_arch_ids() makes
->       call not obvious and is confusing. Instead assign
->       possible_cpu_arch_ids() result to local var and use
->       it instead of direct access to machine->possible_cpus
->       field, as it's done in pc.c
-> ---
->  hw/arm/virt.c | 40 +++++++++++++++++++++++++++++++++++++---
->  1 file changed, 37 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 61ae437..e2c5626 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1221,6 +1221,8 @@ static void machvirt_init(MachineState *machine)
->  {
->      VirtMachineState *vms = VIRT_MACHINE(machine);
->      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(machine);
-> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> +    const CPUArchIdList *possible_cpus;
->      qemu_irq pic[NUM_IRQS];
->      MemoryRegion *sysmem = get_system_memory();
->      MemoryRegion *secure_sysmem = NULL;
-> @@ -1344,10 +1346,16 @@ static void machvirt_init(MachineState *machine)
->          exit(1);
->      }
->  
-> -    for (n = 0; n < smp_cpus; n++) {
-> -        Object *cpuobj = object_new(typename);
-> +    possible_cpus = mc->possible_cpu_arch_ids(machine);
-> +    for (n = 0; n < possible_cpus->len; n++) {
-> +        Object *cpuobj;
->  
-> -        object_property_set_int(cpuobj, virt_cpu_mp_affinity(vms, n),
-> +        if (n >= smp_cpus) {
-> +            break;
-> +        }
+Hi
 
-Why the break instead of just looping 'n < smp_cpus' like x86 does? Is
-there some future work where looping up to possible_cpus->len (aka
-max_cpus) is what we'll eventually want? If so, then we need a TODO
-comment here. If not, then we should clean this up by removing the break.
+This pull request includes:
+- Add return path to exec (danp)
+- add traces (dave)
+- move hmp commands to hmp.c (quintela)
+- minor migration cleanups (quintela)
 
-Thanks,
-drew
+Please, apply.
 
-> +
-> +        cpuobj = object_new(typename);
-> +        object_property_set_int(cpuobj, possible_cpus->cpus[n].arch_id,
->                                  "mp-affinity", NULL);
->  
->          if (!vms->secure) {
-> @@ -1527,6 +1535,31 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
->      }
->  }
->  
-> +static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-> +{
-> +    int n;
-> +    VirtMachineState *vms = VIRT_MACHINE(ms);
-> +
-> +    if (ms->possible_cpus) {
-> +        assert(ms->possible_cpus->len == max_cpus);
-> +        return ms->possible_cpus;
-> +    }
-> +
-> +    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
-> +                                  sizeof(CPUArchId) * max_cpus);
-> +    ms->possible_cpus->len = max_cpus;
-> +    for (n = 0; n < ms->possible_cpus->len; n++) {
-> +        ms->possible_cpus->cpus[n].arch_id =
-> +            virt_cpu_mp_affinity(vms, n);
-> +        ms->possible_cpus->cpus[n].props.has_thread_id = true;
-> +        ms->possible_cpus->cpus[n].props.thread_id = n;
-> +
-> +        /* TODO: add 'has_node/node' here to describe
-> +           to which node core belongs */
-> +    }
-> +    return ms->possible_cpus;
-> +}
-> +
->  static void virt_machine_class_init(ObjectClass *oc, void *data)
->  {
->      MachineClass *mc = MACHINE_CLASS(oc);
-> @@ -1543,6 +1576,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      mc->pci_allow_0_address = true;
->      /* We know we will never create a pre-ARMv7 CPU which needs 1K pages */
->      mc->minimum_page_bits = 12;
-> +    mc->possible_cpu_arch_ids = virt_possible_cpu_arch_ids;
->  }
->  
->  static const TypeInfo virt_machine_info = {
-> -- 
-> 2.7.4
-> 
+The following changes since commit e619b14746e5d8c0e53061661fd0e1da01fd4d60:
+
+  Merge remote-tracking branch 'sthibault/tags/samuel-thibault' into staging (2017-05-02 15:16:29 +0100)
+
+are available in the git repository at:
+
+  git://github.com/juanquintela/qemu.git tags/migration/20170504
+
+for you to fetch changes up to 1db9d8e501fc99fa2201f228627952aee6cfc349:
+
+  migration: Extra tracing (2017-05-04 10:41:23 +0200)
+
+----------------------------------------------------------------
+migration/next for 20170504
+
+----------------------------------------------------------------
+Daniel P. Berrange (1):
+      migration: setup bi-directional I/O channel for exec: protocol
+
+Dr. David Alan Gilbert (1):
+      migration: Extra tracing
+
+Juan Quintela (8):
+      ram: Split dirty bitmap by RAMBlock
+      migration: to_dst_file at that point is NULL
+      monitor: Remove monitor parameter from save_vmstate
+      monitor: Move hmp_loadvm from monitor.c to hmp.c
+      monitor: Move hmp_savevm from savevm.c to hmp.c
+      monitor: Move hmp_delvm from savevm.c to hmp.c
+      monitor: Move hmp_info_snapshots from savevm.c to hmp.c
+      migration: Move postcopy-ram.h to migration/
+
+ hmp.c                                           | 174 +++++++++++++++
+ hmp.h                                           |   4 +
+ include/exec/ram_addr.h                         |  13 +-
+ include/migration/migration.h                   |   3 +-
+ include/sysemu/sysemu.h                         |   5 +-
+ migration/exec.c                                |   4 +-
+ migration/migration.c                           |   2 +-
+ migration/postcopy-ram.c                        |   7 +-
+ {include/migration => migration}/postcopy-ram.h |   3 -
+ migration/ram.c                                 | 275 ++++++++++--------------
+ migration/savevm.c                              | 185 +---------------
+ migration/socket.c                              |   1 -
+ migration/tls.c                                 |   1 -
+ migration/trace-events                          |   2 +
+ monitor.c                                       |  13 --
+ replay/replay-snapshot.c                        |   2 +-
+ 16 files changed, 317 insertions(+), 377 deletions(-)
+ rename {include/migration => migration}/postcopy-ram.h (95%)
