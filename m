@@ -1,30 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6GMP-0005KU-Aw
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:59:58 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6GPO-0007sA-UW
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6GMK-0008Ed-Gq
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:59:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36762)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6GMK-0008EP-9a
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:59:52 -0400
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1DB8E7F40B
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 12:59:51 +0000 (UTC)
-References: <20170503072819.14462-1-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7f3ca702-7ea8-bcee-af55-71a645b7e39c@redhat.com>
-Date: Thu, 4 May 2017 14:59:47 +0200
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6GPK-0001Ow-2s
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:03:03 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:40948)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6GPJ-0001Od-RF
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:02:58 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170504084135.7488.24715.stgit@PASHA-ISP>
+	<20170504084210.7488.37561.stgit@PASHA-ISP>
+	<b365904f-21ae-85a7-a3a6-bbe21c62e35a@redhat.com>
+	<000401d2c4c7$6d5b6d50$481247f0$@ru>
+	<b44f8aa8-e42f-4b94-ccfa-d80adb60de35@redhat.com>
+	<000801d2c4cd$3d3af720$b7b0e560$@ru>
+	<58398574-88b5-3382-65e2-7208beccc09a@redhat.com>
+	<000f01d2c4cf$7479f630$5d6de290$@ru>
+	<c6f5e430-fa98-124f-146b-6c3de79448cd@redhat.com>
+	<001101d2c4d2$bb44a4e0$31cdeea0$@ru>
+	<e6c5885d-855b-288e-68c8-5665be284d78@redhat.com>
+In-Reply-To: <e6c5885d-855b-288e-68c8-5665be284d78@redhat.com>
+Date: Thu, 4 May 2017 16:02:59 +0300
+Message-ID: <001201d2c4d6$c26bdd20$47439760$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20170503072819.14462-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] dump: Acquire BQL around vm_start() in
- dump thread
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v9 06/10] replay: fix save/load vm for
+ non-empty queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,79 +39,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, peterx@redhat.com
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
 
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 04/05/2017 14:34, Pavel Dovgalyuk wrote:
+> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >> On 04/05/2017 14:10, Pavel Dovgalyuk wrote:
+> >>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >>>> On 04/05/2017 13:54, Pavel Dovgalyuk wrote:
+> >>>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> >>>>>> On 04/05/2017 13:13, Pavel Dovgalyuk wrote:
+> >>>>>>>>> This patch does not allows saving/loading vmstate when
+> >>>>>>>>> replay events queue is not empty. There is no reliable
+> >>>>>>>>> way to save events queue, because it describes internal
+> >>>>>>>>> coroutine state. Therefore saving and loading operations
+> >>>>>>>>> should be deferred to another record/replay step.
+> >>>>>>>>
+> >>>>>>>> Can it actually be non-empty after bdrv_drain_all?
+> >>>>>>>
+> >>>>>>> drain/flush cannot succeed, because started requests are
+> >>>>>>> prisoned in the replay events queue.
+> >>>>>>
+> >>>>>> But that would apply to loading only.  Saving should still be always
+> >>>>>> possible.
+> >>>>>
+> >>>>> We can save it. But it wouldn't load correctly - replay queue will be empty after
+> loading.
+> >>>>
+> >>>> When saving you can drain, and then the events queue should be empty.
+> >>>> Or I am misunderstanding how it works, which is possible too.
+> >>>
+> >>> Drain will wait until the queue becomes empty.
+> >>> Queue is processed only at checkpoints.
+> >>> Checkpoints are met in iothread (at timers processing and so on).
+> >>> But iothread is waiting for finishing the drain.
+> >>
+> >> What checkpoint can hang the drain during a save?
+> >
+> > No one. There are no checkpoins during vmsave and during drain.
+> > Therefore the queue will never become empty.
+> 
+> Understood.  And what checkpoint will you be waiting for during drain,
+> causing a deadlock?
 
+Every checkpoint processes the queue, but none of them are invoked,
+because iothread (which invokes all the checkpoints) is waiting for the end of the drain.
 
-On 03/05/2017 09:28, Fam Zheng wrote:
-> This fixes an assertion failure in the following backtrace:
-> 
->     __GI___assert_fail
->     memory_region_transaction_commit
->     memory_region_add_eventfd
->     virtio_pci_ioeventfd_assign
->     virtio_bus_set_host_notifier
->     virtio_blk_data_plane_start
->     virtio_bus_start_ioeventfd
->     virtio_vmstate_change
->     vm_state_notify
->     vm_prepare_start
->     vm_start
->     dump_cleanup
->     dump_process
->     dump_thread
->     start_thread
->     clone
-> 
-> vm_start need BQL, acquire it if doing cleaning up from main thread.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  dump.c                | 7 +++++++
->  include/sysemu/dump.h | 1 +
->  2 files changed, 8 insertions(+)
-> 
-> diff --git a/dump.c b/dump.c
-> index f7b80d8..d9090a2 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -77,7 +77,13 @@ static int dump_cleanup(DumpState *s)
->      memory_mapping_list_free(&s->list);
->      close(s->fd);
->      if (s->resume) {
-> +        if (s->detached) {
-> +            qemu_mutex_lock_iothread();
-> +        }
->          vm_start();
-> +        if (s->detached) {
-> +            qemu_mutex_unlock_iothread();
-> +        }
->      }
->  
->      return 0;
-> @@ -1804,6 +1810,7 @@ void qmp_dump_guest_memory(bool paging, const char *file,
->  
->      if (detach_p) {
->          /* detached dump */
-> +        s->detached = true;
->          qemu_thread_create(&s->dump_thread, "dump_thread", dump_thread,
->                             s, QEMU_THREAD_DETACHED);
->      } else {
-> diff --git a/include/sysemu/dump.h b/include/sysemu/dump.h
-> index ef931be..2672a15 100644
-> --- a/include/sysemu/dump.h
-> +++ b/include/sysemu/dump.h
-> @@ -157,6 +157,7 @@ typedef struct DumpState {
->      uint32_t sh_info;
->      bool have_section;
->      bool resume;
-> +    bool detached;
->      ssize_t note_size;
->      hwaddr memory_offset;
->      int fd;
-> 
+And we cannot add a checkpoint into the drain, because then vmstop will
+affect the behavior of the guest.
 
-Queued, thanks.
-
-Paolo
+Pavel Dovgalyuk
