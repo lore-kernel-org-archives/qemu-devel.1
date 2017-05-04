@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d69fG-0005CK-37
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 01:50:59 -0400
+	(envelope-from <famz@redhat.com>) id 1d6AQ8-0006e4-9E
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 02:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d69fC-0005Pu-7M
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 01:50:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d69fC-0005P5-0w
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 01:50:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A1D904E4C6
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 05:50:51 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  4 May 2017 07:50:37 +0200
-Message-Id: <20170504055040.31904-1-kraxel@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1d6AQ7-0000jq-Dy
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 02:39:24 -0400
+Date: Thu, 4 May 2017 14:39:12 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170504063912.GB19184@lemon.lan>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-6-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/3] input patch queue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170420120058.28404-6-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/17] block: access wakeup with atomic ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-  Hi,
+On Thu, 04/20 14:00, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/io.c                | 3 ++-
+>  block/nfs.c               | 4 +++-
+>  block/sheepdog.c          | 3 ++-
+>  include/block/block.h     | 5 +++--
+>  include/block/block_int.h | 4 ++--
+>  5 files changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 869322a..3b2ede9 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -501,7 +501,8 @@ static void dummy_bh_cb(void *opaque)
+>  
+>  void bdrv_wakeup(BlockDriverState *bs)
+>  {
+> -    if (bs->wakeup) {
+> +    /* The barrier (or an atomic op) is in the caller.  */
 
-Input patch queue, with a new tracepoint and two bugfixes (one of them
-cve).
+Why not add a barrier here so that callers don't need to worry about that?
 
-please pull,
-  Gerd
+> +    if (atomic_read(&bs->wakeup)) {
+>          aio_bh_schedule_oneshot(qemu_get_aio_context(), dummy_bh_cb, NULL);
+>      }
+>  }
 
-The following changes since commit e619b14746e5d8c0e53061661fd0e1da01fd4d=
-60:
-
-  Merge remote-tracking branch 'sthibault/tags/samuel-thibault' into stag=
-ing (2017-05-02 15:16:29 +0100)
-
-are available in the git repository at:
-
-  git://git.kraxel.org/qemu tags/pull-input-20170504-1
-
-for you to fetch changes up to 2222e0a633070f7f3eafcc9d0e95e7f1a4e6fe36:
-
-  input: Add trace event for empty keyboard queue (2017-05-03 14:20:12 +0=
-200)
-
-----------------------------------------------------------------
-input: limit kbd queue depth
-input: don't queue delay if paused
-input: Add trace event for empty keyboard queue
-
-----------------------------------------------------------------
-Alexander Graf (1):
-      input: Add trace event for empty keyboard queue
-
-Gerd Hoffmann (1):
-      input: limit kbd queue depth
-
-Marc-Andr=C3=A9 Lureau (1):
-      input: don't queue delay if paused
-
- hw/input/hid.c        |  4 ++++
- ui/input.c            | 18 +++++++++++++++---
- hw/input/trace-events |  1 +
- 3 files changed, 20 insertions(+), 3 deletions(-)
+Fam
