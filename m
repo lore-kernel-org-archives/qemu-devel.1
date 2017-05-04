@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d6CEv-000086-LM
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:35:58 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1d6CGg-0001NJ-EK
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d6CEu-0002Hf-S2
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:35:57 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-13-pbonzini@redhat.com>
-	<20170504073058.GE19184@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9462f141-6097-9c4b-cb78-33dbaac69024@redhat.com>
-Date: Thu, 4 May 2017 10:35:48 +0200
+	(envelope-from <amarnath.valluri@intel.com>) id 1d6CGd-0003f3-AA
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:37:46 -0400
+Received: from mga03.intel.com ([134.134.136.65]:1553)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1d6CGc-0003eD-Uf
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:37:43 -0400
+References: <1493725969-19518-1-git-send-email-amarnath.valluri@intel.com>
+	<1493725969-19518-5-git-send-email-amarnath.valluri@intel.com>
+	<CAJ+F1CJC21gXOHuVf09NstSs278Aw9no6H51XPa8_fMgYP+AVQ@mail.gmail.com>
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Message-ID: <d8e3697a-003a-446a-6c88-d0717471ae03@intel.com>
+Date: Thu, 4 May 2017 11:39:48 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170504073058.GE19184@lemon.lan>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAJ+F1CJC21gXOHuVf09NstSs278Aw9no6H51XPa8_fMgYP+AVQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 12/17] block: protect tracked_requests and
- flush_queue with reqs_lock
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] tpm-backend: Made few interface
+ methods optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
+Cc: stefanb@linux.vnet.ibm.com, patrick.ohly@intel.com, berrange@redhat.com
 
 
 
-On 04/05/2017 09:30, Fam Zheng wrote:
->> @@ -2302,11 +2308,13 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
->>      current_gen = atomic_read(&bs->write_gen);
->>  
->>      /* Wait until any previous flushes are completed */
->> +    qemu_co_mutex_lock(&bs->reqs_lock);
->>      while (bs->active_flush_req) {
->> -        qemu_co_queue_wait(&bs->flush_queue, NULL);
->> +        qemu_co_queue_wait(&bs->flush_queue, &bs->reqs_lock);
->>      }
->>  
->>      bs->active_flush_req = true;
->> +    qemu_co_mutex_unlock(&bs->reqs_lock);
->>  
->>      /* Write back all layers by calling one driver function */
->>      if (bs->drv->bdrv_co_flush) {
->> @@ -2328,10 +2336,14 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
->>          goto flush_parent;
->>      }
->>  
->> -    /* Check if we really need to flush anything */
->> +    /* Check if we really need to flush anything
->> +     * TODO: use int and atomic access */
->> +    qemu_co_mutex_lock(&bs->reqs_lock);
->>      if (bs->flushed_gen == current_gen) {
-> 
-> Should the atomic reading of current_gen be moved down here, to avoid TOCTOU?
+On 05/02/2017 03:29 PM, Marc-André Lureau wrote:
+>
+>
+> On Tue, May 2, 2017 at 3:52 PM Amarnath Valluri 
+> <amarnath.valluri@intel.com <mailto:amarnath.valluri@intel.com>> wrote:
+>
+>     This allows backend implementations left optional interface methods.
+>     For mandatory methods assertion checks added.
+>
+>     Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com
+>     <mailto:amarnath.valluri@intel.com>> 
+>
+>     ---
+>      backends/tpm.c           | 24 ++++++++++++++++++------
+>      hw/tpm/tpm_passthrough.c | 16 ----------------
+>      2 files changed, 18 insertions(+), 22 deletions(-)
+>
+>     diff --git a/backends/tpm.c b/backends/tpm.c
+>     index cf5abf1..8245426 100644
+>     --- a/backends/tpm.c
+>     +++ b/backends/tpm.c
+>     @@ -48,7 +48,7 @@ const char *tpm_backend_get_desc(TPMBackend *s)
+>      {
+>          TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+>
+>     -    return k->ops->desc();
+>     +    return k->ops->desc ? k->ops->desc() : "";
+>      }
+>
+>
+> If it only need to returns const, we may consider using a class field, 
+> defaulting to null.
+Yes, it makes more sense being a const member than a function pointer.
+>
+> Who is using it? tpm_backend_get_desc() not being called anywhere. 
+> Let's remove it?
+Frankly no one using this API, rather it's been accessed 
+directly(be_drivers[i]->desc())  in tpm.c. It can be removed.
 
-No, but another change is needed; current_gen needs to be read under the
-lock, to ensure that flushes are processed in increasing generation order.
-
-In addition, this access to flushed_gen does not need the lock;
-bs->active_flush_req itself acts as a "lock" for bs->flushed_gen, only
-the coroutine that set it to true will read it or write it.  I'll adjust
-this patch accordingly.
-
-Paolo
+- Amarnath
