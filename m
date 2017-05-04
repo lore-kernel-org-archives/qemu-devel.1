@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d677g-0002tw-Uj
+	(envelope-from <eblake@redhat.com>) id 1d677h-0002u5-5K
 	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d677f-0001G1-Uk
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1d677f-0001Ft-TQ
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:08:09 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  3 May 2017 22:07:48 -0500
-Message-Id: <20170504030755.1001-4-eblake@redhat.com>
-In-Reply-To: <20170504030755.1001-1-eblake@redhat.com>
-References: <20170504030755.1001-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 03/10] qcow2: Correctly report status of
- preallocated zero clusters
+Date: Wed,  3 May 2017 22:07:45 -0500
+Message-Id: <20170504030755.1001-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v12 00/10] qcow2 zero-cluster tweaks [was add
+ blkdebug tests]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,105 +21,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-We were throwing away the preallocation information associated with
-zero clusters.  But we should be matching the well-defined semantics
-in bdrv_get_block_status(), where (BDRV_BLOCK_ZERO |
-BDRV_BLOCK_OFFSET_VALID) informs the user which offset is reserved,
-while still reminding the user that reading from that offset is
-likely to read garbage.
+I've collected several improvements for qcow2 zero-cluster handling.
 
-count_contiguous_clusters_by_type() is now used only for unallocated
-cluster runs, hence it gets renamed and tightened.
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v12
 
-Making this change lets us see which portions of an image are zero
-but preallocated, when using qemu-img map --output=json.  The
---output=human side intentionally ignores all zero clusters, whether
-or not they are preallocated.
+Marked as v12 for "hysterical raisins", since it it the half of
+v10 [1] that was not resubmitted as v11 [2].
 
-The fact that there is no change to qemu-iotests './check -qcow2'
-merely means that we aren't yet testing this aspect of qemu-img;
-a later patch will add a test.
+Depends on Max's block tree:
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00641.html
+and on Max's qcow2 cleanups:
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00689.html
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05227.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05896.html
 
----
-v12: rename helper function
-v11: reserved for blkdebug half of v10
-v10: new patch
----
- block/qcow2-cluster.c | 45 +++++++++++++++++++++++++++++++++++----------
- 1 file changed, 35 insertions(+), 10 deletions(-)
+Changes since last posting:
+- lots of tweaks to resolve Max's review findings, including
+rewriting my additions to test 154
+- a new patch splitting QCOW2_CLUSTER_ZERO that fell out from
+my review of Max's work
+- defer any optimizations of a backing file with different length
+until later (I will still post an RFC patch to explore what
+optimizations a BDRV_BLOCK_EOF would allow, but didn't want to
+hold up this series any further)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 335a505..f3bfce6 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -334,16 +334,23 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
- 	return i;
- }
+001/10:[down] 'qcow2: Use consistent switch indentation'
+002/10:[0043] [FC] 'block: Update comments on BDRV_BLOCK_* meanings'
+003/10:[0023] [FC] 'qcow2: Correctly report status of preallocated zero clusters'
+004/10:[down] 'qcow2: Make distinction between zero cluster types obvious'
+005/10:[0008] [FC] 'qcow2: Optimize zero_single_l2() to minimize L2 churn'
+006/10:[down] 'iotests: Improve _filter_qemu_img_map'
+007/10:[0107] [FC] 'iotests: Add test 179 to cover write zeroes with unmap'
+008/10:[0260] [FC] 'qcow2: Optimize write zero of unaligned tail cluster'
+009/10:[----] [--] 'qcow2: Assert that cluster operations are aligned'
+010/10:[0005] [FC] 'qcow2: Discard/zero clusters by byte count'
 
--static int count_contiguous_clusters_by_type(int nb_clusters,
--                                             uint64_t *l2_table,
--                                             int wanted_type)
-+/*
-+ * Checks how many consecutive unallocated clusters in a given L2
-+ * table have the same cluster type.
-+ */
-+static int count_contiguous_clusters_unallocated(int nb_clusters,
-+                                                 uint64_t *l2_table,
-+                                                 int wanted_type)
- {
-     int i;
+Eric Blake (10):
+  qcow2: Use consistent switch indentation
+  block: Update comments on BDRV_BLOCK_* meanings
+  qcow2: Correctly report status of preallocated zero clusters
+  qcow2: Make distinction between zero cluster types obvious
+  qcow2: Optimize zero_single_l2() to minimize L2 churn
+  iotests: Improve _filter_qemu_img_map
+  iotests: Add test 179 to cover write zeroes with unmap
+  qcow2: Optimize write zero of unaligned tail cluster
+  qcow2: Assert that cluster operations are aligned
+  qcow2: Discard/zero clusters by byte count
 
-+    assert(wanted_type == QCOW2_CLUSTER_ZERO ||
-+           wanted_type == QCOW2_CLUSTER_UNALLOCATED);
-     for (i = 0; i < nb_clusters; i++) {
--        int type = qcow2_get_cluster_type(be64_to_cpu(l2_table[i]));
-+        uint64_t entry = be64_to_cpu(l2_table[i]);
-+        int type = qcow2_get_cluster_type(entry);
+ block/qcow2.h                    |  17 +++--
+ include/block/block.h            |  35 +++++----
+ include/block/block_int.h        |   7 ++
+ block/qcow2-cluster.c            | 156 ++++++++++++++++++++++----------------
+ block/qcow2-refcount.c           | 124 +++++++++++++++---------------
+ block/qcow2-snapshot.c           |   7 +-
+ block/qcow2.c                    |  38 ++++++----
+ tests/qemu-iotests/common.filter |   4 +-
+ tests/qemu-iotests/122.out       |  16 ++--
+ tests/qemu-iotests/154           | 160 ++++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/154.out       | 159 ++++++++++++++++++++++++++++++++++----
+ tests/qemu-iotests/179           | 132 ++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/179.out       | 160 +++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group         |   1 +
+ 14 files changed, 818 insertions(+), 198 deletions(-)
+ create mode 100755 tests/qemu-iotests/179
+ create mode 100644 tests/qemu-iotests/179.out
 
--        if (type != wanted_type) {
-+        if (type != wanted_type || entry & L2E_OFFSET_MASK) {
-             break;
-         }
-     }
-@@ -565,14 +572,32 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-             ret = -EIO;
-             goto fail;
-         }
--        c = count_contiguous_clusters_by_type(nb_clusters, &l2_table[l2_index],
--                                              QCOW2_CLUSTER_ZERO);
--        *cluster_offset = 0;
-+        /* Distinguish between pure zero clusters and pre-allocated ones */
-+        if (*cluster_offset & L2E_OFFSET_MASK) {
-+            c = count_contiguous_clusters(nb_clusters, s->cluster_size,
-+                                          &l2_table[l2_index], QCOW_OFLAG_ZERO);
-+            *cluster_offset &= L2E_OFFSET_MASK;
-+            if (offset_into_cluster(s, *cluster_offset)) {
-+                qcow2_signal_corruption(bs, true, -1, -1,
-+                                        "Preallocated zero cluster offset %#"
-+                                        PRIx64 " unaligned (L2 offset: %#"
-+                                        PRIx64 ", L2 index: %#x)",
-+                                        *cluster_offset, l2_offset, l2_index);
-+                ret = -EIO;
-+                goto fail;
-+            }
-+        } else {
-+            c = count_contiguous_clusters_unallocated(nb_clusters,
-+                                                      &l2_table[l2_index],
-+                                                      QCOW2_CLUSTER_ZERO);
-+            *cluster_offset = 0;
-+        }
-         break;
-     case QCOW2_CLUSTER_UNALLOCATED:
-         /* how many empty clusters ? */
--        c = count_contiguous_clusters_by_type(nb_clusters, &l2_table[l2_index],
--                                              QCOW2_CLUSTER_UNALLOCATED);
-+        c = count_contiguous_clusters_unallocated(nb_clusters,
-+                                                  &l2_table[l2_index],
-+                                                  QCOW2_CLUSTER_UNALLOCATED);
-         *cluster_offset = 0;
-         break;
-     case QCOW2_CLUSTER_NORMAL:
 -- 
 2.9.3
