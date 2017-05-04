@@ -1,29 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6GjN-0001W6-2g
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:23:42 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6Gjp-0001ih-Op
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:24:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6GjJ-0001fJ-T5
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:23:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6GjJ-0001f4-J0
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:23:37 -0400
-References: <20170502203115.22233-1-ehabkost@redhat.com>
-	<20170502203115.22233-3-ehabkost@redhat.com>
-	<87y3udsz3k.fsf@dusky.pond.sub.org>
-	<20170503183037.GV3482@thinpad.lan.raisama.net>
-	<87vaphm4fs.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0778f9a5-d974-9beb-ae94-b8e46de7b75d@redhat.com>
-Date: Thu, 4 May 2017 08:23:33 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6Gjm-0001k0-Js
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:24:09 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:43222)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6Gjm-0001jZ-Bv
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 09:24:06 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170504084135.7488.24715.stgit@PASHA-ISP>
+	<20170504084210.7488.37561.stgit@PASHA-ISP>
+	<b365904f-21ae-85a7-a3a6-bbe21c62e35a@redhat.com>
+	<000401d2c4c7$6d5b6d50$481247f0$@ru>
+	<b44f8aa8-e42f-4b94-ccfa-d80adb60de35@redhat.com>
+	<000801d2c4cd$3d3af720$b7b0e560$@ru>
+	<58398574-88b5-3382-65e2-7208beccc09a@redhat.com>
+	<000f01d2c4cf$7479f630$5d6de290$@ru>
+	<c6f5e430-fa98-124f-146b-6c3de79448cd@redhat.com>
+	<001101d2c4d2$bb44a4e0$31cdeea0$@ru>
+	<e6c5885d-855b-288e-68c8-5665be284d78@redhat.com>
+	<001201d2c4d6$c26bdd20$47439760$@ru>
+	<bf930126-426b-b208-8fcb-76adda3bd9f5@redhat.com>
+In-Reply-To: <bf930126-426b-b208-8fcb-76adda3bd9f5@redhat.com>
+Date: Thu, 4 May 2017 16:24:02 +0300
+Message-ID: <001301d2c4d9$b69e9840$23dbc8c0$@ru>
 MIME-Version: 1.0
-In-Reply-To: <87vaphm4fs.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PQWgvRWIovabSkEhOkWdb5ICBg2QH4PwE"
-Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support
- alternate types
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v9 06/10] replay: fix save/load vm for
+ non-empty queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +41,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PQWgvRWIovabSkEhOkWdb5ICBg2QH4PwE
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
-Message-ID: <0778f9a5-d974-9beb-ae94-b8e46de7b75d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] string-input-visitor: Support alternate
- types
-References: <20170502203115.22233-1-ehabkost@redhat.com>
- <20170502203115.22233-3-ehabkost@redhat.com>
- <87y3udsz3k.fsf@dusky.pond.sub.org>
- <20170503183037.GV3482@thinpad.lan.raisama.net>
- <87vaphm4fs.fsf@dusky.pond.sub.org>
-In-Reply-To: <87vaphm4fs.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 04/05/2017 15:02, Pavel Dovgalyuk wrote:
+> >> Understood.  And what checkpoint will you be waiting for during drain,
+> >> causing a deadlock?
+> > Every checkpoint processes the queue, but none of them are invoked,
+> > because iothread (which invokes all the checkpoints) is waiting for the end of the drain.
+> >
+> > And we cannot add a checkpoint into the drain, because then vmstop will
+> > affect the behavior of the guest.
+> 
+> But it does affect the behavior already when RR is off.  And it
+> shouldn't be a problem if it does in record mode (as long as the effect
+> can be replayed).
 
-On 05/04/2017 03:06 AM, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
->=20
->> On Wed, May 03, 2017 at 06:07:43PM +0200, Markus Armbruster wrote:
->>> Eduardo Habkost <ehabkost@redhat.com> writes:
->>>
->>>> When parsing alternates from a string, there are some limitations in=
+Then we'll have to add something like "stop" event which flushes the queue.
+And there is still a problem with stopping in replay mode, because there
+is no way to flush the queue, because coroutines are executing somewhere.
 
->>>> what we can do, but it is a valid use case in some situations. We ca=
-n
->>>> support booleans, integer types, and enums.
->=20
-> By the way, the same restrictions apply to the "keyval" variant of the
-> QObject input visitor.  It's a known problem stated here:
->=20
->     Message-ID: <8737exuz6u.fsf@dusky.pond.sub.org>
->     https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00046.html=
+> If RR cannot do drain reliably, not even in record mode, that is a huge
+> problem because a lot of block layer operations assume they can.
 
->=20
-> However, I failed to document it properly in the source.
->=20
+I think it could be an acceptable limitation (like disabling savevm/loadvm
+when queue is not empty).
+I assume that RR is mostly used for debugging and analysis and it could
+have some limitations of this kind.
+Making our own block queue (instead of coroutines) is much worse, therefore
+we have to replay the original internal behavior.
 
->>> Begs the question what happens when you violate these restrictions.
->>
->> Right now, we don't detect those cases and behavior is undefined.
->> I think it will be a good idea to give start_alternate() enough
->> information to detect those cases (by adding a 'const char *const
->> enum_table[]' parameter).
->=20
-> Alternate types that won't work with the string input visitor can be
-> detected at compile time (by qapi.py), but not their actual use.  Pity.=
-
->=20
-> Do we actually use alternates that violate the restrictions?  If not, w=
-e
-> could simply restrict alternates so they work with *all* visitors.  If
-> we ever run into an actual need for alternates that don't, we'll be no
-> worse off than now.
->=20
-> Let's review existing alternates outside tests:
->=20
-> * Qcow2OverlapChecks: struct + enum
-> * BlockdevRef: struct + str
-> * GuestFileWhence: int + enum (all enum members start with a letter)
->=20
-> Restricting alternates looks practical to me.  Eric, what do you think?=
-
-
-As in: we forbid the combination of a scalar (whether 'int', 'number',
-'bool', and perhaps 'null') with a plain 'str' (since there's no way to
-tell whether '1' should parse as an integer or the string "1"); and
-combining a scalar with an 'enum' requires that all enum members be
-distinct from what could otherwise be parsed as a scalar?  I can live
-with such a restriction.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---PQWgvRWIovabSkEhOkWdb5ICBg2QH4PwE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZCytVAAoJEKeha0olJ0NqdOQIAIh8Cv7gLl+wixnqjmANYtP3
-u6uIEuVGMC0j24PMgfk170g+lHhh0MbN9X85vMMSLEbkPFhiXheETXKVg10C7Z9a
-RJeM1xPq84fb87+FF7vMdmS1SLJBG9rrhuXMTMq7hTVkSVuPjg2WKXByVBM9htbh
-VfadWASSca7ZXQTGzaSZ0aV5jOi7WKj7/b4pEOHPI0WijYq2KUHUdKfpSIuMvfKb
-DtfpF9o3/TMw9fGYyA2hFt0MU5TFIXm47Ih7QcIsJnJwku+Vk6DX813bA0WP0DHH
-8daLLZEG04/iwctVJnmw5cSmillsBRfqtmdPJKpURduObCnNq8sm8MaYYthRyqM=
-=RpVu
------END PGP SIGNATURE-----
-
---PQWgvRWIovabSkEhOkWdb5ICBg2QH4PwE--
+Pavel Dovgalyuk
