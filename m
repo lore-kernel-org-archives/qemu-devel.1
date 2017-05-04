@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6AwV-0007uO-0T
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:12:51 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d6B1t-0001U3-5M
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6AwU-0001om-7K
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:12:50 -0400
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-6-pbonzini@redhat.com>
-	<20170504063912.GB19184@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9485e469-3cc1-5577-9aa3-be71a00ec895@redhat.com>
-Date: Thu, 4 May 2017 09:12:40 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170504063912.GB19184@lemon.lan>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/17] block: access wakeup with atomic ops
+	(envelope-from <kraxel@redhat.com>) id 1d6B1o-0004XZ-TO
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40210)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6B1o-0004XD-N1
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:20 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu,  4 May 2017 09:17:44 +0200
+Message-Id: <20170504071811.3547-4-kraxel@redhat.com>
+In-Reply-To: <20170504071811.3547-1-kraxel@redhat.com>
+References: <20170504071811.3547-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 03/30] audio: release capture buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>, Huawei PSIRT <PSIRT@huawei.com>
 
+AUD_add_capture() allocates two buffers which are never released.
+Add the missing calls to AUD_del_capture().
 
+Impact: Allows vnc clients to exhaust host memory by repeatedly
+starting and stopping audio capture.
 
-On 04/05/2017 08:39, Fam Zheng wrote:
-> On Thu, 04/20 14:00, Paolo Bonzini wrote:
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  block/io.c                | 3 ++-
->>  block/nfs.c               | 4 +++-
->>  block/sheepdog.c          | 3 ++-
->>  include/block/block.h     | 5 +++--
->>  include/block/block_int.h | 4 ++--
->>  5 files changed, 12 insertions(+), 7 deletions(-)
->>
->> diff --git a/block/io.c b/block/io.c
->> index 869322a..3b2ede9 100644
->> --- a/block/io.c
->> +++ b/block/io.c
->> @@ -501,7 +501,8 @@ static void dummy_bh_cb(void *opaque)
->>  
->>  void bdrv_wakeup(BlockDriverState *bs)
->>  {
->> -    if (bs->wakeup) {
->> +    /* The barrier (or an atomic op) is in the caller.  */
-> 
-> Why not add a barrier here so that callers don't need to worry about that?
+Fixes: CVE-2017-8309
+Cc: P J P <ppandit@redhat.com>
+Cc: Huawei PSIRT <PSIRT@huawei.com>
+Reported-by: "Jiangxin (hunter, SCC)" <jiangxin1@huawei.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
+Message-id: 20170428075612.9997-1-kraxel@redhat.com
+---
+ audio/audio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Barriers are relatively expensive, and the common case is
-
-dataplane7:block/io.c-void bdrv_dec_in_flight(BlockDriverState *bs)
-dataplane7:block/io.c-{
-dataplane7:block/io.c-    atomic_dec(&bs->in_flight);
-dataplane7:block/io.c:    bdrv_wakeup(bs);
-dataplane7:block/io.c-}
-
-Paolo
-
->> +    if (atomic_read(&bs->wakeup)) {
->>          aio_bh_schedule_oneshot(qemu_get_aio_context(), dummy_bh_cb, NULL);
->>      }
->>  }
-> 
-> Fam
-> 
+diff --git a/audio/audio.c b/audio/audio.c
+index c8898d8422..beafed209b 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -2028,6 +2028,8 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
+                     sw = sw1;
+                 }
+                 QLIST_REMOVE (cap, entries);
++                g_free (cap->hw.mix_buf);
++                g_free (cap->buf);
+                 g_free (cap);
+             }
+             return;
+-- 
+2.9.3
