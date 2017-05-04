@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6BJF-0000Qv-Ma
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:36:22 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d6BL6-0002DS-MJ
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:38:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6BJE-00068B-U9
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:36:21 -0400
-Date: Thu, 4 May 2017 15:36:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170504073615.GF19184@lemon.lan>
+	(envelope-from <pbonzini@redhat.com>) id 1d6BL2-0007rn-PA
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:38:16 -0400
 References: <20170420120058.28404-1-pbonzini@redhat.com>
 	<20170420120058.28404-10-pbonzini@redhat.com>
+	<20170504073615.GF19184@lemon.lan>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <71bba48c-317f-b553-ad27-ae6ca66cb878@redhat.com>
+Date: Thu, 4 May 2017 09:38:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170420120058.28404-10-pbonzini@redhat.com>
+In-Reply-To: <20170504073615.GF19184@lemon.lan>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH 09/17] util: add stats64 module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,23 +24,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Fam Zheng <famz@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Thu, 04/20 14:00, Paolo Bonzini wrote:
-> +static inline void stat64_rdlock(Stat64 *s)
-> +{
-> +    /* Keep out incoming writers to avoid them starving us. */
-> +    atomic_add(&s->lock, 2);
-> +
-> +    /* If there is a concurrent writer, wait for it.  */
-> +    while (atomic_read(&s->lock) & 1) {
-> +        g_usleep(5);
 
-What's the difference of g_usleep() from cpu_relax() in
-qemu_co_mutex_lock_unlock?
 
-> +    }
-> +}
+On 04/05/2017 09:36, Fam Zheng wrote:
+>> +
+>> +    /* If there is a concurrent writer, wait for it.  */
+>> +    while (atomic_read(&s->lock) & 1) {
+>> +        g_usleep(5);
+> What's the difference of g_usleep() from cpu_relax() in
+> qemu_co_mutex_lock_unlock?
 
-Fam
+cpu_relax() did not exist when I wrote this patch. :)  I'll change it.
+
+Paolo
