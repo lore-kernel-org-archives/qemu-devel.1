@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6F9f-0002G3-Lp
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:44 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d6F9j-0002H6-JV
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6F9b-0004Bh-BK
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59274)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d6F9i-0004Dj-Gr
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50378)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1d6F9b-0004BW-57
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:39 -0400
+	id 1d6F9i-0004DZ-7b
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:42:46 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  4 May 2017 15:42:11 +0400
-Message-Id: <20170504114232.20318-1-marcandre.lureau@redhat.com>
+Date: Thu,  4 May 2017 15:42:12 +0400
+Message-Id: <20170504114232.20318-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170504114232.20318-1-marcandre.lureau@redhat.com>
+References: <20170504114232.20318-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/21] Chr tests patches
+Subject: [Qemu-devel] [PULL 01/21] char: remove qemu_chr_be_generic_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +28,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: stefanha@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-The following changes since commit e619b14746e5d8c0e53061661fd0e1da01fd4d=
-60:
+The function simply alias and hides the real event function.
 
-  Merge remote-tracking branch 'sthibault/tags/samuel-thibault' into stag=
-ing (2017-05-02 15:16:29 +0100)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ include/sysemu/char.h |  1 -
+ chardev/char-pty.c    |  2 +-
+ chardev/char-socket.c |  2 +-
+ chardev/char.c        | 10 ++--------
+ ui/console.c          |  2 +-
+ ui/gtk.c              |  2 +-
+ 6 files changed, 6 insertions(+), 13 deletions(-)
 
-are available in the git repository at:
-
-  https://github.com/elmarco/qemu.git tags/chr-tests-pull-request
-
-for you to fetch changes up to 79c8db5a13c0f4b73f930be0fcff9bbc1237c258:
-
-  tests: add /char/console test (2017-05-04 15:34:42 +0400)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Marc-Andr=C3=A9 Lureau (21):
-  char: remove qemu_chr_be_generic_open
-  mux: simplfy muxes_realize_done
-  xen: use a better chardev type check
-  container: don't leak container reference
-  char: add a /chardevs container
-  vl: add todo note about root container cleanup
-  char: use /chardevs container instead of chardevs list
-  char: remove qemu_chardev_add
-  char: remove chardevs list
-  char: useless NULL check
-  char-socket: introduce update_disconnected_filename()
-  char-socket: update local address after listen
-  char-socket: add 'addr' property
-  char-socket: add 'connected' property
-  char-udp: flush as much buffer as possible
-  tests: add alias check in /char/ringbuf
-  tests: add /char/pipe test
-  tests: add /char/file test
-  tests: add /char/socket test
-  tests: add /char/udp test
-  tests: add /char/console test
-
- chardev/char-mux.h          |   2 +-
- include/sysemu/char.h       |  10 --
- chardev/char-mux.c          |  11 +-
- chardev/char-pty.c          |   2 +-
- chardev/char-socket.c       |  46 +++++-
- chardev/char-udp.c          |  26 ++--
- chardev/char.c              | 148 ++++++++----------
- gdbstub.c                   |   4 +-
- hw/usb/ccid-card-passthru.c |   2 +-
- hw/usb/redirect.c           |   2 +-
- hw/xen/xen-common.c         |   2 +-
- net/vhost-user.c            |   2 +-
- qom/container.c             |   1 +
- tests/test-char.c           | 366 ++++++++++++++++++++++++++++++++++++++=
-+++++-
- tests/vhost-user-test.c     |   2 +-
- ui/console.c                |   2 +-
- ui/gtk.c                    |   2 +-
- vl.c                        |   1 +
- 18 files changed, 504 insertions(+), 127 deletions(-)
-
+diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+index 450881d42c..a30ff3fa80 100644
+--- a/include/sysemu/char.h
++++ b/include/sysemu/char.h
+@@ -427,7 +427,6 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+  */
+ void qemu_chr_fe_take_focus(CharBackend *b);
+=20
+-void qemu_chr_be_generic_open(Chardev *s);
+ void qemu_chr_fe_accept_input(CharBackend *be);
+ int qemu_chr_add_client(Chardev *s, int fd);
+ Chardev *qemu_chr_find(const char *name);
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index a6337be8aa..aa9d0cb2c3 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -185,7 +185,7 @@ static gboolean qemu_chr_be_generic_open_func(gpointe=
+r opaque)
+     PtyChardev *s =3D PTY_CHARDEV(opaque);
+=20
+     s->open_tag =3D 0;
+-    qemu_chr_be_generic_open(chr);
++    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+     return FALSE;
+ }
+=20
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 36ab0d633a..2789eb1f40 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -489,7 +489,7 @@ static void tcp_chr_connect(void *opaque)
+                                            tcp_chr_read,
+                                            chr, NULL);
+     }
+-    qemu_chr_be_generic_open(chr);
++    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+ }
+=20
+ static void tcp_chr_update_read_handler(Chardev *chr,
+diff --git a/chardev/char.c b/chardev/char.c
+index 3df116350b..aad639b620 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -66,12 +66,6 @@ void qemu_chr_be_event(Chardev *s, int event)
+     be->chr_event(be->opaque, event);
+ }
+=20
+-void qemu_chr_be_generic_open(Chardev *s)
+-{
+-    qemu_chr_be_event(s, CHR_EVENT_OPENED);
+-}
+-
+-
+ /* Not reporting errors from writing to logfile, as logs are
+  * defined to be "best effort" only */
+ static void qemu_chr_fe_write_log(Chardev *s,
+@@ -469,7 +463,7 @@ static void muxes_realize_done(Notifier *notifier, vo=
+id *unused)
+             /* mark mux as OPENED so any new FEs will immediately receiv=
+e
+              * OPENED event
+              */
+-            qemu_chr_be_generic_open(chr);
++            qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+         }
+     }
+     muxes_realized =3D true;
+@@ -581,7 +575,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+         /* We're connecting to an already opened device, so let's make s=
+ure we
+            also get the open event */
+         if (s->be_open) {
+-            qemu_chr_be_generic_open(s);
++            qemu_chr_be_event(s, CHR_EVENT_OPENED);
+         }
+     }
+=20
+diff --git a/ui/console.c b/ui/console.c
+index 189eecfd29..ac66b3c910 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -2076,7 +2076,7 @@ static void text_console_do_init(Chardev *chr, Disp=
+layState *ds)
+         s->t_attrib =3D s->t_attrib_default;
+     }
+=20
+-    qemu_chr_be_generic_open(chr);
++    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+ }
+=20
+ static void vc_chr_open(Chardev *chr,
+diff --git a/ui/gtk.c b/ui/gtk.c
+index a86848f3b0..7479ceef35 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1868,7 +1868,7 @@ static GSList *gd_vc_vte_init(GtkDisplayState *s, V=
+irtualConsole *vc,
+     gtk_notebook_append_page(GTK_NOTEBOOK(s->notebook), vc->tab_item,
+                              gtk_label_new(vc->label));
+=20
+-    qemu_chr_be_generic_open(vc->vte.chr);
++    qemu_chr_be_event(vc->vte.chr, CHR_EVENT_OPENED);
+=20
+     return group;
+ }
 --=20
 2.12.0.191.gc5d8de91d
