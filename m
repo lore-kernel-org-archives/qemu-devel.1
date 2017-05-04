@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6HTL-0000F0-60
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:11:16 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6HUp-0002Lb-Bm
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:12:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6HTG-00045Q-KT
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:11:11 -0400
-Date: Thu, 4 May 2017 10:41:55 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170504134155.GY3482@thinpad.lan.raisama.net>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1d6HUk-0004ta-DJ
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:12:43 -0400
+Date: Thu, 4 May 2017 15:12:34 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170504141234.GQ32376@stefanha-x1.localdomain>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-14-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ZgGN478A9hzzvyZc"
 Content-Disposition: inline
-In-Reply-To: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/24] numa: add '-numa cpu' option
+In-Reply-To: <20170420120058.28404-14-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 13/17] coroutine-lock: introduce
+ qemu_co_mutex_lock_unlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,19 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Wed, May 03, 2017 at 02:56:54PM +0200, Igor Mammedov wrote:
-[...]
-> Igor Mammedov (24):
->   tests: add CPUs to numa node mapping test
->   hw/arm/virt: extract mp-affinity calculation in separate function
->   hw/arm/virt: use machine->possible_cpus for storing possible topology
->     info
->   hw/arm/virt: explicitly allocate cpu_index for cpus
 
-Patches 1-4 (above) queued on numa-next. Thanks!
+--ZgGN478A9hzzvyZc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Eduardo
+On Thu, Apr 20, 2017 at 02:00:54PM +0200, Paolo Bonzini wrote:
+> This primitive lets you lock/unlock a CoMutex, guaranteeing neither
+> blocking nor cacheline bouncing if there is no qemu_co_mutex_lock
+> critical section.
+
+"Guaranteeing neither X nor Y" means "does not guarantee X or Y".  Did
+you mean "Guarantees not X and not Y"?
+
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/qemu/coroutine.h   |  6 ++++++
+>  util/qemu-coroutine-lock.c | 36 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 42 insertions(+)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--ZgGN478A9hzzvyZc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZCzbSAAoJEJykq7OBq3PIuxsIAL/+kxlLqgZ0fwfOutLSYYaN
+SFJ8Mf7IyIauE6/3w4C2BJztr+B7s0gbxzx0qiVKA6uMAqo9CI0N5LgA6QZ0t8ht
+pQn9paNugucZNMvXwKw9DjJxMdwZ1T/HaHBF+mxqVfcrDHmVIkZFRn2x4nuvQspo
+JeM5bvbZuxOuyDw5fKQ495bc9bMmYOHuywAFaBy70SQPUYQMIFcJ6Lqpl76lzbNr
+yLZt3WSzWuNk/bFK9RDC2j/LffFjKLdfBLkhZ8ptmAXxVoKJNxVOE5xCmx5GIDQf
+NEAV2R16NJe3lBW9CdaCJ2m4/PHHkDV4h8uN1Rv6j/9CrwCVOtgv9ZvoNqZPjtk=
+=cQjc
+-----END PGP SIGNATURE-----
+
+--ZgGN478A9hzzvyZc--
