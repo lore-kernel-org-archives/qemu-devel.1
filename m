@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=290862c92=anthony.perard@citrix.com>)
-	id 1d6Kyr-0005il-9I
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 13:55:58 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d6LiE-0003Ne-5E
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 14:42:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=290862c92=anthony.perard@citrix.com>)
-	id 1d6Kyo-0001Mx-2b
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 13:55:57 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:40789)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=290862c92=anthony.perard@citrix.com>)
-	id 1d6Kyn-0001JI-S1
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 13:55:54 -0400
-Date: Thu, 4 May 2017 18:55:43 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170504175543.GE1553@perard.uk.xensource.com>
-References: <alpine.DEB.2.10.1705031359390.9240@sstabellini-ThinkPad-X260>
+	(envelope-from <ehabkost@redhat.com>) id 1d6LiA-0006OP-7L
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 14:42:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37012)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d6Li9-0006O3-V2
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 14:42:46 -0400
+Date: Thu, 4 May 2017 15:42:41 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170504184241.GB3482@thinpad.lan.raisama.net>
+References: <20170504145658.5506-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.10.1705031359390.9240@sstabellini-ThinkPad-X260>
-Subject: Re: [Qemu-devel] [PATCH v2] xen/mapcache: store dma information in
- revmapcache entries for debugging
+In-Reply-To: <20170504145658.5506-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] i386: expose "TCGTCGTCGTCG" in the
+ 0x40000000 CPUID leaf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,166 +27,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xensource.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, hrgstephen@gmail.com, x1917x@gmail.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Richard W.M. Jones" <rjones@redhat.com>
 
-On Wed, May 03, 2017 at 02:00:35PM -0700, Stefano Stabellini wrote:
-> The Xen mapcache is able to create long term mappings, they are called
-> "locked" mappings. The third parameter of the xen_map_cache call
-> specifies if a mapping is a "locked" mapping.
+On Thu, May 04, 2017 at 03:56:58PM +0100, Daniel P. Berrange wrote:
+> Currently when running KVM, we expose "KVMKVMKVM\0\0\0" in
+> the 0x40000000 CPUID leaf. Other hypervisors (VMWare,
+> HyperV, Xen, BHyve) all do the same thing, which leaves
+> TCG as the odd one out.
 > 
+> The CPUID is used by software to detect when running in a
+> virtual environment and change behaviour in certain ways.
+> For example, systemd supports a ConditionVirtualization=
+> setting in unit files. Currently they have to resort to
+> custom hacks like looking for 'fw-cfg' entry in the
+> /proc/device-tree file. The virt-what command has the
+> same hacks & needs.
 > 
-> >From the QEMU point of view there are two kinds of long term mappings:
+> This change thus proposes a signature TCGTCGTCGTCG to be
+> reported when running under TCG.
 > 
-> [a] device memory mappings, such as option roms and video memory
-> [b] dma mappings, created by dma_memory_map & friends
-> 
-> After certain operations, ballooning a VM in particular, Xen asks QEMU
-> kindly to destroy all mappings. However, certainly [a] mappings are
-> present and cannot be removed. That's not a problem as they are not
-> affected by balloonning. The *real* problem is that if there are any
-> mappings of type [b], any outstanding dma operations could fail. This is
-> a known shortcoming. In other words, when Xen asks QEMU to destroy all
-> mappings, it is an error if any [b] mappings exist.
-> 
-> However today we have no way of distinguishing [a] from [b]. Because of
-> that, we cannot even print a decent warning.
-> 
-> This patch introduces a new "dma" bool field to MapCacheRev entires, to
-> remember if a given mapping is for dma or is a long term device memory
-> mapping. When xen_invalidate_map_cache is called, we print a warning if
-> any [b] mappings exist. We ignore [a] mappings.
-> 
-> Mappings created by qemu_map_ram_ptr are assumed to be [a], while
-> mappings created by address_space_map->qemu_ram_ptr_length are assumed
-> to be [b].
-> 
-> The goal of the patch is to make debugging and system understanding
-> easier.
-> 
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> NB1, for reasons I don't undersatnd 'cpu_x86_cpuid' function
+> clamps the requested CPUID leaf based on env->cpuid_level.
+
+That's how CPUID is specified: Intel SDM says: "If a value
+entered for CPUID.EAX is higher than the maximum input value for
+basic or extended function for that processor then the data for
+the highest basic information leaf is returned."
+
+> The latter comes from the CPU model definitions, and is
+> lower than 0x40000000, so the CPUID signature request just
+> gets turned into a completely different request. eg when
+> using '-cpu qemu64', the 0x40000000 request from the guest
+> gets clamped to 0xD and thus returns totally bogus data.
+> I just removed the clamping code, but someone who understands
+> this might have a better suggestion.
 > 
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+I would rewrite that code as:
 
+    switch (index & 0xF0000000) {
+    case 0:
+        [...] // check cpuid_level
+    case 0x40000000:
+        if (index > 0x40000001) {
+            /* Not sure what we should do here. Intel and KVM
+             * documentation is not explicit about it, but it
+             * looks like KVM will return the highest _basic_
+             * leaf (env->cpuid_level) on that case.
+             */
+            index = env->cpuid_level;
+        }
+        [...]
+    case 0x80000000:
+        [...] // check cpuid_xlevel
+    case 0xC0000000:
+        [...] // check cpuid_xlevel2
+    default:
+       /* Intel documentation states that invalid EAX input will
+        * return the same information as EAX=cpuid_level
+        * (Intel SDM Vol. 2A - Instruction Set Reference - CPUID)
+        */
+        index = env->cpuid_level;
+    }
+
+> NB2, for KVM, we added a flag for '-cpu kvm=off' to let you
+> hide the KVMKVMKVM signature from guests. Presumably we should
+> add a 'tcg=off' flag for the same reason ?
+
+I don't like "kvm=off" because it sounds like it disables KVM
+completely. "tcg=off" would be misleading as well.
+
+What about a generic "hypervisor-cpuid=off" property?
+
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
+>  target/i386/cpu.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
 > 
-> Changes in v2:
-> - add acked-by
-> - fix code style problem
-> 
-> diff --git a/exec.c b/exec.c
-> index eac6085..85769e1 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2084,10 +2084,10 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
->           * In that case just map until the end of the page.
->           */
->          if (block->offset == 0) {
-> -            return xen_map_cache(addr, 0, 0);
-> +            return xen_map_cache(addr, 0, 0, false);
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 13c0985..ac2776e 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2626,6 +2626,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>      X86CPU *cpu = x86_env_get_cpu(env);
+>      CPUState *cs = CPU(cpu);
+>      uint32_t pkg_offset;
+> +    uint32_t signature[3];
+>  
+>      /* test if maximum index reached */
+>      if (index & 0x80000000) {
+> @@ -2646,8 +2647,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>              }
 >          }
->  
-> -        block->host = xen_map_cache(block->offset, block->max_length, 1);
-> +        block->host = xen_map_cache(block->offset, block->max_length, 1, false);
->      }
->      return ramblock_ptr(block, addr);
->  }
-> @@ -2117,10 +2117,10 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
->           * In that case just map the requested area.
->           */
->          if (block->offset == 0) {
-> -            return xen_map_cache(addr, *size, 1);
-> +            return xen_map_cache(addr, *size, 1, true);
->          }
->  
-> -        block->host = xen_map_cache(block->offset, block->max_length, 1);
-> +        block->host = xen_map_cache(block->offset, block->max_length, 1, true);
->      }
->  
->      return ramblock_ptr(block, addr);
-> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-> index 31debdf..e60156c 100644
-> --- a/hw/i386/xen/xen-mapcache.c
-> +++ b/hw/i386/xen/xen-mapcache.c
-> @@ -62,6 +62,7 @@ typedef struct MapCacheRev {
->      hwaddr paddr_index;
->      hwaddr size;
->      QTAILQ_ENTRY(MapCacheRev) next;
-> +    bool dma;
->  } MapCacheRev;
->  
->  typedef struct MapCache {
-> @@ -202,7 +203,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
->  }
->  
->  static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
-> -                                       uint8_t lock)
-> +                                       uint8_t lock, bool dma)
->  {
->      MapCacheEntry *entry, *pentry = NULL;
->      hwaddr address_index;
-> @@ -289,6 +290,7 @@ tryagain:
->      if (lock) {
->          MapCacheRev *reventry = g_malloc0(sizeof(MapCacheRev));
->          entry->lock++;
-> +        reventry->dma = dma;
->          reventry->vaddr_req = mapcache->last_entry->vaddr_base + address_offset;
->          reventry->paddr_index = mapcache->last_entry->paddr_index;
->          reventry->size = entry->size;
-> @@ -300,12 +302,12 @@ tryagain:
->  }
->  
->  uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
-> -                       uint8_t lock)
-> +                       uint8_t lock, bool dma)
->  {
->      uint8_t *p;
->  
->      mapcache_lock();
-> -    p = xen_map_cache_unlocked(phys_addr, size, lock);
-> +    p = xen_map_cache_unlocked(phys_addr, size, lock, dma);
->      mapcache_unlock();
->      return p;
->  }
-> @@ -426,8 +428,11 @@ void xen_invalidate_map_cache(void)
->      mapcache_lock();
->  
->      QTAILQ_FOREACH(reventry, &mapcache->locked_entries, next) {
-> -        DPRINTF("There should be no locked mappings at this time, "
-> -                "but "TARGET_FMT_plx" -> %p is present\n",
-> +        if (!reventry->dma) {
-> +            continue;
+>      } else {
+> -        if (index > env->cpuid_level)
+> +        /* XXX this just breaks CPUID turning guest requests
+> +         * into something totally different, thus returning
+> +         * garbage data
+> +         */
+> +        if (0 && index > env->cpuid_level) {
+>              index = env->cpuid_level;
 > +        }
-> +        fprintf(stderr, "Locked DMA mapping while invalidating mapcache!"
-> +                " "TARGET_FMT_plx" -> %p is present\n",
->                  reventry->paddr_index, reventry->vaddr_req);
 >      }
 >  
-> diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
-> index b8c93b9..01daaad 100644
-> --- a/include/sysemu/xen-mapcache.h
-> +++ b/include/sysemu/xen-mapcache.h
-> @@ -17,7 +17,7 @@ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr start_addr,
->  void xen_map_cache_init(phys_offset_to_gaddr_t f,
->                          void *opaque);
->  uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
-> -                       uint8_t lock);
-> +                       uint8_t lock, bool dma);
->  ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
->  void xen_invalidate_map_cache_entry(uint8_t *buffer);
->  void xen_invalidate_map_cache(void);
-> @@ -31,7 +31,8 @@ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
->  
->  static inline uint8_t *xen_map_cache(hwaddr phys_addr,
->                                       hwaddr size,
-> -                                     uint8_t lock)
-> +                                     uint8_t lock,
-> +                                     bool dma)
->  {
->      abort();
->  }
+>      switch(index) {
+> @@ -2872,6 +2878,14 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          }
+>          break;
+>      }
+> +    case 0x40000000:
+> +        /* XXX add flag to let us hide this */
+> +        memcpy(signature, "TCGTCGTCGTCG", 12);
+
+This shouldn't be seen by any guests if not using TCG. Probably
+that will never happen with the current code, but I would make
+this conditional on tcg_enabled() just in case.
+
+Note that the CPUID code at kvm_arch_init_vcpu() will ignore the
+values here. Probably worth mentioning that in a comment so
+people don't get confused.
+
+> +        *eax = 0x40000001;
+
+Should we really return 0x40000001 here, if we still don't have
+anything being returned on CPUID[0x40000001]?
+
+If we really want to return 0x40000001 here, an explicit
+"case 0x40000001:" line returning all-zeroes would make that
+intention clearer.
+
+> +        *ebx = signature[0];
+> +        *ecx = signature[1];
+> +        *edx = signature[2];
+> +        break;
+>      case 0x80000000:
+>          *eax = env->cpuid_xlevel;
+>          *ebx = env->cpuid_vendor1;
+> -- 
+> 2.9.3
+> 
 
 -- 
-Anthony PERARD
+Eduardo
