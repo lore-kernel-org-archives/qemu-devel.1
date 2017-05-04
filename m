@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6B1t-0001U3-5M
+	(envelope-from <kraxel@redhat.com>) id 1d6B1t-0001U7-Ue
 	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6B1o-0004XZ-TO
+	(envelope-from <kraxel@redhat.com>) id 1d6B1q-0004ZD-RF
 	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40210)
+Received: from mx1.redhat.com ([209.132.183.28]:57878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6B1o-0004XD-N1
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:20 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6B1q-0004YN-L5
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A73A0C059726
+	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 07:18:21 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  4 May 2017 09:17:44 +0200
-Message-Id: <20170504071811.3547-4-kraxel@redhat.com>
+Date: Thu,  4 May 2017 09:17:45 +0200
+Message-Id: <20170504071811.3547-5-kraxel@redhat.com>
 In-Reply-To: <20170504071811.3547-1-kraxel@redhat.com>
 References: <20170504071811.3547-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 03/30] audio: release capture buffers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 04/30] audio: fix WAVState leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +33,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>, Huawei PSIRT <PSIRT@huawei.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-AUD_add_capture() allocates two buffers which are never released.
-Add the missing calls to AUD_del_capture().
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Impact: Allows vnc clients to exhaust host memory by repeatedly
-starting and stopping audio capture.
+Spotted by ASAN.
 
-Fixes: CVE-2017-8309
-Cc: P J P <ppandit@redhat.com>
-Cc: Huawei PSIRT <PSIRT@huawei.com>
-Reported-by: "Jiangxin (hunter, SCC)" <jiangxin1@huawei.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20170503223846.6559-4-marcandre.lureau@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
-Message-id: 20170428075612.9997-1-kraxel@redhat.com
 ---
- audio/audio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ audio/wavcapture.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/audio/audio.c b/audio/audio.c
-index c8898d8422..beafed209b 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -2028,6 +2028,8 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
-                     sw = sw1;
-                 }
-                 QLIST_REMOVE (cap, entries);
-+                g_free (cap->hw.mix_buf);
-+                g_free (cap->buf);
-                 g_free (cap);
-             }
-             return;
--- 
+diff --git a/audio/wavcapture.c b/audio/wavcapture.c
+index 8bfb9e7654..5863803584 100644
+--- a/audio/wavcapture.c
++++ b/audio/wavcapture.c
+@@ -88,6 +88,7 @@ static void wav_capture_destroy (void *opaque)
+     WAVState *wav =3D opaque;
+=20
+     AUD_del_capture (wav->cap, wav);
++    g_free (wav);
+ }
+=20
+ static void wav_capture_info (void *opaque)
+--=20
 2.9.3
