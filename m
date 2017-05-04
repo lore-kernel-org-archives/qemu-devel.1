@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d6I3E-0004FJ-0y
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:48:16 -0400
+	(envelope-from <berrange@redhat.com>) id 1d6IBs-0006vI-SV
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d6I3A-0005jZ-SA
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:48:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23932)
+	(envelope-from <berrange@redhat.com>) id 1d6IBn-0003AG-Sa
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:57:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d6I3A-0005j8-Li
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:48:12 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9475BC04BD2F
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 14:48:11 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170504125432.21653-1-marcandre.lureau@redhat.com>
-	<20170504125432.21653-5-marcandre.lureau@redhat.com>
-Date: Thu, 04 May 2017 16:48:07 +0200
-In-Reply-To: <20170504125432.21653-5-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Thu, 4 May 2017 16:54:32 +0400")
-Message-ID: <87h910adaw.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] qmp-shell: improve help
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d6IBn-00037Z-Js
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 10:57:07 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu,  4 May 2017 15:56:58 +0100
+Message-Id: <20170504145658.5506-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC] i386: expose "TCGTCGTCGTCG" in the
+ 0x40000000 CPUID leaf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,40 +22,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Currently when running KVM, we expose "KVMKVMKVM\0\0\0" in
+the 0x40000000 CPUID leaf. Other hypervisors (VMWare,
+HyperV, Xen, BHyve) all do the same thing, which leaves
+TCG as the odd one out.
 
-> Describe the arguments & fix the tool name.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qmp/qmp-shell | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-> index db24c87cdd..fce1ab6c49 100755
-> --- a/scripts/qmp/qmp-shell
-> +++ b/scripts/qmp/qmp-shell
-> @@ -375,7 +375,11 @@ def die(msg):
->  def fail_cmdline(option=3DNone):
->      if option:
->          sys.stderr.write('ERROR: bad command-line option \'%s\'\n' % opt=
-ion)
-> -    sys.stderr.write('qemu-shell [ -v ] [ -p ] [ -H ] [ -N ] < UNIX sock=
-et path> | < TCP address:port >\n')
-> +    sys.stderr.write('qmp-shell [ -v ] [ -p ] [ -H ] [ -N ] < UNIX socke=
-t path> | < TCP address:port >\n')
-> +    sys.stderr.write('    -v     Verbose (echo command sent and received=
-)\n')
-> +    sys.stderr.write('    -p     Pretty-print JSON\n')
-> +    sys.stderr.write('    -H     Use HMP interface\n')
-> +    sys.stderr.write('    -N     Skip negotiate (for qemu-ga)\n')
->      sys.exit(1)
->=20=20
->  def main():
+The CPUID is used by software to detect when running in a
+virtual environment and change behaviour in certain ways.
+For example, systemd supports a ConditionVirtualization=
+setting in unit files. Currently they have to resort to
+custom hacks like looking for 'fw-cfg' entry in the
+/proc/device-tree file. The virt-what command has the
+same hacks & needs.
 
-Given Python modules like argparse, doing option parsing by hand is
-basically stupid.  I'll take this patch anyway, because it improves help
-without making the program appreciably stupider.
+This change thus proposes a signature TCGTCGTCGTCG to be
+reported when running under TCG.
+
+NB1, for reasons I don't undersatnd 'cpu_x86_cpuid' function
+clamps the requested CPUID leaf based on env->cpuid_level.
+The latter comes from the CPU model definitions, and is
+lower than 0x40000000, so the CPUID signature request just
+gets turned into a completely different request. eg when
+using '-cpu qemu64', the 0x40000000 request from the guest
+gets clamped to 0xD and thus returns totally bogus data.
+I just removed the clamping code, but someone who understands
+this might have a better suggestion.
+
+NB2, for KVM, we added a flag for '-cpu kvm=off' to let you
+hide the KVMKVMKVM signature from guests. Presumably we should
+add a 'tcg=off' flag for the same reason ?
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ target/i386/cpu.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 13c0985..ac2776e 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2626,6 +2626,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+     X86CPU *cpu = x86_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
+     uint32_t pkg_offset;
++    uint32_t signature[3];
+ 
+     /* test if maximum index reached */
+     if (index & 0x80000000) {
+@@ -2646,8 +2647,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             }
+         }
+     } else {
+-        if (index > env->cpuid_level)
++        /* XXX this just breaks CPUID turning guest requests
++         * into something totally different, thus returning
++         * garbage data
++         */
++        if (0 && index > env->cpuid_level) {
+             index = env->cpuid_level;
++        }
+     }
+ 
+     switch(index) {
+@@ -2872,6 +2878,14 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         }
+         break;
+     }
++    case 0x40000000:
++        /* XXX add flag to let us hide this */
++        memcpy(signature, "TCGTCGTCGTCG", 12);
++        *eax = 0x40000001;
++        *ebx = signature[0];
++        *ecx = signature[1];
++        *edx = signature[2];
++        break;
+     case 0x80000000:
+         *eax = env->cpuid_xlevel;
+         *ebx = env->cpuid_vendor1;
+-- 
+2.9.3
