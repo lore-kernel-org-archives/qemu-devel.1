@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1d6Ef8-0007B4-FL
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:11:12 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6EhB-0007zP-7u
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1d6Ef4-0000Gz-FB
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:11:10 -0400
-Received: from mga06.intel.com ([134.134.136.31]:29788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1d6Ef4-0000GB-5F
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:11:06 -0400
-From: Amarnath Valluri <amarnath.valluri@intel.com>
-Date: Thu,  4 May 2017 14:06:40 +0300
-Message-Id: <1493896000-20087-1-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <CAJ+F1CJC21gXOHuVf09NstSs278Aw9no6H51XPa8_fMgYP+AVQ@mail.gmail.com>
-References: <CAJ+F1CJC21gXOHuVf09NstSs278Aw9no6H51XPa8_fMgYP+AVQ@mail.gmail.com>
-Subject: [Qemu-devel] [PATCH v4 4/8] tpm-backend: Made few interface methods
- optional
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6Eh7-0002tE-9J
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:13:17 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:57354)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1d6Eh6-0002sk-SD
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:13:13 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170504084135.7488.24715.stgit@PASHA-ISP>
+	<20170504084210.7488.37561.stgit@PASHA-ISP>
+	<b365904f-21ae-85a7-a3a6-bbe21c62e35a@redhat.com>
+In-Reply-To: <b365904f-21ae-85a7-a3a6-bbe21c62e35a@redhat.com>
+Date: Thu, 4 May 2017 14:13:15 +0300
+Message-ID: <000401d2c4c7$6d5b6d50$481247f0$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v9 06/10] replay: fix save/load vm for
+ non-empty queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,236 +31,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, kraxel@redhat.com
 
-This allows backend implementations left optional interface methods.
-For mandatory methods assertion checks added.
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 04/05/2017 10:42, Pavel Dovgalyuk wrote:
+> > From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> >
+> > This patch does not allows saving/loading vmstate when
+> > replay events queue is not empty. There is no reliable
+> > way to save events queue, because it describes internal
+> > coroutine state. Therefore saving and loading operations
+> > should be deferred to another record/replay step.
+> 
+> Can it actually be non-empty after bdrv_drain_all?
 
-Took the opportunity to remove unused methods:
-  tpm_backend_get_type()
-  tpm_backend_get_desc()
+drain/flush cannot succeed, because started requests are
+prisoned in the replay events queue.
 
-Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
----
- backends/tpm.c               | 36 +++++++++++++++++-------------------
- hw/tpm/tpm_passthrough.c     | 23 +----------------------
- include/sysemu/tpm_backend.h | 19 +------------------
- tpm.c                        |  2 +-
- 4 files changed, 20 insertions(+), 60 deletions(-)
+> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> > ---
+> >  include/sysemu/replay.h  |    3 +++
+> >  migration/savevm.c       |   13 +++++++++++++
+> >  replay/replay-snapshot.c |    6 ++++++
+> >  3 files changed, 22 insertions(+)
+> >
+> > diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+> > index f1c0712795..5c9db2a2ef 100644
+> > --- a/include/sysemu/replay.h
+> > +++ b/include/sysemu/replay.h
+> > @@ -164,5 +164,8 @@ void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
+> >  /*! Called at the start of execution.
+> >      Loads or saves initial vmstate depending on execution mode. */
+> >  void replay_vmstate_init(void);
+> > +/*! Called to ensure that replay state is consistent and VM snapshot
+> > +    can be created */
+> > +bool replay_can_snapshot(void);
+> >
+> >  #endif
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index 03ae1bdeb4..358d22170d 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -54,6 +54,7 @@
+> >  #include "qemu/cutils.h"
+> >  #include "io/channel-buffer.h"
+> >  #include "io/channel-file.h"
+> > +#include "sysemu/replay.h"
+> >
+> >  #ifndef ETH_P_RARP
+> >  #define ETH_P_RARP 0x8035
+> > @@ -2083,6 +2084,12 @@ int save_vmstate(Monitor *mon, const char *name)
+> >      Error *local_err = NULL;
+> >      AioContext *aio_context;
+> >
+> > +    if (!replay_can_snapshot()) {
+> > +        monitor_printf(mon, "Record/replay does not allow making snapshot right now. "
+> > +                        "Try stopping at another step.\n");
+> > +        return ret;
+> > +    }
+> > +
+> >      if (!bdrv_all_can_snapshot(&bs)) {
+> >          monitor_printf(mon, "Device '%s' is writable but does not "
+> >                         "support snapshots.\n", bdrv_get_device_name(bs));
+> > @@ -2244,6 +2251,12 @@ int load_vmstate(const char *name)
+> >      AioContext *aio_context;
+> >      MigrationIncomingState *mis = migration_incoming_get_current();
+> >
+> > +    if (!replay_can_snapshot()) {
+> > +        error_report("Record/replay does not allow loading snapshot right now. "
+> > +                     "Try stopping at another step.\n");
+> > +        return -EINVAL;
+> > +    }
+> > +
+> >      if (!bdrv_all_can_snapshot(&bs)) {
+> >          error_report("Device '%s' is writable but does not support snapshots.",
+> >                       bdrv_get_device_name(bs));
+> > diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+> > index 65e2d375c2..438d82ec33 100644
+> > --- a/replay/replay-snapshot.c
+> > +++ b/replay/replay-snapshot.c
+> > @@ -76,3 +76,9 @@ void replay_vmstate_init(void)
+> >          }
+> >      }
+> >  }
+> > +
+> > +bool replay_can_snapshot(void)
+> > +{
+> > +    return replay_mode == REPLAY_MODE_NONE
+> > +        || !replay_has_events();
+> > +}
+> >
 
-diff --git a/backends/tpm.c b/backends/tpm.c
-index cf5abf1..05002e6 100644
---- a/backends/tpm.c
-+++ b/backends/tpm.c
-@@ -37,20 +37,6 @@ static void tpm_backend_thread_end(TPMBackend *s)
-     }
- }
- 
--enum TpmType tpm_backend_get_type(TPMBackend *s)
--{
--    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
--
--    return k->ops->type;
--}
--
--const char *tpm_backend_get_desc(TPMBackend *s)
--{
--    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
--
--    return k->ops->desc();
--}
--
- int tpm_backend_init(TPMBackend *s, TPMState *state,
-                      TPMRecvDataCB *datacb)
- {
-@@ -59,7 +45,7 @@ int tpm_backend_init(TPMBackend *s, TPMState *state,
-     s->tpm_state = state;
-     s->recv_data_callback = datacb;
- 
--    return k->ops->init(s);
-+    return k->ops->init ? k->ops->init(s) : 0;
- }
- 
- int tpm_backend_startup_tpm(TPMBackend *s)
-@@ -73,13 +59,15 @@ int tpm_backend_startup_tpm(TPMBackend *s)
-                                        NULL);
-     g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_INIT, NULL);
- 
--    return k->ops->startup_tpm(s);
-+    return k->ops->startup_tpm ? k->ops->startup_tpm(s) : 0;
- }
- 
- bool tpm_backend_had_startup_error(TPMBackend *s)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
-+    assert(k->ops->had_startup_error);
-+
-     return k->ops->had_startup_error(s);
- }
- 
-@@ -87,6 +75,8 @@ size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
-+    assert(k->ops->realloc_buffer);
-+
-     return k->ops->realloc_buffer(sb);
- }
- 
-@@ -100,7 +90,9 @@ void tpm_backend_reset(TPMBackend *s)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
--    k->ops->reset(s);
-+    if (k->ops->reset) {
-+        k->ops->reset(s);
-+    }
- 
-     tpm_backend_thread_end(s);
- }
-@@ -109,6 +101,8 @@ void tpm_backend_cancel_cmd(TPMBackend *s)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
-+    assert(k->ops->cancel_cmd);
-+
-     k->ops->cancel_cmd(s);
- }
- 
-@@ -116,20 +110,24 @@ bool tpm_backend_get_tpm_established_flag(TPMBackend *s)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
--    return k->ops->get_tpm_established_flag(s);
-+    return k->ops->get_tpm_established_flag ?
-+           k->ops->get_tpm_established_flag(s) : false;
- }
- 
- int tpm_backend_reset_tpm_established_flag(TPMBackend *s, uint8_t locty)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
--    return k->ops->reset_tpm_established_flag(s, locty);
-+    return k->ops->reset_tpm_established_flag ?
-+           k->ops->reset_tpm_established_flag(s, locty) : 0;
- }
- 
- TPMVersion tpm_backend_get_tpm_version(TPMBackend *s)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
-+    assert(k->ops->get_tpm_version);
-+
-     return k->ops->get_tpm_version(s);
- }
- 
-diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index 815a72e..a0459a6 100644
---- a/hw/tpm/tpm_passthrough.c
-+++ b/hw/tpm/tpm_passthrough.c
-@@ -227,15 +227,6 @@ static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd cmd)
-     }
- }
- 
--/*
-- * Start the TPM (thread). If it had been started before, then terminate
-- * and start it again.
-- */
--static int tpm_passthrough_startup_tpm(TPMBackend *tb)
--{
--    return 0;
--}
--
- static void tpm_passthrough_reset(TPMBackend *tb)
- {
-     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
-@@ -247,11 +238,6 @@ static void tpm_passthrough_reset(TPMBackend *tb)
-     tpm_pt->had_startup_error = false;
- }
- 
--static int tpm_passthrough_init(TPMBackend *tb)
--{
--    return 0;
--}
--
- static bool tpm_passthrough_get_tpm_established_flag(TPMBackend *tb)
- {
-     return false;
-@@ -309,11 +295,6 @@ static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
-     }
- }
- 
--static const char *tpm_passthrough_create_desc(void)
--{
--    return "Passthrough TPM backend driver";
--}
--
- static TPMVersion tpm_passthrough_get_tpm_version(TPMBackend *tb)
- {
-     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
-@@ -453,10 +434,8 @@ static const QemuOptDesc tpm_passthrough_cmdline_opts[] = {
- static const TPMDriverOps tpm_passthrough_driver = {
-     .type                     = TPM_TYPE_PASSTHROUGH,
-     .opts                     = tpm_passthrough_cmdline_opts,
--    .desc                     = tpm_passthrough_create_desc,
-+    .desc                     = "Passthrough TPM backend driver",
-     .create                   = tpm_passthrough_create,
--    .init                     = tpm_passthrough_init,
--    .startup_tpm              = tpm_passthrough_startup_tpm,
-     .realloc_buffer           = tpm_passthrough_realloc_buffer,
-     .reset                    = tpm_passthrough_reset,
-     .had_startup_error        = tpm_passthrough_get_startup_error,
-diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index f61bcfe..d6ae463 100644
---- a/include/sysemu/tpm_backend.h
-+++ b/include/sysemu/tpm_backend.h
-@@ -75,7 +75,7 @@ struct TPMDriverOps {
-     enum TpmType type;
-     const QemuOptDesc *opts;
-     /* get a descriptive text of the backend to display to the user */
--    const char *(*desc)(void);
-+    const char *desc;
- 
-     TPMBackend *(*create)(QemuOpts *opts, const char *id);
- 
-@@ -99,23 +99,6 @@ struct TPMDriverOps {
-     TPMVersion (*get_tpm_version)(TPMBackend *t);
- };
- 
--
--/**
-- * tpm_backend_get_type:
-- * @s: the backend
-- *
-- * Returns the TpmType of the backend.
-- */
--enum TpmType tpm_backend_get_type(TPMBackend *s);
--
--/**
-- * tpm_backend_get_desc:
-- * @s: the backend
-- *
-- * Returns a human readable description of the backend.
-- */
--const char *tpm_backend_get_desc(TPMBackend *s);
--
- /**
-  * tpm_backend_init:
-  * @s: the backend to initialized
-diff --git a/tpm.c b/tpm.c
-index 70f74fa..2979508 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -102,7 +102,7 @@ static void tpm_display_backend_drivers(void)
- 
-     for (i = 0; i < TPM_MAX_DRIVERS && be_drivers[i] != NULL; i++) {
-         fprintf(stderr, "%12s   %s\n",
--                TpmType_lookup[be_drivers[i]->type], be_drivers[i]->desc());
-+                TpmType_lookup[be_drivers[i]->type], be_drivers[i]->desc);
-     }
-     fprintf(stderr, "\n");
- }
--- 
-2.7.4
+Pavel Dovgalyuk
