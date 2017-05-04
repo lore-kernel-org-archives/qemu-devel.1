@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6B1v-0001UU-1G
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:30 -0400
+	(envelope-from <famz@redhat.com>) id 1d6B3Z-00035n-St
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:20:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6B1r-0004aP-Sz
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6B1r-0004ZQ-KW
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:18:23 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ACB484E047
-	for <qemu-devel@nongnu.org>; Thu,  4 May 2017 07:18:22 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  4 May 2017 09:17:58 +0200
-Message-Id: <20170504071811.3547-18-kraxel@redhat.com>
-In-Reply-To: <20170504071811.3547-1-kraxel@redhat.com>
-References: <20170504071811.3547-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 17/30] audio: Remove type field
+	(envelope-from <famz@redhat.com>) id 1d6B3Y-0005Kc-C9
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 03:20:09 -0400
+Date: Thu, 4 May 2017 15:19:57 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170504071957.GD19184@lemon.lan>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-10-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170420120058.28404-10-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/17] util: add stats64 module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +23,403 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-From: Juan Quintela <quintela@redhat.com>
+On Thu, 04/20 14:00, Paolo Bonzini wrote:
+> This module provides fast paths for 64-bit atomic operations on machines
+> that only have 32-bit atomic access.
 
-It was not used anymore as now there is only one type of devices.
+Interesting patch!
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Message-id: 20170425223739.6703-14-quintela@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/audio/fmopl.h |  7 +------
- hw/audio/adlib.c |  2 +-
- hw/audio/fmopl.c | 20 ++++++++------------
- 3 files changed, 10 insertions(+), 19 deletions(-)
+Out of curiosity: what are the machines here, besides i386? It strikes me as
+they are old and slow anyway, then why this optimization?
 
-diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
-index 8ef0b3e3c3..df790a0b7d 100644
---- a/hw/audio/fmopl.h
-+++ b/hw/audio/fmopl.h
-@@ -11,8 +11,6 @@ typedef unsigned char (*OPL_PORTHANDLER_R)(int param);
- 
- /* !!!!! here is private section , do not access there member direct !!!!! */
- 
--#define OPL_TYPE_WAVESEL   0x01  /* waveform select    */
--
- /* Saving is necessary for member of the 'R' mark for suspend/resume */
- /* ---------- OPL one of slot  ---------- */
- typedef struct fm_opl_slot {
-@@ -62,7 +60,6 @@ typedef struct fm_opl_channel {
- 
- /* OPL state */
- typedef struct fm_opl_f {
--	uint8_t type;			/* chip type                         */
- 	int clock;			/* master clock  (Hz)                */
- 	int rate;			/* sampling rate (Hz)                */
- 	double freqbase;	/* frequency base                    */
-@@ -108,9 +105,7 @@ typedef struct fm_opl_f {
- } FM_OPL;
- 
- /* ---------- Generic interface section ---------- */
--#define OPL_TYPE_YM3812 (OPL_TYPE_WAVESEL)
--
--FM_OPL *OPLCreate(int type, int clock, int rate);
-+FM_OPL *OPLCreate(int clock, int rate);
- void OPLDestroy(FM_OPL *OPL);
- void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER TimerHandler,int channelOffset);
- void OPLSetIRQHandler(FM_OPL *OPL,OPL_IRQHANDLER IRQHandler,int param);
-diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
-index f9adcd709a..09b8248cda 100644
---- a/hw/audio/adlib.c
-+++ b/hw/audio/adlib.c
-@@ -265,7 +265,7 @@ static void adlib_realizefn (DeviceState *dev, Error **errp)
-     }
-     glob_adlib = s;
- 
--    s->opl = OPLCreate (OPL_TYPE_YM3812, 3579545, s->freq);
-+    s->opl = OPLCreate (3579545, s->freq);
-     if (!s->opl) {
-         error_setg (errp, "OPLCreate %d failed", s->freq);
-         return;
-diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
-index 9171001030..48db828a49 100644
---- a/hw/audio/fmopl.c
-+++ b/hw/audio/fmopl.c
-@@ -761,18 +761,15 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
- 		{
- 		case 0x01:
- 			/* wave selector enable */
--			if(OPL->type&OPL_TYPE_WAVESEL)
-+			OPL->wavesel = v&0x20;
-+                        if(!OPL->wavesel)
- 			{
--				OPL->wavesel = v&0x20;
--				if(!OPL->wavesel)
-+				/* preset compatible mode */
-+				int c;
-+				for(c=0;c<OPL->max_ch;c++)
- 				{
--					/* preset compatible mode */
--					int c;
--					for(c=0;c<OPL->max_ch;c++)
--					{
--						OPL->P_CH[c].SLOT[SLOT1].wavetable = &SIN_TABLE[0];
--						OPL->P_CH[c].SLOT[SLOT2].wavetable = &SIN_TABLE[0];
--					}
-+					OPL->P_CH[c].SLOT[SLOT1].wavetable = &SIN_TABLE[0];
-+					OPL->P_CH[c].SLOT[SLOT2].wavetable = &SIN_TABLE[0];
- 				}
- 			}
- 			return;
-@@ -1076,7 +1073,7 @@ void OPLResetChip(FM_OPL *OPL)
- 
- /* ----------  Create one of vietual YM3812 ----------       */
- /* 'rate'  is sampling rate and 'bufsiz' is the size of the  */
--FM_OPL *OPLCreate(int type, int clock, int rate)
-+FM_OPL *OPLCreate(int clock, int rate)
- {
- 	char *ptr;
- 	FM_OPL *OPL;
-@@ -1095,7 +1092,6 @@ FM_OPL *OPLCreate(int type, int clock, int rate)
- 	OPL        = (FM_OPL *)ptr; ptr+=sizeof(FM_OPL);
- 	OPL->P_CH  = (OPL_CH *)ptr; ptr+=sizeof(OPL_CH)*max_ch;
- 	/* set channel state pointer */
--	OPL->type  = type;
- 	OPL->clock = clock;
- 	OPL->rate  = rate;
- 	OPL->max_ch = max_ch;
--- 
-2.9.3
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/qemu/stats64.h | 210 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  util/Makefile.objs     |   1 +
+>  util/stats64.c         | 135 ++++++++++++++++++++++++++++++++
+>  3 files changed, 346 insertions(+)
+>  create mode 100644 include/qemu/stats64.h
+>  create mode 100644 util/stats64.c
+> 
+> diff --git a/include/qemu/stats64.h b/include/qemu/stats64.h
+> new file mode 100644
+> index 0000000..70963f4
+> --- /dev/null
+> +++ b/include/qemu/stats64.h
+> @@ -0,0 +1,210 @@
+> +/*
+> + * Atomic operations on 64-bit quantities.
+> + *
+> + * Copyright (C) 2017 Red Hat, Inc.
+> + *
+> + * Author: Paolo Bonzini <pbonzini@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_STATS64_H
+> +#define QEMU_STATS64_H 1
+> +
+> +#include "qemu/atomic.h"
+
+Include qemu/osdep.h first, to honor scripts/clean-includes?
+
+> +
+> +/* FIXME: i386 doesn't need the spinlock.  Are there any others? */
+> +#if __SIZEOF_LONG__ < 8
+> +#define STAT64_NEED_SPINLOCK 1
+> +#endif
+> +
+> +/* This provides atomic operations on 64-bit type, using a reader-writer
+> + * spinlock on architectures that do not have 64-bit accesses.  However
+> + * it tries hard not to take the lock.
+> + */
+> +
+> +typedef struct Stat64 {
+> +#ifdef STAT64_NEED_SPINLOCK
+> +    uint32_t low, high;
+> +    uint32_t lock;
+> +#else
+> +    uint64_t value;
+> +#endif
+> +} Stat64;
+> +
+> +#ifndef STAT64_NEED_SPINLOCK
+> +static inline void stat64_init(Stat64 *s, uint64_t value)
+> +{
+> +    /* This is not guaranteed to be atomic! */
+> +    *s = (Stat64) { value };
+> +}
+> +
+> +static inline uint64_t stat64_get(const Stat64 *s)
+> +{
+> +    return atomic_read(&s->value);
+> +}
+> +
+> +static inline void stat64_add(Stat64 *s, uint64_t value)
+> +{
+> +    atomic_add(&s->value, value);
+> +}
+> +
+> +static inline void stat64_min(Stat64 *s, uint32_t value)
+> +{
+> +    for (;;) {
+> +        uint64_t orig = atomic_read(&s->value);
+> +        if (orig <= value) {
+> +            break;
+> +        }
+> +        orig = atomic_cmpxchg(&s->value, orig, value);
+> +        if (orig <= value) {
+> +            break;
+> +        }
+> +    }
+> +}
+> +
+> +static inline void stat64_max(Stat64 *s, uint32_t value)
+> +{
+> +    for (;;) {
+> +        uint64_t orig = atomic_read(&s->value);
+> +        if (orig >= value) {
+> +            break;
+> +        }
+> +        orig = atomic_cmpxchg(&s->value, orig, value);
+> +        if (orig >= value) {
+> +            break;
+> +        }
+> +    }
+> +}
+> +#else
+> +uint64_t stat64_get(const Stat64 *s);
+> +bool stat64_min_slow(Stat64 *s, uint64_t value);
+> +bool stat64_max_slow(Stat64 *s, uint64_t value);
+> +bool stat64_add32_carry(Stat64 *s, uint32_t low, uint32_t high);
+> +
+> +static inline void stat64_init(Stat64 *s, uint64_t value)
+> +{
+> +    /* This is not guaranteed to be atomic! */
+> +    *s = (Stat64) { .low = value, .high = value >> 32, .lock = 0 };
+> +}
+> +
+> +static inline void stat64_add(Stat64 *s, uint64_t value)
+> +{
+> +    uint32_t low, high;
+> +    high = value >> 32;
+> +    low = (uint32_t) value;
+> +    if (!low) {
+> +        if (high) {
+> +            atomic_add(&s->high, high);
+> +        }
+> +        return;
+> +    }
+> +
+> +    for (;;) {
+> +        uint32_t orig = s->low;
+> +        uint32_t result = orig + low;
+> +        uint32_t old;
+> +
+> +        if (result < low || high) {
+> +            /* If the high part is affected, take the lock.  */
+> +            if (stat64_add32_carry(s, low, high)) {
+> +                return;
+> +            }
+> +            continue;
+> +        }
+> +
+> +        /* No carry, try with a 32-bit cmpxchg.  The result is independent of
+> +         * the high 32 bits, so it can race just fine with stat64_add32_carry
+> +         * and even stat64_get!
+> +         */
+> +        old = atomic_cmpxchg(&s->low, orig, result);
+> +        if (orig == old) {
+> +            return;
+> +        }
+> +    }
+> +}
+> +
+> +static inline void stat64_min(Stat64 *s, uint64_t value)
+> +{
+> +    uint32_t low, high;
+> +    uint32_t orig_low, orig_high;
+> +
+> +    high = value >> 32;
+> +    low = (uint32_t) value;
+> +    do {
+> +        orig_high = atomic_read(&s->high);
+> +        if (orig_high < high) {
+> +            return;
+> +        }
+> +
+> +        if (orig_high == high) {
+> +            /* High 32 bits are equal.  Read low after high, otherwise we
+> +             * can get a false positive (e.g. 0x1235,0x0000 changes to
+> +             * 0x1234,0x8000 and we read it as 0x1234,0x0000). Pairs with
+> +             * the write barrier in stat64_min_slow.
+> +             */
+> +            smp_rmb();
+> +            orig_low = atomic_read(&s->low);
+> +            if (orig_low <= low) {
+> +                return;
+> +            }
+> +
+> +            /* See if we were lucky and a writer raced against us.  The
+> +             * barrier is theoretically unnecessary, but if we remove it
+> +             * we may miss being lucky.
+> +             */
+> +            smp_rmb();
+> +            orig_high = atomic_read(&s->high);
+> +            if (orig_high < high) {
+> +                return;
+> +            }
+> +        }
+> +
+> +        /* If the value changes in any way, we have to take the lock.  */
+> +    } while (!stat64_min_slow(s, value));
+> +}
+> +
+> +static inline void stat64_max(Stat64 *s, uint64_t value)
+> +{
+> +    uint32_t low, high;
+> +    uint32_t orig_low, orig_high;
+> +
+> +    high = value >> 32;
+> +    low = (uint32_t) value;
+> +    do {
+> +        orig_high = atomic_read(&s->high);
+> +        if (orig_high > high) {
+> +            return;
+> +        }
+> +
+> +        if (orig_high == high) {
+> +            /* High 32 bits are equal.  Read low after high, otherwise we
+> +             * can get a false positive (e.g. 0x1234,0x8000 changes to
+> +             * 0x1235,0x0000 and we read it as 0x1235,0x8000). Pairs with
+> +             * the write barrier in stat64_max_slow.
+> +             */
+> +            smp_rmb();
+> +            orig_low = atomic_read(&s->low);
+> +            if (orig_low >= low) {
+> +                return;
+> +            }
+> +
+> +            /* See if we were lucky and a writer raced against us.  The
+> +             * barrier is theoretically unnecessary, but if we remove it
+> +             * we may miss being lucky.
+> +             */
+> +            smp_rmb();
+> +            orig_high = atomic_read(&s->high);
+> +            if (orig_high > high) {
+> +                return;
+> +            }
+> +        }
+> +
+> +        /* If the value changes in any way, we have to take the lock.  */
+> +    } while (!stat64_max_slow(s, value));
+> +}
+> +
+> +#endif
+> +
+> +#endif
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index c6205eb..8a333d3 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -42,4 +42,5 @@ util-obj-y += log.o
+>  util-obj-y += qdist.o
+>  util-obj-y += qht.o
+>  util-obj-y += range.o
+> +util-obj-y += stats64.o
+>  util-obj-y += systemd.o
+> diff --git a/util/stats64.c b/util/stats64.c
+> new file mode 100644
+> index 0000000..b9238d7
+> --- /dev/null
+> +++ b/util/stats64.c
+> @@ -0,0 +1,135 @@
+> +/*
+> + * Atomic operations on 64-bit quantities.
+> + *
+> + * Copyright (C) 2017 Red Hat, Inc.
+> + *
+> + * Author: Paolo Bonzini <pbonzini@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/atomic.h"
+> +#include "qemu/stats64.h"
+> +
+> +#ifdef STAT64_NEED_SPINLOCK
+> +static inline void stat64_rdlock(Stat64 *s)
+> +{
+> +    /* Keep out incoming writers to avoid them starving us. */
+> +    atomic_add(&s->lock, 2);
+> +
+> +    /* If there is a concurrent writer, wait for it.  */
+> +    while (atomic_read(&s->lock) & 1) {
+> +        g_usleep(5);
+> +    }
+> +}
+> +
+> +static inline void stat64_rdunlock(Stat64 *s)
+> +{
+> +    atomic_sub(&s->lock, 2);
+> +}
+> +
+> +static inline bool stat64_wrtrylock(Stat64 *s)
+> +{
+> +    return atomic_cmpxchg(&s->lock, 0, 1) == 0;
+> +}
+> +
+> +static inline void stat64_wrunlock(Stat64 *s)
+> +{
+> +    atomic_dec(&s->lock);
+> +}
+> +
+> +uint64_t stat64_get(const Stat64 *s)
+> +{
+> +    uint32_t high, low;
+> +
+> +    stat64_rdlock((Stat64 *)s);
+> +
+> +    /* 64-bit writes always take the lock, so we can read in
+> +     * any order.
+> +     */
+> +    high = atomic_read(&s->high);
+> +    low = atomic_read(&s->low);
+> +    stat64_rdunlock((Stat64 *)s);
+> +
+> +    return ((uint64_t)high << 32) | low;
+> +}
+> +
+> +bool stat64_add32_carry(Stat64 *s, uint32_t low, uint32_t high)
+
+Maybe add "try" in the name too, for this, and the two below?
+
+> +{
+> +    uint32_t old;
+> +
+> +    if (!stat64_wrtrylock(s)) {
+> +        return false;
+> +    }
+> +
+> +    /* 64-bit reads always take the lock, so they don't care about the
+> +     * order of our update.  By updating s->low first, we can check
+> +     * whether we have to carry into s->high.
+> +     */
+> +    old = atomic_fetch_add(&s->low, value);
+> +    high += (old + value < old);
+> +    atomic_add(&s->high, high);
+> +    stat64_wrunlock(s);
+> +    return true;
+> +}
+> +
+> +bool stat64_min_slow(Stat64 *s, uint64_t value)
+> +{
+> +    uint32_t high, low;
+> +    uint64_t orig;
+> +
+> +    if (!stat64_wrtrylock(s)) {
+> +        return false;
+> +    }
+> +
+> +    high = atomic_read(&s->high);
+> +    low = atomic_read(&s->low);
+> +
+> +    orig = ((uint64_t)high << 32) | low;
+> +    if (orig < value) {
+> +        /* The value may become higher temporarily, but stat64_get does not
+> +         * notice (it takes the lock) and the only effect on stat64_min is
+> +         * that the slow path may be triggered unnecessarily.
+> +         *
+> +         * But, we have to set low before high, just like stat64_min reads
+> +         * high before low.
+> +         */
+> +        atomic_set(&s->low, (uint32_t)value);
+> +        smp_wmb();
+> +        atomic_set(&s->high, value >> 32);
+> +    }
+> +    stat64_wrunlock(s);
+> +    return true;
+> +}
+> +
+> +bool stat64_max_slow(Stat64 *s, uint64_t value)
+> +{
+> +    uint32_t high, low;
+> +    uint64_t orig;
+> +
+> +    if (!stat64_wrtrylock(s)) {
+> +        return false;
+> +    }
+> +
+> +    high = atomic_read(&s->high);
+> +    low = atomic_read(&s->low);
+> +
+> +    orig = ((uint64_t)high << 32) | low;
+> +    if (orig > value) {
+> +        /* The value may become lower temporarily, but stat64_get does not
+> +         * notice (it takes the lock) and the only effect on stat64_max is
+> +         * that the slow path may be triggered unnecessarily.
+> +         *
+> +         * But, we have to set low before high, just like stat64_max reads
+> +         * high before low.
+> +         */
+> +        atomic_set(&s->low, (uint32_t)value);
+> +        smp_wmb();
+> +        atomic_set(&s->high, value >> 32);
+> +    }
+> +    stat64_wrunlock(s);
+> +    return true;
+> +}
+> +#endif
+> -- 
+> 2.9.3
+> 
+> 
+> 
