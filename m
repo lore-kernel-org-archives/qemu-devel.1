@@ -1,28 +1,49 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6EbI-0004tg-Uw
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:07:14 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1d6EcS-0005cz-PJ
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:08:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6EbH-0007eJ-M1
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:07:12 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36239)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d6EbH-0007df-F9
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:07:11 -0400
-Received: by mail-wm0-x243.google.com with SMTP id u65so2522069wmu.3
-	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 04:07:11 -0700 (PDT)
-Date: Thu, 4 May 2017 12:07:08 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170504110708.GF32376@stefanha-x1.localdomain>
-References: <20170419144219.20371-1-pbonzini@redhat.com>
-	<20170419144219.20371-12-pbonzini@redhat.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1d6EcK-0007wv-GR
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:08:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36226
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1d6EcK-0007vI-AH
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:08:16 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v44B46f0009697
+	for <qemu-devel@nongnu.org>; Thu, 4 May 2017 07:08:14 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a7m0rbp6u-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 07:08:13 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 4 May 2017 05:08:13 -0600
+References: <CAJ+F1C+gLTVpZZeKtxuLFUgs6nJ0KbgnJp4VdAuuM4JK2RbYMA@mail.gmail.com>
+	<38a2aa2e-6270-63af-3dec-bd666d56780d@linux.vnet.ibm.com>
+	<CAJ+F1CKcZvWE4OQOMKuDqNvKGEQK3DdihM6Eyx-piqtQtSbXGQ@mail.gmail.com>
+	<5ee48b85-0404-a810-95b5-4b19b197373e@linux.vnet.ibm.com>
+	<1493749518.4241.225.camel@intel.com>
+	<CAJ+F1CK4jN2Nb6eKB1x9Km0xnurs976=Kb0idFpPgtH+JHYTcQ@mail.gmail.com>
+	<b6e0d6d2-d276-c66d-ae5e-c6502cbe0b5c@linux.vnet.ibm.com>
+	<20170503084136.GC4121@redhat.com> <20170503111659.GA2077@work-vm>
+	<CAJ+F1CJ2JnLS2BbMWES0HQ3-iJUzXrrj21RVPo70d04xpWbgDQ@mail.gmail.com>
+	<20170503112948.GA3985@redhat.com>
+	<14dc8420-0a21-b92e-4e50-a92676d35b96@linux.vnet.ibm.com>
+	<1493891098.4241.285.camel@intel.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 4 May 2017 07:08:06 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="udcq9yAoWb9A4FsZ"
-Content-Disposition: inline
-In-Reply-To: <20170419144219.20371-12-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 11/11] blockjob: use deferred_to_main_loop
- to indicate the coroutine has ended
+In-Reply-To: <1493891098.4241.285.camel@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <242ac1b9-1b2e-f8b2-a29e-2fd6dd4a63cf@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 8/8] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +52,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 
+On 05/04/2017 05:44 AM, Patrick Ohly wrote:
+> On Wed, 2017-05-03 at 10:42 -0400, Stefan Berger wrote:
+>>    - the TPM 2 part , as stated before, is still somewhat in flux. I am
+>> not sure when there will be a final TPM 2 from TCG. There the
+>> possibility exists that the state blobs the TPM 2 is writing out still
+>> change. I have added a version tag in front of the blobs so in case
+>> something else gets added that that can be accommodated. Besides that
+>> it's also adapted to write the state blobs in big endian format for the
+>> same reason as above. Maybe at some point I'll just freeze the code and
+>> don't follow the ongoing TPM 2 development anymore besides bug fixes to
+>> exsting code, which then freezes the state blobs as well.
+> Ignoring the "work in progress" status of TPM 2 and your
+> https://github.com/stefanberger/swtpm/tree/tpm2-preview branch, should
+> your current code already also work with the qemu device backend that is
+> getting discussed here?
 
---udcq9yAoWb9A4FsZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes.
 
-On Wed, Apr 19, 2017 at 04:42:19PM +0200, Paolo Bonzini wrote:
-> All block jobs are using block_job_defer_to_main_loop as the final
-> step just before the coroutine terminates.  At this point,
-> block_job_enter should do nothing, but currently it restarts
-> the freed coroutine.
->=20
-> Now, the job->co states should probably be changed to an enum
-> (e.g. BEFORE_START, STARTED, YIELDED, COMPLETED) subsuming
-> block_job_started, job->deferred_to_main_loop and job->busy.
-> For now, this patch eliminates the problematic reenter by
-> removing the reset of job->deferred_to_main_loop (which served
-> no purpose, as far as I could see) and checking the flag in
-> block_job_enter.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  blockjob.c                   | 10 ++++++++--
->  include/block/blockjob_int.h |  3 ++-
->  2 files changed, 10 insertions(+), 3 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---udcq9yAoWb9A4FsZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZCwtcAAoJEJykq7OBq3PIgRIH/iNcTltB/hfUH3Kgn7gjINUT
-IMAqTFqVzO6h9s7HY89ikq83sTGpGapHIoWvoQvtt0tDvDIUz5RBT21lQ87mZ8xI
-43hQ3EA2p4CDfOqEM+wKwu4wJeRWp+M4s7tsh8LJkWbys+O+kGEx3cKEN4kSlOQF
-pim6v3a9rcX2CZT+Ejf6WSaMJrmI1VUGjiQ6fE+tiTeRHtQ5JMZarQfQv+1IdXVW
-LRmqCtr8AxhkZqNaoPT/EjZvpgAvFLzAPFtBOPNUCEE4QoBHCw9N9/uqndQS0ONi
-iHsfhoun1CM4LUm6jwiQ1BmNrqy/6P5p35zO21QxMOm1qKEtdklX5So/Mmz75no=
-=WCxz
------END PGP SIGNATURE-----
-
---udcq9yAoWb9A4FsZ--
+>
+> In other words, are protocol changes needed? I know that TPM 2 has
+> changed the commands, but I don't know whether that affects also the
+> lower layers.
+>
+No, should work as-is.
