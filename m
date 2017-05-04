@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FBy-0004nU-9j
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:45:07 -0400
+	(envelope-from <drjones@redhat.com>) id 1d6FCb-0005RH-Dj
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d6FBx-000512-Fw
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:45:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44028)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1d6FBx-00050p-AS
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:45:05 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  4 May 2017 15:42:32 +0400
-Message-Id: <20170504114232.20318-22-marcandre.lureau@redhat.com>
-In-Reply-To: <20170504114232.20318-1-marcandre.lureau@redhat.com>
-References: <20170504114232.20318-1-marcandre.lureau@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1d6FCX-0005Pf-Dd
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 07:45:45 -0400
+Date: Thu, 4 May 2017 13:45:28 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170504114528.hegmpv62s3iteq7y@kamzik.brq.redhat.com>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-12-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/21] tests: add /char/console test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493816238-33120-12-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 11/24] numa: do default mapping based on
+ possible_cpus instead of node_cpu bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/test-char.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+On Wed, May 03, 2017 at 02:57:05PM +0200, Igor Mammedov wrote:
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  numa.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/numa.c b/numa.c
+> index 5ff1212..c7e3e0a 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -309,6 +309,7 @@ static void validate_numa_cpus(void)
+>  void parse_numa_opts(MachineState *ms)
+>  {
+>      int i;
+> +    const CPUArchIdList *possible_cpus;
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>  
+>      for (i = 0; i < MAX_NODES; i++) {
+> @@ -379,11 +380,6 @@ void parse_numa_opts(MachineState *ms)
+>  
+>          numa_set_mem_ranges();
+>  
+> -        for (i = 0; i < nb_numa_nodes; i++) {
+> -            if (!bitmap_empty(numa_info[i].node_cpu, max_cpus)) {
+> -                break;
+> -            }
+> -        }
+>          /* Historically VCPUs were assigned in round-robin order to NUMA
+>           * nodes. However it causes issues with guest not handling it nice
+>           * in case where cores/threads from a multicore CPU appear on
+> @@ -391,11 +387,20 @@ void parse_numa_opts(MachineState *ms)
+>           * rule grouping VCPUs by socket so that VCPUs from the same socket
+>           * would be on the same node.
+>           */
+> -        if (!mc->cpu_index_to_instance_props) {
+> +        if (!mc->cpu_index_to_instance_props || !mc->possible_cpu_arch_ids) {
+>              error_report("default CPUs to NUMA node mapping isn't supported");
+>              exit(1);
+>          }
+> -        if (i == nb_numa_nodes) {
+> +
+> +        possible_cpus = mc->possible_cpu_arch_ids(ms);
+> +        for (i = 0; i < possible_cpus->len; i++) {
+> +            if (possible_cpus->cpus[i].props.has_node_id) {
+> +                break;
+> +            }
+> +        }
+> +
+> +        /* no CPUs are assigned to NUMA nodes */
+> +        if (i == possible_cpus->len) {
+>              for (i = 0; i < max_cpus; i++) {
+>                  CpuInstanceProperties props;
+>                  /* fetch default mapping from board and enable it */
+> -- 
+> 2.7.4
+>
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 19707bfcda..773a1c36ba 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -57,6 +57,32 @@ static void fe_event(void *opaque, int event)
- }
-=20
- #ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
-+#ifdef _WIN32
-+static void char_console_test_subprocess(void)
-+{
-+    QemuOpts *opts;
-+    Chardev *chr;
-+
-+    opts =3D qemu_opts_create(qemu_find_opts("chardev"), "console-label"=
-,
-+                            1, &error_abort);
-+    qemu_opt_set(opts, "backend", "console", &error_abort);
-+
-+    chr =3D qemu_chr_new_from_opts(opts, NULL);
-+    g_assert_nonnull(chr);
-+
-+    qemu_chr_write_all(chr, (const uint8_t *)"CONSOLE", 7);
-+
-+    qemu_opts_del(opts);
-+    object_unparent(OBJECT(chr));
-+}
-+
-+static void char_console_test(void)
-+{
-+    g_test_trap_subprocess("/char/console/subprocess", 0, 0);
-+    g_test_trap_assert_passed();
-+    g_test_trap_assert_stdout("CONSOLE");
-+}
-+#endif
- static void char_stdio_test_subprocess(void)
- {
-     Chardev *chr;
-@@ -83,7 +109,6 @@ static void char_stdio_test(void)
- }
- #endif
-=20
--
- static void char_ringbuf_test(void)
- {
-     QemuOpts *opts;
-@@ -566,6 +591,10 @@ int main(int argc, char **argv)
-     g_test_add_func("/char/ringbuf", char_ringbuf_test);
-     g_test_add_func("/char/mux", char_mux_test);
- #ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
-+#ifdef _WIN32
-+    g_test_add_func("/char/console/subprocess", char_console_test_subpro=
-cess);
-+    g_test_add_func("/char/console", char_console_test);
-+#endif
-     g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess=
-);
-     g_test_add_func("/char/stdio", char_stdio_test);
- #endif
---=20
-2.12.0.191.gc5d8de91d
+Reviewed-by: Andrew Jones <drjones@redhat.com> 
