@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d6K01-0008Es-Nl
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d6K02-0008Fr-C7
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d6K00-0003wQ-LA
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d6K01-0003xZ-Eq
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:53:06 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  4 May 2017 18:52:40 +0200
-Message-Id: <1493916761-32319-6-git-send-email-kwolf@redhat.com>
+Date: Thu,  4 May 2017 18:52:41 +0200
+Message-Id: <1493916761-32319-7-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
 References: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/6] block: Fix write/resize permissions for
- inactive images
+Subject: [Qemu-devel] [PATCH 6/6] file-posix: Remove
+ .bdrv_inactivate/invalidate_cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,129 +23,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
 
-Format drivers for inactive nodes don't need write/resize permissions on
-their bs->file and can share write/resize with another VM (in fact, this
-is the whole point of keeping images inactive). Represent this fact in
-the op blocker system, so that image locking does the right thing
-without special-casing inactive images.
+Now that the block layer takes care to request a lot less permissions
+for inactive nodes, the special-casing in file-posix isn't necessary any
+more.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c               | 35 +++++++++++++++++++++++++++++++++--
- include/block/block.h |  1 +
- 2 files changed, 34 insertions(+), 2 deletions(-)
+ block/file-posix.c | 33 ---------------------------------
+ 1 file changed, 33 deletions(-)
 
-diff --git a/block.c b/block.c
-index 773bd64..cd89467 100644
---- a/block.c
-+++ b/block.c
-@@ -192,11 +192,20 @@ void path_combine(char *dest, int dest_size,
-     }
+diff --git a/block/file-posix.c b/block/file-posix.c
+index f1f924b..90a5f53 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2190,35 +2190,6 @@ static void raw_abort_perm_update(BlockDriverState *bs)
+     raw_handle_perm_lock(bs, RAW_PL_ABORT, 0, 0, NULL);
  }
  
-+/* Returns whether the image file is opened as read-only. Note that this can
-+ * return false and writing to the image file is still not possible because the
-+ * image is inactivated. */
- bool bdrv_is_read_only(BlockDriverState *bs)
- {
-     return bs->read_only;
- }
- 
-+/* Returns whether the image file can be written to right now */
-+bool bdrv_is_writable(BlockDriverState *bs)
-+{
-+    return !bdrv_is_read_only(bs) && !(bs->open_flags & BDRV_O_INACTIVE);
-+}
-+
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
- {
-     /* Do not set read_only if copy_on_read is enabled */
-@@ -1512,7 +1521,7 @@ static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
- 
-     /* Write permissions never work with read-only images */
-     if ((cumulative_perms & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED)) &&
--        bdrv_is_read_only(bs))
-+        !bdrv_is_writable(bs))
-     {
-         error_setg(errp, "Block node is read-only");
-         return -EPERM;
-@@ -1797,7 +1806,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-         bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, &shared);
- 
-         /* Format drivers may touch metadata even if the guest doesn't write */
--        if (!bdrv_is_read_only(bs)) {
-+        if (bdrv_is_writable(bs)) {
-             perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
-         }
- 
-@@ -1823,6 +1832,10 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                   BLK_PERM_WRITE_UNCHANGED;
-     }
- 
-+    if (bs->open_flags & BDRV_O_INACTIVE) {
-+        shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+    }
-+
-     *nperm = perm;
-     *nshared = shared;
- }
-@@ -3969,6 +3982,7 @@ void bdrv_init_with_whitelist(void)
- void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
- {
-     BdrvChild *child, *parent;
-+    uint64_t perm, shared_perm;
-     Error *local_err = NULL;
-     int ret;
- 
-@@ -4005,6 +4019,16 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
-         return;
-     }
- 
-+    /* Update permissions, they may differ for inactive nodes */
-+    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
-+    ret = bdrv_check_perm(bs, perm, shared_perm, NULL, &local_err);
-+    if (ret < 0) {
-+        bs->open_flags |= BDRV_O_INACTIVE;
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    bdrv_set_perm(bs, perm, shared_perm);
-+
-     QLIST_FOREACH(parent, &bs->parents, next_parent) {
-         if (parent->role->activate) {
-             parent->role->activate(parent, &local_err);
-@@ -4049,6 +4073,8 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
-     }
- 
-     if (setting_flag) {
-+        uint64_t perm, shared_perm;
-+
-         bs->open_flags |= BDRV_O_INACTIVE;
- 
-         QLIST_FOREACH(parent, &bs->parents, next_parent) {
-@@ -4060,6 +4086,11 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
-                 }
-             }
-         }
-+
-+        /* Update permissions, they may differ for inactive nodes */
-+        bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
-+        bdrv_check_perm(bs, perm, shared_perm, NULL, &error_abort);
-+        bdrv_set_perm(bs, perm, shared_perm);
-     }
- 
-     QLIST_FOREACH(child, &bs->children, next) {
-diff --git a/include/block/block.h b/include/block/block.h
-index 80d51d8..90932b4 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -435,6 +435,7 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-                             int64_t sector_num, int nb_sectors, int *pnum);
- 
- bool bdrv_is_read_only(BlockDriverState *bs);
-+bool bdrv_is_writable(BlockDriverState *bs);
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
- int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
- bool bdrv_is_sg(BlockDriverState *bs);
+-static int raw_inactivate(BlockDriverState *bs)
+-{
+-    int ret;
+-    uint64_t perm = 0;
+-    uint64_t shared = BLK_PERM_ALL;
+-
+-    ret = raw_handle_perm_lock(bs, RAW_PL_PREPARE, perm, shared, NULL);
+-    if (ret) {
+-        return ret;
+-    }
+-    raw_handle_perm_lock(bs, RAW_PL_COMMIT, perm, shared, NULL);
+-    return 0;
+-}
+-
+-
+-static void raw_invalidate_cache(BlockDriverState *bs, Error **errp)
+-{
+-    BDRVRawState *s = bs->opaque;
+-    int ret;
+-
+-    assert(!(bdrv_get_flags(bs) & BDRV_O_INACTIVE));
+-    ret = raw_handle_perm_lock(bs, RAW_PL_PREPARE, s->perm, s->shared_perm,
+-                               errp);
+-    if (ret) {
+-        return;
+-    }
+-    raw_handle_perm_lock(bs, RAW_PL_COMMIT, s->perm, s->shared_perm, NULL);
+-}
+-
+ BlockDriver bdrv_file = {
+     .format_name = "file",
+     .protocol_name = "file",
+@@ -2249,8 +2220,6 @@ BlockDriver bdrv_file = {
+     .bdrv_get_info = raw_get_info,
+     .bdrv_get_allocated_file_size
+                         = raw_get_allocated_file_size,
+-    .bdrv_inactivate = raw_inactivate,
+-    .bdrv_invalidate_cache = raw_invalidate_cache,
+     .bdrv_check_perm = raw_check_perm,
+     .bdrv_set_perm   = raw_set_perm,
+     .bdrv_abort_perm_update = raw_abort_perm_update,
+@@ -2712,8 +2681,6 @@ static BlockDriver bdrv_host_device = {
+     .bdrv_get_info = raw_get_info,
+     .bdrv_get_allocated_file_size
+                         = raw_get_allocated_file_size,
+-    .bdrv_inactivate = raw_inactivate,
+-    .bdrv_invalidate_cache = raw_invalidate_cache,
+     .bdrv_check_perm = raw_check_perm,
+     .bdrv_set_perm   = raw_set_perm,
+     .bdrv_abort_perm_update = raw_abort_perm_update,
 -- 
 1.8.3.1
