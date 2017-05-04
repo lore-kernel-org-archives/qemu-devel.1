@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1d6CLJ-00045n-Jt
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:42:34 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d6CNR-0006Tx-I7
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1d6CLG-000752-9Q
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:42:33 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:42446)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1d6CLF-00073U-RL
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:42:30 -0400
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Thu, 04 May 2017 11:42:33 +0300
-Message-ID: <20170504084233.7488.8159.stgit@PASHA-ISP>
-In-Reply-To: <20170504084135.7488.24715.stgit@PASHA-ISP>
-References: <20170504084135.7488.24715.stgit@PASHA-ISP>
+	(envelope-from <imammedo@redhat.com>) id 1d6CNQ-00009V-8u
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 04:44:45 -0400
+Date: Thu, 4 May 2017 10:44:34 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170504104434.210ec40b@nial.brq.redhat.com>
+In-Reply-To: <20170503152022.GQ3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-11-git-send-email-imammedo@redhat.com>
+	<20170503152022.GQ3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v9 10/10] icount: fixed saving/restoring of
- icount warp timers
+Subject: Re: [Qemu-devel] [PATCH v2 10/24] numa: mirror cpu to node mapping
+ in MachineState::possible_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,207 +25,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, dovgaluk@ispras.ru, kraxel@redhat.com, pbonzini@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Wed, 3 May 2017 12:20:22 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-This patch adds saving and restoring of the icount warp
-timers in the vmstate.
-It is needed because there timers affect the virtual clock value.
-Therefore determinism of the execution in icount record/replay mode
-depends on determinism of the timers.
+> On Wed, May 03, 2017 at 02:57:04PM +0200, Igor Mammedov wrote:
+> > Introduce machine_set_cpu_numa_node() helper that stores
+> > node mapping for CPU in MachineState::possible_cpus.
+> > CPU and node it belongs to is specified by 'props' argument.
+> > 
+> > Patch doesn't remove old way of storing mapping in
+> > numa_info[X].node_cpu as removing it at the same time
+> > makes patch rather big. Instead it just mirrors mapping
+> > in possible_cpus and follow up per target patches will
+> > switch to possible_cpus and numa_info[X].node_cpu will
+> > be removed once there isn't any users left.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  include/hw/boards.h |  2 ++
+> >  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  numa.c              |  8 +++++++
+> >  3 files changed, 78 insertions(+)
+> > 
+> > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > index 5d6af21..1f518a1 100644
+> > --- a/include/hw/boards.h
+> > +++ b/include/hw/boards.h
+> > @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
+> >  bool machine_mem_merge(MachineState *machine);
+> >  void machine_register_compat_props(MachineState *machine);
+> >  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
+> > +void machine_set_cpu_numa_node(MachineState *machine,
+> > +                               CpuInstanceProperties *props, Error **errp);
+> >  
+> >  /**
+> >   * CPUArchId:
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index ada9eea..a63f17b 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
+> >      return head;
+> >  }
+> >  
+> > +void machine_set_cpu_numa_node(MachineState *machine,
+> > +                               CpuInstanceProperties *props, Error **errp)  
+> 
+> As the semantics of this function aren't trivial, it would be
+> nice to have a comment explaining what exactly this function do.
+> 
+> e.g.:
+> * make it clear that it could affect multiple CPU slots;
+> * make it clear what does it mean to have props->has_node_id=false as
+>   argument (is it really valid?);
+> * make it clear that it will refuse to change an existing mapping.
+sure, I'll add comment.
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- cpus.c |   83 +++++++++++++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 64 insertions(+), 19 deletions(-)
+> > +{
+> > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> > +    bool match = false;
+> > +    int i;
+> > +
+> > +    if (!mc->possible_cpu_arch_ids) {
+> > +        error_setg(errp, "mapping of CPUs to NUMA node is not supported");
+> > +        return;
+> > +    }
+> > +
+> > +    /* force board to initialize possible_cpus if it hasn't been done yet */
+> > +    mc->possible_cpu_arch_ids(machine);
+> > +
+> > +    for (i = 0; i < machine->possible_cpus->len; i++) {
+> > +        CPUArchId *slot = &machine->possible_cpus->cpus[i];
+> > +
+> > +        /* reject unsupported by board properties */
+> > +        if (props->has_thread_id && !slot->props.has_thread_id) {
+> > +            error_setg(errp, "thread-id is not supported");
+> > +            return;
+> > +        }
+> > +
+> > +        if (props->has_core_id && !slot->props.has_core_id) {
+> > +            error_setg(errp, "core-id is not supported");
+> > +            return;
+> > +        }
+> > +
+> > +        if (props->has_socket_id && !slot->props.has_socket_id) {
+> > +            error_setg(errp, "socket-id is not supported");
+> > +            return;
+> > +        }
+> > +
+> > +        /* skip slots with explicit mismatch */
+> > +        if (props->has_thread_id && props->thread_id != slot->props.thread_id) {
+> > +                continue;
+> > +        }
+> > +
+> > +        if (props->has_core_id && props->core_id != slot->props.core_id) {
+> > +                continue;
+> > +        }
+> > +
+> > +        if (props->has_socket_id && props->socket_id != slot->props.socket_id) {
+> > +                continue;
+> > +        }
+> > +
+> > +        /* reject assignment if slot is already assigned, for compatibility
+> > +         * of legacy cpu_index mapping with SPAPR core based mapping do not
+> > +         * error out if cpu thread and matched core have the same node-id */
+> > +        if (slot->props.has_node_id &&
+> > +            slot->props.node_id != props->node_id) {
+> > +            error_setg(errp, "CPU is already assigned to node-id: %" PRId64,
+> > +                       slot->props.node_id);
+> > +            return;
+> > +        }
+> > +
+> > +        /* assign slot to node as it's matched '-numa cpu' key */
+> > +        match = true;
+> > +        slot->props.node_id = props->node_id;
+> > +        slot->props.has_node_id = props->has_node_id;  
+> 
+> Is it really valid to have has_node_id=false? Maybe an
+> assert(props->has_node_id) at the beginning of the function would
+> be useful.
+yep, it shouldn't be false for props->has_node_id
+I'll add assert
 
-diff --git a/cpus.c b/cpus.c
-index f21e7f3166..5c955a709c 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -118,16 +118,11 @@ static bool all_cpu_threads_idle(void)
- /* Protected by TimersState seqlock */
- 
- static bool icount_sleep = true;
--static int64_t vm_clock_warp_start = -1;
- /* Conversion factor from emulated instructions to virtual clock ticks.  */
- static int icount_time_shift;
- /* Arbitrarily pick 1MIPS as the minimum allowable speed.  */
- #define MAX_ICOUNT_SHIFT 10
- 
--static QEMUTimer *icount_rt_timer;
--static QEMUTimer *icount_vm_timer;
--static QEMUTimer *icount_warp_timer;
--
- typedef struct TimersState {
-     /* Protected by BQL.  */
-     int64_t cpu_ticks_prev;
-@@ -145,6 +140,11 @@ typedef struct TimersState {
-     int64_t qemu_icount_bias;
-     /* Only written by TCG thread */
-     int64_t qemu_icount;
-+    /* for adjusting icount */
-+    int64_t vm_clock_warp_start;
-+    QEMUTimer *icount_rt_timer;
-+    QEMUTimer *icount_vm_timer;
-+    QEMUTimer *icount_warp_timer;
- } TimersState;
- 
- static TimersState timers_state;
-@@ -430,14 +430,14 @@ static void icount_adjust(void)
- 
- static void icount_adjust_rt(void *opaque)
- {
--    timer_mod(icount_rt_timer,
-+    timer_mod(timers_state.icount_rt_timer,
-               qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL_RT) + 1000);
-     icount_adjust();
- }
- 
- static void icount_adjust_vm(void *opaque)
- {
--    timer_mod(icount_vm_timer,
-+    timer_mod(timers_state.icount_vm_timer,
-                    qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                    NANOSECONDS_PER_SECOND / 10);
-     icount_adjust();
-@@ -458,7 +458,7 @@ static void icount_warp_rt(void)
-      */
-     do {
-         seq = seqlock_read_begin(&timers_state.vm_clock_seqlock);
--        warp_start = vm_clock_warp_start;
-+        warp_start = timers_state.vm_clock_warp_start;
-     } while (seqlock_read_retry(&timers_state.vm_clock_seqlock, seq));
- 
-     if (warp_start == -1) {
-@@ -471,7 +471,7 @@ static void icount_warp_rt(void)
-                                      cpu_get_clock_locked());
-         int64_t warp_delta;
- 
--        warp_delta = clock - vm_clock_warp_start;
-+        warp_delta = clock - timers_state.vm_clock_warp_start;
-         if (use_icount == 2) {
-             /*
-              * In adaptive mode, do not let QEMU_CLOCK_VIRTUAL run too
-@@ -483,7 +483,7 @@ static void icount_warp_rt(void)
-         }
-         timers_state.qemu_icount_bias += warp_delta;
-     }
--    vm_clock_warp_start = -1;
-+    timers_state.vm_clock_warp_start = -1;
-     seqlock_write_end(&timers_state.vm_clock_seqlock);
- 
-     if (qemu_clock_expired(QEMU_CLOCK_VIRTUAL)) {
-@@ -592,11 +592,11 @@ void qemu_start_warp_timer(void)
-              * every 100ms.
-              */
-             seqlock_write_begin(&timers_state.vm_clock_seqlock);
--            if (vm_clock_warp_start == -1 || vm_clock_warp_start > clock) {
--                vm_clock_warp_start = clock;
-+            if (timers_state.vm_clock_warp_start == -1 || timers_state.vm_clock_warp_start > clock) {
-+                timers_state.vm_clock_warp_start = clock;
-             }
-             seqlock_write_end(&timers_state.vm_clock_seqlock);
--            timer_mod_anticipate(icount_warp_timer, clock + deadline);
-+            timer_mod_anticipate(timers_state.icount_warp_timer, clock + deadline);
-         }
-     } else if (deadline == 0) {
-         qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
-@@ -621,7 +621,7 @@ static void qemu_account_warp_timer(void)
-         return;
-     }
- 
--    timer_del(icount_warp_timer);
-+    timer_del(timers_state.icount_warp_timer);
-     icount_warp_rt();
- }
- 
-@@ -630,6 +630,44 @@ static bool icount_state_needed(void *opaque)
-     return use_icount;
- }
- 
-+static bool warp_timer_state_needed(void *opaque)
-+{
-+    TimersState *s = opaque;
-+    return s->icount_warp_timer != NULL;
-+}
-+
-+static bool adjust_timers_state_needed(void *opaque)
-+{
-+    TimersState *s = opaque;
-+    return s->icount_rt_timer != NULL;
-+}
-+
-+/*
-+ * Subsection for warp timer migration is optional, because may not be created
-+ */
-+static const VMStateDescription icount_vmstate_warp_timer = {
-+    .name = "timer/icount/warp_timer",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = warp_timer_state_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_TIMER_PTR(icount_warp_timer, TimersState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription icount_vmstate_adjust_timers = {
-+    .name = "timer/icount/timers",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = adjust_timers_state_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_TIMER_PTR(icount_rt_timer, TimersState),
-+        VMSTATE_TIMER_PTR(icount_vm_timer, TimersState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- /*
-  * This is a subsection for icount migration.
-  */
-@@ -641,7 +679,13 @@ static const VMStateDescription icount_vmstate_timers = {
-     .fields = (VMStateField[]) {
-         VMSTATE_INT64(qemu_icount_bias, TimersState),
-         VMSTATE_INT64(qemu_icount, TimersState),
-+        VMSTATE_INT64(vm_clock_warp_start, TimersState),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription*[]) {
-+        &icount_vmstate_warp_timer,
-+        &icount_vmstate_adjust_timers,
-+        NULL
-     }
- };
- 
-@@ -752,7 +796,7 @@ void configure_icount(QemuOpts *opts, Error **errp)
- 
-     icount_sleep = qemu_opt_get_bool(opts, "sleep", true);
-     if (icount_sleep) {
--        icount_warp_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL_RT,
-+        timers_state.icount_warp_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL_RT,
-                                          icount_timer_cb, NULL);
-     }
- 
-@@ -786,13 +830,14 @@ void configure_icount(QemuOpts *opts, Error **errp)
-        the virtual time trigger catches emulated time passing too fast.
-        Realtime triggers occur even when idle, so use them less frequently
-        than VM triggers.  */
--    icount_rt_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL_RT,
-+    timers_state.vm_clock_warp_start = -1;
-+    timers_state.icount_rt_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL_RT,
-                                    icount_adjust_rt, NULL);
--    timer_mod(icount_rt_timer,
-+    timer_mod(timers_state.icount_rt_timer,
-                    qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL_RT) + 1000);
--    icount_vm_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+    timers_state.icount_vm_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                         icount_adjust_vm, NULL);
--    timer_mod(icount_vm_timer,
-+    timer_mod(timers_state.icount_vm_timer,
-                    qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-                    NANOSECONDS_PER_SECOND / 10);
- }
+> 
+> > +    }
+> > +
+> > +    if (!match) {
+> > +        error_setg(errp, "no match found");
+> > +    }
+> > +}
+> > +
+> >  static void machine_class_init(ObjectClass *oc, void *data)
+> >  {
+> >      MachineClass *mc = MACHINE_CLASS(oc);
+> > diff --git a/numa.c b/numa.c
+> > index b517870..5ff1212 100644
+> > --- a/numa.c
+> > +++ b/numa.c
+> > @@ -169,6 +169,7 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
+> >          exit(1);
+> >      }
+> >      for (cpus = node->cpus; cpus; cpus = cpus->next) {
+> > +        CpuInstanceProperties props;
+> >          if (cpus->value >= max_cpus) {
+> >              error_setg(errp,
+> >                         "CPU index (%" PRIu16 ")"
+> > @@ -177,6 +178,10 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
+> >              return;
+> >          }
+> >          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
+> > +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
+> > +        props.node_id = nodenr;
+> > +        props.has_node_id = true;
+> > +        machine_set_cpu_numa_node(ms, &props, &error_fatal);
+> >      }
+> >  
+> >      if (node->has_mem && node->has_memdev) {
+> > @@ -393,9 +398,12 @@ void parse_numa_opts(MachineState *ms)
+> >          if (i == nb_numa_nodes) {
+> >              for (i = 0; i < max_cpus; i++) {
+> >                  CpuInstanceProperties props;
+> > +                /* fetch default mapping from board and enable it */
+> >                  props = mc->cpu_index_to_instance_props(ms, i);
+> > +                props.has_node_id = true;
+> >  
+> >                  set_bit(i, numa_info[props.node_id].node_cpu);
+> > +                machine_set_cpu_numa_node(ms, &props, &error_fatal);
+> >              }
+> >          }
+> >  
+> > -- 
+> > 2.7.4
+> >   
+> 
