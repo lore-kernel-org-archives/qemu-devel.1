@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6DRM-00025J-4y
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:52:53 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d6DVm-0005A9-Ve
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6DRL-0008FP-2M
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:52:52 -0400
-Date: Thu, 4 May 2017 11:52:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170504115239.3bae3732@nial.brq.redhat.com>
-In-Reply-To: <20170503175802.GU3482@thinpad.lan.raisama.net>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-24-git-send-email-imammedo@redhat.com>
-	<20170503163543.GR3482@thinpad.lan.raisama.net>
-	<5f71cfda-2a73-77e3-0bf7-85e2aed53811@redhat.com>
-	<20170503173841.GT3482@thinpad.lan.raisama.net>
-	<20170503175802.GU3482@thinpad.lan.raisama.net>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d6DVm-0002jb-4M
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 05:57:27 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-16-pbonzini@redhat.com>
+	<20170504075536.GB4725@lemon.lan>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2edc4902-8698-369d-ec36-2e15c8186619@redhat.com>
+Date: Thu, 4 May 2017 11:57:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170504075536.GB4725@lemon.lan>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 23/24] numa: add '-numa cpu,
- ...' option for property based node mapping
+Subject: Re: [Qemu-devel] [PATCH 15/17] block: introduce dirty_bitmap_mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Wed, 3 May 2017 14:58:02 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> On Wed, May 03, 2017 at 02:38:41PM -0300, Eduardo Habkost wrote:
-> > On Wed, May 03, 2017 at 11:39:10AM -0500, Eric Blake wrote:  
-> > > On 05/03/2017 11:35 AM, Eduardo Habkost wrote:
-> > >   
-> > > >> +
-> > > >> +        memset(&cpu, 0, sizeof(cpu));
-> > > >> +        cpu.has_node_id = object->u.cpu.has_node_id;
-> > > >> +        cpu.node_id = object->u.cpu.node_id;
-> > > >> +        cpu.has_socket_id = object->u.cpu.has_socket_id;
-> > > >> +        cpu.socket_id = object->u.cpu.socket_id;
-> > > >> +        cpu.has_core_id = object->u.cpu.has_core_id;
-> > > >> +        cpu.core_id = object->u.cpu.core_id;
-> > > >> +        cpu.has_thread_id = object->u.cpu.has_thread_id;
-> > > >> +        cpu.thread_id = object->u.cpu.thread_id;  
-> > > > 
-> > > > We don't have a way to avoid copying each field individually?
-> > > > Some visitor trick, maybe?
-> > > > 
-> > > > Eric, Markus, Michael, do you have any suggestions?  
-> > > 
-> > > Markus just added QAPI_CLONE_MEMBERS(), which sounds like what you want:
-> > > 
-> > > https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04867.html  
-> > 
-> > Not sure if it would work in this case. Note that cpu and
-> > object->u.cpu have different types. 'cpu' is CpuInstanceProps,
-> > but object->u.cpu is NodeCpuOptions.
-> > 
-> > NodeCpuOptions has { 'base': 'CpuInstanceProps' }, and
-> > CpuInstanceProps field declarations are duplicated in struct
-> > NodeCpuOptions. Do you know why struct inheritance is implemented
-> > by duplicating the fields of the base struct instead of embedding
-> > the base struct?  
-> 
-> Nevermind, I just found out that QAPI generates a
-> qapi_NumaCpuOptions_base() upcast helper. So this can be solved
-> with no data copying at all:
-> 
->  machine_set_cpu_numa_nodes(ms, qapi_NumaCpuOptions_base(&object->u.cpu), &err);
-> 
 
-Thanks for finding out, I'll try it this way
+On 04/05/2017 09:55, Fam Zheng wrote:
+> On Thu, 04/20 14:00, Paolo Bonzini wrote:
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 519737c..e13718e 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -52,6 +52,24 @@ struct BdrvDirtyBitmapIter {
+>>      BdrvDirtyBitmap *bitmap;
+>>  };
+>>  
+>> +static QemuMutex dirty_bitmap_mutex;
+>> +
+>> +static void __attribute__((__constructor__)) bdrv_dirty_bitmaps_init_lock(void)
+>> +{
+>> +    qemu_mutex_init(&dirty_bitmap_mutex);
+>> +}
+>> +
+>> +static inline void bdrv_dirty_bitmaps_lock(BlockDriverState *bs)
+>> +{
+>> +    qemu_mutex_lock(&dirty_bitmap_mutex);
+>> +}
+>> +
+>> +static inline void bdrv_dirty_bitmaps_unlock(BlockDriverState *bs)
+>> +{
+>> +    qemu_mutex_unlock(&dirty_bitmap_mutex);
+>> +}
+> 
+> Why a global lock instead of a per-BDS one? The contention can be heavy if a
+> block job is made to run on a different thread than the one processing guest
+> I/O.
+
+Yes, I'll introduce bs->dirty_bitmap_mutex in this patch already.
+
+>> @@ -508,12 +550,19 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
+>>                      int64_t nr_sectors)
+>>  {
+>>      BdrvDirtyBitmap *bitmap;
+>> +
+>> +    if (QLIST_EMPTY(&bs->dirty_bitmaps)) {
+>> +        return;
+>> +    }
+> 
+> Should this check be protected by lock/unlock? Or simply removed?
+
+The check avoids taking the lock in the common case of having no dirty
+bitmap.
+
+Paolo
+
+>> +
+>> +    bdrv_dirty_bitmaps_lock(bs);
+>>      QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
+>>          if (!bdrv_dirty_bitmap_enabled(bitmap)) {
+>>              continue;
+>>          }
+>>          hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
+>>      }
+>> +    bdrv_dirty_bitmaps_unlock(bs);
+>>  }
+>>  
+>>  /**
+> 
+> Fam
+> 
+> 
