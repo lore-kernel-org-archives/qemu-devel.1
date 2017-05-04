@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1d67Q9-0004CI-Dx
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:27:14 -0400
+	(envelope-from <wang.guang55@zte.com.cn>) id 1d67Wb-0005wY-Kg
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:33:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1d67Q6-0000Yi-13
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:27:13 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1d67Q5-0000Y0-R9
-	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:27:09 -0400
-Received: by mail-pg0-x241.google.com with SMTP id s62so342689pgc.0
-	for <qemu-devel@nongnu.org>; Wed, 03 May 2017 20:27:09 -0700 (PDT)
-References: <20170412095111.11728-1-xiaoguangrong@tencent.com>
-	<20170412095111.11728-2-xiaoguangrong@tencent.com>
-	<65524a48-e39a-1db4-b173-2ba488a762f8@redhat.com>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <e9c40b05-1f90-cb54-ab9b-397148fe0551@gmail.com>
-Date: Thu, 4 May 2017 11:27:11 +0800
-MIME-Version: 1.0
-In-Reply-To: <65524a48-e39a-1db4-b173-2ba488a762f8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] mc146818rtc: update periodic timer
- only if it is needed
+	(envelope-from <wang.guang55@zte.com.cn>) id 1d67WY-0002Sc-EE
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:33:53 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:56430)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.guang55@zte.com.cn>) id 1d67WW-0002S2-5m
+	for qemu-devel@nongnu.org; Wed, 03 May 2017 23:33:50 -0400
+Date: Thu, 4 May 2017 11:33:21 +0800 (CST)
+Message-ID: <201705041133216315739@zte.com.cn>
+References: 1492849558-17540-1-git-send-email-zhang.zhanghailiang@huawei.com,
+	1492849558-17540-6-git-send-email-zhang.zhanghailiang@huawei.com
+Mime-Version: 1.0
+From: <wang.guang55@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiAgW1BBVENIIHYyIDA1LzE4XSBDT0xP?=
+ =?utf-8?q?=3A_Handle_shutdown_command_for_VMin_COLO_state?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,100 +28,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, yunfangtai@tencent.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: zhang.zhanghailiang@huawei.com
+Cc: qemu-devel@nongnu.org, gilbert@redhat.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, quintela@redhat.com, pbonzini@redhat.com
 
-
-
-On 05/03/2017 11:42 PM, Paolo Bonzini wrote:
-> 
-> 
-> On 12/04/2017 11:51, guangrong.xiao@gmail.com wrote:
->> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->>
->> Currently, the timer is updated whenever RegA or RegB is written
->> even if the periodic timer related configuration is not changed
->>
->> This patch optimizes it slightly to make the update happen only
->> if its period or enable-status is changed, also later patches are
->> depend on this optimization
->>
->> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
->> ---
->>   hw/timer/mc146818rtc.c | 31 +++++++++++++++++++++++++++++--
->>   1 file changed, 29 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
->> index 4165450..749e206 100644
->> --- a/hw/timer/mc146818rtc.c
->> +++ b/hw/timer/mc146818rtc.c
->> @@ -387,10 +387,25 @@ static void rtc_update_timer(void *opaque)
->>       check_update_timer(s);
->>   }
->>   
->> +static bool rtc_periodic_timer_updated_by_regA(RTCState *s, uint64_t data)
->> +{
->> +    uint8_t orig = s->cmos_data[RTC_REG_A];
->> +
->> +    return (orig & 0x0f) != (data & 0x0f);
->> +}
->> +
->> +static bool rtc_periodic_timer_updated_by_regB(RTCState *s, uint64_t data)
->> +{
->> +    uint8_t orig = s->cmos_data[RTC_REG_B];
->> +
->> +    return (orig & REG_B_PIE) != (data & REG_B_PIE);
->> +}
->> +
->>   static void cmos_ioport_write(void *opaque, hwaddr addr,
->>                                 uint64_t data, unsigned size)
->>   {
->>       RTCState *s = opaque;
->> +    bool update_periodic_timer;
->>   
->>       if ((addr & 1) == 0) {
->>           s->cmos_index = data & 0x7f;
->> @@ -423,6 +438,8 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
->>               }
->>               break;
->>           case RTC_REG_A:
->> +            update_periodic_timer = rtc_periodic_timer_updated_by_regA(s, data);
-> 
-> I think you can change it to a...
-> 
->>               if ((data & 0x60) == 0x60) {
->>                   if (rtc_running(s)) {
->>                       rtc_update_time(s);
->> @@ -445,10 +462,16 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
->>               /* UIP bit is read only */
-> 
-> ... inlined update_periodic_timer assignment here:
-> 
->      update_periodic_timer = (s->cmos_data[RTC_REG_A] ^ data) & REG_A_PERIOD;
-> 
->>               s->cmos_data[RTC_REG_A] = (data & ~REG_A_UIP) |
->>                   (s->cmos_data[RTC_REG_A] & REG_A_UIP);
->> -            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock));
->> +
->> +            if (update_periodic_timer) {
->> +                periodic_timer_update(s, qemu_clock_get_ns(rtc_clock));
->> +            }
->> +
->>               check_update_timer(s);
->>               break;
->>           case RTC_REG_B:
->> +            update_periodic_timer = rtc_periodic_timer_updated_by_regB(s, data);
->> +
->>               if (data & REG_B_SET) {
->>                   /* update cmos to when the rtc was stopping */
->>                   if (rtc_running(s)) {
->> @@ -475,7 +498,11 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
->>                   qemu_irq_lower(s->irq);
->>               }
-> 
-> Same here:
-> 
->      update_periodic_timer = (s->cmos_data[RTC_REG_A] ^ data) & REG_B_PIE;
-> 
-
-Okay, will do, thanks!
+aGkNCg0KVGhlIHBhdGNoIG1heSBjYXVzZSBxZW11X3N5c3RlbV9yZXNldF9yZXF1ZXN0IGNhbGwg
+IHFlbXVfbm90aWZ5X2V2ZW50KCkgdHdpY2UuDQoNCm9sZDoNCg0KDQoNCnZvaWQgcWVtdV9zeXN0
+ZW1fcmVzZXRfcmVxdWVzdCh2b2lkKQ0KDQp7DQoNCiAgICBpZiAobm9fcmVib290KSB7DQoNCiAg
+ICAgICAgc2h1dGRvd25fcmVxdWVzdGVkID0gMQ0KDQogICAgfSBlbHNlIHsNCg0KICAgICAgICBy
+ZXNldF9yZXF1ZXN0ZWQgPSAxDQoNCiAgICB9DQoNCiAgICBjcHVfc3RvcF9jdXJyZW50KCkNCg0K
+ICAgIHFlbXVfbm90aWZ5X2V2ZW50KCkNCg0KfQ0KDQoNCm5ldzoNCg0KcWVtdV9zeXN0ZW1fcmVz
+ZXRfcmVxdWVzdCAt77yecWVtdV9zeXN0ZW1fc2h1dGRvd25fcmVxdWVzdC3vvJ5xZW11X25vdGlm
+eV9ldmVudCgpDQoNCg0KQW5kIHFlbXVfc3lzdGVtX3Jlc2V0X3JlcXVlc3QgIG1heSBjYWxsICAg
+cmVwbGF5X3NodXRkb3duX3JlcXVlc3QoKSAsb2xkIHZlcnNpb24gZG9zZSBub3QgY2FsbCByZXBs
+YXlfc2h1dGRvd25fcmVxdWVzdCBoZXJlLg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0K
+DQoNCg0KDQoNCg0K5Y6f5aeL6YKu5Lu2DQoNCg0KDQrlj5Hku7bkurrvvJog77ycemhhbmcuemhh
+bmdoYWlsaWFuZ0BodWF3ZWkuY29t77yeDQrmlLbku7bkurrvvJog77yccWVtdS1kZXZlbEBub25n
+bnUub3Jn77yeIO+8nGdpbGJlcnRAcmVkaGF0LmNvbe+8ng0K5oqE6YCB5Lq677yaIO+8nGxpemhp
+amlhbkBjbi5mdWppdHN1LmNvbe+8niDvvJx4aWVjbC5mbnN0QGNuLmZ1aml0c3UuY29t77yeIO+8
+nHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbe+8niDvvJx6aGFuZ2NoZW4uZm5zdEBjbi5m
+dWppdHN1LmNvbe+8niDvvJxxdWludGVsYUByZWRoYXQuY29t77yeIO+8nHBib256aW5pQHJlZGhh
+dC5jb23vvJ4NCuaXpSDmnJ8g77yaMjAxN+W5tDA05pyIMjLml6UgMTY6NTUNCuS4uyDpopgg77ya
+W1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwNS8xOF0gQ09MTzogSGFuZGxlIHNodXRkb3duIGNvbW1h
+bmQgZm9yIFZNaW4gQ09MTyBzdGF0ZQ0KDQoNCg0KDQoNCklmIFZNIGlzIGluIENPTE8gRlQgc3Rh
+dGUsIHdlIG5lZWQgdG8gZG8gc29tZSBleHRyYSB3b3JrcyBiZWZvcmUNCnN0YXJ0aW5nIG5vcm1h
+bCBzaHV0ZG93biBwcm9jZXNzLg0KDQpTZWNvbmRhcnkgVk0gd2lsbCBpZ25vcmUgdGhlIHNodXRk
+b3duIGNvbW1hbmQgaWYgdXNlcnMgaXNzdWUgaXQgZGlyZWN0bHkNCnRvIFNlY29uZGFyeSBWTS4g
+Q09MTyB3aWxsIGNhcHR1cmUgc2h1dGRvd24gY29tbWFuZCBhbmQgYWZ0ZXINCnNodXRkb3duIHJl
+cXVlc3QgZnJvbSB1c2VyLg0KDQpDYzogUGFvbG8gQm9uemluaSDvvJxwYm9uemluaUByZWRoYXQu
+Y29t77yeDQpTaWduZWQtb2ZmLWJ5OiB6aGFuZ2hhaWxpYW5nIO+8nHpoYW5nLnpoYW5naGFpbGlh
+bmdAaHVhd2VpLmNvbe+8ng0KU2lnbmVkLW9mZi1ieTogTGkgWmhpamlhbiDvvJxsaXpoaWppYW5A
+Y24uZnVqaXRzdS5jb23vvJ4NClJldmlld2VkLWJ5OiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IO+8
+nGRnaWxiZXJ0QHJlZGhhdC5jb23vvJ4NCi0tLQ0KIGluY2x1ZGUvbWlncmF0aW9uL2NvbG8uaCB8
+ICAxICsNCiBpbmNsdWRlL3N5c2VtdS9zeXNlbXUuaCAgfCAgMyArKysNCiBtaWdyYXRpb24vY29s
+by5jICAgICAgICAgfCA0NiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKystDQogcWFwaS1zY2hlbWEuanNvbiAgICAgICAgIHwgIDQgKysrLQ0KIHZsLmMgICAgICAg
+ICAgICAgICAgICAgICB8IDE5ICsrKysrKysrKysrKysrKystLS0NCiA1IGZpbGVzIGNoYW5nZWQs
+IDY4IGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9pbmNsdWRl
+L21pZ3JhdGlvbi9jb2xvLmggYi9pbmNsdWRlL21pZ3JhdGlvbi9jb2xvLmgNCmluZGV4IDJiYmZm
+OWUuLmFhZGQwNDAgMTAwNjQ0DQotLS0gYS9pbmNsdWRlL21pZ3JhdGlvbi9jb2xvLmgNCisrKyBi
+L2luY2x1ZGUvbWlncmF0aW9uL2NvbG8uaA0KQEAgLTM3LDQgKzM3LDUgQEAgQ09MT01vZGUgZ2V0
+X2NvbG9fbW9kZSh2b2lkKQ0KIHZvaWQgY29sb19kb19mYWlsb3ZlcihNaWdyYXRpb25TdGF0ZSAq
+cykNCiANCiB2b2lkIGNvbG9fY2hlY2twb2ludF9ub3RpZnkodm9pZCAqb3BhcXVlKQ0KK2Jvb2wg
+Y29sb19oYW5kbGVfc2h1dGRvd24odm9pZCkNCiAjZW5kaWYNCmRpZmYgLS1naXQgYS9pbmNsdWRl
+L3N5c2VtdS9zeXNlbXUuaCBiL2luY2x1ZGUvc3lzZW11L3N5c2VtdS5oDQppbmRleCAxNjE3NWY3
+Li44MDU0ZjUzIDEwMDY0NA0KLS0tIGEvaW5jbHVkZS9zeXNlbXUvc3lzZW11LmgNCisrKyBiL2lu
+Y2x1ZGUvc3lzZW11L3N5c2VtdS5oDQpAQCAtNDksNiArNDksOCBAQCB0eXBlZGVmIGVudW0gV2Fr
+ZXVwUmVhc29uIHsNCiAgICAgUUVNVV9XQUtFVVBfUkVBU09OX09USEVSLA0KIH0gV2FrZXVwUmVh
+c29uDQogDQorZXh0ZXJuIGludCBjb2xvX3NodXRkb3duX3JlcXVlc3RlZA0KKw0KIHZvaWQgcWVt
+dV9zeXN0ZW1fcmVzZXRfcmVxdWVzdCh2b2lkKQ0KIHZvaWQgcWVtdV9zeXN0ZW1fc3VzcGVuZF9y
+ZXF1ZXN0KHZvaWQpDQogdm9pZCBxZW11X3JlZ2lzdGVyX3N1c3BlbmRfbm90aWZpZXIoTm90aWZp
+ZXIgKm5vdGlmaWVyKQ0KQEAgLTU2LDYgKzU4LDcgQEAgdm9pZCBxZW11X3N5c3RlbV93YWtldXBf
+cmVxdWVzdChXYWtldXBSZWFzb24gcmVhc29uKQ0KIHZvaWQgcWVtdV9zeXN0ZW1fd2FrZXVwX2Vu
+YWJsZShXYWtldXBSZWFzb24gcmVhc29uLCBib29sIGVuYWJsZWQpDQogdm9pZCBxZW11X3JlZ2lz
+dGVyX3dha2V1cF9ub3RpZmllcihOb3RpZmllciAqbm90aWZpZXIpDQogdm9pZCBxZW11X3N5c3Rl
+bV9zaHV0ZG93bl9yZXF1ZXN0KHZvaWQpDQordm9pZCBxZW11X3N5c3RlbV9zaHV0ZG93bl9yZXF1
+ZXN0X2NvcmUodm9pZCkNCiB2b2lkIHFlbXVfc3lzdGVtX3Bvd2VyZG93bl9yZXF1ZXN0KHZvaWQp
+DQogdm9pZCBxZW11X3JlZ2lzdGVyX3Bvd2VyZG93bl9ub3RpZmllcihOb3RpZmllciAqbm90aWZp
+ZXIpDQogdm9pZCBxZW11X3N5c3RlbV9kZWJ1Z19yZXF1ZXN0KHZvaWQpDQpkaWZmIC0tZ2l0IGEv
+bWlncmF0aW9uL2NvbG8uYyBiL21pZ3JhdGlvbi9jb2xvLmMNCmluZGV4IGEzMzQ0Y2UuLmM0ZmM4
+NjUgMTAwNjQ0DQotLS0gYS9taWdyYXRpb24vY29sby5jDQorKysgYi9taWdyYXRpb24vY29sby5j
+DQpAQCAtMzg0LDYgKzM4NCwyMSBAQCBzdGF0aWMgaW50IGNvbG9fZG9fY2hlY2twb2ludF90cmFu
+c2FjdGlvbihNaWdyYXRpb25TdGF0ZSAqcywNCiAgICAgICAgIGdvdG8gb3V0DQogICAgIH0NCiAN
+CisgICAgaWYgKGNvbG9fc2h1dGRvd25fcmVxdWVzdGVkKSB7DQorICAgICAgICBjb2xvX3NlbmRf
+bWVzc2FnZShzLe+8nnRvX2RzdF9maWxlLCBDT0xPX01FU1NBR0VfR1VFU1RfU0hVVERPV04sDQor
+ICAgICAgICAgICAgICAgICAgICAgICAgICAmbG9jYWxfZXJyKQ0KKyAgICAgICAgaWYgKGxvY2Fs
+X2Vycikgew0KKyAgICAgICAgICAgIGVycm9yX2ZyZWUobG9jYWxfZXJyKQ0KKyAgICAgICAgICAg
+IC8qIEdvIG9uIHRoZSBzaHV0ZG93biBwcm9jZXNzIGFuZCB0aHJvdyB0aGUgZXJyb3IgbWVzc2Fn
+ZSAqLw0KKyAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiRmFpbGVkIHRvIHNlbmQgc2h1dGRvd24g
+bWVzc2FnZSB0byBTVk0iKQ0KKyAgICAgICAgfQ0KKyAgICAgICAgcWVtdV9mZmx1c2gocy3vvJ50
+b19kc3RfZmlsZSkNCisgICAgICAgIGNvbG9fc2h1dGRvd25fcmVxdWVzdGVkID0gMA0KKyAgICAg
+ICAgcWVtdV9zeXN0ZW1fc2h1dGRvd25fcmVxdWVzdF9jb3JlKCkNCisgICAgICAgIC8qIEZpeCBt
+ZTogSnVzdCBsZXQgdGhlIGNvbG8gdGhyZWFkIGV4aXQgPyAqLw0KKyAgICAgICAgcWVtdV90aHJl
+YWRfZXhpdCgwKQ0KKyAgICB9DQorDQogICAgIHJldCA9IDANCiANCiAgICAgcWVtdV9tdXRleF9s
+b2NrX2lvdGhyZWFkKCkNCkBAIC00NDksNyArNDY0LDkgQEAgc3RhdGljIHZvaWQgY29sb19wcm9j
+ZXNzX2NoZWNrcG9pbnQoTWlncmF0aW9uU3RhdGUgKnMpDQogICAgICAgICAgICAgZ290byBvdXQN
+CiAgICAgICAgIH0NCiANCi0gICAgICAgIHFlbXVfc2VtX3dhaXQoJnMt77yeY29sb19jaGVja3Bv
+aW50X3NlbSkNCisgICAgICAgIGlmICghY29sb19zaHV0ZG93bl9yZXF1ZXN0ZWQpIHsNCisgICAg
+ICAgICAgICBxZW11X3NlbV93YWl0KCZzLe+8nmNvbG9fY2hlY2twb2ludF9zZW0pDQorICAgICAg
+ICB9DQogDQogICAgICAgICByZXQgPSBjb2xvX2RvX2NoZWNrcG9pbnRfdHJhbnNhY3Rpb24ocywg
+YmlvYywgZmIpDQogICAgICAgICBpZiAocmV0IO+8nCAwKSB7DQpAQCAtNTM0LDYgKzU1MSwxNiBA
+QCBzdGF0aWMgdm9pZCBjb2xvX3dhaXRfaGFuZGxlX21lc3NhZ2UoUUVNVUZpbGUgKmYsIGludCAq
+Y2hlY2twb2ludF9yZXF1ZXN0LA0KICAgICBjYXNlIENPTE9fTUVTU0FHRV9DSEVDS1BPSU5UX1JF
+UVVFU1Q6DQogICAgICAgICAqY2hlY2twb2ludF9yZXF1ZXN0ID0gMQ0KICAgICAgICAgYnJlYWsN
+CisgICAgY2FzZSBDT0xPX01FU1NBR0VfR1VFU1RfU0hVVERPV046DQorICAgICAgICBxZW11X211
+dGV4X2xvY2tfaW90aHJlYWQoKQ0KKyAgICAgICAgdm1fc3RvcF9mb3JjZV9zdGF0ZShSVU5fU1RB
+VEVfQ09MTykNCisgICAgICAgIHFlbXVfc3lzdGVtX3NodXRkb3duX3JlcXVlc3RfY29yZSgpDQor
+ICAgICAgICBxZW11X211dGV4X3VubG9ja19pb3RocmVhZCgpDQorICAgICAgICAvKg0KKyAgICAg
+ICAgICogVGhlIG1haW4gdGhyZWFkIHdpbGwgYmUgZXhpdCBhbmQgdGVybWluYXRlIHRoZSB3aG9s
+ZQ0KKyAgICAgICAgICogcHJvY2VzcywgZG8gbmVlZCBzb21lIGNsZWFudXAgPw0KKyAgICAgICAg
+ICovDQorICAgICAgICBxZW11X3RocmVhZF9leGl0KDApDQogICAgIGRlZmF1bHQ6DQogICAgICAg
+ICAqY2hlY2twb2ludF9yZXF1ZXN0ID0gMA0KICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiR290
+IHVua25vd24gQ09MTyBtZXNzYWdlOiAlZCIsIG1zZykNCkBAIC02OTYsMyArNzIzLDIwIEBAIG91
+dDoNCiANCiAgICAgcmV0dXJuIE5VTEwNCiB9DQorDQorYm9vbCBjb2xvX2hhbmRsZV9zaHV0ZG93
+bih2b2lkKQ0KK3sNCisgICAgLyoNCisgICAgICogSWYgVk0gaXMgaW4gQ09MTy1GVCBtb2RlLCB3
+ZSBuZWVkIGRvIHNvbWUgc2lnbmlmaWNhbnQgd29yayBiZWZvcmUNCisgICAgICogcmVzcG9uZCB0
+byB0aGUgc2h1dGRvd24gcmVxdWVzdC4gQmVzaWRlcywgU2Vjb25kYXJ5IFZNIHdpbGwgaWdub3Jl
+DQorICAgICAqIHRoZSBzaHV0ZG93biByZXF1ZXN0IGZyb20gdXNlcnMuDQorICAgICAqLw0KKyAg
+ICBpZiAobWlncmF0aW9uX2luY29taW5nX2luX2NvbG9fc3RhdGUoKSkgew0KKyAgICAgICAgcmV0
+dXJuIHRydWUNCisgICAgfQ0KKyAgICBpZiAobWlncmF0aW9uX2luX2NvbG9fc3RhdGUoKSkgew0K
+KyAgICAgICAgY29sb19zaHV0ZG93bl9yZXF1ZXN0ZWQgPSAxDQorICAgICAgICByZXR1cm4gdHJ1
+ZQ0KKyAgICB9DQorICAgIHJldHVybiBmYWxzZQ0KK30NCmRpZmYgLS1naXQgYS9xYXBpLXNjaGVt
+YS5qc29uIGIvcWFwaS1zY2hlbWEuanNvbg0KaW5kZXggMDFiMDg3Zi4uNGIzZTFiNyAxMDA2NDQN
+Ci0tLSBhL3FhcGktc2NoZW1hLmpzb24NCisrKyBiL3FhcGktc2NoZW1hLmpzb24NCkBAIC0xMTg3
+LDEyICsxMTg3LDE0IEBADQogIw0KICMgQHZtc3RhdGUtbG9hZGVkOiBWTSdzIHN0YXRlIGhhcyBi
+ZWVuIGxvYWRlZCBieSBTVk0uDQogIw0KKyMgQGd1ZXN0LXNodXRkb3duOiBzaHV0ZG93biByZXF1
+ZXN0ZWQgZnJvbSBQVk0gdG8gU1ZNLiAoU2luY2UgMi45KQ0KKyMNCiAjIFNpbmNlOiAyLjgNCiAj
+Iw0KIHsgJ2VudW0nOiAnQ09MT01lc3NhZ2UnLA0KICAgJ2RhdGEnOiBbICdjaGVja3BvaW50LXJl
+YWR5JywgJ2NoZWNrcG9pbnQtcmVxdWVzdCcsICdjaGVja3BvaW50LXJlcGx5JywNCiAgICAgICAg
+ICAgICAndm1zdGF0ZS1zZW5kJywgJ3Ztc3RhdGUtc2l6ZScsICd2bXN0YXRlLXJlY2VpdmVkJywN
+Ci0gICAgICAgICAgICAndm1zdGF0ZS1sb2FkZWQnIF0gfQ0KKyAgICAgICAgICAgICd2bXN0YXRl
+LWxvYWRlZCcsICdndWVzdC1zaHV0ZG93bicgXSB9DQogDQogIyMNCiAjIEBDT0xPTW9kZToNCmRp
+ZmYgLS1naXQgYS92bC5jIGIvdmwuYw0KaW5kZXggMGI0ZWQ1Mi4uNzI2MzhjOSAxMDA2NDQNCi0t
+LSBhL3ZsLmMNCisrKyBiL3ZsLmMNCkBAIC0xNjExLDYgKzE2MTEsOCBAQCBzdGF0aWMgTm90aWZp
+ZXJMaXN0IHdha2V1cF9ub3RpZmllcnMgPQ0KICAgICBOT1RJRklFUl9MSVNUX0lOSVRJQUxJWkVS
+KHdha2V1cF9ub3RpZmllcnMpDQogc3RhdGljIHVpbnQzMl90IHdha2V1cF9yZWFzb25fbWFzayA9
+IH4oMSDvvJzvvJwgUUVNVV9XQUtFVVBfUkVBU09OX05PTkUpDQogDQoraW50IGNvbG9fc2h1dGRv
+d25fcmVxdWVzdGVkDQorDQogaW50IHFlbXVfc2h1dGRvd25fcmVxdWVzdGVkX2dldCh2b2lkKQ0K
+IHsNCiAgICAgcmV0dXJuIHNodXRkb3duX3JlcXVlc3RlZA0KQEAgLTE3MzcsNyArMTczOSwxMCBA
+QCB2b2lkIHFlbXVfc3lzdGVtX2d1ZXN0X3Bhbmlja2VkKEd1ZXN0UGFuaWNJbmZvcm1hdGlvbiAq
+aW5mbykNCiB2b2lkIHFlbXVfc3lzdGVtX3Jlc2V0X3JlcXVlc3Qodm9pZCkNCiB7DQogICAgIGlm
+IChub19yZWJvb3QpIHsNCi0gICAgICAgIHNodXRkb3duX3JlcXVlc3RlZCA9IDENCisgICAgICAg
+IHFlbXVfc3lzdGVtX3NodXRkb3duX3JlcXVlc3QoKQ0KKyAgICAgICAgaWYgKCFzaHV0ZG93bl9y
+ZXF1ZXN0ZWQpIHsvKiBjb2xvIGhhbmRsZSBpdCA/ICovDQorICAgICAgICAgICAgcmV0dXJuDQor
+ICAgICAgICB9DQogICAgIH0gZWxzZSB7DQogICAgICAgICByZXNldF9yZXF1ZXN0ZWQgPSAxDQog
+ICAgIH0NCkBAIC0xODEwLDE0ICsxODE1LDIyIEBAIHZvaWQgcWVtdV9zeXN0ZW1fa2lsbGVkKGlu
+dCBzaWduYWwsIHBpZF90IHBpZCkNCiAgICAgcWVtdV9ub3RpZnlfZXZlbnQoKQ0KIH0NCiANCi12
+b2lkIHFlbXVfc3lzdGVtX3NodXRkb3duX3JlcXVlc3Qodm9pZCkNCit2b2lkIHFlbXVfc3lzdGVt
+X3NodXRkb3duX3JlcXVlc3RfY29yZSh2b2lkKQ0KIHsNCi0gICAgdHJhY2VfcWVtdV9zeXN0ZW1f
+c2h1dGRvd25fcmVxdWVzdCgpDQogICAgIHJlcGxheV9zaHV0ZG93bl9yZXF1ZXN0KCkNCiAgICAg
+c2h1dGRvd25fcmVxdWVzdGVkID0gMQ0KICAgICBxZW11X25vdGlmeV9ldmVudCgpDQogfQ0KIA0K
+K3ZvaWQgcWVtdV9zeXN0ZW1fc2h1dGRvd25fcmVxdWVzdCh2b2lkKQ0KK3sNCisgICAgdHJhY2Vf
+cWVtdV9zeXN0ZW1fc2h1dGRvd25fcmVxdWVzdCgpDQorICAgIGlmIChjb2xvX2hhbmRsZV9zaHV0
+ZG93bigpKSB7DQorICAgICAgICByZXR1cm4NCisgICAgfQ0KKyAgICBxZW11X3N5c3RlbV9zaHV0
+ZG93bl9yZXF1ZXN0X2NvcmUoKQ0KK30NCisNCiBzdGF0aWMgdm9pZCBxZW11X3N5c3RlbV9wb3dl
+cmRvd24odm9pZCkNCiB7DQogICAgIHFhcGlfZXZlbnRfc2VuZF9wb3dlcmRvd24oJmVycm9yX2Fi
+b3J0KQ0KLS0gDQoxLjguMy4x
