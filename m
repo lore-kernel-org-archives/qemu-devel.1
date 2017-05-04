@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6FuS-000130-8r
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:31:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d6Fuv-0001OI-AB
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1d6FuM-0004mG-6V
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:31:04 -0400
-Date: Thu, 4 May 2017 14:30:44 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170504123044.dieszx6qvezdz5zf@kamzik.brq.redhat.com>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-14-git-send-email-imammedo@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1d6Fuq-0004rp-CB
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:31:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6Fuq-0004rV-1u
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 08:31:28 -0400
+References: <20170504115948.3048-1-xiaoguangrong@tencent.com>
+	<20170504115948.3048-3-xiaoguangrong@tencent.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1bdc4c8a-b07a-dd3a-af9a-1718623fcc2e@redhat.com>
+Date: Thu, 4 May 2017 14:31:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1493816238-33120-14-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 13/24] pc: get numa node mapping from
- possible_cpus instead of numa_get_node_for_cpu()
+In-Reply-To: <20170504115948.3048-3-xiaoguangrong@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] mc146818rtc: precisely count the
+ clock for periodic timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +28,349 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: guangrong.xiao@gmail.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, yunfangtai@tencent.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Wed, May 03, 2017 at 02:57:07PM +0200, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+
+
+On 04/05/2017 13:59, guangrong.xiao@gmail.com wrote:
+> From: Tai Yunfang <yunfangtai@tencent.com>
+>=20
+> There are two issues in current code:
+> 1) If the period is changed by re-configuring RegA, the coalesced
+>    irq will be scaled to reflect the new period, however, it
+>    calculates the new interrupt number like this:
+>     s->irq_coalesced =3D (s->irq_coalesced * s->period) / period;
+>=20
+>    There are some clocks will be lost if they are not enough to
+>    be squeezed to a single new period that will cause the VM clock
+>    slower
+>=20
+>    In order to fix the issue, we calculate the interrupt window
+>    based on the precise clock rather than period, then the clocks
+>    lost during period is scaled can be compensated properly
+>=20
+> 2) If periodic_timer_update() is called due to RegA reconfiguration,
+>    i.e, the period is updated, current time is not the start point
+>    for the next periodic timer, instead, which should start from the
+>    last interrupt, otherwise, the clock in VM will become slow
+>=20
+>    This patch takes the clocks from last interrupt to current clock
+>    into account and compensates the clocks for the next interrupt,
+>    especially=EF=BC=8Cif a complete interrupt was lost in this window, =
+the
+>    time can be caught up by LOST_TICK_POLICY_SLEW
+>=20
+> [ Xiao: redesign the algorithm based on Yunfang's original work. ]
+>=20
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> Signed-off-by: Tai Yunfang <yunfangtai@tencent.com>
 > ---
-> v2:
->    use numa_[has_]node_id() wrappers (Drew)
-> ---
->  hw/acpi/cpu.c        |  7 +++----
->  hw/i386/acpi-build.c | 11 ++++-------
->  hw/i386/pc.c         | 18 ++++++++++--------
->  3 files changed, 17 insertions(+), 19 deletions(-)
-> 
-> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-> index 8c719d3..2002198 100644
-> --- a/hw/acpi/cpu.c
-> +++ b/hw/acpi/cpu.c
-> @@ -503,7 +503,6 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
->  
->          /* build Processor object for each processor */
->          for (i = 0; i < arch_ids->len; i++) {
-> -            int j;
->              Aml *dev;
->              Aml *uid = aml_int(i);
->              GArray *madt_buf = g_array_new(0, 1, 1);
-> @@ -557,9 +556,9 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
->               * as a result _PXM is required for all CPUs which might
->               * be hot-plugged. For simplicity, add it for all CPUs.
->               */
-> -            j = numa_get_node_for_cpu(i);
-> -            if (j < nb_numa_nodes) {
-> -                aml_append(dev, aml_name_decl("_PXM", aml_int(j)));
-> +            if (numa_has_node_id(arch_ids, i)) {
-> +                aml_append(dev,
-> +                    aml_name_decl("_PXM", aml_int(numa_node_id(arch_ids, i))));
->              }
->  
->              aml_append(cpus_dev, dev);
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 2073108..a66a968 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2306,7 +2306,8 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->      srat->reserved1 = cpu_to_le32(1);
->  
->      for (i = 0; i < apic_ids->len; i++) {
-> -        int j = numa_get_node_for_cpu(i);
-> +        int node_id = numa_has_node_id(apic_ids, i) ?
-> +            numa_node_id(apic_ids, i) : 0;
->          uint32_t apic_id = apic_ids->cpus[i].arch_id;
->  
->          if (apic_id < 255) {
-> @@ -2316,9 +2317,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->              core->type = ACPI_SRAT_PROCESSOR_APIC;
->              core->length = sizeof(*core);
->              core->local_apic_id = apic_id;
-> -            if (j < nb_numa_nodes) {
-> -                core->proximity_lo = j;
-> -            }
-> +            core->proximity_lo = node_id;
->              memset(core->proximity_hi, 0, 3);
->              core->local_sapic_eid = 0;
->              core->flags = cpu_to_le32(1);
-> @@ -2329,9 +2328,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->              core->type = ACPI_SRAT_PROCESSOR_x2APIC;
->              core->length = sizeof(*core);
->              core->x2apic_id = cpu_to_le32(apic_id);
-> -            if (j < nb_numa_nodes) {
-> -                core->proximity_domain = cpu_to_le32(j);
-> -            }
-> +            core->proximity_domain = cpu_to_le32(node_id);
->              core->flags = cpu_to_le32(1);
->          }
->      }
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 4a4fb1c..aeecf4b 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -747,7 +747,9 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
+>  hw/timer/mc146818rtc.c | 116 ++++++++++++++++++++++++++++++++++++++++-=
+--------
+>  1 file changed, 96 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+> index 5cccb2a..14bde1a 100644
+> --- a/hw/timer/mc146818rtc.c
+> +++ b/hw/timer/mc146818rtc.c
+> @@ -146,31 +146,104 @@ static void rtc_coalesced_timer(void *opaque)
+>  }
+>  #endif
+> =20
+> -/* handle periodic timer */
+> -static void periodic_timer_update(RTCState *s, int64_t current_time)
+> +static int period_code_to_clock(int period_code)
+> +{
+> +    /* periodic timer is disabled. */
+> +    if (!period_code) {
+> +        return 0;
+> +    }
+> +
+> +    if (period_code <=3D 2) {
+> +        period_code +=3D 7;
+> +    }
+> +
+> +    /* period in 32 Khz cycles */
+> +    return 1 << (period_code - 1);
+> +}
+> +
+> +/*
+> + * handle periodic timer. @old_period indicates the periodic timer upd=
+ate
+> + * is just due to period adjustment.
+> + */
+> +static void
+> +periodic_timer_update(RTCState *s, int64_t current_time, int old_perio=
+d)
+
+We need old_period to distinguish reconfiguration from interrupts ("if
+(old_period)" below), but it can be a bool.  Instead of passing the old
+period value, we can use s->period which is
+period_code_to_clock(old_period).
+
+That is, just do
+
+    old_period =3D s->period;
+    s->period =3D rtc_periodic_clock_ticks(s);
+
+    /*
+     * if the periodic timer's update is due to period re-configuration,
+     * the clock should count since last interrupt.
+     */
+    if (s->period !=3D 0) {
+        ...
+        if (!from_interrupt) {
+        }
+        ...
+    }
+
+where rtc_periodic_clock_ticks takes into account both regA and regB,
+returning the result in 32 kHZ ticks.
+
 >  {
->      FWCfgState *fw_cfg;
->      uint64_t *numa_fw_cfg;
-> -    int i, j;
-> +    int i;
-> +    const CPUArchIdList *cpus;
-> +    MachineClass *mc = MACHINE_GET_CLASS(pcms);
->  
->      fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4, as);
->      fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
-> @@ -782,12 +784,12 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
->       */
->      numa_fw_cfg = g_new0(uint64_t, 1 + pcms->apic_id_limit + nb_numa_nodes);
->      numa_fw_cfg[0] = cpu_to_le64(nb_numa_nodes);
-> -    for (i = 0; i < max_cpus; i++) {
-> -        unsigned int apic_id = x86_cpu_apic_id_from_index(i);
-> +    cpus = mc->possible_cpu_arch_ids(MACHINE(pcms));
-> +    for (i = 0; i < cpus->len; i++) {
-> +        unsigned int apic_id = cpus->cpus[i].arch_id;
->          assert(apic_id < pcms->apic_id_limit);
-> -        j = numa_get_node_for_cpu(i);
-> -        if (j < nb_numa_nodes) {
-> -            numa_fw_cfg[apic_id + 1] = cpu_to_le64(j);
-> +        if (numa_has_node_id(cpus, i)) {
-> +            numa_fw_cfg[apic_id + 1] = cpu_to_le64(numa_node_id(cpus, i));
+>      int period_code, period;
+> -    int64_t cur_clock, next_irq_clock;
+> +    int64_t cur_clock, next_irq_clock, lost_clock =3D 0;
+> =20
+>      period_code =3D s->cmos_data[RTC_REG_A] & 0x0f;
+>      if (period_code !=3D 0
+>          && (s->cmos_data[RTC_REG_B] & REG_B_PIE)) {
+> -        if (period_code <=3D 2)
+> -            period_code +=3D 7;
+> -        /* period in 32 Khz cycles */
+> -        period =3D 1 << (period_code - 1);
+> -#ifdef TARGET_I386
+> -        if (period !=3D s->period) {
+> -            s->irq_coalesced =3D (s->irq_coalesced * s->period) / peri=
+od;
+> -            DPRINTF_C("cmos: coalesced irqs scaled to %d\n", s->irq_co=
+alesced);
+> -        }
+> -        s->period =3D period;
+> -#endif
+> +        period =3D period_code_to_clock(period_code);
+
+
+Since we have old_period, we can assign s->period here.
+
+>          /* compute 32 khz clock */
+>          cur_clock =3D
+>              muldiv64(current_time, RTC_CLOCK_RATE, NANOSECONDS_PER_SEC=
+OND);
+> =20
+> -        next_irq_clock =3D (cur_clock & ~(period - 1)) + period;
+> +        /*
+> +        * if the periodic timer's update is due to period re-configura=
+tion,
+> +        * we should count the clock since last interrupt.
+> +        */
+> +        if (old_period) {
+> +            int64_t last_periodic_clock;
+> +
+> +            last_periodic_clock =3D muldiv64(s->next_periodic_time,
+> +                                    RTC_CLOCK_RATE, NANOSECONDS_PER_SE=
+COND);
+> +            /*
+> +             * if the next interrupt has not happened yet, we recall t=
+he last
+> +             * interrupt based on the original period.
+> +             */
+> +            if (last_periodic_clock > cur_clock) {
+> +                last_periodic_clock -=3D period_code_to_clock(old_peri=
+od);
+
+This becomes "last_periodic_clock -=3D old_period".
+
+But, I'm not sure how it can happen that last_periodic_clock <=3D
+cur_clock.  More precisely, if it happened, you have lost a tick and you
+should add it to s->irq_coalesced it below.  The simplest way to do it,
+is to *always* do the subtraction.
+
+
+> +
+> +                /* the last interrupt must have happened. */
+> +                assert(cur_clock >=3D last_periodic_clock);
+> +            }
+> +
+> +            /* calculate the clock since last interrupt. */
+> +            lost_clock =3D cur_clock - last_periodic_clock;
+> +        }
+
+I think the "assert(lost_clock >=3D 0)" should be here.  Then you can als=
+o
+remove the "the last interrupt must have happened" assertion, since the
+two test exactly the same formula:
+
+	lost_clock >=3D 0
+	cur_clock - last_periodic_clock >=3D 0
+	cur_clock >=3D last_periodic_clock.
+
+Putting everything together, this becomes:
+
+	if (!from_interrupt) {
+            int64_t next_periodic_clock, last_periodic_clock;
+
+            next_periodic_clock =3D muldiv64(s->next_periodic_time,
+                                    RTC_CLOCK_RATE,
+				    NANOSECONDS_PER_SECOND);
+	    last_periodic_clock =3D next_periodic_clock - old_period;
+	    lost_clock =3D cur_clock - last_periodic_clock;
+	    assert(lost_clock >=3D 0);
+	}
+
+	if (s->lost_tick_policy =3D=3D LOST_TICK_POLICY_SLEW) {
+	    ...
+	} else {
+	    lost_clock =3D MIN(lost_clock, s->period);
+	}
+	assert(lost_clock >=3D 0 && lost_clock < s->period);
+
+> +            /*
+> +#ifdef TARGET_I386
+> +        /*
+> +         * recalculate the coalesced irqs for two reasons:
+> +         *    a) the lost_clock is more that a period, i,e. the timer
+> +         *       interrupt has been lost, we should catch up the time.
+> +         *
+> +         *    b) the period may be reconfigured, under this case, when
+> +         *       switching from a shorter to a longer period, scale do=
+wn
+> +         *       the missing ticks since we expect the OS handler to
+> +         *       treat the delayed ticks as longer. Any leftovers are
+> +         *       put back into lost_clock.
+> +         *       When switching to a shorter period, scale up the miss=
+ing
+> +         *       ticks since we expect the OS handler to treat the del=
+ayed
+> +         *       ticks as shorter.
+> +         */
+> +        if (s->lost_tick_policy =3D=3D LOST_TICK_POLICY_SLEW) {
+> +            uint32_t cur_irq_coalesced =3D s->irq_coalesced;
+> +            uint32_t cur_period =3D s->period;
+
+These are really "old" values rather than current.
+
+> +
+> +            lost_clock +=3D cur_irq_coalesced * cur_period;
+> +            s->irq_coalesced =3D lost_clock / period;
+> +            lost_clock %=3D period;
+> +            s->period =3D period;
+> +            if ((cur_irq_coalesced !=3D s->irq_coalesced) ||
+> +               (cur_period |=3D s->period)) {
+
+Typo here, so this becomes:
+
+        uint32_t old_irq_coalesced =3D s->irq_coalesced;
+	lost_clock +=3D old_irq_coalesced * old_period;
+	s->irq_coalesced =3D lost_clock / s->period;
+	lost_clock %=3D s->period;
+	if (old_irq_coalesced !=3D s->irq_coalesced ||
+	    old_period !=3D s->period) {
+		DPRINTF ...
+		rtc_coalesced_timer_update(s);
+	}
+
+> +                DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, =
+"
+> +                          "period scaled from %d to %d\n", cur_irq_coa=
+lesced,
+> +                          s->irq_coalesced, cur_period, s->period);
+> +                rtc_coalesced_timer_update(s);
+> +            }
+> +        }
+> +#endif
+> +        /*
+> +         * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
+> +         * is not used, we should make the time progress anyway.
+> +         */
+> +        lost_clock =3D MIN(lost_clock, period);
+
+See above---let's put it under "else", since it is unnecessary in the
+SLEW case.
+
+This is already much more understandable, and all of it makes a lot of
+sense.  The next version should be perfect. :)
+
+Paolo
+
+> +        assert(lost_clock >=3D 0);
+> +
+> +        next_irq_clock =3D cur_clock + period - lost_clock;
+>          s->next_periodic_time =3D muldiv64(next_irq_clock, NANOSECONDS=
+_PER_SECOND,
+>                                           RTC_CLOCK_RATE) + 1;
+>          timer_mod(s->periodic_timer, s->next_periodic_time);
+> @@ -186,7 +259,7 @@ static void rtc_periodic_timer(void *opaque)
+>  {
+>      RTCState *s =3D opaque;
+> =20
+> -    periodic_timer_update(s, s->next_periodic_time);
+> +    periodic_timer_update(s, s->next_periodic_time, 0);
+>      s->cmos_data[RTC_REG_C] |=3D REG_C_PF;
+>      if (s->cmos_data[RTC_REG_B] & REG_B_PIE) {
+>          s->cmos_data[RTC_REG_C] |=3D REG_C_IRQF;
+> @@ -391,6 +464,7 @@ static void cmos_ioport_write(void *opaque, hwaddr =
+addr,
+>                                uint64_t data, unsigned size)
+>  {
+>      RTCState *s =3D opaque;
+> +    int cur_period;
+>      bool update_periodic_timer;
+> =20
+>      if ((addr & 1) =3D=3D 0) {
+> @@ -424,6 +498,7 @@ static void cmos_ioport_write(void *opaque, hwaddr =
+addr,
+>              }
+>              break;
+>          case RTC_REG_A:
+> +            cur_period =3D s->cmos_data[RTC_REG_A] & 0xf;
+>              update_periodic_timer =3D (s->cmos_data[RTC_REG_A] ^ data)=
+ & 0x0f;
+> =20
+>              if ((data & 0x60) =3D=3D 0x60) {
+> @@ -450,7 +525,8 @@ static void cmos_ioport_write(void *opaque, hwaddr =
+addr,
+>                  (s->cmos_data[RTC_REG_A] & REG_A_UIP);
+> =20
+>              if (update_periodic_timer) {
+> -                periodic_timer_update(s, qemu_clock_get_ns(rtc_clock))=
+;
+> +                periodic_timer_update(s, qemu_clock_get_ns(rtc_clock),
+> +                                      cur_period);
+>              }
+> =20
+>              check_update_timer(s);
+> @@ -487,7 +563,7 @@ static void cmos_ioport_write(void *opaque, hwaddr =
+addr,
+>              s->cmos_data[RTC_REG_B] =3D data;
+> =20
+>              if (update_periodic_timer) {
+> -                periodic_timer_update(s, qemu_clock_get_ns(rtc_clock))=
+;
+> +                periodic_timer_update(s, qemu_clock_get_ns(rtc_clock),=
+ 0);
+>              }
+> =20
+>              check_update_timer(s);
+> @@ -757,7 +833,7 @@ static int rtc_post_load(void *opaque, int version_=
+id)
+>          uint64_t now =3D qemu_clock_get_ns(rtc_clock);
+>          if (now < s->next_periodic_time ||
+>              now > (s->next_periodic_time + get_max_clock_jump())) {
+> -            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock));
+> +            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock), 0);
 >          }
 >      }
->      for (i = 0; i < nb_numa_nodes; i++) {
-> @@ -1984,8 +1986,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->      cs = CPU(cpu);
->      cs->cpu_index = idx;
->  
-> -    node_id = numa_get_node_for_cpu(cs->cpu_index);
-> -    if (node_id == nb_numa_nodes) {
-> +    node_id = cpu_slot->props.node_id;
-> +    if (!cpu_slot->props.has_node_id) {
->          /* by default CPUState::numa_node was 0 if it's not set via CLI
->           * keep it this way for now but in future we probably should
->           * refuse to start up with incomplete numa mapping */
-> -- 
-> 2.7.4
-> 
->
-
-Reviewed-by: Andrew Jones <drjones@redhat.com> 
+> =20
+> @@ -822,7 +898,7 @@ static void rtc_notify_clock_reset(Notifier *notifi=
+er, void *data)
+>      int64_t now =3D *(int64_t *)data;
+> =20
+>      rtc_set_date_from_host(ISA_DEVICE(s));
+> -    periodic_timer_update(s, now);
+> +    periodic_timer_update(s, now, 0);
+>      check_update_timer(s);
+>  #ifdef TARGET_I386
+>      if (s->lost_tick_policy =3D=3D LOST_TICK_POLICY_SLEW) {
+>=20
