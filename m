@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6JmG-0002N8-5N
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:38:53 -0400
+	(envelope-from <gengdj.1984@gmail.com>) id 1d6Jro-0004Wt-6M
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d6JmC-0008T8-W6
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:38:52 -0400
-Resent-Message-Id: <E1d6JmC-0008T8-W6@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21469)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d6JmC-0008Sm-OT
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:38:48 -0400
-In-Reply-To: <1493911445-19568-1-git-send-email-armbru@redhat.com>
-Message-ID: <149391591116.183.7243750235188675402@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <gengdj.1984@gmail.com>) id 1d6Jrm-0004EW-M3
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 12:44:36 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 4 May 2017 09:38:31 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/28] QAPI patches for 2017-05-04
+In-Reply-To: <CAMj-D2DO_CfvD77izsGfggoKP45HSC9aD6auUPAYC9Yeq_aX7w@mail.gmail.com>
+References: <CAMj-D2DO_CfvD77izsGfggoKP45HSC9aD6auUPAYC9Yeq_aX7w@mail.gmail.com>
+From: gengdongjiu <gengdj.1984@gmail.com>
+Date: Fri, 5 May 2017 00:44:33 +0800
+Message-ID: <CAMj-D2BVerutQXg0AArBvWrB04x9jYF+ACMQCZu3FT92kReZBg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] (no subject)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +22,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: mtsirkin@redhat.com, kvm@vger.kernel.org, Tyler Baicar <tbaicar@codeaurora.org>, qemu-devel@nongnu.org, Xiongfeng Wang <wangxiongfeng2@huawei.com>, ben@skyportsystems.com, linux@armlinux.org.uk, kvmarm@lists.cs.columbia.edu, huangshaoyu@huawei.com, lersek@redhat.com, songwenjun@huawei.com, wuquanming@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, qemu-arm@nongnu.org, imammedo@redhat.com, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, pbonzini@redhat.com, James Morse <james.morse@arm.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAwLzI4XSBRQVBJIHBhdGNoZXMgZm9yIDIwMTctMDUtMDQKTWVzc2FnZS1p
-ZDogMTQ5MzkxMTQ0NS0xOTU2OC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClR5
-cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
-ICAgIHBhdGNoZXcvMTQ5MzkxNTEzNi0xOTE1MC0xLWdpdC1zZW5kLWVtYWlsLXpoaXlvbmcueWFu
-Z0BpbnRlbC5jb20gLT4gcGF0Y2hldy8xNDkzOTE1MTM2LTE5MTUwLTEtZ2l0LXNlbmQtZW1haWwt
-emhpeW9uZy55YW5nQGludGVsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjJl
-NDM0YTkgcW1wLXNoZWxsOiBpbXByb3ZlIGhlbHAKNzdjZDlmMCBxbXAtc2hlbGw6IGRvbid0IHNo
-b3cgdmVyc2lvbiBncmVldGluZyBpZiB1bmF2YWlsYWJsZQpkMTdlNGZiIHFtcC1zaGVsbDogQ29w
-ZSB3aXRoIHF1ZXJ5LWNvbW1hbmRzIGVycm9yCmY3YWMzYzQgcW1wLXNoZWxsOiBhZGQgLU4gb3B0
-aW9uIHRvIHNraXAgbmVnb3RpYXRlCjk1NzE3NTggcW1wLXNoZWxsOiBhZGQgcGVyc2lzdGVudCBj
-b21tYW5kIGhpc3RvcnkKYWEwMDk4NSBxb2JqZWN0LWlucHV0LXZpc2l0b3I6IENhdGNoIG1pc3Vz
-ZSBvZiBlbmRfc3RydWN0IHZzLiBlbmRfbGlzdAoxOTRiM2UyIHFhcGk6IERvY3VtZW50IGludGVu
-ZGVkIHVzZSBvZiBAbmFtZSB3aXRoaW4gYWx0ZXJuYXRlIHZpc2l0cwo2N2MwMDkwIHFvYmplY3Qt
-aW5wdXQtdmlzaXRvcjogRG9jdW1lbnQgZnVsbF9uYW1lX250aCgpCjhjMTY3ODMgcW1wOiBJbXBy
-b3ZlIFFNUCBkaXNwYXRjaCBlcnJvciBtZXNzYWdlcwphMDQ0MmQyIHNvY2tldHM6IERlbGV0ZSB1
-bnVzZWQgaGVscGVyIHNvY2tldF9hZGRyZXNzX2NydW1wbGUoKQpjYTkwYjAzIHNvY2tldHM6IExp
-bWl0IFNvY2tldEFkZHJlc3NMZWdhY3kgdG8gZXh0ZXJuYWwgaW50ZXJmYWNlcwo0MGQ1NjAyIHNv
-Y2tldHM6IFJlbmFtZSBTb2NrZXRBZGRyZXNzRmxhdCB0byBTb2NrZXRBZGRyZXNzCmY4YjliYmIg
-c29ja2V0czogUmVuYW1lIFNvY2tldEFkZHJlc3MgdG8gU29ja2V0QWRkcmVzc0xlZ2FjeQphODFk
-YzUyIHFhcGk6IE5ldyBRQVBJX0NMT05FX01FTUJFUlMoKQo0ZjE4NDcxIHNvY2tldHM6IFByZXBh
-cmUgaW5ldF9wYXJzZSgpIGZvciBmbGF0dGVuZWQgU29ja2V0QWRkcmVzcwo1Y2JlZmZjIHNvY2tl
-dHM6IFByZXBhcmUgdnNvY2tfcGFyc2UoKSBmb3IgZmxhdHRlbmVkIFNvY2tldEFkZHJlc3MKY2M5
-MGFhZiB0ZXN0LXFnYTogQWN0dWFsbHkgdGVzdCAweGZmIHN5bmMgYnl0ZXMKZGYzMDAzZiBmZGMt
-dGVzdDogQXZvaWQgZGVwcmVjYXRlZCAnY2hhbmdlJyBjb21tYW5kCmU1MDI5MzIgUWVtdU9wdHM6
-IFNpbXBsaWZ5IHFlbXVfb3B0c190b19xZGljdCgpCmE5NzJkNDcgYmxvY2s6IFNpbXBsaWZ5IGJk
-cnZfYXBwZW5kX3RlbXBfc25hcHNob3QoKSBsb2dpYwoyNzM0NzY3IHFvYmplY3Q6IFVzZSBzaW1w
-bGVyIFFEaWN0L1FMaXN0IHNjYWxhciBpbnNlcnRpb24gbWFjcm9zCmMyMmE3YTkgcW9iamVjdDog
-QWRkIGhlbHBlciBtYWNyb3MgZm9yIGNvbW1vbiBzY2FsYXIgaW5zZXJ0aW9ucwpjNzU2ZDFmIHFv
-YmplY3Q6IERyb3AgdXNlbGVzcyBRT2JqZWN0IGNhc3RzCjYzODJlZjYgY29jY2luZWxsZTogQWRk
-IHNjcmlwdCB0byByZW1vdmUgdXNlbGVzcyBRT2JqZWN0IGNhc3RzCjFlZTdjYWQgcGNpOiBSZWR1
-Y2Ugc2NvcGUgb2YgZXJyb3IgaW5qZWN0aW9uCmM0OWFhZjIgcGNpOiBVc2Ugc3RydWN0IGluc3Rl
-YWQgb2YgUURpY3QgdG8gcGFzcyBiYWNrIHBhcmFtZXRlcnMKODUzOTkzNCB0ZXN0LWtleXZhbDog
-Zml4IGxlYWtzCmQxMmIyYjMgdGVzdHMvY2hlY2stcWRpY3Q6IEZpeCBtaXNzaW5nIGJyYWNrZXRz
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI4OiB0ZXN0cy9jaGVjay1x
-ZGljdDogRml4IG1pc3NpbmcgYnJhY2tldHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8yODogdGVzdC1r
-ZXl2YWw6IGZpeCBsZWFrcy4uLgpDaGVja2luZyBQQVRDSCAzLzI4OiBwY2k6IFVzZSBzdHJ1Y3Qg
-aW5zdGVhZCBvZiBRRGljdCB0byBwYXNzIGJhY2sgcGFyYW1ldGVycy4uLgpDaGVja2luZyBQQVRD
-SCA0LzI4OiBwY2k6IFJlZHVjZSBzY29wZSBvZiBlcnJvciBpbmplY3Rpb24uLi4KQ2hlY2tpbmcg
-UEFUQ0ggNS8yODogY29jY2luZWxsZTogQWRkIHNjcmlwdCB0byByZW1vdmUgdXNlbGVzcyBRT2Jq
-ZWN0IGNhc3RzLi4uCkNoZWNraW5nIFBBVENIIDYvMjg6IHFvYmplY3Q6IERyb3AgdXNlbGVzcyBR
-T2JqZWN0IGNhc3RzLi4uCkNoZWNraW5nIFBBVENIIDcvMjg6IHFvYmplY3Q6IEFkZCBoZWxwZXIg
-bWFjcm9zIGZvciBjb21tb24gc2NhbGFyIGluc2VydGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8y
-ODogcW9iamVjdDogVXNlIHNpbXBsZXIgUURpY3QvUUxpc3Qgc2NhbGFyIGluc2VydGlvbiBtYWNy
-b3MuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yODogYmxvY2s6IFNpbXBsaWZ5IGJkcnZfYXBwZW5kX3Rl
-bXBfc25hcHNob3QoKSBsb2dpYy4uLgpDaGVja2luZyBQQVRDSCAxMC8yODogUWVtdU9wdHM6IFNp
-bXBsaWZ5IHFlbXVfb3B0c190b19xZGljdCgpLi4uCkNoZWNraW5nIFBBVENIIDExLzI4OiBmZGMt
-dGVzdDogQXZvaWQgZGVwcmVjYXRlZCAnY2hhbmdlJyBjb21tYW5kLi4uCkNoZWNraW5nIFBBVENI
-IDEyLzI4OiB0ZXN0LXFnYTogQWN0dWFsbHkgdGVzdCAweGZmIHN5bmMgYnl0ZXMuLi4KRVJST1I6
-IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzg5OiBGSUxFOiB0ZXN0cy90ZXN0LXFnYS5jOjE1OToKKyAg
-ICAgKiAnaWQnIGZpZWxkIG9mIHRoZSByZXNwb25zZSBkb2VzIG5vdCBtYXRjaCB0aGUgJ2lkJyBm
-aWVsZCBvZiAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDcwIGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEz
-LzI4OiBzb2NrZXRzOiBQcmVwYXJlIHZzb2NrX3BhcnNlKCkgZm9yIGZsYXR0ZW5lZCBTb2NrZXRB
-ZGRyZXNzLi4uCkNoZWNraW5nIFBBVENIIDE0LzI4OiBzb2NrZXRzOiBQcmVwYXJlIGluZXRfcGFy
-c2UoKSBmb3IgZmxhdHRlbmVkIFNvY2tldEFkZHJlc3MuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjg6
-IHFhcGk6IE5ldyBRQVBJX0NMT05FX01FTUJFUlMoKS4uLgpDaGVja2luZyBQQVRDSCAxNi8yODog
-c29ja2V0czogUmVuYW1lIFNvY2tldEFkZHJlc3MgdG8gU29ja2V0QWRkcmVzc0xlZ2FjeS4uLgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTI5OiBGSUxFOiBibG9ja2Rldi1uYmQu
-YzoxMjc6CisgICAgICAgIC8qIFRPRE8gU09DS0VUX0FERFJFU1NfTEVHQUNZX0tJTkRfRkQgd2hl
-cmUgZmQgaGFzIEFGX0lORVQgb3IgQUZfSU5FVDYgKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiM1MjU6IEZJTEU6IGluY2x1ZGUvcWVtdS9zb2NrZXRzLmg6NDk6CitpbnQgc29j
-a2V0X2Nvbm5lY3QoU29ja2V0QWRkcmVzc0xlZ2FjeSAqYWRkciwgTm9uQmxvY2tpbmdDb25uZWN0
-SGFuZGxlciAqY2FsbGJhY2ssCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTMx
-OiBGSUxFOiBpbmNsdWRlL3FlbXUvc29ja2V0cy5oOjUzOgoraW50IHNvY2tldF9kZ3JhbShTb2Nr
-ZXRBZGRyZXNzTGVnYWN5ICpyZW1vdGUsIFNvY2tldEFkZHJlc3NMZWdhY3kgKmxvY2FsLCBFcnJv
-ciAqKmVycnApOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzkxODogRklMRTog
-bWlncmF0aW9uL3NvY2tldC5jOjI4Ogorc3RhdGljIFNvY2tldEFkZHJlc3NMZWdhY3kgKnRjcF9i
-dWlsZF9hZGRyZXNzKGNvbnN0IGNoYXIgKmhvc3RfcG9ydCwgRXJyb3IgKiplcnJwKQoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3Mjc6IEZJTEU6IHVpL3ZuYy5jOjM2MTM6Cisg
-ICAgICAgICpyZXR3c2FkZHIgPSBnX3JlbmV3KFNvY2tldEFkZHJlc3NMZWdhY3kgKiwgKnJldHdz
-YWRkciwgKnJldG53c2FkZHIgKyAxKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiMxODg3OiBGSUxFOiB1dGlsL3FlbXUtc29ja2V0cy5jOjEwNzU6CitpbnQgc29ja2V0X2Nvbm5l
-Y3QoU29ja2V0QWRkcmVzc0xlZ2FjeSAqYWRkciwgTm9uQmxvY2tpbmdDb25uZWN0SGFuZGxlciAq
-Y2FsbGJhY2ssCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTk3MDogRklMRTog
-dXRpbC9xZW11LXNvY2tldHMuYzoxMTUyOgoraW50IHNvY2tldF9kZ3JhbShTb2NrZXRBZGRyZXNz
-TGVnYWN5ICpyZW1vdGUsIFNvY2tldEFkZHJlc3NMZWdhY3kgKmxvY2FsLCBFcnJvciAqKmVycnAp
-Cgp0b3RhbDogMCBlcnJvcnMsIDcgd2FybmluZ3MsIDE4OTUgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxNy8yODogc29j
-a2V0czogUmVuYW1lIFNvY2tldEFkZHJlc3NGbGF0IHRvIFNvY2tldEFkZHJlc3MuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTgvMjg6IHNvY2tldHM6IExpbWl0IFNvY2tldEFkZHJlc3NMZWdhY3kgdG8gZXh0
-ZXJuYWwgaW50ZXJmYWNlcy4uLgpDaGVja2luZyBQQVRDSCAxOS8yODogc29ja2V0czogRGVsZXRl
-IHVudXNlZCBoZWxwZXIgc29ja2V0X2FkZHJlc3NfY3J1bXBsZSgpLi4uCkNoZWNraW5nIFBBVENI
-IDIwLzI4OiBxbXA6IEltcHJvdmUgUU1QIGRpc3BhdGNoIGVycm9yIG1lc3NhZ2VzLi4uCkNoZWNr
-aW5nIFBBVENIIDIxLzI4OiBxb2JqZWN0LWlucHV0LXZpc2l0b3I6IERvY3VtZW50IGZ1bGxfbmFt
-ZV9udGgoKS4uLgpDaGVja2luZyBQQVRDSCAyMi8yODogcWFwaTogRG9jdW1lbnQgaW50ZW5kZWQg
-dXNlIG9mIEBuYW1lIHdpdGhpbiBhbHRlcm5hdGUgdmlzaXRzLi4uCkNoZWNraW5nIFBBVENIIDIz
-LzI4OiBxb2JqZWN0LWlucHV0LXZpc2l0b3I6IENhdGNoIG1pc3VzZSBvZiBlbmRfc3RydWN0IHZz
-LiBlbmRfbGlzdC4uLgpDaGVja2luZyBQQVRDSCAyNC8yODogcW1wLXNoZWxsOiBhZGQgcGVyc2lz
-dGVudCBjb21tYW5kIGhpc3RvcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjUvMjg6IHFtcC1zaGVsbDog
-YWRkIC1OIG9wdGlvbiB0byBza2lwIG5lZ290aWF0ZS4uLgpDaGVja2luZyBQQVRDSCAyNi8yODog
-cW1wLXNoZWxsOiBDb3BlIHdpdGggcXVlcnktY29tbWFuZHMgZXJyb3IuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMjcvMjg6IHFtcC1zaGVsbDogZG9uJ3Qgc2hvdyB2ZXJzaW9uIGdyZWV0aW5nIGlmIHVuYXZh
-aWxhYmxlLi4uCkNoZWNraW5nIFBBVENIIDI4LzI4OiBxbXAtc2hlbGw6IGltcHJvdmUgaGVscC4u
-Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
-ZWxpc3RzLm9yZw==
+Dear James,
+   Thanks a lot for your review and comments. I am very sorry for the
+late response.
+
+
+2017-05-04 23:42 GMT+08:00 gengdongjiu <gengdj.1984@gmail.com>:
+>  Hi Dongjiu Geng,
+>
+> On 30/04/17 06:37, Dongjiu Geng wrote:
+>> when happen SEA, deliver signal bus and handle the ioctl that
+>> inject SEA abort to guest, so that guest can handle the SEA error.
+>
+>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+>> index 105b6ab..a96594f 100644
+>> --- a/arch/arm/kvm/mmu.c
+>> +++ b/arch/arm/kvm/mmu.c
+>> @@ -20,8 +20,10 @@
+>> @@ -1238,6 +1240,36 @@ static void coherent_cache_guest_page(struct kvm_=
+vcpu *vcpu, kvm_pfn_t pfn,
+>>   __coherent_cache_guest_page(vcpu, pfn, size);
+>>  }
+>>
+>> +static void kvm_send_signal(unsigned long address, bool hugetlb, bool h=
+wpoison)
+>> +{
+>> + siginfo_t info;
+>> +
+>> + info.si_signo   =3D SIGBUS;
+>> + info.si_errno   =3D 0;
+>> + if (hwpoison)
+>> + info.si_code    =3D BUS_MCEERR_AR;
+>> + else
+>> + info.si_code    =3D 0;
+>> +
+>> + info.si_addr    =3D (void __user *)address;
+>> + if (hugetlb)
+>> + info.si_addr_lsb =3D PMD_SHIFT;
+>> + else
+>> + info.si_addr_lsb =3D PAGE_SHIFT;
+>> +
+>> + send_sig_info(SIGBUS, &info, current);
+>> +}
+>> +
+> =C2=AB  [hide part of quote]
+>
+> Punit reviewed the other version of this patch, this PMD_SHIFT is not the=
+ right
+> thing to do, it needs a more accurate set of calls and shifts as there ma=
+y be
+> hugetlbfs pages other than PMD_SIZE.
+>
+> https://www.spinics.net/lists/arm-kernel/msg568919.html
+>
+> I haven't posted a new version of that patch because I was still hunting =
+a bug
+> in the hugepage/hwpoison code, even with Punit's fixes series I see -EFAU=
+LT
+> returned to userspace instead of this hwpoison code being invoked.
+
+  Ok, got it, thanks for your information.
+>
+> Please avoid duplicating functionality between patches, it wastes reviewe=
+rs
+> time, especially when we know there are problems with this approach.
+>
+>
+>> +static void kvm_handle_bad_page(unsigned long address,
+>> + bool hugetlb, bool hwpoison)
+>> +{
+>> + /* handle both hwpoison and other synchronous external Abort */
+>> + if (hwpoison)
+>> + kvm_send_signal(address, hugetlb, true);
+>> + else
+>> + kvm_send_signal(address, hugetlb, false);
+>> +}
+>
+> Why the extra level of indirection? We only want to signal userspace like=
+ this
+> from KVM for hwpoison. Signals for RAS related reasons should come from t=
+he bits
+> of the kernel that decoded the error.
+
+For the SEA, the are maily two types:
+0b010000 Synchronous External Abort on memory access.
+0b0101xx Synchronous External Abort on page table walk. DFSC[1:0]
+encode the level.
+
+hwpoison should belong to the  "Synchronous External Abort on memory access=
+"
+if the SEA type is not hwpoison, such as page table walk, do you mean
+KVM do not deliver the SIGBUS?
+If so, how the KVM handle the SEA type other than hwpoison?
+
+>
+> (hwpoison for KVM is a corner case as Qemu's memory effectively has two u=
+sers,
+> Qemu and KVM. This isn't the example of how user-space gets signalled.)
+>
+>
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> index b37446a..780e3c4 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -277,6 +277,13 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *=
+vcpu,
+>>   return -EINVAL;
+>>  }
+>>
+>> +int kvm_vcpu_ioctl_sea(struct kvm_vcpu *vcpu)
+>> +{
+>> + kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+>> +
+>> + return 0;
+>> +}
+>
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index bb02909..1d2e2e7 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1306,6 +1306,7 @@ struct kvm_s390_ucas_mapping {
+>>  #define KVM_S390_GET_IRQ_STATE  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_s=
+tate)
+>>  /* Available with KVM_CAP_X86_SMM */
+>>  #define KVM_SMI                   _IO(KVMIO,   0xb7)
+>> +#define KVM_ARM_SEA               _IO(KVMIO,   0xb8)
+>>
+>>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU (1 << 0)
+>>  #define KVM_DEV_ASSIGN_PCI_2_3 (1 << 1)
+>>
+>
+> Why do we need a userspace API for SEA? It can also be done by using
+> KVM_{G,S}ET_ONE_REG to change the vcpu registers. The advantage of doing =
+it this
+> way is you can choose which ESR value to use.
+>
+> Adding a new API call to do something you could do with an old one doesn'=
+t look
+> right.
+
+James, I considered your suggestion before that use the
+KVM_{G,S}ET_ONE_REG to change the vcpu registers. but I found it does
+not have difference to use the alread existed KVM API.  so may be
+changing the vcpu registers in qemu will duplicate with the KVM APIs.
+
+injection a SEA is no more than setting some registers: elr_el1, PC,
+PSTATE, SPSR_el1, far_el1, esr_el1
+I seen this KVM API do the same thing as Qemu.  do you found call this
+API will have issue and necessary to choose another ESR value?
+
+I pasted the alread existed KVM API code:
+
+static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned
+long addr)
+{
+ unsigned long cpsr =3D *vcpu_cpsr(vcpu);
+ bool is_aarch32 =3D vcpu_mode_is_32bit(vcpu);
+ u32 esr =3D 0;
+ *vcpu_elr_el1(vcpu) =3D *vcpu_pc(vcpu);
+ *vcpu_pc(vcpu) =3D get_except_vector(vcpu, except_type_sync);
+ *vcpu_cpsr(vcpu) =3D PSTATE_FAULT_BITS_64;
+ *vcpu_spsr(vcpu) =3D cpsr;
+ vcpu_sys_reg(vcpu, FAR_EL1) =3D addr;
+ /*
+  * Build an {i,d}abort, depending on the level and the
+  * instruction set. Report an external synchronous abort.
+  */
+ if (kvm_vcpu_trap_il_is32bit(vcpu))
+  esr |=3D ESR_ELx_IL;
+ /*
+  * Here, the guest runs in AArch64 mode when in EL1. If we get
+  * an AArch32 fault, it means we managed to trap an EL0 fault.
+  */
+ if (is_aarch32 || (cpsr & PSR_MODE_MASK) =3D=3D PSR_MODE_EL0t)
+  esr |=3D (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
+ else
+  esr |=3D (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
+ if (!is_iabt)
+  esr |=3D ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
+ vcpu_sys_reg(vcpu, ESR_EL1) =3D esr | ESR_ELx_FSC_EXTABT;
+}
+
+static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+    unsigned long addr)
+{
+ u32 vect_offset;
+ u32 *far, *fsr;
+ bool is_lpae;
+ if (is_pabt) {
+  vect_offset =3D 12;
+  far =3D &vcpu_cp15(vcpu, c6_IFAR);
+  fsr =3D &vcpu_cp15(vcpu, c5_IFSR);
+ } else { /* !iabt */
+  vect_offset =3D 16;
+  far =3D &vcpu_cp15(vcpu, c6_DFAR);
+  fsr =3D &vcpu_cp15(vcpu, c5_DFSR);
+ }
+ prepare_fault32(vcpu, COMPAT_PSR_MODE_ABT | COMPAT_PSR_A_BIT, vect_offset)=
+;
+ *far =3D addr;
+ /* Give the guest an IMPLEMENTATION DEFINED exception */
+ is_lpae =3D (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+ if (is_lpae)
+  *fsr =3D 1 << 9 | 0x34;
+ else
+  *fsr =3D 0x14;
+}
+
+
+/**
+ * kvm_inject_dabt - inject a data abort into the guest
+ * @vcpu: The VCPU to receive the undefined exception
+ * @addr: The address to report in the DFAR
+ *
+ * It is assumed that this code is called from the VCPU thread and that the
+ * VCPU therefore is not currently executing guest code.
+ */
+void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+{
+ if (!(vcpu->arch.hcr_el2 & HCR_RW))
+  inject_abt32(vcpu, false, addr);
+ else
+  inject_abt64(vcpu, false, addr);
+}
+
+
+>
+>
+> Thanks,
+>
+> James
