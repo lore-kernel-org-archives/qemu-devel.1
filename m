@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1d6elg-0001RF-HS
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:03:41 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6epq-0002Rb-VY
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:08:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1d6elc-0001Su-Ez
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:03:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55383
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
-	id 1d6elc-0001RI-9E
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:03:36 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v45ExPkB055927
-	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 11:03:33 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8q5re3bb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 11:03:33 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
-	Fri, 5 May 2017 09:03:32 -0600
-References: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
-	<20170505074143.GB21435@lemon.lan>
-From: Eric Farman <farman@linux.vnet.ibm.com>
-Date: Fri, 5 May 2017 11:03:25 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6epm-0003VE-Vw
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:07:59 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d6epm-0003Ur-P5
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:07:54 -0400
+Received: by mail-wm0-x244.google.com with SMTP id u65so1894386wmu.3
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 08:07:54 -0700 (PDT)
+Date: Fri, 5 May 2017 16:07:51 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170505150751.GD14316@stefanha-x1.localdomain>
+References: <1618105799.2706822.1493821255206.ref@mail.yahoo.com>
+	<1618105799.2706822.1493821255206@mail.yahoo.com>
 MIME-Version: 1.0
-In-Reply-To: <20170505074143.GB21435@lemon.lan>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <298bd169-6f9f-e622-1b8b-85ef126d8d0c@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v1 0/5] Enable virtio-scsi boot from
- /dev/sgX
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Km1U/tdNT/EmXiR1"
+Content-Disposition: inline
+In-Reply-To: <1618105799.2706822.1493821255206@mail.yahoo.com>
+Subject: Re: [Qemu-devel] Dummy Panel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,77 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: John Bradley <flypie1@yahoo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, John Bradley <flypie@rocketmail.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
 
+--Km1U/tdNT/EmXiR1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 05/05/2017 03:41 AM, Fam Zheng wrote:
-> On Wed, 04/26 16:46, Eric Farman wrote:
->> The short version of what happens is the host device driver rejects our
->> requests because the transfer lengths are too long for it to satisfy.
->> A virtio-scsi disk connected via scsi-generic is fine as a non-boot device
->> because the guest kernel is able to break up the requests for us.  So we just
->> need to handle this situation for the boot process.
->>
->> Patches 2-N in this series do that, but rely on us to specify the max_sectors
->> parameter for the virtio-scsi-ccw device:
->>
->>   /usr/bin/qemu-system-s390x ...
->>     -device virtio-scsi-ccw,id=scsi0,devno=fe.0.0001,max_sectors=2048
->
-> Can you instead do an INQUIRY from the bios code to check the Block Limits page?
-> The response is intercepted by hw/scsi/scsi-generic.c to merge in the host LUN's
-> limits. That's how Linux kernel finds the granularity for request splitting.
+On Wed, May 03, 2017 at 02:20:55PM +0000, John Bradley via Qemu-devel wrote:
+> Hi
+> I have created a new fork on GitHub https://github.com/flypie/flypie-pi-q=
+emu and an associated project https://github.com/flypie/GDummyPanel the ide=
+a as well as getting the Original PI emulation working is to add some facil=
+ity for simulated IO. This is a demonstration of the latest version, runnin=
+g the QEMU demo from https://github.com/rsta2/circle. I took the idea from =
+an implementation for the BIFFboard but only the socket number is left, the=
+ commuications is all via IP. The code is only really Alpha level at the mo=
+ment and needs some refing to reduce bandwidth. I could also extend the cod=
+e so that the connection can be to a remote machine rather than via the loc=
+al host.
+>=20
+> I intend to generalise the code, to work with several different boards ot=
+her than the PI, could anyone suggest a board that would benefit from such =
+an add on.
+> Is this a worth while addon?=20
+> John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge Hill =
+Liverpool L7 7AF
 
-It's a good idea (Thanks Christian, Paolo, and Fam :), but this leads to 
-other difficulties.
+CCing ARM maintainers (see the ./MAINTAINERS file to find the right
+people to CC)
 
-We get a value of x3fffff when sending that to a scsi-disk from bios 
-code.  That's fully emulated though, in scsi_disk_emulate_inquiry.  And 
-that's the scenario that already works.
+Stefan
 
-While there is indeed code in hw/scsi/scsi-generic.c to wire that in, 
-that only happens after the I/O goes to the device itself.  The Block 
-Limits page isn't supported [1] and thus it gets rejected with "invalid 
-field in cdb".  We never get to that fixup code you reference, since the 
-returned len is zero.
+--Km1U/tdNT/EmXiR1
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Should I be refactoring this code to always patch in that block limit 
-regardless of a response from the host/device?  (That is, when page xb0 
-isn't supported by the hw.)
+-----BEGIN PGP SIGNATURE-----
 
-  - Eric
+iQEcBAEBAgAGBQJZDJVHAAoJEJykq7OBq3PI2dIH/jYDyMAPKcsCT1mT29Fcn6oq
+zYw2IWLk8hHbGGJJalL6Rh/aER5NDqDBW1qYmmI90cdU3giSuIaz+WRTVGVZJbmt
+/+gtWvvIB6pPDFlFYdMMnaIbNe6iyu4lZfKiLo8Hlqaxt0i72SAfqjEHoV74kMNk
+Q0TWkRbyKjVXSNESH8ygANBLFeRmdSqxSN3ZQnS1Aq1ZoIGAdTT2CQETSUhs9hoG
+SHlwH+InQNyagRN8sDs+9c/42VTRUqage/HRVKdGOIIoBZzSGtuOw6/Wv4R3ztu8
+7DZdY0UzIK42okFuXxthLoDloG98TMSV1F2vuJKoAwv245JQQR/o2m/n03QbZ/g=
+=NxpQ
+-----END PGP SIGNATURE-----
 
-[1] If I issue an EVPD page x00 from the QEMU bios code, I only see 
-pages xb1, xc0, and c1 are supported.  If I look at the supported pages 
-from the host, I see a few more but still not xb0:
-
-$ sg_inq --page=0 /dev/sda
-VPD INQUIRY: Supported VPD pages page
-    Supported VPD pages:
-      0x0	Supported VPD pages
-      0x80	Unit serial number
-      0x83	Device identification
-      0x86	Extended INQUIRY data
-      0xb1	Block device characteristics (sbc3)
-      0xc0	vendor: Firmware numbers (seagate); Unit path report (EMC)
-      0xc1	vendor: Date code (seagate)
-$ sg_inq --page=0 /dev/sg0
-VPD INQUIRY: Supported VPD pages page
-    Supported VPD pages:
-      0x0	Supported VPD pages
-      0x80	Unit serial number
-      0x83	Device identification
-      0x86	Extended INQUIRY data
-      0xb1	Block device characteristics (sbc3)
-      0xc0	vendor: Firmware numbers (seagate); Unit path report (EMC)
-      0xc1	vendor: Date code (seagate)
-
-
->
-> That way, patch 1 is not necessary too. I don't like it because it doesn't
-> always work considering LUN hotplug.
->
-> Fam
->
+--Km1U/tdNT/EmXiR1--
