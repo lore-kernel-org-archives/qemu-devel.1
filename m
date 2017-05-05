@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6Snq-0003yH-OT
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:17:08 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d6Sxr-0005zr-4G
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6Snn-00028n-FW
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:17:06 -0400
-References: <20170505020430.2305-1-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <00709aa5-218f-9080-9a82-e5e47c286081@redhat.com>
-Date: Thu, 4 May 2017 21:17:00 -0500
+	(envelope-from <jasowang@redhat.com>) id 1d6Sxo-00082q-0i
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:27:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47106)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d6Sxn-00082K-Qe
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:27:23 -0400
+References: <286AC319A985734F985F78AFA26841F7391FDD30@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <056500d7-6a91-12e5-be1d-2b2beebd0430@redhat.com>
+Date: Fri, 5 May 2017 10:27:13 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170505020430.2305-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DK6xTS3q8iTBPv97Wh40U1oMck7AmT4GO"
-Subject: Re: [Qemu-devel] [PATCH] tests: Remove redundant assignment
+In-Reply-To: <286AC319A985734F985F78AFA26841F7391FDD30@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] virtio-net: configurable TX queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DK6xTS3q8iTBPv97Wh40U1oMck7AmT4GO
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
-Message-ID: <00709aa5-218f-9080-9a82-e5e47c286081@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests: Remove redundant assignment
-References: <20170505020430.2305-1-famz@redhat.com>
-In-Reply-To: <20170505020430.2305-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/04/2017 09:04 PM, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/postcopy-test.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
-> index de35a18..e86f876 100644
-> --- a/tests/postcopy-test.c
-> +++ b/tests/postcopy-test.c
-> @@ -41,7 +41,7 @@ static bool ufd_version_check(void)
->      struct uffdio_api api_struct;
->      uint64_t ioctl_mask;
-> =20
-> -    int ufd =3D ufd =3D syscall(__NR_userfaultfd, O_CLOEXEC);
-> +    int ufd =3D syscall(__NR_userfaultfd, O_CLOEXEC);
-> =20
->      if (ufd =3D=3D -1) {
->          g_test_message("Skipping test: userfaultfd not available");
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: "Wang, Wei W" <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Jan Scheurich <jan.scheurich@ericsson.com>
 
 
---DK6xTS3q8iTBPv97Wh40U1oMck7AmT4GO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 2017=E5=B9=B405=E6=9C=8804=E6=97=A5 18:58, Wang, Wei W wrote:
+> Hi,
+>
+> I want to re-open the discussion left long time ago:
+> https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg06194.html
+> , and discuss the possibility of changing the hardcoded (256) TX  queue
+> size to be configurable between 256 and 1024.
 
-iQEcBAEBCAAGBQJZC+CcAAoJEKeha0olJ0NqHekH/AlgcUBCaLxitjbMufqav4Eb
-yWlBhgPeVEodZGnlBXoY9WWNhj5VUBNYBbeG+baMe7KUaCul9ig0S6yME9n8WGoS
-GIZLqzFVmyBjUe4eHeY5caboYieLgBRBZtVD/VHkYTT4d5n1ps23qomFkFCjZfU1
-alr1mPQ6mclZ4s3mzYMyiAHshp/3xbjLskCdmCHQZA7sX5ZpkFQn69nGl7UocEQv
-nIGlzWTUjkV9XYuU6rYOgz5UKiFmlDwkZG/T7HCxOb+pzxWN7uXszP3UT0i35Zph
-BylOGTB4bZscfrUAX3sttC7GS+re1EB3Pza/TP7cCcUF2dn0TyI3unQx1zWypYM=
-=kefV
------END PGP SIGNATURE-----
+Yes, I think we probably need this.
 
---DK6xTS3q8iTBPv97Wh40U1oMck7AmT4GO--
+>
+> The reason to propose this request is that a severe issue of packet dro=
+ps in
+> TX direction was observed with the existing hardcoded 256 queue size,
+> which causes performance issues for packet drop sensitive guest
+> applications that cannot use indirect descriptor tables. The issue goes=
+ away
+> with 1K queue size.
+
+Do we need even more, what if we find 1K is even not sufficient in the=20
+future? Modern nics has size up to ~8192.
+
+>
+> The concern mentioned in the previous discussion (please check the link
+> above) is that the number of chained descriptors would exceed
+> UIO_MAXIOV (1024) supported by the Linux.
+
+We could try to address this limitation but probably need a new feature=20
+bit to allow more than UIO_MAXIOV sgs.
+
+>
+>  From the code,  I think the number of the chained descriptors is limit=
+ed to
+> MAX_SKB_FRAGS + 2 (~18), which is much less than UIO_MAXIOV.
+
+This is the limitation of #page frags for skb, not the iov limitation.
+
+Thanks
+
+> Please point out if I missed anything. Thanks.
+>
+> Best,
+> Wei
+>
+>
