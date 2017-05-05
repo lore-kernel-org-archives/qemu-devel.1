@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6eTr-0004c8-DK
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:45:16 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6eXG-0005j7-1m
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:48:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6eTm-00085n-Dz
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:45:15 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38198)
+	(envelope-from <stefanha@gmail.com>) id 1d6eXB-00024f-1j
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:48:46 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35946)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d6eTm-00084K-7x
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:45:10 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id 142so8480190wma.1
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 07:45:09 -0700 (PDT)
-Date: Fri, 5 May 2017 15:45:06 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d6eXA-00022v-SF
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:48:41 -0400
+Received: by mail-wm0-x243.google.com with SMTP id u65so1789347wmu.3
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 07:48:40 -0700 (PDT)
+Date: Fri, 5 May 2017 15:48:37 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170505144506.GA14316@stefanha-x1.localdomain>
-References: <CAEfK_46MMR6cH3ahuJ=zfcuKAp07iU20Ps+yZYv5s9woCPnsSw@mail.gmail.com>
-	<20170502142207.GJ22502@stefanha-x1.localdomain>
-	<CAEfK_46hGYYpO4YhYcxdUar1ugLQwbpJMgxAJDJU13zSpbD4zw@mail.gmail.com>
+Message-ID: <20170505144837.GB14316@stefanha-x1.localdomain>
+References: <1493726062-31743-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
+	protocol="application/pgp-signature"; boundary="yEPQxsgoJgBvi8ip"
 Content-Disposition: inline
-In-Reply-To: <CAEfK_46hGYYpO4YhYcxdUar1ugLQwbpJMgxAJDJU13zSpbD4zw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] gdbstub: implement remote debugging
- protocol escapes for command receive
+In-Reply-To: <1493726062-31743-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Mark legacy option '-no-kvm' as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Gale <doug16k@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 
---dDRMvlgZJXvWKvBx
+--yEPQxsgoJgBvi8ip
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 02, 2017 at 10:32:40AM -0400, Doug Gale wrote:
-> +            } else {
-> +                /* decode repeat length */
-> +                int repeat = (unsigned char)ch - ' ' + 3;
-> +                if (s->line_buf_index + repeat >= sizeof(s->line_buf) - 1) {
-> +                    /* that many repeats would overrun the command buffer */
-> +#ifdef DEBUG_GDB
-> +                    printf("gdbstub command buffer overrun,"
-> +                           " dropping command\n");
-> +#endif
-> +                    s->state = RS_IDLE;
-> +                } else if (s->line_buf_index <= 2) {
+On Tue, May 02, 2017 at 01:54:22PM +0200, Thomas Huth wrote:
+> '-no-kvm' was just a legacy convenience option for the users of
+> qemu-kvm, it never made sense in the normal QEMU tree since TCG is
+> the default here anyway. The option has also never been specified
+> in the QEMU docs and in the '--help' list, so likely hardly anybody
+> knows about this option at all. I think we could get rid of this
+> without bothering anybody nowadays, but just in case, let's print
+> out a warning for a couple of releases first.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  vl.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/vl.c b/vl.c
+> index d5ec87e..2d44621 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3709,7 +3709,9 @@ int main(int argc, char **argv, char **envp)
+>                      exit(1);
+>                  }
+>                  break;
+> -             case QEMU_OPTION_no_kvm:
+> +            case QEMU_OPTION_no_kvm:
+> +                error_report("'-no-kvm' is depreacted, please use "
 
-Why s->line_buf_index <= 2?  I expected s->line_buf_index < 1 since we
-just need 1 character to clone for run-length decoding.
+s/depreacted/deprecated/
 
-> +                    /* got a repeat but we have nothing to repeat */
-> +#ifdef DEBUG_GDB
-> +                    printf("gdbstub got invalid RLE sequence\n");
-> +#endif
-> +                } else {
-
-Missing s->state = RS_IDLE?
-
---dDRMvlgZJXvWKvBx
+--yEPQxsgoJgBvi8ip
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZDI/yAAoJEJykq7OBq3PIfwIH/1vkZvq0KmuvpYNn8xxTRVgE
-J+MejocyCzJ2MAVe7BdQjS9I6URAMsWL2SKT0AQmQv7jii6JIcvQk+h99Cksw9AV
-m2cKC5BVeOXKDRVbCsgbP7j+vrnuMDG7YQ+v8v+kqnQ+0tE1TEzLkSM6yAzgxiV1
-8+5wb1vIlQffxIC9JWG9JIApcSWaA1Cm52nFN6uKTd3klDIkztc8bsnfvlZv4JCZ
-NfDnBooA5uN3vnQE0lwaQWR/VOdppDtjmw1ze1kKlrEfpCIUDBh+mrNKt5HmtwBp
-3KTwYZS28X5LwrFqYcx9qyMQ/gfCrbslV6g6YbQDY20cbKLSJn8D0LvMNQ/SEds=
-=ZJos
+iQEcBAEBAgAGBQJZDJDFAAoJEJykq7OBq3PIToMH/3P9ilUuXGhb7e5fwQz4EMWd
+0GJbIJBKIvgzBhz7tF8l34eOXJUIUkW6b2epCPpZCWptznS8s0JHTs+aOQwiankG
+SRCgU4LRZCjnAVY9oVe211CfcRTZdQ7WyJWv74JmyFCvYeFBPaxLT/zquIT9QNLK
+n72raSpnzmw3CjVEoOmgWVXqNFJhel/PFZfWFtmo21ettTqd1525G93NL+aT4Ix2
+ylZc5mfSHuyOgAK+HtD03F63r0ZHcInIZFbw7X29gU2Z3bVpSewlmEgGRpJuRkM8
+SMxyt4Cf2e/fPtOvpTERFHTsLY6W+6yIBuhfbfx5hZnzjXq9fOagky3bBJh9Cas=
+=nALo
 -----END PGP SIGNATURE-----
 
---dDRMvlgZJXvWKvBx--
+--yEPQxsgoJgBvi8ip--
