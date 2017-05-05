@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d6dki-0000IP-OD
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:58:38 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d6dlk-00011h-Kj
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:59:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d6dke-0003a6-5f
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:58:36 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33059)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d6dkd-0003Zi-Qy
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:58:32 -0400
-Received: by mail-wr0-x230.google.com with SMTP id w50so4409940wrc.0
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 06:58:31 -0700 (PDT)
-References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-	<1486046099-17726-15-git-send-email-batuzovk@ispras.ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1486046099-17726-15-git-send-email-batuzovk@ispras.ru>
-Date: Fri, 05 May 2017 14:59:10 +0100
-Message-ID: <87wp9vmmkx.fsf@linaro.org>
+	(envelope-from <stefanha@gmail.com>) id 1d6dlf-00043M-RV
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:59:40 -0400
+Date: Fri, 5 May 2017 14:59:31 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170505135931.GH11350@stefanha-x1.localdomain>
+References: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2.1 14/21] tcg: do not rely on exact
- values of MO_BSWAP or MO_SIGN in backend
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="17/8oYur5Y32USnW"
+Content-Disposition: inline
+In-Reply-To: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] Refactor DMG driver to have chunk
+ size independence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,253 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, famz@redhat.com, peter@lekensteyn.nl, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 
-Kirill Batuzov <batuzovk@ispras.ru> writes:
+--17/8oYur5Y32USnW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
-> ---
->  tcg/aarch64/tcg-target.inc.c |  4 ++--
->  tcg/arm/tcg-target.inc.c     |  4 ++--
->  tcg/i386/tcg-target.inc.c    |  4 ++--
->  tcg/mips/tcg-target.inc.c    |  4 ++--
->  tcg/ppc/tcg-target.inc.c     |  4 ++--
->  tcg/s390/tcg-target.inc.c    |  4 ++--
->  tcg/sparc/tcg-target.inc.c   | 12 ++++++------
->  tcg/tcg-op.c                 |  4 ++--
->  tcg/tcg.h                    |  1 +
->  9 files changed, 21 insertions(+), 20 deletions(-)
->
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index 6d227a5..2b0b548 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -1032,7 +1032,7 @@ static void tcg_out_cltz(TCGContext *s, TCGType ext, TCGReg d,
->  /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
->   *                                     TCGMemOpIdx oi, uintptr_t ra)
->   */
-> -static void * const qemu_ld_helpers[16] = {
-> +static void * const qemu_ld_helpers[] = {
->      [MO_UB]   = helper_ret_ldub_mmu,
->      [MO_LEUW] = helper_le_lduw_mmu,
->      [MO_LEUL] = helper_le_ldul_mmu,
-> @@ -1046,7 +1046,7 @@ static void * const qemu_ld_helpers[16] = {
->   *                                     uintxx_t val, TCGMemOpIdx oi,
->   *                                     uintptr_t ra)
->   */
-> -static void * const qemu_st_helpers[16] = {
-> +static void * const qemu_st_helpers[] = {
->      [MO_UB]   = helper_ret_stb_mmu,
->      [MO_LEUW] = helper_le_stw_mmu,
->      [MO_LEUL] = helper_le_stl_mmu,
-> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-> index e75a6d4..f603f02 100644
-> --- a/tcg/arm/tcg-target.inc.c
-> +++ b/tcg/arm/tcg-target.inc.c
-> @@ -1058,7 +1058,7 @@ static inline void tcg_out_mb(TCGContext *s, TCGArg a0)
->  /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
->   *                                     int mmu_idx, uintptr_t ra)
->   */
-> -static void * const qemu_ld_helpers[16] = {
-> +static void * const qemu_ld_helpers[] = {
->      [MO_UB]   = helper_ret_ldub_mmu,
->      [MO_SB]   = helper_ret_ldsb_mmu,
->
-> @@ -1078,7 +1078,7 @@ static void * const qemu_ld_helpers[16] = {
->  /* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
->   *                                     uintxx_t val, int mmu_idx, uintptr_t ra)
->   */
-> -static void * const qemu_st_helpers[16] = {
-> +static void * const qemu_st_helpers[] = {
->      [MO_UB]   = helper_ret_stb_mmu,
->      [MO_LEUW] = helper_le_stw_mmu,
->      [MO_LEUL] = helper_le_stl_mmu,
-> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-> index d8f0d81..263c15e 100644
-> --- a/tcg/i386/tcg-target.inc.c
-> +++ b/tcg/i386/tcg-target.inc.c
-> @@ -1334,7 +1334,7 @@ static void tcg_out_nopn(TCGContext *s, int n)
->  /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
->   *                                     int mmu_idx, uintptr_t ra)
->   */
-> -static void * const qemu_ld_helpers[16] = {
-> +static void * const qemu_ld_helpers[] = {
->      [MO_UB]   = helper_ret_ldub_mmu,
->      [MO_LEUW] = helper_le_lduw_mmu,
->      [MO_LEUL] = helper_le_ldul_mmu,
-> @@ -1347,7 +1347,7 @@ static void * const qemu_ld_helpers[16] = {
->  /* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
->   *                                     uintxx_t val, int mmu_idx, uintptr_t ra)
->   */
-> -static void * const qemu_st_helpers[16] = {
-> +static void * const qemu_st_helpers[] = {
->      [MO_UB]   = helper_ret_stb_mmu,
->      [MO_LEUW] = helper_le_stw_mmu,
->      [MO_LEUL] = helper_le_stl_mmu,
-> diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-> index 01ac7b2..4f2d5d1 100644
-> --- a/tcg/mips/tcg-target.inc.c
-> +++ b/tcg/mips/tcg-target.inc.c
-> @@ -1108,7 +1108,7 @@ static void tcg_out_call(TCGContext *s, tcg_insn_unit *arg)
->  }
->
->  #if defined(CONFIG_SOFTMMU)
-> -static void * const qemu_ld_helpers[16] = {
-> +static void * const qemu_ld_helpers[] = {
->      [MO_UB]   = helper_ret_ldub_mmu,
->      [MO_SB]   = helper_ret_ldsb_mmu,
->      [MO_LEUW] = helper_le_lduw_mmu,
-> @@ -1125,7 +1125,7 @@ static void * const qemu_ld_helpers[16] = {
->  #endif
->  };
->
-> -static void * const qemu_st_helpers[16] = {
-> +static void * const qemu_st_helpers[] = {
->      [MO_UB]   = helper_ret_stb_mmu,
->      [MO_LEUW] = helper_le_stw_mmu,
->      [MO_LEUL] = helper_le_stl_mmu,
-> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-> index 64f67d2..680050b 100644
-> --- a/tcg/ppc/tcg-target.inc.c
-> +++ b/tcg/ppc/tcg-target.inc.c
-> @@ -1419,7 +1419,7 @@ static const uint32_t qemu_exts_opc[4] = {
->  /* helper signature: helper_ld_mmu(CPUState *env, target_ulong addr,
->   *                                 int mmu_idx, uintptr_t ra)
->   */
-> -static void * const qemu_ld_helpers[16] = {
-> +static void * const qemu_ld_helpers[] = {
->      [MO_UB]   = helper_ret_ldub_mmu,
->      [MO_LEUW] = helper_le_lduw_mmu,
->      [MO_LEUL] = helper_le_ldul_mmu,
-> @@ -1432,7 +1432,7 @@ static void * const qemu_ld_helpers[16] = {
->  /* helper signature: helper_st_mmu(CPUState *env, target_ulong addr,
->   *                                 uintxx_t val, int mmu_idx, uintptr_t ra)
->   */
-> -static void * const qemu_st_helpers[16] = {
-> +static void * const qemu_st_helpers[] = {
->      [MO_UB]   = helper_ret_stb_mmu,
->      [MO_LEUW] = helper_le_stw_mmu,
->      [MO_LEUL] = helper_le_stl_mmu,
-> diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-> index a679280..ec3491a 100644
-> --- a/tcg/s390/tcg-target.inc.c
-> +++ b/tcg/s390/tcg-target.inc.c
-> @@ -309,7 +309,7 @@ static const uint8_t tcg_cond_to_ltr_cond[] = {
->  };
->
->  #ifdef CONFIG_SOFTMMU
-> -static void * const qemu_ld_helpers[16] = {
-> +static void * const qemu_ld_helpers[] = {
->      [MO_UB]   = helper_ret_ldub_mmu,
->      [MO_SB]   = helper_ret_ldsb_mmu,
->      [MO_LEUW] = helper_le_lduw_mmu,
-> @@ -324,7 +324,7 @@ static void * const qemu_ld_helpers[16] = {
->      [MO_BEQ]  = helper_be_ldq_mmu,
->  };
->
-> -static void * const qemu_st_helpers[16] = {
-> +static void * const qemu_st_helpers[] = {
->      [MO_UB]   = helper_ret_stb_mmu,
->      [MO_LEUW] = helper_le_stw_mmu,
->      [MO_LEUL] = helper_le_stl_mmu,
-> diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-> index d1f4c0d..1b115d2 100644
-> --- a/tcg/sparc/tcg-target.inc.c
-> +++ b/tcg/sparc/tcg-target.inc.c
-> @@ -840,12 +840,12 @@ static void tcg_out_mb(TCGContext *s, TCGArg a0)
->  }
->
->  #ifdef CONFIG_SOFTMMU
-> -static tcg_insn_unit *qemu_ld_trampoline[16];
-> -static tcg_insn_unit *qemu_st_trampoline[16];
-> +static tcg_insn_unit *qemu_ld_trampoline[MO_ALL];
-> +static tcg_insn_unit *qemu_st_trampoline[MO_ALL];
+On Thu, Apr 27, 2017 at 01:36:30PM +0530, Ashijeet Acharya wrote:
+> This series helps to provide chunk size independence for DMG driver to prevent
+> denial-of-service in cases where untrusted files are being accessed by the user.
 
-Minor merge conflict here since
-709a340d679d95a0c6cbb9b5f654498f04345b50.
+The core of the chunk size dependence problem are these lines:
 
->
->  static void build_trampolines(TCGContext *s)
->  {
-> -    static void * const qemu_ld_helpers[16] = {
-> +    static void * const qemu_ld_helpers[MO_ALL] = {
+    s->compressed_chunk = qemu_try_blockalign(bs->file->bs,
+                                              ds.max_compressed_size + 1);
+    s->uncompressed_chunk = qemu_try_blockalign(bs->file->bs,
+                                                512 * ds.max_sectors_per_chunk);
 
-Why bother bounding the array here when for the other MO_ indexed arrays
-in other backends you changed to []?
+The refactoring needs to eliminate these buffers because their size is
+controlled by the untrusted input file.
 
->          [MO_UB]   = helper_ret_ldub_mmu,
->          [MO_SB]   = helper_ret_ldsb_mmu,
->          [MO_LEUW] = helper_le_lduw_mmu,
-> @@ -857,7 +857,7 @@ static void build_trampolines(TCGContext *s)
->          [MO_BEUL] = helper_be_ldul_mmu,
->          [MO_BEQ]  = helper_be_ldq_mmu,
->      };
-> -    static void * const qemu_st_helpers[16] = {
-> +    static void * const qemu_st_helpers[MO_ALL] = {
->          [MO_UB]   = helper_ret_stb_mmu,
->          [MO_LEUW] = helper_le_stw_mmu,
->          [MO_LEUL] = helper_le_stl_mmu,
-> @@ -870,7 +870,7 @@ static void build_trampolines(TCGContext *s)
->      int i;
->      TCGReg ra;
->
-> -    for (i = 0; i < 16; ++i) {
-> +    for (i = 0; i < MO_ALL; ++i) {
+After applying your patches these lines remain unchanged and we still
+cannot use input files that have a 250 MB chunk size, for example.  So
+I'm not sure how this series is supposed to work.
 
-You could just use ARRAY_SIZE(qemu_ld_helpers) here instead.
+Here is the approach I would take:
 
->          if (qemu_ld_helpers[i] == NULL) {
->              continue;
->          }
-> @@ -898,7 +898,7 @@ static void build_trampolines(TCGContext *s)
->          tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_O7, ra);
->      }
->
-> -    for (i = 0; i < 16; ++i) {
-> +    for (i = 0; i < MO_ALL; ++i) {
+In order to achieve this dmg_read_chunk() needs to be scrapped.  It is
+designed to read a full chunk.  The new model does not read full chunks
+anymore.
 
-And ARRAY_SIZE here again.
+Uncompressed reads or zeroes should operate directly on qiov, not
+s->uncompressed_chunk.  This code will be dropped:
 
->          if (qemu_st_helpers[i] == NULL) {
->              continue;
->          }
-> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-> index 8a19eee..0dfe611 100644
-> --- a/tcg/tcg-op.c
-> +++ b/tcg/tcg-op.c
-> @@ -2767,7 +2767,7 @@ typedef void (*gen_atomic_op_i64)(TCGv_i64, TCGv_env, TCGv, TCGv_i64);
->  # define WITH_ATOMIC64(X)
->  #endif
->
-> -static void * const table_cmpxchg[16] = {
-> +static void * const table_cmpxchg[] = {
->      [MO_8] = gen_helper_atomic_cmpxchgb,
->      [MO_16 | MO_LE] = gen_helper_atomic_cmpxchgw_le,
->      [MO_16 | MO_BE] = gen_helper_atomic_cmpxchgw_be,
-> @@ -2985,7 +2985,7 @@ static void do_atomic_op_i64(TCGv_i64 ret, TCGv addr, TCGv_i64 val,
->  }
->
->  #define GEN_ATOMIC_HELPER(NAME, OP, NEW)                                \
-> -static void * const table_##NAME[16] = {                                \
-> +static void * const table_##NAME[] = {                                  \
->      [MO_8] = gen_helper_atomic_##NAME##b,                               \
->      [MO_16 | MO_LE] = gen_helper_atomic_##NAME##w_le,                   \
->      [MO_16 | MO_BE] = gen_helper_atomic_##NAME##w_be,                   \
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index fd43f15..5e0c6da 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -386,6 +386,7 @@ typedef enum TCGMemOp {
->      MO_TEQ   = MO_TE | MO_Q,
->
->      MO_SSIZE = MO_SIZE | MO_SIGN,
-> +    MO_ALL   = MO_SIZE | MO_SIGN | MO_BSWAP | MO_AMASK,
->  } TCGMemOp;
->
->  /**
+    data = s->uncompressed_chunk + sector_offset_in_chunk * 512;
+    qemu_iovec_from_buf(qiov, i * 512, data, 512);
 
+Compressed reads still buffers.  I suggest the following buffers:
 
---
-Alex Bennée
+1. compressed_buf - compressed data is read into this buffer from file
+2. uncompressed_buf - a place to discard decompressed data while
+                      simulating a seek operation
+
+Data is read from compressed chunks by reading a reasonable amount
+(64k?) into compressed_buf.  If the user wishes to read at an offset
+into this chunk then a loop decompresses data we are seeking over into
+uncompressed_buf (and refills compressed_buf if it becomes empty) until
+the desired offset is reached.  Then decompression can continue
+directly into the user's qiov and uncompressed_buf isn't used to
+decompress the data requested by the user.
+
+Sequential compressed reads can be optimized by keeping the compression
+state across read calls.  That means the zlib/bz2 state plus
+compressed_buf and the current offset.  That way we don't need to
+re-seek into the current compressed chunk to handle sequential reads.
+
+--17/8oYur5Y32USnW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZDIVDAAoJEJykq7OBq3PIK8YIAJ0Tv4cCpwtKJxfCLX2rsDgh
+fMU/vvGmHBm3t7nkEcl0C+PBm057OLiyhsjgFfjcvGc+O85vem90FZ/tmHhbQURf
+P05voWBjQGzpQ+gmnwMguI8o19s72QkYBygnzZo/uroJyIN5zOrbvNudjb2r/9ps
+tJPidlwTr00/+S7/pU33gHaIiVjwvBshyRYT3GW2czPmm7W/8KNJ+gco8Sx6zaz9
+zOEvYM3yGvXS8rClvwskP06Qu8B43t7S9K23h/tHQ4sYkwIiinUQp4NgPbFjTzin
+TZPyj6F31k2WHrNOBiNbzk9LnOkcA5mOUJoQ8aIAzckg0P/tt9Jhe+fw9ZO7F9k=
+=FMwi
+-----END PGP SIGNATURE-----
+
+--17/8oYur5Y32USnW--
