@@ -1,44 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d6eIE-0001Nj-6o
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:33:15 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1d6ePK-00031X-4J
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:40:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d6eIA-0003JQ-U3
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:33:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52387
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1d6eIA-0003Iv-Nw
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:33:10 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v45ETLeO117954
-	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 10:33:09 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8q5rcfe6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 10:33:08 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 5 May 2017 15:33:06 +0100
-References: <1492842231-223720-1-git-send-email-arei.gonglei@huawei.com>
-	<1492842231-223720-2-git-send-email-arei.gonglei@huawei.com>
-	<38d13582-47f4-2a03-efef-064063c8852f@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA263FC5@DGGEMA505-MBX.china.huawei.com>
-	<9c1c994a-f8ba-1182-8806-d04d44723c1e@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA264BF8@DGGEMA505-MBX.china.huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 5 May 2017 16:32:57 +0200
+	(envelope-from <alex.williamson@redhat.com>) id 1d6ePF-00061J-F4
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:40:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33050)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1d6ePF-00060o-8p
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:40:29 -0400
+Date: Fri, 5 May 2017 08:40:23 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170505084023.6e97a2b3@t450s.home>
+In-Reply-To: <9BD73EA91F8E404F851CF3F519B14AA8CD467A@SZXEMI503-MBS.china.huawei.com>
+References: <9BD73EA91F8E404F851CF3F519B14AA8CD467A@SZXEMI503-MBS.china.huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA264BF8@DGGEMA505-MBX.china.huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <deb3c5f2-e4d5-1479-8a3c-2c52a1f263a9@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [virtio-dev] RE: [PATCH v18 1/2] virtio-crypto:
- Add virtio crypto device specification
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Why we need redirect the access to bar0 through
+ the PCI config space access function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,70 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "agraf@suse.de" <agraf@suse.de>, "jasowang@redhat.com" <jasowang@redhat.com>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Wubin (H)" <wu.wubin@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, Linqiangmin <linqiangmin@huawei.com>, Zhbzg <zhbzg@huawei.com>, "Chenshanxi (Eety Chen, Euler)" <eety.chen@huawei.com>, "Zhanghuimin (Amy)" <amy.zhanghuimin@huawei.com>, "lixiao (H)" <lixiao91@huawei.com>
+To: "wuzongyong (A)" <wuzongyong1@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "vfio-users@redhat.com" <vfio-users@redhat.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>, "Lianxueguo (Albert)" <lianxueguo@huawei.com>, "Lifei (Louis)" <louis.lifei@huawei.com>
 
+On Fri, 5 May 2017 09:49:33 +0000
+"wuzongyong (A)" <wuzongyong1@huawei.com> wrote:
 
+[contents deleted per legal clause]
 
-On 05/05/2017 07:56 AM, Gonglei (Arei) wrote:
->>
->>
->> On 05/04/2017 03:53 PM, Gonglei (Arei) wrote:
->>> Sorry, I missed one comment in the previous reply.
->>>
->>>>
->>>>> +\end{itemize*}
->>>>> +
->>>>
->>>> What about extensibility regarding "detailed algorithms"? Is the driver
->>>> required ignore algorithms
->>>> it does not "know about"? Should we reserve the not (yet) defined bits?
->>>>
->>> I mean the device MUST set the algorithms mask bits based on supported
->>> algorithms by the device, and the driver read them to get the capacity.
->>> I don't think we should care about the not defined bits.
->>
->> Let us assume that the driver fails if it encounters an unknown bit
->> (i.e. bit 13 set in hash_algo). I do not think there is anything in
->> this document that prohibits the driver doing so -- if there is please
->> do tell. Now at some point we want to support a new hash algorithm.
->> If we can't be sure that existing drivers are going to play along with
->> defining new bits (which are 'not defined bits' using your words for
->> the existing drivers) we have a small problem.
->>
->> Was I clear about my concern?
->>
-> Sorry, I'm confused. For the device, it just set the bit mask based on
-> supported algorithms. Please see cryptodev_builtin_init() 
-> in cryptodev-builtin.c, the current device only support AES_CBC algorithm,
-> so we just need set:
->  backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
->  backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
-> 
-> Then the driver can only register AES CBC algorithm to the LKCF. Other
-> algorithms are not supported no matter the driver if register them or not.
-> 
-> Thanks,
-> -Gonglei
-> 
+________________________________
+> =E5=8D=8E=E4=B8=BA=E6=8A=80=E6=9C=AF=E6=9C=89=E9=99=90=E5=85=AC=E5=8F=B8 =
+Huawei Technologies Co., Ltd.
+> [Company_logo]
+> =E4=B8=AA=E4=BA=BA=E7=AD=BE=E5=90=8D=EF=BC=9A=E9=82=AC=E5=AE=97=E5=8B=87
+> =E6=89=8B=E3=80=80=E3=80=80=E6=9C=BA=EF=BC=9A15656583887
+> =E7=94=B5=E5=AD=90=E9=82=AE=E4=BB=B6=EF=BC=9Awuzongyong1@huawei.com
+> ________________________________
+> =EF=BB=BF =E6=9C=AC=E9=82=AE=E4=BB=B6=E5=8F=8A=E5=85=B6=E9=99=84=E4=BB=B6=
+=E5=90=AB=E6=9C=89=E5=8D=8E=E4=B8=BA=E5=85=AC=E5=8F=B8=E7=9A=84=E4=BF=9D=E5=
+=AF=86=E4=BF=A1=E6=81=AF=EF=BC=8C=E4=BB=85=E9=99=90=E4=BA=8E=E5=8F=91=E9=80=
+=81=E7=BB=99=E4=B8=8A=E9=9D=A2=E5=9C=B0=E5=9D=80=E4=B8=AD=E5=88=97=E5=87=BA=
+=E7=9A=84=E4=B8=AA=E4=BA=BA=E6=88=96=E7=BE=A4=E7=BB=84=E3=80=82=E7=A6=81
+> =E6=AD=A2=E4=BB=BB=E4=BD=95=E5=85=B6=E4=BB=96=E4=BA=BA=E4=BB=A5=E4=BB=BB=
+=E4=BD=95=E5=BD=A2=E5=BC=8F=E4=BD=BF=E7=94=A8=EF=BC=88=E5=8C=85=E6=8B=AC=E4=
+=BD=86=E4=B8=8D=E9=99=90=E4=BA=8E=E5=85=A8=E9=83=A8=E6=88=96=E9=83=A8=E5=88=
+=86=E5=9C=B0=E6=B3=84=E9=9C=B2=E3=80=81=E5=A4=8D=E5=88=B6=E3=80=81=E6=88=96=
+=E6=95=A3=E5=8F=91=EF=BC=89=E6=9C=AC=E9=82=AE=E4=BB=B6=E4=B8=AD
+> =E7=9A=84=E4=BF=A1=E6=81=AF=E3=80=82=E5=A6=82=E6=9E=9C=E6=82=A8=E9=94=99=
+=E6=94=B6=E4=BA=86=E6=9C=AC=E9=82=AE=E4=BB=B6=EF=BC=8C=E8=AF=B7=E6=82=A8=E7=
+=AB=8B=E5=8D=B3=E7=94=B5=E8=AF=9D=E6=88=96=E9=82=AE=E4=BB=B6=E9=80=9A=E7=9F=
+=A5=E5=8F=91=E4=BB=B6=E4=BA=BA=E5=B9=B6=E5=88=A0=E9=99=A4=E6=9C=AC=E9=82=AE=
+=E4=BB=B6=EF=BC=81
+> This e-mail and its attachments contain confidential information from HUA=
+WEI, which
+> is intended only for the person or entity whose address is listed above. =
+Any use of the
+> information contained herein in any way (including, but not limited to, t=
+otal or partial
+> disclosure, reproduction, or dissemination) by persons other than the int=
+ended
+> recipient(s) is prohibited. If you receive this e-mail in error, please n=
+otify the sender by
+> phone or email immediately and delete it!
 
-Now I'm confused too. So let's try to clear things up with two simple
-question:
-
-1) Is a device allowed to so set not defined bits ( garbage values or
-even worse an implementation specific usage) way (e.g. bit 13 for
-hash_algo)?
-
-2) Is a driver allowed to rejects unknown algorithm bits (e.g. give up on
-the device because it considers it broken)?
-
-If the answer is 'no' please point me to the appropriate conformance
-statements.
-
-Question 1) is about why should we reserve the remaining
-bits for future use.
-
-Question 2) is about the interaction with feature bits -- if the answer
-is 'yes' then we have to guard new algorithms with feature bits.
-
-Halil
+Sorry, per your legal clause, I don't think I'm allowed to answer in
+reply to public mailing lists.
