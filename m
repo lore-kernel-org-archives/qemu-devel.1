@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6aLP-0007xw-9I
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:20:16 -0400
+	(envelope-from <famz@redhat.com>) id 1d6aN8-0000zU-6p
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:22:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6aLO-0008Cq-Ew
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:20:15 -0400
-Date: Fri, 5 May 2017 18:19:55 +0800
+	(envelope-from <famz@redhat.com>) id 1d6aN7-0008Tp-Bt
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:22:02 -0400
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170505101955.GG21435@lemon.lan>
-References: <20170505100255.11145-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170505100255.11145-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] aio: add missing aio_notify() to
- aio_enable_external()
+Date: Fri,  5 May 2017 18:21:53 +0800
+Message-Id: <20170505102153.758-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: 147: Don't test inet6 if not available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +17,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Fri, 05/05 11:02, Stefan Hajnoczi wrote:
-> diff --git a/include/block/aio.h b/include/block/aio.h
-> index 406e323..b3d6f76 100644
-> --- a/include/block/aio.h
-> +++ b/include/block/aio.h
-> @@ -454,8 +454,14 @@ static inline void aio_disable_external(AioContext *ctx)
->   */
->  static inline void aio_enable_external(AioContext *ctx)
->  {
-> -    assert(ctx->external_disable_cnt > 0);
-> -    atomic_dec(&ctx->external_disable_cnt);
-> +    int old;
-> +
-> +    old = atomic_dec_fetch(&ctx->external_disable_cnt);
+This is the case in our docker tests, as we use --net=none there. Skip
+this method.
 
-Did you mean atomic_fetch_dec? atomic_dec_fetch is new, not old.
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/qemu-iotests/147 | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-> +    assert(old > 0);
-> +    if (old == 1) {
-> +        /* Kick event loop so it re-arms file descriptors */
-> +        aio_notify(ctx);
-> +    }
->  }
->  
->  /**
-> -- 
-> 2.9.3
-> 
+diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+index 32afea6..db34838 100755
+--- a/tests/qemu-iotests/147
++++ b/tests/qemu-iotests/147
+@@ -147,6 +147,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
+         self._server_down()
+ 
+     def test_inet6(self):
++        try:
++            socket.getaddrinfo("::0", "0", socket.AF_INET6,
++                               socket.SOCK_STREAM, socket.IPPROTO_TCP,
++                               socket.AI_ADDRCONFIG | socket.AI_CANONNAME)
++        except socket.gaierror:
++            # IPv6 not available, skip
++            return
+         address = { 'type': 'inet',
+                     'data': {
+                         'host': '::1',
+-- 
+2.9.3
