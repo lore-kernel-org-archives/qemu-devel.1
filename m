@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d6jlp-0001kg-3c
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:24:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d6jmF-00021v-1V
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:24:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d6jln-0007uA-Vd
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:24:08 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d6jmE-00084l-4n
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:24:35 -0400
 References: <20170504030755.1001-1-eblake@redhat.com>
-	<20170504030755.1001-3-eblake@redhat.com>
-	<53789feb-7a2d-09ae-cc03-8cde0b1b85e4@redhat.com>
-	<c81a7c3e-5eae-5740-a600-53729fe8c6e7@redhat.com>
+	<20170504030755.1001-4-eblake@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d4237cd0-a841-0f2d-2694-21311c501ae7@redhat.com>
-Date: Fri, 5 May 2017 22:23:57 +0200
+Message-ID: <14b0d29d-0a4f-c7aa-b364-a08198aa4cb2@redhat.com>
+Date: Fri, 5 May 2017 22:24:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <c81a7c3e-5eae-5740-a600-53729fe8c6e7@redhat.com>
+In-Reply-To: <20170504030755.1001-4-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XL9kpEvrF9XpPfC440islRXIPrSUaxO4I"
-Subject: Re: [Qemu-devel] [PATCH v12 02/10] block: Update comments on
- BDRV_BLOCK_* meanings
+	boundary="1juLJqB33h6Luen7qLMPB9V4MIc3djvKt"
+Subject: Re: [Qemu-devel] [PATCH v12 03/10] qcow2: Correctly report status
+ of preallocated zero clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +29,68 @@ To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XL9kpEvrF9XpPfC440islRXIPrSUaxO4I
+--1juLJqB33h6Luen7qLMPB9V4MIc3djvKt
 From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <d4237cd0-a841-0f2d-2694-21311c501ae7@redhat.com>
-Subject: Re: [PATCH v12 02/10] block: Update comments on BDRV_BLOCK_* meanings
+Message-ID: <14b0d29d-0a4f-c7aa-b364-a08198aa4cb2@redhat.com>
+Subject: Re: [PATCH v12 03/10] qcow2: Correctly report status of preallocated
+ zero clusters
 References: <20170504030755.1001-1-eblake@redhat.com>
- <20170504030755.1001-3-eblake@redhat.com>
- <53789feb-7a2d-09ae-cc03-8cde0b1b85e4@redhat.com>
- <c81a7c3e-5eae-5740-a600-53729fe8c6e7@redhat.com>
-In-Reply-To: <c81a7c3e-5eae-5740-a600-53729fe8c6e7@redhat.com>
+ <20170504030755.1001-4-eblake@redhat.com>
+In-Reply-To: <20170504030755.1001-4-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05.05.2017 22:13, Eric Blake wrote:
-> On 05/05/2017 03:06 PM, Max Reitz wrote:
->> On 04.05.2017 05:07, Eric Blake wrote:
->>> We had some conflicting documentation: a nice 8-way table that
->>> described all possible combinations of DATA, ZERO, and
->>> OFFSET_VALID, contrasted with text that implied that OFFSET_VALID
->>> always meant raw data could be read directly.  Furthermore, the
->>> text refers a lot to bs->file, even though the interface was
->>> updated back in 67a0fd2a to let the driver pass back which BDS (not
->>> necessarily bs->file).
->>
->> Not sure about my English skills here, but is this missing a verb? ("t=
-o
->> pass back which BDS...")
+On 04.05.2017 05:07, Eric Blake wrote:
+> We were throwing away the preallocation information associated with
+> zero clusters.  But we should be matching the well-defined semantics
+> in bdrv_get_block_status(), where (BDRV_BLOCK_ZERO |
+> BDRV_BLOCK_OFFSET_VALID) informs the user which offset is reserved,
+> while still reminding the user that reading from that offset is
+> likely to read garbage.
 >=20
-> maybe s/which/a specific/
-
-Or that, yes. :-)
-
+> count_contiguous_clusters_by_type() is now used only for unallocated
+> cluster runs, hence it gets renamed and tightened.
 >=20
->>
->>>                         As the 8-way table is the intended
->>> semantics, simplify the rest of the text to get rid of the
->>> confusion.
->>>
->>> ALLOCATED is always set by the block layer for convenience (drivers
->>> do not have to worry about it). RAW is used only internally, but
->>
->> Just one space after the period? How inconsistent! :-)
+> Making this change lets us see which portions of an image are zero
+> but preallocated, when using qemu-img map --output=3Djson.  The
+> --output=3Dhuman side intentionally ignores all zero clusters, whether
+> or not they are preallocated.
 >=20
-> But do commit messages really count?  :)
-
-It's a critical bug, I'm telling you!!!
-
->>> + * Internal flag:
->>> + * BDRV_BLOCK_RAW: used internally to indicate that the request was
->>> + *                 answered by a passthrough driver such as raw and =
-that the
->>
->> s/passthrough/filter/? But I'm not even sure myself. Well, "passthroug=
-h"
->> is a safe bet, so let's just go with it.
+> The fact that there is no change to qemu-iotests './check -qcow2'
+> merely means that we aren't yet testing this aspect of qemu-img;
+> a later patch will add a test.
 >=20
-> Calling 'raw' a filter driver is a bit weird - but in one sense, it is =
-a
-> no-op filter (filter the protocol layer into the format layer by doing
-> nothing).  Meanwhile 'commit' certainly sounds like more of a filter
-> than a passthrough.  I could go either way, and filter is slightly
-> shorter.  If there's a real reason to respin the series, 'filter' seems=
-
-> reasonable if we're worried about line length, otherwise I'm just as
-> inclined to leave it alone.
-
-raw certainly is a filter driver; the thing I wasn't sure about is that
-I'm not sure whether filter drivers are required to set this flag. But
-neither the comment nor the code require it necessarily, so using
-"filter" instead of "passthrough" should be OK.
-
-The main reason for using "filter" over "passthrough" is that "filter"
-is a "real" class of block drivers (just "real" in the sense that we
-actually only have child-less protocol drivers and non-protocol drivers
-that do have children; further dividing into "format" and "filter" is
-just a convention).
-
-But it should be clear anyway, so I don't mind either way. Leaving it as
-it is certainly is simpler.
-
-Max
-
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 >=20
->>
->> With the commit message fixed or a =E2=80=9Cno it's fine=E2=80=9D:
->>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>
->=20
+> ---
+> v12: rename helper function
+> v11: reserved for blkdebug half of v10
+> v10: new patch
+> ---
+>  block/qcow2-cluster.c | 45 +++++++++++++++++++++++++++++++++++--------=
+--
+>  1 file changed, 35 insertions(+), 10 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-
---XL9kpEvrF9XpPfC440islRXIPrSUaxO4I
+--1juLJqB33h6Luen7qLMPB9V4MIc3djvKt
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkM310SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AoLwH/1EBjQrPmqnMhPx1Ca57hTCAYoh6OQGl
-QXvh2CIQeN039XsBIYu1OMabHjF19br2tuNyXRXaNj4ImipEmnJ/kzD8FcjK3nR6
-Us9pSuKK/lTGRP1d+jZLEcE44IIpVC/aRxNPp6PUQ0CX14h9ZlGTtn8bCyDdTXFL
-/MHNowzs/MMWTeNQd5DZzvcqYMNpr8tA8Eu7aOyTsVuNSNZGT6+dSfnh7r1IFUjp
-65gI3GtLKJOOLUCJ5LDC44Z+MucQfjhdPjJGyDhKrplQRyaoSDol8F+PS5uYhyL/
-KG3A7zCXfUWLibrU5ypUP1kZq3DMcsNrUr0FlR/j8e/Jfh8iuBRE6B0=
-=sj72
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkM33cSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AYP4IAJx0X+7CMrDXyfNmMHUebWSDfK+7thQW
+/3/iL6osTEnNdOIttgFfF39acjlJrdwXRuaMigNobb2KkdR+u+AOlGDbDyUl1I1v
+r4FAH/sUpOHo8zD821JM9b1SdEC5Sr1LW+ISE0oCdv8mvql0mfdDb4ryvzactr3k
+Ayn6NjHpYxc9kJY0fR3fmvcfit3wTt1YsLnX+TCWQdUZ8sgnBvzZVhjZB1SqNO8b
+9PZ4I/rmHA4R11KmoxCNsfVYfAGlVeBziV9qtyWQZVZdJC/FkyNVP4lNKLdMHqTF
+kywBFUlpSqvWml7M8Xkf4siQukd34rnuT9JBgcLyiglq9Mp2kY2eaF4=
+=kw1o
 -----END PGP SIGNATURE-----
 
---XL9kpEvrF9XpPfC440islRXIPrSUaxO4I--
+--1juLJqB33h6Luen7qLMPB9V4MIc3djvKt--
