@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6aff-0004gV-Bi
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:12 -0400
+	(envelope-from <berrange@redhat.com>) id 1d6ag9-0005AO-VF
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1d6afc-00088V-Gy
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37682)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6afc-00087z-83
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:08 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22E8BC04B941
-	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 10:41:07 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  5 May 2017 12:40:57 +0200
-Message-Id: <20170505104101.30589-3-kraxel@redhat.com>
-In-Reply-To: <20170505104101.30589-1-kraxel@redhat.com>
-References: <20170505104101.30589-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/6] egl-helpers: drop support for gles and
- debug logging
+	(envelope-from <berrange@redhat.com>) id 1d6ag9-0008Fc-0D
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:42 -0400
+Date: Fri, 5 May 2017 11:41:28 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170505104128.GC12773@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170505102153.758-1-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170505102153.758-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: 147: Don't test inet6 if not
+ available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,172 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Leftover from the early opengl days.
-Unused now, so delete the dead code.
+On Fri, May 05, 2017 at 06:21:53PM +0800, Fam Zheng wrote:
+> This is the case in our docker tests, as we use --net=none there. Skip
+> this method.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/qemu-iotests/147 | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+> index 32afea6..db34838 100755
+> --- a/tests/qemu-iotests/147
+> +++ b/tests/qemu-iotests/147
+> @@ -147,6 +147,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
+>          self._server_down()
+>  
+>      def test_inet6(self):
+> +        try:
+> +            socket.getaddrinfo("::0", "0", socket.AF_INET6,
+> +                               socket.SOCK_STREAM, socket.IPPROTO_TCP,
+> +                               socket.AI_ADDRCONFIG | socket.AI_CANONNAME)
+> +        except socket.gaierror:
+> +            # IPv6 not available, skip
+> +            return
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/egl-helpers.h |  2 +-
- ui/egl-helpers.c         | 52 +++++-------------------------------------------
- ui/gtk-egl.c             |  2 +-
- 3 files changed, 7 insertions(+), 49 deletions(-)
+FWIW, in test-io-channel-socket.c we call getaddrinfo() and also check
+bind() succeeds (use port==0 to let it select a free port to test bind
+on), before assuming IPv6 is working.
 
-diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
-index 88a13e827b..fec7da14a5 100644
---- a/include/ui/egl-helpers.h
-+++ b/include/ui/egl-helpers.h
-@@ -21,7 +21,7 @@ int egl_get_fd_for_texture(uint32_t tex_id, EGLint *stride, EGLint *fourcc);
- 
- EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win);
- 
--int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug);
-+int qemu_egl_init_dpy(EGLNativeDisplayType dpy);
- EGLContext qemu_egl_init_ctx(void);
- 
- #endif /* EGL_HELPERS_H */
-diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-index b7b6b2e3cc..a3d7c3d7f5 100644
---- a/ui/egl-helpers.c
-+++ b/ui/egl-helpers.c
-@@ -26,18 +26,6 @@ EGLConfig qemu_egl_config;
- 
- /* ---------------------------------------------------------------------- */
- 
--static bool egl_gles;
--static int egl_debug;
--
--#define egl_dbg(_x ...)                          \
--    do {                                         \
--        if (egl_debug) {                         \
--            fprintf(stderr, "egl: " _x);         \
--        }                                        \
--    } while (0);
--
--/* ---------------------------------------------------------------------- */
--
- #ifdef CONFIG_OPENGL_DMABUF
- 
- int qemu_egl_rn_fd;
-@@ -105,7 +93,7 @@ int egl_rendernode_init(const char *rendernode)
-         goto err;
-     }
- 
--    qemu_egl_init_dpy((EGLNativeDisplayType)qemu_egl_rn_gbm_dev, false, false);
-+    qemu_egl_init_dpy((EGLNativeDisplayType)qemu_egl_rn_gbm_dev);
- 
-     if (!epoxy_has_egl_extension(qemu_egl_display,
-                                  "EGL_KHR_surfaceless_context")) {
-@@ -171,8 +159,6 @@ EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win)
-     EGLSurface esurface;
-     EGLBoolean b;
- 
--    egl_dbg("eglCreateWindowSurface (x11 win id 0x%lx) ...\n",
--            (unsigned long) win);
-     esurface = eglCreateWindowSurface(qemu_egl_display,
-                                       qemu_egl_config,
-                                       (EGLNativeWindowType)win, NULL);
-@@ -242,7 +228,7 @@ static EGLDisplay qemu_egl_get_display(void *native)
-     return dpy;
- }
- 
--int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
-+int qemu_egl_init_dpy(EGLNativeDisplayType dpy)
- {
-     static const EGLint conf_att_gl[] = {
-         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-@@ -253,56 +239,34 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
-         EGL_ALPHA_SIZE, 0,
-         EGL_NONE,
-     };
--    static const EGLint conf_att_gles[] = {
--        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
--        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
--        EGL_RED_SIZE,   5,
--        EGL_GREEN_SIZE, 5,
--        EGL_BLUE_SIZE,  5,
--        EGL_ALPHA_SIZE, 0,
--        EGL_NONE,
--    };
-     EGLint major, minor;
-     EGLBoolean b;
-     EGLint n;
- 
--    if (debug) {
--        egl_debug = 1;
--        setenv("EGL_LOG_LEVEL", "debug", true);
--        setenv("LIBGL_DEBUG", "verbose", true);
--    }
--
--    egl_dbg("qemu_egl_get_display (dpy %p) ...\n", dpy);
-     qemu_egl_display = qemu_egl_get_display(dpy);
-     if (qemu_egl_display == EGL_NO_DISPLAY) {
-         error_report("egl: eglGetDisplay failed");
-         return -1;
-     }
- 
--    egl_dbg("eglInitialize ...\n");
-     b = eglInitialize(qemu_egl_display, &major, &minor);
-     if (b == EGL_FALSE) {
-         error_report("egl: eglInitialize failed");
-         return -1;
-     }
- 
--    egl_dbg("eglBindAPI ...\n");
--    b = eglBindAPI(gles ? EGL_OPENGL_ES_API : EGL_OPENGL_API);
-+    b = eglBindAPI(EGL_OPENGL_API);
-     if (b == EGL_FALSE) {
-         error_report("egl: eglBindAPI failed");
-         return -1;
-     }
- 
--    egl_dbg("eglChooseConfig ...\n");
--    b = eglChooseConfig(qemu_egl_display,
--                        gles ? conf_att_gles : conf_att_gl,
-+    b = eglChooseConfig(qemu_egl_display, conf_att_gl,
-                         &qemu_egl_config, 1, &n);
-     if (b == EGL_FALSE || n != 1) {
-         error_report("egl: eglChooseConfig failed");
-         return -1;
-     }
--
--    egl_gles = gles;
-     return 0;
- }
- 
-@@ -311,17 +275,11 @@ EGLContext qemu_egl_init_ctx(void)
-     static const EGLint ctx_att_gl[] = {
-         EGL_NONE
-     };
--    static const EGLint ctx_att_gles[] = {
--        EGL_CONTEXT_CLIENT_VERSION, 2,
--        EGL_NONE
--    };
--
-     EGLContext ectx;
-     EGLBoolean b;
- 
--    egl_dbg("eglCreateContext ...\n");
-     ectx = eglCreateContext(qemu_egl_display, qemu_egl_config, EGL_NO_CONTEXT,
--                            egl_gles ? ctx_att_gles : ctx_att_gl);
-+                            ctx_att_gl);
-     if (ectx == EGL_NO_CONTEXT) {
-         error_report("egl: eglCreateContext failed");
-         return NULL;
-diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
-index d53288f027..89492c0e02 100644
---- a/ui/gtk-egl.c
-+++ b/ui/gtk-egl.c
-@@ -246,7 +246,7 @@ void gtk_egl_init(void)
-     GdkDisplay *gdk_display = gdk_display_get_default();
-     Display *x11_display = gdk_x11_display_get_xdisplay(gdk_display);
- 
--    if (qemu_egl_init_dpy(x11_display, false, false) < 0) {
-+    if (qemu_egl_init_dpy(x11_display) < 0) {
-         return;
-     }
- 
+Regards,
+Daniel
 -- 
-2.9.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
