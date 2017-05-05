@@ -1,21 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d6eDE-0007Eb-Ce
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:28:05 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d6eIE-0001Nj-6o
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:33:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d6eDD-0000VK-AC
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:28:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d6eDD-0000V7-1b
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:28:03 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri,  5 May 2017 15:27:43 +0100
-Message-Id: <20170505142743.19849-3-berrange@redhat.com>
-In-Reply-To: <20170505142743.19849-1-berrange@redhat.com>
-References: <20170505142743.19849-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] i386: expose "TCGTCGTCGTCG" in the
- 0x40000000 CPUID leaf
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d6eIA-0003JQ-U3
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:33:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52387
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1d6eIA-0003Iv-Nw
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:33:10 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v45ETLeO117954
+	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 10:33:09 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8q5rcfe6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 10:33:08 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 5 May 2017 15:33:06 +0100
+References: <1492842231-223720-1-git-send-email-arei.gonglei@huawei.com>
+	<1492842231-223720-2-git-send-email-arei.gonglei@huawei.com>
+	<38d13582-47f4-2a03-efef-064063c8852f@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA263FC5@DGGEMA505-MBX.china.huawei.com>
+	<9c1c994a-f8ba-1182-8806-d04d44723c1e@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA264BF8@DGGEMA505-MBX.china.huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 5 May 2017 16:32:57 +0200
+MIME-Version: 1.0
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA264BF8@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <deb3c5f2-e4d5-1479-8a3c-2c52a1f263a9@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [virtio-dev] RE: [PATCH v18 1/2] virtio-crypto:
+ Add virtio crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,126 +47,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "agraf@suse.de" <agraf@suse.de>, "jasowang@redhat.com" <jasowang@redhat.com>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Wubin (H)" <wu.wubin@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, Linqiangmin <linqiangmin@huawei.com>, Zhbzg <zhbzg@huawei.com>, "Chenshanxi (Eety Chen, Euler)" <eety.chen@huawei.com>, "Zhanghuimin (Amy)" <amy.zhanghuimin@huawei.com>, "lixiao (H)" <lixiao91@huawei.com>
 
-Currently when running KVM, we expose "KVMKVMKVM\0\0\0" in
-the 0x40000000 CPUID leaf. Other hypervisors (VMWare,
-HyperV, Xen, BHyve) all do the same thing, which leaves
-TCG as the odd one out.
 
-The CPUID signature is used by software to detect which
-virtual environment they are running in and (potentially)
-change behaviour in certain ways. For example, systemd
-supports a ConditionVirtualization= setting in unit files.
-The virt-what command can also report the virt type it is
-running on
 
-Currently both these apps have to resort to custom hacks
-like looking for 'fw-cfg' entry in the /proc/device-tree
-file to identify TCG.
+On 05/05/2017 07:56 AM, Gonglei (Arei) wrote:
+>>
+>>
+>> On 05/04/2017 03:53 PM, Gonglei (Arei) wrote:
+>>> Sorry, I missed one comment in the previous reply.
+>>>
+>>>>
+>>>>> +\end{itemize*}
+>>>>> +
+>>>>
+>>>> What about extensibility regarding "detailed algorithms"? Is the driver
+>>>> required ignore algorithms
+>>>> it does not "know about"? Should we reserve the not (yet) defined bits?
+>>>>
+>>> I mean the device MUST set the algorithms mask bits based on supported
+>>> algorithms by the device, and the driver read them to get the capacity.
+>>> I don't think we should care about the not defined bits.
+>>
+>> Let us assume that the driver fails if it encounters an unknown bit
+>> (i.e. bit 13 set in hash_algo). I do not think there is anything in
+>> this document that prohibits the driver doing so -- if there is please
+>> do tell. Now at some point we want to support a new hash algorithm.
+>> If we can't be sure that existing drivers are going to play along with
+>> defining new bits (which are 'not defined bits' using your words for
+>> the existing drivers) we have a small problem.
+>>
+>> Was I clear about my concern?
+>>
+> Sorry, I'm confused. For the device, it just set the bit mask based on
+> supported algorithms. Please see cryptodev_builtin_init() 
+> in cryptodev-builtin.c, the current device only support AES_CBC algorithm,
+> so we just need set:
+>  backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
+>  backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
+> 
+> Then the driver can only register AES CBC algorithm to the LKCF. Other
+> algorithms are not supported no matter the driver if register them or not.
+> 
+> Thanks,
+> -Gonglei
+> 
 
-This change thus proposes a signature "TCGTCGTCGTCG" to be
-reported when running under TCG.
+Now I'm confused too. So let's try to clear things up with two simple
+question:
 
-To hide this, the -cpu option tcg-cpuid=off can be used.
+1) Is a device allowed to so set not defined bits ( garbage values or
+even worse an implementation specific usage) way (e.g. bit 13 for
+hash_algo)?
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- include/hw/i386/pc.h |  5 +++++
- target/i386/cpu.c    | 30 ++++++++++++++++++++++++++++++
- target/i386/cpu.h    |  1 +
- 3 files changed, 36 insertions(+)
+2) Is a driver allowed to rejects unknown algorithm bits (e.g. give up on
+the device because it considers it broken)?
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index f278b3a..3aec60f 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -376,6 +376,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- #define PC_COMPAT_2_8 \
-     HW_COMPAT_2_8 \
-     {\
-+        .driver   = TYPE_X86_CPU,\
-+        .property = "tcg-cpuid",\
-+        .value    = "off",\
-+    },\
-+    {\
-         .driver   = "kvmclock",\
-         .property = "x-mach-use-reliable-get-clock",\
-         .value    = "off",\
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3d5903c..aa8e14c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2626,6 +2626,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-     X86CPU *cpu = x86_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
-     uint32_t pkg_offset;
-+    uint32_t signature[3];
- 
-     /* test if maximum index reached */
-     switch (index & 0xF0000000) {
-@@ -2638,6 +2639,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             index = env->cpuid_level;
-         }
-         break;
-+    case 0x40000000:
-+        /* Not sure what we should do here. Intel and KVM
-+         * documentation is not explicit about it, but it
-+         * looks like KVM will return the highest _basic_
-+         * leaf (env->cpuid_level) on that case.
-+         */
-+        if (index > 0x40000001) {
-+            index = env->cpuid_level;
-+        }
-+        break;
-     case 0x80000000:
-         if (index > env->cpuid_xlevel) {
-             index = env->cpuid_xlevel;
-@@ -2879,6 +2890,24 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         }
-         break;
-     }
-+    case 0x40000000:
-+        /*
-+         * CPUID code in kvm_arch_init_vcpu() ignores stuff
-+         * set here, but we restrict to TCG none the less.
-+         */
-+        if (tcg_enabled() && cpu->expose_tcg) {
-+            memcpy(signature, "TCGTCGTCGTCG", 12);
-+            *eax = 0;
-+            *ebx = signature[0];
-+            *ecx = signature[1];
-+            *edx = signature[2];
-+        } else {
-+            *eax = 0;
-+            *ebx = 0;
-+            *ecx = 0;
-+            *edx = 0;
-+        }
-+        break;
-     case 0x80000000:
-         *eax = env->cpuid_xlevel;
-         *ebx = env->cpuid_vendor1;
-@@ -4020,6 +4049,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
-                      false),
-     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-+    DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index c4602ca..c25f0ce 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1216,6 +1216,7 @@ struct X86CPU {
-     bool check_cpuid;
-     bool enforce_cpuid;
-     bool expose_kvm;
-+    bool expose_tcg;
-     bool migratable;
-     bool max_features; /* Enable all supported features automatically */
-     uint32_t apic_id;
--- 
-2.9.3
+If the answer is 'no' please point me to the appropriate conformance
+statements.
+
+Question 1) is about why should we reserve the remaining
+bits for future use.
+
+Question 2) is about the interaction with feature bits -- if the answer
+is 'yes' then we have to guard new algorithms with feature bits.
+
+Halil
