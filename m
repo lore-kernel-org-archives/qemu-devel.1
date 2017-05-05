@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aFQ-0002Ul-HH
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFQ-0002UZ-9S
 	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aFP-0006hw-K6
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFN-0006gy-5r
 	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33112)
+Received: from mx1.redhat.com ([209.132.183.28]:33044)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFP-0006hh-D8
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:03 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFM-0006gj-VU
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:01 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  5 May 2017 12:13:35 +0200
-Message-Id: <20170505101337.4650-20-pbonzini@redhat.com>
+Date: Fri,  5 May 2017 12:13:33 +0200
+Message-Id: <20170505101337.4650-18-pbonzini@redhat.com>
 In-Reply-To: <20170505101337.4650-1-pbonzini@redhat.com>
 References: <20170505101337.4650-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 19/21] get_maintainer: add subsystem to reviewer
- output
+Subject: [Qemu-devel] [PULL 17/21] get_maintainer: it's '--pattern-depth',
+ not '-pattern-depth'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +25,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Joe Perches <joe@perches.com>
+Cc: Brian Norris <computersforpeace@gmail.com>
 
-From: Joe Perches <joe@perches.com>
+From: Brian Norris <computersforpeace@gmail.com>
 
-Reviewer output currently does not include the subsystem
-that matched.  Add it.
+Though it appears that Perl's GetOptions will take either, the latter is
+not documented in the options listing.
 
-Miscellanea:
+Cherry picked from Linux commit cc7ff0ef6eca3deeea4a424ca47a67c8450d5424.
 
-o Add a get_subsystem_name routine to centralize this
-
-Cherry picked from Linux commit 2a7cb1dc82fc2a52e747b4c496c13f6575fb1790.
-
-Signed-off-by: Joe Perches <joe@perches.com>
+Signed-off-by: Brian Norris <computersforpeace@gmail.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/get_maintainer.pl | 31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+ scripts/get_maintainer.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
-index c7cb197a27..96e66a80a0 100755
+index c1146ca194..1f637ff076 100755
 --- a/scripts/get_maintainer.pl
 +++ b/scripts/get_maintainer.pl
-@@ -896,20 +896,29 @@ sub find_ending_index {
-     return $index;
- }
+@@ -748,7 +748,7 @@ Other options:
+   --help => show this help information
  
--sub get_maintainer_role {
-+sub get_subsystem_name {
-     my ($index) = @_;
+ Default options:
+-  [--email --nogit --git-fallback --m --n --l --multiline -pattern-depth=0
++  [--email --nogit --git-fallback --m --n --l --multiline --pattern-depth=0
+    --remove-duplicates --rolestats]
  
--    my $i;
-     my $start = find_starting_index($index);
--    my $end = find_ending_index($index);
- 
--    my $role = "unknown";
-     my $subsystem = $typevalue[$start];
-     if (length($subsystem) > 20) {
- 	$subsystem = substr($subsystem, 0, 17);
- 	$subsystem =~ s/\s*$//;
- 	$subsystem = $subsystem . "...";
-     }
-+    return $subsystem;
-+}
-+
-+sub get_maintainer_role {
-+    my ($index) = @_;
-+
-+    my $i;
-+    my $start = find_starting_index($index);
-+    my $end = find_ending_index($index);
-+
-+    my $role = "unknown";
-+    my $subsystem = get_subsystem_name($index);
- 
-     for ($i = $start + 1; $i < $end; $i++) {
- 	my $tv = $typevalue[$i];
-@@ -943,16 +952,7 @@ sub get_maintainer_role {
- sub get_list_role {
-     my ($index) = @_;
- 
--    my $i;
--    my $start = find_starting_index($index);
--    my $end = find_ending_index($index);
--
--    my $subsystem = $typevalue[$start];
--    if (length($subsystem) > 20) {
--	$subsystem = substr($subsystem, 0, 17);
--	$subsystem =~ s/\s*$//;
--	$subsystem = $subsystem . "...";
--    }
-+    my $subsystem = get_subsystem_name($index);
- 
-     if ($subsystem eq "THE REST") {
- 	$subsystem = "";
-@@ -1040,7 +1040,8 @@ sub add_categories {
- 		    }
- 		}
- 		if ($email_reviewer) {
--		    push_email_addresses($pvalue, 'reviewer');
-+		    my $subsystem = get_subsystem_name($i);
-+		    push_email_addresses($pvalue, "reviewer:$subsystem");
- 		}
- 	    } elsif ($ptype eq "T") {
- 		push(@scm, $pvalue);
+ Notes:
 -- 
 2.12.2
