@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aFG-0002KZ-Kx
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:58 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFK-0002OQ-UE
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aFD-0006df-NN
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32822)
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFJ-0006fj-N3
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFD-0006dS-Gk
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:51 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFJ-0006fM-Df
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:57 -0400
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8EBA7C056790
-	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 10:13:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 720F03D974
+	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 10:13:56 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  5 May 2017 12:13:25 +0200
-Message-Id: <20170505101337.4650-10-pbonzini@redhat.com>
+Date: Fri,  5 May 2017 12:13:30 +0200
+Message-Id: <20170505101337.4650-15-pbonzini@redhat.com>
 In-Reply-To: <20170505101337.4650-1-pbonzini@redhat.com>
 References: <20170505101337.4650-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 09/21] vmw_pvscsi: check message ring page count
- at initialisation
+Subject: [Qemu-devel] [PULL 14/21] Fix the -accel parameter and the
+ documentation for 'hax'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +31,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: P J P <ppandit@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: P J P <ppandit@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-A guest could set the message ring page count to zero, resulting in
-infinite loop. Add check to avoid it.
+Since 'hax' is a possible accelerator nowadays, too, the '-accel'
+option should support it and we should mention this accelerator
+in the documentation, too.
 
-Reported-by: YY Z <bigbird475958471@gmail.com>
-Signed-off-by: P J P <ppandit@redhat.com>
-Message-Id: <20170425130623.3649-1-ppandit@redhat.com>
-Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1493875481-16388-1-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/vmw_pvscsi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qemu-options.hx | 18 +++++++++---------
+ vl.c            | 23 +++++++++--------------
+ 2 files changed, 18 insertions(+), 23 deletions(-)
 
-diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-index 75575461e2..4a106da856 100644
---- a/hw/scsi/vmw_pvscsi.c
-+++ b/hw/scsi/vmw_pvscsi.c
-@@ -202,7 +202,7 @@ pvscsi_ring_init_msg(PVSCSIRingInfo *m, PVSCSICmdDescSetupMsgRing *ri)
-     uint32_t len_log2;
-     uint32_t ring_size;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f68829f3b0..70c0ded12e 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -31,7 +31,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "-machine [type=]name[,prop[=value][,...]]\n"
+     "                selects emulated machine ('-machine help' for list)\n"
+     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
+-    "                supported accelerators are kvm, xen, tcg (default: tcg)\n"
++    "                supported accelerators are kvm, xen, hax or tcg (default: tcg)\n"
+     "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
+     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
+     "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
+@@ -52,9 +52,9 @@ available machines. Supported machine properties are:
+ @table @option
+ @item accel=@var{accels1}[:@var{accels2}[:...]]
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, or tcg can be available. By default, tcg is used. If there is more
+-than one accelerator specified, the next one is used if the previous one fails
+-to initialize.
++kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
++more than one accelerator specified, the next one is used if the previous one
++fails to initialize.
+ @item kernel_irqchip=on|off
+ Controls in-kernel irqchip support for the chosen accelerator when available.
+ @item gfx_passthru=on|off
+@@ -97,15 +97,15 @@ ETEXI
  
--    if (ri->numPages > PVSCSI_SETUP_MSG_RING_MAX_NUM_PAGES) {
-+    if (!ri->numPages || ri->numPages > PVSCSI_SETUP_MSG_RING_MAX_NUM_PAGES) {
-         return -1;
-     }
-     ring_size = ri->numPages * PVSCSI_MAX_NUM_MSG_ENTRIES_PER_PAGE;
+ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "-accel [accel=]accelerator[,thread=single|multi]\n"
+-    "               select accelerator ('-accel help for list')\n"
+-    "               thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
++    "                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)\n"
++    "                thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
+ STEXI
+ @item -accel @var{name}[,prop=@var{value}[,...]]
+ @findex -accel
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, or tcg can be available. By default, tcg is used. If there is more
+-than one accelerator specified, the next one is used if the previous one fails
+-to initialize.
++kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
++more than one accelerator specified, the next one is used if the previous one
++fails to initialize.
+ @table @option
+ @item thread=single|multi
+ Controls number of TCG threads. When the TCG is multi-threaded there will be one
+diff --git a/vl.c b/vl.c
+index 42d4bce439..17b9a8ac2f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3727,26 +3727,21 @@ int main(int argc, char **argv, char **envp)
+                 qdev_prop_register_global(&kvm_pit_lost_tick_policy);
+                 break;
+             }
+-            case QEMU_OPTION_accel:
++            case QEMU_OPTION_accel: {
++                QemuOpts *accel_opts;
++
+                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
+                                                      optarg, true);
+                 optarg = qemu_opt_get(accel_opts, "accel");
+-
+-                olist = qemu_find_opts("machine");
+-                if (strcmp("kvm", optarg) == 0) {
+-                    qemu_opts_parse_noisily(olist, "accel=kvm", false);
+-                } else if (strcmp("xen", optarg) == 0) {
+-                    qemu_opts_parse_noisily(olist, "accel=xen", false);
+-                } else if (strcmp("tcg", optarg) == 0) {
+-                    qemu_opts_parse_noisily(olist, "accel=tcg", false);
+-                } else {
+-                    if (!is_help_option(optarg)) {
+-                        error_printf("Unknown accelerator: %s", optarg);
+-                    }
+-                    error_printf("Supported accelerators: kvm, xen, tcg\n");
++                if (!optarg || is_help_option(optarg)) {
++                    error_printf("Possible accelerators: kvm, xen, hax, tcg\n");
+                     exit(1);
+                 }
++                accel_opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
++                                              false, &error_abort);
++                qemu_opt_set(accel_opts, "accel", optarg, &error_abort);
+                 break;
++            }
+             case QEMU_OPTION_usb:
+                 olist = qemu_find_opts("machine");
+                 qemu_opts_parse_noisily(olist, "usb=on", false);
 -- 
 2.12.2
