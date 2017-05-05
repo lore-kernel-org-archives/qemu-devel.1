@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6bPa-0005H8-JP
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:28:39 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d6bRV-000630-Oq
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:30:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6bPZ-0000eB-NO
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:28:38 -0400
-Date: Fri, 5 May 2017 13:28:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170505132826.29aa8377@nial.brq.redhat.com>
-In-Reply-To: <20170504114018.zpqvohjxu23bhar7@kamzik.brq.redhat.com>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-11-git-send-email-imammedo@redhat.com>
-	<20170504114018.zpqvohjxu23bhar7@kamzik.brq.redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d6bRR-00010s-Rz
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:30:37 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:18460 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1d6bRR-0000y7-Gg
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:30:33 -0400
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-4-vsementsov@virtuozzo.com>
+	<e55d7819-db41-3077-3fe5-ecad88ab2c47@redhat.com>
+	<9392b02d-e251-d3f7-dbf5-b2bce1aa7620@virtuozzo.com>
+	<27047727-9208-d2f9-96f7-40829e869b54@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3f669272-c423-0466-b545-224964012c2a@virtuozzo.com>
+Date: Fri, 5 May 2017 14:30:09 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <27047727-9208-d2f9-96f7-40829e869b54@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/24] numa: mirror cpu to node mapping
- in MachineState::possible_cpus
+Subject: Re: [Qemu-devel] [PATCH 03/18] nbd: Minimal structured read for
+ server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-On Thu, 4 May 2017 13:40:18 +0200
-Andrew Jones <drjones@redhat.com> wrote:
+04.05.2017 16:28, Eric Blake wrote:
+> On 05/04/2017 05:58 AM, Vladimir Sementsov-Ogievskiy wrote:
+>
+>>>> @@ -70,6 +70,25 @@ struct NBDSimpleReply {
+>>>>    };
+>>>>    typedef struct NBDSimpleReply NBDSimpleReply;
+>>>>    +typedef struct NBDStructuredReplyChunk {
+>>>> +    uint32_t magic;
+>>>> +    uint16_t flags;
+>>>> +    uint16_t type;
+>>>> +    uint64_t handle;
+>>>> +    uint32_t length;
+>>>> +} QEMU_PACKED NBDStructuredReplyChunk;
+>>>> +
+>>>> +typedef struct NBDStructuredRead {
+>>>> +    NBDStructuredReplyChunk h;
+>>>> +    uint64_t offset;
+>>>> +} QEMU_PACKED NBDStructuredRead;
+>>>> +
+>>>> +typedef struct NBDStructuredError {
+>>>> +    NBDStructuredReplyChunk h;
+>>>> +    uint32_t error;
+>>>> +    uint16_t message_length;
+>>>> +} QEMU_PACKED NBDStructuredError;
+>>> Definitely a subset of all types added in the NBD protocol extension,
+>>> but reasonable for a minimal implementation.  Might be worth adding
+>>> comments to the types...
+>> Hmm, for me their names looks descriptive enough, but my sight may be
+>> biased.. What kind of comments do you want?
+> I guess I was thinking of existing structs in include/block/nbd.h:
+>
+> /* Handshake phase structs - this struct is passed on the wire */
+>
+> struct nbd_option {
+>      uint64_t magic; /* NBD_OPTS_MAGIC */
+>      uint32_t option; /* NBD_OPT_* */
+>      uint32_t length;
+> } QEMU_PACKED;
+> typedef struct nbd_option nbd_option;
+>
+>
+> and compared to:
+>
+> /* Transmission phase structs
+>   *
+>   * Note: these are _NOT_ the same as the network representation of an NBD
+>   * request and reply!
+>   */
+> struct NBDRequest {
+>      uint64_t handle;
+>      uint64_t from;
+>      uint32_t len;
+>      uint16_t flags; /* NBD_CMD_FLAG_* */
+>      uint16_t type; /* NBD_CMD_* */
+> };
+> typedef struct NBDRequest NBDRequest;
+>
+> where the comments make it obvious whether QEMU_PACKED matters because
+> we are using the struct to directly map bytes read/written on the wire.
+>
 
-[...]
-> > +void machine_set_cpu_numa_node(MachineState *machine,
-> > +                               CpuInstanceProperties *props, Error **errp)
-> > +{
-[...]
+Ok, thank you, will add.
 
-> > +        }
-> > +
-> > +        /* skip slots with explicit mismatch */
-> > +        if (props->has_thread_id && props->thread_id != slot->props.thread_id) {
-> > +                continue;
-> > +        }
-> > +
-> > +        if (props->has_core_id && props->core_id != slot->props.core_id) {
-> > +                continue;
-> > +        }
-> > +
-> > +        if (props->has_socket_id && props->socket_id != slot->props.socket_id) {
-> > +                continue;
-> > +        }  
-> 
-> nit: above 3 if-conditions could be condensed into 1 compound condition
-this reduces number of lines but result is a bit ugly due to 80chr/line limit:
 
-        /* skip slots with explicit mismatch */                                  
-        if ((props->has_thread_id &&                                             
-             props->thread_id != slot->props.thread_id) ||                       
-            (props->has_core_id && props->core_id != slot->props.core_id) ||     
-            (props->has_socket_id && props->socket_id != slot->props.socket_id)  
-        ) {                                                                      
-                continue;                                                        
-        }
-
-do you still want the change?
+-- 
+Best regards,
+Vladimir
