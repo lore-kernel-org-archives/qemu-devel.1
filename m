@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6cAb-0004wP-DU
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:17:14 -0400
+	(envelope-from <bounces@canonical.com>) id 1d6cCx-0005eV-Qw
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:19:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d6cAU-0004pv-Vq
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:17:13 -0400
-Date: Fri, 5 May 2017 14:16:48 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170505141648.35ba172f@nial.brq.redhat.com>
-In-Reply-To: <20170503152022.GQ3482@thinpad.lan.raisama.net>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-11-git-send-email-imammedo@redhat.com>
-	<20170503152022.GQ3482@thinpad.lan.raisama.net>
+	(envelope-from <bounces@canonical.com>) id 1d6cCu-0006ng-Jy
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:19:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57777)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d6cCu-0006nM-Dq
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:19:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d6cCt-0007jv-8k
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 12:19:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 273F32E80CC
+	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 12:19:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/24] numa: mirror cpu to node mapping
- in MachineState::possible_cpus
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 05 May 2017 12:09:49 -0000
+From: Daniel Berrange <778032@bugs.launchpad.net>
+Reply-To: Bug 778032 <778032@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110505180701.14074.17686.malonedeb@wampee.canonical.com>
+Message-Id: <20170505120949.4508.22387.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 778032] Re: qemu spinning on serial port writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,211 +36,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Wed, 3 May 2017 12:20:22 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+I'm confident this has been solved a while ago. When this bug was
+reported, the code was indeed broken wrt EAGAIN handling.
 
-> On Wed, May 03, 2017 at 02:57:04PM +0200, Igor Mammedov wrote:
-> > Introduce machine_set_cpu_numa_node() helper that stores
-> > node mapping for CPU in MachineState::possible_cpus.
-> > CPU and node it belongs to is specified by 'props' argument.
-> > 
-> > Patch doesn't remove old way of storing mapping in
-> > numa_info[X].node_cpu as removing it at the same time
-> > makes patch rather big. Instead it just mirrors mapping
-> > in possible_cpus and follow up per target patches will
-> > switch to possible_cpus and numa_info[X].node_cpu will
-> > be removed once there isn't any users left.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  include/hw/boards.h |  2 ++
-> >  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  numa.c              |  8 +++++++
-> >  3 files changed, 78 insertions(+)
-> > 
-> > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > index 5d6af21..1f518a1 100644
-> > --- a/include/hw/boards.h
-> > +++ b/include/hw/boards.h
-> > @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
-> >  bool machine_mem_merge(MachineState *machine);
-> >  void machine_register_compat_props(MachineState *machine);
-> >  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
-> > +void machine_set_cpu_numa_node(MachineState *machine,
-> > +                               CpuInstanceProperties *props, Error **errp);
-> >  
-> >  /**
-> >   * CPUArchId:
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index ada9eea..a63f17b 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
-> >      return head;
-> >  }
-> >  
-> > +void machine_set_cpu_numa_node(MachineState *machine,
-> > +                               CpuInstanceProperties *props, Error **errp)  
-> 
-> As the semantics of this function aren't trivial, it would be
-> nice to have a comment explaining what exactly this function do.
-> 
-> e.g.:
-> * make it clear that it could affect multiple CPU slots;
-> * make it clear what does it mean to have props->has_node_id=false as
->   argument (is it really valid?);
-> * make it clear that it will refuse to change an existing mapping.
-Will be following comment sufficient?
+The chardev code has long since been re-written though, and the send_all
+method replaced by io_channel_send_all() which will handle EAGAIN by
+returning instead of spinning in a loop.
 
-+/**
-+ * machine_set_cpu_numa_node:
-+ * @machine: machine object to modify
-+ * @props: specifies which cpu objects to assign to
-+ *         numa node specified by @props.node_id
-+ * @errp: if an error occurs, a pointer to an area to store the error
-+ *
-+ * Associate NUMA node specified by @props.node_id with cpu slots that
-+ * match socket/core/thread-ids specified by @props. It's recommended to use
-+ * query-hotpluggable-cpus.props values to specify affected cpu slots,
-+ * which would lead to exact 1:1 mapping of cpu slots to NUMA node.
-+ *
-+ * However for CLI convenience it's possible to pass in subset of properties,
-+ * which would affect all cpu slots that match it.
-+ * Ex for pc machine:
-+ *    -smp 4,cores=2,sockets=2 -numa node,nodeid=0 -numa node,nodeid=1 \
-+ *    -numa cpu,node-id=0,socket_id=0 \
-+ *    -numa cpu,node-id=1,socket_id=1
-+ * will assign all child cores of socket 0 to node 0 and
-+ * of socket 1 to node 1.
-+ *
-+ * Empty subset is disallowed and function will return with error in this case.
-+ */
- void machine_set_cpu_numa_node(MachineState *machine,
-                                CpuInstanceProperties *props, Error **errp)
- {
-@@ -400,6 +423,8 @@ void machine_set_cpu_numa_node(MachineState *machine,
-         error_setg(errp, "mapping of CPUs to NUMA node is not supported");
-         return;
-     }
-+    /* disabling numa mapping is not supported, forbid it */
-+    assert(props->has_node_id);
+Specifically this commit changed the code to stop spinning in send_all()
+on EAGAIN
 
-> 
-> > +{
-> > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> > +    bool match = false;
-> > +    int i;
-> > +
-> > +    if (!mc->possible_cpu_arch_ids) {
-> > +        error_setg(errp, "mapping of CPUs to NUMA node is not supported");
-> > +        return;
-> > +    }
-> > +
-> > +    /* force board to initialize possible_cpus if it hasn't been done yet */
-> > +    mc->possible_cpu_arch_ids(machine);
-> > +
-> > +    for (i = 0; i < machine->possible_cpus->len; i++) {
-> > +        CPUArchId *slot = &machine->possible_cpus->cpus[i];
-> > +
-> > +        /* reject unsupported by board properties */
-> > +        if (props->has_thread_id && !slot->props.has_thread_id) {
-> > +            error_setg(errp, "thread-id is not supported");
-> > +            return;
-> > +        }
-> > +
-> > +        if (props->has_core_id && !slot->props.has_core_id) {
-> > +            error_setg(errp, "core-id is not supported");
-> > +            return;
-> > +        }
-> > +
-> > +        if (props->has_socket_id && !slot->props.has_socket_id) {
-> > +            error_setg(errp, "socket-id is not supported");
-> > +            return;
-> > +        }
-> > +
-> > +        /* skip slots with explicit mismatch */
-> > +        if (props->has_thread_id && props->thread_id != slot->props.thread_id) {
-> > +                continue;
-> > +        }
-> > +
-> > +        if (props->has_core_id && props->core_id != slot->props.core_id) {
-> > +                continue;
-> > +        }
-> > +
-> > +        if (props->has_socket_id && props->socket_id != slot->props.socket_id) {
-> > +                continue;
-> > +        }
-> > +
-> > +        /* reject assignment if slot is already assigned, for compatibility
-> > +         * of legacy cpu_index mapping with SPAPR core based mapping do not
-> > +         * error out if cpu thread and matched core have the same node-id */
-> > +        if (slot->props.has_node_id &&
-> > +            slot->props.node_id != props->node_id) {
-> > +            error_setg(errp, "CPU is already assigned to node-id: %" PRId64,
-> > +                       slot->props.node_id);
-> > +            return;
-> > +        }
-> > +
-> > +        /* assign slot to node as it's matched '-numa cpu' key */
-> > +        match = true;
-> > +        slot->props.node_id = props->node_id;
-> > +        slot->props.has_node_id = props->has_node_id;  
-> 
-> Is it really valid to have has_node_id=false? Maybe an
-> assert(props->has_node_id) at the beginning of the function would
-> be useful.
-> 
-> > +    }
-> > +
-> > +    if (!match) {
-> > +        error_setg(errp, "no match found");
-> > +    }
-> > +}
-> > +
-> >  static void machine_class_init(ObjectClass *oc, void *data)
-> >  {
-> >      MachineClass *mc = MACHINE_CLASS(oc);
-> > diff --git a/numa.c b/numa.c
-> > index b517870..5ff1212 100644
-> > --- a/numa.c
-> > +++ b/numa.c
-> > @@ -169,6 +169,7 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
-> >          exit(1);
-> >      }
-> >      for (cpus = node->cpus; cpus; cpus = cpus->next) {
-> > +        CpuInstanceProperties props;
-> >          if (cpus->value >= max_cpus) {
-> >              error_setg(errp,
-> >                         "CPU index (%" PRIu16 ")"
-> > @@ -177,6 +178,10 @@ static void numa_node_parse(MachineState *ms, NumaNodeOptions *node,
-> >              return;
-> >          }
-> >          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
-> > +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
-> > +        props.node_id = nodenr;
-> > +        props.has_node_id = true;
-> > +        machine_set_cpu_numa_node(ms, &props, &error_fatal);
-> >      }
-> >  
-> >      if (node->has_mem && node->has_memdev) {
-> > @@ -393,9 +398,12 @@ void parse_numa_opts(MachineState *ms)
-> >          if (i == nb_numa_nodes) {
-> >              for (i = 0; i < max_cpus; i++) {
-> >                  CpuInstanceProperties props;
-> > +                /* fetch default mapping from board and enable it */
-> >                  props = mc->cpu_index_to_instance_props(ms, i);
-> > +                props.has_node_id = true;
-> >  
-> >                  set_bit(i, numa_info[props.node_id].node_cpu);
-> > +                machine_set_cpu_numa_node(ms, &props, &error_fatal);
-> >              }
-> >          }
-> >  
-> > -- 
-> > 2.7.4
-> >   
-> 
+commit 23673ca740e0eda66901ca801a5a901df378b063
+Author: Anthony Liguori <aliguori@us.ibm.com>
+Date:   Tue Mar 5 23:21:23 2013 +0530
+
+    qemu-char: add watch support
+    =
+
+    This allows a front-end to request for a callback when the backend
+    is writable again.
+
+
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/778032
+
+Title:
+  qemu spinning on serial port writes
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  As originally found at http://www.mail-
+  archive.com/kvm@vger.kernel.org/msg08745.html from 3 years ago!
+
+  Basically qemu seizes up in the event that the file descriptor for its
+  emulated serial port has a full buffer, i.e. write() returns EAGAIN.
+  For me, this happened when the serial port was being directed through
+  a UNIX socket, with a default-sized 4KB buffer.  Just the normal
+  output from a Linux kernel boot caused it to seize up, and stop the
+  main emulation / select loop.
+
+  My suggestion is to remove the detection of EAGAIN in qemu-char.c:521,
+  so that if the buffer is full, KVM discards the byte(s) it was trying
+  to write.  This is a surely better outcome than the process spinning
+  forever.
+
+  I will submit a separate patch to control the buffer sizes when
+  creating UNIX sockets, which will help allow slow-reading processes to
+  tune things so that they don't miss any output.
+
+  Additionally, in the context of a hosted environment, if the -serial
+  option is used, this could be a small security issue. An untrusted
+  user of a guest system, knowing their serial output is going via a
+  small buffer, could spew output to their /dev/ttyS0 at a rate fast
+  enough to trigger this bug and eat a CPU core on the host.
+
+  To quote David S. Ahern's original bug report (mine was the same, only
+  with the latest version from git, so line numbers may have changed -
+  my suggested fix above is accurate though):
+
+  I am trying to redirect a guest's boot output through the host's serial
+  port.  Shortly after launching qemu, the main thread is spinning on:
+
+  write(9, "0", 1)   =3D -1 EAGAIN (Resource temporarily unavailable)
+
+  fd 9 is the serial port, ttyS0.
+
+  =
+
+  The backtrace for the thread is:
+
+  #0  0x00002ac3433f8c0b in write () from /lib64/libpthread.so.0
+  #1  0x0000000000475df9 in send_all (fd=3D9, buf=3D<value optimized out>,
+  len1=3D1) at qemu-char.c:477
+  #2  0x000000000043a102 in serial_xmit (opaque=3D<value optimized out>) at
+  /root/kvm-81/qemu/hw/serial.c:311
+  #3  0x000000000043a591 in serial_ioport_write (opaque=3D0x14971790,
+  addr=3D<value optimized out>, val=3D48)
+      at /root/kvm-81/qemu/hw/serial.c:366
+  #4  0x00000000410eeedc in ?? ()
+  #5  0x0000000000129000 in ?? ()
+  #6  0x0000000014821fa0 in ?? ()
+  #7  0x0000000000000007 in ?? ()
+  #8  0x00000000004a54c5 in tlb_set_page_exec (env=3D0x10ab4,
+  vaddr=3D46912496956816, paddr=3D1, prot=3D-1, mmu_idx=3D0, is_softmmu=3D1)
+      at /root/kvm-81/qemu/exec.c:388
+  #9  0x0000000000512f3b in tlb_fill (addr=3D345446292, is_write=3D1,
+  mmu_idx=3D-1, retaddr=3D0x0)
+      at /root/kvm-81/qemu/target-i386/op_helper.c:4690
+  #10 0x00000000004a6bd2 in __ldb_cmmu (addr=3D9, mmu_idx=3D0) at
+  /root/kvm-81/qemu/softmmu_template.h:135
+  #11 0x00000000004a879b in cpu_x86_exec (env1=3D<value optimized out>) at
+  /root/kvm-81/qemu/cpu-exec.c:628
+  #12 0x000000000040ba29 in main (argc=3D12, argv=3D0x7fff67f7a398) at
+  /root/kvm-81/qemu/vl.c:3816
+
+  send_all() invokes unix_write() which by design is not breaking out on
+  EAGAIN.
+
+  The following command is enough to show the problem:
+
+  qemu-system-x86_64 -m 256 -smp 1 -no-kvm \
+      -drivefile=3D/dev/cciss/c0d0,if=3Dscsi,cache=3Doff,boot=3Don \
+      -vnc :1 -serial /dev/ttyS0
+
+  =
+
+  The guest is running RHEL3 with the parameter 'console=3DttyS0' added to
+  grub.conf; the problem appears to be with qemu, so I would expect it to
+  show with any linux guest. This particular host is running RHEL5.2 with
+  kvm-81, but I have also seen the problem with Fedora-9 as the host OS.
+
+  Yes, the serial port of the server is connected to another system via a
+  null modem. If I change the serial argument to '-serial udp::4555' and
+  use  'nc -u -l  localhost 4555  > /dev/ttyS0' I see the guest's boot
+  output show up on the second system as expected. I'd prefer to be able
+  to use the serial port connection directly without nc as a proxy.
+  Suggestions?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/778032/+subscriptions
