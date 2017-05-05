@@ -1,35 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d6Sbp-0002Sr-63
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:04:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1d6Slx-0002eU-7n
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:15:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d6Sbl-0004M5-71
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:04:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44468)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1d6Sbk-0004Kl-W1
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:04:37 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4523aZw104115
-	for <qemu-devel@nongnu.org>; Thu, 4 May 2017 22:04:36 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8ecjm10a-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 22:04:35 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Thu, 4 May 2017 22:04:34 -0400
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Fri,  5 May 2017 04:03:51 +0200
-In-Reply-To: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170505020352.8984-13-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v7 12/13] vfio/ccw: update sense data if a unit
- check is pending
+	(envelope-from <eblake@redhat.com>) id 1d6Slw-000111-4d
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:15:09 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu,  4 May 2017 21:14:58 -0500
+Message-Id: <20170505021500.19315-1-eblake@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 0/2] Enhance block status when crossing EOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,43 +17,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
-Cc: bjsdjshi@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, eric.auger@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-Concurrent-sense data is currently not delivered. This patch stores
-the concurrent-sense data to the subchannel if a unit check is pending
-and the concurrent-sense bit is enabled. Then a TSCH can retreive the
-right IRB data back to the guest.
+As mentioned in my 'qcow2 zero-cluster tweaks' cover letter
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00722.html
+I hit a case where we were not fully optimizing a write-zeroes
+operation when we have a backing file that is shorter than the
+active layer, and where the request crosses that boundary.  I don't
+know that the situation will be all that common (most qcow2 files
+happen to be cluster-aligned in size; and most backing chains use
+the same length at each layer of the chain), but for RFC purposes,
+I wanted to explore how easy it would be to optimize the case
+anyways, and to see if we can think of any other cases where
+knowing that a block status crossed an end-of-file boundary can
+be exploited for less work.
 
-Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
----
- hw/vfio/ccw.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Thus, this is a followup to that series, but I'm also okay if we
+think it is too much maintenance compared to the potential gains,
+and decide to drop it after all.
 
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 3c8b518..73f326f 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -94,6 +94,7 @@ static void vfio_ccw_io_notifier_handler(void *opaque)
-     CcwDevice *ccw_dev = CCW_DEVICE(cdev);
-     SubchDev *sch = ccw_dev->sch;
-     SCSW *s = &sch->curr_status.scsw;
-+    PMCW *p = &sch->curr_status.pmcw;
-     IRB irb;
-     int size;
- 
-@@ -143,6 +144,12 @@ static void vfio_ccw_io_notifier_handler(void *opaque)
-     /* Update control block via irb. */
-     copy_scsw_to_guest(s, &irb.scsw);
- 
-+    /* If a uint check is pending, copy sense data. */
-+    if ((s->dstat & SCSW_DSTAT_UNIT_CHECK) &&
-+        (p->chars & PMCW_CHARS_MASK_CSENSE)) {
-+        memcpy(sch->sense_data, irb.ecw, sizeof(irb.ecw));
-+    }
-+
- read_err:
-     css_inject_io_interrupt(sch);
- }
+Another potential use that I thought of: we may someday want to
+track BDS length by bytes.  Right now, bdrv_getlength() returns a
+value in bytes, but which is sector-aligned, by adding padding;
+but raw-format.c is able to see the transition between data up to
+EOF followed by a hole after EOF.  Because of that, my series to
+convert bdrv_get_block_status() into a byte-based interface has to
+fudge things - any time we see a mid-sector hole being reported,
+we know it is because we hit EOF, and can round the result up to
+the next sector boundary.  Having the BDRV_BLOCK_EOF flag set in
+that case may alert clients that the rounding took place, or help
+us when we quit doing the rounding and actually start tracking BDS
+lengths by bytes even where it is not sector-aligned.
+
+Eric Blake (2):
+  block: Add BDRV_BLOCK_EOF to bdrv_get_block_status()
+  block: Exploit BDRV_BLOCK_EOF for larger zero blocks
+
+ include/block/block.h      |  2 ++
+ block/io.c                 | 42 +++++++++++++++++++++++++++++++++---------
+ tests/qemu-iotests/154     |  4 ----
+ tests/qemu-iotests/154.out | 12 ++++++------
+ 4 files changed, 41 insertions(+), 19 deletions(-)
+
 -- 
-2.10.2
+2.9.3
