@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6gcD-0007Dj-08
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:02:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d6geb-0008Ik-Jp
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6gcA-0007Dn-9n
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:02:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33632)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6gcA-0007Dg-0n
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:01:58 -0400
-References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
-	<149399504137.29022.4985100698645275511.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3c8abd95-b490-1b71-b467-4f00d6ce121d@redhat.com>
-Date: Fri, 5 May 2017 12:01:55 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1d6gea-0007hd-Ik
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:04:29 -0400
+Date: Fri, 5 May 2017 14:04:15 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170505170415.GH3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-11-git-send-email-imammedo@redhat.com>
+	<20170503152022.GQ3482@thinpad.lan.raisama.net>
+	<20170505141648.35ba172f@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <149399504137.29022.4985100698645275511.stgit@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fps9NA2dcMRoxDTPJQbuCjBiJmSLJO1Hm"
-Subject: Re: [Qemu-devel] [PATCH 3/5] 9pfs: local: simplify file opening
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170505141648.35ba172f@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 10/24] numa: mirror cpu to node mapping
+ in MachineState::possible_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?L=c3=a9o_Gaspard?= <leo@gaspard.io>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fps9NA2dcMRoxDTPJQbuCjBiJmSLJO1Hm
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?L=c3=a9o_Gaspard?= <leo@gaspard.io>
-Message-ID: <3c8abd95-b490-1b71-b467-4f00d6ce121d@redhat.com>
-Subject: Re: [PATCH 3/5] 9pfs: local: simplify file opening
-References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
- <149399504137.29022.4985100698645275511.stgit@bahia.lan>
-In-Reply-To: <149399504137.29022.4985100698645275511.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, May 05, 2017 at 02:16:48PM +0200, Igor Mammedov wrote:
+> On Wed, 3 May 2017 12:20:22 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Wed, May 03, 2017 at 02:57:04PM +0200, Igor Mammedov wrote:
+> > > Introduce machine_set_cpu_numa_node() helper that stores
+> > > node mapping for CPU in MachineState::possible_cpus.
+> > > CPU and node it belongs to is specified by 'props' argument.
+> > > 
+> > > Patch doesn't remove old way of storing mapping in
+> > > numa_info[X].node_cpu as removing it at the same time
+> > > makes patch rather big. Instead it just mirrors mapping
+> > > in possible_cpus and follow up per target patches will
+> > > switch to possible_cpus and numa_info[X].node_cpu will
+> > > be removed once there isn't any users left.
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > > ---
+> > >  include/hw/boards.h |  2 ++
+> > >  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  numa.c              |  8 +++++++
+> > >  3 files changed, 78 insertions(+)
+> > > 
+> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > index 5d6af21..1f518a1 100644
+> > > --- a/include/hw/boards.h
+> > > +++ b/include/hw/boards.h
+> > > @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
+> > >  bool machine_mem_merge(MachineState *machine);
+> > >  void machine_register_compat_props(MachineState *machine);
+> > >  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
+> > > +void machine_set_cpu_numa_node(MachineState *machine,
+> > > +                               CpuInstanceProperties *props, Error **errp);
+> > >  
+> > >  /**
+> > >   * CPUArchId:
+> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > index ada9eea..a63f17b 100644
+> > > --- a/hw/core/machine.c
+> > > +++ b/hw/core/machine.c
+> > > @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
+> > >      return head;
+> > >  }
+> > >  
+> > > +void machine_set_cpu_numa_node(MachineState *machine,
+> > > +                               CpuInstanceProperties *props, Error **errp)  
+> > 
+> > As the semantics of this function aren't trivial, it would be
+> > nice to have a comment explaining what exactly this function do.
+> > 
+> > e.g.:
+> > * make it clear that it could affect multiple CPU slots;
+> > * make it clear what does it mean to have props->has_node_id=false as
+> >   argument (is it really valid?);
+> > * make it clear that it will refuse to change an existing mapping.
+> Will be following comment sufficient?
+> 
+> +/**
+> + * machine_set_cpu_numa_node:
+> + * @machine: machine object to modify
+> + * @props: specifies which cpu objects to assign to
+> + *         numa node specified by @props.node_id
+> + * @errp: if an error occurs, a pointer to an area to store the error
+> + *
+> + * Associate NUMA node specified by @props.node_id with cpu slots that
+> + * match socket/core/thread-ids specified by @props. It's recommended to use
+> + * query-hotpluggable-cpus.props values to specify affected cpu slots,
+> + * which would lead to exact 1:1 mapping of cpu slots to NUMA node.
+> + *
+> + * However for CLI convenience it's possible to pass in subset of properties,
+> + * which would affect all cpu slots that match it.
+> + * Ex for pc machine:
+> + *    -smp 4,cores=2,sockets=2 -numa node,nodeid=0 -numa node,nodeid=1 \
+> + *    -numa cpu,node-id=0,socket_id=0 \
+> + *    -numa cpu,node-id=1,socket_id=1
+> + * will assign all child cores of socket 0 to node 0 and
+> + * of socket 1 to node 1.
+> + *
+> + * Empty subset is disallowed and function will return with error in this case.
+> + */
+>  void machine_set_cpu_numa_node(MachineState *machine,
+>                                 CpuInstanceProperties *props, Error **errp)
 
-On 05/05/2017 09:37 AM, Greg Kurz wrote:
-> All paths in the virtfs directory now start with "./" (except the virtf=
-s
-> root itself which is exactly ".").
->=20
-> We hence don't need to skip leading '/' characters anymore, nor to hand=
-le
-> the empty path case. Also, since virtfs will only ever be supported on
-> linux+glibc hosts, we can use strchrnul() and come up with a much simpl=
-ier
-> code to walk through the path elements. And we don't need to dup() the
-> passed directory fd.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p-local.c |    5 -----
->  hw/9pfs/9p-util.c  |   26 ++++++++++----------------
->  2 files changed, 10 insertions(+), 21 deletions(-)
->=20
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index 92262f3c3e37..bb6e296df317 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -54,11 +54,6 @@ int local_open_nofollow(FsContext *fs_ctx, const cha=
-r *path, int flags,
->  {
->      LocalData *data =3D fs_ctx->private;
-> =20
-> -    /* All paths are relative to the path data->mountfd points to */
-> -    while (*path =3D=3D '/') {
-> -        path++;
-> -    }
+Sounds good to me.
 
-Is it worth adding any assert()s in place of the deleted code?
+While at it, we could make 'props' const, as it's not going to be
+touched by the function.
 
-Otherwise looks okay.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---fps9NA2dcMRoxDTPJQbuCjBiJmSLJO1Hm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZDLADAAoJEKeha0olJ0Nqqc8H/jhf38LAHCZzYicm+s0yBWDC
-3xNYJkuAXX5cjKTzule+obcuPK/TrpluKXaKWJNHfIzZgMniS/ihO+1WzROBbn6I
-a9Pnug7UsPckM3XLXQ48B09/USHvhkgZlIxk/zu5fV8prLu6gbnQkYIzUQf9SwKq
-BWIiJwDKSj56Iy+UJm83XGQpBp9VnmdaB+b2GByGQ+mxnphE4+I92Mnuxe1JLvtK
-l8EW05gLyjfOmd8haj3gGbtksvSv3D9KBsGLELJtWitUoUxJN6Or+pQHs9k7tfQx
-M8QW1m12F7QwtOKMB4JtOGYrNB4X5ZQI2KkV+pif+Iwz2JBOi2LquXwtktCiZaE=
-=HotE
------END PGP SIGNATURE-----
-
---fps9NA2dcMRoxDTPJQbuCjBiJmSLJO1Hm--
+-- 
+Eduardo
