@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6hVq-0002ha-Pr
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:59:31 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d6ixh-0001Ub-AJ
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 15:32:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6hVn-0006tr-QO
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:59:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48794)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d6hVn-0006tj-Ji
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:59:27 -0400
-Date: Fri, 5 May 2017 14:59:24 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170505175924.GL3482@thinpad.lan.raisama.net>
-References: <20170502203115.22233-1-ehabkost@redhat.com>
-	<20170502203115.22233-5-ehabkost@redhat.com>
-	<20170504101638.coz6n5vc2d33bess@eukaryote>
+	(envelope-from <mreitz@redhat.com>) id 1d6ixg-0000m1-Ed
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 15:32:21 -0400
+References: <20170504173745.27414-1-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <422dbc7f-6a6b-7706-781e-eac345b3bc14@redhat.com>
+Date: Fri, 5 May 2017 21:32:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170504101638.coz6n5vc2d33bess@eukaryote>
-Subject: Re: [Qemu-devel] [PATCH 4/4] x86: Support feature=force on the
- command-line
+In-Reply-To: <20170504173745.27414-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="x0wbMt2dvRxNrWJaDbtbAq5m5Anb3ViAf"
+Subject: Re: [Qemu-devel] [PATCH] block: Simplify BDRV_BLOCK_RAW recursion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Thu, May 04, 2017 at 12:16:38PM +0200, Kashyap Chamarthy wrote:
-> On Tue, May 02, 2017 at 05:31:15PM -0300, Eduardo Habkost wrote:
-> 
-> Hi,
-> 
-> Yet to try this series, a small question in-line.
-> 
-> > Introduce a new CPUFeatureSetting QAPI data type, and use it to support
-> > feature=force on -cpu.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-[...]
-> > @@ -336,5 +340,13 @@ int main(int argc, char **argv)
-> >                       "-machine accel=kvm:tcg -cpu max,mmx=off",
-> >                       1, 0, "EDX", 23, false);
-> >  
-> > +    {
-> > +    FeatureTestArgs *a;
-> > +    a = add_feature_test("x86/cpuid/features/monitor-force",
-> > +                         "-machine accel=kvm:tcg -cpu 486,monitor=force",
-> 
-> Following your above test example, should the 'force' boolean also work
-> (understood: only for testing / debugging) as below, for a recognized
-> CPUID flag, taking the example of 'INVPCID'?
-> 
->   $ qemu-system-x86_64 [...] -cpu Haswell-noTSX,invpcid=force [...]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--x0wbMt2dvRxNrWJaDbtbAq5m5Anb3ViAf
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+Message-ID: <422dbc7f-6a6b-7706-781e-eac345b3bc14@redhat.com>
+Subject: Re: [PATCH] block: Simplify BDRV_BLOCK_RAW recursion
+References: <20170504173745.27414-1-eblake@redhat.com>
+In-Reply-To: <20170504173745.27414-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This would be valid syntax and would enable invpcid on CPUID,
-yes. But on most cases this means you will get a broken VCPU
-because the host won't virtualize the feature properly (if it
-did, the feature would be reported as available in
-GET_SUPPORTED_CPUID and "feature=on" would already work).
+On 04.05.2017 19:37, Eric Blake wrote:
+> Since we are already in coroutine context during the body of
+> bdrv_co_get_block_status(), we can shave off a few layers of
+> wrappers when recursing to query the protocol when a format driver
+> returned BDRV_BLOCK_RAW.
+>=20
+> Note that we are already using the correct recursion later on in
+> the same function, when probing whether the protocol layer is sparse
+> in order to find out if we can add BDRV_BLOCK_ZERO to an existing
+> BDRV_BLOCK_DATA|BDRV_BLOCK_OFFSET_VALID.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/io.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
--- 
-Eduardo
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--x0wbMt2dvRxNrWJaDbtbAq5m5Anb3ViAf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkM0zISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AJ5MH/1lBnHcWQVWYtrYxLBgG/eI0D2Y6cart
+pCSipULL0HJgnN2xlIvCzL7ozggVLmwT9cQdzq9zNwazECfbOWTrPZcIp91JN/1C
+vTpLyXqZZVcAPz/5JdBbnqX9a3TSrVxf6tsYqkGKwJK4pis6W8ab0qKaM6vqUtXD
+3xC2coEammo5df1Stt6BcKK84T+bO7E3JGvR1KHg4L3tEc2qfyAM3L3cC/xBOBy2
+OvvWUqlIc8oZvVYTmqVKgIXdOKlP0d2sr13VeuUQaS7U3Y9BLvkEC23rXoILiu/O
+Ebn54jaeIHS0JMa9I4fyw5YFWIIGexNkZAxbb3lFq5HgpCjB0tqzhGs=
+=KJwe
+-----END PGP SIGNATURE-----
+
+--x0wbMt2dvRxNrWJaDbtbAq5m5Anb3ViAf--
