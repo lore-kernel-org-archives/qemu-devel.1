@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6abg-0001P5-Qr
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:05 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d6acO-0001kL-Os
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6abd-0006HH-Lf
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:04 -0400
-Date: Fri, 5 May 2017 11:36:58 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170505103658.GB11350@stefanha-x1.localdomain>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-17-pbonzini@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1d6acL-0006hL-IV
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:48 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36447)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d6acL-0006gy-BI
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:45 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id l50so1360655wrc.3
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 03:37:43 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri,  5 May 2017 11:38:13 +0100
+Message-Id: <20170505103822.20641-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pvezYHf7grwyp3Bc"
-Content-Disposition: inline
-In-Reply-To: <20170420120058.28404-17-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/17] block: protect
- modification of dirty bitmaps with a mutex
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH v1 0/9] BQL and Replay Lock changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +27,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: pbonzini@redhat.com, boost.lists@gmail.com, pavel.dovgaluk@ispras.ru
+Cc: cota@braap.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+Hi,
 
---pvezYHf7grwyp3Bc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This RFC does two principle things. It continues the push to reduce
+the BQL lock contention to a minimum by dropping the BQL for most of
+the run loop - eventually only holding it for timer processing and
+sleeping. The second part is an attempt to fix the breakage caused to
+record/replay by the previous work reducing the BQL in 2.9.
 
-On Thu, Apr 20, 2017 at 02:00:57PM +0200, Paolo Bonzini wrote:
-> @@ -410,6 +442,18 @@ int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBi=
-tmap *bitmap,
->      }
->  }
-> =20
-> +int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-> +                   int64_t sector)
+The patch breakdown is as follows:
 
-Is it a good idea to offer an unlocked bdrv_get_dirty() API?  It
-encourages non-atomic access to the bitmap, e.g.
+ - target/arm/arm-powertctl: drop BQL assertions
 
-  if (bdrv_get_dirty()) {
-      ...do something outside the lock...
-      bdrv_reset_dirty_bitmap();
-  }
+This just fixes a bogus assert. The async work doesn't need BQL
+protection as it is all done in the context of the vCPU (meaning
+nothing else should be messing with it). However going forward we will
+need to audit all the async work calls to make sure they are fine to
+run outside of the BQL.
 
-The unlocked API should be test-and-set/clear instead so that callers
-automatically avoid race conditions.
+ - cpus: push BQL lock to qemu_*_wait_io_event
+ - cpus: only take BQL for sleeping threads
 
-> diff --git a/block/mirror.c b/block/mirror.c
-> index dc227a2..6a5b0f8 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -344,10 +344,12 @@ static uint64_t coroutine_fn mirror_iteration(Mirro=
-rBlockJob *s)
-> =20
->      sector_num =3D bdrv_dirty_iter_next(s->dbi);
->      if (sector_num < 0) {
-> +        bdrv_dirty_bitmap_lock(s->dirty_bitmap);
+The BQL reduction is done in two stages, mainly to make bisection
+easier.
 
-bdrv_dirty_iter_next() is listed under "functions that require manual
-locking" but it's being called outside of the lock.
+ - replay/replay-internal.c: track holding of replay_lock
+ - replay: make locking visible outside replay code
+ - replay: push replay_mutex_lock up the call tree
 
---pvezYHf7grwyp3Bc
-Content-Type: application/pgp-signature; name="signature.asc"
+There is still more work to do here but essentially replay_lock now
+replaces the BQL in keeping synchronisation between main-loop and the
+TCG thread - it is no longer a fine lock for the replay log but a
+gross lock that keeps batches of updates together. So far I have been
+testing with the simple testcase:
 
------BEGIN PGP SIGNATURE-----
+  ./arm-softmmu/qemu-system-arm -machine type=vexpress-a9 -m 1024 \
+    -display none -smp 1 -kernel ../images/vexpress-kernel.img \
+    -dtb ../images/vexpress-v2p-ca9.dtb  \
+    -append "console=ttyAMA0" -serial mon:stdio \
+    -icount shift=7,rr=record,rrfile=replay.bin
 
-iQEcBAEBAgAGBQJZDFXKAAoJEJykq7OBq3PI2boH/1K6qZURXCqPUQi6aobD4dgj
-GlFWOxnRPvePGylDFB1RGczIjrKUm1dRJinfCNbjc/Ph1XQnwSHNlzheXBi+UtgU
-g5upqgWe88noKuIkgXHBlq+oSh6TYXZ3ykM3YrSc/Y5B5OHYaGqdMX0gQHdr+PtH
-BwrFR6wEHbW52JZq3hTRhYnLDHy+lTUkS5xFDU/2KlhWnm0Zi95SdYK3OtKB1jCe
-SmuHBn7w+xUip7F4AdgIUR7y7vaM2wLHst45/nbrgYsIwEGK2DTE7Qp6gYKjLB/+
-iiotxRfvA7lJwJm7ZsonMGEfIQCv50c7bNnpWamXbFdLK25D9GudhW/sNpgATa4=
-=9C5B
------END PGP SIGNATURE-----
+..and that works fine. However more complex testing with more devices
+to exercise the async events code is needed here. One change that
+needs some careful care is we are now not dropping the replay_mutex
+lock between events.
 
---pvezYHf7grwyp3Bc--
+And finally:
+
+ - scripts/qemu-gdb: add simple tcg lock status helper
+ - util/qemu-thread-*: add qemu_lock, locked and unlock trace events
+ - scripts/analyse-locks-simpletrace.py: script to analyse lock times
+
+These are helpers I wrote while debugging the locking. The GDB helper
+is fairly dump but does attempt to show where locks are held. The
+qemu-lock tracing is a little hacky but could prove useful in doing
+more detailed lock analysis.
+
+Any thoughts/comments? Does this seem like a reasonable direction to
+go?
+
+Alex Bennée (9):
+  target/arm/arm-powertctl: drop BQL assertions
+  cpus: push BQL lock to qemu_*_wait_io_event
+  cpus: only take BQL for sleeping threads
+  replay/replay-internal.c: track holding of replay_lock
+  replay: make locking visible outside replay code
+  replay: push replay_mutex_lock up the call tree
+  scripts/qemu-gdb: add simple tcg lock status helper
+  util/qemu-thread-*: add qemu_lock, locked and unlock trace events
+  scripts/analyse-locks-simpletrace.py: script to analyse lock times
+
+ cpus-common.c                        | 13 ++---
+ cpus.c                               | 57 ++++++++++++++++++---
+ docs/replay.txt                      | 19 +++++++
+ include/qemu/thread.h                |  7 ++-
+ include/sysemu/replay.h              | 16 ++++++
+ kvm-all.c                            |  4 --
+ replay/replay-char.c                 | 21 +++-----
+ replay/replay-events.c               | 18 ++-----
+ replay/replay-internal.c             | 22 +++++++-
+ replay/replay-internal.h             |  5 +-
+ replay/replay-time.c                 | 10 ++--
+ replay/replay.c                      | 40 +++++++--------
+ scripts/analyse-locks-simpletrace.py | 99 ++++++++++++++++++++++++++++++++++++
+ scripts/qemu-gdb.py                  |  3 +-
+ scripts/qemugdb/tcg.py               | 46 +++++++++++++++++
+ stubs/replay.c                       | 15 ++++++
+ target/arm/arm-powerctl.c            |  8 ---
+ target/i386/hax-all.c                |  2 -
+ util/main-loop.c                     | 23 +++++++--
+ util/qemu-thread-posix.c             | 11 +++-
+ util/trace-events                    |  5 ++
+ vl.c                                 |  2 +
+ 22 files changed, 353 insertions(+), 93 deletions(-)
+ create mode 100755 scripts/analyse-locks-simpletrace.py
+ create mode 100644 scripts/qemugdb/tcg.py
+
+-- 
+2.11.0
