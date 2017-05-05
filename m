@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d6lT0-0007ZB-Lr
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:12:52 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d6lYH-0000jj-L8
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d6lSv-0005Q2-KU
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:12:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d6lSv-0005M0-Ab
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:12:45 -0400
-Date: Sat, 6 May 2017 01:12:35 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170506011012-mutt-send-email-mst@kernel.org>
-References: <1493887815-6070-5-git-send-email-wei.w.wang@intel.com>
-	<201705050851.KJdDIPUA%fengguang.wu@intel.com>
+	(envelope-from <mreitz@redhat.com>) id 1d6lYG-00081W-Cp
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:18:17 -0400
+References: <20170504030755.1001-1-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c157232e-5ec4-ddb2-0e35-be8eae2309f5@redhat.com>
+Date: Sat, 6 May 2017 00:18:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201705050851.KJdDIPUA%fengguang.wu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v10 4/6] mm: function to offer a page block
- on the free list
+In-Reply-To: <20170504030755.1001-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="M4kggJGu2mfCMGbkC8atFXBuCqJIOdj42"
+Subject: Re: [Qemu-devel] [PATCH v12 00/10] qcow2 zero-cluster tweaks [was
+ add blkdebug tests]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,166 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kbuild test robot <lkp@intel.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, kbuild-all@01.org, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-On Fri, May 05, 2017 at 08:21:34AM +0800, kbuild test robot wrote:
-> Hi Wei,
-> 
-> [auto build test WARNING on linus/master]
-> [also build test WARNING on v4.11 next-20170504]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Wei-Wang/Extend-virtio-balloon-for-fast-de-inflating-fast-live-migration/20170505-052958
-> reproduce: make htmldocs
-> 
-> All warnings (new ones prefixed by >>):
-> 
->    WARNING: convert(1) not found, for SVG to PDF conversion install ImageMagick (https://www.imagemagick.org)
->    arch/x86/include/asm/uaccess_32.h:1: warning: no structured comments found
-> >> mm/page_alloc.c:4663: warning: No description found for parameter 'zone'
-> >> mm/page_alloc.c:4663: warning: No description found for parameter 'order'
-> >> mm/page_alloc.c:4663: warning: No description found for parameter 'migratetype'
-> >> mm/page_alloc.c:4663: warning: No description found for parameter 'page'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
->    include/net/cfg80211.h:1738: warning: No description found for parameter 'report_results'
->    include/net/cfg80211.h:1738: warning: Excess struct/union/enum/typedef member 'results_wk' description in 'cfg80211_sched_scan_request'
-> 
-> vim +/zone +4663 mm/page_alloc.c
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--M4kggJGu2mfCMGbkC8atFXBuCqJIOdj42
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
+Message-ID: <c157232e-5ec4-ddb2-0e35-be8eae2309f5@redhat.com>
+Subject: Re: [PATCH v12 00/10] qcow2 zero-cluster tweaks [was add blkdebug
+ tests]
+References: <20170504030755.1001-1-eblake@redhat.com>
+In-Reply-To: <20170504030755.1001-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-the issue is actually aboe this line: it is:
+On 04.05.2017 05:07, Eric Blake wrote:
+> I've collected several improvements for qcow2 zero-cluster handling.
+>=20
+> Available as a tag at:
+> git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v12
+>=20
+> Marked as v12 for "hysterical raisins", since it it the half of
+> v10 [1] that was not resubmitted as v11 [2].
+>=20
+> Depends on Max's block tree:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00641.html
+> and on Max's qcow2 cleanups:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00689.html
+>=20
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05227.html=
 
-/**
+> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05896.html=
 
-which is reserved for kernel-doc.
+>=20
+> Changes since last posting:
+> - lots of tweaks to resolve Max's review findings, including
+> rewriting my additions to test 154
+> - a new patch splitting QCOW2_CLUSTER_ZERO that fell out from
+> my review of Max's work
+> - defer any optimizations of a backing file with different length
+> until later (I will still post an RFC patch to explore what
+> optimizations a BDRV_BLOCK_EOF would allow, but didn't want to
+> hold up this series any further)
 
-Either format properly for kernel-doc, or use simple /*
-to start comments.
+I have given an R-b for every patch, so I could apply the series as-is
+(with the really minor fixes we have talked about, and the thing in
+patch 8), and I would be more or less OK with that. But I did have my
+fair share of nit picks and before I discard all of them, I'd like to
+know for sure that you don't intend to address them, or address them in
+a follow-up.
+
+I'm saying this because some of the issues I had do not really lend
+themselves nicely to a follow-up; for instance the
+s/Data cluster/Cluster allocation/ for patch 4.
+
+=46rom my perspective, it's not much more difficult to review a respin of=
+
+this series which just these minor points changed and maybe some very
+small patches (the follow-up, basically) added to it.
+
+Max
 
 
->   4647	 * Heuristically get a page block in the system that is unused.
->   4648	 * It is possible that pages from the page block are used immediately after
->   4649	 * report_unused_page_block() returns. It is the caller's responsibility
->   4650	 * to either detect or prevent the use of such pages.
->   4651	 *
->   4652	 * The free list to check: zone->free_area[order].free_list[migratetype].
->   4653	 *
->   4654	 * If the caller supplied page block (i.e. **page) is on the free list, offer
->   4655	 * the next page block on the list to the caller. Otherwise, offer the first
->   4656	 * page block on the list.
->   4657	 *
->   4658	 * Return 0 when a page block is found on the caller specified free list.
->   4659	 */
->   4660	int report_unused_page_block(struct zone *zone, unsigned int order,
->   4661				     unsigned int migratetype, struct page **page)
->   4662	{
-> > 4663		struct zone *this_zone;
->   4664		struct list_head *this_list;
->   4665		int ret = 0;
->   4666		unsigned long flags;
->   4667	
->   4668		/* Sanity check */
->   4669		if (zone == NULL || page == NULL || order >= MAX_ORDER ||
->   4670		    migratetype >= MIGRATE_TYPES)
->   4671			return -EINVAL;
-> 
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+--M4kggJGu2mfCMGbkC8atFXBuCqJIOdj42
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkM+h4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AWyoIAL2FrdrRVn3rGjVRohAOAmN/47P4byuv
+h/NDK0+u7Hm7oETgaArRwmaKPzZ1SVekOzXckGypftZ0M30YKal1gtSyuM6h7jaZ
+N/9GY+4KBnLoZwRrsRh+P8gYtGyuCwKyP1+lpWB+2qDXj0/9pr3cS+KOK1+WgtW6
+ilyEhnFgmfWr5xh0mIde3DfmdSXSv26rk7lfXsuUNzO5tHFj6OtaF6pZVoGWjACc
+QFWz9EPIKURdSt/DmAO/gE1Re4Xiz+DFAHLCAm4fmCZmMZeBQxikj9LquBGDoqKG
+7vO5i3Gln2Kyi/U8d2FDaJYLFfdLJFS2Yi3/0TNJyM81ONhteGakfAQ=
+=B8ZV
+-----END PGP SIGNATURE-----
+
+--M4kggJGu2mfCMGbkC8atFXBuCqJIOdj42--
