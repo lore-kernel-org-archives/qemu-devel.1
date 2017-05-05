@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59888)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<BATV+a81ac7e8c20139a7399f+5003+infradead.org+hch@bombadil.srs.infradead.org>)
-	id 1d6Z75-00037o-16
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:01:28 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60948)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <drjones@redhat.com>) id 1d6ZBn-0004Vm-CD
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:06:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from
-	<BATV+a81ac7e8c20139a7399f+5003+infradead.org+hch@bombadil.srs.infradead.org>)
-	id 1d6Z74-0004vW-5T
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:01:23 -0400
-From: Christoph Hellwig <hch@lst.de>
-Date: Fri,  5 May 2017 11:00:44 +0200
-Message-Id: <20170505090044.28754-1-hch@lst.de>
-Subject: [Qemu-devel] [PATCH] nvme: Implement Write Zeroes
+	(envelope-from <drjones@redhat.com>) id 1d6ZBm-0007AU-9V
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:06:15 -0400
+Date: Fri, 5 May 2017 11:06:02 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170505090602.c2u7ugdh65rdjrs6@hawk.localdomain>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-13-git-send-email-imammedo@redhat.com>
+	<20170505014522.GK14413@umbus.fritz.box>
+	<20170505100918.181acc8b@nial.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170505100918.181acc8b@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 12/24] numa: add numa_[has_]node_id()
+ wrappers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,79 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: keith.busch@intel.com, kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
-[hch: ported over from qemu-nvme.git to mainline]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- hw/block/nvme.c | 26 ++++++++++++++++++++++++++
- hw/block/nvme.h |  1 +
- 2 files changed, 27 insertions(+)
+On Fri, May 05, 2017 at 10:09:18AM +0200, Igor Mammedov wrote:
+> On Fri, 5 May 2017 11:45:22 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+> 
+> > On Wed, May 03, 2017 at 02:57:06PM +0200, Igor Mammedov wrote:
+> > > wrappers should make access to [has]node_id fields more readable
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> > 
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > 
+> > Correct, though I'm not sure it actually simplifies things that much.
+> > Maybe more in future patches, though.
+> that's what Drew insisted on, and even though I prefer other way around
+> I won't stall series arguing about styling issues,
+> so here this patch goes.
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index ae303d44e5..3f4d2bf2ba 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -227,6 +227,29 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     return NVME_NO_COMPLETE;
- }
- 
-+static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-+    NvmeRequest *req)
-+{
-+    NvmeRwCmd *rw = (NvmeRwCmd *)cmd;
-+    const uint8_t lba_index = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
-+    const uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
-+    uint64_t slba = le64_to_cpu(rw->slba);
-+    uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
-+    uint64_t aio_slba = slba << (data_shift - BDRV_SECTOR_BITS);
-+    uint32_t aio_nlb = nlb << (data_shift - BDRV_SECTOR_BITS);
-+
-+    if (slba + nlb > ns->id_ns.nsze) {
-+        return NVME_LBA_RANGE | NVME_DNR;
-+    }
-+
-+    req->has_sg = false;
-+    block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
-+                     BLOCK_ACCT_WRITE);
-+    req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, aio_slba, aio_nlb, 0,
-+                                        nvme_rw_cb, req);
-+    return NVME_NO_COMPLETE;
-+}
-+
- static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     NvmeRequest *req)
- {
-@@ -279,6 +302,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-     switch (cmd->opcode) {
-     case NVME_CMD_FLUSH:
-         return nvme_flush(n, ns, cmd, req);
-+    case NVME_CMD_WRITE_ZEROS:
-+        return nvme_write_zeros(n, ns, cmd, req);
-     case NVME_CMD_WRITE:
-     case NVME_CMD_READ:
-         return nvme_rw(n, ns, cmd, req);
-@@ -895,6 +920,7 @@ static int nvme_init(PCIDevice *pci_dev)
-     id->sqes = (0x6 << 4) | 0x6;
-     id->cqes = (0x4 << 4) | 0x4;
-     id->nn = cpu_to_le32(n->num_namespaces);
-+    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS);
-     id->psd[0].mp = cpu_to_le16(0x9c4);
-     id->psd[0].enlat = cpu_to_le32(0x10);
-     id->psd[0].exlat = cpu_to_le32(0x4);
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 8fb0c10756..a0d15649f9 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -179,6 +179,7 @@ enum NvmeIoCommands {
-     NVME_CMD_READ               = 0x02,
-     NVME_CMD_WRITE_UNCOR        = 0x04,
-     NVME_CMD_COMPARE            = 0x05,
-+    NVME_CMD_WRITE_ZEROS        = 0x08,
-     NVME_CMD_DSM                = 0x09,
- };
- 
--- 
-2.11.0
+My argument in the last review of this series was that references like
+
+ machine->possible_cpus->cpus[cs->cpu_index].props.has_node_id
+and
+ machine->possible_cpus->cpus[cs->cpu_index].props.node_id
+
+are quite long, and only differ by 'has_', making it tough to
+easily recognize. But, if nobody, but me, sees value in changing
+them to
+
+ numa_has_node_id(machine->possible_cpus, cs->cpu_index)
+and
+ numa_node_id(machine->possible_cpus, cs->cpu_index)
+
+then I won't insist.
+
+Thanks,
+drew
+
+> 
+> > 
+> > > ---
+> > >  follow up patches will use this wrappers
+> > >  v2:
+> > >     - add wrappers (Drew)
+> > > ---
+> > >  include/sysemu/numa.h | 10 ++++++++++
+> > >  numa.c                |  2 +-
+> > >  2 files changed, 11 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> > > index 46ea6c7..98d01e6 100644
+> > > --- a/include/sysemu/numa.h
+> > > +++ b/include/sysemu/numa.h
+> > > @@ -35,4 +35,14 @@ uint32_t numa_get_node(ram_addr_t addr, Error **errp);
+> > >  /* on success returns node index in numa_info,
+> > >   * on failure returns nb_numa_nodes */
+> > >  int numa_get_node_for_cpu(int idx);
+> > > +
+> > > +static inline bool numa_has_node_id(const CPUArchIdList *possible_cpus, int idx)
+> > > +{
+> > > +    return possible_cpus->cpus[idx].props.has_node_id;
+> > > +}
+> > > +
+> > > +static inline int numa_node_id(const CPUArchIdList *possible_cpus, int idx)
+> > > +{
+> > > +    return possible_cpus->cpus[idx].props.node_id;
+> > > +}
+> > >  #endif
+> > > diff --git a/numa.c b/numa.c
+> > > index c7e3e0a..872ee0d 100644
+> > > --- a/numa.c
+> > > +++ b/numa.c
+> > > @@ -394,7 +394,7 @@ void parse_numa_opts(MachineState *ms)
+> > >  
+> > >          possible_cpus = mc->possible_cpu_arch_ids(ms);
+> > >          for (i = 0; i < possible_cpus->len; i++) {
+> > > -            if (possible_cpus->cpus[i].props.has_node_id) {
+> > > +            if (numa_has_node_id(possible_cpus, i)) {
+> > >                  break;
+> > >              }
+> > >          }  
+> > 
+> 
+> 
