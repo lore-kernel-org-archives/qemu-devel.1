@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aF9-0002DE-La
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFB-0002F4-Dm
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aF7-0006bl-W7
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21835)
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFA-0006ca-Ex
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58650)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aF7-0006bT-Mx
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:45 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFA-0006cH-87
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:48 -0400
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 492A461971
+	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 10:13:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  5 May 2017 12:13:20 +0200
-Message-Id: <20170505101337.4650-5-pbonzini@redhat.com>
+Date: Fri,  5 May 2017 12:13:22 +0200
+Message-Id: <20170505101337.4650-7-pbonzini@redhat.com>
 In-Reply-To: <20170505101337.4650-1-pbonzini@redhat.com>
 References: <20170505101337.4650-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 04/21] target/i386: Add GDB XML register
- description support
+Subject: [Qemu-devel] [PULL 06/21] vl: deprecate the "-hdachs" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,235 +30,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+From: Thomas Huth <thuth@redhat.com>
 
-This patch implements XML target description support for X86 and X86-64
-architectures in the GDB stub, as the way with ARM and PowerPC:
-- gdb-xml/32bit-core.xml & gdb-xml/64bit-core.xml: Adding the XML target
-  description files, these files are picked from GDB source code.
-- configure: Define gdb_xml_files for X86 targets.
-- target/i386/cpu.c: Define gdb_core_xml_file and gdb_arch_name to add
-  XML awareness for this architecture, modify the gdb_num_core_regs to
-  fit the registers number defined in each XML file.
+If the user needs to specify the disk geometry, the corresponding
+parameters of the "-device ide-hd" option should be used instead.
+"-hdachs" is considered as deprecated and might be removed soon.
 
-Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-Message-Id: <2b3c8119-1602-28c7-eab4-296593877103@lauterbach.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1493270454-1448-1-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure                   |  2 ++
- gdb-xml/i386-32bit-core.xml | 65 ++++++++++++++++++++++++++++++++++++++++
- gdb-xml/i386-64bit-core.xml | 73 +++++++++++++++++++++++++++++++++++++++++++++
- target/i386/cpu.c           | 21 ++++++++++---
- 4 files changed, 157 insertions(+), 4 deletions(-)
- create mode 100644 gdb-xml/i386-32bit-core.xml
- create mode 100644 gdb-xml/i386-64bit-core.xml
+ qemu-options.hx | 4 ++--
+ vl.c            | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 48a9370cc6..ff2c81f2c7 100755
---- a/configure
-+++ b/configure
-@@ -6023,9 +6023,11 @@ TARGET_ABI_DIR=""
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 787b9c38da..f68829f3b0 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -803,8 +803,8 @@ STEXI
+ Force hard disk 0 physical geometry (1 <= @var{c} <= 16383, 1 <=
+ @var{h} <= 16, 1 <= @var{s} <= 63) and optionally force the BIOS
+ translation mode (@var{t}=none, lba or auto). Usually QEMU can guess
+-all those parameters. This option is useful for old MS-DOS disk
+-images.
++all those parameters. This option is deprecated, please use
++@code{-device ide-hd,cyls=c,heads=h,secs=s,...} instead.
+ ETEXI
  
- case "$target_name" in
-   i386)
-+    gdb_xml_files="i386-32bit-core.xml"
-   ;;
-   x86_64)
-     TARGET_BASE_ARCH=i386
-+    gdb_xml_files="i386-64bit-core.xml"
-   ;;
-   alpha)
-     mttcg="yes"
-diff --git a/gdb-xml/i386-32bit-core.xml b/gdb-xml/i386-32bit-core.xml
-new file mode 100644
-index 0000000000..7aeeeca3b2
---- /dev/null
-+++ b/gdb-xml/i386-32bit-core.xml
-@@ -0,0 +1,65 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2010-2015 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.i386.core">
-+  <flags id="i386_eflags" size="4">
-+    <field name="CF" start="0" end="0"/>
-+    <field name="" start="1" end="1"/>
-+    <field name="PF" start="2" end="2"/>
-+    <field name="AF" start="4" end="4"/>
-+    <field name="ZF" start="6" end="6"/>
-+    <field name="SF" start="7" end="7"/>
-+    <field name="TF" start="8" end="8"/>
-+    <field name="IF" start="9" end="9"/>
-+    <field name="DF" start="10" end="10"/>
-+    <field name="OF" start="11" end="11"/>
-+    <field name="NT" start="14" end="14"/>
-+    <field name="RF" start="16" end="16"/>
-+    <field name="VM" start="17" end="17"/>
-+    <field name="AC" start="18" end="18"/>
-+    <field name="VIF" start="19" end="19"/>
-+    <field name="VIP" start="20" end="20"/>
-+    <field name="ID" start="21" end="21"/>
-+  </flags>
-+
-+  <reg name="eax" bitsize="32" type="int32"/>
-+  <reg name="ecx" bitsize="32" type="int32"/>
-+  <reg name="edx" bitsize="32" type="int32"/>
-+  <reg name="ebx" bitsize="32" type="int32"/>
-+  <reg name="esp" bitsize="32" type="data_ptr"/>
-+  <reg name="ebp" bitsize="32" type="data_ptr"/>
-+  <reg name="esi" bitsize="32" type="int32"/>
-+  <reg name="edi" bitsize="32" type="int32"/>
-+
-+  <reg name="eip" bitsize="32" type="code_ptr"/>
-+  <reg name="eflags" bitsize="32" type="i386_eflags"/>
-+  <reg name="cs" bitsize="32" type="int32"/>
-+  <reg name="ss" bitsize="32" type="int32"/>
-+  <reg name="ds" bitsize="32" type="int32"/>
-+  <reg name="es" bitsize="32" type="int32"/>
-+  <reg name="fs" bitsize="32" type="int32"/>
-+  <reg name="gs" bitsize="32" type="int32"/>
-+
-+  <reg name="st0" bitsize="80" type="i387_ext"/>
-+  <reg name="st1" bitsize="80" type="i387_ext"/>
-+  <reg name="st2" bitsize="80" type="i387_ext"/>
-+  <reg name="st3" bitsize="80" type="i387_ext"/>
-+  <reg name="st4" bitsize="80" type="i387_ext"/>
-+  <reg name="st5" bitsize="80" type="i387_ext"/>
-+  <reg name="st6" bitsize="80" type="i387_ext"/>
-+  <reg name="st7" bitsize="80" type="i387_ext"/>
-+
-+  <reg name="fctrl" bitsize="32" type="int" group="float"/>
-+  <reg name="fstat" bitsize="32" type="int" group="float"/>
-+  <reg name="ftag" bitsize="32" type="int" group="float"/>
-+  <reg name="fiseg" bitsize="32" type="int" group="float"/>
-+  <reg name="fioff" bitsize="32" type="int" group="float"/>
-+  <reg name="foseg" bitsize="32" type="int" group="float"/>
-+  <reg name="fooff" bitsize="32" type="int" group="float"/>
-+  <reg name="fop" bitsize="32" type="int" group="float"/>
-+</feature>
-diff --git a/gdb-xml/i386-64bit-core.xml b/gdb-xml/i386-64bit-core.xml
-new file mode 100644
-index 0000000000..5088d84ceb
---- /dev/null
-+++ b/gdb-xml/i386-64bit-core.xml
-@@ -0,0 +1,73 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2010-2015 Free Software Foundation, Inc.
-+
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
-+
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.i386.core">
-+  <flags id="i386_eflags" size="4">
-+    <field name="CF" start="0" end="0"/>
-+    <field name="" start="1" end="1"/>
-+    <field name="PF" start="2" end="2"/>
-+    <field name="AF" start="4" end="4"/>
-+    <field name="ZF" start="6" end="6"/>
-+    <field name="SF" start="7" end="7"/>
-+    <field name="TF" start="8" end="8"/>
-+    <field name="IF" start="9" end="9"/>
-+    <field name="DF" start="10" end="10"/>
-+    <field name="OF" start="11" end="11"/>
-+    <field name="NT" start="14" end="14"/>
-+    <field name="RF" start="16" end="16"/>
-+    <field name="VM" start="17" end="17"/>
-+    <field name="AC" start="18" end="18"/>
-+    <field name="VIF" start="19" end="19"/>
-+    <field name="VIP" start="20" end="20"/>
-+    <field name="ID" start="21" end="21"/>
-+  </flags>
-+
-+  <reg name="rax" bitsize="64" type="int64"/>
-+  <reg name="rbx" bitsize="64" type="int64"/>
-+  <reg name="rcx" bitsize="64" type="int64"/>
-+  <reg name="rdx" bitsize="64" type="int64"/>
-+  <reg name="rsi" bitsize="64" type="int64"/>
-+  <reg name="rdi" bitsize="64" type="int64"/>
-+  <reg name="rbp" bitsize="64" type="data_ptr"/>
-+  <reg name="rsp" bitsize="64" type="data_ptr"/>
-+  <reg name="r8" bitsize="64" type="int64"/>
-+  <reg name="r9" bitsize="64" type="int64"/>
-+  <reg name="r10" bitsize="64" type="int64"/>
-+  <reg name="r11" bitsize="64" type="int64"/>
-+  <reg name="r12" bitsize="64" type="int64"/>
-+  <reg name="r13" bitsize="64" type="int64"/>
-+  <reg name="r14" bitsize="64" type="int64"/>
-+  <reg name="r15" bitsize="64" type="int64"/>
-+
-+  <reg name="rip" bitsize="64" type="code_ptr"/>
-+  <reg name="eflags" bitsize="32" type="i386_eflags"/>
-+  <reg name="cs" bitsize="32" type="int32"/>
-+  <reg name="ss" bitsize="32" type="int32"/>
-+  <reg name="ds" bitsize="32" type="int32"/>
-+  <reg name="es" bitsize="32" type="int32"/>
-+  <reg name="fs" bitsize="32" type="int32"/>
-+  <reg name="gs" bitsize="32" type="int32"/>
-+
-+  <reg name="st0" bitsize="80" type="i387_ext"/>
-+  <reg name="st1" bitsize="80" type="i387_ext"/>
-+  <reg name="st2" bitsize="80" type="i387_ext"/>
-+  <reg name="st3" bitsize="80" type="i387_ext"/>
-+  <reg name="st4" bitsize="80" type="i387_ext"/>
-+  <reg name="st5" bitsize="80" type="i387_ext"/>
-+  <reg name="st6" bitsize="80" type="i387_ext"/>
-+  <reg name="st7" bitsize="80" type="i387_ext"/>
-+
-+  <reg name="fctrl" bitsize="32" type="int" group="float"/>
-+  <reg name="fstat" bitsize="32" type="int" group="float"/>
-+  <reg name="ftag" bitsize="32" type="int" group="float"/>
-+  <reg name="fiseg" bitsize="32" type="int" group="float"/>
-+  <reg name="fioff" bitsize="32" type="int" group="float"/>
-+  <reg name="foseg" bitsize="32" type="int" group="float"/>
-+  <reg name="fooff" bitsize="32" type="int" group="float"/>
-+  <reg name="fop" bitsize="32" type="int" group="float"/>
-+</feature>
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 13c0985f11..7e87031fad 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2577,6 +2577,15 @@ out:
-     return ret;
- }
- 
-+static gchar *x86_gdb_arch_name(CPUState *cs)
-+{
-+#ifdef TARGET_X86_64
-+    return g_strdup("i386:x86-64");
-+#else
-+    return g_strdup("i386");
-+#endif
-+}
-+
- X86CPU *cpu_x86_init(const char *cpu_model)
- {
-     return X86_CPU(cpu_generic_init(TYPE_X86_CPU, cpu_model));
-@@ -4056,10 +4065,14 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-     cc->write_elf32_qemunote = x86_cpu_write_elf32_qemunote;
-     cc->vmsd = &vmstate_x86_cpu;
- #endif
--    /* CPU_NB_REGS * 2 = general regs + xmm regs
--     * 25 = eip, eflags, 6 seg regs, st[0-7], fctrl,...,fop, mxcsr.
--     */
--    cc->gdb_num_core_regs = CPU_NB_REGS * 2 + 25;
-+    cc->gdb_arch_name = x86_gdb_arch_name;
-+#ifdef TARGET_X86_64
-+    cc->gdb_core_xml_file = "i386-64bit-core.xml";
-+    cc->gdb_num_core_regs = 40;
-+#else
-+    cc->gdb_core_xml_file = "i386-32bit-core.xml";
-+    cc->gdb_num_core_regs = 32;
-+#endif
- #ifndef CONFIG_USER_ONLY
-     cc->debug_excp_handler = breakpoint_handler;
- #endif
+ DEF("fsdev", HAS_ARG, QEMU_OPTION_fsdev,
+diff --git a/vl.c b/vl.c
+index f46e070e0d..42d4bce439 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3231,6 +3231,8 @@ int main(int argc, char **argv, char **envp)
+                         }
+                     }
+                 }
++                error_report("'-hdachs' is deprecated, please use '-device"
++                             " ide-hd,cyls=c,heads=h,secs=s,...' instead");
+                 break;
+             case QEMU_OPTION_numa:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
 -- 
 2.12.2
