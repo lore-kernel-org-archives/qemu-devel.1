@@ -1,39 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d6Y0K-0004pI-P8
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:50:21 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d6YB4-0007nZ-E2
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:01:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1d6Y0H-0002mQ-LI
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:50:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59401)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1d6Y0H-0002mC-Cj
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:50:17 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v457mXMj012743
-	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 03:50:16 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8jb3q65w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 03:50:15 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 5 May 2017 01:50:14 -0600
-References: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
-	<20170426144645.12476-2-farman@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 5 May 2017 09:50:09 +0200
+	(envelope-from <imammedo@redhat.com>) id 1d6YB3-0007KG-Ac
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:01:26 -0400
+Date: Fri, 5 May 2017 10:01:13 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170505100113.36d941d2@nial.brq.redhat.com>
+In-Reply-To: <20170504073213.GE14413@umbus.fritz.box>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-6-git-send-email-imammedo@redhat.com>
+	<20170503144240.GL3482@thinpad.lan.raisama.net>
+	<20170504073213.GE14413@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20170426144645.12476-2-farman@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 8bit
-Message-Id: <8af6d47e-06fc-d840-47a8-6690fd250cc6@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v1 1/5] hw/scsi: Override the
- max_sectors value for virtio-scsi
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/24] numa: move source of default CPUs
+ to NUMA node mapping into boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,72 +26,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Alexander Graf <agraf@suse.de>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-On 04/26/2017 04:46 PM, Eric Farman wrote:
-> The virtio spec states that the max_sectors field is
-> "a hint to the driver for the maximum transfer size"
-> that would be used for a virtio-scsi request.
+On Thu, 4 May 2017 17:32:13 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Wed, May 03, 2017 at 11:42:40AM -0300, Eduardo Habkost wrote:
+> > On Wed, May 03, 2017 at 02:56:59PM +0200, Igor Mammedov wrote:  
+> > > Originally CPU threads were by default assigned in
+> > > round-robin fashion. However it was causing issues in
+> > > guest since CPU threads from the same socket/core could
+> > > be placed on different NUMA nodes.
+> > > Commit fb43b73b (pc: fix default VCPU to NUMA node mapping)
+> > > fixed it by grouping threads within a socket on the same node
+> > > introducing cpu_index_to_socket_id() callback and commit
+> > > 20bb648d (spapr: Fix default NUMA node allocation for threads)
+> > > reused callback to fix similar issues for SPAPR machine
+> > > even though socket doesn't make much sense there.
+> > > 
+> > > As result QEMU ended up having 3 default distribution rules
+> > > used by 3 targets /virt-arm, spapr, pc/.
+> > > 
+> > > In effort of moving NUMA mapping for CPUs into possible_cpus,
+> > > generalize default mapping in numa.c by making boards decide
+> > > on default mapping and let them explicitly tell generic
+> > > numa code to which node a CPU thread belongs to by replacing
+> > > cpu_index_to_socket_id() with @cpu_index_to_instance_props()
+> > > which provides default node_id assigned by board to specified
+> > > cpu_index.
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> > 
+> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> > 
+> > Just two extra comments below:
+> > 
+> > [...]  
+> > > +static CpuInstanceProperties
+> > > +virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+> > > +{
+> > > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> > > +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+> > > +
+> > > +    assert(cpu_index < possible_cpus->len);
+> > > +    return possible_cpus->cpus[cpu_index].props;;
+> > > +}
+> > > +  
+> > [...]  
+> > > +static CpuInstanceProperties
+> > > +pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+> > >  {
+> > > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> > > +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+> > > +
+> > > +    assert(cpu_index < possible_cpus->len);
+> > > +    return possible_cpus->cpus[cpu_index].props;;
+> > >  }  
+> > 
+> > The fact that these two implementations look exactly the same
+> > made me wonder:
+> > 
+> > 1) Why this isn't the default implementation;
+> > 2) Why exactly spapr needs a different implementation.
+> > 
+> > Then I noticed that there's nothing in the common machine code
+> > that specifies that possible_cpus->cpus[] is indexed by
+> > cpu_index. This means it is indeed safer to require each machine
+> > to provide its own cpu_index_to_props implementation than having
+> > a default implementation that can unexpectedly break (e.g. if
+> > granularity at possible_cpus is not at VCPU/thread level).
+> > 
+> > I would still like to have an abstraction that wouldn't require
+> > writing machine-specific code (e.g. cpu_index ranges to
+> > possible_cpus like David suggested), but that's for a follow-up
+> > series.  
 > 
-> It's currently hardcoded to xFFFF unless one is established
-> by the max_sectors parameter on the command line, but let's
-> roll through the associated devices and set it to anything
-> lower if one is set for the underlying block device and
-> retrieved by the BLKSECTGET ioctl.
+> Yeah, that similarity bothered me to, but like you I realised the
+> problem is that spapr simply doesn't have the same granularity of
+> information as x86 and ARM - there's only one entry per core for PAPR
+> instead of one per thread.
 > 
-> Signed-off-by: Eric Farman <farman@linux.vnet.ibm.com>
-
-So since nobody else commented, I looked into this (not knowing anything 
-about scsi before)
-
-Your patch basically limits the HBA limit to the lowest size of all child devices.
-This will certainly work, as guests will use the minimum of per-device size
-and hba size.
-Now: I think this might have some impact on cases where a HBA will have different
-scsi disks or even non disk type scsi devices (what does blk_get_max_transfer 
-return for a scsi cdrom or old scsi-1 devices?)
-
-So in essence I think what could be a better solution is to enhance the 
-ccw bios to actually read the per-device config in addition to the hba config.
-
-Linux seems to use the Block Limits VPD any maybe the ccw bios should do the
-same. So basically keep patch 4 and add an additional call to read the block VPD
-and use the minimum of HBA and device value?
-
-> ---
->  hw/scsi/virtio-scsi.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> So, we do need a machine specific mapping of cpu_index to location
+> properties, which is what the callback is for.
 > 
-> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> index 46a3e3f..bca9461 100644
-> --- a/hw/scsi/virtio-scsi.c
-> +++ b/hw/scsi/virtio-scsi.c
-> @@ -640,7 +640,11 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
->                                     uint8_t *config)
->  {
->      VirtIOSCSIConfig *scsiconf = (VirtIOSCSIConfig *)config;
-> +    VirtIOSCSI *vs = VIRTIO_SCSI(vdev);
->      VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(vdev);
-> +    SCSIDevice *d;
-> +    BusChild *kid;
-> +    unsigned int max_transfer;
+> It does occur to me that another way of accomplishing that would be
+> for possible_cpu_arch_ids() to create a cpu_index->props mapping as a
+> simple array ofpointers, in addition to the list of possiblee props
+> structures.
 > 
->      virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
->      virtio_stl_p(vdev, &scsiconf->seg_max, 128 - 2);
-> @@ -652,6 +656,14 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
->      virtio_stw_p(vdev, &scsiconf->max_channel, VIRTIO_SCSI_MAX_CHANNEL);
->      virtio_stw_p(vdev, &scsiconf->max_target, VIRTIO_SCSI_MAX_TARGET);
->      virtio_stl_p(vdev, &scsiconf->max_lun, VIRTIO_SCSI_MAX_LUN);
-> +
-> +    QTAILQ_FOREACH(kid, &vs->bus.qbus.children, sibling) {
-> +        d = SCSI_DEVICE(kid->child);
-> +        max_transfer = blk_get_max_transfer(d->conf.blk) / d->blocksize;
-> +        virtio_stl_p(vdev,
-> +                     &scsiconf->max_sectors,
-> +                     MIN_NON_ZERO(max_transfer, scsiconf->max_sectors));
-> +    }
->  }
+> Not sure if that would end up looking better or not.
+I'd like to remove foo_cpu_index_to_props() callbacks in future,
+to do so we would need to obsolete and remove cpu_index based
+'-numa node,cpus='. Lets give a year for new interface to settle
+in and then remove old interface.
+
+so I'd rather do not extend possible_cpus with more complex structure
+and related mgmt routines.
+
+
+
 > 
->  static void virtio_scsi_set_config(VirtIODevice *vdev,
+> > [...]  
+> > > +static CpuInstanceProperties
+> > > +spapr_cpu_index_to_props(MachineState *machine, unsigned cpu_index)
+> > >  {
+> > > +    CPUArchId *core_slot;
+> > > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
+> > > +
+> > > +    /* make sure possible_cpu are intialized */
+> > > +    mc->possible_cpu_arch_ids(machine);
+> > > +    core_slot = spapr_find_cpu_slot(machine, cpu_index, NULL);
+> > > +    assert(core_slot);
+> > > +    return core_slot->props;
+> > >  }  
+> > 
+> > If you need to submit v3, maybe a comment here explaining why
+> > spapr needs a different cpu_index_to_props implementation would
+> > be helpful. I took a while to figure it out.
+> >   
 > 
