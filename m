@@ -1,38 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d6aqm-0006UM-0P
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:52:41 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d6b77-0002Bu-DA
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d6aqi-0003yB-St
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:52:40 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d6aqi-0003we-Kj
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:52:36 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v45AmeMs049920
-	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 06:52:35 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8eck7kt9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 06:52:34 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 5 May 2017 11:52:31 +0100
-Date: Fri, 5 May 2017 12:52:26 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170505101930.45837-1-aik@ozlabs.ru>
-References: <20170505101930.45837-1-aik@ozlabs.ru>
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d6b72-0001oQ-EX
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:09:33 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:12897)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d6b72-0001iw-5g
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:09:28 -0400
+References: <1493735386-39622-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1493735386-39622-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<4ccaf863-4c73-e168-3c09-c916a6aaa75e@redhat.com>
+	<25938992-bdea-4f0c-0b9c-0467b8684b98@huawei.com>
+	<c8b789ab-97d9-6bf6-e7bd-49b9260827ee@redhat.com>
+	<04bf2bd9-54af-161f-6fc6-e0fcd5c05406@huawei.com>
+	<34550398-7d98-cc5c-8646-f6399f3833a6@redhat.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <93fd1eb1-5a19-f385-0fe2-8db0be91dc5a@huawei.com>
+Date: Fri, 5 May 2017 13:09:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <34550398-7d98-cc5c-8646-f6399f3833a6@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20170505125226.5c962179.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH qemu v6] memory/iommu: QOM'fy IOMMU
- MemoryRegion
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,70 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+To: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
+Cc: alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On Fri,  5 May 2017 20:19:30 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On 5/4/2017 5:19 PM, Eric Blake wrote:
+> On 05/04/2017 10:12 AM, Pradeep Jagadeesh wrote:
+>
+>>>>>> +    IOThrottle throttle = {
+>>>>>> +        .has_id = true,
+>>>>>> +        .id = (char *) qdict_get_str(qdict, "id"),
+>>>>>> +        .bps = qdict_get_int(qdict, "bps"),
+>>>>>> +        .bps_rd = qdict_get_int(qdict, "bps_rd"),
+>>>>>> +        .bps_wr = qdict_get_int(qdict, "bps_wr"),
+>>>>>> +        .iops = qdict_get_int(qdict, "iops"),
+>>>>>> +        .iops_rd = qdict_get_int(qdict, "iops_rd"),
+>>>>>> +        .iops_wr = qdict_get_int(qdict, "iops_wr"),
+>>>>>
+>>>>> Again, don't you need to be setting .has_bps=true and so on?
+>>>> Same as above. I have not set any max burst values here, because I
+>>>> wanted to keep it in line with the block device.
+>>>> May be there is a room to enable these max values in both in future.
+>>>
+>>> I don't think you were getting the point of my question. Since 'bps' is
+>>> an optional member of struct IOThrottle, you have to set 'has_bps' at
+>>> the same time to make it obvious that 'bps' should affect things.
+>>>
+>> I need some more clarifications here.
+>> I did not understand what do you mean by an optional parameter?
+>> You mean I need to set "has_*" for all the parameters?
+>
+> Yes, any optional parameter (one named '*foo' in the .json file) has a
+> counterpart has_foo boolean, which should be set to true when the
+> parameter is in use (and thus making it obvious when it is set to false
+> that it is not in use).
+OK, but here the id is only with * (Optional), others are not. Still 
+need them to set?
 
-> This defines new QOM object - IOMMUMemoryRegion - with MemoryRegion
-> as a parent.
-> 
-> This moves IOMMU-related fields from MR to IOMMU MR. However to avoid
-> dymanic QOM casting in fast path (address_space_translate, etc),
-> this adds an @is_iommu boolean flag to MR and provides new helper to
-> do simple cast to IOMMU MR - memory_region_get_iommu. The flag
-> is set in the instance init callback. This defines
-> memory_region_is_iommu as memory_region_get_iommu()!=NULL.
-> 
-> This switches MemoryRegion to IOMMUMemoryRegion in most places except
-> the ones where MemoryRegion may be an alias.
-> 
-> This defines memory_region_init_iommu_type() to allow creating
-> IOMMUMemoryRegion subclasses. In order to support custom QOM type,
-> this splits memory_region_init() to object_initialize() +
-> memory_region_do_init.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> Changes:
-> v6:
-> * s/\<iommumr\>/iommu_mr/g
-> 
-> v5:
-> * fixed sparc64, first time in many years did run "./configure" without
-> --target-list :-D Sorry for the noise though :(
-> 
-> v4:
-> * fixed alpha, mips64el and sparc
-> 
-> v3:
-> * rebased on sha1 81b2d5ceb0
-> 
-> v2:
-> * added mr->is_iommu
-> * updated i386/x86_64/s390/sun
-> ---
->  hw/s390x/s390-pci-bus.h       |   2 +-
->  include/exec/memory.h         |  77 +++++++++++++++++++-------
->  include/hw/i386/intel_iommu.h |   2 +-
->  include/hw/mips/mips.h        |   2 +-
->  include/hw/ppc/spapr.h        |   3 +-
->  include/hw/vfio/vfio-common.h |   2 +-
->  include/qemu/typedefs.h       |   1 +
->  exec.c                        |  16 +++---
->  hw/alpha/typhoon.c            |   8 ++-
->  hw/dma/rc4030.c               |   8 +--
->  hw/i386/amd_iommu.c           |   9 +--
->  hw/i386/intel_iommu.c         |  17 +++---
->  hw/mips/mips_jazz.c           |   2 +-
->  hw/pci-host/apb.c             |   6 +-
->  hw/ppc/spapr_iommu.c          |  20 ++++---
->  hw/s390x/s390-pci-bus.c       |   6 +-
->  hw/s390x/s390-pci-inst.c      |   8 +--
->  hw/vfio/common.c              |  12 ++--
->  hw/vfio/spapr.c               |   3 +-
->  memory.c                      | 124 +++++++++++++++++++++++++++++-------------
->  20 files changed, 213 insertions(+), 115 deletions(-)
+>
+>>> I understand that you aren't setting 'bps_max', nor it's counterpart
+>>> 'has_bps_max', and that's not what I was asking about.
+>>>
+>>>
+>>>>>> +++ b/qapi/iothrottle.json
+>>>>>> @@ -3,6 +3,7 @@
+>>>>>>  ##
+>>>>>>  # == QAPI IOThrottle definitions
+>>>>>>  ##
+>>>>>> +##
+>>>>>>  # @IOThrottle:
+>>>>>
+>>>>> This looks like a spurious change
+>>>> You mean the below sentence is not required?
+>>>
+>>> No, the above addition of a second ## is not required.
+>> If I remove that I will get the compilation error.
+>> I think the parser needs that.
+>
+> If the parser chokes without it, then that implies patch 1 is broken,
+> and the fix should be squashed there for full bisectability.  Either
+> way, it looks like a spurious change when it is occurring in patch 3.
+>
+Yes, I reordered the patches and fixed this issue.
 
-Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+-Pradeep
