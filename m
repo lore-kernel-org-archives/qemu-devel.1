@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6k6A-0003iy-Gw
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:45:12 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d6k92-0004ul-Em
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6k67-0005ZP-DA
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:45:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6k67-0005YV-48
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:45:07 -0400
-References: <20170505201128.12099-1-ehabkost@redhat.com>
-	<20170505201128.12099-3-ehabkost@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9f623263-e78c-fbb3-5ac4-5629d68c4bbc@redhat.com>
-Date: Fri, 5 May 2017 15:45:01 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170505201128.12099-3-ehabkost@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="u0iKBwErNuCfM84lQ0JucpM00U4OahXeE"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] qapi: Add enum_table[] parameter to
- start_alternate
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1d6k8z-0006Rc-CE
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:48:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39112
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1d6k8z-0006RR-61
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:48:05 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v45KhjLc073082
+	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 16:48:03 -0400
+Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a8y2uuvfk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 16:48:03 -0400
+Received: from localhost
+	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Fri, 5 May 2017 17:48:01 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Fri,  5 May 2017 17:47:40 -0300
+Message-Id: <20170505204746.14116-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v9 0/6] migration/ppc: migrating DRC,
+ ccs_list and pending_events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u0iKBwErNuCfM84lQ0JucpM00U4OahXeE
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <9f623263-e78c-fbb3-5ac4-5629d68c4bbc@redhat.com>
-Subject: Re: [PATCH v2 2/3] qapi: Add enum_table[] parameter to
- start_alternate
-References: <20170505201128.12099-1-ehabkost@redhat.com>
- <20170505201128.12099-3-ehabkost@redhat.com>
-In-Reply-To: <20170505201128.12099-3-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+v9:
+- patch 1 (*new*): added a qtail in sPAPRMachineState called pending_dimm_unplugs
+that stores the DIMM LMB state during the unplug process.
+- patch 2 (*new*): merged v8-patch1 and v8-patch2: removing detach_cb and
+detach_cb_opaque.
+- patch 3:
+    * removed dk->vmsd entry. We're using vmstate_register instead
+    * added 'awaiting_allocation' flag in the DRC migration
+- patch 4 (*new*): migrating spapr->pending_dimm_unplugs qtailq to allow
+for an ongoing PCDIMM unplug to continue after a migration.
 
-On 05/05/2017 03:11 PM, Eduardo Habkost wrote:
-> The new parameter will be used by the string input visitor to detect
-> alternate types that can't be parsed unambiguously.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes v1 -> v2:
-> * (new patch added to series)
-> ---
+v8:
+- new patch added: 'removing spapr_drc_detach_cb opaques'. This new patch removes
+the need for the detach_cb_opaques inside the removal callback functions. See
+the commit message of the patch for more info.
 
-> +++ b/include/qapi/visitor.h
-> @@ -411,13 +411,21 @@ void visit_end_list(Visitor *v, void **list);
->   * @supported_qtypes is a bit mask indicating which QTypes are support=
-ed
->   * by the alternate.
->   *
-> + * @enum_table contains the enum value lookup table, in case
-> + * strings in the input are going to be parsed as enums. Visitors
-> + * aren't required to validate string input according to
-> + * enum_table, as visit_type_enum() will be called automatically
-> + * if (*obj)->type is QTYPE_QSTRING.
+v7:
+- removed the first patch. DRC registration is now done by vmstate_register
+in patch 2.
+- added a new patch that changes spapr_dr_connector_new to receive as argument
+the detach_cb.
+- removed the callback logic of patch 2 since there is no need to restore the
+detach_cb on post-load due to the detach_cb on spapr_dr_connector_new change.
+- added word separators in the VMSD names of patch 3 and 4.
 
-Presumably, enum_table will be NULL if the alternate type does not
-include an enum?  [reads ahead] yes. Should be documented.
+v6: - Rebased with QEMU master after 6+ months.
+    - Simplified the logic in patch 1.
+    - Reworked patch 2: added CPU DRC migration, removed a function pointer from DRC
+class and minor improvements.
+    - Added clarifications from the previous v5 discussions in the commit messages.
 
-I'm less convinced we need this patch, if we can instead guarantee at
-QAPI-generation time that alternates are not possible if they would
-cause an ambiguity.
+v5: - Rebased to David's ppc-for-2.8.
 
+v4: - Introduce a way to set customized instance_id in SaveStateEntry. Use it
+      to set instance_id for DRC using its unique index to address David 
+      Gibson's concern.
+    - Rename VMS_CSTM to VMS_LINKED based on Paolo Bonzini's suggestions.
+    - Clean up qjson stuff in put_qtailq. 
+    - Add trace for put_qtailq and get_qtailq based on David Gilbert's 
+      suggestion.
 
-> +++ b/scripts/qapi-visit.py
-> @@ -166,6 +166,12 @@ def gen_visit_alternate(name, variants):
->      supported_qtypes =3D ' | '.join(qtypes)
->      ret =3D ''
-> =20
-> +    enum_table =3D 'NULL'
-> +    for var in variants.variants:
-> +        if isinstance(var.type, QAPISchemaEnumType):
-> +            enum_table =3D '%s_lookup' % (var.type.c_name())
-> +            break
-> +
->      ret +=3D mcgen('''
-> =20
->  void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **=
-obj, Error **errp)
-> @@ -174,7 +180,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *=
-name, %(c_name)s **obj, Error
->      uint32_t supported_qtypes =3D %(supported_qtypes)s;
-> =20
->      visit_start_alternate(v, name, (GenericAlternate **)obj, sizeof(**=
-obj),
-> -                          supported_qtypes, &err);
-> +                          supported_qtypes, %(enum_table)s, &err);
+    - Based on David's ppc-for-2.7. 
 
-So there's where you populate the enum through.
+v3: - Simplify overall design followng discussion with Paolo. No longer need
+      metadata to migrate QTAILQ.
+    - Extend VMStateInfo instead of adding similar fields to VMStateField.
+    - Clean up macros in qemu/queue.h.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg05695.html)
 
-I'll have to see where 3/3 goes before deciding if this is worth having.
+v2: - Introduce a general approach to migrate QTAILQ in qemu/queue.h.
+    - Migrate signalled field in the DRC state.
+    - Put the newly added migrating fields in subsections so that backward 
+      migration is not broken.  
+    - Set detach_cb field right after migration so that a migrated hot-unplug
+      event could finish its course.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg04188.html)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+v1: - Inital version.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-04/msg02601.html)
 
 
---u0iKBwErNuCfM84lQ0JucpM00U4OahXeE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+To make guest devices (PCI, CPU and memory) hotplug work together 
+with guest migration, spapr drc state needs be transmitted in
+migration. This patch defines the VMStateDescription struct for
+spapr drc state to enable it.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+To fix the potential racing between hotplug events on guest and 
+guest migration, ccs_list and pending_events of spapr state need be 
+transmitted in migration. This patch set also takes care of it.
 
-iQEcBAEBCAAGBQJZDORNAAoJEKeha0olJ0NqJp8H/iSlcD5N77G6uFk8Q1jZaUCi
-GFFGx0K3skFvCfViZJw0TeoYI+l9at+4L5D1Dz9JmUDcMjgyjJd6zBbNh8iURB6V
-MO2OgBzWnmZ4zG9+1af+//Y5nVpIOkyOaHCHw1MN2epWitpeP/7GuiCCB5VH8bni
-y6/6upDp9EbsTUQzw5JXt39zZF4XC/ai1WAxibLdlY5xwb6rmMt6ZPQqlgi897yt
-HBoJCtr2u32GRomEHDCxv1xlUezKiLYlQsSA7suK+PbkP2ZKclo00EYZ/BLfHAYy
-kwmU/8qKyT66Y8i/25/JG8PMZiunW/WJihl/6vGDmMzKvHzYuDAwha+Trk/1Uwo=
-=zf8j
------END PGP SIGNATURE-----
 
---u0iKBwErNuCfM84lQ0JucpM00U4OahXeE--
+
+Daniel Henrique Barboza (4):
+  hw/ppc/spapr.c: adding pending_dimm_unplugs to sPAPRMachineState
+  hw/ppc: removing drc->detach_cb and drc->detach_cb_opaque
+  hw/ppc: migrating the DRC state of hotplugged devices
+  hw/ppc/spapr.c: migrate pending_dimm_unplugs of spapr state
+
+Jianjun Duan (2):
+  migration: spapr: migrate ccs_list in spapr state
+  migration: spapr: migrate pending_events of spapr state
+
+ hw/ppc/spapr.c              | 158 +++++++++++++++++++++++++++++++++++++++++---
+ hw/ppc/spapr_drc.c          |  97 ++++++++++++++++++++++-----
+ hw/ppc/spapr_events.c       |  24 ++++---
+ hw/ppc/spapr_pci.c          |   5 +-
+ include/hw/pci-host/spapr.h |   3 +
+ include/hw/ppc/spapr.h      |  24 ++++++-
+ include/hw/ppc/spapr_drc.h  |   8 +--
+ 7 files changed, 273 insertions(+), 46 deletions(-)
+
+-- 
+2.9.3
