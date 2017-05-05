@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gveitmic@redhat.com>) id 1d6REf-0004cE-6p
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 20:36:43 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d6SbO-00029e-Dt
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:04:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gveitmic@redhat.com>) id 1d6REb-0003Qq-Se
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 20:36:41 -0400
-Received: from mail-yw0-f171.google.com ([209.85.161.171]:32795)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gveitmic@redhat.com>) id 1d6REb-0003Qf-Jq
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 20:36:37 -0400
-Received: by mail-yw0-f171.google.com with SMTP id 203so14574905ywe.0
-	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 17:36:36 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170327163157.GA5424@work-vm>
-References: <CANHSq5DhUak9fVpvjG=VyeetP7VQudHwyEa4VevC21BuieSstw@mail.gmail.com>
-	<20170303103919.GA2439@work-vm> <87o9xizhs1.fsf@dusky.pond.sub.org>
-	<20170327163157.GA5424@work-vm>
-From: Germano Veit Michel <germano@redhat.com>
-Date: Fri, 5 May 2017 10:36:35 +1000
-Message-ID: <CANHSq5Bvpm-ofhCVvReDcAPJYpfHTgu3qanT+kaJU3KH1MViNw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2] migration: expose qemu_announce_self()
- via qmp
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d6SbK-000478-Dr
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:04:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42164)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1d6SbK-00046c-5q
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:04:10 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4523afl022350
+	for <qemu-devel@nongnu.org>; Thu, 4 May 2017 22:04:08 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8f8uj243-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 04 May 2017 22:04:07 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Thu, 4 May 2017 22:04:06 -0400
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Date: Fri,  5 May 2017 04:03:39 +0200
+Message-Id: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v7 00/13] basic channel IO passthrough
+ infrastructure based on vfio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,322 +36,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Juan Jose Quintela Carreira <quintela@redhat.com>
+To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
+Cc: bjsdjshi@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, eric.auger@redhat.com
 
-Hi guys,
+The patch series introduce a basic channel I/O passthrough
+infrastructure based on vfio.
+- Focus on supporting dasd-eckd(cu_type/dev_type = 0x3990/0x3390) as
+  the target device. 
+- Support new qemu parameters in the style of:
+    -machine s390-ccw-virtio(,s390-squash-mcss=on|off) \
+    -device vfio-ccw,sysfsdev=$MDEV_PATH
+  We want to support real (i.e. not virtual) channel devices even for
+  guests that do not support MCSS-E (where guests may see devices from
+  any channel subsystem image at once). As all virtio-ccw devices are in
+  css 0xfe (and show up in the default css 0 for guests not activating
+  MCSS-E), we need an option to squash e.g. passed-through channel devices
+  from their real css (0-3, or 0 for hosts not activating MCSS-E) into
+  the default css, that is what the new machine option s390-squash-css is
+  added.
 
-Finally got some time to prepare V3.
+Build and install:
+1. kernel configuration
+  CONFIG_S390_CCW_IOMMU=m
+  CONFIG_VFIO=m
+  CONFIG_VFIO_MDEV=m
+  CONFIG_VFIO_MDEV_DEVICE=m
+  CONFIG_VFIO_CCW=m
+2. modules required
+  modprobe vfio.ko
+  modprobe mdev.ko
+  modprobe vfio_mdev.ko
+  modprobe vfio_iommu_type1.ko
+  modprobe vfio_ccw.ko
+3. find a subchannel(0.0."%schid") of a DASD-ECKD device and bind it to
+  vfio_ccw driver
+  #find the dasd you can use with lsdasd on your host. e.g.:
+  devno="7e52"
+  schid="16ca"
+  #unbind the ccw device from the subchannel
+  echo 0.0."$devno" > /sys/bus/ccw/devices/0.0."$devno"/driver/unbind
+  #unbind the subchannel from io_subchannel driver
+  echo 0.0."$schid" > /sys/bus/css/devices/0.0."$schid"/driver/unbind
+  #bind the subchannel with vfio_ccw driver
+  echo 0.0."$schid" > /sys/bus/css/drivers/vfio_ccw/bind
+4. create a mediated device
+  #generate a uuid with uuidgen. e.g.:
+  uuid="6dfd3ec5-e8b3-4e18-a6fe-57bc9eceb920"
+  echo "$uuid" > \
+  /sys/bus/css/devices/0.0."$schid"/mdev_supported_types/vfio_ccw-io/create
+5. pass-through this device to a vm
+  -M s390-ccw-virtio,s390-squash-css=on \
+  -device vfio-ccw,sysfsdev=/sys/bus/mdev/devices/$uuid \
+  ... ...
 
-First of all Dave's trick is really useful to test it:
+Change log:
+v6 -> v7:
+1. Patch #6:
+   Use error_setg_errno as possible.
+   Use local Error variable as possible.
+   Free @sch when error out.
+2. Patch #7:
+   Use local Error variable as possible.
+   Remove vfio_ccw_put_group.
+3. Patch #8:
+   Use local Error variable as possible.
+   Free @info when error out.
+4. Patch #9:
+   Use error_setg_errno as possible.
+   Use local Error variable as possible.
+5. Patch #10:
+   Move handle_request from device to class.
+   Generate channel-check for information transfer error.
+   Improve pread logic.
 
-./x86_64-softmmu/qemu-system-x86_64 -nographic -nodefaults -netdev
-user,id=3Dnetuser -object filter-dump,id=3Ddump,netdev=3Dnetuser,file=3Dfoo=
-2
--device e1000,netdev=3Dnetuser,mac=3D00:11:22:33:44:55 -monitor stdio
-QEMU 2.8.91 monitor - type 'help' for more information
-(qemu) announce-self
-(qemu) announce-self
-(qemu) qemu-system-x86_64: terminating on signal 2
+v5 -> v6:
+1. Rebase against git://github.com/cohuck/qemu s390-next.
+2. Patch #6: correct error message: -vfio-ccw --> -device vfio-ccw
+3. Patch #7:
+   Rewrite vfio_ccw_get_group by:
+     - removing unnecessary checking of path existance;
+     - removing useless 'path' variable;
+   Fix a typo: s/operationis/operations/
+   In vfio_ccw_unrealize, move cdc->unrealize to the end.
 
-tshark -r foo2 | grep RARP
-    1   0.000000 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-    2   0.050017 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-    3   0.200077 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-    4   0.450112 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-    5   0.800090 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-   13   5.583887 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-   14   5.633079 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-   15   5.783152 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-   16   6.033130 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
-   17   6.383144 Cimsys_33:44:55 =E2=86=92 Broadcast    RARP 60 Who is
-00:11:22:33:44:55? Tell 00:11:22:33:44:55
+v4 -> v5:
+1. Rebase to git://github.com/cohuck/qemu s390-next.
+2. New patch #1: update-linux-headers.
+3. Patch #6: update s390_ccw_realize according to the new code base.
+4. New patch #13: add maintainer for vfio-ccw.
 
-Now for qtest:
+v3 -> v4:
+1. Adjustments of the s-o-b chains for some patches.
 
-It is compiling and running my test:
+v2 -> v3:
+1. Move vfio_ccw.h to uapi.
+2. Adopt the vfio-ccw cmdline interface as vfio-pci with mdev devices.
+3. Rename s390-map-css to s390-squash-mcss (patch 2), and update devno
+   generation method (patch 5).
+4. Patch 7: correct the validation of num_regions.
+5. Patch 8: correct the validation of num_irqs.
 
-  [....]
-  CC      tests/qmp-net-test.o
-  LINK    tests/qmp-net-test
-  [....]
-  GTESTER check-qtest-x86_64
+v1 -> v2:
+1. Rebase the implementation to the mdev framework approach.
+2. Use pread and pwrite on an I/O region to issue I/O requests and
+   receive results.
 
-/bin/sh -c printf "  %-7s %s\n" "GTESTER" "check-qtest-x86_64" &&
-QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=3Dqemu=
--img
-MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$((RANDOM % 255 + 1))} gtester -k -q
--m=3Dquick [.....] tests/qmp-net-test [....]
+Dong Jia Shi (8):
+  update-linux-headers: update for vfio-ccw
+  vfio: linux-headers update for vfio-ccw
+  s390x/css: realize css_create_sch
+  s390x/css: device support for s390-ccw passthrough
+  vfio/ccw: get io region info
+  vfio/ccw: get irqs info and set the eventfd fd
+  vfio/ccw: update sense data if a unit check is pending
+  MAINTAINERS: Add vfio-ccw maintainer
 
-Weird is... is the test qemu running without NICs?
+Xiao Feng Ren (5):
+  s390x/css: add s390-squash-mcss machine option
+  s390x/css: realize css_sch_build_schib
+  vfio/ccw: vfio based subchannel passthrough driver
+  s390x/css: introduce and realize ccw-request callback
+  s390x/css: ccw translation infrastructure
 
-x86_64-softmmu/qemu-system-x86_64 -qtest unix:/tmp/qtest-17545.sock,nowait
--qtest-log /dev/null -qmp unix:/tmp/qtest-17545.qmp,nowait -machine
-accel=3Dqtest -display none -M q35,accel=3Dtcg -chardev
-file,id=3Dserial0,path=3D/tmp/qtest-boot-serial-HYHJ2e -no-shutdown -serial
-chardev:serial0 -device sga
+ MAINTAINERS                        |   5 +
+ default-configs/s390x-softmmu.mak  |   1 +
+ hw/s390x/Makefile.objs             |   1 +
+ hw/s390x/css-bridge.c              |   2 +
+ hw/s390x/css.c                     | 291 +++++++++++++++++++++++--
+ hw/s390x/s390-ccw.c                | 150 +++++++++++++
+ hw/s390x/s390-ccw.h                |  39 ++++
+ hw/s390x/s390-virtio-ccw.c         |  33 ++-
+ hw/s390x/virtio-ccw.c              |   7 +-
+ hw/vfio/Makefile.objs              |   1 +
+ hw/vfio/ccw.c                      | 436 +++++++++++++++++++++++++++++++++++++
+ include/hw/s390x/css-bridge.h      |   1 +
+ include/hw/s390x/css.h             |  67 +++---
+ include/hw/s390x/s390-virtio-ccw.h |   1 +
+ include/hw/vfio/vfio-common.h      |   1 +
+ linux-headers/linux/vfio.h         |  17 ++
+ linux-headers/linux/vfio_ccw.h     |  28 +++
+ qemu-options.hx                    |   6 +-
+ scripts/update-linux-headers.sh    |   2 +-
+ target/s390x/cpu.h                 |  10 +
+ target/s390x/ioinst.c              |   9 +
+ 21 files changed, 1059 insertions(+), 49 deletions(-)
+ create mode 100644 hw/s390x/s390-ccw.c
+ create mode 100644 hw/s390x/s390-ccw.h
+ create mode 100644 hw/vfio/ccw.c
+ create mode 100644 linux-headers/linux/vfio_ccw.h
 
-I was looking at this
-http://events.linuxfoundation.org/sites/events/files/slides/Testing%20QEMU%=
-20emulated%20devices%20using%20qtest.pdf
-and it's pretty helpful. But I have no clues on how to actually check if
-the RARP packets really go out on each NIC. Any idea on how to implement
-this or is the smoke test enough?
-
-Thanks
-
-On Tue, Mar 28, 2017 at 2:31 AM, Dr. David Alan Gilbert <dgilbert@redhat.co=
-m
-> wrote:
-
-> * Markus Armbruster (armbru@redhat.com) wrote:
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> >
-> > > * Germano Veit Michel (germano@redhat.com) wrote:
-> > >> qemu_announce_self() is triggered by qemu at the end of migrations
-> > >> to update the network regarding the path to the guest l2addr.
-> > >>
-> > >> however it is also useful when there is a network change such as
-> > >> an active bond slave swap. Essentially, it's the same as a migration
-> > >> from a network perspective - the guest moves to a different point
-> > >> in the network topology.
-> > >>
-> > >> this exposes the function via qmp.
-> > >
-> > > Markus: Since you're asking for tests for qmp commands; how would you
-> > > test this?
-> >
-> > Good question, as tests/ isn't exactly full of examples you could crib.
-> >
-> > Let me look at the patch...
-> >
-> > > Jason: Does this look OK from the networking side of things?
-> > >
-> > >> Signed-off-by: Germano Veit Michel <germano@redhat.com>
-> > >> ---
-> > >>  include/migration/vmstate.h |  5 +++++
-> > >>  migration/savevm.c          | 30 +++++++++++++++++++-----------
-> > >>  qapi-schema.json            | 18 ++++++++++++++++++
-> > >>  3 files changed, 42 insertions(+), 11 deletions(-)
-> > >>
-> > >> diff --git a/include/migration/vmstate.h b/include/migration/vmstate=
-.h
-> > >> index 63e7b02..a08715c 100644
-> > >> --- a/include/migration/vmstate.h
-> > >> +++ b/include/migration/vmstate.h
-> > >> @@ -1042,6 +1042,11 @@ int64_t self_announce_delay(int round)
-> > >>      return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
-> > >>  }
-> > >>
-> > >> +struct AnnounceRound {
-> > >> +    QEMUTimer *timer;
-> > >> +    int count;
-> > >> +};
-> > >> +
-> > >>  void dump_vmstate_json_to_file(FILE *out_fp);
-> > >>
-> > >>  #endif
-> > >> diff --git a/migration/savevm.c b/migration/savevm.c
-> > >> index 5ecd264..44e196b 100644
-> > >> --- a/migration/savevm.c
-> > >> +++ b/migration/savevm.c
-> > >> @@ -118,29 +118,37 @@ static void qemu_announce_self_iter(NICState
-> > >> *nic, void *opaque)
-> > >>      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
-> > >>  }
-> > >>
-> > >> -
-> > >>  static void qemu_announce_self_once(void *opaque)
-> > >>  {
-> > >> -    static int count =3D SELF_ANNOUNCE_ROUNDS;
-> > >> -    QEMUTimer *timer =3D *(QEMUTimer **)opaque;
-> > >> +    struct AnnounceRound *round =3D opaque;
-> > >>
-> > >>      qemu_foreach_nic(qemu_announce_self_iter, NULL);
-> > >>
-> > >> -    if (--count) {
-> > >> +    round->count--;
-> > >> +    if (round->count) {
-> > >>          /* delay 50ms, 150ms, 250ms, ... */
-> > >> -        timer_mod(timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
-> > >> -                  self_announce_delay(count));
-> > >> +        timer_mod(round->timer, qemu_clock_get_ms(QEMU_CLOCK_REALTI=
-ME)
-> +
-> > >> +                  self_announce_delay(round->count));
-> > >>      } else {
-> > >> -            timer_del(timer);
-> > >> -            timer_free(timer);
-> > >> +            timer_del(round->timer);
-> > >> +            timer_free(round->timer);
-> > >> +            g_free(round);
-> > >>      }
-> > >>  }
-> > >>
-> > >>  void qemu_announce_self(void)
-> > >>  {
-> > >> -    static QEMUTimer *timer;
-> > >> -    timer =3D timer_new_ms(QEMU_CLOCK_REALTIME,
-> qemu_announce_self_once, &timer);
-> > >> -    qemu_announce_self_once(&timer);
-> > >> +    struct AnnounceRound *round =3D g_malloc(sizeof(struct
-> AnnounceRound));
-> > >
-> > > I prefer g_new0 - i.e.
-> > >    struct AnnounceRound *round =3D g_new0(struct AnnounceRound, 1)
-> > >
-> > >> +    if (!round)
-> > >> +        return;
-> > >> +    round->count =3D SELF_ANNOUNCE_ROUNDS;
-> > >> +    round->timer =3D timer_new_ms(QEMU_CLOCK_REALTIME,
-> > >> qemu_announce_self_once, round);
-> > >
-> > > An odd line break?
-> > >
-> > >> +    qemu_announce_self_once(round);
-> > >> +}
-> > >> +
-> > >> +void qmp_announce_self(Error **errp)
-> > >> +{
-> > >> +    qemu_announce_self();
-> > >>  }
-> > >>
-> > >>  /***********************************************************/
-> > >> diff --git a/qapi-schema.json b/qapi-schema.json
-> > >> index baa0d26..0d9bffd 100644
-> > >> --- a/qapi-schema.json
-> > >> +++ b/qapi-schema.json
-> > >> @@ -6080,3 +6080,21 @@
-> > >>  #
-> > >>  ##
-> > >>  { 'command': 'query-hotpluggable-cpus', 'returns':
-> ['HotpluggableCPU'] }
-> > >> +
-> > >> +##
-> > >> +# @announce-self:
-> > >> +#
-> > >> +# Trigger generation of broadcast RARP frames to update network
-> switches.
-> > >> +# This can be useful when network bonds fail-over the active slave.
-> > >> +#
-> > >> +# Arguments: None.
-> >
-> > Please drop this line.
-> >
-> > >> +#
-> > >> +# Example:
-> > >> +#
-> > >> +# -> { "execute": "announce-self" }
-> > >> +# <- { "return": {} }
-> > >> +#
-> > >> +# Since: 2.9
-> > >> +##
-> > >> +{ 'command': 'announce-self' }
-> > >> +
-> >
-> > From QMP's point of view, this command is as simple as they get: no
-> > arguments, no return values, no errors.
-> >
-> > I think a basic smoke test would do: try the command, check no magic
-> > smoke comes out.  Untested sketch adapted from qmp-test.c:
-> >
-> >     /*
-> >      * Test cases for network-related QMP commands
-> >      *
-> >      * Copyright (c) 2017 Red Hat Inc.
-> >      *
-> >      * Authors:
-> >      *  Markus Armbruster <armbru@redhat.com>,
-> >      *
-> >      * This work is licensed under the terms of the GNU GPL, version 2
-> or later.
-> >      * See the COPYING file in the top-level directory.
-> >      */
-> >
-> >     #include "qemu/osdep.h"
-> >     #include "libqtest.h"
-> >     #include "qapi/error.h"
-> >
-> >     const char common_args[] =3D "-nodefaults -machine none";
-> >
-> >     static void test_qmp_announce_self(void)
-> >     {
-> >         QDict *resp, *ret;
-> >
-> >         qtest_start(common_args);
-> >
-> >         resp =3D qmp("{ 'execute': 'qmp_capabilities' }");
-> >         ret =3D qdict_get_qdict(resp, "return");
-> >         g_assert(ret && !qdict_size(ret));
-> >         QDECREF(resp);
-> >
-> >         qtest_end();
-> >     }
-> >
-> >     int main(int argc, char *argv[])
-> >     {
-> >         g_test_init(&argc, &argv, NULL);
-> >
-> >         qtest_add_func("qmp/net/announce_self", test_qmp_announce_self)=
-;
-> >
-> >         return g_test_run();
-> >     }
-> >
-> > If you want to go the extra mile: is there a way to set up networking s=
-o
-> > you can observe the RARPs this should trigger?
->
-> I've been fiddling with the RARP code for other changes and noticed you
-> can do:
->
-> ./x86_64-softmmu/qemu-system-x86_64 -nographic -nodefaults -netdev
-> user,id=3Dnetuser -object filter-dump,id=3Ddump,netdev=3Dnetuser,file=3Df=
-oo2
-> -device e1000,netdev=3Dnetuser,mac=3D00:11:22:33:44:55 -monitor stdio
->
-> (Thanks to Thomas for helping explain filter-dump).
->
-> So those land in foo2 as a pcap file.
->
-> Dave
->
-> > I'd call this qmp-net-test.  Add to Makefile.include exactly like
-> > qmp-test.
-> >
-> > Test cases for existing networking-related QMP commands should be added=
-,
-> > but not in this patch, and not necessarily by you.
-> >
-> > Alternatively, have a more general test program for networking stuff,
-> > and make this one of its test cases.  Your choice.
-> >
-> > Hope this helps!
-> >
-> > >
-> > > Please wire hmp up as well (see hmp-commands.hx).
-> > >
-> > > Dave
-> > >
-> > >> --
-> > >> 2.9.3
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
-
-
-
---=20
-Germano Veit Michel <germano@redhat.com>
-Senior Software Maintenance Engineer, Virtualization, Red Hat
+-- 
+2.10.2
