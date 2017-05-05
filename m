@@ -1,23 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d6anl-0003cI-2l
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:49:33 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d6aqm-0006UM-0P
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d6ani-0002o1-0M
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:49:33 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3972)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d6anh-0002nJ-DM
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:49:29 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 5 May 2017 10:49:05 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA2650C5@DGGEMA505-MBX.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d6aqi-0003yB-St
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:52:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d6aqi-0003we-Kj
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:52:36 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v45AmeMs049920
+	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 06:52:35 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8eck7kt9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 06:52:34 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Fri, 5 May 2017 11:52:31 +0100
+Date: Fri, 5 May 2017 12:52:26 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170505101930.45837-1-aik@ozlabs.ru>
+References: <20170505101930.45837-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [Question] SeaBIOS: cannot boot oracle linux if
- increase the maximum size of permanent high memory area
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170505125226.5c962179.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH qemu v6] memory/iommu: QOM'fy IOMMU
+ MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +41,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "seabios@seabios.org" <seabios@seabios.org>, "Xulei (Stone)" <stone.xulei@huawei.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Wulizhen (Pss)" <pss.wulizhen@huawei.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-Hi guys,=20
+On Fri,  5 May 2017 20:19:30 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-Currently my workmate encountered an issues in the testing environment:=20
+> This defines new QOM object - IOMMUMemoryRegion - with MemoryRegion
+> as a parent.
+> 
+> This moves IOMMU-related fields from MR to IOMMU MR. However to avoid
+> dymanic QOM casting in fast path (address_space_translate, etc),
+> this adds an @is_iommu boolean flag to MR and provides new helper to
+> do simple cast to IOMMU MR - memory_region_get_iommu. The flag
+> is set in the instance init callback. This defines
+> memory_region_is_iommu as memory_region_get_iommu()!=NULL.
+> 
+> This switches MemoryRegion to IOMMUMemoryRegion in most places except
+> the ones where MemoryRegion may be an alias.
+> 
+> This defines memory_region_init_iommu_type() to allow creating
+> IOMMUMemoryRegion subclasses. In order to support custom QOM type,
+> this splits memory_region_init() to object_initialize() +
+> memory_region_do_init.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> Changes:
+> v6:
+> * s/\<iommumr\>/iommu_mr/g
+> 
+> v5:
+> * fixed sparc64, first time in many years did run "./configure" without
+> --target-list :-D Sorry for the noise though :(
+> 
+> v4:
+> * fixed alpha, mips64el and sparc
+> 
+> v3:
+> * rebased on sha1 81b2d5ceb0
+> 
+> v2:
+> * added mr->is_iommu
+> * updated i386/x86_64/s390/sun
+> ---
+>  hw/s390x/s390-pci-bus.h       |   2 +-
+>  include/exec/memory.h         |  77 +++++++++++++++++++-------
+>  include/hw/i386/intel_iommu.h |   2 +-
+>  include/hw/mips/mips.h        |   2 +-
+>  include/hw/ppc/spapr.h        |   3 +-
+>  include/hw/vfio/vfio-common.h |   2 +-
+>  include/qemu/typedefs.h       |   1 +
+>  exec.c                        |  16 +++---
+>  hw/alpha/typhoon.c            |   8 ++-
+>  hw/dma/rc4030.c               |   8 +--
+>  hw/i386/amd_iommu.c           |   9 +--
+>  hw/i386/intel_iommu.c         |  17 +++---
+>  hw/mips/mips_jazz.c           |   2 +-
+>  hw/pci-host/apb.c             |   6 +-
+>  hw/ppc/spapr_iommu.c          |  20 ++++---
+>  hw/s390x/s390-pci-bus.c       |   6 +-
+>  hw/s390x/s390-pci-inst.c      |   8 +--
+>  hw/vfio/common.c              |  12 ++--
+>  hw/vfio/spapr.c               |   3 +-
+>  memory.c                      | 124 +++++++++++++++++++++++++++++-------------
+>  20 files changed, 213 insertions(+), 115 deletions(-)
 
-A letter from him:
-
-In order to boot a BIG vm (with 4T mem, 255 vCPUs, 60 virtio-scsi disk...),=
- i have to increase the=20
-BUILD_MAX_HIGHTABLE to 512KB.
-But, then i found i can not boot a  specific VM anymore (oracle linux 6.7 6=
-4bits with kernel 3.8.13, 2G mem).
-It seems be related with the unused high ram given VM back by SeaBios (mayb=
-e also related to the memory align).
-I've tested if setting giveback memory 64KB alignment other than 4KB, SeaBi=
-os with 512KB BUILD_MAX_HIGHTABLE
-can boot the specific VM. But , i don't know the reason...
-
-As far as i know, if seabios does not give back the unused ZoneHigh memory =
-seems will not trigger any problems
-but just waste only a little memory ,right?
-
-Can you tell me what's the worst effect if i apply the following patch?=20
-
-Does it influence live migration?
-
-Thanks!
-
-
-diff --git a/src/config.h b/src/config.h
-index baca029..b3536f1 100644
-index baca029..b3536f1 100644
---- a/src/config.h
-+++ b/src/config.h
-@@ -17,7 +17,7 @@
- // Maximum number of map entries in the e820 map
- #define BUILD_MAX_E820 32
- // Space to reserve in high-memory for tables
--#define BUILD_MAX_HIGHTABLE (256*1024)
-+#define BUILD_MAX_HIGHTABLE (512*1024)
-
-diff --git a/src/malloc.c b/src/malloc.c
-index 3733855..6302525 100644
---- a/src/malloc.c
-+++ b/src/malloc.c
-@@ -549,13 +549,7 @@ malloc_prepboot(void)
-     dprintf(1, "Space available for UMB: %x-%x, %x-%x\n"
-             , RomEnd, base, info->range_start, info->range_end);
-
--    // Give back unused high ram.
--    info =3D alloc_find_lowest(&ZoneHigh);
--    if (info) {
--        u32 giveback =3D ALIGN_DOWN(info->range_end-info->range_start, PAG=
-E_SIZE);
--        e820_add(info->range_start, giveback, E820_RAM);
--        dprintf(1, "Returned %d bytes of ZoneHigh\n", giveback);
--    }
-
-     calcRamSize();
-
-
-
-Regards,
--Gonglei
+Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
