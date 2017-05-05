@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d6h4C-0007KL-Sl
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:30:57 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d6h8S-00011H-Ln
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d6h49-0003OZ-Pt
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:30:56 -0400
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:40484)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d6h49-0003OD-Id
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:30:53 -0400
-Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C7284E11F2
-	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 19:30:50 +0200 (CEST)
-Date: Fri, 5 May 2017 19:30:46 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170505193046.6c9bf2c1@bahia>
-In-Reply-To: <e1843524-9ec7-2aea-4138-f3ce246f0929@redhat.com>
-References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
-	<149399502436.29022.4452572475773635974.stgit@bahia.lan>
-	<e1843524-9ec7-2aea-4138-f3ce246f0929@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/Yukj13YSpS/qhl9vtoWqEiO";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 1/5] 9pfs: check return value of
- v9fs_co_name_to_path()
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d6h8P-0005GB-JH
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:35:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47485
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1d6h8P-0005Ft-DJ
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:35:17 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v45HXmnL126758
+	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 13:35:16 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a8rx2fnfj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 13:35:16 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 5 May 2017 18:35:14 +0100
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri,  5 May 2017 19:34:57 +0200
+Message-Id: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 00/10] migration: s390x css migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?B?TMOpbw==?= Gaspard <leo@gaspard.io>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
---Sig_/Yukj13YSpS/qhl9vtoWqEiO
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This patch set has a dual purpose: introduce proper migration for the
+channel subsystem (css) and convert the migration of ccw devices to
+vmstate. The state of the css was only partially migrated by the
+virtio-ccw devices (was the only device type until recent), which was
+good enough for a while.
 
-On Fri, 5 May 2017 11:55:43 -0500
-Eric Blake <eblake@redhat.com> wrote:
+Since the new vmstate infrastructure is used also for handling the
+migration stream for legacy machines some bits are a bit convoluted:
+that is, if you see something convoluted there is a good chance the
+reason why is compatibility.
 
-> On 05/05/2017 09:37 AM, Greg Kurz wrote:
-> > These v9fs_co_name_to_path() call sites have always been around. I guess
-> > no care was taken to check the return value because the name_to_path
-> > operation could never fail at the time. This is no longer true: the
-> > handle and synth backends can already fail this operation, and so will =
-the
-> > local backend soon.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/9pfs/9p.c |   36 +++++++++++++++++++++++++-----------
-> >  1 file changed, 25 insertions(+), 11 deletions(-)
-> >  =20
->=20
-> > @@ -2588,8 +2591,11 @@ static int coroutine_fn v9fs_complete_rename(V9f=
-sPDU *pdu, V9fsFidState *fidp,
-> >          new_name =3D g_malloc0(end - old_name + name->size + 1);
-> >          strncat(new_name, old_name, end - old_name);
-> >          strncat(new_name + (end - old_name), name->data, name->size); =
-=20
->=20
-> Ad long as you're here, you could replace this strncat mess with the
-> shorter:
->=20
-> new_name =3D g_strdup_printf("%.*s%.*s", end - old_name, old_name,
->                            name->size, name->data);
->=20
-> (or with further simplifications if you have NUL-terminated data).  But
-> that can be a separate cleanup.
->=20
+Halil Pasic (10):
+  s390x: add helper get_machine_class
+  s390x: add css_migration_enabled to machine class
+  s390x/css: add vmstate entities for css
+  s390x/css: add vmstate macro for CcwDevice
+  virtio-ccw: add vmstate entities for VirtioCcwDevice
+  virtio-ccw: use vmstate way for config migration
+  s390x/css: remove unused subch_dev_(load|save)
+  s390x/css: add ORB to SubchDev
+  s390x/css: turn on channel subsystem migration
+  s390x/css: use SubchDev.orb
 
-Yes you're right, this definitely looks better than the strncat() logic.
-I guess I'll do this in a separate patch.
+ hw/intc/s390_flic.c                |  48 ++++
+ hw/s390x/ccw-device.c              |  11 +
+ hw/s390x/ccw-device.h              |   4 +
+ hw/s390x/css.c                     | 478 +++++++++++++++++++++++++------------
+ hw/s390x/s390-virtio-ccw.c         |  58 +++--
+ hw/s390x/virtio-ccw.c              | 164 +++++++------
+ include/hw/s390x/css.h             |  17 +-
+ include/hw/s390x/s390-virtio-ccw.h |   7 +
+ include/hw/s390x/s390_flic.h       |   5 +
+ 9 files changed, 543 insertions(+), 249 deletions(-)
 
-Thanks for the suggestion.
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-
-
---Sig_/Yukj13YSpS/qhl9vtoWqEiO
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkMtscACgkQAvw66wEB28KUuwCfZbssU+xUGb4q013NMtizPba6
-sawAn1Ck3vus+XCVm8Tx9j/lyAWbOGCw
-=G16v
------END PGP SIGNATURE-----
-
---Sig_/Yukj13YSpS/qhl9vtoWqEiO--
+-- 
+2.10.2
