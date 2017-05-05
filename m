@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d6TWp-0002iS-E4
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 23:03:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d6Tiq-0005MT-3B
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 23:16:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d6TWl-0007cK-E3
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 23:03:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45598)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d6TWl-0007aM-4f
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 23:03:31 -0400
-References: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492674416-9408-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<df05a73b-fba8-a6d3-bf6a-648304458257@redhat.com>
-	<58FD9546.5000104@huawei.com>
-	<82c50df3-28c9-fb21-f2c6-76a99f864bee@redhat.com>
-	<58FF1DF7.4000006@huawei.com>
-	<bfac018b-55cf-9cf8-5ffe-ff0d1fbd4b53@redhat.com>
-	<590A971B.1070900@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <6af63243-5e20-8a43-9ba1-fce37323bf78@redhat.com>
-Date: Fri, 5 May 2017 11:03:23 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1d6Tio-0004kq-WC
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 23:16:00 -0400
+Date: Fri, 5 May 2017 13:15:32 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170505031532.GL14413@umbus.fritz.box>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-15-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <590A971B.1070900@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: serialize compare
- thread's initialization with main thread
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="RNGrj7vazCqBHNw7"
+Content-Disposition: inline
+In-Reply-To: <1493816238-33120-15-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 14/24] spapr: get numa node mapping from
+ possible_cpus instead of numa_get_node_for_cpu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,100 +25,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com
-Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
 
+--RNGrj7vazCqBHNw7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B405=E6=9C=8804=E6=97=A5 10:51, Hailiang Zhang wrote:
-> Hi Jason,
->
-> On 2017/4/25 19:33, Jason Wang wrote:
->>
->> On 2017=E5=B9=B404=E6=9C=8825=E6=97=A5 17:59, Hailiang Zhang wrote:
->>> On 2017/4/25 16:41, Jason Wang wrote:
->>>> On 2017=E5=B9=B404=E6=9C=8824=E6=97=A5 14:03, Hailiang Zhang wrote:
->>>>> On 2017/4/24 12:10, Jason Wang wrote:
->>>>>> On 2017=E5=B9=B404=E6=9C=8820=E6=97=A5 15:46, zhanghailiang wrote:
->>>>>>> We call qemu_chr_fe_set_handlers() in colo-compare thread, it is=20
->>>>>>> used
->>>>>>> to detach watched fd from default main context, so it has chance =
-to
->>>>>>> handle the same watched fd with main thread concurrently, which=20
->>>>>>> will
->>>>>>> trigger an error report:
->>>>>>> "qemu-char.c:918: io_watch_poll_finalize: Assertion `iwp->src =3D=
-=3D
->>>>>>> ((void *)0)' failed."
->>>>>> Anyway to prevent fd from being handled by main thread before=20
->>>>>> creating
->>>>>> colo thread? Using semaphore seems not elegant.
->>>>> So how about calling qemu_mutex_lock_iothread() before
->>>>> qemu_chr_fe_set_handlers() ?
->>>> Looks better, but I needs more information e.g how main thread can
->>>> touch it?
->>> Hmm, this happened quite occasionally, and we didn't catch the first
->>> place (backtrace)
->>> of removing fd from been watched, but  from the codes logic, we found
->>> there should
->>> be such possible cases:
->>> tcp_chr_write (Or tcp_chr_read/tcp_chr_sync_read/chr_disconnect)
->>>   ->tcp_chr_disconnect (Or char_socket_finalize)
->>>      ->tcp_chr_free_connection
->>>        -> remove_fd_in_watch(chr);
->>>
->>> Anyway, it needs the protection from been freed twice.
->>>
->>> Thanks,
->>> Hailiang
->> Still a little bit confused. The question is how could main thread sti=
-ll
->> call tcp_chr_write or other in the above case?
->
-> Finally, we reproduced this bug (We use qemu 2.6), and got the follow=20
-> backtrace of this problem:
->
-> (gdb) thread apply all bt
->
-> Thread 7 (Thread 0x7f407a1ff700 (LWP 23144)):
-> #0  0x00007f41037e0db5 in _int_malloc () from /usr/lib64/libc.so.6
-> #1  0x00007f41037e3b96 in calloc () from /usr/lib64/libc.so.6
-> #2  0x00007f41041ad4d7 in g_malloc0 () from /usr/lib64/libglib-2.0.so.0
-> #3  0x00007f41041a5437 in g_source_new () from=20
-> /usr/lib64/libglib-2.0.so.0
-> #4  0x00007f410a2cec9c in qio_channel_create_fd_watch=20
-> (ioc=3Dioc@entry=3D0x7f410d6238c0, fd=3D20, condition=3Dcondition@entry=
-=3D
->     (G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL)) at=20
-> io/channel-watch.c:259
-> #5  0x00007f410a2ced01 in qio_channel_create_socket_watch=20
-> (ioc=3Dioc@entry=3D0x7f410d6238c0, socket=3D<optimized out>,
->     condition=3Dcondition@entry=3D(G_IO_IN | G_IO_ERR | G_IO_HUP |=20
-> G_IO_NVAL)) at io/channel-watch.c:311
-> #6  0x00007f410a2cbea7 in qio_channel_socket_create_watch=20
-> (ioc=3D0x7f410d6238c0, condition=3D(G_IO_IN | G_IO_ERR | G_IO_HUP |=20
-> G_IO_NVAL))
->     at io/channel-socket.c:732
-> #7  0x00007f410a2c94d2 in qio_channel_create_watch=20
-> (ioc=3D0x7f410d6238c0, condition=3Dcondition@entry=3D
->     (G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL)) at io/channel.c:132
-> #8  0x00007f410a003cd6 in io_watch_poll_prepare=20
-> (source=3D0x7f4070000d00, timeout_=3D<optimized out>) at qemu-char.c:88=
-3
-> #9  0x00007f41041a72ed in g_main_context_prepare () from=20
-> /usr/lib64/libglib-2.0.so.0
-> #10 0x00007f41041a7b7b in g_main_context_iterate.isra.24 () from=20
-> /usr/lib64/libglib-2.0.so.0
-> #11 0x00007f41041a7fba in g_main_loop_run () from=20
-> /usr/lib64/libglib-2.0.so.0
-> #12 0x00007f410a1e528f in colo_compare_thread (opaque=3D0x7f410d7d6800)=
-=20
-> at net/colo-compare.c:651
-> #13 0x00007f4103b2bdc5 in start_thread () from /usr/lib64/libpthread.so=
-.0
-> #14 0x00007f410385971d in clone () from /usr/lib64/libc.so.6=20
+On Wed, May 03, 2017 at 02:57:08PM +0200, Igor Mammedov wrote:
+> it's safe to remove thread node_id !=3D core node_id error
+> branch as machine_set_cpu_numa_node() also does mismatch
+> check and is called even before any CPU is created.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-It looks like we use main context which is wrong, maybe you can track=20
-io_add_watch_poll() and its caller get the reason.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Thanks
+> ---
+>  hw/ppc/spapr.c          |  4 ++--
+>  hw/ppc/spapr_cpu_core.c | 14 ++------------
+>  2 files changed, 4 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7f58ee4..bcb91e7 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2863,8 +2863,8 @@ static void spapr_core_pre_plug(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+>          goto out;
+>      }
+> =20
+> -    node_id =3D numa_get_node_for_cpu(cc->core_id);
+> -    if (node_id =3D=3D nb_numa_nodes) {
+> +    node_id =3D core_slot->props.node_id;
+> +    if (!core_slot->props.has_node_id) {
+>          /* by default CPUState::numa_node was 0 if it's not set via CLI
+>           * keep it this way for now but in future we probably should
+>           * refuse to start up with incomplete numa mapping */
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 9de7a56..a17ea07 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -181,7 +181,6 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+> =20
+>      sc->threads =3D g_malloc0(size * cc->nr_threads);
+>      for (i =3D 0; i < cc->nr_threads; i++) {
+> -        int node_id;
+>          char id[32];
+>          CPUState *cs;
+> =20
+> @@ -191,17 +190,8 @@ static void spapr_cpu_core_realize(DeviceState *dev,=
+ Error **errp)
+>          cs =3D CPU(obj);
+>          cs->cpu_index =3D cc->core_id + i;
+> =20
+> -        /* Set NUMA node for the added CPUs  */
+> -        node_id =3D numa_get_node_for_cpu(cs->cpu_index);
+> -        if (node_id !=3D sc->node_id) {
+> -            error_setg(&local_err, "Invalid node-id=3D%d of thread[cpu-i=
+ndex: %d]"
+> -                " on CPU[core-id: %d, node-id: %d], node-id must be the =
+same",
+> -                 node_id, cs->cpu_index, cc->core_id, sc->node_id);
+> -            goto err;
+> -        }
+> -        if (node_id < nb_numa_nodes) {
+> -            cs->numa_node =3D node_id;
+> -        }
+> +        /* Set NUMA node for the threads belonged to core  */
+> +        cs->numa_node =3D sc->node_id;
+> =20
+>          snprintf(id, sizeof(id), "thread[%d]", i);
+>          object_property_add_child(OBJECT(sc), id, obj, &local_err);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--RNGrj7vazCqBHNw7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZC+5QAAoJEGw4ysog2bOSjeMQAKk3TNS2uIGaheLJliuEDZVX
+/cM6elEU+IVVVF+4Gt6hD5g1Car5lKzwFvSxjJLXSol71WMAKv6bCcVRRfThi/10
+7zrr1d4DsWpWv5zq+FuaeOcK8npNckKcRiDxDTBjsussJEGHwrXcix8ZxLP4W3af
+vOhEt0sYTSTdo6Fl9BqUTMQ2UY4ORXxPCoRoR9FV8+TNj/JLmWSpAuEwEMplrqwz
+rSiN29/eFnmwM766Lz55h7FzxaujAiXUHZjLbMo6PuXkUWCGwbqSg4DM0WXN2mOd
+D4Bkb0/TOhTsU/aEwYfevyxm7541McZYFPeE5nffbEqYwJol9UJlarVKvpgLDkwN
+iGYPOdPRhXS9EWGxciItHB1msVWaa6Cd66eEqX/74cpl26FhW9JJMbQddR9IX/29
+NQr+BMt9rBiNJsuQD7Vpf7X6roNphrekMpIxrAGLAy8B/8rf3aMT2Ci3MG4v/Q0i
+8jy+w+mmnmE28i4VHPmFOBbhaKNZG3+eGmguffjqtBW8UwC174C7eFKDGsT8NjPY
+s779c47l/7Gk1Q+DusXKwwUD0CDyE08HPzPwLxbZSuWWYge+VAUxy0bo2Ki8Yhfd
+tchtP5vc1simfy96Ue7wrxh21MfEAsFvrCE68R9wL5ka/oguYzruW0puWABoF40U
+Btd0ZxZLDN6bfrRzaZtS
+=fg33
+-----END PGP SIGNATURE-----
+
+--RNGrj7vazCqBHNw7--
