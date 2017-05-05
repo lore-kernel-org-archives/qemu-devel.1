@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d6acT-0001of-Ml
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:56 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d6aff-0004gX-Bl
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d6acS-0006ol-KJ
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:53 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35415)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d6acS-0006nD-BJ
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:52 -0400
-Received: by mail-wm0-x233.google.com with SMTP id w64so20094989wma.0
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 03:37:52 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  5 May 2017 11:38:22 +0100
-Message-Id: <20170505103822.20641-10-alex.bennee@linaro.org>
-In-Reply-To: <20170505103822.20641-1-alex.bennee@linaro.org>
-References: <20170505103822.20641-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v1 9/9]
- scripts/analyse-locks-simpletrace.py: script to analyse lock times
+	(envelope-from <kraxel@redhat.com>) id 1d6afc-00088O-DD
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d6afc-00087y-7G
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0DC9880C08
+	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 10:41:07 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri,  5 May 2017 12:40:55 +0200
+Message-Id: <20170505104101.30589-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/6] opengl: add headless ui, misc fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,134 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, boost.lists@gmail.com, pavel.dovgaluk@ispras.ru
-Cc: cota@braap.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This script allows analysis of mutex acquisition and hold times based
-on a trace file. Given a trace control file of:
+  Hi,
 
-  qemu_mutex_lock
-  qemu_mutex_locked
-  qemu_mutex_unlock
+This patch adds a headless opengl ui (see patch 6 for details) and fixes
+a bunch of issues along the way which I've trapped into while coding
+things up (patches 1-5).
 
-And running with:
+cheers,
+  Gerd
 
-  $QEMU $QEMU_ARGS -trace events=./lock-trace
+Gerd Hoffmann (6):
+  virtio-gpu: move virtio_gpu_gl_block
+  egl-helpers: drop support for gles and debug logging
+  egl-helpers: fix display init for x11
+  egl-helpers: add missing error check
+  egl: explicitly ask for core context
+  opengl: add egl-headless display
 
-You can analyse the results with:
+ include/hw/virtio/virtio-gpu.h |   1 +
+ include/ui/console.h           |   3 +
+ include/ui/egl-helpers.h       |   3 +-
+ hw/display/virtio-gpu-3d.c     |  16 +++++
+ hw/display/virtio-gpu.c        |  18 +----
+ ui/egl-context.c               |   7 +-
+ ui/egl-headless.c              | 158 +++++++++++++++++++++++++++++++++++++++++
+ ui/egl-helpers.c               |  88 +++++++++--------------
+ ui/gtk-egl.c                   |   2 +-
+ vl.c                           |  16 +++++
+ ui/Makefile.objs               |   1 +
+ 11 files changed, 239 insertions(+), 74 deletions(-)
+ create mode 100644 ui/egl-headless.c
 
-  ./scripts/analyse-locks-simpletrace.py trace-events-all ./trace-21812
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- scripts/analyse-locks-simpletrace.py | 99 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 99 insertions(+)
- create mode 100755 scripts/analyse-locks-simpletrace.py
-
-diff --git a/scripts/analyse-locks-simpletrace.py b/scripts/analyse-locks-simpletrace.py
-new file mode 100755
-index 0000000000..b72c951cd9
---- /dev/null
-+++ b/scripts/analyse-locks-simpletrace.py
-@@ -0,0 +1,99 @@
-+#!/usr/bin/env python
-+# -*- coding: utf-8 -*-
-+#
-+# Analyse lock events and
-+#
-+# Author: Alex Bennée <alex.bennee@linaro.org>
-+#
-+
-+import os
-+import simpletrace
-+import argparse
-+import numpy as np
-+
-+class MutexAnalyser(simpletrace.Analyzer):
-+    "A simpletrace Analyser for checking locks."
-+
-+    def __init__(self):
-+        self.locks = 0
-+        self.locked = 0
-+        self.unlocks = 0
-+        self.mutex_records = {}
-+
-+    def _get_mutex(self, mutex):
-+        if not mutex in self.mutex_records:
-+            self.mutex_records[mutex] = {"locks": 0,
-+                                         "lock_time": 0,
-+                                         "acquire_times": [],
-+                                         "locked": 0,
-+                                         "locked_time": 0,
-+                                         "held_times": [],
-+                                         "unlocked": 0}
-+
-+        return self.mutex_records[mutex]
-+
-+    def qemu_mutex_lock(self, timestamp, mutex, filename, line):
-+        self.locks += 1
-+        rec = self._get_mutex(mutex)
-+        rec["locks"] += 1
-+        rec["lock_time"] = timestamp[0]
-+        rec["lock_loc"] = (filename, line)
-+
-+    def qemu_mutex_locked(self, timestamp, mutex, filename, line):
-+        self.locked += 1
-+        rec = self._get_mutex(mutex)
-+        rec["locked"] += 1
-+        rec["locked_time"] = timestamp[0]
-+        acquire_time = rec["locked_time"] - rec["lock_time"]
-+        rec["locked_loc"] = (filename, line)
-+        rec["acquire_times"].append(acquire_time)
-+
-+    def qemu_mutex_unlock(self, timestamp, mutex, filename, line):
-+        self.unlocks += 1
-+        rec = self._get_mutex(mutex)
-+        rec["unlocked"] += 1
-+        held_time = timestamp[0] - rec["locked_time"]
-+        rec["held_times"].append(held_time)
-+        rec["unlock_loc"] = (filename, line)
-+
-+
-+def get_args():
-+    "Grab options"
-+    parser = argparse.ArgumentParser()
-+    parser.add_argument("--output", "-o", type=str, help="Render plot to file")
-+    parser.add_argument("events", type=str, help='trace file read from')
-+    parser.add_argument("tracefile", type=str, help='trace file read from')
-+    return parser.parse_args()
-+
-+if __name__ == '__main__':
-+    args = get_args()
-+
-+    # Gather data from the trace
-+    analyser = MutexAnalyser()
-+    simpletrace.process(args.events, args.tracefile, analyser)
-+
-+    print ("Total locks: %d, locked: %d, unlocked: %d" %
-+           (analyser.locks, analyser.locked, analyser.unlocks))
-+
-+    # Now dump the individual lock stats
-+    for key, val in sorted(analyser.mutex_records.iteritems(),
-+                           key=lambda (k,v): v["locks"]):
-+        print ("Lock: %#x locks: %d, locked: %d, unlocked: %d" %
-+               (key, val["locks"], val["locked"], val["unlocked"]))
-+
-+        acquire_times = np.array(val["acquire_times"])
-+        if len(acquire_times) > 0:
-+            print ("  Acquire Time: min:%d median:%d avg:%.2f max:%d" %
-+                   (acquire_times.min(), np.median(acquire_times),
-+                    acquire_times.mean(), acquire_times.max()))
-+
-+        held_times = np.array(val["held_times"])
-+        if len(held_times) > 0:
-+            print ("  Held Time: min:%d median:%d avg:%.2f max:%d" %
-+                   (held_times.min(), np.median(held_times),
-+                    held_times.mean(), held_times.max()))
-+
-+        # Check if any locks still held
-+        if val["locks"] > val["locked"]:
-+            print ("  LOCK HELD (%s:%s)" % (val["locked_loc"]))
-+            print ("  BLOCKED   (%s:%s)" % (val["lock_loc"]))
 -- 
-2.11.0
+2.9.3
