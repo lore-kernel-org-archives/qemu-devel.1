@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d6j7g-000052-CJ
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 15:42:41 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d6jPl-0005Gy-Ge
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d6j7f-0005Hp-7A
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 15:42:40 -0400
-References: <20170504030755.1001-1-eblake@redhat.com>
-	<20170504030755.1001-2-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1b59906d-4d5f-c5d7-57db-8752685df262@redhat.com>
-Date: Fri, 5 May 2017 21:42:30 +0200
+	(envelope-from <imammedo@redhat.com>) id 1d6jPk-0005i8-Ix
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:01:21 -0400
+Date: Fri, 5 May 2017 22:00:56 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170505220101.6342077d@Igors-MacBook-Pro.local>
+In-Reply-To: <20170505170415.GH3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-11-git-send-email-imammedo@redhat.com>
+	<20170503152022.GQ3482@thinpad.lan.raisama.net>
+	<20170505141648.35ba172f@nial.brq.redhat.com>
+	<20170505170415.GH3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <20170504030755.1001-2-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="n8HWtWB8XIcTbik2Ctb9uwoTi26UeRRiu"
-Subject: Re: [Qemu-devel] [PATCH v12 01/10] qcow2: Use consistent switch
- indentation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/24] numa: mirror cpu to node mapping
+ in MachineState::possible_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,213 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---n8HWtWB8XIcTbik2Ctb9uwoTi26UeRRiu
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <1b59906d-4d5f-c5d7-57db-8752685df262@redhat.com>
-Subject: Re: [PATCH v12 01/10] qcow2: Use consistent switch indentation
-References: <20170504030755.1001-1-eblake@redhat.com>
- <20170504030755.1001-2-eblake@redhat.com>
-In-Reply-To: <20170504030755.1001-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, 5 May 2017 14:04:15 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-On 04.05.2017 05:07, Eric Blake wrote:
-> Fix a couple of inconsistent indentations, before an upcoming
-> patch further tweaks the switch statements.  While at it, make
-> some tweaks for shorter lines to keep checkpatch happy (best
-> viewed with 'git diff -b').
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> ---
-> v12: new patch
-> ---
->  block/qcow2-cluster.c  | 32 ++++++++---------
->  block/qcow2-refcount.c | 96 ++++++++++++++++++++++++++----------------=
---------
->  2 files changed, 65 insertions(+), 63 deletions(-)
-
-[...]
-
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index 4efca7e..a5a0076 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -1117,70 +1117,72 @@ int qcow2_update_snapshot_refcount(BlockDriverS=
-tate *bs,
->                  goto fail;
->              }
->=20
-> -            for(j =3D 0; j < s->l2_size; j++) {
-> +            for (j =3D 0; j < s->l2_size; j++) {
->                  uint64_t cluster_index;
-> +                uint64_t offset_masked;
->=20
->                  offset =3D be64_to_cpu(l2_table[j]);
->                  old_offset =3D offset;
-> +                offset_masked =3D offset & L2E_OFFSET_MASK;
-
-I'd rather rename "offset" to "entry" (or "l2_entry") and name this just
-"offset". Much less confusing.
-
-Also, I really wouldn't mind splitting the non-indentation changes off
-into their own patch.
-
-Tentative
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
->                  offset &=3D ~QCOW_OFLAG_COPIED;
->=20
->                  switch (qcow2_get_cluster_type(offset)) {
-> -                    case QCOW2_CLUSTER_COMPRESSED:
-> -                        nb_csectors =3D ((offset >> s->csize_shift) &
-> -                                       s->csize_mask) + 1;
-> -                        if (addend !=3D 0) {
-> -                            ret =3D update_refcount(bs,
-> -                                (offset & s->cluster_offset_mask) & ~5=
-11,
-> -                                nb_csectors * 512, abs(addend), addend=
- < 0,
-> -                                QCOW2_DISCARD_SNAPSHOT);
-> -                            if (ret < 0) {
-> -                                goto fail;
-> -                            }
-> -                        }
-> -                        /* compressed clusters are never modified */
-> -                        refcount =3D 2;
-> -                        break;
-> -
-> -                    case QCOW2_CLUSTER_NORMAL:
-> -                    case QCOW2_CLUSTER_ZERO:
-> -                        if (offset_into_cluster(s, offset & L2E_OFFSET=
-_MASK)) {
-> -                            qcow2_signal_corruption(bs, true, -1, -1, =
-"Data "
-> -                                                    "cluster offset %#=
-llx "
-> -                                                    "unaligned (L2 off=
-set: %#"
-> -                                                    PRIx64 ", L2 index=
-: %#x)",
-> -                                                    offset & L2E_OFFSE=
-T_MASK,
-> -                                                    l2_offset, j);
-> -                            ret =3D -EIO;
-> +                case QCOW2_CLUSTER_COMPRESSED:
-> +                    nb_csectors =3D ((offset >> s->csize_shift) &
-> +                                   s->csize_mask) + 1;
-> +                    if (addend !=3D 0) {
-> +                        ret =3D update_refcount(bs,
-> +                            (offset & s->cluster_offset_mask) & ~511,
-> +                            nb_csectors * 512, abs(addend), addend < 0=
-,
-> +                            QCOW2_DISCARD_SNAPSHOT);
-> +                        if (ret < 0) {
->                              goto fail;
->                          }
-> +                    }
-> +                    /* compressed clusters are never modified */
-> +                    refcount =3D 2;
-> +                    break;
->=20
-> -                        cluster_index =3D (offset & L2E_OFFSET_MASK) >=
-> s->cluster_bits;
-> -                        if (!cluster_index) {
-> -                            /* unallocated */
-> -                            refcount =3D 0;
-> -                            break;
-> -                        }
-> -                        if (addend !=3D 0) {
-> -                            ret =3D qcow2_update_cluster_refcount(bs,
-> +                case QCOW2_CLUSTER_NORMAL:
-> +                case QCOW2_CLUSTER_ZERO:
-> +                    if (offset_into_cluster(s, offset_masked)) {
-> +                        qcow2_signal_corruption(bs, true, -1, -1, "Dat=
-a "
-> +                                                "cluster offset %#" PR=
-Ix64
-> +                                                " unaligned (L2 offset=
-: %#"
-> +                                                PRIx64 ", L2 index: %#=
-x)",
-> +                                                offset_masked,
-> +                                                l2_offset, j);
-> +                        ret =3D -EIO;
-> +                        goto fail;
-> +                    }
-> +
-> +                    cluster_index =3D offset_masked >> s->cluster_bits=
-;
-> +                    if (!cluster_index) {
-> +                        /* unallocated */
-> +                        refcount =3D 0;
-> +                        break;
-> +                    }
-> +                    if (addend !=3D 0) {
-> +                        ret =3D qcow2_update_cluster_refcount(bs,
->                                      cluster_index, abs(addend), addend=
- < 0,
->                                      QCOW2_DISCARD_SNAPSHOT);
-> -                            if (ret < 0) {
-> -                                goto fail;
-> -                            }
-> -                        }
-> -
-> -                        ret =3D qcow2_get_refcount(bs, cluster_index, =
-&refcount);
->                          if (ret < 0) {
->                              goto fail;
->                          }
-> -                        break;
-> +                    }
->=20
-> -                    case QCOW2_CLUSTER_UNALLOCATED:
-> -                        refcount =3D 0;
-> -                        break;
-> +                    ret =3D qcow2_get_refcount(bs, cluster_index, &ref=
-count);
-> +                    if (ret < 0) {
-> +                        goto fail;
-> +                    }
-> +                    break;
->=20
-> -                    default:
-> -                        abort();
-> +                case QCOW2_CLUSTER_UNALLOCATED:
-> +                    refcount =3D 0;
-> +                    break;
-> +
-> +                default:
-> +                    abort();
->                  }
->=20
->                  if (refcount =3D=3D 1) {
->=20
-
-
-
---n8HWtWB8XIcTbik2Ctb9uwoTi26UeRRiu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkM1aYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AoSEIAKgZYlb3xZ5YgcqVzJYW26In2Z4gfWoV
-YxSl9qJecZALXqbRYFy9Xzc8kXTsXk4aoQ6NgXDGUBZMkXnYMaVI9KZUOUyjTLAc
-pda8I6Sq4TxS6nuEjFATqRusm3nK+o0G5sV0Vs/JDJF8qmlqAHbyMFreB9kKNEE1
-+unEBQnrdd8KmYVxlOKVhIpmVZH+beB9b5lVbVVq3F/c+7oq+oNzgFUTvqSz0P2o
-wUVANr8CGd2h4EC2/lN2wGjCEe2RVQo21k4nh14DXVYOIcnV4JcK6eaGJfj34xnz
-H/V4gMUpXd/p/J8WKj2VCPtD0lzBomguJqOZDbDAcA/YRqOvY3KV68w=
-=3IFe
------END PGP SIGNATURE-----
-
---n8HWtWB8XIcTbik2Ctb9uwoTi26UeRRiu--
+> On Fri, May 05, 2017 at 02:16:48PM +0200, Igor Mammedov wrote:
+> > On Wed, 3 May 2017 12:20:22 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > 
+> > > On Wed, May 03, 2017 at 02:57:04PM +0200, Igor Mammedov wrote:
+> > > > Introduce machine_set_cpu_numa_node() helper that stores
+> > > > node mapping for CPU in MachineState::possible_cpus.
+> > > > CPU and node it belongs to is specified by 'props' argument.
+> > > > 
+> > > > Patch doesn't remove old way of storing mapping in
+> > > > numa_info[X].node_cpu as removing it at the same time
+> > > > makes patch rather big. Instead it just mirrors mapping
+> > > > in possible_cpus and follow up per target patches will
+> > > > switch to possible_cpus and numa_info[X].node_cpu will
+> > > > be removed once there isn't any users left.
+> > > > 
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > ---
+> > > >  include/hw/boards.h |  2 ++
+> > > >  hw/core/machine.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > > >  numa.c              |  8 +++++++
+> > > >  3 files changed, 78 insertions(+)
+> > > > 
+> > > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > > index 5d6af21..1f518a1 100644
+> > > > --- a/include/hw/boards.h
+> > > > +++ b/include/hw/boards.h
+> > > > @@ -42,6 +42,8 @@ bool machine_dump_guest_core(MachineState *machine);
+> > > >  bool machine_mem_merge(MachineState *machine);
+> > > >  void machine_register_compat_props(MachineState *machine);
+> > > >  HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
+> > > > +void machine_set_cpu_numa_node(MachineState *machine,
+> > > > +                               CpuInstanceProperties *props, Error **errp);
+> > > >  
+> > > >  /**
+> > > >   * CPUArchId:
+> > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > > index ada9eea..a63f17b 100644
+> > > > --- a/hw/core/machine.c
+> > > > +++ b/hw/core/machine.c
+> > > > @@ -388,6 +388,74 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
+> > > >      return head;
+> > > >  }
+> > > >  
+> > > > +void machine_set_cpu_numa_node(MachineState *machine,
+> > > > +                               CpuInstanceProperties *props, Error **errp)  
+> > > 
+> > > As the semantics of this function aren't trivial, it would be
+> > > nice to have a comment explaining what exactly this function do.
+> > > 
+> > > e.g.:
+> > > * make it clear that it could affect multiple CPU slots;
+> > > * make it clear what does it mean to have props->has_node_id=false as
+> > >   argument (is it really valid?);
+> > > * make it clear that it will refuse to change an existing mapping.
+> > Will be following comment sufficient?
+> > 
+> > +/**
+> > + * machine_set_cpu_numa_node:
+> > + * @machine: machine object to modify
+> > + * @props: specifies which cpu objects to assign to
+> > + *         numa node specified by @props.node_id
+> > + * @errp: if an error occurs, a pointer to an area to store the error
+> > + *
+> > + * Associate NUMA node specified by @props.node_id with cpu slots that
+> > + * match socket/core/thread-ids specified by @props. It's recommended to use
+> > + * query-hotpluggable-cpus.props values to specify affected cpu slots,
+> > + * which would lead to exact 1:1 mapping of cpu slots to NUMA node.
+> > + *
+> > + * However for CLI convenience it's possible to pass in subset of properties,
+> > + * which would affect all cpu slots that match it.
+> > + * Ex for pc machine:
+> > + *    -smp 4,cores=2,sockets=2 -numa node,nodeid=0 -numa node,nodeid=1 \
+> > + *    -numa cpu,node-id=0,socket_id=0 \
+> > + *    -numa cpu,node-id=1,socket_id=1
+> > + * will assign all child cores of socket 0 to node 0 and
+> > + * of socket 1 to node 1.
+> > + *
+> > + * Empty subset is disallowed and function will return with error in this case.
+> > + */
+> >  void machine_set_cpu_numa_node(MachineState *machine,
+> >                                 CpuInstanceProperties *props, Error **errp)
+> 
+> Sounds good to me.
+> 
+> While at it, we could make 'props' const, as it's not going to be
+> touched by the function.
+sure
