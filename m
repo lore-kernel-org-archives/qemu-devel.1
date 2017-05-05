@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6dlk-00011h-Kj
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:59:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d6dx7-0003CF-Qd
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6dlf-00043M-RV
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:59:40 -0400
-Date: Fri, 5 May 2017 14:59:31 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170505135931.GH11350@stefanha-x1.localdomain>
-References: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <dgilbert@redhat.com>) id 1d6dx3-0001LN-Pl
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:11:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d6dx3-0001LB-G4
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:11:21 -0400
+Date: Fri, 5 May 2017 15:11:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170505141113.GA3293@work-vm>
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170428065754eucas1p1f51713373ce8c2d19945a4f91c52bd5c@eucas1p1.samsung.com>
+	<1493362658-8179-5-git-send-email-a.perevalov@samsung.com>
+	<20170428093825.GA22801@pxdev.xzpeter.org>
+	<3a95fb33-f496-7e9d-50cb-6286d23dbdf6@samsung.com>
+	<20170428100700.GC22801@pxdev.xzpeter.org>
+	<20170428162205.GE3276@work-vm>
+	<20170429091634.GA6721@aperevalov-ubuntu>
+	<20170502085143.GA2072@work-vm>
+	<20170504130949.GA20340@aperevalov-ubuntu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="17/8oYur5Y32USnW"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Refactor DMG driver to have chunk
- size independence
+In-Reply-To: <20170504130949.GA20340@aperevalov-ubuntu>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 4/6] migration: add postcopy
+ downtime into MigrationIncommingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +36,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, famz@redhat.com, peter@lekensteyn.nl, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Alexey <a.perevalov@samsung.com>
+Cc: i.maximets@samsung.com, f4bug@amsat.org, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 
+* Alexey (a.perevalov@samsung.com) wrote:
+> On Tue, May 02, 2017 at 09:51:44AM +0100, Dr. David Alan Gilbert wrote:
+> > * Alexey (a.perevalov@samsung.com) wrote:
+> > > On Fri, Apr 28, 2017 at 05:22:05PM +0100, Dr. David Alan Gilbert wrote:
+> > > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > > On Fri, Apr 28, 2017 at 01:03:45PM +0300, Alexey Perevalov wrote:
+> > > > > 
+> > > > > [...]
+> > > > > 
+> > > > > > >>diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > > > > > >>index 21e7150..f3688f5 100644
+> > > > > > >>--- a/migration/postcopy-ram.c
+> > > > > > >>+++ b/migration/postcopy-ram.c
+> > > > > > >>@@ -132,6 +132,14 @@ static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+> > > > > > >>          return false;
+> > > > > > >>      }
+> > > > > > >>+#ifdef UFFD_FEATURE_THREAD_ID
+> > > > > > >>+    if (mis && UFFD_FEATURE_THREAD_ID & supported_features) {
+> > > > > > >>+        /* kernel supports that feature */
+> > > > > > >>+        mis->downtime_ctx = downtime_context_new();
+> > > > > > >>+        new_features |= UFFD_FEATURE_THREAD_ID;
+> > > > > > >So here I know why in patch 2 new_features == 0...
+> > > > > > >
+> > > > > > >If I were you, I would like the series be done in below 4 patches:
+> > > > > > >
+> > > > > > >1. update header
+> > > > > > >2. introduce THREAD_ID feature, and enable it conditionally
+> > > > > > >3. squash all the downtime thing (downtime context, calculation) in
+> > > > > > >    one patch here
+> > > > > > >4. introduce trace
+> > > > > > >
+> > > > > > >IMHO that's clearer and easier for review. But I'm okay with current
+> > > > > > >as well as long as the maintainers (Dave/Juan) won't disagree. :)
+> > > > > > In previous series, David asked me to split one patch into 2
+> > > > > > [Qemu-devel] [PATCH 3/6] migration: add UFFD_FEATURE_THREAD_ID feature
+> > > > > > support
+> > > > > > 
+> > > > > > >There seem to be two parts to this:
+> > > > > > >  a) Adding the mis parameter to ufd_version_check
+> > > > > > >  b) Asking for the feature
+> > > > > > 
+> > > > > > >Please split it into two patches.
+> > > > > > 
+> > > > > > So in current patch set, I also added re-factoring, which was missed before
+> > > > > > "migration: split ufd_version_check onto receive/request features part"
+> > > > > 
+> > > > > Sure. As long as Dave agrees, I'm okay with either way.
+> > > > 
+> > > > I'm OK with the split, it pretty much matches what I asked last time I think.
+> > > > 
+> > > > The question I still have is how is this memory-expensive feature turned
+> > > > on and off by the user?
+> > > > Also I think Peter had some ideas for simpler data structures, how did
+> > > > that play out?
+> > > Maybe introduce it as extension of MigrationParameter,
+> > > I mean { "execute": "migrate-set-parameters" , "arguments":
+> > > 	{ "calculate-postcopy-downtime": 1 } }
+> > 
+> > Use migrate-set-capabilities, they're effectively the same but just booleans.
+> 
+> For me it's not so clear, where to set that capability, on destination or on source
+> side. User sets postcopy ram capability on source side, probably on
+> source side user wants to set postcopy-downtime.
+> If I'm not wrong, neither capabilities nor parameters are transferring
+> from source to destination.
 
---17/8oYur5Y32USnW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Use a capability on the destination specifically for this; it's OK to set capabilities
+on the destination, and actually libvirt already sets some for us.
 
-On Thu, Apr 27, 2017 at 01:36:30PM +0530, Ashijeet Acharya wrote:
-> This series helps to provide chunk size independence for DMG driver to prevent
-> denial-of-service in cases where untrusted files are being accessed by the user.
+One question: Now we're using Peter's idea, so you don't have that big tree
+structure, what are the costs now - is it as big a problem as it was?
 
-The core of the chunk size dependence problem are these lines:
+> I wanted to pass in in MIG_CMD_POSTCOPY_ADVISE, but it holds only 2
+> uint64, and they are already occupied.
+> Like with RETURN PATH protocol, MIG couldn't be extended w/o breaking backward
+> compatibility. Length for cmd is transmitted, but compared with
+> predefined len from mig_cmd_args.
+> 
+> Maybe just increase QEMU_VM_FILE_VERSION in this case, it will be
+> possible to return downtime back to source by return path.
+> For supporting backward compatibility keep several versions of mig_cmd_args
+> per QEMU_VM_FILE_VERSION. 
 
-    s->compressed_chunk = qemu_try_blockalign(bs->file->bs,
-                                              ds.max_compressed_size + 1);
-    s->uncompressed_chunk = qemu_try_blockalign(bs->file->bs,
-                                                512 * ds.max_sectors_per_chunk);
+No, we'll only change file version on some massive improvement.
 
-The refactoring needs to eliminate these buffers because their size is
-controlled by the untrusted input file.
+Dave
 
-After applying your patches these lines remain unchanged and we still
-cannot use input files that have a 250 MB chunk size, for example.  So
-I'm not sure how this series is supposed to work.
-
-Here is the approach I would take:
-
-In order to achieve this dmg_read_chunk() needs to be scrapped.  It is
-designed to read a full chunk.  The new model does not read full chunks
-anymore.
-
-Uncompressed reads or zeroes should operate directly on qiov, not
-s->uncompressed_chunk.  This code will be dropped:
-
-    data = s->uncompressed_chunk + sector_offset_in_chunk * 512;
-    qemu_iovec_from_buf(qiov, i * 512, data, 512);
-
-Compressed reads still buffers.  I suggest the following buffers:
-
-1. compressed_buf - compressed data is read into this buffer from file
-2. uncompressed_buf - a place to discard decompressed data while
-                      simulating a seek operation
-
-Data is read from compressed chunks by reading a reasonable amount
-(64k?) into compressed_buf.  If the user wishes to read at an offset
-into this chunk then a loop decompresses data we are seeking over into
-uncompressed_buf (and refills compressed_buf if it becomes empty) until
-the desired offset is reached.  Then decompression can continue
-directly into the user's qiov and uncompressed_buf isn't used to
-decompress the data requested by the user.
-
-Sequential compressed reads can be optimized by keeping the compression
-state across read calls.  That means the zlib/bz2 state plus
-compressed_buf and the current offset.  That way we don't need to
-re-seek into the current compressed chunk to handle sequential reads.
-
---17/8oYur5Y32USnW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZDIVDAAoJEJykq7OBq3PIK8YIAJ0Tv4cCpwtKJxfCLX2rsDgh
-fMU/vvGmHBm3t7nkEcl0C+PBm057OLiyhsjgFfjcvGc+O85vem90FZ/tmHhbQURf
-P05voWBjQGzpQ+gmnwMguI8o19s72QkYBygnzZo/uroJyIN5zOrbvNudjb2r/9ps
-tJPidlwTr00/+S7/pU33gHaIiVjwvBshyRYT3GW2czPmm7W/8KNJ+gco8Sx6zaz9
-zOEvYM3yGvXS8rClvwskP06Qu8B43t7S9K23h/tHQ4sYkwIiinUQp4NgPbFjTzin
-TZPyj6F31k2WHrNOBiNbzk9LnOkcA5mOUJoQ8aIAzckg0P/tt9Jhe+fw9ZO7F9k=
-=FMwi
------END PGP SIGNATURE-----
-
---17/8oYur5Y32USnW--
+> 
+> > Dave
+> > 
+> > > 
+> > > > 
+> > > > Dave
+> > > > 
+> > > > 
+> > > > > -- 
+> > > > > Peter Xu
+> > > > --
+> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > > 
+> > > 
+> > > -- 
+> > > 
+> > > BR
+> > > Alexey
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+> -- 
+> 
+> BR
+> Alexey
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
