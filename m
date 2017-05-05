@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aFQ-0002Ua-9R
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFQ-0002Ul-HH
 	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aFM-0006ge-97
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFP-0006hw-K6
 	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60530)
+Received: from mx1.redhat.com ([209.132.183.28]:33112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFM-0006gL-0D
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:00 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFP-0006hh-D8
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:14:03 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  5 May 2017 12:13:32 +0200
-Message-Id: <20170505101337.4650-17-pbonzini@redhat.com>
+Date: Fri,  5 May 2017 12:13:35 +0200
+Message-Id: <20170505101337.4650-20-pbonzini@redhat.com>
 In-Reply-To: <20170505101337.4650-1-pbonzini@redhat.com>
 References: <20170505101337.4650-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 16/21] get_maintainer: Teach get_maintainer.pl
- about the new "R:" tag
+Subject: [Qemu-devel] [PULL 19/21] get_maintainer: add subsystem to reviewer
+ output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +29,87 @@ Cc: Joe Perches <joe@perches.com>
 
 From: Joe Perches <joe@perches.com>
 
-We can now designate reviewers in the MAINTAINERS file with the new
-"R:" tag, so this commit teaches get_maintainers.pl to add their
-email addresses.
+Reviewer output currently does not include the subsystem
+that matched.  Add it.
 
-Cherry picked from Linux commit c1c3f2c906e35bcb6e4cdf5b8e077660fead14fe,
-with fixes to avoid \C as in QEMU commit ba10f729f1 ("get_maintainer.pl:
-\C is deprecated", 2015-09-25).
+Miscellanea:
+
+o Add a get_subsystem_name routine to centralize this
+
+Cherry picked from Linux commit 2a7cb1dc82fc2a52e747b4c496c13f6575fb1790.
 
 Signed-off-by: Joe Perches <joe@perches.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/get_maintainer.pl | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ scripts/get_maintainer.pl | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
 
 diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
-index 8261bcb1ad..c1146ca194 100755
+index c7cb197a27..96e66a80a0 100755
 --- a/scripts/get_maintainer.pl
 +++ b/scripts/get_maintainer.pl
-@@ -21,6 +21,7 @@ my $lk_path = "./";
- my $email = 1;
- my $email_usename = 1;
- my $email_maintainer = 1;
-+my $email_reviewer = 1;
- my $email_list = 1;
- my $email_subscriber_list = 0;
- my $email_git = 0;
-@@ -180,6 +181,7 @@ if (!GetOptions(
- 		'remove-duplicates!' => \$email_remove_duplicates,
- 		'mailmap!' => \$email_use_mailmap,
- 		'm!' => \$email_maintainer,
-+		'r!' => \$email_reviewer,
- 		'n!' => \$email_usename,
- 		'l!' => \$email_list,
- 		's!' => \$email_subscriber_list,
-@@ -238,7 +240,8 @@ if ($sections) {
+@@ -896,20 +896,29 @@ sub find_ending_index {
+     return $index;
  }
  
- if ($email &&
--    ($email_maintainer + $email_list + $email_subscriber_list +
-+    ($email_maintainer + $email_reviewer +
-+     $email_list + $email_subscriber_list +
-      $email_git + $email_git_blame) == 0) {
-     die "$P: Please select at least 1 email option\n";
- }
-@@ -718,6 +721,7 @@ MAINTAINER field selection options:
-     --hg-since => hg history to use (default: $email_hg_since)
-     --interactive => display a menu (mostly useful if used with the --git option)
-     --m => include maintainer(s) if any
-+    --r => include reviewer(s) if any
-     --n => include name 'Full Name <addr\@domain.tld>'
-     --l => include list(s) if any
-     --s => include subscriber only list(s) if any
-@@ -1022,6 +1026,22 @@ sub add_categories {
- 		    my $role = get_maintainer_role($i);
- 		    push_email_addresses($pvalue, $role);
+-sub get_maintainer_role {
++sub get_subsystem_name {
+     my ($index) = @_;
+ 
+-    my $i;
+     my $start = find_starting_index($index);
+-    my $end = find_ending_index($index);
+ 
+-    my $role = "unknown";
+     my $subsystem = $typevalue[$start];
+     if (length($subsystem) > 20) {
+ 	$subsystem = substr($subsystem, 0, 17);
+ 	$subsystem =~ s/\s*$//;
+ 	$subsystem = $subsystem . "...";
+     }
++    return $subsystem;
++}
++
++sub get_maintainer_role {
++    my ($index) = @_;
++
++    my $i;
++    my $start = find_starting_index($index);
++    my $end = find_ending_index($index);
++
++    my $role = "unknown";
++    my $subsystem = get_subsystem_name($index);
+ 
+     for ($i = $start + 1; $i < $end; $i++) {
+ 	my $tv = $typevalue[$i];
+@@ -943,16 +952,7 @@ sub get_maintainer_role {
+ sub get_list_role {
+     my ($index) = @_;
+ 
+-    my $i;
+-    my $start = find_starting_index($index);
+-    my $end = find_ending_index($index);
+-
+-    my $subsystem = $typevalue[$start];
+-    if (length($subsystem) > 20) {
+-	$subsystem = substr($subsystem, 0, 17);
+-	$subsystem =~ s/\s*$//;
+-	$subsystem = $subsystem . "...";
+-    }
++    my $subsystem = get_subsystem_name($index);
+ 
+     if ($subsystem eq "THE REST") {
+ 	$subsystem = "";
+@@ -1040,7 +1040,8 @@ sub add_categories {
+ 		    }
  		}
-+	    } elsif ($ptype eq "R") {
-+		my ($name, $address) = parse_email($pvalue);
-+		if ($name eq "") {
-+		    if ($i > 0) {
-+			my $tv = $typevalue[$i - 1];
-+			if ($tv =~ m/^(.):\s*(.*)/) {
-+			    if ($1 eq "P") {
-+				$name = $2;
-+				$pvalue = format_email($name, $address, $email_usename);
-+			    }
-+			}
-+		    }
-+		}
-+		if ($email_reviewer) {
-+		    push_email_addresses($pvalue, 'reviewer');
-+		}
+ 		if ($email_reviewer) {
+-		    push_email_addresses($pvalue, 'reviewer');
++		    my $subsystem = get_subsystem_name($i);
++		    push_email_addresses($pvalue, "reviewer:$subsystem");
+ 		}
  	    } elsif ($ptype eq "T") {
  		push(@scm, $pvalue);
- 	    } elsif ($ptype eq "W") {
 -- 
 2.12.2
