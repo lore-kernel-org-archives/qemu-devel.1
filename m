@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6dMi-00086a-Hp
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:33:50 -0400
+	(envelope-from <philippevoinov@gmail.com>) id 1d6dSy-000282-JK
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:40:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6dMa-0007zo-7E
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:33:44 -0400
-Date: Fri, 5 May 2017 14:33:36 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170505133336.GG11350@stefanha-x1.localdomain>
-References: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
-	<1493280397-9622-4-git-send-email-ashijeetacharya@gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="z9ECzHErBrwFF8sy"
-Content-Disposition: inline
-In-Reply-To: <1493280397-9622-4-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] dmg: Refactor and prepare
- dmg_read_chunk() to cache random access points
+	(envelope-from <philippevoinov@gmail.com>) id 1d6dSv-0003TC-GI
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:40:16 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33991)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippevoinov@gmail.com>)
+	id 1d6dSv-0003Sj-6d
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 09:40:13 -0400
+Received: by mail-wm0-x242.google.com with SMTP id z129so1436570wmb.1
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 06:40:13 -0700 (PDT)
+From: Philippe Voinov <philippevoinov@gmail.com>
+Date: Fri,  5 May 2017 15:39:52 +0200
+Message-Id: <20170505133952.29885-1-philippevoinov@gmail.com>
+Subject: [Qemu-devel] [PATCH] ui: Support non-zero minimum values for
+ absolute input axes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,288 +25,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, famz@redhat.com, peter@lekensteyn.nl, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Philippe Voinov <philippevoinov@gmail.com>
 
+This patch refactors ui/input.c to support absolute axis
+minimum values other than 0. All dependent calls to qemu_input_queue_abs
+have been updated to explicitly supply 0 as the axis minimum value.
 
---z9ECzHErBrwFF8sy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Philippe Voinov <philippevoinov@gmail.com>
+---
+ hw/input/virtio-input-hid.c |  6 ++++--
+ include/ui/input.h          | 11 +++++++----
+ ui/cocoa.m                  |  4 ++--
+ ui/gtk.c                    |  4 ++--
+ ui/input.c                  | 31 ++++++++++++++++++++++---------
+ ui/sdl.c                    |  4 ++--
+ ui/sdl2.c                   |  4 ++--
+ ui/spice-input.c            |  4 ++--
+ ui/vnc.c                    |  4 ++--
+ 9 files changed, 45 insertions(+), 27 deletions(-)
 
-On Thu, Apr 27, 2017 at 01:36:33PM +0530, Ashijeet Acharya wrote:
-> Refactor dmg_read_chunk() to start making use of the new DMGReadState
-> structure and do chunk and sector related calculations based on it.
-> Add a new argument "DMGReadState *drs" to it.
->=20
-> Also, rename DMG_SECTORCOUNTS_MAX to DMG_SECTOR_MAX to avoid indentaion
-> problems at some places inside dmg_read_chunk()
->=20
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> ---
->  block/dmg.c | 159 +++++++++++++++++++++++++++++++++++-------------------=
-------
->  1 file changed, 94 insertions(+), 65 deletions(-)
-
-This patch makes dmg_read_chunk() reread the chunk even if it has
-already been read into s->uncompressed_chunk.  This is inefficient.  If
-this is necessary for some reason then the commit description should
-include a justification.
-
-> diff --git a/block/dmg.c b/block/dmg.c
-> index c6fe8b0..32623e2 100644
-> --- a/block/dmg.c
-> +++ b/block/dmg.c
-> @@ -38,7 +38,7 @@ enum {
->       * or truncating when converting to 32-bit types
->       */
->      DMG_LENGTHS_MAX =3D 64 * 1024 * 1024, /* 64 MB */
-> -    DMG_SECTORCOUNTS_MAX =3D DMG_LENGTHS_MAX / 512,
-> +    DMG_SECTOR_MAX =3D DMG_LENGTHS_MAX / 512,
->  };
-> =20
->  static int dmg_probe(const uint8_t *buf, int buf_size, const char *filen=
-ame)
-> @@ -260,10 +260,10 @@ static int dmg_read_mish_block(BDRVDMGState *s, Dmg=
-HeaderState *ds,
-> =20
->          /* all-zeroes sector (type 2) does not need to be "uncompressed"=
- and can
->           * therefore be unbounded. */
-> -        if (s->types[i] !=3D 2 && s->sectorcounts[i] > DMG_SECTORCOUNTS_=
-MAX) {
-> +        if (s->types[i] !=3D 2 && s->sectorcounts[i] > DMG_SECTOR_MAX) {
->              error_report("sector count %" PRIu64 " for chunk %" PRIu32
->                           " is larger than max (%u)",
-> -                         s->sectorcounts[i], i, DMG_SECTORCOUNTS_MAX);
-> +                         s->sectorcounts[i], i, DMG_SECTOR_MAX);
->              ret =3D -EINVAL;
->              goto fail;
->          }
-> @@ -578,78 +578,106 @@ static inline uint32_t search_chunk(BDRVDMGState *=
-s, uint64_t sector_num)
->      return s->n_chunks; /* error */
->  }
-> =20
-> -static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_n=
-um)
-> +static inline int dmg_read_chunk(BlockDriverState *bs, uint64_t sector_n=
-um,
-> +                                 DMGReadState *drs)
->  {
->      BDRVDMGState *s =3D bs->opaque;
-> =20
-> +    int ret;
-> +    uint32_t sector_offset;
-> +    uint64_t sectors_read;
-> +    uint32_t chunk;
-> +
->      if (!is_sector_in_chunk(s, s->current_chunk, sector_num)) {
-> -        int ret;
-> -        uint32_t chunk =3D search_chunk(s, sector_num);
-> +        chunk =3D search_chunk(s, sector_num);
-> +    } else {
-> +        chunk =3D drs->saved_chunk_type;
-
-chunk is an index into s->sectors[] and s->sectorcounts[].  It is not a
-chunk type, so drs->saved_chunk_type is an odd name for this new field.
-
-But now this makes me wonder - how is s->current_chunk different from
-drs->saved_chunk_type?
-
-> +    }
-> =20
-> -        if (chunk >=3D s->n_chunks) {
-> +    if (chunk >=3D s->n_chunks) {
-> +            return -1;
-> +    }
-> +
-> +    /* reset our access point cache if we had a change in current chunk =
-*/
-> +    if (chunk !=3D drs->saved_chunk_type) {
-> +        cache_access_point(drs, NULL, -1, -1, -1, -1);
-> +    }
-> +
-
-The results of the computation from here...
-
-> +    sector_offset =3D sector_num - s->sectors[chunk];
-> +
-> +    if ((s->sectorcounts[chunk] - sector_offset) > DMG_SECTOR_MAX) {
-> +        sectors_read =3D DMG_SECTOR_MAX;
-> +    } else {
-> +        sectors_read =3D s->sectorcounts[chunk] - sector_offset;
-> +    }
-> +
-> +    /* truncate sectors read if it exceeds the 2MB buffer of qemu-img
-> +     * convert */
-> +    if ((sector_num % DMG_SECTOR_MAX) + sectors_read > DMG_SECTOR_MAX) {
-> +        sectors_read =3D DMG_SECTOR_MAX - (sector_num % DMG_SECTOR_MAX);
-> +    }
-
-=2E..to here are never used.  Please remove the unused code and variables
-=66rom this patch.  It may be necessary to add them back in a later patch
-(I haven't looked ahead), but each patch must be self-contained and make
-sense without foreknowledge of future patches.
-
-> +
-> +    s->current_chunk =3D s->n_chunks;
-> +
-> +    switch (s->types[chunk]) { /* block entry type */
-> +    case 0x80000005: { /* zlib compressed */
-> +        /* we need to buffer, because only the chunk as whole can be
-> +         * inflated. */
-> +        ret =3D bdrv_pread(bs->file, s->offsets[chunk],
-> +                         s->compressed_chunk, s->lengths[chunk]);
-> +        if (ret !=3D s->lengths[chunk]) {
->              return -1;
->          }
-> =20
-> -        s->current_chunk =3D s->n_chunks;
-> -        switch (s->types[chunk]) { /* block entry type */
-> -        case 0x80000005: { /* zlib compressed */
-> -            /* we need to buffer, because only the chunk as whole can be
-> -             * inflated. */
-> -            ret =3D bdrv_pread(bs->file, s->offsets[chunk],
-> -                             s->compressed_chunk, s->lengths[chunk]);
-> -            if (ret !=3D s->lengths[chunk]) {
-> -                return -1;
-> -            }
-> -
-> -            s->zstream.next_in =3D s->compressed_chunk;
-> -            s->zstream.avail_in =3D s->lengths[chunk];
-> -            s->zstream.next_out =3D s->uncompressed_chunk;
-> -            s->zstream.avail_out =3D 512 * s->sectorcounts[chunk];
-> -            ret =3D inflateReset(&s->zstream);
-> -            if (ret !=3D Z_OK) {
-> -                return -1;
-> -            }
-> -            ret =3D inflate(&s->zstream, Z_FINISH);
-> -            if (ret !=3D Z_STREAM_END ||
-> -                s->zstream.total_out !=3D 512 * s->sectorcounts[chunk]) {
-> -                return -1;
-> -            }
-> -            break; }
-> -        case 0x80000006: /* bzip2 compressed */
-> -            if (!dmg_uncompress_bz2) {
-> -                break;
-> -            }
-> -            /* we need to buffer, because only the chunk as whole can be
-> -             * inflated. */
-> -            ret =3D bdrv_pread(bs->file, s->offsets[chunk],
-> -                             s->compressed_chunk, s->lengths[chunk]);
-> -            if (ret !=3D s->lengths[chunk]) {
-> -                return -1;
-> -            }
-> -
-> -            ret =3D dmg_uncompress_bz2((char *)s->compressed_chunk,
-> -                                     (unsigned int) s->lengths[chunk],
-> -                                     (char *)s->uncompressed_chunk,
-> -                                     (unsigned int)
-> -                                         (512 * s->sectorcounts[chunk]));
-> -            if (ret < 0) {
-> -                return ret;
-> -            }
-> -            break;
-> -        case 1: /* copy */
-> -            ret =3D bdrv_pread(bs->file, s->offsets[chunk],
-> -                             s->uncompressed_chunk, s->lengths[chunk]);
-> -            if (ret !=3D s->lengths[chunk]) {
-> -                return -1;
-> -            }
-> -            break;
-> -        case 2: /* zero */
-> -            /* see dmg_read, it is treated specially. No buffer needs to=
- be
-> -             * pre-filled, the zeroes can be set directly. */
-> +        s->zstream.next_in =3D s->compressed_chunk;
-> +        s->zstream.avail_in =3D s->lengths[chunk];
-> +        s->zstream.next_out =3D s->uncompressed_chunk;
-> +        s->zstream.avail_out =3D 512 * s->sectorcounts[chunk];
-> +        ret =3D inflateReset(&s->zstream);
-> +        if (ret !=3D Z_OK) {
-> +            return -1;
-> +        }
-> +        ret =3D inflate(&s->zstream, Z_FINISH);
-> +        if (ret !=3D Z_STREAM_END ||
-> +            s->zstream.total_out !=3D 512 * s->sectorcounts[chunk]) {
-> +            return -1;
-> +        }
-> +        break; }
-> +    case 0x80000006: /* bzip2 compressed */
-> +        if (!dmg_uncompress_bz2) {
->              break;
->          }
-> -        s->current_chunk =3D chunk;
-> +        /* we need to buffer, because only the chunk as whole can be
-> +         * inflated. */
-> +        ret =3D bdrv_pread(bs->file, s->offsets[chunk],
-> +                         s->compressed_chunk, s->lengths[chunk]);
-> +        if (ret !=3D s->lengths[chunk]) {
-> +            return -1;
-> +        }
-> +
-> +        ret =3D dmg_uncompress_bz2((char *)s->compressed_chunk,
-> +                                 (unsigned int) s->lengths[chunk],
-> +                                 (char *)s->uncompressed_chunk,
-> +                                 (unsigned int)
-> +                                    (512 * s->sectorcounts[chunk]));
-> +        if (ret < 0) {
-> +            return ret;
-> +        }
-> +        break;
-> +    case 1: /* copy */
-> +        ret =3D bdrv_pread(bs->file, s->offsets[chunk],
-> +                         s->uncompressed_chunk, s->lengths[chunk]);
-> +        if (ret !=3D s->lengths[chunk]) {
-> +            return -1;
-> +        }
-> +        break;
-> +    case 2: /* zero */
-> +        /* see dmg_read, it is treated specially. No buffer needs to be
-> +         * pre-filled, the zeroes can be set directly. */
-> +        break;
->      }
-> +    s->current_chunk =3D chunk;
-> +
->      return 0;
->  }
-> =20
-> @@ -661,6 +689,7 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset, =
-uint64_t bytes,
->      uint64_t sector_num =3D offset >> BDRV_SECTOR_BITS;
->      int nb_sectors =3D bytes >> BDRV_SECTOR_BITS;
->      int ret, i;
-> +    DMGReadState *drs =3D s->drs;
-> =20
->      assert((offset & (BDRV_SECTOR_SIZE - 1)) =3D=3D 0);
->      assert((bytes & (BDRV_SECTOR_SIZE - 1)) =3D=3D 0);
-> @@ -671,7 +700,7 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset, =
-uint64_t bytes,
->          uint32_t sector_offset_in_chunk;
->          void *data;
-> =20
-> -        if (dmg_read_chunk(bs, sector_num + i) !=3D 0) {
-> +        if (dmg_read_chunk(bs, sector_num + i, drs) !=3D 0) {
->              ret =3D -EIO;
->              goto fail;
->          }
-> --=20
-> 2.6.2
->=20
-
---z9ECzHErBrwFF8sy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZDH8wAAoJEJykq7OBq3PIYFkIAL3MtexSYdFe4jfkFQBY/kRZ
-nGzpcXDYSz9Kwqko0YLc6mvKO4/qQPTXPxrmc3wHytKreYA1NRB9NXzpyKb2g6cA
-IB+C5xfn5sGC9I5KVT2eBjLFkrs8p7S/sSABF6qe8a7CTc+uuIOs6rTeMrZdekGS
-ukiWFElh33omfCSsE5v9S0s3ABcpZ8zah1TEefvzK+1aIFVniJCAXimVPtul1OFy
-2eWPv9y2IciA74QasJF4hz0DzAVSlm0619UefOt13nJ+3lyct9W+GTIKUIESLrlU
-DEN8Ga1FeOg43PBxsDJ0mUUPmWumZDqjKTzG49bnaTmP6wICsGpAIyhYPskqEwM=
-=2Gu/
------END PGP SIGNATURE-----
-
---z9ECzHErBrwFF8sy--
+diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
+index 3ee0c18..46c0381 100644
+--- a/hw/input/virtio-input-hid.c
++++ b/hw/input/virtio-input-hid.c
+@@ -484,12 +484,14 @@ static struct virtio_input_config virtio_tablet_config[] = {
+         .select    = VIRTIO_INPUT_CFG_ABS_INFO,
+         .subsel    = ABS_X,
+         .size      = sizeof(virtio_input_absinfo),
+-        .u.abs.max = const_le32(INPUT_EVENT_ABS_SIZE - 1),
++        .u.abs.min = const_le32(INPUT_EVENT_ABS_MIN),
++        .u.abs.max = const_le32(INPUT_EVENT_ABS_MAX),
+     },{
+         .select    = VIRTIO_INPUT_CFG_ABS_INFO,
+         .subsel    = ABS_Y,
+         .size      = sizeof(virtio_input_absinfo),
+-        .u.abs.max = const_le32(INPUT_EVENT_ABS_SIZE - 1),
++        .u.abs.min = const_le32(INPUT_EVENT_ABS_MIN),
++        .u.abs.max = const_le32(INPUT_EVENT_ABS_MAX),
+     },
+     { /* end of list */ },
+ };
+diff --git a/include/ui/input.h b/include/ui/input.h
+index d06a12d..3cfd0f3 100644
+--- a/include/ui/input.h
++++ b/include/ui/input.h
+@@ -8,7 +8,8 @@
+ #define INPUT_EVENT_MASK_REL   (1<<INPUT_EVENT_KIND_REL)
+ #define INPUT_EVENT_MASK_ABS   (1<<INPUT_EVENT_KIND_ABS)
+ 
+-#define INPUT_EVENT_ABS_SIZE   0x8000
++#define INPUT_EVENT_ABS_MIN    0x0000
++#define INPUT_EVENT_ABS_MAX    0x7FFF
+ 
+ typedef struct QemuInputHandler QemuInputHandler;
+ typedef struct QemuInputHandlerState QemuInputHandlerState;
+@@ -54,12 +55,14 @@ void qemu_input_update_buttons(QemuConsole *src, uint32_t *button_map,
+                                uint32_t button_old, uint32_t button_new);
+ 
+ bool qemu_input_is_absolute(void);
+-int qemu_input_scale_axis(int value, int size_in, int size_out);
++int qemu_input_scale_axis(int value,
++                          int min_in, int max_in,
++                          int min_out, int max_out);
+ InputEvent *qemu_input_event_new_move(InputEventKind kind,
+                                       InputAxis axis, int value);
+ void qemu_input_queue_rel(QemuConsole *src, InputAxis axis, int value);
+-void qemu_input_queue_abs(QemuConsole *src, InputAxis axis,
+-                          int value, int size);
++void qemu_input_queue_abs(QemuConsole *src, InputAxis axis, int value,
++                          int min_in, int max_in);
+ 
+ void qemu_input_check_mode_change(void);
+ void qemu_add_mouse_mode_change_notifier(Notifier *notify);
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 207555e..3a9bc4d 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -749,8 +749,8 @@ QemuCocoaView *cocoaView;
+                  * clicks in the titlebar.
+                  */
+                 if ([self screenContainsPoint:p]) {
+-                    qemu_input_queue_abs(dcl->con, INPUT_AXIS_X, p.x, screen.width);
+-                    qemu_input_queue_abs(dcl->con, INPUT_AXIS_Y, screen.height - p.y, screen.height);
++                    qemu_input_queue_abs(dcl->con, INPUT_AXIS_X, p.x, 0, screen.width);
++                    qemu_input_queue_abs(dcl->con, INPUT_AXIS_Y, screen.height - p.y, 0, screen.height);
+                 }
+             } else {
+                 qemu_input_queue_rel(dcl->con, INPUT_AXIS_X, (int)[event deltaX]);
+diff --git a/ui/gtk.c b/ui/gtk.c
+index a86848f..0798d97 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -912,9 +912,9 @@ static gboolean gd_motion_event(GtkWidget *widget, GdkEventMotion *motion,
+             return TRUE;
+         }
+         qemu_input_queue_abs(vc->gfx.dcl.con, INPUT_AXIS_X, x,
+-                             surface_width(vc->gfx.ds));
++                             0, surface_width(vc->gfx.ds));
+         qemu_input_queue_abs(vc->gfx.dcl.con, INPUT_AXIS_Y, y,
+-                             surface_height(vc->gfx.ds));
++                             0, surface_height(vc->gfx.ds));
+         qemu_input_event_sync();
+     } else if (s->last_set && s->ptr_owner == vc) {
+         qemu_input_queue_rel(vc->gfx.dcl.con, INPUT_AXIS_X, x - s->last_x);
+diff --git a/ui/input.c b/ui/input.c
+index ed88cda..25e6e31 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -164,6 +164,11 @@ void qmp_input_send_event(bool has_device, const char *device,
+     qemu_input_event_sync();
+ }
+ 
++static int qemu_input_transform_invert_abs_value(int value)
++{
++  return (int64_t)INPUT_EVENT_ABS_MAX - value + INPUT_EVENT_ABS_MIN;
++}
++
+ static void qemu_input_transform_abs_rotate(InputEvent *evt)
+ {
+     InputMoveEvent *move = evt->u.abs.data;
+@@ -173,16 +178,16 @@ static void qemu_input_transform_abs_rotate(InputEvent *evt)
+             move->axis = INPUT_AXIS_Y;
+         } else if (move->axis == INPUT_AXIS_Y) {
+             move->axis = INPUT_AXIS_X;
+-            move->value = INPUT_EVENT_ABS_SIZE - 1 - move->value;
++            move->value = qemu_input_transform_invert_abs_value(move->value);
+         }
+         break;
+     case 180:
+-        move->value = INPUT_EVENT_ABS_SIZE - 1 - move->value;
++        move->value = qemu_input_transform_invert_abs_value(move->value);
+         break;
+     case 270:
+         if (move->axis == INPUT_AXIS_X) {
+             move->axis = INPUT_AXIS_Y;
+-            move->value = INPUT_EVENT_ABS_SIZE - 1 - move->value;
++            move->value = qemu_input_transform_invert_abs_value(move->value);
+         } else if (move->axis == INPUT_AXIS_Y) {
+             move->axis = INPUT_AXIS_X;
+         }
+@@ -455,12 +460,17 @@ bool qemu_input_is_absolute(void)
+     return (s != NULL) && (s->handler->mask & INPUT_EVENT_MASK_ABS);
+ }
+ 
+-int qemu_input_scale_axis(int value, int size_in, int size_out)
++int qemu_input_scale_axis(int value,
++                          int min_in, int max_in,
++                          int min_out, int max_out)
+ {
+-    if (size_in < 2) {
+-        return size_out / 2;
++    int64_t range_in = (int64_t)max_in - min_in;
++    int64_t range_out = (int64_t)max_out - min_out;
++
++    if (range_in < 1) {
++        return min_out + range_out / 2;
+     }
+-    return (int64_t)value * (size_out - 1) / (size_in - 1);
++    return ((int64_t)value - min_in) * range_out / range_in + min_out;
+ }
+ 
+ InputEvent *qemu_input_event_new_move(InputEventKind kind,
+@@ -484,10 +494,13 @@ void qemu_input_queue_rel(QemuConsole *src, InputAxis axis, int value)
+     qapi_free_InputEvent(evt);
+ }
+ 
+-void qemu_input_queue_abs(QemuConsole *src, InputAxis axis, int value, int size)
++void qemu_input_queue_abs(QemuConsole *src, InputAxis axis, int value,
++                          int min_in, int max_in)
+ {
+     InputEvent *evt;
+-    int scaled = qemu_input_scale_axis(value, size, INPUT_EVENT_ABS_SIZE);
++    int scaled = qemu_input_scale_axis(value, min_in, max_in,
++                                       INPUT_EVENT_ABS_MIN,
++                                       INPUT_EVENT_ABS_MAX);
+     evt = qemu_input_event_new_move(INPUT_EVENT_KIND_ABS, axis, scaled);
+     qemu_input_event_send(src, evt);
+     qapi_free_InputEvent(evt);
+diff --git a/ui/sdl.c b/ui/sdl.c
+index 37c21a0..b35a678 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -490,9 +490,9 @@ static void sdl_send_mouse_event(int dx, int dy, int x, int y, int state)
+ 
+     if (qemu_input_is_absolute()) {
+         qemu_input_queue_abs(dcl->con, INPUT_AXIS_X, x,
+-                             real_screen->w);
++                             0, real_screen->w);
+         qemu_input_queue_abs(dcl->con, INPUT_AXIS_Y, y,
+-                             real_screen->h);
++                             0, real_screen->h);
+     } else {
+         if (guest_cursor) {
+             x -= guest_x;
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index faf9bdf..21de052 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -298,8 +298,8 @@ static void sdl_send_mouse_event(struct sdl2_console *scon, int dx, int dy,
+                 }
+             }
+         }
+-        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, off_x + x, max_w);
+-        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, off_y + y, max_h);
++        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, off_x + x, 0, max_w);
++        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, off_y + y, 0, max_h);
+     } else {
+         if (guest_cursor) {
+             x -= guest_x;
+diff --git a/ui/spice-input.c b/ui/spice-input.c
+index 8eeebdb..86293dd 100644
+--- a/ui/spice-input.c
++++ b/ui/spice-input.c
+@@ -172,8 +172,8 @@ static void tablet_position(SpiceTabletInstance* sin, int x, int y,
+     QemuSpicePointer *pointer = container_of(sin, QemuSpicePointer, tablet);
+ 
+     spice_update_buttons(pointer, 0, buttons_state);
+-    qemu_input_queue_abs(NULL, INPUT_AXIS_X, x, pointer->width);
+-    qemu_input_queue_abs(NULL, INPUT_AXIS_Y, y, pointer->height);
++    qemu_input_queue_abs(NULL, INPUT_AXIS_X, x, 0, pointer->width);
++    qemu_input_queue_abs(NULL, INPUT_AXIS_Y, y, 0, pointer->height);
+     qemu_input_event_sync();
+ }
+ 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 349cfc9..60d358f 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1556,8 +1556,8 @@ static void pointer_event(VncState *vs, int button_mask, int x, int y)
+     }
+ 
+     if (vs->absolute) {
+-        qemu_input_queue_abs(con, INPUT_AXIS_X, x, width);
+-        qemu_input_queue_abs(con, INPUT_AXIS_Y, y, height);
++        qemu_input_queue_abs(con, INPUT_AXIS_X, x, 0, width);
++        qemu_input_queue_abs(con, INPUT_AXIS_Y, y, 0, height);
+     } else if (vnc_has_feature(vs, VNC_FEATURE_POINTER_TYPE_CHANGE)) {
+         qemu_input_queue_rel(con, INPUT_AXIS_X, x - 0x7FFF);
+         qemu_input_queue_rel(con, INPUT_AXIS_Y, y - 0x7FFF);
+-- 
+2.12.2
