@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d6UUd-0007tW-BS
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:05:24 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d6UcL-0001E2-8W
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:13:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d6UUa-00024B-7E
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:05:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36288)
+	(envelope-from <jasowang@redhat.com>) id 1d6UcG-0005VS-LT
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:13:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d6UUZ-00022s-UO
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:05:20 -0400
-References: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d6UcG-0005Uw-Bn
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:13:16 -0400
+References: <1493264805-15398-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <5ec930ef-82e1-85ee-71bd-2d3f1b554a68@redhat.com>
-Date: Fri, 5 May 2017 12:05:06 +0800
+Message-ID: <f9e9e40a-1eab-b0be-2139-4f3483034bda@redhat.com>
+Date: Fri, 5 May 2017 12:13:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <286AC319A985734F985F78AFA26841F7391EF490@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <1493264805-15398-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Vhost-pci RFC2.0
+Subject: Re: [Qemu-devel] [PATCH] COLO-compare: Improve tcp compare trace
+ event readability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Wei W" <wei.w.wang@intel.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
 
 
-On 2017=E5=B9=B404=E6=9C=8819=E6=97=A5 14:38, Wang, Wei W wrote:
-> Hi,
-> We made some design changes to the original vhost-pci design, and want=20
-> to open
-> a discussion about the latest design (labelled 2.0) and its extension=20
-> (2.1).
-> 2.0 design: One VM shares the entire memory of another VM
-> 2.1 design: One VM uses an intermediate memory shared with another VM f=
-or
->                      packet transmission.
-> For the convenience of discussion, I have some pictures presented at=20
-> this link:
-> _https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost-p=
-ci-rfc2.0.pdf_
+On 2017=E5=B9=B404=E6=9C=8827=E6=97=A5 11:46, Zhang Chen wrote:
+> Because of previous patch's trace arguments over the limit
+> of UST backend, so I rewrite the patch.
+>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>   net/colo-compare.c | 33 ++++++++++++++++++++++-----------
+>   net/trace-events   |  3 +--
+>   2 files changed, 23 insertions(+), 13 deletions(-)
+>
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 4ab80b1..2639c7f 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -265,17 +265,28 @@ static int colo_packet_compare_tcp(Packet *spkt, =
+Packet *ppkt)
+>       }
+>  =20
+>       if (res !=3D 0 && trace_event_get_state(TRACE_COLO_COMPARE_MISCOM=
+PARE)) {
+> -        trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
+> -                                        ntohl(stcp->th_seq),
+> -                                        ntohl(stcp->th_ack),
+> -                                        res, stcp->th_flags,
+> -                                        spkt->size);
+> -
+> -        trace_colo_compare_pkt_info_dst(inet_ntoa(ppkt->ip->ip_dst),
+> -                                        ntohl(ptcp->th_seq),
+> -                                        ntohl(ptcp->th_ack),
+> -                                        res, ptcp->th_flags,
+> -                                        ppkt->size);
+> +        char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_ds=
+t[20];
+> +
+> +        strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
+> +        strcpy(pri_ip_dst, inet_ntoa(ppkt->ip->ip_dst));
+> +        strcpy(sec_ip_src, inet_ntoa(spkt->ip->ip_src));
+> +        strcpy(sec_ip_dst, inet_ntoa(spkt->ip->ip_dst));
+> +
+> +        trace_colo_compare_ip_info(ppkt->size, pri_ip_src,
+> +                                   pri_ip_dst, spkt->size,
+> +                                   sec_ip_src, sec_ip_dst);
+> +
+> +        trace_colo_compare_tcp_info("pri tcp packet",
+> +                                    ntohl(ptcp->th_seq),
+> +                                    ntohl(ptcp->th_ack),
+> +                                    res, ptcp->th_flags,
+> +                                    ppkt->size);
+> +
+> +        trace_colo_compare_tcp_info("sec tcp packet",
+> +                                    ntohl(stcp->th_seq),
+> +                                    ntohl(stcp->th_ack),
+> +                                    res, stcp->th_flags,
+> +                                    spkt->size);
+>  =20
+>           qemu_hexdump((char *)ppkt->data, stderr,
+>                        "colo-compare ppkt", ppkt->size);
+> diff --git a/net/trace-events b/net/trace-events
+> index 35198bc..247e5c0 100644
+> --- a/net/trace-events
+> +++ b/net/trace-events
+> @@ -13,8 +13,7 @@ colo_compare_icmp_miscompare(const char *sta, int siz=
+e) ": %s =3D %d"
+>   colo_compare_ip_info(int psize, const char *sta, const char *stb, int=
+ ssize, const char *stc, const char *std) "ppkt size =3D %d, ip_src =3D %=
+s, ip_dst =3D %s, spkt size =3D %d, ip_src =3D %s, ip_dst =3D %s"
+>   colo_old_packet_check_found(int64_t old_time) "%" PRId64
+>   colo_compare_miscompare(void) ""
+> -colo_compare_pkt_info_src(const char *src, uint32_t sseq, uint32_t sac=
+k, int res, uint32_t sflag, int ssize) "src/dst: %s s: seq/ack=3D%u/%u re=
+s=3D%d flags=3D%x spkt_size: %d\n"
+> -colo_compare_pkt_info_dst(const char *dst, uint32_t dseq, uint32_t dac=
+k, int res, uint32_t dflag, int dsize) "src/dst: %s d: seq/ack=3D%u/%u re=
+s=3D%d flags=3D%x dpkt_size: %d\n"
+> +colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int=
+ res, uint32_t flag, int size) "side: %s seq/ack=3D %u/%u res=3D %d flags=
+=3D %x pkt_size: %d\n"
+>  =20
+>   # net/filter-rewriter.c
+>   colo_filter_rewriter_debug(void) ""
 
-Hi, is there any doc or pointer that describes the the design in detail?=20
-E.g patch 4 in v1=20
-https://lists.gnu.org/archive/html/qemu-devel/2016-05/msg05163.html.
-
-Thanks
-
-> Fig. 1 shows the common driver frame that we want use to build the 2.0=20
-> and 2.1
-> design. A TX/RX engine consists of a local ring and an exotic ring.
-> Local ring:
-> 1) allocated by the driver itself;
-> 2) registered with the device (i.e. virtio_add_queue())
-> Exotic ring:
-> 1) ring memory comes from the outside (of the driver), and exposed to=20
-> the driver
->      via a BAR MMIO;
-> 2) does not have a registration in the device, so no ioeventfd/irqfd,=20
-> configuration
-> registers allocated in the device
-> Fig. 2 shows how the driver frame is used to build the 2.0 design.
-> 1) Asymmetric: vhost-pci-net <-> virtio-net
-> 2) VM1 shares the entire memory of VM2, and the exotic rings are the ri=
-ngs
->     from VM2.
-> 3) Performance (in terms of copies between VMs):
->     TX: 0-copy (packets are put to VM2=E2=80=99s RX ring directly)
->     RX: 1-copy (the green arrow line in the VM1=E2=80=99s RX engine)
-> Fig. 3 shows how the driver frame is used to build the 2.1 design.
-> 1) Symmetric: vhost-pci-net <-> vhost-pci-net
-> 2) Share an intermediate memory, allocated by VM1=E2=80=99s vhost-pci d=
-evice,
-> for data exchange, and the exotic rings are built on the shared memory
-> 3) Performance:
->     TX: 1-copy
-> RX: 1-copy
-> Fig. 4 shows the inter-VM notification path for 2.0 (2.1 is similar).
-> The four eventfds are allocated by virtio-net, and shared with=20
-> vhost-pci-net:
-> Uses virtio-net=E2=80=99s TX/RX kickfd as the vhost-pci-net=E2=80=99s R=
-X/TX callfd
-> Uses virtio-net=E2=80=99s TX/RX callfd as the vhost-pci-net=E2=80=99s R=
-X/TX kickfd
-> Example of how it works:
-> After packets are put into vhost-pci-net=E2=80=99s TX, the driver kicks=
- TX, which
-> causes the an interrupt associated with fd3 to be injected to virtio-ne=
-t
-> The draft code of the 2.0 design is ready, and can be found here:
-> Qemu: _https://github.com/wei-w-wang/vhost-pci-device_
-> Guest driver: _https://github.com/wei-w-wang/vhost-pci-driver_
-> We tested the 2.0 implementation using the Spirent packet
-> generator to transmit 64B packets, the results show that the
-> throughput of vhost-pci reaches around 1.8Mpps, which is around
-> two times larger than the legacy OVS+DPDK.
-
-Does this mean OVS+DPDK can only have ~0.9Mpps? A little bit surprise=20
-that the number looks rather low (I can get similar result if I use=20
-kernel bridge).
-
-Thanks
-
-> Also, vhost-pci shows
-> better scalability than OVS+DPDK.
-> Best,
-> Wei
+Applied, thanks.
