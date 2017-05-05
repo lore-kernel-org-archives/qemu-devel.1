@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d6Sxr-0005zr-4G
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:27:28 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d6T0V-0006sW-Fe
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:30:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d6Sxo-00082q-0i
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:27:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47106)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d6Sxn-00082K-Qe
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:27:23 -0400
-References: <286AC319A985734F985F78AFA26841F7391FDD30@shsmsx102.ccr.corp.intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <056500d7-6a91-12e5-be1d-2b2beebd0430@redhat.com>
-Date: Fri, 5 May 2017 10:27:13 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1d6T0U-0000v7-F8
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:30:11 -0400
+Date: Fri, 5 May 2017 11:45:22 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170505014522.GK14413@umbus.fritz.box>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-13-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <286AC319A985734F985F78AFA26841F7391FDD30@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] virtio-net: configurable TX queue size
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="kswDJesP0akhmDn8"
+Content-Disposition: inline
+In-Reply-To: <1493816238-33120-13-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 12/24] numa: add numa_[has_]node_id()
+ wrappers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Wei W" <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Jan Scheurich <jan.scheurich@ericsson.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
 
+--kswDJesP0akhmDn8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B405=E6=9C=8804=E6=97=A5 18:58, Wang, Wei W wrote:
-> Hi,
->
-> I want to re-open the discussion left long time ago:
-> https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg06194.html
-> , and discuss the possibility of changing the hardcoded (256) TX  queue
-> size to be configurable between 256 and 1024.
+On Wed, May 03, 2017 at 02:57:06PM +0200, Igor Mammedov wrote:
+> wrappers should make access to [has]node_id fields more readable
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Yes, I think we probably need this.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
->
-> The reason to propose this request is that a severe issue of packet dro=
-ps in
-> TX direction was observed with the existing hardcoded 256 queue size,
-> which causes performance issues for packet drop sensitive guest
-> applications that cannot use indirect descriptor tables. The issue goes=
- away
-> with 1K queue size.
+Correct, though I'm not sure it actually simplifies things that much.
+Maybe more in future patches, though.
 
-Do we need even more, what if we find 1K is even not sufficient in the=20
-future? Modern nics has size up to ~8192.
+> ---
+>  follow up patches will use this wrappers
+>  v2:
+>     - add wrappers (Drew)
+> ---
+>  include/sysemu/numa.h | 10 ++++++++++
+>  numa.c                |  2 +-
+>  2 files changed, 11 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 46ea6c7..98d01e6 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -35,4 +35,14 @@ uint32_t numa_get_node(ram_addr_t addr, Error **errp);
+>  /* on success returns node index in numa_info,
+>   * on failure returns nb_numa_nodes */
+>  int numa_get_node_for_cpu(int idx);
+> +
+> +static inline bool numa_has_node_id(const CPUArchIdList *possible_cpus, =
+int idx)
+> +{
+> +    return possible_cpus->cpus[idx].props.has_node_id;
+> +}
+> +
+> +static inline int numa_node_id(const CPUArchIdList *possible_cpus, int i=
+dx)
+> +{
+> +    return possible_cpus->cpus[idx].props.node_id;
+> +}
+>  #endif
+> diff --git a/numa.c b/numa.c
+> index c7e3e0a..872ee0d 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -394,7 +394,7 @@ void parse_numa_opts(MachineState *ms)
+> =20
+>          possible_cpus =3D mc->possible_cpu_arch_ids(ms);
+>          for (i =3D 0; i < possible_cpus->len; i++) {
+> -            if (possible_cpus->cpus[i].props.has_node_id) {
+> +            if (numa_has_node_id(possible_cpus, i)) {
+>                  break;
+>              }
+>          }
 
->
-> The concern mentioned in the previous discussion (please check the link
-> above) is that the number of chained descriptors would exceed
-> UIO_MAXIOV (1024) supported by the Linux.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-We could try to address this limitation but probably need a new feature=20
-bit to allow more than UIO_MAXIOV sgs.
+--kswDJesP0akhmDn8
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
->  From the code,  I think the number of the chained descriptors is limit=
-ed to
-> MAX_SKB_FRAGS + 2 (~18), which is much less than UIO_MAXIOV.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-This is the limitation of #page frags for skb, not the iov limitation.
+iQIcBAEBCAAGBQJZC9kuAAoJEGw4ysog2bOSmSsP/0ccdmR65sMDQswO18tGBQUu
+H9UJQJImV0UkmeTrbeN7JRzqKIOmqQ1dkunRzeS2R7M6vdyZZFZPbjMhNocOTmmh
+hOg/yBM3rPPtUnOHkQ68zhQlVS0nrwZSpExoyFt9UWed8i0thQZSVxAw1OP0Ya5v
+lI8GuP5s051cn1a2VzjpPJJFEgKxVBsEYXPhpU0Qc0Ql6mupLoF0hTp6v6jSjbDi
+Np4G/znuzO3Ze4vhRBhzlfwgcOZdCHM8laXUNWo/TpzZlIO9lB0XPe3WLGgD3UQB
+FcikNtGRFK6zQ65MosCL9Y1cdnxHzOwJRedzlDZm8zvsfs6pTB5GXeLiGetln7Gz
+bNe1ddFtzrbUICgrqduBhMud9shhROqfFakzNO9oQDqk4RcLwDuFIGPL1nMHIGGn
+rjJdqjqjhnt0RLmx5viwqRxP82Jxr0tC6q9KScVc4w/QGNVBtkLAM9arf/cgGER+
++DnMOytU2Sjia1C2nrc/iRPzy7CPUS3540EZvEWaQ9HfAKQKJ4tVO+eHNF1oA4e0
+yZ3p1FCCctkao0GiJr+aZCw/gitVwMXCw/aUHM15mwKMgUzyqTLHYxTCjKuu5u4B
+tBUDkKdvXxZvG6fsj4VE0x4GRL8vEYkBxRG3+VWKJHuudwkl54JMCa+RBFarSQLj
+CCuYREyAVcBX/F+j7yVL
+=e8CJ
+-----END PGP SIGNATURE-----
 
-Thanks
-
-> Please point out if I missed anything. Thanks.
->
-> Best,
-> Wei
->
->
+--kswDJesP0akhmDn8--
