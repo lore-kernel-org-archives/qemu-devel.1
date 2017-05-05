@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d6YDe-0000M0-QW
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:04:07 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d6YE4-0000aG-7D
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d6YDZ-00006G-UA
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:04:06 -0400
-From: jemmy858585@gmail.com
-Date: Fri,  5 May 2017 16:03:49 +0800
-Message-Id: <1493971429-10441-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v4] migration/block: move bdrv_is_allocated()
- into bb's AioContext
+	(envelope-from <imammedo@redhat.com>) id 1d6YE2-0000WX-Ss
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:04:32 -0400
+Date: Fri, 5 May 2017 10:04:19 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170505100419.5b545502@nial.brq.redhat.com>
+In-Reply-To: <20170504164952.GH14413@umbus.fritz.box>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-7-git-send-email-imammedo@redhat.com>
+	<20170503144644.GM3482@thinpad.lan.raisama.net>
+	<20170503181217.1757e128@nial.brq.redhat.com>
+	<20170504164952.GH14413@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 06/24] spapr: add node-id property to
+ sPAPR core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,92 +27,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, Lidong Chen <lidongchen@tencent.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-From: Lidong Chen <lidongchen@tencent.com>
+On Fri, 5 May 2017 02:49:52 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-when block migration with high-speed, mig_save_device_bulk hold the
-BQL and invoke bdrv_is_allocated frequently. This patch moves
-bdrv_is_allocated() into bb's AioContext. It will execute without
-blocking other I/O activity.
+> On Wed, May 03, 2017 at 06:12:17PM +0200, Igor Mammedov wrote:
+> > On Wed, 3 May 2017 11:46:44 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >   
+> > > On Wed, May 03, 2017 at 02:57:00PM +0200, Igor Mammedov wrote:  
+> > > > it will allow switching from cpu_index to core based numa
+> > > > mapping in follow up patches.
+> > > > 
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>    
+> > > 
+> > > Have you considered adding this to TYPE_CPU instead of
+> > > duplicating the same code on multiple architectures/boards?  
+> > it was in TYPE_CPU at RFC time, but it adds public node-id
+> > property to every CPU.
+> > So I've rewrote it they way it would affect only necessary CPUs,
+> > 
+> > it might be possible to generalize node_id sanity checks at
+> > pre_plug time into a common wrapper, I can do it on top so
+> > it would be visible what it's generalized (or an extra patch on
+> > respin)  
+> 
+> Note that the spapr cpu core type here is *not* a descendent of
+> TYPE_CPU (the threads under it are).
+yep, what I was saying is that numa checks in pre_plug callbacks
+are very similar and it might be possible to replaces them with
+common function.
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
-     v4 changelog:
-          Use the prototype code written by Stefan and fix some bug.
-          moves bdrv_is_allocated() into bb's AioContext.
----
- migration/block.c | 48 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 39 insertions(+), 9 deletions(-)
-
-diff --git a/migration/block.c b/migration/block.c
-index 060087f..c871361 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -263,6 +263,30 @@ static void blk_mig_read_cb(void *opaque, int ret)
-     blk_mig_unlock();
- }
- 
-+typedef struct {
-+    int64_t *total_sectors;
-+    int64_t *cur_sector;
-+    BlockBackend *bb;
-+    QemuEvent event;
-+} MigNextAllocatedClusterData;
-+
-+static void coroutine_fn mig_next_allocated_cluster(void *opaque)
-+{
-+    MigNextAllocatedClusterData *data = opaque;
-+    int nr_sectors;
-+
-+    /* Skip unallocated sectors; intentionally treats failure as
-+     * an allocated sector */
-+    while (*data->cur_sector < *data->total_sectors &&
-+           !bdrv_is_allocated(blk_bs(data->bb), *data->cur_sector,
-+                              MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
-+        *data->cur_sector += nr_sectors;
-+    }
-+
-+    bdrv_dec_in_flight(blk_bs(data->bb));
-+    qemu_event_set(&data->event);
-+}
-+
- /* Called with no lock taken.  */
- 
- static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
-@@ -274,17 +298,23 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
-     int nr_sectors;
- 
-     if (bmds->shared_base) {
-+        AioContext *bb_ctx;
-+        Coroutine *co;
-+        MigNextAllocatedClusterData data = {
-+            .cur_sector = &cur_sector,
-+            .total_sectors = &total_sectors,
-+            .bb = bb,
-+        };
-+        qemu_event_init(&data.event, false);
-+
-         qemu_mutex_lock_iothread();
--        aio_context_acquire(blk_get_aio_context(bb));
--        /* Skip unallocated sectors; intentionally treats failure as
--         * an allocated sector */
--        while (cur_sector < total_sectors &&
--               !bdrv_is_allocated(blk_bs(bb), cur_sector,
--                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
--            cur_sector += nr_sectors;
--        }
--        aio_context_release(blk_get_aio_context(bb));
-+        bdrv_inc_in_flight(blk_bs(bb));
-+        bb_ctx = blk_get_aio_context(bb);
-+        co = qemu_coroutine_create(mig_next_allocated_cluster, &data);
-+        aio_co_schedule(bb_ctx, co);
-         qemu_mutex_unlock_iothread();
-+
-+        qemu_event_wait(&data.event);
-     }
- 
-     if (cur_sector >= total_sectors) {
--- 
-1.8.3.1
+> >   
+> > >   
+> > > > ---
+> > > >  include/hw/ppc/spapr_cpu_core.h |  1 +
+> > > >  include/qom/cpu.h               |  2 ++
+> > > >  hw/ppc/spapr.c                  | 17 +++++++++++++++++
+> > > >  hw/ppc/spapr_cpu_core.c         | 11 ++++++++---
+> > > >  4 files changed, 28 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+> > > > index 3c35665..93051e9 100644
+> > > > --- a/include/hw/ppc/spapr_cpu_core.h
+> > > > +++ b/include/hw/ppc/spapr_cpu_core.h
+> > > > @@ -27,6 +27,7 @@ typedef struct sPAPRCPUCore {
+> > > >  
+> > > >      /*< public >*/
+> > > >      void *threads;
+> > > > +    int node_id;
+> > > >  } sPAPRCPUCore;
+> > > >  
+> > > >  typedef struct sPAPRCPUCoreClass {
+> > > > diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> > > > index 5d10359..55214ce 100644
+> > > > --- a/include/qom/cpu.h
+> > > > +++ b/include/qom/cpu.h
+> > > > @@ -258,6 +258,8 @@ typedef void (*run_on_cpu_func)(CPUState *cpu, run_on_cpu_data data);
+> > > >  
+> > > >  struct qemu_work_item;
+> > > >  
+> > > > +#define CPU_UNSET_NUMA_NODE_ID -1
+> > > > +
+> > > >  /**
+> > > >   * CPUState:
+> > > >   * @cpu_index: CPU index (informative).
+> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > > index 33405a0..7f58ee4 100644
+> > > > --- a/hw/ppc/spapr.c
+> > > > +++ b/hw/ppc/spapr.c
+> > > > @@ -2824,9 +2824,11 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> > > >      MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+> > > >      Error *local_err = NULL;
+> > > >      CPUCore *cc = CPU_CORE(dev);
+> > > > +    sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
+> > > >      char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
+> > > >      const char *type = object_get_typename(OBJECT(dev));
+> > > >      CPUArchId *core_slot;
+> > > > +    int node_id;
+> > > >      int index;
+> > > >  
+> > > >      if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
+> > > > @@ -2861,6 +2863,21 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> > > >          goto out;
+> > > >      }
+> > > >  
+> > > > +    node_id = numa_get_node_for_cpu(cc->core_id);
+> > > > +    if (node_id == nb_numa_nodes) {
+> > > > +        /* by default CPUState::numa_node was 0 if it's not set via CLI
+> > > > +         * keep it this way for now but in future we probably should
+> > > > +         * refuse to start up with incomplete numa mapping */
+> > > > +        node_id = 0;
+> > > > +    }
+> > > > +    if (sc->node_id == CPU_UNSET_NUMA_NODE_ID) {
+> > > > +        sc->node_id = node_id;
+> > > > +    } else if (sc->node_id != node_id) {
+> > > > +        error_setg(&local_err, "node-id %d must match numa node specified"
+> > > > +            "with -numa option for cpu-index %d", sc->node_id, cc->core_id);
+> > > > +        goto out;
+> > > > +    }
+> > > > +
+> > > >  out:
+> > > >      g_free(base_core_type);
+> > > >      error_propagate(errp, local_err);
+> > > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > > > index 4389ef4..9de7a56 100644
+> > > > --- a/hw/ppc/spapr_cpu_core.c
+> > > > +++ b/hw/ppc/spapr_cpu_core.c
+> > > > @@ -176,7 +176,6 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+> > > >      const char *typename = object_class_get_name(scc->cpu_class);
+> > > >      size_t size = object_type_get_instance_size(typename);
+> > > >      Error *local_err = NULL;
+> > > > -    int core_node_id = numa_get_node_for_cpu(cc->core_id);;
+> > > >      void *obj;
+> > > >      int i, j;
+> > > >  
+> > > > @@ -194,10 +193,10 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+> > > >  
+> > > >          /* Set NUMA node for the added CPUs  */
+> > > >          node_id = numa_get_node_for_cpu(cs->cpu_index);
+> > > > -        if (node_id != core_node_id) {
+> > > > +        if (node_id != sc->node_id) {
+> > > >              error_setg(&local_err, "Invalid node-id=%d of thread[cpu-index: %d]"
+> > > >                  " on CPU[core-id: %d, node-id: %d], node-id must be the same",
+> > > > -                 node_id, cs->cpu_index, cc->core_id, core_node_id);
+> > > > +                 node_id, cs->cpu_index, cc->core_id, sc->node_id);
+> > > >              goto err;
+> > > >          }
+> > > >          if (node_id < nb_numa_nodes) {
+> > > > @@ -263,6 +262,11 @@ static const char *spapr_core_models[] = {
+> > > >      "POWER9_v1.0",
+> > > >  };
+> > > >  
+> > > > +static Property spapr_cpu_core_properties[] = {
+> > > > +    DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
+> > > > +    DEFINE_PROP_END_OF_LIST()
+> > > > +};
+> > > > +
+> > > >  void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+> > > >  {
+> > > >      DeviceClass *dc = DEVICE_CLASS(oc);
+> > > > @@ -270,6 +274,7 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+> > > >  
+> > > >      dc->realize = spapr_cpu_core_realize;
+> > > >      dc->unrealize = spapr_cpu_core_unrealizefn;
+> > > > +    dc->props = spapr_cpu_core_properties;
+> > > >      scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
+> > > >      g_assert(scc->cpu_class);
+> > > >  }  
+> > >   
+> >   
+> 
