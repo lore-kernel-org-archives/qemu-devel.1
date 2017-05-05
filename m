@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d6T0V-0006sW-Fe
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:30:12 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d6TWp-0002iS-E4
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 23:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d6T0U-0000v7-F8
-	for qemu-devel@nongnu.org; Thu, 04 May 2017 22:30:11 -0400
-Date: Fri, 5 May 2017 11:45:22 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170505014522.GK14413@umbus.fritz.box>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-13-git-send-email-imammedo@redhat.com>
+	(envelope-from <jasowang@redhat.com>) id 1d6TWl-0007cK-E3
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 23:03:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45598)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d6TWl-0007aM-4f
+	for qemu-devel@nongnu.org; Thu, 04 May 2017 23:03:31 -0400
+References: <1492674416-9408-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1492674416-9408-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<df05a73b-fba8-a6d3-bf6a-648304458257@redhat.com>
+	<58FD9546.5000104@huawei.com>
+	<82c50df3-28c9-fb21-f2c6-76a99f864bee@redhat.com>
+	<58FF1DF7.4000006@huawei.com>
+	<bfac018b-55cf-9cf8-5ffe-ff0d1fbd4b53@redhat.com>
+	<590A971B.1070900@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <6af63243-5e20-8a43-9ba1-fce37323bf78@redhat.com>
+Date: Fri, 5 May 2017 11:03:23 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="kswDJesP0akhmDn8"
-Content-Disposition: inline
-In-Reply-To: <1493816238-33120-13-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 12/24] numa: add numa_[has_]node_id()
- wrappers
+In-Reply-To: <590A971B.1070900@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: serialize compare
+ thread's initialization with main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +34,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com
+Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com
 
 
---kswDJesP0akhmDn8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 03, 2017 at 02:57:06PM +0200, Igor Mammedov wrote:
-> wrappers should make access to [has]node_id fields more readable
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On 2017=E5=B9=B405=E6=9C=8804=E6=97=A5 10:51, Hailiang Zhang wrote:
+> Hi Jason,
+>
+> On 2017/4/25 19:33, Jason Wang wrote:
+>>
+>> On 2017=E5=B9=B404=E6=9C=8825=E6=97=A5 17:59, Hailiang Zhang wrote:
+>>> On 2017/4/25 16:41, Jason Wang wrote:
+>>>> On 2017=E5=B9=B404=E6=9C=8824=E6=97=A5 14:03, Hailiang Zhang wrote:
+>>>>> On 2017/4/24 12:10, Jason Wang wrote:
+>>>>>> On 2017=E5=B9=B404=E6=9C=8820=E6=97=A5 15:46, zhanghailiang wrote:
+>>>>>>> We call qemu_chr_fe_set_handlers() in colo-compare thread, it is=20
+>>>>>>> used
+>>>>>>> to detach watched fd from default main context, so it has chance =
+to
+>>>>>>> handle the same watched fd with main thread concurrently, which=20
+>>>>>>> will
+>>>>>>> trigger an error report:
+>>>>>>> "qemu-char.c:918: io_watch_poll_finalize: Assertion `iwp->src =3D=
+=3D
+>>>>>>> ((void *)0)' failed."
+>>>>>> Anyway to prevent fd from being handled by main thread before=20
+>>>>>> creating
+>>>>>> colo thread? Using semaphore seems not elegant.
+>>>>> So how about calling qemu_mutex_lock_iothread() before
+>>>>> qemu_chr_fe_set_handlers() ?
+>>>> Looks better, but I needs more information e.g how main thread can
+>>>> touch it?
+>>> Hmm, this happened quite occasionally, and we didn't catch the first
+>>> place (backtrace)
+>>> of removing fd from been watched, but  from the codes logic, we found
+>>> there should
+>>> be such possible cases:
+>>> tcp_chr_write (Or tcp_chr_read/tcp_chr_sync_read/chr_disconnect)
+>>>   ->tcp_chr_disconnect (Or char_socket_finalize)
+>>>      ->tcp_chr_free_connection
+>>>        -> remove_fd_in_watch(chr);
+>>>
+>>> Anyway, it needs the protection from been freed twice.
+>>>
+>>> Thanks,
+>>> Hailiang
+>> Still a little bit confused. The question is how could main thread sti=
+ll
+>> call tcp_chr_write or other in the above case?
+>
+> Finally, we reproduced this bug (We use qemu 2.6), and got the follow=20
+> backtrace of this problem:
+>
+> (gdb) thread apply all bt
+>
+> Thread 7 (Thread 0x7f407a1ff700 (LWP 23144)):
+> #0  0x00007f41037e0db5 in _int_malloc () from /usr/lib64/libc.so.6
+> #1  0x00007f41037e3b96 in calloc () from /usr/lib64/libc.so.6
+> #2  0x00007f41041ad4d7 in g_malloc0 () from /usr/lib64/libglib-2.0.so.0
+> #3  0x00007f41041a5437 in g_source_new () from=20
+> /usr/lib64/libglib-2.0.so.0
+> #4  0x00007f410a2cec9c in qio_channel_create_fd_watch=20
+> (ioc=3Dioc@entry=3D0x7f410d6238c0, fd=3D20, condition=3Dcondition@entry=
+=3D
+>     (G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL)) at=20
+> io/channel-watch.c:259
+> #5  0x00007f410a2ced01 in qio_channel_create_socket_watch=20
+> (ioc=3Dioc@entry=3D0x7f410d6238c0, socket=3D<optimized out>,
+>     condition=3Dcondition@entry=3D(G_IO_IN | G_IO_ERR | G_IO_HUP |=20
+> G_IO_NVAL)) at io/channel-watch.c:311
+> #6  0x00007f410a2cbea7 in qio_channel_socket_create_watch=20
+> (ioc=3D0x7f410d6238c0, condition=3D(G_IO_IN | G_IO_ERR | G_IO_HUP |=20
+> G_IO_NVAL))
+>     at io/channel-socket.c:732
+> #7  0x00007f410a2c94d2 in qio_channel_create_watch=20
+> (ioc=3D0x7f410d6238c0, condition=3Dcondition@entry=3D
+>     (G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL)) at io/channel.c:132
+> #8  0x00007f410a003cd6 in io_watch_poll_prepare=20
+> (source=3D0x7f4070000d00, timeout_=3D<optimized out>) at qemu-char.c:88=
+3
+> #9  0x00007f41041a72ed in g_main_context_prepare () from=20
+> /usr/lib64/libglib-2.0.so.0
+> #10 0x00007f41041a7b7b in g_main_context_iterate.isra.24 () from=20
+> /usr/lib64/libglib-2.0.so.0
+> #11 0x00007f41041a7fba in g_main_loop_run () from=20
+> /usr/lib64/libglib-2.0.so.0
+> #12 0x00007f410a1e528f in colo_compare_thread (opaque=3D0x7f410d7d6800)=
+=20
+> at net/colo-compare.c:651
+> #13 0x00007f4103b2bdc5 in start_thread () from /usr/lib64/libpthread.so=
+.0
+> #14 0x00007f410385971d in clone () from /usr/lib64/libc.so.6=20
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+It looks like we use main context which is wrong, maybe you can track=20
+io_add_watch_poll() and its caller get the reason.
 
-Correct, though I'm not sure it actually simplifies things that much.
-Maybe more in future patches, though.
-
-> ---
->  follow up patches will use this wrappers
->  v2:
->     - add wrappers (Drew)
-> ---
->  include/sysemu/numa.h | 10 ++++++++++
->  numa.c                |  2 +-
->  2 files changed, 11 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index 46ea6c7..98d01e6 100644
-> --- a/include/sysemu/numa.h
-> +++ b/include/sysemu/numa.h
-> @@ -35,4 +35,14 @@ uint32_t numa_get_node(ram_addr_t addr, Error **errp);
->  /* on success returns node index in numa_info,
->   * on failure returns nb_numa_nodes */
->  int numa_get_node_for_cpu(int idx);
-> +
-> +static inline bool numa_has_node_id(const CPUArchIdList *possible_cpus, =
-int idx)
-> +{
-> +    return possible_cpus->cpus[idx].props.has_node_id;
-> +}
-> +
-> +static inline int numa_node_id(const CPUArchIdList *possible_cpus, int i=
-dx)
-> +{
-> +    return possible_cpus->cpus[idx].props.node_id;
-> +}
->  #endif
-> diff --git a/numa.c b/numa.c
-> index c7e3e0a..872ee0d 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -394,7 +394,7 @@ void parse_numa_opts(MachineState *ms)
-> =20
->          possible_cpus =3D mc->possible_cpu_arch_ids(ms);
->          for (i =3D 0; i < possible_cpus->len; i++) {
-> -            if (possible_cpus->cpus[i].props.has_node_id) {
-> +            if (numa_has_node_id(possible_cpus, i)) {
->                  break;
->              }
->          }
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---kswDJesP0akhmDn8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZC9kuAAoJEGw4ysog2bOSmSsP/0ccdmR65sMDQswO18tGBQUu
-H9UJQJImV0UkmeTrbeN7JRzqKIOmqQ1dkunRzeS2R7M6vdyZZFZPbjMhNocOTmmh
-hOg/yBM3rPPtUnOHkQ68zhQlVS0nrwZSpExoyFt9UWed8i0thQZSVxAw1OP0Ya5v
-lI8GuP5s051cn1a2VzjpPJJFEgKxVBsEYXPhpU0Qc0Ql6mupLoF0hTp6v6jSjbDi
-Np4G/znuzO3Ze4vhRBhzlfwgcOZdCHM8laXUNWo/TpzZlIO9lB0XPe3WLGgD3UQB
-FcikNtGRFK6zQ65MosCL9Y1cdnxHzOwJRedzlDZm8zvsfs6pTB5GXeLiGetln7Gz
-bNe1ddFtzrbUICgrqduBhMud9shhROqfFakzNO9oQDqk4RcLwDuFIGPL1nMHIGGn
-rjJdqjqjhnt0RLmx5viwqRxP82Jxr0tC6q9KScVc4w/QGNVBtkLAM9arf/cgGER+
-+DnMOytU2Sjia1C2nrc/iRPzy7CPUS3540EZvEWaQ9HfAKQKJ4tVO+eHNF1oA4e0
-yZ3p1FCCctkao0GiJr+aZCw/gitVwMXCw/aUHM15mwKMgUzyqTLHYxTCjKuu5u4B
-tBUDkKdvXxZvG6fsj4VE0x4GRL8vEYkBxRG3+VWKJHuudwkl54JMCa+RBFarSQLj
-CCuYREyAVcBX/F+j7yVL
-=e8CJ
------END PGP SIGNATURE-----
-
---kswDJesP0akhmDn8--
+Thanks
