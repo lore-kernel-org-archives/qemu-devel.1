@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6joQ-0003OU-0q
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:26:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d6jr9-00055I-G6
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:29:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6joM-0000Mv-Nr
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:26:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49246)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6joM-0000Mh-Ef
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:26:46 -0400
-References: <20170505201128.12099-1-ehabkost@redhat.com>
-	<20170505201128.12099-2-ehabkost@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <66817015-f286-42a6-c225-d03af470f904@redhat.com>
-Date: Fri, 5 May 2017 15:26:37 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1d6jr8-00019H-6b
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:29:39 -0400
+Date: Fri, 5 May 2017 17:29:23 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170505202923.GM3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-8-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170505201128.12099-2-ehabkost@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="623clX6bdPIIj48rm00oPuMaG1xsjUT27"
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] visitor: Add 'supported_qtypes'
- parameter to visit_start_alternate()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493816238-33120-8-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 07/24] pc: add node-id property to CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +23,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---623clX6bdPIIj48rm00oPuMaG1xsjUT27
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <66817015-f286-42a6-c225-d03af470f904@redhat.com>
-Subject: Re: [PATCH v2 1/3] visitor: Add 'supported_qtypes' parameter to
- visit_start_alternate()
-References: <20170505201128.12099-1-ehabkost@redhat.com>
- <20170505201128.12099-2-ehabkost@redhat.com>
-In-Reply-To: <20170505201128.12099-2-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/05/2017 03:11 PM, Eduardo Habkost wrote:
-> This will allow visitors to make decisions based on the supported qtype=
-s
-> of a given alternate type. The new parameter can replace the old
-> 'promote_int' argument, as qobject-input-visitor can simply check if
-> QTYPE_QINT is set in supported_qtypes.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+On Wed, May 03, 2017 at 02:57:01PM +0200, Igor Mammedov wrote:
+> it will allow switching from cpu_index to property based
+> numa mapping in follow up patches.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
-> Changes v1 -> v2:
-> * Change supported_qtypes to uint32_t (Eric Blake)
-> * Replace assert() on all generated visitor functions with a
->   single QEMU_BUILD_BUG_ON() on visit_start_alternate()
-> * Extra spaces around "|" on generated visitor code
->   (Eric Blake)
-> * Don't use bitops.h and just use (1U << QTYPE_FOO)
->   (Markus Armbruster)
+>  hw/i386/pc.c      | 17 +++++++++++++++++
+>  target/i386/cpu.c |  1 +
+>  2 files changed, 18 insertions(+)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 9cec0c1..4a4fb1c 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1893,6 +1893,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>                              DeviceState *dev, Error **errp)
+>  {
+>      int idx;
+> +    int node_id;
+>      CPUState *cs;
+>      CPUArchId *cpu_slot;
+>      X86CPUTopoInfo topo;
+> @@ -1982,6 +1983,22 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>  
+>      cs = CPU(cpu);
+>      cs->cpu_index = idx;
+> +
+> +    node_id = numa_get_node_for_cpu(cs->cpu_index);
+> +    if (node_id == nb_numa_nodes) {
+> +        /* by default CPUState::numa_node was 0 if it's not set via CLI
+> +         * keep it this way for now but in future we probably should
+> +         * refuse to start up with incomplete numa mapping */
+> +        node_id = 0;
+> +    }
+> +    if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
+> +        cs->numa_node = node_id;
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I suggest moving the above lines to cpu_common_realizefn(), and
+deleting the code in numa_post_machine_init().
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+If you want to do this in v3 of this series, or as a follow-up
+patch, it's up to you.
 
 
---623clX6bdPIIj48rm00oPuMaG1xsjUT27
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> +    } else if (cs->numa_node != node_id) {
+> +            error_setg(errp, "node-id %d must match numa node specified"
+> +                "with -numa option for cpu-index %d",
+> +                cs->numa_node, cs->cpu_index);
+> +            return;
+> +    }
+>  }
+>  
+>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 13c0985..007a5bd 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3982,6 +3982,7 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
+>      DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
+>  #endif
+> +    DEFINE_PROP_INT32("node-id", CPUState, numa_node, CPU_UNSET_NUMA_NODE_ID),
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+This changes the default from 0 to CPU_UNSET_NUMA_NODE_ID, but it
+looks like there's no existing i386 or PC code that ever looks at
+CPUState::numa_node. Maybe worth mentioning in the commit
+message.
 
-iQEcBAEBCAAGBQJZDN/9AAoJEKeha0olJ0Nq/RQH/RDrTzV0cUIOztxD0BEAjk/b
-mzG+uVNXg/9dSTXNZ0Y6NDhAXWJBMWb6qslmvq5DDmg41uBSzQ/qLZQDOr0rKNp1
-NnJpfxgqjpOut/cLoovyq5NTKUWHMdFm8p/2hTpCAdC8PBzPV8N6zf3RhgMu3gN2
-2dEWiFOIgNbigzxddCnn+KTzFitJi+7gELrGvA5OkJsSu+voj7JlbyVMC4gOA2Av
-NgNJ8+OcH91WowzY2/RwVtuZyZ1H6MsRMl/86RiyUYjYn4B1g3irzdTzvcid9hN1
-N8pyVoHZOZZMc8kGTdFKRrdIPD3kD0OfQcmAtUfOzapvWmecpNi/BjbHpdRk8GM=
-=XHbF
------END PGP SIGNATURE-----
+>      DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+>      { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
+>      DEFINE_PROP_BOOL("hv-relaxed", X86CPU, hyperv_relaxed_timing, false),
+> -- 
+> 2.7.4
+> 
 
---623clX6bdPIIj48rm00oPuMaG1xsjUT27--
+-- 
+Eduardo
