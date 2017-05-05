@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6gmP-00021r-3N
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:12:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1d6gnm-000352-OU
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6gmO-0003CV-2E
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:12:33 -0400
-Date: Fri, 5 May 2017 14:12:26 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170505171226.GI3482@thinpad.lan.raisama.net>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-13-git-send-email-imammedo@redhat.com>
-	<20170505014522.GK14413@umbus.fritz.box>
-	<20170505100918.181acc8b@nial.brq.redhat.com>
-	<20170505090602.c2u7ugdh65rdjrs6@hawk.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1d6gnk-00049n-AT
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:13:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6gnk-00048n-0i
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:13:56 -0400
+References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+	<149399505841.29022.17760460736155165332.stgit@bahia.lan>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2b6e4c71-8f11-a1f5-8b34-43ac68f2d503@redhat.com>
+Date: Fri, 5 May 2017 12:13:52 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170505090602.c2u7ugdh65rdjrs6@hawk.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 12/24] numa: add numa_[has_]node_id()
- wrappers
+In-Reply-To: <149399505841.29022.17760460736155165332.stgit@bahia.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WsHbtf4GPpl2XDgbIbmBJu18EW12KdwiH"
+Subject: Re: [Qemu-devel] [PATCH 5/5] 9pfs: local: forbid client access to
+ metadata
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?L=c3=a9o_Gaspard?= <leo@gaspard.io>
 
-On Fri, May 05, 2017 at 11:06:02AM +0200, Andrew Jones wrote:
-> On Fri, May 05, 2017 at 10:09:18AM +0200, Igor Mammedov wrote:
-> > On Fri, 5 May 2017 11:45:22 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > 
-> > > On Wed, May 03, 2017 at 02:57:06PM +0200, Igor Mammedov wrote:
-> > > > wrappers should make access to [has]node_id fields more readable
-> > > > 
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> > > 
-> > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > > 
-> > > Correct, though I'm not sure it actually simplifies things that much.
-> > > Maybe more in future patches, though.
-> > that's what Drew insisted on, and even though I prefer other way around
-> > I won't stall series arguing about styling issues,
-> > so here this patch goes.
-> 
-> My argument in the last review of this series was that references like
-> 
->  machine->possible_cpus->cpus[cs->cpu_index].props.has_node_id
-> and
->  machine->possible_cpus->cpus[cs->cpu_index].props.node_id
-> 
-> are quite long, and only differ by 'has_', making it tough to
-> easily recognize.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WsHbtf4GPpl2XDgbIbmBJu18EW12KdwiH
+From: Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?L=c3=a9o_Gaspard?= <leo@gaspard.io>
+Message-ID: <2b6e4c71-8f11-a1f5-8b34-43ac68f2d503@redhat.com>
+Subject: Re: [PATCH 5/5] 9pfs: local: forbid client access to metadata
+References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+ <149399505841.29022.17760460736155165332.stgit@bahia.lan>
+In-Reply-To: <149399505841.29022.17760460736155165332.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If expression length is a problem, we can just use an extra
-variable:
+On 05/05/2017 09:37 AM, Greg Kurz wrote:
+> When using the mapped-file security mode, we shouldn't let the client
+> mess with the metadata. The current code already hides it but the
+> client can still access the metadata through several operations.
+>=20
+> This patch fixes the issue by:
+> - preventing the creation of fids pointing to the metadata (name_to_pat=
+h)
+> - failing various operations taking a dirpath and a name arguments if
+>   name is a metadata reserved name
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/9pfs/9p-local.c |   41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
+>=20
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index b427d2928800..93cadac302c9 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -588,6 +588,11 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath=
+ *dir_path,
+>      int err =3D -1;
+>      int dirfd;
+> =20
+> +    if (local_must_skip_metadata(fs_ctx, name)) {
+> +        errno =3D EINVAL;
+> +        return -1;
+> +    }
+> +
 
- CPUArchId *slot = &machine->possible_cpus->cpus[cs->cpu_index];
- if (slot->props.has_node_id && slot->props.node_id == FOO) ...
+I don't know if EINVAL is the best error, but it seems reasonable enough.=
 
 
->                   But, if nobody, but me, sees value in changing
-> them to
-> 
->  numa_has_node_id(machine->possible_cpus, cs->cpu_index)
-> and
->  numa_node_id(machine->possible_cpus, cs->cpu_index)
-> 
-> then I won't insist.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-I don't mind that much, but I still prefer the version without
-the wrappers.
 
--- 
-Eduardo
+--WsHbtf4GPpl2XDgbIbmBJu18EW12KdwiH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZDLLQAAoJEKeha0olJ0NqduoH/1NvrkIalYxOIA/fbeGsCdHo
+IooANS3MpVgosyYk/kl208TSl4k887PN9jC0IoLyxCJDkA7etH0outsQQqUPFFgy
+b2+SPU5mpBb83xUpDBW3shs+/O+Rgg6tppUxqA7QQO0OGOmsmwrnqCvib8iiclhm
+mi22dZWIxZXQ6cnRFia0fljOCB7rYLuYQ2S4PMBgbeoOku7WDd6ewp7CEI4d9Pb+
+B6qJJW13IAKBHoJMcuFSowC99rkpRfEvT7GDYomFJm1CkuqZEt9zGIvcbLkeMaP/
+UQFbF2RzDMt9/tTMjCwdQ6tE4bEZBJI/2kEfPYqO2dwxR0aAawoYQ55ybCiemEU=
+=ALKg
+-----END PGP SIGNATURE-----
+
+--WsHbtf4GPpl2XDgbIbmBJu18EW12KdwiH--
