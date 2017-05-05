@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1d6Zps-0000au-6R
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:47:41 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d6ZrE-0001C3-Rf
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:49:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1d6Zpp-0006RZ-5b
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:47:40 -0400
-References: <20170503104441.1349-1-pbonzini@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <c3fb7ebf-a09b-0852-cdd9-84c159afa694@msgid.tls.msk.ru>
-Date: Fri, 5 May 2017 12:47:34 +0300
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d6Zr6-00078e-8k
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:48:59 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36247)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1d6Zr6-00078P-1g
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 05:48:56 -0400
+Received: by mail-wm0-x242.google.com with SMTP id u65so237280wmu.3
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 02:48:55 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  5 May 2017 11:48:50 +0200
+Message-Id: <1493977730-20581-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170503104441.1349-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] jazz_led: fix bad snprintf
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] ppc: xics: fix compilation with CentOS 6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,15 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, leon.alrae@imgtec.com
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, dgibson@redhat.com
 
-03.05.2017 13:44, Paolo Bonzini wrote:
-> Detected by GCC 7's -Wformat-truncation.  snprintf writes at most
-> 2 bytes here including the terminating NUL, so the result is
-> truncated.  In addition, the newline at the end is pointless.
-> Fix the buffer size and the format string.
+The PowerPCCPU typedef is included twice if a file includes
+both hw/ppc/xics.h and target/ppc/cpu-qom.h.
 
-Applied to -trivial, thanks!
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+	There are other failures but I don't have time to debug them today:
 
-/mjt
+	In file included from /tmp/qemu-test/src/include/hw/ppc/pnv.h:26,
+	                 from /tmp/qemu-test/src/hw/ppc/pnv.c:31:
+	/tmp/qemu-test/src/include/hw/ppc/pnv_psi.h:50: error: redefinition of typedef ‘PnvPsi’
+	/tmp/qemu-test/src/include/hw/ppc/pnv_lpc.h:26: note: previous declaration of ‘PnvPsi’ was here
+	In file included from /tmp/qemu-test/src/include/hw/ppc/pnv.h:27,
+	                 from /tmp/qemu-test/src/hw/ppc/pnv.c:31:
+	/tmp/qemu-test/src/include/hw/ppc/pnv_occ.h:25: error: redefinition of typedef ‘PnvPsi’
+	/tmp/qemu-test/src/include/hw/ppc/pnv_psi.h:50: note: previous declaration of ‘PnvPsi’ was here
+	In file included from /tmp/qemu-test/src/hw/ppc/pnv.c:39:
+	/tmp/qemu-test/src/include/hw/ipmi/ipmi.h:188: error: redefinition of typedef ‘IPMIBmc’
+	/tmp/qemu-test/src/include/hw/ppc/pnv.h:121: note: previous declaration of ‘IPMIBmc’ was here
+	make[1]: *** [hw/ppc/pnv.o] Error 1
+
+	Please start including Docker-based tests in your pre-pull-request tests.
+
+ include/hw/ppc/xics.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index c215dc7..ce1942b 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -29,6 +29,7 @@
+ #define XICS_H
+ 
+ #include "hw/qdev.h"
++#include "target/ppc/cpu-qom.h"
+ 
+ #define XICS_IPI        0x2
+ #define XICS_BUID       0x1
+@@ -46,7 +47,6 @@ typedef struct ICSStateClass ICSStateClass;
+ typedef struct ICSState ICSState;
+ typedef struct ICSIRQState ICSIRQState;
+ typedef struct XICSFabric XICSFabric;
+-typedef struct PowerPCCPU PowerPCCPU;
+ 
+ #define TYPE_ICP "icp"
+ #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
+-- 
+1.8.3.1
