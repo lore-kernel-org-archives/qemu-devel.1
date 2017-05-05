@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6YH1-0002zw-Ls
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:07:36 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d6YIr-0003mC-CR
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6YGw-0001TE-NU
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:07:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:26342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6YGw-0001S7-GR
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:07:30 -0400
-References: <20170505032340.26467-1-famz@redhat.com>
-	<03beb071-ebbc-4328-3530-37b9856476cc@redhat.com>
-	<20170505080513.GC21435@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d75dec74-8cce-cad9-6e47-4fae5fa415ca@redhat.com>
-Date: Fri, 5 May 2017 10:07:26 +0200
+	(envelope-from <imammedo@redhat.com>) id 1d6YIq-0001yu-Bw
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 04:09:29 -0400
+Date: Fri, 5 May 2017 10:09:18 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170505100918.181acc8b@nial.brq.redhat.com>
+In-Reply-To: <20170505014522.GK14413@umbus.fritz.box>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-13-git-send-email-imammedo@redhat.com>
+	<20170505014522.GK14413@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20170505080513.GC21435@lemon.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] docker: Add test-block
+Subject: Re: [Qemu-devel] [PATCH v2 12/24] numa: add numa_[has_]node_id()
+ wrappers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On Fri, 5 May 2017 11:45:22 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-
-On 05/05/2017 10:05, Fam Zheng wrote:
->> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->> For patch 5, I think we should revive the "quick" qemu-iotests group
->> (maybe we can have support for skipping groups, and have a "slow" group
->> with the very few tests that take >30 seconds?) and add the quick tests
->> to "make check".
-> Sounds like a good idea, but for a separate series, IMO.
+> On Wed, May 03, 2017 at 02:57:06PM +0200, Igor Mammedov wrote:
+> > wrappers should make access to [has]node_id fields more readable
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
 > 
-> The idea of the new test-block is to include all qemu-iotests tests.  I only
-> added raw and qcow2 because vmdk etc. fails case 181. I could use "-x" but
-> that's a bit ugly - they can wait for the fix.
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> 
+> Correct, though I'm not sure it actually simplifies things that much.
+> Maybe more in future patches, though.
+that's what Drew insisted on, and even though I prefer other way around
+I won't stall series arguing about styling issues,
+so here this patch goes.
 
-I think that would still be a bit too slow for patchew?
-
-Paolo
+> 
+> > ---
+> >  follow up patches will use this wrappers
+> >  v2:
+> >     - add wrappers (Drew)
+> > ---
+> >  include/sysemu/numa.h | 10 ++++++++++
+> >  numa.c                |  2 +-
+> >  2 files changed, 11 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> > index 46ea6c7..98d01e6 100644
+> > --- a/include/sysemu/numa.h
+> > +++ b/include/sysemu/numa.h
+> > @@ -35,4 +35,14 @@ uint32_t numa_get_node(ram_addr_t addr, Error **errp);
+> >  /* on success returns node index in numa_info,
+> >   * on failure returns nb_numa_nodes */
+> >  int numa_get_node_for_cpu(int idx);
+> > +
+> > +static inline bool numa_has_node_id(const CPUArchIdList *possible_cpus, int idx)
+> > +{
+> > +    return possible_cpus->cpus[idx].props.has_node_id;
+> > +}
+> > +
+> > +static inline int numa_node_id(const CPUArchIdList *possible_cpus, int idx)
+> > +{
+> > +    return possible_cpus->cpus[idx].props.node_id;
+> > +}
+> >  #endif
+> > diff --git a/numa.c b/numa.c
+> > index c7e3e0a..872ee0d 100644
+> > --- a/numa.c
+> > +++ b/numa.c
+> > @@ -394,7 +394,7 @@ void parse_numa_opts(MachineState *ms)
+> >  
+> >          possible_cpus = mc->possible_cpu_arch_ids(ms);
+> >          for (i = 0; i < possible_cpus->len; i++) {
+> > -            if (possible_cpus->cpus[i].props.has_node_id) {
+> > +            if (numa_has_node_id(possible_cpus, i)) {
+> >                  break;
+> >              }
+> >          }  
+> 
