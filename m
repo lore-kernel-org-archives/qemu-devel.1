@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d6acS-0001nR-Du
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:53 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d6acT-0001of-Ml
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d6acR-0006n9-Hq
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:52 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:36653)
+	(envelope-from <alex.bennee@linaro.org>) id 1d6acS-0006ol-KJ
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:53 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35415)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d6acR-0006lv-C1
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:51 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id u65so20032188wmu.1
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 03:37:51 -0700 (PDT)
+	id 1d6acS-0006nD-BJ
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:37:52 -0400
+Received: by mail-wm0-x233.google.com with SMTP id w64so20094989wma.0
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 03:37:52 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  5 May 2017 11:38:20 +0100
-Message-Id: <20170505103822.20641-8-alex.bennee@linaro.org>
+Date: Fri,  5 May 2017 11:38:22 +0100
+Message-Id: <20170505103822.20641-10-alex.bennee@linaro.org>
 In-Reply-To: <20170505103822.20641-1-alex.bennee@linaro.org>
 References: <20170505103822.20641-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v1 7/9] scripts/qemu-gdb: add simple tcg
- lock status helper
+Subject: [Qemu-devel] [RFC PATCH v1 9/9]
+ scripts/analyse-locks-simpletrace.py: script to analyse lock times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +33,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, boost.lists@gmail.com, pavel.dovgaluk@ispras.ru
 Cc: cota@braap.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Add a simple helper to dump lock state.
+This script allows analysis of mutex acquisition and hold times based
+on a trace file. Given a trace control file of:
+
+  qemu_mutex_lock
+  qemu_mutex_locked
+  qemu_mutex_unlock
+
+And running with:
+
+  $QEMU $QEMU_ARGS -trace events=./lock-trace
+
+You can analyse the results with:
+
+  ./scripts/analyse-locks-simpletrace.py trace-events-all ./trace-21812
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- scripts/qemu-gdb.py    |  3 ++-
- scripts/qemugdb/tcg.py | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 1 deletion(-)
- create mode 100644 scripts/qemugdb/tcg.py
+ scripts/analyse-locks-simpletrace.py | 99 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 99 insertions(+)
+ create mode 100755 scripts/analyse-locks-simpletrace.py
 
-diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
-index b3f8e04f77..d58213e549 100644
---- a/scripts/qemu-gdb.py
-+++ b/scripts/qemu-gdb.py
-@@ -26,7 +26,7 @@ import os, sys
- 
- sys.path.append(os.path.dirname(__file__))
- 
--from qemugdb import aio, mtree, coroutine
-+from qemugdb import aio, mtree, coroutine, tcg
- 
- class QemuCommand(gdb.Command):
-     '''Prefix for QEMU debug support commands'''
-@@ -38,6 +38,7 @@ QemuCommand()
- coroutine.CoroutineCommand()
- mtree.MtreeCommand()
- aio.HandlersCommand()
-+tcg.TCGLockStatusCommand()
- 
- coroutine.CoroutineSPFunction()
- coroutine.CoroutinePCFunction()
-diff --git a/scripts/qemugdb/tcg.py b/scripts/qemugdb/tcg.py
-new file mode 100644
-index 0000000000..8c7f1d7454
+diff --git a/scripts/analyse-locks-simpletrace.py b/scripts/analyse-locks-simpletrace.py
+new file mode 100755
+index 0000000000..b72c951cd9
 --- /dev/null
-+++ b/scripts/qemugdb/tcg.py
-@@ -0,0 +1,46 @@
-+#!/usr/bin/python
++++ b/scripts/analyse-locks-simpletrace.py
+@@ -0,0 +1,99 @@
++#!/usr/bin/env python
 +# -*- coding: utf-8 -*-
 +#
-+# GDB debugging support, TCG status
++# Analyse lock events and
 +#
-+# Copyright 2016 Linaro Ltd
++# Author: Alex Bennée <alex.bennee@linaro.org>
 +#
-+# Authors:
-+#  Alex Bennée <alex.bennee@linaro.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2.  See
-+# the COPYING file in the top-level directory.
-+#
-+# Contributions after 2012-01-13 are licensed under the terms of the
-+# GNU GPL, version 2 or (at your option) any later version.
 +
-+# 'qemu tcg-lock-status' -- display the TCG lock status across threads
++import os
++import simpletrace
++import argparse
++import numpy as np
 +
-+import gdb
++class MutexAnalyser(simpletrace.Analyzer):
++    "A simpletrace Analyser for checking locks."
 +
-+class TCGLockStatusCommand(gdb.Command):
-+    '''Display TCG Execution Status'''
 +    def __init__(self):
-+        gdb.Command.__init__(self, 'qemu tcg-lock-status', gdb.COMMAND_DATA,
-+                             gdb.COMPLETE_NONE)
++        self.locks = 0
++        self.locked = 0
++        self.unlocks = 0
++        self.mutex_records = {}
 +
-+    def invoke(self, arg, from_tty):
-+        gdb.write("Thread, BQL (iothread_mutex), Replay, Blocked?\n")
-+        for thread in gdb.inferiors()[0].threads():
-+            thread.switch()
++    def _get_mutex(self, mutex):
++        if not mutex in self.mutex_records:
++            self.mutex_records[mutex] = {"locks": 0,
++                                         "lock_time": 0,
++                                         "acquire_times": [],
++                                         "locked": 0,
++                                         "locked_time": 0,
++                                         "held_times": [],
++                                         "unlocked": 0}
 +
-+            iothread = gdb.parse_and_eval("iothread_locked")
-+            replay = gdb.parse_and_eval("replay_locked")
++        return self.mutex_records[mutex]
 +
-+            frame = gdb.selected_frame()
-+            if frame.name() == "__lll_lock_wait":
-+                frame.older().select()
-+                mutex = gdb.parse_and_eval("mutex")
-+                owner = gdb.parse_and_eval("mutex->__data.__owner")
-+                blocked = ("__lll_lock_wait waiting on %s from %d" %
-+                           (mutex, owner))
-+            else:
-+                blocked = "not blocked"
++    def qemu_mutex_lock(self, timestamp, mutex, filename, line):
++        self.locks += 1
++        rec = self._get_mutex(mutex)
++        rec["locks"] += 1
++        rec["lock_time"] = timestamp[0]
++        rec["lock_loc"] = (filename, line)
 +
-+            gdb.write("%d/%d, %s, %s, %s\n" % (thread.num, thread.ptid[1],
-+                                               iothread, replay, blocked))
++    def qemu_mutex_locked(self, timestamp, mutex, filename, line):
++        self.locked += 1
++        rec = self._get_mutex(mutex)
++        rec["locked"] += 1
++        rec["locked_time"] = timestamp[0]
++        acquire_time = rec["locked_time"] - rec["lock_time"]
++        rec["locked_loc"] = (filename, line)
++        rec["acquire_times"].append(acquire_time)
++
++    def qemu_mutex_unlock(self, timestamp, mutex, filename, line):
++        self.unlocks += 1
++        rec = self._get_mutex(mutex)
++        rec["unlocked"] += 1
++        held_time = timestamp[0] - rec["locked_time"]
++        rec["held_times"].append(held_time)
++        rec["unlock_loc"] = (filename, line)
++
++
++def get_args():
++    "Grab options"
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--output", "-o", type=str, help="Render plot to file")
++    parser.add_argument("events", type=str, help='trace file read from')
++    parser.add_argument("tracefile", type=str, help='trace file read from')
++    return parser.parse_args()
++
++if __name__ == '__main__':
++    args = get_args()
++
++    # Gather data from the trace
++    analyser = MutexAnalyser()
++    simpletrace.process(args.events, args.tracefile, analyser)
++
++    print ("Total locks: %d, locked: %d, unlocked: %d" %
++           (analyser.locks, analyser.locked, analyser.unlocks))
++
++    # Now dump the individual lock stats
++    for key, val in sorted(analyser.mutex_records.iteritems(),
++                           key=lambda (k,v): v["locks"]):
++        print ("Lock: %#x locks: %d, locked: %d, unlocked: %d" %
++               (key, val["locks"], val["locked"], val["unlocked"]))
++
++        acquire_times = np.array(val["acquire_times"])
++        if len(acquire_times) > 0:
++            print ("  Acquire Time: min:%d median:%d avg:%.2f max:%d" %
++                   (acquire_times.min(), np.median(acquire_times),
++                    acquire_times.mean(), acquire_times.max()))
++
++        held_times = np.array(val["held_times"])
++        if len(held_times) > 0:
++            print ("  Held Time: min:%d median:%d avg:%.2f max:%d" %
++                   (held_times.min(), np.median(held_times),
++                    held_times.mean(), held_times.max()))
++
++        # Check if any locks still held
++        if val["locks"] > val["locked"]:
++            print ("  LOCK HELD (%s:%s)" % (val["locked_loc"]))
++            print ("  BLOCKED   (%s:%s)" % (val["lock_loc"]))
 -- 
 2.11.0
