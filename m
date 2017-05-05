@@ -1,38 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vyasevic@redhat.com>) id 1d6jUd-0000bi-5z
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:06:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d6jV5-0000rv-Hr
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vyasevic@redhat.com>) id 1d6jUY-000835-1R
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:06:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1d6jUX-00082J-O8
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:06:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D488A7AEA1
-	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 20:06:15 +0000 (UTC)
-Reply-To: vyasevic@redhat.com
-References: <1490818790-3100-1-git-send-email-vyasevic@redhat.com>
-	<20170330082419.GA2585@work-vm>
-	<161e7bfe-2d0a-d69f-44ac-94fb62db1b4a@redhat.com>
-	<20170330145334.GI2800@work-vm>
-	<d2e41d4d-482a-2c27-6982-97920aeeada5@redhat.com>
-	<20170330152639.GK2800@work-vm>
-	<43003ddd-e91b-736c-e67e-d6edf89876f4@redhat.com>
-	<20170502104104.GC2072@work-vm>
-From: Vlad Yasevich <vyasevic@redhat.com>
-Message-ID: <115fca9d-40f3-fa2e-29cc-ca6e2e872533@redhat.com>
-Date: Fri, 5 May 2017 16:06:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d6jV4-00089v-Eu
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 16:06:51 -0400
+References: <20170504030755.1001-1-eblake@redhat.com>
+	<20170504030755.1001-3-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <53789feb-7a2d-09ae-cc03-8cde0b1b85e4@redhat.com>
+Date: Fri, 5 May 2017 22:06:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170502104104.GC2072@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: consolidate guest announcement
- with qemu_announce_self
+In-Reply-To: <20170504030755.1001-3-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VCWofOnIJEti3ABDKUroChOvsOeWX1bQi"
+Subject: Re: [Qemu-devel] [PATCH v12 02/10] block: Update comments on
+ BDRV_BLOCK_* meanings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,304 +25,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, gveitmic@redhat.com, mst@redhat.com, Jason Wang <jasowang@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-On 05/02/2017 06:41 AM, Dr. David Alan Gilbert wrote:
-> * Vlad Yasevich (vyasevic@redhat.com) wrote:
->> On 03/30/2017 11:26 AM, Dr. David Alan Gilbert wrote:
->>> * Vlad Yasevich (vyasevic@redhat.com) wrote:
->>>> On 03/30/2017 10:53 AM, Dr. David Alan Gilbert wrote:
->>>>> * Vlad Yasevich (vyasevic@redhat.com) wrote:
->>>>>> On 03/30/2017 04:24 AM, Dr. David Alan Gilbert wrote:
->>>>>>> * Vladislav Yasevich (vyasevic@redhat.com) wrote:
->>>>>>>> virtio announcements seem to run on its own timer with it's own
->>>>>>>> repetition loop and are invoked separately from qemu_announce_self.
->>>>>>>> This patch consolidates announcements into a single location and
->>>>>>>> allows other nics to provide it's own announcement capabilities, if
->>>>>>>> necessary.
->>>>>>>>
->>>>>>>> This is also usefull in support of exposing qemu_announce_self through
->>>>>>>> qmp/hmp.
->>>>>>>>
->>>>>>>> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
->>>>>>>> ---
->>>>>>>>  hw/net/virtio-net.c            | 30 ++++++++----------------------
->>>>>>>>  include/hw/virtio/virtio-net.h |  2 --
->>>>>>>>  include/net/net.h              |  2 ++
->>>>>>>>  migration/savevm.c             |  6 ++++++
->>>>>>>>  4 files changed, 16 insertions(+), 24 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->>>>>>>> index c321680..6e9ce4f 100644
->>>>>>>> --- a/hw/net/virtio-net.c
->>>>>>>> +++ b/hw/net/virtio-net.c
->>>>>>>> @@ -110,14 +110,16 @@ static bool virtio_net_started(VirtIONet *n, uint8_t status)
->>>>>>>>          (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
->>>>>>>>  }
->>>>>>>>  
->>>>>>>> -static void virtio_net_announce_timer(void *opaque)
->>>>>>>> +static void virtio_net_announce(NetClientState *nc)
->>>>>>>>  {
->>>>>>>> -    VirtIONet *n = opaque;
->>>>>>>> +    VirtIONet *n = qemu_get_nic_opaque(nc);
->>>>>>>>      VirtIODevice *vdev = VIRTIO_DEVICE(n);
->>>>>>>>  
->>>>>>>> -    n->announce_counter--;
->>>>>>>> -    n->status |= VIRTIO_NET_S_ANNOUNCE;
->>>>>>>> -    virtio_notify_config(vdev);
->>>>>>>> +    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
->>>>>>>> +        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
->>>>>>>> +            n->status |= VIRTIO_NET_S_ANNOUNCE;
->>>>>>>> +            virtio_notify_config(vdev);
->>>>>>>> +    }
->>>>>>>>  }
->>>>>>>>  
->>>>>>>>  static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
->>>>>>>> @@ -427,8 +429,6 @@ static void virtio_net_reset(VirtIODevice *vdev)
->>>>>>>>      n->nobcast = 0;
->>>>>>>>      /* multiqueue is disabled by default */
->>>>>>>>      n->curr_queues = 1;
->>>>>>>> -    timer_del(n->announce_timer);
->>>>>>>> -    n->announce_counter = 0;
->>>>>>>>      n->status &= ~VIRTIO_NET_S_ANNOUNCE;
->>>>>>>>  
->>>>>>>>      /* Flush any MAC and VLAN filter table state */
->>>>>>>> @@ -868,11 +868,6 @@ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
->>>>>>>>      if (cmd == VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
->>>>>>>>          n->status & VIRTIO_NET_S_ANNOUNCE) {
->>>>>>>>          n->status &= ~VIRTIO_NET_S_ANNOUNCE;
->>>>>>>> -        if (n->announce_counter) {
->>>>>>>> -            timer_mod(n->announce_timer,
->>>>>>>> -                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
->>>>>>>> -                      self_announce_delay(n->announce_counter));
->>>>>>>> -        }
->>>>>>>>          return VIRTIO_NET_OK;
->>>>>>>>      } else {
->>>>>>>>          return VIRTIO_NET_ERR;
->>>>>>>> @@ -1609,12 +1604,6 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
->>>>>>>>          qemu_get_subqueue(n->nic, i)->link_down = link_down;
->>>>>>>>      }
->>>>>>>>  
->>>>>>>> -    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
->>>>>>>> -        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
->>>>>>>> -        n->announce_counter = SELF_ANNOUNCE_ROUNDS;
->>>>>>>> -        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
->>>>>>>> -    }
->>>>>>>> -
->>>>>>>>      return 0;
->>>>>>>>  }
->>>>>>>>  
->>>>>>>> @@ -1829,6 +1818,7 @@ static NetClientInfo net_virtio_info = {
->>>>>>>>      .receive = virtio_net_receive,
->>>>>>>>      .link_status_changed = virtio_net_set_link_status,
->>>>>>>>      .query_rx_filter = virtio_net_query_rxfilter,
->>>>>>>> +    .announce = virtio_net_announce,
->>>>>>>>  };
->>>>>>>>  
->>>>>>>>  static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
->>>>>>>> @@ -1934,8 +1924,6 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
->>>>>>>>      qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
->>>>>>>>      memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
->>>>>>>>      n->status = VIRTIO_NET_S_LINK_UP;
->>>>>>>> -    n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
->>>>>>>> -                                     virtio_net_announce_timer, n);
->>>>>>>>  
->>>>>>>>      if (n->netclient_type) {
->>>>>>>>          /*
->>>>>>>> @@ -1997,8 +1985,6 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
->>>>>>>>          virtio_net_del_queue(n, i);
->>>>>>>>      }
->>>>>>>>  
->>>>>>>> -    timer_del(n->announce_timer);
->>>>>>>> -    timer_free(n->announce_timer);
->>>>>>>>      g_free(n->vqs);
->>>>>>>>      qemu_del_nic(n->nic);
->>>>>>>>      virtio_cleanup(vdev);
->>>>>>>> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
->>>>>>>> index 1eec9a2..0c597f4 100644
->>>>>>>> --- a/include/hw/virtio/virtio-net.h
->>>>>>>> +++ b/include/hw/virtio/virtio-net.h
->>>>>>>> @@ -94,8 +94,6 @@ typedef struct VirtIONet {
->>>>>>>>      char *netclient_name;
->>>>>>>>      char *netclient_type;
->>>>>>>>      uint64_t curr_guest_offloads;
->>>>>>>> -    QEMUTimer *announce_timer;
->>>>>>>> -    int announce_counter;
->>>>>>>>      bool needs_vnet_hdr_swap;
->>>>>>>>  } VirtIONet;
->>>>>>>>  
->>>>>>>> diff --git a/include/net/net.h b/include/net/net.h
->>>>>>>> index 99b28d5..598f523 100644
->>>>>>>> --- a/include/net/net.h
->>>>>>>> +++ b/include/net/net.h
->>>>>>>> @@ -64,6 +64,7 @@ typedef int (SetVnetLE)(NetClientState *, bool);
->>>>>>>>  typedef int (SetVnetBE)(NetClientState *, bool);
->>>>>>>>  typedef struct SocketReadState SocketReadState;
->>>>>>>>  typedef void (SocketReadStateFinalize)(SocketReadState *rs);
->>>>>>>> +typedef void (NetAnnounce)(NetClientState *);
->>>>>>>>  
->>>>>>>>  typedef struct NetClientInfo {
->>>>>>>>      NetClientDriver type;
->>>>>>>> @@ -84,6 +85,7 @@ typedef struct NetClientInfo {
->>>>>>>>      SetVnetHdrLen *set_vnet_hdr_len;
->>>>>>>>      SetVnetLE *set_vnet_le;
->>>>>>>>      SetVnetBE *set_vnet_be;
->>>>>>>> +    NetAnnounce *announce;
->>>>>>>>  } NetClientInfo;
->>>>>>>>  
->>>>>>>>  struct NetClientState {
->>>>>>>> diff --git a/migration/savevm.c b/migration/savevm.c
->>>>>>>> index 3b19a4a..5c1d8dc 100644
->>>>>>>> --- a/migration/savevm.c
->>>>>>>> +++ b/migration/savevm.c
->>>>>>>> @@ -113,9 +113,15 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
->>>>>>>>      int len;
->>>>>>>>  
->>>>>>>>      trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
->>>>>>>> +
->>>>>>>>      len = announce_self_create(buf, nic->conf->macaddr.a);
->>>>>>>>  
->>>>>>>>      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
->>>>>>>> +
->>>>>>>> +    /* if the NIC provides it's own announcement support, use it as well */
->>>>>>>> +    if (nic->ncs->info->announce) {
->>>>>>>> +        nic->ncs->info->announce(nic->ncs);
->>>>>>>> +    }
->>>>>>>>  }
->>>>>>>
->>>>>>> Combining them doesn't necessarily seem like a bad thing; but
->>>>>>> it does change the timing quite a bit - at the moment the QEMU RARPs
->>>>>>> are sent at the end of migration, while the Virtio ARPs are sent
->>>>>>> when the guest starts running which is quite a bit later.
->>>>>>>
->>>>>>> In many ways the 'when the guest starts' is better, given that libvirt
->>>>>>> etc has had a chance to reconfigure the networking,  but I'm not that
->>>>>>> sure if it's safe to move the existing one - I had considered *adding*
->>>>>>> another shot of the current mechanism after the guest is started.
->>>>>>>
->>>>>>
->>>>>> Yes, the timing of things have been giving me some issues, but I wanted to post
->>>>>> this patch to get some comments just like this one..
->>>>>>
->>>>>> I've wondered why they qemu one happens before the guest starts running.
->>>>>>
->>>>>>> I certainly think it's wrong to do the virtio announce at the earlier
->>>>>>> point.
->>>>>>>
->>>>>>
->>>>>> I see.
->>>>>
->>>>> The problem with moving it earlier is that it won't really happen.
->>>>> The guest wont be running at all at the earlier point so it wont consume
->>>>> your requests to the guest to do the announce.
->>>>>
->>>>>
->>>>>
->>>>>>> See also Germano's thread of being able to retrigger the announce
->>>>>>> at arbitrary points, and the series I posted a couple of days ago
->>>>>>> to extend the length/timing of the announce.
->>>>>>>
->>>>>>
->>>>>> That's kind of what prompted me to do try this.  The issue with just
->>>>>> exposing qemu_announce_self() is that RARPS just aren't enough in
->>>>>> some cases (vlans, multicast).  This attempts to add the callback
->>>>>> like Jason mentioned, but then we get timer interactions between the
->>>>>> virtio-net timers and qemu one.
->>>>>
->>>>> Yes, and I think it would be a good idea to add the virtio stuff
->>>>> to germano's announces; however I don't think we can move those
->>>>> announces earlier in the normal migration case.
->>>>>
->>>>
->>>> So, I am taking a different approach.  I am going to expose device specific
->>>> announcement capabilities, and once that's done, the qmp API can directly
->>>> tell the device to self-announce if it supports it, or tell qemu to announce
->>>> itself in the old-fashioned method.
->>>>
->>>> That seems to provide the most flexibility.  An additional thought is for the qmp
->>>> command to optionally specify the number of announcement retries (like your set
->>>> allows for migration).
->>>
->>> Hmm, we could do without yet another solution!
->>>
->>> How about:
->>>   a) Take Germano's patch
->>>   b) My patch
->>
->> Swap the the 2 and add optional parameters to Germano's patch to specify announcement
->> options.  Irrespective of migration, those can be used by management layer to specify
->> at least the number of attempts.
-> 
-> That would need to have the migration settings as well then to change what migration
-> does?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VCWofOnIJEti3ABDKUroChOvsOeWX1bQi
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
+Message-ID: <53789feb-7a2d-09ae-cc03-8cde0b1b85e4@redhat.com>
+Subject: Re: [PATCH v12 02/10] block: Update comments on BDRV_BLOCK_* meanings
+References: <20170504030755.1001-1-eblake@redhat.com>
+ <20170504030755.1001-3-eblake@redhat.com>
+In-Reply-To: <20170504030755.1001-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hmm...
+On 04.05.2017 05:07, Eric Blake wrote:
+> We had some conflicting documentation: a nice 8-way table that
+> described all possible combinations of DATA, ZERO, and
+> OFFSET_VALID, contrasted with text that implied that OFFSET_VALID
+> always meant raw data could be read directly.  Furthermore, the
+> text refers a lot to bs->file, even though the interface was
+> updated back in 67a0fd2a to let the driver pass back which BDS (not
+> necessarily bs->file).
 
-Since we want to expose announcements, it would make sense to have configurable timeouts
-and separate them from migration specific things.
+Not sure about my English skills here, but is this missing a verb? ("to
+pass back which BDS...")
 
-May be when we create announcement timers we can pass the parameters to them?
+>                         As the 8-way table is the intended
+> semantics, simplify the rest of the text to get rid of the
+> confusion.
+>=20
+> ALLOCATED is always set by the block layer for convenience (drivers
+> do not have to worry about it). RAW is used only internally, but
 
-If we take Germano's patch first, I guess we could add this with your series
+Just one space after the period? How inconsistent! :-)
 
-> 
->>>   c) Something close to this patch you've already posted
->>>   d) And we add a call to qemu_announce_self at the point we start the
->>>      CPUs somewhere.
->>>
->>> Germano's makes (d) safe even if it's overlapping QEMU's RARPs.
->>> I don't think there's any harm in this patches code making it trigger
->>> during the initial RARP stage as long as we also do (d).
->>
->> Having it all in one place is nice, but what about the different timer types?  Would
->> allowing for different timer types help?
-> 
-> I guess you could share it and make it switchable.
-> 
-> We should get this pile of different patches rolling again; I keep getting prodded
-> by cases which need to work around broken networking during migration because
-> Openstack hasn't reconfigured the networking by the time we send the announces.
+> by more than the raw driver.  Document these additional items on
+> the driver callback.
+>=20
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
+> ---
+> v12: even more wording tweaks
+> v11: reserved for blkdebug half of v10
+> v10: new patch
+> ---
+>  include/block/block.h     | 35 +++++++++++++++++++----------------
+>  include/block/block_int.h |  7 +++++++
+>  2 files changed, 26 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 862eb56..c8bec7d 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -120,29 +120,32 @@ typedef struct HDGeometry {
+>  #define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTO=
+R_BITS)
+>=20
+>  /*
+> - * Allocation status flags
+> - * BDRV_BLOCK_DATA: data is read from a file returned by bdrv_get_bloc=
+k_status.
+> - * BDRV_BLOCK_ZERO: sectors read as zero
+> - * BDRV_BLOCK_OFFSET_VALID: sector stored as raw data in a file return=
+ed by
+> - *                          bdrv_get_block_status.
+> + * Allocation status flags for bdrv_get_block_status() and friends.
+> + *
+> + * Public flags:
+> + * BDRV_BLOCK_DATA: allocation for data at offset is tied to this laye=
+r
+> + * BDRV_BLOCK_ZERO: offset reads as zero
+> + * BDRV_BLOCK_OFFSET_VALID: an associated offset exists for accessing =
+raw data
+>   * BDRV_BLOCK_ALLOCATED: the content of the block is determined by thi=
+s
+> - *                       layer (as opposed to the backing file)
+> - * BDRV_BLOCK_RAW: used internally to indicate that the request
+> - *                 was answered by the raw driver and that one
+> - *                 should look in bs->file directly.
+> + *                       layer (short for DATA || ZERO), set by block =
+layer
+>   *
+> - * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 represent the offset i=
+n
+> - * bs->file where sector data can be read from as raw data.
+> + * Internal flag:
+> + * BDRV_BLOCK_RAW: used internally to indicate that the request was
+> + *                 answered by a passthrough driver such as raw and th=
+at the
 
-Ok.  I am updating my set now.
+s/passthrough/filter/? But I'm not even sure myself. Well, "passthrough"
+is a safe bet, so let's just go with it.
 
--vlad
+With the commit message fixed or a =E2=80=9Cno it's fine=E2=80=9D:
 
-> 
-> Dave
-> 
->> -vlad
->>
->>>
->>> Dave
->>>
->>>
->>>
->>>>
->>>> -vlad
->>>>
->>>>> Dave
->>>>>
->>>>>> -vlad
->>>>>>
->>>>>>> Dave
->>>>>>>
->>>>>>>> -- 
->>>>>>>> 2.7.4
->>>>>>>>
->>>>>>>>
->>>>>>> --
->>>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>>>>>>
->>>>>>
->>>>> --
->>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>>>>
->>>>
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> + *                 block layer should recompute the answer from bs->fi=
+le.
+>   *
+> - * DATA =3D=3D 0 && ZERO =3D=3D 0 means that data is read from backing=
+_hd if present.
+> + * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MAS=
+K)
+> + * represent the offset in the returned BDS that is allocated for the
+> + * corresponding raw data; however, whether that offset actually conta=
+ins
+> + * data also depends on BDRV_BLOCK_DATA and BDRV_BLOCK_ZERO, as follow=
+s:
+>   *
+>   * DATA ZERO OFFSET_VALID
+> - *  t    t        t       sectors read as zero, bs->file is zero at of=
+fset
+> - *  t    f        t       sectors read as valid from bs->file at offse=
+t
+> - *  f    t        t       sectors preallocated, read as zero, bs->file=
+ not
+> + *  t    t        t       sectors read as zero, returned file is zero =
+at offset
+> + *  t    f        t       sectors read as valid from file at offset
+> + *  f    t        t       sectors preallocated, read as zero, returned=
+ file not
+>   *                        necessarily zero at offset
+>   *  f    f        t       sectors preallocated but read from backing_h=
+d,
+> - *                        bs->file contains garbage at offset
+> + *                        returned file contains garbage at offset
+>   *  t    t        f       sectors preallocated, read as zero, unknown =
+offset
+>   *  t    f        f       sectors read from unknown file or offset
+>   *  f    t        f       not allocated or unknown offset, read as zer=
+o
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 8773940..1fdfff7 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -165,6 +165,13 @@ struct BlockDriver {
+>          int64_t offset, int count, BdrvRequestFlags flags);
+>      int coroutine_fn (*bdrv_co_pdiscard)(BlockDriverState *bs,
+>          int64_t offset, int count);
+> +
+> +    /*
+> +     * Building block for bdrv_block_status[_above]. The driver should=
+
+> +     * answer only according to the current layer, and should not
+> +     * set BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See bloc=
+k.h
+> +     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.
+> +     */
+>      int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState =
+*bs,
+>          int64_t sector_num, int nb_sectors, int *pnum,
+>          BlockDriverState **file);
+>=20
+
+
+
+--VCWofOnIJEti3ABDKUroChOvsOeWX1bQi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkM208SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9As64H/21QJaoQjqignlC3zUWaweoGcJ4K12b6
+mJ7SVKl+qlACp3OFp3FiZGAcE/3nNy5NSRPStKOjF4vYtagsqLiB6CbVYpNFIHSz
+Iq+05QTOQqex7HmukPlp2d8bUQwQNtPNr4Cpo7EeQpfHI6XN+SrsXpYRQ5k8jWL7
+kNNmT8VEKkNgZkSLwWaaCnt4BTQj0aJa8RCeffgW+XcTICXGf57W7RTy0IWJl4f8
+EBoE4csk40ZxA7Hp9IuNEO9xx6qYZDAl6r3YwG4NP9gCWEYE3Mit/f8yOxM+FpW3
+gMnTywpLei7tvxODF36225ZimVBNFuqJrDE978JFtL7LCaga98yBAW4=
+=i8lp
+-----END PGP SIGNATURE-----
+
+--VCWofOnIJEti3ABDKUroChOvsOeWX1bQi--
