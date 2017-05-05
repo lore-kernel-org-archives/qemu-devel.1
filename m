@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d6UcL-0001E2-8W
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:13:22 -0400
+	(envelope-from <bharata.rao@gmail.com>) id 1d6V0y-0004nb-E2
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1d6UcG-0005VS-LT
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:13:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d6UcG-0005Uw-Bn
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:13:16 -0400
-References: <1493264805-15398-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f9e9e40a-1eab-b0be-2139-4f3483034bda@redhat.com>
-Date: Fri, 5 May 2017 12:13:09 +0800
+	(envelope-from <bharata.rao@gmail.com>) id 1d6V0w-0007EB-0Q
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 00:38:48 -0400
 MIME-Version: 1.0
-In-Reply-To: <1493264805-15398-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] COLO-compare: Improve tcp compare trace
- event readability
+In-Reply-To: <20170504072050.GB14413@umbus.fritz.box>
+References: <20170430172547.13415-1-danielhb@linux.vnet.ibm.com>
+	<20170430172547.13415-3-danielhb@linux.vnet.ibm.com>
+	<CAGZKiBok2=HRT9BjMiDx+c20YeKhknJ0ZD_GV1Zx=BrbFSmxwA@mail.gmail.com>
+	<c890eaba-6d61-4e82-c771-1476cd3df0f2@linux.vnet.ibm.com>
+	<20170504072050.GB14413@umbus.fritz.box>
+From: Bharata B Rao <bharata.rao@gmail.com>
+Date: Fri, 5 May 2017 10:08:37 +0530
+Message-ID: <CAGZKiBpMjqnmL-TOcBbWy4BO+OAdLdi-UCH5fVDq_J+2eyCbTw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/5] hw/ppc: removing
+ spapr_drc_detach_cb opaques
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +26,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
+On Thu, May 4, 2017 at 12:50 PM, David Gibson <david@gibson.dropbear.id.au>
+wrote:
 
-
-On 2017=E5=B9=B404=E6=9C=8827=E6=97=A5 11:46, Zhang Chen wrote:
-> Because of previous patch's trace arguments over the limit
-> of UST backend, so I rewrite the patch.
+> On Tue, May 02, 2017 at 04:43:51AM -0300, Daniel Henrique Barboza wrote:
+> >
+> >
+> > On 05/02/2017 12:40 AM, Bharata B Rao wrote:
+> > > On Sun, Apr 30, 2017 at 10:55 PM, Daniel Henrique Barboza
+> > > <danielhb@linux.vnet.ibm.com <mailto:danielhb@linux.vnet.ibm.com>>
+> > > wrote:
+> > >
+> > >     Following up the previous detach_cb change, this patch removes the
+> > >     detach_cb_opaque entirely from the code.
+> > >
+> > >     The reason is that the drc->detach_cb_opaque object can't be
+> > >     restored in the post load of the upcoming DRC migration and no
+> detach
+> > >     callbacks actually need this opaque. 'spapr_core_release' is
+> > >     receiving it as NULL, 'spapr_phb_remove_pci_device_cb' is
+> receiving
+> > >     a phb object as opaque but is't using it. These were trivial
+> removal
+> > >     cases.
+> > >
+> > >     However, the LM removal callback 'spapr_lmb_release' is receiving
+> > >     and using the opaque object, a 'sPAPRDIMMState' struct. This struct
+> > >     holds the number of LMBs the DIMM object contains and the callback
+> > >     was using this counter as a countdown to check if all LMB DRCs were
+> > >     release before proceeding to the DIMM unplug. To remove the need of
+> > >     this callback we have choices such as:
+> > >
+> > >     - migrate the 'sPAPRDIMMState' struct. This would require creating
+> a
+> > >     QTAILQ to store all DIMMStates and an additional 'dimm_id' field to
+> > >     associate the DIMMState with the DIMM object. We could attach this
+> > >     QTAILQ to the 'sPAPRPHBState' and retrieve it later in the
+> callback.
+> > >
+> > >     - fetch the state of the LMB DRCs directly by scanning the state of
+> > >     them and, if all of them are released, proceed with the DIMM
+> unplug.
+> > >
+> > >     The second approach was chosen. The new
+> 'spapr_all_lmbs_drcs_released'
+> > >     function scans all LMBs of a given DIMM device to see if their DRC
+> > >     state are inactive. If all of them are inactive return 'true',
+> 'false'
+> > >     otherwise. This function is being called inside the
+> > >     'spapr_lmb_release'
+> > >     callback, replacing the role of the 'sPAPRDIMMState' opaque. The
+> > >     'sPAPRDIMMState' struct was removed from the code given that there
+> are
+> > >     no more uses for it.
+> > >
+> > >     After all these changes, there are no roles left for the
+> > >     'detach_cb_opaque'
+> > >     attribute of the 'sPAPRDRConnector' as well, so we can safely
+> remove
+> > >     it from the code too.
+> > >
+> > >     Signed-off-by: Daniel Henrique Barboza
+> > >     <danielhb@linux.vnet.ibm.com <mailto:danielhb@linux.vnet.ibm.com>>
+> > >     ---
+> > >      hw/ppc/spapr.c             | 46
+> > >     +++++++++++++++++++++++++++++++++-------------
+> > >      hw/ppc/spapr_drc.c         | 16 +++++-----------
+> > >      hw/ppc/spapr_pci.c         |  4 ++--
+> > >      include/hw/ppc/spapr_drc.h |  6 ++----
+> > >      4 files changed, 42 insertions(+), 30 deletions(-)
+> > >
+> > >     diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > >     index bc11757..8b9a6cf 100644
+> > >     --- a/hw/ppc/spapr.c
+> > >     +++ b/hw/ppc/spapr.c
+> > >     @@ -1887,21 +1887,43 @@ static void spapr_drc_reset(void *opaque)
+> > >          }
+> > >      }
+> > >
+> > >     -typedef struct sPAPRDIMMState {
+> > >     -    uint32_t nr_lmbs;
+> > >     -} sPAPRDIMMState;
+> > >     +static bool spapr_all_lmbs_drcs_released(PCDIMMDevice *dimm)
+> > >     +{
+> > >     +    Error *local_err = NULL;
+> > >     +    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> > >     +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+> > >     +    uint64_t size = memory_region_size(mr);
+> > >     +
+> > >     +    uint64_t addr;
+> > >     +    addr = object_property_get_int(OBJECT(dimm),
+> > >     PC_DIMM_ADDR_PROP, &local_err);
+> > >     +    if (local_err) {
+> > >     +        error_propagate(&error_abort, local_err);
+> > >     +        return false;
+> > >     +    }
+> > >     +    uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+> > >
+> > >     -static void spapr_lmb_release(DeviceState *dev, void *opaque)
+> > >     +    sPAPRDRConnector *drc;
+> > >     +    int i = 0;
+> > >     +    for (i = 0; i < nr_lmbs; i++) {
+> > >     +        drc = spapr_dr_connector_by_id(
+> SPAPR_DR_CONNECTOR_TYPE_LMB,
+> > >     +                addr / SPAPR_MEMORY_BLOCK_SIZE);
+> > >     +        g_assert(drc);
+> > >     +        if (drc->indicator_state !=
+> > >     SPAPR_DR_INDICATOR_STATE_INACTIVE) {
+> > >     +            return false;
+> > >     +        }
+> > >     +        addr += SPAPR_MEMORY_BLOCK_SIZE;
+> > >     +    }
+> > >     +    return true;
+> > >     +}
+> > >     +
+> > >     +static void spapr_lmb_release(DeviceState *dev)
+> > >      {
+> > >     -    sPAPRDIMMState *ds = (sPAPRDIMMState *)opaque;
+> > >          HotplugHandler *hotplug_ctrl;
+> > >
+> > >     -    if (--ds->nr_lmbs) {
+> > >     +    if (!spapr_all_lmbs_drcs_released(PC_DIMM(dev))) {
+> > >              return;
+> > >          }
+> > >
+> > >
+> > > I am concerned about the number of times we walk the DRC list
+> > > corresponding to each DIMM device. When a DIMM device is being removed,
+> > > spapr_lmb_release() will be invoked for each of the LMBs of that DIMM.
+> > > Now in this scheme, we end up walking through all the DRC objects of
+> the
+> > > DIMM from every LMB's release function.
+> >
+> > Hi Bharata,
+> >
+> >
+> > I agree, this is definitely a poorer performance than simply decrementing
+> > ds->nr_lmbs.
+> > The reasons why I went on with it:
+> >
+> > - hot unplug isn't an operation that happens too often, so it's not
+> terrible
+> > to have a delay increase here;
 >
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
->   net/colo-compare.c | 33 ++++++++++++++++++++++-----------
->   net/trace-events   |  3 +--
->   2 files changed, 23 insertions(+), 13 deletions(-)
+> So, if it were just a fixed increase in the time, I'd agree.  But IIUC
+> from the above, this basically makes the removal O(N^2) in the size of
+> the DIMM, which sounds like it could get bad to me.
 >
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index 4ab80b1..2639c7f 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -265,17 +265,28 @@ static int colo_packet_compare_tcp(Packet *spkt, =
-Packet *ppkt)
->       }
->  =20
->       if (res !=3D 0 && trace_event_get_state(TRACE_COLO_COMPARE_MISCOM=
-PARE)) {
-> -        trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
-> -                                        ntohl(stcp->th_seq),
-> -                                        ntohl(stcp->th_ack),
-> -                                        res, stcp->th_flags,
-> -                                        spkt->size);
-> -
-> -        trace_colo_compare_pkt_info_dst(inet_ntoa(ppkt->ip->ip_dst),
-> -                                        ntohl(ptcp->th_seq),
-> -                                        ntohl(ptcp->th_ack),
-> -                                        res, ptcp->th_flags,
-> -                                        ppkt->size);
-> +        char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_ds=
-t[20];
-> +
-> +        strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
-> +        strcpy(pri_ip_dst, inet_ntoa(ppkt->ip->ip_dst));
-> +        strcpy(sec_ip_src, inet_ntoa(spkt->ip->ip_src));
-> +        strcpy(sec_ip_dst, inet_ntoa(spkt->ip->ip_dst));
-> +
-> +        trace_colo_compare_ip_info(ppkt->size, pri_ip_src,
-> +                                   pri_ip_dst, spkt->size,
-> +                                   sec_ip_src, sec_ip_dst);
-> +
-> +        trace_colo_compare_tcp_info("pri tcp packet",
-> +                                    ntohl(ptcp->th_seq),
-> +                                    ntohl(ptcp->th_ack),
-> +                                    res, ptcp->th_flags,
-> +                                    ppkt->size);
-> +
-> +        trace_colo_compare_tcp_info("sec tcp packet",
-> +                                    ntohl(stcp->th_seq),
-> +                                    ntohl(stcp->th_ack),
-> +                                    res, stcp->th_flags,
-> +                                    spkt->size);
->  =20
->           qemu_hexdump((char *)ppkt->data, stderr,
->                        "colo-compare ppkt", ppkt->size);
-> diff --git a/net/trace-events b/net/trace-events
-> index 35198bc..247e5c0 100644
-> --- a/net/trace-events
-> +++ b/net/trace-events
-> @@ -13,8 +13,7 @@ colo_compare_icmp_miscompare(const char *sta, int siz=
-e) ": %s =3D %d"
->   colo_compare_ip_info(int psize, const char *sta, const char *stb, int=
- ssize, const char *stc, const char *std) "ppkt size =3D %d, ip_src =3D %=
-s, ip_dst =3D %s, spkt size =3D %d, ip_src =3D %s, ip_dst =3D %s"
->   colo_old_packet_check_found(int64_t old_time) "%" PRId64
->   colo_compare_miscompare(void) ""
-> -colo_compare_pkt_info_src(const char *src, uint32_t sseq, uint32_t sac=
-k, int res, uint32_t sflag, int ssize) "src/dst: %s s: seq/ack=3D%u/%u re=
-s=3D%d flags=3D%x spkt_size: %d\n"
-> -colo_compare_pkt_info_dst(const char *dst, uint32_t dseq, uint32_t dac=
-k, int res, uint32_t dflag, int dsize) "src/dst: %s d: seq/ack=3D%u/%u re=
-s=3D%d flags=3D%x dpkt_size: %d\n"
-> +colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int=
- res, uint32_t flag, int size) "side: %s seq/ack=3D %u/%u res=3D %d flags=
-=3D %x pkt_size: %d\n"
->  =20
->   # net/filter-rewriter.c
->   colo_filter_rewriter_debug(void) ""
+> > - it didn't increased the unplug delay in an human noticeable way, at
+> least
+> > in
+> > my tests;
+>
+> Right, but what size of DIMM did you use?
+>
+> > - apart from migrating the information, there is nothing much we can do
+> in
+> > the
+> > callback side about it. The callback isn't aware of the current state of
+> the
+> > DIMM
+> > removal process, so the scanning is required every time.
+>
+> Well we could potentially use "cached" state here.  In the normal way
+> of things we use a value like this, but in the case of migration we
+> re-generate the information with a full scan.
+>
+> > All that said, assuming that the process of DIMM removal will always go
+> > through
+> > 'spapr_del_lmbs', why do we need this callback? Can't we simply do
+> something
+> > like this in spapr_del_lmbs?
+> >
+> >
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index cd42449..e443fea 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2734,6 +2734,20 @@ static void spapr_del_lmbs(DeviceState *dev,
+> uint64_t
+> > addr_start, uint64_t size,
+> >          addr += SPAPR_MEMORY_BLOCK_SIZE;
+> >      }
+> >
+> > +    if (!spapr_all_lmbs_drcs_released(PC_DIMM(dev))) {
+> > +        // something went wrong in the removal of the LMBs.
+> > +        // propagate error and return
+> > +        throw_error_code;
+> > +        return;
+> > +    }
+> > +
+> > +    /*
+> > +     * Now that all the LMBs have been removed by the guest, call the
+> > +     * pc-dimm unplug handler to cleanup up the pc-dimm device.
+> > +     */
+> > +    hotplug_ctrl = qdev_get_hotplug_handler(dev);
+> > +    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+> > +
+> >      drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
+> >                                     addr_start /
+> SPAPR_MEMORY_BLOCK_SIZE);
+> >      drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> >
+> >
+> > With this change we run the LMB scanning once at the end of the for
+> > loop inside spapr_del_lmbs to make sure everything went fine (something
+> > that the current code  isn't doing, there are operationsvbeing done
+> > afterwards
+> > without checking if the LMB removals actually happened).
+> >
+> > If something went wrong, propagate an error. If not, proceed with the
+> > removal
+> > of the DIMM device and the remaining spapr_del_lmbs code.
+> spapr_lmb_release
+> > can
+> > be safely removed from the code after that.
+> >
+> >
+> > What do you think?
+>
+> That seems like a good idea, independent of anything else.  But I may
+> not be remembering how the LMB removal paths all work.  Bharata?
+>
 
-Applied, thanks.
+As I pointed out in another thread and as Daniel himself realized, the
+above scheme won't work as we have to wait for the guest to acknowledge the
+removal and that is when callback is executed.
+
+Regards,
+Bharata.
