@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d6bgt-0008TC-HR
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:46:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d6biF-0000xH-DX
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d6bgq-0006hA-Cx
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:46:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d6bgq-0006gr-4C
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:46:28 -0400
-Date: Fri, 5 May 2017 12:46:21 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170505114621.GG12773@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170504145658.5506-1-berrange@redhat.com>
-	<20170504184241.GB3482@thinpad.lan.raisama.net>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d6biC-00074A-8i
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:47:55 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d6biC-000731-2u
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:47:52 -0400
+Received: by mail-qt0-x241.google.com with SMTP id j13so413449qta.3
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 04:47:50 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170505104101.30589-1-kraxel@redhat.com>
+	<20170505104101.30589-2-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5f4bacb7-af8d-90f4-679b-5846173fc4e6@amsat.org>
+Date: Fri, 5 May 2017 08:47:46 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170504184241.GB3482@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH RFC] i386: expose "TCGTCGTCGTCG" in the
- 0x40000000 CPUID leaf
+In-Reply-To: <20170505104101.30589-2-kraxel@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] virtio-gpu: move virtio_gpu_gl_block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +34,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Richard W.M. Jones" <rjones@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-On Thu, May 04, 2017 at 03:42:41PM -0300, Eduardo Habkost wrote:
-> On Thu, May 04, 2017 at 03:56:58PM +0100, Daniel P. Berrange wrote:
-> > Currently when running KVM, we expose "KVMKVMKVM\0\0\0" in
-> > the 0x40000000 CPUID leaf. Other hypervisors (VMWare,
-> > HyperV, Xen, BHyve) all do the same thing, which leaves
-> > TCG as the odd one out.
-> > 
-> > The CPUID is used by software to detect when running in a
-> > virtual environment and change behaviour in certain ways.
-> > For example, systemd supports a ConditionVirtualization=
-> > setting in unit files. Currently they have to resort to
-> > custom hacks like looking for 'fw-cfg' entry in the
-> > /proc/device-tree file. The virt-what command has the
-> > same hacks & needs.
-> > 
-> > This change thus proposes a signature TCGTCGTCGTCG to be
-> > reported when running under TCG.
-> > 
-> > NB1, for reasons I don't undersatnd 'cpu_x86_cpuid' function
-> > clamps the requested CPUID leaf based on env->cpuid_level.
+On 05/05/2017 07:40 AM, Gerd Hoffmann wrote:
+> Move to virtio-gpu-3d.c where all the other virgl code lives too.
+>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-[snip]
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> > NB2, for KVM, we added a flag for '-cpu kvm=off' to let you
-> > hide the KVMKVMKVM signature from guests. Presumably we should
-> > add a 'tcg=off' flag for the same reason ?
-> 
-> I don't like "kvm=off" because it sounds like it disables KVM
-> completely. "tcg=off" would be misleading as well.
-> 
-> What about a generic "hypervisor-cpuid=off" property?
-
-Assuming that is intended to obsolete the existing 'kvm' parameter too,
-I'm not seeing a way to introduce that in a backwards compatible safe
-manner.
-
-eg we add
-
-    DEFINE_PROP_BOOL("hypervisor-cpuid", X86CPU, expose_hypervisor, true),
-
-and in legacy machine types we need to set
-
-    {\
-        .driver   = TYPE_X86_CPU,\
-        .property = "hypervisor-cpuid",\
-        .value    = "off",\
-    },\
-
-to prevent TCGTCGTCGTCG appearing.
-
-
-Now in current KVM code we have
-
-    if (cpu->expose_kvm) {
-        memcpy(signature, "KVMKVMKVM\0\0\0", 12);
-        ....
-    }
-
-if we add 'expose_hypervisor' as a generic variable and thus change
-existing KVM code to
-
-    if (cpu->expose_kvm || cpu->expose_hypervisor)
-
-then to disable the KVMKVMKVMKVM signature, we now need to set *two*
-flags - kvm=off, and hypervisor-cpuid=off and this will break existing
-apps that are only setting kvm=off to disable it.
-
-Conversely if we do
-
-    if (cpu->expose_kvm && cpu->expose_hypervisor)
-
-we're going to break KVMKVMKVM signature reporting by default, since
-we need to set hypervisor-cpuid=off in back compat machine types
-to prevent TCGTCGTCGTCG being exposed.
-
-So it seems we're doomed either way, as we can't distinguish between
-a boolean value that is at its default, vs a boolean value that has
-been explicitly set to a value that matches the default.
-
-Having a separate variable just for TCG seems the only viable option
-to me - eg
-
-    DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> ---
+>  include/hw/virtio/virtio-gpu.h |  1 +
+>  hw/display/virtio-gpu-3d.c     | 16 ++++++++++++++++
+>  hw/display/virtio-gpu.c        | 18 ++----------------
+>  3 files changed, 19 insertions(+), 16 deletions(-)
+>
+> diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
+> index f3ffdceca4..83f474ffc3 100644
+> --- a/include/hw/virtio/virtio-gpu.h
+> +++ b/include/hw/virtio/virtio-gpu.h
+> @@ -169,6 +169,7 @@ void virtio_gpu_virgl_process_cmd(VirtIOGPU *g,
+>                                    struct virtio_gpu_ctrl_command *cmd);
+>  void virtio_gpu_virgl_fence_poll(VirtIOGPU *g);
+>  void virtio_gpu_virgl_reset(VirtIOGPU *g);
+> +void virtio_gpu_gl_block(void *opaque, bool block);
+>  int virtio_gpu_virgl_init(VirtIOGPU *g);
+>
+>  #endif
+> diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+> index f49b7fe8cd..8c106a662d 100644
+> --- a/hw/display/virtio-gpu-3d.c
+> +++ b/hw/display/virtio-gpu-3d.c
+> @@ -600,6 +600,22 @@ void virtio_gpu_virgl_reset(VirtIOGPU *g)
+>      }
+>  }
+>
+> +void virtio_gpu_gl_block(void *opaque, bool block)
+> +{
+> +    VirtIOGPU *g = opaque;
+> +
+> +    if (block) {
+> +        g->renderer_blocked++;
+> +    } else {
+> +        g->renderer_blocked--;
+> +    }
+> +    assert(g->renderer_blocked >= 0);
+> +
+> +    if (g->renderer_blocked == 0) {
+> +        virtio_gpu_process_cmdq(g);
+> +    }
+> +}
+> +
+>  int virtio_gpu_virgl_init(VirtIOGPU *g)
+>  {
+>      int ret;
+> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> index e1056f34df..cfb5dfa336 100644
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -929,28 +929,14 @@ static int virtio_gpu_ui_info(void *opaque, uint32_t idx, QemuUIInfo *info)
+>      return 0;
+>  }
+>
+> -static void virtio_gpu_gl_block(void *opaque, bool block)
+> -{
+> -    VirtIOGPU *g = opaque;
+> -
+> -    if (block) {
+> -        g->renderer_blocked++;
+> -    } else {
+> -        g->renderer_blocked--;
+> -    }
+> -    assert(g->renderer_blocked >= 0);
+> -
+> -    if (g->renderer_blocked == 0) {
+> -        virtio_gpu_process_cmdq(g);
+> -    }
+> -}
+> -
+>  const GraphicHwOps virtio_gpu_ops = {
+>      .invalidate = virtio_gpu_invalidate_display,
+>      .gfx_update = virtio_gpu_update_display,
+>      .text_update = virtio_gpu_text_update,
+>      .ui_info = virtio_gpu_ui_info,
+> +#ifdef CONFIG_VIRGL
+>      .gl_block = virtio_gpu_gl_block,
+> +#endif
+>  };
+>
+>  static const VMStateDescription vmstate_virtio_gpu_scanout = {
+>
