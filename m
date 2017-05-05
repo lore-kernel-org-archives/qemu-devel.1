@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aFH-0002Lj-Tv
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFJ-0002Me-9r
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6aFG-0006eL-4P
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60366)
+	(envelope-from <pbonzini@redhat.com>) id 1d6aFI-0006fE-Gn
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50834)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFF-0006e8-Td
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:54 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6aFI-0006ew-Ak
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:13:56 -0400
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E80F815D9
-	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 10:13:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4497161D11
+	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 10:13:55 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  5 May 2017 12:13:27 +0200
-Message-Id: <20170505101337.4650-12-pbonzini@redhat.com>
+Date: Fri,  5 May 2017 12:13:29 +0200
+Message-Id: <20170505101337.4650-14-pbonzini@redhat.com>
 In-Reply-To: <20170505101337.4650-1-pbonzini@redhat.com>
 References: <20170505101337.4650-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 11/21] checkpatch: Disallow glib asserts in main
- code
+Subject: [Qemu-devel] [PULL 13/21] dump: Acquire BQL around vm_start() in
+ dump thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +31,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-Glib commit a6a875068779 (from 2013) made many of the glib assert
-macros non-fatal if a flag is set.
-This causes two problems:
-  a) Compilers moan that your code is unsafe even though you've
-     put an assert in before the point of use.
-  b) Someone evil could, in a library, call
-     g_test_set_nonfatal_assertions() and cause our assertions in
-     important places not to fail and potentially allow memory overruns.
+This fixes an assertion failure in the following backtrace:
 
-Ban most of the glib assertion functions (basically everything except
-g_assert and g_assert_not_reached) except in tests/
+    __GI___assert_fail
+    memory_region_transaction_commit
+    memory_region_add_eventfd
+    virtio_pci_ioeventfd_assign
+    virtio_bus_set_host_notifier
+    virtio_blk_data_plane_start
+    virtio_bus_start_ioeventfd
+    virtio_vmstate_change
+    vm_state_notify
+    vm_prepare_start
+    vm_start
+    dump_cleanup
+    dump_process
+    dump_thread
+    start_thread
+    clone
 
-This makes checkpatch gives an error such as:
+vm_start need BQL, acquire it if doing cleaning up from main thread.
 
-  ERROR: Use g_assert or g_assert_not_reached
-  #77: FILE: vl.c:4725:
-  +    g_assert_cmpstr("Chocolate", >, "Cheese");
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20170427165526.19836-1-dgilbert@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-Id: <20170503072819.14462-1-famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/checkpatch.pl | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ dump.c                | 7 +++++++
+ include/sysemu/dump.h | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index f084542934..73cee81b79 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2571,6 +2571,27 @@ sub process {
- 		if ($line =~ /\bbzero\(/) {
- 			ERROR("use memset() instead of bzero()\n" . $herecurr);
- 		}
-+		my $non_exit_glib_asserts = qr{g_assert_cmpstr|
-+						g_assert_cmpint|
-+						g_assert_cmpuint|
-+						g_assert_cmphex|
-+						g_assert_cmpfloat|
-+						g_assert_true|
-+						g_assert_false|
-+						g_assert_nonnull|
-+						g_assert_null|
-+						g_assert_no_error|
-+						g_assert_error|
-+						g_test_assert_expected_messages|
-+						g_test_trap_assert_passed|
-+						g_test_trap_assert_stdout|
-+						g_test_trap_assert_stdout_unmatched|
-+						g_test_trap_assert_stderr|
-+						g_test_trap_assert_stderr_unmatched}x;
-+		if ($realfile !~ /^tests\// &&
-+			$line =~ /\b(?:$non_exit_glib_asserts)\(/) {
-+			ERROR("Use g_assert or g_assert_not_reached\n". $herecurr);
-+		}
- 	}
+diff --git a/dump.c b/dump.c
+index f7b80d856b..d9090a24cc 100644
+--- a/dump.c
++++ b/dump.c
+@@ -77,7 +77,13 @@ static int dump_cleanup(DumpState *s)
+     memory_mapping_list_free(&s->list);
+     close(s->fd);
+     if (s->resume) {
++        if (s->detached) {
++            qemu_mutex_lock_iothread();
++        }
+         vm_start();
++        if (s->detached) {
++            qemu_mutex_unlock_iothread();
++        }
+     }
  
- 	# If we have no input at all, then there is nothing to report on
+     return 0;
+@@ -1804,6 +1810,7 @@ void qmp_dump_guest_memory(bool paging, const char *file,
+ 
+     if (detach_p) {
+         /* detached dump */
++        s->detached = true;
+         qemu_thread_create(&s->dump_thread, "dump_thread", dump_thread,
+                            s, QEMU_THREAD_DETACHED);
+     } else {
+diff --git a/include/sysemu/dump.h b/include/sysemu/dump.h
+index ef931be469..2672a15f8b 100644
+--- a/include/sysemu/dump.h
++++ b/include/sysemu/dump.h
+@@ -157,6 +157,7 @@ typedef struct DumpState {
+     uint32_t sh_info;
+     bool have_section;
+     bool resume;
++    bool detached;
+     ssize_t note_size;
+     hwaddr memory_offset;
+     int fd;
 -- 
 2.12.2
