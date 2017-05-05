@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39897)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d6bsX-0006jv-9J
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:58:35 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40216)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1d6btI-0007Mp-BT
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1d6bsV-0005eb-J0
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:58:33 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34404)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1d6bsV-0005eO-5g
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:58:31 -0400
-Received: by mail-lf0-x244.google.com with SMTP id q24so367770lfb.1
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 04:58:30 -0700 (PDT)
+	(envelope-from <n54@gmx.com>) id 1d6btF-0006B3-As
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:59:20 -0400
+Received: from mout.gmx.net ([212.227.15.19]:55738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1d6btE-000698-Vj
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 07:59:17 -0400
+References: <20170426105027.10666-1-n54@gmx.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <bb7b340d-a4a4-fc63-a704-5b32cb482695@gmx.com>
+Date: Fri, 5 May 2017 13:51:12 +0200
 MIME-Version: 1.0
-References: <20170505104101.30589-1-kraxel@redhat.com>
-	<20170505104101.30589-3-kraxel@redhat.com>
-In-Reply-To: <20170505104101.30589-3-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 05 May 2017 11:58:19 +0000
-Message-ID: <CAJ+F1CJSxD4G6R0AQcazmvU=me-EZmWDpy8rLjBJStRpxY+zRA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/6] egl-helpers: drop support for gles and
- debug logging
+In-Reply-To: <20170426105027.10666-1-n54@gmx.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hWC51Aua1bFJmuAVl0SgnT1wpXAD4wft2"
+Subject: Re: [Qemu-devel] [PATCH] configure: Detect native NetBSD curses(3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,195 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Fri, May 5, 2017 at 2:43 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hWC51Aua1bFJmuAVl0SgnT1wpXAD4wft2
+From: Kamil Rytarowski <n54@gmx.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
+Message-ID: <bb7b340d-a4a4-fc63-a704-5b32cb482695@gmx.com>
+Subject: Re: [PATCH] configure: Detect native NetBSD curses(3)
+References: <20170426105027.10666-1-n54@gmx.com>
+In-Reply-To: <20170426105027.10666-1-n54@gmx.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-> Leftover from the early opengl days.
-> Unused now, so delete the dead code.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->
+x1 ping
 
+On 26.04.2017 12:50, Kamil Rytarowski wrote:
+> NetBSD ships with traditional BSD curses with compatibility with ncurse=
+s.
+> qemu works nicely with the basesystem version of curses(3) from NetBSD.=
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> The only mismatch between curses(3) and ncurses is the lack of
+> curses_version() in the NetBSD version. This function is used solely in=
 
-
-
+> the configure script, therefore eliminate it from the curses(3) detecti=
+on.
+>=20
+> With this change applied, configure detects correctly curses frontend.
+>=20
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
 > ---
->  include/ui/egl-helpers.h |  2 +-
->  ui/egl-helpers.c         | 52
-> +++++-------------------------------------------
->  ui/gtk-egl.c             |  2 +-
->  3 files changed, 7 insertions(+), 49 deletions(-)
->
-> diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
-> index 88a13e827b..fec7da14a5 100644
-> --- a/include/ui/egl-helpers.h
-> +++ b/include/ui/egl-helpers.h
-> @@ -21,7 +21,7 @@ int egl_get_fd_for_texture(uint32_t tex_id, EGLint
-> *stride, EGLint *fourcc);
->
->  EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win);
->
-> -int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug);
-> +int qemu_egl_init_dpy(EGLNativeDisplayType dpy);
->  EGLContext qemu_egl_init_ctx(void);
->
->  #endif /* EGL_HELPERS_H */
-> diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-> index b7b6b2e3cc..a3d7c3d7f5 100644
-> --- a/ui/egl-helpers.c
-> +++ b/ui/egl-helpers.c
-> @@ -26,18 +26,6 @@ EGLConfig qemu_egl_config;
->
->  /* ---------------------------------------------------------------------=
--
-> */
->
-> -static bool egl_gles;
-> -static int egl_debug;
-> -
-> -#define egl_dbg(_x ...)                          \
-> -    do {                                         \
-> -        if (egl_debug) {                         \
-> -            fprintf(stderr, "egl: " _x);         \
-> -        }                                        \
-> -    } while (0);
-> -
-> -/* ---------------------------------------------------------------------=
--
-> */
-> -
->  #ifdef CONFIG_OPENGL_DMABUF
->
->  int qemu_egl_rn_fd;
-> @@ -105,7 +93,7 @@ int egl_rendernode_init(const char *rendernode)
->          goto err;
->      }
->
-> -    qemu_egl_init_dpy((EGLNativeDisplayType)qemu_egl_rn_gbm_dev, false,
-> false);
-> +    qemu_egl_init_dpy((EGLNativeDisplayType)qemu_egl_rn_gbm_dev);
->
->      if (!epoxy_has_egl_extension(qemu_egl_display,
->                                   "EGL_KHR_surfaceless_context")) {
-> @@ -171,8 +159,6 @@ EGLSurface qemu_egl_init_surface_x11(EGLContext ectx,
-> Window win)
->      EGLSurface esurface;
->      EGLBoolean b;
->
-> -    egl_dbg("eglCreateWindowSurface (x11 win id 0x%lx) ...\n",
-> -            (unsigned long) win);
->      esurface =3D eglCreateWindowSurface(qemu_egl_display,
->                                        qemu_egl_config,
->                                        (EGLNativeWindowType)win, NULL);
-> @@ -242,7 +228,7 @@ static EGLDisplay qemu_egl_get_display(void *native)
->      return dpy;
+>  configure | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/configure b/configure
+> index c35acf1192..17dc7224f7 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3034,14 +3034,13 @@ if test "$curses" !=3D "no" ; then
+>  #include <curses.h>
+>  #include <wchar.h>
+>  int main(void) {
+> -  const char *s =3D curses_version();
+>    wchar_t wch =3D L'w';
+>    setlocale(LC_ALL, "");
+>    resize_term(0, 0);
+>    addwstr(L"wide chars\n");
+>    addnwstr(&wch, 1);
+>    add_wch(WACS_DEGREE);
+> -  return s !=3D 0;
+> +  return 0;
 >  }
->
-> -int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
-> +int qemu_egl_init_dpy(EGLNativeDisplayType dpy)
->  {
->      static const EGLint conf_att_gl[] =3D {
->          EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-> @@ -253,56 +239,34 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, boo=
-l
-> gles, bool debug)
->          EGL_ALPHA_SIZE, 0,
->          EGL_NONE,
->      };
-> -    static const EGLint conf_att_gles[] =3D {
-> -        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-> -        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-> -        EGL_RED_SIZE,   5,
-> -        EGL_GREEN_SIZE, 5,
-> -        EGL_BLUE_SIZE,  5,
-> -        EGL_ALPHA_SIZE, 0,
-> -        EGL_NONE,
-> -    };
->      EGLint major, minor;
->      EGLBoolean b;
->      EGLint n;
->
-> -    if (debug) {
-> -        egl_debug =3D 1;
-> -        setenv("EGL_LOG_LEVEL", "debug", true);
-> -        setenv("LIBGL_DEBUG", "verbose", true);
-> -    }
-> -
-> -    egl_dbg("qemu_egl_get_display (dpy %p) ...\n", dpy);
->      qemu_egl_display =3D qemu_egl_get_display(dpy);
->      if (qemu_egl_display =3D=3D EGL_NO_DISPLAY) {
->          error_report("egl: eglGetDisplay failed");
->          return -1;
->      }
->
-> -    egl_dbg("eglInitialize ...\n");
->      b =3D eglInitialize(qemu_egl_display, &major, &minor);
->      if (b =3D=3D EGL_FALSE) {
->          error_report("egl: eglInitialize failed");
->          return -1;
->      }
->
-> -    egl_dbg("eglBindAPI ...\n");
-> -    b =3D eglBindAPI(gles ? EGL_OPENGL_ES_API : EGL_OPENGL_API);
-> +    b =3D eglBindAPI(EGL_OPENGL_API);
->      if (b =3D=3D EGL_FALSE) {
->          error_report("egl: eglBindAPI failed");
->          return -1;
->      }
->
-> -    egl_dbg("eglChooseConfig ...\n");
-> -    b =3D eglChooseConfig(qemu_egl_display,
-> -                        gles ? conf_att_gles : conf_att_gl,
-> +    b =3D eglChooseConfig(qemu_egl_display, conf_att_gl,
->                          &qemu_egl_config, 1, &n);
->      if (b =3D=3D EGL_FALSE || n !=3D 1) {
->          error_report("egl: eglChooseConfig failed");
->          return -1;
->      }
-> -
-> -    egl_gles =3D gles;
->      return 0;
->  }
->
-> @@ -311,17 +275,11 @@ EGLContext qemu_egl_init_ctx(void)
->      static const EGLint ctx_att_gl[] =3D {
->          EGL_NONE
->      };
-> -    static const EGLint ctx_att_gles[] =3D {
-> -        EGL_CONTEXT_CLIENT_VERSION, 2,
-> -        EGL_NONE
-> -    };
-> -
->      EGLContext ectx;
->      EGLBoolean b;
->
-> -    egl_dbg("eglCreateContext ...\n");
->      ectx =3D eglCreateContext(qemu_egl_display, qemu_egl_config,
-> EGL_NO_CONTEXT,
-> -                            egl_gles ? ctx_att_gles : ctx_att_gl);
-> +                            ctx_att_gl);
->      if (ectx =3D=3D EGL_NO_CONTEXT) {
->          error_report("egl: eglCreateContext failed");
->          return NULL;
-> diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
-> index d53288f027..89492c0e02 100644
-> --- a/ui/gtk-egl.c
-> +++ b/ui/gtk-egl.c
-> @@ -246,7 +246,7 @@ void gtk_egl_init(void)
->      GdkDisplay *gdk_display =3D gdk_display_get_default();
->      Display *x11_display =3D gdk_x11_display_get_xdisplay(gdk_display);
->
-> -    if (qemu_egl_init_dpy(x11_display, false, false) < 0) {
-> +    if (qemu_egl_init_dpy(x11_display) < 0) {
->          return;
->      }
->
-> --
-> 2.9.3
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+>  EOF
+>    IFS=3D:
+>=20
+
+
+
+--hWC51Aua1bFJmuAVl0SgnT1wpXAD4wft2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZDGc5AAoJEEuzCOmwLnZswTsP/RGaxdzJdMUd0HorQh4NGAHR
+RTJCTVlefMI/v9tJOSGog/goKrxH5k4vj/W8i23hJLGpHoNNmZ9Z1KeNGFoyCEB8
+GZH5G68z9QxJxQGKs05qerDFaElGLfjzcSRvU6wmE3f4kL0OfcAHOwSkBxVzwWt5
+7vIRIJMF6TT28hpewNdPHYKZwr/NiTxiJzoWbd9OzaLFrZkmWRmmyskRlrJMbfVX
+hDAowAjDMtKj8rv0/gu+bV8C3btsyvKXkQKqylfC4+RrN5RhCp7S0mNuiX9Ux+B5
+A2m2h3Z9VgXrEOjzPsF73C3ssyPHG91MkV41yLigZ4fI7OZUZNtCuj2t6JA7zltt
+x+10XVx/dQlsfqPtMk6pkZjZf/tHtezjHiinTcM3mjOYWJBF6yzQhrJStuqg1PPH
+8mR3gDt4/w0riNjlod1VL/BClVeRNms/2wkeXvOYJPIaRgOTMBd+II4sq60WEIoQ
+Iv2hAiTIRAz6+GtjFq7hKJ7WGqkZxnzfDgIKbH6/YqWXEq08HZXWhEhqb7RZIM6U
+8vCQiH1BUuD/TrTQwvJ+dB6BBpULqUHPY45gz3mTikE6nNqbC6W6qoIuRa1IbQik
+C8hRcM0BZ4IBQpjC8gYqoEOqF7R8FYuzNIXcvRzlN/t3d+GS6U4TQyGdCGUR4p56
+vefMqIlPwu+yq1aoiRdm
+=CTN0
+-----END PGP SIGNATURE-----
+
+--hWC51Aua1bFJmuAVl0SgnT1wpXAD4wft2--
