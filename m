@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d6alx-00024c-PS
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:47:42 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d6anl-0003cI-2l
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:49:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1d6alw-00021z-VN
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:47:41 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-17-pbonzini@redhat.com>
-	<20170505103658.GB11350@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ca446302-518f-63bc-9022-5b2f7182cb1a@redhat.com>
-Date: Fri, 5 May 2017 12:47:35 +0200
+	(envelope-from <arei.gonglei@huawei.com>) id 1d6ani-0002o1-0M
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:49:33 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3972)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d6anh-0002nJ-DM
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:49:29 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 5 May 2017 10:49:05 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA2650C5@DGGEMA505-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20170505103658.GB11350@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/17] block: protect
- modification of dirty bitmaps with a mutex
+Subject: [Qemu-devel] [Question] SeaBIOS: cannot boot oracle linux if
+ increase the maximum size of permanent high memory area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Kevin O'Connor <kevin@koconnor.net>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "seabios@seabios.org" <seabios@seabios.org>, "Xulei (Stone)" <stone.xulei@huawei.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Wulizhen (Pss)" <pss.wulizhen@huawei.com>
+
+Hi guys,=20
+
+Currently my workmate encountered an issues in the testing environment:=20
+
+A letter from him:
+
+In order to boot a BIG vm (with 4T mem, 255 vCPUs, 60 virtio-scsi disk...),=
+ i have to increase the=20
+BUILD_MAX_HIGHTABLE to 512KB.
+But, then i found i can not boot a  specific VM anymore (oracle linux 6.7 6=
+4bits with kernel 3.8.13, 2G mem).
+It seems be related with the unused high ram given VM back by SeaBios (mayb=
+e also related to the memory align).
+I've tested if setting giveback memory 64KB alignment other than 4KB, SeaBi=
+os with 512KB BUILD_MAX_HIGHTABLE
+can boot the specific VM. But , i don't know the reason...
+
+As far as i know, if seabios does not give back the unused ZoneHigh memory =
+seems will not trigger any problems
+but just waste only a little memory ,right?
+
+Can you tell me what's the worst effect if i apply the following patch?=20
+
+Does it influence live migration?
+
+Thanks!
+
+
+diff --git a/src/config.h b/src/config.h
+index baca029..b3536f1 100644
+index baca029..b3536f1 100644
+--- a/src/config.h
++++ b/src/config.h
+@@ -17,7 +17,7 @@
+ // Maximum number of map entries in the e820 map
+ #define BUILD_MAX_E820 32
+ // Space to reserve in high-memory for tables
+-#define BUILD_MAX_HIGHTABLE (256*1024)
++#define BUILD_MAX_HIGHTABLE (512*1024)
+
+diff --git a/src/malloc.c b/src/malloc.c
+index 3733855..6302525 100644
+--- a/src/malloc.c
++++ b/src/malloc.c
+@@ -549,13 +549,7 @@ malloc_prepboot(void)
+     dprintf(1, "Space available for UMB: %x-%x, %x-%x\n"
+             , RomEnd, base, info->range_start, info->range_end);
+
+-    // Give back unused high ram.
+-    info =3D alloc_find_lowest(&ZoneHigh);
+-    if (info) {
+-        u32 giveback =3D ALIGN_DOWN(info->range_end-info->range_start, PAG=
+E_SIZE);
+-        e820_add(info->range_start, giveback, E820_RAM);
+-        dprintf(1, "Returned %d bytes of ZoneHigh\n", giveback);
+-    }
+
+     calcRamSize();
 
 
 
-On 05/05/2017 12:36, Stefan Hajnoczi wrote:
-> On Thu, Apr 20, 2017 at 02:00:57PM +0200, Paolo Bonzini wrote:
->> @@ -410,6 +442,18 @@ int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
->>      }
->>  }
->>  
->> +int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
->> +                   int64_t sector)
-> 
-> Is it a good idea to offer an unlocked bdrv_get_dirty() API?  It
-> encourages non-atomic access to the bitmap, e.g.
-> 
->   if (bdrv_get_dirty()) {
->       ...do something outside the lock...
->       bdrv_reset_dirty_bitmap();
->   }
-> 
-> The unlocked API should be test-and-set/clear instead so that callers
-> automatically avoid race conditions.
-
-I'm not sure it's possible to implement atomic test and clear for
-HBitmap.  But I can look into removing unlocked bdrv_get_dirty, the only
-user is block migration.
-
->> diff --git a/block/mirror.c b/block/mirror.c
->> index dc227a2..6a5b0f8 100644
->> --- a/block/mirror.c
->> +++ b/block/mirror.c
->> @@ -344,10 +344,12 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
->>  
->>      sector_num = bdrv_dirty_iter_next(s->dbi);
->>      if (sector_num < 0) {
->> +        bdrv_dirty_bitmap_lock(s->dirty_bitmap);
-> 
-> bdrv_dirty_iter_next() is listed under "functions that require manual
-> locking" but it's being called outside of the lock.
-
-Thanks, will fix.
-
-Paolo
+Regards,
+-Gonglei
