@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6hEV-00066k-Oy
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:41:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d6hVq-0002ha-Pr
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:59:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6hEQ-0007oe-TM
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:41:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33032)
+	(envelope-from <ehabkost@redhat.com>) id 1d6hVn-0006tr-QO
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:59:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d6hEQ-0007o1-Jp
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:41:30 -0400
-Date: Fri, 5 May 2017 14:41:27 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d6hVn-0006tj-Ji
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:59:27 -0400
+Date: Fri, 5 May 2017 14:59:24 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170505174127.GK3482@thinpad.lan.raisama.net>
-References: <20170505142743.19849-1-berrange@redhat.com>
-	<20170505142743.19849-2-berrange@redhat.com>
+Message-ID: <20170505175924.GL3482@thinpad.lan.raisama.net>
+References: <20170502203115.22233-1-ehabkost@redhat.com>
+	<20170502203115.22233-5-ehabkost@redhat.com>
+	<20170504101638.coz6n5vc2d33bess@eukaryote>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170505142743.19849-2-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] i386: rewrite way CPUID index is
- validated
+In-Reply-To: <20170504101638.coz6n5vc2d33bess@eukaryote>
+Subject: Re: [Qemu-devel] [PATCH 4/4] x86: Support feature=force on the
+ command-line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, May 05, 2017 at 03:27:42PM +0100, Daniel P. Berrange wrote:
-> Change the nested if statements into a flat switch, to make
-> it clearer what validation / capping is being performed on
-> different CPUID index values.
+On Thu, May 04, 2017 at 12:16:38PM +0200, Kashyap Chamarthy wrote:
+> On Tue, May 02, 2017 at 05:31:15PM -0300, Eduardo Habkost wrote:
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  target/i386/cpu.c | 43 +++++++++++++++++++++++++------------------
->  1 file changed, 25 insertions(+), 18 deletions(-)
+> Hi,
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 13c0985..3d5903c 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2628,26 +2628,33 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->      uint32_t pkg_offset;
->  
->      /* test if maximum index reached */
-> -    if (index & 0x80000000) {
-> +    switch (index & 0xF0000000) {
-> +    case 0:
-> +        /* Intel documentation states that invalid EAX input will
-> +         * return the same information as EAX=cpuid_level
-> +         * (Intel SDM Vol. 2A - Instruction Set Reference - CPUID)
-> +         */
-> +        if (index > env->cpuid_level) {
-> +            index = env->cpuid_level;
-> +        }
-> +        break;
-
-It looks like we can just move this code to the default branch,
-and remove the "case 0:" branch.
-
-> +    case 0x80000000:
->          if (index > env->cpuid_xlevel) {
-> -            if (env->cpuid_xlevel2 > 0) {
-> -                /* Handle the Centaur's CPUID instruction. */
-> -                if (index > env->cpuid_xlevel2) {
-> -                    index = env->cpuid_xlevel2;
-                                    ^^^ [1]
-
-> -                } else if (index < 0xC0000000) {
-> -                    index = env->cpuid_xlevel;
-                                    ^^^ [2]
-> -                }
-> -            } else {
-> -                /* Intel documentation states that invalid EAX input will
-> -                 * return the same information as EAX=cpuid_level
-> -                 * (Intel SDM Vol. 2A - Instruction Set Reference - CPUID)
-> -                 */
-> -                index =  env->cpuid_level;
-                                 ^^^ [3]
-
-> -            }
-> +            index = env->cpuid_xlevel;
-                            ^^^ [4]
-
-Actually, CPUs do return the max _basic_ leaf (cpuid_level) even
-when input EAX is larger than 0x80000000. (See [3])
-
-...except for the existing code at [2], but:
-
-* TCG doesn't support any of the Centaur features.
-* KVM is not affected by [2] because CPUID
-  limits are handled inside the KVM kernel code (and KVM returns
-  CPUID[env->cpuid_level] on that case, see
-  linux/arch/x86/kvm/cpuid.c:check_cpuid_limit())
-
-In other words, [2] was dead code, and we only need to reproduce
-behavior implemented by [3].
-
->          }
-> -    } else {
-> -        if (index > env->cpuid_level)
-> -            index = env->cpuid_level;
-> +        break;
-> +    case 0xC0000000:
-> +        if (index > env->cpuid_xlevel2) {
-> +            index = env->cpuid_xlevel2;
-
-This line reimplements [1], but (like [2]) [1] was dead code too.
-But I suggest setting index=env->cpuid_level for consistency with
-KVM code.
-
-> +        }
-> +        break;
-> +    default:
-> +        /* Intel documentation states that invalid EAX input will
-> +         * return the same information as EAX=cpuid_level
-> +         * (Intel SDM Vol. 2A - Instruction Set Reference - CPUID)
-> +         */
-> +        index =  env->cpuid_level;
-> +        break;
->      }
-
-What about simplifying this even further:
-
-    if (index > 0xC0000000) {
-        limit = env->cpuid_xlevel2;
-    } else if (index > 0x80000000) {
-        limit = env->cpuid_xlevel;
-    } else {
-        limit = env->cpuid_level;
-    }
-
-    if (index > limit) {
-        /* Intel documentation states that invalid EAX input will
-         * return the same information as EAX=cpuid_level
-         * (Intel SDM Vol. 2A - Instruction Set Reference - CPUID)
-         */
-        index = env->cpuid_level;
-    }
-
->  
->      switch(index) {
-> -- 
-> 2.9.3
+> Yet to try this series, a small question in-line.
 > 
+> > Introduce a new CPUFeatureSetting QAPI data type, and use it to support
+> > feature=force on -cpu.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+[...]
+> > @@ -336,5 +340,13 @@ int main(int argc, char **argv)
+> >                       "-machine accel=kvm:tcg -cpu max,mmx=off",
+> >                       1, 0, "EDX", 23, false);
+> >  
+> > +    {
+> > +    FeatureTestArgs *a;
+> > +    a = add_feature_test("x86/cpuid/features/monitor-force",
+> > +                         "-machine accel=kvm:tcg -cpu 486,monitor=force",
+> 
+> Following your above test example, should the 'force' boolean also work
+> (understood: only for testing / debugging) as below, for a recognized
+> CPUID flag, taking the example of 'INVPCID'?
+> 
+>   $ qemu-system-x86_64 [...] -cpu Haswell-noTSX,invpcid=force [...]
+
+This would be valid syntax and would enable invpcid on CPUID,
+yes. But on most cases this means you will get a broken VCPU
+because the host won't virtualize the feature properly (if it
+did, the feature would be reported as available in
+GET_SUPPORTED_CPUID and "feature=on" would already work).
 
 -- 
 Eduardo
