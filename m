@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6m1o-0002oM-3H
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:48:49 -0400
+	(envelope-from <laurent@vivier.eu>) id 1d6m1x-0002ta-NL
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6m1n-0006NV-3g
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:48:48 -0400
-References: <20170429191419.30051-1-eblake@redhat.com>
-	<20170429191419.30051-10-eblake@redhat.com>
-	<9ba6f9fa-5ac7-894c-4112-ec0ca36eb82c@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <adebff53-1879-1047-7778-3e05b3426d2b@redhat.com>
-Date: Fri, 5 May 2017 17:48:38 -0500
-MIME-Version: 1.0
-In-Reply-To: <9ba6f9fa-5ac7-894c-4112-ec0ca36eb82c@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="THpNuVmPOtIcTtE1XaDQn3FwJd8IsXXi8"
-Subject: Re: [Qemu-devel] [PATCH v11 9/9] tests: Add coverage for recent
- block geometry fixes
+	(envelope-from <laurent@vivier.eu>) id 1d6m1q-0006PF-8D
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:48:55 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:54484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1d6m1p-0006Nn-TW
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 18:48:50 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Sat,  6 May 2017 00:48:32 +0200
+Message-Id: <20170505224833.17769-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v4 0/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +21,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---THpNuVmPOtIcTtE1XaDQn3FwJd8IsXXi8
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <adebff53-1879-1047-7778-3e05b3426d2b@redhat.com>
-Subject: Re: [PATCH v11 9/9] tests: Add coverage for recent block geometry
- fixes
-References: <20170429191419.30051-1-eblake@redhat.com>
- <20170429191419.30051-10-eblake@redhat.com>
- <9ba6f9fa-5ac7-894c-4112-ec0ca36eb82c@redhat.com>
-In-Reply-To: <9ba6f9fa-5ac7-894c-4112-ec0ca36eb82c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch implements the SOCKS5 client part for "-net user" backend.
 
-On 05/05/2017 05:34 PM, Max Reitz wrote:
-> On 29.04.2017 21:14, Eric Blake wrote:
->> Use blkdebug's new geometry constraints to emulate setups that
->> have needed past regression fixes: write zeroes asserting
->> when running through a loopback block device with max-transfer
->> smaller than cluster size, and discard rounding away portions
->> of requests not aligned to preferred boundaries.  Also, add
->> coverage that the block layer is honoring max transfer limits.
->>
+It allows to route all internet traffic of the virtual machine
+to a SOCKS5 server.
 
->> +function verify_io()
->> +{
->> +    if ($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" |
+But all the local traffic (to the host) is sent to the host.
+It is needed because this SOCKS5 client doesn't route UDP traffic,
+and this allows to use the host DNS server.
 
->> +
->> +verify_io | $QEMU_IO "$TEST_IMG" | _filter_qemu_io
->=20
-> This conflicts with Fam's image locking series that has been introduced=
+I've tested this using public SOCKS5 proxy list found on the WEB, and
+using TOR server on my host.
 
-> in the meantime (and unfortunately I'm the one who has to base his bloc=
-k
-> queue on Kevin's...). I suppose it's because the qemu_io process is
-> launched before the qemu_img info process.
+Used with TOR, all the TCP connections are sent to the TOR network and
+this allows to insert a virtual machine directly in the TOR network
+without needing more configuration in the virtual machine.
 
-Indeed. My test was heavily modeled after 046; there, our solution
-(currently commit 64ace79 on Kevin's tree) was to add -U, not -r.
+But be aware that all DNS requests will be sent to the host that can
+forward them to internet with its own IP address. So confidentiality
+will not be as good as with the TOR browser which hides in the TOR
+network all the DNS requests.
 
->=20
-> Simply adding an -r to the qemu_io command fixes this, however. I'll do=
+If you want to test this:
 
-> so in my branch, assuming you're OK with that. :-)
+- with a public SOCKS5 server, ask google for "socks5 proxy address"
+  and start QEMU with, for instance:
 
-I'd lean towards -U, but yes, I'm fine if you make whatever one-line
-tweak is needed to obey the rules.
+  qemu-system-x86_64 -net nic,model=e1000 -net user,proxy-server=46.105.121.37:63066 ...
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  if needed, you can provide user/password using secret objects framework:
+  "-object secret,id=sec0,data=password,format=raw \
+   -net user,...,proxy-user=user,proxy-secretid=sec0"
 
+- with a local TOR proxy:
 
---THpNuVmPOtIcTtE1XaDQn3FwJd8IsXXi8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  sudo systemctl start tor
+  qemu-system-x86_64 -net nic,model=e1000 -net user,proxy-server=localhost:9050 ...
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+You can check your IP address is the one of the proxy by connecting
+to http://check.torproject.org with a browser inside the VM.
 
-iQEcBAEBCAAGBQJZDQFGAAoJEKeha0olJ0NqYPAH/i595He/DK0mBapT2njYvA0u
-BpIGzzvXOP8wVtbJ6PFxjz/rt8sEyxHH5k9QIX+HVB1fL6iSlnZwDKPoBrj3h1Vz
-84YlfSpW5pBYpJns8Jih5tsoHnTvYYdgawtRfkOMefFu7tKXnpn7Vi2xRQTD+nxk
-uq+g2NhhLhgZHp0y3DQd2UslFnvVE4N4M3N+tWoFyMXhszAH2VBkcsOIsotbUiqS
-FywhlxoVWGGM6BKlaswg+Hn8qkTU6/ocU0im6ENx8jz0TmIhDc13+t1mzDpoPPzd
-iwAHp7q9AgFMT3cIU1ViZg+kIK+gaHrccdRQyBPnwJMYYBSUSb5XmZEngJVggAQ=
-=ONve
------END PGP SIGNATURE-----
+v4:
+  - rebase
+  - define some macros to use instead of meaningless values
+  - better management of error cases
+  - add some error logs
 
---THpNuVmPOtIcTtE1XaDQn3FwJd8IsXXi8--
+v3:
+  - rewrite SOCKS5 functions from scratch and drop code from nmap/ncat
+  - don't drop the IPv6 UDP local traffic
+  - don't pass to the proxy the IPv6 TCP local traffic
+  - add some comments...
+
+v2:
+  - use secret objects framework to provide password
+  - add documentation for new parameters in qapi-schema.json
+  - s/passwd/password/g
+  - I didn't move proxy paramaters to a substruct as I didn't
+    find a way to set them from the command line :(
+
+Laurent Vivier (1):
+  slirp: add SOCKS5 support
+
+ net/slirp.c         |  39 +++++-
+ qapi-schema.json    |   9 ++
+ qemu-options.hx     |  11 ++
+ slirp/Makefile.objs |   2 +-
+ slirp/ip_icmp.c     |   2 +-
+ slirp/libslirp.h    |   3 +
+ slirp/slirp.c       |  69 +++++++++-
+ slirp/slirp.h       |   6 +
+ slirp/socket.h      |   4 +
+ slirp/socks5.c      | 371 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/socks5.h      |  25 ++++
+ slirp/tcp_subr.c    |  22 +++-
+ slirp/udp.c         |   9 ++
+ slirp/udp6.c        |   8 ++
+ 14 files changed, 569 insertions(+), 11 deletions(-)
+ create mode 100644 slirp/socks5.c
+ create mode 100644 slirp/socks5.h
+
+-- 
+2.9.3
