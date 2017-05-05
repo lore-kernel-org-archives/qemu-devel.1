@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6gZe-0005tK-U0
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 12:59:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1d6gcD-0007Dj-08
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d6gZa-0006ZH-Mq
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 12:59:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50410)
+	(envelope-from <eblake@redhat.com>) id 1d6gcA-0007Dn-9n
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:02:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33632)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6gZa-0006Yr-DA
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 12:59:18 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d6gcA-0007Dg-0n
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 13:01:58 -0400
 References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
-	<149399503288.29022.13904385823492355197.stgit@bahia.lan>
+	<149399504137.29022.4985100698645275511.stgit@bahia.lan>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <093d42d3-a4a5-94bd-3a7a-b2a2f867ae89@redhat.com>
-Date: Fri, 5 May 2017 11:59:15 -0500
+Message-ID: <3c8abd95-b490-1b71-b467-4f00d6ce121d@redhat.com>
+Date: Fri, 5 May 2017 12:01:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <149399503288.29022.13904385823492355197.stgit@bahia.lan>
+In-Reply-To: <149399504137.29022.4985100698645275511.stgit@bahia.lan>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="rWJccGdxBTQjtV13U21SkEEWR46EDSaXn"
-Subject: Re: [Qemu-devel] [PATCH 2/5] 9pfs: local: resolve special
- directories in paths
+	boundary="fps9NA2dcMRoxDTPJQbuCjBiJmSLJO1Hm"
+Subject: Re: [Qemu-devel] [PATCH 3/5] 9pfs: local: simplify file opening
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +32,54 @@ To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?L=c3=a9o_Gaspard?= <leo@gaspard.io>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rWJccGdxBTQjtV13U21SkEEWR46EDSaXn
+--fps9NA2dcMRoxDTPJQbuCjBiJmSLJO1Hm
 From: Eric Blake <eblake@redhat.com>
 To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?L=c3=a9o_Gaspard?= <leo@gaspard.io>
-Message-ID: <093d42d3-a4a5-94bd-3a7a-b2a2f867ae89@redhat.com>
-Subject: Re: [PATCH 2/5] 9pfs: local: resolve special directories in paths
+Message-ID: <3c8abd95-b490-1b71-b467-4f00d6ce121d@redhat.com>
+Subject: Re: [PATCH 3/5] 9pfs: local: simplify file opening
 References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
- <149399503288.29022.13904385823492355197.stgit@bahia.lan>
-In-Reply-To: <149399503288.29022.13904385823492355197.stgit@bahia.lan>
+ <149399504137.29022.4985100698645275511.stgit@bahia.lan>
+In-Reply-To: <149399504137.29022.4985100698645275511.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/05/2017 09:37 AM, Greg Kurz wrote:
-> When using the mapped-file security mode, the creds of a path /foo/bar
-> are stored in the /foo/.virtfs_metadata/bar file. This is okay for all
-> paths unless they end with '.' or '..', because we cannot create the
-> corresponding file in the metadata directory.
+> All paths in the virtfs directory now start with "./" (except the virtf=
+s
+> root itself which is exactly ".").
 >=20
-> This patch ensures that '.' and '..' are resolved in all paths.
->=20
-> The core code only passes path elements (no '/') to the backend, with
-> the notable exception of the '/' path, which refers to the virtfs root.=
-
-> This patch preserve the current behavior of converting it to '.' so
-
-s/preserve/preserves/
-
-> that it can be passed to "*at()" syscalls ('/' would mean the host root=
-).
+> We hence don't need to skip leading '/' characters anymore, nor to hand=
+le
+> the empty path case. Also, since virtfs will only ever be supported on
+> linux+glibc hosts, we can use strchrnul() and come up with a much simpl=
+ier
+> code to walk through the path elements. And we don't need to dup() the
+> passed directory fd.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/9pfs/9p-local.c |   30 +++++++++++++++++++++++-------
->  1 file changed, 23 insertions(+), 7 deletions(-)
+>  hw/9pfs/9p-local.c |    5 -----
+>  hw/9pfs/9p-util.c  |   26 ++++++++++----------------
+>  2 files changed, 10 insertions(+), 21 deletions(-)
 >=20
 > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index f3ebca4f7a56..92262f3c3e37 100644
+> index 92262f3c3e37..bb6e296df317 100644
 > --- a/hw/9pfs/9p-local.c
 > +++ b/hw/9pfs/9p-local.c
-> @@ -1097,14 +1097,30 @@ static int local_name_to_path(FsContext *ctx, V=
-9fsPath *dir_path,
->                                const char *name, V9fsPath *target)
+> @@ -54,11 +54,6 @@ int local_open_nofollow(FsContext *fs_ctx, const cha=
+r *path, int flags,
 >  {
->      if (dir_path) {
-> -        v9fs_path_sprintf(target, "%s/%s", dir_path->data, name);
-> -    } else if (strcmp(name, "/")) {
-> -        v9fs_path_sprintf(target, "%s", name);
-> +        if (!strcmp(name, ".")) {
-> +            /* "." relative to "foo/bar" is "foo/bar" */
-> +            v9fs_path_copy(target, dir_path);
-> +        } else if (!strcmp(name, "..")) {
-> +            if (!strcmp(dir_path->data, ".")) {
-> +                /* ".." relative to the root is "." */
-> +                v9fs_path_sprintf(target, ".");
-> +            } else {
-> +                char *tmp =3D g_path_get_dirname(dir_path->data);
-> +                /* ".." relative to "foo/bar" is equivalent to "foo" *=
-/
+>      LocalData *data =3D fs_ctx->private;
+> =20
+> -    /* All paths are relative to the path data->mountfd points to */
+> -    while (*path =3D=3D '/') {
+> -        path++;
+> -    }
 
-True only if bar is not a symlink to some other directory.  What
-guarantees do you have that you are not going to be inadvertently
-skipping a traversal through symlinks and thereby picking the wrong
-location for '..'?
+Is it worth adding any assert()s in place of the deleted code?
 
-> +                v9fs_path_sprintf(target, "%s", tmp);
-> +                g_free(tmp);
-> +            }
-> +        } else {
-> +            assert(!strchr(name, '/'));
-> +            v9fs_path_sprintf(target, "%s/%s", dir_path->data, name);
-> +        }
-> +    } else if (!strcmp(name, "/") || !strcmp(name, ".") ||
-> +               !strcmp(name, "..")) {
-> +            /* This is the root fid */
-> +        v9fs_path_sprintf(target, ".");
->      } else {
-> -        /* We want the path of the export root to be relative, otherwi=
-se
-> -         * "*at()" syscalls would treat it as "/" in the host.
-> -         */
-> -        v9fs_path_sprintf(target, "%s", ".");
-> +        assert(!strchr(name, '/'));
-> +        v9fs_path_sprintf(target, "./%s", name);
->      }
->      return 0;
->  }
->=20
->=20
+Otherwise looks okay.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -128,7 +87,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---rWJccGdxBTQjtV13U21SkEEWR46EDSaXn
+--fps9NA2dcMRoxDTPJQbuCjBiJmSLJO1Hm
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -138,13 +97,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZDK9jAAoJEKeha0olJ0Nq37QH/RZyEF+uQzrHNNjd6ZEuB95o
-ov8jkEAIXGkwCiN1OkHLfEQHhJQ2xP5yIH4ObEG55F16kjJ11hEhkMk+dhP/dml/
-3T1o777h+Q58d3viRWR+bWMpB+Fj1jXM6EqSsxC+wPEqDkQF/DSMXvhNoFXljxyd
-NZft0MUdnA8AqpdbuHi+2Ht/SbZe+3JJ9fUh/ds9hbFt3SEfVQQH8LM1iaNUyt0X
-KZjmgtatHWMmtPiIcPsnLc2rBpzj1JYXVpVrwMnwVNPO1R1ZCzIoMW/8HxL5c6qo
-s/MkdXXDAQU38H0xQb0DXuTsaFtI9Vk3i9SPJ0HtkkUS651Wgi+XbB3BEaBROOE=
-=1f1S
+iQEcBAEBCAAGBQJZDLADAAoJEKeha0olJ0Nqqc8H/jhf38LAHCZzYicm+s0yBWDC
+3xNYJkuAXX5cjKTzule+obcuPK/TrpluKXaKWJNHfIzZgMniS/ihO+1WzROBbn6I
+a9Pnug7UsPckM3XLXQ48B09/USHvhkgZlIxk/zu5fV8prLu6gbnQkYIzUQf9SwKq
+BWIiJwDKSj56Iy+UJm83XGQpBp9VnmdaB+b2GByGQ+mxnphE4+I92Mnuxe1JLvtK
+l8EW05gLyjfOmd8haj3gGbtksvSv3D9KBsGLELJtWitUoUxJN6Or+pQHs9k7tfQx
+M8QW1m12F7QwtOKMB4JtOGYrNB4X5ZQI2KkV+pif+Iwz2JBOi2LquXwtktCiZaE=
+=HotE
 -----END PGP SIGNATURE-----
 
---rWJccGdxBTQjtV13U21SkEEWR46EDSaXn--
+--fps9NA2dcMRoxDTPJQbuCjBiJmSLJO1Hm--
