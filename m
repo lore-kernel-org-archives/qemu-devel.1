@@ -1,38 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d6cG0-0007B7-5A
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:22:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d6cLH-0008Hx-RM
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:28:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d6cFw-0007Xw-Rg
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:22:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56967)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d6cFw-0007Xi-IY
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:22:44 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v45CJFAs137573
-	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 08:22:43 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8k76rm3a-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 08:22:42 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 5 May 2017 13:22:40 +0100
-Date: Fri, 5 May 2017 14:22:34 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <kwolf@redhat.com>) id 1d6cLC-0001qK-Tl
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:28:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1d6cLC-0001pw-L5
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:28:10 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 66B5B2D9FC4
+	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 12:28:09 +0000 (UTC)
+Date: Fri, 5 May 2017 14:27:35 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170505122735.GA6047@noname.redhat.com>
+References: <20170118160332.13390-1-marcandre.lureau@redhat.com>
+	<87mvaszbsu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170505142234.487dfda9.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v7 00/13] basic channel IO passthrough
- infrastructure based on vfio
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mvaszbsu.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v2 00/25] qmp: add async command type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,30 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, eric.auger@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri,  5 May 2017 04:03:39 +0200
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+Am 04.05.2017 um 21:01 hat Markus Armbruster geschrieben:
+> Now let me take a step back: we need to crack the "jobs" problem anyway.
+> Merging this series now would in a way add another special case of the
+> general case "jobs" before adding the general case.  In other words,
+> create more stuff to unify.
 
-> The patch series introduce a basic channel I/O passthrough
-> infrastructure based on vfio.
-> - Focus on supporting dasd-eckd(cu_type/dev_type = 0x3990/0x3390) as
->   the target device. 
-> - Support new qemu parameters in the style of:
->     -machine s390-ccw-virtio(,s390-squash-mcss=on|off) \
->     -device vfio-ccw,sysfsdev=$MDEV_PATH
->   We want to support real (i.e. not virtual) channel devices even for
->   guests that do not support MCSS-E (where guests may see devices from
->   any channel subsystem image at once). As all virtio-ccw devices are in
->   css 0xfe (and show up in the default css 0 for guests not activating
->   MCSS-E), we need an option to squash e.g. passed-through channel devices
->   from their real css (0-3, or 0 for hosts not activating MCSS-E) into
->   the default css, that is what the new machine option s390-squash-css is
->   added.
+It's actually not obvious to me that both cases should be using the same
+infrastructure. The primary target for jobs as we discussed them in the
+past are true long running operations (and in some common cases even
+indefinitely, until the user stops them), whereas for async commands the
+primary target are "quick, but not that quick" operations.
 
-Basically looks good, some small nitpicking and the virtual vs. virtio
-issue I noticed.
+Today, all jobs have a unique job ID, all of them can be paused, all of
+them send completion/cancellation events, and similar things that make a
+lot of sense for true long running operations, but are either useless
+overhead or can't even be implemented for quick operations. The
+unification would potentially lead to many special cases in the job
+infrastructure to allow e.g. anonymous jobs, jobs that aren't listed in
+query-jobs, jobs that don't accept basic management commands like pause,
+jobs that don't send completion events, etc. Would the (superficially)
+unified infrastructure really be worth the special cases?
 
-Let's wait if others have more comments. Hopefully, the 3270 changes
-will by then be in master and you can rebase on top of them :)
+Just to be clear, I am not necessarily against unifying these two
+classes of operations in our infrastructure if it makes sense, but they
+seem to be distinct enough that I feel we should have a little more
+arguments for it than just "they are the same anyway".
+
+> > The benefits of async commands that can be trade-off depending on the
+> > requirements are:
+> >
+> > 1) allow the command handler to re-enter the main loop if the command
+> > cannot be handled synchronously, or if it is long-lasting. This is
+> > currently not possible and make some bugs such as rhbz#1230527 tricky
+> > (see below) to solve.  Furthermore, many QMP commands do IO and could
+> > be considered 'slow' and blocking today.
+
+In any case, I think we can go forward with this one, right? This should
+be useful work no matter what we end up doing with the external
+interface. I've long wished that QMP handlers could be executed in a
+coroutine and yield while they are doing I/O.
+
+> > 2) allow concurrent commands and events. This mainly implies hanlding
+> > concurrency in qemu and out-of-order replies for the client. As noted
+> > earlier, a good qmp client already has to handle dispatching of
+> > received messages (reply and events).
+
+And it's only this one that should wait for generic jobs.
+
+Kevin
