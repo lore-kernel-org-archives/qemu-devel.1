@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d6ag9-0005AO-VF
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:43 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d6alN-0001XV-Uj
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d6ag9-0008Fc-0D
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:41:42 -0400
-Date: Fri, 5 May 2017 11:41:28 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170505104128.GC12773@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170505102153.758-1-famz@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d6alN-0001Xz-3K
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 06:47:05 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-15-pbonzini@redhat.com>
+	<20170504145906.GR32376@stefanha-x1.localdomain>
+	<a60d65e8-fff3-dbe3-7357-38095a91e83a@redhat.com>
+	<20170505102550.GA11350@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1bf3079d-3af5-ffa9-c074-660b77874ff7@redhat.com>
+Date: Fri, 5 May 2017 12:45:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170505102153.758-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: 147: Don't test inet6 if not
- available
+In-Reply-To: <20170505102550.GA11350@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 14/17] block: optimize access
+ to reqs_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Fri, May 05, 2017 at 06:21:53PM +0800, Fam Zheng wrote:
-> This is the case in our docker tests, as we use --net=none there. Skip
-> this method.
+
+
+On 05/05/2017 12:25, Stefan Hajnoczi wrote:
+> On Thu, May 04, 2017 at 06:06:39PM +0200, Paolo Bonzini wrote:
+>> On 04/05/2017 16:59, Stefan Hajnoczi wrote:
+>>> On Thu, Apr 20, 2017 at 02:00:55PM +0200, Paolo Bonzini wrote:
+>>>> Hot path reqs_lock critical sections are very small; the only large critical
+>>>> sections happen when a request waits for serialising requests, and these
+>>>> should never happen in usual circumstances.
+>>>>
+>>>> We do not want these small critical sections to yield in any case,
+>>>> which calls for using a spinlock while writing the list.
+>>>
+>>> Is this patch purely an optimization?
+>>
+>> Yes, it is, and pretty much a no-op until we have true multiqueue.  But
+>> I expect it to have a significant effect for multiqueue.
+>>
+>>> I'm hesitant about using spinlocks in userspace.  There are cases where
+>>> the thread is descheduled that are beyond our control.  Nested virt will
+>>> probably make things worse.  People have been optimizing and trying
+>>> paravirt approaches to kernel spinlocks for these reasons for years.
+>>
+>> This is true, but here we're talking about a 5-10 instruction window for
+>> preemption; it matches the usage of spinlocks in other parts of QEMU.
 > 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/qemu-iotests/147 | 7 +++++++
->  1 file changed, 7 insertions(+)
+> Only util/qht.c uses spinlocks, it's not a widely used primitive.
+
+Right, but the idea is the same---very short, heavy and
+performance-critical cases use spinlocks.  (util/qht.c is used heavily
+in TCG mode).
+
+>> It is efficient when there is no contention, but when there is, the
+>> latency goes up by several orders of magnitude.
 > 
-> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-> index 32afea6..db34838 100755
-> --- a/tests/qemu-iotests/147
-> +++ b/tests/qemu-iotests/147
-> @@ -147,6 +147,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
->          self._server_down()
->  
->      def test_inet6(self):
-> +        try:
-> +            socket.getaddrinfo("::0", "0", socket.AF_INET6,
-> +                               socket.SOCK_STREAM, socket.IPPROTO_TCP,
-> +                               socket.AI_ADDRCONFIG | socket.AI_CANONNAME)
-> +        except socket.gaierror:
-> +            # IPv6 not available, skip
-> +            return
+> Doesn't glibc spin for a while before waiting on the futex?  i.e. the
+> best of both worlds.
 
-FWIW, in test-io-channel-socket.c we call getaddrinfo() and also check
-bind() succeeds (use port==0 to let it select a free port to test bind
-on), before assuming IPv6 is working.
+You have to specify that manually with pthread_mutexattr_settype(...,
+PTHRED_MUTEX_ADAPTIVE_NP).  It is not enabled by default because IIUC
+the adaptive one doesn't support pthread_mutex_timedlock.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Paolo
