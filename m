@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6kTl-0008DT-PQ
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 17:09:39 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d6kiA-0003dz-OE
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 17:24:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d6kTf-0003PO-Lw
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 17:09:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d6kTf-0003OU-CL
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 17:09:27 -0400
-Date: Fri, 5 May 2017 18:09:23 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170505210923.GP3482@thinpad.lan.raisama.net>
-References: <20170505201128.12099-1-ehabkost@redhat.com>
-	<20170505201128.12099-4-ehabkost@redhat.com>
-	<a30986e0-6a07-509d-a2c0-969847bc4906@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1d6ki9-0007uD-Uy
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 17:24:26 -0400
+References: <20170504030755.1001-1-eblake@redhat.com>
+	<20170504030755.1001-8-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6510e826-c39f-8910-ab67-a45b031efd20@redhat.com>
+Date: Fri, 5 May 2017 23:24:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a30986e0-6a07-509d-a2c0-969847bc4906@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] string-input-visitor: Support
- alternate types
+In-Reply-To: <20170504030755.1001-8-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DKM162gD71kBrEpcN6k4RpNUQugCIJSi9"
+Subject: Re: [Qemu-devel] [PATCH v12 07/10] iotests: Add test 179 to cover
+ write zeroes with unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,133 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-On Fri, May 05, 2017 at 03:53:40PM -0500, Eric Blake wrote:
-> On 05/05/2017 03:11 PM, Eduardo Habkost wrote:
-> > When parsing alternates from a string, there are some limitations in
-> > what we can do, but it is a valid use case in some situations. We can
-> > support booleans, integer types, and enums.
-> 
-> Stale comment, given...
-> 
-> > 
-> > This will be used to support 'feature=force' in -cpu options, while
-> > keeping 'feature=on|off|true|false' represented as boolean values.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > Changes v1 -> v2:
-> > * Updated string_input_visitor_new() documentation
-> >   to mention alternate support (Markus Armbruster)
-> > * Detect ambiguous alternates at runtime. Test case included.
-> > * Removed support for integers. We don't need it yet, and
-> 
-> ...this.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DKM162gD71kBrEpcN6k4RpNUQugCIJSi9
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
+Message-ID: <6510e826-c39f-8910-ab67-a45b031efd20@redhat.com>
+Subject: Re: [PATCH v12 07/10] iotests: Add test 179 to cover write zeroes
+ with unmap
+References: <20170504030755.1001-1-eblake@redhat.com>
+ <20170504030755.1001-8-eblake@redhat.com>
+In-Reply-To: <20170504030755.1001-8-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Oops.
+On 04.05.2017 05:07, Eric Blake wrote:
+> No tests were covering write zeroes with unmap.  Additionally,
+> I needed to prove that my previous patches for correct status
+> reporting and write zeroes optimizations actually had an impact.
+>=20
+> The test works for cluster_size between 8k and 2M (for smaller
+> sizes, it fails because our allocation patterns are not contiguous
+> with small clusters - in part, the largest consecutive allocation
+> we tend to get is often bounded by the size covered by one L2
+> table).
+>=20
+> Note that testing for zero clusters is tricky: 'qemu-io map'
+> reports whether data comes from the current layer of the image
+> (useful for sniffing out which regions of the file have
+> QCOW_OFLAG_ZERO) - but doesn't show which clusters have mappings;
+> while 'qemu-img map' sees "zero":true for both unallocated and
+> zero clusters for any qcow2 with no backing layer (so less useful
+> at detecting true zero clusters), but reliably shows mappings.
+> So we have to rely on both queries side-by-side at each point of
+> the test.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
+> ---
+> v12: probe the map in more places, to make test easier to follow
+> v11: reserved for blkdebug half of v10
+> v10: drop any changes to v2 files, rewrite test to work with updates
+> earlier in the series, add a blkdebug probe
+> v9: new patch
+> ---
+>  tests/qemu-iotests/179     | 132 +++++++++++++++++++++++++++++++++++++=
 
-> 
-> >   it would require sorting out the parse_str() mess.
-> > * Change supported_qtypes to uint32_t (Eric Blake)
-> > * Update tests/qapi-schema/qapi-schema-test.out to match
-> >   qapi-schema-test.json updates
-> >   (Eric Blake)
-> > * Code indentation fix (Markus Armbruster)
-> > * Use &error_abort on test cases instead of g_assert(!err)
-> >   (Markus Armbruster)
-> > ---
-> 
-> >  
-> > +/*
-> > + * Check if alternate type string representation is ambiguous and
-> > + * can't be parsed by StringInputVisitor
-> > + */
-> > +static bool ambiguous_alternate(uint32_t qtypes, const char *const enum_table[])
-> > +{
-> > +    uint32_t non_str_qtypes = qtypes & ~(1U << QTYPE_QSTRING);
-> > +
-> > +    if ((qtypes & (1U << QTYPE_QSTRING)) && !enum_table && non_str_qtypes) {
-> > +        return true;
-> > +    }
-> > +
-> > +    if (qtypes & (1U << QTYPE_QBOOL)) {
-> > +        const char *const *e;
-> > +        /*
-> > +         * If the string representation of enum members can be parsed as
-> > +         * booleans, the alternate string representation is ambiguous.
-> > +         */
-> > +        for (e = enum_table; e && *e; e++) {
-> > +            if (try_parse_bool(*e, NULL) == 0) {
-> > +                return true;
-> > +            }
-> > +        }
-> > +    }
-> > +
-> > +    return false;
-> > +}
-> 
-> Seems okay for detecting ambiguity, but it is a runtime cost (one that
-> you will run every single time you parse, even though the answer will be
-> the same every single time you run it); I still think doing it at QAPI
-> compile time will be more efficient in the long run.  And as this is the
-> only use of enum_table added in 2/3, I'm still not sold on needing that
-> patch.
+>  tests/qemu-iotests/179.out | 160 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 293 insertions(+)
+>  create mode 100755 tests/qemu-iotests/179
+>  create mode 100644 tests/qemu-iotests/179.out
 
-I'm OK with deleting this part. That's the main reason I moved it
-to a separate function.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> 
-> > +
-> > +static void start_alternate(Visitor *v, const char *name,
-> > +                            GenericAlternate **obj, size_t size,
-> > +                            uint32_t qtypes, const char *const enum_table[],
-> > +                            Error **errp)
-> > +{
-> > +    /*
-> > +     * Enum types are represented as QTYPE_QSTRING, so this is
-> > +     * the default. Actual parsing of the string as an enum is
-> > +     * done by visit_type_<EnumType>(), which is called just
-> > +     * after visit_start_alternate().
-> > +     */
-> > +    QType qtype = QTYPE_QSTRING;
-> > +    uint32_t unsupported_qtypes = qtypes & ~((1U << QTYPE_QSTRING) |
-> > +                                             (1U << QTYPE_QBOOL));
-> > +    StringInputVisitor *siv = to_siv(v);
-> > +
-> > +    if (ambiguous_alternate(qtypes, enum_table)) {
-> > +        error_setg(errp, "Can't parse ambiguous alternate type");
-> > +        return;
-> > +    }
-> > +
-> > +    if (unsupported_qtypes) {
-> > +        error_setg(errp, "Can't parse %s' alternate member",
-> > +                   QType_lookup[ctz32(unsupported_qtypes)]);
-> > +        return;
-> > +    }
-> > +
-> > +    if ((qtypes & (1U << QTYPE_QBOOL)) &&
-> > +        try_parse_bool(siv->string, NULL) == 0) {
-> > +        qtype = QTYPE_QBOOL;
-> > +    }
-> > +
-> > +    *obj = g_malloc0(size);
-> > +    (*obj)->type = qtype;
-> 
-> Slightly simpler for ignoring int for now, while still something we
-> could add in later.  I've been wanting to have an alternate for
-> 'int'/'str' for InetAddress port, since we want to support named ports
-> but most often use just integers.  On the command line, port=1 is fine,
-> but in QMP, we currently have to spell it port="1".  That's a case where
-> we'd allow a pairing of any string with an integer, rather than just an
-> enum.
+TIL qemu-io -c w.
 
-Does that mean we already have an use case where we will have to
-relax the restrictions on ambiguous enums? :)
 
-I won't mind at all if we remove the runtime detection of
-ambiguous enums. It will make the code much simpler.
+--DKM162gD71kBrEpcN6k4RpNUQugCIJSi9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Eduardo
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkM7X8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ALlMIAIX9o5JxGwI6U9PGGJb6QS+GKT1zpR6R
+j1/qaVIQBrNcAULsk75EMTnD+nc3+npN0syr3oqlgdCqTK/VLhMcM9fdeBEG6Usk
+TeLAM6iB7e8tMKb9YnsUZz2FOSkCwpCcD7vxualea7Kj8NlHwpGNBztrdVc7a7ad
+suHBD/rcLvkFB0bIiCksvAFQ4uNHd8ujDM0lom3hTcAUjSpbSoVkR9WrThC6+L6c
+PWvcIJbjawFEgdqYu9+XrL1QBUbDdIogkwHGEuu+ZWHz7vfvMT53KYBpQlqDwSs6
+HIIalfD7uIRgUR9vkVuuE0cc8s9AE9//1eRgjnWqVRu02AEqIxR7w7o=
+=A4QY
+-----END PGP SIGNATURE-----
+
+--DKM162gD71kBrEpcN6k4RpNUQugCIJSi9--
