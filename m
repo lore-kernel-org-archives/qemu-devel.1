@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6ege-0008Az-2u
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:58:29 -0400
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1d6elg-0001RF-HS
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:03:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d6ega-000833-3J
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:58:28 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34636)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d6egZ-00082p-Sa
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 10:58:24 -0400
-Received: by mail-wr0-x244.google.com with SMTP id 6so953811wrb.1
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 07:58:23 -0700 (PDT)
-Date: Fri, 5 May 2017 15:58:20 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170505145820.GC14316@stefanha-x1.localdomain>
-References: <20170502133604.17735-1-cornelia.huck@de.ibm.com>
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1d6elc-0001Su-Ez
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:03:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55383
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
+	id 1d6elc-0001RI-9E
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:03:36 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v45ExPkB055927
+	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 11:03:33 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2a8q5re3bb-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 11:03:33 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
+	Fri, 5 May 2017 09:03:32 -0600
+References: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
+	<20170505074143.GB21435@lemon.lan>
+From: Eric Farman <farman@linux.vnet.ibm.com>
+Date: Fri, 5 May 2017 11:03:25 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qjNfmADvan18RZcF"
-Content-Disposition: inline
-In-Reply-To: <20170502133604.17735-1-cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PULL 00/12] next batch of s390x patches
+In-Reply-To: <20170505074143.GB21435@lemon.lan>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <298bd169-6f9f-e622-1b8b-85ef126d8d0c@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 0/5] Enable virtio-scsi boot from
+ /dev/sgX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +43,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: peter.maydell@linaro.org, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---qjNfmADvan18RZcF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 02, 2017 at 03:35:52PM +0200, Cornelia Huck wrote:
-> The following changes since commit 38bb54f323bf7c83496b6a044cfd28896e997a=
-00:
->=20
->   replication: Make --disable-replication compile again (2017-04-28 16:50=
-:16 +0100)
->=20
-> are available in the git repository at:
->=20
->   git://github.com/cohuck/qemu tags/s390x-20170502
->=20
-> for you to fetch changes up to 99efaa2696caaf6182958e27d553449674894b27:
->=20
->   hw/s390x/ipl: Fix crash with virtio-scsi-pci device (2017-05-02 15:08:5=
-4 +0200)
->=20
-> ----------------------------------------------------------------
-> More s390x patches, this time boot related:
-> - LOADPARM machine property, exposed to the guest via SCLP and
->   diagnose 308
-> - Use LOADPARM in the s390-ccw bios to select a boot entry
-> - Fix a crash in the ipl device code when a virtio-scsi-pci device
->   has been specified
->=20
-> ----------------------------------------------------------------
->=20
-> Cornelia Huck (1):
->   pc-bios/s390-ccw.img: update image
->=20
-> Eugene (jno) Dvurechenski (2):
->   pc-bios/s390-ccw: Make ebcdic/ascii conversion public
->   pc-bios/s390-ccw: add boot entry selection to El Torito routine
->=20
-> Farhan Ali (8):
->   hw/s390x: provide loadparm property for the machine
->   hw/s390x/ipl: enable LOADPARM in IPIB for a boot device
->   hw/s390x/sclp: update LOADPARM in SCP Info
->   util/qemu-config: Add loadparm to qemu machine_opts
->   pc-bios/s390-ccw: get LOADPARM stored in SCP Read Info
->   pc-bios/s390-ccw: provide a function to interpret LOADPARM value
->   pc-bios/s390-ccw: provide entry selection on LOADPARM for SCSI disk
->   pc-bios/s390-ccw: add boot entry selection for ECKD DASD
->=20
-> Thomas Huth (1):
->   hw/s390x/ipl: Fix crash with virtio-scsi-pci device
->=20
->  hw/s390x/ipl.c                            |  39 ++++++++++++++++++++++++=
-+++---
->  hw/s390x/ipl.h                            |   3 +++
->  hw/s390x/s390-virtio-ccw.c                |  37 ++++++++++++++++++++++++=
-++++
->  hw/s390x/sclp.c                           |   9 +++++++
->  include/hw/s390x/s390-virtio-ccw.h        |   1 +
->  pc-bios/s390-ccw.img                      | Bin 26456 -> 26472 bytes
->  pc-bios/s390-ccw/Makefile                 |   2 +-
->  pc-bios/s390-ccw/bootmap.c                |  34 +++++++++++++++++-------=
---
->  pc-bios/s390-ccw/bootmap.h                |  24 +-----------------
->  pc-bios/s390-ccw/main.c                   |  38 ++++++++++++++++++++++++=
-++++-
->  pc-bios/s390-ccw/s390-ccw.h               |  17 ++++++++++++-
->  pc-bios/s390-ccw/{sclp-ascii.c =3D> sclp.c} |  12 +++++++++
->  pc-bios/s390-ccw/sclp.h                   |   2 ++
->  util/qemu-config.c                        |   6 +++++
->  14 files changed, 184 insertions(+), 40 deletions(-)
->  rename pc-bios/s390-ccw/{sclp-ascii.c =3D> sclp.c} (87%)
->=20
-> --=20
-> 2.11.0
->=20
->=20
+On 05/05/2017 03:41 AM, Fam Zheng wrote:
+> On Wed, 04/26 16:46, Eric Farman wrote:
+>> The short version of what happens is the host device driver rejects our
+>> requests because the transfer lengths are too long for it to satisfy.
+>> A virtio-scsi disk connected via scsi-generic is fine as a non-boot device
+>> because the guest kernel is able to break up the requests for us.  So we just
+>> need to handle this situation for the boot process.
+>>
+>> Patches 2-N in this series do that, but rely on us to specify the max_sectors
+>> parameter for the virtio-scsi-ccw device:
+>>
+>>   /usr/bin/qemu-system-s390x ...
+>>     -device virtio-scsi-ccw,id=scsi0,devno=fe.0.0001,max_sectors=2048
+>
+> Can you instead do an INQUIRY from the bios code to check the Block Limits page?
+> The response is intercepted by hw/scsi/scsi-generic.c to merge in the host LUN's
+> limits. That's how Linux kernel finds the granularity for request splitting.
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+It's a good idea (Thanks Christian, Paolo, and Fam :), but this leads to 
+other difficulties.
 
-Stefan
+We get a value of x3fffff when sending that to a scsi-disk from bios 
+code.  That's fully emulated though, in scsi_disk_emulate_inquiry.  And 
+that's the scenario that already works.
 
---qjNfmADvan18RZcF
-Content-Type: application/pgp-signature; name="signature.asc"
+While there is indeed code in hw/scsi/scsi-generic.c to wire that in, 
+that only happens after the I/O goes to the device itself.  The Block 
+Limits page isn't supported [1] and thus it gets rejected with "invalid 
+field in cdb".  We never get to that fixup code you reference, since the 
+returned len is zero.
 
------BEGIN PGP SIGNATURE-----
+Should I be refactoring this code to always patch in that block limit 
+regardless of a response from the host/device?  (That is, when page xb0 
+isn't supported by the hw.)
 
-iQEcBAEBAgAGBQJZDJMMAAoJEJykq7OBq3PI2hkH/0lMj5Y9zIkEGstk7sxCWRWr
-/eiHfTR932ZMK8kgRdf3GZCjI6CNCaM6yQmxbvD7Ag4IR2pNQhA4YWD52vrtl/ol
-5nYNETG4l3BKnT2dWcARxjUEFW0SdrhaRKmIrO6RVMXb6cRWc3T2vQ8iN2rl/A5W
-sdKkJPheWD9hdofZanbjrqBCCaAwOjzAm/WNbTOwD5HAEPLYOjPEaULIJSCmmBki
-QGExTD8Hoah19qUoM2k9vA6hzoHwnD677xPhWMn5rQlwNy/P7Hr2iY05w4+mX1Ae
-RSxp4nJ1Me5XuseR/lgWuObRuN2bdyF34n5bD3fV5OiWVVnDw0RPS6jBviszIuU=
-=pY9l
------END PGP SIGNATURE-----
+  - Eric
 
---qjNfmADvan18RZcF--
+[1] If I issue an EVPD page x00 from the QEMU bios code, I only see 
+pages xb1, xc0, and c1 are supported.  If I look at the supported pages 
+from the host, I see a few more but still not xb0:
+
+$ sg_inq --page=0 /dev/sda
+VPD INQUIRY: Supported VPD pages page
+    Supported VPD pages:
+      0x0	Supported VPD pages
+      0x80	Unit serial number
+      0x83	Device identification
+      0x86	Extended INQUIRY data
+      0xb1	Block device characteristics (sbc3)
+      0xc0	vendor: Firmware numbers (seagate); Unit path report (EMC)
+      0xc1	vendor: Date code (seagate)
+$ sg_inq --page=0 /dev/sg0
+VPD INQUIRY: Supported VPD pages page
+    Supported VPD pages:
+      0x0	Supported VPD pages
+      0x80	Unit serial number
+      0x83	Device identification
+      0x86	Extended INQUIRY data
+      0xb1	Block device characteristics (sbc3)
+      0xc0	vendor: Firmware numbers (seagate); Unit path report (EMC)
+      0xc1	vendor: Date code (seagate)
+
+
+>
+> That way, patch 1 is not necessary too. I don't like it because it doesn't
+> always work considering LUN hotplug.
+>
+> Fam
+>
