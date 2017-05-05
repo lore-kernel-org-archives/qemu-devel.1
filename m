@@ -1,33 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d6cCx-0005eV-Qw
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:19:41 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d6cDi-00066B-VN
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d6cCu-0006ng-Jy
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:19:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57777)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d6cDf-00070O-QK
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:20:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35560
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d6cCu-0006nM-Dq
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:19:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d6cCt-0007jv-8k
-	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 12:19:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 273F32E80CC
-	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 12:19:35 +0000 (UTC)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d6cDf-000704-Kk
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 08:20:23 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v45CJAXM010687
+	for <qemu-devel@nongnu.org>; Fri, 5 May 2017 08:20:22 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2a8rx214r6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 May 2017 08:20:22 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Fri, 5 May 2017 13:20:20 +0100
+Date: Fri, 5 May 2017 14:20:14 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170505020352.8984-14-bjsdjshi@linux.vnet.ibm.com>
+References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170505020352.8984-14-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 May 2017 12:09:49 -0000
-From: Daniel Berrange <778032@bugs.launchpad.net>
-Reply-To: Bug 778032 <778032@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110505180701.14074.17686.malonedeb@wampee.canonical.com>
-Message-Id: <20170505120949.4508.22387.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 778032] Re: qemu spinning on serial port writes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170505142014.28c849b8.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v7 13/13] MAINTAINERS: Add vfio-ccw
+ maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,132 +43,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, eric.auger@redhat.com
 
-I'm confident this has been solved a while ago. When this bug was
-reported, the code was indeed broken wrt EAGAIN handling.
+On Fri,  5 May 2017 04:03:52 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-The chardev code has long since been re-written though, and the send_all
-method replaced by io_channel_send_all() which will handle EAGAIN by
-returning instead of spinning in a loop.
+> Add Cornelia Huck as the vfio-ccw maintainer.
+> 
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  MAINTAINERS | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index cae3b09..c1f9917 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -999,6 +999,11 @@ S: Supported
+>  F: hw/vfio/*
+>  F: include/hw/vfio/
+> 
+> +vfio-ccw
+> +M: Cornelia Huck <cornelia.huck@de.ibm.com>
+> +S: Supported
+> +F: hw/vfio/ccw.c
 
-Specifically this commit changed the code to stop spinning in send_all()
-on EAGAIN
+The other code related to vfio-ccw is entangled with the other virtual
+css code, so this is probably really the only file that needs to be
+listed separately.
 
-commit 23673ca740e0eda66901ca801a5a901df378b063
-Author: Anthony Liguori <aliguori@us.ibm.com>
-Date:   Tue Mar 5 23:21:23 2013 +0530
+I will likely take any vfio-ccw changes together with the other code I
+take through s390-next. I'll add the respective line when I apply.
 
-    qemu-char: add watch support
-    =
-
-    This allows a front-end to request for a callback when the backend
-    is writable again.
-
-
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/778032
-
-Title:
-  qemu spinning on serial port writes
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  As originally found at http://www.mail-
-  archive.com/kvm@vger.kernel.org/msg08745.html from 3 years ago!
-
-  Basically qemu seizes up in the event that the file descriptor for its
-  emulated serial port has a full buffer, i.e. write() returns EAGAIN.
-  For me, this happened when the serial port was being directed through
-  a UNIX socket, with a default-sized 4KB buffer.  Just the normal
-  output from a Linux kernel boot caused it to seize up, and stop the
-  main emulation / select loop.
-
-  My suggestion is to remove the detection of EAGAIN in qemu-char.c:521,
-  so that if the buffer is full, KVM discards the byte(s) it was trying
-  to write.  This is a surely better outcome than the process spinning
-  forever.
-
-  I will submit a separate patch to control the buffer sizes when
-  creating UNIX sockets, which will help allow slow-reading processes to
-  tune things so that they don't miss any output.
-
-  Additionally, in the context of a hosted environment, if the -serial
-  option is used, this could be a small security issue. An untrusted
-  user of a guest system, knowing their serial output is going via a
-  small buffer, could spew output to their /dev/ttyS0 at a rate fast
-  enough to trigger this bug and eat a CPU core on the host.
-
-  To quote David S. Ahern's original bug report (mine was the same, only
-  with the latest version from git, so line numbers may have changed -
-  my suggested fix above is accurate though):
-
-  I am trying to redirect a guest's boot output through the host's serial
-  port.  Shortly after launching qemu, the main thread is spinning on:
-
-  write(9, "0", 1)   =3D -1 EAGAIN (Resource temporarily unavailable)
-
-  fd 9 is the serial port, ttyS0.
-
-  =
-
-  The backtrace for the thread is:
-
-  #0  0x00002ac3433f8c0b in write () from /lib64/libpthread.so.0
-  #1  0x0000000000475df9 in send_all (fd=3D9, buf=3D<value optimized out>,
-  len1=3D1) at qemu-char.c:477
-  #2  0x000000000043a102 in serial_xmit (opaque=3D<value optimized out>) at
-  /root/kvm-81/qemu/hw/serial.c:311
-  #3  0x000000000043a591 in serial_ioport_write (opaque=3D0x14971790,
-  addr=3D<value optimized out>, val=3D48)
-      at /root/kvm-81/qemu/hw/serial.c:366
-  #4  0x00000000410eeedc in ?? ()
-  #5  0x0000000000129000 in ?? ()
-  #6  0x0000000014821fa0 in ?? ()
-  #7  0x0000000000000007 in ?? ()
-  #8  0x00000000004a54c5 in tlb_set_page_exec (env=3D0x10ab4,
-  vaddr=3D46912496956816, paddr=3D1, prot=3D-1, mmu_idx=3D0, is_softmmu=3D1)
-      at /root/kvm-81/qemu/exec.c:388
-  #9  0x0000000000512f3b in tlb_fill (addr=3D345446292, is_write=3D1,
-  mmu_idx=3D-1, retaddr=3D0x0)
-      at /root/kvm-81/qemu/target-i386/op_helper.c:4690
-  #10 0x00000000004a6bd2 in __ldb_cmmu (addr=3D9, mmu_idx=3D0) at
-  /root/kvm-81/qemu/softmmu_template.h:135
-  #11 0x00000000004a879b in cpu_x86_exec (env1=3D<value optimized out>) at
-  /root/kvm-81/qemu/cpu-exec.c:628
-  #12 0x000000000040ba29 in main (argc=3D12, argv=3D0x7fff67f7a398) at
-  /root/kvm-81/qemu/vl.c:3816
-
-  send_all() invokes unix_write() which by design is not breaking out on
-  EAGAIN.
-
-  The following command is enough to show the problem:
-
-  qemu-system-x86_64 -m 256 -smp 1 -no-kvm \
-      -drivefile=3D/dev/cciss/c0d0,if=3Dscsi,cache=3Doff,boot=3Don \
-      -vnc :1 -serial /dev/ttyS0
-
-  =
-
-  The guest is running RHEL3 with the parameter 'console=3DttyS0' added to
-  grub.conf; the problem appears to be with qemu, so I would expect it to
-  show with any linux guest. This particular host is running RHEL5.2 with
-  kvm-81, but I have also seen the problem with Fedora-9 as the host OS.
-
-  Yes, the serial port of the server is connected to another system via a
-  null modem. If I change the serial argument to '-serial udp::4555' and
-  use  'nc -u -l  localhost 4555  > /dev/ttyS0' I see the guest's boot
-  output show up on the second system as expected. I'd prefer to be able
-  to use the serial port connection directly without nc as a proxy.
-  Suggestions?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/778032/+subscriptions
+> +
+>  vhost
+>  M: Michael S. Tsirkin <mst@redhat.com>
+>  S: Supported
