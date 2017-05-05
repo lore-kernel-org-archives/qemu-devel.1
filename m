@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6ex7-0005hR-Pa
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:15:30 -0400
+	(envelope-from <groug@kaod.org>) id 1d6eyB-0006MB-3X
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d6ex2-0006dR-An
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:15:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39030)
+	(envelope-from <groug@kaod.org>) id 1d6ey7-0006ys-Ss
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:16:35 -0400
+Received: from 10.mo5.mail-out.ovh.net ([46.105.52.148]:40427)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6ex2-0006dD-4R
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:15:24 -0400
-References: <20170505103822.20641-1-alex.bennee@linaro.org>
-	<20170505103822.20641-4-alex.bennee@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8b648c73-ecfc-7a13-fc98-be349dcfceac@redhat.com>
-Date: Fri, 5 May 2017 17:15:19 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d6ey7-0006xk-MO
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 11:16:31 -0400
+Received: from player786.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 1B050EBC77
+	for <qemu-devel@nongnu.org>; Fri,  5 May 2017 17:16:29 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 05 May 2017 16:36:46 +0200
+Message-ID: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170505103822.20641-4-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v1 3/9] cpus: only take BQL for
- sleeping threads
+Subject: [Qemu-devel] [PATCH 0/5] 9pfs: local: fix metadata of mapped-file
+ security mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, boost.lists@gmail.com, pavel.dovgaluk@ispras.ru
-Cc: cota@braap.org, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: =?utf-8?q?L=C3=A9o?= Gaspard <leo@gaspard.io>, Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>
+
+This series fixes two issues in the local backend when using the mapped-f=
+ile
+security mode:
+- allow chmod and chown to succeed on the virtfs root (patch 4)
+- completely hide the metadata files from the client (patch 5)
+
+Patch 2 resolves '.' and '..' in paths, and patch 3 reworks the way we op=
+en
+files accordingly. They could be squashed together in a single patch (thi=
+s
+was the case in earlier versions actually), but I decided to separate the=
+m
+for easier review.
+
+L=C3=A9o,
+
+I'd appreciate if you could test this series (especially patch 4) on your
+setup.
+
+Cheers.
+
+--
+Greg
+
+---
+
+Greg Kurz (5):
+      9pfs: check return value of v9fs_co_name_to_path()
+      9pfs: local: resolve special directories in paths
+      9pfs: local: simplify file opening
+      9pfs: local: metadata file for the VirtFS root
+      9pfs: local: forbid client access to metadata
 
 
-
-On 05/05/2017 12:38, Alex Benn=C3=A9e wrote:
-> =20
->      while (qemu_tcg_should_sleep(cpu)) {
-> +        qemu_mutex_lock_iothread();
->          stop_tcg_kick_timer();
->          qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-> +        qemu_mutex_unlock_iothread();
->      }
-
-This is racy.  You need to recheck the condition under the lock, or to
-switch from QemuCond to QemuEvent (then you still need to check the
-condition twice, the second between qemu_event_reset and qemu_event_wait)=
-.
-
-Paolo
+ hw/9pfs/9p-local.c |  164 ++++++++++++++++++++++++++++++++++++++++------=
+------
+ hw/9pfs/9p-util.c  |   26 +++-----
+ hw/9pfs/9p.c       |   36 ++++++++---
+ 3 files changed, 160 insertions(+), 66 deletions(-)
