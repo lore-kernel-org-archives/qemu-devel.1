@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6Xs8-0002DD-9D
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:41:52 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d6XuN-00033i-KT
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d6Xs5-0007mh-71
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:41:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49992)
+	(envelope-from <pbonzini@redhat.com>) id 1d6XuK-0000DW-I2
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:44:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d6Xs5-0007mS-0U
-	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:41:49 -0400
-Date: Fri, 5 May 2017 15:41:43 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170505074143.GB21435@lemon.lan>
-References: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d6XuK-0000DJ-Bk
+	for qemu-devel@nongnu.org; Fri, 05 May 2017 03:44:08 -0400
+References: <20170505032340.26467-1-famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <03beb071-ebbc-4328-3530-37b9856476cc@redhat.com>
+Date: Fri, 5 May 2017 09:44:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v1 0/5] Enable virtio-scsi boot from
- /dev/sgX
+In-Reply-To: <20170505032340.26467-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/5] docker: Add test-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Wed, 04/26 16:46, Eric Farman wrote:
-> The short version of what happens is the host device driver rejects our
-> requests because the transfer lengths are too long for it to satisfy.
-> A virtio-scsi disk connected via scsi-generic is fine as a non-boot device
-> because the guest kernel is able to break up the requests for us.  So we just
-> need to handle this situation for the boot process.
+
+
+On 05/05/2017 05:23, Fam Zheng wrote:
+> A few tweaks to the docker images and running commands allow us to run
+> qemu-iotests in the fedora container. This will be added to the patchew test
+> cases later.
 > 
-> Patches 2-N in this series do that, but rely on us to specify the max_sectors
-> parameter for the virtio-scsi-ccw device:
+> Fam Zheng (5):
+>   docker: Run tests with current user
+>   docker: Add bzip2 and hostname to fedora image
+>   docker: Use unconfined security profile
+>   docker: Add libaio to fedora image
+>   docker: Add test-block
 > 
->   /usr/bin/qemu-system-s390x ...
->     -device virtio-scsi-ccw,id=scsi0,devno=fe.0.0001,max_sectors=2048
+>  tests/docker/Makefile.include          |  3 ++-
+>  tests/docker/dockerfiles/fedora.docker |  4 ++--
+>  tests/docker/test-block                | 21 +++++++++++++++++++++
+>  3 files changed, 25 insertions(+), 3 deletions(-)
+>  create mode 100755 tests/docker/test-block
+> 
 
-Can you instead do an INQUIRY from the bios code to check the Block Limits page?
-The response is intercepted by hw/scsi/scsi-generic.c to merge in the host LUN's
-limits. That's how Linux kernel finds the granularity for request splitting.
+Patches 1-4:
 
-That way, patch 1 is not necessary too. I don't like it because it doesn't
-always work considering LUN hotplug.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Fam
+For patch 5, I think we should revive the "quick" qemu-iotests group
+(maybe we can have support for skipping groups, and have a "slow" group
+with the very few tests that take >30 seconds?) and add the quick tests
+to "make check".
+
+Paolo
