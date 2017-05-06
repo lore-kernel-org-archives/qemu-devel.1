@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d6xff-00030O-UT
+	(envelope-from <aurelien@aurel32.net>) id 1d6xfg-00030Q-4a
 	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d6xfe-0003vI-Si
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:43 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:39998)
+	(envelope-from <aurelien@aurel32.net>) id 1d6xfe-0003vD-RQ
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:44 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:40000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1d6xfe-0003uC-MA
+	id 1d6xfe-0003uD-Lw
 	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:42 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Sat,  6 May 2017 13:14:25 +0200
-Message-Id: <20170506111431.12548-9-aurelien@aurel32.net>
+Date: Sat,  6 May 2017 13:14:27 +0200
+Message-Id: <20170506111431.12548-11-aurelien@aurel32.net>
 In-Reply-To: <20170506111431.12548-1-aurelien@aurel32.net>
 References: <20170506111431.12548-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH v2 08/14] target/sh4: fold ctx->bstate =
- BS_BRANCH into gen_conditional_jump
+Subject: [Qemu-devel] [PATCH v2 10/14] target/sh4: optimize gen_write_sr
+ using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +28,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>
 
+This doesn't change the generated code on x86, but optimizes it on most
+RISC architectures and makes the code simpler to read.
+
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
  target/sh4/translate.c | 9 +++------
  1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 8cee7d333f..a4c7a0895b 100644
+index b4e5606098..8c766eed2a 100644
 --- a/target/sh4/translate.c
 +++ b/target/sh4/translate.c
-@@ -279,6 +279,7 @@ static void gen_conditional_jump(DisasContext * ctx,
-     gen_goto_tb(ctx, 0, ifnott);
-     gen_set_label(l1);
-     gen_goto_tb(ctx, 1, ift);
-+    ctx->bstate = BS_BRANCH;
+@@ -204,12 +204,9 @@ static void gen_write_sr(TCGv src)
+ {
+     tcg_gen_andi_i32(cpu_sr, src,
+                      ~((1u << SR_Q) | (1u << SR_M) | (1u << SR_T)));
+-    tcg_gen_shri_i32(cpu_sr_q, src, SR_Q);
+-    tcg_gen_andi_i32(cpu_sr_q, cpu_sr_q, 1);
+-    tcg_gen_shri_i32(cpu_sr_m, src, SR_M);
+-    tcg_gen_andi_i32(cpu_sr_m, cpu_sr_m, 1);
+-    tcg_gen_shri_i32(cpu_sr_t, src, SR_T);
+-    tcg_gen_andi_i32(cpu_sr_t, cpu_sr_t, 1);
++    tcg_gen_extract_i32(cpu_sr_q, src, SR_Q, 1);
++    tcg_gen_extract_i32(cpu_sr_m, src, SR_M, 1);
++    tcg_gen_extract_i32(cpu_sr_t, src, SR_T, 1);
  }
  
- /* Delayed conditional jump (bt or bf) */
-@@ -1158,9 +1159,7 @@ static void _decode_opc(DisasContext * ctx)
- 	return;
-     case 0x8b00:		/* bf label */
- 	CHECK_NOT_DELAY_SLOT
--	    gen_conditional_jump(ctx, ctx->pc + 2,
--				 ctx->pc + 4 + B7_0s * 2);
--	ctx->bstate = BS_BRANCH;
-+        gen_conditional_jump(ctx, ctx->pc + 2, ctx->pc + 4 + B7_0s * 2);
- 	return;
-     case 0x8f00:		/* bf/s label */
- 	CHECK_NOT_DELAY_SLOT
-@@ -1170,9 +1169,7 @@ static void _decode_opc(DisasContext * ctx)
- 	return;
-     case 0x8900:		/* bt label */
- 	CHECK_NOT_DELAY_SLOT
--	    gen_conditional_jump(ctx, ctx->pc + 4 + B7_0s * 2,
--				 ctx->pc + 2);
--	ctx->bstate = BS_BRANCH;
-+        gen_conditional_jump(ctx, ctx->pc + 4 + B7_0s * 2, ctx->pc + 2);
- 	return;
-     case 0x8d00:		/* bt/s label */
- 	CHECK_NOT_DELAY_SLOT
+ static inline void gen_save_cpu_state(DisasContext *ctx, bool save_pc)
 -- 
 2.11.0
