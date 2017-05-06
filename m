@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d6vvv-0003n4-EH
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 05:23:26 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1d6xVE-0007c0-I0
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:03:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d6vvs-0005Sh-AU
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 05:23:23 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:42409)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d6vvs-0005Rq-3Y
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 05:23:20 -0400
-Date: Sat, 6 May 2017 11:23:16 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170506092316.im32h7vth5rmvqtg@var.youpi.perso.aquilenet.fr>
-References: <20170430075033.yjqj4ibssa52h4d7@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB247905FC4B3FEE03780CF1EE9C150@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170430125703.pcp4ldw7oardptmn@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB247996FB5818A956470FE8169CEB0@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170505231433.ggp34jmzx4fad6jp@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479934DD8D5807C7A9DB0A39CE80@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170506005600.6utgnirnrlm2g56i@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479B8C2F3EA375823AD6B6E9CE80@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-	<20170506011720.x7proxrmpvakd4it@var.youpi.perso.aquilenet.fr>
-	<VI1PR0601MB2479B2228D4C769486ECAEC39CE80@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR0601MB2479B2228D4C769486ECAEC39CE80@VI1PR0601MB2479.eurprd06.prod.outlook.com>
-Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
- networking (SLIRP)
+	(envelope-from <aurelien@aurel32.net>) id 1d6xVB-0007ZT-A0
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:03:54 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:39896)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1d6xVB-0007V2-4a
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:03:53 -0400
+From: Aurelien Jarno <aurelien@aurel32.net>
+Date: Sat,  6 May 2017 13:03:32 +0200
+Message-Id: <20170506110333.11000-1-aurelien@aurel32.net>
+Subject: [Qemu-devel] [PULL 0/1] tcg-mips queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,41 +22,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: FONNEMANN Mark <mark.fonnemann@hexagon.com>
-Cc: Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-FONNEMANN Mark, on sam. 06 mai 2017 04:18:52 +0000, wrote:
-> >That's so weird there's no packet log. Does your guest perhaps have the strace tool? Or perhaps you >can manage to copy it over from another VM, since it only depends on libc.
-> 
-> See attached file.
+The following changes since commit 12a95f320a36ef66f724a49bb05e4fb553ac5dbe:
 
-Ok, so for some reason it doesn't even try to emit a packet...
+  Merge remote-tracking branch 'kwolf/tags/for-upstream' into staging (2017-05-04 13:44:32 +0100)
 
-> open("/etc/resolv.conf", O_RDONLY)      = 3
-> read(3, "nameserver 10.0.2.3\n\n", 4096) = 21
+are available in the git repository at:
 
-It does get the proper nameserver.
+  git://git.aurel32.net/qemu.git tags/pull-tcg-mips-20170506
 
-> connect(3, {sa_family=AF_FILE, path="/var/run/nscd/socket"}, 110) = -1 ENOENT (No such file or directory)
+for you to fetch changes up to 2f5a5f5774d95baacf86c03aa8a77a2d0390f2b2:
 
-It tries to connect to nscd but that's not running.
+  tcg/mips: fix field extraction opcode (2017-05-06 12:48:53 +0200)
 
-> open("/etc/nsswitch.conf", O_RDONLY)    = 3
-> read(3, "hosts:      files\n", 4096)    = 18
-> read(3, "", 4096)                       = 0
+----------------------------------------------------------------
+Fix MIPS R2 hosts support
 
-And I guess that's the culprit: in nsswitch.conf you only have
-"hosts: files", so
+----------------------------------------------------------------
 
-> open("/lib/libnss_files.so.2", O_RDONLY) = 3
-> open("/etc/hosts", O_RDONLY)            = 3
-> read(3, "127.0.0.1\tlocalhost\n10.0.2.15\tqe"..., 4096) = 35
+Aurelien Jarno (1):
+  tcg/mips: fix field extraction opcode
 
-It only uses /etc/hosts.
+ tcg/mips/tcg-target.inc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-So, in your /etc/nsswitch.conf, use
-
-hosts: files dns
-
-Samuel
+-- 
+2.11.0
