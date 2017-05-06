@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45410)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d72Og-0004Ls-B8
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 12:17:31 -0400
+	id 1d72Qm-0005FV-64
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 12:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d72Oe-0005mk-DH
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 12:17:30 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34918)
+	id 1d72Qj-0006JI-03
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 12:19:40 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35009)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d72Oe-0005mg-90
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 12:17:28 -0400
-Received: by mail-qt0-x241.google.com with SMTP id r58so4571303qtb.2
-	for <qemu-devel@nongnu.org>; Sat, 06 May 2017 09:17:28 -0700 (PDT)
+	id 1d72Qi-0006JD-Rm
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 12:19:36 -0400
+Received: by mail-qt0-x242.google.com with SMTP id r58so4575638qtb.2
+	for <qemu-devel@nongnu.org>; Sat, 06 May 2017 09:19:36 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170506111431.12548-1-aurelien@aurel32.net>
-	<20170506111431.12548-7-aurelien@aurel32.net>
+	<20170506111431.12548-11-aurelien@aurel32.net>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b769a74f-33f4-8fce-4438-e48597e2eea8@amsat.org>
-Date: Sat, 6 May 2017 13:17:20 -0300
+Message-ID: <42b1b33c-c8e5-70d6-650c-3f512c4b5439@amsat.org>
+Date: Sat, 6 May 2017 13:19:32 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170506111431.12548-7-aurelien@aurel32.net>
+In-Reply-To: <20170506111431.12548-11-aurelien@aurel32.net>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/14] target/sh4: fix BS_EXCP exit
+Subject: Re: [Qemu-devel] [PATCH v2 10/14] target/sh4: optimize gen_write_sr
+ using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,87 +37,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
 
+Lovely!
+
+What about a Coccinelle meta-script to catch similar (ab)uses?
+
+Phil.
+
 On 05/06/2017 08:14 AM, Aurelien Jarno wrote:
-> In case of exception, there is no need to call tcg_gen_exit_tb as the
-> exception helper won't return.
->
-> Also fix a few cases where BS_BRANCH is called instead of BS_EXCP.
+> This doesn't change the generated code on x86, but optimizes it on most
+> RISC architectures and makes the code simpler to read.
 >
 > Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/sh4/translate.c | 16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
+>  target/sh4/translate.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
 >
 > diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-> index 04bc18bf7c..f608e314b6 100644
+> index b4e5606098..8c766eed2a 100644
 > --- a/target/sh4/translate.c
 > +++ b/target/sh4/translate.c
-> @@ -339,7 +339,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
->      if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {     \
->          tcg_gen_movi_i32(cpu_pc, ctx->pc);                           \
->          gen_helper_raise_slot_illegal_instruction(cpu_env);          \
-> -        ctx->bstate = BS_BRANCH;                                     \
-> +        ctx->bstate = BS_EXCP;                                       \
->          return;                                                      \
->      }
->
-> @@ -351,7 +351,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
->          } else {                                                     \
->              gen_helper_raise_illegal_instruction(cpu_env);           \
->          }                                                            \
-> -        ctx->bstate = BS_BRANCH;                                     \
-> +        ctx->bstate = BS_EXCP;                                       \
->          return;                                                      \
->      }
->
-> @@ -363,7 +363,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
->          } else {                                                     \
->              gen_helper_raise_fpu_disable(cpu_env);                   \
->          }                                                            \
-> -        ctx->bstate = BS_BRANCH;                                     \
-> +        ctx->bstate = BS_EXCP;                                       \
->          return;                                                      \
->      }
->
-> @@ -1289,7 +1289,7 @@ static void _decode_opc(DisasContext * ctx)
->  	    imm = tcg_const_i32(B7_0);
->              gen_helper_trapa(cpu_env, imm);
->  	    tcg_temp_free(imm);
-> -	    ctx->bstate = BS_BRANCH;
-> +            ctx->bstate = BS_EXCP;
->  	}
->  	return;
->      case 0xc800:		/* tst #imm,R0 */
-> @@ -1798,7 +1798,7 @@ static void _decode_opc(DisasContext * ctx)
->      } else {
->          gen_helper_raise_illegal_instruction(cpu_env);
->      }
-> -    ctx->bstate = BS_BRANCH;
-> +    ctx->bstate = BS_EXCP;
+> @@ -204,12 +204,9 @@ static void gen_write_sr(TCGv src)
+>  {
+>      tcg_gen_andi_i32(cpu_sr, src,
+>                       ~((1u << SR_Q) | (1u << SR_M) | (1u << SR_T)));
+> -    tcg_gen_shri_i32(cpu_sr_q, src, SR_Q);
+> -    tcg_gen_andi_i32(cpu_sr_q, cpu_sr_q, 1);
+> -    tcg_gen_shri_i32(cpu_sr_m, src, SR_M);
+> -    tcg_gen_andi_i32(cpu_sr_m, cpu_sr_m, 1);
+> -    tcg_gen_shri_i32(cpu_sr_t, src, SR_T);
+> -    tcg_gen_andi_i32(cpu_sr_t, cpu_sr_t, 1);
+> +    tcg_gen_extract_i32(cpu_sr_q, src, SR_Q, 1);
+> +    tcg_gen_extract_i32(cpu_sr_m, src, SR_M, 1);
+> +    tcg_gen_extract_i32(cpu_sr_t, src, SR_T, 1);
 >  }
 >
->  static void decode_opc(DisasContext * ctx)
-> @@ -1867,7 +1867,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
->              /* We have hit a breakpoint - make sure PC is up-to-date */
->              tcg_gen_movi_i32(cpu_pc, ctx.pc);
->              gen_helper_debug(cpu_env);
-> -            ctx.bstate = BS_BRANCH;
-> +            ctx.bstate = BS_EXCP;
->              /* The address covered by the breakpoint must be included in
->                 [tb->pc, tb->pc + tb->size) in order to for it to be
->                 properly cleared -- thus we increment the PC here so that
-> @@ -1911,9 +1911,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
->              gen_goto_tb(&ctx, 0, ctx.pc);
->              break;
->          case BS_EXCP:
-> -            /* gen_op_interrupt_restart(); */
-> -            tcg_gen_exit_tb(0);
-> -            break;
-> +            /* fall through */
->          case BS_BRANCH:
->          default:
->              break;
+>  static inline void gen_save_cpu_state(DisasContext *ctx, bool save_pc)
 >
