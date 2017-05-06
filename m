@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d6xff-00030L-NJ
+	(envelope-from <aurelien@aurel32.net>) id 1d6xff-00030H-59
 	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d6xfe-0003v4-Nj
+	(envelope-from <aurelien@aurel32.net>) id 1d6xfe-0003uV-BI
 	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:43 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:39996)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:39988)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1d6xfe-0003uA-I7
+	id 1d6xfe-0003ty-54
 	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:42 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Sat,  6 May 2017 13:14:23 +0200
-Message-Id: <20170506111431.12548-7-aurelien@aurel32.net>
+Date: Sat,  6 May 2017 13:14:20 +0200
+Message-Id: <20170506111431.12548-4-aurelien@aurel32.net>
 In-Reply-To: <20170506111431.12548-1-aurelien@aurel32.net>
 References: <20170506111431.12548-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH v2 06/14] target/sh4: fix BS_EXCP exit
+Subject: [Qemu-devel] [PATCH v2 03/14] target/sh4: do not include
+ DELAY_SLOT_TRUE in the TB state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +28,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-In case of exception, there is no need to call tcg_gen_exit_tb as the
-exception helper won't return.
-
-Also fix a few cases where BS_BRANCH is called instead of BS_EXCP.
+DELAY_SLOT_TRUE is used as a dynamic condition for the branch after the
+delay slot instruction. It is not used in code generation, so there is
+no need to including in the TB state.
 
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/sh4/translate.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ target/sh4/cpu.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 04bc18bf7c..f608e314b6 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -339,7 +339,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
-     if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {     \
-         tcg_gen_movi_i32(cpu_pc, ctx->pc);                           \
-         gen_helper_raise_slot_illegal_instruction(cpu_env);          \
--        ctx->bstate = BS_BRANCH;                                     \
-+        ctx->bstate = BS_EXCP;                                       \
-         return;                                                      \
-     }
- 
-@@ -351,7 +351,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
-         } else {                                                     \
-             gen_helper_raise_illegal_instruction(cpu_env);           \
-         }                                                            \
--        ctx->bstate = BS_BRANCH;                                     \
-+        ctx->bstate = BS_EXCP;                                       \
-         return;                                                      \
-     }
- 
-@@ -363,7 +363,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
-         } else {                                                     \
-             gen_helper_raise_fpu_disable(cpu_env);                   \
-         }                                                            \
--        ctx->bstate = BS_BRANCH;                                     \
-+        ctx->bstate = BS_EXCP;                                       \
-         return;                                                      \
-     }
- 
-@@ -1289,7 +1289,7 @@ static void _decode_opc(DisasContext * ctx)
- 	    imm = tcg_const_i32(B7_0);
-             gen_helper_trapa(cpu_env, imm);
- 	    tcg_temp_free(imm);
--	    ctx->bstate = BS_BRANCH;
-+            ctx->bstate = BS_EXCP;
- 	}
- 	return;
-     case 0xc800:		/* tst #imm,R0 */
-@@ -1798,7 +1798,7 @@ static void _decode_opc(DisasContext * ctx)
-     } else {
-         gen_helper_raise_illegal_instruction(cpu_env);
-     }
--    ctx->bstate = BS_BRANCH;
-+    ctx->bstate = BS_EXCP;
- }
- 
- static void decode_opc(DisasContext * ctx)
-@@ -1867,7 +1867,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-             /* We have hit a breakpoint - make sure PC is up-to-date */
-             tcg_gen_movi_i32(cpu_pc, ctx.pc);
-             gen_helper_debug(cpu_env);
--            ctx.bstate = BS_BRANCH;
-+            ctx.bstate = BS_EXCP;
-             /* The address covered by the breakpoint must be included in
-                [tb->pc, tb->pc + tb->size) in order to for it to be
-                properly cleared -- thus we increment the PC here so that
-@@ -1911,9 +1911,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-             gen_goto_tb(&ctx, 0, ctx.pc);
-             break;
-         case BS_EXCP:
--            /* gen_op_interrupt_restart(); */
--            tcg_gen_exit_tb(0);
--            break;
-+            /* fall through */
-         case BS_BRANCH:
-         default:
-             break;
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index 9445cc779f..da8d15f1b9 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -382,8 +382,7 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
+ {
+     *pc = env->pc;
+     *cs_base = 0;
+-    *flags = (env->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL
+-                    | DELAY_SLOT_TRUE))                        /* Bits  0- 2 */
++    *flags = (env->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) /* Bits 0-1 */
+             | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
+             | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
+             | (env->sr & (1u << SR_FD))                        /* Bit 15 */
 -- 
 2.11.0
