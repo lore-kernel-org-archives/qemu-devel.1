@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d76LV-000625-Rd
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 16:30:31 -0400
+	(envelope-from <mark.fonnemann@hexagon.com>) id 1d77Hy-0002e2-5v
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 17:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d76LU-00011o-PJ
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 16:30:29 -0400
-References: <20170504030755.1001-1-eblake@redhat.com>
-	<20170504030755.1001-5-eblake@redhat.com>
-	<030dca5b-7b6a-8ec7-0f46-bfef6346dfbe@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <33cd5d43-b732-68bf-f072-5abaf312e148@redhat.com>
-Date: Sat, 6 May 2017 15:30:18 -0500
+	(envelope-from <mark.fonnemann@hexagon.com>) id 1d77Hv-0005pF-1U
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 17:30:54 -0400
+Received: from mail-ve1eur01on0133.outbound.protection.outlook.com
+	([104.47.1.133]:48832
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.fonnemann@hexagon.com>)
+	id 1d77Hu-0005p5-DS
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 17:30:50 -0400
+From: FONNEMANN Mark <mark.fonnemann@hexagon.com>
+Date: Sat, 6 May 2017 21:30:47 +0000
+Message-ID: <VI1PR0601MB2479748C35B3C9F914896AEA9CE80@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <030dca5b-7b6a-8ec7-0f46-bfef6346dfbe@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="06OoiAnoAdJ3TGgO8MlpmuT5iOnq8Ingr"
-Subject: Re: [Qemu-devel] [PATCH v12 04/10] qcow2: Make distinction between
- zero cluster types obvious
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] slirp: question about using SMB on windows host with
+ linux guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,150 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---06OoiAnoAdJ3TGgO8MlpmuT5iOnq8Ingr
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <33cd5d43-b732-68bf-f072-5abaf312e148@redhat.com>
-Subject: Re: [PATCH v12 04/10] qcow2: Make distinction between zero cluster
- types obvious
-References: <20170504030755.1001-1-eblake@redhat.com>
- <20170504030755.1001-5-eblake@redhat.com>
- <030dca5b-7b6a-8ec7-0f46-bfef6346dfbe@redhat.com>
-In-Reply-To: <030dca5b-7b6a-8ec7-0f46-bfef6346dfbe@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/05/2017 03:51 PM, Max Reitz wrote:
-> On 04.05.2017 05:07, Eric Blake wrote:
->> Treat plain zero clusters differently from allocated ones, so that
->> we can simplify the logic of checking whether an offset is present.
->> Do this by splitting QCOW2_CLUSTER_ZERO into two new enums,
->> QCOW2_CLUSTER_ZERO_PLAIN and QCOW2_CLUSTER_ZERO_ALLOC.
->>
->> I tried to arrange the enum so that we could use
->> 'ret <=3D QCOW2_CLUSTER_ZERO_PLAIN' for all unallocated types, and
->> 'ret >=3D QCOW2_CLUSTER_ZERO_ALLOC' for allocated types, although
->> I didn't actually end up taking advantage of the layout.
->>
->> In many cases, this leads to simpler code, by properly combining
->> cases (sometimes, both zero types pair together, other times,
->> plain zero is more like unallocated while allocated zero is more
->> like normal).
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
-
->> @@ -558,52 +557,32 @@ int qcow2_get_cluster_offset(BlockDriverState *b=
-s, uint64_t offset,
->>      assert(nb_clusters <=3D INT_MAX);
->>
->>      ret =3D qcow2_get_cluster_type(*cluster_offset);
->> +    if (s->qcow_version < 3 && (ret =3D=3D QCOW2_CLUSTER_ZERO_PLAIN |=
-|
->> +                                ret =3D=3D QCOW2_CLUSTER_ZERO_ALLOC))=
- {
->> +        qcow2_signal_corruption(bs, true, -1, -1, "Zero cluster entry=
- found"
->> +                                " in pre-v3 image (L2 offset: %#" PRI=
-x64
->> +                                ", L2 index: %#x)", l2_offset, l2_ind=
-ex);
->> +        ret =3D -EIO;
->> +        goto fail;
->> +    }
-=2E..
->> +    case QCOW2_CLUSTER_ZERO_PLAIN:
->>      case QCOW2_CLUSTER_UNALLOCATED:
->>          /* how many empty clusters ? */
->>          c =3D count_contiguous_clusters_unallocated(nb_clusters,
->> -                                                  &l2_table[l2_index]=
-,
->> -                                                  QCOW2_CLUSTER_UNALL=
-OCATED);
->> +                                                  &l2_table[l2_index]=
-, ret);
->=20
-> Nit pick: Using ret here is a bit weird (because it's such a meaningles=
-s
-> name). It would be good if we had a separate cluster_type variable.
-
-qcow2_get_cluster_offset() returns the cluster type on success, and
--errno on failure.  So 'ret' actually makes some sense: it really is the
-value we are about to return.  But it may also work to have a separate
-variable up front, then assign ret =3D cluster_type at the end; I'll play=
-
-with it and see which one looks better.
-
->=20
->>          *cluster_offset =3D 0;
->>          break;
->> +    case QCOW2_CLUSTER_ZERO_ALLOC:
->>      case QCOW2_CLUSTER_NORMAL:
->>          /* how many allocated clusters ? */
->>          c =3D count_contiguous_clusters(nb_clusters, s->cluster_size,=
-
->> -                &l2_table[l2_index], QCOW_OFLAG_ZERO);
->> +                                      &l2_table[l2_index], QCOW_OFLAG=
-_ZERO);
->>          *cluster_offset &=3D L2E_OFFSET_MASK;
->>          if (offset_into_cluster(s, *cluster_offset)) {
->>              qcow2_signal_corruption(bs, true, -1, -1, "Data cluster o=
-ffset %#"
->=20
-> Well, preallocated zero clusters are not exactly data clusters... Not
-> that any user cared, but s/Data cluster/Cluster allocation/ would be
-> more correct.
-
-Good idea.
-
->=20
-> By the way, allow me to state just how much I love this hunk: Very much=
-=2E
-> Looks great! It gets a place on my list of favorite hunks of this year
-> at least.
->=20
-> [...]
->=20
->> @@ -1760,7 +1740,8 @@ static int expand_zero_clusters_in_l1(BlockDrive=
-rState *bs, uint64_t *l1_table,
->>              int cluster_type =3D qcow2_get_cluster_type(l2_entry);>  =
-            bool preallocated =3D offset !=3D 0;
->=20
-> I could get behind removing this variable and replacing all
-> "if (!preallocated)" instances by
-> "if (cluster_type =3D=3D QCOW2_CLUSTER_ZERO_PLAIN)". Up to you, though.=
-
-
-Makes sense.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---06OoiAnoAdJ3TGgO8MlpmuT5iOnq8Ingr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZDjJaAAoJEKeha0olJ0Nqqx0H/1tmB/HBc6tm1S/pgbuqVjUb
-YU5l5Wn38mx7ZXvXK//3cr54i+StM5H5uWMMQqf60OdR4ShygolOBi5ZsLE2CEYo
-9Ce8XAi/UMW9m4dHMbCm/69J19hjlgMZEVkdqlF2dI37IeCfGlVf1hhnXhigQkDl
-eX1xw15Zuj/49c62Rf53+ZBZhGyqNxzlpgJbkhExIzQHJfvvVZFvGh2RDDDUuDKz
-LUVlWnGZsKzXk8osglnvJXwj8uignTlfmaCeBPh9cdmn+SaPS7IyBbn15NfFtEAv
-a9KKrb83RdyxgNKMiL/GflLRxeuCba4eVmqTiP/YrDEfcuDiwG9SvnCN5WFRmrk=
-=XJ1K
------END PGP SIGNATURE-----
-
---06OoiAnoAdJ3TGgO8MlpmuT5iOnq8Ingr--
+SGVsbG8tDQoNCkkgYW0gdHJ5aW5nIHRvIHNoYXJlcyBmaWxlcyBiZXR3ZWVuIFdpbmRvd3MgaG9z
+dCBhbmQgTGludXggZ3Vlc3QgdXNpbmcgc2xpcnDigJlzIGJ1aWx0LWluIFNNQiBzZXJ2ZXIuDQpJ
+IHN0YXJ0IFFFTVUgMi45LjAgdXNpbmcgdGhlIGZvbGxvd2luZzoNCg0KQzpcUHJvZ3JhbSBGaWxl
+c1xxZW11PnFlbXUtc3lzdGVtLWkzODYuZXhlIC1yZWFkY29uZmlnIFxVc2Vyc1xtZm9ubmVtYW5u
+XHFlbXUuY2ZnIC1uZXQgbmljIC1uZXQgdXNlcixzbWI9XFVzZXJzXG1mb25uZW1hbm5cc21iDQoN
+CkkgdGhlbiB0cnkgdG8gbW91bnQgdGhlIFNNQiBzaGFyZSBmaXJzdCB3aXRoIDEwLjAuMi40Og0K
+DQpyb290QHFlbXU6fiMgbW91bnQgLXQgY2lmcyAvLzEwLjAuMi40L1VzZXJzL21mb25uZW1hbm4v
+c21iIHRtcCAtbyB1c2VyPW1mb25uZW1hbm4NCiAgICAgICAgICAgICAgICAgICAgUGFzc3dvcmQ6
+DQogICAgICAgICAgICAgICAgICAgICBDSUZTIFZGUzogRXJyb3IgY29ubmVjdGluZyB0byBJUHY0
+IHNvY2tldC4gQWJvcnRpbmcgb3BlcmF0aW9uDQogICAgICAgICAgICAgICAgICAgICBDSUZTIFZG
+UzogY2lmc19tb3VudCBmYWlsZWQgdy9yZXR1cm4gY29kZSA9IC0xMTMNCiAgICAgICAgICAgICAg
+ICAgICAgbW91bnQgZXJyb3IgMTEzID0gTm8gcm91dGUgdG8gaG9zdA0KICAgICAgICAgICAgICAg
+ICAgICBtb3VudDogbW91bnQuY2lmcyBmYWlsZWQgd2l0aCBzdGF0dXMgLTENCg0KQW5kIHRoZW4g
+d2l0aCAxMC4wLjIuMjoNCg0Kcm9vdEBxZW11On4jIG1vdW50IC10IGNpZnMgLy8xMC4wLjIuMi9V
+c2Vycy9tZm9ubmVtYW5uL3NtYiB0bXAgLW8gdXNlcj1tZm9ubmVtYW5uDQogICAgICAgICAgICAg
+ICAgICAgIFBhc3N3b3JkOg0KICAgICAgICAgICAgICAgICAgICAgQ0lGUyBWRlM6IFVua25vd24g
+UkZDIDEwMDIgZnJhbWUNCg0KICAgICAgICAgICAgICAgICAgICAgQ0lGUyBWRlM6IFNlbmQgZXJy
+b3IgaW4gU2Vzc1NldHVwID0gLTEzDQogICAgICAgICAgICAgICAgICAgICBDSUZTIFZGUzogY2lm
+c19tb3VudCBmYWlsZWQgdy9yZXR1cm4gY29kZSA9IC0xMw0KICAgICAgICAgICAgICAgICAgICBt
+b3VudCBlcnJvciAxMyA9IFBlcm1pc3Npb24gZGVuaWVkDQogICAgICAgICAgICAgICAgICAgIG1v
+dW50OiBtb3VudC5jaWZzIGZhaWxlZCB3aXRoIHN0YXR1cyAtMQ0KDQpSZWdhcmRpbmcgUkZDIDEw
+MDIgZnJhbWUsIEkgc2VlIHRoZSBmb2xsb3dpbmcgd2hlbiB1c2luZyDigJxkbWVzZ+KAnToNCg0K
+Q0lGUyBWRlM6IFVua25vd24gUkZDIDEwMDIgZnJhbWUNCiAgICAgICAgICAgICAgICAgICAgIFJl
+Y2VpdmVkIERhdGE6IDogZHVtcCBvZiAzNiBieXRlcyBvZiBkYXRhIGF0IDB4ZjcxNDAwYzANCg0K
+ICAgICAgICAgICAgICAgICAgICAgMDAwMDAwOGQgNTc3NzAwNjQgNmUwMDY5MDAgNmYwMDY0MDAg
+LiAuIC4gLiBkIC4gdyBXIC4gaSAuIG4gLiBkIC4gbw0KICAgICAgICAgICAgICAgICAgICAgNzMw
+MDc3MDAgMzEwMDIwMDAgMjAwMDMwMDAgNzIwMDUwMDAgLiB3IC4gcyAuICAgLiAxIC4gMCAuICAg
+LiBQIC4gcg0KICAgICAgICAgICAgICAgICAgICAgMjAwMDZmMDAgLiBvIC4NCg0KQW55IGhlbHAg
+d291bGQgYmUgZ3JlYXRseSBhcHByZWNpYXRlZCEhDQpUaGFuayB5b3UgdmVyeSBtdWNoLg0KDQpC
+ZXN0IFJlZ2FyZHMgLyBNaXQgZnJldW5kbGljaGVuIEdyw7zDn2VuIC8g5pWs5YW3LA0KTWFyay4N
+Cg0K
