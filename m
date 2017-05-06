@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d6xff-00030I-9O
+	(envelope-from <aurelien@aurel32.net>) id 1d6xfg-00030P-00
 	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d6xfe-0003uc-D3
+	(envelope-from <aurelien@aurel32.net>) id 1d6xff-0003vV-0A
 	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:43 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:39986)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:40002)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1d6xfe-0003tr-6g
+	id 1d6xfe-0003uG-Oi
 	for qemu-devel@nongnu.org; Sat, 06 May 2017 07:14:42 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Sat,  6 May 2017 13:14:17 +0200
-Message-Id: <20170506111431.12548-1-aurelien@aurel32.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 00/14] target/sh4: misc fixes,
- cleanup and optimizations
+Date: Sat,  6 May 2017 13:14:26 +0200
+Message-Id: <20170506111431.12548-10-aurelien@aurel32.net>
+In-Reply-To: <20170506111431.12548-1-aurelien@aurel32.net>
+References: <20170506111431.12548-1-aurelien@aurel32.net>
+Subject: [Qemu-devel] [PATCH v2 09/14] target/sh4: optimize gen_store_fpr64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +27,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-This patch series try to improve the SH4 target by using the (more or
-less) recently introduced TCG features. It also fixes some issues spot
-when writting the patches (linking of TB with different flags, SH4-A
-specific instructions allowed on SH4) and correctly trap unaligned
-accesses.
+Isuing extrh and avoiding intermediate temps.
 
-v2:
-- Add some comments in the struct DisasContext declaration, as suggested
-  by Philippe Mathieu-Daudé
-- Add Reviewed-by entries
+Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+---
+ target/sh4/translate.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-Aurelien Jarno (14):
-  target/sh4: split ctx->flags into ctx->tbflags and ctx->envflags
-  target/sh4: get rid of DELAY_SLOT_CLEARME
-  target/sh4: do not include DELAY_SLOT_TRUE in the TB state
-  target/sh4: move DELAY_SLOT_TRUE flag into a separate global
-  target/sh4: fix BS_STOP exit
-  target/sh4: fix BS_EXCP exit
-  target/sh4: only save flags state at the end of the TB
-  target/sh4: fold ctx->bstate = BS_BRANCH into gen_conditional_jump
-  target/sh4: optimize gen_store_fpr64
-  target/sh4: optimize gen_write_sr using extract op
-  target/sh4: generate fences for SH4
-  target/sh4: implement tas.b using atomic helper
-  target/sh4: movua.l is an SH4-A only instruction
-  target/sh4: trap unaligned accesses
-
- target/sh4/cpu.c       |   1 +
- target/sh4/cpu.h       |  18 ++-
- target/sh4/helper.c    |   4 +-
- target/sh4/op_helper.c |  19 +++
- target/sh4/translate.c | 323 ++++++++++++++++++++++++-------------------------
- 5 files changed, 183 insertions(+), 182 deletions(-)
-
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index a4c7a0895b..b4e5606098 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -305,13 +305,8 @@ static inline void gen_load_fpr64(TCGv_i64 t, int reg)
+ 
+ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
+ {
+-    TCGv_i32 tmp = tcg_temp_new_i32();
+-    tcg_gen_extrl_i64_i32(tmp, t);
+-    tcg_gen_mov_i32(cpu_fregs[reg + 1], tmp);
+-    tcg_gen_shri_i64(t, t, 32);
+-    tcg_gen_extrl_i64_i32(tmp, t);
+-    tcg_gen_mov_i32(cpu_fregs[reg], tmp);
+-    tcg_temp_free_i32(tmp);
++    tcg_gen_extrl_i64_i32(cpu_fregs[reg + 1], t);
++    tcg_gen_extrh_i64_i32(cpu_fregs[reg], t);
+ }
+ 
+ #define B3_0 (ctx->opcode & 0xf)
 -- 
 2.11.0
