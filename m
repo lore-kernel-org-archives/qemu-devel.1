@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d79iB-0002dJ-N0
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1d79iC-0002eT-UH
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d79iA-0007jM-JL
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1d79iB-0007jy-R0
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:08 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Sat,  6 May 2017 19:05:44 -0500
-Message-Id: <20170507000552.20847-5-eblake@redhat.com>
+Date: Sat,  6 May 2017 19:05:45 -0500
+Message-Id: <20170507000552.20847-6-eblake@redhat.com>
 In-Reply-To: <20170507000552.20847-1-eblake@redhat.com>
 References: <20170507000552.20847-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 04/12] qcow2: Correctly report status of
- preallocated zero clusters
+Subject: [Qemu-devel] [PATCH v13 05/12] qcow2: Name typedef for cluster type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +22,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-We were throwing away the preallocation information associated with
-zero clusters.  But we should be matching the well-defined semantics
-in bdrv_get_block_status(), where (BDRV_BLOCK_ZERO |
-BDRV_BLOCK_OFFSET_VALID) informs the user which offset is reserved,
-while still reminding the user that reading from that offset is
-likely to read garbage.
+Although it doesn't add all that much type safety (this is C, after
+all), it does add a bit of legibility to use the name QCow2ClusterType
+instead of a plain int.
 
-count_contiguous_clusters_by_type() is now used only for unallocated
-cluster runs, hence it gets renamed and tightened.
+In particular, qcow2_get_cluster_offset() has an overloaded return
+type; a QCow2ClusterType on success, and -errno on failure; keeping
+the cluster type in a separate variable makes it slightly easier for
+the next patch to make further computations based on the type.
 
-Making this change lets us see which portions of an image are zero
-but preallocated, when using qemu-img map --output=json.  The
---output=human side intentionally ignores all zero clusters, whether
-or not they are preallocated.
-
-The fact that there is no change to qemu-iotests './check -qcow2'
-merely means that we aren't yet testing this aspect of qemu-img;
-a later patch will add a test.
-
+Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 ---
-v13: no change
-v12: rename helper function
-v11: reserved for blkdebug half of v10
-v10: new patch
+v13: new patch
 ---
- block/qcow2-cluster.c | 45 +++++++++++++++++++++++++++++++++++----------
- 1 file changed, 35 insertions(+), 10 deletions(-)
+ block/qcow2.h          |  6 +++---
+ block/qcow2-cluster.c  | 17 +++++++++--------
+ block/qcow2-refcount.c |  2 +-
+ 3 files changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 335a505..f3bfce6 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -334,16 +334,23 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
- 	return i;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 8731f24..c148bbc 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -349,12 +349,12 @@ typedef struct QCowL2Meta
+     QLIST_ENTRY(QCowL2Meta) next_in_flight;
+ } QCowL2Meta;
+
+-enum {
++typedef enum QCow2ClusterType {
+     QCOW2_CLUSTER_UNALLOCATED,
+     QCOW2_CLUSTER_NORMAL,
+     QCOW2_CLUSTER_COMPRESSED,
+     QCOW2_CLUSTER_ZERO
+-};
++} QCow2ClusterType;
+
+ typedef enum QCow2MetadataOverlap {
+     QCOW2_OL_MAIN_HEADER_BITNR    = 0,
+@@ -443,7 +443,7 @@ static inline uint64_t qcow2_max_refcount_clusters(BDRVQcow2State *s)
+     return QCOW_MAX_REFTABLE_SIZE >> s->cluster_bits;
  }
 
--static int count_contiguous_clusters_by_type(int nb_clusters,
--                                             uint64_t *l2_table,
--                                             int wanted_type)
-+/*
-+ * Checks how many consecutive unallocated clusters in a given L2
-+ * table have the same cluster type.
-+ */
-+static int count_contiguous_clusters_unallocated(int nb_clusters,
-+                                                 uint64_t *l2_table,
-+                                                 int wanted_type)
+-static inline int qcow2_get_cluster_type(uint64_t l2_entry)
++static inline QCow2ClusterType qcow2_get_cluster_type(uint64_t l2_entry)
+ {
+     if (l2_entry & QCOW_OFLAG_COMPRESSED) {
+         return QCOW2_CLUSTER_COMPRESSED;
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index f3bfce6..ed78a30 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -340,7 +340,7 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+  */
+ static int count_contiguous_clusters_unallocated(int nb_clusters,
+                                                  uint64_t *l2_table,
+-                                                 int wanted_type)
++                                                 QCow2ClusterType wanted_type)
  {
      int i;
 
-+    assert(wanted_type == QCOW2_CLUSTER_ZERO ||
-+           wanted_type == QCOW2_CLUSTER_UNALLOCATED);
-     for (i = 0; i < nb_clusters; i++) {
--        int type = qcow2_get_cluster_type(be64_to_cpu(l2_table[i]));
-+        uint64_t entry = be64_to_cpu(l2_table[i]);
-+        int type = qcow2_get_cluster_type(entry);
+@@ -500,6 +500,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+     int l1_bits, c;
+     unsigned int offset_in_cluster;
+     uint64_t bytes_available, bytes_needed, nb_clusters;
++    QCow2ClusterType type;
+     int ret;
 
--        if (type != wanted_type) {
-+        if (type != wanted_type || entry & L2E_OFFSET_MASK) {
-             break;
-         }
+     offset_in_cluster = offset_into_cluster(s, offset);
+@@ -522,13 +523,13 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+
+     l1_index = offset >> l1_bits;
+     if (l1_index >= s->l1_size) {
+-        ret = QCOW2_CLUSTER_UNALLOCATED;
++        type = QCOW2_CLUSTER_UNALLOCATED;
+         goto out;
      }
-@@ -565,14 +572,32 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-             ret = -EIO;
-             goto fail;
-         }
--        c = count_contiguous_clusters_by_type(nb_clusters, &l2_table[l2_index],
--                                              QCOW2_CLUSTER_ZERO);
--        *cluster_offset = 0;
-+        /* Distinguish between pure zero clusters and pre-allocated ones */
-+        if (*cluster_offset & L2E_OFFSET_MASK) {
-+            c = count_contiguous_clusters(nb_clusters, s->cluster_size,
-+                                          &l2_table[l2_index], QCOW_OFLAG_ZERO);
-+            *cluster_offset &= L2E_OFFSET_MASK;
-+            if (offset_into_cluster(s, *cluster_offset)) {
-+                qcow2_signal_corruption(bs, true, -1, -1,
-+                                        "Preallocated zero cluster offset %#"
-+                                        PRIx64 " unaligned (L2 offset: %#"
-+                                        PRIx64 ", L2 index: %#x)",
-+                                        *cluster_offset, l2_offset, l2_index);
-+                ret = -EIO;
-+                goto fail;
-+            }
-+        } else {
-+            c = count_contiguous_clusters_unallocated(nb_clusters,
-+                                                      &l2_table[l2_index],
-+                                                      QCOW2_CLUSTER_ZERO);
-+            *cluster_offset = 0;
-+        }
-         break;
-     case QCOW2_CLUSTER_UNALLOCATED:
-         /* how many empty clusters ? */
--        c = count_contiguous_clusters_by_type(nb_clusters, &l2_table[l2_index],
--                                              QCOW2_CLUSTER_UNALLOCATED);
-+        c = count_contiguous_clusters_unallocated(nb_clusters,
-+                                                  &l2_table[l2_index],
-+                                                  QCOW2_CLUSTER_UNALLOCATED);
-         *cluster_offset = 0;
-         break;
-     case QCOW2_CLUSTER_NORMAL:
+
+     l2_offset = s->l1_table[l1_index] & L1E_OFFSET_MASK;
+     if (!l2_offset) {
+-        ret = QCOW2_CLUSTER_UNALLOCATED;
++        type = QCOW2_CLUSTER_UNALLOCATED;
+         goto out;
+     }
+
+@@ -557,8 +558,8 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+      * true */
+     assert(nb_clusters <= INT_MAX);
+
+-    ret = qcow2_get_cluster_type(*cluster_offset);
+-    switch (ret) {
++    type = qcow2_get_cluster_type(*cluster_offset);
++    switch (type) {
+     case QCOW2_CLUSTER_COMPRESSED:
+         /* Compressed clusters can only be processed one by one */
+         c = 1;
+@@ -633,7 +634,7 @@ out:
+     assert(bytes_available - offset_in_cluster <= UINT_MAX);
+     *bytes = bytes_available - offset_in_cluster;
+
+-    return ret;
++    return type;
+
+ fail:
+     qcow2_cache_put(bs, s->l2_table_cache, (void **)&l2_table);
+@@ -891,7 +892,7 @@ static int count_cow_clusters(BDRVQcow2State *s, int nb_clusters,
+
+     for (i = 0; i < nb_clusters; i++) {
+         uint64_t l2_entry = be64_to_cpu(l2_table[l2_index + i]);
+-        int cluster_type = qcow2_get_cluster_type(l2_entry);
++        QCow2ClusterType cluster_type = qcow2_get_cluster_type(l2_entry);
+
+         switch(cluster_type) {
+         case QCOW2_CLUSTER_NORMAL:
+@@ -1757,7 +1758,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
+         for (j = 0; j < s->l2_size; j++) {
+             uint64_t l2_entry = be64_to_cpu(l2_table[j]);
+             int64_t offset = l2_entry & L2E_OFFSET_MASK;
+-            int cluster_type = qcow2_get_cluster_type(l2_entry);
++            QCow2ClusterType cluster_type = qcow2_get_cluster_type(l2_entry);
+             bool preallocated = offset != 0;
+
+             if (cluster_type != QCOW2_CLUSTER_ZERO) {
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 908dbe5..e639b34 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1640,7 +1640,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+         for (j = 0; j < s->l2_size; j++) {
+             uint64_t l2_entry = be64_to_cpu(l2_table[j]);
+             uint64_t data_offset = l2_entry & L2E_OFFSET_MASK;
+-            int cluster_type = qcow2_get_cluster_type(l2_entry);
++            QCow2ClusterType cluster_type = qcow2_get_cluster_type(l2_entry);
+
+             if ((cluster_type == QCOW2_CLUSTER_NORMAL) ||
+                 ((cluster_type == QCOW2_CLUSTER_ZERO) && (data_offset != 0))) {
 -- 
 2.9.3
