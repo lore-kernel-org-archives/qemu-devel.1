@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfkarsten@gmail.com>) id 1d7EyG-0001vw-7O
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 01:43:05 -0400
+	(envelope-from <doug16k@gmail.com>) id 1d7O5k-0006pQ-1Q
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 11:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfkarsten@gmail.com>) id 1d7EyF-00066L-84
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 01:43:04 -0400
-Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:34317)
+	(envelope-from <doug16k@gmail.com>) id 1d7O5j-00069C-8i
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 11:27:24 -0400
+Received: from mail-it0-x236.google.com ([2607:f8b0:4001:c0b::236]:34965)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cfkarsten@gmail.com>) id 1d7EyF-00065G-1h
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 01:43:03 -0400
-Received: by mail-qt0-x22d.google.com with SMTP id j29so30427290qtj.1
-	for <qemu-devel@nongnu.org>; Sat, 06 May 2017 22:43:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <doug16k@gmail.com>) id 1d7O5j-00067R-3G
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 11:27:23 -0400
+Received: by mail-it0-x236.google.com with SMTP id c15so53967604ith.0
+	for <qemu-devel@nongnu.org>; Sun, 07 May 2017 08:27:21 -0700 (PDT)
 MIME-Version: 1.0
-Sender: cfkarsten@gmail.com
-From: Carl Karsten <carl@personnelware.com>
-Date: Sun, 7 May 2017 00:42:31 -0500
-Message-ID: <CADmzSSjY4n7bBBUVk45=_SRSj74AkSpN3O1d61Cik1q-eDiHKQ@mail.gmail.com>
+In-Reply-To: <20170505144506.GA14316@stefanha-x1.localdomain>
+References: <CAEfK_46MMR6cH3ahuJ=zfcuKAp07iU20Ps+yZYv5s9woCPnsSw@mail.gmail.com>
+	<20170502142207.GJ22502@stefanha-x1.localdomain>
+	<CAEfK_46hGYYpO4YhYcxdUar1ugLQwbpJMgxAJDJU13zSpbD4zw@mail.gmail.com>
+	<20170505144506.GA14316@stefanha-x1.localdomain>
+From: Doug Gale <doug16k@gmail.com>
+Date: Sun, 7 May 2017 11:27:20 -0400
+Message-ID: <CAEfK_47+yGMVSEPui3GfyEfqPy9dQfJGB2c1smhV=TjSCoD8=g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] boot order=d bug?
+Subject: Re: [Qemu-devel] [PATCH] gdbstub: implement remote debugging
+ protocol escapes for command receive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-In the real world I will have a machine with a sata hd and boot the
-installer from a usb stick. I want to test this with 2 disk image files.
+[Oops, forgot to reply all, resending...]
 
-The usb stick will be built like so:
-https://github.com/CarlFK/video-stack-deploy/blob/usbstick/scripts/mk_usb_installer.sh
+Yes, on second thought, <= 2 is off by one. [0] would be the '$', [1]
+would be the repeated character, and [2] would be the '*'.
 
-but this will demo the problem I have run into with qemu:  how do I boot
-from boot.img without using boot=menu?
+And yes, there is a missing s->state = RS_IDLE there. Good catch. I'll
+post updated patch shortly...
 
-# make a blank disk to install to
-qemu-img create -f qcow2 disk.cow 8G
-
-# get an installer image
-wget
-http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/hd-media/boot.img.gz
-gunzip boot.img.gz
-
-qemu-system-x86_64 -m 256 -display curses  \
-    -drive file=disk.cow,index=0 \
-    -drive file=boot.img,index=1 \
-    -boot menu=on
-
-# Hit esc and then #2 to boot the installer.
-
-Press ESC for boot menu.
-Select boot device:
-1. ata0-0: QEMU HARDDISK ATA-7 Hard-Disk (8192 MiBytes)
-2. ata0-1: QEMU HARDDISK ATA-7 Hard-Disk (953 MiBytes)
-3. Legacy option rom
-4. Floppy [drive A]
-5. DVD/CD [ata1-0: QEMU DVD-ROM ATAPI-4 DVD/CD]
-6. iPXE (PCI 00:03.0)
-
-
-juser@gator:~/temp/video-stack-deploy/scripts$ qemu-system-x86_64 -version
-QEMU emulator version 2.8.1(Debian 1:2.8+dfsg-4+b1)
-Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
-
-
--- 
-Carl K
+On Fri, May 5, 2017 at 10:45 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Tue, May 02, 2017 at 10:32:40AM -0400, Doug Gale wrote:
+>> +            } else {
+>> +                /* decode repeat length */
+>> +                int repeat = (unsigned char)ch - ' ' + 3;
+>> +                if (s->line_buf_index + repeat >= sizeof(s->line_buf) - 1) {
+>> +                    /* that many repeats would overrun the command buffer */
+>> +#ifdef DEBUG_GDB
+>> +                    printf("gdbstub command buffer overrun,"
+>> +                           " dropping command\n");
+>> +#endif
+>> +                    s->state = RS_IDLE;
+>> +                } else if (s->line_buf_index <= 2) {
+>
+> Why s->line_buf_index <= 2?  I expected s->line_buf_index < 1 since we
+> just need 1 character to clone for run-length decoding.
+>
+>> +                    /* got a repeat but we have nothing to repeat */
+>> +#ifdef DEBUG_GDB
+>> +                    printf("gdbstub got invalid RLE sequence\n");
+>> +#endif
+>> +                } else {
+>
+> Missing s->state = RS_IDLE?
