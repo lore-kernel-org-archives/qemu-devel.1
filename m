@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <doug16k@gmail.com>) id 1d7RP0-000242-9m
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 14:59:31 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1d7U2y-0000Q1-Qx
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 17:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <doug16k@gmail.com>) id 1d7ROz-0000Qe-AY
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 14:59:30 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:35277)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <doug16k@gmail.com>) id 1d7ROz-0000QY-2n
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 14:59:29 -0400
-Received: by mail-it0-x243.google.com with SMTP id 67so906898itx.2
-	for <qemu-devel@nongnu.org>; Sun, 07 May 2017 11:59:28 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAEfK_47+yGMVSEPui3GfyEfqPy9dQfJGB2c1smhV=TjSCoD8=g@mail.gmail.com>
-References: <CAEfK_46MMR6cH3ahuJ=zfcuKAp07iU20Ps+yZYv5s9woCPnsSw@mail.gmail.com>
-	<20170502142207.GJ22502@stefanha-x1.localdomain>
-	<CAEfK_46hGYYpO4YhYcxdUar1ugLQwbpJMgxAJDJU13zSpbD4zw@mail.gmail.com>
-	<20170505144506.GA14316@stefanha-x1.localdomain>
-	<CAEfK_47+yGMVSEPui3GfyEfqPy9dQfJGB2c1smhV=TjSCoD8=g@mail.gmail.com>
-From: Doug Gale <doug16k@gmail.com>
-Date: Sun, 7 May 2017 14:59:27 -0400
-Message-ID: <CAEfK_46jBNgzS0f-p+vp9fiUiz-wsn+QzKiG9UNgUSt+UMjexw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] gdbstub: implement remote debugging
- protocol escapes for command receive
+	(envelope-from <programmingkidx@gmail.com>) id 1d7U2v-0006Cv-Ac
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 17:48:56 -0400
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=MACINTOSH; delsp=yes; format=flowed
+Message-Id: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+From: G 3 <programmingkidx@gmail.com>
+Date: Sun, 7 May 2017 17:48:48 -0400
+Subject: [Qemu-devel] Floating point unit bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,194 +20,1101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-Updated patch with comments addressed:
+I made a diagnostic program for the floating point unit. It will test =20=
 
->From 6bce4e5c87c255f10b22d2bf6fc951dde2bbf457 Mon Sep 17 00:00:00 2001
-From: Doug Gale <doug16k@gmail.com>
-Date: Mon, 1 May 2017 12:22:10 -0400
-Subject: [PATCH] gdbstub: implement remote debugging protocol escapes for
- command receive
+various PowerPC floating point instructions for compatibility with =20
+the PowerPC G3 processor. It was tested on a PowerPC G3 and G5 =20
+system. The results of the program in qemu-system-ppc were pretty =20
+bad. About every instruction tested is not implemented correctly.
 
-- decode escape sequences
-- decompress run-length encoding escape sequences
-- report command parsing problems to output when debug output is enabled
-- reject packet checksums that are not valid hex digits
-- compute the checksum based on the packet stream, not based on the
-  decoded packet
+Here is the download link to the program: http://www.mediafire.com/=20
+file/6j9tqubvk73lkw1/floating_point_test_program.zip
 
-Tested with GDB and QtCreator integrated debugger on SMP QEMU instance.
-Works for me.
+Here is the full source code to the program:
+/=20
+************************************************************************=20=
 
-Signed-off-by: Doug Gale <doug16k@gmail.com>
----
- gdbstub.c | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 99 insertions(+), 9 deletions(-)
+**************
+  * File: main.c
+  * Date: 4-30-2017
+  * Description: Implement a test program for various floating point =20
+instructions.
+  * Note: tests made to work with PowerPC G3 and G5 only.
+  * Compiling on Mac OS X: use gcc-3.3 -force_cpusubtype_ALL
+  * Note: fsqrt test will not work on PowerPC G3.
+  =20
+************************************************************************=20=
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 9911153..3abaf7c 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -286,6 +286,8 @@ enum RSState {
-     RS_INACTIVE,
-     RS_IDLE,
-     RS_GETLINE,
-+    RS_GETLINE_ESC,
-+    RS_GETLINE_RLE,
-     RS_CHKSUM1,
-     RS_CHKSUM2,
- };
-@@ -296,7 +298,8 @@ typedef struct GDBState {
-     enum RSState state; /* parsing state */
-     char line_buf[MAX_PACKET_LENGTH];
-     int line_buf_index;
--    int line_csum;
-+    int line_sum; /* running checksum */
-+    int line_csum; /* checksum at the end of the packet */
-     uint8_t last_packet[MAX_PACKET_LENGTH + 4];
-     int last_packet_len;
-     int signal;
-@@ -1508,7 +1511,6 @@ void gdb_do_syscall(gdb_syscall_complete_cb cb,
-const char *fmt, ...)
+**************/
 
- static void gdb_read_byte(GDBState *s, int ch)
- {
--    int i, csum;
-     uint8_t reply;
+#include <stdio.h>
+#include <stdint.h>
+#include <math.h>
+#include <float.h>
+#include <inttypes.h>
 
- #ifndef CONFIG_USER_ONLY
-@@ -1542,35 +1544,123 @@ static void gdb_read_byte(GDBState *s, int ch)
-         switch(s->state) {
-         case RS_IDLE:
-             if (ch == '$') {
-+                /* start of command packet */
-                 s->line_buf_index = 0;
-+                s->line_sum = 0;
-                 s->state = RS_GETLINE;
-+            } else {
-+#ifdef DEBUG_GDB
-+                printf("gdbstub received garbage between packets: 0x%x\n", ch);
-+#endif
-             }
-             break;
-         case RS_GETLINE:
-+            if (ch == '}') {
-+                /* start escape sequence */
-+                s->state = RS_GETLINE_ESC;
-+                s->line_sum += ch;
-+            } else if (ch == '*') {
-+                /* start run length encoding sequence */
-+                s->state = RS_GETLINE_RLE;
-+                s->line_sum += ch;
-+            } else if (ch == '#') {
-+                /* end of command, start of checksum*/
-+                s->state = RS_CHKSUM1;
-+            } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
-+#ifdef DEBUG_GDB
-+                printf("gdbstub command buffer overrun, dropping command\n");
-+#endif
-+                s->state = RS_IDLE;
-+            } else {
-+                /* unescaped command character */
-+                s->line_buf[s->line_buf_index++] = ch;
-+                s->line_sum += ch;
-+            }
-+            break;
-+        case RS_GETLINE_ESC:
-             if (ch == '#') {
--            s->state = RS_CHKSUM1;
-+                /* unexpected end of command in escape sequence */
-+                s->state = RS_CHKSUM1;
-             } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
-+                /* command buffer overrun */
-+#ifdef DEBUG_GDB
-+                printf("gdbstub command buffer overrun, dropping command\n");
-+#endif
-                 s->state = RS_IDLE;
-             } else {
--            s->line_buf[s->line_buf_index++] = ch;
-+                /* parse escaped character and leave escape state */
-+                s->line_buf[s->line_buf_index++] = ch ^ 0x20;
-+                s->line_sum += ch;
-+                s->state = RS_GETLINE;
-+            }
-+            break;
-+        case RS_GETLINE_RLE:
-+            if (ch < ' ') {
-+                /* invalid RLE count encoding */
-+#ifdef DEBUG_GDB
-+                printf("gdbstub got invalid RLE count: 0x%x\n", ch);
-+#endif
-+                s->state = RS_GETLINE;
-+            } else {
-+                /* decode repeat length */
-+                int repeat = (unsigned char)ch - ' ' + 3;
-+                if (s->line_buf_index + repeat >= sizeof(s->line_buf) - 1) {
-+                    /* that many repeats would overrun the command buffer */
-+#ifdef DEBUG_GDB
-+                    printf("gdbstub command buffer overrun,"
-+                           " dropping command\n");
-+#endif
-+                    s->state = RS_IDLE;
-+                } else if (s->line_buf_index < 2) {
-+                    /* got a repeat but we have nothing to repeat */
-+#ifdef DEBUG_GDB
-+                    printf("gdbstub got invalid RLE sequence\n");
-+#endif
-+                    s->state = RS_GETLINE;
-+                } else {
-+                    /* repeat the last character */
-+                    memset(s->line_buf + s->line_buf_index,
-+                           s->line_buf[s->line_buf_index - 1], repeat);
-+                    s->line_buf_index += repeat;
-+                    s->line_sum += ch;
-+                    s->state = RS_GETLINE;
-+                }
-             }
-             break;
-         case RS_CHKSUM1:
-+            /* get high hex digit of checksum */
-+            if (!isxdigit(ch)) {
-+#ifdef DEBUG_GDB
-+                printf("gdbstub got invalid command checksum digit\n");
-+#endif
-+                s->state = RS_GETLINE;
-+                break;
-+            }
-             s->line_buf[s->line_buf_index] = '\0';
-             s->line_csum = fromhex(ch) << 4;
-             s->state = RS_CHKSUM2;
-             break;
-         case RS_CHKSUM2:
-+            /* get low hex digit of checksum */
-+            if (!isxdigit(ch)) {
-+#ifdef DEBUG_GDB
-+                printf("gdbstub got invalid command checksum digit\n");
-+#endif
-+                s->state = RS_GETLINE;
-+                break;
-+            }
-             s->line_csum |= fromhex(ch);
--            csum = 0;
--            for(i = 0; i < s->line_buf_index; i++) {
--                csum += s->line_buf[i];
--            }
--            if (s->line_csum != (csum & 0xff)) {
-+
-+            if (s->line_csum != (s->line_sum & 0xff)) {
-+                /* send NAK reply */
-                 reply = '-';
-                 put_buffer(s, &reply, 1);
-+#ifdef DEBUG_GDB
-+                printf("gdbstub got command packet with incorrect checksum\n");
-+#endif
-                 s->state = RS_IDLE;
-             } else {
-+                /* send ACK reply */
-                 reply = '+';
-                 put_buffer(s, &reply, 1);
-                 s->state = gdb_handle_packet(s, s->line_buf);
--- 
-2.7.4
+// Used to convert unsigned integer <--> double
+union Converter
+{
+     double d;
+     uint64_t i;
+};
+
+typedef union Converter Converter;
+
+/* Describes the name and description of each bit of the FPSCR */
+struct fpscr_info
+{
+     char name[8];
+     char description[100];
+};
+
+struct fpscr_info finfo[] =3D
+{
+     "FX", "Floating-point exception summary",
+     "FEX", "Floating-point enabled exception summary",
+     "VX", "Floating-point invalid operation exception summary",
+     "OX", "Floating-point overflow exception",
+     "UX", "Floating-point underflow exception",
+     "ZX", "Floating-point zero divide exception",
+     "XX", "Floating-point inexact exception",
+     "VXSNAN", "Floating-point invalid operation exception for SNaN",
+     "VXISI", "Floating-point invalid operation exception for =B0 - =B0",
+     "VXIDI", "Floating-point invalid operation exception for =B0/=B0",
+     "VXZDZ", "Floating-point invalid operation exception for 0/0",
+     "VXIMZ", "Floating-point invalid operation exception for =B0 * 0",
+     "VXVC", "Floating-point invalid operation exception for invalid =20
+compare",
+     "FR", "Floating-point fraction rounded",
+     "FI", "Floating-point fraction inexact",
+     "FPRF", "Floating-point result class descriptor ",
+     "FPRF", "Floating-point less than or negative",
+     "FPRF", "Floating-point greater than or positive",
+     "FPRF", "Floating-point equal or zero",
+     "FPRF", "Floating-point unordered or NaN",
+     "NO NAME", "Reserved - you shouldn't be seeing this",
+     "VXSOFT", "Floating-point invalid operation exception for =20
+software request",
+     "VXSQRT", "Floating-point invalid operation exception for =20
+invalid square root",
+     "VXCVI", "Floating-point invalid operation exception for invalid =20=
+
+integer convert",
+     "VE", "Floating-point invalid operation exception enable",
+     "OE", "IEEE floating-point overflow exception enable",
+     "UE", "IEEE floating-point underflow exception enable",
+     "ZE", "IEEE floating-point zero divide exception enable",
+     "XE", "Floating-point inexact exception enable",
+     "NI", "Floating-point non-IEEE mode",
+     "RN", "Rounding bit 0",
+     "RN", "Rounding bit 1",
+};
+
+// Prints all the FPSCR settings that are set in the input
+void print_fpscr_settings(uint32_t fpscr)
+{
+     int i;
+     for (i =3D 0; i < 32; i++) {
+         if ((fpscr >> i) & 0x1 =3D=3D 1) {
+             /* right description =3D 31 - i  Oddity of IBM =20
+documentation */
+             printf("bit %d: %s - %s\n", 31-i, finfo[31-i].name, finfo=20=
+
+[31-i].description);
+         }
+     }
+}
+
+
+#define ZE 27
+#define set_fpscr_bit(x) asm volatile ("mtfsb1 %0" : : "i"(x))
+
+/* Keeps track of the number of tests that failed */
+int failed_tests =3D 0;
+
+// Reset the FPSCR
+void reset_fpscr()
+{
+     asm volatile("mtfsb0 0");
+     asm volatile("mtfsb0 1");
+     asm volatile("mtfsb0 2");
+     asm volatile("mtfsb0 3");
+     asm volatile("mtfsb0 4");
+     asm volatile("mtfsb0 5");
+     asm volatile("mtfsb0 6");
+     asm volatile("mtfsb0 7");
+     asm volatile("mtfsb0 8");
+     asm volatile("mtfsb0 9");
+     asm volatile("mtfsb0 10");
+     asm volatile("mtfsb0 11");
+     asm volatile("mtfsb0 12");
+     asm volatile("mtfsb0 13");
+     asm volatile("mtfsb0 14");
+     asm volatile("mtfsb0 15");
+     asm volatile("mtfsb0 16");
+     asm volatile("mtfsb0 17");
+     asm volatile("mtfsb0 18");
+     asm volatile("mtfsb0 19");
+     asm volatile("mtfsb0 20");
+     asm volatile("mtfsb0 21");
+     asm volatile("mtfsb0 22");
+     asm volatile("mtfsb0 23");
+     asm volatile("mtfsb0 24");
+     asm volatile("mtfsb0 25");
+     asm volatile("mtfsb0 26");
+     asm volatile("mtfsb0 27");
+     asm volatile("mtfsb0 28");
+     asm volatile("mtfsb0 29");
+     asm volatile("mtfsb0 30");
+     asm volatile("mtfsb0 31");
+
+     /* Check if everything is alright */
+     uint32_t fpscr;
+     asm volatile("mffs f0");
+     asm volatile("stfd f0, 40(r1)");
+     asm volatile("lwz %0, 44(r1)" : "=3Dr"(fpscr));
+     if (fpscr !=3D 0) {
+         printf("Warning: fpscr not equal to zero: 0x%x\n", fpscr);
+     }
+}
+
+/*
+  * The action to take if a test fails
+  * Input one: message string
+  * Input two: actual fpscr value
+  * Input three: expected fpscr value
+  * Input four: actual answer
+  * Input five: expected answer
+  */
+  void test_failed(const char *message, uint32_t actual_fpscr, =20
+uint32_t expected_fpscr,
+                   uint64_t actual_answer, uint64_t expected_answer)
+  {
+     printf("%s\n", message);
+     printf("expected answer: 0x%" PRIx64 "\n", expected_answer);
+     printf("  actual answer: 0x%" PRIx64 "\n", actual_fpscr);
+     printf("expected fpscr: 0x%x\n", expected_fpscr);
+     printf("  actual fpscr: 0x%x\n", actual_fpscr);
+
+     /* Only print FPSCR bits if there is a difference */
+     if (actual_fpscr !=3D expected_fpscr) {
+         printf("\nactual FPSCR bits set:\n");
+         print_fpscr_settings(actual_fpscr);
+         printf("\nexpected FPSCR bits set:\n");
+         print_fpscr_settings(expected_fpscr);
+     }
+     printf("\n");
+     failed_tests++;
+  }
+
+/*
+  * Returns the value of the FPSCR
+  * output: unsigned 32 bit integer
+  */
+uint32_t get_fpscr()
+{
+     asm volatile("mffs f0");
+     asm volatile("stfd f0, 40(r1)");
+     uint32_t return_value;
+     asm volatile("lwz %0, 44(r1)" : "=3Dr"(return_value));
+     return return_value;
+}
+
+
+/* The fpscr and answer have to be right for a test to pass. */
+
+
+/* Test the fadd instruction */
+void test_fadd()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x3ff3333333333334;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82064000;
+     reset_fpscr();
+     asm volatile("fadd %0, %1, %2" : "=3Df"(c.d) : "f"(0.4), "f"(0.8));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fadd test passed\n");
+     } else {
+         test_failed("fadd test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fadds instruction */
+void test_fadds()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x407024d500000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82064000;
+     reset_fpscr();
+     asm volatile("fadds %0, %1, %2" : "=3Df"(c.d) : "f"(257.445), =20
+"f"(0.857));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fadds test passed\n");
+     } else {
+         test_failed("fadds test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fsub instruction */
+void test_fsub()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x40f2fd1deb11c6d2;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x4000;
+     reset_fpscr();
+     asm volatile("fsub %0, %1, %2" : "=3Df"(c.d) : "f"(123456.78), =20
+"f"(45678.91011));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fsub test passed\n");
+     } else {
+         test_failed("fsub test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fsubs instruction */
+void test_fsubs()
+{
+     Converter c;
+     double expected_answer =3D 0x40884e3d70a3d70a;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x4000;
+     reset_fpscr();
+     asm volatile("fsub %0, %1, %2" : "=3Df"(c.d) : "f"(1234.56), =20
+"f"(456.78));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fsubs test passed\n");
+     } else {
+         test_failed("fsubs test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test infinity - infinity */
+void test_inf_minus_inf()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x7ff8000000000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0xa0811000;
+     reset_fpscr();
+     asm volatile("fsub %0, %1, %1" : "=3Df"(c.d) : "f"(INFINITY));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("inf - inf test passed\n");
+     } else {
+         test_failed("inf - inf test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test division by zero */
+void test_division_by_zero()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x0;
+     uint32_t actual_fpscr, expected_fpscr =3D 0xc4000010;
+     reset_fpscr();
+     set_fpscr_bit(ZE);
+     asm volatile("fdiv %0, %1, %2" : "=3Df"(c.d) : "f"(1.0), "f"(0.0));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("division by zero test passed\n");
+     } else {
+         test_failed("division by zero test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test zero divided by zero */
+void test_zero_div_zero()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x7ff8000000000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0xa0211010;
+     reset_fpscr();
+     set_fpscr_bit(ZE);
+     asm volatile("fdiv %0, %1, %1" : "=3Df"(c.d) : "f"(0.0), "f"(0.0));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("0/0 test passed\n");
+     } else {
+         test_failed("0/0 test failed", actual_fpscr, expected_fpscr, =20=
+
+c.i, expected_answer);
+     }
+}
+
+/* Test infinity divided by infinity */
+void test_inf_div_inf()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x7ff8000000000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0xa0411000;
+     reset_fpscr();
+     asm volatile("fdiv %0, %1, %1" : "=3Df"(c.d) : "f"(INFINITY));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("inf/inf test passed\n");
+     } else {
+         test_failed("inf/inf test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+
+/* Test the fdiv instruction */
+void test_fdiv()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x40059f38ee13b48b;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82064000;
+     reset_fpscr();
+     asm volatile("fdiv %0, %1, %2" : "=3Df"(c.d) : "f"(1234.56), =20
+"f"(456.78));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fdiv test passed\n");
+     } else {
+         test_failed("fdiv test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fdivs instruction */
+void test_fdivs()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x40059f38e0000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82024000;
+     reset_fpscr();
+     asm volatile("fdivs %0, %1, %2" : "=3Df"(c.d) : "f"(1234.56), =20
+"f"(456.78));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fdivs test passed\n");
+     } else {
+         test_failed("fdivs test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fmul instruction */
+void test_fmul()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x40365c28f5c28f5c;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82024000;
+     reset_fpscr();
+     asm volatile("fmul %0, %1, %2" : "=3Df"(c.d) : "f"(5.2), "f"(4.3));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fmul test passed\n");
+     } else {
+         test_failed("fmul test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fmuls instruction */
+void test_fmuls()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x412135a4a0000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82024000;
+     reset_fpscr();
+     asm volatile("fmuls %0, %1, %2" : "=3Df"(c.d) : "f"(1234.56), =20
+"f"(456.78));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fmuls test passed\n");
+     } else {
+         test_failed("fmuls test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fmul instruction */
+void test_inf_times_zero()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x7ff8000000000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0xa0111000;
+     reset_fpscr();
+     asm volatile("fmul %0, %1, %2" : "=3Df"(c.d) : "f"(INFINITY), =20
+"f"(0.0));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("inf * 0 test passed\n");
+     } else {
+         test_failed("inf * 0 test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fmadd instruction */
+void test_fmadd()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x4123fcaadfa43fe5;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82024000;
+     reset_fpscr();
+     asm volatile("fmadd %0, %1, %2, %3" : "=3Df"(c.d) : "f"(1234.56), =20=
+
+"f"(456.78), "f"(91011.12));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fmadd test passed\n");
+     } else {
+         test_failed("fmadd test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fmadds instruction */
+void test_fmadds()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x4123fcaae0000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82064000;
+     reset_fpscr();
+     asm volatile("fmadds %0, %1, %2, %3" : "=3Df"(c.d) : "f"(1234.56), =20=
+
+"f"(456.78), "f"(91011.12));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fmadds test passed\n");
+     } else {
+         test_failed("fmadds test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fsqrt instruction - This instruction doesn't work on the =20
+PowerPC 750 (G3).
+    It does work on the PowerPC 970 (G5).  */
+/*void test_fsqrt()
+{
+     double answer;
+     reset_fpscr();
+     asm volatile("fsqrt %0, %1" : "=3Df"(answer) : "f"(-1.0));
+     if (get_fpscr() =3D=3D 0xa0011200) {
+         printf("fsqrt test passed\n");
+     } else {
+         test_failed("fsqrt test failed");
+     }
+}*/
+
+/* Test an overflow condition */
+void test_overflow()
+{
+     // multiplying two really big numbers equals overflow
+     Converter c;
+     double really_big_input;
+     uint64_t expected_answer =3D 0x7ff0000000000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x92025000;
+     reset_fpscr();
+     really_big_input =3D 1.7 * pow(10, 308);
+     asm volatile("fmul %0, %1, %1" : "=3Df"(c.d) : =20
+"f"(really_big_input));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("overflow test passed\n");
+     } else {
+         test_failed("overflow test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test an underflow condition */
+void test_underflow()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x199999999999a;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x8a074000;
+     reset_fpscr();
+     asm volatile("fmadd %0, %1, %2, %3" : "=3Df"(c.d) : "f"(DBL_MIN), =20=
+
+"f"(0.1), "f"(0.0));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("underflow test passed\n");
+     } else {
+         test_failed("underflow test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fctiw instruction */
+void test_fctiw()
+{
+     Converter c;
+     uint64_t expected_answer;
+     uint32_t actual_fpscr, expected_fpscr;
+     double frB;
+
+     /* above maximum value test */
+     expected_fpscr =3D 0xa0000100;
+     expected_answer =3D 0x7fffffff;
+     frB =3D pow(2, 32); // greater than 2^31 - 1
+     reset_fpscr();
+     asm volatile("fctiw %0, %1" : "=3Df"(c.d) : "f"(frB));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && (c.i & 0xffffffff) =3D=3D =
+=20
+expected_answer) {
+         printf("fctiw above maximum value test passed\n");
+     } else {
+         test_failed("fctiw above maximum value test failed", =20
+actual_fpscr, expected_fpscr, c.i, expected_answer);
+     }
+
+     /* below minimum value test*/
+     expected_fpscr =3D 0xa0000100;
+     expected_answer =3D 0x80000000;
+     frB =3D -frB;  // less than -2^31
+     reset_fpscr();
+     asm volatile("fctiw %0, %1" : "=3Df"(c.d) : "f"(frB));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && (c.i & 0xffffffff) =3D=3D =
+=20
+expected_answer) {
+         printf("fctiw below minimum value test passed\n");
+     } else {
+         test_failed("fctiw below minimum value test failed", =20
+actual_fpscr, expected_fpscr, c.i, expected_answer);
+     }
+
+     /* float to integer test */
+     expected_fpscr =3D 0x82060000;
+     expected_answer =3D 0xfff800000000000d;
+     reset_fpscr();
+     asm volatile("fctiw %0, %1" : "=3Df"(c.d) : "f"(12.7));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fctiw integer conversion test passed\n");
+     } else {
+         test_failed("fctiw integer conversion test failed", =20
+actual_fpscr, expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fctiwz instruction */
+void test_fctiwz()
+{
+     Converter c;
+     uint64_t expected_answer;
+     uint32_t actual_fpscr, expected_fpscr;
+     double frB;
+
+     /* above maximum value test */
+     expected_fpscr =3D 0xa0000100;
+     expected_answer =3D 0x7fffffff;
+     frB =3D pow(2, 32); // greater than 2^31 - 1
+     reset_fpscr();
+     asm volatile("fctiwz %0, %1" : "=3Df"(c.d) : "f"(frB));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && (c.i & 0xffffffff) =3D=3D =
+=20
+expected_answer) {
+         printf("fctiwz above maximum value test passed\n");
+     } else {
+         test_failed("fctiwz above maximum value test failed", =20
+actual_fpscr, expected_fpscr, c.i, expected_answer);
+     }
+
+     /* below minimum value test*/
+     expected_fpscr =3D 0xa0000100;
+     expected_answer =3D 0x80000000;
+     frB =3D -frB;  // less than -2^31
+     reset_fpscr();
+     asm volatile("fctiwz %0, %1" : "=3Df"(c.d) : "f"(frB));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && (c.i & 0xffffffff) =3D=3D =
+=20
+expected_answer) {
+         printf("fctiwz below minimum value test passed\n");
+     } else {
+         test_failed("fctiwz below minimum value test failed", =20
+actual_fpscr, expected_fpscr, c.i, expected_answer);
+     }
+
+     /* float to integer test */
+     expected_fpscr =3D 0x82060000;
+     expected_answer =3D 0xfff800000000001c;
+     reset_fpscr();
+     asm volatile("fctiw %0, %1" : "=3Df"(c.d) : "f"(27.98));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fctiwz integer conversion test passed\n");
+     } else {
+         test_failed("fctiwz integer conversion test failed", =20
+actual_fpscr, expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the frsp instruction */
+void test_frsp()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0x4271f71fc0000000;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82064000;
+     reset_fpscr();
+     asm volatile("frsp %0, %1" : "=3Df"(c.d) : =20
+"f"(1234567891012.131415));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("frsp test passed\n");
+     } else {
+         test_failed("frsp test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Test the fnmsub instruction */
+void test_fnmsub()
+{
+     Converter c;
+     uint64_t expected_answer =3D 0xc11cdd3cc985f06e;
+     uint32_t actual_fpscr, expected_fpscr =3D 0x82028000;
+     reset_fpscr();
+     asm volatile("fnmsub %0, %1, %2, %3" : "=3Df"(c.d) : "f"(1234.56), =20=
+
+"f"(456.78), "f"(91011.12));
+     actual_fpscr =3D get_fpscr();
+     if (actual_fpscr =3D=3D expected_fpscr && c.i =3D=3D =
+expected_answer) {
+         printf("fnmsub test passed\n");
+     } else {
+         test_failed("fnmsub test failed", actual_fpscr, =20
+expected_fpscr, c.i, expected_answer);
+     }
+}
+
+/* Report the results of all the tests */
+void report_results()
+{
+     if (failed_tests =3D=3D 1) {
+         printf("\n=3D=3D=3D Warning: %d test failed =3D=3D=3D\n", =
+failed_tests);
+     } else if (failed_tests > 1) {
+         printf("\n=3D=3D=3D Warning: %d tests failed =3D=3D=3D\n", =
+failed_tests);
+     } else {
+         printf("\n=3D=3D=3D All tests passed =3D=3D=3D\n");
+     }
+}
+
+int main (int argc, const char * argv[]) {
+
+     test_fadd();
+     test_fadds();
+     test_fsub();
+     test_fsubs();
+     test_fmul();
+     test_fmuls();
+     test_fdiv();
+     test_fdivs();
+     test_fmadd();
+     test_fmadds();
+     //test_fsqrt();
+     test_inf_minus_inf();
+     test_division_by_zero();
+     test_zero_div_zero();
+     test_inf_div_inf();
+     test_inf_times_zero();
+     test_overflow();
+     test_underflow();
+     test_fctiw();
+     test_fctiwz();
+     test_frsp();
+     test_fnmsub();
+
+     report_results();
+
+     return 0;
+}
+
+
+Here is the full test results after running this program in qemu-=20
+system-ppc with a Mac OS 10.4 guest:
+
+
+
+
+fadd test failed
+expected answer: 0x3ff3333333333334
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82064000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 13: FR - Floating-point fraction rounded
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fadds test failed
+expected answer: 0x407024d500000000
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82064000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 13: FR - Floating-point fraction rounded
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fsub test passed
+fsubs test passed
+fmul test failed
+expected answer: 0x40365c28f5c28f5c
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82024000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fmuls test failed
+expected answer: 0x412135a4a0000000
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82024000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fdiv test failed
+expected answer: 0x40059f38ee13b48b
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82064000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 13: FR - Floating-point fraction rounded
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fdivs test failed
+expected answer: 0x40059f38e0000000
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82024000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fmadd test failed
+expected answer: 0x4123fcaadfa43fe5
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82024000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fmadds test failed
+expected answer: 0x4123fcaae0000000
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82064000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 13: FR - Floating-point fraction rounded
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+inf - inf test passed
+Warning: fpscr not equal to zero: 0x20000000
+division by zero test failed
+expected answer: 0x0
+   actual answer: 0xc400501000000015
+expected fpscr: 0xc4000010
+   actual fpscr: 0xc4005010
+
+actual FPSCR bits set:
+bit 27: ZE - IEEE floating-point zero divide exception enable
+bit 19: FPRF - Floating-point unordered or NaN
+bit 17: FPRF - Floating-point greater than or positive
+bit 5: ZX - Floating-point zero divide exception
+bit 1: FEX - Floating-point enabled exception summary
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 27: ZE - IEEE floating-point zero divide exception enable
+bit 5: ZX - Floating-point zero divide exception
+bit 1: FEX - Floating-point enabled exception summary
+bit 0: FX - Floating-point exception summary
+
+Warning: fpscr not equal to zero: 0x40000000
+0/0 test passed
+Warning: fpscr not equal to zero: 0x20000000
+inf/inf test passed
+Warning: fpscr not equal to zero: 0x20000000
+inf * 0 test passed
+Warning: fpscr not equal to zero: 0x20000000
+overflow test passed
+underflow test failed
+expected answer: 0x199999999999a
+   actual answer: 0x8801400000000021
+expected fpscr: 0x8a074000
+   actual fpscr: 0x88014000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 15: FPRF - Floating-point result class descriptor
+bit 4: UX - Floating-point underflow exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 15: FPRF - Floating-point result class descriptor
+bit 14: FI - Floating-point fraction inexact
+bit 13: FR - Floating-point fraction rounded
+bit 6: XX - Floating-point inexact exception
+bit 4: UX - Floating-point underflow exception
+bit 0: FX - Floating-point exception summary
+
+fctiw above maximum value test failed
+expected answer: 0x7fffffff
+   actual answer: 0xa00111000000001c
+expected fpscr: 0xa0000100
+   actual fpscr: 0xa0011100
+
+actual FPSCR bits set:
+bit 23: VXCVI - Floating-point invalid operation exception for =20
+invalid integer convert
+bit 19: FPRF - Floating-point unordered or NaN
+bit 15: FPRF - Floating-point result class descriptor
+bit 2: VX - Floating-point invalid operation exception summary
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 23: VXCVI - Floating-point invalid operation exception for =20
+invalid integer convert
+bit 2: VX - Floating-point invalid operation exception summary
+bit 0: FX - Floating-point exception summary
+
+Warning: fpscr not equal to zero: 0x20000000
+fctiw below minimum value test failed
+expected answer: 0x80000000
+   actual answer: 0xa00111000000001c
+expected fpscr: 0xa0000100
+   actual fpscr: 0xa0011100
+
+actual FPSCR bits set:
+bit 23: VXCVI - Floating-point invalid operation exception for =20
+invalid integer convert
+bit 19: FPRF - Floating-point unordered or NaN
+bit 15: FPRF - Floating-point result class descriptor
+bit 2: VX - Floating-point invalid operation exception summary
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 23: VXCVI - Floating-point invalid operation exception for =20
+invalid integer convert
+bit 2: VX - Floating-point invalid operation exception summary
+bit 0: FX - Floating-point exception summary
+
+Warning: fpscr not equal to zero: 0x20000000
+fctiw integer conversion test failed
+expected answer: 0xfff800000000000d
+   actual answer: 0x8200000000000024
+expected fpscr: 0x82060000
+   actual fpscr: 0x82000000
+
+actual FPSCR bits set:
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 14: FI - Floating-point fraction inexact
+bit 13: FR - Floating-point fraction rounded
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fctiwz above maximum value test failed
+expected answer: 0x7fffffff
+   actual answer: 0xa00111000000001c
+expected fpscr: 0xa0000100
+   actual fpscr: 0xa0011100
+
+actual FPSCR bits set:
+bit 23: VXCVI - Floating-point invalid operation exception for =20
+invalid integer convert
+bit 19: FPRF - Floating-point unordered or NaN
+bit 15: FPRF - Floating-point result class descriptor
+bit 2: VX - Floating-point invalid operation exception summary
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 23: VXCVI - Floating-point invalid operation exception for =20
+invalid integer convert
+bit 2: VX - Floating-point invalid operation exception summary
+bit 0: FX - Floating-point exception summary
+
+Warning: fpscr not equal to zero: 0x20000000
+fctiwz below minimum value test failed
+expected answer: 0x80000000
+   actual answer: 0xa00111000000001c
+expected fpscr: 0xa0000100
+   actual fpscr: 0xa0011100
+
+actual FPSCR bits set:
+bit 23: VXCVI - Floating-point invalid operation exception for =20
+invalid integer convert
+bit 19: FPRF - Floating-point unordered or NaN
+bit 15: FPRF - Floating-point result class descriptor
+bit 2: VX - Floating-point invalid operation exception summary
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 23: VXCVI - Floating-point invalid operation exception for =20
+invalid integer convert
+bit 2: VX - Floating-point invalid operation exception summary
+bit 0: FX - Floating-point exception summary
+
+Warning: fpscr not equal to zero: 0x20000000
+fctiwz integer conversion test failed
+expected answer: 0xfff800000000001c
+   actual answer: 0x8200000000000024
+expected fpscr: 0x82060000
+   actual fpscr: 0x82000000
+
+actual FPSCR bits set:
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 14: FI - Floating-point fraction inexact
+bit 13: FR - Floating-point fraction rounded
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+frsp test failed
+expected answer: 0x4271f71fc0000000
+   actual answer: 0x8200400000000024
+expected fpscr: 0x82064000
+   actual fpscr: 0x82004000
+
+actual FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 17: FPRF - Floating-point greater than or positive
+bit 14: FI - Floating-point fraction inexact
+bit 13: FR - Floating-point fraction rounded
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+fnmsub test failed
+expected answer: 0xc11cdd3cc985f06e
+   actual answer: 0x8200800000000024
+expected fpscr: 0x82028000
+   actual fpscr: 0x82008000
+
+actual FPSCR bits set:
+bit 16: FPRF - Floating-point less than or negative
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+expected FPSCR bits set:
+bit 16: FPRF - Floating-point less than or negative
+bit 14: FI - Floating-point fraction inexact
+bit 6: XX - Floating-point inexact exception
+bit 0: FX - Floating-point exception summary
+
+
+=3D=3D=3D Warning: 18 tests failed =3D=3D=3D
+
+
+It looks like the floating point instructions need a little work.=20=
