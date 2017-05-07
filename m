@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1d7GJj-0005jP-5F
+	(envelope-from <mjt@tls.msk.ru>) id 1d7GJj-0005jM-54
 	for qemu-devel@nongnu.org; Sun, 07 May 2017 03:09:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1d7GJg-0000Ho-6W
+	(envelope-from <mjt@tls.msk.ru>) id 1d7GJg-0000Hz-7u
 	for qemu-devel@nongnu.org; Sun, 07 May 2017 03:09:19 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sun,  7 May 2017 10:02:03 +0300
-Message-Id: <cover.1494140527.git.mjt@msgid.tls.msk.ru>
+Date: Sun,  7 May 2017 10:02:12 +0300
+Message-Id: <ec45bbe5f1921c6553fbf9c0c76b358b0403c22d.1494140528.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1494140527.git.mjt@msgid.tls.msk.ru>
+References: <cover.1494140527.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1494140527.git.mjt@msgid.tls.msk.ru>
+References: <cover.1494140527.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/23] Trivial patches for 2017-05-07
+Subject: [Qemu-devel] [PULL 09/23] util: Use g_malloc/g_free in envlist.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,113 +25,226 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
+Cc: Saurav Sachidanand <sauravsachidanand@gmail.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-The following changes since commit 12a95f320a36ef66f724a49bb05e4fb553ac5d=
-be:
+From: Saurav Sachidanand <sauravsachidanand@gmail.com>
 
-  Merge remote-tracking branch 'kwolf/tags/for-upstream' into staging (20=
-17-05-04 13:44:32 +0100)
+Change malloc/strdup/free to g_malloc/g_strdup/g_free in
+util/envlist.c.
 
-are available in the git repository at:
+Remove NULL checks for pointers returned from g_malloc and g_strdup
+as they exit in case of failure. Also, update calls to envlist_create
+to reflect this.
 
-  git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
+Free array and array contents returned by envlist_to_environ using
+g_free in bsd-user/main.c and linux-user/main.c.
 
-for you to fetch changes up to 311875781e549af91a3216d34c6ef40420bab435:
+Update comments to reflect change in semantics.
 
-  tests: Remove redundant assignment (2017-05-07 09:57:51 +0300)
-
-----------------------------------------------------------------
-trivial patches for 2017-05-07
-
-----------------------------------------------------------------
-Andreas Grapentin (1):
-      use _Static_assert in QEMU_BUILD_BUG_ON
-
-Chris Webb (1):
-      virtfs: allow a device id to be specified in the -virtfs option
-
-Craig Jellick (1):
-      Add 'none' as type for drive's if option
-
-Eric Blake (2):
-      tests: Ignore more test executables
-      tests: Ignore another built executable (test-hmp)
-
-Fam Zheng (3):
-      block: Make 'replication_state' an enum
-      virtio-blk: Remove useless condition around g_free()
-      tests: Remove redundant assignment
-
-Ishani Chugh (1):
-      Remove reduntant qemu: from error functions
-
-KONRAD Frederic (1):
-      ppc_booke: drop useless assignment
-
-Kamil Rytarowski (2):
-      scripts/qemu-binfmt-conf.sh: Fix shell portability issue
-      scripts: Switch to more portable Perl shebang
-
-Marc-Andr=C3=A9 Lureau (1):
-      doc: fix function spelling
-
-Paolo Bonzini (3):
-      jazz_led: fix bad snprintf
-      MAINTAINERS: Update paths for main loop
-      MAINTAINERS: Update paths for AioContext implementation
-
-Philippe Mathieu-Daud=C3=A9 (3):
-      usb-ccid: make ccid_write_data_block() cope with null buffers
-      device_tree: fix compiler warnings (clang 5)
-      qga: fix compiler warnings (clang 5)
-
-Saurav Sachidanand (1):
-      util: Use g_malloc/g_free in envlist.c
-
-Thomas Huth (2):
-      qemu-doc: Fix broken URLs of amnhltm.zip and dosidle210.zip
-      hw/core/generic-loader: Fix crash when running without CPU
-
-sochin.jiang fix wrong parameter comments in channel-file.h (1):
-      channel-file: fix wrong parameter comments
-
- MAINTAINERS                     |  8 +++----
- block/replication.c             | 44 +++++++++++++++++++----------------=
+Signed-off-by: Saurav Sachidanand <sauravsachidanand@gmail.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- bsd-user/main.c                 | 14 ++++--------
- configure                       | 18 ++++++++++++++++
- device_tree.c                   |  1 +
- hw/block/virtio-blk.c           |  4 +---
- hw/core/generic-loader.c        |  9 ++++----
- hw/display/jazz_led.c           |  4 ++--
- hw/microblaze/boot.c            |  2 +-
- hw/nios2/boot.c                 |  2 +-
- hw/ppc/pnv.c                    |  2 +-
- hw/ppc/ppc_booke.c              |  1 -
- hw/s390x/sclp.c                 |  4 ++--
- hw/tricore/tricore_testboard.c  |  2 +-
- hw/usb/dev-smartcard-reader.c   |  5 ++++-
- include/io/channel-file.h       |  2 +-
- include/io/channel.h            |  2 +-
- include/qemu/compiler.h         |  4 +++-
- linux-user/main.c               |  9 +++-----
- numa.c                          |  4 ++--
- qemu-doc.texi                   | 10 ++++-----
- qemu-options.hx                 |  4 ++--
- qga/commands-posix.c            |  8 ++++---
- scripts/checkpatch.pl           |  3 ++-
- scripts/clean-header-guards.pl  |  3 ++-
- scripts/cleanup-trace-events.pl |  2 +-
- scripts/disas-objdump.pl        |  4 +++-
- scripts/get_maintainer.pl       |  3 ++-
- scripts/qemu-binfmt-conf.sh     |  4 ++--
- scripts/shaderinclude.pl        |  2 +-
- scripts/switch-timer-api        |  2 +-
- scripts/texi2pod.pl             |  4 +++-
- tests/.gitignore                |  4 ++++
- tests/postcopy-test.c           |  2 +-
- util/envlist.c                  | 47 +++++++++++++++++------------------=
-------
- vl.c                            |  5 +++--
- 36 files changed, 133 insertions(+), 115 deletions(-)
+ bsd-user/main.c   | 14 ++++----------
+ linux-user/main.c |  9 +++------
+ util/envlist.c    | 47 +++++++++++++++++++----------------------------
+ 3 files changed, 26 insertions(+), 44 deletions(-)
+
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 714a692e6f..04f95ddd54 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -744,10 +744,7 @@ int main(int argc, char **argv)
+     qemu_init_cpu_list();
+     module_call_init(MODULE_INIT_QOM);
+=20
+-    if ((envlist =3D envlist_create()) =3D=3D NULL) {
+-        (void) fprintf(stderr, "Unable to allocate envlist\n");
+-        exit(1);
+-    }
++    envlist =3D envlist_create();
+=20
+     /* add current environment into the list */
+     for (wrk =3D environ; *wrk !=3D NULL; wrk++) {
+@@ -785,10 +782,7 @@ int main(int argc, char **argv)
+                 usage();
+         } else if (!strcmp(r, "ignore-environment")) {
+             envlist_free(envlist);
+-            if ((envlist =3D envlist_create()) =3D=3D NULL) {
+-                (void) fprintf(stderr, "Unable to allocate envlist\n");
+-                exit(1);
+-            }
++            envlist =3D envlist_create();
+         } else if (!strcmp(r, "U")) {
+             r =3D argv[optind++];
+             if (envlist_unsetenv(envlist, r) !=3D 0)
+@@ -956,10 +950,10 @@ int main(int argc, char **argv)
+     }
+=20
+     for (wrk =3D target_environ; *wrk; wrk++) {
+-        free(*wrk);
++        g_free(*wrk);
+     }
+=20
+-    free(target_environ);
++    g_free(target_environ);
+=20
+     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
+         qemu_log("guest_base  0x%lx\n", guest_base);
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 10a3bb3a12..5f20769cb9 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4229,10 +4229,7 @@ int main(int argc, char **argv, char **envp)
+     qemu_init_cpu_list();
+     module_call_init(MODULE_INIT_QOM);
+=20
+-    if ((envlist =3D envlist_create()) =3D=3D NULL) {
+-        (void) fprintf(stderr, "Unable to allocate envlist\n");
+-        exit(EXIT_FAILURE);
+-    }
++    envlist =3D envlist_create();
+=20
+     /* add current environment into the list */
+     for (wrk =3D environ; *wrk !=3D NULL; wrk++) {
+@@ -4429,10 +4426,10 @@ int main(int argc, char **argv, char **envp)
+     }
+=20
+     for (wrk =3D target_environ; *wrk; wrk++) {
+-        free(*wrk);
++        g_free(*wrk);
+     }
+=20
+-    free(target_environ);
++    g_free(target_environ);
+=20
+     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
+         qemu_log("guest_base  0x%lx\n", guest_base);
+diff --git a/util/envlist.c b/util/envlist.c
+index e86857e70a..1eeb7fca87 100644
+--- a/util/envlist.c
++++ b/util/envlist.c
+@@ -17,16 +17,14 @@ static int envlist_parse(envlist_t *envlist,
+     const char *env, int (*)(envlist_t *, const char *));
+=20
+ /*
+- * Allocates new envlist and returns pointer to that or
+- * NULL in case of error.
++ * Allocates new envlist and returns pointer to it.
+  */
+ envlist_t *
+ envlist_create(void)
+ {
+ 	envlist_t *envlist;
+=20
+-	if ((envlist =3D malloc(sizeof (*envlist))) =3D=3D NULL)
+-		return (NULL);
++	envlist =3D g_malloc(sizeof(*envlist));
+=20
+ 	QLIST_INIT(&envlist->el_entries);
+ 	envlist->el_count =3D 0;
+@@ -48,10 +46,10 @@ envlist_free(envlist_t *envlist)
+ 		entry =3D envlist->el_entries.lh_first;
+ 		QLIST_REMOVE(entry, ev_link);
+=20
+-		free((char *)entry->ev_var);
+-		free(entry);
++		g_free((char *)entry->ev_var);
++		g_free(entry);
+ 	}
+-	free(envlist);
++	g_free(envlist);
+ }
+=20
+ /*
+@@ -101,8 +99,7 @@ envlist_parse(envlist_t *envlist, const char *env,
+ 	if ((envlist =3D=3D NULL) || (env =3D=3D NULL))
+ 		return (EINVAL);
+=20
+-	if ((tmpenv =3D strdup(env)) =3D=3D NULL)
+-		return (errno);
++	tmpenv =3D g_strdup(env);
+     envsave =3D tmpenv;
+=20
+     do {
+@@ -117,7 +114,7 @@ envlist_parse(envlist_t *envlist, const char *env,
+         tmpenv =3D envvar + 1;
+     } while (envvar !=3D NULL);
+=20
+-    free(envsave);
++    g_free(envsave);
+     return ret;
+ }
+=20
+@@ -155,18 +152,14 @@ envlist_setenv(envlist_t *envlist, const char *env)
+=20
+ 	if (entry !=3D NULL) {
+ 		QLIST_REMOVE(entry, ev_link);
+-		free((char *)entry->ev_var);
+-		free(entry);
++		g_free((char *)entry->ev_var);
++		g_free(entry);
+ 	} else {
+ 		envlist->el_count++;
+ 	}
+=20
+-	if ((entry =3D malloc(sizeof (*entry))) =3D=3D NULL)
+-		return (errno);
+-	if ((entry->ev_var =3D strdup(env)) =3D=3D NULL) {
+-		free(entry);
+-		return (errno);
+-	}
++	entry =3D g_malloc(sizeof(*entry));
++	entry->ev_var =3D g_strdup(env);
+ 	QLIST_INSERT_HEAD(&envlist->el_entries, entry, ev_link);
+=20
+ 	return (0);
+@@ -201,8 +194,8 @@ envlist_unsetenv(envlist_t *envlist, const char *env)
+ 	}
+ 	if (entry !=3D NULL) {
+ 		QLIST_REMOVE(entry, ev_link);
+-		free((char *)entry->ev_var);
+-		free(entry);
++		g_free((char *)entry->ev_var);
++		g_free(entry);
+=20
+ 		envlist->el_count--;
+ 	}
+@@ -212,12 +205,12 @@ envlist_unsetenv(envlist_t *envlist, const char *en=
+v)
+ /*
+  * Returns given envlist as array of strings (in same form that
+  * global variable environ is).  Caller must free returned memory
+- * by calling free(3) for each element and for the array.  Returned
+- * array and given envlist are not related (no common references).
++ * by calling g_free for each element and the array.
++ * Returned array and given envlist are not related (no common
++ * references).
+  *
+  * If caller provides count pointer, number of items in array is
+- * stored there.  In case of error, NULL is returned and no memory
+- * is allocated.
++ * stored there.
+  */
+ char **
+ envlist_to_environ(const envlist_t *envlist, size_t *count)
+@@ -225,13 +218,11 @@ envlist_to_environ(const envlist_t *envlist, size_t=
+ *count)
+ 	struct envlist_entry *entry;
+ 	char **env, **penv;
+=20
+-	penv =3D env =3D malloc((envlist->el_count + 1) * sizeof (char *));
+-	if (env =3D=3D NULL)
+-		return (NULL);
++	penv =3D env =3D g_malloc((envlist->el_count + 1) * sizeof(char *));
+=20
+ 	for (entry =3D envlist->el_entries.lh_first; entry !=3D NULL;
+ 	    entry =3D entry->ev_link.le_next) {
+-		*(penv++) =3D strdup(entry->ev_var);
++		*(penv++) =3D g_strdup(entry->ev_var);
+ 	}
+ 	*penv =3D NULL; /* NULL terminate the list */
+=20
+--=20
+2.11.0
