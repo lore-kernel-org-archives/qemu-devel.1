@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <netz.kernel@gmail.com>) id 1d79we-0003EA-80
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:21:05 -0400
+	(envelope-from <cfkarsten@gmail.com>) id 1d7EyG-0001vw-7O
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 01:43:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <netz.kernel@gmail.com>) id 1d79wZ-0002a9-4O
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:21:04 -0400
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:33652)
+	(envelope-from <cfkarsten@gmail.com>) id 1d7EyF-00066L-84
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 01:43:04 -0400
+Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:34317)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <netz.kernel@gmail.com>)
-	id 1d79wY-0002Zs-Ux
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:20:59 -0400
-Received: by mail-oi0-x236.google.com with SMTP id w10so20078920oif.0
-	for <qemu-devel@nongnu.org>; Sat, 06 May 2017 17:20:57 -0700 (PDT)
-Received: from tha-monstah.mydomain (cpe-72-176-85-27.stx.res.rr.com.
-	[72.176.85.27]) by smtp.gmail.com with ESMTPSA id
-	w79sm4695388oiw.13.2017.05.06.17.20.55 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 06 May 2017 17:20:55 -0700 (PDT)
-Date: Sat, 6 May 2017 19:23:26 -0500
-From: Marty Plummer <netz.kernel@gmail.com>
-Message-ID: <20170507002325.cg3rud5u5k5zqlsi@tha-monstah.mydomain>
+	(Exim 4.71) (envelope-from <cfkarsten@gmail.com>) id 1d7EyF-00065G-1h
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 01:43:03 -0400
+Received: by mail-qt0-x22d.google.com with SMTP id j29so30427290qtj.1
+	for <qemu-devel@nongnu.org>; Sat, 06 May 2017 22:43:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] 'blank' address space for unknown arm peripherals?
+Sender: cfkarsten@gmail.com
+From: Carl Karsten <carl@personnelware.com>
+Date: Sun, 7 May 2017 00:42:31 -0500
+Message-ID: <CADmzSSjY4n7bBBUVk45=_SRSj74AkSpN3O1d61Cik1q-eDiHKQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] boot order=d bug?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,21 +28,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Greetings.
+In the real world I will have a machine with a sata hd and boot the
+installer from a usb stick. I want to test this with 2 disk image files.
 
-Its my understanding that for creating machine definitions for qemu one
-uses what amount to 'drivers' or 'hardware simulations'. I was wondering
-if there was what amounted to a blank or raw memory area one could use
-as a placeholder for a peripheral which is currently undocumented and
-lacking source code for the linux kernel drivers the vendor ships.
+The usb stick will be built like so:
+https://github.com/CarlFK/video-stack-deploy/blob/usbstick/scripts/mk_usb_installer.sh
 
-My aim is to simulate as much of the hardware as I've managed to
-positively identify (mostly primecell stuff) and use the
-blank/placeholder address space to observe the interactions between the
-blob drivers with the known address space within a simulated environment
-to hopefully deduce the hardware registers for the peripherals (mostly
-a/v & h264/jpeg stuff).
+but this will demo the problem I have run into with qemu:  how do I boot
+from boot.img without using boot=menu?
 
-Any tips and tricks you could provide I would be greatly appreciative.
+# make a blank disk to install to
+qemu-img create -f qcow2 disk.cow 8G
 
-Marty.
+# get an installer image
+wget
+http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/hd-media/boot.img.gz
+gunzip boot.img.gz
+
+qemu-system-x86_64 -m 256 -display curses  \
+    -drive file=disk.cow,index=0 \
+    -drive file=boot.img,index=1 \
+    -boot menu=on
+
+# Hit esc and then #2 to boot the installer.
+
+Press ESC for boot menu.
+Select boot device:
+1. ata0-0: QEMU HARDDISK ATA-7 Hard-Disk (8192 MiBytes)
+2. ata0-1: QEMU HARDDISK ATA-7 Hard-Disk (953 MiBytes)
+3. Legacy option rom
+4. Floppy [drive A]
+5. DVD/CD [ata1-0: QEMU DVD-ROM ATAPI-4 DVD/CD]
+6. iPXE (PCI 00:03.0)
+
+
+juser@gator:~/temp/video-stack-deploy/scripts$ qemu-system-x86_64 -version
+QEMU emulator version 2.8.1(Debian 1:2.8+dfsg-4+b1)
+Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+
+
+-- 
+Carl K
