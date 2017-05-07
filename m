@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d79iG-0002if-R6
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1d79iN-0002nR-1Q
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d79iE-0007l1-OE
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1d79iL-0007n2-CP
+	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:19 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Sat,  6 May 2017 19:05:46 -0500
-Message-Id: <20170507000552.20847-7-eblake@redhat.com>
+Date: Sat,  6 May 2017 19:05:52 -0500
+Message-Id: <20170507000552.20847-13-eblake@redhat.com>
 In-Reply-To: <20170507000552.20847-1-eblake@redhat.com>
 References: <20170507000552.20847-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 06/12] qcow2: Make distinction between zero
- cluster types obvious
+Subject: [Qemu-devel] [PATCH v13 12/12] qcow2: Discard/zero clusters by byte
+ count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,410 +23,244 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-Treat plain zero clusters differently from allocated ones, so that
-we can simplify the logic of checking whether an offset is present.
-Do this by splitting QCOW2_CLUSTER_ZERO into two new enums,
-QCOW2_CLUSTER_ZERO_PLAIN and QCOW2_CLUSTER_ZERO_ALLOC.
+Passing a byte offset, but sector count, when we ultimately
+want to operate on cluster granularity, is madness.  Clean up
+the external interfaces to take both offset and count as bytes,
+while still keeping the assertion added previously that the
+caller must align the values to a cluster.  Then rename things
+to make sure backports don't get confused by changed units:
+instead of qcow2_discard_clusters() and qcow2_zero_clusters(),
+we now have qcow2_cluster_discard() and qcow2_cluster_zeroize().
 
-I tried to arrange the enum so that we could use
-'ret <= QCOW2_CLUSTER_ZERO_PLAIN' for all unallocated types, and
-'ret >= QCOW2_CLUSTER_ZERO_ALLOC' for allocated types, although
-I didn't actually end up taking advantage of the layout.
-
-In many cases, this leads to simpler code, by properly combining
-cases (sometimes, both zero types pair together, other times,
-plain zero is more like unallocated while allocated zero is more
-like normal).
+The internal functions still operate on clusters at a time, and
+return an int for number of cleared clusters; but on an image
+with 2M clusters, a single L2 table holds 256k entries that each
+represent a 2M cluster, totalling well over INT_MAX bytes if we
+ever had a request for that many bytes at once.  All our callers
+currently limit themselves to 32-bit bytes (and therefore fewer
+clusters), but by making this function 64-bit clean, we have one
+less place to clean up if we later improve the block layer to
+support 64-bit bytes through all operations (with the block layer
+auto-fragmenting on behalf of more-limited drivers), rather than
+the current state where some interfaces are artificially limited
+to INT_MAX at a time.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 ---
-v13: s/!preallocated/cluster_type == QCOW2_CLUSTER_ZERO_PLAIN/, fix
-error message text (including iotest fallout), rebase to earlier cleanups
-v12: new patch
+v13: no change
+v12: minor tweaks suggested by Max
+v11: reserved for blkdebug half of v10
+v10: squash in fixup accounting for unaligned file end
+v9: rebase to earlier changes, drop R-b
+v7, v8: only earlier half of series submitted for 2.9
+v6: rebase due to context
+v5: s/count/byte/ to make the units obvious, and rework the math
+to ensure no 32-bit integer overflow on large clusters
+v4: improve function names, split assertion additions into earlier patch
+[no v3 or v2]
+v1: https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00339.html
 ---
- block/qcow2.h              |  8 +++--
- block/qcow2-cluster.c      | 81 ++++++++++++++++++----------------------------
- block/qcow2-refcount.c     | 44 +++++++++++--------------
- block/qcow2.c              |  9 ++++--
- tests/qemu-iotests/060.out |  6 ++--
- 5 files changed, 64 insertions(+), 84 deletions(-)
+ block/qcow2.h          |  9 +++++----
+ block/qcow2-cluster.c  | 42 ++++++++++++++++++++++--------------------
+ block/qcow2-snapshot.c |  7 +++----
+ block/qcow2.c          | 22 +++++++++-------------
+ 4 files changed, 39 insertions(+), 41 deletions(-)
 
 diff --git a/block/qcow2.h b/block/qcow2.h
-index c148bbc..810ceb8 100644
+index 810ceb8..1801dc3 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -351,9 +351,10 @@ typedef struct QCowL2Meta
+@@ -551,10 +551,11 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+                                          int compressed_size);
 
- typedef enum QCow2ClusterType {
-     QCOW2_CLUSTER_UNALLOCATED,
-+    QCOW2_CLUSTER_ZERO_PLAIN,
-+    QCOW2_CLUSTER_ZERO_ALLOC,
-     QCOW2_CLUSTER_NORMAL,
-     QCOW2_CLUSTER_COMPRESSED,
--    QCOW2_CLUSTER_ZERO
- } QCow2ClusterType;
+ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
+-int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
+-    int nb_sectors, enum qcow2_discard_type type, bool full_discard);
+-int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+-                        int flags);
++int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
++                          uint64_t bytes, enum qcow2_discard_type type,
++                          bool full_discard);
++int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
++                          uint64_t bytes, int flags);
 
- typedef enum QCow2MetadataOverlap {
-@@ -448,7 +449,10 @@ static inline QCow2ClusterType qcow2_get_cluster_type(uint64_t l2_entry)
-     if (l2_entry & QCOW_OFLAG_COMPRESSED) {
-         return QCOW2_CLUSTER_COMPRESSED;
-     } else if (l2_entry & QCOW_OFLAG_ZERO) {
--        return QCOW2_CLUSTER_ZERO;
-+        if (l2_entry & L2E_OFFSET_MASK) {
-+            return QCOW2_CLUSTER_ZERO_ALLOC;
-+        }
-+        return QCOW2_CLUSTER_ZERO_PLAIN;
-     } else if (!(l2_entry & L2E_OFFSET_MASK)) {
-         return QCOW2_CLUSTER_UNALLOCATED;
-     } else {
+ int qcow2_expand_zero_clusters(BlockDriverState *bs,
+                                BlockDriverAmendStatusCB *status_cb,
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index ed78a30..a4a3229 100644
+index 1b9592d..89d23e5 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -321,8 +321,7 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
-     /* must be allocated */
-     first_cluster_type = qcow2_get_cluster_type(first_entry);
-     assert(first_cluster_type == QCOW2_CLUSTER_NORMAL ||
--           (first_cluster_type == QCOW2_CLUSTER_ZERO &&
--            (first_entry & L2E_OFFSET_MASK) != 0));
-+           first_cluster_type == QCOW2_CLUSTER_ZERO_ALLOC);
+@@ -1549,34 +1549,36 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
+     return nb_clusters;
+ }
 
-     for (i = 0; i < nb_clusters; i++) {
-         uint64_t l2_entry = be64_to_cpu(l2_table[i]) & mask;
-@@ -344,13 +343,13 @@ static int count_contiguous_clusters_unallocated(int nb_clusters,
+-int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
+-    int nb_sectors, enum qcow2_discard_type type, bool full_discard)
++int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
++                          uint64_t bytes, enum qcow2_discard_type type,
++                          bool full_discard)
  {
-     int i;
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t end_offset;
++    uint64_t end_offset = offset + bytes;
+     uint64_t nb_clusters;
++    int64_t cleared;
+     int ret;
 
--    assert(wanted_type == QCOW2_CLUSTER_ZERO ||
-+    assert(wanted_type == QCOW2_CLUSTER_ZERO_PLAIN ||
-            wanted_type == QCOW2_CLUSTER_UNALLOCATED);
-     for (i = 0; i < nb_clusters; i++) {
-         uint64_t entry = be64_to_cpu(l2_table[i]);
--        int type = qcow2_get_cluster_type(entry);
-+        QCow2ClusterType type = qcow2_get_cluster_type(entry);
-
--        if (type != wanted_type || entry & L2E_OFFSET_MASK) {
-+        if (type != wanted_type) {
-             break;
-         }
-     }
-@@ -559,55 +558,36 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-     assert(nb_clusters <= INT_MAX);
-
-     type = qcow2_get_cluster_type(*cluster_offset);
-+    if (s->qcow_version < 3 && (type == QCOW2_CLUSTER_ZERO_PLAIN ||
-+                                type == QCOW2_CLUSTER_ZERO_ALLOC)) {
-+        qcow2_signal_corruption(bs, true, -1, -1, "Zero cluster entry found"
-+                                " in pre-v3 image (L2 offset: %#" PRIx64
-+                                ", L2 index: %#x)", l2_offset, l2_index);
-+        ret = -EIO;
-+        goto fail;
-+    }
-     switch (type) {
-     case QCOW2_CLUSTER_COMPRESSED:
-         /* Compressed clusters can only be processed one by one */
-         c = 1;
-         *cluster_offset &= L2E_COMPRESSED_OFFSET_SIZE_MASK;
-         break;
--    case QCOW2_CLUSTER_ZERO:
--        if (s->qcow_version < 3) {
--            qcow2_signal_corruption(bs, true, -1, -1, "Zero cluster entry found"
--                                    " in pre-v3 image (L2 offset: %#" PRIx64
--                                    ", L2 index: %#x)", l2_offset, l2_index);
--            ret = -EIO;
--            goto fail;
--        }
--        /* Distinguish between pure zero clusters and pre-allocated ones */
--        if (*cluster_offset & L2E_OFFSET_MASK) {
--            c = count_contiguous_clusters(nb_clusters, s->cluster_size,
--                                          &l2_table[l2_index], QCOW_OFLAG_ZERO);
--            *cluster_offset &= L2E_OFFSET_MASK;
--            if (offset_into_cluster(s, *cluster_offset)) {
--                qcow2_signal_corruption(bs, true, -1, -1,
--                                        "Preallocated zero cluster offset %#"
--                                        PRIx64 " unaligned (L2 offset: %#"
--                                        PRIx64 ", L2 index: %#x)",
--                                        *cluster_offset, l2_offset, l2_index);
--                ret = -EIO;
--                goto fail;
--            }
--        } else {
--            c = count_contiguous_clusters_unallocated(nb_clusters,
--                                                      &l2_table[l2_index],
--                                                      QCOW2_CLUSTER_ZERO);
--            *cluster_offset = 0;
--        }
--        break;
-+    case QCOW2_CLUSTER_ZERO_PLAIN:
-     case QCOW2_CLUSTER_UNALLOCATED:
-         /* how many empty clusters ? */
-         c = count_contiguous_clusters_unallocated(nb_clusters,
--                                                  &l2_table[l2_index],
--                                                  QCOW2_CLUSTER_UNALLOCATED);
-+                                                  &l2_table[l2_index], type);
-         *cluster_offset = 0;
-         break;
-+    case QCOW2_CLUSTER_ZERO_ALLOC:
-     case QCOW2_CLUSTER_NORMAL:
-         /* how many allocated clusters ? */
-         c = count_contiguous_clusters(nb_clusters, s->cluster_size,
--                &l2_table[l2_index], QCOW_OFLAG_ZERO);
-+                                      &l2_table[l2_index], QCOW_OFLAG_ZERO);
-         *cluster_offset &= L2E_OFFSET_MASK;
-         if (offset_into_cluster(s, *cluster_offset)) {
--            qcow2_signal_corruption(bs, true, -1, -1, "Data cluster offset %#"
-+            qcow2_signal_corruption(bs, true, -1, -1,
-+                                    "Cluster allocation offset %#"
-                                     PRIx64 " unaligned (L2 offset: %#" PRIx64
-                                     ", L2 index: %#x)", *cluster_offset,
-                                     l2_offset, l2_index);
-@@ -902,7 +882,8 @@ static int count_cow_clusters(BDRVQcow2State *s, int nb_clusters,
-             break;
-         case QCOW2_CLUSTER_UNALLOCATED:
-         case QCOW2_CLUSTER_COMPRESSED:
--        case QCOW2_CLUSTER_ZERO:
-+        case QCOW2_CLUSTER_ZERO_PLAIN:
-+        case QCOW2_CLUSTER_ZERO_ALLOC:
-             break;
-         default:
-             abort();
-@@ -1203,8 +1184,8 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-      * wrong with our code. */
-     assert(nb_clusters > 0);
-
--    if (qcow2_get_cluster_type(entry) == QCOW2_CLUSTER_ZERO &&
--        (entry & L2E_OFFSET_MASK) != 0 && (entry & QCOW_OFLAG_COPIED) &&
-+    if (qcow2_get_cluster_type(entry) == QCOW2_CLUSTER_ZERO_ALLOC &&
-+        (entry & QCOW_OFLAG_COPIED) &&
-         (!*host_offset ||
-          start_of_cluster(s, *host_offset) == (entry & L2E_OFFSET_MASK)))
-     {
-@@ -1536,13 +1517,13 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
-             }
-             break;
-
--        case QCOW2_CLUSTER_ZERO:
--            /* Preallocated zero clusters should be discarded in any case */
--            if (!full_discard && (old_l2_entry & L2E_OFFSET_MASK) == 0) {
-+        case QCOW2_CLUSTER_ZERO_PLAIN:
-+            if (!full_discard) {
-                 continue;
-             }
-             break;
-
-+        case QCOW2_CLUSTER_ZERO_ALLOC:
-         case QCOW2_CLUSTER_NORMAL:
-         case QCOW2_CLUSTER_COMPRESSED:
-             break;
-@@ -1759,13 +1740,13 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-             uint64_t l2_entry = be64_to_cpu(l2_table[j]);
-             int64_t offset = l2_entry & L2E_OFFSET_MASK;
-             QCow2ClusterType cluster_type = qcow2_get_cluster_type(l2_entry);
--            bool preallocated = offset != 0;
-
--            if (cluster_type != QCOW2_CLUSTER_ZERO) {
-+            if (cluster_type != QCOW2_CLUSTER_ZERO_PLAIN &&
-+                cluster_type != QCOW2_CLUSTER_ZERO_ALLOC) {
-                 continue;
-             }
-
--            if (!preallocated) {
-+            if (cluster_type == QCOW2_CLUSTER_ZERO_PLAIN) {
-                 if (!bs->backing) {
-                     /* not backed; therefore we can simply deallocate the
-                      * cluster */
-@@ -1800,7 +1781,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-                                         "%#" PRIx64 " unaligned (L2 offset: %#"
-                                         PRIx64 ", L2 index: %#x)", offset,
-                                         l2_offset, j);
--                if (!preallocated) {
-+                if (cluster_type == QCOW2_CLUSTER_ZERO_PLAIN) {
-                     qcow2_free_clusters(bs, offset, s->cluster_size,
-                                         QCOW2_DISCARD_ALWAYS);
-                 }
-@@ -1810,7 +1791,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-
-             ret = qcow2_pre_write_overlap_check(bs, 0, offset, s->cluster_size);
-             if (ret < 0) {
--                if (!preallocated) {
-+                if (cluster_type == QCOW2_CLUSTER_ZERO_PLAIN) {
-                     qcow2_free_clusters(bs, offset, s->cluster_size,
-                                         QCOW2_DISCARD_ALWAYS);
-                 }
-@@ -1819,7 +1800,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
-
-             ret = bdrv_pwrite_zeroes(bs->file, offset, s->cluster_size, 0);
-             if (ret < 0) {
--                if (!preallocated) {
-+                if (cluster_type == QCOW2_CLUSTER_ZERO_PLAIN) {
-                     qcow2_free_clusters(bs, offset, s->cluster_size,
-                                         QCOW2_DISCARD_ALWAYS);
-                 }
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index e639b34..7c06061 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1028,18 +1028,17 @@ void qcow2_free_any_clusters(BlockDriverState *bs, uint64_t l2_entry,
-         }
-         break;
-     case QCOW2_CLUSTER_NORMAL:
--    case QCOW2_CLUSTER_ZERO:
--        if (l2_entry & L2E_OFFSET_MASK) {
--            if (offset_into_cluster(s, l2_entry & L2E_OFFSET_MASK)) {
--                qcow2_signal_corruption(bs, false, -1, -1,
--                                        "Cannot free unaligned cluster %#llx",
--                                        l2_entry & L2E_OFFSET_MASK);
--            } else {
--                qcow2_free_clusters(bs, l2_entry & L2E_OFFSET_MASK,
--                                    nb_clusters << s->cluster_bits, type);
--            }
-+    case QCOW2_CLUSTER_ZERO_ALLOC:
-+        if (offset_into_cluster(s, l2_entry & L2E_OFFSET_MASK)) {
-+            qcow2_signal_corruption(bs, false, -1, -1,
-+                                    "Cannot free unaligned cluster %#llx",
-+                                    l2_entry & L2E_OFFSET_MASK);
-+        } else {
-+            qcow2_free_clusters(bs, l2_entry & L2E_OFFSET_MASK,
-+                                nb_clusters << s->cluster_bits, type);
-         }
-         break;
-+    case QCOW2_CLUSTER_ZERO_PLAIN:
-     case QCOW2_CLUSTER_UNALLOCATED:
-         break;
-     default:
-@@ -1145,10 +1144,10 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                     break;
-
-                 case QCOW2_CLUSTER_NORMAL:
--                case QCOW2_CLUSTER_ZERO:
-+                case QCOW2_CLUSTER_ZERO_ALLOC:
-                     if (offset_into_cluster(s, offset)) {
--                        qcow2_signal_corruption(bs, true, -1, -1, "Data "
--                                                "cluster offset %#" PRIx64
-+                        qcow2_signal_corruption(bs, true, -1, -1, "Cluster "
-+                                                "allocation offset %#" PRIx64
-                                                 " unaligned (L2 offset: %#"
-                                                 PRIx64 ", L2 index: %#x)",
-                                                 offset, l2_offset, j);
-@@ -1157,11 +1156,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                     }
-
-                     cluster_index = offset >> s->cluster_bits;
--                    if (!cluster_index) {
--                        /* unallocated */
--                        refcount = 0;
--                        break;
--                    }
-+                    assert(cluster_index);
-                     if (addend != 0) {
-                         ret = qcow2_update_cluster_refcount(bs,
-                                     cluster_index, abs(addend), addend < 0,
-@@ -1177,6 +1172,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                     }
-                     break;
-
-+                case QCOW2_CLUSTER_ZERO_PLAIN:
-                 case QCOW2_CLUSTER_UNALLOCATED:
-                     refcount = 0;
-                     break;
-@@ -1443,12 +1439,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-             }
-             break;
-
--        case QCOW2_CLUSTER_ZERO:
--            if ((l2_entry & L2E_OFFSET_MASK) == 0) {
--                break;
--            }
--            /* fall through */
+-    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
 -
-+        case QCOW2_CLUSTER_ZERO_ALLOC:
-         case QCOW2_CLUSTER_NORMAL:
-         {
-             uint64_t offset = l2_entry & L2E_OFFSET_MASK;
-@@ -1478,6 +1469,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-             break;
+     /* Caller must pass aligned values, except at image end */
+     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
+            end_offset == bs->total_sectors << BDRV_SECTOR_BITS);
+
+-    nb_clusters = size_to_clusters(s, end_offset - offset);
++    nb_clusters = size_to_clusters(s, bytes);
+
+     s->cache_discards = true;
+
+     /* Each L2 table is handled by its own loop iteration */
+     while (nb_clusters > 0) {
+-        ret = discard_single_l2(bs, offset, nb_clusters, type, full_discard);
+-        if (ret < 0) {
++        cleared = discard_single_l2(bs, offset, nb_clusters, type,
++                                    full_discard);
++        if (cleared < 0) {
++            ret = cleared;
+             goto fail;
          }
 
-+        case QCOW2_CLUSTER_ZERO_PLAIN:
-         case QCOW2_CLUSTER_UNALLOCATED:
-             break;
+-        nb_clusters -= ret;
+-        offset += (ret * s->cluster_size);
++        nb_clusters -= cleared;
++        offset += (cleared * s->cluster_size);
+     }
 
-@@ -1642,8 +1634,8 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
-             uint64_t data_offset = l2_entry & L2E_OFFSET_MASK;
-             QCow2ClusterType cluster_type = qcow2_get_cluster_type(l2_entry);
+     ret = 0;
+@@ -1641,16 +1643,15 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
+     return nb_clusters;
+ }
 
--            if ((cluster_type == QCOW2_CLUSTER_NORMAL) ||
--                ((cluster_type == QCOW2_CLUSTER_ZERO) && (data_offset != 0))) {
-+            if (cluster_type == QCOW2_CLUSTER_NORMAL ||
-+                cluster_type == QCOW2_CLUSTER_ZERO_ALLOC) {
-                 ret = qcow2_get_refcount(bs,
-                                          data_offset >> s->cluster_bits,
-                                          &refcount);
+-int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+-                        int flags)
++int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
++                          uint64_t bytes, int flags)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t end_offset;
++    uint64_t end_offset = offset + bytes;
+     uint64_t nb_clusters;
++    int64_t cleared;
+     int ret;
+
+-    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
+-
+     /* Caller must pass aligned values, except at image end */
+     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
+@@ -1662,18 +1663,19 @@ int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+     }
+
+     /* Each L2 table is handled by its own loop iteration */
+-    nb_clusters = size_to_clusters(s, nb_sectors << BDRV_SECTOR_BITS);
++    nb_clusters = size_to_clusters(s, bytes);
+
+     s->cache_discards = true;
+
+     while (nb_clusters > 0) {
+-        ret = zero_single_l2(bs, offset, nb_clusters, flags);
+-        if (ret < 0) {
++        cleared = zero_single_l2(bs, offset, nb_clusters, flags);
++        if (cleared < 0) {
++            ret = cleared;
+             goto fail;
+         }
+
+-        nb_clusters -= ret;
+-        offset += (ret * s->cluster_size);
++        nb_clusters -= cleared;
++        offset += (cleared * s->cluster_size);
+     }
+
+     ret = 0;
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index 0324243..44243e0 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -440,10 +440,9 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+
+     /* The VM state isn't needed any more in the active L1 table; in fact, it
+      * hurts by causing expensive COW for the next snapshot. */
+-    qcow2_discard_clusters(bs, qcow2_vm_state_offset(s),
+-                           align_offset(sn->vm_state_size, s->cluster_size)
+-                                >> BDRV_SECTOR_BITS,
+-                           QCOW2_DISCARD_NEVER, false);
++    qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
++                          align_offset(sn->vm_state_size, s->cluster_size),
++                          QCOW2_DISCARD_NEVER, false);
+
+ #ifdef DEBUG_ALLOC
+     {
 diff --git a/block/qcow2.c b/block/qcow2.c
-index f5a72a4..dded5a0 100644
+index 3478bb6..ce571ea 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -1385,7 +1385,7 @@ static int64_t coroutine_fn qcow2_co_get_block_status(BlockDriverState *bs,
-         *file = bs->file->bs;
-         status |= BDRV_BLOCK_OFFSET_VALID | cluster_offset;
+@@ -2512,7 +2512,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+     trace_qcow2_pwrite_zeroes(qemu_coroutine_self(), offset, count);
+
+     /* Whatever is left can use real zero clusters */
+-    ret = qcow2_zero_clusters(bs, offset, count >> BDRV_SECTOR_BITS, flags);
++    ret = qcow2_cluster_zeroize(bs, offset, count, flags);
+     qemu_co_mutex_unlock(&s->lock);
+
+     return ret;
+@@ -2535,8 +2535,8 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
      }
--    if (ret == QCOW2_CLUSTER_ZERO) {
-+    if (ret == QCOW2_CLUSTER_ZERO_PLAIN || ret == QCOW2_CLUSTER_ZERO_ALLOC) {
-         status |= BDRV_BLOCK_ZERO;
-     } else if (ret != QCOW2_CLUSTER_UNALLOCATED) {
-         status |= BDRV_BLOCK_DATA;
-@@ -1482,7 +1482,8 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-             }
-             break;
 
--        case QCOW2_CLUSTER_ZERO:
-+        case QCOW2_CLUSTER_ZERO_PLAIN:
-+        case QCOW2_CLUSTER_ZERO_ALLOC:
-             qemu_iovec_memset(&hd_qiov, 0, 0, cur_bytes);
-             break;
+     qemu_co_mutex_lock(&s->lock);
+-    ret = qcow2_discard_clusters(bs, offset, count >> BDRV_SECTOR_BITS,
+-                                 QCOW2_DISCARD_REQUEST, false);
++    ret = qcow2_cluster_discard(bs, offset, count, QCOW2_DISCARD_REQUEST,
++                                false);
+     qemu_co_mutex_unlock(&s->lock);
+     return ret;
+ }
+@@ -2843,9 +2843,8 @@ fail:
+ static int qcow2_make_empty(BlockDriverState *bs)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t start_sector;
+-    int sector_step = (QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size) /
+-                       BDRV_SECTOR_SIZE);
++    uint64_t offset, end_offset;
++    int step = QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size);
+     int l1_clusters, ret = 0;
 
-@@ -2491,7 +2492,9 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-         count = s->cluster_size;
-         nr = s->cluster_size;
-         ret = qcow2_get_cluster_offset(bs, offset, &nr, &off);
--        if (ret != QCOW2_CLUSTER_UNALLOCATED && ret != QCOW2_CLUSTER_ZERO) {
-+        if (ret != QCOW2_CLUSTER_UNALLOCATED &&
-+            ret != QCOW2_CLUSTER_ZERO_PLAIN &&
-+            ret != QCOW2_CLUSTER_ZERO_ALLOC) {
-             qemu_co_mutex_unlock(&s->lock);
-             return -ENOTSUP;
+     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
+@@ -2862,18 +2861,15 @@ static int qcow2_make_empty(BlockDriverState *bs)
+
+     /* This fallback code simply discards every active cluster; this is slow,
+      * but works in all cases */
+-    for (start_sector = 0; start_sector < bs->total_sectors;
+-         start_sector += sector_step)
+-    {
++    end_offset = bs->total_sectors * BDRV_SECTOR_SIZE;
++    for (offset = 0; offset < end_offset; offset += step) {
+         /* As this function is generally used after committing an external
+          * snapshot, QCOW2_DISCARD_SNAPSHOT seems appropriate. Also, the
+          * default action for this kind of discard is to pass the discard,
+          * which will ideally result in an actually smaller image file, as
+          * is probably desired. */
+-        ret = qcow2_discard_clusters(bs, start_sector * BDRV_SECTOR_SIZE,
+-                                     MIN(sector_step,
+-                                         bs->total_sectors - start_sector),
+-                                     QCOW2_DISCARD_SNAPSHOT, true);
++        ret = qcow2_cluster_discard(bs, offset, MIN(step, end_offset - offset),
++                                    QCOW2_DISCARD_SNAPSHOT, true);
+         if (ret < 0) {
+             break;
          }
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index 5d40206..9e8f5b9 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -135,7 +135,7 @@ qemu-img: Error while amending options: Input/output error
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--qcow2: Marking image as corrupt: Data cluster offset 0x52a00 unaligned (L2 offset: 0x40000, L2 index: 0); further corruption events will be suppressed
-+qcow2: Marking image as corrupt: Cluster allocation offset 0x52a00 unaligned (L2 offset: 0x40000, L2 index: 0); further corruption events will be suppressed
- read failed: Input/output error
-
- === Testing unaligned pre-allocated zero cluster ===
-@@ -166,7 +166,7 @@ discard 65536/65536 bytes at offset 0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--qcow2: Image is corrupt: Data cluster offset 0x52a00 unaligned (L2 offset: 0x40000, L2 index: 0); further non-fatal corruption events will be suppressed
-+qcow2: Image is corrupt: Cluster allocation offset 0x52a00 unaligned (L2 offset: 0x40000, L2 index: 0); further non-fatal corruption events will be suppressed
- read failed: Input/output error
- read failed: Input/output error
-
-@@ -176,7 +176,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- qcow2: Image is corrupt: Cannot free unaligned cluster 0x52a00; further non-fatal corruption events will be suppressed
--qcow2: Marking image as corrupt: Data cluster offset 0x62a00 unaligned (L2 offset: 0x40000, L2 index: 0x1); further corruption events will be suppressed
-+qcow2: Marking image as corrupt: Cluster allocation offset 0x62a00 unaligned (L2 offset: 0x40000, L2 index: 0x1); further corruption events will be suppressed
- discard 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read failed: Input/output error
 -- 
 2.9.3
