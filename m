@@ -1,17 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d79iO-0002oh-4r
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:22 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d7DfX-00059R-9b
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 00:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d79iL-0007n7-D9
-	for qemu-devel@nongnu.org; Sat, 06 May 2017 20:06:20 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Sat,  6 May 2017 19:05:50 -0500
-Message-Id: <20170507000552.20847-11-eblake@redhat.com>
-In-Reply-To: <20170507000552.20847-1-eblake@redhat.com>
-References: <20170507000552.20847-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 10/12] qcow2: Optimize write zero of
- unaligned tail cluster
+	(envelope-from <wei.w.wang@intel.com>) id 1d7DfU-0004HV-3P
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 00:19:39 -0400
+Received: from mga06.intel.com ([134.134.136.31]:45279)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1d7DfT-0004HO-QH
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 00:19:36 -0400
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Sun, 7 May 2017 04:19:28 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F7391FFBB0@shsmsx102.ccr.corp.intel.com>
+References: <1492076108-117229-1-git-send-email-wei.w.wang@intel.com>
+	<1492076108-117229-3-git-send-email-wei.w.wang@intel.com>
+	<20170413184040-mutt-send-email-mst@kernel.org>
+	<58F08A60.2020407@intel.com>
+	<20170415000934-mutt-send-email-mst@kernel.org>
+	<58F43801.7060004@intel.com>
+	<286AC319A985734F985F78AFA26841F7391F6DCD@shsmsx102.ccr.corp.intel.com>
+	<20170426192753-mutt-send-email-mst@kernel.org>
+	<59019055.3040708@intel.com>
+	<20170506012322-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170506012322-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v9 2/5] virtio-balloon:
+ VIRTIO_BALLOON_F_BALLOON_CHUNKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,398 +38,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
 
-We've already improved discards to operate efficiently on the tail
-of an unaligned qcow2 image; it's time to make a similar improvement
-to write zeroes.  The special case is only valid at the tail
-cluster of a file, where we must recognize that any sectors beyond
-the image end would implicitly read as zero, and therefore should
-not penalize our logic for widening a partial cluster into writing
-the whole cluster as zero.
+On 05/06/2017 06:26 AM, Michael S. Tsirkin wrote:
+> On Thu, Apr 27, 2017 at 02:31:49PM +0800, Wei Wang wrote:
+> > On 04/27/2017 07:20 AM, Michael S. Tsirkin wrote:
+> > > On Wed, Apr 26, 2017 at 11:03:34AM +0000, Wang, Wei W wrote:
+> > > > Hi Michael, could you please give some feedback?
+> > > I'm sorry, I'm not sure feedback on what you are requesting.
+> > Oh, just some trivial things (e.g. use a field in the header,
+> > hdr->chunks to indicate the number of chunks in the payload) that
+> > wasn't confirmed.
+> >
+> > I will prepare the new version with fixing the agreed issues, and we
+> > can continue to discuss those parts if you still find them improper.
+> >
+> >
+> > >
+> > > The interface looks reasonable now, even though there's a way to
+> > > make it even simpler if we can limit chunk size to 2G (in fact 4G -
+> > > 1). Do you think we can live with this limitation?
+> > Yes, I think we can. So, is it good to change to use the previous
+> > 64-bit chunk format (52-bit base + 12-bit size)?
+>=20
+> This isn't what I meant. virtio ring has descriptors with a 64 bit addres=
+s and 32 bit
+> size.
+>=20
+> If size < 4g is not a significant limitation, why not just use that to pa=
+ss
+> address/size in a standard s/g list, possibly using INDIRECT?
 
-However, note that for now, the special case of end-of-file is only
-recognized if there is no backing file, or if the backing file has
-the same length; that's because when the backing file is shorter
-than the active layer, we don't have code in place to recognize
-that reads of a sector unallocated at the top and beyond the backing
-end-of-file are implicitly zero.  It's not much of a real loss,
-because most people don't use images that aren't cluster-aligned,
-or where the active layer is a different size than the backing
-layer (especially where the difference falls within a single cluster).
+OK, I see your point, thanks. Post the two options here for an analysis:
+Option1 (what we have now):
+struct virtio_balloon_page_chunk {
+        __le64 chunk_num;
+        struct virtio_balloon_page_chunk_entry entry[];
+};
+Option2:
+struct virtio_balloon_page_chunk {
+        __le64 chunk_num;
+        struct scatterlist entry[];
+};
 
-Update test 154 to cover the new scenarios, using two images of
-intentionally differing length.
+I don't have an issue to change it to Option2, but I would prefer Option1,
+because I think there is no be obvious difference between the two options,
+while Option1 appears to have little advantages here:
+1) "struct virtio_balloon_page_chunk_entry" has smaller size than
+"struct scatterlist", so the same size of allocated page chunk buffer
+can hold more entry[] using Option1;
+2) INDIRECT needs on demand kmalloc();
+3) no 4G size limit;
 
-While at it, fix the test to gracefully skip when run as
-./check -qcow2 -o compat=0.10 154
-since the older format lacks zero clusters already required earlier
-in the test.
+What do you think?
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
----
-v13: fix typo that left pattern verification failure in test
-v12: fix testsuite problems, document shortcoming of differing
-v11: reserved for blkdebug half of v10
-size of backing file
-
-v10: rebase to better reporting of preallocated zero clusters
-v9: new patch
----
- block/qcow2.c              |   7 ++
- tests/qemu-iotests/154     | 160 ++++++++++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/154.out | 128 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 293 insertions(+), 2 deletions(-)
-
-diff --git a/block/qcow2.c b/block/qcow2.c
-index dded5a0..3478bb6 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2451,6 +2451,10 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
-     BlockDriverState *file;
-     int64_t res;
-
-+    if (start + count > bs->total_sectors) {
-+        count = bs->total_sectors - start;
-+    }
-+
-     if (!count) {
-         return true;
-     }
-@@ -2469,6 +2473,9 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     uint32_t tail = (offset + count) % s->cluster_size;
-
-     trace_qcow2_pwrite_zeroes_start_req(qemu_coroutine_self(), offset, count);
-+    if (offset + count == bs->total_sectors * BDRV_SECTOR_SIZE) {
-+        tail = 0;
-+    }
-
-     if (head || tail) {
-         int64_t cl_start = (offset - head) >> BDRV_SECTOR_BITS;
-diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
-index 7ca7219..dd8a426 100755
---- a/tests/qemu-iotests/154
-+++ b/tests/qemu-iotests/154
-@@ -2,7 +2,7 @@
- #
- # qcow2 specific bdrv_pwrite_zeroes tests with backing files (complements 034)
- #
--# Copyright (C) 2016 Red Hat, Inc.
-+# Copyright (C) 2016-2017 Red Hat, Inc.
- #
- # This program is free software; you can redistribute it and/or modify
- # it under the terms of the GNU General Public License as published by
-@@ -42,7 +42,10 @@ _supported_proto file
- _supported_os Linux
-
- CLUSTER_SIZE=4k
--size=128M
-+size=$((128 * 1024 * 1024))
-+
-+# This test requires zero clusters, added in v3 images
-+_unsupported_imgopts compat=0.10
-
- echo
- echo == backing file contains zeros ==
-@@ -299,6 +302,159 @@ $QEMU_IO -c "read -P 0 75k 1k" "$TEST_IMG" | _filter_qemu_io
-
- $QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-
-+echo
-+echo == unaligned image tail cluster, no allocation needed ==
-+
-+# With no backing file, write to all or part of unallocated partial cluster
-+# will mark the cluster as zero, but does not allocate.
-+# Re-create the image each time to get back to unallocated clusters.
-+
-+# Write at the front: sector-wise, the request is: 128m... | 00 -- -- --
-+_make_test_img $((size + 2048))
-+$QEMU_IO -c "write -z $size 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write at the back: sector-wise, the request is: 128m... | -- -- -- 00
-+_make_test_img $((size + 2048))
-+$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write at middle: sector-wise, the request is: 128m... | -- 00 00 --
-+_make_test_img $((size + 2048))
-+$QEMU_IO -c "write -z $((size + 512)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write entire cluster: sector-wise, the request is: 128m... | 00 00 00 00
-+_make_test_img $((size + 2048))
-+$QEMU_IO -c "write -z $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Repeat with backing file holding unallocated cluster.
-+# TODO: Note that this forces an allocation, because we aren't yet able to
-+# quickly detect that reads beyond EOF of the backing file are always zero
-+CLUSTER_SIZE=2048 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+
-+# Write at the front: sector-wise, the request is:
-+# backing: 128m... | -- --
-+# active:  128m... | 00 -- -- --
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -z $size 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write at the back: sector-wise, the request is:
-+# backing: 128m... | -- --
-+# active:  128m... | -- -- -- 00
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write at middle: sector-wise, the request is:
-+# backing: 128m... | -- --
-+# active:  128m... | -- 00 00 --
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -z $((size + 512)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write entire cluster: sector-wise, the request is:
-+# backing: 128m... | -- --
-+# active:  128m... | 00 00 00 00
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -z $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Repeat with backing file holding zero'd cluster
-+# TODO: Note that this forces an allocation, because we aren't yet able to
-+# quickly detect that reads beyond EOF of the backing file are always zero
-+$QEMU_IO -c "write -z $size 512" "$TEST_IMG.base" | _filter_qemu_io
-+
-+# Write at the front: sector-wise, the request is:
-+# backing: 128m... | 00 00
-+# active:  128m... | 00 -- -- --
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -z $size 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write at the back: sector-wise, the request is:
-+# backing: 128m... | 00 00
-+# active:  128m... | -- -- -- 00
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write at middle: sector-wise, the request is:
-+# backing: 128m... | 00 00
-+# active:  128m... | -- 00 00 --
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -z $((size + 512)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Write entire cluster: sector-wise, the request is:
-+# backing: 128m... | 00 00
-+# active:  128m... | 00 00 00 00
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -z $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 2048" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# A preallocated cluster maintains its allocation, whether it stays as
-+# data due to a partial write:
-+# Convert 128m... | XX XX => ... | XX 00
-+_make_test_img $((size + 1024))
-+$QEMU_IO -c "write -P 1 $((size)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# or because it is the entire cluster and can use the zero flag:
-+# Convert 128m... | XX XX => ... | 00 00
-+$QEMU_IO -c "write -z $((size)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "alloc $size 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $size 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+echo
-+echo == unaligned image tail cluster, allocation required ==
-+
-+# Write beyond backing file must COW
-+# Backing file: 128m... | XX --
-+# Active layer: 128m... | -- -- 00 --
-+CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -P 1 $((size)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 1024)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 512)) 1536" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# Writes at boundaries of (partial) cluster must not lose mid-cluster data
-+# Backing file: 128m: ... | -- XX
-+# Active layer: 128m: ... | 00 -- -- 00
-+CLUSTER_SIZE=512 TEST_IMG="$TEST_IMG.base" _make_test_img $((size + 1024))
-+_make_test_img -b "$TEST_IMG.base" $((size + 2048))
-+$QEMU_IO -c "write -P 1 $((size + 512)) 512" "$TEST_IMG.base" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -z $((size + 1536)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 1 $((size + 512)) 512" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "read -P 0 $((size + 1024)) 1024" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/154.out b/tests/qemu-iotests/154.out
-index d3b68e7..d8485ee 100644
---- a/tests/qemu-iotests/154.out
-+++ b/tests/qemu-iotests/154.out
-@@ -282,4 +282,132 @@ read 1024/1024 bytes at offset 76800
- { "start": 69632, "length": 4096, "depth": 0, "zero": true, "data": false},
- { "start": 73728, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
- { "start": 77824, "length": 134139904, "depth": 1, "zero": true, "data": false}]
-+
-+== unaligned image tail cluster, no allocation needed ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134219776, "depth": 0, "zero": true, "data": false}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776
-+wrote 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134219776, "depth": 0, "zero": true, "data": false}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776
-+wrote 1024/1024 bytes at offset 134218240
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134219776, "depth": 0, "zero": true, "data": false}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776
-+wrote 2048/2048 bytes at offset 134217728
-+2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134219776, "depth": 0, "zero": true, "data": false}]
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 1024/1024 bytes at offset 134218240
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 2048/2048 bytes at offset 134217728
-+2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 1024/1024 bytes at offset 134218240
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 2048/2048 bytes at offset 134217728
-+2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+2048/2048 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134218752
-+wrote 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+1024/1024 bytes allocated at offset 128 MiB
-+[{ "start": 0, "length": 134217728, "depth": 0, "zero": true, "data": false},
-+{ "start": 134217728, "length": 1024, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+wrote 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+1024/1024 bytes allocated at offset 128 MiB
-+read 1024/1024 bytes at offset 134217728
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 0, "zero": true, "data": false},
-+{ "start": 134217728, "length": 1024, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+
-+== unaligned image tail cluster, allocation required ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134218752
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1536/1536 bytes at offset 134218240
-+1.500 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134218752
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 134218752
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset 134219264
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134217728
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 512/512 bytes at offset 134218240
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 134218752
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
-+{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
- *** done
--- 
-2.9.3
+Best,
+Wei
