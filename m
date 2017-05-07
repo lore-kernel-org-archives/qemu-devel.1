@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1d7Qmt-0001mC-67
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 14:20:08 -0400
+	(envelope-from <doug16k@gmail.com>) id 1d7RP0-000242-9m
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 14:59:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1d7Qms-0000Ev-8Q
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 14:20:07 -0400
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Sun,  7 May 2017 20:19:40 +0200
-Message-Id: <20170507181940.25882-4-krzk@kernel.org>
-In-Reply-To: <20170507181940.25882-1-krzk@kernel.org>
-References: <20170507181940.25882-1-krzk@kernel.org>
+	(envelope-from <doug16k@gmail.com>) id 1d7ROz-0000Qe-AY
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 14:59:30 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:35277)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <doug16k@gmail.com>) id 1d7ROz-0000QY-2n
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 14:59:29 -0400
+Received: by mail-it0-x243.google.com with SMTP id 67so906898itx.2
+	for <qemu-devel@nongnu.org>; Sun, 07 May 2017 11:59:28 -0700 (PDT)
 MIME-Version: 1.0
+In-Reply-To: <CAEfK_47+yGMVSEPui3GfyEfqPy9dQfJGB2c1smhV=TjSCoD8=g@mail.gmail.com>
+References: <CAEfK_46MMR6cH3ahuJ=zfcuKAp07iU20Ps+yZYv5s9woCPnsSw@mail.gmail.com>
+	<20170502142207.GJ22502@stefanha-x1.localdomain>
+	<CAEfK_46hGYYpO4YhYcxdUar1ugLQwbpJMgxAJDJU13zSpbD4zw@mail.gmail.com>
+	<20170505144506.GA14316@stefanha-x1.localdomain>
+	<CAEfK_47+yGMVSEPui3GfyEfqPy9dQfJGB2c1smhV=TjSCoD8=g@mail.gmail.com>
+From: Doug Gale <doug16k@gmail.com>
+Date: Sun, 7 May 2017 14:59:27 -0400
+Message-ID: <CAEfK_46jBNgzS0f-p+vp9fiUiz-wsn+QzKiG9UNgUSt+UMjexw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/3] hw/arm/exynos: QOM-ify the SoC
+Subject: Re: [Qemu-devel] [PATCH] gdbstub: implement remote debugging
+ protocol escapes for command receive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,129 +32,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Krzysztof Kozlowski <krzk@kernel.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-Convert the Exynos4210 SoC code into a QOM model which is a preferred
-approach instead of directly initializing SoC-related devices from the
-board file.
+Updated patch with comments addressed:
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>From 6bce4e5c87c255f10b22d2bf6fc951dde2bbf457 Mon Sep 17 00:00:00 2001
+From: Doug Gale <doug16k@gmail.com>
+Date: Mon, 1 May 2017 12:22:10 -0400
+Subject: [PATCH] gdbstub: implement remote debugging protocol escapes for
+ command receive
+
+- decode escape sequences
+- decompress run-length encoding escape sequences
+- report command parsing problems to output when debug output is enabled
+- reject packet checksums that are not valid hex digits
+- compute the checksum based on the packet stream, not based on the
+  decoded packet
+
+Tested with GDB and QtCreator integrated debugger on SMP QEMU instance.
+Works for me.
+
+Signed-off-by: Doug Gale <doug16k@gmail.com>
 ---
- hw/arm/exynos4210.c         | 18 +++++++++++++++---
- hw/arm/exynos4_boards.c     |  9 ++++++---
- include/hw/arm/exynos4210.h |  8 ++++++--
- 3 files changed, 27 insertions(+), 8 deletions(-)
+ gdbstub.c | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 99 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 27a7bf28a5a9..034fc8be9d76 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -160,9 +160,10 @@ static uint64_t exynos4210_calc_affinity(int cpu)
-     return mp_affinity;
- }
-=20
--Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
-+static void exynos4210_init(Object *obj)
+diff --git a/gdbstub.c b/gdbstub.c
+index 9911153..3abaf7c 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -286,6 +286,8 @@ enum RSState {
+     RS_INACTIVE,
+     RS_IDLE,
+     RS_GETLINE,
++    RS_GETLINE_ESC,
++    RS_GETLINE_RLE,
+     RS_CHKSUM1,
+     RS_CHKSUM2,
+ };
+@@ -296,7 +298,8 @@ typedef struct GDBState {
+     enum RSState state; /* parsing state */
+     char line_buf[MAX_PACKET_LENGTH];
+     int line_buf_index;
+-    int line_csum;
++    int line_sum; /* running checksum */
++    int line_csum; /* checksum at the end of the packet */
+     uint8_t last_packet[MAX_PACKET_LENGTH + 4];
+     int last_packet_len;
+     int signal;
+@@ -1508,7 +1511,6 @@ void gdb_do_syscall(gdb_syscall_complete_cb cb,
+const char *fmt, ...)
+
+ static void gdb_read_byte(GDBState *s, int ch)
  {
--    Exynos4210State *s =3D g_new(Exynos4210State, 1);
-+    MemoryRegion *system_mem =3D get_system_memory();
-+    Exynos4210State *s =3D EXYNOS4210(obj);
-     qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
-     SysBusDevice *busdev;
-     ObjectClass *cpu_oc;
-@@ -402,6 +403,17 @@ Exynos4210State *exynos4210_init(MemoryRegion *syste=
-m_mem)
-=20
-     sysbus_create_simple(TYPE_EXYNOS4210_EHCI, EXYNOS4210_EHCI_BASE_ADDR=
-,
-             s->irq_table[exynos4210_get_irq(28, 3)]);
-+}
+-    int i, csum;
+     uint8_t reply;
+
+ #ifndef CONFIG_USER_ONLY
+@@ -1542,35 +1544,123 @@ static void gdb_read_byte(GDBState *s, int ch)
+         switch(s->state) {
+         case RS_IDLE:
+             if (ch == '$') {
++                /* start of command packet */
+                 s->line_buf_index = 0;
++                s->line_sum = 0;
+                 s->state = RS_GETLINE;
++            } else {
++#ifdef DEBUG_GDB
++                printf("gdbstub received garbage between packets: 0x%x\n", ch);
++#endif
+             }
+             break;
+         case RS_GETLINE:
++            if (ch == '}') {
++                /* start escape sequence */
++                s->state = RS_GETLINE_ESC;
++                s->line_sum += ch;
++            } else if (ch == '*') {
++                /* start run length encoding sequence */
++                s->state = RS_GETLINE_RLE;
++                s->line_sum += ch;
++            } else if (ch == '#') {
++                /* end of command, start of checksum*/
++                s->state = RS_CHKSUM1;
++            } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
++#ifdef DEBUG_GDB
++                printf("gdbstub command buffer overrun, dropping command\n");
++#endif
++                s->state = RS_IDLE;
++            } else {
++                /* unescaped command character */
++                s->line_buf[s->line_buf_index++] = ch;
++                s->line_sum += ch;
++            }
++            break;
++        case RS_GETLINE_ESC:
+             if (ch == '#') {
+-            s->state = RS_CHKSUM1;
++                /* unexpected end of command in escape sequence */
++                s->state = RS_CHKSUM1;
+             } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
++                /* command buffer overrun */
++#ifdef DEBUG_GDB
++                printf("gdbstub command buffer overrun, dropping command\n");
++#endif
+                 s->state = RS_IDLE;
+             } else {
+-            s->line_buf[s->line_buf_index++] = ch;
++                /* parse escaped character and leave escape state */
++                s->line_buf[s->line_buf_index++] = ch ^ 0x20;
++                s->line_sum += ch;
++                s->state = RS_GETLINE;
++            }
++            break;
++        case RS_GETLINE_RLE:
++            if (ch < ' ') {
++                /* invalid RLE count encoding */
++#ifdef DEBUG_GDB
++                printf("gdbstub got invalid RLE count: 0x%x\n", ch);
++#endif
++                s->state = RS_GETLINE;
++            } else {
++                /* decode repeat length */
++                int repeat = (unsigned char)ch - ' ' + 3;
++                if (s->line_buf_index + repeat >= sizeof(s->line_buf) - 1) {
++                    /* that many repeats would overrun the command buffer */
++#ifdef DEBUG_GDB
++                    printf("gdbstub command buffer overrun,"
++                           " dropping command\n");
++#endif
++                    s->state = RS_IDLE;
++                } else if (s->line_buf_index < 2) {
++                    /* got a repeat but we have nothing to repeat */
++#ifdef DEBUG_GDB
++                    printf("gdbstub got invalid RLE sequence\n");
++#endif
++                    s->state = RS_GETLINE;
++                } else {
++                    /* repeat the last character */
++                    memset(s->line_buf + s->line_buf_index,
++                           s->line_buf[s->line_buf_index - 1], repeat);
++                    s->line_buf_index += repeat;
++                    s->line_sum += ch;
++                    s->state = RS_GETLINE;
++                }
+             }
+             break;
+         case RS_CHKSUM1:
++            /* get high hex digit of checksum */
++            if (!isxdigit(ch)) {
++#ifdef DEBUG_GDB
++                printf("gdbstub got invalid command checksum digit\n");
++#endif
++                s->state = RS_GETLINE;
++                break;
++            }
+             s->line_buf[s->line_buf_index] = '\0';
+             s->line_csum = fromhex(ch) << 4;
+             s->state = RS_CHKSUM2;
+             break;
+         case RS_CHKSUM2:
++            /* get low hex digit of checksum */
++            if (!isxdigit(ch)) {
++#ifdef DEBUG_GDB
++                printf("gdbstub got invalid command checksum digit\n");
++#endif
++                s->state = RS_GETLINE;
++                break;
++            }
+             s->line_csum |= fromhex(ch);
+-            csum = 0;
+-            for(i = 0; i < s->line_buf_index; i++) {
+-                csum += s->line_buf[i];
+-            }
+-            if (s->line_csum != (csum & 0xff)) {
 +
-+static const TypeInfo exynos4210_type_info =3D {
-+    .name =3D TYPE_EXYNOS4210,
-+    .parent =3D TYPE_DEVICE,
-+    .instance_size =3D sizeof(Exynos4210State),
-+    .instance_init =3D exynos4210_init,
-+};
-=20
--    return s;
-+static void exynos4210_register_types(void)
-+{
-+    type_register_static(&exynos4210_type_info);
- }
-+type_init(exynos4210_register_types)
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index 6240b26839cd..5e7c6b562ae2 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -58,7 +58,7 @@ typedef enum Exynos4BoardType {
- } Exynos4BoardType;
-=20
- typedef struct Exynos4BoardState {
--    Exynos4210State *soc;
-+    Exynos4210State soc;
-     MemoryRegion dram0_mem;
-     MemoryRegion dram1_mem;
- } Exynos4BoardState;
-@@ -162,7 +162,10 @@ exynos4_boards_init_common(MachineState *machine,
-     exynos4_boards_init_ram(s, get_system_memory(),
-                             exynos4_board_ram_size[board_type]);
-=20
--    s->soc =3D exynos4210_init(get_system_memory());
-+    object_initialize(&s->soc, sizeof(s->soc), TYPE_EXYNOS4210);
-+    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-+                              &error_abort);
-+    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_f=
-atal);
-=20
-     return s;
- }
-@@ -180,7 +183,7 @@ static void smdkc210_init(MachineState *machine)
-                                                       EXYNOS4_BOARD_SMDK=
-C210);
-=20
-     lan9215_init(SMDK_LAN9118_BASE_ADDR,
--            qemu_irq_invert(s->soc->irq_table[exynos4210_get_irq(37, 1)]=
-));
-+            qemu_irq_invert(s->soc.irq_table[exynos4210_get_irq(37, 1)])=
-);
-     arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
- }
-=20
-diff --git a/include/hw/arm/exynos4210.h b/include/hw/arm/exynos4210.h
-index 098a69ec73d3..116eae62756b 100644
---- a/include/hw/arm/exynos4210.h
-+++ b/include/hw/arm/exynos4210.h
-@@ -29,6 +29,10 @@
- #include "exec/memory.h"
- #include "target/arm/cpu-qom.h"
-=20
-+#define TYPE_EXYNOS4210 "exynos4210"
-+#define EXYNOS4210(obj) \
-+    OBJECT_CHECK(Exynos4210State, (obj), TYPE_EXYNOS4210)
-+
- #define EXYNOS4210_NCPUS                    2
-=20
- #define EXYNOS4210_DRAM0_BASE_ADDR          0x40000000
-@@ -85,6 +89,8 @@ typedef struct Exynos4210Irq {
- } Exynos4210Irq;
-=20
- typedef struct Exynos4210State {
-+    DeviceState parent_obj;
-+
-     ARMCPU *cpu[EXYNOS4210_NCPUS];
-     Exynos4210Irq irqs;
-     qemu_irq *irq_table;
-@@ -101,8 +107,6 @@ typedef struct Exynos4210State {
- void exynos4210_write_secondary(ARMCPU *cpu,
-         const struct arm_boot_info *info);
-=20
--Exynos4210State *exynos4210_init(MemoryRegion *system_mem);
--
- /* Initialize exynos4210 IRQ subsystem stub */
- qemu_irq *exynos4210_init_irq(Exynos4210Irq *env);
-=20
---=20
-2.9.3
++            if (s->line_csum != (s->line_sum & 0xff)) {
++                /* send NAK reply */
+                 reply = '-';
+                 put_buffer(s, &reply, 1);
++#ifdef DEBUG_GDB
++                printf("gdbstub got command packet with incorrect checksum\n");
++#endif
+                 s->state = RS_IDLE;
+             } else {
++                /* send ACK reply */
+                 reply = '+';
+                 put_buffer(s, &reply, 1);
+                 s->state = gdb_handle_packet(s, s->line_buf);
+-- 
+2.7.4
