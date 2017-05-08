@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d7ox9-0004vQ-TI
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:08:20 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d7oxy-0005LA-Qi
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d7ox8-0000aT-Vs
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:08:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d7ox8-0000aD-N3
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:08:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C19FC04B32C
-	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 20:08:17 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon,  8 May 2017 17:08:12 -0300
-Message-Id: <20170508200812.25296-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] iommu: Don't crash if machine is not PC_MACHINE
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d7oxx-0000jz-PV
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:09:10 -0400
+Received: from hera.aquilenet.fr ([2a01:474::1]:49708)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d7oxx-0000jr-Im
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:09:09 -0400
+Date: Mon, 8 May 2017 22:09:07 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170508200907.ll5gms6krkk7kdct@var.youpi.perso.aquilenet.fr>
+References: <20170505224833.17769-1-laurent@vivier.eu>
+	<20170505224833.17769-2-laurent@vivier.eu>
+	<20170505232738.targ5w5jm2vb73fe@var.youpi.perso.aquilenet.fr>
+	<7f643a77-0dd7-cf43-b51a-337da34f8f87@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f643a77-0dd7-cf43-b51a-337da34f8f87@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Currently it's possible to crash QEMU using "-device *-iommu" and
-"-machine none":
+Hello,
 
-  $ qemu-system-x86_64 -machine none -device amd-iommu
-  qemu/hw/i386/amd_iommu.c:1140:amdvi_realize: Object 0x55627dafbc90 is not an instance of type generic-pc-machine
-  Aborted (core dumped)
-  $ qemu-system-x86_64 -machine none -device intel-iommu
-  qemu/hw/i386/intel_iommu.c:2972:vtd_realize: Object 0x56292ec0bc90 is not an instance of type generic-pc-machine
-  Aborted (core dumped)
+Laurent Vivier, on sam. 06 mai 2017 15:19:44 +0200, wrote:
+> > Laurent Vivier, on sam. 06 mai 2017 00:48:33 +0200, wrote:
+> >> @@ -617,6 +622,10 @@ void slirp_pollfds_poll(GArray *pollfds, int select_error)
+> >>                   * Check sockets for reading
+> >>                   */
+> >>                  else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
+> >> +                    if (so->so_state & SS_ISFCONNECTING) {
+> >> +                        socks5_recv(so->s, &so->so_proxy_state);
+> >> +                        continue;
+> >> +                    }
+> > 
+> > Again, I don't see how this can work with both socks5 case and
+> > non-socks5 case.  Don't we need to somehow check for the type of socket
+> > before calling socks5_recv?
+> 
+> The check is done previously by:
+> 
+> @@ -442,6 +443,10 @@ void slirp_pollfds_fill(GArray *pollfds, uint32_t
+> *timeout)
+>                      .fd = so->s,
+>                      .events = G_IO_OUT | G_IO_ERR,
+>                  };
+> +                if (so->so_proxy_state &&
+> +                    so->so_proxy_state != SOCKS5_STATE_ERROR) {
+> +                    pfd.events |= G_IO_IN;
+> +                }
+> 
+> We can enter in socks5_recv() only if so->so_proxy_state is in a valid
+> state because G_IO_IN triggers that.
 
-Fix amd-iommu and intel-iommu to ensure the current machine is really a
-TYPE_PC_MACHINE instance at their realize methods.
+I don't understand: the socks5_recv gets called not only when pfd.events
+contains G_IO_IN, but also when it contains G_IO_HUP or G_IO_ERR.  Also,
+so_proxy_state being non-nul is not the only way to have G_IO_IN set in
+pfd.events, so_state & SS_FACCEPTCONN and CONN_CANFRCV(so) also trigger
+that.
 
-Resulting error messages:
+> >> @@ -645,11 +654,19 @@ void slirp_pollfds_poll(GArray *pollfds, int select_error)
+> >>                      /*
+> >>                       * Check for non-blocking, still-connecting sockets
+> >>                       */
+> >> -                    if (so->so_state & SS_ISFCONNECTING) {
+> >> -                        /* Connected */
+> >> -                        so->so_state &= ~SS_ISFCONNECTING;
+> >>  
+> >> -                        ret = send(so->s, (const void *) &ret, 0, 0);
+> >> +                    if (so->so_state & SS_ISFCONNECTING) {
+> >> +                        ret = socks5_send(so->s, slirp->proxy_user,
+> > 
+> > Ditto.
+> 
+> if so_proxy_state is 0 the function does nothing
 
-  $ qemu-system-x86_64 -machine none -device amd-iommu
-  qemu-system-x86_64: -device amd-iommu: Machine-type 'none' not supported by amd-iommu
-  $ qemu-system-x86_64 -machine none -device intel-iommu
-  qemu-system-x86_64: -device intel-iommu: Machine-type 'none' not supported by intel-iommu
+Well, that's quite weak reason to me, and will confuse readers, because
+they'll think that the code is for the socks5 case only.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/i386/amd_iommu.c   | 15 ++++++++++++++-
- hw/i386/intel_iommu.c | 14 ++++++++++++--
- 2 files changed, 26 insertions(+), 3 deletions(-)
+> >> +++ b/slirp/socks5.c
+> >> @@ -0,0 +1,371 @@
+> > 
+> > In v2 of the patch, this was said to have "some parts from nmap/ncat
+> > GPLv2".  Is that really not true any more?  If any part of the file is
+> > not original, it *has* to wear proper copyright notices, otherwise it's
+> > copyright infrigement.
+> 
+> No, I've re-written entirely this part from RFC.
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index f86a40aa30..516ebae952 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -21,6 +21,7 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/i386/amd_iommu.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "trace.h"
- 
-@@ -1137,7 +1138,19 @@ static void amdvi_realize(DeviceState *dev, Error **err)
-     int ret = 0;
-     AMDVIState *s = AMD_IOMMU_DEVICE(dev);
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
--    PCIBus *bus = PC_MACHINE(qdev_get_machine())->bus;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    PCMachineState *pcms =
-+        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-+    PCIBus *bus;
-+
-+    if (!pcms) {
-+        error_setg(err, "Machine-type '%s' not supported by amd-iommu",
-+                   mc->name);
-+        return;
-+    }
-+
-+    bus = pcms->bus;
-     s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
-                                      amdvi_uint64_equal, g_free, g_free);
- 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 02f047c8e3..a12b1761f5 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2969,11 +2969,21 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
- 
- static void vtd_realize(DeviceState *dev, Error **errp)
- {
--    PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
--    PCIBus *bus = pcms->bus;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    PCMachineState *pcms =
-+        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-+    PCIBus *bus;
-     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
- 
-+    if (!pcms) {
-+        error_setg(errp, "Machine-type '%s' not supported by intel-iommu",
-+                   mc->name);
-+        return;
-+    }
-+
-+    bus = pcms->bus;
-     VTD_DPRINTF(GENERAL, "");
-     x86_iommu->type = TYPE_INTEL;
- 
--- 
-2.11.0.259.g40922b1
+Ok.
+
+> for ncat.h
+
+Which code comes from ncat.h?
+
+Again, we can't copy/paste code like that, that is copyright
+infrigement.
+
+> license is 281 lines long (with clarifications and
+> extensions) for 60 lines copied...
+
+That is really no reason.  Copyright thingies are considered as soon
+as dozen-ish lines of non-trivial code.  The size of the terms of the
+licence itself really doesn't matter.  If we don't respect others'
+copyright, we can't expect others (e.g. companies) to respect our GPL
+code.
+
+Samuel
