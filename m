@@ -1,41 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:61000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d7n0U-0008SQ-CY
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:03:39 -0400
+	(envelope-from <stefanha@redhat.com>) id 1d7n43-0001nx-Di
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:07:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d7n0L-0004hy-Ka
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:03:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37886
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1d7n0L-0004ht-EN
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:03:29 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v48HnGuc040163
-	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 14:03:28 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2aap5gvuye-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 14:03:28 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 8 May 2017 19:03:26 +0100
-References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
-	<20170505173507.74077-10-pasic@linux.vnet.ibm.com>
-	<20170508172757.GI2120@work-vm>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 8 May 2017 20:03:23 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170508172757.GI2120@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <f0c6584a-1cd9-9aca-8eee-ef5cac26c613@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 09/10] s390x/css: turn on channel subsystem
- migration
+	(envelope-from <stefanha@redhat.com>) id 1d7n42-0005WL-Gz
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:07:19 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon,  8 May 2017 14:07:05 -0400
+Message-Id: <20170508180705.20609-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] aio: add missing aio_notify() to
+ aio_enable_external()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,52 +18,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+The main loop uses aio_disable_external()/aio_enable_external() to
+temporarily disable processing of external AioContext clients like
+device emulation.
 
+This allows monitor commands to quiesce I/O and prevent the guest from
+submitting new requests while a monitor command is in progress.
 
-On 05/08/2017 07:27 PM, Dr. David Alan Gilbert wrote:
-> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->> Turn on migration for the channel subsystem and the new scheme for
->> migrating virtio-ccw proxy devices (instead of letting the transport
->> independent child device migrate it's proxy, use the usual
->> DeviceClass.vmsd mechanism) for future machine versions.
+The aio_enable_external() API is currently broken when an IOThread is in
+aio_poll() waiting for fd activity when the main loop re-enables
+external clients.  Incrementing ctx->external_disable_cnt does not wake
+the IOThread from ppoll(2) so fd processing remains suspended and leads
+to unresponsive emulated devices.
 
-[..]
+This patch adds an aio_notify() call to aio_enable_external() so the
+IOThread is kicked out of ppoll(2) and will re-arm the file descriptors.
 
->> +void css_register_vmstate(void)
->> +{
->> +    vmstate_register(NULL, 0, &vmstate_css, &channel_subsys);
->> +}
->> +
-> 
-> Why isn't that attached to a device vmsd? 
+The bug can be reproduced as follows:
 
-Because there is no device. The channel subsystem is not modeled 
-as a QEMU device but it does have state which needs to be
-migrated.
+  $ qemu -M accel=kvm -m 1024 \
+         -object iothread,id=iothread0 \
+         -device virtio-scsi-pci,iothread=iothread0,id=virtio-scsi-pci0 \
+         -drive if=none,id=drive0,aio=native,cache=none,format=raw,file=test.img \
+         -device scsi-hd,id=scsi-hd0,drive=drive0 \
+         -qmp tcp::5555,server,nowait
 
-[..]
+  $ scripts/qmp/qmp-shell localhost:5555
+  (qemu) blockdev-snapshot-sync device=drive0 snapshot-file=sn1.qcow2
+         mode=absolute-paths format=qcow2
 
->> @@ -1365,6 +1373,11 @@ static void virtio_ccw_device_plugged(DeviceState *d, Error **errp)
->>      sch->id.cu_model = virtio_bus_get_vdev_id(&dev->bus);
->>  
->>  
->> +    /* Avoid generating unknown section for legacy migration target. */
->> +    if (!css_migration_enabled()) {
->> +        DEVICE_GET_CLASS(ccw_dev)->vmsd = NULL;
->> +    }
->> +
-> 
-> That's a very odd thing to do; can't you use a .needed at the
-> top level of the vmstate_virtio_ccw_dev to avoid having to
-> set it to NULL like this?
-> 
+After blockdev-snapshot-sync completes the SCSI disk will be
+unresponsive.  This leads to request timeouts inside the guest.
 
-I agree it's odd. As far as I remember I can't use .needed but
-I will double check.
+Reported-by: Qianqian Zhu <qizhu@redhat.com>
+Suggested-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v3:
+ * s/dec_fetch/fetch_dec/ [Fam]
+---
+ include/block/aio.h | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-Many thanks for your review!
-
-Halil
+diff --git a/include/block/aio.h b/include/block/aio.h
+index 406e323..e9aeeae 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -454,8 +454,14 @@ static inline void aio_disable_external(AioContext *ctx)
+  */
+ static inline void aio_enable_external(AioContext *ctx)
+ {
+-    assert(ctx->external_disable_cnt > 0);
+-    atomic_dec(&ctx->external_disable_cnt);
++    int old;
++
++    old = atomic_fetch_dec(&ctx->external_disable_cnt);
++    assert(old > 0);
++    if (old == 1) {
++        /* Kick event loop so it re-arms file descriptors */
++        aio_notify(ctx);
++    }
+ }
+ 
+ /**
+-- 
+2.9.3
