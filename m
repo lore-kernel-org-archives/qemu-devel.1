@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfkarsten@gmail.com>) id 1d7l27-0003ZP-IC
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:57:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1d7l36-0004Ib-Up
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfkarsten@gmail.com>) id 1d7l26-0005Ru-Eb
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:57:11 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cfkarsten@gmail.com>) id 1d7l26-0005RZ-8o
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:57:10 -0400
-Received: by mail-qt0-x241.google.com with SMTP id j13so10118343qta.3
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 08:57:10 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1d7l33-0006A8-0a
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:58:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d7l32-00068z-NK
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:58:08 -0400
+References: <87pofj8kek.fsf@linaro.org>
+	<20170508153625.y7jhzv32go5fzlwh@aurel32.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <addc4f06-5554-0a8c-b651-3c921a148bfb@redhat.com>
+Date: Mon, 8 May 2017 17:58:03 +0200
 MIME-Version: 1.0
-Sender: cfkarsten@gmail.com
-In-Reply-To: <bdb8ffb7-b9f0-242c-2bf9-3eb94530180b@redhat.com>
-References: <CADmzSSiQYXzJf0vzhyaXdncZaq9gzPrN0BRm4_OOpPv+wJ9Bjw@mail.gmail.com>
-	<87wp9r689l.fsf@dusky.pond.sub.org>
-	<CADmzSShCnLNFzBAZDw8+ZG00L=Qgy7OOE7Q06-z1fHYuBJHpRQ@mail.gmail.com>
-	<bdb8ffb7-b9f0-242c-2bf9-3eb94530180b@redhat.com>
-From: Carl Karsten <carl@personnelware.com>
-Date: Mon, 8 May 2017 10:56:39 -0500
-Message-ID: <CADmzSSizPt5JcWq8n-ZqnpYVB0q36x+JQYWXimyk1LciHsnkKQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] format=raw,readonly errors
+In-Reply-To: <20170508153625.y7jhzv32go5fzlwh@aurel32.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Future of SoftFloat use in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Aleksandar Markovic <aleksandar.markovic@imgtec.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, May 8, 2017 at 10:32 AM, John Snow <jsnow@redhat.com> wrote:
+On 08.05.2017 17:36, Aurelien Jarno wrote:
+> Hi,
+>=20
+> On 2017-05-08 15:58, Alex Benn=C3=A9e wrote:
+>> Hi,
+>>
+>> We've got a task coming up to implement half-precision floating point
+>> (FP16) for ARMv8.2. As you know pretty much all our floating point in
+>> QEMU is handled by our internal fork of John R. Hauser's BSD SoftFloat
+>> library. Our current implementation is based on version 2a which doesn=
+'t
+>> support FP16.
+>>
+>> As it happens there has been a new release of SoftFloat recently.
+>> Version 3 is a complete re-write which made a number of changes, some
+>> notable ones being:
+>>
+>>   - Complete rewrite, different use license than earlier releases.
+>>   - Renaming most types and functions, upgrading some algorithms
+>>     - restructuring the source files, and making SoftFloat into a true=
+ library.
+>>   - Added functions to convert between floating-point and unsigned int=
+egers, both 32-bit and 64-bit (uint32_t and uint64_t).
+>>   - Added functions for fused multiply-add, for all supported floating=
+-point formats except 80-bit double-extended-precision.
+>>   - Added support for a fifth rounding mode, near_maxMag (round to nea=
+rest, with ties to maximum magnitude, away from zero).
+>>
+>> And in the most recent release as of February 2017, 3c:
+>>
+>>   - Added optional rounding mode odd (round to odd, also known as jamm=
+ing).
+>>   - Implemented the common 16-bit =E2=80=9Chalf-precision=E2=80=9D flo=
+ating-point format (float16_t)
+>>
+>> See: http://www.jhauser.us/arithmetic/SoftFloat-3c/doc/SoftFloat-histo=
+ry.html
+>>
+>> Of course the softfloat in QEMU's tree hasn't been static either. We'v=
+e
+>> made numerous changes over the years to add and fix various features,
+>> including features that have since been added to the upstream softfloa=
+t.
+>> It seems unlikely we could switch to the newer softfloat without riski=
+ng
+>> breaking something. However if we look at back-porting stuff from the
+>> newer library we essentially get to own our version of softfloat
+>> forever.
+>=20
+> There have been many many changes in our forked version of softfloat:
+> qNaN/sNaN, IEEE754-2008 functions, squash input denormal, many floatx80
+> fixes, ...
 
->
->
-> On 05/08/2017 10:15 AM, Carl Karsten wrote:
-> > On Mon, May 8, 2017 at 3:51 AM, Markus Armbruster <armbru@redhat.com>
-> wrote:
-> >
-> >> Carl Karsten <carl@personnelware.com> writes:
-> >>
-> >>> juser@gator:~/temp$ qemu-system-x86_64 -m 256 -display curses  -drive
-> >>> file=disk.cow -drive file=boot.img
-> >>> WARNING: Image format was not specified for 'boot.img' and probing
-> >> guessed
-> >>> raw.
-> >>>          Automatically detecting the format is dangerous for raw
-> images,
-> >>> write operations on block 0 will be restricted.
-> >>>          Specify the 'raw' format explicitly to remove the
-> restrictions.
-> >>>
-> >>> This is OK, as I don't want anything writing to that thing anyway.  So
-> to
-> >>> get rid of the waring:
-> >>>
-> >>> juser@gator:~/temp$ qemu-system-x86_64 -drive
-> >>> file=boot.img,format=raw,readonly qemu-system-x86_64: Can't use a
-> >> read-only
-> >>> drive
-> >>> qemu-system-x86_64: Initialization of device ide-hd failed: Device
-> >>> initialization failed.
-> >>
-> >> -drive without if=... creates an IDE disk[*].  IDE disks can't do
-> >> read-only.  Have you tried omitting ",readonly"?
-> >>
-> >
-> >
-> > omitting works, but my goal was for the drive to be read only.
-> >
-> >
->
-> I don't think there's a way to make physical IDE drives "read only." I
-> don't think there's any jumper settings or any of the like which can
-> accomplish this.
->
-> Unlike floppy disks (which you could notch the corner of) or SD cards
-> (which have the write lock), I don't think ATA disks have a method for
-> being "read only," so this isn't a feature QEMU can support.
->
-> What you CAN do, however, is to use -snapshot or otherwise use something
-> like a qcow2 overlay to trap all writes to a temporary file that you can
-> discard at a later point in time, effectively keeping your original
-> image "read only."
->
-> I believe that SCSI disks support a read-only mode, though.
->
+Note that we've apparently also got plenty of bugs in our version of
+softloat left, for example:
 
+- https://bugs.launchpad.net/qemu/+bug/645662
+- http://lists.nongnu.org/archive/html/qemu-ppc/2017-05/msg00187.html
 
-k - that all makes sense.
+... would be interesting to know whether such issues are fixed with the
+newer version of softfloat...
 
-kinda ;)
-
- "write operations on block 0 will be restricted."
-
-Is there a way to explicitly enable that?
-
-The installer on the usb stick keeps stepping on itself rendering it
-broken, both physical usb drive and a dd image.
-
-I can play with OS permissions too, but that restricted warning made me
-think that would be 'best'.
-
-but but, now that I have index/bootindex working I probably won't be
-trashing my installer any more, so non-issue.
-
-
-
--- 
-Carl K
+ Thomas
