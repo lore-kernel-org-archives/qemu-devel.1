@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d7g3Z-0004Am-39
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:38:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1d7g6Q-0005DD-2s
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1d7g3U-0004L7-2y
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:38:21 -0400
-Received: from mga01.intel.com ([192.55.52.88]:4772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d7g3T-0004Kp-OI
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:38:16 -0400
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Mon, 8 May 2017 10:38:09 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743906890D@shsmsx102.ccr.corp.intel.com>
-References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1493201210-14357-4-git-send-email-yi.l.liu@linux.intel.com>
-	<20170427105317.GE1542@pxdev.xzpeter.org>
-In-Reply-To: <20170427105317.GE1542@pxdev.xzpeter.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1d7g6L-0004zn-4v
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:41:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54944)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d7g6K-0004zf-VU
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:41:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d7g6I-0003zg-PM
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 10:41:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 632A42E80DD
+	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 10:41:08 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 03/20] intel_iommu: add "svm" option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 May 2017 10:33:18 -0000
+From: Benjamin Wang <1689245@bugs.launchpad.net>
+Reply-To: Bug 1689245 <1689245@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170508082429.4330.4394.malonedeb@soybean.canonical.com>
+Message-Id: <20170508103318.13465.57776.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1689245] Re: qcow2 image converted from Photon OS
+ can't be started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Tian, Kevin" <kevin.tian@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
+To: qemu-devel@nongnu.org
 
-T24gVGh1LCAyNyBBcHIgMjAxNyAxODo1MzoxNyArMDgwMA0KUGV0ZXIgWHUgPHBldGVyeEByZWRo
-YXQuY29tPiB3cm90ZToNCg0KPiBPbiBXZWQsIEFwciAyNiwgMjAxNyBhdCAwNjowNjozM1BNICsw
-ODAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gRXhwb3NlICJTaGFyZWQgVmlydHVhbCBNZW1vcnki
-IHRvIGd1ZXN0IGJ5IHVzaW5nICJzdm0iIG9wdGlvbi4NCj4gPiBBbHNvIHVzZSAic3ZtIiB0byBl
-eHBvc2UgU1ZNIHJlbGF0ZWQgY2FwYWJpbGl0aWVzIHRvIGd1ZXN0Lg0KPiA+IGUuZy4gIi1kZXZp
-Y2UgaW50ZWwtaW9tbXUsIHN2bT1vbiINCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IExpdSwgWWkg
-TCA8eWkubC5saXVAbGludXguaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+ICBody9pMzg2L2ludGVs
-X2lvbW11LmMgICAgICAgICAgfCAxMCArKysrKysrKysrDQo+ID4gIGh3L2kzODYvaW50ZWxfaW9t
-bXVfaW50ZXJuYWwuaCB8ICA1ICsrKysrDQo+ID4gaW5jbHVkZS9ody9pMzg2L2ludGVsX2lvbW11
-LmggIHwgIDEgKw0KPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKykNCj4gPg0K
-PiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2ludGVsX2lvbW11LmMgYi9ody9pMzg2L2ludGVsX2lv
-bW11LmMgaW5kZXgNCj4gPiBiZjk4ZmE1Li5iYTFlN2ViIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kz
-ODYvaW50ZWxfaW9tbXUuYw0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IEBA
-IC0yNDUzLDYgKzI0NTMsNyBAQCBzdGF0aWMgUHJvcGVydHkgdnRkX3Byb3BlcnRpZXNbXSA9IHsN
-Cj4gPiAgICAgIERFRklORV9QUk9QX0JPT0woIngtYnVnZ3ktZWltIiwgSW50ZWxJT01NVVN0YXRl
-LCBidWdneV9laW0sIGZhbHNlKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0JPT0woImNhY2hpbmct
-bW9kZSIsIEludGVsSU9NTVVTdGF0ZSwgY2FjaGluZ19tb2RlLA0KPiBGQUxTRSksDQo+ID4gICAg
-ICBERUZJTkVfUFJPUF9CT09MKCJlY3MiLCBJbnRlbElPTU1VU3RhdGUsIGVjcywgRkFMU0UpLA0K
-PiA+ICsgICAgREVGSU5FX1BST1BfQk9PTCgic3ZtIiwgSW50ZWxJT01NVVN0YXRlLCBzdm0sIEZB
-TFNFKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0VORF9PRl9MSVNUKCksDQo+ID4gIH07DQo+ID4N
-Cj4gPiBAQCAtMjk3Myw2ICsyOTc0LDE1IEBAIHN0YXRpYyB2b2lkIHZ0ZF9pbml0KEludGVsSU9N
-TVVTdGF0ZSAqcykNCj4gPiAgICAgICAgICBzLT5lY2FwIHw9IFZURF9FQ0FQX0VDUzsNCj4gPiAg
-ICAgIH0NCj4gPg0KPiA+ICsgICAgaWYgKHMtPnN2bSkgew0KPiA+ICsgICAgICAgIGlmICghcy0+
-ZWNzIHx8ICF4ODZfaW9tbXUtPnB0X3N1cHBvcnRlZCB8fCAhcy0+Y2FjaGluZ19tb2RlKSB7DQo+
-ID4gKyAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiTmVlZCB0byBzZXQgZWNzLCBwdCwgY2FjaGlu
-Zy1tb2RlIGZvciBzdm0iKTsNCj4gPiArICAgICAgICAgICAgZXhpdCgxKTsNCj4gPiArICAgICAg
-ICB9DQo+ID4gKyAgICAgICAgcy0+Y2FwIHw9IFZURF9DQVBfRFdEIHwgVlREX0NBUF9EUkQ7DQo+
-ID4gKyAgICAgICAgcy0+ZWNhcCB8PSBWVERfRUNBUF9QUlMgfCBWVERfRUNBUF9QVFMgfCBWVERf
-RUNBUF9QQVNJRDI4Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAgICAgIGlmIChzLT5jYWNoaW5n
-X21vZGUpIHsNCj4gPiAgICAgICAgICBzLT5jYXAgfD0gVlREX0NBUF9DTTsNCj4gPiAgICAgIH0N
-Cj4gPiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oDQo+ID4gYi9o
-dy9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmggaW5kZXggNzFhMWMxZS4uZjJhN2QxMiAxMDA2
-NDQNCj4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgNCj4gPiArKysgYi9o
-dy9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgNCj4gPiBAQCAtMTkxLDYgKzE5MSw5IEBADQo+
-ID4gICNkZWZpbmUgVlREX0VDQVBfUFQgICAgICAgICAgICAgICAgICgxVUxMIDw8IDYpDQo+ID4g
-ICNkZWZpbmUgVlREX0VDQVBfTUhNViAgICAgICAgICAgICAgICgxNVVMTCA8PCAyMCkNCj4gPiAg
-I2RlZmluZSBWVERfRUNBUF9FQ1MgICAgICAgICAgICAgICAgKDFVTEwgPDwgMjQpDQo+ID4gKyNk
-ZWZpbmUgVlREX0VDQVBfUEFTSUQyOCAgICAgICAgICAgICgxVUxMIDw8IDI4KQ0KPiANCj4gQ291
-bGQgSSBhc2sgd2hhdCdzIHRoaXMgYml0PyBPbiBteSBzcGVjLCBpdCBzYXlzIHRoaXMgYml0IGlz
-IHJlc2VydmVkIGFuZCBkZWZ1bmN0IChzcGVjDQo+IHZlcnNpb246IEp1bmUgMjAxNikuDQoNCkFz
-IEFzaG9rIGNvbmZpcm1lZCwgeWVzIGl0IHNob3VsZCBiZSBiaXQgNDAuIHdvdWxkIHVwZGF0ZSBp
-dC4NCg0KPiA+ICsjZGVmaW5lIFZURF9FQ0FQX1BSUyAgICAgICAgICAgICAgICAoMVVMTCA8PCAy
-OSkNCj4gPiArI2RlZmluZSBWVERfRUNBUF9QVFMgICAgICAgICAgICAgICAgKDB4ZVVMTCA8PCAz
-NSkNCj4gDQo+IFdvdWxkIGl0IGJldHRlciB3ZSBhdm9pZCB1c2luZyAweGUgaGVyZSwgb3IgYXQg
-bGVhc3QgYWRkIHNvbWUgY29tbWVudD8NCg0KRm9yIHRoaXMgdmFsdWUsIGl0IG11c3QgYmUgbm8g
-bW9yZSB0aGFuIHRoZSBiaXRzIGhvc3Qgc3VwcG9ydHMuIFNvIGl0IG1heSBiZQ0KYmV0dGVyIHRv
-IGhhdmUgYSBkZWZhdWx0IHZhbHVlIGFuZCBtZWFud2hpbGUgZXhwb3NlIGFuIG9wdGlvbiB0byBs
-ZXQgdXNlcg0Kc2V0IGl0LiBob3cgYWJvdXQgeW91ciBvcGluaW9uPw0KDQo+IA0KPiA+DQo+ID4g
-IC8qIENBUF9SRUcgKi8NCj4gPiAgLyogKG9mZnNldCA+PiA0KSA8PCAyNCAqLw0KPiA+IEBAIC0y
-MDcsNiArMjEwLDggQEANCj4gPiAgI2RlZmluZSBWVERfQ0FQX1BTSSAgICAgICAgICAgICAgICAg
-KDFVTEwgPDwgMzkpDQo+ID4gICNkZWZpbmUgVlREX0NBUF9TTExQUyAgICAgICAgICAgICAgICgo
-MVVMTCA8PCAzNCkgfCAoMVVMTCA8PCAzNSkpDQo+ID4gICNkZWZpbmUgVlREX0NBUF9DTSAgICAg
-ICAgICAgICAgICAgICgxVUxMIDw8IDcpDQo+ID4gKyNkZWZpbmUgVlREX0NBUF9EV0QgICAgICAg
-ICAgICAgICAgICgxVUxMIDw8IDU0KQ0KPiA+ICsjZGVmaW5lIFZURF9DQVBfRFJEICAgICAgICAg
-ICAgICAgICAoMVVMTCA8PCA1NSkNCj4gDQo+IEp1c3QgdG8gY29uZmlybTogYWZ0ZXIgdGhpcyBz
-ZXJpZXMsIHdlIHNob3VsZCBzdXBwb3J0IGRyYWluIHJlYWQvd3JpdGUgdGhlbiwgcmlnaHQ/DQoN
-CkkgaGF2ZW7igJl0IGRvbmUgc3BlY2lhbCBwcm9jZXNzIGFnYWluc3QgaXQgaW4gSU9NTVUgZW11
-bGF0b3IuIEl0J3Mgc2V0IHRvIGtlZXANCmNvbnNpc3RlbmNlIHdpdGggVlQtZCBzcGVjIHNpbmNl
-IERXRCBhbmQgRFJXIGlzIHJlcXVpcmVkIGNhcGFiaWxpdHkgd2hlbg0KUEFTSUQgaXQgcmVwb3J0
-ZWQgYXMgU2V0LiBIb3dldmVyLCBJIHRoaW5rIGl0IHNob3VsZCBiZSBmaW5lIGlmIGd1ZXN0IGlz
-c3VlIFFJDQp3aXRoIGRyYWluIHJlYWQvd3JpdGUgc2V0IGluIHRoZSBkZXNjcmlwdG9yLiBIb3N0
-IHNob3VsZCBiZSBhYmxlIHRvIHByb2Nlc3MgaXQuDQoNClRoYW5rcywNCllpIEwNCj4gPg0KPiA+
-ICAvKiBTdXBwb3J0ZWQgQWRqdXN0ZWQgR3Vlc3QgQWRkcmVzcyBXaWR0aHMgKi8NCj4gPiAgI2Rl
-ZmluZSBWVERfQ0FQX1NBR0FXX1NISUZUICAgICAgICAgOA0KPiA+IGRpZmYgLS1naXQgYS9pbmNs
-dWRlL2h3L2kzODYvaW50ZWxfaW9tbXUuaA0KPiA+IGIvaW5jbHVkZS9ody9pMzg2L2ludGVsX2lv
-bW11LmggaW5kZXggYWUyMWZlNS4uODk4MTYxNSAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2h3
-L2kzODYvaW50ZWxfaW9tbXUuaA0KPiA+ICsrKyBiL2luY2x1ZGUvaHcvaTM4Ni9pbnRlbF9pb21t
-dS5oDQo+ID4gQEAgLTI2Nyw2ICsyNjcsNyBAQCBzdHJ1Y3QgSW50ZWxJT01NVVN0YXRlIHsNCj4g
-Pg0KPiA+ICAgICAgYm9vbCBjYWNoaW5nX21vZGU7ICAgICAgICAgIC8qIFJPIC0gaXMgY2FwIENN
-IGVuYWJsZWQ/ICovDQo+ID4gICAgICBib29sIGVjczsgICAgICAgICAgICAgICAgICAgICAgIC8q
-IEV4dGVuZGVkIENvbnRleHQgU3VwcG9ydCAqLw0KPiA+ICsgICAgYm9vbCBzdm07ICAgICAgICAg
-ICAgICAgICAgICAgICAvKiBTaGFyZWQgVmlydHVhbCBNZW1vcnkgKi8NCj4gPg0KPiA+ICAgICAg
-ZG1hX2FkZHJfdCByb290OyAgICAgICAgICAgICAgICAvKiBDdXJyZW50IHJvb3QgdGFibGUgcG9p
-bnRlciAqLw0KPiA+ICAgICAgYm9vbCByb290X2V4dGVuZGVkOyAgICAgICAgICAgICAvKiBUeXBl
-IG9mIHJvb3QgdGFibGUgKGV4dGVuZGVkIG9yIG5vdCkgKi8NCj4gPiAtLQ0KPiA+IDEuOS4xDQo+
-ID4NCj4gDQo+IC0tDQo+IFBldGVyIFh1DQo=
+I try this steps and meet the similar issue:
+1. Deploy a VM in ESXi from https://bintray.com/vmware/photon/download_file=
+?file_path=3Dphoton-custom-hw10-1.0-62c543d.ova
+2. Copy vmdk and flat.vmdk file
+3. Convert from vmdk format to raw via qeum-img(qemu-img convert -f vmdk -O=
+ raw Photon.vmdk Photon.raw)
+4. Launch the qcow2 image. The VM is started. And the splash screen is show=
+ed. But then there is no any output.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1689245
+
+Title:
+  qcow2 image converted from Photon OS can't be started
+
+Status in QEMU:
+  New
+
+Bug description:
+  Steps to reproduce the issue:
+  1. Download the ovf from this place:
+  https://bintray.com/vmware/photon/download_file?file_path=3Dphoton-custom=
+-hw10-1.0-62c543d.ova
+  2. Extract vmdk from ova file.
+  3. Convert from vmdk fromat to qcow2 via qeum-img
+  4. Launch the qcow2 image. The VM is started. But there is no any output.=
+ CPU usage is 100%
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1689245/+subscriptions
