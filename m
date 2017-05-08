@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d7lBJ-0002G6-SV
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:06:42 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d7lMJ-0005k0-TU
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d7lBG-0001G9-Nu
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:06:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45372)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d7lBG-0001Fy-I3
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:06:38 -0400
-References: <20170505032340.26467-1-famz@redhat.com>
-	<03beb071-ebbc-4328-3530-37b9856476cc@redhat.com>
-	<20170508155511.GX18871@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d3c224dd-baa1-e132-089f-d1707d5bb641@redhat.com>
-Date: Mon, 8 May 2017 18:06:34 +0200
+	(envelope-from <stefanha@gmail.com>) id 1d7lMG-0005zX-Qd
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:18:03 -0400
+Date: Mon, 8 May 2017 12:17:57 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170508161757.GA22428@stefanha-x1.localdomain>
+References: <20170420120058.28404-1-pbonzini@redhat.com>
+	<20170420120058.28404-17-pbonzini@redhat.com>
+	<20170505103658.GB11350@stefanha-x1.localdomain>
+	<ca446302-518f-63bc-9022-5b2f7182cb1a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170508155511.GX18871@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] docker: Add test-block
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Disposition: inline
+In-Reply-To: <ca446302-518f-63bc-9022-5b2f7182cb1a@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/17] block: protect
+ modification of dirty bitmaps with a mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 08/05/2017 17:55, Daniel P. Berrange wrote:
->>
->> For patch 5, I think we should revive the "quick" qemu-iotests group
->> (maybe we can have support for skipping groups, and have a "slow" group
->> with the very few tests that take >30 seconds?) and add the quick tests
->> to "make check".
-> 'quick' not only depends on the test case, but also the backend.
-> Most of the so called 'quick' tests are very slow with qcow v1 (over
-> your 30 sec mark), and can also be fairly slow with LUKS too.
+On Fri, May 05, 2017 at 12:47:35PM +0200, Paolo Bonzini wrote:
+>=20
+>=20
+> On 05/05/2017 12:36, Stefan Hajnoczi wrote:
+> > On Thu, Apr 20, 2017 at 02:00:57PM +0200, Paolo Bonzini wrote:
+> >> @@ -410,6 +442,18 @@ int bdrv_get_dirty(BlockDriverState *bs, BdrvDirt=
+yBitmap *bitmap,
+> >>      }
+> >>  }
+> >> =20
+> >> +int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
+> >> +                   int64_t sector)
+> >=20
+> > Is it a good idea to offer an unlocked bdrv_get_dirty() API?  It
+> > encourages non-atomic access to the bitmap, e.g.
+> >=20
+> >   if (bdrv_get_dirty()) {
+> >       ...do something outside the lock...
+> >       bdrv_reset_dirty_bitmap();
+> >   }
+> >=20
+> > The unlocked API should be test-and-set/clear instead so that callers
+> > automatically avoid race conditions.
+>=20
+> I'm not sure it's possible to implement atomic test and clear for
+> HBitmap.  But I can look into removing unlocked bdrv_get_dirty, the only
+> user is block migration.
 
-You could define two groups: "quick" for those that are pretty much
-guaranteed to be fast with all backends, "slow" for those that are
-guaranteed to be slow with all backends.
+Removing unlocked bdrv_get_dirty() is good.
 
-Then CI can use "!slow" when running with selected backends (raw, qcow2,
-raw-over-NBD) and "quick" for other backends.
+Stefan
 
-Paolo
+--d6Gm4EdcadzBjdND
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZEJo1AAoJEJykq7OBq3PIGD4H/RJwQmR34X3VAn9o27F/lbtN
+SJDwQ5H/ewytAWfgXpUjJ+ket4fYIakW9QxniZDbcck8lpn62cr8xVO/i7aDLu9+
+mG4cdMwp5TKpIVYCNUM7P365suFlOrE4lYUsw0IRi3yfCv9mnufXpatWAVxHBmer
+HOv7N7AhH0q4cPjgocAEKwnOqr/ipGDkzwz7mbiqzKDzjxcgqK8/mkVvqFrz2Ano
+orOt7ZAbL7HgwLdCAEY1lTAJUWSa4em54d4mjCuPGmQmK9Cfnx1JtUE40/zDfFBy
+ADMcv2xzt56TM1DYWmvE0T5/DLdQS4JfftDEpzX863QsW1xa1odxAsMIUgGq/BM=
+=xFIH
+-----END PGP SIGNATURE-----
+
+--d6Gm4EdcadzBjdND--
