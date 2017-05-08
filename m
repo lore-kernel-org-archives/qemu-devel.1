@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d7psO-0003RC-E8
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:07:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7pwQ-0004qR-ID
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d7psN-0006G3-I8
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:07:28 -0400
-References: <20170504105444.8940-1-daniel.kucera@gmail.com>
-	<20170508203556.GA22634@stefanha-x1.localdomain>
-	<c51044c8-edf6-c0a2-e543-0d9be1a61b29@openvz.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <fac1ae33-dc7e-b513-d694-c8f8c1555baa@redhat.com>
-Date: Mon, 8 May 2017 17:07:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7pwM-000801-CL
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:11:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d7pwM-0007zj-3t
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:11:34 -0400
+References: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1f0bf90b-a706-01c8-cad1-6dea6620deef@redhat.com>
+Date: Mon, 8 May 2017 16:11:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <c51044c8-edf6-c0a2-e543-0d9be1a61b29@openvz.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] mirror: add sync mode incremental to
- drive-mirror and blockdev-mirror
+In-Reply-To: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0wrl2I62axX5rCCecxecReCHJVo05LHa1"
+Subject: Re: [Qemu-devel] [PATCH] Fix issues affecting Xen 9pfs discovered
+ by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@gmail.com>, Daniel Kucera <daniel.kucera@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Stefano Stabellini <sstabellini@kernel.org>, anthony.perard@citrix.com
+Cc: xen-devel@lists.xensource.com, aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org, groug@kaod.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0wrl2I62axX5rCCecxecReCHJVo05LHa1
+From: Eric Blake <eblake@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>, anthony.perard@citrix.com
+Cc: xen-devel@lists.xensource.com, aneesh.kumar@linux.vnet.ibm.com,
+ qemu-devel@nongnu.org, groug@kaod.org
+Message-ID: <1f0bf90b-a706-01c8-cad1-6dea6620deef@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Fix issues affecting Xen 9pfs discovered by
+ Coverity
+References: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/08/2017 03:45 PM, Stefano Stabellini wrote:
+> Fix two resource leaks on error paths, discovered by Coverity.
+> Check for errors returned by fcntl, also found by Coverity.
+>=20
+> CID:1374836
+> CID:1374831
+>=20
+
+> @@ -378,7 +380,10 @@ static int xen_9pfs_connect(struct XenDevice *xend=
+ev)
+>          if (xen_9pdev->rings[i].evtchndev =3D=3D NULL) {
+>              goto out;
+>          }
+> -        fcntl(xenevtchn_fd(xen_9pdev->rings[i].evtchndev), F_SETFD, FD=
+_CLOEXEC);
+> +        if (fcntl(xenevtchn_fd(xen_9pdev->rings[i].evtchndev),
+> +                  F_SETFD, FD_CLOEXEC) =3D=3D -1) {
+> +            goto out;
+
+Directly calling fcntl(F_SETFD) without first reading fcntl(F_GETFD) is
+(theoretically) incorrect.  Better might be using qemu_set_cloexec()
+instead of open-coding something.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--0wrl2I62axX5rCCecxecReCHJVo05LHa1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 05/08/2017 05:02 PM, Denis V. Lunev wrote:
-> On 05/08/2017 10:35 PM, Stefan Hajnoczi wrote:
->> On Thu, May 04, 2017 at 12:54:40PM +0200, Daniel Kucera wrote:
->>
->> Seems like a logical extension along the same lines as the backup block
->> job's dirty bitmap sync mode.
->>
->>> parameter bitmap chooses existing dirtymap instead of newly created
->>> in mirror_start_job
->>>
->>> Signed-off-by: Daniel Kucera <daniel.kucera@gmail.com>
-> Can you pls describe the use case pls in a bit more details.
-> 
-> For now this could be a bit strange:
-> - dirty bitmap, which can be found via bdrv_create_dirty_bitmap
->   could be read-only or read-write, i.e. being modified by writes
->   or be read-only, which should not be modified. Thus adding
->   r/o bitmap to the mirror could result in interesting things.
-> 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-This patch as it was submitted does not put the bitmap into a read-only
-mode; it leaves it RW and modifies it as it processes the mirror command.
+iQEcBAEBCAAGBQJZEN8CAAoJEKeha0olJ0NqTB8H/1JgGZ2smxjJVtOdw0DQcMwG
+nlkechOKjB3urHR4uNnorZDTGsOgroswYzvWhubriVm5y49kasHoy8JHnVWiZTxT
+3MQuSFargA4yQeDDk6ieYB/2PQ7uvdFL8x76W/QfKnroth7jPkDaILZHPo7Qf4in
+clrSO/KxsoIPKIluXM4pYXbp3gppmOd2wysPYS0qwCCXg5d/hbA79M/D37hs7ocu
+BQzhl3oKxTKPgAg2jcSB+TRxkDvAhBGxJd+JTXkbvQZSP1gzdl+NQQIEHmw8uDev
+QIisyxkxrxF9kSZWhtDwqstoCCMgTjobKhllOQEflaQIqi49tlOJ5mQ7Zi1wFCE=
+=7BsU
+-----END PGP SIGNATURE-----
 
-Though you do raise a good point; this bitmap is now in-use by a job and
-should not be allowed to be deleted by the user, but our existing
-mechanism treats a locked bitmap as one that is also in R/O mode. This
-would be a different use case.
-
-> Minimally we should prohibit usage of r/o bitmaps this way.
-> 
-> So, why to use mirror, not backup for the case?
-> 
-
-My guess is for pivot semantics.
-
-> Den
-> 
+--0wrl2I62axX5rCCecxecReCHJVo05LHa1--
