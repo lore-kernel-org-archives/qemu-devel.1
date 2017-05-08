@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d7fRU-0001wJ-A8
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:59:02 -0400
+	(envelope-from <thuth@redhat.com>) id 1d7fhv-0005Gd-1h
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:16:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d7fRQ-00027J-63
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:59:00 -0400
-Received: from mga14.intel.com ([192.55.52.115]:60566)
+	(envelope-from <thuth@redhat.com>) id 1d7fht-000667-VM
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:15:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33786)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1d7fRP-000274-RS
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:58:56 -0400
-Date: Sun, 7 May 2017 17:44:52 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20170507094452.GB2931@gmail.com>
-References: <1493285660-4470-1-git-send-email-peterx@redhat.com>
-	<1493285660-4470-7-git-send-email-peterx@redhat.com>
-	<20170501045822.GM13773@umbus.fritz.box>
-	<20170508054814.GA2820@pxdev.xzpeter.org>
-	<20170508060744.GG25748@umbus.fritz.box>
-	<20170508073217.GD2820@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d7fht-000662-MC
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:15:57 -0400
+References: <1493726062-31743-1-git-send-email-thuth@redhat.com>
+	<20170505144837.GB14316@stefanha-x1.localdomain>
+	<20170505145049.GM12773@redhat.com> <871srz7n9x.fsf@dusky.pond.sub.org>
+	<5c08c6b2-f82f-8e75-622e-0b229971cd8b@redhat.com>
+	<20170508094039.GG18871@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6725f67e-e86e-ab63-deff-04f7be8bbca9@redhat.com>
+Date: Mon, 8 May 2017 12:15:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170508073217.GD2820@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 6/8] memory: introduce AddressSpaceOps
+In-Reply-To: <20170508094039.GG18871@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Mark legacy option '-no-kvm' as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,128 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, May 08, 2017 at 03:32:17PM +0800, Peter Xu wrote:
-> On Mon, May 08, 2017 at 04:07:44PM +1000, David Gibson wrote:
-> > On Mon, May 08, 2017 at 01:48:14PM +0800, Peter Xu wrote:
-> > > On Mon, May 01, 2017 at 02:58:22PM +1000, David Gibson wrote:
-> > > > On Thu, Apr 27, 2017 at 05:34:18PM +0800, Peter Xu wrote:
-> > > > > This is something similar to MemoryRegionOps, it's just for address
-> > > > > spaces to store arch-specific hooks.
-> > > > > 
-> > > > > The first hook I would like to introduce is iommu_get().
-> > > > > 
-> > > > > For systems that have IOMMUs, we will create a special address space per
-> > > > > device which is different from system default address space for
-> > > > > it (please refer to pci_device_iommu_address_space()). Normally when
-> > > > > that happens, there will be one specific IOMMU (or say, translation
-> > > > > unit) stands right behind that new address space.
-> > > > > 
-> > > > > This iommu_get() fetches that guy behind the address space. Here, the
-> > > > > guy is defined as IOMMUObject, which is currently a (void *). In the
-> > > > > future, maybe we can make it a better definition, but imho it's good
-> > > > > enough for now, considering it's arch-dependent.
-> > > > > 
-> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > 
-> > > > This doesn't make sense to me.  It would be entirely possible for a
-> > > > single address space to have different regions mapped by different
-> > > > IOMMUs.  Or some regions mapped by IOMMUs and others direct mapped to
-> > > > a device or memory block.
-> > > 
-> > > Oh, so it's more complicated than I thought... Then, do we really have
-> > > existing use case that one device is managed by more than one IOMMU
-> > > (on any of the platform)? Frankly speaking I haven't thought about
-> > > complicated scenarios like this, or nested IOMMUs yet.
-> > 
-> > Sort of, it depends what you count as "more than one IOMMU".
-> > 
-> > spapr can - depending on guest configuration - have two IOMMU windows
-> > for each guest PCI domain.  In theory the guest can set these up
-> > however it wants, in practice there's usually a small (~256MiB) at PCI
-> > address 0 for the benefit of 32-bit PCI devices, then a much larger
-> > window up at a high address to allow better performance for 64-bit
-> > capable devices.
-> > 
-> > Those are the same IOMMU in the sense that they're both implemented by
-> > logic built into the same virtual PCI host bridge.  However, they're
-> > different IOMMUs in the sense that they have independent data
-> > structures describing the mappings and are currently modelled as two
-> > different IOMMU memory regions.
-> > 
-> > 
-> > I don't believe we have any existing platforms with both an IOMMU and
-> > a direct mapped window in a device's address space.  But it seems to
-> > be just too plausible a setup to not plan for it. [1]
-> > 
-> > > This patch derived from a requirement in virt-svm project (on x86).
-> > > Virt-svm needs some notification mechanism for each IOMMU (or say, the
-> > > IOMMU that managers the SVM-enabled device). For now, all IOMMU
-> > > notifiers are per-memory-region not per-iommu, and that's imho not
-> > > what virt-svm wants. Any suggestions?
-> > 
-> > I don't know SVM, so I can't really make sense of that.  What format
-> > does this identifier need?  What does "for one IOMMU" mean in this
-> > context - i.e. what guest observable properties require the IDs to be
-> > the same or to be different.
-> 
-> Virt-svm should need to trap the content of a register (actually the
-> data is in the memory, but, let's assume it's a mmio operation for
-> simplicity, considering it is finally delivered via invalidation
-> requests), then pass that info down to kernel. So the listened element
-> is per-iommu not per-mr this time. When the content changed, vfio will
-> need to be notified, then pass this info down.
-> 
-> Yi/others, please feel free to correct me.
+On 08.05.2017 11:40, Daniel P. Berrange wrote:
+> On Mon, May 08, 2017 at 11:14:00AM +0200, Thomas Huth wrote:
+>> On 08.05.2017 10:42, Markus Armbruster wrote:
+>>> "Daniel P. Berrange" <berrange@redhat.com> writes:
+>>>
+>>>> On Fri, May 05, 2017 at 03:48:37PM +0100, Stefan Hajnoczi wrote:
+>>>>> On Tue, May 02, 2017 at 01:54:22PM +0200, Thomas Huth wrote:
+>>>>>> '-no-kvm' was just a legacy convenience option for the users of
+>>>>>> qemu-kvm, it never made sense in the normal QEMU tree since TCG is
+>>>>>> the default here anyway. The option has also never been specified
+>>>>>> in the QEMU docs and in the '--help' list, so likely hardly anybod=
+y
+>>>>>> knows about this option at all. I think we could get rid of this
+>>>>>> without bothering anybody nowadays, but just in case, let's print
+>>>>>> out a warning for a couple of releases first.
+>>>>>>
+>>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>>> ---
+>>>>>>  vl.c | 4 +++-
+>>>>>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/vl.c b/vl.c
+>>>>>> index d5ec87e..2d44621 100644
+>>>>>> --- a/vl.c
+>>>>>> +++ b/vl.c
+>>>>>> @@ -3709,7 +3709,9 @@ int main(int argc, char **argv, char **envp)
+>>>>>>                      exit(1);
+>>>>>>                  }
+>>>>>>                  break;
+>>>>>> -             case QEMU_OPTION_no_kvm:
+>>>>>> +            case QEMU_OPTION_no_kvm:
+>>>>>> +                error_report("'-no-kvm' is depreacted, please use=
+ "
+>>>>>
+>>>>> s/depreacted/deprecated/
+>>>>
+>>>> Should we have an dedicated  'error_deprecated(oldfeat, newfeat)' me=
+thod
+>>>> that prints a standardized message, as well as a -no-deprecated flag=
+ that
+>>>
+>>> I hate flags starting with "no".  What about something like
+>>> --suppress-deprecation-warnings?
+>>>
+>>>> turns off all the deprecation warnings. There's nothing more annoyin=
+g than
+>>>> an application that insists on spewing warnings to stdout that you k=
+now
+>>>> about, but aren't in a position to address any time soon.
+>>>
+>>> If we do that, we should consider having the warnings tell users how =
+to
+>>> suppress them, say "You can suppress this warning with
+>>> --suppress-deprecation-warnings".
+>>
+>> IMHO we should not add such a flag. Otherwise people will simply alway=
+s
+>> turn it on and not only ignore this warning, but also all other
+>> warnings. I think these warnings *have* to be annoying to make sure th=
+at
+>> people change their scripts.
+>> (And if they "aren't in a position to address any time soon", they
+>> likely also aren't in a position to add a
+>> "--suppress-deprecation-warnings" parameter to their scripts either).
+>=20
+> That isn't really true. Adding a --suppress-deprecation-warnings flag d=
+oes
+> not change semantics of either QEMU, or the mgmt app and so would not h=
+ave
+> any coding or testing burden.  Rewriting the mgmt app code to generate =
+the
+> QEMU command line in a different way has significant overhead in both c=
+ode
+> and testing work, as well as potential to introduce semantic bugs.
 
-Hi David,
+OK, I think we were talking at crossed purposes here. I was thinking
+about people who invoke QEMU directly or via a shell script, and you
+apparently had libvirt and other management apps in mind (I should've
+know that, sorry).
 
-May be I can provide some detail to assist your review.
+So yes, with libvirt or other compiled management apps in mind, it would
+make sense to have an error_deprecated() function, I guess.
+But ideally, we should only deprecate those interfaces in QEMU where
+we're sure that libvirt already does not use them anymore anyway.
+For example, in this specific case here, it should not matter. libvirt
+indeed has some code to use the -no-kvm switch, but as far as I can see,
+it probes the help output of QEMU for the switch before using it. Since
+QEMU does not list this switch in its help text (I guess only qemu-kvm
+did so), it should simply ignore it.
 
-virt-SVM wants two notifiers so far.
-* notifier1: link guest pasid table to host, it would be triggered when
-  context entry is changed in guest
-* notifier2: passdown iommu tlb invalidate, the mappings to be invalidated
-  is GVA->GPA mappings. It just wants to flush IOTLB in host, no need to
-  change the page table in memory with this notifer.
+Anyway, since Paolo does not like to remove these trivial legacy
+switches anyway, I'll stop here, so -no-kvm can stay where it is.
 
-The two new notifiers must be registered when vIOMMU is exposed to guest.
-Context entry flush triggers notifier1. iommu tlb flushing(extended-IOTLB/
-pasid-cache/extended-device-IOTLB flushing in VT-d) triggers notifier2.
-
-Current MAP/UNMAP notifiers are actually registered when there is memory
-region event. In the latest code, the event is address space switching.
-They are triggered when guest changed IOVA->GPA mappings.
-
-Both the existed notifier and the new notifier would be triggered by iommu
-events(iotlb flush)in guest. However, the registration is different. New
-notifier depends on vIOMMU exposure. It's per-iommu unit as Peter mentioned.
-While MAP/UNMAP registration depends on iommu memory region, so it's more
-like memory region notifier.
-
-Thanks,
-Yi L
- 
-> Thanks,
-> 
-> > 
-> > 
-> > [1] My reasoning here is similar to the reason sPAPR allows the two
-> > windows.  For PAPR, the guest is paravirtualized, so both windows
-> > essentially have to be remapped IOMMU windows.  For a bare metal
-> > platform it seems a very reasonable tradeoff would be to have a
-> > small(ish) 32-bit IOMMU window to allow 32-bit devices to work on a
-> > large RAM machine, along with a large direct mapped "bypass" window
-> > for maxmimum performance for 64-bit devices.
-> > 
-> > -- 
-> > David Gibson			| I'll have my music baroque, and my code
-> > david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> > 				| _way_ _around_!
-> > http://www.ozlabs.org/~dgibson
-> 
-> -- 
-> Peter Xu
-> 
+ Thomas
