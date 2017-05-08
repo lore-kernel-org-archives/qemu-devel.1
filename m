@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7Zeh-0007Oe-UM
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 23:48:16 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1d7ZzV-00028M-L2
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 00:09:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7Zed-0007ST-S6
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 23:48:15 -0400
-Received: from [59.151.112.132] (port=43575 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7Zed-0007RD-Fn
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 23:48:11 -0400
-References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1493372840-24551-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<7bde3681-280c-764a-71df-f4a1cc4b7011@redhat.com>
-	<4cc14276-55bc-2981-cbdd-4d66ae6be59e@cn.fujitsu.com>
-	<fbb4b2b1-4af2-c948-406f-e63398f4c749@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <d960c269-b68a-ffd9-5df1-b507eb4fe24d@cn.fujitsu.com>
-Date: Mon, 8 May 2017 11:47:56 +0800
+	(envelope-from <guangrong.xiao@gmail.com>) id 1d7ZzS-0003HK-Gv
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 00:09:45 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33614)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1d7ZzS-0003HD-BH
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 00:09:42 -0400
+Received: by mail-pg0-x244.google.com with SMTP id s62so8789795pgc.0
+	for <qemu-devel@nongnu.org>; Sun, 07 May 2017 21:09:42 -0700 (PDT)
+References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <3a67fc54-905a-b7f8-2eb5-1d75a89c2335@gmail.com>
+Date: Mon, 8 May 2017 12:09:42 +0800
 MIME-Version: 1.0
-In-Reply-To: <fbb4b2b1-4af2-c948-406f-e63398f4c749@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V3 05/10] net/net.c: Add vnet header length
- to SocketReadState
+In-Reply-To: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/8] Shared Virtual Memory
+ virtualization for VT-d
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, jean-philippe.brucker@arm.com
 
 
+Hi Liu Yi,
 
-On 05/03/2017 06:42 PM, Jason Wang wrote:
->
->
-> On 2017年05月03日 11:43, Zhang Chen wrote:
->>
->>
->> On 05/02/2017 12:53 PM, Jason Wang wrote:
->>>
->>>
->>> On 2017年04月28日 17:47, Zhang Chen wrote:
->>>> Address Jason Wang's comments add vnet header length to 
->>>> SocketReadState.
->>>
->>> Instead of saying this, you can add "Suggested-by: Jason Wang 
->>> <jasowang@redhat.com>" above your sign-off.
->>
->> OK.
->>
->>>
->>>> So we change net_fill_rstate() to read
->>>> struct  {int size; int vnet_hdr_len; const uint8_t buf[];}.
->>>
->>> This makes me thinking about the backward compatibility. I think 
->>> we'd better try to keep it as much as possible. E.g how about pack 
->>> vnet_hdr_len into higher bits of size?
->>>
->>
->> Do you means split uint32_t size to uint16_t size and uint16_t 
->> vnet_hdr_len ?
->> If yes, we also can't keep compatibility with old version.
->> Old code send a uint32_t size, we read it as uint16_t size is always 
->> wrong.
->>
->> Thanks
->> Zhang Chen
->
-> Consider it's unlikely to send or receive packet >= 64K, we can reuse 
-> higher bits (e.g highest 8 bits). Then we can still read uint32_t and 
-> then check its highest 8 bits. If it was zero, we know vnet header is 
-> zero, if not it could be read as vnet header length.
+I haven't started to read the code yet, however, could you
+detail more please? It emulates a SVM capable iommu device in
+a VM? Or It speeds up device's DMA access in a VM? Or it is a
+new facility introduced for a VM? Could you please add a bit
+more for its usage?
 
-I got your point, but in this way, packet size must < 64K, if size >=64K 
-we still can't maintain the backward compatibility,
-For the packet sender that didn't know the potential packet size limit, 
-I think we should make code explicitly declared like
-currently code. Otherwise we will make other people confused and make 
-code difficult to maintain.
+Thanks!
 
-Thanks
-Zhang Chen
-
-
->
-> Thanks
->
->
->
-> .
->
-
--- 
-Thanks
-Zhang Chen
+On 04/26/2017 06:11 PM, Liu, Yi L wrote:
+> Hi,
+> 
+> This patchset introduces SVM virtualization for intel_iommu in
+> IOMMU/VFIO. The total SVM virtualization for intel_iommu touched
+> Qemu/IOMMU/VFIO.
+> 
+> Another patchset would change the Qemu. It is "[RFC PATCH 0/20] Qemu:
+> Extend intel_iommu emulator to support Shared Virtual Memory"
+> 
+> In this patchset, it adds two new IOMMU APIs and their implementation
+> in intel_iommu driver. In VFIO, it adds two IOCTL cmd attached on
+> container->fd to propagate data from QEMU to kernel space.
+> 
+> [Patch Overview]
+> * 1 adds iommu API definition for binding guest PASID table
+> * 2 adds binding PASID table API implementation in VT-d iommu driver
+> * 3 adds iommu API definition to do IOMMU TLB invalidation from guest
+> * 4 adds IOMMU TLB invalidation implementation in VT-d iommu driver
+> * 5 adds VFIO IOCTL for propagating PASID table binding from guest
+> * 6 adds processing of pasid table binding in vfio_iommu_type1
+> * 7 adds VFIO IOCTL for propagating IOMMU TLB invalidation from guest
+> * 8 adds processing of IOMMU TLB invalidation in vfio_iommu_type1
+> 
+> Best Wishes,
+> Yi L
+> 
+> 
+> Jacob Pan (3):
+>    iommu: Introduce bind_pasid_table API function
+>    iommu/vt-d: add bind_pasid_table function
+>    iommu/vt-d: Add iommu do invalidate function
+> 
+> Liu, Yi L (5):
+>    iommu: Introduce iommu do invalidate API function
+>    VFIO: Add new IOTCL for PASID Table bind propagation
+>    VFIO: do pasid table binding
+>    VFIO: Add new IOCTL for IOMMU TLB invalidate propagation
+>    VFIO: do IOMMU TLB invalidation from guest
+> 
+>   drivers/iommu/intel-iommu.c     | 146 ++++++++++++++++++++++++++++++++++++++++
+>   drivers/iommu/iommu.c           |  32 +++++++++
+>   drivers/vfio/vfio_iommu_type1.c |  98 +++++++++++++++++++++++++++
+>   include/linux/dma_remapping.h   |   1 +
+>   include/linux/intel-iommu.h     |  11 +++
+>   include/linux/iommu.h           |  47 +++++++++++++
+>   include/uapi/linux/vfio.h       |  26 +++++++
+>   7 files changed, 361 insertions(+)
+> 
