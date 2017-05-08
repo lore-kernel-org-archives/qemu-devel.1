@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d7dOv-0006VC-0g
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 03:48:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d7dUP-0007j5-B2
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 03:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d7dOr-00082t-RV
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 03:48:13 -0400
-Received: from mga09.intel.com ([134.134.136.24]:64536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1d7dOr-0007lR-Gg
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 03:48:09 -0400
-Date: Sun, 7 May 2017 15:33:42 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20170507073342.GA2931@gmail.com>
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<3a67fc54-905a-b7f8-2eb5-1d75a89c2335@gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1d7dUN-0001OQ-Vt
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 03:53:53 -0400
+Date: Mon, 8 May 2017 16:35:34 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170508063534.GI25748@umbus.fritz.box>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-25-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vs0rQTeTompTJjtd"
 Content-Disposition: inline
-In-Reply-To: <3a67fc54-905a-b7f8-2eb5-1d75a89c2335@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/8] Shared Virtual Memory
- virtualization for VT-d
+In-Reply-To: <1493816238-33120-25-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 24/24] tests: check -numa node,
+ cpu=props_list usecase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +25,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, ashok.raj@intel.com, jean-philippe.brucker@arm.com, jasowang@redhat.com, qemu-devel@nongnu.org, jacob.jun.pan@intel.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-On Mon, May 08, 2017 at 12:09:42PM +0800, Xiao Guangrong wrote:
-> 
-> Hi Liu Yi,
-> 
-> I haven't started to read the code yet, however, could you
-> detail more please? It emulates a SVM capable iommu device in
-> a VM? Or It speeds up device's DMA access in a VM? Or it is a
-> new facility introduced for a VM? Could you please add a bit
-> more for its usage?
 
-Hi Guangrong,
+--vs0rQTeTompTJjtd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Nice to hear from you.
+On Wed, May 03, 2017 at 02:57:18PM +0200, Igor Mammedov wrote:
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-This patchset is part of the whole SVM virtualization work. The whole
-patchset wants to expose a SVM capable Intel IOMMU to guest. And yes,
-it is an emulated iommu.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-For the detail introduction for SVM and SVM virtualization, I think
-you may get more from the link below.
+> ---
+>  tests/numa-test.c | 151 ++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 151 insertions(+)
+>=20
+> diff --git a/tests/numa-test.c b/tests/numa-test.c
+> index 2722687..c3475d6 100644
+> --- a/tests/numa-test.c
+> +++ b/tests/numa-test.c
+> @@ -131,6 +131,144 @@ static void test_query_cpus(const void *data)
+>      g_free(cli);
+>  }
+> =20
+> +static void pc_numa_cpu(const void *data)
+> +{
+> +    char *cli;
+> +    QDict *resp;
+> +    QList *cpus;
+> +    const QObject *e;
+> +
+> +    cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,th=
+reads=3D2 "
+> +        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+> +        "-numa cpu,node-id=3D1,socket-id=3D0 "
+> +        "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D0 "
+> +        "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D0 "
+> +        "-numa cpu,node-id=3D1,socket-id=3D1,core-id=3D1,thread-id=3D1");
+> +    qtest_start(cli);
+> +    cpus =3D get_cpus(&resp);
+> +    g_assert(cpus);
+> +
+> +    while ((e =3D qlist_pop(cpus))) {
+> +        QDict *cpu, *props;
+> +        int64_t socket, core, thread, node;
+> +
+> +        cpu =3D qobject_to_qdict(e);
+> +        g_assert(qdict_haskey(cpu, "props"));
+> +        props =3D qdict_get_qdict(cpu, "props");
+> +
+> +        g_assert(qdict_haskey(props, "node-id"));
+> +        node =3D qdict_get_int(props, "node-id");
+> +        g_assert(qdict_haskey(props, "socket-id"));
+> +        socket =3D qdict_get_int(props, "socket-id");
+> +        g_assert(qdict_haskey(props, "core-id"));
+> +        core =3D qdict_get_int(props, "core-id");
+> +        g_assert(qdict_haskey(props, "thread-id"));
+> +        thread =3D qdict_get_int(props, "thread-id");
+> +
+> +        if (socket =3D=3D 0) {
+> +            g_assert_cmpint(node, =3D=3D, 1);
+> +        } else if (socket =3D=3D 1 && core =3D=3D 0) {
+> +            g_assert_cmpint(node, =3D=3D, 0);
+> +        } else if (socket =3D=3D 1 && core =3D=3D 1 && thread =3D=3D 0) {
+> +            g_assert_cmpint(node, =3D=3D, 0);
+> +        } else if (socket =3D=3D 1 && core =3D=3D 1 && thread =3D=3D 1) {
+> +            g_assert_cmpint(node, =3D=3D, 1);
+> +        } else {
+> +            g_assert(false);
+> +        }
+> +    }
+> +
+> +    QDECREF(resp);
+> +    qtest_end();
+> +    g_free(cli);
+> +}
+> +
+> +static void spapr_numa_cpu(const void *data)
+> +{
+> +    char *cli;
+> +    QDict *resp;
+> +    QList *cpus;
+> +    const QObject *e;
+> +
+> +    cli =3D make_cli(data, "-smp 4,cores=3D4 "
+> +        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+> +        "-numa cpu,node-id=3D0,core-id=3D0 "
+> +        "-numa cpu,node-id=3D0,core-id=3D1 "
+> +        "-numa cpu,node-id=3D0,core-id=3D2 "
+> +        "-numa cpu,node-id=3D1,core-id=3D3");
+> +    qtest_start(cli);
+> +    cpus =3D get_cpus(&resp);
+> +    g_assert(cpus);
+> +
+> +    while ((e =3D qlist_pop(cpus))) {
+> +        QDict *cpu, *props;
+> +        int64_t core, node;
+> +
+> +        cpu =3D qobject_to_qdict(e);
+> +        g_assert(qdict_haskey(cpu, "props"));
+> +        props =3D qdict_get_qdict(cpu, "props");
+> +
+> +        g_assert(qdict_haskey(props, "node-id"));
+> +        node =3D qdict_get_int(props, "node-id");
+> +        g_assert(qdict_haskey(props, "core-id"));
+> +        core =3D qdict_get_int(props, "core-id");
+> +
+> +        if (core >=3D 0 && core < 3) {
+> +            g_assert_cmpint(node, =3D=3D, 0);
+> +        } else if (core =3D=3D 3) {
+> +            g_assert_cmpint(node, =3D=3D, 1);
+> +        } else {
+> +            g_assert(false);
+> +        }
+> +    }
+> +
+> +    QDECREF(resp);
+> +    qtest_end();
+> +    g_free(cli);
+> +}
+> +
+> +static void aarch64_numa_cpu(const void *data)
+> +{
+> +    char *cli;
+> +    QDict *resp;
+> +    QList *cpus;
+> +    const QObject *e;
+> +
+> +    cli =3D make_cli(data, "-smp 2 "
+> +        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+> +        "-numa cpu,node-id=3D1,thread-id=3D0 "
+> +        "-numa cpu,node-id=3D0,thread-id=3D1");
+> +    qtest_start(cli);
+> +    cpus =3D get_cpus(&resp);
+> +    g_assert(cpus);
+> +
+> +    while ((e =3D qlist_pop(cpus))) {
+> +        QDict *cpu, *props;
+> +        int64_t thread, node;
+> +
+> +        cpu =3D qobject_to_qdict(e);
+> +        g_assert(qdict_haskey(cpu, "props"));
+> +        props =3D qdict_get_qdict(cpu, "props");
+> +
+> +        g_assert(qdict_haskey(props, "node-id"));
+> +        node =3D qdict_get_int(props, "node-id");
+> +        g_assert(qdict_haskey(props, "thread-id"));
+> +        thread =3D qdict_get_int(props, "thread-id");
+> +
+> +        if (thread =3D=3D 0) {
+> +            g_assert_cmpint(node, =3D=3D, 1);
+> +        } else if (thread =3D=3D 1) {
+> +            g_assert_cmpint(node, =3D=3D, 0);
+> +        } else {
+> +            g_assert(false);
+> +        }
+> +    }
+> +
+> +    QDECREF(resp);
+> +    qtest_end();
+> +    g_free(cli);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      const char *args =3D NULL;
+> @@ -147,5 +285,18 @@ int main(int argc, char **argv)
+>      qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial=
+);
+>      qtest_add_data_func("/numa/qmp/cpus/query-cpus", args, test_query_cp=
+us);
+> =20
+> +    if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
+> +        qtest_add_data_func("/numa/pc/cpu/explicit", args, pc_numa_cpu);
+> +    }
+> +
+> +    if (!strcmp(arch, "ppc64")) {
+> +        qtest_add_data_func("/numa/spapr/cpu/explicit", args, spapr_numa=
+_cpu);
+> +    }
+> +
+> +    if (!strcmp(arch, "aarch64")) {
+> +        qtest_add_data_func("/numa/aarch64/cpu/explicit", args,
+> +                            aarch64_numa_cpu);
+> +    }
+> +
+>      return g_test_run();
+>  }
 
-http://www.spinics.net/lists/kvm/msg148798.html
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-For the usage, I can give an example with IGD. Latest IGD is SVM capable
-device. On bare metal(Intel IOMMU is also SVM capable), application could
-request to share its virtual address(an allocated buffer) with IGD device
-through the IOCTL cmd provided by IGD driver. e.g. OpenCL application. When
-IGD is assigned to a guest, it is expected to support such usage in guest.
-With the SVM virtualization patchset, the application in guest would also
-be able to share its virtual address with IGD device. Different from bare
-metal, it's sharing GVA with IGD. The hardware IOMMU needs to help translate
-the GVA to HPA. So hardware IOMMU needs to know the GVA->HPA mapping. This
-patchset would make sure the GVA->HPA mapping is built and maintain the TLB.
+--vs0rQTeTompTJjtd
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Be free to let me know if you want more detail.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Thanks,
-Yi L
+iQIcBAEBCAAGBQJZEBGxAAoJEGw4ysog2bOSIxcP/09U0v1NWjzEt1AODrLPRwWd
+9C8ka/45dKeWDWf8+kaI/0LGIZc8nnvUFEjKWvHxLZgy6xDMrgY2cJZSbiscgq3F
+5jpa4SPAUkT8c1EgTlZkR1/RrkHLIWLQyjdjlWZJzkeYVQRVYvJgzqZhKEM93Gcp
+zFe5Qczhwz6IsHGPErFWCf9/iDGEYkLqiYdD50hcX+XXjHsVENbSoSHQf+5H5AP2
+xEcQ/3CHoqrW0JnRpCWZ/uEfK9wJh37/tAxIRfNZw/7BIZ6WJmyEnjk5OVq9xccF
+sic9v4YS3meXnlUeFvbr8CeqHooi1XI7absH8h/qeumdNlNJtCOrt6fwT/F533SK
+Oph8PG47ExD4IKINxyHA/0dgsLZOd+SfRAHsvcSzrrELtMeM+IksGolPeneCJdne
+cnlzd5Q7thOz2KF6+ISi3EOx+m7FCJ/YSPUGHKN7Sc7GCefQMIf0F92utGKSreTF
+tKkp5iSFoToQKrvayEEhLG3XX19rXVR4gOPKzkfa5Yhoih3VlkVhBtsDfE2ssA5k
+8ejkhSYyrw1Fp2PO/Bvy2xvliRMgW9pySCLHz3+qswDwuxED6tpR1Bfpxu39xaCL
+zdGEaCepI9cJDziDCzuBqwBoDtME4p5pJbJpjReO/GOLlOycyJmsimvi4+vG/YNR
+XpwpTeIs1UZlYKqGa+jV
+=OIt+
+-----END PGP SIGNATURE-----
 
-> 
-> Thanks!
-> 
-> On 04/26/2017 06:11 PM, Liu, Yi L wrote:
-> >Hi,
-> >
-> >This patchset introduces SVM virtualization for intel_iommu in
-> >IOMMU/VFIO. The total SVM virtualization for intel_iommu touched
-> >Qemu/IOMMU/VFIO.
-> >
-> >Another patchset would change the Qemu. It is "[RFC PATCH 0/20] Qemu:
-> >Extend intel_iommu emulator to support Shared Virtual Memory"
-> >
-> >In this patchset, it adds two new IOMMU APIs and their implementation
-> >in intel_iommu driver. In VFIO, it adds two IOCTL cmd attached on
-> >container->fd to propagate data from QEMU to kernel space.
-> >
-> >[Patch Overview]
-> >* 1 adds iommu API definition for binding guest PASID table
-> >* 2 adds binding PASID table API implementation in VT-d iommu driver
-> >* 3 adds iommu API definition to do IOMMU TLB invalidation from guest
-> >* 4 adds IOMMU TLB invalidation implementation in VT-d iommu driver
-> >* 5 adds VFIO IOCTL for propagating PASID table binding from guest
-> >* 6 adds processing of pasid table binding in vfio_iommu_type1
-> >* 7 adds VFIO IOCTL for propagating IOMMU TLB invalidation from guest
-> >* 8 adds processing of IOMMU TLB invalidation in vfio_iommu_type1
-> >
-> >Best Wishes,
-> >Yi L
-> >
-> >
-> >Jacob Pan (3):
-> >   iommu: Introduce bind_pasid_table API function
-> >   iommu/vt-d: add bind_pasid_table function
-> >   iommu/vt-d: Add iommu do invalidate function
-> >
-> >Liu, Yi L (5):
-> >   iommu: Introduce iommu do invalidate API function
-> >   VFIO: Add new IOTCL for PASID Table bind propagation
-> >   VFIO: do pasid table binding
-> >   VFIO: Add new IOCTL for IOMMU TLB invalidate propagation
-> >   VFIO: do IOMMU TLB invalidation from guest
-> >
-> >  drivers/iommu/intel-iommu.c     | 146 ++++++++++++++++++++++++++++++++++++++++
-> >  drivers/iommu/iommu.c           |  32 +++++++++
-> >  drivers/vfio/vfio_iommu_type1.c |  98 +++++++++++++++++++++++++++
-> >  include/linux/dma_remapping.h   |   1 +
-> >  include/linux/intel-iommu.h     |  11 +++
-> >  include/linux/iommu.h           |  47 +++++++++++++
-> >  include/uapi/linux/vfio.h       |  26 +++++++
-> >  7 files changed, 361 insertions(+)
-> >
-> 
+--vs0rQTeTompTJjtd--
