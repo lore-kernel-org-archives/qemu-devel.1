@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d7qmB-0004n9-JC
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:05:08 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1d7qqu-0005sf-6P
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:10:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d7qm8-0002AG-D3
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:05:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d7qm8-0002A8-3L
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:05:04 -0400
-References: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
-	<1f0bf90b-a706-01c8-cad1-6dea6620deef@redhat.com>
-	<alpine.DEB.2.10.1705081454510.24729@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1705081459030.24729@sstabellini-ThinkPad-X260>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <356752db-bd70-a908-141e-eec99f4c15e2@redhat.com>
-Date: Mon, 8 May 2017 17:05:01 -0500
-MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1705081459030.24729@sstabellini-ThinkPad-X260>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gjiOIWEhbDnMrvrswwQKPE39C1tk9Kl7N"
-Subject: Re: [Qemu-devel] [PATCH] Fix issues affecting Xen 9pfs discovered
- by Coverity
+	(envelope-from <programmingkidx@gmail.com>) id 1d7qqt-0003pe-5s
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:10:00 -0400
+In-Reply-To: <20170508215412.othbbicpjvz5p4fz@aurel32.net>
+References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
+	<20170508215412.othbbicpjvz5p4fz@aurel32.net>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <619279EC-F49E-44D2-AAC7-74DB7DEFE0E3@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Mon, 8 May 2017 18:09:49 -0400
+Subject: Re: [Qemu-devel] Floating point unit bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: anthony.perard@citrix.com, xen-devel@lists.xensource.com, aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org, groug@kaod.org
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gjiOIWEhbDnMrvrswwQKPE39C1tk9Kl7N
-From: Eric Blake <eblake@redhat.com>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: anthony.perard@citrix.com, xen-devel@lists.xensource.com,
- aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org, groug@kaod.org
-Message-ID: <356752db-bd70-a908-141e-eec99f4c15e2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Fix issues affecting Xen 9pfs discovered by
- Coverity
-References: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
- <1f0bf90b-a706-01c8-cad1-6dea6620deef@redhat.com>
- <alpine.DEB.2.10.1705081454510.24729@sstabellini-ThinkPad-X260>
- <alpine.DEB.2.10.1705081459030.24729@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1705081459030.24729@sstabellini-ThinkPad-X260>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 05/08/2017 05:00 PM, Stefano Stabellini wrote:
+On May 8, 2017, at 5:54 PM, Aurelien Jarno wrote:
 
->>> Directly calling fcntl(F_SETFD) without first reading fcntl(F_GETFD) =
-is
->>> (theoretically) incorrect.  Better might be using qemu_set_cloexec()
->>> instead of open-coding something.
+> On 2017-05-07 17:48, G 3 wrote:
+>> I made a diagnostic program for the floating point unit. It will test
+>> various PowerPC floating point instructions for compatibility with  
+>> the
+>> PowerPC G3 processor. It was tested on a PowerPC G3 and G5 system.  
+>> The
+>> results of the program in qemu-system-ppc were pretty bad. About  
+>> every
+>> instruction tested is not implemented correctly.
+>
+> I don't say that qemu-system-ppc is bug free, but this looks  
+> suspicious
+> that about every instruction is buggy.
+
+I really hope you don't think I'm blaming anyone. I'm only reporting  
+the results of the test.
+
+> Have you tried to run your
+> program on a real G3 or G5 system?
+
+Yes. I made sure it ran on a real G3 and G5 system without problem  
+before testing it on QEMU. I suspect the Motorola designed G4  
+processor will not be compatible. I don't have a working G4 system to  
+verify this unfortunately.
+
+>
+> [ snip ]
+>
 >>
->> Makes sense but the unchecked return of fcntl, discovered by Coverity,=
-
->> would remain unfixed by calling qemu_set_cloexec here. I don't think I=
-
->> am up for fixing all the call sites of qemu_set_cloexec.
+>> Here is the full test results after running this program in qemu- 
+>> system-ppc
+>> with a Mac OS 10.4 guest:
 >>
->> I am going to drop this change, and resend this patch was only the oth=
-er
->> two fixes, fixing 1374836 only.
->=20
-> Unless you would be fine with:
->=20
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 4d9189e..16894ad 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -182,7 +182,9 @@ void qemu_set_cloexec(int fd)
->  {
->      int f;
->      f =3D fcntl(fd, F_GETFD);
-> -    fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-> +    assert(f !=3D -1);
-> +    f =3D fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-> +    assert(f !=3D -1);
+>>
+>>
+>>
+>> fadd test failed
+>> expected answer: 0x3ff3333333333334
+>>   actual answer: 0x8200400000000024
+>> expected fpscr: 0x82064000
+>>   actual fpscr: 0x82004000
+>
+> This looks highly suspicious that the actual answer match the expected
+> answer.
 
-Seems reasonable to me, but I don't know if anyone else would object.
+You can use this web page to find the decimal value: http:// 
+www6.uniovi.es/~antonio/uned/ieee754/IEEE-754hex64.html
 
-Changes semantics if someone ever calls qemu_set_cloexec(-1) (previously
-it would ignore the EBADF failures, now it will abort) - such callers
-are arguably broken, so that's okay by me.
+0x3ff3333333333334 = 1.2000000000000002
+0x8200400000000024 = -4.8529708162167760e-299
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---gjiOIWEhbDnMrvrswwQKPE39C1tk9Kl7N
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZEOuNAAoJEKeha0olJ0NqcLQH/RafKZ5gkrROCygz3mcGUN6E
-vOffrprotbepD4fnloyqRmkdjpsXjeWY4/pohqGfDOGr+JzuGB4z44tYsi2Ty3hP
-R3ywaotARt3Al7akkM7GkpnSkNj4fU7ur+IBsrH35NBvmA2l3jjav3DmphO8zBEf
-jh+dYvy2OkVgM9Yc6IWfa0EhQpJXkv6+0sV/YRxP7TA7Fa0Y8Kbq5vf2IX873K4x
-/ztYt/zgEloXAhcjOfAGUAJyR8edNfOkVZiuiJE3ueLefXhvic/H+gaFPMBdtf4S
-outoELbjZGZ0BxToT72HiGVNDzpA/Tj2MF2o3ewGID5eva6tWqnshItyjEjiRPE=
-=9aJj
------END PGP SIGNATURE-----
-
---gjiOIWEhbDnMrvrswwQKPE39C1tk9Kl7N--
+The expected answer and actual answer are very far from each other.
