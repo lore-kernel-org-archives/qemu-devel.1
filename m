@@ -1,42 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d7efk-0002OJ-22
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:09:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1d7ek7-0004MR-AF
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d7efg-0004me-Qm
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:09:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56431
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d7efg-0004m2-L5
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:09:36 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4895r4Y112811
-	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 05:09:34 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aakxee9py-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 05:09:34 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Mon, 8 May 2017 10:09:32 +0100
-Date: Mon, 8 May 2017 11:09:27 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170508052927.GD15974@bjsdjshi@linux.vnet.ibm.com>
-References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170505020352.8984-14-bjsdjshi@linux.vnet.ibm.com>
-	<20170505142014.28c849b8.cornelia.huck@de.ibm.com>
-	<20170508052927.GD15974@bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1d7ek4-0006Pq-3g
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:14:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49650)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d7ek3-0006Pk-Qg
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:14:08 -0400
+References: <1493726062-31743-1-git-send-email-thuth@redhat.com>
+	<20170505144837.GB14316@stefanha-x1.localdomain>
+	<20170505145049.GM12773@redhat.com> <871srz7n9x.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5c08c6b2-f82f-8e75-622e-0b229971cd8b@redhat.com>
+Date: Mon, 8 May 2017 11:14:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170508110927.5713c101.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v7 13/13] MAINTAINERS: Add vfio-ccw
- maintainer
+In-Reply-To: <871srz7n9x.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Mark legacy option '-no-kvm' as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,63 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, eric.auger@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, 8 May 2017 13:29:27 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+On 08.05.2017 10:42, Markus Armbruster wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> writes:
+>=20
+>> On Fri, May 05, 2017 at 03:48:37PM +0100, Stefan Hajnoczi wrote:
+>>> On Tue, May 02, 2017 at 01:54:22PM +0200, Thomas Huth wrote:
+>>>> '-no-kvm' was just a legacy convenience option for the users of
+>>>> qemu-kvm, it never made sense in the normal QEMU tree since TCG is
+>>>> the default here anyway. The option has also never been specified
+>>>> in the QEMU docs and in the '--help' list, so likely hardly anybody
+>>>> knows about this option at all. I think we could get rid of this
+>>>> without bothering anybody nowadays, but just in case, let's print
+>>>> out a warning for a couple of releases first.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>  vl.c | 4 +++-
+>>>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/vl.c b/vl.c
+>>>> index d5ec87e..2d44621 100644
+>>>> --- a/vl.c
+>>>> +++ b/vl.c
+>>>> @@ -3709,7 +3709,9 @@ int main(int argc, char **argv, char **envp)
+>>>>                      exit(1);
+>>>>                  }
+>>>>                  break;
+>>>> -             case QEMU_OPTION_no_kvm:
+>>>> +            case QEMU_OPTION_no_kvm:
+>>>> +                error_report("'-no-kvm' is depreacted, please use "
+>>>
+>>> s/depreacted/deprecated/
+>>
+>> Should we have an dedicated  'error_deprecated(oldfeat, newfeat)' meth=
+od
+>> that prints a standardized message, as well as a -no-deprecated flag t=
+hat
+>=20
+> I hate flags starting with "no".  What about something like
+> --suppress-deprecation-warnings?
+>=20
+>> turns off all the deprecation warnings. There's nothing more annoying =
+than
+>> an application that insists on spewing warnings to stdout that you kno=
+w
+>> about, but aren't in a position to address any time soon.
+>=20
+> If we do that, we should consider having the warnings tell users how to
+> suppress them, say "You can suppress this warning with
+> --suppress-deprecation-warnings".
 
-> * Cornelia Huck <cornelia.huck@de.ibm.com> [2017-05-05 14:20:14 +0200]:
-> 
-> > On Fri,  5 May 2017 04:03:52 +0200
-> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> > 
-> > > Add Cornelia Huck as the vfio-ccw maintainer.
-> > > 
-> > > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > > ---
-> > >  MAINTAINERS | 5 +++++
-> > >  1 file changed, 5 insertions(+)
-> > > 
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index cae3b09..c1f9917 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -999,6 +999,11 @@ S: Supported
-> > >  F: hw/vfio/*
-> > >  F: include/hw/vfio/
-> > > 
-> > > +vfio-ccw
-> > > +M: Cornelia Huck <cornelia.huck@de.ibm.com>
-> > > +S: Supported
-> > > +F: hw/vfio/ccw.c
-> > 
-> > The other code related to vfio-ccw is entangled with the other virtual
-> > css code, so this is probably really the only file that needs to be
-> > listed separately.
-> "hw/s390x/" and "include/hw/s390x/" are listed under the "S390 Machines"
-> part.
-> 
-> Maybe you would like to list the following files separately here:
-> hw/s390x/s390-ccw.c
-> hw/s390x/s390-ccw.h
+IMHO we should not add such a flag. Otherwise people will simply always
+turn it on and not only ignore this warning, but also all other
+warnings. I think these warnings *have* to be annoying to make sure that
+people change their scripts.
+(And if they "aren't in a position to address any time soon", they
+likely also aren't in a position to add a
+"--suppress-deprecation-warnings" parameter to their scripts either).
 
-Yes, that makes sense.
-
-But seeing the path name here: Should s390-ccw.h rather go into
-include/hw/s390x/ (even if hw/s390x/ already contains several .h
-files...)?
-
-> 
-> > 
-> > I will likely take any vfio-ccw changes together with the other code I
-> > take through s390-next. I'll add the respective line when I apply.
-> Ok. Leave this to you. :>
-> 
-> > 
-> > > +
-> > >  vhost
-> > >  M: Michael S. Tsirkin <mst@redhat.com>
-> > >  S: Supported
-> > 
-> 
+ Thomas
