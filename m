@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d7rTs-0002by-Bg
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:50:17 -0400
+	(envelope-from <leo@gaspard.io>) id 1d7kfy-0007mK-2o
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:34:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d7rTr-000151-5F
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:50:16 -0400
-Date: Tue, 9 May 2017 00:50:07 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170508225007.2duqxlo5ab2aenpl@aurel32.net>
-References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
-	<20170508221304.y36owezwla7sc6ss@aurel32.net>
-	<BB3E29F1-8BBB-407B-AAC8-795E9718CF5E@gmail.com>
+	(envelope-from <leo@gaspard.io>) id 1d7kfv-0007Gi-FV
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:34:18 -0400
+Received: from smtp01.smtpout.orange.fr ([80.12.242.123]:46286
+	helo=smtp.smtpout.orange.fr)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <leo@gaspard.io>) id 1d7kfv-0007Dh-3n
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:34:15 -0400
+References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+From: Leo Gaspard <leo@gaspard.io>
+Message-ID: <3d315a77-3e48-8441-de03-36b2cdda7a66@gaspard.io>
+Date: Mon, 8 May 2017 17:33:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BB3E29F1-8BBB-407B-AAC8-795E9718CF5E@gmail.com>
-Subject: Re: [Qemu-devel] Floating point unit bugs
+In-Reply-To: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bCEAf8EA49mGCpmalh4OObUQq6N0lMMUO"
+Subject: Re: [Qemu-devel] [PATCH 0/5] 9pfs: local: fix metadata of
+ mapped-file security mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>
-Cc: "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 
-On 2017-05-08 18:36, G 3 wrote:
-> 
-> On May 8, 2017, at 6:13 PM, Aurelien Jarno wrote:
-> 
-> > On 2017-05-07 17:48, G 3 wrote:
-> > > I made a diagnostic program for the floating point unit. It will test
-> > > various PowerPC floating point instructions for compatibility with
-> > > the
-> > > PowerPC G3 processor. It was tested on a PowerPC G3 and G5 system.
-> > > The
-> > > results of the program in qemu-system-ppc were pretty bad. About
-> > > every
-> > > instruction tested is not implemented correctly.
-> > > 
-> > > Here is the download link to the program: http://www.mediafire.com/file/6j9tqubvk73lkw1/floating_point_test_program.zip
-> > 
-> > Some comments on the code.
-> > > 
-> > >     /* Check if everything is alright */
-> > >     uint32_t fpscr;
-> > >     asm volatile("mffs f0");
-> > >     asm volatile("stfd f0, 40(r1)");
-> > >     asm volatile("lwz %0, 44(r1)" : "=r"(fpscr));
-> > >     if (fpscr != 0) {
-> > >         printf("Warning: fpscr not equal to zero: 0x%x\n", fpscr);
-> > >     }
-> > 
-> > This is overly complicated and just doesn't compile with recent GCC
-> > versions.
-> 
-> Which version of GCC had the problem? GCC 5.2 and GCC 3.3 seems to work
-> fine. GCC 4.0 did not work. Could you send me the error message?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bCEAf8EA49mGCpmalh4OObUQq6N0lMMUO
+From: Leo Gaspard <leo@gaspard.io>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>
+Message-ID: <3d315a77-3e48-8441-de03-36b2cdda7a66@gaspard.io>
+Subject: Re: [PATCH 0/5] 9pfs: local: fix metadata of mapped-file security
+ mode
+References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+In-Reply-To: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I tried with GCC 4.9. Actually the error message is coming from
-binutils:
+Greg,
 
-| main.c:34:5: warning: missing braces around initializer [-Wmissing-braces]
-|      "FX", "Floating-point exception summary",
-|      ^
-| main.c:34:5: warning: (near initialization for 'finfo[0]') [-Wmissing-braces]
-| main.c: In function 'print_fpscr_settings':
-| main.c:73:26: warning: suggest parentheses around comparison in operand of '&' [-Wparentheses]
-|          if ((fpscr >> i) & 0x1 == 1) {
-|                           ^
-| main.c: In function 'test_failed':
-| main.c:146:5: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 2 has type 'uint32_t' [-Wformat=]
-|      printf("  actual answer: 0x%" PRIx64 "\n", actual_fpscr);
-|      ^
-| /tmp/cctHPRx4.s: Assembler messages:
-| /tmp/cctHPRx4.s:315: Error: unsupported relocation against f0
-| /tmp/cctHPRx4.s:318: Error: unsupported relocation against f0
-| /tmp/cctHPRx4.s:318: Error: unsupported relocation against r1
-| /tmp/cctHPRx4.s:321: Error: unsupported relocation against r1
-| /tmp/cctHPRx4.s:438: Error: unsupported relocation against f0
-| /tmp/cctHPRx4.s:441: Error: unsupported relocation against f0
-| /tmp/cctHPRx4.s:441: Error: unsupported relocation against r1
-| /tmp/cctHPRx4.s:444: Error: unsupported relocation against r1
+I just tested on 2.9.0 with the 5 patches applied, and it appears to
+work on my setup, thanks!
 
-> > What about something like:
-> > 
-> >     Converter c;
-> >     asm volatile("mffs %0" : "=f"(c.d));
-> >     fpscr = (uint32_t)c.i;
-> 
-> This way does work also.
-> 
-> > 
-> > 
-> > > /*
-> > >  * The action to take if a test fails
-> > >  * Input one: message string
-> > >  * Input two: actual fpscr value
-> > >  * Input three: expected fpscr value
-> > >  * Input four: actual answer
-> > >  * Input five: expected answer
-> > >  */
-> > >  void test_failed(const char *message, uint32_t actual_fpscr,
-> > > uint32_t
-> > > expected_fpscr,
-> > >                   uint64_t actual_answer, uint64_t expected_answer)
-> > >  {
-> > >     printf("%s\n", message);
-> > >     printf("expected answer: 0x%" PRIx64 "\n", expected_answer);
-> > >     printf("  actual answer: 0x%" PRIx64 "\n", actual_fpscr);
-> > 
-> > This is wrong. It should be actual_answer instead of actual_fpscr. That
-> > is why all the instructions seems totally wrongly implemented.
-> 
-> Thanks for catching this error. Actually this would only effect the "actual
-> answer:" output field. The comparison between expected_answer and
-> actual_answer in each individual test is still valid.
+Just a side note: .virtfs_metadata_root is set as u=3Drwx on the host fil=
+e
+system (the "ret =3D fchmod(map_fd, 0700);" line in patch 4 I guess),
+while u=3Drw would be more appropriate, I think.
 
-Indeed, but I guess it gives "better" results than what it looks when
-looking at your mail where the values are totally wrong.
+Thank you,
+Leo
 
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+
+On 05/05/2017 04:36 PM, Greg Kurz wrote:
+> This series fixes two issues in the local backend when using the mapped=
+-file
+> security mode:
+> - allow chmod and chown to succeed on the virtfs root (patch 4)
+> - completely hide the metadata files from the client (patch 5)
+>=20
+> Patch 2 resolves '.' and '..' in paths, and patch 3 reworks the way we =
+open
+> files accordingly. They could be squashed together in a single patch (t=
+his
+> was the case in earlier versions actually), but I decided to separate t=
+hem
+> for easier review.
+>=20
+> L=C3=A9o,
+>=20
+> I'd appreciate if you could test this series (especially patch 4) on yo=
+ur
+> setup.
+>=20
+> Cheers.
+>=20
+> --
+> Greg
+>=20
+> ---
+>=20
+> Greg Kurz (5):
+>       9pfs: check return value of v9fs_co_name_to_path()
+>       9pfs: local: resolve special directories in paths
+>       9pfs: local: simplify file opening
+>       9pfs: local: metadata file for the VirtFS root
+>       9pfs: local: forbid client access to metadata
+>=20
+>=20
+>  hw/9pfs/9p-local.c |  164 ++++++++++++++++++++++++++++++++++++++++----=
+--------
+>  hw/9pfs/9p-util.c  |   26 +++-----
+>  hw/9pfs/9p.c       |   36 ++++++++---
+>  3 files changed, 160 insertions(+), 66 deletions(-)
+>=20
+
+
+--bCEAf8EA49mGCpmalh4OObUQq6N0lMMUO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBCAAdFiEEplquSIS+CbvsrRWvilWEi2CQ+c8FAlkQj9cACgkQilWEi2CQ
++c/9CQv+NqzsccgAxWlC7IUDiURsgc5PDSlHjcqTFpcX0PwKd44JrubSRC796+8J
+/FhoITxTBtGujRQkOflGQzU6MB8YS4wPxBk2juqwKHpulHE2f1yFYpyftU/EnYPa
+2CVa1QlJGcQX9QvCDSq7mstoD/IHmBLj7rZtQJEjObHdSQYeqvwuY3TKrZeB5/yX
+/i9P7XDsVo/W3bO2bmTwHLITZCAO49jOnUQRJGP4cld40EgJNNHyqB/O+XUcwSyl
+Tk4AoqYhqATIZCbTED2DKNqd6FM7Ai/r0LZyIh0c2KN87caqPMfYk+hxqPF0uBzd
+ghbWGCPwzbjflosdpVTxGh0SulghNm20ukXcZJTFTTIrcE6v49AROs9oLxTDxu2D
+hHdF+vtrSXdwPftSNSFy4iP6kmSaU/Z8SoXL0MQX0lAAcFdnIE76Cn4SsAmgEGpc
+ONhGmmPiUPt4OuTCKQ8XcPRZYjQNVFeRpFmX5pTRnFsWUcxd8nTNqUzZ75tDX/9q
+tAT8GFTK
+=4IX3
+-----END PGP SIGNATURE-----
+
+--bCEAf8EA49mGCpmalh4OObUQq6N0lMMUO--
