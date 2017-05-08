@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1d7fHR-0004eQ-CM
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:48:38 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1d7fHp-0004ta-Lt
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1d7fHM-00089z-EQ
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:48:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33048
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1d7fHk-0008Ek-PK
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:49:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39827)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1d7fHM-00089U-8Q
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:48:32 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1d7fHk-0008EY-Fr
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 05:48:56 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v489YD9M046468
-	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 05:48:30 -0400
+	v489mrDs003162
+	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 05:48:55 -0400
 Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aamkwwntj-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aaky5r4ht-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 05:48:30 -0400
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 05:48:54 -0400
 Received: from localhost
 	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Mon, 8 May 2017 19:09:46 +1000
+	Mon, 8 May 2017 19:09:48 +1000
 From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Mon,  8 May 2017 14:36:16 +0530
+Date: Mon,  8 May 2017 14:36:17 +0530
 In-Reply-To: <1494234377-1773-1-git-send-email-bharata@linux.vnet.ibm.com>
 References: <1494234377-1773-1-git-send-email-bharata@linux.vnet.ibm.com>
-Message-Id: <1494234377-1773-2-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH 1/2] spapr: Make h_register_process_table
- hcall flags global
+Message-Id: <1494234377-1773-3-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH 2/2] spapr: Fix migration of Radix guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,108 +40,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-The flags used in h_register_process_table hcall are needed in spapr.c
-and hence move them to a header file. While doing so, give them
-slightly specific names.
+Currently HTAB savevm handlers get registered by default and migration
+of radix guest will fail.
 
+- Ensure that HTAB savevm handlers are not registered for radix case.
+- Ensure that we issue KVM_PPC_CONFIGURE_V3_MMU for radix case post
+  migration.
+
+TODO: Right now I have delayed the HTAB savevm handler registration
+to CAS call where we know if the guest is radix or hash. Another approach
+is to let the HTAB handlers to be registered by default (as it is being
+done currently, but unregister them from CAS when we discover radix
+capability).
+
+Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
 Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr_hcall.c   | 31 ++++++++++++++-----------------
- include/hw/ppc/spapr.h | 10 ++++++++++
- 2 files changed, 24 insertions(+), 17 deletions(-)
+ hw/ppc/spapr.c         | 18 +++++++++++++++---
+ hw/ppc/spapr_hcall.c   |  5 +++++
+ include/hw/ppc/spapr.h |  3 +++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e2dc77c..e14f55c 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1436,6 +1436,14 @@ static int spapr_post_load(void *opaque, int version_id)
+         err = spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
+     }
+ 
++    if (spapr->patb_entry && (spapr->patb_flags & SPAPR_PROC_TABLE_RADIX) &&
++        kvmppc_has_cap_mmu_radix() && kvm_enabled()) {
++        err = kvmppc_configure_v3_mmu(POWERPC_CPU(first_cpu),
++                                      spapr->patb_flags &
++                                      SPAPR_PROC_TABLE_RADIX,
++                                      spapr->patb_flags & SPAPR_PROC_TABLE_GTSE,
++                                      spapr->patb_entry);
++    }
+     return err;
+ }
+ 
+@@ -1520,6 +1528,7 @@ static const VMStateDescription vmstate_spapr_patb_entry = {
+     .needed = spapr_patb_entry_needed,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT64(patb_entry, sPAPRMachineState),
++        VMSTATE_UINT64(patb_flags, sPAPRMachineState),
+         VMSTATE_END_OF_LIST()
+     },
+ };
+@@ -1869,6 +1878,12 @@ static SaveVMHandlers savevm_htab_handlers = {
+     .load_state = htab_load,
+ };
+ 
++void spapr_htab_savevm_register(sPAPRMachineState *spapr)
++{
++    register_savevm_live(NULL, "spapr/htab", -1, 1,
++                         &savevm_htab_handlers, spapr);
++}
++
+ static void spapr_boot_set(void *opaque, const char *boot_device,
+                            Error **errp)
+ {
+@@ -2331,9 +2346,6 @@ static void ppc_spapr_init(MachineState *machine)
+      * interface, this is a legacy from the sPAPREnvironment structure
+      * which predated MachineState but had a similar function */
+     vmstate_register(NULL, 0, &vmstate_spapr, spapr);
+-    register_savevm_live(NULL, "spapr/htab", -1, 1,
+-                         &savevm_htab_handlers, spapr);
+-
+     /* used by RTAS */
+     QTAILQ_INIT(&spapr->ccs_list);
+     qemu_register_reset(spapr_ccs_reset_hook, spapr);
 diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 0d608d6..3600b0e 100644
+index 3600b0e..fa03ca0 100644
 --- a/hw/ppc/spapr_hcall.c
 +++ b/hw/ppc/spapr_hcall.c
-@@ -924,13 +924,6 @@ static void spapr_check_setup_free_hpt(sPAPRMachineState *spapr,
-     return;
- }
+@@ -988,6 +988,7 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
+     spapr_check_setup_free_hpt(spapr, spapr->patb_entry, cproc);
  
--#define FLAGS_MASK              0x01FULL
--#define FLAG_MODIFY             0x10
--#define FLAG_REGISTER           0x08
--#define FLAG_RADIX              0x04
--#define FLAG_HASH_PROC_TBL      0x02
--#define FLAG_GTSE               0x01
--
- static target_ulong h_register_process_table(PowerPCCPU *cpu,
-                                              sPAPRMachineState *spapr,
-                                              target_ulong opcode,
-@@ -943,12 +936,13 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
-     target_ulong table_size = args[3];
-     uint64_t cproc;
+     spapr->patb_entry = cproc; /* Save new process table */
++    spapr->patb_flags = flags; /* Save the flags */
  
--    if (flags & ~FLAGS_MASK) { /* Check no reserved bits are set */
-+    if (flags & ~SPAPR_PROC_TABLE_MASK) { /* Check no reserved bits are set */
-         return H_PARAMETER;
-     }
--    if (flags & FLAG_MODIFY) {
--        if (flags & FLAG_REGISTER) {
--            if (flags & FLAG_RADIX) { /* Register new RADIX process table */
-+    if (flags & SPAPR_PROC_TABLE_MODIFY) {
-+        if (flags & SPAPR_PROC_TABLE_REGISTER) {
-+            if (flags & SPAPR_PROC_TABLE_RADIX) {
-+                /* Register new RADIX process table */
-                 if (proc_tbl & 0xfff || proc_tbl >> 60) {
-                     return H_P2;
-                 } else if (page_size) {
-@@ -958,7 +952,8 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
-                 }
-                 cproc = PATBE1_GR | proc_tbl | table_size;
-             } else { /* Register new HPT process table */
--                if (flags & FLAG_HASH_PROC_TBL) { /* Hash with Segment Tables */
-+                if (flags & SPAPR_PROC_TABLE_HPT_PT) {
-+                    /* Hash with Segment Tables */
-                     /* TODO - Not Supported */
-                     /* Technically caused by flag bits => H_PARAMETER */
-                     return H_PARAMETER;
-@@ -981,7 +976,8 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
-             cproc = spapr->patb_entry & PATBE1_GR;
-         }
-     } else { /* Maintain current registration */
--        if (!(flags & FLAG_RADIX) != !(spapr->patb_entry & PATBE1_GR)) {
-+        if (!(flags & SPAPR_PROC_TABLE_RADIX) !=
-+            !(spapr->patb_entry & PATBE1_GR)) {
-             /* Technically caused by flag bits => H_PARAMETER */
-             return H_PARAMETER; /* Existing Process Table Mismatch */
-         }
-@@ -996,13 +992,14 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
      /* Update the UPRT and GTSE bits in the LPCR for all cpus */
      CPU_FOREACH(cs) {
-         set_spr(cs, SPR_LPCR, LPCR_UPRT | LPCR_GTSE,
--                ((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UPRT : 0) |
--                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0));
-+                ((flags & (SPAPR_PROC_TABLE_RADIX | SPAPR_PROC_TABLE_HPT_PT)) ?
-+                LPCR_UPRT : 0) | ((flags & SPAPR_PROC_TABLE_GTSE) ?
-+                SPAPR_PROC_TABLE_GTSE : 0));
+@@ -1169,6 +1170,10 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+         }
      }
  
-     if (kvm_enabled()) {
--        return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
--                                       flags & FLAG_GTSE, cproc);
-+        return kvmppc_configure_v3_mmu(cpu, flags & SPAPR_PROC_TABLE_RADIX,
-+                                       flags & SPAPR_PROC_TABLE_GTSE, cproc);
-     }
++    /* Register savevm handlers for HTAB case */
++    if (!guest_radix || !kvmppc_has_cap_mmu_radix()) {
++        spapr_htab_savevm_register(spapr);
++    }
      return H_SUCCESS;
  }
+ 
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 5802f88..a692e63 100644
+index a692e63..0d0e9e4 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -681,4 +681,14 @@ int spapr_rng_populate_dt(void *fdt);
+@@ -75,6 +75,7 @@ struct sPAPRMachineState {
+     void *htab;
+     uint32_t htab_shift;
+     uint64_t patb_entry; /* Process tbl registed in H_REGISTER_PROCESS_TABLE */
++    uint64_t patb_flags;
+     hwaddr rma_size;
+     int vrma_adjust;
+     ssize_t rtas_size;
+@@ -691,4 +692,6 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
+ #define SPAPR_PROC_TABLE_HPT_PT      0x02
+ #define SPAPR_PROC_TABLE_GTSE        0x01
  
- void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
- 
-+/*
-+ * Defines for flag value used in H_REGISTER_PROC_TBL hcall.
-+ */
-+#define SPAPR_PROC_TABLE_MASK        0x01FULL
-+#define SPAPR_PROC_TABLE_MODIFY      0x10
-+#define SPAPR_PROC_TABLE_REGISTER    0x08
-+#define SPAPR_PROC_TABLE_RADIX       0x04
-+#define SPAPR_PROC_TABLE_HPT_PT      0x02
-+#define SPAPR_PROC_TABLE_GTSE        0x01
++void spapr_htab_savevm_register(sPAPRMachineState *spapr);
 +
  #endif /* HW_SPAPR_H */
 -- 
