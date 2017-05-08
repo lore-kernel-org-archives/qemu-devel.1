@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d7bii-0007Tb-3j
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 02:00:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d7bwx-0003Kx-Mc
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 02:15:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d7big-00053B-VF
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 02:00:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38250)
+	(envelope-from <dgibson@ozlabs.org>) id 1d7bwu-0000KI-FU
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 02:15:15 -0400
+Received: from ozlabs.org ([103.22.144.67]:57405)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d7big-000531-MY
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 02:00:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D4D88050A
-	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 06:00:29 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Mon,  8 May 2017 14:00:04 +0800
-Message-Id: <1494223204-16388-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1494223204-16388-1-git-send-email-peterx@redhat.com>
-References: <1494223204-16388-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] ramblock: add new hmp command "info
- ramblock"
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d7bwt-0000IK-K9
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 02:15:12 -0400
+Date: Mon, 8 May 2017 16:13:59 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170508061359.GH25748@umbus.fritz.box>
+References: <1493977730-20581-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="l06SQqiZYCi8rTKz"
+Content-Disposition: inline
+In-Reply-To: <1493977730-20581-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] ppc: xics: fix compilation with CentOS 6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,214 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, dgibson@redhat.com, stefanha@redhat.com
 
-To dump information about ramblocks. It looks like:
 
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used              Total
-            /objects/mem       2M  0x0000000000000000 0x0000000080000000 0x0000000080000000
-                vga.vram       4K  0x0000000080060000 0x0000000001000000 0x0000000001000000
-    /rom@etc/acpi/tables       4K  0x00000000810b0000 0x0000000000020000 0x0000000000200000
-                 pc.bios       4K  0x0000000080000000 0x0000000000040000 0x0000000000040000
-  0000:00:03.0/e1000.rom       4K  0x0000000081070000 0x0000000000040000 0x0000000000040000
-                  pc.rom       4K  0x0000000080040000 0x0000000000020000 0x0000000000020000
-    0000:00:02.0/vga.rom       4K  0x0000000081060000 0x0000000000010000 0x0000000000010000
-   /rom@etc/table-loader       4K  0x00000000812b0000 0x0000000000001000 0x0000000000001000
-      /rom@etc/acpi/rsdp       4K  0x00000000812b1000 0x0000000000001000 0x0000000000001000
+--l06SQqiZYCi8rTKz
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Ramblock is something hidden internally in QEMU implementation, and this
-command should only be used by mostly QEMU developers on RAM stuff. It
-is not a command suitable for QMP interface. So only HMP interface is
-provided for it.
+On Fri, May 05, 2017 at 11:48:50AM +0200, Paolo Bonzini wrote:
+> The PowerPCCPU typedef is included twice if a file includes
+> both hw/ppc/xics.h and target/ppc/cpu-qom.h.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- exec.c                 | 20 ++++++++++++++++++++
- hmp-commands-info.hx   | 14 ++++++++++++++
- hmp.c                  |  6 ++++++
- hmp.h                  |  1 +
- include/exec/ramlist.h |  1 +
- include/qemu-common.h  |  1 +
- util/cutils.c          | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 89 insertions(+)
+Applied to ppc-for-2.10, thanks.
 
-diff --git a/exec.c b/exec.c
-index 50519ae..5e50bdf 100644
---- a/exec.c
-+++ b/exec.c
-@@ -71,6 +71,8 @@
- #include "qemu/mmap-alloc.h"
- #endif
- 
-+#include "monitor/monitor.h"
-+
- //#define DEBUG_SUBPAGE
- 
- #if !defined(CONFIG_USER_ONLY)
-@@ -1333,6 +1335,24 @@ void qemu_mutex_unlock_ramlist(void)
-     qemu_mutex_unlock(&ram_list.mutex);
- }
- 
-+void ram_block_dump(Monitor *mon)
-+{
-+    RAMBlock *block;
-+
-+    rcu_read_lock();
-+    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-+                   "Block Name", "PSize", "Offset", "Used", "Total");
-+    RAMBLOCK_FOREACH(block) {
-+        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
-+                       " 0x%016" PRIx64 "\n", block->idstr,
-+                       page_size_to_str(block->page_size),
-+                       (uint64_t)block->offset,
-+                       (uint64_t)block->used_length,
-+                       (uint64_t)block->max_length);
-+    }
-+    rcu_read_unlock();
-+}
-+
- #ifdef __linux__
- /*
-  * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a53f105..ae16901 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -788,6 +788,20 @@ Display the latest dump status.
- ETEXI
- 
-     {
-+        .name       = "ramblock",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Display system ramblock information",
-+        .cmd        = hmp_info_ramblock,
-+    },
-+
-+STEXI
-+@item info ramblock
-+@findex ramblock
-+Dump all the ramblocks of the system.
-+ETEXI
-+
-+    {
-         .name       = "hotpluggable-cpus",
-         .args_type  = "",
-         .params     = "",
-diff --git a/hmp.c b/hmp.c
-index ab407d6..8369388 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -37,6 +37,7 @@
- #include "qemu-io.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-+#include "exec/ramlist.h"
- #include "hw/intc/intc.h"
- 
- #ifdef CONFIG_SPICE
-@@ -2563,6 +2564,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
-     qapi_free_DumpQueryResult(result);
- }
- 
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
-+{
-+    ram_block_dump(mon);
-+}
-+
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-diff --git a/hmp.h b/hmp.h
-index 799fd37..7353b67 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -136,6 +136,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- 
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-index f1c6b45..2e2ac6c 100644
---- a/include/exec/ramlist.h
-+++ b/include/exec/ramlist.h
-@@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
- void ram_block_notify_add(void *host, size_t size);
- void ram_block_notify_remove(void *host, size_t size);
- 
-+void ram_block_dump(Monitor *mon);
- 
- #endif /* RAMLIST_H */
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index d218821..62aef10 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -146,6 +146,7 @@ int parse_debug_env(const char *name, int max, int initial);
- 
- const char *qemu_ether_ntoa(const MACAddr *mac);
- void page_size_init(void);
-+const char *page_size_to_str(size_t psize);
- 
- /* returns non-zero if dump is in progress, otherwise zero is
-  * returned. */
-diff --git a/util/cutils.c b/util/cutils.c
-index 50ad179..b0fe88a 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -619,3 +619,49 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
- 
-     return ret;
- }
-+
-+const char *page_size_to_str(size_t psize)
-+{
-+    switch (psize) {
-+    case 0x1000:
-+        return "4K";
-+    case 0x2000:
-+        return "8K";
-+    case 0x4000:
-+        return "16K";
-+    case 0x8000:
-+        return "32K";
-+    case 0x10000:
-+        return "64K";
-+    case 0x20000:
-+        return "128K";
-+    case 0x40000:
-+        return "256K";
-+    case 0x80000:
-+        return "512K";
-+    case 0x100000:
-+        return "1M";
-+    case 0x200000:
-+        return "2M";
-+    case 0x400000:
-+        return "4M";
-+    case 0x800000:
-+        return "8M";
-+    case 0x1000000:
-+        return "16M";
-+    case 0x2000000:
-+        return "32M";
-+    case 0x4000000:
-+        return "64M";
-+    case 0x8000000:
-+        return "128M";
-+    case 0x10000000:
-+        return "256M";
-+    case 0x20000000:
-+        return "512M";
-+    case 0x40000000:
-+        return "1G";
-+    default:
-+        return "N/A";
-+    }
-+}
--- 
-2.7.4
+> ---
+> 	There are other failures but I don't have time to debug them today:
+>=20
+> 	In file included from /tmp/qemu-test/src/include/hw/ppc/pnv.h:26,
+> 	                 from /tmp/qemu-test/src/hw/ppc/pnv.c:31:
+> 	/tmp/qemu-test/src/include/hw/ppc/pnv_psi.h:50: error: redefinition of t=
+ypedef =E2=80=98PnvPsi=E2=80=99
+> 	/tmp/qemu-test/src/include/hw/ppc/pnv_lpc.h:26: note: previous declarati=
+on of =E2=80=98PnvPsi=E2=80=99 was here
+> 	In file included from /tmp/qemu-test/src/include/hw/ppc/pnv.h:27,
+> 	                 from /tmp/qemu-test/src/hw/ppc/pnv.c:31:
+> 	/tmp/qemu-test/src/include/hw/ppc/pnv_occ.h:25: error: redefinition of t=
+ypedef =E2=80=98PnvPsi=E2=80=99
+> 	/tmp/qemu-test/src/include/hw/ppc/pnv_psi.h:50: note: previous declarati=
+on of =E2=80=98PnvPsi=E2=80=99 was here
+> 	In file included from /tmp/qemu-test/src/hw/ppc/pnv.c:39:
+> 	/tmp/qemu-test/src/include/hw/ipmi/ipmi.h:188: error: redefinition of ty=
+pedef =E2=80=98IPMIBmc=E2=80=99
+> 	/tmp/qemu-test/src/include/hw/ppc/pnv.h:121: note: previous declaration =
+of =E2=80=98IPMIBmc=E2=80=99 was here
+> 	make[1]: *** [hw/ppc/pnv.o] Error 1
+>=20
+> 	Please start including Docker-based tests in your pre-pull-request tests.
+
+Um.. is there some doco on how to execute these.  I tried "make
+docker-test" and "make docker-image" and they both just seem to hang
+at:
+
+umbus:~/src/qemu (ppc-for-2.10)$ make docker-image
+  BUILD   travis
+
+strace shows docker blocked on a futex.
+
+>  include/hw/ppc/xics.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index c215dc7..ce1942b 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -29,6 +29,7 @@
+>  #define XICS_H
+> =20
+>  #include "hw/qdev.h"
+> +#include "target/ppc/cpu-qom.h"
+> =20
+>  #define XICS_IPI        0x2
+>  #define XICS_BUID       0x1
+> @@ -46,7 +47,6 @@ typedef struct ICSStateClass ICSStateClass;
+>  typedef struct ICSState ICSState;
+>  typedef struct ICSIRQState ICSIRQState;
+>  typedef struct XICSFabric XICSFabric;
+> -typedef struct PowerPCCPU PowerPCCPU;
+> =20
+>  #define TYPE_ICP "icp"
+>  #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--l06SQqiZYCi8rTKz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZEAynAAoJEGw4ysog2bOS1R8QAKwV6LYJY4fopdazHgXyA9HX
+nG4iIKSrMdVxRx9ubaQKK70XP9bvMMVnHBB2ygxfm9hRWmiTmuwphE0JmCti8YTP
+AJHZwNzYU4YdlDokDL8wTQkWck7XG+SAa8hWqgUY6xA9UWd+zPjaiya5a1POG1OB
+CoVZxCZezZcCrJewZkNIxL8+Kb/ghO5htVpovQS+qs0Wtxxfejgb3d8A1BrdTFXm
+3hSKuiSkDCJ6QwbKB50u9v1ktd2nszmCpLhkElPQiSURjq+BU+czuUsRDIbJstVi
+QOiXVTG48gT9vILkFXHoS2JieU7V2aMvo83TG0lGUhUR+kCZLz1T4dj+HLSW/mce
+zjh2PKT2nvipWdqn7+HunjHIT/LVYFaC2EFuAf+ektAD3d9DpZq1dtayqCND7sHb
+a8A7Wp+TNQGeNIr6Psci4ujMwT9boZM7bOeLGE3cOU5lfR9RdoMkbuWPQSK87W3c
+BtEGU13m3AH0LILqV66U4uHR+6797uOFlW6VM79MCt655NjITw3EHy+LPlo8YYHK
+47ooIMuuvHcDcrIRMgRMmtMydy0AnqNRNwLu4Zvr6cW7sB9eHV3bI1mT7jvY6noK
+vjmBooXwgczdw0nIPSFLhJEm5aOamAAmCBawJaUp/F+rATS1A/nO+XLAvUzHzPWZ
+qsspn2JQ5nL7qpW1LZbX
+=u1pY
+-----END PGP SIGNATURE-----
+
+--l06SQqiZYCi8rTKz--
