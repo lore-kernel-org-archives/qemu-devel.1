@@ -1,42 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d7nO9-0001ta-PB
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:28:06 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d7nS8-0003Pa-4J
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:32:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d7nO6-0003p1-Ii
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:28:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1d7nO6-0003ng-AE
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:28:02 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v48IQ15Z121219
-	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 14:28:01 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aakg4y8g1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 14:27:56 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 8 May 2017 19:27:54 +0100
-References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
-	<20170505173507.74077-7-pasic@linux.vnet.ibm.com>
-	<20170508173650.GJ2120@work-vm>
-	<877c80d1-fa63-0fd1-e394-fb649281aea1@linux.vnet.ibm.com>
-	<20170508175906.GK2120@work-vm>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 8 May 2017 20:27:51 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170508175906.GK2120@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <b69e0df0-120f-6634-d7ff-4bea9ccb4e31@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 06/10] virtio-ccw: use vmstate way for
- config migration
+	(envelope-from <ehabkost@redhat.com>) id 1d7nS4-0005A2-Um
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:32:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d7nS4-00059t-Lv
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:32:08 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7120680F97
+	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 18:32:07 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon,  8 May 2017 15:32:05 -0300
+Message-Id: <20170508183205.10884-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] tests: Add [+-]feature and feature=on|off
+ test cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,71 +28,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>
 
+Add test code to ensure features are enabled/disabled correctly in the
+command-line. The test case use the "feature-words" and
+"filtered-features" properties to check if the features were
+enabled/disabled correctly.
 
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Changes v1 -> v2:
+* Remove explicit "accel=" option to avoid triggering warnings
+  on "make check"
+* Use qdict_get_*() helpers to make code shorter
+* Rename input_eax, input_ecx to in_eax, in_ecx to make
+  lines fit in the coding style width limit
+* v1 was submitted as part of the series:
+  Subject: [PATCH 0/4] x86: Support "-cpu feature=force"
+* Coding style: split lines
+* Style changes on code comments
+---
+ tests/test-x86-cpuid-compat.c | 111 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 111 insertions(+)
 
-On 05/08/2017 07:59 PM, Dr. David Alan Gilbert wrote:
->>>>  const VMStateDescription vmstate_virtio_ccw_dev = {
->>>>      .name = "s390_virtio_ccw_dev",
->>>>      .version_id = 1,
->>>> @@ -67,6 +93,14 @@ const VMStateDescription vmstate_virtio_ccw_dev = {
->>>>          VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
->>>>          VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
->>>>          VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
->>>> +        {
->>>> +        /*
->>>> +         * Ugly hack because VirtIODevice does not migrate itself.
->>>> +         * This also makes legacy via vmstate_save_state possible.
->>>> +         */
->>>> +            .name         = "virtio/config_vector",
->>>> +            .info         = &vmstate_info_config_vector,
->>>> +        },
->>> I'm a bit confused - isn't just this bit the bit going
->>> through the vdev->load_config hook?
->>>
->> Exactly! If you examine the part underscored with ============== in
->> virtio_ccw_(load|save)_config  (that is what is behind vdev->load_config)
->> you should see that we use vmstate_virtio_ccw_dev (that is this
->> VMStateDescription to implement these function. 
->>
->> Actually virtio_ccw_(load|save)_config won't do anything after patch 9
->> and for new machines since the VirtIOCcwDevice is going to migrate
->> itself via DeviceClass.vmsd like other "normal" devices, and we fall
->> back to the VirtIO specific callbacks only in "legacy mode".
->>
->> I hope this helps!
-> Hmm, still confused!
-> Why are you changing a Virtio device not to use the same migration
-> oddities as all the other virtio devices?
-> 
-> I was assuming we'd have to change the virtio core code to
-> solve that for all virtio devices.
-> 
-
-You can ask difficult questions ;). First I'm not aware of any
-ongoing effort to solve this for all virtio devices by changing
-the core, and probably breaking compatibility for all devices
-(in a sense I break migration compatibility for all virtio-ccw
-devices). To be honest, I have considered that move unlikely,
-but the possibility is one of my reasons for seeking an upstream
-discussion and having You and Michael on cc.
-
-Why not use virtio oddities? Because they are oddities. I have
-figured, it's a good idea to separate the migration of the 
-proxy form the rest: we have two QEMU Device objects and it
-should be good practice, that these are migrating themselves via
-DeviceClass.vmsd. That's what I get with this patch set, 
-for new machine versions (since we can not fix the past), and
-with the notable difference of config_vector, because it is
-defined as a common infrastructure (struct VirtIODevice) but
-ain't migrated as a common virtio infrastructure.
-
-Would you suggest to rather keep the oddities? Should I expect
-to see a generic solution to the problem sometime soon?
-
-Halil
-
-> Dave
-> 
+diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
+index 79a2e69a28..6c71e46391 100644
+--- a/tests/test-x86-cpuid-compat.c
++++ b/tests/test-x86-cpuid-compat.c
+@@ -1,6 +1,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/qlist.h"
++#include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qint.h"
+ #include "qapi/qmp/qbool.h"
+@@ -78,6 +79,90 @@ static void add_cpuid_test(const char *name, const char *cmdline,
+     qtest_add_data_func(name, args, test_cpuid_prop);
+ }
+ 
++
++/* Parameters to a add_feature_test() test case */
++typedef struct FeatureTestArgs {
++    /* cmdline to start QEMU */
++    const char *cmdline;
++    /*
++     * cpuid-input-eax and cpuid-input-ecx values to look for,
++     * in "feature-words" and "filtered-features" properties.
++     */
++    uint32_t in_eax, in_ecx;
++    /* The register name to look for, in the X86CPUFeatureWordInfo array */
++    const char *reg;
++    /* The bit to check in X86CPUFeatureWordInfo.features */
++    int bitnr;
++    /* The expected value for the bit in (X86CPUFeatureWordInfo.features) */
++    bool expected_value;
++} FeatureTestArgs;
++
++/* Get the value for a feature word in a X86CPUFeatureWordInfo list */
++static uint32_t get_feature_word(QList *features, uint32_t eax, uint32_t ecx,
++                                 const char *reg)
++{
++    const QListEntry *e;
++
++    for (e = qlist_first(features); e; e = qlist_next(e)) {
++        QDict *w = qobject_to_qdict(qlist_entry_obj(e));
++        const char *rreg = qdict_get_str(w, "cpuid-register");
++        uint32_t reax = qdict_get_int(w, "cpuid-input-eax");
++        bool has_ecx = qdict_haskey(w, "cpuid-input-ecx");
++        uint32_t recx = 0;
++
++        if (has_ecx) {
++            recx = qdict_get_int(w, "cpuid-input-ecx");
++        }
++        if (eax == reax && (!has_ecx || ecx == recx) && !strcmp(rreg, reg)) {
++            return qint_get_int(qobject_to_qint(qdict_get(w, "features")));
++        }
++    }
++    return 0;
++}
++
++static void test_feature_flag(const void *data)
++{
++    const FeatureTestArgs *args = data;
++    char *path;
++    QList *present, *filtered;
++    uint32_t value;
++
++    qtest_start(args->cmdline);
++    path = get_cpu0_qom_path();
++    present = qobject_to_qlist(qom_get(path, "feature-words"));
++    filtered = qobject_to_qlist(qom_get(path, "filtered-features"));
++    value = get_feature_word(present, args->in_eax, args->in_ecx, args->reg);
++    value |= get_feature_word(filtered, args->in_eax, args->in_ecx, args->reg);
++    qtest_end();
++
++    g_assert(!!(value & (1U << args->bitnr)) == args->expected_value);
++
++    QDECREF(present);
++    QDECREF(filtered);
++    g_free(path);
++}
++
++/*
++ * Add test case to ensure that a given feature flag is set in
++ * either "feature-words" or "filtered-features", when running QEMU
++ * using cmdline
++ */
++static FeatureTestArgs *add_feature_test(const char *name, const char *cmdline,
++                                         uint32_t eax, uint32_t ecx,
++                                         const char *reg, int bitnr,
++                                         bool expected_value)
++{
++    FeatureTestArgs *args = g_new0(FeatureTestArgs, 1);
++    args->cmdline = cmdline;
++    args->in_eax = eax;
++    args->in_ecx = ecx;
++    args->reg = reg;
++    args->bitnr = bitnr;
++    args->expected_value = expected_value;
++    qtest_add_data_func(name, args, test_feature_flag);
++    return args;
++}
++
+ #ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
+ static void test_plus_minus_subprocess(void)
+ {
+@@ -229,5 +314,31 @@ int main(int argc, char **argv)
+                    "-machine pc-i440fx-2.7 -cpu 486,+xstore",
+                    "xlevel2", 0);
+ 
++    /* Test feature parsing */
++    add_feature_test("x86/cpuid/features/plus",
++                     "-cpu 486,+arat",
++                     6, 0, "EAX", 2, true);
++    add_feature_test("x86/cpuid/features/minus",
++                     "-cpu pentium,-mmx",
++                     1, 0, "EDX", 23, false);
++    add_feature_test("x86/cpuid/features/on",
++                     "-cpu 486,arat=on",
++                     6, 0, "EAX", 2, true);
++    add_feature_test("x86/cpuid/features/off",
++                     "-cpu pentium,mmx=off",
++                     1, 0, "EDX", 23, false);
++    add_feature_test("x86/cpuid/features/max-plus-invtsc",
++                     "-cpu max,+invtsc",
++                     0x80000007, 0, "EDX", 8, true);
++    add_feature_test("x86/cpuid/features/max-invtsc-on",
++                     "-cpu max,invtsc=on",
++                     0x80000007, 0, "EDX", 8, true);
++    add_feature_test("x86/cpuid/features/max-minus-mmx",
++                     "-cpu max,-mmx",
++                     1, 0, "EDX", 23, false);
++    add_feature_test("x86/cpuid/features/max-invtsc-on,mmx=off",
++                     "-cpu max,mmx=off",
++                     1, 0, "EDX", 23, false);
++
+     return g_test_run();
+ }
+-- 
+2.11.0.259.g40922b1
