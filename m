@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d7hK8-0005B2-5z
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:59:33 -0400
+	(envelope-from <doug16k@gmail.com>) id 1d7iWQ-0005dq-EM
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 09:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d7hK4-0003Ee-93
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:59:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47667)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d7hK3-0003Ca-W8
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:59:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d7hK3-0005Cs-0s
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 11:59:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EDF292E8048
-	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 11:59:26 +0000 (UTC)
+	(envelope-from <doug16k@gmail.com>) id 1d7iWP-0001IR-4H
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 09:16:18 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:34131)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <doug16k@gmail.com>) id 1d7iWO-0001II-Ue
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 09:16:17 -0400
+Received: by mail-it0-x241.google.com with SMTP id c26so7255420itd.1
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 06:16:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 May 2017 11:46:06 -0000
-From: Thomas Huth <899664@bugs.launchpad.net>
-Reply-To: Bug 899664 <899664@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111203174530.13621.15995.malonedeb@soybean.canonical.com>
-Message-Id: <20170508114607.4117.72177.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 899664] Re: Bad internet performance for Host to
- Guest or Guest to Host
+In-Reply-To: <CAJSP0QV++8rKxPrAXv1GWrwtiK4CNZCv+QoSzYkG-1LYF2SEgw@mail.gmail.com>
+References: <CAEfK_46MMR6cH3ahuJ=zfcuKAp07iU20Ps+yZYv5s9woCPnsSw@mail.gmail.com>
+	<20170502142207.GJ22502@stefanha-x1.localdomain>
+	<CAEfK_46hGYYpO4YhYcxdUar1ugLQwbpJMgxAJDJU13zSpbD4zw@mail.gmail.com>
+	<20170505144506.GA14316@stefanha-x1.localdomain>
+	<CAEfK_44TpSJVi7JULXMRLftM5BFUJs=vHSxKG3h=YOUjQz1t+g@mail.gmail.com>
+	<CAJSP0QV++8rKxPrAXv1GWrwtiK4CNZCv+QoSzYkG-1LYF2SEgw@mail.gmail.com>
+From: Doug Gale <doug16k@gmail.com>
+Date: Mon, 8 May 2017 09:16:15 -0400
+Message-ID: <CAEfK_44j8k3Jiqp7LbXNasKjcfTT0uPPAbyPN=xg=HDAk0WoRQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] gdbstub: implement remote debugging
+ protocol escapes for command receive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,177 +33,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Triaging old bug tickets ... can you still reproduce this problem with
-the latest version of QEMU (currently v2.9.0)?
+Right, only GETLINE_* states write to the linebuf, so line_buf_index <
+1 is correct. Updated patch:
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+>From 2e6c45260cae60bbae446bffe43f948ab002c529 Mon Sep 17 00:00:00 2001
+From: Doug Gale <doug16k@gmail.com>
+Date: Mon, 1 May 2017 12:22:10 -0400
+Subject: [PATCH] gdbstub: implement remote debugging protocol escapes for
+ command receive
 
--- =
+- decode escape sequences
+- decompress run-length encoding escape sequences
+- report command parsing problems to output when debug output is enabled
+- reject packet checksums that are not valid hex digits
+- compute the checksum based on the packet stream, not based on the
+  decoded packet
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/899664
+Tested with GDB and QtCreator integrated debugger on SMP QEMU instance.
+Works for me.
 
-Title:
-  Bad internet performance for Host to Guest or Guest to Host
+Signed-off-by: Doug Gale <doug16k@gmail.com>
+---
+ gdbstub.c | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 99 insertions(+), 9 deletions(-)
 
-Status in QEMU:
-  Incomplete
+diff --git a/gdbstub.c b/gdbstub.c
+index 9911153..dee0ff3 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -286,6 +286,8 @@ enum RSState {
+     RS_INACTIVE,
+     RS_IDLE,
+     RS_GETLINE,
++    RS_GETLINE_ESC,
++    RS_GETLINE_RLE,
+     RS_CHKSUM1,
+     RS_CHKSUM2,
+ };
+@@ -296,7 +298,8 @@ typedef struct GDBState {
+     enum RSState state; /* parsing state */
+     char line_buf[MAX_PACKET_LENGTH];
+     int line_buf_index;
+-    int line_csum;
++    int line_sum; /* running checksum */
++    int line_csum; /* checksum at the end of the packet */
+     uint8_t last_packet[MAX_PACKET_LENGTH + 4];
+     int last_packet_len;
+     int signal;
+@@ -1508,7 +1511,6 @@ void gdb_do_syscall(gdb_syscall_complete_cb cb,
+const char *fmt, ...)
 
-Bug description:
-  Hi, =
+ static void gdb_read_byte(GDBState *s, int ch)
+ {
+-    int i, csum;
+     uint8_t reply;
 
-  Internet performance for Host to Quest is low. =
-
-  The speed Guest to same Guest is  11.3 Gbits/sec
-  The speed Host to same Host is  similar (9.8-11 Gbits/sec)
-
-  But the speed from Guest to Host is slow and around 1Gbit/sec. =
-
-  In the reality traffic never leave a Host. I expected that in this case s=
-peed should be close to Host to Host. =
-
-  It is important for virtual infrastructure when you have several Guests o=
-n a same Host. Guest to Guest on a same host has speed  around 1 Gbits/sec =
-too. =
-
-
-  Below you can find testes and additional information:
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  biouml@biouml-db:~$ iperf -c 192.168.2.31 -t 30 #Guest to Guest =
-
-  ------------------------------------------------------------
-  Client connecting to 192.168.2.31, TCP port 5001
-  TCP window size: 49.7 KByte (default)
-  ------------------------------------------------------------
-  [  3] local 192.168.2.31 port 52170 connected with 192.168.2.31 port 5001
-  [ ID] Interval       Transfer     Bandwidth
-  [  3]  0.0-30.0 sec  39.6 GBytes  11.3 Gbits/sec
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-  biouml@biouml-db:~$ iperf -c 192.168.2.11 -t 30 # Guest to Host
-  ------------------------------------------------------------
-  Client connecting to 192.168.2.11, TCP port 5001
-  TCP window size: 43.4 KByte (default)
-  ------------------------------------------------------------
-  [  3] local 192.168.2.31 port 47148 connected with 192.168.2.11 port 5001
-  [ ID] Interval       Transfer     Bandwidth
-  [  3]  0.0-30.0 sec  3.69 GBytes  1.06 Gbits/sec
-  biouml@biouml-db:~$ =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-  root@s2-8core:~# iperf -c 192.168.2.30 -t 30 #host to guest
-  ------------------------------------------------------------
-  Client connecting to 192.168.2.30, TCP port 5001
-  TCP window size: 16.0 KByte (default)
-  ------------------------------------------------------------
-  [  3] local 192.168.2.11 port 57403 connected with 192.168.2.30 port 5001
-  [ ID] Interval       Transfer     Bandwidth
-  [  3]  0.0-30.0 sec  5.47 GBytes  1.57 Gbits/sec
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  root@s2-8core:~# iperf -c 192.168.2.11 -t 30 #host to host
-  ------------------------------------------------------------
-  Client connecting to 192.168.2.11, TCP port 5001
-  TCP window size: 49.7 KByte (default)
-  ------------------------------------------------------------
-  [  3] local 192.168.2.11 port 38313 connected with 192.168.2.11 port 5001
-  [ ID] Interval       Transfer     Bandwidth
-  [  3]  0.0-30.0 sec  34.5 GBytes  9.87 Gbits/sec
-  root@s2-8core:~# =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  I am using virtio drivers and virtual machine was started with
-  following parameters:
-
-  /usr/bin/kvm -S -M pc-1.0 -enable-kvm -m 4096 -smp 4,sockets=3D4,cores=3D=
-1,threads=3D1 -name one-25 -uuid d1e125ee-d692-4598-3a75-441cd79a513a -node=
-fconfig -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvir=
-t/qemu/one-25.monitor,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor=
-,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -drive file=3D/var/lib/one/Ope=
-nNebula/var//25/images/disk.0,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dra=
-w,cache=3Dnone -device virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-=
-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/var/lib/one/Ope=
-nNebula/var//25/images/disk.1,if=3Dnone,id=3Ddrive-virtio-disk3,format=3Dra=
-w -device virtio-blk-pci,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk3,=
-id=3Dvirtio-disk3 -netdev tap,fd=3D19,id=3Dhostnet0 -device virtio-net-pci,=
-netdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:c0:a8:02:02,bus=3Dpci.0,addr=3D0x3 =
--usb -device usb-mouse,id=3Dinput0 -vnc 0.0.0.0:98 -vga cirrus -device virt=
-io-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-  Qemu version:
-  root@s2-8core:~# /usr/bin/kvm --version
-  QEMU emulator version 0.15.92, Copyright (c) 2003-2008 Fabrice Bellard
-
-  root@s2-8core:~# ls -la /usr/bin/kvm
-  lrwxrwxrwx 1 root root 27 2011-11-07 17:34 /usr/bin/kvm -> /usr/bin/qemu-=
-system-x86_64
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  Bridge configuration:
-
-  root@s2-8core:~# cat /etc/network/interfaces =
-
-  auto lo
-  iface lo inet loopback
-
-  auto eth0
-  iface eth0 inet manual
-
-  auto eth1 =
-
-  iface eth1 inet manual
-
-  auto br0
-  iface br0 inet static
-          address 192.168.2.11
-          network 192.168.2.0
-          netmask 255.255.255.0
-          broadcast 192.168.2.255
-          gateway 192.168.2.1
-          bridge_ports eth0
-          bridge_stp on
-          bridge_fd 0
-          bridge_maxwait 0
-  root@s2-8core:~# =
-
-
-  root@s2-8core:~# brctl show
-  bridge name	bridge id		STP enabled	interfaces
-  br0		8000.001e8cec6113	yes		eth0
-  							vnet0
-  virbr0		8000.000000000000	yes		=
+ #ifndef CONFIG_USER_ONLY
+@@ -1542,35 +1544,123 @@ static void gdb_read_byte(GDBState *s, int ch)
+         switch(s->state) {
+         case RS_IDLE:
+             if (ch == '$') {
++                /* start of command packet */
+                 s->line_buf_index = 0;
++                s->line_sum = 0;
+                 s->state = RS_GETLINE;
++            } else {
++#ifdef DEBUG_GDB
++                printf("gdbstub received garbage between packets: 0x%x\n", ch);
++#endif
+             }
+             break;
+         case RS_GETLINE:
++            if (ch == '}') {
++                /* start escape sequence */
++                s->state = RS_GETLINE_ESC;
++                s->line_sum += ch;
++            } else if (ch == '*') {
++                /* start run length encoding sequence */
++                s->state = RS_GETLINE_RLE;
++                s->line_sum += ch;
++            } else if (ch == '#') {
++                /* end of command, start of checksum*/
++                s->state = RS_CHKSUM1;
++            } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
++#ifdef DEBUG_GDB
++                printf("gdbstub command buffer overrun, dropping command\n");
++#endif
++                s->state = RS_IDLE;
++            } else {
++                /* unescaped command character */
++                s->line_buf[s->line_buf_index++] = ch;
++                s->line_sum += ch;
++            }
++            break;
++        case RS_GETLINE_ESC:
+             if (ch == '#') {
+-            s->state = RS_CHKSUM1;
++                /* unexpected end of command in escape sequence */
++                s->state = RS_CHKSUM1;
+             } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
++                /* command buffer overrun */
++#ifdef DEBUG_GDB
++                printf("gdbstub command buffer overrun, dropping command\n");
++#endif
+                 s->state = RS_IDLE;
+             } else {
+-            s->line_buf[s->line_buf_index++] = ch;
++                /* parse escaped character and leave escape state */
++                s->line_buf[s->line_buf_index++] = ch ^ 0x20;
++                s->line_sum += ch;
++                s->state = RS_GETLINE;
++            }
++            break;
++        case RS_GETLINE_RLE:
++            if (ch < ' ') {
++                /* invalid RLE count encoding */
++#ifdef DEBUG_GDB
++                printf("gdbstub got invalid RLE count: 0x%x\n", ch);
++#endif
++                s->state = RS_GETLINE;
++            } else {
++                /* decode repeat length */
++                int repeat = (unsigned char)ch - ' ' + 3;
++                if (s->line_buf_index + repeat >= sizeof(s->line_buf) - 1) {
++                    /* that many repeats would overrun the command buffer */
++#ifdef DEBUG_GDB
++                    printf("gdbstub command buffer overrun,"
++                           " dropping command\n");
++#endif
++                    s->state = RS_IDLE;
++                } else if (s->line_buf_index < 1) {
++                    /* got a repeat but we have nothing to repeat */
++#ifdef DEBUG_GDB
++                    printf("gdbstub got invalid RLE sequence\n");
++#endif
++                    s->state = RS_GETLINE;
++                } else {
++                    /* repeat the last character */
++                    memset(s->line_buf + s->line_buf_index,
++                           s->line_buf[s->line_buf_index - 1], repeat);
++                    s->line_buf_index += repeat;
++                    s->line_sum += ch;
++                    s->state = RS_GETLINE;
++                }
+             }
+             break;
+         case RS_CHKSUM1:
++            /* get high hex digit of checksum */
++            if (!isxdigit(ch)) {
++#ifdef DEBUG_GDB
++                printf("gdbstub got invalid command checksum digit\n");
++#endif
++                s->state = RS_GETLINE;
++                break;
++            }
+             s->line_buf[s->line_buf_index] = '\0';
+             s->line_csum = fromhex(ch) << 4;
+             s->state = RS_CHKSUM2;
+             break;
+         case RS_CHKSUM2:
++            /* get low hex digit of checksum */
++            if (!isxdigit(ch)) {
++#ifdef DEBUG_GDB
++                printf("gdbstub got invalid command checksum digit\n");
++#endif
++                s->state = RS_GETLINE;
++                break;
++            }
+             s->line_csum |= fromhex(ch);
+-            csum = 0;
+-            for(i = 0; i < s->line_buf_index; i++) {
+-                csum += s->line_buf[i];
+-            }
+-            if (s->line_csum != (csum & 0xff)) {
++
++            if (s->line_csum != (s->line_sum & 0xff)) {
++                /* send NAK reply */
+                 reply = '-';
+                 put_buffer(s, &reply, 1);
++#ifdef DEBUG_GDB
++                printf("gdbstub got command packet with incorrect checksum\n");
++#endif
+                 s->state = RS_IDLE;
+             } else {
++                /* send ACK reply */
+                 reply = '+';
+                 put_buffer(s, &reply, 1);
+                 s->state = gdb_handle_packet(s, s->line_buf);
+-- 
+2.7.4
 
 
-  root@s2-8core:~# brctl --version
-  bridge-utils, 1.5
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  root@s2-8core:~# uname -a
-  Linux s2-8core 3.0.0-13-server #22-Ubuntu SMP Wed Nov 2 15:09:08 UTC 2011=
- x86_64 x86_64 x86_64 GNU/Linux
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/899664/+subscriptions
+On Mon, May 8, 2017 at 5:01 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Sun, May 7, 2017 at 4:26 PM, Doug Gale <doug16k@gmail.com> wrote:
+>> On Fri, May 5, 2017 at 10:45 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>>> On Tue, May 02, 2017 at 10:32:40AM -0400, Doug Gale wrote:
+>>>> +            } else {
+>>>> +                /* decode repeat length */
+>>>> +                int repeat = (unsigned char)ch - ' ' + 3;
+>>>> +                if (s->line_buf_index + repeat >= sizeof(s->line_buf) - 1) {
+>>>> +                    /* that many repeats would overrun the command buffer */
+>>>> +#ifdef DEBUG_GDB
+>>>> +                    printf("gdbstub command buffer overrun,"
+>>>> +                           " dropping command\n");
+>>>> +#endif
+>>>> +                    s->state = RS_IDLE;
+>>>> +                } else if (s->line_buf_index <= 2) {
+>>>
+>>> Why s->line_buf_index <= 2?  I expected s->line_buf_index < 1 since we
+>>> just need 1 character to clone for run-length decoding.
+>>
+>> Yes, on second thought, <= 2 is off by one. [0] would be the '$', [1]
+>> would be the repeated character, and [2] would be the '*'.
+>
+> '$' and '*' are not placed into line_buf[] and do not increment
+> line_buf_index.  They don't count.
+>
+> I think the correct condition is line_buf_index < 1 so that the
+> following input from the GDB documentation parses: "$0* " -> "0000".
+>
+> https://sourceware.org/gdb/onlinedocs/gdb/Overview.html
