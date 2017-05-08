@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7nZE-0006ny-I6
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:39:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d7nbA-0007y8-W8
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:41:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7nZD-0007pi-DG
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:39:32 -0400
-References: <20170507000552.20847-1-eblake@redhat.com>
-	<20170507000552.20847-7-eblake@redhat.com>
-	<3f3d454b-6ab4-52d4-eaac-adaeec3ca700@redhat.com>
-	<d8ba0bbc-b69b-9aae-0496-b1b6feb963d2@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1d7nbA-0008Jb-6E
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:41:33 -0400
+References: <20170508171302.17805-1-eblake@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <97f9365a-2a46-010f-0aa4-841c01605601@redhat.com>
-Date: Mon, 8 May 2017 20:39:23 +0200
+Message-ID: <4d045f6a-15ce-7659-94d2-fb573fa621b1@redhat.com>
+Date: Mon, 8 May 2017 20:41:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <d8ba0bbc-b69b-9aae-0496-b1b6feb963d2@redhat.com>
+In-Reply-To: <20170508171302.17805-1-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="venNVgJ9xKFifFwSdgRx4eMAiwvwVPmXn"
-Subject: Re: [Qemu-devel] [PATCH v13 06/12] qcow2: Make distinction between
- zero cluster types obvious
+	boundary="pdHekqHPQlvEJIN7c4b5oWnEieP6u2n3q"
+Subject: Re: [Qemu-devel] [PATCH] block: Tweak error message related to
+ qemu-img convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +25,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---venNVgJ9xKFifFwSdgRx4eMAiwvwVPmXn
+--pdHekqHPQlvEJIN7c4b5oWnEieP6u2n3q
 From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <97f9365a-2a46-010f-0aa4-841c01605601@redhat.com>
-Subject: Re: [PATCH v13 06/12] qcow2: Make distinction between zero cluster
- types obvious
-References: <20170507000552.20847-1-eblake@redhat.com>
- <20170507000552.20847-7-eblake@redhat.com>
- <3f3d454b-6ab4-52d4-eaac-adaeec3ca700@redhat.com>
- <d8ba0bbc-b69b-9aae-0496-b1b6feb963d2@redhat.com>
-In-Reply-To: <d8ba0bbc-b69b-9aae-0496-b1b6feb963d2@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <4d045f6a-15ce-7659-94d2-fb573fa621b1@redhat.com>
+Subject: Re: [PATCH] block: Tweak error message related to qemu-img convert
+References: <20170508171302.17805-1-eblake@redhat.com>
+In-Reply-To: <20170508171302.17805-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08.05.2017 19:15, Eric Blake wrote:
-> On 05/08/2017 10:54 AM, Max Reitz wrote:
->> On 07.05.2017 02:05, Eric Blake wrote:
->>> Treat plain zero clusters differently from allocated ones, so that
->>> we can simplify the logic of checking whether an offset is present.
->>> Do this by splitting QCOW2_CLUSTER_ZERO into two new enums,
->>> QCOW2_CLUSTER_ZERO_PLAIN and QCOW2_CLUSTER_ZERO_ALLOC.
->>>
+On 08.05.2017 19:13, Eric Blake wrote:
+> When converting a 1.1 image down to 0.10, qemu-iotests 060 forces
+> a contrived failure where allocating a cluster used to replace a
+> zero cluster reads unaligned data.  Since it is a zero cluster
+> rather than a data cluster being converted, changing the error
+> message to match our earlier change in 'qcow2: Make distinction
+> bewteen zero cluster types obvious' is worthwhile.
 >=20
->> (No, I'm not mentioning the fact that 060.out contains one more mentio=
-n
->> of "Data cluster offset" that should definitely be a "Cluster allocati=
-on
->> offset" or even "Preallocated zero cluster offset" at
->> block/qcow2-cluster.c:1780, because let's really worry about this late=
-r)
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
 >=20
-> Oh, you mean this?
-> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01784.html
+> There's one more instance of "Data cluster offset" in qcow2-cluster.c,
+> but that one in handle_copied() is contained inside a
+> cluster_type =3D=3D QCOW2_CLUSTER_NORMAL conditional.
+>=20
+>  block/qcow2-cluster.c      | 3 ++-
+>  tests/qemu-iotests/060.out | 2 +-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
 
-http://78.47.108.109:8080/oor0jae2.webm
+Looks good, except for one thing: This is for qemu-img amend, not
+qemu-img convert.
+
+I can handle that, if you'd like, though. :-)
+
+Max
 
 
---venNVgJ9xKFifFwSdgRx4eMAiwvwVPmXn
+--pdHekqHPQlvEJIN7c4b5oWnEieP6u2n3q
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQu1sSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A6IMH/RYphJ7fMwIrsaFBOZCIwltAjQx+4wEy
-4Xlsc7SEy6Lm8cP+rOeVo+EUNY9d18+rR/5j9NKOZY767HE3c+BLhlxscY1v7/0r
-d5SeC5vD527Vt+2Iguo2KrpwKDuNzv5ZFsH8jbl/GdbBn6Rlz4m2xDsuksH9udtr
-vyoOj47QzQjndXCpsZA8xdTUGWBJ+NVVpm5F3XEIgG9q0o+1ttq7cdiHYzAvDB1Z
-zLe1XKlKuHxtwMWOvDTCyaY8mgerXTZ3f8JFOXfm7lQCL2CwkwV4YRGvB9SF5h8w
-z8xVE0ZWciUk1UKK+3l4tPinIouRPQAGcB3FdgVRF/27zkv9E8f2M0E=
-=c/kx
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQu9QSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AAQQIAIcWKUsdpeAVNGvRN+ZlrGaDwryv+Ytn
++UJrPdIFlVVkW3x25ZtWM6DWYzaoLhXedlt7Sh6vcXhcKsbwe9gxofBaFai4bl5f
+OW0Xxar+Ef/EkTHPgqc3ntljrbJSarFW6q9LxP+QmScgwOLbOMlvjes+b8WRedHR
+dIAFaLfSIzUWnFN8j3MY7LrA0/Gn1qz3Vz3x3obvp16nWIK8zHLzfec+Cv3KwQ5F
+5DmnOFdV3iyjvaF8HjF5MDCd4CmXVnJklJC/HNqiaRxOVaGHGDVJMWmqnE0W8qvv
+U63T9KirTWwLXEs9zO/gkgR4Fgf5hPMl/rWq7Hhsc6iZeWUn9DV6ai8=
+=XARE
 -----END PGP SIGNATURE-----
 
---venNVgJ9xKFifFwSdgRx4eMAiwvwVPmXn--
+--pdHekqHPQlvEJIN7c4b5oWnEieP6u2n3q--
