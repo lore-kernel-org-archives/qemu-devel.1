@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d7kMJ-0003oF-U3
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:14:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7kML-0003pv-0c
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d7kMF-0000XM-N6
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:13:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53692)
+	(envelope-from <eblake@redhat.com>) id 1d7kMJ-0000ao-Ph
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:14:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43408)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d7kMF-0000X3-Eb
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:13:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E19C7F6AA
-	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 15:13:53 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon,  8 May 2017 17:13:49 +0200
-Message-Id: <1494256429-31720-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v4] qemu-doc: Update to use the new way of
- attaching USB devices
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d7kMJ-0000ak-Fo
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:13:59 -0400
+References: <87pofj8kek.fsf@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6d99873f-a68f-180d-a72f-db6d569fb215@redhat.com>
+Date: Mon, 8 May 2017 10:13:56 -0500
+MIME-Version: 1.0
+In-Reply-To: <87pofj8kek.fsf@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="w5S2rHS9kIB6lSBJlri5NqLiojRt7rtHG"
+Subject: Re: [Qemu-devel] Future of SoftFloat use in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,199 +27,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <aleksandar.markovic@imgtec.com>, Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-The preferred way of adding USB devices is via "-device" and
-"device_add" nowadays, so let's start to get rid of "-usbdevice"
-and "usb_add" in the documentation. While we're at it, also
-add the new USB devices there which have been added to QEMU
-during the last years, and get rid of the old "vendorid" and
-"productid" parameters of "-usbdevice serial" which have been
-removed in QEMU version 0.14.0 already.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--w5S2rHS9kIB6lSBJlri5NqLiojRt7rtHG
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Richard Henderson
+ <rth@twiddle.net>, Bharata B Rao <bharata@linux.vnet.ibm.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Markovic <aleksandar.markovic@imgtec.com>,
+ Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <6d99873f-a68f-180d-a72f-db6d569fb215@redhat.com>
+Subject: Re: [Qemu-devel] Future of SoftFloat use in QEMU
+References: <87pofj8kek.fsf@linaro.org>
+In-Reply-To: <87pofj8kek.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v4:
- - usb-braille needs a chardev parameter, too, as noticed by Paolo
+On 05/08/2017 09:58 AM, Alex Benn=C3=A9e wrote:
+> Hi,
+>=20
+> We've got a task coming up to implement half-precision floating point
+> (FP16) for ARMv8.2. As you know pretty much all our floating point in
+> QEMU is handled by our internal fork of John R. Hauser's BSD SoftFloat
+> library. Our current implementation is based on version 2a which doesn'=
+t
+> support FP16.
 
- v3:
- - Get rid of vendorid and productid completely
- - Describe x-root option
- - Fixed some more cosmetic nits mentioned by Markus
+Our fork is stuck at 2a because the license of 2b had compatibility
+problems (it had legal restrictions that prevent interaction with GPL).
 
- v2:
- - Addressed review feedback from Markus
- - Added the new USB devices that are only available via "-device"
- - Update qdev-device-use.txt about "vendorid" and "productid"
+>=20
+> As it happens there has been a new release of SoftFloat recently.
+> Version 3 is a complete re-write which made a number of changes, some
+> notable ones being:
+>=20
+>   - Complete rewrite, different use license than earlier releases.
 
- docs/qdev-device-use.txt |  6 ++--
- qemu-doc.texi            | 93 +++++++++++++++++++++++++++---------------------
- 2 files changed, 54 insertions(+), 45 deletions(-)
+And this different license is what?
 
-diff --git a/docs/qdev-device-use.txt b/docs/qdev-device-use.txt
-index b059405..4274fe9 100644
---- a/docs/qdev-device-use.txt
-+++ b/docs/qdev-device-use.txt
-@@ -182,15 +182,13 @@ The appropriate DEVNAME depends on the machine type.  For type "pc":
- 
-   This lets you control I/O ports and IRQs.
- 
--* -usbdevice serial:vendorid=VID,productid=PRID becomes
--  -device usb-serial,vendorid=VID,productid=PRID
-+* -usbdevice serial::chardev becomes -device usb-serial,chardev=dev.
- 
- * -usbdevice braille doesn't support LEGACY-CHARDEV syntax.  It always
-   uses "braille".  With -device, this useful default is gone, so you
-   have to use something like
- 
--  -device usb-braille,chardev=braille,vendorid=VID,productid=PRID
--  -chardev braille,id=braille
-+  -device usb-braille,chardev=braille -chardev braille,id=braille
- 
- * -virtioconsole becomes
-   -device virtio-serial-pci,class=C,vectors=V,ioeventfd=IOEVENTFD,max_ports=N
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 794ab4a..59d0ccb 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -182,7 +182,7 @@ Gravis Ultrasound GF1 sound card
- @item
- CS4231A compatible sound card
- @item
--PCI UHCI USB controller and a virtual USB hub.
-+PCI UHCI, OHCI, EHCI or XHCI USB controller and a virtual USB-1.1 hub.
- @end itemize
- 
- SMP is supported with up to 255 CPUs.
-@@ -1357,10 +1357,10 @@ monitor (@pxref{pcsys_keys}).
- @node pcsys_usb
- @section USB emulation
- 
--QEMU emulates a PCI UHCI USB controller. You can virtually plug
--virtual USB devices or real host USB devices (experimental, works only
--on Linux hosts).  QEMU will automatically create and connect virtual USB hubs
--as necessary to connect multiple USB devices.
-+QEMU can emulate a PCI UHCI, OHCI, EHCI or XHCI USB controller. You can
-+plug virtual USB devices or real host USB devices (only works with certain
-+host operating systems). QEMU will automatically create and connect virtual
-+USB hubs as necessary to connect multiple USB devices.
- 
- @menu
- * usb_devices::
-@@ -1369,53 +1369,64 @@ as necessary to connect multiple USB devices.
- @node usb_devices
- @subsection Connecting USB devices
- 
--USB devices can be connected with the @option{-usbdevice} commandline option
--or the @code{usb_add} monitor command.  Available devices are:
-+USB devices can be connected with the @option{-device usb-...} command line
-+option or the @code{device_add} monitor command. Available devices are:
- 
- @table @code
--@item mouse
-+@item usb-mouse
- Virtual Mouse.  This will override the PS/2 mouse emulation when activated.
--@item tablet
-+@item usb-tablet
- Pointer device that uses absolute coordinates (like a touchscreen).
- This means QEMU is able to report the mouse position without having
- to grab the mouse.  Also overrides the PS/2 mouse emulation when activated.
--@item disk:@var{file}
--Mass storage device based on @var{file} (@pxref{disk_images})
--@item host:@var{bus.addr}
--Pass through the host device identified by @var{bus.addr}
--(Linux only)
--@item host:@var{vendor_id:product_id}
--Pass through the host device identified by @var{vendor_id:product_id}
--(Linux only)
--@item wacom-tablet
-+@item usb-storage,drive=@var{drive_id}
-+Mass storage device backed by @var{drive_id} (@pxref{disk_images})
-+@item usb-uas
-+USB attached SCSI device, see
-+@url{http://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/usb-storage.txt,usb-storage.txt}
-+for details
-+@item usb-bot
-+Bulk-only transport storage device, see
-+@url{http://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/usb-storage.txt,usb-storage.txt}
-+for details here, too
-+@item usb-mtp,x-root=@var{dir}
-+Media transfer protocol device, using @var{dir} as root of the file tree
-+that is presented to the guest.
-+@item usb-host,hostbus=@var{bus},hostaddr=@var{addr}
-+Pass through the host device identified by @var{bus} and @var{addr}
-+@item usb-host,vendorid=@var{vendor},productid=@var{product}
-+Pass through the host device identified by @var{vendor} and @var{product} ID
-+@item usb-wacom-tablet
- Virtual Wacom PenPartner tablet.  This device is similar to the @code{tablet}
- above but it can be used with the tslib library because in addition to touch
- coordinates it reports touch pressure.
--@item keyboard
-+@item usb-kbd
- Standard USB keyboard.  Will override the PS/2 keyboard (if present).
--@item serial:[vendorid=@var{vendor_id}][,product_id=@var{product_id}]:@var{dev}
-+@item usb-serial,chardev=@var{id}
- Serial converter. This emulates an FTDI FT232BM chip connected to host character
--device @var{dev}. The available character devices are the same as for the
--@code{-serial} option. The @code{vendorid} and @code{productid} options can be
--used to override the default 0403:6001. For instance,
--@example
--usb_add serial:productid=FA00:tcp:192.168.0.2:4444
--@end example
--will connect to tcp port 4444 of ip 192.168.0.2, and plug that to the virtual
--serial converter, faking a Matrix Orbital LCD Display (USB ID 0403:FA00).
--@item braille
-+device @var{id}.
-+@item usb-braille,chardev=@var{id}
- Braille device.  This will use BrlAPI to display the braille output on a real
--or fake device.
--@item net:@var{options}
--Network adapter that supports CDC ethernet and RNDIS protocols.  @var{options}
--specifies NIC options as with @code{-net nic,}@var{options} (see description).
-+or fake device referenced by @var{id}.
-+@item usb-net[,netdev=@var{id}]
-+Network adapter that supports CDC ethernet and RNDIS protocols.  @var{id}
-+specifies a netdev defined with @code{-netdev @dots{},id=@var{id}}.
- For instance, user-mode networking can be used with
- @example
--qemu-system-i386 [...OPTIONS...] -net user,vlan=0 -usbdevice net:vlan=0
--@end example
--Currently this cannot be used in machines that support PCI NICs.
--@item bt[:@var{hci-type}]
--Bluetooth dongle whose type is specified in the same format as with
-+qemu-system-i386 [...] -netdev user,id=net0 -device usb-net,netdev=net0
-+@end example
-+@item usb-ccid
-+Smartcard reader device
-+@item usb-audio
-+USB audio device
-+@item usb-bt-dongle
-+Bluetooth dongle for the transport layer of HCI. It is connected to HCI
-+scatternet 0 by default (corresponds to @code{-bt hci,vlan=0}).
-+Note that the syntax for the @code{-device usb-bt-dongle} option is not as
-+useful yet as it was with the legacy @code{-usbdevice} option. So to
-+configure an USB bluetooth device, you might need to use
-+"@code{-usbdevice bt}[:@var{hci-type}]" instead. This configures a
-+bluetooth dongle whose type is specified in the same format as with
- the @option{-bt hci} option, @pxref{bt-hcis,,allowed HCI types}.  If
- no type is given, the HCI logic corresponds to @code{-bt hci,vlan=0}.
- This USB device implements the USB Transport Layer of HCI.  Example
-@@ -1460,11 +1471,11 @@ hubs, it won't work).
- 
- @item Add the device in QEMU by using:
- @example
--usb_add host:1234:5678
-+device_add usb-host,vendorid=0x1234,productid=0x5678
- @end example
- 
--Normally the guest OS should report that a new USB device is
--plugged. You can use the option @option{-usbdevice} to do the same.
-+Normally the guest OS should report that a new USB device is plugged.
-+You can use the option @option{-device usb-host,...} to do the same.
- 
- @item Now you can try to use the host USB device in QEMU.
- 
--- 
-1.8.3.1
+> See: http://www.jhauser.us/arithmetic/SoftFloat-3c/doc/SoftFloat-histor=
+y.html
+
+which says merely "Replaced the license text supplied by the University
+of California, Berkeley." but not WHAT the actual license text is.  Are
+we lucky enough that it might have a 2-clause BSD license?
+
+/me goes digging...
+
+http://www.jhauser.us/arithmetic/SoftFloat-3c/doc/SoftFloat.html
+
+>  The following applies to the whole of SoftFloat Release 3c as well as =
+to each source file individually.
+>=20
+> Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 The Regents of the U=
+niversity of California. All rights reserved.
+>=20
+> Redistribution and use in source and binary forms, with or without modi=
+fication, are permitted provided that the following conditions are met:
+>=20
+>     Redistributions of source code must retain the above copyright noti=
+ce, this list of conditions, and the following disclaimer.
+>=20
+>     Redistributions in binary form must reproduce the above copyright n=
+otice, this list of conditions, and the following disclaimer in the docum=
+entation and/or other materials provided with the distribution.
+>=20
+>     Neither the name of the University nor the names of its contributor=
+s may be used to endorse or promote products derived from this software w=
+ithout specific prior written permission.
+>=20
+> THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS =E2=80=9CAS I=
+S=E2=80=9D, AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIM=
+ITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PART=
+ICULAR PURPOSE, ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBU=
+TORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, =
+OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF S=
+UBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS I=
+NTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CO=
+NTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARI=
+SING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE P=
+OSSIBILITY OF SUCH DAMAGE.=20
+
+Not a 2-clause BSD, but sure looks exactly like the stock 3-clause BSD
+license.  Yay - https://www.gnu.org/licenses/license-list.en.html says
+it is compatible with GPL, and thus we can use it in qemu!
+
+> So any thoughts about what would make the best approach?
+
+No quick thoughts on the best way to proceed, but at least (from my
+non-lawyer perspective) it looks like we CAN quit maintaining our fork.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--w5S2rHS9kIB6lSBJlri5NqLiojRt7rtHG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZEIs0AAoJEKeha0olJ0NqvEUH/1+wHBsTjQhYu2GsQdbua/LX
+1vuYEFjYT7CJKLgDJ1uC3JKs9FKaCgOnwlqrS0Dx0MmMQTpDqsUOo/eMvyC5MP4t
+ozB/AQ7lGTxcziRrOMNap4IbGi4RFhJ6nXz2hC+j4BuSZMj5gnmiw7vjdyXYspOv
+iS2vrfIrjnAPJNR+cwj6YjkxBf2cW/FLYdn1wVWyNo6dSmZKTVqEnMHZS+QmTOlp
+DU2o1d6jAvJjLh1Ju1TvgevebdGT6NdxZZgPrZYELtiVZbhmC9OLq8XL+H6/CV5K
+BVJ3sUrmakh+V9XW43UOuxIbql+j5RGR3jHSRCGGld12J27Rj2ojBaPePnkkATo=
+=Yucp
+-----END PGP SIGNATURE-----
+
+--w5S2rHS9kIB6lSBJlri5NqLiojRt7rtHG--
