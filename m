@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d7sVa-0000Wy-8w
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:56:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7sVk-0000el-JZ
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:56:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d7sVZ-0000jo-Cn
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:56:06 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:60806)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1d7sVZ-0000jL-0k
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:56:05 -0400
-Date: Tue, 9 May 2017 01:56:03 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170508235603.d6676ezjv5p7gmgs@aurel32.net>
-References: <20170508151707.5434-1-rth@twiddle.net>
-	<20170508151707.5434-4-rth@twiddle.net>
+	(envelope-from <eblake@redhat.com>) id 1d7sVg-0000mp-DN
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:56:16 -0400
+References: <20170508233918.9043-1-f4bug@amsat.org>
+	<20170508233918.9043-4-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2ad7eaf6-3691-f9f1-4d09-204444adbd19@redhat.com>
+Date: Mon, 8 May 2017 18:56:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170508151707.5434-4-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] target/s390x: Diagnose
- specification exception for atomics
+In-Reply-To: <20170508233918.9043-4-f4bug@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="luLuHpJJNqhrSjDVCHef8wXx0erkQ5qJE"
+Subject: Re: [Qemu-devel] [PATCH 03/11] hw/misc: add missing includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 2017-05-08 08:17, Richard Henderson wrote:
-> All of the interlocked access facility instructions raise a
-> specification exception for unaligned accesses.  Do this by
-> using the (previously unused) unaligned_access hook.
-> 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--luLuHpJJNqhrSjDVCHef8wXx0erkQ5qJE
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <2ad7eaf6-3691-f9f1-4d09-204444adbd19@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 03/11] hw/misc: add missing includes
+References: <20170508233918.9043-1-f4bug@amsat.org>
+ <20170508233918.9043-4-f4bug@amsat.org>
+In-Reply-To: <20170508233918.9043-4-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/08/2017 06:39 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  target/s390x/cpu.c    |  1 +
->  target/s390x/cpu.h    |  3 +++
->  target/s390x/helper.c | 16 ++++++++++++++++
->  3 files changed, 20 insertions(+)
-> 
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 066dcd1..a1bf2ba 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -430,6 +430,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
->      cc->write_elf64_note = s390_cpu_write_elf64_note;
->      cc->cpu_exec_interrupt = s390_cpu_exec_interrupt;
->      cc->debug_excp_handler = s390x_cpu_debug_excp_handler;
-> +    cc->do_unaligned_access = s390x_cpu_do_unaligned_access;
->  #endif
->      cc->disas_set_info = s390_cpu_disas_set_info;
->  
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 058ddad..bbed320 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -480,6 +480,9 @@ int s390_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw,
->  
->  #ifndef CONFIG_USER_ONLY
->  void do_restart_interrupt(CPUS390XState *env);
-> +void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-> +                                   MMUAccessType access_type,
-> +                                   int mmu_idx, uintptr_t retaddr);
->  
->  static inline hwaddr decode_basedisp_s(CPUS390XState *env, uint32_t ipb,
->                                         uint8_t *ar)
-> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-> index 68bd2f9..9978490 100644
-> --- a/target/s390x/helper.c
-> +++ b/target/s390x/helper.c
-> @@ -718,4 +718,20 @@ void s390x_cpu_debug_excp_handler(CPUState *cs)
->          cpu_loop_exit_noexc(cs);
->      }
->  }
-> +
-> +/* Unaligned accesses are only diagnosed with MO_ALIGN.  At the moment,
-> +   this is only for the atomic operations, for which we want to raise a
-> +   specification exception.  */
-> +void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-> +                                   MMUAccessType access_type,
-> +                                   int mmu_idx, uintptr_t retaddr)
-> +{
-> +    S390CPU *cpu = S390_CPU(cs);
-> +    CPUS390XState *env = &cpu->env;
-> +
-> +    if (retaddr) {
-> +        cpu_restore_state(cs, retaddr);
-> +    }
-> +    program_interrupt(env, PGM_SPECIFICATION, ILEN_LATER);
-> +}
->  #endif /* CONFIG_USER_ONLY */
+>  include/hw/misc/unimp.h | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/include/hw/misc/unimp.h b/include/hw/misc/unimp.h
+> index 3462d85836..353ee19abf 100644
+> --- a/include/hw/misc/unimp.h
+> +++ b/include/hw/misc/unimp.h
+> @@ -8,6 +8,9 @@
+>  #ifndef HW_MISC_UNIMP_H
+>  #define HW_MISC_UNIMP_H
+> =20
+> +#include "qemu/osdep.h"
 
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+NACK. .h files should not include osdep.h, because the .c file that is
+using the .h file should have already done so.  This is mentioned in
+HACKING.
 
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--luLuHpJJNqhrSjDVCHef8wXx0erkQ5qJE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZEQWZAAoJEKeha0olJ0NqUS0H/jp4fE4izBwNT0OV4RM6PQlT
+S+CrgBGmvB48HVe5RU0sKCzhITCHrXVcKHK8Pg3x+L1oo5MPm/aB8qgZMhu0nojV
++fITWXb5m88Fv70CFZikkwgTxz7za7Sf/4gBQ7hoxU5ruY296hIB9glBJ3QG+mnQ
+K2erUVQhnxy47twI4ajPV8wE0cW8+OM9L1SEb55FLb32L1UDvI30Q5o5Wa7ZQfwC
+mGgSaX4LoHNJvSh7lOKjY0DY5LWeB2KsEUlqT/QAfIwgb0WS5WsVtd8Zl6+3j9cX
+1zFrCc85YeQavvxy1csBwDPqwxB5jDlT2pgGaH9qpGW3yiXLQ4m4ncUIvrXpE9M=
+=JM/0
+-----END PGP SIGNATURE-----
+
+--luLuHpJJNqhrSjDVCHef8wXx0erkQ5qJE--
