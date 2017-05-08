@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7kqr-0005e5-PG
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:45:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1d7ksA-0006Io-Kn
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7kqq-0002IE-Ue
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:45:33 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20170507000552.20847-1-eblake@redhat.com>
-	<20170507000552.20847-6-eblake@redhat.com>
-	<54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
-Message-ID: <537ffb45-1126-e4cf-7b74-35865f7a8387@redhat.com>
-Date: Mon, 8 May 2017 17:45:24 +0200
+	(envelope-from <berrange@redhat.com>) id 1d7ks7-0002XS-Sa
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:46:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34288)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d7ks7-0002XM-Jz
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:46:51 -0400
+Date: Mon, 8 May 2017 16:46:43 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170508154643.GV18871@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <87pofj8kek.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="he51x7VdLAd243qLVKW5fJVGBbri91rkm"
-Subject: Re: [Qemu-devel] [PATCH v13 05/12] qcow2: Name typedef for cluster
- type
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87pofj8kek.fsf@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Future of SoftFloat use in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <aleksandar.markovic@imgtec.com>, Pranith Kumar <bobby.prani@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---he51x7VdLAd243qLVKW5fJVGBbri91rkm
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <537ffb45-1126-e4cf-7b74-35865f7a8387@redhat.com>
-Subject: Re: [PATCH v13 05/12] qcow2: Name typedef for cluster type
-References: <20170507000552.20847-1-eblake@redhat.com>
- <20170507000552.20847-6-eblake@redhat.com>
- <54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
-In-Reply-To: <54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, May 08, 2017 at 03:58:59PM +0100, Alex Benn=C3=A9e wrote:
+> Of course the softfloat in QEMU's tree hasn't been static either. We've
+> made numerous changes over the years to add and fix various features,
+> including features that have since been added to the upstream softfloat=
+.
 
-On 08.05.2017 17:43, Max Reitz wrote:
-> On 07.05.2017 02:05, Eric Blake wrote:
->> Although it doesn't add all that much type safety (this is C, after
->> all), it does add a bit of legibility to use the name QCow2ClusterType=
+Based on way Peter achieved the switch to softfloat 2a, we can
+reasonably identify the set of custom QEMU changes to the
+original 2a code base.  From that diff, plus the subsequent
+git history, it is within realm of practicality to at least
+identify areas where we might need enhance/customize version 3.
 
->> instead of a plain int.
->>
->> In particular, qcow2_get_cluster_offset() has an overloaded return
->> type; a QCow2ClusterType on success, and -errno on failure; keeping
->> the cluster type in a separate variable makes it slightly easier for
->> the next patch to make further computations based on the type.
->>
->> Suggested-by: Max Reitz <mreitz@redhat.com>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> ---
->> v13: new patch
->> ---
->>  block/qcow2.h          |  6 +++---
->>  block/qcow2-cluster.c  | 17 +++++++++--------
->>  block/qcow2-refcount.c |  2 +-
->>  3 files changed, 13 insertions(+), 12 deletions(-)
+> It seems unlikely we could switch to the newer softfloat without riskin=
+g
+> breaking something. However if we look at back-porting stuff from the
+> newer library we essentially get to own our version of softfloat
+> forever.
+
+Maintaining our own fork forever certainly feels unappealing,
+particularly with the big feature gap you identify for FP16
+
+> So what else can we do?
 >=20
-> [...]
->=20
->> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
->> index f3bfce6..ed78a30 100644
->> --- a/block/qcow2-cluster.c
->> +++ b/block/qcow2-cluster.c
->=20
-> Above this hunk, there is count_contiguous_clusters() with a variable
-> "first_cluster_type" that could be a QCow2ClusterType as well.
->=20
->> @@ -340,7 +340,7 @@ static int count_contiguous_clusters(int nb_cluste=
-rs, int cluster_size,
->>   */
->>  static int count_contiguous_clusters_unallocated(int nb_clusters,
->>                                                   uint64_t *l2_table,
->> -                                                 int wanted_type)
->> +                                                 QCow2ClusterType wan=
-ted_type)
->>  {
->>      int i;
->>
->=20
-> And some lines below this (in this function), there is a "type" variabl=
+> We could investigate having both libraries included in QEMU. It seems
+> the API has changed quite a bit so that might be possible although ther=
 e
-> that (c|sh)ould be a QCow2ClusterType, too.
-
-I see you're doing this in the next patch... Well, that's not really
-where it belongs, though.
-
-> Although it's quite a functional change, I would be willing to change
-> both when applying, if you allowed me to.
-
-I guess I'm extending my offer to handle the rebase fallout of the next
-patch, too...?
-
-Max
-
-> (Once again, "no good deed shall go unpunished", as Markus likes to say=
- :-))
+> would be hackage involved in having two different softfloat.h's
+> involved.
 >=20
-> Max
+> This would be useful if we wanted to take a piecemeal approach to
+> updating the library. For example we could just use softfloat3 when we
+> need the newer features (e.g. FP16).
+>
+> Or we could convert one architecture at a time so each qemu binary link=
+s
+> against either a version 2 or version 3 softfloat library. Of course
+> that does run the risk of permanently holding two versions of softfloat
+> in the code if the less maintained guest architectures don't convert
+> quickly.
 >=20
+> So any thoughts about what would make the best approach?
 
+WRT to supporting the FP16 feature, I'd certainly vote for using softfloa=
+t3,
+over trying to re-implement FP16 ourselves in the old codebase we have a =
+fork
+of, even if that means us carrying both versions forever (provided having
+both versions present in QEMU doesn't cause us symbol clashes ?).
 
+Incrementally converting existing usage to softfloat3 is reasonable, but
+doesn't seem like a decision that needs to be an immediate blocker for
+FP16 usage. Given our desire to kill off areas of code which are not acti=
+vely
+maintained, it could be reasonable to set a timebox on softfloat3 convers=
+ion
+for architectures eg must be completed within 3 release cycles, or we'll
+consider the architecture unmaintained and subject for removal.
 
---he51x7VdLAd243qLVKW5fJVGBbri91rkm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQkpQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AKLIH/RAI13fyqk4nvzy4/Dv6Sx+HsObPdp5Z
-QwWrBe83wf6ZPfWMlmUbM98pjwqFQnZM+cXAbMBH7m83y4NJ6ai14GCt25VeRVMP
-AxGvfsccnui3POTWJx9kAoEhWB2JGEakS7v66awK9v/Br4bVd3SjXw6MRCVtdHMb
-/FIh1SPYD5+3OhvPXIe1/gFs6Xt0nhhpSnHW11jOTHXx2d6ih42ZrQ5arWPOSHag
-tEWPG5gx15dtEFlJLMGh10B816NTEp8FaXd/qLGRyDi+buQQvDy8YPN9qw2owmyG
-1cUX2pa+yofIacvNlZzG8UuZGtYNj5phh83DH4dn+A/vCD7x/ob7494=
-=xgrk
------END PGP SIGNATURE-----
-
---he51x7VdLAd243qLVKW5fJVGBbri91rkm--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
