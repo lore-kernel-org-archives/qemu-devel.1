@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7nFs-00077U-Ej
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:19:33 -0400
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1d7nIn-0008Am-C6
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7nFp-0000he-8Z
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:19:32 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7nFp-0000hU-4c
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:19:29 -0400
-Received: by mail-qt0-x244.google.com with SMTP id l39so10659134qtb.1
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 11:19:28 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170508045715.21770-1-f4bug@amsat.org>
-	<20170508045715.21770-5-f4bug@amsat.org> <878tm7a9uc.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <97659c3f-a907-ddf1-e7fa-993ac5692603@amsat.org>
-Date: Mon, 8 May 2017 15:19:25 -0300
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1d7nIm-0001Od-B4
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:22:33 -0400
+Date: Mon, 8 May 2017 20:22:24 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Message-ID: <20170508182224.dfbvmfb4fxfbe3ys@kozik-lap>
+References: <20170507113540.8687-1-krzk@kernel.org>
+	<20170507113540.8687-4-krzk@kernel.org>
+	<f8b021fa-e3f8-50d7-8013-d67e66e25ce6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <878tm7a9uc.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 04/23] docker: compact debian base
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f8b021fa-e3f8-50d7-8013-d67e66e25ce6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/arm/exynos: Add support for system
+ poweroff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 05/08/2017 08:04 AM, Alex Bennée wrote:
->
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->
->> - install common/basic tools at once
->> - one-line Emdebian setup
->> - use eatmydata and remove apt cache to save space
->> - add bison and flex and git
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  tests/docker/dockerfiles/debian.docker | 22 ++++++++++++----------
->>  1 file changed, 12 insertions(+), 10 deletions(-)
->>
->> diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
->> index 52bd79938e..694f8d3b63 100644
->> --- a/tests/docker/dockerfiles/debian.docker
->> +++ b/tests/docker/dockerfiles/debian.docker
->> @@ -9,17 +9,19 @@
->>  #
->>  FROM debian:stable-slim
->>
->> -# Setup some basic tools we need
->> -RUN apt update
->> -RUN apt install -yy curl aptitude
->> -
->> -# Setup Emdebian
->> -RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
->> -RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
->> +# Install some basic tools and common build utilities
->> +RUN apt-get update && \
->> +    DEBIAN_FRONTEND=noninteractive apt-get install -yy \
->> +        eatmydata && \
->
-> I wonder if we should just use ENV instead to set DEBIAN_FRONTEND?
+On Mon, May 08, 2017 at 09:21:40AM -0500, Eric Blake wrote:
+> On 05/07/2017 06:35 AM, Krzysztof Kozlowski wrote:
+> > On all Exynos-based boards, the system powers down itself by driving
+> > PS_HOLD signal low.  Handle writing to respective PMU register to fix
+> > power off failure:
+> > 
+> >     reboot: Power down
+> >     Unable to poweroff system
+> >     shutdown: 31 output lines suppressed due to ratelimiting
+> >     Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000
+> > 
+> >     CPU: 0 PID: 1 Comm: shutdown Not tainted 4.11.0-rc8 #846
+> >     Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+> >     [<c031050c>] (unwind_backtrace) from [<c030ba6c>] (show_stack+0x10/0x14)
+> >     [<c030ba6c>] (show_stack) from [<c05b2800>] (dump_stack+0x88/0x9c)
+> >     [<c05b2800>] (dump_stack) from [<c03d3140>] (panic+0xdc/0x268)
+> >     [<c03d3140>] (panic) from [<c0343614>] (do_exit+0xa90/0xab4)
+> >     [<c0343614>] (do_exit) from [<c035f2dc>] (SyS_reboot+0x164/0x1d0)
+> >     [<c035f2dc>] (SyS_reboot) from [<c0307c80>] (ret_fast_syscall+0x0/0x3c)
+> > 
+> > Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> > ---
+> >  hw/misc/exynos4210_pmu.c | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
+> 
+> > @@ -397,6 +398,12 @@ typedef struct Exynos4210PmuState {
+> >      uint32_t reg[PMU_NUM_OF_REGISTERS];
+> >  } Exynos4210PmuState;
+> >  
+> > +static void exynos4210_pmu_poweroff(void)
+> > +{
+> > +    PRINT_DEBUG("QEMU PMU: PS_HOLD bit down, powering off\n");
+> > +    qemu_system_shutdown_request();
+> 
+> Depending on whether your patch lands before or after mine, we'll have
+> to update this. It sounds like it is a guest-triggered reset, so my
+> patch would have this use SHUTDOWN_CAUSE_GUEST_SHUTDOWN.
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01380.html
 
-In https://github.com/moby/moby/issues/4032#issuecomment-34597177 Tianon 
-Gravi commented:
+Sure, I can rebase and fix the difference once your patchset gets in.
 
-[...] setting it via ENV should be actively discouraged. [...]
-The reason it's not a good default is that if I docker run -i -t ... 
-bash, I'm now interactive, and this variable being set is very, very wrong.
-
->
->> +    DEBIAN_FRONTEND=noninteractive eatmydata apt-get install -y --no-install-recommends \
->> +        curl aptitude \
->> +        build-essential clang git \
->> +        bison flex && \
->> +    rm -rf /var/lib/apt
->
-> Use apt clean to do this.
-
-Ok.
-
->>
->>  # Duplicate deb line as deb-src
->>  RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
->>
->> -# Install common build utilities
->> -RUN apt update
->> -RUN apt install -yy build-essential clang
->> +# Setup Emdebian
->> +RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list && \
->> +    curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
->
-> Why move this to the end? Once we have curl installed it would be nice
-> to do just one update step and have emdebian synced up in the base
-> image.
-
-In the first apt-get can install curl + build-essential clang in the 
-same call, and there is no need to fetch emdebian.org index.
-
-Using 'apt clean' at the end of a layer keeps smaller layer but the next 
-layer have to call `apt-get update` again. Since this base image is used 
-to cross-compile, the child image will have to call `dpkg 
---add-architecture ...` before fetching emdebian.org arch index again 
-(apt-get update) to be able to install the `crossbuild-essential-$arch` 
-package.
-So there is no need to update right after adding this repo, the 'child' 
-will do it (and have to do it).
-
->
-> --
-> Alex Bennée
->
+Best regards,
+Krzysztof
