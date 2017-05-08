@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7apD-00081n-GC
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 01:03:12 -0400
+	(envelope-from <rob@landley.net>) id 1d7au9-0003kT-5J
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 01:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7apC-0000NV-NU
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 01:03:11 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35338)
+	(envelope-from <rob@landley.net>) id 1d7au5-0001KC-58
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 01:08:17 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:33783)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7apC-0000NR-JT
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 01:03:10 -0400
-Received: by mail-qt0-x243.google.com with SMTP id r58so8248580qtb.2
-	for <qemu-devel@nongnu.org>; Sun, 07 May 2017 22:03:10 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  8 May 2017 02:02:30 -0300
-Message-Id: <20170508050230.22039-1-f4bug@amsat.org>
-In-Reply-To: <20170508045715.21770-1-f4bug@amsat.org>
-References: <20170508045715.21770-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <rob@landley.net>) id 1d7au4-0001Ja-V2
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 01:08:13 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id w10so38432474oif.0
+	for <qemu-devel@nongnu.org>; Sun, 07 May 2017 22:08:11 -0700 (PDT)
+Received: from [192.168.43.158] (me95336d0.tmodns.net. [208.54.83.233])
+	by smtp.googlemail.com with ESMTPSA id
+	c47sm6363637otc.28.2017.05.07.22.08.10 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 07 May 2017 22:08:10 -0700 (PDT)
+From: Rob Landley <rob@landley.net>
+Message-ID: <619adaac-955d-c6f6-f137-ff627b7cbfb0@landley.net>
+Date: Mon, 8 May 2017 00:08:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 18/23] shippable: temporary disable
- mips64el-softmmu build
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] How do you -sd squashfs.img without truncating?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +31,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- .shippable.yml | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+As far as I can tell "qemu-system-arm -M vexpress-a9" only implements sd
+card, not any conventional hard drive, and it uses an sdcard block size
+of 262144 bytes rounded down. This means when I create a squashfs image
+and feed it in through the sd card, it truncates it.
 
-diff --git a/.shippable.yml b/.shippable.yml
-index 6601243060..7e714991f9 100644
---- a/.shippable.yml
-+++ b/.shippable.yml
-@@ -15,8 +15,9 @@ env:
-       TARGET_LIST=aarch64-softmmu,aarch64-linux-user
-     - IMAGE=debian-s390x-cross
-       TARGET_LIST=s390x-softmmu,s390x-linux-user
-+    # mips64el-softmmu disabled due to libfdt problem
-     - IMAGE=debian-mipsel-cross
--      TARGET_LIST=mipsel-softmmu,mips64el-softmmu,mipsel-linux-user,mips64el-linux-user
-+      TARGET_LIST=mipsel-softmmu,mipsel-linux-user,mips64el-linux-user
- build:
-   pre_ci:
-     - make docker-image-${IMAGE}
--- 
-2.11.0
+Wouldn't -sd rounding _up_ be more useful?
+
+Rob
