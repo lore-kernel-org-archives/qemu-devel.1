@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7o2b-0003YY-5F
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 15:09:54 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d7oE4-0007XA-8h
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 15:21:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7o2a-0000jC-Az
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 15:09:53 -0400
-References: <20170508171302.17805-1-eblake@redhat.com>
-	<4d045f6a-15ce-7659-94d2-fb573fa621b1@redhat.com>
-	<a9c93461-8829-3270-5527-3f93fad32a62@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3a3a99d1-4d77-da01-9b3c-21cbd4d9b8dc@redhat.com>
-Date: Mon, 8 May 2017 21:09:42 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1d7oE0-0006mD-7N
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 15:21:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51252)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d7oDz-0006ky-US
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 15:21:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A8CFC0467C5
+	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 19:21:38 +0000 (UTC)
+Date: Mon, 8 May 2017 20:21:33 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170508192132.GN2120@work-vm>
+References: <1494223204-16388-1-git-send-email-peterx@redhat.com>
+	<1494223204-16388-3-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a9c93461-8829-3270-5527-3f93fad32a62@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="96rRLa73xLttr5OriOM1ihoNT46wdR1xd"
-Subject: Re: [Qemu-devel] [PATCH] block: Tweak error message related to
- qemu-img convert
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1494223204-16388-3-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] ramblock: add new hmp command "info
+ ramblock"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +34,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---96rRLa73xLttr5OriOM1ihoNT46wdR1xd
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <3a3a99d1-4d77-da01-9b3c-21cbd4d9b8dc@redhat.com>
-Subject: Re: [PATCH] block: Tweak error message related to qemu-img convert
-References: <20170508171302.17805-1-eblake@redhat.com>
- <4d045f6a-15ce-7659-94d2-fb573fa621b1@redhat.com>
- <a9c93461-8829-3270-5527-3f93fad32a62@redhat.com>
-In-Reply-To: <a9c93461-8829-3270-5527-3f93fad32a62@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Peter Xu (peterx@redhat.com) wrote:
+> To dump information about ramblocks. It looks like:
+> 
+> (qemu) info ramblock
+>               Block Name    PSize              Offset               Used              Total
+>             /objects/mem       2M  0x0000000000000000 0x0000000080000000 0x0000000080000000
+>                 vga.vram       4K  0x0000000080060000 0x0000000001000000 0x0000000001000000
+>     /rom@etc/acpi/tables       4K  0x00000000810b0000 0x0000000000020000 0x0000000000200000
+>                  pc.bios       4K  0x0000000080000000 0x0000000000040000 0x0000000000040000
+>   0000:00:03.0/e1000.rom       4K  0x0000000081070000 0x0000000000040000 0x0000000000040000
+>                   pc.rom       4K  0x0000000080040000 0x0000000000020000 0x0000000000020000
+>     0000:00:02.0/vga.rom       4K  0x0000000081060000 0x0000000000010000 0x0000000000010000
+>    /rom@etc/table-loader       4K  0x00000000812b0000 0x0000000000001000 0x0000000000001000
+>       /rom@etc/acpi/rsdp       4K  0x00000000812b1000 0x0000000000001000 0x0000000000001000
+> 
+> Ramblock is something hidden internally in QEMU implementation, and this
+> command should only be used by mostly QEMU developers on RAM stuff. It
+> is not a command suitable for QMP interface. So only HMP interface is
+> provided for it.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  exec.c                 | 20 ++++++++++++++++++++
+>  hmp-commands-info.hx   | 14 ++++++++++++++
+>  hmp.c                  |  6 ++++++
+>  hmp.h                  |  1 +
+>  include/exec/ramlist.h |  1 +
+>  include/qemu-common.h  |  1 +
+>  util/cutils.c          | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+>  7 files changed, 89 insertions(+)
+> 
+> diff --git a/exec.c b/exec.c
+> index 50519ae..5e50bdf 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -71,6 +71,8 @@
+>  #include "qemu/mmap-alloc.h"
+>  #endif
+>  
+> +#include "monitor/monitor.h"
+> +
+>  //#define DEBUG_SUBPAGE
+>  
+>  #if !defined(CONFIG_USER_ONLY)
+> @@ -1333,6 +1335,24 @@ void qemu_mutex_unlock_ramlist(void)
+>      qemu_mutex_unlock(&ram_list.mutex);
+>  }
+>  
+> +void ram_block_dump(Monitor *mon)
+> +{
+> +    RAMBlock *block;
+> +
+> +    rcu_read_lock();
+> +    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
+> +                   "Block Name", "PSize", "Offset", "Used", "Total");
+> +    RAMBLOCK_FOREACH(block) {
+> +        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
+> +                       " 0x%016" PRIx64 "\n", block->idstr,
+> +                       page_size_to_str(block->page_size),
+> +                       (uint64_t)block->offset,
+> +                       (uint64_t)block->used_length,
+> +                       (uint64_t)block->max_length);
+> +    }
+> +    rcu_read_unlock();
+> +}
+> +
+>  #ifdef __linux__
+>  /*
+>   * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index a53f105..ae16901 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -788,6 +788,20 @@ Display the latest dump status.
+>  ETEXI
+>  
+>      {
+> +        .name       = "ramblock",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "Display system ramblock information",
+> +        .cmd        = hmp_info_ramblock,
+> +    },
+> +
+> +STEXI
+> +@item info ramblock
+> +@findex ramblock
+> +Dump all the ramblocks of the system.
+> +ETEXI
+> +
+> +    {
+>          .name       = "hotpluggable-cpus",
+>          .args_type  = "",
+>          .params     = "",
+> diff --git a/hmp.c b/hmp.c
+> index ab407d6..8369388 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -37,6 +37,7 @@
+>  #include "qemu-io.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/error-report.h"
+> +#include "exec/ramlist.h"
+>  #include "hw/intc/intc.h"
+>  
+>  #ifdef CONFIG_SPICE
+> @@ -2563,6 +2564,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
+>      qapi_free_DumpQueryResult(result);
+>  }
+>  
+> +void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
+> +{
+> +    ram_block_dump(mon);
+> +}
+> +
+>  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
+>  {
+>      Error *err = NULL;
+> diff --git a/hmp.h b/hmp.h
+> index 799fd37..7353b67 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -136,6 +136,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
+>  void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
+>  void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
+>  void hmp_info_dump(Monitor *mon, const QDict *qdict);
+> +void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
+>  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  
+> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
+> index f1c6b45..2e2ac6c 100644
+> --- a/include/exec/ramlist.h
+> +++ b/include/exec/ramlist.h
+> @@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
+>  void ram_block_notify_add(void *host, size_t size);
+>  void ram_block_notify_remove(void *host, size_t size);
+>  
+> +void ram_block_dump(Monitor *mon);
+>  
+>  #endif /* RAMLIST_H */
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index d218821..62aef10 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -146,6 +146,7 @@ int parse_debug_env(const char *name, int max, int initial);
+>  
+>  const char *qemu_ether_ntoa(const MACAddr *mac);
+>  void page_size_init(void);
+> +const char *page_size_to_str(size_t psize);
+>  
+>  /* returns non-zero if dump is in progress, otherwise zero is
+>   * returned. */
+> diff --git a/util/cutils.c b/util/cutils.c
+> index 50ad179..b0fe88a 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -619,3 +619,49 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
+>  
+>      return ret;
+>  }
+> +
+> +const char *page_size_to_str(size_t psize)
+> +{
+> +    switch (psize) {
+> +    case 0x1000:
+> +        return "4K";
+> +    case 0x2000:
+> +        return "8K";
+> +    case 0x4000:
+> +        return "16K";
+> +    case 0x8000:
+> +        return "32K";
+> +    case 0x10000:
+> +        return "64K";
+> +    case 0x20000:
+> +        return "128K";
+> +    case 0x40000:
+> +        return "256K";
+> +    case 0x80000:
+> +        return "512K";
+> +    case 0x100000:
+> +        return "1M";
+> +    case 0x200000:
+> +        return "2M";
+> +    case 0x400000:
+> +        return "4M";
+> +    case 0x800000:
+> +        return "8M";
+> +    case 0x1000000:
+> +        return "16M";
+> +    case 0x2000000:
+> +        return "32M";
+> +    case 0x4000000:
+> +        return "64M";
+> +    case 0x8000000:
+> +        return "128M";
+> +    case 0x10000000:
+> +        return "256M";
+> +    case 0x20000000:
+> +        return "512M";
+> +    case 0x40000000:
+> +        return "1G";
+> +    default:
+> +        return "N/A";
+> +    }
+> +}
 
-On 08.05.2017 21:06, Eric Blake wrote:
-> On 05/08/2017 01:41 PM, Max Reitz wrote:
->> On 08.05.2017 19:13, Eric Blake wrote:
->>> When converting a 1.1 image down to 0.10, qemu-iotests 060 forces
->>> a contrived failure where allocating a cluster used to replace a
->>> zero cluster reads unaligned data.  Since it is a zero cluster
->>> rather than a data cluster being converted, changing the error
->>> message to match our earlier change in 'qcow2: Make distinction
->>> bewteen zero cluster types obvious' is worthwhile.
->>>
->>> Suggested-by: Max Reitz <mreitz@redhat.com>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>
->>> There's one more instance of "Data cluster offset" in qcow2-cluster.c=
-,
->>> but that one in handle_copied() is contained inside a
->>> cluster_type =3D=3D QCOW2_CLUSTER_NORMAL conditional.
->>>
->>>  block/qcow2-cluster.c      | 3 ++-
->>>  tests/qemu-iotests/060.out | 2 +-
->>>  2 files changed, 3 insertions(+), 2 deletions(-)
->>
->> Looks good, except for one thing: This is for qemu-img amend, not
->> qemu-img convert.
->>
->> I can handle that, if you'd like, though. :-)
->=20
-> So is fixing my commit message considered a conversion, or an amendment=
-?
+Again, I'm happy - but this function still bothers me; I wonder
+what we can do.  My main worry is it's the same as cvtstr and
+print_type_size - but it's actually not, because they do odd
+things printing it as %.3f.  Is print_type_str in MB or MiB
+(I cna't tell it's got both 1000 and 1024 in - odd)
 
-The git commit parameter is called "--amend", so take your guess. ;-)
+Can't we just write a general routine using ctz rather
+than the big switch - then anyone can use it with a power of 2.
 
-Max
-
-
---96rRLa73xLttr5OriOM1ihoNT46wdR1xd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQwnYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Axc8H/0ryHLd1GpRkxOcY6RIy6PLYS8Zh8rJ7
-2SVfvxrB6Q0yWZ0Wdwrux1XNjUcC6HonArohdb3ouetAn+aiTzW6oRm5H1bYSaly
-dxqY4JoNZSJNKAPEYOVCqxIx9JGT45pmYLYt1SgkEwG27tAOak2B5fQ26VAF6Vv+
-Qj+ZhZ6neno/RPlgcFgc6jw7Ww6IZYGf+iZWQwnpvOehD65VLun4jhxCJ8I+5vwp
-VH7VGrALaTz5BrUqpasw/pt/dXK+OH/r5JOdJvkP5ISIZsF9vxfSwXGemfrtQP9y
-17XhRrqcZqxpLqoLwrHUXFwQbRKBw7IrVHYnyCgKUpx5te6AZP8gtOQ=
-=53LI
------END PGP SIGNATURE-----
-
---96rRLa73xLttr5OriOM1ihoNT46wdR1xd--
+Dave
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
