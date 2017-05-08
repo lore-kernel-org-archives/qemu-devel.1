@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7m89-0007lH-5D
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:07:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7mDl-0000zC-6V
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:13:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7m85-0003e6-6a
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:07:29 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35643)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d7m85-0003di-2d
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:07:25 -0400
-Received: by mail-qk0-x242.google.com with SMTP id k74so10981071qke.2
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 10:07:25 -0700 (PDT)
-Date: Mon, 8 May 2017 13:07:22 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170508170722.GI22428@stefanha-x1.localdomain>
-References: <20170506110333.11000-1-aurelien@aurel32.net>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pe+tqlI1iYzVj1X/"
-Content-Disposition: inline
-In-Reply-To: <20170506110333.11000-1-aurelien@aurel32.net>
-Subject: Re: [Qemu-devel] [PULL 0/1] tcg-mips queue
+	(envelope-from <eblake@redhat.com>) id 1d7mDk-0005ap-5v
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:13:17 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon,  8 May 2017 12:13:02 -0500
+Message-Id: <20170508171302.17805-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: Tweak error message related to qemu-img
+ convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +18,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
+When converting a 1.1 image down to 0.10, qemu-iotests 060 forces
+a contrived failure where allocating a cluster used to replace a
+zero cluster reads unaligned data.  Since it is a zero cluster
+rather than a data cluster being converted, changing the error
+message to match our earlier change in 'qcow2: Make distinction
+bewteen zero cluster types obvious' is worthwhile.
 
---pe+tqlI1iYzVj1X/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Suggested-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
-On Sat, May 06, 2017 at 01:03:32PM +0200, Aurelien Jarno wrote:
-> The following changes since commit 12a95f320a36ef66f724a49bb05e4fb553ac5d=
-be:
->=20
->   Merge remote-tracking branch 'kwolf/tags/for-upstream' into staging (20=
-17-05-04 13:44:32 +0100)
->=20
-> are available in the git repository at:
->=20
->   git://git.aurel32.net/qemu.git tags/pull-tcg-mips-20170506
->=20
-> for you to fetch changes up to 2f5a5f5774d95baacf86c03aa8a77a2d0390f2b2:
->=20
->   tcg/mips: fix field extraction opcode (2017-05-06 12:48:53 +0200)
->=20
-> ----------------------------------------------------------------
-> Fix MIPS R2 hosts support
->=20
-> ----------------------------------------------------------------
->=20
-> Aurelien Jarno (1):
->   tcg/mips: fix field extraction opcode
->=20
->  tcg/mips/tcg-target.inc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> --=20
-> 2.11.0
->=20
->=20
+There's one more instance of "Data cluster offset" in qcow2-cluster.c,
+but that one in handle_copied() is contained inside a
+cluster_type == QCOW2_CLUSTER_NORMAL conditional.
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+ block/qcow2-cluster.c      | 3 ++-
+ tests/qemu-iotests/060.out | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Stefan
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 347d94b..d779ea1 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1797,7 +1797,8 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
+             }
 
---pe+tqlI1iYzVj1X/
-Content-Type: application/pgp-signature; name="signature.asc"
+             if (offset_into_cluster(s, offset)) {
+-                qcow2_signal_corruption(bs, true, -1, -1, "Data cluster offset "
++                qcow2_signal_corruption(bs, true, -1, -1,
++                                        "Cluster allocation offset "
+                                         "%#" PRIx64 " unaligned (L2 offset: %#"
+                                         PRIx64 ", L2 index: %#x)", offset,
+                                         l2_offset, j);
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index 9e8f5b9..3bc1461 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -143,7 +143,7 @@ read failed: Input/output error
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-qcow2: Marking image as corrupt: Data cluster offset 0x52a00 unaligned (L2 offset: 0x40000, L2 index: 0); further corruption events will be suppressed
++qcow2: Marking image as corrupt: Cluster allocation offset 0x52a00 unaligned (L2 offset: 0x40000, L2 index: 0); further corruption events will be suppressed
+ qemu-img: Error while amending options: Input/output error
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZEKXKAAoJEJykq7OBq3PI+ScIALqcCDo+r9DKEiwVPGQ3COUK
-sOQaGVF9mliOzOnbKlrcZJr4mOgZwM7xuUVjeI9rRIMVMEqsHOb20htPmWJv0cox
-4pLuT10Yg0zn32Famr4Ex63P/CgxZqnS0iBUgsD1vZaVYDMowfKgRxR6spVn4G36
-PACzmhQjLdcnpLfKHi755ylEoWM+4Ehb7Mvv7/1MWY8Au4qKmHiRwhYempI3JSnM
-V9CvV08qtZmw+B9Yecx0v7uOFtz2lf0pjsIPPDcyY/gRMxwYOLjO3yPNWnZTkD4A
-vbqDz19dFW1e2Juig8HdgIa8kTcxoQ/apXrQzhiVOjhCA2jLmOjGv1paRR3TOCo=
-=hztB
------END PGP SIGNATURE-----
-
---pe+tqlI1iYzVj1X/--
+ === Testing unaligned reftable entry ===
+-- 
+2.9.3
