@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57406)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7mlg-00079E-Vj
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:48:22 -0400
+	id 1d7mmE-0007Oc-Pm
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:48:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7mld-00083U-TG
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:48:21 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36847)
+	id 1d7mm9-000887-OK
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:48:54 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34057)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7mld-00083P-OK
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:48:17 -0400
-Received: by mail-qt0-x242.google.com with SMTP id j13so10540392qta.3
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 10:48:17 -0700 (PDT)
+	id 1d7mm9-000881-Kx
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:48:49 -0400
+Received: by mail-qt0-x243.google.com with SMTP id l39so10541251qtb.1
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 10:48:49 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170508045715.21770-1-f4bug@amsat.org>
-	<20170508045715.21770-15-f4bug@amsat.org> <874lwva9gc.fsf@linaro.org>
+	<20170508045715.21770-17-f4bug@amsat.org> <871srza9bi.fsf@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bf8b7d5b-690a-946a-2554-9800d9b62742@amsat.org>
-Date: Mon, 8 May 2017 14:48:13 -0300
+Message-ID: <89ae857f-9dd8-6ed1-336f-748920a0f92c@amsat.org>
+Date: Mon, 8 May 2017 14:48:46 -0300
 MIME-Version: 1.0
-In-Reply-To: <874lwva9gc.fsf@linaro.org>
+In-Reply-To: <871srza9bi.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 14/23] docker: add 'apt-fake' script
- which generate fake debian packages
+Subject: Re: [Qemu-devel] [PATCH 16/23] shippable: do not initialize
+ submodules automatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,108 +36,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurel32@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Vagrant Cascadian <vagrant@debian.org>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
-On 05/08/2017 08:12 AM, Alex Bennée wrote:
+On 05/08/2017 08:15 AM, Alex Bennée wrote:
 >
 > Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 >
+>> do it in the 'ci' target when needed.
+>>
 >> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >> ---
->>  tests/docker/Makefile.include               |  2 ++
->>  tests/docker/dockerfiles/debian-apt-fake.sh | 46 +++++++++++++++++++++++++++++
->>  tests/docker/dockerfiles/debian.docker      |  2 ++
->>  3 files changed, 50 insertions(+)
->>  create mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
+>>  .shippable.yml | 2 ++
+>>  1 file changed, 2 insertions(+)
 >>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
->> index 47978fb56c..ca6f57a292 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -55,6 +55,8 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
->>  		$(if $(EXTRA_FILE),--include-file=$(EXTRA_FILE)),\
->>  		"BUILD","$*")
->>
->> +docker-image-debian: EXTRA_FILE:=tests/docker/dockerfiles/debian-apt-fake.sh
->> +
+>> diff --git a/.shippable.yml b/.shippable.yml
+>> index fa2d6a4e9b..b3cbca458c 100644
+>> --- a/.shippable.yml
+>> +++ b/.shippable.yml
+>> @@ -1,4 +1,6 @@
+>>  language: c
+>> +git:
+>> +   submodules: false
+>>  env:
+>>    global:
+>>      - LC_ALL=C
 >
-> Can we only include debian-apt-fake on the debian images that require it please?
+> Maybe this should be merged with the next patch?
 
-Sure.
+Ok.
 
->>  # Enforce dependancies for composite images
->>  docker-image-debian-armhf-cross: docker-image-debian
->>  docker-image-debian-arm64-cross: docker-image-debian
->> diff --git a/tests/docker/dockerfiles/debian-apt-fake.sh b/tests/docker/dockerfiles/debian-apt-fake.sh
->> new file mode 100755
->> index 0000000000..387522c174
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/debian-apt-fake.sh
->> @@ -0,0 +1,46 @@
->> +#! /bin/sh
->> +#
->> +# Generate fake debian package to resolve unimportant unmet dependencies held
->> +# by upstream multiarch broken packages.
->> +#
->> +# Copyright (c) 2017 Philippe Mathieu-Daudé <f4bug@amsat.org>
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2
->> +# or (at your option) any later version. See the COPYING file in
->> +# the top-level directory.
->> +
->> +test $1 = "install" && shift 1
->> +
->> +fake_install()
->> +{
->> +    echo "Generating fake $2 $1 $3 ..."
->> +    (cd /var/cache/apt/archives
->> +        (cat << 'EOF'
->> +Section: misc
->> +Priority: optional
->> +Standards-Version: 3.9.2
->> +
->> +Package: NAME
->> +Version: VERSION
->> +Maintainer: qemu-devel@nongnu.org
->> +Architecture: any
->> +Multi-Arch: same
->> +Description: fake NAME
->> +EOF
->> +        ) | sed s/NAME/$2/g | sed s/VERSION/$3/g > $2.control
->> +        equivs-build -a $1 $2.control 1>/dev/null 2>/dev/null
->> +        dpkg -i $2_$3_$1.deb
->> +    )
->> +}
->> +
->> +try_install()
->> +{
->> +    name=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\1/")
->> +    arch=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\2/")
->> +    vers=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\3/")
->> +    apt-get install -q -yy $1 || fake_install $arch $name $vers
->> +}
->> +
->> +for package in $*; do
->> +    try_install $package
->> +done
->> diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
->> index 694f8d3b63..a99396ae8f 100644
->> --- a/tests/docker/dockerfiles/debian.docker
->> +++ b/tests/docker/dockerfiles/debian.docker
->> @@ -22,6 +22,8 @@ RUN apt-get update && \
->>  # Duplicate deb line as deb-src
->>  RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
->>
->> +ADD debian-apt-fake.sh /usr/local/bin/apt-fake
->> +
->
-> And only add this in the images that need it.
->
->>  # Setup Emdebian
->>  RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list && \
->>      curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
->
->
 > --
 > Alex Bennée
 >
