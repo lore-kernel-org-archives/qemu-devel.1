@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d7qty-0006xq-MB
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:13:12 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d7qyu-0008Ep-OY
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d7qtx-00055a-HZ
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:13:10 -0400
-Date: Tue, 9 May 2017 00:13:04 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170508221304.y36owezwla7sc6ss@aurel32.net>
-References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d7qyr-0006hP-IA
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:16 -0400
+Received: from mail-qk0-x235.google.com ([2607:f8b0:400d:c09::235]:34564)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d7qyr-0006gm-DK
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:13 -0400
+Received: by mail-qk0-x235.google.com with SMTP id k74so64892934qke.1
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 15:18:13 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon,  8 May 2017 19:17:38 -0300
+Message-Id: <20170508221759.15616-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
-Subject: Re: [Qemu-devel] Floating point unit bugs
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/21] docker/shippable: cross-build mipsel
+ and powerpc targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +32,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>
-Cc: "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 2017-05-07 17:48, G 3 wrote:
-> I made a diagnostic program for the floating point unit. It will test
-> various PowerPC floating point instructions for compatibility with the
-> PowerPC G3 processor. It was tested on a PowerPC G3 and G5 system. The
-> results of the program in qemu-system-ppc were pretty bad. About every
-> instruction tested is not implemented correctly.
->=20
-> Here is the download link to the program: http://www.mediafire.com/file/6=
-j9tqubvk73lkw1/floating_point_test_program.zip
+This patchset add 2 more architectures to the cross-build farm.
 
-Some comments on the code.
->=20
->     /* Check if everything is alright */
->     uint32_t fpscr;
->     asm volatile("mffs f0");
->     asm volatile("stfd f0, 40(r1)");
->     asm volatile("lwz %0, 44(r1)" : "=3Dr"(fpscr));
->     if (fpscr !=3D 0) {
->         printf("Warning: fpscr not equal to zero: 0x%x\n", fpscr);
->     }
+There is still some issue trying to cross-build mips64el-softmmu, it seems the
+cross tools use the system outdated libfdt instead of the one checkouted in the
+dtc submodule. I disabled this target for now.
 
-This is overly complicated and just doesn't compile with recent GCC
-versions. What about something like:
+The branch https://github.com/philmd/qemu/tree/docker_shippable_v2 can be
+checked at Shippable:
+  https://app.shippable.com/github/philmd/qemu/status/dashboard
 
-    Converter c;
-    asm volatile("mffs %0" : "=3Df"(c.d));
-    fpscr =3D (uint32_t)c.i;
+With the free open source projects service, each arch builds in around ~8min,
+the 5 jobs take ~38min in total.
 
+v2:
+- Addressed review feedback from Alex, added his R-B
+- Fixed the "Problem with the SSL CA cert" problem while cloning from github.com
+  installing the ca-certificates package.
+- Squashed/split some commits
+- use 'apt-get clean' instead of brutal 'rm -rf'
+- checked how many cores are available on Shippable and use them fully
+  (reduced total time from 44min to 38min)
+- build armeb-linux-user target
 
-> /*
->  * The action to take if a test fails
->  * Input one: message string
->  * Input two: actual fpscr value
->  * Input three: expected fpscr value
->  * Input four: actual answer
->  * Input five: expected answer
->  */
->  void test_failed(const char *message, uint32_t actual_fpscr, uint32_t
-> expected_fpscr,
->                   uint64_t actual_answer, uint64_t expected_answer)
->  {
->     printf("%s\n", message);
->     printf("expected answer: 0x%" PRIx64 "\n", expected_answer);
->     printf("  actual answer: 0x%" PRIx64 "\n", actual_fpscr);
+v1:
+- Reorganize Dockerfiles to use less layers, resulting in smaller images.
+  This also reduce time of image transfer, for example while using:
+  `docker save qemu:debian | ssh remote docker load`
+- Install more debian packages so the configure script enable more features and
+  more code can be compiled/covered.
+- There are still some incorrect multiarch packages on debian/jessie used in
+  the docker images, add a script to generate fake packages and avoid
+  dependencies issues.
+- Modify the docker.py script to include an extra file while building images.
 
-This is wrong. It should be actual_answer instead of actual_fpscr. That
-is why all the instructions seems totally wrongly implemented. Note that
-compiling with -Wall would give you a warning:
+Regards,
 
-| main.c: In function =E2=80=98test_failed=E2=80=99:
-| main.c:146:5: warning: format =E2=80=98%llx=E2=80=99 expects argument of =
-type =E2=80=98long long unsigned int=E2=80=99, but argument 2 has type =E2=
-=80=98uint32_t=E2=80=99 [-Wformat=3D]
-|      printf("  actual answer: 0x%" PRIx64 "\n", actual_fpscr);
-|=C2=A0     ^
+Phil.
 
-So I think the cone needs to be improved a bit before we can conclude
-anything.
+Philippe Mathieu-Daudé (21):
+  docker: let _copy_with_mkdir() sub_path argument be optional
+  docker: add --include-file argument to 'build' command
+  docker: add 'apt-fake' script which generate fake debian packages
+  docker: install ca-certificates package in base image
+  docker: compact debian base
+  docker: compact debian armhf
+  docker: compact debian arm64
+  docker: add extra libs to armhf target to extend codebase coverage
+  docker: add extra libs to arm64 target to extend codebase coverage
+  docker: add extra libs to s390x target to extend codebase coverage
+  docker: add mipsel build target
+  docker: add powerpc build target
+  shippable: use C locale to simplify console output
+  shippable: build using all available cpus
+  shippable: do not initialize submodules automatically
+  shippable: be verbose while building docker images
+  shippable: add armeb-linux-user target
+  shippable: add powerpc target
+  shippable: add mipsel target
+  MAINTAINERS: add Shippable automation platform URL
+  MAINTAINERS: self-appoint me as reviewer in build/test automation
 
-Aurelien
+ .shippable.yml                                     | 23 +++++++++--
+ MAINTAINERS                                        |  2 +
+ tests/docker/Makefile.include                      |  8 +++-
+ tests/docker/docker.py                             |  7 +++-
+ tests/docker/dockerfiles/debian-apt-fake.sh        | 46 ++++++++++++++++++++++
+ tests/docker/dockerfiles/debian-arm64-cross.docker | 16 ++++++--
+ tests/docker/dockerfiles/debian-armhf-cross.docker | 16 ++++++--
+ .../docker/dockerfiles/debian-mipsel-cross.docker  | 31 +++++++++++++++
+ .../docker/dockerfiles/debian-powerpc-cross.docker | 31 +++++++++++++++
+ tests/docker/dockerfiles/debian-s390x-cross.docker |  6 +++
+ tests/docker/dockerfiles/debian.docker             | 26 ++++++------
+ 11 files changed, 186 insertions(+), 26 deletions(-)
+ create mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
+ create mode 100644 tests/docker/dockerfiles/debian-mipsel-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-powerpc-cross.docker
 
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+-- 
+2.11.0
