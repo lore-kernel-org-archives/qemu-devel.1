@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7kjf-0002FE-I7
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:38:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d7koq-0004TB-Nx
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:43:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7kje-0008A1-NF
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:38:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d7kop-0001jq-Sp
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:43:28 -0400
 References: <20170507000552.20847-1-eblake@redhat.com>
-	<20170507000552.20847-2-eblake@redhat.com>
-	<35324a73-aae8-e677-f411-00dfaf6d4f38@redhat.com>
-	<f72fca48-7e77-4268-9463-a2c51e999687@redhat.com>
+	<20170507000552.20847-6-eblake@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e1338ab4-02f9-9644-ee94-f92fb4b8d617@redhat.com>
-Date: Mon, 8 May 2017 17:37:57 +0200
+Message-ID: <54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
+Date: Mon, 8 May 2017 17:43:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <f72fca48-7e77-4268-9463-a2c51e999687@redhat.com>
+In-Reply-To: <20170507000552.20847-6-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="LsgsV0aLD5h2SN199eigloVPDd3pXUaP2"
-Subject: Re: [Qemu-devel] [PATCH v13 01/12] qcow2: Nicer variable names in
- qcow2_update_snapshot_refcount()
+	boundary="GEJTTb6gqV7jNuMAlvJ4mVt2Xs82rHUOF"
+Subject: Re: [Qemu-devel] [PATCH v13 05/12] qcow2: Name typedef for cluster
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +29,88 @@ To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LsgsV0aLD5h2SN199eigloVPDd3pXUaP2
+--GEJTTb6gqV7jNuMAlvJ4mVt2Xs82rHUOF
 From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <e1338ab4-02f9-9644-ee94-f92fb4b8d617@redhat.com>
-Subject: Re: [PATCH v13 01/12] qcow2: Nicer variable names in
- qcow2_update_snapshot_refcount()
+Message-ID: <54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
+Subject: Re: [PATCH v13 05/12] qcow2: Name typedef for cluster type
 References: <20170507000552.20847-1-eblake@redhat.com>
- <20170507000552.20847-2-eblake@redhat.com>
- <35324a73-aae8-e677-f411-00dfaf6d4f38@redhat.com>
- <f72fca48-7e77-4268-9463-a2c51e999687@redhat.com>
-In-Reply-To: <f72fca48-7e77-4268-9463-a2c51e999687@redhat.com>
+ <20170507000552.20847-6-eblake@redhat.com>
+In-Reply-To: <20170507000552.20847-6-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08.05.2017 17:36, Eric Blake wrote:
-> On 05/08/2017 10:27 AM, Max Reitz wrote:
->> On 07.05.2017 02:05, Eric Blake wrote:
->>> In order to keep checkpatch happy when the next patch changes
->>> indentation, we first have to shorten some long lines.  The easiest
->>> approach is to use a new variable in place of
->>> 'offset & L2E_OFFSET_MASK', except that 'offset' is the best name
->>> for that variable.  Change '[old_]offset' to '[old_]entry' to
->>> make room.
->>>
->>> While touching things, also fix checkpatch warnings about unusual
->>> 'for' statements.
->>>
->>> Suggested by Max Reitz <mreitz@redhat.com>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>>
+On 07.05.2017 02:05, Eric Blake wrote:
+> Although it doesn't add all that much type safety (this is C, after
+> all), it does add a bit of legibility to use the name QCow2ClusterType
+> instead of a plain int.
 >=20
->>> @@ -1117,20 +1118,22 @@ int qcow2_update_snapshot_refcount(BlockDrive=
-rState *bs,
->>>                  goto fail;
->>>              }
->>>
->>> -            for(j =3D 0; j < s->l2_size; j++) {
->>> +            for (j =3D 0; j < s->l2_size; j++) {
->>>                  uint64_t cluster_index;
->>> +                uint64_t offset;
->>
->> Actually, introducing entry and old_entry in this scope would have
->> sufficed, too, because they aren't used anywhere else. But nobody
->> actually cares (O:-)), so:
->>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>
->>>
->>> -                offset =3D be64_to_cpu(l2_table[j]);
->>> -                old_offset =3D offset;
->>> -                offset &=3D ~QCOW_OFLAG_COPIED;
->>> +                entry =3D be64_to_cpu(l2_table[j]);
->>> +                old_entry =3D entry;
+> In particular, qcow2_get_cluster_offset() has an overloaded return
+> type; a QCow2ClusterType on success, and -errno on failure; keeping
+> the cluster type in a separate variable makes it slightly easier for
+> the next patch to make further computations based on the type.
 >=20
-> Other things I thought about, but didn't care enough to actually do:
-> it's possible to reduce a line of code by either:
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 >=20
-> old_entry =3D entry =3D be64_to_cpu(l2_table[j]);
-> entry &=3D ~QCOW_OFLAG_COPIED;
->=20
-> or by:
->=20
-> old_entry =3D be64_to_cpu(l2_table[j]);
-> entry =3D old_entry & ~QCOW_OFLAG_COPIED;
->=20
-> for one less line of source.  You're welcome to make either such tweak
-> if you care, but I'm not going to respin for just that ;)
+> ---
+> v13: new patch
+> ---
+>  block/qcow2.h          |  6 +++---
+>  block/qcow2-cluster.c  | 17 +++++++++--------
+>  block/qcow2-refcount.c |  2 +-
+>  3 files changed, 13 insertions(+), 12 deletions(-)
 
-No, I actually like the code as it is. :-)
+[...]
+
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index f3bfce6..ed78a30 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+
+Above this hunk, there is count_contiguous_clusters() with a variable
+"first_cluster_type" that could be a QCow2ClusterType as well.
+
+> @@ -340,7 +340,7 @@ static int count_contiguous_clusters(int nb_cluster=
+s, int cluster_size,
+>   */
+>  static int count_contiguous_clusters_unallocated(int nb_clusters,
+>                                                   uint64_t *l2_table,
+> -                                                 int wanted_type)
+> +                                                 QCow2ClusterType want=
+ed_type)
+>  {
+>      int i;
+>=20
+
+And some lines below this (in this function), there is a "type" variable
+that (c|sh)ould be a QCow2ClusterType, too.
+
+Although it's quite a functional change, I would be willing to change
+both when applying, if you allowed me to.
+
+(Once again, "no good deed shall go unpunished", as Markus likes to say :=
+-))
 
 Max
 
 
---LsgsV0aLD5h2SN199eigloVPDd3pXUaP2
+--GEJTTb6gqV7jNuMAlvJ4mVt2Xs82rHUOF
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQkNYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AuscIAIFZAD+EwuxvNCs7xyM19uGoXbeZRnJG
-fYOHVyJUaSTkMCbyDJ2cSiefehDw0Yi2WEWE7O87UVSJT/P9LabX6ZkNxmEvylXh
-f/pF8px8x6lLaFti+u0GvFjGDv7h3A03Lt6Yko3C6rNMXTQdWQGcjR1CQZB+zAP+
-2UrTTOjYuRccYZU16XWwtAGY1/pjI1vrHAVqQoohr7xI/XtkalMCDTnEsfeWJap2
-0Aa1J2Xlcfg6+wBoi2RaD6MwbCho++XrLSej94rkEZoyZrhCigxZjxwm6QfwUSTp
-ilaGP/vC1+pTpACsPhG+b+JNMeU+8tx81/Z/hE5u+RYp6f+XddCnXmU=
-=R+Vv
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQkhcSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AOqAH/2dpiN/nmC3/8LU48FO6lKEeaKBMBWiv
+lg6WM7MJWonbFjGn1mHdVQFfaL2r315vf4JLMnziS82/GHKFz8Hvcmj1U+Ww3Mzk
+GD5dd+M5fOF4Lld0TrbWpD2dbsdp/acGQKog4jdTDxoR/0mQ46nVoG4XwXQfcMir
+Rt2qrVj7yzsQjdNMRRVTbE5wYLaGoB84Qh3DJHPdn0M61LmiyS6IyvaYp+rrxaKL
+ibDcxb0W5Wos+Ueiw04Rd2U3fioQPGxVDTmAp6ZyVz1JYzoHVPWhXDDm/gpyMq1v
++gIa6Sty8+BGPo/Lrn8hUh7QsM44kuvrHVCNDTYYdybZhaeoEYG6cgc=
+=/irm
 -----END PGP SIGNATURE-----
 
---LsgsV0aLD5h2SN199eigloVPDd3pXUaP2--
+--GEJTTb6gqV7jNuMAlvJ4mVt2Xs82rHUOF--
