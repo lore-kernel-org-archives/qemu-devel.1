@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d7jPo-0007Qn-BZ
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:13:33 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d7jPo-0007RJ-Sz
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d7jPn-0003Gk-Az
+	(envelope-from <pbonzini@redhat.com>) id 1d7jPn-0003H9-UZ
 	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:13:32 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  8 May 2017 16:13:05 +0200
-Message-Id: <20170508141310.8674-7-pbonzini@redhat.com>
+Date: Mon,  8 May 2017 16:13:07 +0200
+Message-Id: <20170508141310.8674-9-pbonzini@redhat.com>
 In-Reply-To: <20170508141310.8674-1-pbonzini@redhat.com>
 References: <20170508141310.8674-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/11] blockjob: move iostatus reset inside
- block_job_user_resume
+Subject: [Qemu-devel] [PATCH 08/11] blockjob: group BlockJob transaction
+ functions together
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +23,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, jcody@redhat.com, jsnow@redhat.com, stefanha@redhat.com
 
-Outside blockjob.c, the block_job_iostatus_reset function is used once
-in the monitor and once in BlockBackend.  When we introduce the block
-job mutex, block_job_iostatus_reset's client is going to be the block
-layer (for which blockjob.c will take the block job mutex) rather than
-the monitor (which will take the block job mutex by itself).
-
-The monitor's call to block_job_iostatus_reset from the monitor comes
-just before the sole call to block_job_user_resume, so reset the
-iostatus directly from block_job_iostatus_reset.  This will avoid
-the need to introduce separate block_job_iostatus_reset and
-block_job_iostatus_reset_locked APIs.
-
-After making this change, move the function together with the others
-that were moved in the previous patch.
+Yet another pure code movement patch, preparing for the next change.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- blockdev.c |  1 -
- blockjob.c | 11 ++++++-----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ blockjob.c | 128 ++++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 64 insertions(+), 64 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 64282065d8..cdec4ac82a 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3726,7 +3726,6 @@ void qmp_block_job_resume(const char *device, Error **errp)
-     }
- 
-     trace_qmp_block_job_resume(job);
--    block_job_iostatus_reset(job);
-     block_job_user_resume(job);
-     aio_context_release(aio_context);
- }
 diff --git a/blockjob.c b/blockjob.c
-index 41dc2fe9f1..7edf779adc 100644
+index 9a5204346f..68efed9042 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -412,6 +412,7 @@ void block_job_user_resume(BlockJob *job)
- {
-     if (job && job->user_paused && job->pause_count > 0) {
-         job->user_paused = false;
-+        block_job_iostatus_reset(job);
-         block_job_resume(job);
-     }
- }
-@@ -427,11 +428,6 @@ void block_job_cancel(BlockJob *job)
-     }
+@@ -91,6 +91,39 @@ BlockJob *block_job_get(const char *id)
+     return NULL;
  }
  
--void block_job_iostatus_reset(BlockJob *job)
--{
--    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
--}
--
- static int block_job_finish_sync(BlockJob *job,
-                                  void (*finish)(BlockJob *, Error **errp),
-                                  Error **errp)
-@@ -767,6 +763,11 @@ void block_job_yield(BlockJob *job)
-     block_job_pause_point(job);
- }
- 
-+void block_job_iostatus_reset(BlockJob *job)
++BlockJobTxn *block_job_txn_new(void)
 +{
-+    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
++    BlockJobTxn *txn = g_new0(BlockJobTxn, 1);
++    QLIST_INIT(&txn->jobs);
++    txn->refcnt = 1;
++    return txn;
 +}
 +
- void block_job_event_ready(BlockJob *job)
++static void block_job_txn_ref(BlockJobTxn *txn)
++{
++    txn->refcnt++;
++}
++
++void block_job_txn_unref(BlockJobTxn *txn)
++{
++    if (txn && --txn->refcnt == 0) {
++        g_free(txn);
++    }
++}
++
++void block_job_txn_add_job(BlockJobTxn *txn, BlockJob *job)
++{
++    if (!txn) {
++        return;
++    }
++
++    assert(!job->txn);
++    job->txn = txn;
++
++    QLIST_INSERT_HEAD(&txn->jobs, job, txn_list);
++    block_job_txn_ref(txn);
++}
++
+ static void block_job_pause(BlockJob *job)
  {
-     job->ready = true;
+     job->pause_count++;
+@@ -317,6 +350,37 @@ static void block_job_cancel_async(BlockJob *job)
+     job->cancelled = true;
+ }
+ 
++static int block_job_finish_sync(BlockJob *job,
++                                 void (*finish)(BlockJob *, Error **errp),
++                                 Error **errp)
++{
++    Error *local_err = NULL;
++    int ret;
++
++    assert(blk_bs(job->blk)->job == job);
++
++    block_job_ref(job);
++
++    finish(job, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        block_job_unref(job);
++        return -EBUSY;
++    }
++    /* block_job_drain calls block_job_enter, and it should be enough to
++     * induce progress until the job completes or moves to the main thread.
++    */
++    while (!job->deferred_to_main_loop && !job->completed) {
++        block_job_drain(job);
++    }
++    while (!job->completed) {
++        aio_poll(qemu_get_aio_context(), true);
++    }
++    ret = (job->cancelled && job->ret == 0) ? -ECANCELED : job->ret;
++    block_job_unref(job);
++    return ret;
++}
++
+ static void block_job_completed_txn_abort(BlockJob *job)
+ {
+     AioContext *ctx;
+@@ -440,37 +504,6 @@ void block_job_cancel(BlockJob *job)
+     }
+ }
+ 
+-static int block_job_finish_sync(BlockJob *job,
+-                                 void (*finish)(BlockJob *, Error **errp),
+-                                 Error **errp)
+-{
+-    Error *local_err = NULL;
+-    int ret;
+-
+-    assert(blk_bs(job->blk)->job == job);
+-
+-    block_job_ref(job);
+-
+-    finish(job, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        block_job_unref(job);
+-        return -EBUSY;
+-    }
+-    /* block_job_drain calls block_job_enter, and it should be enough to
+-     * induce progress until the job completes or moves to the main thread.
+-    */
+-    while (!job->deferred_to_main_loop && !job->completed) {
+-        block_job_drain(job);
+-    }
+-    while (!job->completed) {
+-        aio_poll(qemu_get_aio_context(), true);
+-    }
+-    ret = (job->cancelled && job->ret == 0) ? -ECANCELED : job->ret;
+-    block_job_unref(job);
+-    return ret;
+-}
+-
+ /* A wrapper around block_job_cancel() taking an Error ** parameter so it may be
+  * used with block_job_finish_sync() without the need for (rather nasty)
+  * function pointer casts there. */
+@@ -883,36 +916,3 @@ void block_job_defer_to_main_loop(BlockJob *job,
+     aio_bh_schedule_oneshot(qemu_get_aio_context(),
+                             block_job_defer_to_main_loop_bh, data);
+ }
+-
+-BlockJobTxn *block_job_txn_new(void)
+-{
+-    BlockJobTxn *txn = g_new0(BlockJobTxn, 1);
+-    QLIST_INIT(&txn->jobs);
+-    txn->refcnt = 1;
+-    return txn;
+-}
+-
+-static void block_job_txn_ref(BlockJobTxn *txn)
+-{
+-    txn->refcnt++;
+-}
+-
+-void block_job_txn_unref(BlockJobTxn *txn)
+-{
+-    if (txn && --txn->refcnt == 0) {
+-        g_free(txn);
+-    }
+-}
+-
+-void block_job_txn_add_job(BlockJobTxn *txn, BlockJob *job)
+-{
+-    if (!txn) {
+-        return;
+-    }
+-
+-    assert(!job->txn);
+-    job->txn = txn;
+-
+-    QLIST_INSERT_HEAD(&txn->jobs, job, txn_list);
+-    block_job_txn_ref(txn);
+-}
 -- 
 2.12.2
