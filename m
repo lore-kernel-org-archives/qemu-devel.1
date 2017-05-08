@@ -1,44 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1d7k9n-00074o-BA
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7kAE-0007JM-E8
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.vnet.ibm.com>) id 1d7k9k-0003bj-H3
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
-	id 1d7k9k-0003aV-7S
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:00 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v48Ewnjs035987
-	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 11:00:57 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aadbd3a0u-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 11:00:52 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
-	Mon, 8 May 2017 11:00:51 -0400
-References: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
-	<20170505074143.GB21435@lemon.lan>
-	<298bd169-6f9f-e622-1b8b-85ef126d8d0c@linux.vnet.ibm.com>
-	<ca23d2f5-1296-976b-fe98-35277eb632f9@redhat.com>
-	<c50c12c0-93bb-bd40-9751-d4b716407c20@linux.vnet.ibm.com>
-	<eecd3b1f-a554-b64e-30ba-a45b053f5260@redhat.com>
-	<5d72d4cc-da61-9bbf-3f4c-61fd1c799cd8@de.ibm.com>
-From: Eric Farman <farman@linux.vnet.ibm.com>
-Date: Mon, 8 May 2017 11:00:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7kAB-0003rz-Sn
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d7kAB-0003rn-Jd
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:27 -0400
+References: <20170508141536.20690-1-stefanha@redhat.com>
+	<20170508141536.20690-5-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <68fd3173-ae56-50ed-4cfc-f9c19904aa30@redhat.com>
+Date: Mon, 8 May 2017 10:00:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <5d72d4cc-da61-9bbf-3f4c-61fd1c799cd8@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <0479016a-5731-caed-dd24-986b5d1532a9@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v1 0/5] Enable virtio-scsi boot from
- /dev/sgX
+In-Reply-To: <20170508141536.20690-5-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lS0GcFHcMQ6DAFrCtXTuWlx2OViT7N0Wk"
+Subject: Re: [Qemu-devel] [PATCH v6 4/9] qcow2: make refcount size
+ calculation conservative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,61 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>, Alexander Graf <agraf@suse.de>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lS0GcFHcMQ6DAFrCtXTuWlx2OViT7N0Wk
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange"
+ <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <68fd3173-ae56-50ed-4cfc-f9c19904aa30@redhat.com>
+Subject: Re: [PATCH v6 4/9] qcow2: make refcount size calculation conservative
+References: <20170508141536.20690-1-stefanha@redhat.com>
+ <20170508141536.20690-5-stefanha@redhat.com>
+In-Reply-To: <20170508141536.20690-5-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/08/2017 09:15 AM, Stefan Hajnoczi wrote:
+> The refcount metadata size calculation is inaccurate and can produce
+> numbers that are too small.  This is bad because we should calculate a
+> conservative number - one that is guaranteed to be large enough.
+>=20
+> This patch switches the approach to a fixed point calculation because
+> the existing equation is hard to solve when inaccuracies are taken care=
+
+> of.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c | 82 ++++++++++++++++++++++++++++++---------------------=
+--------
+>  1 file changed, 42 insertions(+), 40 deletions(-)
+>=20
+
+> -    nrefblocke =3D (aligned_total_size + meta_size + cluster_size)
+> -        / (cluster_size - rces - rces * sizeof(uint64_t)
+> -                / cluster_size);
+> -    meta_size +=3D DIV_ROUND_UP(nrefblocke, refblock_size) * cluster_s=
+ize;
+> -
+> -    /* total size of refcount tables */
+> -    nreftablee =3D nrefblocke / refblock_size;
+> -    nreftablee =3D align_offset(nreftablee, cluster_size / sizeof(uint=
+64_t));
+> -    meta_size +=3D nreftablee * sizeof(uint64_t);
+> +    /* total size of refcount table and blocks */
+> +    meta_size +=3D qcow2_refcount_metadata_size(
+> +            (meta_size + aligned_total_size) / cluster_size,
+
+How does this interact with Max's patch which avoids truncating division
+in favor of rounding up?
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00690.html
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--lS0GcFHcMQ6DAFrCtXTuWlx2OViT7N0Wk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 05/08/2017 03:00 AM, Christian Borntraeger wrote:
-> On 05/06/2017 10:24 AM, Paolo Bonzini wrote:
->>
->>
->> On 05/05/2017 18:12, Eric Farman wrote:
->>>
->>>
->>> On 05/05/2017 11:13 AM, Paolo Bonzini wrote:
->>>>
->>>>
->>>> On 05/05/2017 17:03, Eric Farman wrote:
->>>>> We get a value of x3fffff when sending that to a scsi-disk from bios
->>>>> code.  That's fully emulated though, in scsi_disk_emulate_inquiry.  And
->>>>> that's the scenario that already works.
->>>>>
->>>>> While there is indeed code in hw/scsi/scsi-generic.c to wire that in,
->>>>> that only happens after the I/O goes to the device itself.  The Block
->>>>> Limits page isn't supported [1] and thus it gets rejected with "invalid
->>>>> field in cdb".  We never get to that fixup code you reference, since the
->>>>> returned len is zero.
->>>>>
->>>>> Should I be refactoring this code to always patch in that block limit
->>>>> regardless of a response from the host/device?  (That is, when page xb0
->>>>> isn't supported by the hw.)
->>>>
->>>> What is thec value you get?
->>>
->>> x140000 bytes when using /dev/sg0 (xa00 sectors when using /dev/sda).
->>>
->>>>  Is there a sensible default value
->>>> that you can use when page 0xb0 isn't supported by the hardware?
->>>
->>> I was setting max_sectors to x800 with good success, which was the
->>> power-of-2 floor that BLKSECTGET gave us.  That kept us within the
->>> limits of the host biovec code.  But it's a long way from the
->>> virtio-scsi value of xFFFF when max_sectors isn't specified, so don't
->>> know what side effects that may cause.
->>
->> It's just slower, but 0x800 is already a megabyte worth of data so it's
->> not going to be that much slower.
->>
->> Paolo
->>
->
-> Eric, maybe that would be a safe variant. The bios boot code is not
-> performance optimized anyway. Lets just always use a maximum size that
-> will always work.
->
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Sounds good to me.  Let me work on getting my very ugly code to be 
-slightly less ugly, and I'll send a v2 here.  Thanks, everyone.
+iQEcBAEBCAAGBQJZEIgeAAoJEKeha0olJ0NqHPoH/A/Yrft9QppBhAFfWJYlLOIJ
+WoARbJa2WtgmGG5e9cRa03JxQC3aZbwfAUC0Ydmf9R+2d6ZptkHfxBp2d7K4SMwx
+8uqhvyqACu9RNi/yvS3eRu+zHx+tEbkuOX0cjozVaE4txH5eVvShgLxKp+MH3mEM
+FgFE/Z6qdOLTjXcLXhjdehhVaIsb8EGH0kuFM8Rr7/yDzqQ8cIsftDcm3GDf624O
+e+kEdNTp5Zd1vieeIRvFswr+B2gcCGf2atRtMSedBzWpyFaPFapdITOZvXV4oSWk
+olk6x5BRTYEXmbXkZQ325FmnrkGR4mpIKUQ5kikNWgYpO25cWI2oIylW8tgM86U=
+=hDmr
+-----END PGP SIGNATURE-----
 
-  - Eric
+--lS0GcFHcMQ6DAFrCtXTuWlx2OViT7N0Wk--
