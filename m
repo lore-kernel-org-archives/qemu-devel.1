@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d7mGR-0002Rc-2f
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:16:04 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d7mMT-0004gI-WF
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:22:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d7mGP-0006NW-Tx
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:16:02 -0400
-References: <20170507000552.20847-1-eblake@redhat.com>
-	<20170507000552.20847-7-eblake@redhat.com>
-	<3f3d454b-6ab4-52d4-eaac-adaeec3ca700@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d8ba0bbc-b69b-9aae-0496-b1b6feb963d2@redhat.com>
-Date: Mon, 8 May 2017 12:15:53 -0500
+	(envelope-from <stefanha@gmail.com>) id 1d7mMQ-0007HL-Qd
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:22:17 -0400
+Date: Mon, 8 May 2017 13:22:11 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170508172211.GJ22428@stefanha-x1.localdomain>
+References: <20170506124314.23354-1-aurelien@aurel32.net>
 MIME-Version: 1.0
-In-Reply-To: <3f3d454b-6ab4-52d4-eaac-adaeec3ca700@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="whRlQVHwrxgkd90A9N84RQqqABpJ7xnFK"
-Subject: Re: [Qemu-devel] [PATCH v13 06/12] qcow2: Make distinction between
- zero cluster types obvious
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="k1BdFSKqAqVdu8k/"
+Content-Disposition: inline
+In-Reply-To: <20170506124314.23354-1-aurelien@aurel32.net>
+Subject: Re: [Qemu-devel] [PATCH 1/3] hw/block: Introduce rotational qdev
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---whRlQVHwrxgkd90A9N84RQqqABpJ7xnFK
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <d8ba0bbc-b69b-9aae-0496-b1b6feb963d2@redhat.com>
-Subject: Re: [PATCH v13 06/12] qcow2: Make distinction between zero cluster
- types obvious
-References: <20170507000552.20847-1-eblake@redhat.com>
- <20170507000552.20847-7-eblake@redhat.com>
- <3f3d454b-6ab4-52d4-eaac-adaeec3ca700@redhat.com>
-In-Reply-To: <3f3d454b-6ab4-52d4-eaac-adaeec3ca700@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--k1BdFSKqAqVdu8k/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 05/08/2017 10:54 AM, Max Reitz wrote:
-> On 07.05.2017 02:05, Eric Blake wrote:
->> Treat plain zero clusters differently from allocated ones, so that
->> we can simplify the logic of checking whether an offset is present.
->> Do this by splitting QCOW2_CLUSTER_ZERO into two new enums,
->> QCOW2_CLUSTER_ZERO_PLAIN and QCOW2_CLUSTER_ZERO_ALLOC.
->>
+On Sat, May 06, 2017 at 02:43:12PM +0200, Aurelien Jarno wrote:
+> The Linux kernel uses different I/O scheduler depending if the block
+> device is a rotational device or not. Also it uses rotational devices
+> to add entropy to the random pool.
+>=20
+> This patch add a rotational qdev property so that the block device can
+> be configured as a rotational device or a non-rotational device. Default
+> to true to not change the default behavior.
+>=20
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> ---
+>  blockdev.c               | 4 ++++
+>  include/hw/block/block.h | 4 +++-
+>  2 files changed, 7 insertions(+), 1 deletion(-)
 
-> (No, I'm not mentioning the fact that 060.out contains one more mention=
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> of "Data cluster offset" that should definitely be a "Cluster allocatio=
-n
-> offset" or even "Preallocated zero cluster offset" at
-> block/qcow2-cluster.c:1780, because let's really worry about this later=
-)
-
-Oh, you mean this?
-https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01784.html
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---whRlQVHwrxgkd90A9N84RQqqABpJ7xnFK
+--k1BdFSKqAqVdu8k/
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZEKfJAAoJEKeha0olJ0NqKA8IAJl/PYaHD1b0TamblBHwjncB
-Mta5vduaGAEA/L4RmqR2ggDrGW0eXbRGXAhbagK7OsvDY8nVMhAYMw8+9F9jJNIR
-xktS4xyeAHRL1XKywOWYOLNvPjP+OAj8gNwQrL2aXBP4bwoZSPUsAAGuW0BwdO+O
-TKBTjUpK2Eqoux6dINldpHj42caohgughl2Th424xmiXSSeuxldOek0tJ8NFSwqF
-nony2gmW6PsWwZk0pK5VX6V88kLNjGhU1HSEj/eYlFXCbLhCzcrFWZRBQoFm7hv0
-7ia9QmFqREJnx59m/P+L/3BjjoaRmrQ/NoIc4A9CeLDOnSLl62RjHlekzBC7Gok=
-=Pi18
+iQEcBAEBAgAGBQJZEKlDAAoJEJykq7OBq3PIvA4H/jnorkYuhCAVonogLIBE+gAH
+RnhwbbbrbOMi3RhI03B5rE8aOgOVeCCtXEbMM/HaXukxhBvNBm4go6h57JhPx5TN
+zE6MZ2cXUWQz1Oo+HIOIE+3IvKPQXkOoy/nIy3Du06IrNBCW9mOL8YP8wysyv+QM
+216ZKyUsZY8VttpITEQAZwMDO+YVr3Uer1KDq3/Zoj/GJKTWyB/BWTgKa5ws7a3c
+hU/QHce5aCF6T1L4uYfMMqWCP4ettqc2T+Ji170D0nNaPSvUJEKsd86PsQnr+7Wa
+C4UihnFUl+o+0T9c1+X9/miKSy11vo2nK3YtrdRqr/E83oykawjLzGBKWJWgoiQ=
+=IU6z
 -----END PGP SIGNATURE-----
 
---whRlQVHwrxgkd90A9N84RQqqABpJ7xnFK--
+--k1BdFSKqAqVdu8k/--
