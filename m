@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7lSV-0000ig-I7
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:24:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7lSp-000107-FP
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:24:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7lSS-00089S-FV
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:24:27 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35942)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d7lSS-00089I-Ad
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:24:24 -0400
-Received: by mail-qt0-x241.google.com with SMTP id j13so10226454qta.3
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 09:24:24 -0700 (PDT)
-Date: Mon, 8 May 2017 12:24:21 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170508162421.GC22428@stefanha-x1.localdomain>
-References: <20170503113304.8704.13997.stgit@PASHA-ISP>
+	(envelope-from <eblake@redhat.com>) id 1d7lSo-0008D0-KE
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:24:47 -0400
+References: <20170507000552.20847-1-eblake@redhat.com>
+	<20170507000552.20847-6-eblake@redhat.com>
+	<54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <78a5041a-52fd-69f1-8678-382a880e6e9f@redhat.com>
+Date: Mon, 8 May 2017 11:24:39 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
-Content-Disposition: inline
-In-Reply-To: <20170503113304.8704.13997.stgit@PASHA-ISP>
-Subject: Re: [Qemu-devel] [PATCH v2] maintainers: add maintainer for replay*
- files
+In-Reply-To: <54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LDSEAf2aeMeR1sENPQSUeITTCFd6i2mpw"
+Subject: Re: [Qemu-devel] [PATCH v13 05/12] qcow2: Name typedef for cluster
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +26,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-
---raC6veAxrt5nqIoY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LDSEAf2aeMeR1sENPQSUeITTCFd6i2mpw
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
+Message-ID: <78a5041a-52fd-69f1-8678-382a880e6e9f@redhat.com>
+Subject: Re: [PATCH v13 05/12] qcow2: Name typedef for cluster type
+References: <20170507000552.20847-1-eblake@redhat.com>
+ <20170507000552.20847-6-eblake@redhat.com>
+ <54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
+In-Reply-To: <54dddadc-42a3-0256-09ee-03e8d4d5d0bc@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 03, 2017 at 02:33:04PM +0300, Pavel Dovgalyuk wrote:
-> Updating MAINTAINERS to set Pavel Dovgalyuk as record/replay maintainer
-> and Paolo Bonzini as a reviewer.
+On 05/08/2017 10:43 AM, Max Reitz wrote:
+> On 07.05.2017 02:05, Eric Blake wrote:
+>> Although it doesn't add all that much type safety (this is C, after
+>> all), it does add a bit of legibility to use the name QCow2ClusterType=
+
+>> instead of a plain int.
+>>
+>> In particular, qcow2_get_cluster_offset() has an overloaded return
+>> type; a QCow2ClusterType on success, and -errno on failure; keeping
+>> the cluster type in a separate variable makes it slightly easier for
+>> the next patch to make further computations based on the type.
+>>
+>> Suggested-by: Max Reitz <mreitz@redhat.com>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> ---
+>> v13: new patch
+>> ---
+>>  block/qcow2.h          |  6 +++---
+>>  block/qcow2-cluster.c  | 17 +++++++++--------
+>>  block/qcow2-refcount.c |  2 +-
+>>  3 files changed, 13 insertions(+), 12 deletions(-)
 >=20
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> ---
->  MAINTAINERS |   12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> [...]
+>=20
+>> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+>> index f3bfce6..ed78a30 100644
+>> --- a/block/qcow2-cluster.c
+>> +++ b/block/qcow2-cluster.c
+>=20
+> Above this hunk, there is count_contiguous_clusters() with a variable
+> "first_cluster_type" that could be a QCow2ClusterType as well.
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+Hmm, I guess I didn't catch them all. Yes, that one definitely qualified.=
 
-Stefan
 
---raC6veAxrt5nqIoY
+>=20
+>> @@ -340,7 +340,7 @@ static int count_contiguous_clusters(int nb_cluste=
+rs, int cluster_size,
+>>   */
+>>  static int count_contiguous_clusters_unallocated(int nb_clusters,
+>>                                                   uint64_t *l2_table,
+>> -                                                 int wanted_type)
+>> +                                                 QCow2ClusterType wan=
+ted_type)
+>>  {
+>>      int i;
+>>
+>=20
+> And some lines below this (in this function), there is a "type" variabl=
+e
+> that (c|sh)ould be a QCow2ClusterType, too.
+
+That one I blame on poor rebasing on my side.
+
+>=20
+> Although it's quite a functional change, I would be willing to change
+> both when applying, if you allowed me to.
+>=20
+> (Once again, "no good deed shall go unpunished", as Markus likes to say=
+ :-))
+
+Yes, both changes are appropriate, and I'm fine with you making the
+tweaks as part of putting it on your tree (and the corresponding fallout
+on 6/12).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--LDSEAf2aeMeR1sENPQSUeITTCFd6i2mpw
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZEJu1AAoJEJykq7OBq3PISfgH/jkuk1/SlFyEc+DbPfg6fTBg
-x+xJ6MuY3K4z5dgyZJTE1Q0F/wDThFGzIaHbk6ZwjthfEeDekMZzSHRibRKpW+4r
-h0gm2rlNyEjVkPDDlbHvfL2HJQDWJHqOb/FGiV4nxenoBZ1xsIqzFiURXsgykZyZ
-mmjT+LTkDa/56AVO3GzC/mhiv5/iIwO9cHnsZ5AqY4rme9RUjdBguT/9GuHD0QFp
-ij6EqfTQLxmbN65rh7d3W/kbAKsLbgzDTven/nHdQsV8Ae/N/K+FoPNJo6LL6YD8
-OqCEB554e9gvmiSBgBoNCugaLQ05GOJIGYtn5x1rDGCd+yALEjfp+DZ6lkGfErg=
-=Hrx2
+iQEcBAEBCAAGBQJZEJvHAAoJEKeha0olJ0Nq3x4H+wYrvqnpZW3NWvFUAAZOcYXR
+cFSpAGFOuOv41mvByAsOtunqQKrRnp53snpycYsFgOo60q9D20VIZANPUx6NmfBp
+NITmV2pmEFs/ISYOLtOICE79lAVwnNwJpR04X+HKdO4yeORJD9DePFcAgKzNrXue
+dibvPYTOdPqbhiCawrNeCKEsPl+KKCUr90KZpjBwmWS484DiG1MoQFK0kXqgx6Tv
+FKxDfzJA1EThlxXnHoI9flNo5bYDvx3Z+mLMetnJnFf0D0gqkNEyOJnVogCl1QW7
+qB84Flg4kA5aIKxV+p/qYkbONqbkH6rtPOMuZT6JZqDVGiS1vyESS4F04l+tIX8=
+=bDDv
 -----END PGP SIGNATURE-----
 
---raC6veAxrt5nqIoY--
+--LDSEAf2aeMeR1sENPQSUeITTCFd6i2mpw--
