@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d7mpd-0001PE-Nc
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:52:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d7mps-0001jn-CR
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d7mpZ-0000Np-0W
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:52:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d7mpY-0000Nj-RJ
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:52:20 -0400
-Date: Mon, 8 May 2017 13:52:17 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170508175217.GO22428@stefanha-x1.localdomain>
-References: <20170505103822.20641-1-alex.bennee@linaro.org>
-	<20170505103822.20641-9-alex.bennee@linaro.org>
-	<9d3cca3f-3a95-0beb-9342-428b96816173@redhat.com>
-	<87pofnmgzl.fsf@linaro.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d7mpq-0000TF-BB
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:52:40 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36357)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d7mpq-0000Sf-6e
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:52:38 -0400
+Received: by mail-qt0-x244.google.com with SMTP id j13so10556330qta.3
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 10:52:38 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170508045715.21770-1-f4bug@amsat.org>
+	<20170508050230.22039-1-f4bug@amsat.org> <87vapb8uf2.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ebe59b22-8600-b906-0194-067d23e042d9@amsat.org>
+Date: Mon, 8 May 2017 14:52:34 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="vNrHrykRFvLVX6W3"
-Content-Disposition: inline
-In-Reply-To: <87pofnmgzl.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v1 8/9] util/qemu-thread-*: add
- qemu_lock, locked and unlock trace events
+In-Reply-To: <87vapb8uf2.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 18/23] shippable: temporary disable
+ mips64el-softmmu build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, boost.lists@gmail.com, pavel.dovgaluk@ispras.ru, cota@braap.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
+On 05/08/2017 08:22 AM, Alex Bennée wrote:
+>
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  .shippable.yml | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/.shippable.yml b/.shippable.yml
+>> index 6601243060..7e714991f9 100644
+>> --- a/.shippable.yml
+>> +++ b/.shippable.yml
+>> @@ -15,8 +15,9 @@ env:
+>>        TARGET_LIST=aarch64-softmmu,aarch64-linux-user
+>>      - IMAGE=debian-s390x-cross
+>>        TARGET_LIST=s390x-softmmu,s390x-linux-user
+>> +    # mips64el-softmmu disabled due to libfdt problem
+>>      - IMAGE=debian-mipsel-cross
+>> -      TARGET_LIST=mipsel-softmmu,mips64el-softmmu,mipsel-linux-user,mips64el-linux-user
+>> +      TARGET_LIST=mipsel-softmmu,mipsel-linux-user,mips64el-linux-user
+>>  build:
+>>    pre_ci:
+>>      - make docker-image-${IMAGE}
+>
+>
+> If you fix the order of your patches you can get rid of this noise.
 
---vNrHrykRFvLVX6W3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'll squash with patch 11 (removing your R-B).
 
-On Fri, May 05, 2017 at 04:59:58PM +0100, Alex Benn=E9e wrote:
->=20
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->=20
-> > On 05/05/2017 12:38, Alex Benn=E9e wrote:
-> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >
-> > Can you look at the patch I just sent a pull request for?  It only has
-> > locked and unlocked trace events, you can add lock on top.
->=20
-> Cool - great minds think alike ;-)
->=20
-> I'll re-spin my trace analysis script and the lock trace point once that
-> pull request is merged. I would be nice if we could associate locks with
-> names though as the QemuMutex * is basically just an anonymous handle.
-> Would it be overly extravagant to add a const char * to QemuMutex to can
-> be init'ed with a human readable name?
->=20
-> Stefan,
->=20
-> Does the trace sub-system have any way to register a human readable
-> string to a given pointer value? I guess this is something that could be
-> added to the trace pre-amble?
-
-No, it doesn't.  I would make the trace event take const char * and pass
-in the string.
-
-Stefan
-
---vNrHrykRFvLVX6W3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZELBRAAoJEJykq7OBq3PIoKQIAIeRQB7LD1V9EqaLo+glg2pj
-lGqhWLGJHuXRBQXxV0SLhxKE+9pN0J9aD9758JrHH/tl+5gCW/KiE4a19c7k+03N
-3lPKyyOIrTulC04n+h8k9fcOX2FKLHkfBiUIZapsRFq4hE0a5s3Zpo6IAtEhYF5r
-Y97Fn8UXIH8z57AvecFjOc0ryYPYiqjHTXZ/gUpevtMI+sS2+7SFZyUnuKp2c5V9
-dbGK9kzzRfqdZLb+VNlsudFnG4R0lrcuFzU8RSMk90AzdIXeKPRIt6ANeZhytupy
-BJfr0GGtvPk8O2/XeP7EgO3OcPEejTTuAOLNuH8SnrkOANiTSYGzZoDC5NCHkEg=
-=HSiN
------END PGP SIGNATURE-----
-
---vNrHrykRFvLVX6W3--
+> --
+> Alex Bennée
+>
