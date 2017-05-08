@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7pNy-0006xJ-Uw
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:36:03 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d7pQP-000872-0q
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7pNv-0001Gm-J3
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:36:02 -0400
-Date: Mon, 8 May 2017 16:35:56 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170508203556.GA22634@stefanha-x1.localdomain>
-References: <20170504105444.8940-1-daniel.kucera@gmail.com>
+	(envelope-from <ehabkost@redhat.com>) id 1d7pQL-0002JE-Uv
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:38:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37400)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d7pQL-0002Hj-OR
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:38:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 706CA61D19
+	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 20:38:28 +0000 (UTC)
+Date: Mon, 8 May 2017 17:38:25 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170508203825.GX3482@thinpad.lan.raisama.net>
+References: <20170508201628.32502-1-ehabkost@redhat.com>
+	<149427558833.258.8729008947473825070@c05f1edc8ed1>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mYCpIKhGyMATD0i+"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170504105444.8940-1-daniel.kucera@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] mirror: add sync mode incremental to
- drive-mirror and blockdev-mirror
+In-Reply-To: <149427558833.258.8729008947473825070@c05f1edc8ed1>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] arch_init: Move soundhw code to
+ hw/audio/soundhw.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +35,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Kucera <daniel.kucera@gmail.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, jsnow@redhat.com, "Denis V. Lunev" <den@openvz.org>
+To: qemu-devel@nongnu.org, kraxel@redhat.com
 
+On Mon, May 08, 2017 at 01:33:09PM -0700, no-reply@patchew.org wrote:
+[...]
+>   CC      s390x-softmmu/hw/cpu/core.o
+>   CC      ppc-softmmu/hw/ppc/ppc440_bamboo.o
+>   CC      s390x-softmmu/hw/display/virtio-gpu.o
+>   CC      ppc64-softmmu/hw/ppc/spapr_hcall.o
+>   CC      ppc-softmmu/hw/ppc/ppc4xx_pci.o
+>   CC      ppc-softmmu/hw/ppc/prep.o
+>   CC      ppc64-softmmu/hw/ppc/spapr_iommu.o
+> /var/tmp/patchew-tester-tmp-ibdexxkb/src/hw/ppc/prep.c: In function =E2=
+=80=98ibm_40p_init=E2=80=99:
+> /var/tmp/patchew-tester-tmp-ibdexxkb/src/hw/ppc/prep.c:785:5: error: im=
+plicit declaration of function =E2=80=98audio_init=E2=80=99 [-Werror=3Dim=
+plicit-function-declaration]
+>      audio_init();
+>      ^~~~~~~~~~
+> /var/tmp/patchew-tester-tmp-ibdexxkb/src/hw/ppc/prep.c:785:5: error: ne=
+sted extern declaration of =E2=80=98audio_init=E2=80=99 [-Werror=3Dnested=
+-externs]
+> cc1: all warnings being treated as errors
+> /var/tmp/patchew-tester-tmp-ibdexxkb/src/rules.mak:69: recipe for targe=
+t 'hw/ppc/prep.o' failed
+> make[1]: *** [hw/ppc/prep.o] Error 1
+> Makefile:327: recipe for target 'subdir-ppc-softmmu' failed
+> make: *** [subdir-ppc-softmmu] Error 2
+> make: *** Waiting for unfinished jobs....
+>   CC      ppc64-softmmu/hw/ppc/spapr_rtas.o
 
---mYCpIKhGyMATD0i+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Oops, I should have built all targets instead of assuming that
+nothing would break on a trivial rebase.
 
-On Thu, May 04, 2017 at 12:54:40PM +0200, Daniel Kucera wrote:
+Expect v3 with a fix for that. Sorry for the noise.
 
-Seems like a logical extension along the same lines as the backup block
-job's dirty bitmap sync mode.
-
-> parameter bitmap chooses existing dirtymap instead of newly created
-> in mirror_start_job
->=20
-> Signed-off-by: Daniel Kucera <daniel.kucera@gmail.com>
-> ---
->  block/mirror.c            | 47 ++++++++++++++++++++++++++++++-----------=
-------
->  blockdev.c                | 16 +++++++++++++++-
->  include/block/block_int.h |  4 +++-
->  qapi/block-core.json      | 12 ++++++++++--
->  4 files changed, 58 insertions(+), 21 deletions(-)
-
-This patch modifies the user's bitmap in-place and does not
-differentiate successful completion from failure.  I suggest following
-the same bitmap lifecycle as the backup block job so that
-cancellation/failure offers useful behavior.  (If the job fails due to
-intermittent errors on the target it should be possible to start the job
-again - the bitmap must not be lost!).
-
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 9f5eb69..1bfbe2e 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -49,7 +49,7 @@ typedef struct MirrorBlockJob {
->      BlockDriverState *to_replace;
->      /* Used to block operations on the drive-mirror-replace target */
->      Error *replace_blocker;
-> -    bool is_none_mode;
-> +    MirrorSyncMode sync_mode;
->      BlockMirrorBackingMode backing_mode;
->      BlockdevOnError on_source_error, on_target_error;
->      bool synced;
-> @@ -523,7 +523,9 @@ static void mirror_exit(BlockJob *job, void *opaque)
->      bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
->                              &error_abort);
->      if (s->backing_mode =3D=3D MIRROR_SOURCE_BACKING_CHAIN) {
-> -        BlockDriverState *backing =3D s->is_none_mode ? src : s->base;
-> +        BlockDriverState *backing =3D
-> +        (s->sync_mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) ||
-> +        (s->sync_mode =3D=3D MIRROR_SYNC_MODE_NONE) ? src : s->base;
-
-Please update the comment in include/block/block_int.h:typedef enum
-BlockMirrorBackingMode.
-
-> @@ -1213,9 +1217,21 @@ static void mirror_start_job(const char *job_id, B=
-lockDriverState *bs,
->          s->should_complete =3D true;
->      }
-> =20
-> -    s->dirty_bitmap =3D bdrv_create_dirty_bitmap(bs, granularity, NULL, =
-errp);
-> -    if (!s->dirty_bitmap) {
-> -        goto fail;
-> +    if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
-> +        if (bitmap =3D=3D NULL) {
-> +            error_setg(errp, "Mode incremental requires parameter 'bitma=
-p'");
-> +            goto fail;
-> +        }
-> +        s->dirty_bitmap =3D bdrv_find_dirty_bitmap(bs, bitmap);
-> +        if (!s->dirty_bitmap) {
-> +            error_setg(errp, "Bitmap '%s' not found", bitmap);
-> +            goto fail;
-> +        }
-> +    } else {
-> +        s->dirty_bitmap =3D bdrv_create_dirty_bitmap(bs, granularity, NU=
-LL, errp);
-> +        if (!s->dirty_bitmap) {
-> +            goto fail;
-> +        }
->      }
-
-Do we need to check that granularity is compatible with the pre-existing
-dirty bitmap's granularity when sync_mode is
-MIRROR_SYNC_MODE_INCREMENTAL?
-
---mYCpIKhGyMATD0i+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZENasAAoJEJykq7OBq3PIqw4H/1lnNzA9TmOLL5yCe8jf47Lv
-xQvPp1JBU+rh6gbDW0KxaOt36o9PArbL8MhkgS8ZtzCJtVy0Dsw1TtUrYSh9Onc2
-eoDAFx2idpW5MxYaUDZFkBk6SKBTB80+rZirPh33BYQbtedgaandmgt8o9WyIaeN
-6IVkMnOO6k4DVnP53wI77RCycTu0GYplNokvlel5ScCJ4JpWaYTlsKKCfh1IPLha
-vgpABQStKZCaM9YzCkFbbKkEm70IND4mC7uV/LmCHMK8PXWJFDDkidT/bVLT58ZE
-j/expQLuoV478m/LWLjD44PE9r6tF9QhN+URRo90diShvSuydIzqnYiME2V4E3k=
-=yOaG
------END PGP SIGNATURE-----
-
---mYCpIKhGyMATD0i+--
+--=20
+Eduardo
