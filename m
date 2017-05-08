@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1d7fwC-0001Dn-Nj
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:30:45 -0400
+	(envelope-from <yi.l.liu@intel.com>) id 1d7g3Z-0004Am-39
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1d7fw9-00024V-IW
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:30:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52971)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1d7fw9-00024L-A2
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:30:41 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v48ASpFs146678
-	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 06:30:39 -0400
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aakg4bc8w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 06:30:35 -0400
-Received: from localhost
-	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Mon, 8 May 2017 19:21:23 +1000
-Date: Mon, 8 May 2017 14:48:58 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
+	(envelope-from <yi.l.liu@intel.com>) id 1d7g3U-0004L7-2y
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:38:21 -0400
+Received: from mga01.intel.com ([192.55.52.88]:4772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1d7g3T-0004Kp-OI
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 06:38:16 -0400
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Mon, 8 May 2017 10:38:09 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743906890D@shsmsx102.ccr.corp.intel.com>
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-4-git-send-email-yi.l.liu@linux.intel.com>
+	<20170427105317.GE1542@pxdev.xzpeter.org>
+In-Reply-To: <20170427105317.GE1542@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Message-Id: <20170508091858.GA27774@in.ibm.com>
-Subject: [Qemu-devel] ppc/spapr: Radix guest causing host kernel oops
+Subject: Re: [Qemu-devel] [RFC PATCH 03/20] intel_iommu: add "svm" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,70 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, aik@ozlabs.ru, rnsastry@linux.vnet.ibm.com
+To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Tian, Kevin" <kevin.tian@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
 
-Hi,
-
-With ppc-for-2.10 branch of dwg's tree, starting a radix guest is currently
-causing a host kernel oops like this:
-
-Unable to handle kernel paging request for data at address 0xe64bb17da64ab078
-Faulting instruction address: 0xc0000000002c3ddc
-Oops: Kernel access of bad area, sig: 11 [#1]
-SMP NR_CPUS=1024
-NUMA
-PowerNV
-task: c0000003bfb8b880 task.stack: c0000003c215c000
-NIP: c0000000002c3ddc LR: c0000000002c3e80 CTR: c0000000000ce2e0
-REGS: c0000003c215f150 TRAP: 0380   Not tainted  (4.11.0-1.git4a6869a.el7.centos.ppc64le)
-MSR: 9000000000001031 <SF,HV,ME,IR,DR,LE>
-  CR: 44008024  XER: 20000000
-CFAR: c0000000002c3e7c SOFTE: 1
-GPR00: 000000000000018f c0000003c215f3d0 c00000000131fd00 0000000000000000
-GPR04: 0000000000000005 00000000000001ff 0000000000000000 7db04aa67db14ba6
-GPR08: 264bb17da64ab000 e64bb17da64ab000 0000000000000078 0000000000000000
-GPR12: c0000003c32f0008 c00000000fdc0000 c00000000000e148 0000000000000000
-GPR16: 0000000008000000 0000000020000000 0000000000000000 c0000003c215f4c0
-GPR20: c0000001fd033000 c0000001fd0330e0 c0000001ffff8f50 c0000001f25afff8
-GPR24: 0000000000000200 00000001f25b0000 0000000000000010 0000000000020000
-GPR28: 0800000000000000 00000001f25b0000 000000007db04aa6 00000000a64ab07d
-NIP [c0000000002c3ddc] vmalloc_to_page+0x19c/0x220
-LR [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
-Call Trace:
-[c0000003c215f3d0] [7265677368657265] 0x7265677368657265 (unreliable)
-[c0000003c215f400] [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
-[c0000003c215f420] [c0000000000637e8] vmalloc_to_phys+0x28/0x60
-[c0000003c215f450] [c0000000000ce480] kvmppc_rm_h_put_tce_indirect+0x1a0/0x540
-[c0000003c215f590] [c0000000000d0314] hcall_try_real_mode+0x60/0x7c
-[c0000003c215f600] [c0000000000cefac] kvmppc_call_hv_entry+0x8/0x17c
-[c0000003c215f670] [c00800000357a970] __kvmppc_vcore_entry+0x13c/0x1ac [kvm_hv]
-[c0000003c215f840] [c0080000035774a8] kvmppc_run_core+0x788/0x1650 [kvm_hv]
-[c0000003c215fa00] [c0080000035790b8] kvmppc_vcpu_run_hv+0x388/0x1200 [kvm_hv]
-[c0000003c215fb30] [c008000002f34684] kvmppc_vcpu_run+0x34/0x50 [kvm]
-[c0000003c215fb50] [c008000002f30b54] kvm_arch_vcpu_ioctl_run+0x114/0x2a0 [kvm]
-[c0000003c215fbd0] [c008000002f23dd8] kvm_vcpu_ioctl+0x5e8/0x7c0 [kvm]
-[c0000003c215fd40] [c000000000350b50] do_vfs_ioctl+0xd0/0x8c0
-[c0000003c215fde0] [c000000000351414] SyS_ioctl+0xd4/0xf0
-[c0000003c215fe30] [c00000000000b8e0] system_call+0x38/0xfc
-Instruction dump:
-53dfc42e 790807c6 394affff 7d08fb78 78638402 79081764 7d4a07b4 7c6a5038
-7908f5e6 7d094b78 794a1f24 38600000 <7d2a482a> 7924cfe3 41820040 79260022
-
-Reverting the below commit allows the radix guest to boot successfully.
-
-commit 3dc410ae83e6cb76c81ea30a05d62596092b3165
-Author: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date:   Mon Mar 27 16:22:19 2017 +1100
-
-    target-ppc/kvm: Enable in-kernel TCE acceleration for multi-tce
-    
-    This enables in-kernel handling of H_PUT_TCE_INDIRECT and
-    H_STUFF_TCE hypercalls. The host kernel support is there since v4.6,
-    in particular d3695aa4f452
-    ("KVM: PPC: Add support for multiple-TCE hcalls").
-    
-    H_PUT_TCE is already accelerated and does not need any special enablement.
-
-Regards,
-Bharata.
+T24gVGh1LCAyNyBBcHIgMjAxNyAxODo1MzoxNyArMDgwMA0KUGV0ZXIgWHUgPHBldGVyeEByZWRo
+YXQuY29tPiB3cm90ZToNCg0KPiBPbiBXZWQsIEFwciAyNiwgMjAxNyBhdCAwNjowNjozM1BNICsw
+ODAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gRXhwb3NlICJTaGFyZWQgVmlydHVhbCBNZW1vcnki
+IHRvIGd1ZXN0IGJ5IHVzaW5nICJzdm0iIG9wdGlvbi4NCj4gPiBBbHNvIHVzZSAic3ZtIiB0byBl
+eHBvc2UgU1ZNIHJlbGF0ZWQgY2FwYWJpbGl0aWVzIHRvIGd1ZXN0Lg0KPiA+IGUuZy4gIi1kZXZp
+Y2UgaW50ZWwtaW9tbXUsIHN2bT1vbiINCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IExpdSwgWWkg
+TCA8eWkubC5saXVAbGludXguaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+ICBody9pMzg2L2ludGVs
+X2lvbW11LmMgICAgICAgICAgfCAxMCArKysrKysrKysrDQo+ID4gIGh3L2kzODYvaW50ZWxfaW9t
+bXVfaW50ZXJuYWwuaCB8ICA1ICsrKysrDQo+ID4gaW5jbHVkZS9ody9pMzg2L2ludGVsX2lvbW11
+LmggIHwgIDEgKw0KPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKykNCj4gPg0K
+PiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2ludGVsX2lvbW11LmMgYi9ody9pMzg2L2ludGVsX2lv
+bW11LmMgaW5kZXgNCj4gPiBiZjk4ZmE1Li5iYTFlN2ViIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kz
+ODYvaW50ZWxfaW9tbXUuYw0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IEBA
+IC0yNDUzLDYgKzI0NTMsNyBAQCBzdGF0aWMgUHJvcGVydHkgdnRkX3Byb3BlcnRpZXNbXSA9IHsN
+Cj4gPiAgICAgIERFRklORV9QUk9QX0JPT0woIngtYnVnZ3ktZWltIiwgSW50ZWxJT01NVVN0YXRl
+LCBidWdneV9laW0sIGZhbHNlKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0JPT0woImNhY2hpbmct
+bW9kZSIsIEludGVsSU9NTVVTdGF0ZSwgY2FjaGluZ19tb2RlLA0KPiBGQUxTRSksDQo+ID4gICAg
+ICBERUZJTkVfUFJPUF9CT09MKCJlY3MiLCBJbnRlbElPTU1VU3RhdGUsIGVjcywgRkFMU0UpLA0K
+PiA+ICsgICAgREVGSU5FX1BST1BfQk9PTCgic3ZtIiwgSW50ZWxJT01NVVN0YXRlLCBzdm0sIEZB
+TFNFKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0VORF9PRl9MSVNUKCksDQo+ID4gIH07DQo+ID4N
+Cj4gPiBAQCAtMjk3Myw2ICsyOTc0LDE1IEBAIHN0YXRpYyB2b2lkIHZ0ZF9pbml0KEludGVsSU9N
+TVVTdGF0ZSAqcykNCj4gPiAgICAgICAgICBzLT5lY2FwIHw9IFZURF9FQ0FQX0VDUzsNCj4gPiAg
+ICAgIH0NCj4gPg0KPiA+ICsgICAgaWYgKHMtPnN2bSkgew0KPiA+ICsgICAgICAgIGlmICghcy0+
+ZWNzIHx8ICF4ODZfaW9tbXUtPnB0X3N1cHBvcnRlZCB8fCAhcy0+Y2FjaGluZ19tb2RlKSB7DQo+
+ID4gKyAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiTmVlZCB0byBzZXQgZWNzLCBwdCwgY2FjaGlu
+Zy1tb2RlIGZvciBzdm0iKTsNCj4gPiArICAgICAgICAgICAgZXhpdCgxKTsNCj4gPiArICAgICAg
+ICB9DQo+ID4gKyAgICAgICAgcy0+Y2FwIHw9IFZURF9DQVBfRFdEIHwgVlREX0NBUF9EUkQ7DQo+
+ID4gKyAgICAgICAgcy0+ZWNhcCB8PSBWVERfRUNBUF9QUlMgfCBWVERfRUNBUF9QVFMgfCBWVERf
+RUNBUF9QQVNJRDI4Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAgICAgIGlmIChzLT5jYWNoaW5n
+X21vZGUpIHsNCj4gPiAgICAgICAgICBzLT5jYXAgfD0gVlREX0NBUF9DTTsNCj4gPiAgICAgIH0N
+Cj4gPiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oDQo+ID4gYi9o
+dy9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmggaW5kZXggNzFhMWMxZS4uZjJhN2QxMiAxMDA2
+NDQNCj4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgNCj4gPiArKysgYi9o
+dy9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgNCj4gPiBAQCAtMTkxLDYgKzE5MSw5IEBADQo+
+ID4gICNkZWZpbmUgVlREX0VDQVBfUFQgICAgICAgICAgICAgICAgICgxVUxMIDw8IDYpDQo+ID4g
+ICNkZWZpbmUgVlREX0VDQVBfTUhNViAgICAgICAgICAgICAgICgxNVVMTCA8PCAyMCkNCj4gPiAg
+I2RlZmluZSBWVERfRUNBUF9FQ1MgICAgICAgICAgICAgICAgKDFVTEwgPDwgMjQpDQo+ID4gKyNk
+ZWZpbmUgVlREX0VDQVBfUEFTSUQyOCAgICAgICAgICAgICgxVUxMIDw8IDI4KQ0KPiANCj4gQ291
+bGQgSSBhc2sgd2hhdCdzIHRoaXMgYml0PyBPbiBteSBzcGVjLCBpdCBzYXlzIHRoaXMgYml0IGlz
+IHJlc2VydmVkIGFuZCBkZWZ1bmN0IChzcGVjDQo+IHZlcnNpb246IEp1bmUgMjAxNikuDQoNCkFz
+IEFzaG9rIGNvbmZpcm1lZCwgeWVzIGl0IHNob3VsZCBiZSBiaXQgNDAuIHdvdWxkIHVwZGF0ZSBp
+dC4NCg0KPiA+ICsjZGVmaW5lIFZURF9FQ0FQX1BSUyAgICAgICAgICAgICAgICAoMVVMTCA8PCAy
+OSkNCj4gPiArI2RlZmluZSBWVERfRUNBUF9QVFMgICAgICAgICAgICAgICAgKDB4ZVVMTCA8PCAz
+NSkNCj4gDQo+IFdvdWxkIGl0IGJldHRlciB3ZSBhdm9pZCB1c2luZyAweGUgaGVyZSwgb3IgYXQg
+bGVhc3QgYWRkIHNvbWUgY29tbWVudD8NCg0KRm9yIHRoaXMgdmFsdWUsIGl0IG11c3QgYmUgbm8g
+bW9yZSB0aGFuIHRoZSBiaXRzIGhvc3Qgc3VwcG9ydHMuIFNvIGl0IG1heSBiZQ0KYmV0dGVyIHRv
+IGhhdmUgYSBkZWZhdWx0IHZhbHVlIGFuZCBtZWFud2hpbGUgZXhwb3NlIGFuIG9wdGlvbiB0byBs
+ZXQgdXNlcg0Kc2V0IGl0LiBob3cgYWJvdXQgeW91ciBvcGluaW9uPw0KDQo+IA0KPiA+DQo+ID4g
+IC8qIENBUF9SRUcgKi8NCj4gPiAgLyogKG9mZnNldCA+PiA0KSA8PCAyNCAqLw0KPiA+IEBAIC0y
+MDcsNiArMjEwLDggQEANCj4gPiAgI2RlZmluZSBWVERfQ0FQX1BTSSAgICAgICAgICAgICAgICAg
+KDFVTEwgPDwgMzkpDQo+ID4gICNkZWZpbmUgVlREX0NBUF9TTExQUyAgICAgICAgICAgICAgICgo
+MVVMTCA8PCAzNCkgfCAoMVVMTCA8PCAzNSkpDQo+ID4gICNkZWZpbmUgVlREX0NBUF9DTSAgICAg
+ICAgICAgICAgICAgICgxVUxMIDw8IDcpDQo+ID4gKyNkZWZpbmUgVlREX0NBUF9EV0QgICAgICAg
+ICAgICAgICAgICgxVUxMIDw8IDU0KQ0KPiA+ICsjZGVmaW5lIFZURF9DQVBfRFJEICAgICAgICAg
+ICAgICAgICAoMVVMTCA8PCA1NSkNCj4gDQo+IEp1c3QgdG8gY29uZmlybTogYWZ0ZXIgdGhpcyBz
+ZXJpZXMsIHdlIHNob3VsZCBzdXBwb3J0IGRyYWluIHJlYWQvd3JpdGUgdGhlbiwgcmlnaHQ/DQoN
+CkkgaGF2ZW7igJl0IGRvbmUgc3BlY2lhbCBwcm9jZXNzIGFnYWluc3QgaXQgaW4gSU9NTVUgZW11
+bGF0b3IuIEl0J3Mgc2V0IHRvIGtlZXANCmNvbnNpc3RlbmNlIHdpdGggVlQtZCBzcGVjIHNpbmNl
+IERXRCBhbmQgRFJXIGlzIHJlcXVpcmVkIGNhcGFiaWxpdHkgd2hlbg0KUEFTSUQgaXQgcmVwb3J0
+ZWQgYXMgU2V0LiBIb3dldmVyLCBJIHRoaW5rIGl0IHNob3VsZCBiZSBmaW5lIGlmIGd1ZXN0IGlz
+c3VlIFFJDQp3aXRoIGRyYWluIHJlYWQvd3JpdGUgc2V0IGluIHRoZSBkZXNjcmlwdG9yLiBIb3N0
+IHNob3VsZCBiZSBhYmxlIHRvIHByb2Nlc3MgaXQuDQoNClRoYW5rcywNCllpIEwNCj4gPg0KPiA+
+ICAvKiBTdXBwb3J0ZWQgQWRqdXN0ZWQgR3Vlc3QgQWRkcmVzcyBXaWR0aHMgKi8NCj4gPiAgI2Rl
+ZmluZSBWVERfQ0FQX1NBR0FXX1NISUZUICAgICAgICAgOA0KPiA+IGRpZmYgLS1naXQgYS9pbmNs
+dWRlL2h3L2kzODYvaW50ZWxfaW9tbXUuaA0KPiA+IGIvaW5jbHVkZS9ody9pMzg2L2ludGVsX2lv
+bW11LmggaW5kZXggYWUyMWZlNS4uODk4MTYxNSAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2h3
+L2kzODYvaW50ZWxfaW9tbXUuaA0KPiA+ICsrKyBiL2luY2x1ZGUvaHcvaTM4Ni9pbnRlbF9pb21t
+dS5oDQo+ID4gQEAgLTI2Nyw2ICsyNjcsNyBAQCBzdHJ1Y3QgSW50ZWxJT01NVVN0YXRlIHsNCj4g
+Pg0KPiA+ICAgICAgYm9vbCBjYWNoaW5nX21vZGU7ICAgICAgICAgIC8qIFJPIC0gaXMgY2FwIENN
+IGVuYWJsZWQ/ICovDQo+ID4gICAgICBib29sIGVjczsgICAgICAgICAgICAgICAgICAgICAgIC8q
+IEV4dGVuZGVkIENvbnRleHQgU3VwcG9ydCAqLw0KPiA+ICsgICAgYm9vbCBzdm07ICAgICAgICAg
+ICAgICAgICAgICAgICAvKiBTaGFyZWQgVmlydHVhbCBNZW1vcnkgKi8NCj4gPg0KPiA+ICAgICAg
+ZG1hX2FkZHJfdCByb290OyAgICAgICAgICAgICAgICAvKiBDdXJyZW50IHJvb3QgdGFibGUgcG9p
+bnRlciAqLw0KPiA+ICAgICAgYm9vbCByb290X2V4dGVuZGVkOyAgICAgICAgICAgICAvKiBUeXBl
+IG9mIHJvb3QgdGFibGUgKGV4dGVuZGVkIG9yIG5vdCkgKi8NCj4gPiAtLQ0KPiA+IDEuOS4xDQo+
+ID4NCj4gDQo+IC0tDQo+IFBldGVyIFh1DQo=
