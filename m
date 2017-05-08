@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d7lRX-0008Qv-4y
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:23:28 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d7lSV-0000ig-I7
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:24:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d7lRT-0007sP-Vp
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:23:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d7lRT-0007qK-Mo
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:23:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8001480058
-	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 16:23:22 +0000 (UTC)
-Date: Mon, 8 May 2017 17:23:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170508162316.GF2120@work-vm>
-References: <1494223204-16388-1-git-send-email-peterx@redhat.com>
-	<1494223204-16388-2-git-send-email-peterx@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1d7lSS-00089S-FV
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:24:27 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35942)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d7lSS-00089I-Ad
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:24:24 -0400
+Received: by mail-qt0-x241.google.com with SMTP id j13so10226454qta.3
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 09:24:24 -0700 (PDT)
+Date: Mon, 8 May 2017 12:24:21 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170508162421.GC22428@stefanha-x1.localdomain>
+References: <20170503113304.8704.13997.stgit@PASHA-ISP>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
 Content-Disposition: inline
-In-Reply-To: <1494223204-16388-2-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] ramblock: add RAMBLOCK_FOREACH()
+In-Reply-To: <20170503113304.8704.13997.stgit@PASHA-ISP>
+Subject: Re: [Qemu-devel] [PATCH v2] maintainers: add maintainer for replay*
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,216 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> So that it can simplifies the iterators.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+--raC6veAxrt5nqIoY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, May 03, 2017 at 02:33:04PM +0300, Pavel Dovgalyuk wrote:
+> Updating MAINTAINERS to set Pavel Dovgalyuk as record/replay maintainer
+> and Paolo Bonzini as a reviewer.
+>=20
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 > ---
->  exec.c                 | 22 +++++++++++-----------
->  include/exec/ramlist.h |  5 +++++
->  migration/ram.c        | 15 ++++++++-------
->  3 files changed, 24 insertions(+), 18 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index eac6085..50519ae 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -978,7 +978,7 @@ static RAMBlock *qemu_get_ram_block(ram_addr_t addr)
->      if (block && addr - block->offset < block->max_length) {
->          return block;
->      }
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          if (addr - block->offset < block->max_length) {
->              goto found;
->          }
-> @@ -1578,12 +1578,12 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
->          return 0;
->      }
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          ram_addr_t end, next = RAM_ADDR_MAX;
->  
->          end = block->offset + block->max_length;
->  
-> -        QLIST_FOREACH_RCU(next_block, &ram_list.blocks, next) {
-> +        RAMBLOCK_FOREACH(next_block) {
->              if (next_block->offset >= end) {
->                  next = MIN(next, next_block->offset);
->              }
-> @@ -1609,7 +1609,7 @@ unsigned long last_ram_page(void)
->      ram_addr_t last = 0;
->  
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          last = MAX(last, block->offset + block->max_length);
->      }
->      rcu_read_unlock();
-> @@ -1659,7 +1659,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
->      pstrcat(new_block->idstr, sizeof(new_block->idstr), name);
->  
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          if (block != new_block &&
->              !strcmp(block->idstr, new_block->idstr)) {
->              fprintf(stderr, "RAMBlock \"%s\" already registered, abort!\n",
-> @@ -1693,7 +1693,7 @@ size_t qemu_ram_pagesize_largest(void)
->      RAMBlock *block;
->      size_t largest = 0;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          largest = MAX(largest, qemu_ram_pagesize(block));
->      }
->  
-> @@ -1839,7 +1839,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
->       * QLIST (which has an RCU-friendly variant) does not have insertion at
->       * tail, so save the last element in last_block.
->       */
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          last_block = block;
->          if (block->max_length < new_block->max_length) {
->              break;
-> @@ -2021,7 +2021,7 @@ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length)
->      int flags;
->      void *area, *vaddr;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          offset = addr - block->offset;
->          if (offset < block->max_length) {
->              vaddr = ramblock_ptr(block, offset);
-> @@ -2167,7 +2167,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
->          goto found;
->      }
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          /* This case append when the block is not mapped. */
->          if (block->host == NULL) {
->              continue;
-> @@ -2200,7 +2200,7 @@ RAMBlock *qemu_ram_block_by_name(const char *name)
->  {
->      RAMBlock *block;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          if (!strcmp(name, block->idstr)) {
->              return block;
->          }
-> @@ -3424,7 +3424,7 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
->      int ret = 0;
->  
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          ret = func(block->idstr, block->host, block->offset,
->                     block->used_length, opaque);
->          if (ret) {
-> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-> index c59880d..f1c6b45 100644
-> --- a/include/exec/ramlist.h
-> +++ b/include/exec/ramlist.h
-> @@ -4,6 +4,7 @@
->  #include "qemu/queue.h"
->  #include "qemu/thread.h"
->  #include "qemu/rcu.h"
-> +#include "qemu/rcu_queue.h"
->  
->  typedef struct RAMBlockNotifier RAMBlockNotifier;
->  
-> @@ -54,6 +55,10 @@ typedef struct RAMList {
->  } RAMList;
->  extern RAMList ram_list;
->  
-> +/* Should be holding either ram_list.mutex, or the RCU lock. */
-> +#define  RAMBLOCK_FOREACH(block)  \
-> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
-> +
->  void qemu_mutex_lock_ramlist(void);
->  void qemu_mutex_unlock_ramlist(void);
->  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f48664e..7ba5d7e 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -672,7 +672,7 @@ uint64_t ram_pagesize_summary(void)
->      RAMBlock *block;
->      uint64_t summary = 0;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          summary |= block->page_size;
->      }
->  
-> @@ -700,7 +700,7 @@ static void migration_bitmap_sync(RAMState *rs)
->  
->      qemu_mutex_lock(&rs->bitmap_mutex);
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          migration_bitmap_sync_range(rs, block, 0, block->used_length);
->      }
->      rcu_read_unlock();
-> @@ -1439,8 +1439,9 @@ uint64_t ram_bytes_total(void)
->      uint64_t total = 0;
->  
->      rcu_read_lock();
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
-> +    RAMBLOCK_FOREACH(block) {
->          total += block->used_length;
-> +    }
->      rcu_read_unlock();
->      return total;
->  }
-> @@ -1543,7 +1544,7 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms)
->      struct RAMBlock *block;
->      unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          unsigned long first = block->offset >> TARGET_PAGE_BITS;
->          unsigned long range = first + (block->used_length >> TARGET_PAGE_BITS);
->          unsigned long run_start = find_next_zero_bit(bitmap, range, first);
-> @@ -1624,7 +1625,7 @@ static int postcopy_each_ram_send_discard(MigrationState *ms)
->      struct RAMBlock *block;
->      int ret;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          unsigned long first = block->offset >> TARGET_PAGE_BITS;
->          PostcopyDiscardState *pds = postcopy_discard_send_init(ms,
->                                                                 first,
-> @@ -1802,7 +1803,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
->      rs->last_sent_block = NULL;
->      rs->last_page = 0;
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          unsigned long first = block->offset >> TARGET_PAGE_BITS;
->  
->          PostcopyDiscardState *pds =
-> @@ -2021,7 +2022,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->  
->      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
->  
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH(block) {
->          qemu_put_byte(f, strlen(block->idstr));
->          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr));
->          qemu_put_be64(f, block->used_length);
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  MAINTAINERS |   12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
+
+Stefan
+
+--raC6veAxrt5nqIoY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZEJu1AAoJEJykq7OBq3PISfgH/jkuk1/SlFyEc+DbPfg6fTBg
+x+xJ6MuY3K4z5dgyZJTE1Q0F/wDThFGzIaHbk6ZwjthfEeDekMZzSHRibRKpW+4r
+h0gm2rlNyEjVkPDDlbHvfL2HJQDWJHqOb/FGiV4nxenoBZ1xsIqzFiURXsgykZyZ
+mmjT+LTkDa/56AVO3GzC/mhiv5/iIwO9cHnsZ5AqY4rme9RUjdBguT/9GuHD0QFp
+ij6EqfTQLxmbN65rh7d3W/kbAKsLbgzDTven/nHdQsV8Ae/N/K+FoPNJo6LL6YD8
+OqCEB554e9gvmiSBgBoNCugaLQ05GOJIGYtn5x1rDGCd+yALEjfp+DZ6lkGfErg=
+=Hrx2
+-----END PGP SIGNATURE-----
+
+--raC6veAxrt5nqIoY--
