@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d7rYF-000549-1V
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:54:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d7sFa-0004sq-3j
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d7rYD-0003Wb-Iv
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:54:47 -0400
-Resent-Message-Id: <E1d7rYD-0003Wb-Iv@eggs.gnu.org>
-In-Reply-To: <20170508205735.23444-1-ehabkost@redhat.com>
-Message-ID: <149428405745.258.3104767309694984726@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d7sFX-00028k-17
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:39:34 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon,  8 May 2017 20:39:07 -0300
+Message-Id: <20170508233918.9043-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 8 May 2017 15:54:18 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] arch_init: Move soundhw code to
- hw/audio/soundhw.c
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 00/11] various easy cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, hpoussin@reactos.org, agraf@suse.de, qemu-ppc@nongnu.org, kraxel@redhat.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MyAwLzNdIGFyY2hfaW5pdDogTW92ZSBzb3VuZGh3IGNvZGUgdG8gaHcv
-YXVkaW8vc291bmRody5jClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE3MDUwODIwNTczNS4y
-MzQ0NC0xLWVoYWJrb3N0QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9n
-IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
-ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
-PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
-ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
-KiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNTA4MjIxNzU5LjE1NjE2LTEtZjRidWdA
-YW1zYXQub3JnIC0+IHBhdGNoZXcvMjAxNzA1MDgyMjE3NTkuMTU2MTYtMS1mNGJ1Z0BhbXNhdC5v
-cmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjYTA1OWNjIGF1ZGlvOiBSZW5hbWUg
-aHcvYXVkaW8vYXVkaW8uaCB0byBody9hdWRpby9zb3VuZGh3LmgKOGNjODM5NiBhdWRpbzogUmVu
-YW1lIGF1ZGlvX2luaXQoKSB0byBzb3VuZGh3X2luaXQoKQplMTliMzAzIGF1ZGlvOiBNb3ZlIGFy
-Y2hfaW5pdCBhdWRpbyBjb2RlIHRvIGh3L2F1ZGlvL3NvdW5kaHcuYwoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zOiBhdWRpbzogTW92ZSBhcmNoX2luaXQgYXVkaW8gY29k
-ZSB0byBody9hdWRpby9zb3VuZGh3LmMuLi4KRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9y
-IGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDgsIDEzKQojMjQwOiBGSUxFOiBody9hdWRpby9zb3Vu
-ZGh3LmM6NzY6CisgICAgICAgIGlmIChzb3VuZGh3X2NvdW50KSB7CisgICAgICAgICAgICAgcHJp
-bnRmKCJWYWxpZCBzb3VuZCBjYXJkIG5hbWVzIChjb21tYSBzZXBhcmF0ZWQpOlxuIik7CgpFUlJP
-Ujogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoMTMsIDE3
-KQojMjQyOiBGSUxFOiBody9hdWRpby9zb3VuZGh3LmM6Nzg6CisgICAgICAgICAgICAgZm9yIChj
-ID0gc291bmRodzsgYy0+bmFtZTsgKytjKSB7CisgICAgICAgICAgICAgICAgIHByaW50ZiAoIiUt
-MTFzICVzXG4iLCBjLT5uYW1lLCBjLT5kZXNjcik7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBi
-ZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMyNDM6IEZJTEU6
-IGh3L2F1ZGlvL3NvdW5kaHcuYzo3OToKKyAgICAgICAgICAgICAgICAgcHJpbnRmICgiJS0xMXMg
-JXNcbiIsIGMtPm5hbWUsIGMtPmRlc2NyKTsKCkVSUk9SOiBlbHNlIHNob3VsZCBmb2xsb3cgY2xv
-c2UgYnJhY2UgJ30nCiMyNTI6IEZJTEU6IGh3L2F1ZGlvL3NvdW5kaHcuYzo4ODoKKyAgICB9Cisg
-ICAgZWxzZSB7CgpFUlJPUjogZWxzZSBzaG91bGQgZm9sbG93IGNsb3NlIGJyYWNlICd9JwojMjgx
-OiBGSUxFOiBody9hdWRpby9zb3VuZGh3LmM6MTE3OgorICAgICAgICAgICAgICAgIH0KKyAgICAg
-ICAgICAgICAgICBlbHNlIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyOTk6
-IEZJTEU6IGh3L2F1ZGlvL3NvdW5kaHcuYzoxMzU6CisgICAgSVNBQnVzICppc2FfYnVzID0gKElT
-QUJ1cyAqKSBvYmplY3RfcmVzb2x2ZV9wYXRoX3R5cGUoIiIsIFRZUEVfSVNBX0JVUywgTlVMTCk7
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzAwOiBGSUxFOiBody9hdWRpby9z
-b3VuZGh3LmM6MTM2OgorICAgIFBDSUJ1cyAqcGNpX2J1cyA9IChQQ0lCdXMgKikgb2JqZWN0X3Jl
-c29sdmVfcGF0aF90eXBlKCIiLCBUWVBFX1BDSV9CVVMsIE5VTEwpOwoKdG90YWw6IDUgZXJyb3Jz
-LCAyIHdhcm5pbmdzLCAzMjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8zOiBhdWRpbzogUmVuYW1lIGF1ZGlvX2lu
-aXQoKSB0byBzb3VuZGh3X2luaXQoKS4uLgpDaGVja2luZyBQQVRDSCAzLzM6IGF1ZGlvOiBSZW5h
-bWUgaHcvYXVkaW8vYXVkaW8uaCB0byBody9hdWRpby9zb3VuZGh3LmguLi4KPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+various easy patchs added while coding around:
+- remove old comments
+- add/remove includes
+- use TYPE_ names when available
+- use ARRAY_SIZE() macro
+
+Philippe Mathieu-Daudé (11):
+  hw/net: removed obsolete comments
+  hw/pci: define msi_nonbroken in pci-stub
+  hw/misc: add missing includes
+  ide/ahci: add missing includes
+  hw/mips: add missing include
+  hw/arm: removed unnecessary include
+  hw/arm: use defined type name instead of hard-coded string.
+  hw/sparc: use ARRAY_SIZE() macro
+  target/sparc: fix DEBUG_MMU DPRINTF() arguments
+  register: display register prefix (name) since it is available
+  MAINTAINERS: self-appoint me as reviewer of the Register API
+
+ MAINTAINERS                |  1 +
+ hw/arm/armv7m.c            |  4 ++--
+ hw/arm/exynos4210.c        |  4 ++--
+ hw/arm/highbank.c          | 11 +++++++----
+ hw/arm/realview.c          |  6 ++++--
+ hw/arm/vexpress.c          |  6 ++++--
+ hw/arm/xilinx_zynq.c       | 14 ++++++++------
+ hw/core/register.c         |  8 ++++----
+ hw/net/pcnet-pci.c         | 10 ----------
+ hw/pci/pci-stub.c          |  3 +++
+ hw/sparc64/sun4u.c         |  2 +-
+ include/hw/arm/arm.h       |  1 -
+ include/hw/ide/ahci.h      |  2 ++
+ include/hw/mips/mips.h     |  1 +
+ include/hw/misc/unimp.h    |  3 +++
+ target/sparc/ldst_helper.c |  4 ++--
+ 16 files changed, 44 insertions(+), 36 deletions(-)
+
+-- 
+2.11.0
