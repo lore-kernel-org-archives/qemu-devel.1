@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d7n43-0001nx-Di
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:07:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7n60-0003E3-W8
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:09:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d7n42-0005WL-Gz
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:07:19 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon,  8 May 2017 14:07:05 -0400
-Message-Id: <20170508180705.20609-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] aio: add missing aio_notify() to
- aio_enable_external()
+	(envelope-from <eblake@redhat.com>) id 1d7n5x-0006Nh-0g
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:09:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d7n5w-0006M9-Kr
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:09:16 -0400
+References: <1493966082-9352-1-git-send-email-armbru@redhat.com>
+	<20170508164230.GD22428@stefanha-x1.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <79237b29-3f53-64c7-413a-4451562292ff@redhat.com>
+Date: Mon, 8 May 2017 13:09:11 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170508164230.GD22428@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="PNejAL5Gn0BgX28A1WBSEmJ0qxV1xQTPu"
+Subject: Re: [Qemu-devel] [PULL v2 00/28] QAPI patches for 2017-05-04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,71 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-The main loop uses aio_disable_external()/aio_enable_external() to
-temporarily disable processing of external AioContext clients like
-device emulation.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PNejAL5Gn0BgX28A1WBSEmJ0qxV1xQTPu
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
+ <marcandre.lureau@redhat.com>
+Message-ID: <79237b29-3f53-64c7-413a-4451562292ff@redhat.com>
+Subject: Re: [Qemu-devel] [PULL v2 00/28] QAPI patches for 2017-05-04
+References: <1493966082-9352-1-git-send-email-armbru@redhat.com>
+ <20170508164230.GD22428@stefanha-x1.localdomain>
+In-Reply-To: <20170508164230.GD22428@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This allows monitor commands to quiesce I/O and prevent the guest from
-submitting new requests while a monitor command is in progress.
+On 05/08/2017 11:42 AM, Stefan Hajnoczi wrote:
+> On Fri, May 05, 2017 at 08:34:42AM +0200, Markus Armbruster wrote:
+>> [v2]: Fix trailing space, note tweaks to PATCH 12 properly in the
+>>
+>> commit message=20
+>> The following changes since commit e619b14746e5d8c0e53061661fd0e1da01f=
+d4d60:
+>>
+>>   Merge remote-tracking branch 'sthibault/tags/samuel-thibault' into s=
+taging (2017-05-02 15:16:29 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-05-04-v2
+>=20
+> make check fails when I apply this series:
+>=20
+>   GTESTER tests/test-char
+>   GTester: last random seed: R02S47a681e3e741223084711f7aacacb19a
+>   GTester: last random seed: R02S739de30ffeb0f93caedc22b2863f60a7
 
-The aio_enable_external() API is currently broken when an IOThread is in
-aio_poll() waiting for fd activity when the main loop re-enables
-external clients.  Incrementing ctx->external_disable_cnt does not wake
-the IOThread from ppoll(2) so fd processing remains suspended and leads
-to unresponsive emulated devices.
+I tried bisecting, and I hit compilation failures during:
 
-This patch adds an aio_notify() call to aio_enable_external() so the
-IOThread is kicked out of ppoll(2) and will re-arm the file descriptors.
+    sockets: Rename SocketAddress to SocketAddressLegacy
 
-The bug can be reproduced as follows:
+chardev/char-socket.c: In function =E2=80=98qmp_chardev_open_socket=E2=80=
+=99:
+chardev/char-socket.c:948:13: error: implicit declaration of function
+=E2=80=98qapi_free_SocketAddress=E2=80=99 [-Werror=3Dimplicit-function-de=
+claration]
+             qapi_free_SocketAddress(s->addr);
+             ^~~~~~~~~~~~~~~~~~~~~~~
 
-  $ qemu -M accel=kvm -m 1024 \
-         -object iothread,id=iothread0 \
-         -device virtio-scsi-pci,iothread=iothread0,id=virtio-scsi-pci0 \
-         -drive if=none,id=drive0,aio=native,cache=none,format=raw,file=test.img \
-         -device scsi-hd,id=scsi-hd0,drive=drive0 \
-         -qmp tcp::5555,server,nowait
 
-  $ scripts/qmp/qmp-shell localhost:5555
-  (qemu) blockdev-snapshot-sync device=drive0 snapshot-file=sn1.qcow2
-         mode=absolute-paths format=qcow2
+and
+    sockets: Rename SocketAddressFlat to SocketAddress
 
-After blockdev-snapshot-sync completes the SCSI disk will be
-unresponsive.  This leads to request timeouts inside the guest.
+chardev/char-socket.c: In function =E2=80=98qmp_chardev_open_socket=E2=80=
+=99:
+chardev/char-socket.c:948:37: error: passing argument 1 of
+=E2=80=98qapi_free_SocketAddress=E2=80=99 from incompatible pointer type
+[-Werror=3Dincompatible-pointer-types]
+             qapi_free_SocketAddress(s->addr);
+                                     ^
 
-Reported-by: Qianqian Zhu <qizhu@redhat.com>
-Suggested-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-v3:
- * s/dec_fetch/fetch_dec/ [Fam]
----
- include/block/aio.h | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+which places the failure(s) anywhere in this range:
 
-diff --git a/include/block/aio.h b/include/block/aio.h
-index 406e323..e9aeeae 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -454,8 +454,14 @@ static inline void aio_disable_external(AioContext *ctx)
-  */
- static inline void aio_enable_external(AioContext *ctx)
- {
--    assert(ctx->external_disable_cnt > 0);
--    atomic_dec(&ctx->external_disable_cnt);
-+    int old;
-+
-+    old = atomic_fetch_dec(&ctx->external_disable_cnt);
-+    assert(old > 0);
-+    if (old == 1) {
-+        /* Kick event loop so it re-arms file descriptors */
-+        aio_notify(ctx);
-+    }
- }
- 
- /**
--- 
-2.9.3
+pick 70ae657 qapi: New QAPI_CLONE_MEMBERS()
+pick f031ce2 sockets: Rename SocketAddress to SocketAddressLegacy
+pick b1eb5e0 sockets: Rename SocketAddressFlat to SocketAddress
+pick a842861 sockets: Limit SocketAddressLegacy to external interfaces
+
+I don't see the failures when testing armbru/qapi-next in isolation.
+
+Probably just means you have to rebase your series on top of
+Marc-Andr=C3=A9's series which got merged first, although such a rebase i=
+s
+not necessarily trivial :(
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--PNejAL5Gn0BgX28A1WBSEmJ0qxV1xQTPu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZELRHAAoJEKeha0olJ0NqRWIH/0xLmTjiO7S4whkMUcysXDDI
+cNcTDbuXmDvuJjI4+VQoCU+m414jh6ErVF2AtHhTQeojmMkm/dQ6ju3HtmIVA/9z
+TZut1R1acZNfBpV/QPGjIJHIP9QKAZOKqhYpLraC9FEPJWniyDV0QCqq0ZJKDbAr
+GXoAkO/HK2OEShD/QBeSpQC6D+KJ4SQkl4QNWHPBl4aRL51cYpANiw2ZNQZjyE+U
+rALeUWqqqtiyZF+3thgVXLy4jluJ6nrLypo9ERVNv8kw7Y2Ap/I+rWdM4QoE9mmI
+Fh74EjBlLSiucyWpOx2Br5zLicsQl6ND2IIWg2OAFJX3V1/RsLMZdFM2fwIpmFM=
+=NHXY
+-----END PGP SIGNATURE-----
+
+--PNejAL5Gn0BgX28A1WBSEmJ0qxV1xQTPu--
