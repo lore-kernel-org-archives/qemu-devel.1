@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d7pwQ-0004qR-ID
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:11:39 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d7q10-00069R-Oc
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:16:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d7pwM-000801-CL
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:11:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33918)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d7pwM-0007zj-3t
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:11:34 -0400
-References: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1f0bf90b-a706-01c8-cad1-6dea6620deef@redhat.com>
-Date: Mon, 8 May 2017 16:11:30 -0500
+	(envelope-from <stefanha@gmail.com>) id 1d7q0w-0002Ez-Nq
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:16:22 -0400
+Date: Mon, 8 May 2017 17:16:15 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170508211615.GB23989@stefanha-x1.localdomain>
+References: <1493042140-25551-1-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0wrl2I62axX5rCCecxecReCHJVo05LHa1"
-Subject: Re: [Qemu-devel] [PATCH] Fix issues affecting Xen 9pfs discovered
- by Coverity
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
+Content-Disposition: inline
+In-Reply-To: <1493042140-25551-1-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/block: optimize the performance
+ by coalescing the same write type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, anthony.perard@citrix.com
-Cc: xen-devel@lists.xensource.com, aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org, groug@kaod.org
+To: jemmy858585@gmail.com
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Lidong Chen <lidongchen@tencent.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0wrl2I62axX5rCCecxecReCHJVo05LHa1
-From: Eric Blake <eblake@redhat.com>
-To: Stefano Stabellini <sstabellini@kernel.org>, anthony.perard@citrix.com
-Cc: xen-devel@lists.xensource.com, aneesh.kumar@linux.vnet.ibm.com,
- qemu-devel@nongnu.org, groug@kaod.org
-Message-ID: <1f0bf90b-a706-01c8-cad1-6dea6620deef@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Fix issues affecting Xen 9pfs discovered by
- Coverity
-References: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1705081334150.24729@sstabellini-ThinkPad-X260>
-Content-Type: text/plain; charset=utf-8
+
+--tjCHc7DPkfUGtrlw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 05/08/2017 03:45 PM, Stefano Stabellini wrote:
-> Fix two resource leaks on error paths, discovered by Coverity.
-> Check for errors returned by fcntl, also found by Coverity.
+On Mon, Apr 24, 2017 at 09:55:40PM +0800, jemmy858585@gmail.com wrote:
+> From: Lidong Chen <lidongchen@tencent.com>
 >=20
-> CID:1374836
-> CID:1374831
+> This patch optimizes the performance by coalescing the same write type.
+> When the zero/non-zero state changes, perform the write for the accumulat=
+ed
+> cluster count.
 >=20
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> ---
+>     Thanks Fam Zheng and Stefan's advice.
+> ---
+>  migration/block.c | 66 +++++++++++++++++++++++++++++++++++++++++--------=
+------
+>  1 file changed, 49 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/migration/block.c b/migration/block.c
+> index 060087f..e9c5e21 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -40,6 +40,8 @@
+> =20
+>  #define MAX_INFLIGHT_IO 512
+> =20
+> +#define MIN_CLUSTER_SIZE 8192
 
-> @@ -378,7 +380,10 @@ static int xen_9pfs_connect(struct XenDevice *xend=
-ev)
->          if (xen_9pdev->rings[i].evtchndev =3D=3D NULL) {
->              goto out;
->          }
-> -        fcntl(xenevtchn_fd(xen_9pdev->rings[i].evtchndev), F_SETFD, FD=
-_CLOEXEC);
-> +        if (fcntl(xenevtchn_fd(xen_9pdev->rings[i].evtchndev),
-> +                  F_SETFD, FD_CLOEXEC) =3D=3D -1) {
-> +            goto out;
+The loop accumulates adjacent zero/non-zero regions.  What is the point
+of this constant?
 
-Directly calling fcntl(F_SETFD) without first reading fcntl(F_GETFD) is
-(theoretically) incorrect.  Better might be using qemu_set_cloexec()
-instead of open-coding something.
+I guess you are trying to reduce the number of loop iterations when
+cluster size is small (e.g. 512).  Do you have performance results
+showing that this really makes a difference?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+It would be simpler to remove MIN_CLUSTER_SIZE.  Unless there is
+evidence showing it's necessary simpler code is better.
 
+> @@ -943,29 +946,58 @@ static int block_load(QEMUFile *f, void *opaque, in=
+t version_id)
+>                                          nr_sectors * BDRV_SECTOR_SIZE,
+>                                          BDRV_REQ_MAY_UNMAP);
+>              } else {
+> -                int i;
+> -                int64_t cur_addr;
+> -                uint8_t *cur_buf;
+> +                int64_t cur_addr =3D addr * BDRV_SECTOR_SIZE;
+> +                uint8_t *cur_buf =3D NULL;
+> +                int64_t last_addr =3D addr * BDRV_SECTOR_SIZE;
+> +                uint8_t *last_buf =3D NULL;
+> +                int64_t end_addr =3D addr * BDRV_SECTOR_SIZE + BLOCK_SIZ=
+E;
+> =20
+>                  buf =3D g_malloc(BLOCK_SIZE);
+>                  qemu_get_buffer(f, buf, BLOCK_SIZE);
+> -                for (i =3D 0; i < BLOCK_SIZE / cluster_size; i++) {
+> -                    cur_addr =3D addr * BDRV_SECTOR_SIZE + i * cluster_s=
+ize;
+> -                    cur_buf =3D buf + i * cluster_size;
+> -
+> -                    if ((!block_mig_state.zero_blocks ||
+> -                        cluster_size < BLOCK_SIZE) &&
+> -                        buffer_is_zero(cur_buf, cluster_size)) {
+> -                        ret =3D blk_pwrite_zeroes(blk, cur_addr,
+> -                                                cluster_size,
+> +                cur_buf =3D buf;
+> +                last_buf =3D buf;
+> +
+> +                while (last_addr < end_addr) {
+> +                    int is_zero =3D 0;
 
---0wrl2I62axX5rCCecxecReCHJVo05LHa1
+Please use bool for boolean values.
+
+--tjCHc7DPkfUGtrlw
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZEN8CAAoJEKeha0olJ0NqTB8H/1JgGZ2smxjJVtOdw0DQcMwG
-nlkechOKjB3urHR4uNnorZDTGsOgroswYzvWhubriVm5y49kasHoy8JHnVWiZTxT
-3MQuSFargA4yQeDDk6ieYB/2PQ7uvdFL8x76W/QfKnroth7jPkDaILZHPo7Qf4in
-clrSO/KxsoIPKIluXM4pYXbp3gppmOd2wysPYS0qwCCXg5d/hbA79M/D37hs7ocu
-BQzhl3oKxTKPgAg2jcSB+TRxkDvAhBGxJd+JTXkbvQZSP1gzdl+NQQIEHmw8uDev
-QIisyxkxrxF9kSZWhtDwqstoCCMgTjobKhllOQEflaQIqi49tlOJ5mQ7Zi1wFCE=
-=7BsU
+iQEcBAEBAgAGBQJZEOAfAAoJEJykq7OBq3PIfY4H/0O4dnIfTv/bSkoAyVqz4UC5
+AwfiJfUqQhg73CtnaybwDnfc6td06MF0V8xsyDR+pad0QM/P/4WfHdkZb7yd/LFC
+tWTdoe/+0bfHmDqMqxcszHPC1c/KUEbl0iTqpBn0pnaqaC9be7MeU3p967I90SU2
+RY8tNcdOHSGUqhy1Zv+2ipBg1p6shySQySte9kXAtGMtrzYNftviG2naNCfnmJ/m
+tr1CeqlS2xu1F8k1jq2TUK+9NZheDqyZQJkoqO5Ctd881bsh6wunMkjxbMFiXGke
+aO/RjqrnRfrWW9jGOr010tot0Rkw6zY/8GT7cdrsGOtMWaiIcNXA79BTcivVXQA=
+=by4a
 -----END PGP SIGNATURE-----
 
---0wrl2I62axX5rCCecxecReCHJVo05LHa1--
+--tjCHc7DPkfUGtrlw--
