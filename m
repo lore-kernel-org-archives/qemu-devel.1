@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d7qqu-0005sf-6P
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:10:01 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1d7qty-0006xq-MB
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1d7qqt-0003pe-5s
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:10:00 -0400
-In-Reply-To: <20170508215412.othbbicpjvz5p4fz@aurel32.net>
+	(envelope-from <aurelien@aurel32.net>) id 1d7qtx-00055a-HZ
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:13:10 -0400
+Date: Tue, 9 May 2017 00:13:04 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170508221304.y36owezwla7sc6ss@aurel32.net>
 References: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
-	<20170508215412.othbbicpjvz5p4fz@aurel32.net>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <619279EC-F49E-44D2-AAC7-74DB7DEFE0E3@gmail.com>
-Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Mon, 8 May 2017 18:09:49 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <0F376E9C-2D4B-4D79-B3D4-24F73FD61446@gmail.com>
 Subject: Re: [Qemu-devel] Floating point unit bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,61 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
+To: G 3 <programmingkidx@gmail.com>
 Cc: "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
+On 2017-05-07 17:48, G 3 wrote:
+> I made a diagnostic program for the floating point unit. It will test
+> various PowerPC floating point instructions for compatibility with the
+> PowerPC G3 processor. It was tested on a PowerPC G3 and G5 system. The
+> results of the program in qemu-system-ppc were pretty bad. About every
+> instruction tested is not implemented correctly.
+>=20
+> Here is the download link to the program: http://www.mediafire.com/file/6=
+j9tqubvk73lkw1/floating_point_test_program.zip
 
-On May 8, 2017, at 5:54 PM, Aurelien Jarno wrote:
+Some comments on the code.
+>=20
+>     /* Check if everything is alright */
+>     uint32_t fpscr;
+>     asm volatile("mffs f0");
+>     asm volatile("stfd f0, 40(r1)");
+>     asm volatile("lwz %0, 44(r1)" : "=3Dr"(fpscr));
+>     if (fpscr !=3D 0) {
+>         printf("Warning: fpscr not equal to zero: 0x%x\n", fpscr);
+>     }
 
-> On 2017-05-07 17:48, G 3 wrote:
->> I made a diagnostic program for the floating point unit. It will test
->> various PowerPC floating point instructions for compatibility with  
->> the
->> PowerPC G3 processor. It was tested on a PowerPC G3 and G5 system.  
->> The
->> results of the program in qemu-system-ppc were pretty bad. About  
->> every
->> instruction tested is not implemented correctly.
->
-> I don't say that qemu-system-ppc is bug free, but this looks  
-> suspicious
-> that about every instruction is buggy.
+This is overly complicated and just doesn't compile with recent GCC
+versions. What about something like:
 
-I really hope you don't think I'm blaming anyone. I'm only reporting  
-the results of the test.
+    Converter c;
+    asm volatile("mffs %0" : "=3Df"(c.d));
+    fpscr =3D (uint32_t)c.i;
 
-> Have you tried to run your
-> program on a real G3 or G5 system?
 
-Yes. I made sure it ran on a real G3 and G5 system without problem  
-before testing it on QEMU. I suspect the Motorola designed G4  
-processor will not be compatible. I don't have a working G4 system to  
-verify this unfortunately.
+> /*
+>  * The action to take if a test fails
+>  * Input one: message string
+>  * Input two: actual fpscr value
+>  * Input three: expected fpscr value
+>  * Input four: actual answer
+>  * Input five: expected answer
+>  */
+>  void test_failed(const char *message, uint32_t actual_fpscr, uint32_t
+> expected_fpscr,
+>                   uint64_t actual_answer, uint64_t expected_answer)
+>  {
+>     printf("%s\n", message);
+>     printf("expected answer: 0x%" PRIx64 "\n", expected_answer);
+>     printf("  actual answer: 0x%" PRIx64 "\n", actual_fpscr);
 
->
-> [ snip ]
->
->>
->> Here is the full test results after running this program in qemu- 
->> system-ppc
->> with a Mac OS 10.4 guest:
->>
->>
->>
->>
->> fadd test failed
->> expected answer: 0x3ff3333333333334
->>   actual answer: 0x8200400000000024
->> expected fpscr: 0x82064000
->>   actual fpscr: 0x82004000
->
-> This looks highly suspicious that the actual answer match the expected
-> answer.
+This is wrong. It should be actual_answer instead of actual_fpscr. That
+is why all the instructions seems totally wrongly implemented. Note that
+compiling with -Wall would give you a warning:
 
-You can use this web page to find the decimal value: http:// 
-www6.uniovi.es/~antonio/uned/ieee754/IEEE-754hex64.html
+| main.c: In function =E2=80=98test_failed=E2=80=99:
+| main.c:146:5: warning: format =E2=80=98%llx=E2=80=99 expects argument of =
+type =E2=80=98long long unsigned int=E2=80=99, but argument 2 has type =E2=
+=80=98uint32_t=E2=80=99 [-Wformat=3D]
+|      printf("  actual answer: 0x%" PRIx64 "\n", actual_fpscr);
+|=C2=A0     ^
 
-0x3ff3333333333334 = 1.2000000000000002
-0x8200400000000024 = -4.8529708162167760e-299
+So I think the cone needs to be improved a bit before we can conclude
+anything.
 
-The expected answer and actual answer are very far from each other.
+Aurelien
+
+--=20
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
