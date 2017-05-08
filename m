@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1d7qAS-0002vd-5h
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:26:09 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d7qAo-00039q-LZ
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1d7qAP-0005Hl-PE
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:26:08 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:32854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1d7qAP-0005HY-Fc
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:26:05 -0400
-Received: by mail-wm0-x242.google.com with SMTP id y10so18279074wmh.0
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 14:26:04 -0700 (PDT)
-References: <1494274635-11029-1-git-send-email-joserz@linux.vnet.ibm.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <3f878a42-e19a-9afe-edff-61b942e477dd@ozlabs.ru>
-Date: Tue, 9 May 2017 07:25:51 +1000
+	(envelope-from <mreitz@redhat.com>) id 1d7qAl-0005JY-Hx
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:26:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1d7qAl-0005JS-8F
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:26:27 -0400
+References: <20170508141536.20690-1-stefanha@redhat.com>
+	<20170508141536.20690-5-stefanha@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8b49e6e9-043d-e628-3c49-1433ba0b5d5e@redhat.com>
+Date: Mon, 8 May 2017 23:26:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <1494274635-11029-1-git-send-email-joserz@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=koi8-r
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Revert "target-ppc/kvm: Enable in-kernel
- TCE acceleration for multi-tce"
+In-Reply-To: <20170508141536.20690-5-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qwxRQaV7OWQA9vq7BRIQDkPPI2M5EhTjc"
+Subject: Re: [Qemu-devel] [PATCH v6 4/9] qcow2: make refcount size
+ calculation conservative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,146 +29,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, bharata@linux.vnet.ibm.com, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On 09/05/17 06:17, Jose Ricardo Ziviani wrote:
-> This reverts commit 3dc410ae83e6cb76c81ea30a05d62596092b3165.
-> 
-> Booting a radix guest in Power9 with that commit throws a host kernel
-> oops:
-> 
-> [17582052553.360178] Unable to handle kernel paging request for data at address 0xe64bb17da64ab078
-> [17582052553.360420] Faulting instruction address: 0xc0000000002c3ddc
-> [17582052553.360533] Oops: Kernel access of bad area, sig: 11 [#1]
-> [17582052553.360643] SMP NR_CPUS=1024
-> [17582052553.360645] NUMA
-> [17582052553.360712] PowerNV
-> [17582052553.360804] Modules linked in: vhost_net vhost tap xt_CHECKSUM ipt_MASQUERADE nf_nat_masquerade_ipv4 ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 nf_conntrack_ipv6 nf_defrag_ipv6 xt_conntrack ip_set nfnetlink ebtable_nat ebtable_broute bridge stp llc ip6table_mangle ip6table_security ip6table_raw iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack libcrc32c iptable_mangle iptable_security iptable_raw ebtable_filter ebtables ip6table_filter ip6_tables ses enclosure scsi_transport_sas ipmi_powernv powernv_op_panel ipmi_devintf ipmi_msghandler nfsd kvm_hv auth_rpcgss oid_registry nfs_acl lockd grace sunrpc kvm tg3 ptp pps_core
-> [17582052553.361797] CPU: 5 PID: 4966 Comm: qemu-system-ppc Not tainted 4.11.0-1.git4a6869a.el7.centos.ppc64le #1
-> [17582052553.361972] task: c0000003c5e90a80 task.stack: c0000003c5f6c000
-> [17582052553.362082] NIP: c0000000002c3ddc LR: c0000000002c3e80 CTR: c0000000000ce2e0
-> [17582052553.362214] REGS: c0000003c5f6f150 TRAP: 0380   Not tainted  (4.11.0-1.git4a6869a.el7.centos.ppc64le)
-> [17582052553.362467] MSR: 9000000000001031 <SF,HV,ME,IR,DR,LE>
-> [17582052553.362480]   CR: 44008024  XER: 20000000
-> [17582052553.362822] CFAR: c0000000002c3e7c SOFTE: 1
-> [17582052553.362822] GPR00: 000000000000018f c0000003c5f6f3d0 c00000000131fd00 0000000000000000
-> [17582052553.362822] GPR04: 0000000000000005 00000000000001ff 0000000000000000 7db04aa67db14ba6
-> [17582052553.362822] GPR08: 264bb17da64ab000 e64bb17da64ab000 0000000000000078 0000000000000000
-> [17582052553.362822] GPR12: c0000003bdb98008 c00000000fdc2d00 c00000000000e148 0000000000000000
-> [17582052553.362822] GPR16: 0000000008000000 0000000020000000 0000000000000000 c0000003c5f6f4c0
-> [17582052553.362822] GPR20: c0000001ffff9440 c0000001fd033280 c0000001fd0342a0 c0000001f24efff8
-> [17582052553.362822] GPR24: 0000000000000200 00000001f24f0000 0000000000000010 0000000000020000
-> [17582052553.362822] GPR28: 0800000000000000 00000001f24f0000 000000007db04aa6 00000000a64ab07d
-> [17582052553.365148] NIP [c0000000002c3ddc] vmalloc_to_page+0x19c/0x220
-> [17582052553.365365] LR [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
-> [17582052553.365582] Call Trace:
-> [17582052553.365720] [c0000003c5f6f3d0] [7265677368657265] 0x7265677368657265 (unreliable)
-> [17582052553.365982] [c0000003c5f6f400] [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
-> [17582052553.366245] [c0000003c5f6f420] [c0000000000637e8] vmalloc_to_phys+0x28/0x60
-> [17582052553.366508] [c0000003c5f6f450] [c0000000000ce480] kvmppc_rm_h_put_tce_indirect+0x1a0/0x540
-> [17582052553.366812] [c0000003c5f6f590] [c0000000000d0314] hcall_try_real_mode+0x60/0x7c
-> [17582052553.367074] [c0000003c5f6f600] [c0000000000cefac] kvmppc_call_hv_entry+0x8/0x17c
-> [17582052553.367346] [c0000003c5f6f670] [c00800000375a970] __kvmppc_vcore_entry+0x13c/0x1ac [kvm_hv]
-> [17582052553.367652] [c0000003c5f6f840] [c0080000037574a8] kvmppc_run_core+0x788/0x1650 [kvm_hv]
-> [17582052553.367965] [c0000003c5f6fa00] [c0080000037590b8] kvmppc_vcpu_run_hv+0x388/0x1200 [kvm_hv]
-> [17582052553.368287] [c0000003c5f6fb30] [c008000003274684] kvmppc_vcpu_run+0x34/0x50 [kvm]
-> [17582052553.368558] [c0000003c5f6fb50] [c008000003270b54] kvm_arch_vcpu_ioctl_run+0x114/0x2a0 [kvm]
-> [17582052553.368870] [c0000003c5f6fbd0] [c008000003263dd8] kvm_vcpu_ioctl+0x5e8/0x7c0 [kvm]
-> [17582052553.369132] [c0000003c5f6fd40] [c000000000350b50] do_vfs_ioctl+0xd0/0x8c0
-> [17582052553.369395] [c0000003c5f6fde0] [c000000000351414] SyS_ioctl+0xd4/0xf0
-> [17582052553.369615] [c0000003c5f6fe30] [c00000000000b8e0] system_call+0x38/0xfc
-> [17582052553.369875] Instruction dump:
-> [17582052553.370011] 53dfc42e 790807c6 394affff 7d08fb78 78638402 79081764 7d4a07b4 7c6a5038
-> [17582052553.370281] 7908f5e6 7d094b78 794a1f24 38600000 <7d2a482a> 7924cfe3 41820040 79260022
-> [17582052553.370599] ---[ end trace 9470442ed18ae727 ]---
-> 
-> As soon as we identify and fix the issue that's causing such problem
-> I'll re-send the referred patch to re-enable TCE.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qwxRQaV7OWQA9vq7BRIQDkPPI2M5EhTjc
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>,
+ Alberto Garcia <berto@igalia.com>
+Message-ID: <8b49e6e9-043d-e628-3c49-1433ba0b5d5e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 4/9] qcow2: make refcount size calculation
+ conservative
+References: <20170508141536.20690-1-stefanha@redhat.com>
+ <20170508141536.20690-5-stefanha@redhat.com>
+In-Reply-To: <20170508141536.20690-5-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 08.05.2017 16:15, Stefan Hajnoczi wrote:
+> The refcount metadata size calculation is inaccurate and can produce
+> numbers that are too small.  This is bad because we should calculate a
+> conservative number - one that is guaranteed to be large enough.
+>=20
+> This patch switches the approach to a fixed point calculation because
+> the existing equation is hard to solve when inaccuracies are taken care=
 
-The proper fix is to change the host kernel to not advertise
-KVM_CAP_SPAPR_MULTITCE for radix guest.
-
-
-> 
-> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> CC: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> of.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
 > ---
->  hw/ppc/spapr.c       |  4 +---
->  target/ppc/kvm.c     | 14 --------------
->  target/ppc/kvm_ppc.h |  6 ------
->  3 files changed, 1 insertion(+), 23 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e2dc77c..362ee81 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2340,12 +2340,10 @@ static void ppc_spapr_init(MachineState *machine)
->  
->      qemu_register_boot_set(spapr_boot_set, spapr);
->  
-> +    /* to stop and start vmclock */
->      if (kvm_enabled()) {
-> -        /* to stop and start vmclock */
->          qemu_add_vm_change_state_handler(cpu_ppc_clock_vm_state_change,
->                                           &spapr->tb);
-> -
-> -        kvmppc_spapr_enable_inkernel_multitce();
->      }
+>  block/qcow2.c | 82 ++++++++++++++++++++++++++++++---------------------=
+--------
+>  1 file changed, 42 insertions(+), 40 deletions(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 5569b63..ff0d825 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2095,6 +2095,43 @@ static int preallocate(BlockDriverState *bs)
+>      return 0;
 >  }
->  
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 8574c36..c959b90 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2198,20 +2198,6 @@ bool kvmppc_spapr_use_multitce(void)
->      return cap_spapr_multitce;
->  }
->  
-> -int kvmppc_spapr_enable_inkernel_multitce(void)
-> -{
-> -    int ret;
-> -
-> -    ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_ENABLE_HCALL, 0,
-> -                            H_PUT_TCE_INDIRECT, 1);
-> -    if (!ret) {
-> -        ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_ENABLE_HCALL, 0,
-> -                                H_STUFF_TCE, 1);
-> -    }
-> -
-> -    return ret;
-> -}
-> -
->  void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
->                                uint64_t bus_offset, uint32_t nb_table,
->                                int *pfd, bool need_vfio)
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index f48243d..4b2fd9a 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -39,7 +39,6 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
->  #ifndef CONFIG_USER_ONLY
->  off_t kvmppc_alloc_rma(void **rma);
->  bool kvmppc_spapr_use_multitce(void);
-> -int kvmppc_spapr_enable_inkernel_multitce(void);
->  void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
->                                uint64_t bus_offset, uint32_t nb_table,
->                                int *pfd, bool need_vfio);
-> @@ -181,11 +180,6 @@ static inline bool kvmppc_spapr_use_multitce(void)
->      return false;
->  }
->  
-> -static inline int kvmppc_spapr_enable_inkernel_multitce(void)
-> -{
-> -    return -1;
-> -}
-> -
->  static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
->                                              uint64_t bus_offset,
->                                              uint32_t nb_table,
-> 
+> =20
+> +/* qcow2_refcount_metadata_size:
+> + * @clusters: number of clusters to refcount (including data and L1/L2=
+ tables)
+> + * @cluster_size: size of a cluster, in bytes
+> + * @refcount_order: refcount bits power-of-2 exponent
+> + *
+> + * Returns: Number of bytes required for refcount blocks and table met=
+adata.
+> + */
+> +static int64_t qcow2_refcount_metadata_size(int64_t clusters,
+> +                                            size_t cluster_size,
+> +                                            int refcount_order)
+> +{
+> +    /*
+> +     * Every host cluster is reference-counted, including metadata (ev=
+en
+> +     * refcount metadata is recursively included).
+> +     *
+> +     * An accurate formula for the size of refcount metadata size is d=
+ifficult
+> +     * to derive.
+
+Oh, by the way:
+
+https://lists.nongnu.org/archive/html/qemu-devel/2014-04/msg04820.html
+
+*cough* *cough*
+
+(No, this is not the formula that was used for this preallocation.
+Otherwise, it would have been correct. O:-))
+
+Max
+
+>                     An easier method of calculation is finding the fixe=
+d point
+> +     * where no further refcount blocks or table clusters are required=
+ to
+> +     * reference count every cluster.
+> +     */
+> +    int64_t blocks_per_table_cluster =3D cluster_size / sizeof(uint64_=
+t);
+> +    int64_t refcounts_per_block =3D cluster_size * 8 / (1 << refcount_=
+order);
+> +    int64_t table =3D 0;  /* number of refcount table clusters */
+> +    int64_t blocks =3D 0; /* number of refcount block clusters */
+> +    int64_t last;
+> +    int64_t n =3D 0;
+> +
+> +    do {
+> +        last =3D n;
+> +        blocks =3D DIV_ROUND_UP(clusters + table + blocks, refcounts_p=
+er_block);
+> +        table =3D DIV_ROUND_UP(blocks, blocks_per_table_cluster);
+> +        n =3D clusters + blocks + table;
+> +    } while (n !=3D last);
+> +
+> +    return (blocks + table) * cluster_size;
+> +}
+> +
+>  /**
+>   * qcow2_calc_prealloc_size:
+>   * @total_size: virtual disk size in bytes
 
 
--- 
-Alexey
+--qwxRQaV7OWQA9vq7BRIQDkPPI2M5EhTjc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQ4noSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AxaEIAImfaJI3rvZbbUSCzgABsqSDjlplcM3J
+6yDazLAWxz67XwdxxBXenxxChjsjJpeotlCGmiPD4Z5xMsJqRLrgrwIQiynyEQ3/
+wK+eSvBGaLAL7dtO6YJCWdcmiduoIBTzw47ofbDMeNspSlKVkmHw7c+k0eJnJwDt
+15+94l8Qh8kHgwHVJvLza7it0G1TcX337ZDSEE2jiGyvohiWrkEhnvBb4Gi5DA/U
+xiGU/+/lvVeWrGBSpoi/+7usvRcL0qjE+jmjjwaEIeh5huc+qGjfnhHJjiFqEGtr
+XCDDw/7R6M13qTdfJD41/SrhgYpElp9HL6EWtNNJVXbkct3Rm8f+1II=
+=Yr/q
+-----END PGP SIGNATURE-----
+
+--qwxRQaV7OWQA9vq7BRIQDkPPI2M5EhTjc--
