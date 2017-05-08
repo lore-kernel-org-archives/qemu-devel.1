@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7q10-00069R-Oc
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:16:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7q4Y-0007Eb-SG
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:20:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7q0w-0002Ez-Nq
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:16:22 -0400
-Date: Mon, 8 May 2017 17:16:15 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170508211615.GB23989@stefanha-x1.localdomain>
-References: <1493042140-25551-1-git-send-email-lidongchen@tencent.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
-Content-Disposition: inline
-In-Reply-To: <1493042140-25551-1-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/block: optimize the performance
- by coalescing the same write type
+	(envelope-from <eblake@redhat.com>) id 1d7q4W-0003X8-5H
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:20:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d7q4V-0003Wp-VT
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:20:00 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon,  8 May 2017 16:19:49 -0500
+Message-Id: <20170508211953.28017-2-eblake@redhat.com>
+In-Reply-To: <20170508211953.28017-1-eblake@redhat.com>
+References: <20170508211953.28017-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 1/5] shutdown: Simplify shutdown_signal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jemmy858585@gmail.com
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, Paolo Bonzini <pbonzini@redhat.com>
 
+There is no signal 0 (kill(pid, 0) has special semantics to probe whether
+a process is alive), rather than actually sending a signal 0).  So we
+can use the simpler 0, instead of -1, for our sentinel of whether a
+shutdown request due to a signal has happened.
 
---tjCHc7DPkfUGtrlw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-On Mon, Apr 24, 2017 at 09:55:40PM +0800, jemmy858585@gmail.com wrote:
-> From: Lidong Chen <lidongchen@tencent.com>
->=20
-> This patch optimizes the performance by coalescing the same write type.
-> When the zero/non-zero state changes, perform the write for the accumulat=
-ed
-> cluster count.
->=20
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> ---
->     Thanks Fam Zheng and Stefan's advice.
-> ---
->  migration/block.c | 66 +++++++++++++++++++++++++++++++++++++++++--------=
-------
->  1 file changed, 49 insertions(+), 17 deletions(-)
->=20
-> diff --git a/migration/block.c b/migration/block.c
-> index 060087f..e9c5e21 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -40,6 +40,8 @@
-> =20
->  #define MAX_INFLIGHT_IO 512
-> =20
-> +#define MIN_CLUSTER_SIZE 8192
+---
+v4-v7: no change
+v3: new patch
+---
+ vl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-The loop accumulates adjacent zero/non-zero regions.  What is the point
-of this constant?
+diff --git a/vl.c b/vl.c
+index acc6e21..7a205e0 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1598,7 +1598,7 @@ void vm_state_notify(int running, RunState state)
+ }
 
-I guess you are trying to reduce the number of loop iterations when
-cluster size is small (e.g. 512).  Do you have performance results
-showing that this really makes a difference?
+ static int reset_requested;
+-static int shutdown_requested, shutdown_signal = -1;
++static int shutdown_requested, shutdown_signal;
+ static pid_t shutdown_pid;
+ static int powerdown_requested;
+ static int debug_requested;
+@@ -1629,7 +1629,7 @@ static int qemu_shutdown_requested(void)
 
-It would be simpler to remove MIN_CLUSTER_SIZE.  Unless there is
-evidence showing it's necessary simpler code is better.
+ static void qemu_kill_report(void)
+ {
+-    if (!qtest_driver() && shutdown_signal != -1) {
++    if (!qtest_driver() && shutdown_signal) {
+         if (shutdown_pid == 0) {
+             /* This happens for eg ^C at the terminal, so it's worth
+              * avoiding printing an odd message in that case.
+@@ -1643,7 +1643,7 @@ static void qemu_kill_report(void)
+                          shutdown_cmd ? shutdown_cmd : "<unknown process>");
+             g_free(shutdown_cmd);
+         }
+-        shutdown_signal = -1;
++        shutdown_signal = 0;
+     }
+ }
 
-> @@ -943,29 +946,58 @@ static int block_load(QEMUFile *f, void *opaque, in=
-t version_id)
->                                          nr_sectors * BDRV_SECTOR_SIZE,
->                                          BDRV_REQ_MAY_UNMAP);
->              } else {
-> -                int i;
-> -                int64_t cur_addr;
-> -                uint8_t *cur_buf;
-> +                int64_t cur_addr =3D addr * BDRV_SECTOR_SIZE;
-> +                uint8_t *cur_buf =3D NULL;
-> +                int64_t last_addr =3D addr * BDRV_SECTOR_SIZE;
-> +                uint8_t *last_buf =3D NULL;
-> +                int64_t end_addr =3D addr * BDRV_SECTOR_SIZE + BLOCK_SIZ=
-E;
-> =20
->                  buf =3D g_malloc(BLOCK_SIZE);
->                  qemu_get_buffer(f, buf, BLOCK_SIZE);
-> -                for (i =3D 0; i < BLOCK_SIZE / cluster_size; i++) {
-> -                    cur_addr =3D addr * BDRV_SECTOR_SIZE + i * cluster_s=
-ize;
-> -                    cur_buf =3D buf + i * cluster_size;
-> -
-> -                    if ((!block_mig_state.zero_blocks ||
-> -                        cluster_size < BLOCK_SIZE) &&
-> -                        buffer_is_zero(cur_buf, cluster_size)) {
-> -                        ret =3D blk_pwrite_zeroes(blk, cur_addr,
-> -                                                cluster_size,
-> +                cur_buf =3D buf;
-> +                last_buf =3D buf;
-> +
-> +                while (last_addr < end_addr) {
-> +                    int is_zero =3D 0;
-
-Please use bool for boolean values.
-
---tjCHc7DPkfUGtrlw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZEOAfAAoJEJykq7OBq3PIfY4H/0O4dnIfTv/bSkoAyVqz4UC5
-AwfiJfUqQhg73CtnaybwDnfc6td06MF0V8xsyDR+pad0QM/P/4WfHdkZb7yd/LFC
-tWTdoe/+0bfHmDqMqxcszHPC1c/KUEbl0iTqpBn0pnaqaC9be7MeU3p967I90SU2
-RY8tNcdOHSGUqhy1Zv+2ipBg1p6shySQySte9kXAtGMtrzYNftviG2naNCfnmJ/m
-tr1CeqlS2xu1F8k1jq2TUK+9NZheDqyZQJkoqO5Ctd881bsh6wunMkjxbMFiXGke
-aO/RjqrnRfrWW9jGOr010tot0Rkw6zY/8GT7cdrsGOtMWaiIcNXA79BTcivVXQA=
-=by4a
------END PGP SIGNATURE-----
-
---tjCHc7DPkfUGtrlw--
+-- 
+2.9.3
