@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d7maj-0002PD-8B
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:37:02 -0400
+	(envelope-from <mst@redhat.com>) id 1d7meK-0004Kq-M6
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d7mag-0004VK-3W
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:37:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45264)
+	(envelope-from <mst@redhat.com>) id 1d7meH-0005is-Jz
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:40:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d7maf-0004V8-QM
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:36:58 -0400
-Date: Mon, 8 May 2017 18:36:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170508173650.GJ2120@work-vm>
-References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
-	<20170505173507.74077-7-pasic@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d7meH-0005ib-B4
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:40:41 -0400
+Date: Mon, 8 May 2017 20:40:33 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170508203533-mutt-send-email-mst@kernel.org>
+References: <1492076108-117229-3-git-send-email-wei.w.wang@intel.com>
+	<20170413184040-mutt-send-email-mst@kernel.org>
+	<58F08A60.2020407@intel.com>
+	<20170415000934-mutt-send-email-mst@kernel.org>
+	<58F43801.7060004@intel.com>
+	<286AC319A985734F985F78AFA26841F7391F6DCD@shsmsx102.ccr.corp.intel.com>
+	<20170426192753-mutt-send-email-mst@kernel.org>
+	<59019055.3040708@intel.com>
+	<20170506012322-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F7391FFBB0@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170505173507.74077-7-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 06/10] virtio-ccw: use vmstate way for
- config migration
+In-Reply-To: <286AC319A985734F985F78AFA26841F7391FFBB0@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v9 2/5] virtio-balloon:
+ VIRTIO_BALLOON_F_BALLOON_CHUNKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,183 +36,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Let us use the freshly introduced vmstate migration helpers instead of
-> saving/loading the config manually.
+On Sun, May 07, 2017 at 04:19:28AM +0000, Wang, Wei W wrote:
+> On 05/06/2017 06:26 AM, Michael S. Tsirkin wrote:
+> > On Thu, Apr 27, 2017 at 02:31:49PM +0800, Wei Wang wrote:
+> > > On 04/27/2017 07:20 AM, Michael S. Tsirkin wrote:
+> > > > On Wed, Apr 26, 2017 at 11:03:34AM +0000, Wang, Wei W wrote:
+> > > > > Hi Michael, could you please give some feedback?
+> > > > I'm sorry, I'm not sure feedback on what you are requesting.
+> > > Oh, just some trivial things (e.g. use a field in the header,
+> > > hdr->chunks to indicate the number of chunks in the payload) that
+> > > wasn't confirmed.
+> > >
+> > > I will prepare the new version with fixing the agreed issues, and we
+> > > can continue to discuss those parts if you still find them improper.
+> > >
+> > >
+> > > >
+> > > > The interface looks reasonable now, even though there's a way to
+> > > > make it even simpler if we can limit chunk size to 2G (in fact 4G -
+> > > > 1). Do you think we can live with this limitation?
+> > > Yes, I think we can. So, is it good to change to use the previous
+> > > 64-bit chunk format (52-bit base + 12-bit size)?
+> > 
+> > This isn't what I meant. virtio ring has descriptors with a 64 bit address and 32 bit
+> > size.
+> > 
+> > If size < 4g is not a significant limitation, why not just use that to pass
+> > address/size in a standard s/g list, possibly using INDIRECT?
 > 
-> To achieve this we need to hack the config_vector which is a common
-> VirtIO state in the middle of the VirtioCcwDevice state representation.
-> This somewhat ugly but we have no choice because the stream format needs
-> to be preserved.
-> 
-> Still no changes in behavior, but the dead code we added previously is
-> finally awakening to life.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
-> ---
->  hw/s390x/virtio-ccw.c | 116 +++++++++++++++++++-------------------------------
->  1 file changed, 44 insertions(+), 72 deletions(-)
-> 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index c2badfe..8ab655c 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -57,6 +57,32 @@ static int virtio_ccw_dev_post_load(void *opaque, int version_id)
->      return 0;
->  }
->  
-> +static int get_config_vector(QEMUFile *f, void *pv, size_t size,
-> +                             VMStateField *field)
-> +{
-> +    VirtioCcwDevice *dev = pv;
-> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
-> +
-> +    qemu_get_be16s(f, &vdev->config_vector);
-> +    return 0;
-> +}
-> +
-> +static int put_config_vector(QEMUFile *f, void *pv, size_t size,
-> +                             VMStateField *field, QJSON *vmdesc)
-> +{
-> +    VirtioCcwDevice *dev = pv;
-> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
-> +
-> +    qemu_put_be16(f, vdev->config_vector);
-> +    return 0;
-> +}
-> +
-> +const VMStateInfo vmstate_info_config_vector = {
-> +    .name = "config_vector",
-> +    .get = get_config_vector,
-> +    .put = put_config_vector,
-> +};
-> +
->  const VMStateDescription vmstate_virtio_ccw_dev = {
->      .name = "s390_virtio_ccw_dev",
->      .version_id = 1,
-> @@ -67,6 +93,14 @@ const VMStateDescription vmstate_virtio_ccw_dev = {
->          VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
->          VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
->          VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
-> +        {
-> +        /*
-> +         * Ugly hack because VirtIODevice does not migrate itself.
-> +         * This also makes legacy via vmstate_save_state possible.
-> +         */
-> +            .name         = "virtio/config_vector",
-> +            .info         = &vmstate_info_config_vector,
-> +        },
+> OK, I see your point, thanks. Post the two options here for an analysis:
+> Option1 (what we have now):
+> struct virtio_balloon_page_chunk {
+>         __le64 chunk_num;
+>         struct virtio_balloon_page_chunk_entry entry[];
+> };
+> Option2:
+> struct virtio_balloon_page_chunk {
+>         __le64 chunk_num;
+>         struct scatterlist entry[];
+> };
 
-I'm a bit confused - isn't just this bit the bit going
-through the vdev->load_config hook?
+This isn't what I meant really :) I meant vring_desc.
 
-Dave
+> I don't have an issue to change it to Option2, but I would prefer Option1,
+> because I think there is no be obvious difference between the two options,
+> while Option1 appears to have little advantages here:
+> 1) "struct virtio_balloon_page_chunk_entry" has smaller size than
+> "struct scatterlist", so the same size of allocated page chunk buffer
+> can hold more entry[] using Option1;
+> 2) INDIRECT needs on demand kmalloc();
 
->          VMSTATE_STRUCT(routes, VirtioCcwDevice, 1, vmstate_adapter_routes, \
->                         AdapterRoutes),
->          VMSTATE_UINT8(thinint_isc, VirtioCcwDevice),
-> @@ -1272,85 +1306,23 @@ static int virtio_ccw_load_queue(DeviceState *d, int n, QEMUFile *f)
->  static void virtio_ccw_save_config(DeviceState *d, QEMUFile *f)
->  {
->      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
-> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
-> -    SubchDev *s = ccw_dev->sch;
-> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
->  
-> -    subch_device_save(s, f);
-> -    if (dev->indicators != NULL) {
-> -        qemu_put_be32(f, dev->indicators->len);
-> -        qemu_put_be64(f, dev->indicators->addr);
-> -    } else {
-> -        qemu_put_be32(f, 0);
-> -        qemu_put_be64(f, 0UL);
-> -    }
-> -    if (dev->indicators2 != NULL) {
-> -        qemu_put_be32(f, dev->indicators2->len);
-> -        qemu_put_be64(f, dev->indicators2->addr);
-> -    } else {
-> -        qemu_put_be32(f, 0);
-> -        qemu_put_be64(f, 0UL);
-> -    }
-> -    if (dev->summary_indicator != NULL) {
-> -        qemu_put_be32(f, dev->summary_indicator->len);
-> -        qemu_put_be64(f, dev->summary_indicator->addr);
-> -    } else {
-> -        qemu_put_be32(f, 0);
-> -        qemu_put_be64(f, 0UL);
-> -    }
-> -    qemu_put_be16(f, vdev->config_vector);
-> -    qemu_put_be64(f, dev->routes.adapter.ind_offset);
-> -    qemu_put_byte(f, dev->thinint_isc);
-> -    qemu_put_be32(f, dev->revision);
-> +    /*
-> +     * We save in legacy mode. The components take care of their own
-> +     * compat. representation (based on css_migration_enabled).
-> +     */
-> +    vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL);
->  }
->  
->  static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
->  {
->      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
-> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
-> -    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
-> -    SubchDev *s = ccw_dev->sch;
-> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
-> -    int len;
-> -
-> -    s->driver_data = dev;
-> -    subch_device_load(s, f);
-> -    /* Re-fill subch_id after loading the subchannel states.*/
-> -    if (ck->refill_ids) {
-> -        ck->refill_ids(ccw_dev);
-> -    }
-> -    len = qemu_get_be32(f);
-> -    if (len != 0) {
-> -        dev->indicators = get_indicator(qemu_get_be64(f), len);
-> -    } else {
-> -        qemu_get_be64(f);
-> -        dev->indicators = NULL;
-> -    }
-> -    len = qemu_get_be32(f);
-> -    if (len != 0) {
-> -        dev->indicators2 = get_indicator(qemu_get_be64(f), len);
-> -    } else {
-> -        qemu_get_be64(f);
-> -        dev->indicators2 = NULL;
-> -    }
-> -    len = qemu_get_be32(f);
-> -    if (len != 0) {
-> -        dev->summary_indicator = get_indicator(qemu_get_be64(f), len);
-> -    } else {
-> -        qemu_get_be64(f);
-> -        dev->summary_indicator = NULL;
-> -    }
-> -    qemu_get_be16s(f, &vdev->config_vector);
-> -    dev->routes.adapter.ind_offset = qemu_get_be64(f);
-> -    dev->thinint_isc = qemu_get_byte(f);
-> -    dev->revision = qemu_get_be32(f);
-> -    if (s->thinint_active) {
-> -        dev->routes.adapter.adapter_id = css_get_adapter_id(
-> -                                         CSS_IO_ADAPTER_VIRTIO,
-> -                                         dev->thinint_isc);
-> -    }
->  
-> -    return 0;
-> +    /*
-> +     * We load in legacy mode. The components take take care to read
-> +     * only stuff which is actually there (based on css_migration_enabled).
-> +     */
-> +    return vmstate_load_state(f, &vmstate_virtio_ccw_dev, dev, 1);
->  }
->  
->  static void virtio_ccw_pre_plugged(DeviceState *d, Error **errp)
-> -- 
-> 2.10.2
+Within alloc_indirect?  We can fix that with a separate patch.
+
+
+> 3) no 4G size limit;
+
+Do you see lots of >=4g chunks in practice?
+
+> What do you think?
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Best,
+> Wei
+> 
+>
+
+OTOH using existing vring APIs handles things like DMA transparently.
+
+
+-- 
+MST
