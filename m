@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7kzt-0001es-J8
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:54:54 -0400
+	(envelope-from <berrange@redhat.com>) id 1d7l0N-00025c-6w
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:55:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7kzs-0004nq-Ol
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:54:53 -0400
-References: <20170507000552.20847-1-eblake@redhat.com>
-	<20170507000552.20847-7-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3f3d454b-6ab4-52d4-eaac-adaeec3ca700@redhat.com>
-Date: Mon, 8 May 2017 17:54:46 +0200
+	(envelope-from <berrange@redhat.com>) id 1d7l0J-0004ua-A5
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:55:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3566)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d7l0J-0004uS-3k
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:55:19 -0400
+Date: Mon, 8 May 2017 16:55:11 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170508155511.GX18871@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170505032340.26467-1-famz@redhat.com>
+	<03beb071-ebbc-4328-3530-37b9856476cc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170507000552.20847-7-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EvpF0l7icibhCoe4ePRE4StQV4RQd1Mnq"
-Subject: Re: [Qemu-devel] [PATCH v13 06/12] qcow2: Make distinction between
- zero cluster types obvious
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <03beb071-ebbc-4328-3530-37b9856476cc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] docker: Add test-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EvpF0l7icibhCoe4ePRE4StQV4RQd1Mnq
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <3f3d454b-6ab4-52d4-eaac-adaeec3ca700@redhat.com>
-Subject: Re: [PATCH v13 06/12] qcow2: Make distinction between zero cluster
- types obvious
-References: <20170507000552.20847-1-eblake@redhat.com>
- <20170507000552.20847-7-eblake@redhat.com>
-In-Reply-To: <20170507000552.20847-7-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, May 05, 2017 at 09:44:04AM +0200, Paolo Bonzini wrote:
+> 
+> 
+> On 05/05/2017 05:23, Fam Zheng wrote:
+> > A few tweaks to the docker images and running commands allow us to run
+> > qemu-iotests in the fedora container. This will be added to the patchew test
+> > cases later.
+> > 
+> > Fam Zheng (5):
+> >   docker: Run tests with current user
+> >   docker: Add bzip2 and hostname to fedora image
+> >   docker: Use unconfined security profile
+> >   docker: Add libaio to fedora image
+> >   docker: Add test-block
+> > 
+> >  tests/docker/Makefile.include          |  3 ++-
+> >  tests/docker/dockerfiles/fedora.docker |  4 ++--
+> >  tests/docker/test-block                | 21 +++++++++++++++++++++
+> >  3 files changed, 25 insertions(+), 3 deletions(-)
+> >  create mode 100755 tests/docker/test-block
+> > 
+> 
+> Patches 1-4:
+> 
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> For patch 5, I think we should revive the "quick" qemu-iotests group
+> (maybe we can have support for skipping groups, and have a "slow" group
+> with the very few tests that take >30 seconds?) and add the quick tests
+> to "make check".
 
-On 07.05.2017 02:05, Eric Blake wrote:
-> Treat plain zero clusters differently from allocated ones, so that
-> we can simplify the logic of checking whether an offset is present.
-> Do this by splitting QCOW2_CLUSTER_ZERO into two new enums,
-> QCOW2_CLUSTER_ZERO_PLAIN and QCOW2_CLUSTER_ZERO_ALLOC.
->=20
-> I tried to arrange the enum so that we could use
-> 'ret <=3D QCOW2_CLUSTER_ZERO_PLAIN' for all unallocated types, and
-> 'ret >=3D QCOW2_CLUSTER_ZERO_ALLOC' for allocated types, although
-> I didn't actually end up taking advantage of the layout.
->=20
-> In many cases, this leads to simpler code, by properly combining
-> cases (sometimes, both zero types pair together, other times,
-> plain zero is more like unallocated while allocated zero is more
-> like normal).
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> ---
-> v13: s/!preallocated/cluster_type =3D=3D QCOW2_CLUSTER_ZERO_PLAIN/, fix=
+'quick' not only depends on the test case, but also the backend.
+Most of the so called 'quick' tests are very slow with qcow v1 (over
+your 30 sec mark), and can also be fairly slow with LUKS too.
 
-> error message text (including iotest fallout), rebase to earlier cleanu=
-ps
-> v12: new patch
-> ---
->  block/qcow2.h              |  8 +++--
->  block/qcow2-cluster.c      | 81 ++++++++++++++++++--------------------=
---------
->  block/qcow2-refcount.c     | 44 +++++++++++--------------
->  block/qcow2.c              |  9 ++++--
->  tests/qemu-iotests/060.out |  6 ++--
->  5 files changed, 64 insertions(+), 84 deletions(-)
-
-[...]
-
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index ed78a30..a4a3229 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-
-[...]
-
-> @@ -344,13 +343,13 @@ static int count_contiguous_clusters_unallocated(=
-int nb_clusters,
->  {
->      int i;
->=20
-> -    assert(wanted_type =3D=3D QCOW2_CLUSTER_ZERO ||
-> +    assert(wanted_type =3D=3D QCOW2_CLUSTER_ZERO_PLAIN ||
->             wanted_type =3D=3D QCOW2_CLUSTER_UNALLOCATED);
->      for (i =3D 0; i < nb_clusters; i++) {
->          uint64_t entry =3D be64_to_cpu(l2_table[i]);
-> -        int type =3D qcow2_get_cluster_type(entry);
-> +        QCow2ClusterType type =3D qcow2_get_cluster_type(entry);
-
-With this moved into the previous patch:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-(No, I'm not mentioning the fact that 060.out contains one more mention
-of "Data cluster offset" that should definitely be a "Cluster allocation
-offset" or even "Preallocated zero cluster offset" at
-block/qcow2-cluster.c:1780, because let's really worry about this later)
-
->=20
-> -        if (type !=3D wanted_type || entry & L2E_OFFSET_MASK) {
-> +        if (type !=3D wanted_type) {
->              break;
->          }
->      }
-
-
---EvpF0l7icibhCoe4ePRE4StQV4RQd1Mnq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQlMYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AgMkH/3UqmuWlsMHBGK+MexqyWh6bjGiSe330
-p6V+sJdlAfEg9WM6duWVMrKihdyZ2lie52KOgKHMGcipchHDiriOEjLEu3KG6lVq
-QSM7DDPZlkppn5Nu1nWB+7wWEaQWoERkhuURww/iFf/YDBr8+/YOT6/27GfzTDKw
-elg2TYlwks/009QWFHNot+8MBpP37IkoSgonTCbM+a/OOL6SxqOeuz/xicr9ZMJZ
-PoyIbiDDBS0jF68LFNmjfI5ZXwg5EMf5a4Uy3yHvjN2cBN2dYAMxHOjRGSLbT7Yc
-tBXV5pu0oYz+y7lR0gpDzgaqXK1FxvZlvmBGQClpFZuGHReMZbcDJ68=
-=BHiN
------END PGP SIGNATURE-----
-
---EvpF0l7icibhCoe4ePRE4StQV4RQd1Mnq--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
