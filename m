@@ -1,24 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d7k78-0005nE-S4
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:58:20 -0400
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1d7k9n-00074o-BA
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1d7k76-0002wd-9m
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:58:18 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1d7k76-0002wV-2j
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:58:16 -0400
-Received: by mail-wr0-x231.google.com with SMTP id z52so46521123wrc.2
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 07:58:15 -0700 (PDT)
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 08 May 2017 15:58:59 +0100
-Message-ID: <87pofj8kek.fsf@linaro.org>
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1d7k9k-0003bj-H3
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
+	id 1d7k9k-0003aV-7S
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:01:00 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v48Ewnjs035987
+	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 11:00:57 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aadbd3a0u-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 11:00:52 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
+	Mon, 8 May 2017 11:00:51 -0400
+References: <20170426144645.12476-1-farman@linux.vnet.ibm.com>
+	<20170505074143.GB21435@lemon.lan>
+	<298bd169-6f9f-e622-1b8b-85ef126d8d0c@linux.vnet.ibm.com>
+	<ca23d2f5-1296-976b-fe98-35277eb632f9@redhat.com>
+	<c50c12c0-93bb-bd40-9751-d4b716407c20@linux.vnet.ibm.com>
+	<eecd3b1f-a554-b64e-30ba-a45b053f5260@redhat.com>
+	<5d72d4cc-da61-9bbf-3f4c-61fd1c799cd8@de.ibm.com>
+From: Eric Farman <farman@linux.vnet.ibm.com>
+Date: Mon, 8 May 2017 11:00:45 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] Future of SoftFloat use in QEMU
+In-Reply-To: <5d72d4cc-da61-9bbf-3f4c-61fd1c799cd8@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <0479016a-5731-caed-dd24-986b5d1532a9@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 0/5] Enable virtio-scsi boot from
+ /dev/sgX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +47,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <aleksandar.markovic@imgtec.com>, Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>, Alexander Graf <agraf@suse.de>, "Michael S . Tsirkin" <mst@redhat.com>
 
-Hi,
 
-We've got a task coming up to implement half-precision floating point
-(FP16) for ARMv8.2. As you know pretty much all our floating point in
-QEMU is handled by our internal fork of John R. Hauser's BSD SoftFloat
-library. Our current implementation is based on version 2a which doesn't
-support FP16.
 
-As it happens there has been a new release of SoftFloat recently.
-Version 3 is a complete re-write which made a number of changes, some
-notable ones being:
+On 05/08/2017 03:00 AM, Christian Borntraeger wrote:
+> On 05/06/2017 10:24 AM, Paolo Bonzini wrote:
+>>
+>>
+>> On 05/05/2017 18:12, Eric Farman wrote:
+>>>
+>>>
+>>> On 05/05/2017 11:13 AM, Paolo Bonzini wrote:
+>>>>
+>>>>
+>>>> On 05/05/2017 17:03, Eric Farman wrote:
+>>>>> We get a value of x3fffff when sending that to a scsi-disk from bios
+>>>>> code.  That's fully emulated though, in scsi_disk_emulate_inquiry.  And
+>>>>> that's the scenario that already works.
+>>>>>
+>>>>> While there is indeed code in hw/scsi/scsi-generic.c to wire that in,
+>>>>> that only happens after the I/O goes to the device itself.  The Block
+>>>>> Limits page isn't supported [1] and thus it gets rejected with "invalid
+>>>>> field in cdb".  We never get to that fixup code you reference, since the
+>>>>> returned len is zero.
+>>>>>
+>>>>> Should I be refactoring this code to always patch in that block limit
+>>>>> regardless of a response from the host/device?  (That is, when page xb0
+>>>>> isn't supported by the hw.)
+>>>>
+>>>> What is thec value you get?
+>>>
+>>> x140000 bytes when using /dev/sg0 (xa00 sectors when using /dev/sda).
+>>>
+>>>>  Is there a sensible default value
+>>>> that you can use when page 0xb0 isn't supported by the hardware?
+>>>
+>>> I was setting max_sectors to x800 with good success, which was the
+>>> power-of-2 floor that BLKSECTGET gave us.  That kept us within the
+>>> limits of the host biovec code.  But it's a long way from the
+>>> virtio-scsi value of xFFFF when max_sectors isn't specified, so don't
+>>> know what side effects that may cause.
+>>
+>> It's just slower, but 0x800 is already a megabyte worth of data so it's
+>> not going to be that much slower.
+>>
+>> Paolo
+>>
+>
+> Eric, maybe that would be a safe variant. The bios boot code is not
+> performance optimized anyway. Lets just always use a maximum size that
+> will always work.
+>
 
-  - Complete rewrite, different use license than earlier releases.
-  - Renaming most types and functions, upgrading some algorithms
-    - restructuring the source files, and making SoftFloat into a true library.
-  - Added functions to convert between floating-point and unsigned integers, both 32-bit and 64-bit (uint32_t and uint64_t).
-  - Added functions for fused multiply-add, for all supported floating-point formats except 80-bit double-extended-precision.
-  - Added support for a fifth rounding mode, near_maxMag (round to nearest, with ties to maximum magnitude, away from zero).
+Sounds good to me.  Let me work on getting my very ugly code to be 
+slightly less ugly, and I'll send a v2 here.  Thanks, everyone.
 
-And in the most recent release as of February 2017, 3c:
-
-  - Added optional rounding mode odd (round to odd, also known as jamming).
-  - Implemented the common 16-bit “half-precision” floating-point format (float16_t)
-
-See: http://www.jhauser.us/arithmetic/SoftFloat-3c/doc/SoftFloat-history.html
-
-Of course the softfloat in QEMU's tree hasn't been static either. We've
-made numerous changes over the years to add and fix various features,
-including features that have since been added to the upstream softfloat.
-It seems unlikely we could switch to the newer softfloat without risking
-breaking something. However if we look at back-porting stuff from the
-newer library we essentially get to own our version of softfloat
-forever.
-
-So what else can we do?
-
-We could investigate having both libraries included in QEMU. It seems
-the API has changed quite a bit so that might be possible although there
-would be hackage involved in having two different softfloat.h's
-involved.
-
-This would be useful if we wanted to take a piecemeal approach to
-updating the library. For example we could just use softfloat3 when we
-need the newer features (e.g. FP16).
-
-Or we could convert one architecture at a time so each qemu binary links
-against either a version 2 or version 3 softfloat library. Of course
-that does run the risk of permanently holding two versions of softfloat
-in the code if the less maintained guest architectures don't convert
-quickly.
-
-So any thoughts about what would make the best approach?
-
---
-Alex Bennée
+  - Eric
