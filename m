@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d7kiI-00012E-2H
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:36:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d7kjf-0002FE-I7
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d7kiH-0007ow-9n
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:36:42 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:57574)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1d7kiH-0007o0-2s
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:36:41 -0400
-Date: Mon, 8 May 2017 17:36:25 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170508153625.y7jhzv32go5fzlwh@aurel32.net>
-References: <87pofj8kek.fsf@linaro.org>
+	(envelope-from <mreitz@redhat.com>) id 1d7kje-0008A1-NF
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 11:38:07 -0400
+References: <20170507000552.20847-1-eblake@redhat.com>
+	<20170507000552.20847-2-eblake@redhat.com>
+	<35324a73-aae8-e677-f411-00dfaf6d4f38@redhat.com>
+	<f72fca48-7e77-4268-9463-a2c51e999687@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e1338ab4-02f9-9644-ee94-f92fb4b8d617@redhat.com>
+Date: Mon, 8 May 2017 17:37:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <87pofj8kek.fsf@linaro.org>
-Sender: Aurelien Jarno <aurelien@aurel32.net>
-Subject: Re: [Qemu-devel] Future of SoftFloat use in QEMU
+In-Reply-To: <f72fca48-7e77-4268-9463-a2c51e999687@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LsgsV0aLD5h2SN199eigloVPDd3pXUaP2"
+Subject: Re: [Qemu-devel] [PATCH v13 01/12] qcow2: Nicer variable names in
+ qcow2_update_snapshot_refcount()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +27,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-15?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Aleksandar Markovic <aleksandar.markovic@imgtec.com>, Pranith Kumar <bobby.prani@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LsgsV0aLD5h2SN199eigloVPDd3pXUaP2
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com
+Message-ID: <e1338ab4-02f9-9644-ee94-f92fb4b8d617@redhat.com>
+Subject: Re: [PATCH v13 01/12] qcow2: Nicer variable names in
+ qcow2_update_snapshot_refcount()
+References: <20170507000552.20847-1-eblake@redhat.com>
+ <20170507000552.20847-2-eblake@redhat.com>
+ <35324a73-aae8-e677-f411-00dfaf6d4f38@redhat.com>
+ <f72fca48-7e77-4268-9463-a2c51e999687@redhat.com>
+In-Reply-To: <f72fca48-7e77-4268-9463-a2c51e999687@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2017-05-08 15:58, Alex Benn=C3=A9e wrote:
-> Hi,
+On 08.05.2017 17:36, Eric Blake wrote:
+> On 05/08/2017 10:27 AM, Max Reitz wrote:
+>> On 07.05.2017 02:05, Eric Blake wrote:
+>>> In order to keep checkpatch happy when the next patch changes
+>>> indentation, we first have to shorten some long lines.  The easiest
+>>> approach is to use a new variable in place of
+>>> 'offset & L2E_OFFSET_MASK', except that 'offset' is the best name
+>>> for that variable.  Change '[old_]offset' to '[old_]entry' to
+>>> make room.
+>>>
+>>> While touching things, also fix checkpatch warnings about unusual
+>>> 'for' statements.
+>>>
+>>> Suggested by Max Reitz <mreitz@redhat.com>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>>
 >=20
-> We've got a task coming up to implement half-precision floating point
-> (FP16) for ARMv8.2. As you know pretty much all our floating point in
-> QEMU is handled by our internal fork of John R. Hauser's BSD SoftFloat
-> library. Our current implementation is based on version 2a which doesn't
-> support FP16.
+>>> @@ -1117,20 +1118,22 @@ int qcow2_update_snapshot_refcount(BlockDrive=
+rState *bs,
+>>>                  goto fail;
+>>>              }
+>>>
+>>> -            for(j =3D 0; j < s->l2_size; j++) {
+>>> +            for (j =3D 0; j < s->l2_size; j++) {
+>>>                  uint64_t cluster_index;
+>>> +                uint64_t offset;
+>>
+>> Actually, introducing entry and old_entry in this scope would have
+>> sufficed, too, because they aren't used anywhere else. But nobody
+>> actually cares (O:-)), so:
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>>>
+>>> -                offset =3D be64_to_cpu(l2_table[j]);
+>>> -                old_offset =3D offset;
+>>> -                offset &=3D ~QCOW_OFLAG_COPIED;
+>>> +                entry =3D be64_to_cpu(l2_table[j]);
+>>> +                old_entry =3D entry;
 >=20
-> As it happens there has been a new release of SoftFloat recently.
-> Version 3 is a complete re-write which made a number of changes, some
-> notable ones being:
+> Other things I thought about, but didn't care enough to actually do:
+> it's possible to reduce a line of code by either:
 >=20
->   - Complete rewrite, different use license than earlier releases.
->   - Renaming most types and functions, upgrading some algorithms
->     - restructuring the source files, and making SoftFloat into a true li=
-brary.
->   - Added functions to convert between floating-point and unsigned intege=
-rs, both 32-bit and 64-bit (uint32_t and uint64_t).
->   - Added functions for fused multiply-add, for all supported floating-po=
-int formats except 80-bit double-extended-precision.
->   - Added support for a fifth rounding mode, near_maxMag (round to neares=
-t, with ties to maximum magnitude, away from zero).
+> old_entry =3D entry =3D be64_to_cpu(l2_table[j]);
+> entry &=3D ~QCOW_OFLAG_COPIED;
 >=20
-> And in the most recent release as of February 2017, 3c:
+> or by:
 >=20
->   - Added optional rounding mode odd (round to odd, also known as jamming=
-).
->   - Implemented the common 16-bit =E2=80=9Chalf-precision=E2=80=9D floati=
-ng-point format (float16_t)
+> old_entry =3D be64_to_cpu(l2_table[j]);
+> entry =3D old_entry & ~QCOW_OFLAG_COPIED;
 >=20
-> See: http://www.jhauser.us/arithmetic/SoftFloat-3c/doc/SoftFloat-history.=
-html
->=20
-> Of course the softfloat in QEMU's tree hasn't been static either. We've
-> made numerous changes over the years to add and fix various features,
-> including features that have since been added to the upstream softfloat.
-> It seems unlikely we could switch to the newer softfloat without risking
-> breaking something. However if we look at back-porting stuff from the
-> newer library we essentially get to own our version of softfloat
-> forever.
+> for one less line of source.  You're welcome to make either such tweak
+> if you care, but I'm not going to respin for just that ;)
 
-There have been many many changes in our forked version of softfloat:
-qNaN/sNaN, IEEE754-2008 functions, squash input denormal, many floatx80
-fixes, ...
+No, I actually like the code as it is. :-)
 
-Do we know if all those changes are also in the new softfloat version,
-and if it is not the case if we can work with upstream to implement
-that? That seems to me like a pre-requisite before trying to get this
-new version in QEMU, either as an option or as the only version.
+Max
 
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+
+--LsgsV0aLD5h2SN199eigloVPDd3pXUaP2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQkNYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AuscIAIFZAD+EwuxvNCs7xyM19uGoXbeZRnJG
+fYOHVyJUaSTkMCbyDJ2cSiefehDw0Yi2WEWE7O87UVSJT/P9LabX6ZkNxmEvylXh
+f/pF8px8x6lLaFti+u0GvFjGDv7h3A03Lt6Yko3C6rNMXTQdWQGcjR1CQZB+zAP+
+2UrTTOjYuRccYZU16XWwtAGY1/pjI1vrHAVqQoohr7xI/XtkalMCDTnEsfeWJap2
+0Aa1J2Xlcfg6+wBoi2RaD6MwbCho++XrLSej94rkEZoyZrhCigxZjxwm6QfwUSTp
+ilaGP/vC1+pTpACsPhG+b+JNMeU+8tx81/Z/hE5u+RYp6f+XddCnXmU=
+=R+Vv
+-----END PGP SIGNATURE-----
+
+--LsgsV0aLD5h2SN199eigloVPDd3pXUaP2--
