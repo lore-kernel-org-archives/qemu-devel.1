@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d7jSq-0001Uz-Qn
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:16:42 -0400
+	(envelope-from <stefanha@redhat.com>) id 1d7jT2-0001et-Ar
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:16:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d7jSp-00045c-De
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:16:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59030)
+	(envelope-from <stefanha@redhat.com>) id 1d7jSz-00048B-SU
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:16:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d7jSp-00045X-3y
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:16:39 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d7jSz-000481-II
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:16:49 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon,  8 May 2017 10:15:34 -0400
-Message-Id: <20170508141536.20690-8-stefanha@redhat.com>
+Date: Mon,  8 May 2017 10:15:36 -0400
+Message-Id: <20170508141536.20690-10-stefanha@redhat.com>
 In-Reply-To: <20170508141536.20690-1-stefanha@redhat.com>
 References: <20170508141536.20690-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 7/9] qemu-img: add measure subcommand
+Subject: [Qemu-devel] [PATCH v6 9/9] iotests: add test 178 for qemu-img
+ measure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,327 +27,637 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The measure subcommand calculates the size required by a new image file.
-This can be used by users or management tools that need to allocate
-space on an LVM volume, SAN LUN, etc before creating or converting an
-image file.
-
-Suggested-by: Maor Lipchuk <mlipchuk@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
-v5:
- * Use UINT64_MAX instead of ~0ULL [Berto]
- * Document qemu-img measure ofmt, fmt, output_fmt, and snapshot_param
-   [Berto]
----
- qemu-img.c       | 228 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- qemu-img-cmds.hx |   6 ++
- qemu-img.texi    |  30 ++++++++
- 3 files changed, 264 insertions(+)
+ tests/qemu-iotests/178           | 168 +++++++++++++++++++++++
+ tests/qemu-iotests/178.out.qcow2 | 278 +++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/178.out.raw   | 146 ++++++++++++++++++++
+ tests/qemu-iotests/group         |   1 +
+ 4 files changed, 593 insertions(+)
+ create mode 100755 tests/qemu-iotests/178
+ create mode 100644 tests/qemu-iotests/178.out.qcow2
+ create mode 100644 tests/qemu-iotests/178.out.raw
 
-diff --git a/qemu-img.c b/qemu-img.c
-index c719636..6eed6d1 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -59,6 +59,7 @@ enum {
-     OPTION_PATTERN = 260,
-     OPTION_FLUSH_INTERVAL = 261,
-     OPTION_NO_DRAIN = 262,
-+    OPTION_SIZE = 263,
- };
- 
- typedef enum OutputFormat {
-@@ -4286,6 +4287,233 @@ out:
-     return 0;
- }
- 
-+static void dump_json_block_measure_info(BlockMeasureInfo *info)
-+{
-+    QString *str;
-+    QObject *obj;
-+    Visitor *v = qobject_output_visitor_new(&obj);
+diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
+new file mode 100755
+index 0000000..a835a97
+--- /dev/null
++++ b/tests/qemu-iotests/178
+@@ -0,0 +1,168 @@
++#!/bin/bash
++#
++# qemu-img measure sub-command tests
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+    visit_type_BlockMeasureInfo(v, NULL, &info, &error_abort);
-+    visit_complete(v, &obj);
-+    str = qobject_to_json_pretty(obj);
-+    assert(str != NULL);
-+    printf("%s\n", qstring_get_str(str));
-+    qobject_decref(obj);
-+    visit_free(v);
-+    QDECREF(str);
++# creator
++owner=stefanha@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1    # failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++    rm -f "$TEST_IMG.converted"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.pattern
++
++_supported_fmt raw qcow2
++_supported_proto file
++_supported_os Linux
++
++echo "== Input validation =="
++echo
++
++_make_test_img 1G
++
++$QEMU_IMG measure # missing arguments
++$QEMU_IMG measure --size 2G "$TEST_IMG" # only one allowed
++$QEMU_IMG measure "$TEST_IMG" a # only one filename allowed
++$QEMU_IMG measure --object secret,id=sec0,data=MTIzNDU2,format=base64 # missing filename
++$QEMU_IMG measure --image-opts # missing filename
++$QEMU_IMG measure -f qcow2 # missing filename
++$QEMU_IMG measure -l snap1 # missing filename
++$QEMU_IMG measure -o , # invalid option list
++$QEMU_IMG measure -l snapshot.foo # invalid snapshot option
++$QEMU_IMG measure --output foo # invalid output format
++$QEMU_IMG measure --size -1 # invalid image size
++$QEMU_IMG measure -O foo "$TEST_IMG" # unknown image file format
++
++make_test_img_with_fmt() {
++    # Shadow global variables within this function
++    local IMGFMT="$1" IMGOPTS=""
++    _make_test_img "$2"
 +}
 +
-+static int img_measure(int argc, char **argv)
-+{
-+    static const struct option long_options[] = {
-+        {"help", no_argument, 0, 'h'},
-+        {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-+        {"object", required_argument, 0, OPTION_OBJECT},
-+        {"output", required_argument, 0, OPTION_OUTPUT},
-+        {"size", required_argument, 0, OPTION_SIZE},
-+        {0, 0, 0, 0}
-+    };
-+    OutputFormat output_format = OFORMAT_HUMAN;
-+    BlockBackend *in_blk = NULL;
-+    BlockDriver *drv;
-+    const char *filename = NULL;
-+    const char *fmt = NULL;
-+    const char *out_fmt = "raw";
-+    char *options = NULL;
-+    char *snapshot_name = NULL;
-+    QemuOpts *opts = NULL;
-+    QemuOpts *object_opts = NULL;
-+    QemuOpts *sn_opts = NULL;
-+    QemuOptsList *create_opts = NULL;
-+    bool image_opts = false;
-+    uint64_t img_size = UINT64_MAX;
-+    BlockMeasureInfo *info = NULL;
-+    Error *local_err = NULL;
-+    int ret = 1;
-+    int c;
-+
-+    while ((c = getopt_long(argc, argv, "hf:O:o:l:",
-+                            long_options, NULL)) != -1) {
-+        switch (c) {
-+        case '?':
-+        case 'h':
-+            help();
-+            break;
-+        case 'f':
-+            fmt = optarg;
-+            break;
-+        case 'O':
-+            out_fmt = optarg;
-+            break;
-+        case 'o':
-+            if (!is_valid_option_list(optarg)) {
-+                error_report("Invalid option list: %s", optarg);
-+                goto out;
-+            }
-+            if (!options) {
-+                options = g_strdup(optarg);
-+            } else {
-+                char *old_options = options;
-+                options = g_strdup_printf("%s,%s", options, optarg);
-+                g_free(old_options);
-+            }
-+            break;
-+        case 'l':
-+            if (strstart(optarg, SNAPSHOT_OPT_BASE, NULL)) {
-+                sn_opts = qemu_opts_parse_noisily(&internal_snapshot_opts,
-+                                                  optarg, false);
-+                if (!sn_opts) {
-+                    error_report("Failed in parsing snapshot param '%s'",
-+                                 optarg);
-+                    goto out;
-+                }
-+            } else {
-+                snapshot_name = optarg;
-+            }
-+            break;
-+        case OPTION_OBJECT:
-+            object_opts = qemu_opts_parse_noisily(&qemu_object_opts,
-+                                                  optarg, true);
-+            if (!object_opts) {
-+                goto out;
-+            }
-+            break;
-+        case OPTION_IMAGE_OPTS:
-+            image_opts = true;
-+            break;
-+        case OPTION_OUTPUT:
-+            if (!strcmp(optarg, "json")) {
-+                output_format = OFORMAT_JSON;
-+            } else if (!strcmp(optarg, "human")) {
-+                output_format = OFORMAT_HUMAN;
-+            } else {
-+                error_report("--output must be used with human or json "
-+                             "as argument.");
-+                goto out;
-+            }
-+            break;
-+        case OPTION_SIZE:
-+        {
-+            int64_t sval;
-+
-+            sval = cvtnum(optarg);
-+            if (sval < 0) {
-+                if (sval == -ERANGE) {
-+                    error_report("Image size must be less than 8 EiB!");
-+                } else {
-+                    error_report("Invalid image size specified! You may use "
-+                                 "k, M, G, T, P or E suffixes for ");
-+                    error_report("kilobytes, megabytes, gigabytes, terabytes, "
-+                                 "petabytes and exabytes.");
-+                }
-+                goto out;
-+            }
-+            img_size = (uint64_t)sval;
-+        }
-+        break;
-+        }
-+    }
-+
-+    if (qemu_opts_foreach(&qemu_object_opts,
-+                          user_creatable_add_opts_foreach,
-+                          NULL, NULL)) {
-+        goto out;
-+    }
-+
-+    if (argc - optind > 1) {
-+        error_report("At most one filename argument is allowed.");
-+        goto out;
-+    } else if (argc - optind == 1) {
-+        filename = argv[optind];
-+    }
-+
-+    if (!filename &&
-+        (object_opts || image_opts || fmt || snapshot_name || sn_opts)) {
-+        error_report("--object, --image-opts, -f, and -l "
-+                     "require a filename argument.");
-+        goto out;
-+    }
-+    if (filename && img_size != ~0ULL) {
-+        error_report("--size N cannot be used together with a filename.");
-+        goto out;
-+    }
-+    if (!filename && img_size == ~0ULL) {
-+        error_report("Either --size N or one filename must be specified.");
-+        goto out;
-+    }
-+
-+    if (filename) {
-+        in_blk = img_open(image_opts, filename, fmt, 0, false, false);
-+        if (!in_blk) {
-+            goto out;
-+        }
-+
-+        if (sn_opts) {
-+            bdrv_snapshot_load_tmp(blk_bs(in_blk),
-+                    qemu_opt_get(sn_opts, SNAPSHOT_OPT_ID),
-+                    qemu_opt_get(sn_opts, SNAPSHOT_OPT_NAME),
-+                    &local_err);
-+        } else if (snapshot_name != NULL) {
-+            bdrv_snapshot_load_tmp_by_id_or_name(blk_bs(in_blk),
-+                    snapshot_name, &local_err);
-+        }
-+        if (local_err) {
-+            error_reportf_err(local_err, "Failed to load snapshot: ");
-+            goto out;
-+        }
-+    }
-+
-+    drv = bdrv_find_format(out_fmt);
-+    if (!drv) {
-+        error_report("Unknown file format '%s'", out_fmt);
-+        goto out;
-+    }
-+    if (!drv->create_opts) {
-+        error_report("Format driver '%s' does not support image creation",
-+                     drv->format_name);
-+        goto out;
-+    }
-+
-+    create_opts = qemu_opts_append(create_opts, drv->create_opts);
-+    create_opts = qemu_opts_append(create_opts, bdrv_file.create_opts);
-+    opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
-+    if (options) {
-+        qemu_opts_do_parse(opts, options, NULL, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            error_report("Invalid options for file format '%s'", out_fmt);
-+            goto out;
-+        }
-+    }
-+    if (img_size != ~0ULL) {
-+        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, img_size, &error_abort);
-+    }
-+
-+    info = bdrv_measure(drv, opts, in_blk ? blk_bs(in_blk) : NULL, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        goto out;
-+    }
-+
-+    if (output_format == OFORMAT_HUMAN) {
-+        printf("required size: %" PRIu64 "\n", info->required);
-+        printf("fully allocated size: %" PRIu64 "\n", info->fully_allocated);
-+    } else {
-+        dump_json_block_measure_info(info);
-+    }
-+
-+    ret = 0;
-+
-+out:
-+    qapi_free_BlockMeasureInfo(info);
-+    qemu_opts_del(object_opts);
-+    qemu_opts_del(opts);
-+    qemu_opts_del(sn_opts);
-+    qemu_opts_free(create_opts);
-+    g_free(options);
-+    blk_unref(in_blk);
-+    return ret;
++qemu_io_with_fmt() {
++    # Shadow global variables within this function
++    local QEMU_IO_OPTIONS=$(echo "$QEMU_IO_OPTIONS" | sed "s/-f $IMGFMT/-f $1/")
++    shift
++    $QEMU_IO "$@"
 +}
- 
- static const img_cmd_t img_cmds[] = {
- #define DEF(option, callback, arg_string)        \
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index bf4ce59..fadf5c6 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -63,6 +63,12 @@ STEXI
- @item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] @var{filename}
- ETEXI
- 
-+DEF("measure", img_measure,
-+"measure [--output=ofmt] [-O output_fmt] [-o options] [--size N | [--object objectdef] [--image-opts] [-f fmt] [-l snapshot_param] filename]")
-+STEXI
-+@item measure [--output=@var{ofmt}] [-O @var{output_fmt}] [-o @var{options}] [--size @var{N} | [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-l @var{snapshot_param}] @var{filename}]
-+ETEXI
 +
- DEF("snapshot", img_snapshot,
-     "snapshot [--object objectdef] [--image-opts] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
- STEXI
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 50a2364..4d00f18 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -430,6 +430,36 @@ preallocated.
- For more information, consult @file{include/block/block.h} in QEMU's
- source code.
- 
-+@item measure [--output=@var{ofmt}] [-O @var{output_fmt}] [-o @var{options}] [--size @var{N} | [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-l @var{snapshot_param}] @var{filename}]
++# The proof is in the pudding: converted image size cannot be larger than the
++# required size.
++#
++# Note: if a change to the image format code causes the file size to change,
++# then this test fails!  This is good because it's a reminder to check that the
++# required size is still at least as big as the actual converted file size.
++convert_and_show_size() {
++    local fmt="$1"
++    shift
++    $QEMU_IMG convert -f "$fmt" -O "$IMGFMT" "$TEST_IMG" "$@" "$TEST_IMG.converted"
++    stat -c "converted image file size in bytes: %s" "$TEST_IMG.converted"
++}
 +
-+Calculate the file size required for a new image.  This information can be used
-+to size logical volumes or SAN LUNs appropriately for the image that will be
-+placed in them.  The values reported are guaranteed to be large enough to fit
-+the image.  The command can output in the format @var{ofmt} which is either
-+@code{human} or @code{json}.
++for ofmt in human json; do
++    echo
++    echo "== Size calculation for a new file ($ofmt) =="
++    echo
 +
-+If the size @var{N} is given then act as if creating a new empty image file
-+using @command{qemu-img create}.  If @var{filename} is given then act as if
-+converting an existing image file using @command{qemu-img convert}.  The format
-+of the new file is given by @var{fmt} while the format of an existing file is
-+given by @var{output_fmt}.
++    # Try a few interesting sizes
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 0
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 2G
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 64G
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 256G
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 1T
 +
-+A snapshot in an existing image can be specified using @var{snapshot_param}.
++    # Always test the raw input files but also IMGFMT
++    for fmt in $(echo -e "raw\n$IMGFMT\n" | sort -u); do
++        echo
++        echo "== Empty $fmt input image ($ofmt) =="
++        echo
++        make_test_img_with_fmt "$fmt" 0
++        $QEMU_IMG measure --output=$ofmt -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        echo
++        convert_and_show_size "$fmt"
 +
-+The following fields are reported:
-+@example
++        echo
++        echo "== $fmt input image with data ($ofmt) =="
++        echo
++        make_test_img_with_fmt "$fmt" 1G
++        $QEMU_IMG measure --output=$ofmt -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        qemu_io_with_fmt "$fmt" -c "write 512 512" "$TEST_IMG" | _filter_qemu_io
++        qemu_io_with_fmt "$fmt" -c "write 64K 64K" "$TEST_IMG" | _filter_qemu_io
++        if [ "$fmt" = "qcow2" ]; then
++            $QEMU_IMG snapshot -c snapshot1 "$TEST_IMG"
++        fi
++        qemu_io_with_fmt "$fmt" -c "write 128M 63K" "$TEST_IMG" | _filter_qemu_io
++        $QEMU_IMG measure --output=$ofmt -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        echo
++        convert_and_show_size "$fmt"
++
++        if [ "$fmt" = "qcow2" ]; then
++            echo
++            echo "== $fmt input image with internal snapshot ($ofmt) =="
++            echo
++            $QEMU_IMG measure --output=$ofmt -f "$fmt" -l snapshot1 \
++                              -O "$IMGFMT" "$TEST_IMG"
++            echo
++            convert_and_show_size "$fmt" -l snapshot1
++        fi
++
++        if [ "$IMGFMT" = "qcow2" ]; then
++            echo
++            echo "== $fmt input image and a backing file ($ofmt) =="
++            echo
++            # The backing file doesn't need to exist :)
++            $QEMU_IMG measure --output=$ofmt -o backing_file=x \
++                              -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        fi
++
++        echo
++        echo "== $fmt input image and preallocation ($ofmt) =="
++        echo
++        $QEMU_IMG measure --output=$ofmt -o preallocation=full \
++                          -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        echo
++        convert_and_show_size "$fmt" -o preallocation=full
++
++        echo
++        echo "== Fully-allocated $fmt input image ($ofmt) =="
++        echo
++        make_test_img_with_fmt "$fmt" 8M
++        qemu_io_with_fmt "$fmt" -c "write 0 8M" "$TEST_IMG" | _filter_qemu_io
++        $QEMU_IMG measure --output=$ofmt -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        echo
++        convert_and_show_size "$fmt"
++    done
++done
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/178.out.qcow2 b/tests/qemu-iotests/178.out.qcow2
+new file mode 100644
+index 0000000..78ccac0
+--- /dev/null
++++ b/tests/qemu-iotests/178.out.qcow2
+@@ -0,0 +1,278 @@
++QA output created by 178
++== Input validation ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++qemu-img: Either --size N or one filename must be specified.
++qemu-img: --size N cannot be used together with a filename.
++qemu-img: At most one filename argument is allowed.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: Invalid option list: ,
++qemu-img: Invalid parameter 'snapshot.foo'
++qemu-img: Failed in parsing snapshot param 'snapshot.foo'
++qemu-img: --output must be used with human or json as argument.
++qemu-img: Image size must be less than 8 EiB!
++qemu-img: Unknown file format 'foo'
++
++== Size calculation for a new file (human) ==
++
++required size: 196608
++fully allocated size: 196608
++required size: 589824
++fully allocated size: 2148073472
++required size: 10747904
++fully allocated size: 68730224640
++required size: 42205184
++fully allocated size: 274920112128
++required size: 168034304
++fully allocated size: 1099679662080
++
++== Empty qcow2 input image (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
++required size: 196608
++fully allocated size: 196608
++
++converted image file size in bytes: 196608
++
++== qcow2 input image with data (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++required size: 393216
++fully allocated size: 1074135040
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 589824
++fully allocated size: 1074135040
++
++converted image file size in bytes: 524288
++
++== qcow2 input image with internal snapshot (human) ==
++
 +required size: 524288
-+fully allocated size: 1074069504
-+@end example
++fully allocated size: 1074135040
 +
-+The @code{required size} is the file size of the new image.  It may be smaller
-+than the virtual disk size if the image format supports compact representation.
++converted image file size in bytes: 458752
 +
-+The @code{fully allocated size} is the file size of the new image once data has
-+been written to all sectors.  This is the maximum size that the image file can
-+occupy with the exception of internal snapshots, dirty bitmaps, vmstate data,
-+and other advanced image format features.
++== qcow2 input image and a backing file (human) ==
 +
- @item snapshot [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot} ] @var{filename}
- 
- List, apply, create or delete snapshots in image @var{filename}.
++required size: 1074135040
++fully allocated size: 1074135040
++
++== qcow2 input image and preallocation (human) ==
++
++required size: 1074135040
++fully allocated size: 1074135040
++
++converted image file size in bytes: 1074135040
++
++== Fully-allocated qcow2 input image (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 8716288
++fully allocated size: 8716288
++
++converted image file size in bytes: 8716288
++
++== Empty raw input image (human) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=0
++required size: 196608
++fully allocated size: 196608
++
++converted image file size in bytes: 196608
++
++== raw input image with data (human) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=1073741824
++required size: 393216
++fully allocated size: 1074135040
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 589824
++fully allocated size: 1074135040
++
++converted image file size in bytes: 524288
++
++== raw input image and a backing file (human) ==
++
++required size: 1074135040
++fully allocated size: 1074135040
++
++== raw input image and preallocation (human) ==
++
++required size: 1074135040
++fully allocated size: 1074135040
++
++converted image file size in bytes: 1074135040
++
++== Fully-allocated raw input image (human) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 8716288
++fully allocated size: 8716288
++
++converted image file size in bytes: 8716288
++
++== Size calculation for a new file (json) ==
++
++{
++    "required": 196608,
++    "fully-allocated": 196608
++}
++{
++    "required": 589824,
++    "fully-allocated": 2148073472
++}
++{
++    "required": 10747904,
++    "fully-allocated": 68730224640
++}
++{
++    "required": 42205184,
++    "fully-allocated": 274920112128
++}
++{
++    "required": 168034304,
++    "fully-allocated": 1099679662080
++}
++
++== Empty qcow2 input image (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
++{
++    "required": 196608,
++    "fully-allocated": 196608
++}
++
++converted image file size in bytes: 196608
++
++== qcow2 input image with data (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++{
++    "required": 393216,
++    "fully-allocated": 1074135040
++}
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 589824,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 524288
++
++== qcow2 input image with internal snapshot (json) ==
++
++{
++    "required": 524288,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 458752
++
++== qcow2 input image and a backing file (json) ==
++
++{
++    "required": 1074135040,
++    "fully-allocated": 1074135040
++}
++
++== qcow2 input image and preallocation (json) ==
++
++{
++    "required": 1074135040,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 1074135040
++
++== Fully-allocated qcow2 input image (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 8716288,
++    "fully-allocated": 8716288
++}
++
++converted image file size in bytes: 8716288
++
++== Empty raw input image (json) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=0
++{
++    "required": 196608,
++    "fully-allocated": 196608
++}
++
++converted image file size in bytes: 196608
++
++== raw input image with data (json) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=1073741824
++{
++    "required": 393216,
++    "fully-allocated": 1074135040
++}
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 589824,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 524288
++
++== raw input image and a backing file (json) ==
++
++{
++    "required": 1074135040,
++    "fully-allocated": 1074135040
++}
++
++== raw input image and preallocation (json) ==
++
++{
++    "required": 1074135040,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 1074135040
++
++== Fully-allocated raw input image (json) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 8716288,
++    "fully-allocated": 8716288
++}
++
++converted image file size in bytes: 8716288
++*** done
+diff --git a/tests/qemu-iotests/178.out.raw b/tests/qemu-iotests/178.out.raw
+new file mode 100644
+index 0000000..bad35c6
+--- /dev/null
++++ b/tests/qemu-iotests/178.out.raw
+@@ -0,0 +1,146 @@
++QA output created by 178
++== Input validation ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++qemu-img: Either --size N or one filename must be specified.
++qemu-img: --size N cannot be used together with a filename.
++qemu-img: At most one filename argument is allowed.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: Invalid option list: ,
++qemu-img: Invalid parameter 'snapshot.foo'
++qemu-img: Failed in parsing snapshot param 'snapshot.foo'
++qemu-img: --output must be used with human or json as argument.
++qemu-img: Image size must be less than 8 EiB!
++qemu-img: Unknown file format 'foo'
++
++== Size calculation for a new file (human) ==
++
++required size: 0
++fully allocated size: 0
++required size: 2147483648
++fully allocated size: 2147483648
++required size: 68719476736
++fully allocated size: 68719476736
++required size: 274877906944
++fully allocated size: 274877906944
++required size: 1099511627776
++fully allocated size: 1099511627776
++
++== Empty raw input image (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
++required size: 0
++fully allocated size: 0
++
++converted image file size in bytes: 0
++
++== raw input image with data (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++required size: 1073741824
++fully allocated size: 1073741824
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 1073741824
++fully allocated size: 1073741824
++
++converted image file size in bytes: 1073741824
++
++== raw input image and preallocation (human) ==
++
++required size: 1073741824
++fully allocated size: 1073741824
++
++converted image file size in bytes: 1073741824
++
++== Fully-allocated raw input image (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 8388608
++fully allocated size: 8388608
++
++converted image file size in bytes: 8388608
++
++== Size calculation for a new file (json) ==
++
++{
++    "required": 0,
++    "fully-allocated": 0
++}
++{
++    "required": 2147483648,
++    "fully-allocated": 2147483648
++}
++{
++    "required": 68719476736,
++    "fully-allocated": 68719476736
++}
++{
++    "required": 274877906944,
++    "fully-allocated": 274877906944
++}
++{
++    "required": 1099511627776,
++    "fully-allocated": 1099511627776
++}
++
++== Empty raw input image (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
++{
++    "required": 0,
++    "fully-allocated": 0
++}
++
++converted image file size in bytes: 0
++
++== raw input image with data (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++{
++    "required": 1073741824,
++    "fully-allocated": 1073741824
++}
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 1073741824,
++    "fully-allocated": 1073741824
++}
++
++converted image file size in bytes: 1073741824
++
++== raw input image and preallocation (json) ==
++
++{
++    "required": 1073741824,
++    "fully-allocated": 1073741824
++}
++
++converted image file size in bytes: 1073741824
++
++== Fully-allocated raw input image (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 8388608,
++    "fully-allocated": 8388608
++}
++
++converted image file size in bytes: 8388608
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 893962d..b10e85a 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -169,4 +169,5 @@
+ 174 auto
+ 175 auto quick
+ 176 rw auto backing
++178 auto quick
+ 181 rw auto migration
 -- 
 2.9.3
