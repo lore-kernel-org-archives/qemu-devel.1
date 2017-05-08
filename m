@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7nqe-0006Dv-Kf
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:57:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d7nzB-0001Jy-GK
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 15:06:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7nqd-00050Z-U4
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 14:57:32 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1494266456-2251-1-git-send-email-jcmvbkbc@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e73e252e-61fc-6b2c-6e3f-f5a2e1f934cc@amsat.org>
-Date: Mon, 8 May 2017 15:57:23 -0300
+	(envelope-from <mreitz@redhat.com>) id 1d7nz7-0007pz-4W
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 15:06:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38224)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1d7nz6-0007pb-R3
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 15:06:17 -0400
+References: <20170508141536.20690-1-stefanha@redhat.com>
+	<20170508141536.20690-5-stefanha@redhat.com>
+	<68fd3173-ae56-50ed-4cfc-f9c19904aa30@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1e61d40a-95f9-f90e-aac2-7897267a5d53@redhat.com>
+Date: Mon, 8 May 2017 21:06:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <1494266456-2251-1-git-send-email-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/xtensa: sim: use g_string/g_new
+In-Reply-To: <68fd3173-ae56-50ed-4cfc-f9c19904aa30@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GLftErm3JUI5G6gvoF3917TjnECuMlLBI"
+Subject: Re: [Qemu-devel] [PATCH v6 4/9] qcow2: make refcount size
+ calculation conservative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
-On 05/08/2017 03:00 PM, Max Filippov wrote:
-> Replace malloc/free/sprintf with g_string/g_string_printf/g_string_free.
-> Replace g_malloc with g_new when allocating the MemoryRegion to get more
-> type safety.
->
-> Suggested-by: Alex Bennée <alex.bennee@linaro.org>
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GLftErm3JUI5G6gvoF3917TjnECuMlLBI
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange"
+ <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <1e61d40a-95f9-f90e-aac2-7897267a5d53@redhat.com>
+Subject: Re: [PATCH v6 4/9] qcow2: make refcount size calculation conservative
+References: <20170508141536.20690-1-stefanha@redhat.com>
+ <20170508141536.20690-5-stefanha@redhat.com>
+ <68fd3173-ae56-50ed-4cfc-f9c19904aa30@redhat.com>
+In-Reply-To: <68fd3173-ae56-50ed-4cfc-f9c19904aa30@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 08.05.2017 17:00, Eric Blake wrote:
+> On 05/08/2017 09:15 AM, Stefan Hajnoczi wrote:
+>> The refcount metadata size calculation is inaccurate and can produce
+>> numbers that are too small.  This is bad because we should calculate a=
 
-> ---
->  hw/xtensa/sim.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-> index d2d1d3a..b27e28d 100644
-> --- a/hw/xtensa/sim.c
-> +++ b/hw/xtensa/sim.c
-> @@ -41,21 +41,21 @@ static void xtensa_create_memory_regions(const XtensaMemory *memory,
->                                           const char *name)
->  {
->      unsigned i;
-> -    char *num_name = malloc(strlen(name) + sizeof(i) * 3 + 1);
-> +    GString *num_name = g_string_new(NULL);
->
->      for (i = 0; i < memory->num; ++i) {
->          MemoryRegion *m;
->
-> -        sprintf(num_name, "%s%u", name, i);
-> -        m = g_malloc(sizeof(*m));
-> -        memory_region_init_ram(m, NULL, num_name,
-> +        g_string_printf(num_name, "%s%u", name, i);
-> +        m = g_new(MemoryRegion, 1);
-> +        memory_region_init_ram(m, NULL, num_name->str,
->                                 memory->location[i].size,
->                                 &error_fatal);
->          vmstate_register_ram_global(m);
->          memory_region_add_subregion(get_system_memory(),
->                                      memory->location[i].addr, m);
->      }
-> -    free(num_name);
-> +    g_string_free(num_name, true);
->  }
->
->  static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
->
+>> conservative number - one that is guaranteed to be large enough.
+>>
+>> This patch switches the approach to a fixed point calculation because
+>> the existing equation is hard to solve when inaccuracies are taken car=
+e
+>> of.
+>>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  block/qcow2.c | 82 ++++++++++++++++++++++++++++++--------------------=
+---------
+>>  1 file changed, 42 insertions(+), 40 deletions(-)
+>>
+>=20
+>> -    nrefblocke =3D (aligned_total_size + meta_size + cluster_size)
+>> -        / (cluster_size - rces - rces * sizeof(uint64_t)
+>> -                / cluster_size);
+>> -    meta_size +=3D DIV_ROUND_UP(nrefblocke, refblock_size) * cluster_=
+size;
+>> -
+>> -    /* total size of refcount tables */
+>> -    nreftablee =3D nrefblocke / refblock_size;
+>> -    nreftablee =3D align_offset(nreftablee, cluster_size / sizeof(uin=
+t64_t));
+>> -    meta_size +=3D nreftablee * sizeof(uint64_t);
+>> +    /* total size of refcount table and blocks */
+>> +    meta_size +=3D qcow2_refcount_metadata_size(
+>> +            (meta_size + aligned_total_size) / cluster_size,
+>=20
+> How does this interact with Max's patch which avoids truncating divisio=
+n
+> in favor of rounding up?
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00690.html
+
+=46rom a quick glance, it looks like it just reimplements everything in a=
+
+(hopefully) more understandable and "generous" way (which is good). So
+the only interaction is that the code that's removed/replaced is a bit
+different (which implies a rebase conflict, but one that should be
+resolved pretty easily).
+
+Max
+
+
+--GLftErm3JUI5G6gvoF3917TjnECuMlLBI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQwaASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Axg4IAKuzcPX9ALASEwczBEcLwyMecj786mQh
+qW6DOVXM/mTlBYUv75/14gWN9MP2gpycOBdhUKeXbrK9NIwoU9e7FWH+gZCZYGXY
+cvpbFQL+KgVQmZbOSzpdPbaEM689CFAHGyisJY47wsiQB7n0ASTTRLgATfkLEWsE
+ZZovGYSHuwfgrc9gAPagUHCtvISX8JQcoNy0olGxj/9z0bn+HoxAkd0bz3jHrYmA
+wJnQF1gqhnRr8jdg7J+LPugdjs3/H4pu+XlvbDdrPNBPNJ0yzVXJTEXqDJ/DQUft
+479nCprMQqlkdb95UNPeS3TNG+4gw2zm6AvD1idThw+kL1M230Yh8+o=
+=R9mu
+-----END PGP SIGNATURE-----
+
+--GLftErm3JUI5G6gvoF3917TjnECuMlLBI--
