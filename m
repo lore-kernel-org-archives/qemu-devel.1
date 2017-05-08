@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7loy-0005NJ-Vh
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:47:42 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d7lqb-0006d4-LI
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:49:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d7lov-0006C4-TB
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:47:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46008)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1d7lov-0006AY-Jx
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:47:37 -0400
-References: <CADmzSSiQYXzJf0vzhyaXdncZaq9gzPrN0BRm4_OOpPv+wJ9Bjw@mail.gmail.com>
-	<87wp9r689l.fsf@dusky.pond.sub.org>
-	<CADmzSShCnLNFzBAZDw8+ZG00L=Qgy7OOE7Q06-z1fHYuBJHpRQ@mail.gmail.com>
-	<bdb8ffb7-b9f0-242c-2bf9-3eb94530180b@redhat.com>
-	<CADmzSSizPt5JcWq8n-ZqnpYVB0q36x+JQYWXimyk1LciHsnkKQ@mail.gmail.com>
-	<0456ed7c-c465-6e6b-77a2-8be37e0e6ae2@redhat.com>
-	<CADmzSSgN6+gK2rhcpiYu7y_gG3UT7oL92Q4zG+GQVoqGbVGKXg@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a535a8cf-6f04-206f-3f4e-3cf7539f16a5@redhat.com>
-Date: Mon, 8 May 2017 18:47:31 +0200
+	(envelope-from <stefanha@gmail.com>) id 1d7lqW-0006ol-RD
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:49:21 -0400
+Date: Mon, 8 May 2017 12:49:13 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170508164913.GF22428@stefanha-x1.localdomain>
+References: <20170505100255.11145-1-stefanha@redhat.com>
+	<20170505101955.GG21435@lemon.lan>
 MIME-Version: 1.0
-In-Reply-To: <CADmzSSgN6+gK2rhcpiYu7y_gG3UT7oL92Q4zG+GQVoqGbVGKXg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uovawJS59Hib4eQDDdasAaHIDorCOvQia"
-Subject: Re: [Qemu-devel] format=raw,readonly errors
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="dgjlcl3Tl+kb3YDk"
+Content-Disposition: inline
+In-Reply-To: <20170505101955.GG21435@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH v2] aio: add missing aio_notify() to
+ aio_enable_external()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Carl Karsten <carl@personnelware.com>, Eric Blake <eblake@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uovawJS59Hib4eQDDdasAaHIDorCOvQia
-From: Max Reitz <mreitz@redhat.com>
-To: Carl Karsten <carl@personnelware.com>, Eric Blake <eblake@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <a535a8cf-6f04-206f-3f4e-3cf7539f16a5@redhat.com>
-Subject: Re: [Qemu-devel] format=raw,readonly errors
-References: <CADmzSSiQYXzJf0vzhyaXdncZaq9gzPrN0BRm4_OOpPv+wJ9Bjw@mail.gmail.com>
- <87wp9r689l.fsf@dusky.pond.sub.org>
- <CADmzSShCnLNFzBAZDw8+ZG00L=Qgy7OOE7Q06-z1fHYuBJHpRQ@mail.gmail.com>
- <bdb8ffb7-b9f0-242c-2bf9-3eb94530180b@redhat.com>
- <CADmzSSizPt5JcWq8n-ZqnpYVB0q36x+JQYWXimyk1LciHsnkKQ@mail.gmail.com>
- <0456ed7c-c465-6e6b-77a2-8be37e0e6ae2@redhat.com>
- <CADmzSSgN6+gK2rhcpiYu7y_gG3UT7oL92Q4zG+GQVoqGbVGKXg@mail.gmail.com>
-In-Reply-To: <CADmzSSgN6+gK2rhcpiYu7y_gG3UT7oL92Q4zG+GQVoqGbVGKXg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+
+--dgjlcl3Tl+kb3YDk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 08.05.2017 18:33, Carl Karsten wrote:
-> On Mon, May 8, 2017 at 11:29 AM, Eric Blake <eblake@redhat.com> wrote:
+On Fri, May 05, 2017 at 06:19:55PM +0800, Fam Zheng wrote:
+> On Fri, 05/05 11:02, Stefan Hajnoczi wrote:
+> > diff --git a/include/block/aio.h b/include/block/aio.h
+> > index 406e323..b3d6f76 100644
+> > --- a/include/block/aio.h
+> > +++ b/include/block/aio.h
+> > @@ -454,8 +454,14 @@ static inline void aio_disable_external(AioContext=
+ *ctx)
+> >   */
+> >  static inline void aio_enable_external(AioContext *ctx)
+> >  {
+> > -    assert(ctx->external_disable_cnt > 0);
+> > -    atomic_dec(&ctx->external_disable_cnt);
+> > +    int old;
+> > +
+> > +    old =3D atomic_dec_fetch(&ctx->external_disable_cnt);
 >=20
->> On 05/08/2017 10:56 AM, Carl Karsten wrote:
->>
->>>>>>> juser@gator:~/temp$ qemu-system-x86_64 -m 256 -display curses
->> -drive
->>>>>>> file=3Ddisk.cow -drive file=3Dboot.img
->>>>>>> WARNING: Image format was not specified for 'boot.img' and probin=
-g
->>>>>> guessed
->>>>>>> raw.
->>>>>>>          Automatically detecting the format is dangerous for raw
->>>> images,
->>>>>>> write operations on block 0 will be restricted.
->>>>>>>          Specify the 'raw' format explicitly to remove the
->>>> restrictions.
->>
->>>  "write operations on block 0 will be restricted."
->>>
->>> Is there a way to explicitly enable that?
->>
->> Yes. Pass format=3Draw at the right place (in other words, instead of
->> getting the 'raw' format driver by default, explicitly mentioning that=
+> Did you mean atomic_fetch_dec? atomic_dec_fetch is new, not old.
 
->> you KNOW you want the 'raw' format driver is enough to shut up the
->> warning).
->>
->=20
-> according to the warning: "Specify the 'raw' format explicitly to remov=
-e
-> the restrictions."
->=20
-> I want the restriction.
->=20
-> format=3Draw, (write operations on block 0)=3Drestricted
+Yes :(.  Will send another revision.
 
-Well, the restriction won't prevent all writes to the first sector,
-though; it will only prevent writes which would make the image look like
-it was in some non-raw format. So this is probably not what you want anyw=
-ay.
+It's good to have both semantics available but clearer naming would
+help, e.g. atomic_dec_then_fetch() or atomic_dec_before_fetch().  Glad
+you spotted the bug!
 
-Unfortunately, I don't know any current way to "soft" write-protect an
-image. It sounds like an interesting idea, though, and should be simple
-enough to implement e.g. in the raw driver.
+Stefan
 
-Max
-
-
---uovawJS59Hib4eQDDdasAaHIDorCOvQia
+--dgjlcl3Tl+kb3YDk
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkQoSMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A+LcH/1fn6XUjs7BZRD7OWE9DRJ32W/WI0oUd
-40CTbUC8RAmdOU7RCDreD1KLQbrirydJmNZHsWFAqHWYZt7Fb580399AdtsLGskZ
-wa9PzR/sF5GOZA6pMb8fVBYbLx2llNiD56OobVVYFS3afIHyaP2h4W5+cF9lT3Ei
-AtBWOPKaxDC5tT5ZkCFmM2YSXHSdKh8rEoUG/uN1FLB7QFvNYyPoQzDHu7/0U7iE
-35cTnE5i+LYeztl61KQtJBZ8JhV5sYjS0iK4OobBR8rJsHtDtERT9nxfZ1mNyWed
-6SgYu4WJEL4g0ci6iFK3WRAT+rJal8sWiIFWCv47a7VXm/Yu8Nk2wCE=
-=mWva
+iQEcBAEBAgAGBQJZEKGJAAoJEJykq7OBq3PIpRMH/3e7ncJfkSpPHsJqTctbzpn/
+C7Kb/0W0tx2I2C218iTDPOQMuDBPE6as7FxVV8wTS4hVe1GqWwBO0GSGHQBf3Lys
+PaSezvqfOj58gVKY+MVNQs8otzc/B3nT5AvClL9b511OI0ySNrwdJjNfK8RDuXTF
+wCfXcfb5Z4Y0AyE0oUxY0eGL1VnAOPODv+KIC9AePhK0An4YiXWp/YElIHn1LKBo
+Y5y0sBImXJFDOK7DyP+myyjTgltkWByZpCvzPJgsyaKhELHOB/NgAKDggo9EtLjs
+FZzhlHcXRDUjxV8YVKGlDMvFgZvLVXvOGzdj/Y7oYQtwXBZSslFSKuG1NPyYph8=
+=9uN0
 -----END PGP SIGNATURE-----
 
---uovawJS59Hib4eQDDdasAaHIDorCOvQia--
+--dgjlcl3Tl+kb3YDk--
