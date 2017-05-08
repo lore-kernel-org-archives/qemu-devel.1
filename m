@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7lMJ-0005k0-TU
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:18:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1d7lOY-0006b0-Tn
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d7lMG-0005zX-Qd
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:18:03 -0400
-Date: Mon, 8 May 2017 12:17:57 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170508161757.GA22428@stefanha-x1.localdomain>
-References: <20170420120058.28404-1-pbonzini@redhat.com>
-	<20170420120058.28404-17-pbonzini@redhat.com>
-	<20170505103658.GB11350@stefanha-x1.localdomain>
-	<ca446302-518f-63bc-9022-5b2f7182cb1a@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1d7lOV-0006rL-Oa
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:20:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d7lOV-0006rD-IL
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 12:20:19 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d7lOT-0005GQ-7I
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 16:20:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7FCB52E80CC
+	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 16:20:16 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
-Content-Disposition: inline
-In-Reply-To: <ca446302-518f-63bc-9022-5b2f7182cb1a@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/17] block: protect
- modification of dirty bitmaps with a mutex
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 May 2017 16:04:44 -0000
+From: Artyom <822408@bugs.launchpad.net>
+Reply-To: Bug 822408 <822408@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110807201009.28795.63294.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170508160444.4257.86588.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 822408] Re: Unable to access disk image on mipsel
+ host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +37,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+
+Well, that's a blast from the past.
+Still have the MIPS laptop in question (Lemote Yeeloong 8101b), got it runn=
+ing.
+
+Built Qemu 0.14.1, the bug is replicated as before.
+Built Qemu 2.9.0,  the bug is still replicated as before (but qemu is now a=
+bout 100x slower for some reason).
+
+So it would appear that whatever the problem is, it never got solved in
+the last 5 years.
+
+Raw image (linux-0.2.img.bz2), can't quite test on WinXP any more since it'=
+s awfully slow.
+Still gives the same kinds of errors:
+hda: dma_intr: status=3D0x41 { DriveReady Error }
+hda: dma_intr: error=3D0x04 { DriveStatusError }
+hda: Failed opcode was: unknown
+
+Built with ./configure --target-list=3Di386-softmmu
 
 
---d6Gm4EdcadzBjdND
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Triage-wise, both the laptop, the company and the CPU architecture lost the=
+ test of time and are at best collector's items these days, so unless the b=
+ug can be replicated on some modern MIPS system it's not worth bothering wi=
+th.
 
-On Fri, May 05, 2017 at 12:47:35PM +0200, Paolo Bonzini wrote:
->=20
->=20
-> On 05/05/2017 12:36, Stefan Hajnoczi wrote:
-> > On Thu, Apr 20, 2017 at 02:00:57PM +0200, Paolo Bonzini wrote:
-> >> @@ -410,6 +442,18 @@ int bdrv_get_dirty(BlockDriverState *bs, BdrvDirt=
-yBitmap *bitmap,
-> >>      }
-> >>  }
-> >> =20
-> >> +int bdrv_get_dirty(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-> >> +                   int64_t sector)
-> >=20
-> > Is it a good idea to offer an unlocked bdrv_get_dirty() API?  It
-> > encourages non-atomic access to the bitmap, e.g.
-> >=20
-> >   if (bdrv_get_dirty()) {
-> >       ...do something outside the lock...
-> >       bdrv_reset_dirty_bitmap();
-> >   }
-> >=20
-> > The unlocked API should be test-and-set/clear instead so that callers
-> > automatically avoid race conditions.
->=20
-> I'm not sure it's possible to implement atomic test and clear for
-> HBitmap.  But I can look into removing unlocked bdrv_get_dirty, the only
-> user is block migration.
+-- =
 
-Removing unlocked bdrv_get_dirty() is good.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/822408
 
-Stefan
+Title:
+  Unable to access disk image on mipsel host
 
---d6Gm4EdcadzBjdND
-Content-Type: application/pgp-signature; name="signature.asc"
+Status in QEMU:
+  Incomplete
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  Something is wrong with hard disk images on MIPSel host.
 
-iQEcBAEBAgAGBQJZEJo1AAoJEJykq7OBq3PIGD4H/RJwQmR34X3VAn9o27F/lbtN
-SJDwQ5H/ewytAWfgXpUjJ+ket4fYIakW9QxniZDbcck8lpn62cr8xVO/i7aDLu9+
-mG4cdMwp5TKpIVYCNUM7P365suFlOrE4lYUsw0IRi3yfCv9mnufXpatWAVxHBmer
-HOv7N7AhH0q4cPjgocAEKwnOqr/ipGDkzwz7mbiqzKDzjxcgqK8/mkVvqFrz2Ano
-orOt7ZAbL7HgwLdCAEY1lTAJUWSa4em54d4mjCuPGmQmK9Cfnx1JtUE40/zDfFBy
-ADMcv2xzt56TM1DYWmvE0T5/DLdQS4JfftDEpzX863QsW1xa1odxAsMIUgGq/BM=
-=xFIH
------END PGP SIGNATURE-----
+  The host system is mips64el (Loongson cpu, Linux 2.6.39, eglibc 2.13)
+  Tried Qemu 0.14.1 and 0.15.0-rc2, both compiled with GCC 4.6.0.
 
---d6Gm4EdcadzBjdND--
+  First I was trying to install WinXP (i386-softmmu).
+  Starting install, create partition, format (either quick and full), seems=
+ to complete, boom the error:
+
+  "
+  Setup was unable to format the partition.  The disk may be damaged.  Make=
+ sure the drive is switched on and properly connected to your computer.  If=
+ the disk is a SCSI disk, make sure your SCSI devices are properly terminat=
+ed.  Consult your computer manual or SCSI adapter documentation for more in=
+formation.
+
+  You must select a different partition for Windows XP.
+  To continue, press ENTER.
+  "
+
+  This happens with both raw and qcow2 image format.
+  Tried 10Gb image, tried 16Gb one - no difference.
+
+  On a x86 host, that formatting makes the image (qcow2) grow to about
+  81 Mb by the time it reaches 100% formatted (quick), but on mipsel it
+  grows to 0.8Mb at the same time and the error appears.
+
+  I tried the same installing of Windows in Qemu on x86 host and copied ove=
+r the completed image.
+  In that case it starts loading, but in the middle of the animation there =
+is an error:
+
+  "
+  STOP: c0000221 Unknown Hard Error
+  \Systemroot\System32\ntdll.dll
+  "
+  (or HAL.dll)
+
+  So, i tried linux-0.2.img.bz2 from the Qemu site, and that fails too.
+  Thus it's the minimal bug reproduction thing.
+
+  During boot there are multiple errors like:
+  "
+  hda: dma_intr: status=3D0x41 { DriveReady Error }
+  hda: dma_intr: error=3D0x04 { DriveStatusError }
+  hda: Failed opcode was: unknown
+  "
+
+  It booted and kind of worked, there were weird glitches in every program.
+  Unusable.
+
+  Summarily, that suggest some error in hard disk emulation or back
+  storage, specific either to MIPSel or non-x86 hosts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/822408/+subscriptions
