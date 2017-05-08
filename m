@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d7jPx-0007Ym-Cj
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:13:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d7jPy-0007ZT-7Y
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:13:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d7jPs-0003KN-H4
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:13:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d7jPx-0003N6-Hi
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 10:13:42 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  8 May 2017 16:13:10 +0200
-Message-Id: <20170508141310.8674-12-pbonzini@redhat.com>
+Date: Mon,  8 May 2017 16:13:08 +0200
+Message-Id: <20170508141310.8674-10-pbonzini@redhat.com>
 In-Reply-To: <20170508141310.8674-1-pbonzini@redhat.com>
 References: <20170508141310.8674-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/11] blockjob: use deferred_to_main_loop to
- indicate the coroutine has ended
+Subject: [Qemu-devel] [PATCH 09/11] blockjob: strengthen a bit
+ test-blockjob-txn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +23,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, jcody@redhat.com, jsnow@redhat.com, stefanha@redhat.com
 
-All block jobs are using block_job_defer_to_main_loop as the final
-step just before the coroutine terminates.  At this point,
-block_job_enter should do nothing, but currently it restarts
-the freed coroutine.
-
-Now, the job->co states should probably be changed to an enum
-(e.g. BEFORE_START, STARTED, YIELDED, COMPLETED) subsuming
-block_job_started, job->deferred_to_main_loop and job->busy.
-For now, this patch eliminates the problematic reenter by
-removing the reset of job->deferred_to_main_loop (which served
-no purpose, as far as I could see) and checking the flag in
-block_job_enter.
+Unlike test-blockjob-txn, QMP releases the reference to the transaction
+before the jobs finish.  Thus, qemu-iotest 124 showed a failure while
+working on the next patch that the unit tests did not have.  Make
+the test a little nastier.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- blockjob.c                   | 10 ++++++++--
- include/block/blockjob_int.h |  3 ++-
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ tests/test-blockjob-txn.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 436f178224..5c7da96cb9 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -771,7 +771,14 @@ void block_job_resume_all(void)
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 0f80194e85..c77343fc04 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -167,6 +167,11 @@ static void test_pair_jobs(int expected1, int expected2)
+     block_job_start(job1);
+     block_job_start(job2);
  
- void block_job_enter(BlockJob *job)
- {
--    if (job->co && !job->busy) {
-+    if (!block_job_started(job)) {
-+        return;
-+    }
-+    if (job->deferred_to_main_loop) {
-+        return;
-+    }
++    /* Release our reference now to trigger as many nice
++     * use-after-free bugs as possible.
++     */
++    block_job_txn_unref(txn);
 +
-+    if (!job->busy) {
-         bdrv_coroutine_enter(blk_bs(job->blk), job->co);
+     if (expected1 == -ECANCELED) {
+         block_job_cancel(job1);
      }
+@@ -187,8 +192,6 @@ static void test_pair_jobs(int expected1, int expected2)
+ 
+     g_assert_cmpint(result1, ==, expected1);
+     g_assert_cmpint(result2, ==, expected2);
+-
+-    block_job_txn_unref(txn);
  }
-@@ -899,7 +906,6 @@ static void block_job_defer_to_main_loop_bh(void *opaque)
-         aio_context_acquire(aio_context);
-     }
  
--    data->job->deferred_to_main_loop = false;
-     data->fn(data->job, data->opaque);
- 
-     if (aio_context != data->aio_context) {
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 4f2d2ac75a..f13ad05c0d 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -241,7 +241,8 @@ typedef void BlockJobDeferToMainLoopFn(BlockJob *job, void *opaque);
-  * @fn: The function to run in the main loop
-  * @opaque: The opaque value that is passed to @fn
-  *
-- * Execute a given function in the main loop with the BlockDriverState
-+ * This function must be called by the main job coroutine just before it
-+ * returns.  @fn is executed in the main loop with the BlockDriverState
-  * AioContext acquired.  Block jobs must call bdrv_unref(), bdrv_close(), and
-  * anything that uses bdrv_drain_all() in the main loop.
-  *
+ static void test_pair_jobs_success(void)
 -- 
 2.12.2
