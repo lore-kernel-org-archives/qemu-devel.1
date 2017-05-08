@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d7UWX-00061t-3Z
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 18:19:30 -0400
+	(envelope-from <thuth@redhat.com>) id 1d7X51-0005By-Pw
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 21:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d7UWT-0004Vl-Rn
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 18:19:29 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d7UWT-0004VZ-LU
-	for qemu-devel@nongnu.org; Sun, 07 May 2017 18:19:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d7UWP-0007XE-6e
-	for <qemu-devel@nongnu.org>; Sun, 07 May 2017 22:19:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D78662E80DD
-	for <qemu-devel@nongnu.org>; Sun,  7 May 2017 22:19:20 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1d7X4y-0007Il-NF
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 21:03:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d7X4y-0007IU-Hg
+	for qemu-devel@nongnu.org; Sun, 07 May 2017 21:03:12 -0400
+References: <20170429124421.2qcthvlsiwvtqov2@var.youpi.perso.aquilenet.fr>
+	<VI1PR0601MB2479CBDA85F323A82C0CFBD99C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<20170429171002.enxmz5dtuzhrxuc6@var.youpi.perso.aquilenet.fr>
+	<VI1PR0601MB2479886B8955148FD8A2D06F9C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<20170429191402.ebsdilnya67ispla@var.youpi.perso.aquilenet.fr>
+	<VI1PR0601MB2479CA25619E1C66359EC3709C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<20170429220156.bb4hdlsaf6zzqmtw@var.youpi.perso.aquilenet.fr>
+	<VI1PR0601MB2479F31C301B954294452CA49C120@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<20170430075033.yjqj4ibssa52h4d7@var.youpi.perso.aquilenet.fr>
+	<VI1PR0601MB247905FC4B3FEE03780CF1EE9C150@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+	<20170430125703.pcp4ldw7oardptmn@var.youpi.perso.aquilenet.fr>
+	<VI1PR0601MB247996FB5818A956470FE8169CEB0@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <45bda408-e14a-ab39-a2fe-898fe96f5b40@redhat.com>
+Date: Mon, 8 May 2017 03:03:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 07 May 2017 22:06:56 -0000
-From: Mathew Hodson <mathew.hodson@gmail.com>
-Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170507220658.4152.92088.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
- CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+In-Reply-To: <VI1PR0601MB247996FB5818A956470FE8169CEB0@VI1PR0601MB2479.eurprd06.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] dns server not working in QEMU using usermode
+ networking (SLIRP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,106 +38,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: FONNEMANN Mark <mark.fonnemann@hexagon.com>, Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, MCDONALD Margaret <margaret.mcdonald@hexagon.com>
 
-** Changed in: qemu (Ubuntu)
-   Importance: Undecided =3D> High
+On 06.05.2017 00:38, FONNEMANN Mark wrote:
+>> Could you run tcpdump inside the guest so we are sure what the nslookup call emits?
+> 
+> Is there another way to determine this info? My guest OS is an embedded system with BusyBox 1.25 and not much else.
 
--- =
+FWIW, QEMU also has a built-in packet-dump functionality. You can use it
+like this:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1581936
+qemu-system-xxx ... -netdev user,id=netuser \
+   -object filter-dump,id=dump,netdev=netuser,file=/tmp/dump.dat \
+   -device e1000,netdev=netuser,mac=00:11:22:33:44:55
 
-Title:
-  Frozen Windows 7 VMs with VGA CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+Then run "wireshark -r /tmp/dump.dat" afterwards to have a look at the
+packets.
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Trusty:
-  Triaged
-Status in qemu source package in Xenial:
-  Triaged
-
-Bug description:
-  Hi,
-
-  As already posted on the QEMU devel list [1] I stumbled upon a problem
-  with QEMU in version 2.5.1.1 and 2.6.0.
-
-  the VM shows Windows loading
-  files for the installation, then the "Starting Windows" screen appears
-  here it hangs and never continues.
-
-  Changing the "-vga" option to cirrus solves this, the installation can
-  proceed and finish. When changing back to std (or also qxl, vmware) the
-  installed VM also hangs on the "Starting Windows" screen while qemu
-  showing a little but no excessive load.
-
-  This phenomena appears also with QEMU 2.6.0 but not with 2.6.0-rc4, a
-  git bisect shows fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7 (vga: make
-  sure vga register setup for vbe stays intact (CVE-2016-3712)) as the
-  culprit for this regression, as its a fix for a DoS its not an option to
-  just revert it, I guess.
-
-  The bisect log is:
-
-  git bisect start
-  # bad: [bfc766d38e1fae5767d43845c15c79ac8fa6d6af] Update version for v2.6=
-.0 release
-  git bisect bad bfc766d38e1fae5767d43845c15c79ac8fa6d6af
-  # good: [975eb6a547f809608ccb08c221552f666611af25] Update version for v2.=
-6.0-rc4 release
-  git bisect good 975eb6a547f809608ccb08c221552f666611af25
-  # good: [2068192dcccd8a80dddfcc8df6164cf9c26e0fc4] vga: update vga regist=
-er setup on vbe changes
-  git bisect good 2068192dcccd8a80dddfcc8df6164cf9c26e0fc4
-  # bad: [53db932604dfa7bb9241d132e0173894cf54261c] Merge remote-tracking b=
-ranch 'remotes/kraxel/tags/pull-vga-20160509-1' into staging
-  git bisect bad 53db932604dfa7bb9241d132e0173894cf54261c
-  # bad: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make sure vga regi=
-ster setup for vbe stays intact (CVE-2016-3712).
-  git bisect bad fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7
-  # first bad commit: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make =
-sure vga register setup for vbe stays intact (CVE-2016-3712).
-
-  =
-
-  I could reproduce that with QEMU 2.5.1 and QEMU 2.6 on a Debian derivate
-  (Promox VE) with 4.4 Kernel and also with QEMU 2.6 on an Arch Linux
-  System with a 4.5 Kernel, so it should not be host distro depended. Both
-  machines have Intel x86_64 processors.
-  The problem should be reproducible with said Versions or a build from
-  git including the above mentioned commit (fd3c136) by starting a VM with
-  an Windows 7 ISO, e.g.:
-
-  Freezing installation (as vga defaults to std I marked it as optional):
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 [-vga=
- (std|qxl|vmware)]
-
-  Working installation:
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 -vga =
-cirrus
-
-  If someone has already an installed Windows 7 VM this behaviour should be
-  also observable when trying to start it with the new versions of QEMU.
-
-  Noteworthy may be that Windows 10 is working, I do not had time to get
-  other Windows versions and test them, I'll do that as soon as possible.
-  Various Linux system also seems do work fine, at least I did not ran
-  into an issue there yet.
-
-  I also tried testing with SeaBIOS and OVMF as firmware, as initially I
-  had no idea what broke, both lead to the same result - without the =
-
-  CVE-2016-3712 fix they both work, with not.
-  Further, KVM enabled and disabled does not make any difference.
-
-  =
-
-  [1] http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg02416.html
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1581936/+subscriptions
+ Thomas
