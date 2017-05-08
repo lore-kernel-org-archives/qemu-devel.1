@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1d7m6o-0006RA-Su
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:06:07 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d7m89-0007lH-5D
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:07:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1d7m6j-0003It-18
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:06:06 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d7m85-0003e6-6a
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:07:29 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35643)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d7m85-0003di-2d
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 13:07:25 -0400
+Received: by mail-qk0-x242.google.com with SMTP id k74so10981071qke.2
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 10:07:25 -0700 (PDT)
+Date: Mon, 8 May 2017 13:07:22 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170508170722.GI22428@stefanha-x1.localdomain>
+References: <20170506110333.11000-1-aurelien@aurel32.net>
 MIME-Version: 1.0
-In-Reply-To: <87r2zz8oep.fsf@linaro.org>
-References: <20170508073529.23449-1-pbonzini@redhat.com>
-	<87r2zz8oep.fsf@linaro.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 8 May 2017 10:05:59 -0700
-Message-ID: <CAMo8BfKZeZe26qOfuJm0ib-3PhYY0X--ZiFGbT6vSjr9RqJsaA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] xtensa: use g_malloc/g_new/g_free
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="pe+tqlI1iYzVj1X/"
+Content-Disposition: inline
+In-Reply-To: <20170506110333.11000-1-aurelien@aurel32.net>
+Subject: Re: [Qemu-devel] [PULL 0/1] tcg-mips queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, May 8, 2017 at 6:32 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->> diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
->> index d2d1d3a6fd..97307728f7 100644
->> --- a/hw/xtensa/sim.c
->> +++ b/hw/xtensa/sim.c
->> @@ -41,13 +41,13 @@ static void xtensa_create_memory_regions(const Xtens=
-aMemory *memory,
->>                                           const char *name)
->>  {
->>      unsigned i;
->> -    char *num_name =3D malloc(strlen(name) + sizeof(i) * 3 + 1);
->> +    char *num_name =3D g_malloc(strlen(name) + sizeof(i) * 3 + 1);
->
-> It seems a little sketchy using the size of the storage type as a proxy
-> for the number of bytes used by the format specifier in a format string.
-> In this sort of situation I'd just use Glib and stop worrying about it:
 
-Ok, I'll send a patch doing it that way.
+--pe+tqlI1iYzVj1X/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
---=20
-Thanks.
--- Max
+On Sat, May 06, 2017 at 01:03:32PM +0200, Aurelien Jarno wrote:
+> The following changes since commit 12a95f320a36ef66f724a49bb05e4fb553ac5d=
+be:
+>=20
+>   Merge remote-tracking branch 'kwolf/tags/for-upstream' into staging (20=
+17-05-04 13:44:32 +0100)
+>=20
+> are available in the git repository at:
+>=20
+>   git://git.aurel32.net/qemu.git tags/pull-tcg-mips-20170506
+>=20
+> for you to fetch changes up to 2f5a5f5774d95baacf86c03aa8a77a2d0390f2b2:
+>=20
+>   tcg/mips: fix field extraction opcode (2017-05-06 12:48:53 +0200)
+>=20
+> ----------------------------------------------------------------
+> Fix MIPS R2 hosts support
+>=20
+> ----------------------------------------------------------------
+>=20
+> Aurelien Jarno (1):
+>   tcg/mips: fix field extraction opcode
+>=20
+>  tcg/mips/tcg-target.inc.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> --=20
+> 2.11.0
+>=20
+>=20
+
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
+
+Stefan
+
+--pe+tqlI1iYzVj1X/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZEKXKAAoJEJykq7OBq3PI+ScIALqcCDo+r9DKEiwVPGQ3COUK
+sOQaGVF9mliOzOnbKlrcZJr4mOgZwM7xuUVjeI9rRIMVMEqsHOb20htPmWJv0cox
+4pLuT10Yg0zn32Famr4Ex63P/CgxZqnS0iBUgsD1vZaVYDMowfKgRxR6spVn4G36
+PACzmhQjLdcnpLfKHi755ylEoWM+4Ehb7Mvv7/1MWY8Au4qKmHiRwhYempI3JSnM
+V9CvV08qtZmw+B9Yecx0v7uOFtz2lf0pjsIPPDcyY/gRMxwYOLjO3yPNWnZTkD4A
+vbqDz19dFW1e2Juig8HdgIa8kTcxoQ/apXrQzhiVOjhCA2jLmOjGv1paRR3TOCo=
+=hztB
+-----END PGP SIGNATURE-----
+
+--pe+tqlI1iYzVj1X/--
