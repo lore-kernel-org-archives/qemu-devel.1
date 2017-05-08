@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d7pjA-0006uX-4D
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:57:57 -0400
+	(envelope-from <den@virtuozzo.com>) id 1d7png-0001gA-51
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:02:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d7pj5-0001f8-9R
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 16:57:56 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon,  8 May 2017 17:57:35 -0300
-Message-Id: <20170508205735.23444-4-ehabkost@redhat.com>
-In-Reply-To: <20170508205735.23444-1-ehabkost@redhat.com>
-References: <20170508205735.23444-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] audio: Rename hw/audio/audio.h to
- hw/audio/soundhw.h
+	(envelope-from <den@virtuozzo.com>) id 1d7pnb-0003ru-9i
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 17:02:36 -0400
+References: <20170504105444.8940-1-daniel.kucera@gmail.com>
+	<20170508203556.GA22634@stefanha-x1.localdomain>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <c51044c8-edf6-c0a2-e543-0d9be1a61b29@openvz.org>
+Date: Mon, 8 May 2017 23:02:19 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170508203556.GA22634@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] mirror: add sync mode incremental to
+ drive-mirror and blockdev-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,196 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, hpoussin@reactos.org, Gerd Hoffmann <kraxel@redhat.com>, agraf@suse.de
+To: Stefan Hajnoczi <stefanha@gmail.com>, Daniel Kucera <daniel.kucera@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, "Denis V. Lunev" <den@openvz.org>, jsnow@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-All the functions in hw/audio/audio.h are called "soundhw_*()"
-and live in hw/audio/audiohw.c. Rename the header file for
-consistency.
+On 05/08/2017 10:35 PM, Stefan Hajnoczi wrote:
+> On Thu, May 04, 2017 at 12:54:40PM +0200, Daniel Kucera wrote:
+>
+> Seems like a logical extension along the same lines as the backup block
+> job's dirty bitmap sync mode.
+>
+>> parameter bitmap chooses existing dirtymap instead of newly created
+>> in mirror_start_job
+>>
+>> Signed-off-by: Daniel Kucera <daniel.kucera@gmail.com>
+Can you pls describe the use case pls in a bit more details.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v2 -> v3:
-* Update header name at hw/ppc/prep.c too
+For now this could be a bit strange:
+- dirty bitmap, which can be found via bdrv_create_dirty_bitmap
+  could be read-only or read-write, i.e. being modified by writes
+  or be read-only, which should not be modified. Thus adding
+  r/o bitmap to the mirror could result in interesting things.
 
-Changes v1 -> v2:
-* Rebase to latest qemu.git master
----
- include/hw/audio/{audio.h => soundhw.h} | 0
- arch_init.c                             | 2 +-
- hw/audio/ac97.c                         | 2 +-
- hw/audio/adlib.c                        | 2 +-
- hw/audio/cs4231a.c                      | 2 +-
- hw/audio/es1370.c                       | 2 +-
- hw/audio/gus.c                          | 2 +-
- hw/audio/intel-hda.c                    | 2 +-
- hw/audio/pcspk.c                        | 2 +-
- hw/audio/sb16.c                         | 2 +-
- hw/audio/soundhw.c                      | 2 +-
- hw/ppc/prep.c                           | 2 +-
- vl.c                                    | 2 +-
- 13 files changed, 12 insertions(+), 12 deletions(-)
- rename include/hw/audio/{audio.h => soundhw.h} (100%)
+Minimally we should prohibit usage of r/o bitmaps this way.
 
-diff --git a/include/hw/audio/audio.h b/include/hw/audio/soundhw.h
-similarity index 100%
-rename from include/hw/audio/audio.h
-rename to include/hw/audio/soundhw.h
-diff --git a/arch_init.c b/arch_init.c
-index 74ca62f508..a0b8ed6167 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -27,7 +27,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/arch_init.h"
- #include "hw/pci/pci.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "qmp-commands.h"
-diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
-index c30657501c..959c786261 100644
---- a/hw/audio/ac97.c
-+++ b/hw/audio/ac97.c
-@@ -19,7 +19,7 @@
- 
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "audio/audio.h"
- #include "hw/pci/pci.h"
- #include "sysemu/dma.h"
-diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
-index 09b8248cda..c6e0f10c16 100644
---- a/hw/audio/adlib.c
-+++ b/hw/audio/adlib.c
-@@ -25,7 +25,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "audio/audio.h"
- #include "hw/isa/isa.h"
- 
-diff --git a/hw/audio/cs4231a.c b/hw/audio/cs4231a.c
-index 3ecd0582bf..096e8e98d7 100644
---- a/hw/audio/cs4231a.c
-+++ b/hw/audio/cs4231a.c
-@@ -23,7 +23,7 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "audio/audio.h"
- #include "hw/isa/isa.h"
- #include "hw/qdev.h"
-diff --git a/hw/audio/es1370.c b/hw/audio/es1370.c
-index fe64c1ac37..dd7c23d185 100644
---- a/hw/audio/es1370.c
-+++ b/hw/audio/es1370.c
-@@ -28,7 +28,7 @@
- 
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "audio/audio.h"
- #include "hw/pci/pci.h"
- #include "sysemu/dma.h"
-diff --git a/hw/audio/gus.c b/hw/audio/gus.c
-index ec103a4db9..3e864cd36d 100644
---- a/hw/audio/gus.c
-+++ b/hw/audio/gus.c
-@@ -24,7 +24,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "audio/audio.h"
- #include "hw/isa/isa.h"
- #include "gusemu.h"
-diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-index 2c497eb174..06acc98f7b 100644
---- a/hw/audio/intel-hda.c
-+++ b/hw/audio/intel-hda.c
-@@ -22,7 +22,7 @@
- #include "hw/pci/pci.h"
- #include "hw/pci/msi.h"
- #include "qemu/timer.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "intel-hda.h"
- #include "intel-hda-defs.h"
- #include "sysemu/dma.h"
-diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
-index 798002277b..c815a2b9ca 100644
---- a/hw/audio/pcspk.c
-+++ b/hw/audio/pcspk.c
-@@ -26,7 +26,7 @@
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
- #include "hw/isa/isa.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "audio/audio.h"
- #include "qemu/timer.h"
- #include "hw/timer/i8254.h"
-diff --git a/hw/audio/sb16.c b/hw/audio/sb16.c
-index 6b4427f242..6ab2f6f89a 100644
---- a/hw/audio/sb16.c
-+++ b/hw/audio/sb16.c
-@@ -23,7 +23,7 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "audio/audio.h"
- #include "hw/isa/isa.h"
- #include "hw/qdev.h"
-diff --git a/hw/audio/soundhw.c b/hw/audio/soundhw.c
-index 29565da93d..e698909d34 100644
---- a/hw/audio/soundhw.c
-+++ b/hw/audio/soundhw.c
-@@ -28,7 +28,7 @@
- #include "qom/object.h"
- #include "hw/isa/isa.h"
- #include "hw/pci/pci.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- 
- struct soundhw {
-     const char *name;
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 4a7d2cfbe0..d16646c95d 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -36,7 +36,7 @@
- #include "hw/pci/pci_host.h"
- #include "hw/ppc/ppc.h"
- #include "hw/boards.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "qemu/error-report.h"
- #include "qemu/log.h"
- #include "hw/ide.h"
-diff --git a/vl.c b/vl.c
-index 42fd66ac0d..54b44937e6 100644
---- a/vl.c
-+++ b/vl.c
-@@ -89,7 +89,7 @@ int main(int argc, char **argv)
- #include "migration/block.h"
- #include "sysemu/tpm.h"
- #include "sysemu/dma.h"
--#include "hw/audio/audio.h"
-+#include "hw/audio/soundhw.h"
- #include "audio/audio.h"
- #include "migration/migration.h"
- #include "sysemu/cpus.h"
--- 
-2.11.0.259.g40922b1
+So, why to use mirror, not backup for the case?
+
+Den
