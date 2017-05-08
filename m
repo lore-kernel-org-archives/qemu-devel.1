@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7hH8-0003wj-Et
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:56:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1d7hK8-0005B2-5z
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7hH4-0001um-BH
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:56:26 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7hH4-0001ui-7V
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:56:22 -0400
-Received: by mail-qk0-x243.google.com with SMTP id u75so9624801qka.1
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 04:56:22 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170508045715.21770-1-f4bug@amsat.org>
-	<20170508045715.21770-4-f4bug@amsat.org> <87a86naa4n.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d7c8a094-a600-960d-da47-026336f16949@amsat.org>
-Date: Mon, 8 May 2017 08:56:17 -0300
+	(envelope-from <bounces@canonical.com>) id 1d7hK4-0003Ee-93
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:59:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47667)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d7hK3-0003Ca-W8
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 07:59:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d7hK3-0005Cs-0s
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 11:59:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EDF292E8048
+	for <qemu-devel@nongnu.org>; Mon,  8 May 2017 11:59:26 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87a86naa4n.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 03/23] shippable: ignore SSL
- verification
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 May 2017 11:46:06 -0000
+From: Thomas Huth <899664@bugs.launchpad.net>
+Reply-To: Bug 899664 <899664@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111203174530.13621.15995.malonedeb@soybean.canonical.com>
+Message-Id: <20170508114607.4117.72177.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 899664] Re: Bad internet performance for Host to
+ Guest or Guest to Host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +37,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi Alex,
+Triaging old bug tickets ... can you still reproduce this problem with
+the latest version of QEMU (currently v2.9.0)?
 
-On 05/08/2017 07:58 AM, Alex Bennée wrote:
->
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->
->> shippable logs:
->> --------------
->> git_sync
->> - ssh-agent bash -c 'ssh-add /tmp/ssh/01_deploy; git clone https://github.com/philmd/qemu.git /root/src/github.com/philmd/qemu'
->> Identity added: /tmp/ssh/01_deploy (rsa w/o comment)
->> Cloning into '/root/src/github.com/philmd/qemu'...
->> fatal: unable to access 'https://github.com/philmd/qemu.git/': Problem with the SSL CA cert (path? access rights?)
->> retrying 1 of 3 times...
->
-> I've not seen this before but which git_sync stage is it. The host or
-> the container? If it is the container that probably just means we are
-> missing the CA Cert package.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-You are right! Adding the ca-certificates package in the docker image 
-solves this issue I had in container's git_sync stage :)
+-- =
 
-Thank for the review,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/899664
 
-Phil.
+Title:
+  Bad internet performance for Host to Guest or Guest to Host
 
->
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  .shippable.yml | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/.shippable.yml b/.shippable.yml
->> index 5170486ff9..b661e667b3 100644
->> --- a/.shippable.yml
->> +++ b/.shippable.yml
->> @@ -2,6 +2,10 @@ language: c
->>  env:
->>    global:
->>      - LC_ALL=C
->> +    # sometimes Shippable fails to clone from github (git_sync stage):
->> +    # "Problem with the SSL CA cert (path? access rights?)"
->> +    # for now disable SSL verification.
->> +    - GIT_SSL_NO_VERIFY=1
->>    matrix:
->>      - IMAGE=debian-armhf-cross
->>        TARGET_LIST=arm-softmmu,arm-linux-user
->
->
-> --
-> Alex Bennée
->
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi, =
+
+  Internet performance for Host to Quest is low. =
+
+  The speed Guest to same Guest is  11.3 Gbits/sec
+  The speed Host to same Host is  similar (9.8-11 Gbits/sec)
+
+  But the speed from Guest to Host is slow and around 1Gbit/sec. =
+
+  In the reality traffic never leave a Host. I expected that in this case s=
+peed should be close to Host to Host. =
+
+  It is important for virtual infrastructure when you have several Guests o=
+n a same Host. Guest to Guest on a same host has speed  around 1 Gbits/sec =
+too. =
+
+
+  Below you can find testes and additional information:
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  biouml@biouml-db:~$ iperf -c 192.168.2.31 -t 30 #Guest to Guest =
+
+  ------------------------------------------------------------
+  Client connecting to 192.168.2.31, TCP port 5001
+  TCP window size: 49.7 KByte (default)
+  ------------------------------------------------------------
+  [  3] local 192.168.2.31 port 52170 connected with 192.168.2.31 port 5001
+  [ ID] Interval       Transfer     Bandwidth
+  [  3]  0.0-30.0 sec  39.6 GBytes  11.3 Gbits/sec
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+  biouml@biouml-db:~$ iperf -c 192.168.2.11 -t 30 # Guest to Host
+  ------------------------------------------------------------
+  Client connecting to 192.168.2.11, TCP port 5001
+  TCP window size: 43.4 KByte (default)
+  ------------------------------------------------------------
+  [  3] local 192.168.2.31 port 47148 connected with 192.168.2.11 port 5001
+  [ ID] Interval       Transfer     Bandwidth
+  [  3]  0.0-30.0 sec  3.69 GBytes  1.06 Gbits/sec
+  biouml@biouml-db:~$ =
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+  root@s2-8core:~# iperf -c 192.168.2.30 -t 30 #host to guest
+  ------------------------------------------------------------
+  Client connecting to 192.168.2.30, TCP port 5001
+  TCP window size: 16.0 KByte (default)
+  ------------------------------------------------------------
+  [  3] local 192.168.2.11 port 57403 connected with 192.168.2.30 port 5001
+  [ ID] Interval       Transfer     Bandwidth
+  [  3]  0.0-30.0 sec  5.47 GBytes  1.57 Gbits/sec
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  root@s2-8core:~# iperf -c 192.168.2.11 -t 30 #host to host
+  ------------------------------------------------------------
+  Client connecting to 192.168.2.11, TCP port 5001
+  TCP window size: 49.7 KByte (default)
+  ------------------------------------------------------------
+  [  3] local 192.168.2.11 port 38313 connected with 192.168.2.11 port 5001
+  [ ID] Interval       Transfer     Bandwidth
+  [  3]  0.0-30.0 sec  34.5 GBytes  9.87 Gbits/sec
+  root@s2-8core:~# =
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  I am using virtio drivers and virtual machine was started with
+  following parameters:
+
+  /usr/bin/kvm -S -M pc-1.0 -enable-kvm -m 4096 -smp 4,sockets=3D4,cores=3D=
+1,threads=3D1 -name one-25 -uuid d1e125ee-d692-4598-3a75-441cd79a513a -node=
+fconfig -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvir=
+t/qemu/one-25.monitor,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor=
+,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -drive file=3D/var/lib/one/Ope=
+nNebula/var//25/images/disk.0,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dra=
+w,cache=3Dnone -device virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-=
+virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/var/lib/one/Ope=
+nNebula/var//25/images/disk.1,if=3Dnone,id=3Ddrive-virtio-disk3,format=3Dra=
+w -device virtio-blk-pci,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk3,=
+id=3Dvirtio-disk3 -netdev tap,fd=3D19,id=3Dhostnet0 -device virtio-net-pci,=
+netdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:c0:a8:02:02,bus=3Dpci.0,addr=3D0x3 =
+-usb -device usb-mouse,id=3Dinput0 -vnc 0.0.0.0:98 -vga cirrus -device virt=
+io-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+  Qemu version:
+  root@s2-8core:~# /usr/bin/kvm --version
+  QEMU emulator version 0.15.92, Copyright (c) 2003-2008 Fabrice Bellard
+
+  root@s2-8core:~# ls -la /usr/bin/kvm
+  lrwxrwxrwx 1 root root 27 2011-11-07 17:34 /usr/bin/kvm -> /usr/bin/qemu-=
+system-x86_64
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  Bridge configuration:
+
+  root@s2-8core:~# cat /etc/network/interfaces =
+
+  auto lo
+  iface lo inet loopback
+
+  auto eth0
+  iface eth0 inet manual
+
+  auto eth1 =
+
+  iface eth1 inet manual
+
+  auto br0
+  iface br0 inet static
+          address 192.168.2.11
+          network 192.168.2.0
+          netmask 255.255.255.0
+          broadcast 192.168.2.255
+          gateway 192.168.2.1
+          bridge_ports eth0
+          bridge_stp on
+          bridge_fd 0
+          bridge_maxwait 0
+  root@s2-8core:~# =
+
+
+  root@s2-8core:~# brctl show
+  bridge name	bridge id		STP enabled	interfaces
+  br0		8000.001e8cec6113	yes		eth0
+  							vnet0
+  virbr0		8000.000000000000	yes		=
+
+
+  root@s2-8core:~# brctl --version
+  bridge-utils, 1.5
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  root@s2-8core:~# uname -a
+  Linux s2-8core 3.0.0-13-server #22-Ubuntu SMP Wed Nov 2 15:09:08 UTC 2011=
+ x86_64 x86_64 x86_64 GNU/Linux
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/899664/+subscriptions
