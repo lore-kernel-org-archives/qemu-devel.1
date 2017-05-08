@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36799)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7qzO-0000Fx-JM
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:47 -0400
+	id 1d7qzQ-0000Ho-Fn
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7qzN-0006yS-Mt
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:46 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35607)
+	id 1d7qzP-000735-OY
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:48 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35294)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d7qzN-0006yC-Hy
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:45 -0400
-Received: by mail-qk0-x242.google.com with SMTP id k74so12139401qke.2
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 15:18:45 -0700 (PDT)
+	id 1d7qzP-00072g-Jr
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 18:18:47 -0400
+Received: by mail-qt0-x243.google.com with SMTP id r58so11461120qtb.2
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 15:18:47 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  8 May 2017 19:17:51 -0300
-Message-Id: <20170508221759.15616-14-f4bug@amsat.org>
+Date: Mon,  8 May 2017 19:17:52 -0300
+Message-Id: <20170508221759.15616-15-f4bug@amsat.org>
 In-Reply-To: <20170508221759.15616-1-f4bug@amsat.org>
 References: <20170508221759.15616-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 13/21] shippable: use C locale to simplify
- console output
+Subject: [Qemu-devel] [PATCH v2 14/21] shippable: build using all available
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,33 +37,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-remove this noise:
+As of this commit:
 
-perl: warning: Setting locale failed.
-perl: warning: Please check that your locale settings:
-    LANGUAGE = (unset),
-    LC_ALL = "en_US.UTF-8",
-    LC_CTYPE = "en_US.UTF-8",
-    LANG = "en_US.UTF-8"
-    are supported and installed on your system.
+$ echo "container proc:" `getconf _NPROCESSORS_ONLN` `getconf _NPROCESSORS_CONF`
+container proc: 2 2
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .shippable.yml | 2 ++
- 1 file changed, 2 insertions(+)
+ .shippable.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/.shippable.yml b/.shippable.yml
-index 653bd750fe..231c29b620 100644
+index 231c29b620..1e3ae35dd9 100644
 --- a/.shippable.yml
 +++ b/.shippable.yml
-@@ -1,5 +1,7 @@
- language: c
- env:
-+  global:
-+    - LC_ALL=C
-   matrix:
-     - IMAGE=debian-armhf-cross
-       TARGET_LIST=arm-softmmu,arm-linux-user
+@@ -20,4 +20,4 @@ build:
+   ci:
+     - unset CC
+     - ./configure ${QEMU_CONFIGURE_OPTS} --target-list=${TARGET_LIST}
+-    - make -j2
++    - make -j$(($(getconf _NPROCESSORS_ONLN) + 1))
 -- 
 2.11.0
