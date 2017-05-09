@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d85TW-0008IP-S6
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:46:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d85W1-0001tc-0Y
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d85TV-0008N6-Nl
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:46:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29058)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d85TV-0008MU-Df
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:46:49 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  9 May 2017 14:46:23 +0100
-Message-Id: <20170509134623.13120-5-berrange@redhat.com>
-In-Reply-To: <20170509134623.13120-1-berrange@redhat.com>
-References: <20170509134623.13120-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 4/4] crypto: qcrypto_random_bytes() now works
- on windows w/o any other crypto libs
+	(envelope-from <alex.bennee@linaro.org>) id 1d85Vx-0001Fb-1L
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:49:25 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:35979)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d85Vw-0001FP-R4
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:49:20 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id l50so73948599wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 06:49:20 -0700 (PDT)
+References: <20170505103822.20641-1-alex.bennee@linaro.org>
+	<20170505103822.20641-9-alex.bennee@linaro.org>
+	<9d3cca3f-3a95-0beb-9342-428b96816173@redhat.com>
+	<87pofnmgzl.fsf@linaro.org>
+	<20170508175217.GO22428@stefanha-x1.localdomain>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170508175217.GO22428@stefanha-x1.localdomain>
+Date: Tue, 09 May 2017 14:50:04 +0100
+Message-ID: <87fuge87hv.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v1 8/9] util/qemu-thread-*: add
+ qemu_lock, locked and unlock trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,169 +34,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Geert Martin Ijewski <gm.ijewski@web.de>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, boost.lists@gmail.com, pavel.dovgaluk@ispras.ru, cota@braap.org, qemu-devel@nongnu.org
 
-From: Geert Martin Ijewski <gm.ijewski@web.de>
 
-If no crypto library is included in the build, QEMU uses
-qcrypto_random_bytes() to generate random data. That function tried to open
-/dev/urandom or /dev/random and if opening both files failed it errored out.
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-Those files obviously do not exist on windows, so there the code uses
-CryptGenRandom().
+> On Fri, May 05, 2017 at 04:59:58PM +0100, Alex Bennée wrote:
+>>
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>
+>> > On 05/05/2017 12:38, Alex Bennée wrote:
+>> >> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> >
+>> > Can you look at the patch I just sent a pull request for?  It only has
+>> > locked and unlocked trace events, you can add lock on top.
+>>
+>> Cool - great minds think alike ;-)
+>>
+>> I'll re-spin my trace analysis script and the lock trace point once that
+>> pull request is merged. I would be nice if we could associate locks with
+>> names though as the QemuMutex * is basically just an anonymous handle.
+>> Would it be overly extravagant to add a const char * to QemuMutex to can
+>> be init'ed with a human readable name?
+>>
+>> Stefan,
+>>
+>> Does the trace sub-system have any way to register a human readable
+>> string to a given pointer value? I guess this is something that could be
+>> added to the trace pre-amble?
+>
+> No, it doesn't.  I would make the trace event take const char * and pass
+> in the string.
 
-Furthermore there was some refactoring and a new function
-qcrypto_random_init() was introduced. If a proper crypto library (gnutls or
-libgcrypt) is included in the build, this function does nothing. If neither
-is included it initializes the (platform specific) handles that are used by
-qcrypto_random_bytes().
-Either:
-* a handle to /dev/urandom | /dev/random on unix like systems
-* a handle to a cryptographic service provider on windows
+It would be nice to avoid having the string for non-trace builds. I was
+thinking of something like:
 
-Signed-off-by: Geert Martin Ijewski <gm.ijewski@web.de>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- crypto/init.c            |  6 ++++++
- crypto/random-gcrypt.c   |  2 ++
- crypto/random-gnutls.c   |  3 +++
- crypto/random-platform.c | 45 +++++++++++++++++++++++++++++++++++++--------
- include/crypto/random.h  |  9 +++++++++
- 5 files changed, 57 insertions(+), 8 deletions(-)
+  trace_register_human_name(void *ptr, const char *name)
 
-diff --git a/crypto/init.c b/crypto/init.c
-index f65207e..f131c42 100644
---- a/crypto/init.c
-+++ b/crypto/init.c
-@@ -32,6 +32,8 @@
- #include <gcrypt.h>
- #endif
- 
-+#include "crypto/random.h"
-+
- /* #define DEBUG_GNUTLS */
- 
- /*
-@@ -146,5 +148,9 @@ int qcrypto_init(Error **errp)
-     gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
- #endif
- 
-+    if (qcrypto_random_init(errp) < 0) {
-+        return -1;
-+    }
-+
-     return 0;
- }
-diff --git a/crypto/random-gcrypt.c b/crypto/random-gcrypt.c
-index 0de9a09..9f1c9ee 100644
---- a/crypto/random-gcrypt.c
-+++ b/crypto/random-gcrypt.c
-@@ -31,3 +31,5 @@ int qcrypto_random_bytes(uint8_t *buf,
-     gcry_randomize(buf, buflen, GCRY_STRONG_RANDOM);
-     return 0;
- }
-+
-+int qcrypto_random_init(Error **errp G_GNUC_UNUSED) { return 0; }
-diff --git a/crypto/random-gnutls.c b/crypto/random-gnutls.c
-index 04b45a8..5350003 100644
---- a/crypto/random-gnutls.c
-+++ b/crypto/random-gnutls.c
-@@ -41,3 +41,6 @@ int qcrypto_random_bytes(uint8_t *buf,
- 
-     return 0;
- }
-+
-+
-+int qcrypto_random_init(Error **errp G_GNUC_UNUSED) { return 0; }
-diff --git a/crypto/random-platform.c b/crypto/random-platform.c
-index 82b755a..0eddb91 100644
---- a/crypto/random-platform.c
-+++ b/crypto/random-platform.c
-@@ -22,14 +22,16 @@
- 
- #include "crypto/random.h"
- 
--int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
--                         size_t buflen G_GNUC_UNUSED,
--                         Error **errp)
--{
--    int fd;
--    int ret = -1;
--    int got;
-+#ifdef _WIN32
-+#include <Wincrypt.h>
-+static HCRYPTPROV hCryptProv;
-+#else
-+static int fd; /* a file handle to either /dev/urandom or /dev/random */
-+#endif
- 
-+int qcrypto_random_init(Error **errp)
-+{
-+#ifndef _WIN32
-     /* TBD perhaps also add support for BSD getentropy / Linux
-      * getrandom syscalls directly */
-     fd = open("/dev/urandom", O_RDONLY);
-@@ -41,6 +43,25 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
-         error_setg(errp, "No /dev/urandom or /dev/random found");
-         return -1;
-     }
-+#else
-+    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL,
-+                             CRYPT_SILENT | CRYPT_VERIFYCONTEXT)) {
-+        error_setg_win32(errp, GetLastError(),
-+                         "Unable to create cryptographic provider");
-+        return -1;
-+    }
-+#endif
-+
-+    return 0;
-+}
-+
-+int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
-+                         size_t buflen G_GNUC_UNUSED,
-+                         Error **errp)
-+{
-+#ifndef _WIN32
-+    int ret = -1;
-+    int got;
- 
-     while (buflen > 0) {
-         got = read(fd, buf, buflen);
-@@ -59,6 +80,14 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
- 
-     ret = 0;
-  cleanup:
--    close(fd);
-     return ret;
-+#else
-+    if (!CryptGenRandom(hCryptProv, buflen, buf)) {
-+        error_setg_win32(errp, GetLastError(),
-+                         "Unable to read random bytes");
-+        return -1;
-+    }
-+
-+    return 0;
-+#endif
- }
-diff --git a/include/crypto/random.h b/include/crypto/random.h
-index a101353..a07229c 100644
---- a/include/crypto/random.h
-+++ b/include/crypto/random.h
-@@ -40,5 +40,14 @@ int qcrypto_random_bytes(uint8_t *buf,
-                          size_t buflen,
-                          Error **errp);
- 
-+/**
-+ * qcrypto_random_init:
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Initializes the handles used by qcrypto_random_bytes
-+ *
-+ * Returns 0 on success, -1 on error
-+ */
-+int qcrypto_random_init(Error **errp);
- 
- #endif /* QCRYPTO_RANDOM_H */
--- 
-2.9.3
+Which compiles away to nothing when tracing is not enabled.
+
+>
+> Stefan
+
+
+--
+Alex Bennée
