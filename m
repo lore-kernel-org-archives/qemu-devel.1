@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d81cM-0008Im-0O
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:39:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d81dN-0000hJ-C4
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:40:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d81cI-00010R-3c
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:39:42 -0400
-Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:59181)
+	(envelope-from <dgilbert@redhat.com>) id 1d81dK-0001P1-DJ
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:40:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d81cH-0000zS-TN
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:39:38 -0400
-Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7C9D5EE332
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:39:36 +0200 (CEST)
-Date: Tue, 9 May 2017 11:39:32 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170509113932.2443c627@bahia>
-In-Reply-To: <2b6e4c71-8f11-a1f5-8b34-43ac68f2d503@redhat.com>
-References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
-	<149399505841.29022.17760460736155165332.stgit@bahia.lan>
-	<2b6e4c71-8f11-a1f5-8b34-43ac68f2d503@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d81dK-0001ON-4F
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:40:42 -0400
+Date: Tue, 9 May 2017 10:40:34 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170509094033.GB2089@work-vm>
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
+	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
+	<20170428100012.GB22801@pxdev.xzpeter.org>
+	<d018d4a6-4b50-3f36-fe69-e232b63bebf0@samsung.com>
+	<20170508062906.GC2820@pxdev.xzpeter.org>
+	<20170508090807.GA4201@aperevalov-ubuntu>
+	<20170509082622.GI2820@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/gcBa7aMUfiWE_k1U+4zhh9O";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 5/5] 9pfs: local: forbid client access to
- metadata
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170509082622.GI2820@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
+ downtime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +34,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?B?TMOpbw==?= Gaspard <leo@gaspard.io>
+To: Peter Xu <peterx@redhat.com>
+Cc: Alexey <a.perevalov@samsung.com>, i.maximets@samsung.com, f4bug@amsat.org, qemu-devel@nongnu.org
 
---Sig_/gcBa7aMUfiWE_k1U+4zhh9O
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+* Peter Xu (peterx@redhat.com) wrote:
+> On Mon, May 08, 2017 at 12:08:07PM +0300, Alexey wrote:
+> > On Mon, May 08, 2017 at 02:29:06PM +0800, Peter Xu wrote:
+> > > On Fri, Apr 28, 2017 at 02:11:19PM +0300, Alexey Perevalov wrote:
+> > > > On 04/28/2017 01:00 PM, Peter Xu wrote:
+> > > > >On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
+> > > > >>This patch provides downtime calculation per vCPU,
+> > > > >>as a summary and as a overlapped value for all vCPUs.
+> > > > >>
+> > > > >>This approach was suggested by Peter Xu, as an improvements of
+> > > > >>previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> > > > >>in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> > > > >>as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> > > > >>list for downtime per vCPU (could be traced with page_fault_addr)
+> > > > >>
+> > > > >>For more details see comments for get_postcopy_total_downtime
+> > > > >>implementation.
+> > > > >>
+> > > > >>Downtime will not calculated if postcopy_downtime field of
+> > > > >>MigrationIncomingState wasn't initialized.
+> > > > >>
+> > > > >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > > > >>---
+> > > > >>  include/migration/migration.h |   3 ++
+> > > > >>  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
+> > > > >>  migration/postcopy-ram.c      |  20 +++++++-
+> > > > >>  migration/trace-events        |   6 ++-
+> > > > >>  4 files changed, 130 insertions(+), 2 deletions(-)
+> > > > >>
+> > > > >>diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > > > >>index e8fb68f..a22f9ce 100644
+> > > > >>--- a/include/migration/migration.h
+> > > > >>+++ b/include/migration/migration.h
+> > > > >>@@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
+> > > > >>   * Functions to work with downtime context
+> > > > >>   */
+> > > > >>  struct DowntimeContext *downtime_context_new(void);
+> > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
+> > > > >>+void mark_postcopy_downtime_end(uint64_t addr);
+> > > > >>+uint64_t get_postcopy_total_downtime(void);
+> > > > >>  struct MigrationState
+> > > > >>  {
+> > > > >>diff --git a/migration/migration.c b/migration/migration.c
+> > > > >>index ec76e5c..2c6f150 100644
+> > > > >>--- a/migration/migration.c
+> > > > >>+++ b/migration/migration.c
+> > > > >>@@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
+> > > > >>      return atomic_xchg(&incoming_postcopy_state, new_state);
+> > > > >>  }
+> > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
+> > > > >>+{
+> > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > >>+    DowntimeContext *dc;
+> > > > >>+    if (!mis->downtime_ctx || cpu < 0) {
+> > > > >>+        return;
+> > > > >>+    }
+> > > > >>+    dc = mis->downtime_ctx;
+> > > > >>+    dc->vcpu_addr[cpu] = addr;
+> > > > >>+    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
+> > > > >>+        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > >>+
+> > > > >>+    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> > > > >>+            cpu);
+> > > > >>+}
+> > > > >>+
+> > > > >>+void mark_postcopy_downtime_end(uint64_t addr)
+> > > > >>+{
+> > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > >>+    DowntimeContext *dc;
+> > > > >>+    int i;
+> > > > >>+    bool all_vcpu_down = true;
+> > > > >>+    int64_t now;
+> > > > >>+
+> > > > >>+    if (!mis->downtime_ctx) {
+> > > > >>+        return;
+> > > > >>+    }
+> > > > >>+    dc = mis->downtime_ctx;
+> > > > >>+    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > >>+
+> > > > >>+    /* check all vCPU down,
+> > > > >>+     * QEMU has bitmap.h, but even with bitmap_and
+> > > > >>+     * will be a cycle */
+> > > > >>+    for (i = 0; i < smp_cpus; i++) {
+> > > > >>+        if (dc->vcpu_addr[i]) {
+> > > > >>+            continue;
+> > > > >>+        }
+> > > > >>+        all_vcpu_down = false;
+> > > > >>+        break;
+> > > > >>+    }
+> > > > >>+
+> > > > >>+    if (all_vcpu_down) {
+> > > > >>+        dc->total_downtime += now - dc->last_begin;
+> > > > >Shall we do this accouting only if we are sure the copied page address
+> > > > >is one of the page faulted addresses? Can it be some other page? I
+> > > > >don't know. But since we have the loop below to make sure of it, why
+> > > > >not?
+> > > > no, the downtime implies since page fault till the
+> > > > page will be copied.
+> > > > Yes another pages could be copied as well as pagefaulted,
+> > > > and they are copied due to prefetching, but it's not a downtime.
+> > > 
+> > > Not sure I got the point... Do you mean that when reach here, then
+> > > this page address is definitely one of the faulted addresses? I am not
+> > > 100% sure of this, but if you are sure, I am okay with it.
+> > Let me clarify.
+> > 
+> > > > >Shall we do this accouting only if we are sure the copied page address
+> > > > >is one of the page faulted addresses?
+> > Yes it's primary condition, due to there are could be another pages,
+> > which weren't faulted, they just was sent from source to destination,
+> > I called it prefetching.
+> > 
+> > I think I got why did you ask that question, because in this version
+> > all_vcpu_down and as a result total_downtime calculated incorrectly,
+> > it calculates every time when any page is copied, but it should
+> > be calculated only when faulted page copied, so only dc->vcpu_downtime
+> > was correctly calculated.
+> 
+> Exactly. I am afraid if we have such "prefetching" stuff then
+> total_downtime will be more than its real value.
 
-On Fri, 5 May 2017 12:13:52 -0500
-Eric Blake <eblake@redhat.com> wrote:
+It should be OK as long as we measure the time between
+  userfault reporting a page miss for an address 
+  and
+  place_page for *that same address*
 
-> On 05/05/2017 09:37 AM, Greg Kurz wrote:
-> > When using the mapped-file security mode, we shouldn't let the client
-> > mess with the metadata. The current code already hides it but the
-> > client can still access the metadata through several operations.
-> >=20
-> > This patch fixes the issue by:
-> > - preventing the creation of fids pointing to the metadata (name_to_pat=
-h)
-> > - failing various operations taking a dirpath and a name arguments if
-> >   name is a metadata reserved name
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/9pfs/9p-local.c |   41 +++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 41 insertions(+)
-> >=20
-> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> > index b427d2928800..93cadac302c9 100644
-> > --- a/hw/9pfs/9p-local.c
-> > +++ b/hw/9pfs/9p-local.c
-> > @@ -588,6 +588,11 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath=
- *dir_path,
-> >      int err =3D -1;
-> >      int dirfd;
-> > =20
-> > +    if (local_must_skip_metadata(fs_ctx, name)) {
-> > +        errno =3D EINVAL;
-> > +        return -1;
-> > +    }
-> > + =20
->=20
-> I don't know if EINVAL is the best error, but it seems reasonable enough.
->=20
+any places for other pages are irrelevant.
 
-I admit that I'm not really a big fan of returning EINVAL, but there's
-nothing like "this file name is illegal" on Linux and I couldn't come
-up with a better error...
+(I still worry that this definition of 'downtime' is possibly
+arbitrary - since if all but one of the vCPUs are down we
+don't count it but it's obviously still a big impact).
 
---Sig_/gcBa7aMUfiWE_k1U+4zhh9O
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Dave
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkRjlQACgkQAvw66wEB28Jo8ACcCDWlt7rVE2a5jjI48+sNgziC
-9r0AoJwLpvK5tKdId6JkxdRdk0UA+9xl
-=ZAzp
------END PGP SIGNATURE-----
-
---Sig_/gcBa7aMUfiWE_k1U+4zhh9O--
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
