@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d87PR-0000wg-PE
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:50:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1d87PR-0000wf-OM
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d87PO-0004Hn-Qn
+	(envelope-from <bounces@canonical.com>) id 1d87PO-0004Hg-ND
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:50:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38002)
+Received: from indium.canonical.com ([91.189.90.7]:37992)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d87PO-0004Ha-L0
+	id 1d87PO-0004HY-GW
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:50:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d87PL-0006XX-ST
+	id 1d87PL-0006Xk-J7
 	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 15:50:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6FD5C2E80D4
+	by loganberry.canonical.com (Postfix) with ESMTP id 107922E80CD
 	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 15:50:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 May 2017 15:44:40 -0000
+Date: Tue, 09 May 2017 15:44:10 -0000
 From: ChristianEhrhardt <1689499@bugs.launchpad.net>
 Reply-To: Bug 1689499 <1689499@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <149431685971.9593.12799784331390412455.malonedeb@gac.canonical.com>
-Message-Id: <149434468073.2400.6960837090285236175.malone@gac.canonical.com>
+Message-Id: <149434465095.2368.2951254706948967049.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1689499] Re: copy-storage-all/inc does not easily
  converge with load going on
@@ -39,7 +39,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I'm "incompleting" myself until I was able to provide more :-/
+Ok, I found an hour to set up a test environment.
+I already had all the bisect script written until the systems were ready, b=
+ut unfortunately it is not reproducible enough with my build from git as of=
+ today's master - out of 8 tries it showed as less of a slowdown once, and =
+never to the hours of wait that I saw when testing on a wider scope.
+
+If my regular testing triggers these issues again I'll try to sort out
+what the difference is between this and my bisect environment (I set the
+latter up with the scripts that do the former), but until then I'm kind
+of out of options for now :-/.
+
+
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
 -- =
 
