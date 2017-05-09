@@ -1,41 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d80cd-0000wo-38
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:35:56 -0400
+	(envelope-from <groug@kaod.org>) id 1d81Co-0004rN-RF
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:13:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d80cZ-0007n0-2D
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:35:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55939
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1d80cY-0007mW-Sx
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:35:50 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v498SxPZ027446
-	for <qemu-devel@nongnu.org>; Tue, 9 May 2017 04:35:49 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ab91ev0ha-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 04:35:49 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 9 May 2017 04:35:49 -0400
-Date: Tue, 9 May 2017 16:35:42 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170505020352.8984-10-bjsdjshi@linux.vnet.ibm.com>
-	<1c84ffc3-70fa-f6b7-fd10-def952d02a84@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1d81Cl-0003pb-Ma
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:13:18 -0400
+Received: from 11.mo5.mail-out.ovh.net ([46.105.47.167]:50152)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d81Cl-0003oo-FV
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:13:15 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 01485EE190
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:13:03 +0200 (CEST)
+Date: Tue, 9 May 2017 11:12:58 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170509111258.4c4f3de9@bahia>
+In-Reply-To: <093d42d3-a4a5-94bd-3a7a-b2a2f867ae89@redhat.com>
+References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+	<149399503288.29022.13904385823492355197.stgit@bahia.lan>
+	<093d42d3-a4a5-94bd-3a7a-b2a2f867ae89@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c84ffc3-70fa-f6b7-fd10-def952d02a84@redhat.com>
-Message-Id: <20170509083542.GA5827@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v7 09/13] vfio/ccw: get irqs info and set
- the eventfd fd
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/M_f8ZNEpesn_D3a7Pap+CZ9";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 2/5] 9pfs: local: resolve special
+ directories in paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,34 +33,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?B?TMOpbw==?= Gaspard <leo@gaspard.io>
 
-* Auger Eric <eric.auger@redhat.com> [2017-05-09 10:21:15 +0200]:
+--Sig_/M_f8ZNEpesn_D3a7Pap+CZ9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hi Eric,
+On Fri, 5 May 2017 11:59:15 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
-> Hi,
-> 
-> On 05/05/2017 04:03, Dong Jia Shi wrote:
-> > vfio-ccw resorts to the eventfd mechanism to communicate with userspace.
-> > We fetch the irqs info via the ioctl VFIO_DEVICE_GET_IRQ_INFO,
-> > register a event notifier to get the eventfd fd which is sent
-> > to kernel via the ioctl VFIO_DEVICE_SET_IRQS, then we can implement
-> > read operation once kernel sends the signal.
-> > 
-> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> On 05/05/2017 09:37 AM, Greg Kurz wrote:
+> > When using the mapped-file security mode, the creds of a path /foo/bar
+> > are stored in the /foo/.virtfs_metadata/bar file. This is okay for all
+> > paths unless they end with '.' or '..', because we cannot create the
+> > corresponding file in the metadata directory.
+> >=20
+> > This patch ensures that '.' and '..' are resolved in all paths.
+> >=20
+> > The core code only passes path elements (no '/') to the backend, with
+> > the notable exception of the '/' path, which refers to the virtfs root.
+> > This patch preserve the current behavior of converting it to '.' so =20
+>=20
+> s/preserve/preserves/
+>=20
 
-Thanks for all of your R-Bs! I will add them in next version. :>
+I'll fix this.
 
-> 
-> Thanks
-> 
-> Eric
-> 
+> > that it can be passed to "*at()" syscalls ('/' would mean the host root=
+).
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/9p-local.c |   30 +++++++++++++++++++++++-------
+> >  1 file changed, 23 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> > index f3ebca4f7a56..92262f3c3e37 100644
+> > --- a/hw/9pfs/9p-local.c
+> > +++ b/hw/9pfs/9p-local.c
+> > @@ -1097,14 +1097,30 @@ static int local_name_to_path(FsContext *ctx, V=
+9fsPath *dir_path,
+> >                                const char *name, V9fsPath *target)
+> >  {
+> >      if (dir_path) {
+> > -        v9fs_path_sprintf(target, "%s/%s", dir_path->data, name);
+> > -    } else if (strcmp(name, "/")) {
+> > -        v9fs_path_sprintf(target, "%s", name);
+> > +        if (!strcmp(name, ".")) {
+> > +            /* "." relative to "foo/bar" is "foo/bar" */
+> > +            v9fs_path_copy(target, dir_path);
+> > +        } else if (!strcmp(name, "..")) {
+> > +            if (!strcmp(dir_path->data, ".")) {
+> > +                /* ".." relative to the root is "." */
+> > +                v9fs_path_sprintf(target, ".");
+> > +            } else {
+> > +                char *tmp =3D g_path_get_dirname(dir_path->data);
+> > +                /* ".." relative to "foo/bar" is equivalent to "foo" *=
+/ =20
+>=20
+> True only if bar is not a symlink to some other directory.  What
+> guarantees do you have that you are not going to be inadvertently
+> skipping a traversal through symlinks and thereby picking the wrong
+> location for '..'?
+>=20
 
-[...]
+My understanding is that symlinks are supposed to be resolved by the client,
+and we shouldn't follow them in the server.
 
--- 
-Dong Jia Shi
+> > +                v9fs_path_sprintf(target, "%s", tmp);
+> > +                g_free(tmp);
+> > +            }
+> > +        } else {
+> > +            assert(!strchr(name, '/'));
+> > +            v9fs_path_sprintf(target, "%s/%s", dir_path->data, name);
+> > +        }
+> > +    } else if (!strcmp(name, "/") || !strcmp(name, ".") ||
+> > +               !strcmp(name, "..")) {
+> > +            /* This is the root fid */
+> > +        v9fs_path_sprintf(target, ".");
+> >      } else {
+> > -        /* We want the path of the export root to be relative, otherwi=
+se
+> > -         * "*at()" syscalls would treat it as "/" in the host.
+> > -         */
+> > -        v9fs_path_sprintf(target, "%s", ".");
+> > +        assert(!strchr(name, '/'));
+> > +        v9fs_path_sprintf(target, "./%s", name);
+> >      }
+> >      return 0;
+> >  }
+> >=20
+> >  =20
+>=20
+
+
+--Sig_/M_f8ZNEpesn_D3a7Pap+CZ9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkRiBoACgkQAvw66wEB28KMgACfQOEIOHyeBbj6/cRRKqQ6OHPf
+hZMAnRFpLbWoDrS7P5Utzo0RkucnVJFy
+=s162
+-----END PGP SIGNATURE-----
+
+--Sig_/M_f8ZNEpesn_D3a7Pap+CZ9--
