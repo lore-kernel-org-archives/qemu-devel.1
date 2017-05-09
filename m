@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d80Ab-00085O-1y
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:06:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1d80Ab-00085V-3q
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d80AV-0007Yt-Et
+	(envelope-from <armbru@redhat.com>) id 1d80AV-0007Zr-Tj
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:06:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35176)
+Received: from mx1.redhat.com ([209.132.183.28]:50406)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d80AV-0007Xq-6a
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d80AV-0007YU-OS
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:06:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3BA3C804ED
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 08:06:50 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-149.ams2.redhat.com
-	[10.36.116.149])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 09B80881FA
+	by mx1.redhat.com (Postfix) with ESMTPS id BEB58C059733
 	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 08:06:50 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  9 May 2017 10:06:32 +0200
-Message-Id: <1494317205-2211-16-git-send-email-armbru@redhat.com>
+Date: Tue,  9 May 2017 10:06:44 +0200
+Message-Id: <1494317205-2211-28-git-send-email-armbru@redhat.com>
 In-Reply-To: <1494317205-2211-1-git-send-email-armbru@redhat.com>
 References: <1494317205-2211-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v3 15/28] qapi: New QAPI_CLONE_MEMBERS()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 27/28] qmp-shell: don't show version greeting
+ if unavailable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +34,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-QAPI_CLONE() returns a newly allocated QAPI object.  Inconvenient when
-we want to clone into an existing object.  QAPI_CLONE_MEMBERS() does
-exactly that.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1493192202-3184-4-git-send-email-armbru@redhat.com>
+qemu-ga doesn't have greeting.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170504125432.21653-4-marcandre.lureau@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/clone-visitor.h | 14 ++++++++++++++
- qapi/qapi-clone-visitor.c    | 13 +++++++++++++
- 2 files changed, 27 insertions(+)
+ scripts/qmp/qmp-shell | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/qapi/clone-visitor.h b/include/qapi/clone-visitor.h
-index b16177e..a4915c7 100644
---- a/include/qapi/clone-visitor.h
-+++ b/include/qapi/clone-visitor.h
-@@ -24,6 +24,9 @@ typedef struct QapiCloneVisitor QapiCloneVisitor;
- 
- void *qapi_clone(const void *src, void (*visit_type)(Visitor *, const char *,
-                                                      void **, Error **));
-+void qapi_clone_members(void *dst, const void *src, size_t sz,
-+                        void (*visit_type_members)(Visitor *, void *,
-+                                                   Error **));
- 
- /*
-  * Deep-clone QAPI object @src of the given @type, and return the result.
-@@ -36,4 +39,15 @@ void *qapi_clone(const void *src, void (*visit_type)(Visitor *, const char *,
-                         (void (*)(Visitor *, const char *, void**,      \
-                                   Error **))visit_type_ ## type))
- 
-+/*
-+ * Copy deep clones of @type members from @src to @dst.
-+ *
-+ * Not usable on QAPI scalars (integers, strings, enums), nor on a
-+ * QAPI object that references the 'any' type.
-+ */
-+#define QAPI_CLONE_MEMBERS(type, dst, src)                              \
-+    qapi_clone_members(dst, src, sizeof(type),                          \
-+                       (void (*)(Visitor *, void *,                     \
-+                                 Error **))visit_type_ ## type ## _members)
-+
- #endif
-diff --git a/qapi/qapi-clone-visitor.c b/qapi/qapi-clone-visitor.c
-index 34086cb..de756bf 100644
---- a/qapi/qapi-clone-visitor.c
-+++ b/qapi/qapi-clone-visitor.c
-@@ -180,3 +180,16 @@ void *qapi_clone(const void *src, void (*visit_type)(Visitor *, const char *,
-     visit_free(v);
-     return dst;
- }
-+
-+void qapi_clone_members(void *dst, const void *src, size_t sz,
-+                        void (*visit_type_members)(Visitor *, void *,
-+                                                   Error **))
-+{
-+    Visitor *v;
-+
-+    v = qapi_clone_visitor_new();
-+    memcpy(dst, src, sz);
-+    to_qcv(v)->depth++;
-+    visit_type_members(v, dst, &error_abort);
-+    visit_free(v);
-+}
--- 
+diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+index 1182f82..5986e37 100755
+--- a/scripts/qmp/qmp-shell
++++ b/scripts/qmp/qmp-shell
+@@ -286,6 +286,9 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+=20
+     def show_banner(self, msg=3D'Welcome to the QMP low-level shell!'):
+         print msg
++        if not self._greeting:
++            print 'Connected'
++            return
+         version =3D self._greeting['QMP']['version']['qemu']
+         print 'Connected to QEMU %d.%d.%d\n' % (version['major'],version=
+['minor'],version['micro'])
+=20
+--=20
 2.7.4
