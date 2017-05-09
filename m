@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1d80OZ-0004wM-Jj
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:21:28 -0400
+	(envelope-from <peterx@redhat.com>) id 1d80TZ-0001Eo-Nd
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:26:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1d80OY-0005lf-Dp
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:21:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36574)
+	(envelope-from <peterx@redhat.com>) id 1d80TV-0007p4-O6
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:26:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1d80OY-0005lT-4B
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:21:22 -0400
-References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170505020352.8984-10-bjsdjshi@linux.vnet.ibm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <1c84ffc3-70fa-f6b7-fd10-def952d02a84@redhat.com>
-Date: Tue, 9 May 2017 10:21:15 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d80TV-0007oi-FD
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:26:29 -0400
+Date: Tue, 9 May 2017 16:26:22 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170509082622.GI2820@pxdev.xzpeter.org>
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
+	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
+	<20170428100012.GB22801@pxdev.xzpeter.org>
+	<d018d4a6-4b50-3f36-fe69-e232b63bebf0@samsung.com>
+	<20170508062906.GC2820@pxdev.xzpeter.org>
+	<20170508090807.GA4201@aperevalov-ubuntu>
 MIME-Version: 1.0
-In-Reply-To: <20170505020352.8984-10-bjsdjshi@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 09/13] vfio/ccw: get irqs info and set
- the eventfd fd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170508090807.GA4201@aperevalov-ubuntu>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
+ downtime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,171 +33,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
-Cc: cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com
+To: Alexey <a.perevalov@samsung.com>
+Cc: i.maximets@samsung.com, f4bug@amsat.org, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Hi,
-
-On 05/05/2017 04:03, Dong Jia Shi wrote:
-> vfio-ccw resorts to the eventfd mechanism to communicate with userspace.
-> We fetch the irqs info via the ioctl VFIO_DEVICE_GET_IRQ_INFO,
-> register a event notifier to get the eventfd fd which is sent
-> to kernel via the ioctl VFIO_DEVICE_SET_IRQS, then we can implement
-> read operation once kernel sends the signal.
+On Mon, May 08, 2017 at 12:08:07PM +0300, Alexey wrote:
+> On Mon, May 08, 2017 at 02:29:06PM +0800, Peter Xu wrote:
+> > On Fri, Apr 28, 2017 at 02:11:19PM +0300, Alexey Perevalov wrote:
+> > > On 04/28/2017 01:00 PM, Peter Xu wrote:
+> > > >On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
+> > > >>This patch provides downtime calculation per vCPU,
+> > > >>as a summary and as a overlapped value for all vCPUs.
+> > > >>
+> > > >>This approach was suggested by Peter Xu, as an improvements of
+> > > >>previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> > > >>in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> > > >>as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> > > >>list for downtime per vCPU (could be traced with page_fault_addr)
+> > > >>
+> > > >>For more details see comments for get_postcopy_total_downtime
+> > > >>implementation.
+> > > >>
+> > > >>Downtime will not calculated if postcopy_downtime field of
+> > > >>MigrationIncomingState wasn't initialized.
+> > > >>
+> > > >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > > >>---
+> > > >>  include/migration/migration.h |   3 ++
+> > > >>  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
+> > > >>  migration/postcopy-ram.c      |  20 +++++++-
+> > > >>  migration/trace-events        |   6 ++-
+> > > >>  4 files changed, 130 insertions(+), 2 deletions(-)
+> > > >>
+> > > >>diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > > >>index e8fb68f..a22f9ce 100644
+> > > >>--- a/include/migration/migration.h
+> > > >>+++ b/include/migration/migration.h
+> > > >>@@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
+> > > >>   * Functions to work with downtime context
+> > > >>   */
+> > > >>  struct DowntimeContext *downtime_context_new(void);
+> > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
+> > > >>+void mark_postcopy_downtime_end(uint64_t addr);
+> > > >>+uint64_t get_postcopy_total_downtime(void);
+> > > >>  struct MigrationState
+> > > >>  {
+> > > >>diff --git a/migration/migration.c b/migration/migration.c
+> > > >>index ec76e5c..2c6f150 100644
+> > > >>--- a/migration/migration.c
+> > > >>+++ b/migration/migration.c
+> > > >>@@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
+> > > >>      return atomic_xchg(&incoming_postcopy_state, new_state);
+> > > >>  }
+> > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
+> > > >>+{
+> > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > >>+    DowntimeContext *dc;
+> > > >>+    if (!mis->downtime_ctx || cpu < 0) {
+> > > >>+        return;
+> > > >>+    }
+> > > >>+    dc = mis->downtime_ctx;
+> > > >>+    dc->vcpu_addr[cpu] = addr;
+> > > >>+    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
+> > > >>+        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > >>+
+> > > >>+    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> > > >>+            cpu);
+> > > >>+}
+> > > >>+
+> > > >>+void mark_postcopy_downtime_end(uint64_t addr)
+> > > >>+{
+> > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > >>+    DowntimeContext *dc;
+> > > >>+    int i;
+> > > >>+    bool all_vcpu_down = true;
+> > > >>+    int64_t now;
+> > > >>+
+> > > >>+    if (!mis->downtime_ctx) {
+> > > >>+        return;
+> > > >>+    }
+> > > >>+    dc = mis->downtime_ctx;
+> > > >>+    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > >>+
+> > > >>+    /* check all vCPU down,
+> > > >>+     * QEMU has bitmap.h, but even with bitmap_and
+> > > >>+     * will be a cycle */
+> > > >>+    for (i = 0; i < smp_cpus; i++) {
+> > > >>+        if (dc->vcpu_addr[i]) {
+> > > >>+            continue;
+> > > >>+        }
+> > > >>+        all_vcpu_down = false;
+> > > >>+        break;
+> > > >>+    }
+> > > >>+
+> > > >>+    if (all_vcpu_down) {
+> > > >>+        dc->total_downtime += now - dc->last_begin;
+> > > >Shall we do this accouting only if we are sure the copied page address
+> > > >is one of the page faulted addresses? Can it be some other page? I
+> > > >don't know. But since we have the loop below to make sure of it, why
+> > > >not?
+> > > no, the downtime implies since page fault till the
+> > > page will be copied.
+> > > Yes another pages could be copied as well as pagefaulted,
+> > > and they are copied due to prefetching, but it's not a downtime.
+> > 
+> > Not sure I got the point... Do you mean that when reach here, then
+> > this page address is definitely one of the faulted addresses? I am not
+> > 100% sure of this, but if you are sure, I am okay with it.
+> Let me clarify.
 > 
-> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-
-> ---
->  hw/vfio/ccw.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 103 insertions(+)
+> > > >Shall we do this accouting only if we are sure the copied page address
+> > > >is one of the page faulted addresses?
+> Yes it's primary condition, due to there are could be another pages,
+> which weren't faulted, they just was sent from source to destination,
+> I called it prefetching.
 > 
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 7ddcfd7..6760cee 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -22,6 +22,7 @@
->  #include "hw/vfio/vfio-common.h"
->  #include "hw/s390x/s390-ccw.h"
->  #include "hw/s390x/ccw-device.h"
-> +#include "qemu/error-report.h"
->  
->  #define TYPE_VFIO_CCW "vfio-ccw"
->  typedef struct VFIOCCWDevice {
-> @@ -30,6 +31,7 @@ typedef struct VFIOCCWDevice {
->      uint64_t io_region_size;
->      uint64_t io_region_offset;
->      struct ccw_io_region *io_region;
-> +    EventNotifier io_notifier;
->  } VFIOCCWDevice;
->  
->  static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
-> @@ -54,6 +56,99 @@ static void vfio_ccw_reset(DeviceState *dev)
->      ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
->  }
->  
-> +static void vfio_ccw_io_notifier_handler(void *opaque)
-> +{
-> +    VFIOCCWDevice *vcdev = opaque;
-> +
-> +    if (!event_notifier_test_and_clear(&vcdev->io_notifier)) {
-> +        return;
-> +    }
-> +}
-> +
-> +static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
-> +{
-> +    VFIODevice *vdev = &vcdev->vdev;
-> +    struct vfio_irq_info *irq_info;
-> +    struct vfio_irq_set *irq_set;
-> +    size_t argsz;
-> +    int32_t *pfd;
-> +
-> +    if (vdev->num_irqs < VFIO_CCW_IO_IRQ_INDEX + 1) {
-> +        error_setg(errp, "vfio: unexpected number of io irqs %u",
-> +                   vdev->num_irqs);
-> +        return;
-> +    }
-> +
-> +    argsz = sizeof(*irq_set);
-> +    irq_info = g_malloc0(argsz);
-> +    irq_info->index = VFIO_CCW_IO_IRQ_INDEX;
-> +    irq_info->argsz = argsz;
-> +    if (ioctl(vdev->fd, VFIO_DEVICE_GET_IRQ_INFO,
-> +              irq_info) < 0 || irq_info->count < 1) {
-> +        error_setg_errno(errp, errno, "vfio: Error getting irq info");
-> +        goto get_error;
-> +    }
-> +
-> +    if (event_notifier_init(&vcdev->io_notifier, 0)) {
-> +        error_setg_errno(errp, errno,
-> +                         "vfio: Unable to init event notifier for IO");
-> +        goto get_error;
-> +    }
-> +
-> +    argsz = sizeof(*irq_set) + sizeof(*pfd);
-> +    irq_set = g_malloc0(argsz);
-> +    irq_set->argsz = argsz;
-> +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-> +                     VFIO_IRQ_SET_ACTION_TRIGGER;
-> +    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
-> +    irq_set->start = 0;
-> +    irq_set->count = 1;
-> +    pfd = (int32_t *) &irq_set->data;
-> +
-> +    *pfd = event_notifier_get_fd(&vcdev->io_notifier);
-> +    qemu_set_fd_handler(*pfd, vfio_ccw_io_notifier_handler, NULL, vcdev);
-> +    if (ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
-> +        error_setg(errp, "vfio: Failed to set up io notification");
-> +        qemu_set_fd_handler(*pfd, NULL, NULL, vcdev);
-> +        event_notifier_cleanup(&vcdev->io_notifier);
-> +        goto set_error;
-> +    }
-> +
-> +set_error:
-> +    g_free(irq_set);
-> +
-> +get_error:
-> +    g_free(irq_info);
-> +}
-> +
-> +static void vfio_ccw_unregister_io_notifier(VFIOCCWDevice *vcdev)
-> +{
-> +    struct vfio_irq_set *irq_set;
-> +    size_t argsz;
-> +    int32_t *pfd;
-> +
-> +    argsz = sizeof(*irq_set) + sizeof(*pfd);
-> +    irq_set = g_malloc0(argsz);
-> +    irq_set->argsz = argsz;
-> +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-> +                     VFIO_IRQ_SET_ACTION_TRIGGER;
-> +    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
-> +    irq_set->start = 0;
-> +    irq_set->count = 1;
-> +    pfd = (int32_t *) &irq_set->data;
-> +    *pfd = -1;
-> +
-> +    if (ioctl(vcdev->vdev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
-> +        error_report("vfio: Failed to de-assign device io fd: %m");
-> +    }
-> +
-> +    qemu_set_fd_handler(event_notifier_get_fd(&vcdev->io_notifier),
-> +                        NULL, NULL, vcdev);
-> +    event_notifier_cleanup(&vcdev->io_notifier);
-> +
-> +    g_free(irq_set);
-> +}
-> +
->  static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
->  {
->      VFIODevice *vdev = &vcdev->vdev;
-> @@ -173,8 +268,15 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
->          goto out_region_err;
->      }
->  
-> +    vfio_ccw_register_io_notifier(vcdev, &err);
-> +    if (err) {
-> +        goto out_notifier_err;
-> +    }
-> +
->      return;
->  
-> +out_notifier_err:
-> +    vfio_ccw_put_region(vcdev);
->  out_region_err:
->      vfio_put_device(vcdev);
->  out_device_err:
-> @@ -195,6 +297,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
->      S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
->      VFIOGroup *group = vcdev->vdev.group;
->  
-> +    vfio_ccw_unregister_io_notifier(vcdev);
->      vfio_ccw_put_region(vcdev);
->      vfio_put_device(vcdev);
->      vfio_put_group(group);
-> 
+> I think I got why did you ask that question, because in this version
+> all_vcpu_down and as a result total_downtime calculated incorrectly,
+> it calculates every time when any page is copied, but it should
+> be calculated only when faulted page copied, so only dc->vcpu_downtime
+> was correctly calculated.
+
+Exactly. I am afraid if we have such "prefetching" stuff then
+total_downtime will be more than its real value.
+
+-- 
+Peter Xu
