@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d7yCj-0002Vn-1K
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:01:07 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7z89-0000uk-EB
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:00:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d7yCf-0001sJ-PZ
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:01:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d7yCf-0001ry-JL
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:00:57 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6843880C0A
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 06:00:56 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Tue,  9 May 2017 14:00:42 +0800
-Message-Id: <1494309644-18743-2-git-send-email-peterx@redhat.com>
-In-Reply-To: <1494309644-18743-1-git-send-email-peterx@redhat.com>
-References: <1494309644-18743-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] kvm: irqchip: trace changes on msi
- add/remove
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7z86-0005bp-EK
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:00:21 -0400
+Received: from [59.151.112.132] (port=65234 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7z85-0005a5-FR
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:00:18 -0400
+References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1493372840-24551-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<7bde3681-280c-764a-71df-f4a1cc4b7011@redhat.com>
+	<4cc14276-55bc-2981-cbdd-4d66ae6be59e@cn.fujitsu.com>
+	<fbb4b2b1-4af2-c948-406f-e63398f4c749@redhat.com>
+	<d960c269-b68a-ffd9-5df1-b507eb4fe24d@cn.fujitsu.com>
+	<f80bed9a-598e-bb89-3a01-123bdc40e526@redhat.com>
+	<09077119-d9bb-c367-799a-a0718664cdc7@cn.fujitsu.com>
+	<97099db3-169d-178c-01ab-73194167677a@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <9fd0649c-caa0-9c4c-adf0-276a0ec6801f@cn.fujitsu.com>
+Date: Tue, 9 May 2017 14:59:55 +0800
+MIME-Version: 1.0
+In-Reply-To: <97099db3-169d-178c-01ab-73194167677a@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH V3 05/10] net/net.c: Add vnet header length
+ to SocketReadState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +35,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-It'll be nice to know which virq belongs to which device/vector when
-adding msi routes, so adding two more parameters for the add trace.
 
-Meanwhile, releasing virq has no tracing before. Add one for it.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- kvm-all.c    | 4 +++-
- trace-events | 3 ++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+On 05/09/2017 01:36 PM, Jason Wang wrote:
+>
+>
+> On 2017年05月09日 12:03, Zhang Chen wrote:
+>>
+>>
+>> On 05/09/2017 10:40 AM, Jason Wang wrote:
+>>>
+>>>
+>>> On 2017年05月08日 11:47, Zhang Chen wrote:
+>>>>
+>>>>
+>>>> On 05/03/2017 06:42 PM, Jason Wang wrote:
+>>>>>
+>>>>>
+>>>>> On 2017年05月03日 11:43, Zhang Chen wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 05/02/2017 12:53 PM, Jason Wang wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 2017年04月28日 17:47, Zhang Chen wrote:
+>>>>>>>> Address Jason Wang's comments add vnet header length to 
+>>>>>>>> SocketReadState.
+>>>>>>>
+>>>>>>> Instead of saying this, you can add "Suggested-by: Jason Wang 
+>>>>>>> <jasowang@redhat.com>" above your sign-off.
+>>>>>>
+>>>>>> OK.
+>>>>>>
+>>>>>>>
+>>>>>>>> So we change net_fill_rstate() to read
+>>>>>>>> struct  {int size; int vnet_hdr_len; const uint8_t buf[];}.
+>>>>>>>
+>>>>>>> This makes me thinking about the backward compatibility. I think 
+>>>>>>> we'd better try to keep it as much as possible. E.g how about 
+>>>>>>> pack vnet_hdr_len into higher bits of size?
+>>>>>>>
+>>>>>>
+>>>>>> Do you means split uint32_t size to uint16_t size and uint16_t 
+>>>>>> vnet_hdr_len ?
+>>>>>> If yes, we also can't keep compatibility with old version.
+>>>>>> Old code send a uint32_t size, we read it as uint16_t size is 
+>>>>>> always wrong.
+>>>>>>
+>>>>>> Thanks
+>>>>>> Zhang Chen
+>>>>>
+>>>>> Consider it's unlikely to send or receive packet >= 64K, we can 
+>>>>> reuse higher bits (e.g highest 8 bits). Then we can still read 
+>>>>> uint32_t and then check its highest 8 bits. If it was zero, we 
+>>>>> know vnet header is zero, if not it could be read as vnet header 
+>>>>> length.
+>>>>
+>>>> I got your point, but in this way, packet size must < 64K, if size 
+>>>> >=64K we still can't maintain the backward compatibility,
+>>>> For the packet sender that didn't know the potential packet size 
+>>>> limit, I think we should make code explicitly declared like
+>>>> currently code. Otherwise we will make other people confused and 
+>>>> make code difficult to maintain.
+>>>>
+>>>> Thanks
+>>>> Zhang Chen
+>>>>
+>>>
+>>> Yes, this is an possible issue in the future. Rethink about this, 
+>>> what if we just compare vnet header? Is there any issue of doing 
+>>> this? (Sorry, I remember this is a reason, but forget now).
+>>
+>> Yes, we can compare all packet with vnet header, the compare 
+>> performance is very low. but we can't parse raw packet to 
+>> tcp/udp/icmp packet, because we didn't know the vnet_hdr_len as the 
+>> offset.
+>>
+>> Thanks
+>> Zhang Chen
+>
+> Aha, so I think it's time to use the new format but:
+>
+> - probably need a new option to enable this support for filter
 
-diff --git a/kvm-all.c b/kvm-all.c
-index 90b8573..2598b1f 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -1144,6 +1144,7 @@ void kvm_irqchip_release_virq(KVMState *s, int virq)
-     }
-     clear_gsi(s, virq);
-     kvm_arch_release_virq_post(virq);
-+    trace_kvm_irqchip_release_virq(virq);
- }
- 
- static unsigned int kvm_hash_msi(uint32_t data)
-@@ -1287,7 +1288,8 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-         return -EINVAL;
-     }
- 
--    trace_kvm_irqchip_add_msi_route(virq);
-+    trace_kvm_irqchip_add_msi_route(dev ? dev->name : (char *)"N/A",
-+                                    vector, virq);
- 
-     kvm_add_routing_entry(s, &kroute);
-     kvm_arch_add_msi_route_post(&kroute, vector, dev);
-diff --git a/trace-events b/trace-events
-index e582d63..f01ec05 100644
---- a/trace-events
-+++ b/trace-events
-@@ -69,8 +69,9 @@ kvm_device_ioctl(int fd, int type, void *arg) "dev fd %d, type 0x%x, arg %p"
- kvm_failed_reg_get(uint64_t id, const char *msg) "Warning: Unable to retrieve ONEREG %" PRIu64 " from KVM: %s"
- kvm_failed_reg_set(uint64_t id, const char *msg) "Warning: Unable to set ONEREG %" PRIu64 " to KVM: %s"
- kvm_irqchip_commit_routes(void) ""
--kvm_irqchip_add_msi_route(int virq) "Adding MSI route virq=%d"
-+kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
- kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
-+kvm_irqchip_release_virq(int virq) "virq %d"
- 
- # TCG related tracing (mostly disabled by default)
- # cpu-exec.c
+Do you means we should add the new option for every filter object like that:
+Now:
+-object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0
+Feature:
+-object 
+filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0,has_vnet_hdr_len=on
+
+And colo-compare also need this option to get the vnet_hdr_len.
+
+
+> - let's don't touch socket backend, and make it still can work with 
+> filters whose vnet_hder is off
+
+OK, Maybe we can add a new variable in net_fill_rstate().
+
+Thanks
+Zhang Chen
+
+>
+> Thanks
+>
+>>
+>>>
+>>> Thanks
+>>>
+>>>
+>>> .
+>>>
+>>
+>
+>
+>
+> .
+>
+
 -- 
-2.7.4
+Thanks
+Zhang Chen
