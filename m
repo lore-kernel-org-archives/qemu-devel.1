@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d87X8-00043H-FB
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:58:43 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d87aX-0007BM-NH
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 12:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d87X7-0008Ce-Be
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:58:42 -0400
-Date: Tue, 9 May 2017 17:58:29 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170509175829.23fcc112@nial.brq.redhat.com>
-In-Reply-To: <20170508054004.GE25748@umbus.fritz.box>
-References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
-	<1493816238-33120-24-git-send-email-imammedo@redhat.com>
-	<20170508054004.GE25748@umbus.fritz.box>
+	(envelope-from <pbonzini@redhat.com>) id 1d87aT-0001Eb-9L
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 12:02:13 -0400
+References: <1493971429-10441-1-git-send-email-lidongchen@tencent.com>
+	<20170508205401.GA23989@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <43873fc6-5d32-c52e-5b37-4c77c9528d73@redhat.com>
+Date: Tue, 9 May 2017 18:01:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 23/24] numa: add '-numa cpu,
- ...' option for property based node mapping
+In-Reply-To: <20170508205401.GA23989@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pLSraVl0wWxnBTVnKiUwWgsW1uqC562gG"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4] migration/block: move
+ bdrv_is_allocated() into bb's AioContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +25,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, jemmy858585@gmail.com
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Lidong Chen <lidongchen@tencent.com>
 
-On Mon, 8 May 2017 15:40:04 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pLSraVl0wWxnBTVnKiUwWgsW1uqC562gG
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, jemmy858585@gmail.com
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org,
+ quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com,
+ Lidong Chen <lidongchen@tencent.com>
+Message-ID: <43873fc6-5d32-c52e-5b37-4c77c9528d73@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v4] migration/block: move bdrv_is_allocated()
+ into bb's AioContext
+References: <1493971429-10441-1-git-send-email-lidongchen@tencent.com>
+ <20170508205401.GA23989@stefanha-x1.localdomain>
+In-Reply-To: <20170508205401.GA23989@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, May 03, 2017 at 02:57:17PM +0200, Igor Mammedov wrote:
-> > legacy cpu to node mapping is using cpu index values to map
-> > VCPU to node with help of '-numa node,nodeid=node,cpus=x[-y]'
-> > option. However cpu index is internal concept and QEMU users
-> > have to guess /reimplement qemu's logic/ to map it to
-> > a concrete cpu socket/core/thread to make sane CPUs
-> > placement across numa nodes.
-> > 
-> > This patch allows to map cpu objects to numa nodes using
-> > the same properties as used for cpus with -device/device_add
-> > (socket-id/core-id/thread-id/node-id).
-> > 
-> > At present valid properties/values to address CPUs could be
-> > fetched using hotpluggable-cpus monitor/qmp command, it will
-> > require user to start qemu twice when creating domain to fetch
-> > possible CPUs for a machine type/-smp layout first and
-> > then the second time with numa explicit mapping for actual
-> > usage. The first step results could be saved and reused to
-> > set/change mapping later as far as machine type/-smp stays
-> > the same.
-> > 
-> > Proposed impl. supports exact and wildcard matching to
-> > simplify CLI and allow to set mapping for a specific cpu
-> > or group of cpu objects specified by matched properties.
-> > 
-> > For example:
-> > 
-> >    # exact mapping x86
-> >    -numa cpu,node-id=x,socket-id=y,core-id=z,thread-id=n
-> > 
-> >    # exact mapping SPAPR
-> >    -numa cpu,node-id=x,core-id=y
-> > 
-> >    # wildcard mapping, all cpu objects that match socket-id=y
-> >    # are mapped to node-id=x
-> >    -numa cpu,node-id=x,socket-id=y
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > v2:
-> >   - use new NumaCpuOptions instead of CpuInstanceProperties in
-> >     NumaOptions, so that in future we could decouple both
-> >     if needed. (Eduardo Habkost <ehabkost@redhat.com>)
-> >   - clarify effect of NumaCpuOptions.node-id in qapi-schema.json
-> > ---
-> >  numa.c           | 25 +++++++++++++++++++++++++
-> >  qapi-schema.json | 21 +++++++++++++++++++--
-> >  qemu-options.hx  | 23 ++++++++++++++++++++++-
-> >  3 files changed, 66 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/numa.c b/numa.c
-> > index 40e9f44..61521f5 100644
-> > --- a/numa.c
-> > +++ b/numa.c
-> > @@ -227,6 +227,7 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-> >      NumaOptions *object = NULL;
-> >      MachineState *ms = opaque;
-> >      Error *err = NULL;
-> > +    CpuInstanceProperties cpu;
-> >  
-> >      {
-> >          Visitor *v = opts_visitor_new(opts);
-> > @@ -246,6 +247,30 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-> >          }
-> >          nb_numa_nodes++;
-> >          break;
-> > +    case NUMA_OPTIONS_TYPE_CPU:
-> > +        if (!object->u.cpu.has_node_id) {
-> > +            error_setg(&err, "Missing mandatory node-id property");
-> > +            goto end;
-> > +        }
-> > +        if (!numa_info[object->u.cpu.node_id].present) {
-> > +            error_setg(&err, "Invalid node-id=%" PRId64 ", NUMA node must be "
-> > +                "defined with -numa node,nodeid=ID before it's used with "
-> > +                "-numa cpu,node-id=ID", object->u.cpu.node_id);
-> > +            goto end;
-> > +        }
-> > +
-> > +        memset(&cpu, 0, sizeof(cpu));
-> > +        cpu.has_node_id = object->u.cpu.has_node_id;
-> > +        cpu.node_id = object->u.cpu.node_id;
-> > +        cpu.has_socket_id = object->u.cpu.has_socket_id;
-> > +        cpu.socket_id = object->u.cpu.socket_id;
-> > +        cpu.has_core_id = object->u.cpu.has_core_id;
-> > +        cpu.core_id = object->u.cpu.core_id;
-> > +        cpu.has_thread_id = object->u.cpu.has_thread_id;
-> > +        cpu.thread_id = object->u.cpu.thread_id;
-> > +
-> > +        machine_set_cpu_numa_node(ms, &cpu, &err);  
-> 
-> It's possible I've confused myself by not looking at this whole series
-> at once.
-> 
-> But, would it be possible to make a single machine hook which maps a
-> constructed cpu property set to a "canonical" cpu property set from
-> the table of CPU slots (or errors, of course).  That would let you do
-> what you need here, and I suspect in other places, without multiple
-> hooks.
-Not sure that get question.
 
-if it's about machine_set_cpu_numa_node() than it's a single generic
-setter of MachineState::possible_cpus(node-id) from non machine code
-and the only place it's supposed to be used is from numa configuration
-code. I don't see any need to reuse it for something/somewhere else
-so far.
 
-More over it's not 1:1 mapping wrt input:affected slots,
-it's 1:[1-n] where input could affect multiple slots.
+On 08/05/2017 22:54, Stefan Hajnoczi wrote:
+> On Fri, May 05, 2017 at 04:03:49PM +0800, jemmy858585@gmail.com wrote:
+>> From: Lidong Chen <lidongchen@tencent.com>
+>>
+>> when block migration with high-speed, mig_save_device_bulk hold the
+>> BQL and invoke bdrv_is_allocated frequently. This patch moves
+>> bdrv_is_allocated() into bb's AioContext. It will execute without
+>> blocking other I/O activity.
+>>
+>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> ---
+>>      v4 changelog:
+>>           Use the prototype code written by Stefan and fix some bug.
+>>           moves bdrv_is_allocated() into bb's AioContext.
+>> ---
+>>  migration/block.c | 48 +++++++++++++++++++++++++++++++++++++++-------=
+--
+>>  1 file changed, 39 insertions(+), 9 deletions(-)
+>=20
+> Added Paolo because he's been reworking AioContext and locking.
+>=20
+> The goal of this patch is to avoid waiting for bdrv_is_allocated() to
+> complete while holding locks.  Do bdrv_is_allocated() in the AioContext=
 
-I think I've tried to get machine return a list of cpu slots
-and then deal with them in numa.c but result looked messy and
-not to my liking.
-Eventually I stopped on machine_set_cpu_numa_node() variant
-as the cleanest for now.
+> so event processing continues after yield.
+
+Since raw_co_get_block_status is coroutine-based I think you should
+instead use the thread pool (thread_pool_submit_co) in
+block/file-posix.c.  This way the lseek is done in a separate thread.
+
+The problem is that find_allocation() is not atomic, so you need either
+a CoMutex around raw_co_get_block_status's call to
+thread_pool_submit_co, or a QemuMutex in find_allocation itself.
+
+Thanks,
+
+Paolo
+
+>>
+>> diff --git a/migration/block.c b/migration/block.c
+>> index 060087f..c871361 100644
+>> --- a/migration/block.c
+>> +++ b/migration/block.c
+>> @@ -263,6 +263,30 @@ static void blk_mig_read_cb(void *opaque, int ret=
+)
+>>      blk_mig_unlock();
+>>  }
+>> =20
+>> +typedef struct {
+>> +    int64_t *total_sectors;
+>> +    int64_t *cur_sector;
+>> +    BlockBackend *bb;
+>> +    QemuEvent event;
+>> +} MigNextAllocatedClusterData;
+>> +
+>> +static void coroutine_fn mig_next_allocated_cluster(void *opaque)
+>> +{
+>> +    MigNextAllocatedClusterData *data =3D opaque;
+>> +    int nr_sectors;
+>> +
+>> +    /* Skip unallocated sectors; intentionally treats failure as
+>> +     * an allocated sector */
+>> +    while (*data->cur_sector < *data->total_sectors &&
+>> +           !bdrv_is_allocated(blk_bs(data->bb), *data->cur_sector,
+>> +                              MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) =
+{
+>> +        *data->cur_sector +=3D nr_sectors;
+>> +    }
+>> +
+>> +    bdrv_dec_in_flight(blk_bs(data->bb));
+>> +    qemu_event_set(&data->event);
+>> +}
+>> +
+>>  /* Called with no lock taken.  */
+>> =20
+>>  static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
+>> @@ -274,17 +298,23 @@ static int mig_save_device_bulk(QEMUFile *f, Blk=
+MigDevState *bmds)
+>>      int nr_sectors;
+>> =20
+>>      if (bmds->shared_base) {
+>> +        AioContext *bb_ctx;
+>> +        Coroutine *co;
+>> +        MigNextAllocatedClusterData data =3D {
+>> +            .cur_sector =3D &cur_sector,
+>> +            .total_sectors =3D &total_sectors,
+>> +            .bb =3D bb,
+>> +        };
+>> +        qemu_event_init(&data.event, false);
+>> +
+>>          qemu_mutex_lock_iothread();
+>> -        aio_context_acquire(blk_get_aio_context(bb));
+>> -        /* Skip unallocated sectors; intentionally treats failure as
+>> -         * an allocated sector */
+>> -        while (cur_sector < total_sectors &&
+>> -               !bdrv_is_allocated(blk_bs(bb), cur_sector,
+>> -                                  MAX_IS_ALLOCATED_SEARCH, &nr_sector=
+s)) {
+>> -            cur_sector +=3D nr_sectors;
+>> -        }
+>> -        aio_context_release(blk_get_aio_context(bb));
+>> +        bdrv_inc_in_flight(blk_bs(bb));
+>=20
+> Please add a comment explaining why bdrv_inc_in_flight() is invoked.
+>=20
+>> +        bb_ctx =3D blk_get_aio_context(bb);
+>> +        co =3D qemu_coroutine_create(mig_next_allocated_cluster, &dat=
+a);
+>> +        aio_co_schedule(bb_ctx, co);
+>>          qemu_mutex_unlock_iothread();
+>> +
+>> +        qemu_event_wait(&data.event);
+>>      }
+>> =20
+>>      if (cur_sector >=3D total_sectors) {
+>> --=20
+>> 1.8.3.1
+>>
+>>
+
+
+--pLSraVl0wWxnBTVnKiUwWgsW1uqC562gG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlkR5+0ACgkQv/vSX3jH
+roNDkAf7BdvoXJPTpPeZPRE0VPobxjiVE3I2d4YvDGRpTSYrLP6MeHTw3lulBmWi
+uMMkEpOPgUeCrmWYSOsCABrvWO/OQBMbon710iiKPHJc3a/Bk6bO20+WbTBzTmEp
+3CDQkqnat3IQQB5LBRBM7YqY1ts/JvK+cAgSU605VckrC2D/j6+6ny+6eAmw2aQp
+w/Uff9GieADsMj4AnK+7X029O+wmncfDjA8/l7FwENYV5+spKW+EjGG6CJs8p5Ql
+l7cUoNSJsIh6c4AeKu0GzuBs7CnrYFAlepL/q9dczza5djGsywlOhLDXhLloSWGN
+dj6/1Tw4TyNPdhMvOnytA/onqoUGwg==
+=Z39/
+-----END PGP SIGNATURE-----
+
+--pLSraVl0wWxnBTVnKiUwWgsW1uqC562gG--
