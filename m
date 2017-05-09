@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d878K-0002vI-Ir
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:33:05 -0400
+	(envelope-from <jcody@redhat.com>) id 1d87Jf-0006Tj-S4
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d878G-0001m3-4b
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:33:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56166)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d878F-0001l8-Rf
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:33:00 -0400
-Date: Tue, 9 May 2017 11:32:55 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170509153255.GJ16825@stefanha-x1.localdomain>
-References: <20170508141536.20690-1-stefanha@redhat.com>
-	<20170508141536.20690-5-stefanha@redhat.com>
-	<8b49e6e9-043d-e628-3c49-1433ba0b5d5e@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1d87Je-0001LV-Md
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:44:47 -0400
+Date: Tue, 9 May 2017 11:44:39 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170509154439.GA16494@localhost.localdomain>
+References: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mFHiwr52TKrxpkjc"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8b49e6e9-043d-e628-3c49-1433ba0b5d5e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 4/9] qcow2: make refcount size
- calculation conservative
+In-Reply-To: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: curl: Allow passing
+ cookies via QCryptoSecret
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +23,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Peter Krempa <pkrempa@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+On Thu, May 04, 2017 at 04:00:06PM +0200, Peter Krempa wrote:
+> Since cookies can contain sensitive data (session ID, etc ...) it is
+> desired to hide them from the prying eyes of users. Add a possibility to
+> pass them via the secret infrastructure.
+> 
+> Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1447413
+> 
+> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+> ---
+>  block/curl.c         | 24 +++++++++++++++++++++++-
+>  qapi/block-core.json | 12 ++++++++++--
+>  2 files changed, 33 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/curl.c b/block/curl.c
+> index 2708d57c2f..483640b14a 100644
+> --- a/block/curl.c
+> +++ b/block/curl.c
+> @@ -85,6 +85,7 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+>  #define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
+>  #define CURL_BLOCK_OPT_TIMEOUT "timeout"
+>  #define CURL_BLOCK_OPT_COOKIE    "cookie"
+> +#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
+>  #define CURL_BLOCK_OPT_USERNAME "username"
+>  #define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
+>  #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
+> @@ -624,6 +625,11 @@ static QemuOptsList runtime_opts = {
+>              .help = "Pass the cookie or list of cookies with each request"
+>          },
+>          {
+> +            .name = CURL_BLOCK_OPT_COOKIE_SECRET,
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "ID of secret used as cookie passed with each request"
+> +        },
+> +        {
+>              .name = CURL_BLOCK_OPT_USERNAME,
+>              .type = QEMU_OPT_STRING,
+>              .help = "Username for HTTP auth"
+> @@ -657,6 +663,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>      Error *local_err = NULL;
+>      const char *file;
+>      const char *cookie;
+> +    const char *cookie_secret;
+>      double d;
+>      const char *secretid;
+>      const char *protocol_delimiter;
+> @@ -693,7 +700,22 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>      s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY, true);
+> 
+>      cookie = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE);
+> -    s->cookie = g_strdup(cookie);
+> +    cookie_secret = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE_SECRET);
+> +
+> +    if (cookie && cookie_secret) {
+> +        error_setg(errp,
+> +                   "curl driver cannot handle both cookie and cookie secret");
+> +        goto out_noclean;
+> +    }
+> +
+> +    if (cookie_secret) {
+> +        s->cookie = qcrypto_secret_lookup_as_utf8(cookie_secret, errp);
+> +        if (!s->cookie) {
+> +            goto out_noclean;
+> +        }
+> +    } else {
+> +        s->cookie = g_strdup(cookie);
+> +    }
+> 
+>      file = qemu_opt_get(opts, CURL_BLOCK_OPT_URL);
+>      if (file == NULL) {
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 87fb747ab6..b1643d2032 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2782,11 +2782,15 @@
+>  #               "name1=content1; name2=content2;" as explained by
+>  #               CURLOPT_COOKIE(3). Defaults to no cookies.
+>  #
+> +# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
+> +#                 secure way. See @cookie for the format. (since 2.10)
+> +#
+>  # Since: 2.9
+>  ##
+>  { 'struct': 'BlockdevOptionsCurlHttp',
+>    'base': 'BlockdevOptionsCurlBase',
+> -  'data': { '*cookie': 'str' } }
+> +  'data': { '*cookie': 'str',
+> +            '*cookie-secret': 'str'} }
+> 
+>  ##
+>  # @BlockdevOptionsCurlHttps:
+> @@ -2801,12 +2805,16 @@
+>  # @sslverify:   Whether to verify the SSL certificate's validity (defaults to
+>  #               true)
+>  #
+> +# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
+> +#                 secure way. See @cookie for the format. (since 2.10)
+> +#
+>  # Since: 2.9
+>  ##
+>  { 'struct': 'BlockdevOptionsCurlHttps',
+>    'base': 'BlockdevOptionsCurlBase',
+>    'data': { '*cookie': 'str',
+> -            '*sslverify': 'bool' } }
+> +            '*sslverify': 'bool',
+> +            '*cookie-secret': 'str'} }
+> 
+>  ##
+>  # @BlockdevOptionsCurlFtp:
+> -- 
+> 2.12.2
+> 
+> 
 
---mFHiwr52TKrxpkjc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks,
 
-On Mon, May 08, 2017 at 11:26:18PM +0200, Max Reitz wrote:
-> On 08.05.2017 16:15, Stefan Hajnoczi wrote:
-> > The refcount metadata size calculation is inaccurate and can produce
-> > numbers that are too small.  This is bad because we should calculate a
-> > conservative number - one that is guaranteed to be large enough.
-> >=20
-> > This patch switches the approach to a fixed point calculation because
-> > the existing equation is hard to solve when inaccuracies are taken care
-> > of.
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Reviewed-by: Alberto Garcia <berto@igalia.com>
-> > ---
-> >  block/qcow2.c | 82 ++++++++++++++++++++++++++++++---------------------=
---------
-> >  1 file changed, 42 insertions(+), 40 deletions(-)
-> >=20
-> > diff --git a/block/qcow2.c b/block/qcow2.c
-> > index 5569b63..ff0d825 100644
-> > --- a/block/qcow2.c
-> > +++ b/block/qcow2.c
-> > @@ -2095,6 +2095,43 @@ static int preallocate(BlockDriverState *bs)
-> >      return 0;
-> >  }
-> > =20
-> > +/* qcow2_refcount_metadata_size:
-> > + * @clusters: number of clusters to refcount (including data and L1/L2=
- tables)
-> > + * @cluster_size: size of a cluster, in bytes
-> > + * @refcount_order: refcount bits power-of-2 exponent
-> > + *
-> > + * Returns: Number of bytes required for refcount blocks and table met=
-adata.
-> > + */
-> > +static int64_t qcow2_refcount_metadata_size(int64_t clusters,
-> > +                                            size_t cluster_size,
-> > +                                            int refcount_order)
-> > +{
-> > +    /*
-> > +     * Every host cluster is reference-counted, including metadata (ev=
-en
-> > +     * refcount metadata is recursively included).
-> > +     *
-> > +     * An accurate formula for the size of refcount metadata size is d=
-ifficult
-> > +     * to derive.
->=20
-> Oh, by the way:
->=20
-> https://lists.nongnu.org/archive/html/qemu-devel/2014-04/msg04820.html
->=20
-> *cough* *cough*
->=20
-> (No, this is not the formula that was used for this preallocation.
-> Otherwise, it would have been correct. O:-))
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-Interesting, I'll have to review the PDF.  I spent some time working
-through the equations when writing this patch and decided that
-ceil()/floor() make it difficult to manipulate the equations without
-sacrificing accuracy.
+Also:
 
-Stefan
+Applied to my block branch:
 
---mFHiwr52TKrxpkjc
-Content-Type: application/pgp-signature; name="signature.asc"
+git://github.com/codyprime/qemu-kvm-jtc block
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZEeEnAAoJEJykq7OBq3PIurYH/1hcvXMocCClHbbrZa7bfiXD
-1NeY0GcVoPq6x+mEBiCKrlr3xG96niXljcz594TnN6ulbE4lxRZRjls9sMxlsiau
-X+9nrgXvzIeiKZLRybh5yDWbRH/+z6nRcQtyhROXRY0BRHzqFoKnIUrEYqpjNJ17
-HCsnwSRpkHpvoEomYcCBt6YFg3u2afea4ch6Sma1/KF2hYyIx0aPxS+aVZZCYUYD
-geZjLQd/xnOc3ZUG/0gWrkYZJxy+z5UfC9U905xX2B0UXgs5QeGldJVU6FfM8X0B
-qTk3KKYsgQr1j36Eko1+cN7DLfn4OaHp2iGKwKdTylta738PO/tz+l51trdIvpE=
-=OCsj
------END PGP SIGNATURE-----
-
---mFHiwr52TKrxpkjc--
+-Jeff
