@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d8ADi-0005Db-TV
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:50:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8AEP-0005X2-1F
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:51:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1d8ADe-000891-1w
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:50:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1d8ADd-00088Y-S8
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:50:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1d8ADb-0001GE-EA
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 18:50:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 591C22E80DF
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 18:50:41 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1d8AEK-0000Fv-FQ
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:51:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37767)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8AEK-0000Fp-6I
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:51:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CD42680F9E
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 18:51:26 +0000 (UTC)
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-4-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <99e29bb5-2f6f-68a6-4ec8-4e9c445a72bd@redhat.com>
+Date: Tue, 9 May 2017 13:51:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 May 2017 18:41:28 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1689499 <1689499@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149431685971.9593.12799784331390412455.malonedeb@gac.canonical.com>
-Message-Id: <20170509184128.1974.55008.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1689499] Re: copy-storage-all/inc does not easily
- converge with load going on
+In-Reply-To: <20170509173559.31598-4-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="79EJjTsHLgo2JeTOjT87eUf45u9nXLvbH"
+Subject: Re: [Qemu-devel] [PATCH 03/17] tests: remove alt num-int cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,70 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-OK, it'll be interesting if you get something repeatable, but sometimes
-these type of bugs go and hide in a dark corner until someone trips over
-them in a more critical situation.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--79EJjTsHLgo2JeTOjT87eUf45u9nXLvbH
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: armbru@redhat.com
+Message-ID: <99e29bb5-2f6f-68a6-4ec8-4e9c445a72bd@redhat.com>
+Subject: Re: [PATCH 03/17] tests: remove alt num-int cases
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+ <20170509173559.31598-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20170509173559.31598-4-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 05/09/2017 12:35 PM, Marc-Andr=C3=A9 Lureau wrote:
+> There are no real users of this case, and it's going to be invalid afte=
+r
+> merging of QFloat and QInt use the same QNum type in the following patc=
+h.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/test-keyval.c                     |  3 ---
+>  tests/test-qobject-input-visitor.c      | 26 -------------------------=
+-
+>  tests/qapi-schema/qapi-schema-test.json |  2 --
+>  tests/qapi-schema/qapi-schema-test.out  |  8 --------
+>  4 files changed, 39 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1689499
+Is it worth adding tests/qapi-schema/alternate-num-int.json that
+attempts to create an alternate on 'int' and 'number' to (eventually)
+show that we give a decent error message at QAPI generation time that
+such a type is invalid?  Such a test would (eventually be) a negative
+replacement test for the (currently positive) test that you are deleting
+here, and make it easier to see the point in the series where we flip
+the concept from supported to rejected.
 
-Title:
-  copy-storage-all/inc does not easily converge with load going on
+That said, it doesn't have to necessarily be done at this point in the
+series (since I haven't even yet seen how QNum will look), so it doesn't
+hold up review of this particular patch.
 
-Status in QEMU:
-  Incomplete
+Also, this may interact with Eduardo's current attempt (or at least
+start of an attempt) to tighten the QAPI parser to reject alternates
+that would otherwise be ambiguous when passed through the string input
+visitor (for example, forbidding the combination of an enum starting
+with a digit in an alternate that also accepts integers).  So be aware
+that we may have some integration things to think about down the road.
 
-Bug description:
-  Hi,
-  for now this is more a report to discuss than a "bug", but I wanted to be=
- sure if there are things I might overlook.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-  I'm regularly testing the qemu's we have in Ubuntu which currently are
-  2.0, 2.5, 2.6.1, 2.8 plus a bunch of patches. And for all sorts of
-  verification upstream every now and then.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  I recently realized that the migration options around --copy-storage-[all=
-/inc] seem to have got worse at converging on migration. Although it is not=
- a hard commit that is to be found, it just seems more likely to occur the =
-newer the qemu versions is. I assume that is partially due to guest perform=
-ance optimization that keep it busy.
-  To a user it appears as a hanging migration being locked up.
 
-  But let me outline what actually happens:
-  - Setup without shared storage
-  - Migration using --copy-storage-all/--copy-storage-inc
-  - Working fine with idle guests
-  - If the guests is busy the migration does take like forever (1 vCPU that=
- are busy with 1 CPU, 1 memory and one disk hogging processes)
-  - statistically seems to trigger more likely on newer qemu's (might be a =
-red herring)
+--79EJjTsHLgo2JeTOjT87eUf45u9nXLvbH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  The background workloads are most trivial burners:
-  - cpu: md5sum /dev/urandom
-  - memory: stress-ng -m 1 --vm-keep --vm-bytes 256M
-  - disk: while /bin/true; do dd if=3D/dev/urandom of=3D/var/tmp/mjb.1 bs=
-=3D4M count=3D100; done
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  We are talking about ~1-2 minutes on qemu 2.5 (4 tries x 3
-  architectures) and 2-10+ hours on >=3Dqemu 2.6.1.
+iQEcBAEBCAAGBQJZEg+mAAoJEKeha0olJ0NqcJAIAK55xSLFXpG+Z+/k3cybr5rN
+xQOSjDFqGwhIa/ucp4IRLXFUeQ0fcBHU2cVlgTRd8B+bsY6OeS62BuX+0WJhFIvS
+RnM9FwD0+DICyJru925it/gWu7e83a6OtNAAfZ8AbkksXfql8C/hiPeJ0w+T2i0M
+gFxSurza5e5Up6MnboAB85f4+eVHbb3m521eKrgyvpeeExLtOtDFI8L0RwRvMgwc
+bpFi4ATKbw7zXaEodMcilgSwxueedsL9jaghvaVAxWRfLKfyBArnPSjrUrqOc8CA
+KMFtWXj2mL0jEwlS1rQyXqDfDka3UHAFvGJrin41N9tlpoBSP8pcXq1h4epcbgo=
+=NZKg
+-----END PGP SIGNATURE-----
 
-  I say it is likely not a bug, but more a discussion as I can easily avoid=
- hanging via either:
-  - timeouts (--timeout, ...) to abort or suspend to migrate it
-  - --auto-converge ( I had only one try, but it seemed to help by slowing =
-down the load generators)
-
-  So you might say "that is all as it should be, and the users can use
-  the further options to mitigate" and I'm all fine with that. In that
-  case the bug still serves as a "searchable" document of some kind for
-  others triggering the same case. But if anything comes to your mind
-  that need better handling around this case lets start to discuss more
-  deeply about it.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1689499/+subscriptions
+--79EJjTsHLgo2JeTOjT87eUf45u9nXLvbH--
