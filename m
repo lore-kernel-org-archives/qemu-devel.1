@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d80IR-0007kk-3Y
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:15:04 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1d80MQ-000375-CC
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d80IP-0003Rr-TM
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:15:03 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:35320)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1d80IP-0003RX-No
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:15:01 -0400
-Date: Tue, 9 May 2017 10:14:57 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170509081457.zcxvzd5spv7n4stj@aurel32.net>
-References: <20170508151707.5434-1-rth@twiddle.net>
-	<20170508151707.5434-2-rth@twiddle.net>
+	(envelope-from <eric.auger@redhat.com>) id 1d80MO-0004tx-VD
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55488)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1d80MO-0004rt-ME
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:08 -0400
+References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <40d4de10-4709-0e2b-0df0-3e9dbeddca33@redhat.com>
+Date: Tue, 9 May 2017 10:18:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170508151707.5434-2-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] target/s390x: Implement STORE
- FACILITIES LIST EXTENDED
+In-Reply-To: <20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 06/13] s390x/css: device support for
+ s390-ccw passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +29,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, alex.williamson@redhat.com, cornelia.huck@de.ibm.com, agraf@suse.com
 
-On 2017-05-08 08:17, Richard Henderson wrote:
-> At the same time, improve STORE FACILITIES LIST
-> so that we don't hard-code the list for all cpus.
+Hi
+
+On 05/05/2017 04:03, Dong Jia Shi wrote:
+> In order to support subchannels pass-through, we introduce a s390
+> subchannel device called "s390-ccw" to hold the real subchannel info.
+> The s390-ccw devices inherit from the abstract CcwDevice which connect
+> to the existing virtual-css-bus.
 > 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
 > ---
->  target/s390x/helper.h      |  2 ++
->  target/s390x/insn-data.def |  2 ++
->  target/s390x/misc_helper.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++
->  target/s390x/translate.c   | 17 ++++++++-------
->  4 files changed, 67 insertions(+), 8 deletions(-)
->
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index eca8244..5263726 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -678,3 +678,57 @@ void HELPER(per_ifetch)(CPUS390XState *env, uint64_t addr)
->      }
->  }
->  #endif
+>  hw/s390x/Makefile.objs |   1 +
+>  hw/s390x/s390-ccw.c    | 138 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-ccw.h    |  38 ++++++++++++++
+>  3 files changed, 177 insertions(+)
+>  create mode 100644 hw/s390x/s390-ccw.c
+>  create mode 100644 hw/s390x/s390-ccw.h
+> 
+> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+> index 41ac4ec..72a3d37 100644
+> --- a/hw/s390x/Makefile.objs
+> +++ b/hw/s390x/Makefile.objs
+> @@ -13,3 +13,4 @@ obj-y += ccw-device.o
+>  obj-y += s390-pci-bus.o s390-pci-inst.o
+>  obj-y += s390-skeys.o
+>  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+> +obj-y += s390-ccw.o
+> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+> new file mode 100644
+> index 0000000..b1aadcd
+> --- /dev/null
+> +++ b/hw/s390x/s390-ccw.c
+> @@ -0,0 +1,138 @@
+> +/*
+> + * s390 CCW Assignment Support
+> + *
+> + * Copyright 2017 IBM Corp
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2
+> + * or (at your option) any later version. See the COPYING file in the
+> + * top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "libgen.h"
+> +#include "hw/s390x/css.h"
+> +#include "hw/s390x/css-bridge.h"
+> +#include "s390-ccw.h"
 > +
-> +/* The maximum bit defined at the moment is 129.  */
-> +#define MAX_STFL_WORDS  3
-
-Could it be computed from S390_FEAT_MAX? in gen-features.c,
-S390_FEAT_MAX / 64 + 1 is used.
-
-> +
-> +/* Canonicalize the current cpu's features into the 64-bit words required
-> +   by STFLE.  Return the index-1 of the max word that is non-zero.  */
-> +static unsigned do_stfle(CPUS390XState *env, uint64_t words[MAX_STFL_WORDS])
+> +static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
+> +                                  char *sysfsdev,
+> +                                  Error **errp)
 > +{
-> +    S390CPU *cpu = s390_env_get_cpu(env);
-> +    const unsigned long *features = cpu->model->features;
-> +    unsigned max_bit = 0;
-> +    S390Feat feat;
+> +    unsigned int cssid, ssid, devid;
+> +    char dev_path[PATH_MAX] = {0}, *tmp;
 > +
-> +    memset(words, 0, sizeof(uint64_t) * MAX_STFL_WORDS);
-> +
-> +    for (feat = find_first_bit(features, S390_FEAT_MAX);
-> +         feat < S390_FEAT_MAX;
-> +         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1)) {
-> +        const S390FeatDef *def = s390_feat_def(feat);
-> +        if (def->type == S390_FEAT_TYPE_STFL) {
-> +            unsigned bit = def->bit;
-> +            if (bit > max_bit) {
-> +                max_bit = bit;
-> +            }
-> +            assert(bit / 64 < MAX_STFL_WORDS);
-> +            words[bit / 64] |= 1ULL << (63 - bit % 64);
-> +        }
+> +    if (!sysfsdev) {
+> +        error_setg(errp, "No host device provided");
+> +        error_append_hint(errp,
+> +                          "Use -device vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
+> +        return;
 > +    }
 > +
-> +    return max_bit / 64;
+> +    if (!realpath(sysfsdev, dev_path)) {
+> +        error_setg_errno(errp, errno, "Host device '%s' not found", sysfsdev);
+> +        return;
+> +    }
+> +
+> +    cdev->mdevid = g_strdup(basename(dev_path));
+> +
+> +    tmp = basename(dirname(dev_path));
+> +    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
+> +
+> +    cdev->hostid.cssid = cssid;
+> +    cdev->hostid.ssid = ssid;
+> +    cdev->hostid.devid = devid;
+> +    cdev->hostid.valid = true;
 > +}
-
-Is there a reason to not use s390_fill_feat_block here? I guess max_bit
-can be compute using find_last_bit. It's probably a bit less optimal,
-but if we care about STFLE performance, we should probably avoid recomputing
-the features words each time. Anyway if there is a good reason to not
-use s390_fill_feat_block, the zArch active bit should also be handled here.
-
-Otherwise it looks fine to me. It's probably a discussion for later
-patches, but should we also implement a TCG feature mask, like for
-example on PowerPC? Currently the only allowed CPU for TCG is z900,
-which makes this code almost useless. And while QEMU implements many
-features from newer CPU, some of them are missing and we don't want
-them to appear in the feature list.
-
-Aurelien
-
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+> +
+> +static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
+> +{
+> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+> +    DeviceState *parent = DEVICE(ccw_dev);
+> +    BusState *qbus = qdev_get_parent_bus(parent);
+> +    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
+> +    SubchDev *sch;
+> +    int ret;
+> +    Error *err = NULL;
+> +
+> +    s390_ccw_get_dev_info(cdev, sysfsdev, &err);
+> +    if (err) {
+> +        goto out_err_propagate;
+> +    }
+> +
+> +    sch = css_create_sch(ccw_dev->devno, false, cbus->squash_mcss, &err);
+> +    if (!sch) {
+> +        goto out_mdevid_free;
+> +    }
+> +    sch->driver_data = cdev;
+> +
+> +    ccw_dev->sch = sch;
+> +    ret = css_sch_build_schib(sch, &cdev->hostid);
+> +    if (ret) {
+> +        error_setg_errno(&err, -ret, "%s: Failed to build initial schib",
+> +                         __func__);
+> +        goto out_err;
+> +    }
+> +
+> +    ck->realize(ccw_dev, &err);
+> +    if (err) {
+> +        goto out_err;
+> +    }
+> +
+> +    css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid,
+> +                          parent->hotplugged, 1);
+> +    return;
+> +
+> +out_err:
+> +    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+> +    ccw_dev->sch = NULL;
+> +    g_free(sch);
+> +out_mdevid_free:
+> +    g_free(cdev->mdevid);
+> +out_err_propagate:
+> +    error_propagate(errp, err);
+> +}
+> +
+> +static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
+> +{
+> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+> +    SubchDev *sch = ccw_dev->sch;
+> +
+> +    if (sch) {
+> +        css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+> +        g_free(sch);
+> +        ccw_dev->sch = NULL;
+> +    }
+> +
+> +    g_free(cdev->mdevid);
+> +}
+> +
+> +static void s390_ccw_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_CLASS(klass);
+> +
+> +    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
+> +    cdc->realize = s390_ccw_realize;
+> +    cdc->unrealize = s390_ccw_unrealize;
+> +}
+> +
+> +static const TypeInfo s390_ccw_info = {
+> +    .name          = TYPE_S390_CCW,
+> +    .parent        = TYPE_CCW_DEVICE,
+> +    .instance_size = sizeof(S390CCWDevice),
+> +    .class_size    = sizeof(S390CCWDeviceClass),
+> +    .class_init    = s390_ccw_class_init,
+> +    .abstract      = true,
+> +};
+> +
+> +static void register_s390_ccw_type(void)
+> +{
+> +    type_register_static(&s390_ccw_info);
+> +}
+> +
+> +type_init(register_s390_ccw_type)
+> diff --git a/hw/s390x/s390-ccw.h b/hw/s390x/s390-ccw.h
+> new file mode 100644
+> index 0000000..b58d8e9
+> --- /dev/null
+> +++ b/hw/s390x/s390-ccw.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * s390 CCW Assignment Support
+> + *
+> + * Copyright 2017 IBM Corp.
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#ifndef HW_S390_CCW_H
+> +#define HW_S390_CCW_H
+> +
+> +#include "hw/s390x/ccw-device.h"
+> +
+> +#define TYPE_S390_CCW "s390-ccw"
+> +#define S390_CCW_DEVICE(obj) \
+> +    OBJECT_CHECK(S390CCWDevice, (obj), TYPE_S390_CCW)
+> +#define S390_CCW_DEVICE_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(S390CCWDeviceClass, (klass), TYPE_S390_CCW)
+> +#define S390_CCW_DEVICE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(S390CCWDeviceClass, (obj), TYPE_S390_CCW)
+> +
+> +typedef struct S390CCWDevice {
+> +    CcwDevice parent_obj;
+> +    CssDevId hostid;
+> +    char *mdevid;
+> +} S390CCWDevice;
+> +
+> +typedef struct S390CCWDeviceClass {
+> +    CCWDeviceClass parent_class;
+> +    void (*realize)(S390CCWDevice *dev, char *sysfsdev, Error **errp);
+> +    void (*unrealize)(S390CCWDevice *dev, Error **errp);
+> +} S390CCWDeviceClass;
+> +
+> +#endif
+> 
