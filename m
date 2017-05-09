@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d7yCj-0002WU-UV
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:01:03 -0400
+	(envelope-from <peterx@redhat.com>) id 1d7yCn-0002Zm-FY
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d7yCj-0001tC-7E
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:01:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41654)
+	(envelope-from <peterx@redhat.com>) id 1d7yCm-0001u1-Fi
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:01:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d7yCi-0001st-VG
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:01:01 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d7yCm-0001ts-9r
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 02:01:04 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CAADA85547
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 06:00:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 329174E334
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 06:01:03 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  9 May 2017 14:00:43 +0800
-Message-Id: <1494309644-18743-3-git-send-email-peterx@redhat.com>
+Date: Tue,  9 May 2017 14:00:44 +0800
+Message-Id: <1494309644-18743-4-git-send-email-peterx@redhat.com>
 In-Reply-To: <1494309644-18743-1-git-send-email-peterx@redhat.com>
 References: <1494309644-18743-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] msix: trace control bit write op
+Subject: [Qemu-devel] [PATCH v2 3/3] kvm: irqchip: skip update msi when
+ disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +33,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
 
-Meanwhile, abstract a function to detect msix masked bit.
+It's possible that one device kept its irqfd/virq there even when
+MSI/MSIX was disabled globally for that device. One example is
+virtio-net-pci (see commit f1d0f15a6 and virtio_pci_vq_vector_mask()).
+It is used as a fast path to avoid allocate/release irqfd/virq
+frequently when guest enables/disables MSIX.
+
+However, this fast path brought a problem to msi_route_list, that the
+device MSIRouteEntry is still dangling there even if MSIX disabled -
+then we cannot know which message to fetch, even if we can, the messages
+are meaningless. In this case, we can just simply ignore this entry.
+
+It's safe, since when MSIX is enabled again, we'll rebuild them no
+matter what.
+
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1448813
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/pci/msix.c       | 11 +++++++++--
- hw/pci/trace-events |  3 +++
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ target/i386/kvm.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index bb54e8b..fc5fe51 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -22,6 +22,7 @@
- #include "hw/xen/xen.h"
- #include "qemu/range.h"
- #include "qapi/error.h"
-+#include "trace.h"
- 
- #define MSIX_CAP_LENGTH 12
- 
-@@ -130,10 +131,14 @@ static void msix_handle_mask_update(PCIDevice *dev, int vector, bool was_masked)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 55865db..554950d 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -43,6 +43,7 @@
+ #include "standard-headers/asm-x86/hyperv.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msi.h"
++#include "hw/pci/msix.h"
+ #include "migration/migration.h"
+ #include "exec/memattrs.h"
+ #include "trace.h"
+@@ -3510,12 +3511,16 @@ static void kvm_update_msi_routes_all(void *private, bool global,
+     int cnt = 0;
+     MSIRouteEntry *entry;
+     MSIMessage msg;
++    PCIDevice *dev;
++
+     /* TODO: explicit route update */
+     QLIST_FOREACH(entry, &msi_route_list, list) {
+-        cnt++;
+-        msg = pci_get_msi_message(entry->dev, entry->vector);
+-        kvm_irqchip_update_msi_route(kvm_state, entry->virq,
+-                                     msg, entry->dev);
++        dev = entry->dev;
++        if (!msix_enabled(dev) && !msi_enabled(dev)) {
++            continue;
++        }
++        msg = pci_get_msi_message(dev, entry->vector);
++        kvm_irqchip_update_msi_route(kvm_state, entry->virq, msg, dev);
      }
- }
- 
-+static bool msix_masked(PCIDevice *dev)
-+{
-+    return dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] & MSIX_MASKALL_MASK;
-+}
-+
- static void msix_update_function_masked(PCIDevice *dev)
- {
--    dev->msix_function_masked = !msix_enabled(dev) ||
--        (dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] & MSIX_MASKALL_MASK);
-+    dev->msix_function_masked = !msix_enabled(dev) || msix_masked(dev);
- }
- 
- /* Handle MSI-X capability config write. */
-@@ -148,6 +153,8 @@ void msix_write_config(PCIDevice *dev, uint32_t addr,
-         return;
-     }
- 
-+    trace_msix_write_config(dev->name, msix_enabled(dev), msix_masked(dev));
-+
-     was_masked = dev->msix_function_masked;
-     msix_update_function_masked(dev);
- 
-diff --git a/hw/pci/trace-events b/hw/pci/trace-events
-index 2b9cf24..83c8f5a 100644
---- a/hw/pci/trace-events
-+++ b/hw/pci/trace-events
-@@ -7,3 +7,6 @@ pci_update_mappings_add(void *d, uint32_t bus, uint32_t slot, uint32_t func, int
- # hw/pci/pci_host.c
- pci_cfg_read(const char *dev, unsigned devid, unsigned fnid, unsigned offs, unsigned val) "%s %02u:%u @0x%x -> 0x%x"
- pci_cfg_write(const char *dev, unsigned devid, unsigned fnid, unsigned offs, unsigned val) "%s %02u:%u @0x%x <- 0x%x"
-+
-+# hw/pci/msix.c
-+msix_write_config(char *name, bool enabled, bool masked) "dev %s enabled %d masked %d"
+     kvm_irqchip_commit_routes(kvm_state);
+     trace_kvm_x86_update_msi_routes(cnt);
 -- 
 2.7.4
