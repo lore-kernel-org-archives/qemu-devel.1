@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d89lC-0002AS-1f
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:21:22 -0400
+	(envelope-from <thuth@redhat.com>) id 1d89oc-0003lS-9b
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d89lB-0002Zz-4c
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:21:22 -0400
-References: <20170509180946.17046-1-jsnow@redhat.com>
-	<0a25ed7b-174f-1860-cef4-d141b5de3d64@redhat.com>
-	<09281d7d-82f1-fdd8-5f03-669f13b2f09d@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a52155cb-bba7-96ad-9735-a952a3a25d46@redhat.com>
-Date: Tue, 9 May 2017 14:21:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1d89ob-0004R5-Gn
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:24:54 -0400
+References: <20170508233918.9043-1-f4bug@amsat.org>
+	<20170508233918.9043-3-f4bug@amsat.org>
+	<2cd1e7a1-7f92-88a2-cf98-0dcea0a2f9b1@redhat.com>
+	<f7e86a1d-f53e-5dfa-e8d2-5dd2e860879a@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <66e1f05c-36d0-9d80-1b57-4b21e9387b2a@redhat.com>
+Date: Tue, 9 May 2017 20:24:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <09281d7d-82f1-fdd8-5f03-669f13b2f09d@redhat.com>
+In-Reply-To: <f7e86a1d-f53e-5dfa-e8d2-5dd2e860879a@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: Check for backing image if
- specified during create
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 02/11] hw/pci: define msi_nonbroken in
+ pci-stub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-arm@nongnu.org
 
+ Hi Philippe,
 
-
-On 05/09/2017 02:19 PM, Eric Blake wrote:
-> On 05/09/2017 01:17 PM, Eric Blake wrote:
->> On 05/09/2017 01:09 PM, John Snow wrote:
->>> Or, rather, force the open of a backing image if one was specified
->>> for creation. Using a similar -unsafe option as rebase, allow qemu-img
->>> to ignore the backing file validation if possible.
->>>
-> 
->>> +++ b/qemu-img.c
->>> @@ -145,9 +145,11 @@ static void QEMU_NORETURN help(void)
->>>             "  'snapshot_id_or_name' is deprecated, use 'snapshot_param'\n"
->>>             "    instead\n"
->>>             "  '-c' indicates that target image must be compressed (qcow format only)\n"
->>> -           "  '-u' enables unsafe rebasing. It is assumed that old and new backing file\n"
->>> -           "       match exactly. The image doesn't need a working backing file before\n"
->>> -           "       rebasing in this case (useful for renaming the backing file)\n"
->>> +           "  '-u' allows unsafe backing chains. For rebasing, it is assumed that old and new\n"
->>> +           "       backing file match exactly. The image doesn't need a working backing file\n"
->>> +           "       before rebasing in this case (useful for renaming the backing file)\n"
-> 
-> Also, a '.' to end this sentence would be nice.
-> 
-
-d'oh.
-
-I can respin if that's more convenient, as I am assuming Max or Kevin
-will have something to say.
-
-If not, either edit it if that's easier, or ask me to re-spin.
-
->>> +           "       For image creation, allow creating without attempting to"
+On 09.05.2017 18:49, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 05/09/2017 02:19 AM, Thomas Huth wrote:
+>> On 09.05.2017 01:39, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> This field is accessed in hw/intc/arm_gicv[23*].c
 >>
->> Missing \n
+>> default-configs/arm-softmmu.mak sets CONFIG_PCI, so this should not be
+>> necessary, I think. Otherwise, you should extend your patch descriptio=
+n,
+>> to elaborate on what you're trying to do here.
 >>
->> With that fixed,
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
-> 
+>>  Thomas
+>=20
+> Sure, I'm willing to add basic support for the TI Hercules MCU which is
+> a big endian SoC (without PCI support).
+>=20
+> I'm using the following config:
+>=20
+> $ cat default-configs/armeb-softmmu.mak
+
+$ cat default-configs/armeb-softmmu.mak
+cat: default-configs/armeb-softmmu.mak: No such file or directory
+
+... so you're planning for a new armeb config file here? That's the kind
+of information that I was missing in the patch description.
+
+[...]
+> As I understand the 'msi_nonbroken' is a kludge (there is no intrinsic
+> relationship between PCI/MSI and this particular interrupt controller).
+> Since it is declared as extern in "hw/pci/msi.h" why not define it in
+> pci-stub?
+
+Sure, your patch is fine, IMHO it just lacks some rationale in its
+description.
+
+ Thomas
