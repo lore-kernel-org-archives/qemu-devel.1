@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d86iU-0007NX-Pd
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:06:24 -0400
+	(envelope-from <stefanha@redhat.com>) id 1d86j6-0007hj-Dz
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:07:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d86iR-00089V-Kv
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:06:22 -0400
-Date: Tue, 9 May 2017 17:06:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170509150605.GG5243@noname.str.redhat.com>
-References: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1d86j0-0008Rf-Pc
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:07:00 -0400
+Date: Tue, 9 May 2017 11:06:45 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170509150645.GG16825@stefanha-x1.localdomain>
+References: <20170508180705.20609-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="f5QefDQHtn8hx44O"
 Content-Disposition: inline
-In-Reply-To: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: curl: Allow passing
- cookies via QCryptoSecret
+In-Reply-To: <20170508180705.20609-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] aio: add missing aio_notify() to
+ aio_enable_external()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,126 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, jcody@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Am 04.05.2017 um 16:00 hat Peter Krempa geschrieben:
-> Since cookies can contain sensitive data (session ID, etc ...) it is
-> desired to hide them from the prying eyes of users. Add a possibility to
-> pass them via the secret infrastructure.
-> 
-> Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1447413
-> 
-> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
 
-I didn't really look at the patch, just adding a maintainer CC:
+--f5QefDQHtn8hx44O
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-$ scripts/get_maintainer.pl -f block/curl.c
-Jeff Cody <jcody@redhat.com> (supporter:CURL)
-...
+On Mon, May 08, 2017 at 02:07:05PM -0400, Stefan Hajnoczi wrote:
+> The main loop uses aio_disable_external()/aio_enable_external() to
+> temporarily disable processing of external AioContext clients like
+> device emulation.
+>=20
+> This allows monitor commands to quiesce I/O and prevent the guest from
+> submitting new requests while a monitor command is in progress.
+>=20
+> The aio_enable_external() API is currently broken when an IOThread is in
+> aio_poll() waiting for fd activity when the main loop re-enables
+> external clients.  Incrementing ctx->external_disable_cnt does not wake
+> the IOThread from ppoll(2) so fd processing remains suspended and leads
+> to unresponsive emulated devices.
+>=20
+> This patch adds an aio_notify() call to aio_enable_external() so the
+> IOThread is kicked out of ppoll(2) and will re-arm the file descriptors.
+>=20
+> The bug can be reproduced as follows:
+>=20
+>   $ qemu -M accel=3Dkvm -m 1024 \
+>          -object iothread,id=3Diothread0 \
+>          -device virtio-scsi-pci,iothread=3Diothread0,id=3Dvirtio-scsi-pc=
+i0 \
+>          -drive if=3Dnone,id=3Ddrive0,aio=3Dnative,cache=3Dnone,format=3D=
+raw,file=3Dtest.img \
+>          -device scsi-hd,id=3Dscsi-hd0,drive=3Ddrive0 \
+>          -qmp tcp::5555,server,nowait
+>=20
+>   $ scripts/qmp/qmp-shell localhost:5555
+>   (qemu) blockdev-snapshot-sync device=3Ddrive0 snapshot-file=3Dsn1.qcow2
+>          mode=3Dabsolute-paths format=3Dqcow2
+>=20
+> After blockdev-snapshot-sync completes the SCSI disk will be
+> unresponsive.  This leads to request timeouts inside the guest.
+>=20
+> Reported-by: Qianqian Zhu <qizhu@redhat.com>
+> Suggested-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> v3:
+>  * s/dec_fetch/fetch_dec/ [Fam]
+> ---
+>  include/block/aio.h | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 
-Kevin
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
->  block/curl.c         | 24 +++++++++++++++++++++++-
->  qapi/block-core.json | 12 ++++++++++--
->  2 files changed, 33 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/curl.c b/block/curl.c
-> index 2708d57c2f..483640b14a 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -85,6 +85,7 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
->  #define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
->  #define CURL_BLOCK_OPT_TIMEOUT "timeout"
->  #define CURL_BLOCK_OPT_COOKIE    "cookie"
-> +#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
->  #define CURL_BLOCK_OPT_USERNAME "username"
->  #define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
->  #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
-> @@ -624,6 +625,11 @@ static QemuOptsList runtime_opts = {
->              .help = "Pass the cookie or list of cookies with each request"
->          },
->          {
-> +            .name = CURL_BLOCK_OPT_COOKIE_SECRET,
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "ID of secret used as cookie passed with each request"
-> +        },
-> +        {
->              .name = CURL_BLOCK_OPT_USERNAME,
->              .type = QEMU_OPT_STRING,
->              .help = "Username for HTTP auth"
-> @@ -657,6 +663,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      Error *local_err = NULL;
->      const char *file;
->      const char *cookie;
-> +    const char *cookie_secret;
->      double d;
->      const char *secretid;
->      const char *protocol_delimiter;
-> @@ -693,7 +700,22 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY, true);
-> 
->      cookie = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE);
-> -    s->cookie = g_strdup(cookie);
-> +    cookie_secret = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE_SECRET);
-> +
-> +    if (cookie && cookie_secret) {
-> +        error_setg(errp,
-> +                   "curl driver cannot handle both cookie and cookie secret");
-> +        goto out_noclean;
-> +    }
-> +
-> +    if (cookie_secret) {
-> +        s->cookie = qcrypto_secret_lookup_as_utf8(cookie_secret, errp);
-> +        if (!s->cookie) {
-> +            goto out_noclean;
-> +        }
-> +    } else {
-> +        s->cookie = g_strdup(cookie);
-> +    }
-> 
->      file = qemu_opt_get(opts, CURL_BLOCK_OPT_URL);
->      if (file == NULL) {
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 87fb747ab6..b1643d2032 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2782,11 +2782,15 @@
->  #               "name1=content1; name2=content2;" as explained by
->  #               CURLOPT_COOKIE(3). Defaults to no cookies.
->  #
-> +# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
-> +#                 secure way. See @cookie for the format. (since 2.10)
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttp',
->    'base': 'BlockdevOptionsCurlBase',
-> -  'data': { '*cookie': 'str' } }
-> +  'data': { '*cookie': 'str',
-> +            '*cookie-secret': 'str'} }
-> 
->  ##
->  # @BlockdevOptionsCurlHttps:
-> @@ -2801,12 +2805,16 @@
->  # @sslverify:   Whether to verify the SSL certificate's validity (defaults to
->  #               true)
->  #
-> +# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
-> +#                 secure way. See @cookie for the format. (since 2.10)
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttps',
->    'base': 'BlockdevOptionsCurlBase',
->    'data': { '*cookie': 'str',
-> -            '*sslverify': 'bool' } }
-> +            '*sslverify': 'bool',
-> +            '*cookie-secret': 'str'} }
-> 
->  ##
->  # @BlockdevOptionsCurlFtp:
-> -- 
-> 2.12.2
-> 
-> 
+Stefan
+
+--f5QefDQHtn8hx44O
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZEdsFAAoJEJykq7OBq3PIyMQH/REGMPf5DwTtJZN1n01gc4K7
+Kccmt3WSk7Iy2v1whJyqwawJ5WYHiWuQvih65ShdkcwIAJDibETPFUWnlq2SIFT8
+O+qIcLZ+QeivqNz0GgTLGiRwecVe/rxFXfdgGIfotigJtHVaEh2l43L8kReTSImP
+5HJNh+pLr+/eelI1iPyZm8MnGolbKeEMgUcCcB1/ckzwb8OFwSGQvcWA2+8MAsOs
+ha/3rGyC8fieAr6Xpw2M+EPgGegTv4qdXsnTI43d4IKQnoDwii4GN9PYe61p+/vM
+PdtX59kjuUNA6GzypJbez0M6uHki7GkeaqoqexbPJA/1bEYUicEZGz5IozKrYPA=
+=qwah
+-----END PGP SIGNATURE-----
+
+--f5QefDQHtn8hx44O--
