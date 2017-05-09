@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d83aY-0007K9-00
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:45:58 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d83gx-0002mV-1W
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d83aU-0007Db-QB
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:45:57 -0400
-Date: Tue, 9 May 2017 19:45:45 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170509114545.GN2820@pxdev.xzpeter.org>
-References: <20170505101930.45837-1-aik@ozlabs.ru>
-	<20170509091451.GJ2820@pxdev.xzpeter.org>
-	<2d7d85cc-a90e-fba1-ede9-2b71c7f68224@ozlabs.ru>
+	(envelope-from <ehabkost@redhat.com>) id 1d83gu-000187-0C
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:52:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d83gt-00016b-NO
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:52:31 -0400
+Date: Tue, 9 May 2017 08:52:28 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170509115228.GA3482@thinpad.lan.raisama.net>
+References: <20170509112034.23351-1-berrange@redhat.com>
+	<20170509112034.23351-3-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2d7d85cc-a90e-fba1-ede9-2b71c7f68224@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v6] memory/iommu: QOM'fy IOMMU
- MemoryRegion
+In-Reply-To: <20170509112034.23351-3-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386: expose "TCGTCGTCGTCG" in the
+ 0x40000000 CPUID leaf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +28,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, May 09, 2017 at 09:34:34PM +1000, Alexey Kardashevskiy wrote:
-> On 09/05/17 19:14, Peter Xu wrote:
+On Tue, May 09, 2017 at 12:20:34PM +0100, Daniel P. Berrange wrote:
+> Currently when running KVM, we expose "KVMKVMKVM\0\0\0" in
+> the 0x40000000 CPUID leaf. Other hypervisors (VMWare,
+> HyperV, Xen, BHyve) all do the same thing, which leaves
+> TCG as the odd one out.
 > 
-> >> +void memory_region_init_iommu(IOMMUMemoryRegion *iommu_mr,
-> >> +                              Object *owner,
-> >> +                              const MemoryRegionIOMMUOps *ops,
-> >> +                              const char *name,
-> >> +                              uint64_t size)
-> >> +{
-> >> +    memory_region_init_iommu_type(TYPE_IOMMU_MEMORY_REGION, iommu_mr,
-> >> +                                  owner, ops, name, size);
-> > 
-> > I see that memory_region_init_iommu_type() is only used to create
-> > TYPE_IOMMU_MEMORY_REGION typed MRs. Then would
-> > memory_region_init_iommu() enough for us? Or do you have plan to add
-> > new memory region types?
+> The CPUID signature is used by software to detect which
+> virtual environment they are running in and (potentially)
+> change behaviour in certain ways. For example, systemd
+> supports a ConditionVirtualization= setting in unit files.
+> The virt-what command can also report the virt type it is
+> running on
 > 
-> Yes, I am still thinking of adding TYPE_SPAPR_TCE_IOMMU_MEMORY_REGION
-> later, for strict types checking when enabling in-kernel DMA operations
-> support (our SPAPR thingy).
+> Currently both these apps have to resort to custom hacks
+> like looking for 'fw-cfg' entry in the /proc/device-tree
+> file to identify TCG.
+> 
+> This change thus proposes a signature "TCGTCGTCGTCG" to be
+> reported when running under TCG.
+> 
+> To hide this, the -cpu option tcg-cpuid=off can be used.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  include/hw/i386/pc.h |  5 +++++
+>  target/i386/cpu.c    | 22 ++++++++++++++++++++++
+>  target/i386/cpu.h    |  1 +
+>  3 files changed, 28 insertions(+)
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index f278b3a..3aec60f 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -376,6 +376,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>  #define PC_COMPAT_2_8 \
+>      HW_COMPAT_2_8 \
+>      {\
+> +        .driver   = TYPE_X86_CPU,\
+> +        .property = "tcg-cpuid",\
+> +        .value    = "off",\
+> +    },\
+> +    {\
+>          .driver   = "kvmclock",\
+>          .property = "x-mach-use-reliable-get-clock",\
+>          .value    = "off",\
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 8cb4af4..ee4f515 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2627,12 +2627,15 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>      CPUState *cs = CPU(cpu);
+>      uint32_t pkg_offset;
+>      uint32_t limit;
+> +    uint32_t signature[3];
+>  
+>      /* Calculate & apply limits for different index ranges */
+>      if (index >= 0xC0000000) {
+>          limit = env->cpuid_xlevel2;
+>      } else if (index >= 0x80000000) {
+>          limit = env->cpuid_xlevel;
+> +    } else if (index & 0x40000000) {
 
-I see. Then this looks okay to me. Thanks,
+Why did you decide to use (index & 0x40000000) instead of
+(index >= 0x40000000)? The latter would be more consistent with
+the rest of the code.
+
+
+> +        limit = 0x40000000;
+
+This is not strictly wrong, but it will make CPUID[0x40000001]
+return arbitrary bits (CPUID[env->cpuid_level]). Guests aren't
+supposed to look at CPUID[0x40000001] without checking
+CPUID[0x40000000] first, but probably it's safer to set
+limit = 0x40000001 and return all-zeroes on CPUID[0x40000001],
+just in case.
+
+>      } else {
+>          limit = env->cpuid_level;
+>      }
+> @@ -2867,6 +2870,24 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          }
+>          break;
+>      }
+> +    case 0x40000000:
+> +        /*
+> +         * CPUID code in kvm_arch_init_vcpu() ignores stuff
+> +         * set here, but we restrict to TCG none the less.
+> +         */
+> +        if (tcg_enabled() && cpu->expose_tcg) {
+> +            memcpy(signature, "TCGTCGTCGTCG", 12);
+> +            *eax = 0;
+
+On both KVM and Hyper-V, CPUID[0x40000000].EAX is the maximum
+CPUID function. KVM has the additional exception that eax=0 on
+the output is interpreted as 0x40000001.
+
+Setting this to 0x40000000 or 0x40000001 would make things more
+consistent for guests. Setting it to 0x40000001 would make it
+safer (see my other comment above).
+
+
+> +            *ebx = signature[0];
+> +            *ecx = signature[1];
+> +            *edx = signature[2];
+> +        } else {
+> +            *eax = 0;
+> +            *ebx = 0;
+> +            *ecx = 0;
+> +            *edx = 0;
+> +        }
+> +        break;
+>      case 0x80000000:
+>          *eax = env->cpuid_xlevel;
+>          *ebx = env->cpuid_vendor1;
+> @@ -4008,6 +4029,7 @@ static Property x86_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
+>                       false),
+>      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+> +    DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index c4602ca..c25f0ce 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1216,6 +1216,7 @@ struct X86CPU {
+>      bool check_cpuid;
+>      bool enforce_cpuid;
+>      bool expose_kvm;
+> +    bool expose_tcg;
+>      bool migratable;
+>      bool max_features; /* Enable all supported features automatically */
+>      uint32_t apic_id;
+> -- 
+> 2.9.3
+> 
 
 -- 
-Peter Xu
+Eduardo
