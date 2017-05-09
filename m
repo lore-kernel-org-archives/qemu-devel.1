@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d7wlT-000399-As
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:28:48 -0400
+	(envelope-from <4345099@qq.com>) id 1d7wpe-0005zT-GX
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:33:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d7wlS-00024V-Eq
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:28:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54170)
+	(envelope-from <4345099@qq.com>) id 1d7wpb-0004r8-E0
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:33:06 -0400
+Received: from smtpproxy19.qq.com ([184.105.206.84]:43438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d7wlS-00023z-92
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:28:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4157088E60
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 04:28:45 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Tue,  9 May 2017 12:28:28 +0800
-Message-Id: <1494304108-9805-4-git-send-email-peterx@redhat.com>
-In-Reply-To: <1494304108-9805-1-git-send-email-peterx@redhat.com>
-References: <1494304108-9805-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] kvm: irqchip: skip update msi when disabled
+	(Exim 4.71) (envelope-from <4345099@qq.com>) id 1d7wpa-0004pR-QD
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:33:03 -0400
+From: "=?ISO-8859-1?B?aGVhdnliaXJk?=" <4345099@qq.com>
+Mime-Version: 1.0
+Date: Tue, 9 May 2017 12:32:57 +0800
+Message-ID: <tencent_025CFFC03619731459E0872A@qq.com>
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel]  timer configure for QEMU versatilepb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
+To: =?ISO-8859-1?B?UGV0ZXIgTWF5ZGVsbA==?= <peter.maydell@linaro.org>
+Cc: =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
 
-It's possible that one device kept its irqfd/virq there even when
-MSI/MSIX was disabled globally for that device. One example is
-virtio-net-pci (see commit f1d0f15a6 and virtio_pci_vq_vector_mask()).
-It is used as a fast path to avoid allocate/release irqfd/virq
-frequently when guest enables/disables MSIX.
-
-However, this fast path brought a problem to msi_route_list, that the
-device MSIRouteEntry is still dangling there even if MSIX disabled -
-then we cannot know which message to fetch, even if we can, the messages
-are meaningless. In this case, we can just simply ignore this entry.
-
-It's safe, since when MSIX is enabled again, we'll rebuild them no
-matter what.
-
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1448813
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- target/i386/kvm.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 55865db..3a85b54 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -3510,12 +3510,16 @@ static void kvm_update_msi_routes_all(void *private, bool global,
-     int cnt = 0;
-     MSIRouteEntry *entry;
-     MSIMessage msg;
-+    PCIDevice *dev;
-+
-     /* TODO: explicit route update */
-     QLIST_FOREACH(entry, &msi_route_list, list) {
--        cnt++;
--        msg = pci_get_msi_message(entry->dev, entry->vector);
--        kvm_irqchip_update_msi_route(kvm_state, entry->virq,
--                                     msg, entry->dev);
-+        dev = entry->dev;
-+        if (!msix_enabled(dev) && !msi_enabled(dev)) {
-+            continue;
-+        }
-+        msg = pci_get_msi_message(dev, entry->vector);
-+        kvm_irqchip_update_msi_route(kvm_state, entry->virq, msg, dev);
-     }
-     kvm_irqchip_commit_routes(kvm_state);
-     trace_kvm_x86_update_msi_routes(cnt);
--- 
-2.7.4
+SGkgUGV0ZXIgYW5kIHFlbXUtZGV2ZWwsDQoNCkkgYW0gdHJ5aW5nIHRvIHBvcnQgb25lIHNp
+bXBsZSBSVE9TIHRvIFFFTVUgdmVyc2F0aWxlcGIsICBob3dldmVyLCBpIGZvdW5kIHRoZSBT
+SUMgYWRkcmVzcyhhY3R1YWxseSBQSUMpIGlzIGRpZmZlcmVudCBmcm9tIHRoZSBQSUMgaW4g
+dGhlIGludGVncmF0b3JjcC5jIGV2ZW4gdGhvdWdoIHRoZXkgYXJlIHNhbWUgYXJtOTI2LCBi
+ZXNpZGVzLCB0aGUgUElDIHJlZ2lzdGVyIGJpdCBkZWZpbml0aW9uIGlzIHNvbWUgZGlmZmVy
+ZW50IGJldHdlZW4gdmVyc2F0aWxlcGIgYW5kIGludGVncmF0b3JjcCBjb21wYXJlZCBieSB0
+aGUgaWNwX3BpY19yZWFkL2ljcF9waWNfcmVhZCBpbnRlcmZhY2UuDQoNCjEgYWRkcmVzcyBk
+ZWZmZXJlbnQgYmV0d2VlbiB2ZXJzYXRpbGVwYiBhbmQgaW50ZWdyYXRvcmNwDQogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJzYXRpbGVwYiAgICAgICAg
+IGludGVncmF0b3JjcA0KVElNRVJfMCBhZHJlc3MgICAgICAgICAgICAgMHgxMDFlMjAwMCAg
+ICAgICAweDEzMDAwMDAwDQpBRERSRVNTX1BJQyAgICAgICAgICAgICAgICAgMHgxMDAwMzAw
+MCAgICAgMHgxNDAwMDAwMA0KDQppIGhhZCB0cmllZCB0aGUgMiBhZGRyZXNzIGFib3ZlIHRv
+IHR1cm4gb24gdGhlIHRpbWVyMCBidXQgaXQgaXMgZmFpbGVkIHdpdGggdmVyc2F0aWxlcGIs
+IGl0IGlzIG9rIHRvIHR1cm4gb24gdGhlIGludGVncmF0b3JjcCB0aW1lcjAgd2l0aCAweDEz
+MDAwMDAwIHRpbWVyMCBhZGRyIGFuZCAweDE0MDAwMDAwIGZvciBQSUMuDQoNCjIgUElDIHJl
+Z2lzdGVyIGJpdCBkaWZmZXJlbmNlIGFmdGVyIGJpdDgNCg0KDQoyLjEgaW50ZXJncmF0b3Jj
+cCBkZWZpbml0aW9uDQogICAgY2FzZSA4OiAvKiBGUlFfU1RBVFVTICovDQogICAgICAgIHJl
+dHVybiBzLT5sZXZlbCAmIHMtPmZpcV9lbmFibGVkOw0KICAgIGNhc2UgOTogLyogRlJRX1JB
+V1NUQVQgKi8NCiAgICAgICAgcmV0dXJuIHMtPmxldmVsOw0KICAgIGNhc2UgMTA6IC8qIEZS
+UV9FTkFCTEVTRVQgKi8NCiAgICAgICAgcmV0dXJuIHMtPmZpcV9lbmFibGVkOw0KICAgIGNh
+c2UgMTE6IC8qIEZSUV9FTkFCTEVDTFIgKi8NCg0KICAgdmVyc2F0aWxlcGIgU0lDIGRlZmlu
+aXRpb24gDQogICAgY2FzZSA4OiAvKiBQSUNFTkFCTEUgKi8NCiAgICAgICAgcmV0dXJuIHMt
+PnBpY19lbmFibGU7DQogICAgY2FzZSA5OiAvKiBQSUNFTkNMUiAqLw0KICAgICAgICBzLT5w
+aWNfZW5hYmxlICY9IH52YWx1ZTsNCiAgICAgICAgdnBiX3NpY191cGRhdGVfcGljKHMpOw0K
+ICAgICAgICBicmVhazsNCg0KQ291bGQgeW91IGNvbmZpcm0gZm9yIG1lIFBJQyByZWdpc3Rl
+ciBiaXQgZGVmaW5pdGlvbiBhbmQgdGhlIFBJQyBhZGRyZXNzL3RpbWVyMCBhZGRyZXNzIGlu
+IHRoZSB2ZXJzYXRpbGVwYiBRRU1VIG9yIHdoZXJlIGkgY2FuIGZpbmQgc29tZSBpbmZvcm1h
+dGlvbiBleGFjdGx5Lg0KDQp0aGFua3MNCmphc29u
