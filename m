@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d89cM-0006A6-Ty
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:12:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1d89hs-0000QL-J2
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:17:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d89cJ-00060H-Lq
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:12:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38914)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d89cJ-000607-CH
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:12:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 43730C059740
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 18:12:10 +0000 (UTC)
-Date: Tue, 9 May 2017 21:12:09 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1494353524-5630-1-git-send-email-mst@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d89hr-0000kK-EX
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:17:56 -0400
+References: <20170509180946.17046-1-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0a25ed7b-174f-1860-cef4-d141b5de3d64@redhat.com>
+Date: Tue, 9 May 2017 13:17:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] acpi-defs: clean up open brace usage
+In-Reply-To: <20170509180946.17046-1-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4ENGhb2E48spkQ3b2V4MaJG4VUKpeTMd6"
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: Check for backing image if
+ specified during create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,143 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-patchew has been saying:
-ERROR: open brace '{' following struct go on the same line
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4ENGhb2E48spkQ3b2V4MaJG4VUKpeTMd6
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <0a25ed7b-174f-1860-cef4-d141b5de3d64@redhat.com>
+Subject: Re: [PATCH v2] qemu-img: Check for backing image if specified during
+ create
+References: <20170509180946.17046-1-jsnow@redhat.com>
+In-Reply-To: <20170509180946.17046-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Fix up acpi-defs.h to follow this rule.
+On 05/09/2017 01:09 PM, John Snow wrote:
+> Or, rather, force the open of a backing image if one was specified
+> for creation. Using a similar -unsafe option as rebase, allow qemu-img
+> to ignore the backing file validation if possible.
+>=20
+> It may not always be possible, as in the existing case when a filesize
+> for the new image was not specified.
+>=20
+> This is accomplished by shifting around the conditionals in
+> bdrv_img_create, such that a backing file is always opened unless we
+> provide BDRV_O_NO_BACKING. qemu-img is adjusted to pass this new flag
+> when -u is provided to create.
+>=20
+> Sorry for the heinous looking diffstat, but it's mostly whitespace.
+>=20
+> Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=3D1213786
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>=20
+> v2: Rebased for 2.10
+>     Corrected some of my less cromulent grammar
+>=20
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/hw/acpi/acpi-defs.h | 37 +++++++++++++------------------------
- 1 file changed, 13 insertions(+), 24 deletions(-)
+> +++ b/qemu-img.c
+> @@ -145,9 +145,11 @@ static void QEMU_NORETURN help(void)
+>             "  'snapshot_id_or_name' is deprecated, use 'snapshot_param=
+'\n"
+>             "    instead\n"
+>             "  '-c' indicates that target image must be compressed (qco=
+w format only)\n"
+> -           "  '-u' enables unsafe rebasing. It is assumed that old and=
+ new backing file\n"
+> -           "       match exactly. The image doesn't need a working bac=
+king file before\n"
+> -           "       rebasing in this case (useful for renaming the back=
+ing file)\n"
+> +           "  '-u' allows unsafe backing chains. For rebasing, it is a=
+ssumed that old and new\n"
+> +           "       backing file match exactly. The image doesn't need =
+a working backing file\n"
+> +           "       before rebasing in this case (useful for renaming t=
+he backing file)\n"
+> +           "       For image creation, allow creating without attempti=
+ng to"
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index dff6d4f..7316a02 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -81,8 +81,8 @@ typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
-     uint32_t asl_compiler_revision;  /* ASL compiler revision number */
- 
- 
--struct AcpiTableHeader         /* ACPI common table header */
--{
-+/* ACPI common table header */
-+struct AcpiTableHeader {
-     ACPI_TABLE_HEADER_DEF
- } QEMU_PACKED;
- typedef struct AcpiTableHeader AcpiTableHeader;
-@@ -133,8 +133,7 @@ typedef struct AcpiTableHeader AcpiTableHeader;
-     uint8_t  mon_alrm;     /* Index to month-of-year alarm in RTC CMOS RAM */ \
-     uint8_t  century;      /* Index to century in RTC CMOS RAM */
- 
--struct AcpiFadtDescriptorRev1
--{
-+struct AcpiFadtDescriptorRev1 {
-     ACPI_FADT_COMMON_DEF
-     uint8_t  reserved4;              /* Reserved */
-     uint8_t  reserved4a;             /* Reserved */
-@@ -229,8 +228,7 @@ typedef struct AcpiSerialPortConsoleRedirection
- /*
-  * ACPI 1.0 Root System Description Table (RSDT)
-  */
--struct AcpiRsdtDescriptorRev1
--{
-+struct AcpiRsdtDescriptorRev1 {
-     ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
-     uint32_t table_offset_entry[0];  /* Array of pointers to other */
-     /* ACPI tables */
-@@ -240,8 +238,7 @@ typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescriptorRev1;
- /*
-  * ACPI 2.0 eXtended System Description Table (XSDT)
-  */
--struct AcpiXsdtDescriptorRev2
--{
-+struct AcpiXsdtDescriptorRev2 {
-     ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
-     uint64_t table_offset_entry[0];  /* Array of pointers to other */
-     /* ACPI tables */
-@@ -251,8 +248,7 @@ typedef struct AcpiXsdtDescriptorRev2 AcpiXsdtDescriptorRev2;
- /*
-  * ACPI 1.0 Firmware ACPI Control Structure (FACS)
-  */
--struct AcpiFacsDescriptorRev1
--{
-+struct AcpiFacsDescriptorRev1 {
-     uint32_t signature;           /* ACPI Signature */
-     uint32_t length;                 /* Length of structure, in bytes */
-     uint32_t hardware_signature;     /* Hardware configuration signature */
-@@ -278,8 +274,7 @@ typedef struct AcpiFacsDescriptorRev1 AcpiFacsDescriptorRev1;
- 
- /* Master MADT */
- 
--struct AcpiMultipleApicTable
--{
-+struct AcpiMultipleApicTable {
-     ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
-     uint32_t local_apic_address;     /* Physical address of local APIC */
-     uint32_t flags;
-@@ -315,8 +310,7 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
- 
- /* Sub-structures for MADT */
- 
--struct AcpiMadtProcessorApic
--{
-+struct AcpiMadtProcessorApic {
-     ACPI_SUB_HEADER_DEF
-     uint8_t  processor_id;           /* ACPI processor id */
-     uint8_t  local_apic_id;          /* Processor's local APIC id */
-@@ -324,8 +318,7 @@ struct AcpiMadtProcessorApic
- } QEMU_PACKED;
- typedef struct AcpiMadtProcessorApic AcpiMadtProcessorApic;
- 
--struct AcpiMadtIoApic
--{
-+struct AcpiMadtIoApic {
-     ACPI_SUB_HEADER_DEF
-     uint8_t  io_apic_id;             /* I/O APIC ID */
-     uint8_t  reserved;               /* Reserved - must be zero */
-@@ -478,8 +471,7 @@ typedef struct Acpi20Hpet Acpi20Hpet;
-  * SRAT (NUMA topology description) table
-  */
- 
--struct AcpiSystemResourceAffinityTable
--{
-+struct AcpiSystemResourceAffinityTable {
-     ACPI_TABLE_HEADER_DEF
-     uint32_t    reserved1;
-     uint32_t    reserved2[2];
-@@ -491,8 +483,7 @@ typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
- #define ACPI_SRAT_PROCESSOR_x2APIC   2
- #define ACPI_SRAT_PROCESSOR_GICC     3
- 
--struct AcpiSratProcessorAffinity
--{
-+struct AcpiSratProcessorAffinity {
-     ACPI_SUB_HEADER_DEF
-     uint8_t     proximity_lo;
-     uint8_t     local_apic_id;
-@@ -514,8 +505,7 @@ struct AcpiSratProcessorX2ApicAffinity {
- } QEMU_PACKED;
- typedef struct AcpiSratProcessorX2ApicAffinity AcpiSratProcessorX2ApicAffinity;
- 
--struct AcpiSratMemoryAffinity
--{
-+struct AcpiSratMemoryAffinity {
-     ACPI_SUB_HEADER_DEF
-     uint32_t    proximity;
-     uint16_t    reserved1;
-@@ -527,8 +517,7 @@ struct AcpiSratMemoryAffinity
- } QEMU_PACKED;
- typedef struct AcpiSratMemoryAffinity AcpiSratMemoryAffinity;
- 
--struct AcpiSratProcessorGiccAffinity
--{
-+struct AcpiSratProcessorGiccAffinity {
-     ACPI_SUB_HEADER_DEF
-     uint32_t    proximity;
-     uint32_t    acpi_processor_uid;
--- 
-MST
+Missing \n
+
+With that fixed,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--4ENGhb2E48spkQ3b2V4MaJG4VUKpeTMd6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZEge/AAoJEKeha0olJ0NqxLQH/1cvOZH5E6Fue9l1G5Sirzw/
+0ASGvMePsX+3+ljDM7NEoQsGTaM3tlwV/1oSDHQA7DyBB7QXsVGzzOO3/RqBt/7D
+3VMRgTCRt1kiagaHauCobxXOEZ+eWbSjc2T/w+Ys3LCGk4SmTYXwZsGvideBw5W0
+718kXR8zreyJ/0wyu/Emh3le1MajaBCJp81tLdMB0DpfntNXKKORFe3Mfx98FYpB
+a024cqj22elQAbu01ZeVTeFGa54l2NYBS3NIZXO3RR7BBh4iXfjZjpzc4F5CcpaF
+zcClUwUsVo9XZGcHkVrTz8BB4OHFItdteyUhFLIkPOIcft2v+OSnABebAnfQKRE=
+=euoT
+-----END PGP SIGNATURE-----
+
+--4ENGhb2E48spkQ3b2V4MaJG4VUKpeTMd6--
