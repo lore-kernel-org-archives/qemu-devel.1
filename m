@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d82Aj-0000iJ-3e
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 06:15:14 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1d82cS-0007Lo-Ph
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 06:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d82Af-0005bR-St
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 06:15:13 -0400
-Date: Tue, 9 May 2017 11:15:06 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170509101506.GQ16511@redhat.com>
-References: <20170509093549.25157-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170509093549.25157-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] curl: locking cleanups and fixes
+	(envelope-from <aurelien@aurel32.net>) id 1d82cR-0000ET-Jr
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 06:43:52 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:36414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1d82cR-0000EH-DP
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 06:43:51 -0400
+From: Aurelien Jarno <aurelien@aurel32.net>
+Date: Tue,  9 May 2017 12:43:36 +0200
+Message-Id: <20170509104336.11676-1-aurelien@aurel32.net>
+Subject: [Qemu-devel] [PATCH RFC] target/s390x: improve SIGP to add SMP
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,106 +23,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, jcody@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
+This patch adds *very rough* SMP support to the s390x target, and make
+it possible to use MTTCG, when used with the various atomic patches
+posted on the mailing list. I haven't done any advanced test, so there
+is certainly more atomic issues to fix.
 
-No I'm afraid this patch series does not fix the bug.
+Anyway this patch is nothing more than a way to determine what needs to
+be implemented in the SIGNAL PROCESSOR instruction to add SMP support,
+and a basis for discussion about how to implement things. It should be
+rewritten from scratch before reaching in an acceptable state.
 
-The stack trace is below.
+It has been wrote mostly looking at the KVM code. Unfortunately I don't
+think it's easy to share code between TCG and KVM because part of KVM
+SIGP support is implemented on the host kernel side. Given I don't have
+a lot of experience with MTTCG, my main question at this point is how to
+determine when it is possible to directly interact with another CPU and
+when run_on_cpu should be used instead. Any help or comments are
+welcome.
 
-Rich.
+Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+---
+ target/s390x/cpu.h         |  2 ++
+ target/s390x/misc_helper.c | 64 ++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 61 insertions(+), 5 deletions(-)
 
-Thread 4 (Thread 0x7f8595cf1700 (LWP 11235)):
-#0  0x00007f86348e6700 in do_futex_wait () at /lib64/libpthread.so.0
-#1  0x00007f86348e6813 in __new_sem_wait_slow () at /lib64/libpthread.so.0
-#2  0x00005610e458519f in qemu_sem_timedwait (sem=sem@entry=0x5610e5db7508, ms=ms@entry=10000) at util/qemu-thread-posix.c:255
-#3  0x00005610e458043c in worker_thread (opaque=0x5610e5db74a0)
-    at util/thread-pool.c:92
-#4  0x00007f86348dd36d in start_thread () at /lib64/libpthread.so.0
-#5  0x00007f862e830e0f in clone () at /lib64/libc.so.6
-
-Thread 3 (Thread 0x7f8621347700 (LWP 10865)):
-#0  0x00007f862e826837 in ioctl () at /lib64/libc.so.6
-#1  0x00005610e4216387 in kvm_vcpu_ioctl (cpu=cpu@entry=0x5610e60f2030, type=type@entry=44672) at /home/rjones/d/qemu/kvm-all.c:2154
-#2  0x00005610e42164be in kvm_cpu_exec (cpu=cpu@entry=0x5610e60f2030)
-    at /home/rjones/d/qemu/kvm-all.c:1992
-#3  0x00005610e4202f94 in qemu_kvm_cpu_thread_fn (arg=0x5610e60f2030)
-    at /home/rjones/d/qemu/cpus.c:1118
-#4  0x00007f86348dd36d in start_thread () at /lib64/libpthread.so.0
-#5  0x00007f862e830e0f in clone () at /lib64/libc.so.6
-
-Thread 2 (Thread 0x7f8626559700 (LWP 10863)):
-#0  0x00007f862e82b7a9 in syscall () at /lib64/libc.so.6
-#1  0x00005610e4585325 in qemu_futex_wait (val=<optimized out>, f=<optimized out>) at /home/rjones/d/qemu/include/qemu/futex.h:26
-#2  0x00005610e4585325 in qemu_event_wait (ev=ev@entry=0x5610e5019ee4 <rcu_call_ready_event>) at util/qemu-thread-posix.c:399
-#3  0x00005610e459539e in call_rcu_thread (opaque=<optimized out>)
-    at util/rcu.c:249
-#4  0x00007f86348dd36d in start_thread () at /lib64/libpthread.so.0
-#5  0x00007f862e830e0f in clone () at /lib64/libc.so.6
-
-Thread 1 (Thread 0x7f863757dc80 (LWP 10861)):
-#0  0x00007f862e824dc6 in ppoll () at /lib64/libc.so.6
-#1  0x00005610e4580ea9 in ppoll (__ss=0x0, __timeout=0x0, __nfds=<optimized out>, __fds=<optimized out>) at /usr/include/bits/poll2.h:77
-#2  0x00005610e4580ea9 in qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, timeout=timeout@entry=-1) at util/qemu-timer.c:322
-#3  0x00005610e4582af4 in aio_poll (ctx=ctx@entry=0x5610e5d92860, blocking=<optimized out>) at util/aio-posix.c:622
-#4  0x00007f8624848299 in curl_init_state (bs=<optimized out>, s=s@entry=0x5610e5defb10) at block/curl.c:490
-#5  0x00007f8624848a51 in curl_readv_bh_cb (p=0x5610e78afb70)
-    at block/curl.c:871
-#6  0x00005610e457fb1e in aio_bh_call (bh=0x5610e6128f10) at util/async.c:90
-#7  0x00005610e457fb1e in aio_bh_poll (ctx=ctx@entry=0x5610e5d92860)
-    at util/async.c:118
-#8  0x00005610e4582cf4 in aio_poll (ctx=ctx@entry=0x5610e5d92860, blocking=<optimized out>) at util/aio-posix.c:682
-#9  0x00007f8624848299 in curl_init_state (bs=<optimized out>, s=s@entry=0x5610e5defb10) at block/curl.c:490
-#10 0x00007f8624848a51 in curl_readv_bh_cb (p=0x5610e6f01380)
-    at block/curl.c:871
-#11 0x00005610e457fb1e in aio_bh_call (bh=0x5610e6e1fff0) at util/async.c:90
-#12 0x00005610e457fb1e in aio_bh_poll (ctx=ctx@entry=0x5610e5d92860)
-    at util/async.c:118
-#13 0x00005610e4582cf4 in aio_poll (ctx=ctx@entry=0x5610e5d92860, blocking=<optimized out>) at util/aio-posix.c:682
-#14 0x00007f8624848299 in curl_init_state (bs=<optimized out>, s=s@entry=0x5610e5defb10) at block/curl.c:490
-#15 0x00007f8624848a51 in curl_readv_bh_cb (p=0x5610e77d6ec0)
-    at block/curl.c:871
-#16 0x00005610e457fb1e in aio_bh_call (bh=0x5610e7229960) at util/async.c:90
-#17 0x00005610e457fb1e in aio_bh_poll (ctx=ctx@entry=0x5610e5d92860)
-    at util/async.c:118
-#18 0x00005610e4582cf4 in aio_poll (ctx=ctx@entry=0x5610e5d92860, blocking=<optimized out>) at util/aio-posix.c:682
-#19 0x00007f8624848299 in curl_init_state (bs=<optimized out>, s=s@entry=0x5610e5defb10) at block/curl.c:490
-#20 0x00007f8624848a51 in curl_readv_bh_cb (p=0x5610e7877220)
-    at block/curl.c:871
-#21 0x00005610e457fb1e in aio_bh_call (bh=0x5610e7054e20) at util/async.c:90
-#22 0x00005610e457fb1e in aio_bh_poll (ctx=ctx@entry=0x5610e5d92860)
-    at util/async.c:118
-#23 0x00005610e4582cf4 in aio_poll (ctx=ctx@entry=0x5610e5d92860, blocking=<optimized out>) at util/aio-posix.c:682
-#24 0x00007f8624848299 in curl_init_state (bs=<optimized out>, s=s@entry=0x5610e5defb10) at block/curl.c:490
-#25 0x00007f8624848a51 in curl_readv_bh_cb (p=0x5610e7903cb0)
-    at block/curl.c:871
-#26 0x00005610e457fb1e in aio_bh_call (bh=0x5610e7903d10) at util/async.c:90
-#27 0x00005610e457fb1e in aio_bh_poll (ctx=ctx@entry=0x5610e5d92860)
-    at util/async.c:118
-#28 0x00005610e4582cf4 in aio_poll (ctx=ctx@entry=0x5610e5d92860, blocking=<optimized out>) at util/aio-posix.c:682
-#29 0x00007f8624848299 in curl_init_state (bs=<optimized out>, s=s@entry=0x5610e5defb10) at block/curl.c:490
-#30 0x00007f8624848a51 in curl_readv_bh_cb (p=0x5610e7146fb0)
-    at block/curl.c:871
-#31 0x00005610e457fb1e in aio_bh_call (bh=0x5610e70593d0) at util/async.c:90
-#32 0x00005610e457fb1e in aio_bh_poll (ctx=ctx@entry=0x5610e5d92860)
-    at util/async.c:118
-#33 0x00005610e45829c0 in aio_dispatch (ctx=0x5610e5d92860)
-    at util/aio-posix.c:429
-#34 0x00005610e457f9fe in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
-#35 0x00007f863235d1d7 in g_main_context_dispatch () at /lib64/libglib-2.0.so.0
-#36 0x00005610e4581c17 in glib_pollfds_poll () at util/main-loop.c:213
-#37 0x00005610e4581c17 in os_host_main_loop_wait (timeout=<optimized out>)
-    at util/main-loop.c:261
-#38 0x00005610e4581c17 in main_loop_wait (nonblocking=<optimized out>)
-    at util/main-loop.c:517
-#39 0x00005610e41c3ad1 in main_loop () at vl.c:1899
-#40 0x00005610e41c3ad1 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4719
-
-
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index fa244f1238..a4651de0d6 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -1057,6 +1057,7 @@ struct sysib_322 {
+ #define SIGP_SET_PREFIX        0x0d
+ #define SIGP_STORE_STATUS_ADDR 0x0e
+ #define SIGP_SET_ARCH          0x12
++#define SIGP_SENSE_RUNNING     0x15
+ #define SIGP_STORE_ADTL_STATUS 0x17
+ 
+ /* SIGP condition codes */
+@@ -1067,6 +1068,7 @@ struct sysib_322 {
+ 
+ /* SIGP status bits */
+ #define SIGP_STAT_EQUIPMENT_CHECK   0x80000000UL
++#define SIGP_STAT_NOT_RUNNING       0x00000400UL
+ #define SIGP_STAT_INCORRECT_STATE   0x00000200UL
+ #define SIGP_STAT_INVALID_PARAMETER 0x00000100UL
+ #define SIGP_STAT_EXT_CALL_PENDING  0x00000080UL
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 9178a3987f..5285c82783 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -516,36 +516,90 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
+ 
+     /* Remember: Use "R1 or R1 + 1, whichever is the odd-numbered register"
+        as parameter (input). Status (output) is always R1. */
++    uint64_t param = (r1 % 2) ? env->regs[r1] : env->regs[r1 + 1];
++
++    S390CPU *dst_cpu = s390_cpu_addr2state(cpu_addr);
++
++    if (dst_cpu == NULL) {
++        return SIGP_STAT_INVALID_PARAMETER;
++    }
++
++    qemu_mutex_lock_iothread();
+ 
+     switch (order_code & SIGP_ORDER_MASK) {
+     case SIGP_SET_ARCH:
++        cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+         /* switch arch */
+         break;
+     case SIGP_SENSE:
+         /* enumerate CPU status */
+         if (cpu_addr) {
+             /* XXX implement when SMP comes */
+-            return 3;
++            cc = SIGP_CC_NOT_OPERATIONAL;
++        } else {
++            env->regs[r1] &= 0xffffffff00000000ULL;
++            cc = SIGP_CC_STATUS_STORED;
+         }
+-        env->regs[r1] &= 0xffffffff00000000ULL;
+-        cc = 1;
++        break;
++    case SIGP_INITIAL_CPU_RESET:
++        S390_CPU_GET_CLASS(dst_cpu)->initial_cpu_reset(CPU(dst_cpu));
++        cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+         break;
+ #if !defined(CONFIG_USER_ONLY)
+     case SIGP_RESTART:
++        /* the restart irq has to be delivered prior to any other pending irq */
++        do_restart_interrupt(&dst_cpu->env);
++        s390_cpu_set_state(CPU_STATE_OPERATING, dst_cpu);
++        qemu_cpu_kick(CPU(dst_cpu));
++        cc = SIGP_CC_ORDER_CODE_ACCEPTED;
++#if 0
+         qemu_system_reset_request();
+         cpu_loop_exit(CPU(s390_env_get_cpu(env)));
++#endif
+         break;
+     case SIGP_STOP:
+-        qemu_system_shutdown_request();
+-        cpu_loop_exit(CPU(s390_env_get_cpu(env)));
++        /* FIXME doesn't work */
++        if (s390_cpu_halt(dst_cpu) == 0) {
++            qemu_system_shutdown_request();
++        }
++        cpu_loop_exit(CPU(dst_cpu));
++        cc = SIGP_CC_ORDER_CODE_ACCEPTED;
++        break;
++    case SIGP_SET_PREFIX:
++        {
++            uint32_t addr = param & 0x7fffe000u;
++            if (!address_space_access_valid(&address_space_memory, addr,
++                                           sizeof(struct LowCore), false)) {
++                cc = SIGP_STAT_INVALID_PARAMETER;
++            } else if (s390_cpu_get_state(dst_cpu) != CPU_STATE_STOPPED) {
++                cc = SIGP_STAT_INCORRECT_STATE;
++            } else {
++                dst_cpu->env.psa = addr;
++                tlb_flush_page(CPU(dst_cpu), 0);
++                tlb_flush_page(CPU(dst_cpu), TARGET_PAGE_SIZE);
++                cc = SIGP_CC_ORDER_CODE_ACCEPTED;
++            }
++        }
+         break;
+ #endif
++    case SIGP_SENSE_RUNNING:
++        if (s390_cpu_get_state(dst_cpu) == CPU_STATE_OPERATING) {
++            cc = SIGP_CC_ORDER_CODE_ACCEPTED;
++        } else {
++            cc = SIGP_STAT_NOT_RUNNING;
++        }
++        break;
++    case SIGP_EXTERNAL_CALL:
++        cpu_inject_ext(dst_cpu, 0x1202, env->cpu_num, 0);
++        cc = SIGP_CC_ORDER_CODE_ACCEPTED;
++        break;
+     default:
+         /* unknown sigp */
+         fprintf(stderr, "XXX unknown sigp: 0x%" PRIx64 "\n", order_code);
+         cc = SIGP_CC_NOT_OPERATIONAL;
+     }
+ 
++    qemu_mutex_unlock_iothread();
+     return cc;
+ }
+ #endif
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+2.11.0
