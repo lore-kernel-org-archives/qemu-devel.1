@@ -1,41 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d84QT-0004tY-LY
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:39 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d84WU-0006hg-8w
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:45:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d84QO-0004lQ-PB
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34753)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1d84QO-0004l3-GC
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:32 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v49CdVuf003600
-	for <qemu-devel@nongnu.org>; Tue, 9 May 2017 08:39:31 -0400
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aaqfdk4dy-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 08:39:30 -0400
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 9 May 2017 09:39:20 -0300
-Date: Tue, 9 May 2017 09:39:11 -0300
-From: joserz@linux.vnet.ibm.com
-References: <1494274635-11029-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<3f878a42-e19a-9afe-edff-61b942e477dd@ozlabs.ru>
-	<20170509052244.GM25748@umbus.fritz.box>
-	<f98d8946-4153-c461-f8ad-311f56f2aaf2@ozlabs.ru>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d84WP-0006n9-CF
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:45:50 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36704)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d84WP-0006mW-7d
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:45:45 -0400
+Received: by mail-qt0-x242.google.com with SMTP id j13so13587185qta.3
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 05:45:45 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170509113332.4987-1-marcandre.lureau@redhat.com>
+	<20170509113332.4987-12-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c7b6f4d9-2d8e-f282-07b2-9aa9fcd2ee81@amsat.org>
+Date: Tue, 9 May 2017 09:45:40 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f98d8946-4153-c461-f8ad-311f56f2aaf2@ozlabs.ru>
-Message-Id: <20170509123911.GC22292@pacoca>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] Revert "target-ppc/kvm: Enable
- in-kernel TCE acceleration for multi-tce"
+In-Reply-To: <20170509113332.4987-12-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 11/13] Remove/replace chardev/char.h
+ inclusion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,103 +35,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: David Gibson <david@gibson.dropbear.id.au>, rnsastry@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com, sam.bobroff@au1.ibm.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-On Tue, May 09, 2017 at 07:14:19PM +1000, Alexey Kardashevskiy wrote:
-> On 09/05/17 15:22, David Gibson wrote:
-> > On Tue, May 09, 2017 at 07:25:51AM +1000, Alexey Kardashevskiy wrote:
-> >> On 09/05/17 06:17, Jose Ricardo Ziviani wrote:
-> >>> This reverts commit 3dc410ae83e6cb76c81ea30a05d62596092b3165.
-> >>>
-> >>> Booting a radix guest in Power9 with that commit throws a host kernel
-> >>> oops:
-> >>>
-> >>> [17582052553.360178] Unable to handle kernel paging request for data at address 0xe64bb17da64ab078
-> >>> [17582052553.360420] Faulting instruction address: 0xc0000000002c3ddc
-> >>> [17582052553.360533] Oops: Kernel access of bad area, sig: 11 [#1]
-> >>> [17582052553.360643] SMP NR_CPUS=1024
-> >>> [17582052553.360645] NUMA
-> >>> [17582052553.360712] PowerNV
-> >>> [17582052553.360804] Modules linked in: vhost_net vhost tap xt_CHECKSUM ipt_MASQUERADE nf_nat_masquerade_ipv4 ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 nf_conntrack_ipv6 nf_defrag_ipv6 xt_conntrack ip_set nfnetlink ebtable_nat ebtable_broute bridge stp llc ip6table_mangle ip6table_security ip6table_raw iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack libcrc32c iptable_mangle iptable_security iptable_raw ebtable_filter ebtables ip6table_filter ip6_tables ses enclosure scsi_transport_sas ipmi_powernv powernv_op_panel ipmi_devintf ipmi_msghandler nfsd kvm_hv auth_rpcgss oid_registry nfs_acl lockd grace sunrpc kvm tg3 ptp pps_core
-> >>> [17582052553.361797] CPU: 5 PID: 4966 Comm: qemu-system-ppc Not tainted 4.11.0-1.git4a6869a.el7.centos.ppc64le #1
-> >>> [17582052553.361972] task: c0000003c5e90a80 task.stack: c0000003c5f6c000
-> >>> [17582052553.362082] NIP: c0000000002c3ddc LR: c0000000002c3e80 CTR: c0000000000ce2e0
-> >>> [17582052553.362214] REGS: c0000003c5f6f150 TRAP: 0380   Not tainted  (4.11.0-1.git4a6869a.el7.centos.ppc64le)
-> >>> [17582052553.362467] MSR: 9000000000001031 <SF,HV,ME,IR,DR,LE>
-> >>> [17582052553.362480]   CR: 44008024  XER: 20000000
-> >>> [17582052553.362822] CFAR: c0000000002c3e7c SOFTE: 1
-> >>> [17582052553.362822] GPR00: 000000000000018f c0000003c5f6f3d0 c00000000131fd00 0000000000000000
-> >>> [17582052553.362822] GPR04: 0000000000000005 00000000000001ff 0000000000000000 7db04aa67db14ba6
-> >>> [17582052553.362822] GPR08: 264bb17da64ab000 e64bb17da64ab000 0000000000000078 0000000000000000
-> >>> [17582052553.362822] GPR12: c0000003bdb98008 c00000000fdc2d00 c00000000000e148 0000000000000000
-> >>> [17582052553.362822] GPR16: 0000000008000000 0000000020000000 0000000000000000 c0000003c5f6f4c0
-> >>> [17582052553.362822] GPR20: c0000001ffff9440 c0000001fd033280 c0000001fd0342a0 c0000001f24efff8
-> >>> [17582052553.362822] GPR24: 0000000000000200 00000001f24f0000 0000000000000010 0000000000020000
-> >>> [17582052553.362822] GPR28: 0800000000000000 00000001f24f0000 000000007db04aa6 00000000a64ab07d
-> >>> [17582052553.365148] NIP [c0000000002c3ddc] vmalloc_to_page+0x19c/0x220
-> >>> [17582052553.365365] LR [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
-> >>> [17582052553.365582] Call Trace:
-> >>> [17582052553.365720] [c0000003c5f6f3d0] [7265677368657265] 0x7265677368657265 (unreliable)
-> >>> [17582052553.365982] [c0000003c5f6f400] [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
-> >>> [17582052553.366245] [c0000003c5f6f420] [c0000000000637e8] vmalloc_to_phys+0x28/0x60
-> >>> [17582052553.366508] [c0000003c5f6f450] [c0000000000ce480] kvmppc_rm_h_put_tce_indirect+0x1a0/0x540
-> >>> [17582052553.366812] [c0000003c5f6f590] [c0000000000d0314] hcall_try_real_mode+0x60/0x7c
-> >>> [17582052553.367074] [c0000003c5f6f600] [c0000000000cefac] kvmppc_call_hv_entry+0x8/0x17c
-> >>> [17582052553.367346] [c0000003c5f6f670] [c00800000375a970] __kvmppc_vcore_entry+0x13c/0x1ac [kvm_hv]
-> >>> [17582052553.367652] [c0000003c5f6f840] [c0080000037574a8] kvmppc_run_core+0x788/0x1650 [kvm_hv]
-> >>> [17582052553.367965] [c0000003c5f6fa00] [c0080000037590b8] kvmppc_vcpu_run_hv+0x388/0x1200 [kvm_hv]
-> >>> [17582052553.368287] [c0000003c5f6fb30] [c008000003274684] kvmppc_vcpu_run+0x34/0x50 [kvm]
-> >>> [17582052553.368558] [c0000003c5f6fb50] [c008000003270b54] kvm_arch_vcpu_ioctl_run+0x114/0x2a0 [kvm]
-> >>> [17582052553.368870] [c0000003c5f6fbd0] [c008000003263dd8] kvm_vcpu_ioctl+0x5e8/0x7c0 [kvm]
-> >>> [17582052553.369132] [c0000003c5f6fd40] [c000000000350b50] do_vfs_ioctl+0xd0/0x8c0
-> >>> [17582052553.369395] [c0000003c5f6fde0] [c000000000351414] SyS_ioctl+0xd4/0xf0
-> >>> [17582052553.369615] [c0000003c5f6fe30] [c00000000000b8e0] system_call+0x38/0xfc
-> >>> [17582052553.369875] Instruction dump:
-> >>> [17582052553.370011] 53dfc42e 790807c6 394affff 7d08fb78 78638402 79081764 7d4a07b4 7c6a5038
-> >>> [17582052553.370281] 7908f5e6 7d094b78 794a1f24 38600000 <7d2a482a> 7924cfe3 41820040 79260022
-> >>> [17582052553.370599] ---[ end trace 9470442ed18ae727 ]---
-> >>>
-> >>> As soon as we identify and fix the issue that's causing such problem
-> >>> I'll re-send the referred patch to re-enable TCE.
-> > 
-> > This is a serious host kernel security bug.  Modifying qemu not to
-> > trigger it is not a fix; it's not even a workaround.
-> > 
-> >> The proper fix is to change the host kernel to not advertise
-> >> KVM_CAP_SPAPR_MULTITCE for radix guest.
-> > 
-> > That doesn't sound like a fix either, though it might be part of one.
-> 
-> My point was that if a feature is known not to work, it should not be
-> advertised rather than disabling the feature entirely in QEMU, even for the
-> time being. vmalloc_to_pfn() needs a fix anyway.
+Hi Marc-André Lureau,
 
-You're right, I'm going to address this by asking for kernel experts to
-look after it.
-> 
-> 
-> > What happens if qemu ignores what's advertised and tries to use the
-> > multitce functions anyway?  The point is you have an easy way for
-> > userspace or a guest to crash the host kernel, which needs to be fixed
-> > as a matter of urgency.
-> 
-> Correct.
-> 
-> > It's not clear to me why the multitce functions would break on radix
-> > anyway.  Isn't the TCE table format independent of the main MMU?
-> 
-> 
-> It is from "rmap = (void *) vmalloc_to_phys(rmap);" to lock the page with
-> TCEs in the H_PUT_TCE_INDIRECT handler, this is irrelevant to the TCE
-> format. I am wondering why only this place fails though as
-> vmalloc_to_phys() is used quite often, may be less on radix tree though.
-> 
-Yes, let's go through the right path. Please, disregard this patch.
+Isn't clearer if the "remove" part of this commit goes before your patch 
+6 "move headers to include/chardev"?
 
-Thanks for all the hints.
-> 
-> 
-> -- 
-> Alexey
-> 
+On 05/09/2017 08:33 AM, Marc-André Lureau wrote:
+> Those are apparently unnecessary includes.
+>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/arm/bcm2835_peripherals.c | 1 -
+>  hw/char/imx_serial.c         | 1 -
+>  hw/display/xenfb.c           | 1 -
+>  hw/i386/xen/xen-hvm.c        | 1 -
+>  hw/mips/mips_fulong2e.c      | 1 -
+>  hw/mips/mips_malta.c         | 1 -
+>  hw/net/xgmac.c               | 1 -
+>  hw/ppc/spapr_events.c        | 1 -
+>  hw/ppc/spapr_rtas.c          | 1 -
+>  hw/sparc/leon3.c             | 1 -
+>  hw/usb/ccid-card-emulated.c  | 2 +-
+>  hw/xen/xen_backend.c         | 1 -
+>  util/event_notifier-posix.c  | 1 -
+>  13 files changed, 1 insertion(+), 13 deletions(-)
+>
+> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+> index 091e14dc60..502f04c02a 100644
+> --- a/hw/arm/bcm2835_peripherals.c
+> +++ b/hw/arm/bcm2835_peripherals.c
+> @@ -13,7 +13,6 @@
+>  #include "hw/arm/bcm2835_peripherals.h"
+>  #include "hw/misc/bcm2835_mbox_defs.h"
+>  #include "hw/arm/raspi_platform.h"
+> -#include "chardev/char.h"
+>  #include "sysemu/sysemu.h"
+>
+>  /* Peripheral base address on the VC (GPU) system bus */
+> diff --git a/hw/char/imx_serial.c b/hw/char/imx_serial.c
+> index 1d4f378a59..af250305be 100644
+> --- a/hw/char/imx_serial.c
+> +++ b/hw/char/imx_serial.c
+> @@ -21,7 +21,6 @@
+>  #include "qemu/osdep.h"
+>  #include "hw/char/imx_serial.h"
+>  #include "sysemu/sysemu.h"
+> -#include "chardev/char.h"
+>  #include "qemu/log.h"
+>
+>  #ifndef DEBUG_IMX_UART
+> diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+> index 4a1a2a4d6e..e76c0d805c 100644
+> --- a/hw/display/xenfb.c
+> +++ b/hw/display/xenfb.c
+> @@ -28,7 +28,6 @@
+>
+>  #include "hw/hw.h"
+>  #include "ui/console.h"
+> -#include "chardev/char.h"
+>  #include "hw/xen/xen_backend.h"
+>
+>  #include <xen/event_channel.h>
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index 8dc57a31cf..321cf36b67 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -18,7 +18,6 @@
+>  #include "hw/xen/xen_backend.h"
+>  #include "qmp-commands.h"
+>
+> -#include "chardev/char.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/range.h"
+>  #include "sysemu/xen-mapcache.h"
+> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+> index 55eeb9227d..dbe2805acb 100644
+> --- a/hw/mips/mips_fulong2e.c
+> +++ b/hw/mips/mips_fulong2e.c
+> @@ -32,7 +32,6 @@
+>  #include "hw/mips/mips.h"
+>  #include "hw/mips/cpudevs.h"
+>  #include "hw/pci/pci.h"
+> -#include "chardev/char.h"
+>  #include "sysemu/sysemu.h"
+>  #include "audio/audio.h"
+>  #include "qemu/log.h"
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 610e1e9085..6fcdd9c6c1 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -37,7 +37,6 @@
+>  #include "hw/mips/mips.h"
+>  #include "hw/mips/cpudevs.h"
+>  #include "hw/pci/pci.h"
+> -#include "chardev/char.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/arch_init.h"
+>  #include "qemu/log.h"
+> diff --git a/hw/net/xgmac.c b/hw/net/xgmac.c
+> index 3d00e2868c..0843bf185c 100644
+> --- a/hw/net/xgmac.c
+> +++ b/hw/net/xgmac.c
+> @@ -26,7 +26,6 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+>  #include "qemu/log.h"
+>  #include "net/net.h"
+>  #include "net/checksum.h"
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index b309f2f4b0..8a5f1d321a 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -28,7 +28,6 @@
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+>  #include "sysemu/sysemu.h"
+> -#include "chardev/char.h"
+>  #include "hw/qdev.h"
+>  #include "sysemu/device_tree.h"
+>
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 9995b1a9f5..dd1633a104 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -29,7 +29,6 @@
+>  #include "qemu/log.h"
+>  #include "qemu/error-report.h"
+>  #include "sysemu/sysemu.h"
+> -#include "chardev/char.h"
+>  #include "hw/qdev.h"
+>  #include "sysemu/device_tree.h"
+>  #include "sysemu/cpus.h"
+> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+> index f3e62f5bd7..f415997649 100644
+> --- a/hw/sparc/leon3.c
+> +++ b/hw/sparc/leon3.c
+> @@ -28,7 +28,6 @@
+>  #include "hw/hw.h"
+>  #include "qemu/timer.h"
+>  #include "hw/ptimer.h"
+> -#include "chardev/char.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/qtest.h"
+>  #include "hw/boards.h"
+> diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+> index 690b6c3ab4..e646eb243b 100644
+> --- a/hw/usb/ccid-card-emulated.c
+> +++ b/hw/usb/ccid-card-emulated.c
+> @@ -33,7 +33,7 @@
+>  #include <vcard_emul.h>
+>
+>  #include "qemu/thread.h"
+> -#include "chardev/char.h"
+> +#include "qemu/main-loop.h"
+>  #include "ccid.h"
+>
+>  #define DPRINTF(card, lvl, fmt, ...) \
+> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+> index a252a7fd96..b6e1b8cf59 100644
+> --- a/hw/xen/xen_backend.c
+> +++ b/hw/xen/xen_backend.c
+> @@ -28,7 +28,6 @@
+>  #include "hw/hw.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/boards.h"
+> -#include "chardev/char.h"
+>  #include "qemu/log.h"
+>  #include "qapi/error.h"
+>  #include "hw/xen/xen_backend.h"
+> diff --git a/util/event_notifier-posix.c b/util/event_notifier-posix.c
+> index 8ab06f9b41..73c4046b58 100644
+> --- a/util/event_notifier-posix.c
+> +++ b/util/event_notifier-posix.c
+> @@ -14,7 +14,6 @@
+>  #include "qemu-common.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/event_notifier.h"
+> -#include "chardev/char.h"
+>  #include "qemu/main-loop.h"
+>
+>  #ifdef CONFIG_EVENTFD
+>
