@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d84zT-0002Fk-1a
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:15:48 -0400
+	(envelope-from <mst@redhat.com>) id 1d84zF-00026p-8N
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:15:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1d84zO-0003PU-Tg
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:15:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34066)
+	(envelope-from <mst@redhat.com>) id 1d84zC-0003NL-2l
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:15:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52014)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d84zO-0003PG-Km
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:15:42 -0400
-Date: Tue, 9 May 2017 16:15:36 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d84zB-0003ND-Rd
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:15:29 -0400
+Date: Tue, 9 May 2017 16:15:22 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1494330527-24163-5-git-send-email-mst@redhat.com>
-References: <1494330527-24163-1-git-send-email-mst@redhat.com>
+Message-ID: <1494330527-24163-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1494330527-24163-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/8] libvhost-user: fix crash when rings aren't
- ready
+Subject: [Qemu-devel] [PULL 0/8] pci, virtio, vhost: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,149 +26,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Felipe Franciosi <felipe@nutanix.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The following changes since commit dd1559bb267becbb838de41132ef60771d183e=
+5d:
 
-Calling libvhost-user functions like vu_queue_get_avail_bytes() when the
-queue doesn't yet have addresses will result in the crashes like the
-following:
+  Merge remote-tracking branch 'elmarco/tags/chr-tests-pull-request' into=
+ staging (2017-05-05 17:07:55 +0100)
 
-Program received signal SIGSEGV, Segmentation fault.
-0x000055c414112ce4 in vring_avail_idx (vq=3D0x55c41582fd68, vq=3D0x55c415=
-82fd68)
-    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
-940            vq->shadow_avail_idx =3D vq->vring.avail->idx;
-(gdb) p vq
-$1 =3D (VuVirtq *) 0x55c41582fd68
-(gdb) p vq->vring
-$2 =3D {num =3D 0, desc =3D 0x0, avail =3D 0x0, used =3D 0x0, log_guest_a=
-ddr =3D 0, flags =3D 0}
+are available in the git repository at:
 
-    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
-No locals.
-    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:960
-        num_heads =3D <optimized out>
-    out_bytes=3Dout_bytes@entry=3D0x7fffd035d7c4, max_in_bytes=3Dmax_in_b=
-ytes@entry=3D0,
-    max_out_bytes=3Dmax_out_bytes@entry=3D0) at /home/dgilbert/git/qemu/c=
-ontrib/libvhost-user/libvhost-user.c:1034
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-Add a pre-condition checks on vring.avail before accessing it.
+for you to fetch changes up to 6512fee18a330463f7cbe2524d92a53252664946:
 
-Fix documentation and return type of vu_queue_empty() while at it.
+  ACPI: don't call acpi_pcihp_device_plug_cb on xen (2017-05-09 14:45:55 =
++0300)
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+----------------------------------------------------------------
+pci, virtio, vhost: fixes
+
+A bunch of fixes that missed the release.
+
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- contrib/libvhost-user/libvhost-user.h |  6 +++---
- contrib/libvhost-user/libvhost-user.c | 26 ++++++++++++++++++++------
- 2 files changed, 23 insertions(+), 9 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-index 156b50e..af02a31 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -327,13 +327,13 @@ void vu_queue_set_notification(VuDev *dev, VuVirtq =
-*vq, int enable);
- bool vu_queue_enabled(VuDev *dev, VuVirtq *vq);
-=20
- /**
-- * vu_queue_enabled:
-+ * vu_queue_empty:
-  * @dev: a VuDev context
-  * @vq: a VuVirtq queue
-  *
-- * Returns: whether the queue is empty.
-+ * Returns: true if the queue is empty or not ready.
-  */
--int vu_queue_empty(VuDev *dev, VuVirtq *vq);
-+bool vu_queue_empty(VuDev *dev, VuVirtq *vq);
-=20
- /**
-  * vu_queue_notify:
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-index af4faad..e1bf964 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -1031,6 +1031,11 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, =
-unsigned int *in_bytes,
-     idx =3D vq->last_avail_idx;
-=20
-     total_bufs =3D in_total =3D out_total =3D 0;
-+    if (unlikely(dev->broken) ||
-+        unlikely(!vq->vring.avail)) {
-+        goto done;
-+    }
-+
-     while ((rc =3D virtqueue_num_heads(dev, vq, idx)) > 0) {
-         unsigned int max, num_bufs, indirect =3D 0;
-         struct vring_desc *desc;
-@@ -1121,11 +1126,16 @@ vu_queue_avail_bytes(VuDev *dev, VuVirtq *vq, uns=
-igned int in_bytes,
-=20
- /* Fetch avail_idx from VQ memory only when we really need to know if
-  * guest has added some buffers. */
--int
-+bool
- vu_queue_empty(VuDev *dev, VuVirtq *vq)
- {
-+    if (unlikely(dev->broken) ||
-+        unlikely(!vq->vring.avail)) {
-+        return true;
-+    }
-+
-     if (vq->shadow_avail_idx !=3D vq->last_avail_idx) {
--        return 0;
-+        return false;
-     }
-=20
-     return vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
-@@ -1174,7 +1184,8 @@ vring_notify(VuDev *dev, VuVirtq *vq)
- void
- vu_queue_notify(VuDev *dev, VuVirtq *vq)
- {
--    if (unlikely(dev->broken)) {
-+    if (unlikely(dev->broken) ||
-+        unlikely(!vq->vring.avail)) {
-         return;
-     }
-=20
-@@ -1291,7 +1302,8 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
-     struct vring_desc *desc;
-     int rc;
-=20
--    if (unlikely(dev->broken)) {
-+    if (unlikely(dev->broken) ||
-+        unlikely(!vq->vring.avail)) {
-         return NULL;
-     }
-=20
-@@ -1445,7 +1457,8 @@ vu_queue_fill(VuDev *dev, VuVirtq *vq,
- {
-     struct vring_used_elem uelem;
-=20
--    if (unlikely(dev->broken)) {
-+    if (unlikely(dev->broken) ||
-+        unlikely(!vq->vring.avail)) {
-         return;
-     }
-=20
-@@ -1474,7 +1487,8 @@ vu_queue_flush(VuDev *dev, VuVirtq *vq, unsigned in=
-t count)
- {
-     uint16_t old, new;
-=20
--    if (unlikely(dev->broken)) {
-+    if (unlikely(dev->broken) ||
-+        unlikely(!vq->vring.avail)) {
-         return;
-     }
-=20
---=20
-MST
+----------------------------------------------------------------
+Ard Biesheuvel (2):
+      hw/acpi-defs: replace leading X with x_ in FADT field names
+      hw/arm/virt: generate 64-bit addressable ACPI objects
+
+Bruce Rogers (1):
+      ACPI: don't call acpi_pcihp_device_plug_cb on xen
+
+Eduardo Habkost (1):
+      iommu: Don't crash if machine is not PC_MACHINE
+
+Igor Mammedov (1):
+      pc/fwcfg: unbreak migration from qemu-2.5 and qemu-2.6 during firmw=
+are boot
+
+Marc-Andr=C3=A9 Lureau (1):
+      libvhost-user: fix crash when rings aren't ready
+
+Peter Xu (1):
+      pc: add 2.10 machine type
+
+Zhiyong Yang (1):
+      hw/virtio: fix vhost user fails to startup when MQ
+
+ contrib/libvhost-user/libvhost-user.h |  6 +++---
+ include/hw/acpi/acpi-defs.h           | 15 +++++++++++++--
+ include/hw/acpi/aml-build.h           |  3 +++
+ include/hw/i386/pc.h                  | 10 ++++++----
+ contrib/libvhost-user/libvhost-user.c | 26 ++++++++++++++++++++------
+ hw/acpi/aml-build.c                   | 27 +++++++++++++++++++++++++++
+ hw/acpi/piix4.c                       | 11 ++++++++---
+ hw/arm/virt-acpi-build.c              | 26 +++++++++++++-------------
+ hw/i386/amd_iommu.c                   | 15 ++++++++++++++-
+ hw/i386/intel_iommu.c                 | 14 ++++++++++++--
+ hw/i386/pc.c                          |  9 ++++-----
+ hw/i386/pc_piix.c                     | 16 +++++++++++++---
+ hw/i386/pc_q35.c                      | 14 ++++++++++++--
+ hw/virtio/vhost-user.c                | 21 +++++++++++++--------
+ 14 files changed, 161 insertions(+), 52 deletions(-)
