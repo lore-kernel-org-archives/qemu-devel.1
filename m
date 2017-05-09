@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d8Bmt-0001mI-Dk
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:16 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d8Bmz-0001ov-5K
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d8Bmp-0003ad-Ab
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:15 -0400
-Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:53684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d8Bmp-0003a9-4D
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:11 -0400
-Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C3ECBE9D94
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 22:31:09 +0200 (CEST)
-Date: Tue, 9 May 2017 22:31:04 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170509223104.55412e1b@bahia>
-In-Reply-To: <1494356693-13190-2-git-send-email-sstabellini@kernel.org>
-References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
-	<1494356693-13190-2-git-send-email-sstabellini@kernel.org>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d8Bmv-0003cK-20
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:21 -0400
+Received: from hera.aquilenet.fr ([141.255.128.1]:33214)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d8Bmu-0003bk-S8
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:16 -0400
+Date: Tue, 9 May 2017 22:31:12 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170509203112.czvrdgdghsnnq3ie@var.youpi.perso.aquilenet.fr>
+References: <20170509193112.16613-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/rwhgYiVV_ui593pL0sJBdi6";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] Check the return value of fcntl in
- qemu_set_cloexec
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170509193112.16613-1-laurent@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH v5 0/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +26,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xen.org, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Eric Blake <eblake@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>
 
---Sig_/rwhgYiVV_ui593pL0sJBdi6
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On Tue,  9 May 2017 12:04:52 -0700
-Stefano Stabellini <sstabellini@kernel.org> wrote:
+Laurent Vivier, on mar. 09 mai 2017 21:31:11 +0200, wrote:
+> This patch implements the SOCKS5 client part for "-net user" backend.
 
-> Assert that the return value is not an error. This issue was found by
-> Coverity.
->=20
-> CID: 1374831
->=20
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> CC: groug@kaod.org
-> CC: pbonzini@redhat.com
-> CC: Eric Blake <eblake@redhat.com>
-> ---
->  util/oslib-posix.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
+Thanks for the changes!
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+It seems from the bot result that windows doesn't define in_port_t.
+Could you post a revised patch which uses sizeof(uint16_t) instead of
+sizeof(in_port_t), to trigger the bot again and confirm that this is the
+last needed fix for windows?
 
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 4d9189e..16894ad 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -182,7 +182,9 @@ void qemu_set_cloexec(int fd)
->  {
->      int f;
->      f =3D fcntl(fd, F_GETFD);
-> -    fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-> +    assert(f !=3D -1);
-> +    f =3D fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-> +    assert(f !=3D -1);
->  }
-> =20
->  /*
-
---Sig_/rwhgYiVV_ui593pL0sJBdi6
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkSJwgACgkQAvw66wEB28Jf9wCdEkzkfWxjbcJ1BpUwpEuD1ebM
-VDYAn02VUPTG59b9dNO1W2vgVw6hbezM
-=5nY4
------END PGP SIGNATURE-----
-
---Sig_/rwhgYiVV_ui593pL0sJBdi6--
+Samuel
