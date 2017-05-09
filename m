@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d83Q4-0005h9-05
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:35:09 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d83QB-0005rk-MD
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1d83Px-0002zo-Q6
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:35:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44272)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1d83Q7-00037C-MA
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:35:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1d83Px-0002yj-HL
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:35:01 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1d83Q7-00036x-Fn
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:35:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 79D9480474
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:35:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 73E9080F97
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:35:10 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  9 May 2017 15:33:26 +0400
-Message-Id: <20170509113332.4987-8-marcandre.lureau@redhat.com>
+Date: Tue,  9 May 2017 15:33:27 +0400
+Message-Id: <20170509113332.4987-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20170509113332.4987-1-marcandre.lureau@redhat.com>
 References: <20170509113332.4987-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 07/13] chardev: serial & parallel declaration
- to own headers
+Subject: [Qemu-devel] [PATCH 08/13] be-hci: use backend functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,246 +36,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+Avoid accessing CharBackend directly, use qemu_chr_be_* methods instead.
+
+be->chr_read should exists if qemu_chr_be_can_write() is true.
+
+(use qemu_chr_be_write(), _impl() bypasses replay)
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/chardev/char-parallel.h | 20 +++++++++++++++++++-
- include/chardev/char-serial.h   | 22 ++++++++++++++++++++++
- include/chardev/char.h          | 36 -----------------------------------=
--
- hw/arm/strongarm.c              |  2 +-
- hw/bt/hci-csr.c                 |  2 +-
- hw/char/cadence_uart.c          |  2 +-
- hw/char/escc.c                  |  2 +-
- hw/char/exynos4210_uart.c       |  2 +-
- hw/char/parallel.c              |  2 +-
- hw/char/serial.c                |  2 +-
- hw/usb/dev-serial.c             |  2 +-
- 11 files changed, 49 insertions(+), 45 deletions(-)
+ hw/bt/hci-csr.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/include/chardev/char-parallel.h b/include/chardev/char-paral=
-lel.h
-index 26742f9d5c..3284a1b96b 100644
---- a/include/chardev/char-parallel.h
-+++ b/include/chardev/char-parallel.h
-@@ -24,9 +24,27 @@
- #ifndef CHAR_PARALLEL_H
- #define CHAR_PARALLEL_H
-=20
--#if defined(__linux__) || defined(__FreeBSD__) || \
-+#include "chardev/char.h"
-+
-+#if defined(__linux__) || defined(__FreeBSD__) ||               \
-     defined(__FreeBSD_kernel__) || defined(__DragonFly__)
- #define HAVE_CHARDEV_PARPORT 1
- #endif
-=20
-+#define CHR_IOCTL_PP_READ_DATA        3
-+#define CHR_IOCTL_PP_WRITE_DATA       4
-+#define CHR_IOCTL_PP_READ_CONTROL     5
-+#define CHR_IOCTL_PP_WRITE_CONTROL    6
-+#define CHR_IOCTL_PP_READ_STATUS      7
-+#define CHR_IOCTL_PP_EPP_READ_ADDR    8
-+#define CHR_IOCTL_PP_EPP_READ         9
-+#define CHR_IOCTL_PP_EPP_WRITE_ADDR  10
-+#define CHR_IOCTL_PP_EPP_WRITE       11
-+#define CHR_IOCTL_PP_DATA_DIR        12
-+
-+struct ParallelIOArg {
-+    void *buffer;
-+    int count;
-+};
-+
- #endif /* CHAR_PARALLEL_H */
-diff --git a/include/chardev/char-serial.h b/include/chardev/char-serial.=
-h
-index 64a27f63b1..cb2e59e82a 100644
---- a/include/chardev/char-serial.h
-+++ b/include/chardev/char-serial.h
-@@ -24,6 +24,8 @@
- #ifndef CHAR_SERIAL_H
- #define CHAR_SERIAL_H
-=20
-+#include "chardev/char.h"
-+
- #ifdef _WIN32
- #define HAVE_CHARDEV_SERIAL 1
- #elif defined(__linux__) || defined(__sun__) || defined(__FreeBSD__)    =
-\
-@@ -32,4 +34,24 @@
- #define HAVE_CHARDEV_SERIAL 1
- #endif
-=20
-+#define CHR_IOCTL_SERIAL_SET_PARAMS   1
-+typedef struct {
-+    int speed;
-+    int parity;
-+    int data_bits;
-+    int stop_bits;
-+} QEMUSerialSetParams;
-+
-+#define CHR_IOCTL_SERIAL_SET_BREAK    2
-+
-+#define CHR_IOCTL_SERIAL_SET_TIOCM   13
-+#define CHR_IOCTL_SERIAL_GET_TIOCM   14
-+
-+#define CHR_TIOCM_CTS   0x020
-+#define CHR_TIOCM_CAR   0x040
-+#define CHR_TIOCM_DSR   0x100
-+#define CHR_TIOCM_RI    0x080
-+#define CHR_TIOCM_DTR   0x002
-+#define CHR_TIOCM_RTS   0x004
-+
- #endif
-diff --git a/include/chardev/char.h b/include/chardev/char.h
-index ea9f2cb7d6..0e1ef1ea4f 100644
---- a/include/chardev/char.h
-+++ b/include/chardev/char.h
-@@ -27,42 +27,6 @@ typedef enum {
-=20
- #define CHR_READ_BUF_LEN 4096
-=20
--#define CHR_IOCTL_SERIAL_SET_PARAMS   1
--typedef struct {
--    int speed;
--    int parity;
--    int data_bits;
--    int stop_bits;
--} QEMUSerialSetParams;
--
--#define CHR_IOCTL_SERIAL_SET_BREAK    2
--
--#define CHR_IOCTL_PP_READ_DATA        3
--#define CHR_IOCTL_PP_WRITE_DATA       4
--#define CHR_IOCTL_PP_READ_CONTROL     5
--#define CHR_IOCTL_PP_WRITE_CONTROL    6
--#define CHR_IOCTL_PP_READ_STATUS      7
--#define CHR_IOCTL_PP_EPP_READ_ADDR    8
--#define CHR_IOCTL_PP_EPP_READ         9
--#define CHR_IOCTL_PP_EPP_WRITE_ADDR  10
--#define CHR_IOCTL_PP_EPP_WRITE       11
--#define CHR_IOCTL_PP_DATA_DIR        12
--
--struct ParallelIOArg {
--    void *buffer;
--    int count;
--};
--
--#define CHR_IOCTL_SERIAL_SET_TIOCM   13
--#define CHR_IOCTL_SERIAL_GET_TIOCM   14
--
--#define CHR_TIOCM_CTS	0x020
--#define CHR_TIOCM_CAR	0x040
--#define CHR_TIOCM_DSR	0x100
--#define CHR_TIOCM_RI	0x080
--#define CHR_TIOCM_DTR	0x002
--#define CHR_TIOCM_RTS	0x004
--
- typedef void IOEventHandler(void *opaque, int event);
-=20
- typedef enum {
-diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-index 66cad198d4..967caea749 100644
---- a/hw/arm/strongarm.c
-+++ b/hw/arm/strongarm.c
-@@ -34,7 +34,7 @@
- #include "strongarm.h"
- #include "qemu/error-report.h"
- #include "hw/arm/arm.h"
--#include "chardev/char.h"
-+#include "chardev/char-serial.h"
- #include "sysemu/sysemu.h"
- #include "hw/ssi/ssi.h"
- #include "qemu/cutils.h"
 diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
-index cc2087392e..0f2021086d 100644
+index 0f2021086d..d13192b9b5 100644
 --- a/hw/bt/hci-csr.c
 +++ b/hw/bt/hci-csr.c
-@@ -20,7 +20,7 @@
+@@ -82,17 +82,14 @@ enum {
 =20
- #include "qemu/osdep.h"
- #include "qemu-common.h"
--#include "chardev/char.h"
-+#include "chardev/char-serial.h"
- #include "qemu/timer.h"
- #include "qemu/bswap.h"
- #include "hw/irq.h"
-diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-index cf4c1d56ff..4bfc185376 100644
---- a/hw/char/cadence_uart.c
-+++ b/hw/char/cadence_uart.c
-@@ -23,7 +23,7 @@
+ static inline void csrhci_fifo_wake(struct csrhci_s *s)
+ {
+-    Chardev *chr =3D (Chardev *)s;
+-    CharBackend *be =3D chr->be;
++    Chardev *chr =3D CHARDEV(s);
 =20
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
--#include "chardev/char.h"
-+#include "chardev/char-serial.h"
- #include "qemu/timer.h"
- #include "qemu/log.h"
- #include "hw/char/cadence_uart.h"
-diff --git a/hw/char/escc.c b/hw/char/escc.c
-index df89d58eed..81d792cb47 100644
---- a/hw/char/escc.c
-+++ b/hw/char/escc.c
-@@ -26,7 +26,7 @@
- #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "hw/char/escc.h"
--#include "chardev/char.h"
-+#include "chardev/char-serial.h"
- #include "ui/console.h"
- #include "ui/input.h"
- #include "trace.h"
-diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
-index 94952fb90f..d93125645a 100644
---- a/hw/char/exynos4210_uart.c
-+++ b/hw/char/exynos4210_uart.c
-@@ -23,7 +23,7 @@
- #include "hw/sysbus.h"
- #include "qemu/error-report.h"
- #include "sysemu/sysemu.h"
--#include "chardev/char.h"
-+#include "chardev/char-serial.h"
+     if (!s->enable || !s->out_len)
+         return;
 =20
- #include "hw/arm/exynos4210.h"
-=20
-diff --git a/hw/char/parallel.c b/hw/char/parallel.c
-index c926df0bee..1d6c6e9f33 100644
---- a/hw/char/parallel.c
-+++ b/hw/char/parallel.c
-@@ -25,7 +25,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "chardev/char.h"
-+#include "chardev/char-parallel.h"
- #include "hw/isa/isa.h"
- #include "hw/i386/pc.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index aa336333be..23e5fe9d18 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -25,7 +25,7 @@
-=20
- #include "qemu/osdep.h"
- #include "hw/char/serial.h"
--#include "chardev/char.h"
-+#include "chardev/char-serial.h"
- #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-index c19cd310c2..4f592d0f82 100644
---- a/hw/usb/dev-serial.c
-+++ b/hw/usb/dev-serial.c
-@@ -15,7 +15,7 @@
- #include "qemu/error-report.h"
- #include "hw/usb.h"
- #include "hw/usb/desc.h"
--#include "chardev/char.h"
-+#include "chardev/char-serial.h"
-=20
- //#define DEBUG_Serial
-=20
+     /* XXX: Should wait for s->modem_state & CHR_TIOCM_RTS? */
+-    if (be && be->chr_can_read && be->chr_can_read(be->opaque) &&
+-        be->chr_read) {
+-        be->chr_read(be->opaque,
+-                     s->outfifo + s->out_start++, 1);
++    if (qemu_chr_be_can_write(chr)) {
++        qemu_chr_be_write(chr, s->outfifo + s->out_start++, 1);
+         s->out_len--;
+         if (s->out_start >=3D s->out_size) {
+             s->out_start =3D 0;
 --=20
 2.13.0.rc1.16.gd80b50c3f
