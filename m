@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d84jJ-0005J3-Gx
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:06 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1d84jl-0005XY-RE
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d84jF-0005SR-BD
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:05 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34247)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d84jF-0005SK-4T
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:01 -0400
-Received: by mail-qk0-x243.google.com with SMTP id u75so14539996qka.1
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 05:59:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170509113332.4987-1-marcandre.lureau@redhat.com>
-	<20170509113332.4987-10-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7a271264-56e5-e919-09d1-9e058ef6b2f5@amsat.org>
-Date: Tue, 9 May 2017 09:58:57 -0300
+	(envelope-from <jemmy858585@gmail.com>) id 1d84jk-0005VW-GY
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:33 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170509113332.4987-10-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 09/13] char: generalize qemu_chr_write_all()
+In-Reply-To: <20170508205401.GA23989@stefanha-x1.localdomain>
+References: <1493971429-10441-1-git-send-email-lidongchen@tencent.com>
+	<20170508205401.GA23989@stefanha-x1.localdomain>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Tue, 9 May 2017 20:59:30 +0800
+Message-ID: <CAOGPPbfukP450k2CaC6sEiFfca2DQ1OqMGSvZgwOvXr9WUGXaQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4] migration/block: move
+ bdrv_is_allocated() into bb's AioContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,150 +23,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Lidong Chen <lidongchen@tencent.com>
 
-Hi Marc-André,
+On Tue, May 9, 2017 at 4:54 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Fri, May 05, 2017 at 04:03:49PM +0800, jemmy858585@gmail.com wrote:
+>> From: Lidong Chen <lidongchen@tencent.com>
+>>
+>> when block migration with high-speed, mig_save_device_bulk hold the
+>> BQL and invoke bdrv_is_allocated frequently. This patch moves
+>> bdrv_is_allocated() into bb's AioContext. It will execute without
+>> blocking other I/O activity.
+>>
+>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> ---
+>>      v4 changelog:
+>>           Use the prototype code written by Stefan and fix some bug.
+>>           moves bdrv_is_allocated() into bb's AioContext.
+>> ---
+>>  migration/block.c | 48 +++++++++++++++++++++++++++++++++++++++---------
+>>  1 file changed, 39 insertions(+), 9 deletions(-)
+>
+> Added Paolo because he's been reworking AioContext and locking.
+>
+> The goal of this patch is to avoid waiting for bdrv_is_allocated() to
+> complete while holding locks.  Do bdrv_is_allocated() in the AioContext
+> so event processing continues after yield.
 
-On 05/09/2017 08:33 AM, Marc-André Lureau wrote:
-> qemu_chr_fe_write() is similar to qemu_chr_write_all(): the later write
-> all with a chardev backend.
->
-> Make qemu_chr_write() and qemu_chr_fe_write_buffer() take an 'all'
-> argument. If false, handle 'partial' write the way qemu_chr_fe_write()
-> use to, and call qemu_chr_write() from qemu_chr_fe_write().
+Hi Paolo:
+    Some information about the problem.
+    https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01423.html
 
-What about invert logic and name the argument 'is_partial[_write]'? Else 
-'write_all' to have more readable code?
+    why bdrv_inc_in_flight() is needed.
+    blk_set_aio_context maybe invoked by vcpu thread. like this:
+              blk_set_aio_context
+                   virtio_blk_data_plane_stop
+                            virtio_pci_stop_ioeventfd
+                                  virtio_pci_common_write
+    so bs->aio_context maybe change before mig_next_allocated_cluster().
+
+    I use this method to verify this patch:
+    run this command in guest os:
+          while [ 1 ]; do rmmod virtio_blk; modprobe virtio_blk; done
+
+   Thanks.
 
 >
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  chardev/char.c | 69 +++++++++++++++++++++++-----------------------------------
->  1 file changed, 27 insertions(+), 42 deletions(-)
+>>
+>> diff --git a/migration/block.c b/migration/block.c
+>> index 060087f..c871361 100644
+>> --- a/migration/block.c
+>> +++ b/migration/block.c
+>> @@ -263,6 +263,30 @@ static void blk_mig_read_cb(void *opaque, int ret)
+>>      blk_mig_unlock();
+>>  }
+>>
+>> +typedef struct {
+>> +    int64_t *total_sectors;
+>> +    int64_t *cur_sector;
+>> +    BlockBackend *bb;
+>> +    QemuEvent event;
+>> +} MigNextAllocatedClusterData;
+>> +
+>> +static void coroutine_fn mig_next_allocated_cluster(void *opaque)
+>> +{
+>> +    MigNextAllocatedClusterData *data = opaque;
+>> +    int nr_sectors;
+>> +
+>> +    /* Skip unallocated sectors; intentionally treats failure as
+>> +     * an allocated sector */
+>> +    while (*data->cur_sector < *data->total_sectors &&
+>> +           !bdrv_is_allocated(blk_bs(data->bb), *data->cur_sector,
+>> +                              MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
+>> +        *data->cur_sector += nr_sectors;
+>> +    }
+>> +
+>> +    bdrv_dec_in_flight(blk_bs(data->bb));
+>> +    qemu_event_set(&data->event);
+>> +}
+>> +
+>>  /* Called with no lock taken.  */
+>>
+>>  static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
+>> @@ -274,17 +298,23 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
+>>      int nr_sectors;
+>>
+>>      if (bmds->shared_base) {
+>> +        AioContext *bb_ctx;
+>> +        Coroutine *co;
+>> +        MigNextAllocatedClusterData data = {
+>> +            .cur_sector = &cur_sector,
+>> +            .total_sectors = &total_sectors,
+>> +            .bb = bb,
+>> +        };
+>> +        qemu_event_init(&data.event, false);
+>> +
+>>          qemu_mutex_lock_iothread();
+>> -        aio_context_acquire(blk_get_aio_context(bb));
+>> -        /* Skip unallocated sectors; intentionally treats failure as
+>> -         * an allocated sector */
+>> -        while (cur_sector < total_sectors &&
+>> -               !bdrv_is_allocated(blk_bs(bb), cur_sector,
+>> -                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
+>> -            cur_sector += nr_sectors;
+>> -        }
+>> -        aio_context_release(blk_get_aio_context(bb));
+>> +        bdrv_inc_in_flight(blk_bs(bb));
 >
-> diff --git a/chardev/char.c b/chardev/char.c
-> index af7d871ed5..392dba6a86 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -96,7 +96,8 @@ static void qemu_chr_fe_write_log(Chardev *s,
->  }
+> Please add a comment explaining why bdrv_inc_in_flight() is invoked.
 >
->  static int qemu_chr_fe_write_buffer(Chardev *s,
-> -                                    const uint8_t *buf, int len, int *offset)
-> +                                    const uint8_t *buf, int len,
-> +                                    int *offset, bool all)
->  {
->      ChardevClass *cc = CHARDEV_GET_CLASS(s);
->      int res = 0;
-> @@ -106,7 +107,7 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
->      while (*offset < len) {
->      retry:
->          res = cc->chr_write(s, buf + *offset, len - *offset);
-> -        if (res < 0 && errno == EAGAIN) {
-> +        if (res < 0 && errno == EAGAIN && all) {
->              g_usleep(100);
->              goto retry;
->          }
-> @@ -116,6 +117,9 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
->          }
->
->          *offset += res;
-> +        if (!all) {
-> +            break;
-> +        }
->      }
->      if (*offset > 0) {
->          qemu_chr_fe_write_log(s, buf, *offset);
-> @@ -130,54 +134,19 @@ static bool qemu_chr_replay(Chardev *chr)
->      return qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
->  }
->
-> -int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
-> +static int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool all)
->  {
-> -    Chardev *s = be->chr;
-> -    ChardevClass *cc;
-> -    int ret;
-> -
-> -    if (!s) {
-> -        return 0;
-> -    }
-> -
-> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
-> -        int offset;
-> -        replay_char_write_event_load(&ret, &offset);
-> -        assert(offset <= len);
-> -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
-> -        return ret;
-> -    }
-> -
-> -    cc = CHARDEV_GET_CLASS(s);
-> -    qemu_mutex_lock(&s->chr_write_lock);
-> -    ret = cc->chr_write(s, buf, len);
-> -
-> -    if (ret > 0) {
-> -        qemu_chr_fe_write_log(s, buf, ret);
-> -    }
-> -
-> -    qemu_mutex_unlock(&s->chr_write_lock);
-> -
-> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
-> -        replay_char_write_event_save(ret, ret < 0 ? 0 : ret);
-> -    }
-> -
-> -    return ret;
-> -}
-> -
-> -int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
-> -{
-> -    int offset;
-> +    int offset = 0;
->      int res;
->
->      if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
->          replay_char_write_event_load(&res, &offset);
->          assert(offset <= len);
-> -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
-> +        qemu_chr_fe_write_buffer(s, buf, offset, &offset, true);
->          return res;
->      }
->
-> -    res = qemu_chr_fe_write_buffer(s, buf, len, &offset);
-> +    res = qemu_chr_fe_write_buffer(s, buf, len, &offset, all);
->
->      if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
->          replay_char_write_event_save(res, offset);
-> @@ -189,6 +158,22 @@ int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
->      return offset;
->  }
->
-> +int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
-> +{
-> +    return qemu_chr_write(s, buf, len, true);
-> +}
-> +
-> +int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
-> +{
-> +    Chardev *s = be->chr;
-> +
-> +    if (!s) {
-> +        return 0;
-> +    }
-> +
-> +    return qemu_chr_write(s, buf, len, false);
-> +}
-> +
->  int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
->  {
->      Chardev *s = be->chr;
-> @@ -197,7 +182,7 @@ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
->          return 0;
->      }
->
-> -    return qemu_chr_write_all(s, buf, len);
-> +    return qemu_chr_write(s, buf, len, true);
->  }
->
->  int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
->
+>> +        bb_ctx = blk_get_aio_context(bb);
+>> +        co = qemu_coroutine_create(mig_next_allocated_cluster, &data);
+>> +        aio_co_schedule(bb_ctx, co);
+>>          qemu_mutex_unlock_iothread();
+>> +
+>> +        qemu_event_wait(&data.event);
+>>      }
+>>
+>>      if (cur_sector >= total_sectors) {
+>> --
+>> 1.8.3.1
+>>
+>>
