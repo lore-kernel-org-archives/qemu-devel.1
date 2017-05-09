@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d83gx-0002mV-1W
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:52:36 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d83oO-0004FZ-M9
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d83gu-000187-0C
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:52:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d83gt-00016b-NO
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:52:31 -0400
-Date: Tue, 9 May 2017 08:52:28 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170509115228.GA3482@thinpad.lan.raisama.net>
-References: <20170509112034.23351-1-berrange@redhat.com>
-	<20170509112034.23351-3-berrange@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d83oL-0004N1-H7
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:00:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1d83oL-0004LP-7G
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:00:13 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v49BsFi2029535
+	for <qemu-devel@nongnu.org>; Tue, 9 May 2017 08:00:11 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aba6nrbku-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 08:00:11 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 9 May 2017 13:00:08 +0100
+References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
+	<20170505173507.74077-4-pasic@linux.vnet.ibm.com>
+	<20170508164505.GG2120@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 9 May 2017 14:00:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170509112034.23351-3-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386: expose "TCGTCGTCGTCG" in the
- 0x40000000 CPUID leaf
+In-Reply-To: <20170508164505.GG2120@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <3e0195e2-ada5-2efc-1feb-e2415761e7bc@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 03/10] s390x/css: add vmstate entities for
+ css
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +43,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, May 09, 2017 at 12:20:34PM +0100, Daniel P. Berrange wrote:
-> Currently when running KVM, we expose "KVMKVMKVM\0\0\0" in
-> the 0x40000000 CPUID leaf. Other hypervisors (VMWare,
-> HyperV, Xen, BHyve) all do the same thing, which leaves
-> TCG as the odd one out.
+
+
+On 05/08/2017 06:45 PM, Dr. David Alan Gilbert wrote:
+> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>> As a preparation for switching to a vmstate based migration let us
+>> introduce vmstate entities (e.g. VMStateDescription) for the css entities
+>> to be migrated. Alongside some comments explaining or indicating the not
+>> migration of certain members are introduced too.
+>>
+>> No changes in behavior, we just added some dead code -- which should
+>> rise to life soon.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>>  hw/s390x/css.c         | 276 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  include/hw/s390x/css.h |  10 +-
+>>  2 files changed, 285 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>> index c03bb20..2bda7d0 100644
+>> --- a/hw/s390x/css.c
+>> +++ b/hw/s390x/css.c
+>> @@ -20,29 +20,231 @@
+>>  #include "hw/s390x/css.h"
+>>  #include "trace.h"
+>>  #include "hw/s390x/s390_flic.h"
+>> +#include "hw/s390x/s390-virtio-ccw.h"
+>>  
+
+[..]
+
+>> +static int css_get_ind_addr(QEMUFile *f, void *pv, size_t size,
+>> +                            VMStateField *field)
+>> +{
+>> +    int32_t len;
+>> +    IndAddr **ind_addr = pv;
+>> +
+>> +    len = qemu_get_be32(f);
+>> +    if (len != 0) {
+>> +        *ind_addr = get_indicator(qemu_get_be64(f), len);
+>> +    } else {
+>> +        qemu_get_be64(f);
+>> +        *ind_addr = NULL;
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>> +static int css_put_ind_addr(QEMUFile *f, void *pv, size_t size,
+>> +                            VMStateField *field, QJSON *vmdesc)
+>> +{
+>> +    IndAddr *ind_addr = *(IndAddr **) pv;
+>> +
+>> +    if (ind_addr != NULL) {
+>> +        qemu_put_be32(f, ind_addr->len);
+>> +        qemu_put_be64(f, ind_addr->addr);
+>> +    } else {
+>> +        qemu_put_be32(f, 0);
+>> +        qemu_put_be64(f, 0UL);
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>> +const VMStateInfo vmstate_info_ind_addr = {
+>> +    .name = "s390_ind_addr",
+>> +    .get = css_get_ind_addr,
+>> +    .put = css_put_ind_addr
+>> +};
 > 
-> The CPUID signature is used by software to detect which
-> virtual environment they are running in and (potentially)
-> change behaviour in certain ways. For example, systemd
-> supports a ConditionVirtualization= setting in unit files.
-> The virt-what command can also report the virt type it is
-> running on
+> You should be able to avoid this .get/.put by using VMSTATE_WITH_TMP,
+> declare a temporary struct something like:
+>   struct tmp_ind_addr {
+>      IndAddr *parent;
+>      uint32_t  len;
+>      uint64_t  addr;
+>   }
 > 
-> Currently both these apps have to resort to custom hacks
-> like looking for 'fw-cfg' entry in the /proc/device-tree
-> file to identify TCG.
-> 
-> This change thus proposes a signature "TCGTCGTCGTCG" to be
-> reported when running under TCG.
-> 
-> To hide this, the -cpu option tcg-cpuid=off can be used.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  include/hw/i386/pc.h |  5 +++++
->  target/i386/cpu.c    | 22 ++++++++++++++++++++++
->  target/i386/cpu.h    |  1 +
->  3 files changed, 28 insertions(+)
-> 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index f278b3a..3aec60f 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -376,6 +376,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->  #define PC_COMPAT_2_8 \
->      HW_COMPAT_2_8 \
->      {\
-> +        .driver   = TYPE_X86_CPU,\
-> +        .property = "tcg-cpuid",\
-> +        .value    = "off",\
-> +    },\
-> +    {\
->          .driver   = "kvmclock",\
->          .property = "x-mach-use-reliable-get-clock",\
->          .value    = "off",\
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 8cb4af4..ee4f515 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2627,12 +2627,15 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->      CPUState *cs = CPU(cpu);
->      uint32_t pkg_offset;
->      uint32_t limit;
-> +    uint32_t signature[3];
->  
->      /* Calculate & apply limits for different index ranges */
->      if (index >= 0xC0000000) {
->          limit = env->cpuid_xlevel2;
->      } else if (index >= 0x80000000) {
->          limit = env->cpuid_xlevel;
-> +    } else if (index & 0x40000000) {
-
-Why did you decide to use (index & 0x40000000) instead of
-(index >= 0x40000000)? The latter would be more consistent with
-the rest of the code.
-
-
-> +        limit = 0x40000000;
-
-This is not strictly wrong, but it will make CPUID[0x40000001]
-return arbitrary bits (CPUID[env->cpuid_level]). Guests aren't
-supposed to look at CPUID[0x40000001] without checking
-CPUID[0x40000000] first, but probably it's safer to set
-limit = 0x40000001 and return all-zeroes on CPUID[0x40000001],
-just in case.
-
->      } else {
->          limit = env->cpuid_level;
->      }
-> @@ -2867,6 +2870,24 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          }
->          break;
->      }
-> +    case 0x40000000:
-> +        /*
-> +         * CPUID code in kvm_arch_init_vcpu() ignores stuff
-> +         * set here, but we restrict to TCG none the less.
-> +         */
-> +        if (tcg_enabled() && cpu->expose_tcg) {
-> +            memcpy(signature, "TCGTCGTCGTCG", 12);
-> +            *eax = 0;
-
-On both KVM and Hyper-V, CPUID[0x40000000].EAX is the maximum
-CPUID function. KVM has the additional exception that eax=0 on
-the output is interpreted as 0x40000001.
-
-Setting this to 0x40000000 or 0x40000001 would make things more
-consistent for guests. Setting it to 0x40000001 would make it
-safer (see my other comment above).
-
-
-> +            *ebx = signature[0];
-> +            *ecx = signature[1];
-> +            *edx = signature[2];
-> +        } else {
-> +            *eax = 0;
-> +            *ebx = 0;
-> +            *ecx = 0;
-> +            *edx = 0;
-> +        }
-> +        break;
->      case 0x80000000:
->          *eax = env->cpuid_xlevel;
->          *ebx = env->cpuid_vendor1;
-> @@ -4008,6 +4029,7 @@ static Property x86_cpu_properties[] = {
->      DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
->                       false),
->      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-> +    DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index c4602ca..c25f0ce 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1216,6 +1216,7 @@ struct X86CPU {
->      bool check_cpuid;
->      bool enforce_cpuid;
->      bool expose_kvm;
-> +    bool expose_tcg;
->      bool migratable;
->      bool max_features; /* Enable all supported features automatically */
->      uint32_t apic_id;
-> -- 
-> 2.9.3
+> and then your .get/.put routines turn into pre_save/post_load
+> routines to just setup the len/addr.
 > 
 
--- 
-Eduardo
+I don't think this is going to work -- unfortunately! You can see below,
+how this IndAddr* migration stuff is supposed to be used:
+the client code just uses the VMSTATE_PTR_TO_IND_ADDR macro as a
+field when describing state which needs and IndAddr* migrated.
+
+The problem is, we do not know in what state will this field
+be embedded, the pre_save/post_load called by put_tmp/get_tmp
+is however copying the pointer to this state into the parent.
+So instead of having a pointer to IndAddr* in those functions
+and updating it accordingly, I would have to find the IndAddr*
+in some arbitrary state (in our case VirtioCcwDevice) first,
+and I lack information for that.
+
+If it's hard to follow I can give you the patch I was debugging
+to come to this conclusion. (By the way I ended up with 10
+lines of code more than in this version, and although I think
+it looks nicer, it's simpler only if one knows how WITH_TMP
+works. My plan was to ask you which version do you like more
+and go with that before I realized it ain't gonna work.)
+
+
+>> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+>> index f1f0d7f..6a451b2 100644
+>> --- a/include/hw/s390x/css.h
+
+[..]
+
+>>  
+>> +extern const VMStateInfo vmstate_info_ind_addr;
+>> +
+>> +#define VMSTATE_PTR_TO_IND_ADDR(_f, _s)                                   \
+>> +    VMSTATE_SINGLE(_f, _s, 1 , vmstate_info_ind_addr, IndAddr*)
+>> +
+>>  IndAddr *get_indicator(hwaddr ind_addr, int len);
+>>  void release_indicator(AdapterInfo *adapter, IndAddr *indicator);
+>>  int map_indicator(AdapterInfo *adapter, IndAddr *indicator);
+>> -- 
+>> 2.10.2
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+
+
+Cheers,
+Halil
