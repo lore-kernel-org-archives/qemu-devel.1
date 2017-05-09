@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d81Uy-0003uw-6p
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:32:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d81Yl-0004wJ-Nu
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:36:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d81Ut-0002Az-A5
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:32:04 -0400
-Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:49253)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d81Ut-0002AP-3O
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:31:59 -0400
-Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6B5F6EE19F
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:31:57 +0200 (CEST)
-Date: Tue, 9 May 2017 11:31:52 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170509113152.2522ab33@bahia>
-In-Reply-To: <2f21803c-7b62-0090-3035-0e48622a46e4@redhat.com>
-References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
-	<149399504988.29022.13818395938763860712.stgit@bahia.lan>
-	<2f21803c-7b62-0090-3035-0e48622a46e4@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/lS6Oq9ug_IO4K7TpC2y.Rcf";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 4/5] 9pfs: local: metadata file for the
- VirtFS root
+	(envelope-from <pbonzini@redhat.com>) id 1d81Yh-0004p0-DR
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:35:59 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue,  9 May 2017 11:35:46 +0200
+Message-Id: <20170509093549.25157-2-pbonzini@redhat.com>
+In-Reply-To: <20170509093549.25157-1-pbonzini@redhat.com>
+References: <20170509093549.25157-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/4] curl: strengthen assertion in
+ curl_clean_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,106 +20,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?B?TMOpbw==?= Gaspard <leo@gaspard.io>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, jcody@redhat.com, rjones@redhat.com
 
---Sig_/lS6Oq9ug_IO4K7TpC2y.Rcf
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+curl_clean_state should only be called after all AIOCBs have been
+completed.  This is not so obvious for the call from curl_detach_aio_context,
+so assert that.
 
-On Fri, 5 May 2017 12:11:14 -0500
-Eric Blake <eblake@redhat.com> wrote:
+Cc: qemu-stable@nongnu.org
+Cc: jcody@redhat.com
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/curl.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> On 05/05/2017 09:37 AM, Greg Kurz wrote:
-> > When using the mapped-file security, credentials are stored in a metada=
-ta
-> > directory located in the parent directory. This is okay for all paths w=
-ith
-> > the notable exception of the root path, since we don't want and probably
-> > can't create a metadata directory above the virtfs directory on the hos=
-t.
-> >=20
-> > This patch introduces a dedicated metadata file, sitting in the virtfs =
-root
-> > for this purpose. It relies on the fact that the "." name necessarily r=
-efer =20
->=20
-> s/refer/refers/
->=20
-
-I'll fix this.
-
-> > to the virtfs root.
-> >=20
-> > As for the metadata directory, we don't want the client to see this fil=
-e.
-> > The current code only cares for readdir() but there are many other plac=
-es
-> > to fix actually. The filtering logic is hence put in a separate functio=
-n.
-> >=20
-> > Before:
-> >=20
-> > # ls -ld
-> > drwxr-xr-x. 3 greg greg 4096 May  5 12:49 .
-> > # chown root.root .
-> > chown: changing ownership of '.': Is a directory
-> > # ls -ld
-> > drwxr-xr-x. 3 greg greg 4096 May  5 12:49 .
-> >=20
-> > After:
-> >=20
-> > # ls -ld
-> > drwxr-xr-x. 3 greg greg 4096 May  5 12:49 .
-> > # chown bin.bin .
-> > # ls -ld
-> > drwxr-xr-x. 3 root root 4096 May  5 12:50 . =20
->=20
-> Huh? How does chown bin.bin result in root.root? Copy-and-paste error?
->=20
-
-Oops, I had first tested with bin.bin, then I decided that root.root would
-make more sense but I fumbled when updating the changelog... :-\
-
-> >=20
-> > and from the host:
-> >=20
-> > ls -al .virtfs_metadata_root
-> > -rwx------. 1 greg greg 26 May  5 12:50 .virtfs_metadata_root
-> > $ cat .virtfs_metadata_root
-> > virtfs.uid=3D0
-> > virtfs.gid=3D0 =20
->=20
-> So what happens if the guest tries to manipulate
-> ./.virtfs_metadata_root? I know you are filtering it so that readdir()
-> and such can't see it, but do you have sane errors for the guest's
-> attempt to circumvent those hidden names?
->=20
-
-This is addressed by patch 5.
-
-> >=20
-> > Reported-by: L=C3=A9o Gaspard <leo@gaspard.io>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/9pfs/9p-local.c |   88 ++++++++++++++++++++++++++++++++++++--------=
---------
-> >  1 file changed, 61 insertions(+), 27 deletions(-)
-> >=20
-> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c =20
->=20
-
-
---Sig_/lS6Oq9ug_IO4K7TpC2y.Rcf
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkRjIkACgkQAvw66wEB28IDeQCeOEnTYmxpI9zF07htoRihqcwz
-6tsAn1gJWNb9ZuWIPDBqh+tLGePdROce
-=aiKp
------END PGP SIGNATURE-----
-
---Sig_/lS6Oq9ug_IO4K7TpC2y.Rcf--
+diff --git a/block/curl.c b/block/curl.c
+index 2708d57c2f..25a301e7b4 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -532,6 +532,11 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+ 
+ static void curl_clean_state(CURLState *s)
+ {
++    int j;
++    for (j = 0; j < CURL_NUM_ACB; j++) {
++        assert(!s->acb[j]);
++    }
++
+     if (s->s->multi)
+         curl_multi_remove_handle(s->s->multi, s->curl);
+ 
+-- 
+2.12.2
