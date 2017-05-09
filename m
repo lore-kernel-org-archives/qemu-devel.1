@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d87Kb-0007Eg-2H
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:45:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1d87PR-0000wg-PE
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d87KY-0001c2-0w
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:45:45 -0400
-Resent-Message-Id: <E1d87KY-0001c2-0w@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21397)
+	(envelope-from <bounces@canonical.com>) id 1d87PO-0004Hn-Qn
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:50:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38002)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d87KX-0001bq-PT
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:45:41 -0400
-In-Reply-To: <1494330527-24163-1-git-send-email-mst@redhat.com>
-Message-ID: <149434473463.264.16180527721284428575@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1d87PO-0004Ha-L0
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:50:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1d87PL-0006XX-ST
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 15:50:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6FD5C2E80D4
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 15:50:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 9 May 2017 08:45:35 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/8] pci, virtio, vhost: fixes
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 09 May 2017 15:44:40 -0000
+From: ChristianEhrhardt <1689499@bugs.launchpad.net>
+Reply-To: Bug 1689499 <1689499@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149431685971.9593.12799784331390412455.malonedeb@gac.canonical.com>
+Message-Id: <149434468073.2400.6960837090285236175.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1689499] Re: copy-storage-all/inc does not easily
+ converge with load going on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAvOF0gcGNpLCB2aXJ0aW8sIHZob3N0OiBmaXhlcwpUeXBlOiBzZXJpZXMK
-TWVzc2FnZS1pZDogMTQ5NDMzMDUyNy0yNDE2My0xLWdpdC1zZW5kLWVtYWlsLW1zdEByZWRoYXQu
-Y29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
-JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
-JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
-dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
-KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0JwoxYWFmMjM0IEFDUEk6IGRvbid0IGNhbGwgYWNwaV9wY2locF9k
-ZXZpY2VfcGx1Z19jYiBvbiB4ZW4KM2I2ZTFiMyBpb21tdTogRG9uJ3QgY3Jhc2ggaWYgbWFjaGlu
-ZSBpcyBub3QgUENfTUFDSElORQo1ZTNmMDI3IHBjOiBhZGQgMi4xMCBtYWNoaW5lIHR5cGUKYTYx
-MWI5ZCBwYy9md2NmZzogdW5icmVhayBtaWdyYXRpb24gZnJvbSBxZW11LTIuNSBhbmQgcWVtdS0y
-LjYgZHVyaW5nIGZpcm13YXJlIGJvb3QKMmVjZTBmNiBsaWJ2aG9zdC11c2VyOiBmaXggY3Jhc2gg
-d2hlbiByaW5ncyBhcmVuJ3QgcmVhZHkKYzlkMmY4NCBody92aXJ0aW86IGZpeCB2aG9zdCB1c2Vy
-IGZhaWxzIHRvIHN0YXJ0dXAgd2hlbiBNUQpmMjQyNjBiIGh3L2FybS92aXJ0OiBnZW5lcmF0ZSA2
-NC1iaXQgYWRkcmVzc2FibGUgQUNQSSBvYmplY3RzCjZmMDFiODQgaHcvYWNwaS1kZWZzOiByZXBs
-YWNlIGxlYWRpbmcgWCB3aXRoIHhfIGluIEZBRFQgZmllbGQgbmFtZXMKCj09PSBPVVRQVVQgQkVH
-SU4gPT09CkNoZWNraW5nIFBBVENIIDEvODogaHcvYWNwaS1kZWZzOiByZXBsYWNlIGxlYWRpbmcg
-WCB3aXRoIHhfIGluIEZBRFQgZmllbGQgbmFtZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiBody9h
-cm0vdmlydDogZ2VuZXJhdGUgNjQtYml0IGFkZHJlc3NhYmxlIEFDUEkgb2JqZWN0cy4uLgpFUlJP
-Ujogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5lCiMx
-NTc6IEZJTEU6IGluY2x1ZGUvaHcvYWNwaS9hY3BpLWRlZnMuaDoyNDQ6CitzdHJ1Y3QgQWNwaVhz
-ZHREZXNjcmlwdG9yUmV2MgorewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjUgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
-bmcgUEFUQ0ggMy84OiBody92aXJ0aW86IGZpeCB2aG9zdCB1c2VyIGZhaWxzIHRvIHN0YXJ0dXAg
-d2hlbiBNUS4uLgpDaGVja2luZyBQQVRDSCA0Lzg6IGxpYnZob3N0LXVzZXI6IGZpeCBjcmFzaCB3
-aGVuIHJpbmdzIGFyZW4ndCByZWFkeS4uLgpDaGVja2luZyBQQVRDSCA1Lzg6IHBjL2Z3Y2ZnOiB1
-bmJyZWFrIG1pZ3JhdGlvbiBmcm9tIHFlbXUtMi41IGFuZCBxZW11LTIuNiBkdXJpbmcgZmlybXdh
-cmUgYm9vdC4uLgpDaGVja2luZyBQQVRDSCA2Lzg6IHBjOiBhZGQgMi4xMCBtYWNoaW5lIHR5cGUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggNy84OiBpb21tdTogRG9uJ3QgY3Jhc2ggaWYgbWFjaGluZSBpcyBu
-b3QgUENfTUFDSElORS4uLgpDaGVja2luZyBQQVRDSCA4Lzg6IEFDUEk6IGRvbid0IGNhbGwgYWNw
-aV9wY2locF9kZXZpY2VfcGx1Z19jYiBvbiB4ZW4uLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+I'm "incompleting" myself until I was able to provide more :-/
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1689499
+
+Title:
+  copy-storage-all/inc does not easily converge with load going on
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi,
+  for now this is more a report to discuss than a "bug", but I wanted to be=
+ sure if there are things I might overlook.
+
+  I'm regularly testing the qemu's we have in Ubuntu which currently are
+  2.0, 2.5, 2.6.1, 2.8 plus a bunch of patches. And for all sorts of
+  verification upstream every now and then.
+
+  I recently realized that the migration options around --copy-storage-[all=
+/inc] seem to have got worse at converging on migration. Although it is not=
+ a hard commit that is to be found, it just seems more likely to occur the =
+newer the qemu versions is. I assume that is partially due to guest perform=
+ance optimization that keep it busy.
+  To a user it appears as a hanging migration being locked up.
+
+  But let me outline what actually happens:
+  - Setup without shared storage
+  - Migration using --copy-storage-all/--copy-storage-inc
+  - Working fine with idle guests
+  - If the guests is busy the migration does take like forever (1 vCPU that=
+ are busy with 1 CPU, 1 memory and one disk hogging processes)
+  - statistically seems to trigger more likely on newer qemu's (might be a =
+red herring)
+
+  The background workloads are most trivial burners:
+  - cpu: md5sum /dev/urandom
+  - memory: stress-ng -m 1 --vm-keep --vm-bytes 256M
+  - disk: while /bin/true; do dd if=3D/dev/urandom of=3D/var/tmp/mjb.1 bs=
+=3D4M count=3D100; done
+
+  We are talking about ~1-2 minutes on qemu 2.5 (4 tries x 3
+  architectures) and 2-10+ hours on >=3Dqemu 2.6.1.
+
+  I say it is likely not a bug, but more a discussion as I can easily avoid=
+ hanging via either:
+  - timeouts (--timeout, ...) to abort or suspend to migrate it
+  - --auto-converge ( I had only one try, but it seemed to help by slowing =
+down the load generators)
+
+  So you might say "that is all as it should be, and the users can use
+  the further options to mitigate" and I'm all fine with that. In that
+  case the bug still serves as a "searchable" document of some kind for
+  others triggering the same case. But if anything comes to your mind
+  that need better handling around this case lets start to discuss more
+  deeply about it.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1689499/+subscriptions
