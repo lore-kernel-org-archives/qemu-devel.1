@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d7zMk-0005mO-Nn
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:15:27 -0400
+	(envelope-from <laurent@vivier.eu>) id 1d7zSa-0007ts-IA
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:21:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d7zMj-0004HG-P6
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:15:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170427215821.19397-1-eblake@redhat.com>
-	<20170427215821.19397-7-eblake@redhat.com>
-	<87a871nd7j.fsf@dusky.pond.sub.org>
-	<w51zien1k1t.fsf@maestria.local.igalia.com>
-Date: Tue, 09 May 2017 09:14:55 +0200
-In-Reply-To: <w51zien1k1t.fsf@maestria.local.igalia.com> (Alberto Garcia's
-	message of "Mon, 08 May 2017 16:48:30 +0200")
-Message-ID: <8737ce33io.fsf@dusky.pond.sub.org>
+	(envelope-from <laurent@vivier.eu>) id 1d7zSZ-00069d-GA
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:21:28 -0400
+References: <20170505224833.17769-1-laurent@vivier.eu>
+	<20170505224833.17769-2-laurent@vivier.eu>
+	<20170505232738.targ5w5jm2vb73fe@var.youpi.perso.aquilenet.fr>
+	<7f643a77-0dd7-cf43-b51a-337da34f8f87@vivier.eu>
+	<20170508200907.ll5gms6krkk7kdct@var.youpi.perso.aquilenet.fr>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <720d2080-08cc-e7e2-6383-de22d63d4eeb@vivier.eu>
+Date: Tue, 9 May 2017 09:21:09 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170508200907.ll5gms6krkk7kdct@var.youpi.perso.aquilenet.fr>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 06/10] qobject: Use simpler QDict/QList
- scalar insertion macros
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "Richard W.M.
-	Jones" <rjones@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <jcody@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "open
-	list:X86" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Alberto Garcia <berto@igalia.com> writes:
+Le 08/05/2017 à 22:09, Samuel Thibault a écrit :
+> Hello,
+> 
+> Laurent Vivier, on sam. 06 mai 2017 15:19:44 +0200, wrote:
+>>> Laurent Vivier, on sam. 06 mai 2017 00:48:33 +0200, wrote:
+>>>> @@ -617,6 +622,10 @@ void slirp_pollfds_poll(GArray *pollfds, int select_error)
+>>>>                   * Check sockets for reading
+>>>>                   */
+>>>>                  else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
+>>>> +                    if (so->so_state & SS_ISFCONNECTING) {
+>>>> +                        socks5_recv(so->s, &so->so_proxy_state);
+>>>> +                        continue;
+>>>> +                    }
+>>>
+>>> Again, I don't see how this can work with both socks5 case and
+>>> non-socks5 case.  Don't we need to somehow check for the type of socket
+>>> before calling socks5_recv?
+>>
+>> The check is done previously by:
+>>
+>> @@ -442,6 +443,10 @@ void slirp_pollfds_fill(GArray *pollfds, uint32_t
+>> *timeout)
+>>                      .fd = so->s,
+>>                      .events = G_IO_OUT | G_IO_ERR,
+>>                  };
+>> +                if (so->so_proxy_state &&
+>> +                    so->so_proxy_state != SOCKS5_STATE_ERROR) {
+>> +                    pfd.events |= G_IO_IN;
+>> +                }
+>>
+>> We can enter in socks5_recv() only if so->so_proxy_state is in a valid
+>> state because G_IO_IN triggers that.
+> 
+> I don't understand: the socks5_recv gets called not only when pfd.events
+> contains G_IO_IN, but also when it contains G_IO_HUP or G_IO_ERR.  Also,
+> so_proxy_state being non-nul is not the only way to have G_IO_IN set in
+> pfd.events, so_state & SS_FACCEPTCONN and CONN_CANFRCV(so) also trigger
+> that.
 
-> On Fri 28 Apr 2017 10:33:36 AM CEST, Markus Armbruster wrote:
->>> v5: rebase to master (Coccinelle found a couple new spots), squash 3
->>> patches into 1, adjust R-b to only list Markus (while there were other
->>> reviews on the pre-squashed patches, Markus was the only one on all 3)
->>
->> The block: part had
->>
->>     Acked-by: Richard W.M. Jones <rjones@redhat.com>
->>     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>     Reviewed-by: Alberto Garcia <berto@igalia.com>
->>
->> The tests and qobject parts had
->>
->>     Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>
->> Richard, Stefan, Alberto, Philippe, let me know if you'd like me to
->> convert your R-by of parts to an Acked-by of the combined patch.  Feel
->> free to review the combined patch, of course.
->
-> You can keep my R-by, I just reviewed the combined patch.
+This is filtered by (so_state & SS_ISFCONNECTING). The only case when we
+enter in the receiving part with SS_ISFCONNECTING is when socks5 part
+has been enabled.
 
-Done.  Thanks!
+>>>> @@ -645,11 +654,19 @@ void slirp_pollfds_poll(GArray *pollfds, int select_error)
+>>>>                      /*
+>>>>                       * Check for non-blocking, still-connecting sockets
+>>>>                       */
+>>>> -                    if (so->so_state & SS_ISFCONNECTING) {
+>>>> -                        /* Connected */
+>>>> -                        so->so_state &= ~SS_ISFCONNECTING;
+>>>>  
+>>>> -                        ret = send(so->s, (const void *) &ret, 0, 0);
+>>>> +                    if (so->so_state & SS_ISFCONNECTING) {
+>>>> +                        ret = socks5_send(so->s, slirp->proxy_user,
+>>>
+>>> Ditto.
+>>
+>> if so_proxy_state is 0 the function does nothing
+> 
+> Well, that's quite weak reason to me, and will confuse readers, because
+> they'll think that the code is for the socks5 case only.
+
+OK, I'm going to add a "if (so->so_proxy_state && so->so_proxy_state !=
+SOCKS5_STATE_ERROR)" here.
+
+> 
+>>>> +++ b/slirp/socks5.c
+>>>> @@ -0,0 +1,371 @@
+>>>
+>>> In v2 of the patch, this was said to have "some parts from nmap/ncat
+>>> GPLv2".  Is that really not true any more?  If any part of the file is
+>>> not original, it *has* to wear proper copyright notices, otherwise it's
+>>> copyright infrigement.
+>>
+>> No, I've re-written entirely this part from RFC.
+> 
+> Ok.
+> 
+>> for ncat.h
+> 
+> Which code comes from ncat.h?
+
+I haven't been clear: none. I've entirely re-written this part.
+
+> Again, we can't copy/paste code like that, that is copyright
+> infrigement.
+> 
+>> license is 281 lines long (with clarifications and
+>> extensions) for 60 lines copied...
+> 
+> That is really no reason.  Copyright thingies are considered as soon
+> as dozen-ish lines of non-trivial code.  The size of the terms of the
+> licence itself really doesn't matter.  If we don't respect others'
+> copyright, we can't expect others (e.g. companies) to respect our GPL
+> code.
+
+I respect others copyright. There is no more nmap/ncat code in this patch.
+
+Thanks,
+Laurent
