@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d7wKx-0004Nr-IN
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:01:24 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7wNU-0005U7-F5
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1d7wKu-0008Ft-GL
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:01:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d7wKu-0008FV-7D
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:01:20 -0400
-Date: Tue, 9 May 2017 12:01:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170509040115.GA18973@lemon.lan>
-References: <20170508221759.15616-1-f4bug@amsat.org>
-	<20170508221759.15616-3-f4bug@amsat.org>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7wNR-0001Bk-CT
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:04:00 -0400
+Received: from [59.151.112.132] (port=51009 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d7wNQ-00015E-WD
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:03:57 -0400
+References: <1493372840-24551-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1493372840-24551-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<7bde3681-280c-764a-71df-f4a1cc4b7011@redhat.com>
+	<4cc14276-55bc-2981-cbdd-4d66ae6be59e@cn.fujitsu.com>
+	<fbb4b2b1-4af2-c948-406f-e63398f4c749@redhat.com>
+	<d960c269-b68a-ffd9-5df1-b507eb4fe24d@cn.fujitsu.com>
+	<f80bed9a-598e-bb89-3a01-123bdc40e526@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <09077119-d9bb-c367-799a-a0718664cdc7@cn.fujitsu.com>
+Date: Tue, 9 May 2017 12:03:41 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170508221759.15616-3-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/21] docker: add --include-file
- argument to 'build' command
+In-Reply-To: <f80bed9a-598e-bb89-3a01-123bdc40e526@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH V3 05/10] net/net.c: Add vnet header length
+ to SocketReadState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-On Mon, 05/08 19:17, Philippe Mathieu-Daud=E9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  tests/docker/Makefile.include | 3 ++-
->  tests/docker/docker.py        | 5 +++++
->  2 files changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
-ude
-> index 03eda37bf4..c99ce702ea 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -51,7 +51,8 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
->  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
->  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
->  		$(if $(NOUSER),,--add-current-user) \
-> -		$(if $(EXECUTABLE),--include-executable=3D$(EXECUTABLE)),\
-> +		$(if $(EXECUTABLE),--include-executable=3D$(EXECUTABLE))\
-> +		$(if $(EXTRA_FILE),--include-file=3D$(EXTRA_FILE)),\
->  		"BUILD","$*")
-> =20
->  # Enforce dependancies for composite images
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 6ddc6e4c2a..90520e4bca 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -237,6 +237,9 @@ class BuildCommand(SubCommand):
->                              help=3D"""Specify a binary that will be co=
-pied to the
->                              container together with all its dependent
->                              libraries""")
-> +        parser.add_argument("--include-file", "-f",
-> +                            help=3D"""Specify a file that will be copi=
-ed to the
-> +                            container""")
 
-Is it more useful if it's '--include-files' that accepts multiple files? =
-Or
-alternatively allow this option to be use multiple times:
 
-    -f foo -f bar -f ...
+On 05/09/2017 10:40 AM, Jason Wang wrote:
+>
+>
+> On 2017年05月08日 11:47, Zhang Chen wrote:
+>>
+>>
+>> On 05/03/2017 06:42 PM, Jason Wang wrote:
+>>>
+>>>
+>>> On 2017年05月03日 11:43, Zhang Chen wrote:
+>>>>
+>>>>
+>>>> On 05/02/2017 12:53 PM, Jason Wang wrote:
+>>>>>
+>>>>>
+>>>>> On 2017年04月28日 17:47, Zhang Chen wrote:
+>>>>>> Address Jason Wang's comments add vnet header length to 
+>>>>>> SocketReadState.
+>>>>>
+>>>>> Instead of saying this, you can add "Suggested-by: Jason Wang 
+>>>>> <jasowang@redhat.com>" above your sign-off.
+>>>>
+>>>> OK.
+>>>>
+>>>>>
+>>>>>> So we change net_fill_rstate() to read
+>>>>>> struct  {int size; int vnet_hdr_len; const uint8_t buf[];}.
+>>>>>
+>>>>> This makes me thinking about the backward compatibility. I think 
+>>>>> we'd better try to keep it as much as possible. E.g how about pack 
+>>>>> vnet_hdr_len into higher bits of size?
+>>>>>
+>>>>
+>>>> Do you means split uint32_t size to uint16_t size and uint16_t 
+>>>> vnet_hdr_len ?
+>>>> If yes, we also can't keep compatibility with old version.
+>>>> Old code send a uint32_t size, we read it as uint16_t size is 
+>>>> always wrong.
+>>>>
+>>>> Thanks
+>>>> Zhang Chen
+>>>
+>>> Consider it's unlikely to send or receive packet >= 64K, we can 
+>>> reuse higher bits (e.g highest 8 bits). Then we can still read 
+>>> uint32_t and then check its highest 8 bits. If it was zero, we know 
+>>> vnet header is zero, if not it could be read as vnet header length.
+>>
+>> I got your point, but in this way, packet size must < 64K, if size 
+>> >=64K we still can't maintain the backward compatibility,
+>> For the packet sender that didn't know the potential packet size 
+>> limit, I think we should make code explicitly declared like
+>> currently code. Otherwise we will make other people confused and make 
+>> code difficult to maintain.
+>>
+>> Thanks
+>> Zhang Chen
+>>
+>
+> Yes, this is an possible issue in the future. Rethink about this, what 
+> if we just compare vnet header? Is there any issue of doing this? 
+> (Sorry, I remember this is a reason, but forget now).
 
-Similarly, should EXTRA_FILE be EXTRA_FILES or something?
+Yes, we can compare all packet with vnet header, the compare performance 
+is very low. but we can't parse raw packet to tcp/udp/icmp packet, 
+because we didn't know the vnet_hdr_len as the offset.
 
-We are already lacking this with --include-executable's documentation, bu=
-t
-please also document "where" is it copied to in the container's filesyste=
-m.
+Thanks
+Zhang Chen
 
-Fam
+>
+> Thanks
+>
+>
+> .
+>
 
->          parser.add_argument("--add-current-user", "-u", dest=3D"user",
->                              action=3D"store_true",
->                              help=3D"Add the current user to image's pa=
-sswd")
-> @@ -274,6 +277,8 @@ class BuildCommand(SubCommand):
->              if args.include_executable:
->                  _copy_binary_with_libs(args.include_executable,
->                                         docker_dir)
-> +            if args.include_file:
-> +                _copy_with_mkdir(args.include_file, docker_dir)
-> =20
->              argv +=3D ["--build-arg=3D" + k.lower() + "=3D" + v
->                          for k, v in os.environ.iteritems()
-> --=20
-> 2.11.0
->=20
+-- 
+Thanks
+Zhang Chen
