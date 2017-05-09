@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d8BlM-0000zv-UR
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:29:41 -0400
+	(envelope-from <groug@kaod.org>) id 1d8Bmt-0001mI-Dk
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d8BlI-0002st-R9
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:29:40 -0400
-Received: from 3.mo5.mail-out.ovh.net ([46.105.40.108]:43151)
+	(envelope-from <groug@kaod.org>) id 1d8Bmp-0003ad-Ab
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:15 -0400
+Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:53684)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d8BlI-0002sU-Ks
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:29:36 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d8Bmp-0003a9-4D
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:31:11 -0400
 Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 33E35EE69D
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 22:29:34 +0200 (CEST)
-Date: Tue, 9 May 2017 22:29:26 +0200
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C3ECBE9D94
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 22:31:09 +0200 (CEST)
+Date: Tue, 9 May 2017 22:31:04 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170509222926.293ab520@bahia>
-In-Reply-To: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
+Message-ID: <20170509223104.55412e1b@bahia>
+In-Reply-To: <1494356693-13190-2-git-send-email-sstabellini@kernel.org>
 References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
+	<1494356693-13190-2-git-send-email-sstabellini@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/naxKA=FAPtwU3bzvGFshwoq";
+	boundary="Sig_/rwhgYiVV_ui593pL0sJBdi6";
 	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen/9pfs: fix two resource leaks on
- error paths, discovered by Coverity
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] Check the return value of fcntl in
+ qemu_set_cloexec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +33,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xen.org, anthony.perard@citrix.com, aneesh.kumar@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xen.org, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>
 
---Sig_/naxKA=FAPtwU3bzvGFshwoq
+--Sig_/rwhgYiVV_ui593pL0sJBdi6
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Tue,  9 May 2017 12:04:51 -0700
+On Tue,  9 May 2017 12:04:52 -0700
 Stefano Stabellini <sstabellini@kernel.org> wrote:
 
-> CID: 1374836
+> Assert that the return value is not an error. This issue was found by
+> Coverity.
+>=20
+> CID: 1374831
 >=20
 > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> CC: anthony.perard@citrix.com
 > CC: groug@kaod.org
-> CC: aneesh.kumar@linux.vnet.ibm.com
+> CC: pbonzini@redhat.com
+> CC: Eric Blake <eblake@redhat.com>
 > ---
->  hw/9pfs/xen-9p-backend.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  util/oslib-posix.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> index 9c7f41a..a1fdede 100644
-> --- a/hw/9pfs/xen-9p-backend.c
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -332,12 +332,14 @@ static int xen_9pfs_connect(struct XenDevice *xende=
-v)
->          str =3D g_strdup_printf("ring-ref%u", i);
->          if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
->                                   &xen_9pdev->rings[i].ref) =3D=3D -1) {
-> +            g_free(str);
->              goto out;
->          }
->          g_free(str);
-
-I would rather do something like:
-
-    int ret;
-
-    [...]
-
-        str =3D g_strdup_printf("ring-ref%u", i);
-        ret =3D xenstore_read_fe_int(&xen_9pdev->xendev, str,
-                                   &xen_9pdev->rings[i].ref);
-        g_free(str);
-        if (ret =3D=3D  -1) {
-            goto out;
-        }
-
-but this is a matter of taste and you own this code so:
 
 Reviewed-by: Greg Kurz <groug@kaod.org>
 
->          str =3D g_strdup_printf("event-channel-%u", i);
->          if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
->                                   &xen_9pdev->rings[i].evtchn) =3D=3D -1)=
- {
-> +            g_free(str);
->              goto out;
->          }
->          g_free(str);
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index 4d9189e..16894ad 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -182,7 +182,9 @@ void qemu_set_cloexec(int fd)
+>  {
+>      int f;
+>      f =3D fcntl(fd, F_GETFD);
+> -    fcntl(fd, F_SETFD, f | FD_CLOEXEC);
+> +    assert(f !=3D -1);
+> +    f =3D fcntl(fd, F_SETFD, f | FD_CLOEXEC);
+> +    assert(f !=3D -1);
+>  }
+> =20
+>  /*
 
-
---Sig_/naxKA=FAPtwU3bzvGFshwoq
+--Sig_/rwhgYiVV_ui593pL0sJBdi6
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAlkSJqYACgkQAvw66wEB28LRXACeJH2/eljzwM9UXX7+erH4je6A
-dbcAn1bqcSd7vMJwxsGc7xz92mDZFt07
-=6UzK
+iEYEARECAAYFAlkSJwgACgkQAvw66wEB28Jf9wCdEkzkfWxjbcJ1BpUwpEuD1ebM
+VDYAn02VUPTG59b9dNO1W2vgVw6hbezM
+=5nY4
 -----END PGP SIGNATURE-----
 
---Sig_/naxKA=FAPtwU3bzvGFshwoq--
+--Sig_/rwhgYiVV_ui593pL0sJBdi6--
