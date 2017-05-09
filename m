@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1d84hk-0004L3-7Y
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:57:29 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d84jJ-0005J3-Gx
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1d84hg-0004FL-AQ
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:57:28 -0400
-Received: from mail-ua0-f178.google.com ([209.85.217.178]:33529)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d84jF-0005SR-BD
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:05 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34247)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1d84hg-0004Dv-3z
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:57:24 -0400
-Received: by mail-ua0-f178.google.com with SMTP id e28so7439883uah.0
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 05:57:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d84jF-0005SK-4T
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:01 -0400
+Received: by mail-qk0-x243.google.com with SMTP id u75so14539996qka.1
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 05:59:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170509113332.4987-1-marcandre.lureau@redhat.com>
+	<20170509113332.4987-10-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7a271264-56e5-e919-09d1-9e058ef6b2f5@amsat.org>
+Date: Tue, 9 May 2017 09:58:57 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170421091632.30900-5-kraxel@redhat.com>
-References: <20170421091632.30900-1-kraxel@redhat.com>
-	<20170421091632.30900-5-kraxel@redhat.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Tue, 9 May 2017 14:57:22 +0200
-Message-ID: <CABdb736fuqG1LhZYmxaZ_GMXXjTwKrQGs4M2h1Juwo=ObdyWNA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 4/9] vga: make display updates thread safe.
+In-Reply-To: <20170509113332.4987-10-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 09/13] char: generalize qemu_chr_write_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,163 +34,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-Hi Gerd,
+Hi Marc-André,
 
-On Fri, Apr 21, 2017 at 11:16 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The vga code clears the dirty bits *after* reading the framebuffer
-> memory.  So if the guest framebuffer updates hits the race window
-> between vga reading the framebuffer and vga clearing the dirty bits
-> vga will miss that update
+On 05/09/2017 08:33 AM, Marc-André Lureau wrote:
+> qemu_chr_fe_write() is similar to qemu_chr_write_all(): the later write
+> all with a chardev backend.
 >
-> Fix it by using the new memory_region_copy_and_clear_dirty()
-> memory_region_copy_get_dirty() functions.  That way we clear the
-> dirty bitmap before reading the framebuffer.  Any guest display
-> updates happening in parallel will be properly tracked in the
-> dirty bitmap then and the next display refresh will pick them up.
+> Make qemu_chr_write() and qemu_chr_fe_write_buffer() take an 'all'
+> argument. If false, handle 'partial' write the way qemu_chr_fe_write()
+> use to, and call qemu_chr_write() from qemu_chr_fe_write().
+
+What about invert logic and name the argument 'is_partial[_write]'? Else 
+'write_all' to have more readable code?
+
 >
-> Problem triggers with mttcg only.  Before mttcg was merged tcg
-> never ran in parallel to vga emulation.  Using kvm will hide the
-> problem too, due to qemu operating on a userspace copy of the
-> kernel's dirty bitmap.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
->  hw/display/vga.c | 36 +++++++++++++++++-------------------
->  1 file changed, 17 insertions(+), 19 deletions(-)
+>  chardev/char.c | 69 +++++++++++++++++++++++-----------------------------------
+>  1 file changed, 27 insertions(+), 42 deletions(-)
 >
-> diff --git a/hw/display/vga.c b/hw/display/vga.c
-> index 3991b88aac..b2516c8d21 100644
-> --- a/hw/display/vga.c
-> +++ b/hw/display/vga.c
-> @@ -1465,7 +1465,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
->      DisplaySurface *surface = qemu_console_surface(s->con);
->      int y1, y, update, linesize, y_start, double_scan, mask, depth;
->      int width, height, shift_control, line_offset, bwidth, bits;
-> -    ram_addr_t page0, page1, page_min, page_max;
-> +    ram_addr_t page0, page1;
-> +    DirtyBitmapSnapshot *snap = NULL;
->      int disp_width, multi_scan, multi_run;
->      uint8_t *d;
->      uint32_t v, addr1, addr;
-> @@ -1480,9 +1481,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
->
->      full_update |= update_basic_params(s);
->
-> -    if (!full_update)
-> -        vga_sync_dirty_bitmap(s);
-> -
->      s->get_resolution(s, &width, &height);
->      disp_width = width;
->
-> @@ -1625,11 +1623,17 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
->      addr1 = (s->start_addr * 4);
->      bwidth = (width * bits + 7) / 8;
->      y_start = -1;
-> -    page_min = -1;
-> -    page_max = 0;
->      d = surface_data(surface);
->      linesize = surface_stride(surface);
->      y1 = 0;
-> +
-> +    if (!full_update) {
-> +        vga_sync_dirty_bitmap(s);
-> +        snap = memory_region_snapshot_and_clear_dirty(&s->vram, addr1,
-> +                                                      bwidth * height,
-> +                                                      DIRTY_MEMORY_VGA);
-> +    }
-> +
->      for(y = 0; y < height; y++) {
->          addr = addr1;
->          if (!(s->cr[VGA_CRTC_MODE] & 1)) {
-> @@ -1644,17 +1648,17 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
->          update = full_update;
->          page0 = addr;
->          page1 = addr + bwidth - 1;
-> -        update |= memory_region_get_dirty(&s->vram, page0, page1 - page0,
-> -                                          DIRTY_MEMORY_VGA);
-> +        if (full_update) {
-> +            update = 1;
-> +        } else {
-> +            update = memory_region_snapshot_get_dirty(&s->vram, snap,
-> +                                                      page0, page1 - page0);
-> +        }
-
-This seems to have broken Windows. I am getting a sporadic assert on
-boot at the following callstack:
-
-#4 cpu_physical_memory_snapshot_get_dirty (snap=0x555556a3b3d0,
-start=2148532224, length=511)
-#5 memory_region_snapshot_get_dirty (mr=0x555558007ad0,
-snap=0x555556a3b3d0, addr=393216, size=511)
-#6 vga_draw_graphic (s=0x555558007ac0, full_update=0)
-#7 vga_update_display (opaque=0x555558007ac0)
-#8 graphic_hw_update (con=0x55555820f6e0)
-#9 qemu_spice_display_refresh (ssd=0x555558007700)
-#10 display_refresh (dcl=0x555558007708)
-#11 dpy_refresh (s=0x55555820f670)
-#12 gui_update (opaque=0x55555820f670)
-#13 timerlist_run_timers (timer_list=0x555556836630)
-#14 qemu_clock_run_timers (type=QEMU_CLOCK_REALTIME)
-#15 qemu_clock_run_all_timers ()
-#16 main_loop_wait (nonblocking=0)
-#17 main_loop ()
-#18 main (argc=83, argv=0x7fffffffdac8, envp=0x7fffffffdd68)
-
-(gdb)
-#4  0x000055555576984d in cpu_physical_memory_snapshot_get_dirty
-(snap=0x555556a3b3d0, start=2148532224, length=511) at
-/home/lprosek/qemu/exec.c:1129
-1129        assert(start + length <= snap->end);
-(gdb) p *snap
-$1 = {start = 2148007936, end = 2148532224, dirty = 0x555556a3b3e0}
-(gdb) p start
-$2 = 2148532224
-(gdb) p length
-$3 = 511
-
-'snap->end' is equal to 'start', so:
-
-qemu-system-x86_64: /home/lprosek/qemu/exec.c:1129:
-cpu_physical_memory_snapshot_get_dirty: Assertion `start + length <=
-snap->end' failed.
-
-Is this enough information to figure out what's going on or would you
-like me to take a closer look?
-
-Thanks!
-Ladi
-
->          /* explicit invalidation for the hardware cursor (cirrus only) */
->          update |= vga_scanline_invalidated(s, y);
->          if (update) {
->              if (y_start < 0)
->                  y_start = y;
-> -            if (page0 < page_min)
-> -                page_min = page0;
-> -            if (page1 > page_max)
-> -                page_max = page1;
->              if (!(is_buffer_shared(surface))) {
->                  vga_draw_line(s, d, s->vram_ptr + addr, width);
->                  if (s->cursor_draw_line)
-> @@ -1687,13 +1691,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
->          dpy_gfx_update(s->con, 0, y_start,
->                         disp_width, y - y_start);
->      }
-> -    /* reset modified pages */
-> -    if (page_max >= page_min) {
-> -        memory_region_reset_dirty(&s->vram,
-> -                                  page_min,
-> -                                  page_max - page_min,
-> -                                  DIRTY_MEMORY_VGA);
-> -    }
-> +    g_free(snap);
->      memset(s->invalidated_y_table, 0, sizeof(s->invalidated_y_table));
+> diff --git a/chardev/char.c b/chardev/char.c
+> index af7d871ed5..392dba6a86 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -96,7 +96,8 @@ static void qemu_chr_fe_write_log(Chardev *s,
 >  }
 >
-> --
-> 2.9.3
+>  static int qemu_chr_fe_write_buffer(Chardev *s,
+> -                                    const uint8_t *buf, int len, int *offset)
+> +                                    const uint8_t *buf, int len,
+> +                                    int *offset, bool all)
+>  {
+>      ChardevClass *cc = CHARDEV_GET_CLASS(s);
+>      int res = 0;
+> @@ -106,7 +107,7 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
+>      while (*offset < len) {
+>      retry:
+>          res = cc->chr_write(s, buf + *offset, len - *offset);
+> -        if (res < 0 && errno == EAGAIN) {
+> +        if (res < 0 && errno == EAGAIN && all) {
+>              g_usleep(100);
+>              goto retry;
+>          }
+> @@ -116,6 +117,9 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
+>          }
 >
+>          *offset += res;
+> +        if (!all) {
+> +            break;
+> +        }
+>      }
+>      if (*offset > 0) {
+>          qemu_chr_fe_write_log(s, buf, *offset);
+> @@ -130,54 +134,19 @@ static bool qemu_chr_replay(Chardev *chr)
+>      return qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
+>  }
+>
+> -int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
+> +static int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool all)
+>  {
+> -    Chardev *s = be->chr;
+> -    ChardevClass *cc;
+> -    int ret;
+> -
+> -    if (!s) {
+> -        return 0;
+> -    }
+> -
+> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
+> -        int offset;
+> -        replay_char_write_event_load(&ret, &offset);
+> -        assert(offset <= len);
+> -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
+> -        return ret;
+> -    }
+> -
+> -    cc = CHARDEV_GET_CLASS(s);
+> -    qemu_mutex_lock(&s->chr_write_lock);
+> -    ret = cc->chr_write(s, buf, len);
+> -
+> -    if (ret > 0) {
+> -        qemu_chr_fe_write_log(s, buf, ret);
+> -    }
+> -
+> -    qemu_mutex_unlock(&s->chr_write_lock);
+> -
+> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
+> -        replay_char_write_event_save(ret, ret < 0 ? 0 : ret);
+> -    }
+> -
+> -    return ret;
+> -}
+> -
+> -int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+> -{
+> -    int offset;
+> +    int offset = 0;
+>      int res;
+>
+>      if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
+>          replay_char_write_event_load(&res, &offset);
+>          assert(offset <= len);
+> -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
+> +        qemu_chr_fe_write_buffer(s, buf, offset, &offset, true);
+>          return res;
+>      }
+>
+> -    res = qemu_chr_fe_write_buffer(s, buf, len, &offset);
+> +    res = qemu_chr_fe_write_buffer(s, buf, len, &offset, all);
+>
+>      if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
+>          replay_char_write_event_save(res, offset);
+> @@ -189,6 +158,22 @@ int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+>      return offset;
+>  }
+>
+> +int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+> +{
+> +    return qemu_chr_write(s, buf, len, true);
+> +}
+> +
+> +int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
+> +{
+> +    Chardev *s = be->chr;
+> +
+> +    if (!s) {
+> +        return 0;
+> +    }
+> +
+> +    return qemu_chr_write(s, buf, len, false);
+> +}
+> +
+>  int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
+>  {
+>      Chardev *s = be->chr;
+> @@ -197,7 +182,7 @@ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
+>          return 0;
+>      }
+>
+> -    return qemu_chr_write_all(s, buf, len);
+> +    return qemu_chr_write(s, buf, len, true);
+>  }
+>
+>  int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
 >
