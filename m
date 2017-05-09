@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d85ly-0002ej-RW
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:05:59 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d85m4-0002lH-4p
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d85lt-0007gW-Pl
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:05:54 -0400
-Date: Tue, 9 May 2017 15:05:38 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170509140538.GJ1669@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170425153858.25660-1-berrange@redhat.com>
-	<20170425153858.25660-14-berrange@redhat.com>
-	<b3f9f0dd-8925-4528-807e-3cf97a199298@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1d85m0-0007im-70
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:06:00 -0400
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:36198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d85lz-0007ig-Te
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:05:56 -0400
+Received: by mail-qt0-x236.google.com with SMTP id m91so1402784qte.3
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 07:05:55 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170509132736.10071-1-berrange@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <040c1e25-224f-1a8a-9f60-7238e6ad5df6@twiddle.net>
+Date: Tue, 9 May 2017 07:05:51 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b3f9f0dd-8925-4528-807e-3cf97a199298@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 13/18] qcow2: add support for LUKS
- encryption format
+In-Reply-To: <20170509132736.10071-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/2] Support CPUID signature for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Wed, Apr 26, 2017 at 12:46:18PM -0500, Eric Blake wrote:
-> On 04/25/2017 10:38 AM, Daniel P. Berrange wrote:
-> > This adds support for using LUKS as an encryption format
-> > with the qcow2 file, using the new encrypt.format parameter
-> > to request "luks" format. e.g.
-> > 
-> >   # qemu-img create --object secret,data=123456,id=sec0 \
-> >        -f qcow2 -o encrypt.-format=luks,encrypt.key-secret=sec0 \
+On 05/09/2017 06:27 AM, Daniel P. Berrange wrote:
+> This enables report of a signature in CPUID for the TCG
+> interpretor.
 > 
-> s/encrypt.-format/encrypt.format/
+> Changed in v4:
 > 
-> >        test.qcow2 10G
-> > 
+>   - Report 0x40000001 in EAX for 0x40000000 index (Eduardo)
+>   - Report all zeros for 0x40000001 index (Eduardo)
+>   - Make code style consistent when checking limits (Eduardo)
 > 
-> > 
-> > Aside from all the cryptographic differences implied by
-> > use of the LUKS format, there is one further key difference
-> > between the use of legacy AES and LUKS encryption in qcow2.
-> > For LUKS, the initialiazation vectors are generated using
-> > the host physical sector as the input, rather than the
-> > guest virtual sector. This guarantees unique initialization
-> > vectors for all sectors when qcow2 internal snapshots are
-> > used, thus giving stronger protection against watermarking
-> > attacks.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
+> Changed in v3:
 > 
-> > @@ -165,6 +246,47 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-> >              }
-> >              break;
-> >  
-> > +        case QCOW2_EXT_MAGIC_CRYPTO_HEADER: {
-> > +            unsigned int cflags = 0;
-> > +            if (s->crypt_method_header != QCOW_CRYPT_LUKS) {
-> > +                error_setg(errp, "CRYPTO header extension only "
-> > +                           "expected with LUKS encryption method");
-> > +                return -EINVAL;
-> > +            }
-> > +            if (ext.len != sizeof(Qcow2CryptoHeaderExtension)) {
-> > +                error_setg(errp, "CRYPTO header extension size %u, "
-> > +                           "but expected size %zu", ext.len,
-> > +                           sizeof(Qcow2CryptoHeaderExtension));
-> > +                return -EINVAL;
-> > +            }
-> > +
-> > +            ret = bdrv_pread(bs->file, offset, &s->crypto_header, ext.len);
-> > +            if (ret < 0) {
-> > +                error_setg_errno(errp, -ret,
-> > +                                 "Unable to read CRYPTO header extension");
-> > +                return ret;
-> > +            }
-> > +            be64_to_cpus(&s->crypto_header.offset);
-> > +            be64_to_cpus(&s->crypto_header.length);
-> > +
-> > +            if ((s->crypto_header.offset % s->cluster_size) != 0) {
-> > +                error_setg(errp, "Encryption header offset '%" PRIu64 "' is "
-> > +                           "not a multiple of cluster size '%u'",
-> > +                           s->crypto_header.offset, s->cluster_size);
-> > +                return -EINVAL;
-> > +            }
+>   - Simplify CPU limit code still further (Eduardo)
 > 
-> Do we need to sanity check that crypto_header.length is not bogus?
+> Changed in v2:
+> 
+>   - Rewrite the way we bounds check / cap the CPUID index
+>     to use a flat switch, instead of nested ifs (Eduardo)
+>   - Add a 'tcg-cpuid' property to allow it to be hidden
+>     (Eduardo)
+>   - Hide the TCG signature for old machine types
+>   - Force code to a no-op if tcg_enabled() is false (Eduardo)
+> 
+> 
+> NB, I did not introduce a general 'hypervisor-cpuid' property
+> to obsolete the existing 'kvm=off|on' -cpu property, since it
+> appears impossible to get the back compat semantics right,
+> as described in a previous reply.
+> 
+> Daniel P. Berrange (2):
+>    i386: rewrite way CPUID index is validated
+>    i386: expose "TCGTCGTCGTCG" in the 0x40000000 CPUID leaf
 
-The only sanity check I can see would be to put an arbitrary size limit
-on the length ? I'm a little loathe to do that since LUKSv2 is going to
-make the header extensible, and/or future LUKSv1 changes might adjust
-padding, both making the header longer than it would be today. I would
-like qemu-img to be able to open such future files, even if it then
-refuses support for the features.
+I probably should have commented earlier but...  what's the point?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+If you want the guest os to actually do anything with this, what do you gain 
+for advertising TCG over KVM?
+
+
+r~
