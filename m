@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d84jl-0005XY-RE
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:35 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d84yI-0001M5-0E
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1d84jk-0005VW-GY
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:59:33 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d84yH-000337-23
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 09:14:34 -0400
+Date: Tue, 9 May 2017 15:14:21 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170509151421.0b51e1f2@nial.brq.redhat.com>
+In-Reply-To: <20170505202923.GM3482@thinpad.lan.raisama.net>
+References: <1493816238-33120-1-git-send-email-imammedo@redhat.com>
+	<1493816238-33120-8-git-send-email-imammedo@redhat.com>
+	<20170505202923.GM3482@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <20170508205401.GA23989@stefanha-x1.localdomain>
-References: <1493971429-10441-1-git-send-email-lidongchen@tencent.com>
-	<20170508205401.GA23989@stefanha-x1.localdomain>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Tue, 9 May 2017 20:59:30 +0800
-Message-ID: <CAOGPPbfukP450k2CaC6sEiFfca2DQ1OqMGSvZgwOvXr9WUGXaQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4] migration/block: move
- bdrv_is_allocated() into bb's AioContext
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 07/24] pc: add node-id property to CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, qemu block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Lidong Chen <lidongchen@tencent.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-On Tue, May 9, 2017 at 4:54 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Fri, May 05, 2017 at 04:03:49PM +0800, jemmy858585@gmail.com wrote:
->> From: Lidong Chen <lidongchen@tencent.com>
->>
->> when block migration with high-speed, mig_save_device_bulk hold the
->> BQL and invoke bdrv_is_allocated frequently. This patch moves
->> bdrv_is_allocated() into bb's AioContext. It will execute without
->> blocking other I/O activity.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> ---
->>      v4 changelog:
->>           Use the prototype code written by Stefan and fix some bug.
->>           moves bdrv_is_allocated() into bb's AioContext.
->> ---
->>  migration/block.c | 48 +++++++++++++++++++++++++++++++++++++++---------
->>  1 file changed, 39 insertions(+), 9 deletions(-)
->
-> Added Paolo because he's been reworking AioContext and locking.
->
-> The goal of this patch is to avoid waiting for bdrv_is_allocated() to
-> complete while holding locks.  Do bdrv_is_allocated() in the AioContext
-> so event processing continues after yield.
+On Fri, 5 May 2017 17:29:23 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Hi Paolo:
-    Some information about the problem.
-    https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg01423.html
+> On Wed, May 03, 2017 at 02:57:01PM +0200, Igor Mammedov wrote:
+> > it will allow switching from cpu_index to property based
+> > numa mapping in follow up patches.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  hw/i386/pc.c      | 17 +++++++++++++++++
+> >  target/i386/cpu.c |  1 +
+> >  2 files changed, 18 insertions(+)
+> > 
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > index 9cec0c1..4a4fb1c 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -1893,6 +1893,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+> >                              DeviceState *dev, Error **errp)
+> >  {
+> >      int idx;
+> > +    int node_id;
+> >      CPUState *cs;
+> >      CPUArchId *cpu_slot;
+> >      X86CPUTopoInfo topo;
+> > @@ -1982,6 +1983,22 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+> >  
+> >      cs = CPU(cpu);
+> >      cs->cpu_index = idx;
+> > +
+> > +    node_id = numa_get_node_for_cpu(cs->cpu_index);
+> > +    if (node_id == nb_numa_nodes) {
+> > +        /* by default CPUState::numa_node was 0 if it's not set via CLI
+> > +         * keep it this way for now but in future we probably should
+> > +         * refuse to start up with incomplete numa mapping */
+> > +        node_id = 0;
+> > +    }
+> > +    if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
+> > +        cs->numa_node = node_id;  
+> 
+> I suggest moving the above lines to cpu_common_realizefn(), and
+> deleting the code in numa_post_machine_init().
+> 
+> If you want to do this in v3 of this series, or as a follow-up
+> patch, it's up to you.
+maybe not to realize time, but yep I'm thinking about moving
+this whole hunk into a helper function that could be reused
+by pc/arm/spapr without duplicating.
+I'd do it as follow-up.
 
-    why bdrv_inc_in_flight() is needed.
-    blk_set_aio_context maybe invoked by vcpu thread. like this:
-              blk_set_aio_context
-                   virtio_blk_data_plane_stop
-                            virtio_pci_stop_ioeventfd
-                                  virtio_pci_common_write
-    so bs->aio_context maybe change before mig_next_allocated_cluster().
 
-    I use this method to verify this patch:
-    run this command in guest os:
-          while [ 1 ]; do rmmod virtio_blk; modprobe virtio_blk; done
+> > +    } else if (cs->numa_node != node_id) {
+> > +            error_setg(errp, "node-id %d must match numa node specified"
+> > +                "with -numa option for cpu-index %d",
+> > +                cs->numa_node, cs->cpu_index);
+> > +            return;
+> > +    }
+> >  }
+> >  
+> >  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 13c0985..007a5bd 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -3982,6 +3982,7 @@ static Property x86_cpu_properties[] = {
+> >      DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
+> >      DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
+> >  #endif
+> > +    DEFINE_PROP_INT32("node-id", CPUState, numa_node, CPU_UNSET_NUMA_NODE_ID),  
+> 
+> This changes the default from 0 to CPU_UNSET_NUMA_NODE_ID, but it
+> looks like there's no existing i386 or PC code that ever looks at
+> CPUState::numa_node. Maybe worth mentioning in the commit
+> message.
+In preceding hunk there is code which still effectively keeps it 0 by default
+with comment explaining that it's so for legacy reasons.
+I can copy comment in commit message as well if that's what you've meant.
 
-   Thanks.
+for PC it would affect only HMP 'info numa' output,
+but pc_cpu_pre_plug() in this patch takes care of it
+to ensure that old behavior is preserved.
 
->
->>
->> diff --git a/migration/block.c b/migration/block.c
->> index 060087f..c871361 100644
->> --- a/migration/block.c
->> +++ b/migration/block.c
->> @@ -263,6 +263,30 @@ static void blk_mig_read_cb(void *opaque, int ret)
->>      blk_mig_unlock();
->>  }
->>
->> +typedef struct {
->> +    int64_t *total_sectors;
->> +    int64_t *cur_sector;
->> +    BlockBackend *bb;
->> +    QemuEvent event;
->> +} MigNextAllocatedClusterData;
->> +
->> +static void coroutine_fn mig_next_allocated_cluster(void *opaque)
->> +{
->> +    MigNextAllocatedClusterData *data = opaque;
->> +    int nr_sectors;
->> +
->> +    /* Skip unallocated sectors; intentionally treats failure as
->> +     * an allocated sector */
->> +    while (*data->cur_sector < *data->total_sectors &&
->> +           !bdrv_is_allocated(blk_bs(data->bb), *data->cur_sector,
->> +                              MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
->> +        *data->cur_sector += nr_sectors;
->> +    }
->> +
->> +    bdrv_dec_in_flight(blk_bs(data->bb));
->> +    qemu_event_set(&data->event);
->> +}
->> +
->>  /* Called with no lock taken.  */
->>
->>  static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
->> @@ -274,17 +298,23 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDevState *bmds)
->>      int nr_sectors;
->>
->>      if (bmds->shared_base) {
->> +        AioContext *bb_ctx;
->> +        Coroutine *co;
->> +        MigNextAllocatedClusterData data = {
->> +            .cur_sector = &cur_sector,
->> +            .total_sectors = &total_sectors,
->> +            .bb = bb,
->> +        };
->> +        qemu_event_init(&data.event, false);
->> +
->>          qemu_mutex_lock_iothread();
->> -        aio_context_acquire(blk_get_aio_context(bb));
->> -        /* Skip unallocated sectors; intentionally treats failure as
->> -         * an allocated sector */
->> -        while (cur_sector < total_sectors &&
->> -               !bdrv_is_allocated(blk_bs(bb), cur_sector,
->> -                                  MAX_IS_ALLOCATED_SEARCH, &nr_sectors)) {
->> -            cur_sector += nr_sectors;
->> -        }
->> -        aio_context_release(blk_get_aio_context(bb));
->> +        bdrv_inc_in_flight(blk_bs(bb));
->
-> Please add a comment explaining why bdrv_inc_in_flight() is invoked.
->
->> +        bb_ctx = blk_get_aio_context(bb);
->> +        co = qemu_coroutine_create(mig_next_allocated_cluster, &data);
->> +        aio_co_schedule(bb_ctx, co);
->>          qemu_mutex_unlock_iothread();
->> +
->> +        qemu_event_wait(&data.event);
->>      }
->>
->>      if (cur_sector >= total_sectors) {
->> --
->> 1.8.3.1
->>
->>
+> 
+> >      DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+> >      { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
+> >      DEFINE_PROP_BOOL("hv-relaxed", X86CPU, hyperv_relaxed_timing, false),
+> > -- 
+> > 2.7.4
+> >   
+> 
