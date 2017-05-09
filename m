@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8Agx-0007ia-6b
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:21:04 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d8AhI-0007uk-4d
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:21:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8Agt-00029u-SP
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:21:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37864)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8Agt-00029h-Gy
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:20:59 -0400
-References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
-	<1494356693-13190-2-git-send-email-sstabellini@kernel.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4b6be500-760b-dcd8-6113-6953bc8f0dce@redhat.com>
-Date: Tue, 9 May 2017 14:20:57 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d8AhE-0002Ew-U2
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:21:24 -0400
+Received: from hera.aquilenet.fr ([141.255.128.1]:33127)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1d8AhE-0002Ed-Iz
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:21:20 -0400
+Date: Tue, 9 May 2017 21:21:16 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170509192116.qjo66457xibgflpp@var.youpi.perso.aquilenet.fr>
+References: <20170505224833.17769-1-laurent@vivier.eu>
+	<20170505224833.17769-2-laurent@vivier.eu>
+	<20170505232738.targ5w5jm2vb73fe@var.youpi.perso.aquilenet.fr>
+	<7f643a77-0dd7-cf43-b51a-337da34f8f87@vivier.eu>
+	<20170508200907.ll5gms6krkk7kdct@var.youpi.perso.aquilenet.fr>
+	<720d2080-08cc-e7e2-6383-de22d63d4eeb@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <1494356693-13190-2-git-send-email-sstabellini@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EOobQJ3OnDr93AN8soljKmnnLhI6Jv9wi"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] Check the return value of fcntl in
- qemu_set_cloexec
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <720d2080-08cc-e7e2-6383-de22d63d4eeb@vivier.eu>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +32,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
-Cc: xen-devel@lists.xen.org, groug@kaod.org, pbonzini@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EOobQJ3OnDr93AN8soljKmnnLhI6Jv9wi
-From: Eric Blake <eblake@redhat.com>
-To: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
-Cc: xen-devel@lists.xen.org, groug@kaod.org, pbonzini@redhat.com
-Message-ID: <4b6be500-760b-dcd8-6113-6953bc8f0dce@redhat.com>
-Subject: Re: [PATCH v2 2/3] Check the return value of fcntl in
- qemu_set_cloexec
-References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
- <1494356693-13190-2-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <1494356693-13190-2-git-send-email-sstabellini@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On 05/09/2017 02:04 PM, Stefano Stabellini wrote:
-> Assert that the return value is not an error. This issue was found by
-> Coverity.
+Laurent Vivier, on mar. 09 mai 2017 09:21:09 +0200, wrote:
+> Le 08/05/2017 =C3=A0 22:09, Samuel Thibault a =C3=A9crit :
+> > Laurent Vivier, on sam. 06 mai 2017 15:19:44 +0200, wrote:
+> >>> Laurent Vivier, on sam. 06 mai 2017 00:48:33 +0200, wrote:
+> >> The check is done previously by:
+> >>
+> >> @@ -442,6 +443,10 @@ void slirp_pollfds_fill(GArray *pollfds, uint32=
+_t
+> >> *timeout)
+> >>                      .fd =3D so->s,
+> >>                      .events =3D G_IO_OUT | G_IO_ERR,
+> >>                  };
+> >> +                if (so->so_proxy_state &&
+> >> +                    so->so_proxy_state !=3D SOCKS5_STATE_ERROR) {
+> >> +                    pfd.events |=3D G_IO_IN;
+> >> +                }
+> >>
+> >> We can enter in socks5_recv() only if so->so_proxy_state is in a val=
+id
+> >> state because G_IO_IN triggers that.
+> >=20
+> > I don't understand: the socks5_recv gets called not only when pfd.eve=
+nts
+> > contains G_IO_IN, but also when it contains G_IO_HUP or G_IO_ERR.  Al=
+so,
+> > so_proxy_state being non-nul is not the only way to have G_IO_IN set =
+in
+> > pfd.events, so_state & SS_FACCEPTCONN and CONN_CANFRCV(so) also trigg=
+er
+> > that.
 >=20
-> CID: 1374831
+> This is filtered by (so_state & SS_ISFCONNECTING). The only case when w=
+e
+> enter in the receiving part with SS_ISFCONNECTING is when socks5 part
+> has been enabled.
+
+The code snippet above is guarded by (so_state & SS_ISFCONNECTING),
+but that won't prevent socks5_recv from being called here in
+slirp_pollfds_poll in the non-socks5 case:
+
+                 else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
++                    if (so->so_state & SS_ISFCONNECTING) {
++                        socks5_recv(so->s, &so->so_proxy_state);
++                        continue;
++                    }
+                     /*
+
+e.g. when (so->so_state & SS_FACCEPTCONN) or when CONN_CANFRCV(so) in
+slirp_pollfds_fill, which both set G_IO_IN too.
+
+> >>>> @@ -645,11 +654,19 @@ void slirp_pollfds_poll(GArray *pollfds, int=
+ select_error)
+> >>>>                      /*
+> >>>>                       * Check for non-blocking, still-connecting s=
+ockets
+> >>>>                       */
+> >>>> -                    if (so->so_state & SS_ISFCONNECTING) {
+> >>>> -                        /* Connected */
+> >>>> -                        so->so_state &=3D ~SS_ISFCONNECTING;
+> >>>> =20
+> >>>> -                        ret =3D send(so->s, (const void *) &ret, =
+0, 0);
+> >>>> +                    if (so->so_state & SS_ISFCONNECTING) {
+> >>>> +                        ret =3D socks5_send(so->s, slirp->proxy_u=
+ser,
+> >>>
+> >>> Ditto.
+> >>
+> >> if so_proxy_state is 0 the function does nothing
+> >=20
+> > Well, that's quite weak reason to me, and will confuse readers, becau=
+se
+> > they'll think that the code is for the socks5 case only.
 >=20
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> CC: groug@kaod.org
-> CC: pbonzini@redhat.com
-> CC: Eric Blake <eblake@redhat.com>
-> ---
->  util/oslib-posix.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> OK, I'm going to add a "if (so->so_proxy_state && so->so_proxy_state !=3D
+> SOCKS5_STATE_ERROR)" here.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks :)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> >>>> +++ b/slirp/socks5.c
+> >>>> @@ -0,0 +1,371 @@
+> >>>
+> >>> In v2 of the patch, this was said to have "some parts from nmap/nca=
+t
+> >>> GPLv2".  Is that really not true any more?  If any part of the file=
+ is
+> >>> not original, it *has* to wear proper copyright notices, otherwise =
+it's
+> >>> copyright infrigement.
+> >>
+> >> No, I've re-written entirely this part from RFC.
+> >=20
+> > Ok.
+> >=20
+> >> for ncat.h
+> >=20
+> > Which code comes from ncat.h?
+>=20
+> I haven't been clear: none. I've entirely re-written this part.
 
+Ah, ok.
 
---EOobQJ3OnDr93AN8soljKmnnLhI6Jv9wi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZEhaZAAoJEKeha0olJ0NqdysIAIWTqT9MpDe5WpYZDOWo7lAS
-KLOrUVm3wz9mif1zXuR1mRPyu4x3ZbIFmvRs8PaK3Mbp9F5IGQzji8tQNrDpYU3H
-+aFVXz65epvRY0DPYwQseq3wBYNqUZv/mDq8ouMkKOLEmf/Vlhrf+lhHg5dxtyiz
-orfTVZUjMZxQK7uFkETrEjzZCEVoYb3jskdD+HhpuHmbGCoK8DKfaZLvYjgwcoT2
-gsfMqUXnseKCHJ4cZlR9v76kUsoNdcsfQzE7XXmc4R36n2Y8eA6ECtWx11lxLwYV
-wrVk6/+q+PNmNv4qAS72Uo5DhsfWpb+Ndl6IPsMxHJO9UUc8m0SfhSXIgpQSBFQ=
-=EdXe
------END PGP SIGNATURE-----
-
---EOobQJ3OnDr93AN8soljKmnnLhI6Jv9wi--
+Samuel
