@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8AoU-0003L0-VL
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:28:52 -0400
+	(envelope-from <laurent@vivier.eu>) id 1d8Ar6-0004R4-Vd
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:31:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8AoQ-0006pT-VS
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:28:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56078)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8AoQ-0006oO-MN
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:28:46 -0400
-References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
-	<7598ea81-5fcb-d806-ce18-a6eb401b5259@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c55f2c76-8c22-4d77-664c-82c07220b8b6@redhat.com>
-Date: Tue, 9 May 2017 14:28:40 -0500
-MIME-Version: 1.0
-In-Reply-To: <7598ea81-5fcb-d806-ce18-a6eb401b5259@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="j7UsnLu7p1ulcBLD9jPtaCRuoALsDenaB"
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen/9pfs: fix two resource leaks on
- error paths, discovered by Coverity
+	(envelope-from <laurent@vivier.eu>) id 1d8Ar1-0000Zy-Rv
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:31:33 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:59921)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1d8Ar1-0000ZL-GW
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:31:27 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue,  9 May 2017 21:31:11 +0200
+Message-Id: <20170509193112.16613-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v5 0/1] slirp: add SOCKS5 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +21,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
-Cc: anthony.perard@citrix.com, xen-devel@lists.xen.org, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---j7UsnLu7p1ulcBLD9jPtaCRuoALsDenaB
-From: Eric Blake <eblake@redhat.com>
-To: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
-Cc: anthony.perard@citrix.com, xen-devel@lists.xen.org,
- aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
-Message-ID: <c55f2c76-8c22-4d77-664c-82c07220b8b6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen/9pfs: fix two resource leaks on
- error paths, discovered by Coverity
-References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
- <7598ea81-5fcb-d806-ce18-a6eb401b5259@redhat.com>
-In-Reply-To: <7598ea81-5fcb-d806-ce18-a6eb401b5259@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch implements the SOCKS5 client part for "-net user" backend.
 
-On 05/09/2017 02:20 PM, Eric Blake wrote:
-> On 05/09/2017 02:04 PM, Stefano Stabellini wrote:
->> CID: 1374836
->>
->> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
->> CC: anthony.perard@citrix.com
->> CC: groug@kaod.org
->> CC: aneesh.kumar@linux.vnet.ibm.com
->> ---
->>  hw/9pfs/xen-9p-backend.c | 2 ++
->>  1 file changed, 2 insertions(+)
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+It allows to route all internet traffic of the virtual machine
+to a SOCKS5 server.
 
-By the way, you forgot to send a 0/3 cover letter (at least, there was
-no In-Reply-To: header in your 1/3 mail).  That makes it harder to
-automate handling of your series; I was going to reply to the series as
-a whole.
+But all the local traffic (to the host) is sent to the host.
+It is needed because this SOCKS5 client doesn't route UDP traffic,
+and this allows to use the host DNS server.
 
-While it is inconvenient for human readers, it is even worse for some of
-the automated patch tooling we have that expects cover letters for any
-multi-patch series.  More patch submission tips at
-http://wiki.qemu.org/Contribute/SubmitAPatch include how to use 'git
-config' to automate the creation of a cover letter.
+I've tested this using public SOCKS5 proxy list found on the WEB, and
+using TOR server on my host.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Used with TOR, all the TCP connections are sent to the TOR network and
+this allows to insert a virtual machine directly in the TOR network
+without needing more configuration in the virtual machine.
 
+But be aware that all DNS requests will be sent to the host that can
+forward them to internet with its own IP address. So confidentiality
+will not be as good as with the TOR browser which hides in the TOR
+network all the DNS requests.
 
---j7UsnLu7p1ulcBLD9jPtaCRuoALsDenaB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+If you want to test this:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+- with a public SOCKS5 server, ask google for "socks5 proxy address"
+  and start QEMU with, for instance:
 
-iQEcBAEBCAAGBQJZEhhoAAoJEKeha0olJ0NqfBgIAIkwB4VvlQDvhrI5DE4CykwS
-JqiEdCGhOlmaOnKqgUszwMQudB8jlg7uKiOWpKB6ELVIeQ704NDaS3s5xX0+YXO3
-xffg5bUv84S3A4blIoXGPHIyTGyKh+cqI1xCshUNihWoqLsoZRKuyF2rwLnuT4TF
-k0KYiWBBm4UvRu27OEzZbYeGeKsTVS7u1PN3xOVZ1AjF+F8tbzpz4zPjMvo8Q5uR
-x53pH7Opwhza/xQgx3tr2oFA7LXbVXEbPTFfh35xECtj5Ct2Z7j+jOmMwDm4dbQc
-VqeOeoUVPhTfp+ddHg+BE2jbzQoeyz9zxNgFBwQuiBe4Z0Qj1O8zbeIeQK+PE0c=
-=IDQL
------END PGP SIGNATURE-----
+  qemu-system-x86_64 -net nic,model=e1000 -net user,proxy-server=46.105.121.37:63066 ...
 
---j7UsnLu7p1ulcBLD9jPtaCRuoALsDenaB--
+  if needed, you can provide user/password using secret objects framework:
+  "-object secret,id=sec0,data=password,format=raw \
+   -net user,...,proxy-user=user,proxy-secretid=sec0"
+
+- with a local TOR proxy:
+
+  sudo systemctl start tor
+  qemu-system-x86_64 -net nic,model=e1000 -net user,proxy-server=localhost:9050 ...
+
+You can check your IP address is the one of the proxy by connecting
+to http://check.torproject.org with a browser inside the VM.
+
+v6:
+  - fix error case in slirp_add_proxy()
+  - add copyright and license in new files
+  - add guards around socks5_recv() and socks5_send()
+
+v5:
+  - remove useless #includes
+
+v4:
+  - rebase
+  - define some macros to use instead of meaningless values
+  - better management of error cases
+  - add some error logs
+
+v3:
+  - rewrite SOCKS5 functions from scratch and drop code from nmap/ncat
+  - don't drop the IPv6 UDP local traffic
+  - don't pass to the proxy the IPv6 TCP local traffic
+  - add some comments...
+
+v2:
+  - use secret objects framework to provide password
+  - add documentation for new parameters in qapi-schema.json
+  - s/passwd/password/g
+  - I didn't move proxy paramaters to a substruct as I didn't
+    find a way to set them from the command line :(
+
+Laurent Vivier (1):
+  slirp: add SOCKS5 support
+
+ net/slirp.c         |  39 +++++-
+ qapi-schema.json    |   9 ++
+ qemu-options.hx     |  11 ++
+ slirp/Makefile.objs |   2 +-
+ slirp/ip_icmp.c     |   2 +-
+ slirp/libslirp.h    |   3 +
+ slirp/slirp.c       |  65 +++++++++
+ slirp/slirp.h       |   6 +
+ slirp/socket.h      |   4 +
+ slirp/socks5.c      | 379 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/socks5.h      |  31 +++++
+ slirp/tcp_subr.c    |  22 ++-
+ slirp/udp.c         |   9 ++
+ slirp/udp6.c        |   8 ++
+ 14 files changed, 583 insertions(+), 7 deletions(-)
+ create mode 100644 slirp/socks5.c
+ create mode 100644 slirp/socks5.h
+
+-- 
+2.9.3
