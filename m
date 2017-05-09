@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1d8AFo-0006QQ-C6
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:53:02 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d8ANm-0000II-OD
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1d8AFi-0002At-CE
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:53:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37860)
+	(envelope-from <dgilbert@redhat.com>) id 1d8ANi-0007OU-RP
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:01:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1d8AFi-00026U-5t
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 14:52:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4AABE3D957
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 18:52:52 +0000 (UTC)
-Date: Tue, 9 May 2017 14:52:50 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1833628273.9365810.1494355970259.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170509184900.GI2089@work-vm>
-References: <20170509184900.GI2089@work-vm>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d8ANi-0007Ns-IL
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:01:10 -0400
+Date: Tue, 9 May 2017 20:01:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170509190100.GJ2089@work-vm>
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
+	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
+	<20170428100012.GB22801@pxdev.xzpeter.org>
+	<d018d4a6-4b50-3f36-fe69-e232b63bebf0@samsung.com>
+	<20170508062906.GC2820@pxdev.xzpeter.org>
+	<20170508090807.GA4201@aperevalov-ubuntu>
+	<20170509082622.GI2820@pxdev.xzpeter.org>
+	<20170509094033.GB2089@work-vm>
+	<20170509151942.GB4201@aperevalov-ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] VhostUserRequest # 20
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170509151942.GB4201@aperevalov-ubuntu>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
+ downtime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +36,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: maxime coquelin <maxime.coquelin@redhat.com>, qemu-devel@nongnu.org
+To: Alexey <a.perevalov@samsung.com>
+Cc: Peter Xu <peterx@redhat.com>, i.maximets@samsung.com, qemu-devel@nongnu.org, f4bug@amsat.org
 
-HI
-
------ Original Message -----
-> Hi,
->   libvhost-user.h defines:
->    VHOST_USER_INPUT_GET_CONFIG = 20,
-
-That slipped by mistake from my vhost-user-input series WIP, please send a fix.
-(luckily, this is only internal header for now)
-
-thanks
-
-> while
->   vhost-user.c defines:
->    VHOST_USER_NET_SET_MTU = 20,
+* Alexey (a.perevalov@samsung.com) wrote:
+> On Tue, May 09, 2017 at 10:40:34AM +0100, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > On Mon, May 08, 2017 at 12:08:07PM +0300, Alexey wrote:
+> > > > On Mon, May 08, 2017 at 02:29:06PM +0800, Peter Xu wrote:
+> > > > > On Fri, Apr 28, 2017 at 02:11:19PM +0300, Alexey Perevalov wrote:
+> > > > > > On 04/28/2017 01:00 PM, Peter Xu wrote:
+> > > > > > >On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
+> > > > > > >>This patch provides downtime calculation per vCPU,
+> > > > > > >>as a summary and as a overlapped value for all vCPUs.
+> > > > > > >>
+> > > > > > >>This approach was suggested by Peter Xu, as an improvements of
+> > > > > > >>previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> > > > > > >>in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> > > > > > >>as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> > > > > > >>list for downtime per vCPU (could be traced with page_fault_addr)
+> > > > > > >>
+> > > > > > >>For more details see comments for get_postcopy_total_downtime
+> > > > > > >>implementation.
+> > > > > > >>
+> > > > > > >>Downtime will not calculated if postcopy_downtime field of
+> > > > > > >>MigrationIncomingState wasn't initialized.
+> > > > > > >>
+> > > > > > >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > > > > > >>---
+> > > > > > >>  include/migration/migration.h |   3 ++
+> > > > > > >>  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
+> > > > > > >>  migration/postcopy-ram.c      |  20 +++++++-
+> > > > > > >>  migration/trace-events        |   6 ++-
+> > > > > > >>  4 files changed, 130 insertions(+), 2 deletions(-)
+> > > > > > >>
+> > > > > > >>diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > > > > > >>index e8fb68f..a22f9ce 100644
+> > > > > > >>--- a/include/migration/migration.h
+> > > > > > >>+++ b/include/migration/migration.h
+> > > > > > >>@@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
+> > > > > > >>   * Functions to work with downtime context
+> > > > > > >>   */
+> > > > > > >>  struct DowntimeContext *downtime_context_new(void);
+> > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
+> > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr);
+> > > > > > >>+uint64_t get_postcopy_total_downtime(void);
+> > > > > > >>  struct MigrationState
+> > > > > > >>  {
+> > > > > > >>diff --git a/migration/migration.c b/migration/migration.c
+> > > > > > >>index ec76e5c..2c6f150 100644
+> > > > > > >>--- a/migration/migration.c
+> > > > > > >>+++ b/migration/migration.c
+> > > > > > >>@@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
+> > > > > > >>      return atomic_xchg(&incoming_postcopy_state, new_state);
+> > > > > > >>  }
+> > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
+> > > > > > >>+{
+> > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > > > >>+    DowntimeContext *dc;
+> > > > > > >>+    if (!mis->downtime_ctx || cpu < 0) {
+> > > > > > >>+        return;
+> > > > > > >>+    }
+> > > > > > >>+    dc = mis->downtime_ctx;
+> > > > > > >>+    dc->vcpu_addr[cpu] = addr;
+> > > > > > >>+    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
+> > > > > > >>+        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > > > >>+
+> > > > > > >>+    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> > > > > > >>+            cpu);
+> > > > > > >>+}
+> > > > > > >>+
+> > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr)
+> > > > > > >>+{
+> > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > > > >>+    DowntimeContext *dc;
+> > > > > > >>+    int i;
+> > > > > > >>+    bool all_vcpu_down = true;
+> > > > > > >>+    int64_t now;
+> > > > > > >>+
+> > > > > > >>+    if (!mis->downtime_ctx) {
+> > > > > > >>+        return;
+> > > > > > >>+    }
+> > > > > > >>+    dc = mis->downtime_ctx;
+> > > > > > >>+    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > > > >>+
+> > > > > > >>+    /* check all vCPU down,
+> > > > > > >>+     * QEMU has bitmap.h, but even with bitmap_and
+> > > > > > >>+     * will be a cycle */
+> > > > > > >>+    for (i = 0; i < smp_cpus; i++) {
+> > > > > > >>+        if (dc->vcpu_addr[i]) {
+> > > > > > >>+            continue;
+> > > > > > >>+        }
+> > > > > > >>+        all_vcpu_down = false;
+> > > > > > >>+        break;
+> > > > > > >>+    }
+> > > > > > >>+
+> > > > > > >>+    if (all_vcpu_down) {
+> > > > > > >>+        dc->total_downtime += now - dc->last_begin;
+> > > > > > >Shall we do this accouting only if we are sure the copied page address
+> > > > > > >is one of the page faulted addresses? Can it be some other page? I
+> > > > > > >don't know. But since we have the loop below to make sure of it, why
+> > > > > > >not?
+> > > > > > no, the downtime implies since page fault till the
+> > > > > > page will be copied.
+> > > > > > Yes another pages could be copied as well as pagefaulted,
+> > > > > > and they are copied due to prefetching, but it's not a downtime.
+> > > > > 
+> > > > > Not sure I got the point... Do you mean that when reach here, then
+> > > > > this page address is definitely one of the faulted addresses? I am not
+> > > > > 100% sure of this, but if you are sure, I am okay with it.
+> > > > Let me clarify.
+> > > > 
+> > > > > > >Shall we do this accouting only if we are sure the copied page address
+> > > > > > >is one of the page faulted addresses?
+> > > > Yes it's primary condition, due to there are could be another pages,
+> > > > which weren't faulted, they just was sent from source to destination,
+> > > > I called it prefetching.
+> > > > 
+> > > > I think I got why did you ask that question, because in this version
+> > > > all_vcpu_down and as a result total_downtime calculated incorrectly,
+> > > > it calculates every time when any page is copied, but it should
+> > > > be calculated only when faulted page copied, so only dc->vcpu_downtime
+> > > > was correctly calculated.
+> > > 
+> > > Exactly. I am afraid if we have such "prefetching" stuff then
+> > > total_downtime will be more than its real value.
+> > 
+> > It should be OK as long as we measure the time between
+> >   userfault reporting a page miss for an address 
+> >   and
+> >   place_page for *that same address*
+> > 
+> > any places for other pages are irrelevant.
+> > 
+> > (I still worry that this definition of 'downtime' is possibly
+> > arbitrary - since if all but one of the vCPUs are down we
+> > don't count it but it's obviously still a big impact).
+> Technically we count downtime per vCPU  and storing it in
+>     vcpu_downtime field of PostcopyDowntimeContext (in this version
+>     still DowntimeContext). I traced downtime per vCPU in previous version.
+> But it just traced as total_downtime in current version.
 > 
-> who wins?
+> Also total_downtime is not possible to get on destination, due to
+> query-migrate is about MigrationState, but not MigrationIncomingState,
+> so I think need to extend it to MigrationIncomingState too.
+
+I don't think that's too problematic; just add it to qmp_query_migrate;
+the only thing to be careful of is what happens if the incoming
+migration finishes during the info migrate is reading the
+MigrationIncomingState.
+
+Dave
+
+> > 
+> > Dave
+> > 
+> > > -- 
+> > > Peter Xu
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
 > 
-> Dave
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> -- 
 > 
+> BR
+> Alexey
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
