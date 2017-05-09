@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1d7zzQ-0004QS-C4
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:55:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1d804V-0005Jm-Ge
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:00:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1d7zzN-0002vE-A7
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:55:24 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34120)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1d7zzN-0002v6-2A
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 03:55:21 -0400
-Received: by mail-pg0-x242.google.com with SMTP id u187so14055157pgb.1
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 00:55:20 -0700 (PDT)
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-7-git-send-email-yi.l.liu@intel.com>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <9441ea23-1867-f59a-1ae3-be5afa4d51da@gmail.com>
-Date: Tue, 9 May 2017 15:55:20 +0800
+	(envelope-from <armbru@redhat.com>) id 1d804R-0004y1-Lk
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:00:39 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1494266456-2251-1-git-send-email-jcmvbkbc@gmail.com>
+Date: Tue, 09 May 2017 10:00:32 +0200
+In-Reply-To: <1494266456-2251-1-git-send-email-jcmvbkbc@gmail.com> (Max
+	Filippov's message of "Mon, 8 May 2017 11:00:56 -0700")
+Message-ID: <87lgq61mu7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1493201525-14418-7-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 6/8] VFIO: do pasid table binding
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/xtensa: sim: use g_string/g_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, jean-philippe.brucker@arm.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+Max Filippov <jcmvbkbc@gmail.com> writes:
 
-
-On 04/26/2017 06:12 PM, Liu, Yi L wrote:
-> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-> 
-> This patch adds IOCTL processing in vfio_iommu_type1 for
-> VFIO_IOMMU_SVM_BIND_TASK. Binds the PASID table bind by
-> calling iommu_ops->bind_pasid_table to link the whole
-> PASID table to pIOMMU.
-> 
-> For VT-d, it is linking the guest PASID table to host pIOMMU.
-> This is key point to support SVM virtualization on VT-d.
-> 
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Replace malloc/free/sprintf with g_string/g_string_printf/g_string_free.
+> Replace g_malloc with g_new when allocating the MemoryRegion to get more
+> type safety.
+>
+> Suggested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 > ---
->   drivers/vfio/vfio_iommu_type1.c | 72 +++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 72 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index b3cc33f..30b6d48 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -1512,6 +1512,50 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
->   	return ret;
->   }
->   
-> +struct vfio_svm_task {
-> +	struct iommu_domain *domain;
-> +	void *payload;
-> +};
-> +
-> +static int bind_pasid_tbl_fn(struct device *dev, void *data)
-> +{
-> +	int ret = 0;
-> +	struct vfio_svm_task *task = data;
-> +	struct pasid_table_info *pasidt_binfo;
-> +
-> +	pasidt_binfo = task->payload;
-> +	ret = iommu_bind_pasid_table(task->domain, dev, pasidt_binfo);
-> +	return ret;
-> +}
-> +
-> +static int vfio_do_svm_task(struct vfio_iommu *iommu, void *data,
-> +				int (*fn)(struct device *, void *))
-> +{
-> +	int ret = 0;
-> +	struct vfio_domain *d;
-> +	struct vfio_group *g;
-> +	struct vfio_svm_task task;
-> +
-> +	task.payload = data;
-> +
-> +	mutex_lock(&iommu->lock);
-> +
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		list_for_each_entry(g, &d->group_list, next) {
-> +			if (g->iommu_group != NULL) {
-> +				task.domain = d->domain;
-> +				ret = iommu_group_for_each_dev(
-> +					g->iommu_group, &task, fn);
-> +				if (ret != 0)
-> +					break;
-> +			}
-> +		}
-> +	}
-> +
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
->   static long vfio_iommu_type1_ioctl(void *iommu_data,
->   				   unsigned int cmd, unsigned long arg)
->   {
-> @@ -1582,6 +1626,34 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->   
->   		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->   			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_SVM_BIND_TASK) {
-> +		struct vfio_device_svm hdr;
-> +		u8 *data = NULL;
-> +		int ret = 0;
-> +
-> +		minsz = offsetofend(struct vfio_device_svm, length);
-> +		if (copy_from_user(&hdr, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (hdr.length == 0)
-> +			return -EINVAL;
-> +
-> +		data = memdup_user((void __user *)(arg + minsz),
-> +					hdr.length);
+>  hw/xtensa/sim.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+> index d2d1d3a..b27e28d 100644
+> --- a/hw/xtensa/sim.c
+> +++ b/hw/xtensa/sim.c
+> @@ -41,21 +41,21 @@ static void xtensa_create_memory_regions(const Xtensa=
+Memory *memory,
+>                                           const char *name)
+>  {
+>      unsigned i;
+> -    char *num_name =3D malloc(strlen(name) + sizeof(i) * 3 + 1);
+> +    GString *num_name =3D g_string_new(NULL);
+>=20=20
+>      for (i =3D 0; i < memory->num; ++i) {
+>          MemoryRegion *m;
+>=20=20
+> -        sprintf(num_name, "%s%u", name, i);
+> -        m =3D g_malloc(sizeof(*m));
+> -        memory_region_init_ram(m, NULL, num_name,
+> +        g_string_printf(num_name, "%s%u", name, i);
 
-You should check the @length is at least sizeof(struct pasid_table_info) as
-kernel uses it as pasid_table_info, a evil application can crash kernel.
+I'd make that
+
+           num_name =3D g_strdup_printf("%s%u, name, i);
+
+for less churn.  Have to free(num_name) in the loop, of course.
+
+> +        m =3D g_new(MemoryRegion, 1);
+> +        memory_region_init_ram(m, NULL, num_name->str,
+>                                 memory->location[i].size,
+>                                 &error_fatal);
+>          vmstate_register_ram_global(m);
+>          memory_region_add_subregion(get_system_memory(),
+>                                      memory->location[i].addr, m);
+>      }
+> -    free(num_name);
+> +    g_string_free(num_name, true);
+>  }
+>=20=20
+>  static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
