@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8AhK-0007wZ-U6
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:21:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8AoU-0003L0-VL
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:28:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8AhJ-0002Fx-VG
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:21:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45004)
+	(envelope-from <eblake@redhat.com>) id 1d8AoQ-0006pT-VS
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:28:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56078)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8AhJ-0002Fi-MM
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:21:25 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8AoQ-0006oO-MN
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 15:28:46 -0400
 References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
-	<1494356693-13190-3-git-send-email-sstabellini@kernel.org>
+	<7598ea81-5fcb-d806-ce18-a6eb401b5259@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <dd261ee0-1636-c1ba-f3d1-8064e593d81f@redhat.com>
-Date: Tue, 9 May 2017 14:21:23 -0500
+Message-ID: <c55f2c76-8c22-4d77-664c-82c07220b8b6@redhat.com>
+Date: Tue, 9 May 2017 14:28:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <1494356693-13190-3-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <7598ea81-5fcb-d806-ce18-a6eb401b5259@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="nJEEOiI3rjrAhMGwJDEhHQiBqKVp5CbAG"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] xen: call qemu_set_cloexec instead
- of fcntl
+	boundary="j7UsnLu7p1ulcBLD9jPtaCRuoALsDenaB"
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen/9pfs: fix two resource leaks on
+ error paths, discovered by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +30,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
-Cc: xen-devel@lists.xen.org, anthony.perard@citrix.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com
+Cc: anthony.perard@citrix.com, xen-devel@lists.xen.org, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nJEEOiI3rjrAhMGwJDEhHQiBqKVp5CbAG
+--j7UsnLu7p1ulcBLD9jPtaCRuoALsDenaB
 From: Eric Blake <eblake@redhat.com>
 To: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
-Cc: xen-devel@lists.xen.org, anthony.perard@citrix.com, groug@kaod.org,
- aneesh.kumar@linux.vnet.ibm.com
-Message-ID: <dd261ee0-1636-c1ba-f3d1-8064e593d81f@redhat.com>
-Subject: Re: [PATCH v2 3/3] xen: call qemu_set_cloexec instead of fcntl
+Cc: anthony.perard@citrix.com, xen-devel@lists.xen.org,
+ aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
+Message-ID: <c55f2c76-8c22-4d77-664c-82c07220b8b6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen/9pfs: fix two resource leaks on
+ error paths, discovered by Coverity
 References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
- <1494356693-13190-3-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <1494356693-13190-3-git-send-email-sstabellini@kernel.org>
+ <7598ea81-5fcb-d806-ce18-a6eb401b5259@redhat.com>
+In-Reply-To: <7598ea81-5fcb-d806-ce18-a6eb401b5259@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05/09/2017 02:04 PM, Stefano Stabellini wrote:
-> Use the common utility function, which contains checks on return values=
-,
-> instead of manually calling fcntl.
+On 05/09/2017 02:20 PM, Eric Blake wrote:
+> On 05/09/2017 02:04 PM, Stefano Stabellini wrote:
+>> CID: 1374836
+>>
+>> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+>> CC: anthony.perard@citrix.com
+>> CC: groug@kaod.org
+>> CC: aneesh.kumar@linux.vnet.ibm.com
+>> ---
+>>  hw/9pfs/xen-9p-backend.c | 2 ++
+>>  1 file changed, 2 insertions(+)
 >=20
-> CID: 1374831
->=20
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> CC: anthony.perard@citrix.com
-> CC: groug@kaod.org
-> CC: aneesh.kumar@linux.vnet.ibm.com
-> CC: Eric Blake <eblake@redhat.com>
-> ---
->  hw/9pfs/xen-9p-backend.c | 2 +-
->  hw/xen/xen_backend.c     | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+By the way, you forgot to send a 0/3 cover letter (at least, there was
+no In-Reply-To: header in your 1/3 mail).  That makes it harder to
+automate handling of your series; I was going to reply to the series as
+a whole.
+
+While it is inconvenient for human readers, it is even worse for some of
+the automated patch tooling we have that expects cover letters for any
+multi-patch series.  More patch submission tips at
+http://wiki.qemu.org/Contribute/SubmitAPatch include how to use 'git
+config' to automate the creation of a cover letter.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -72,7 +78,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---nJEEOiI3rjrAhMGwJDEhHQiBqKVp5CbAG
+--j7UsnLu7p1ulcBLD9jPtaCRuoALsDenaB
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -82,13 +88,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZEhazAAoJEKeha0olJ0NqNy8H/jwRLj4Ry+YxxAsOflEcS5Qz
-NyHNh60150M3OC21c9o35F/jZX4BQsWDK6nUvQp2Ru2CblYtO3crvhozW0BicW42
-K1PdIDASp+C11++ne4VMeD9fB0ol15b6PjPApdW2T0VAKLvNZejA7arAwoOnaoOg
-DQLOpoaECTlYEMYHa0FT6AmmhCp/M6xER/HMCDdWS2JVSmN3CimvvtkInxaxi0Gx
-r3qdsbJM7g8WHSkku3fAJyyZAhqBwEZJtmUB+1lPyzrhCyZtLdRKPUk5UMpynopa
-sfWE2a89qYQHa12kNCOMIRB65KUdNTsuzGWPmFN2206HkmcZVYfsLnMNuNGJOmY=
-=1XM0
+iQEcBAEBCAAGBQJZEhhoAAoJEKeha0olJ0NqfBgIAIkwB4VvlQDvhrI5DE4CykwS
+JqiEdCGhOlmaOnKqgUszwMQudB8jlg7uKiOWpKB6ELVIeQ704NDaS3s5xX0+YXO3
+xffg5bUv84S3A4blIoXGPHIyTGyKh+cqI1xCshUNihWoqLsoZRKuyF2rwLnuT4TF
+k0KYiWBBm4UvRu27OEzZbYeGeKsTVS7u1PN3xOVZ1AjF+F8tbzpz4zPjMvo8Q5uR
+x53pH7Opwhza/xQgx3tr2oFA7LXbVXEbPTFfh35xECtj5Ct2Z7j+jOmMwDm4dbQc
+VqeOeoUVPhTfp+ddHg+BE2jbzQoeyz9zxNgFBwQuiBe4Z0Qj1O8zbeIeQK+PE0c=
+=IDQL
 -----END PGP SIGNATURE-----
 
---nJEEOiI3rjrAhMGwJDEhHQiBqKVp5CbAG--
+--j7UsnLu7p1ulcBLD9jPtaCRuoALsDenaB--
