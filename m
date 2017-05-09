@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d804V-0005Jm-Ge
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:00:45 -0400
+	(envelope-from <famz@redhat.com>) id 1d809W-0007A8-3q
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d804R-0004y1-Lk
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:00:39 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1494266456-2251-1-git-send-email-jcmvbkbc@gmail.com>
-Date: Tue, 09 May 2017 10:00:32 +0200
-In-Reply-To: <1494266456-2251-1-git-send-email-jcmvbkbc@gmail.com> (Max
-	Filippov's message of "Mon, 8 May 2017 11:00:56 -0700")
-Message-ID: <87lgq61mu7.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1d809S-0006yb-Vb
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:05:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37312)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d809S-0006yB-P5
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:05:46 -0400
+Date: Tue, 9 May 2017 16:05:43 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170509080543.GD18973@lemon.lan>
+References: <20170508221759.15616-1-f4bug@amsat.org>
+	<20170508221759.15616-6-f4bug@amsat.org>
+	<20170509040438.GB18973@lemon.lan> <87k25q8oc2.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87k25q8oc2.fsf@linaro.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/xtensa: sim: use g_string/g_new
+Subject: Re: [Qemu-devel] [PATCH v2 05/21] docker: compact debian base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Max Filippov <jcmvbkbc@gmail.com> writes:
+On Tue, 05/09 08:46, Alex Benn=E9e wrote:
+>=20
+> Fam Zheng <famz@redhat.com> writes:
+>=20
+> > On Mon, 05/08 19:17, Philippe Mathieu-Daud=E9 wrote:
+> >> - install common/basic tools at once
+> >> - use eatmydata and remove apt cache to save space
+> >> - add bison and flex and git
+> >> - create deb-src entry and setup Emdebian in the same layer
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >> ---
+> >>  tests/docker/dockerfiles/debian.docker | 26 +++++++++++++----------=
+---
+> >>  1 file changed, 13 insertions(+), 13 deletions(-)
+> >>
+> >> diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/d=
+ockerfiles/debian.docker
+> >> index d08def6a8d..dcded3ce84 100644
+> >> --- a/tests/docker/dockerfiles/debian.docker
+> >> +++ b/tests/docker/dockerfiles/debian.docker
+> >> @@ -9,17 +9,17 @@
+> >>  #
+> >>  FROM debian:stable-slim
+> >>
+> >> -# Setup some basic tools we need
+> >> -RUN apt update
+> >> -RUN apt install -yy aptitude ca-certificates curl
+> >> +# Install some basic tools and common build utilities
+> >> +RUN apt-get update && \
+> >> +    DEBIAN_FRONTEND=3Dnoninteractive apt-get install -yy \
+> >> +        eatmydata && \
+> >> +    DEBIAN_FRONTEND=3Dnoninteractive eatmydata apt-get install -y -=
+-no-install-recommends \
+> >> +        aptitude ca-certificates curl \
+> >> +        build-essential clang git \
+> >> +        bison flex && \
+> >> +    apt-get clean
+> >
+> > Any particular reason to make multiple "RUN" directives into one?
+>=20
+> It reduces the number of layers you generate during the building
+> process. I'm not sure how much space that saves in the long run though
+> (disk space is pretty cheap ;-).
 
-> Replace malloc/free/sprintf with g_string/g_string_printf/g_string_free.
-> Replace g_malloc with g_new when allocating the MemoryRegion to get more
-> type safety.
->
-> Suggested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
->  hw/xtensa/sim.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-> index d2d1d3a..b27e28d 100644
-> --- a/hw/xtensa/sim.c
-> +++ b/hw/xtensa/sim.c
-> @@ -41,21 +41,21 @@ static void xtensa_create_memory_regions(const Xtensa=
-Memory *memory,
->                                           const char *name)
->  {
->      unsigned i;
-> -    char *num_name =3D malloc(strlen(name) + sizeof(i) * 3 + 1);
-> +    GString *num_name =3D g_string_new(NULL);
->=20=20
->      for (i =3D 0; i < memory->num; ++i) {
->          MemoryRegion *m;
->=20=20
-> -        sprintf(num_name, "%s%u", name, i);
-> -        m =3D g_malloc(sizeof(*m));
-> -        memory_region_init_ram(m, NULL, num_name,
-> +        g_string_printf(num_name, "%s%u", name, i);
+I don't think it matters much, but refreshing an image gets slower due to
+coarser cache, for example when you add a package in the big "apt-get ins=
+tall"
+command.
 
-I'd make that
-
-           num_name =3D g_strdup_printf("%s%u, name, i);
-
-for less churn.  Have to free(num_name) in the loop, of course.
-
-> +        m =3D g_new(MemoryRegion, 1);
-> +        memory_region_init_ram(m, NULL, num_name->str,
->                                 memory->location[i].size,
->                                 &error_fatal);
->          vmstate_register_ram_global(m);
->          memory_region_add_subregion(get_system_memory(),
->                                      memory->location[i].addr, m);
->      }
-> -    free(num_name);
-> +    g_string_free(num_name, true);
->  }
->=20=20
->  static uint64_t translate_phys_addr(void *opaque, uint64_t addr)
+I don't see a strong reason why this is better. It clutters the file and =
+is
+inconsistent.
