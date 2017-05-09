@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d85tu-00084E-B2
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:14:07 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d85uh-0000DX-NK
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:14:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d85tr-0002XP-6D
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:14:06 -0400
-References: <1494322876-28843-1-git-send-email-armbru@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ea74cfd3-9009-e99d-8f18-8edc9c0441c2@redhat.com>
-Date: Tue, 9 May 2017 10:14:00 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d85ug-000353-Qa
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:14:55 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35452)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d85ug-00034m-MY
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:14:54 -0400
+Received: by mail-qt0-x241.google.com with SMTP id r58so93019qtb.2
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 07:14:54 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170509082800.10756-1-aurelien@aurel32.net>
+	<20170509082800.10756-2-aurelien@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <66ec67ec-453f-4ce8-55a9-45433ffb2b18@twiddle.net>
+Date: Tue, 9 May 2017 07:14:50 -0700
 MIME-Version: 1.0
-In-Reply-To: <1494322876-28843-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170509082800.10756-2-aurelien@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] docs: Minor updates around ide-drive
+Subject: Re: [Qemu-devel] [PATCH 1/3] target/s390x: mask the SIGP order_code
+ using SIGP_ORDER_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,22 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-
-
-On 05/09/2017 05:41 AM, Markus Armbruster wrote:
-> Markus Armbruster (2):
->   docs qemu-doc: Avoid ide-drive, it's deprecated
->   docs/qdev-device-use.txt: update section Default Devices
+On 05/09/2017 01:27 AM, Aurelien Jarno wrote:
+> For that move the definition from kvm.c to cpu.h
 > 
->  docs/bootindex.txt       |  2 +-
->  docs/qdev-device-use.txt | 13 +++++++------
->  qemu-options.hx          |  2 +-
->  3 files changed, 9 insertions(+), 8 deletions(-)
-> 
+> Signed-off-by: Aurelien Jarno<aurelien@aurel32.net>
+> ---
+>   target/s390x/cpu.h         | 3 +++
+>   target/s390x/kvm.c         | 2 --
+>   target/s390x/misc_helper.c | 3 +--
+>   3 files changed, 4 insertions(+), 4 deletions(-)
 
-Shame on me for not noticing, but thank you.
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-Acked-by: John Snow <jsnow@redhat.com>
+
+r~
