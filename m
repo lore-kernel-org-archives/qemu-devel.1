@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d81Kk-0000Dw-5b
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:21:31 -0400
+	(envelope-from <groug@kaod.org>) id 1d81MT-00010y-BJ
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:23:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d81Kh-00078C-1f
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:21:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50686)
+	(envelope-from <groug@kaod.org>) id 1d81MO-00088k-7E
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:23:17 -0400
+Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:54566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d81Kg-000786-RP
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:21:26 -0400
-References: <20170509082800.10756-1-aurelien@aurel32.net>
-	<20170509082800.10756-2-aurelien@aurel32.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8719906b-80e6-6051-570b-f47e617d1c6c@redhat.com>
-Date: Tue, 9 May 2017 11:21:22 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d81MO-000874-0a
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:23:12 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 46ABFEE27B
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:23:09 +0200 (CEST)
+Date: Tue, 9 May 2017 11:23:05 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170509112305.439c4d85@bahia>
+In-Reply-To: <3c8abd95-b490-1b71-b467-4f00d6ce121d@redhat.com>
+References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+	<149399504137.29022.4985100698645275511.stgit@bahia.lan>
+	<3c8abd95-b490-1b71-b467-4f00d6ce121d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170509082800.10756-2-aurelien@aurel32.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/s390x: mask the SIGP order_code
- using SIGP_ORDER_MASK
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/iX=/f9Tg0fZGwFXqt3QqHHa";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 3/5] 9pfs: local: simplify file opening
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?B?TMOpbw==?= Gaspard <leo@gaspard.io>
 
-On 09.05.2017 10:27, Aurelien Jarno wrote:
-> For that move the definition from kvm.c to cpu.h
-> 
-> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-> ---
->  target/s390x/cpu.h         | 3 +++
->  target/s390x/kvm.c         | 2 --
->  target/s390x/misc_helper.c | 3 +--
->  3 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index df823280a5..2471db920d 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -1081,6 +1081,9 @@ struct sysib_322 {
->  #define SIGP_MODE_Z_ARCH_TRANS_ALL_PSW 1
->  #define SIGP_MODE_Z_ARCH_TRANS_CUR_PSW 2
->  
-> +/* SIGP order code mask corresponding to bit positions 56-63 */
-> +#define SIGP_ORDER_MASK 0x000000ff
-> +
->  void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr);
->  int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->                    target_ulong *raddr, int *flags, bool exc);
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 1a249d8359..fb105429be 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1764,8 +1764,6 @@ static int sigp_set_architecture(S390CPU *cpu, uint32_t param,
->      return SIGP_CC_ORDER_CODE_ACCEPTED;
->  }
->  
-> -#define SIGP_ORDER_MASK 0x000000ff
-> -
->  static int handle_sigp(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
->  {
->      CPUS390XState *env = &cpu->env;
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 53cb3b8ac6..395f38dea5 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -521,8 +521,7 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
->  
->      qemu_mutex_lock_iothread();
->  
-> -    /* sigp contains the order code in bit positions 56-63, mask it here. */
-> -    switch (order_code & 0xff) {
-> +    switch (order_code & SIGP_ORDER_MASK) {
->      case SIGP_SET_ARCH:
->          cc = SIGP_CC_ORDER_CODE_ACCEPTED;
->          /* switch arch */
+--Sig_/iX=/f9Tg0fZGwFXqt3QqHHa
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+On Fri, 5 May 2017 12:01:55 -0500
+Eric Blake <eblake@redhat.com> wrote:
+
+> On 05/05/2017 09:37 AM, Greg Kurz wrote:
+> > All paths in the virtfs directory now start with "./" (except the virtfs
+> > root itself which is exactly ".").
+> >=20
+> > We hence don't need to skip leading '/' characters anymore, nor to hand=
+le
+> > the empty path case. Also, since virtfs will only ever be supported on
+> > linux+glibc hosts, we can use strchrnul() and come up with a much simpl=
+ier
+> > code to walk through the path elements. And we don't need to dup() the
+> > passed directory fd.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/9p-local.c |    5 -----
+> >  hw/9pfs/9p-util.c  |   26 ++++++++++----------------
+> >  2 files changed, 10 insertions(+), 21 deletions(-)
+> >=20
+> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> > index 92262f3c3e37..bb6e296df317 100644
+> > --- a/hw/9pfs/9p-local.c
+> > +++ b/hw/9pfs/9p-local.c
+> > @@ -54,11 +54,6 @@ int local_open_nofollow(FsContext *fs_ctx, const cha=
+r *path, int flags,
+> >  {
+> >      LocalData *data =3D fs_ctx->private;
+> > =20
+> > -    /* All paths are relative to the path data->mountfd points to */
+> > -    while (*path =3D=3D '/') {
+> > -        path++;
+> > -    } =20
+>=20
+> Is it worth adding any assert()s in place of the deleted code?
+>=20
+
+The assert() added by this patch ensures that we never pass an empty
+string to relative_openat_nofollow(), which isn't related to this
+hunk of deleted code... so I'm not sure I understand the question :-\
+
+> Otherwise looks okay.
+>=20
+
+
+--Sig_/iX=/f9Tg0fZGwFXqt3QqHHa
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkRinoACgkQAvw66wEB28KJ+QCfS+fRyADG4JPzk0Blc8kHfXVg
+dksAniI9am1dSUkFLCQa+108oVYnX/Sm
+=kFOQ
+-----END PGP SIGNATURE-----
+
+--Sig_/iX=/f9Tg0fZGwFXqt3QqHHa--
