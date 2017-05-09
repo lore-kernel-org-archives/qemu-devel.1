@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d86j6-0007hj-Dz
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:07:03 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d86j7-0007ie-PP
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:07:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d86j0-0008Rf-Pc
+	(envelope-from <rth7680@gmail.com>) id 1d86j6-0008W2-Vc
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:07:01 -0400
+Received: from mail-qk0-x22d.google.com ([2607:f8b0:400d:c09::22d]:33009)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d86j6-0008VM-Re
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:07:00 -0400
-Date: Tue, 9 May 2017 11:06:45 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170509150645.GG16825@stefanha-x1.localdomain>
-References: <20170508180705.20609-1-stefanha@redhat.com>
+Received: by mail-qk0-x22d.google.com with SMTP id y201so3459719qka.0
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 08:07:00 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+References: <20170508151707.5434-1-rth@twiddle.net>
+	<20170508151707.5434-2-rth@twiddle.net>
+	<20170509081457.zcxvzd5spv7n4stj@aurel32.net>
+	<d8108b48-619f-181f-57ef-95a831608998@twiddle.net>
+Message-ID: <25e744fb-a174-15f2-df6d-0e9db27debfb@twiddle.net>
+Date: Tue, 9 May 2017 08:06:57 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="f5QefDQHtn8hx44O"
-Content-Disposition: inline
-In-Reply-To: <20170508180705.20609-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] aio: add missing aio_notify() to
- aio_enable_external()
+In-Reply-To: <d8108b48-619f-181f-57ef-95a831608998@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] target/s390x: Implement STORE
+ FACILITIES LIST EXTENDED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +34,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org
+
+On 05/09/2017 07:51 AM, Richard Henderson wrote:
+> I'm pleased to see this appears to have been dropped at some point; I cannot 
+> see it present in linux 4.11.  However, this still applies to the kernels 
+> supplied by the shipping distributions.
+
+More accurately, it has been moved to arch/s390/kernel/als.c.
+
+But from what I can see from arch/s390/tools/gen_facilities.c, they have now 
+properly pruned the required list to those that are *really* required.
 
 
---f5QefDQHtn8hx44O
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, May 08, 2017 at 02:07:05PM -0400, Stefan Hajnoczi wrote:
-> The main loop uses aio_disable_external()/aio_enable_external() to
-> temporarily disable processing of external AioContext clients like
-> device emulation.
->=20
-> This allows monitor commands to quiesce I/O and prevent the guest from
-> submitting new requests while a monitor command is in progress.
->=20
-> The aio_enable_external() API is currently broken when an IOThread is in
-> aio_poll() waiting for fd activity when the main loop re-enables
-> external clients.  Incrementing ctx->external_disable_cnt does not wake
-> the IOThread from ppoll(2) so fd processing remains suspended and leads
-> to unresponsive emulated devices.
->=20
-> This patch adds an aio_notify() call to aio_enable_external() so the
-> IOThread is kicked out of ppoll(2) and will re-arm the file descriptors.
->=20
-> The bug can be reproduced as follows:
->=20
->   $ qemu -M accel=3Dkvm -m 1024 \
->          -object iothread,id=3Diothread0 \
->          -device virtio-scsi-pci,iothread=3Diothread0,id=3Dvirtio-scsi-pc=
-i0 \
->          -drive if=3Dnone,id=3Ddrive0,aio=3Dnative,cache=3Dnone,format=3D=
-raw,file=3Dtest.img \
->          -device scsi-hd,id=3Dscsi-hd0,drive=3Ddrive0 \
->          -qmp tcp::5555,server,nowait
->=20
->   $ scripts/qmp/qmp-shell localhost:5555
->   (qemu) blockdev-snapshot-sync device=3Ddrive0 snapshot-file=3Dsn1.qcow2
->          mode=3Dabsolute-paths format=3Dqcow2
->=20
-> After blockdev-snapshot-sync completes the SCSI disk will be
-> unresponsive.  This leads to request timeouts inside the guest.
->=20
-> Reported-by: Qianqian Zhu <qizhu@redhat.com>
-> Suggested-by: Fam Zheng <famz@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> v3:
->  * s/dec_fetch/fetch_dec/ [Fam]
-> ---
->  include/block/aio.h | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---f5QefDQHtn8hx44O
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZEdsFAAoJEJykq7OBq3PIyMQH/REGMPf5DwTtJZN1n01gc4K7
-Kccmt3WSk7Iy2v1whJyqwawJ5WYHiWuQvih65ShdkcwIAJDibETPFUWnlq2SIFT8
-O+qIcLZ+QeivqNz0GgTLGiRwecVe/rxFXfdgGIfotigJtHVaEh2l43L8kReTSImP
-5HJNh+pLr+/eelI1iPyZm8MnGolbKeEMgUcCcB1/ckzwb8OFwSGQvcWA2+8MAsOs
-ha/3rGyC8fieAr6Xpw2M+EPgGegTv4qdXsnTI43d4IKQnoDwii4GN9PYe61p+/vM
-PdtX59kjuUNA6GzypJbez0M6uHki7GkeaqoqexbPJA/1bEYUicEZGz5IozKrYPA=
-=qwah
------END PGP SIGNATURE-----
-
---f5QefDQHtn8hx44O--
+r~
