@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d842A-0001yf-EY
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:14:31 -0400
+	(envelope-from <famz@redhat.com>) id 1d846a-0003uT-98
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8427-0001xo-9a
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:14:30 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33111)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8427-0001xi-3u
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:14:27 -0400
-Received: by mail-qt0-x242.google.com with SMTP id a46so13443291qte.0
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 05:14:27 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <famz@redhat.com>) id 1d846X-00038o-4h
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:19:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d846W-00038F-RW
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:19:01 -0400
+Date: Tue, 9 May 2017 20:18:57 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170509121857.GB23466@lemon.lan>
 References: <20170508221759.15616-1-f4bug@amsat.org>
-	<20170508221759.15616-3-f4bug@amsat.org>
-	<20170509040115.GA18973@lemon.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <666da677-0975-a6fa-0d39-07d1d3165e97@amsat.org>
-Date: Tue, 9 May 2017 09:14:23 -0300
+	<20170508221759.15616-6-f4bug@amsat.org>
+	<20170509040438.GB18973@lemon.lan> <87k25q8oc2.fsf@linaro.org>
+	<20170509080543.GD18973@lemon.lan>
+	<2f874a2e-bb34-7c1b-1b59-cc6b28366bf5@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20170509040115.GA18973@lemon.lan>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/21] docker: add --include-file
- argument to 'build' command
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <2f874a2e-bb34-7c1b-1b59-cc6b28366bf5@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/21] docker: compact debian base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,84 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-On 05/09/2017 01:01 AM, Fam Zheng wrote:
-> On Mon, 05/08 19:17, Philippe Mathieu-Daudé wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  tests/docker/Makefile.include | 3 ++-
->>  tests/docker/docker.py        | 5 +++++
->>  2 files changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
->> index 03eda37bf4..c99ce702ea 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -51,7 +51,8 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
->>  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
->>  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
->>  		$(if $(NOUSER),,--add-current-user) \
->> -		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
->> +		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE))\
->> +		$(if $(EXTRA_FILE),--include-file=$(EXTRA_FILE)),\
->>  		"BUILD","$*")
->>
->>  # Enforce dependancies for composite images
->> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
->> index 6ddc6e4c2a..90520e4bca 100755
->> --- a/tests/docker/docker.py
->> +++ b/tests/docker/docker.py
->> @@ -237,6 +237,9 @@ class BuildCommand(SubCommand):
->>                              help="""Specify a binary that will be copied to the
->>                              container together with all its dependent
->>                              libraries""")
->> +        parser.add_argument("--include-file", "-f",
->> +                            help="""Specify a file that will be copied to the
->> +                            container""")
->
-> Is it more useful if it's '--include-files' that accepts multiple files? Or
-> alternatively allow this option to be use multiple times:
->
->     -f foo -f bar -f ...
+On Tue, 05/09 09:06, Philippe Mathieu-Daud=E9 wrote:
+> On 05/09/2017 05:05 AM, Fam Zheng wrote:
+> > On Tue, 05/09 08:46, Alex Benn=E9e wrote:
+> > >=20
+> > > Fam Zheng <famz@redhat.com> writes:
+> > >=20
+> > > > On Mon, 05/08 19:17, Philippe Mathieu-Daud=E9 wrote:
+> > > > > - install common/basic tools at once
+> > > > > - use eatmydata and remove apt cache to save space
+> > > > > - add bison and flex and git
+> > > > > - create deb-src entry and setup Emdebian in the same layer
+> > > > >=20
+> > > > > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > > > > ---
+> > > > >  tests/docker/dockerfiles/debian.docker | 26 +++++++++++++-----=
+--------
+> > > > >  1 file changed, 13 insertions(+), 13 deletions(-)
+> > > > >=20
+> > > > > diff --git a/tests/docker/dockerfiles/debian.docker b/tests/doc=
+ker/dockerfiles/debian.docker
+> > > > > index d08def6a8d..dcded3ce84 100644
+> > > > > --- a/tests/docker/dockerfiles/debian.docker
+> > > > > +++ b/tests/docker/dockerfiles/debian.docker
+> > > > > @@ -9,17 +9,17 @@
+> > > > >  #
+> > > > >  FROM debian:stable-slim
+> > > > >=20
+> > > > > -# Setup some basic tools we need
+> > > > > -RUN apt update
+> > > > > -RUN apt install -yy aptitude ca-certificates curl
+> > > > > +# Install some basic tools and common build utilities
+> > > > > +RUN apt-get update && \
+> > > > > +    DEBIAN_FRONTEND=3Dnoninteractive apt-get install -yy \
+> > > > > +        eatmydata && \
+> > > > > +    DEBIAN_FRONTEND=3Dnoninteractive eatmydata apt-get install=
+ -y --no-install-recommends \
+> > > > > +        aptitude ca-certificates curl \
+> > > > > +        build-essential clang git \
+> > > > > +        bison flex && \
+> > > > > +    apt-get clean
+> > > >=20
+> > > > Any particular reason to make multiple "RUN" directives into one?
+> > >=20
+> > > It reduces the number of layers you generate during the building
+> > > process. I'm not sure how much space that saves in the long run tho=
+ugh
+> > > (disk space is pretty cheap ;-).
+> >=20
+> > I don't think it matters much, but refreshing an image gets slower du=
+e to
+> > coarser cache, for example when you add a package in the big "apt-get=
+ install"
+> > command.
+> >=20
+> > I don't see a strong reason why this is better. It clutters the file =
+and is
+> > inconsistent.
+>=20
+> I'm living in a remote place where Internet is pretty bad so it does sa=
+ve me
+> some time to have reduced layer while using 'docker save | docker load'=
+, but
+> no worry :)
 
-I agree, since I'm not confident with Python so I tried to touch as 
-little as possible.
+Shouldn't 'docker save' collapse the layers anyway and output final data?
 
-One iter I'm thinking about do a consistent rename with the 
-"dockerfiles/%.docker -> docker.d/%/Dockerfile" pattern and adding git 
-symlinks to required EXTRA_FILES in each dir, to avoid the call to 
-docker.py and be able to build/push images on hub.docker.com directly.
+On the contrary, Docker build cache saves me time too when I play with th=
+e
+package list, as 'apt-get update' result is cached in a previous RUN dire=
+ctive,
+and doesn't need to run again and again. (Yes, I live in a place where "a=
+pt-get
+update" is slow :)
 
-> Similarly, should EXTRA_FILE be EXTRA_FILES or something?
-
-Yes.
-
-> We are already lacking this with --include-executable's documentation, but
-> please also document "where" is it copied to in the container's filesystem.
-
-Ok.
-
-Thank for the review,
-
-Phil.
-
-> Fam
->
->>          parser.add_argument("--add-current-user", "-u", dest="user",
->>                              action="store_true",
->>                              help="Add the current user to image's passwd")
->> @@ -274,6 +277,8 @@ class BuildCommand(SubCommand):
->>              if args.include_executable:
->>                  _copy_binary_with_libs(args.include_executable,
->>                                         docker_dir)
->> +            if args.include_file:
->> +                _copy_with_mkdir(args.include_file, docker_dir)
->>
->>              argv += ["--build-arg=" + k.lower() + "=" + v
->>                          for k, v in os.environ.iteritems()
->> --
->> 2.11.0
->>
->
+Fam
