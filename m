@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d7sYM-0003R0-9p
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:58:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7sa4-0004pg-WE
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 20:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d7sYL-0001zk-7f
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 19:58:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1d7sZw-0002kM-Fr
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 20:00:45 -0400
 References: <20170508233918.9043-1-f4bug@amsat.org>
-	<20170508233918.9043-5-f4bug@amsat.org>
+	<20170508233918.9043-10-f4bug@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <56387911-b587-adf0-c65b-ed12374d604d@redhat.com>
-Date: Mon, 8 May 2017 18:58:46 -0500
+Message-ID: <b0c4d068-3bc1-3611-df36-0f76b7717856@redhat.com>
+Date: Mon, 8 May 2017 19:00:32 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170508233918.9043-5-f4bug@amsat.org>
+In-Reply-To: <20170508233918.9043-10-f4bug@amsat.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="KW7SIcisNcrGPAvwQestLe73ANH5MJxpA"
-Subject: Re: [Qemu-devel] [PATCH 04/11] ide/ahci: add missing includes
+	boundary="AfEuGi6tvkB0KIo7Pd10DDoeMDpb3qlsX"
+Subject: Re: [Qemu-devel] [PATCH 09/11] target/sparc: fix DEBUG_MMU
+ DPRINTF() arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KW7SIcisNcrGPAvwQestLe73ANH5MJxpA
+--AfEuGi6tvkB0KIo7Pd10DDoeMDpb3qlsX
 From: Eric Blake <eblake@redhat.com>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, qemu-trivial@nongnu.org, John Snow
- <jsnow@redhat.com>, qemu-block@nongnu.org
-Message-ID: <56387911-b587-adf0-c65b-ed12374d604d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/11] ide/ahci: add missing includes
+ qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Artyom Tarasenko <atar4qemu@gmail.com>
+Message-ID: <b0c4d068-3bc1-3611-df36-0f76b7717856@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/11] target/sparc: fix DEBUG_MMU DPRINTF()
+ arguments
 References: <20170508233918.9043-1-f4bug@amsat.org>
- <20170508233918.9043-5-f4bug@amsat.org>
-In-Reply-To: <20170508233918.9043-5-f4bug@amsat.org>
+ <20170508233918.9043-10-f4bug@amsat.org>
+In-Reply-To: <20170508233918.9043-10-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/08/2017 06:39 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> qemu/include/hw/ide/ahci.h:260:16: error: field =E2=80=98sglist=E2=80=99=
- has incomplete type
->      QEMUSGList sglist;
->                 ^~~~~~
-
-What are you doing to get this compilation error (configure options,
-platform, compiler, etc)?  I can't reproduce it. Is it something that
-pops up later when you remove includes from somewhere else, and you're
-just pre-emptively adding includes here to allow removal of includes late=
-r?
-
-> /qemu/include/hw/ide/ahci.h:272:5: error: unknown type name =E2=80=98ID=
-EDMA=E2=80=99
->      IDEDMA dma;
->      ^~~~~~
-> qemu/include/hw/ide/ahci.h:273:5: error: unknown type name =E2=80=98IDE=
-Bus=E2=80=99
->      IDEBus port;
->      ^~~~~~
-> qemu/include/hw/ide/ahci.h:305:15: error: field =E2=80=98parent_obj=E2=80=
-=99 has incomplete type
->      PCIDevice parent_obj;
->                ^~~~~~~~~~
+> invalid since 96df2bc99f9
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  include/hw/ide/ahci.h | 2 ++
->  1 file changed, 2 insertions(+)
+>  target/sparc/ldst_helper.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/include/hw/ide/ahci.h b/include/hw/ide/ahci.h
-> index 0ca7c65820..293f9ebcd0 100644
-> --- a/include/hw/ide/ahci.h
-> +++ b/include/hw/ide/ahci.h
-> @@ -25,6 +25,8 @@
->  #define HW_IDE_AHCI_H
+> diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
+> index 57968d9143..aa83a49a88 100644
+> --- a/target/sparc/ldst_helper.c
+> +++ b/target/sparc/ldst_helper.c
+> @@ -1631,7 +1631,7 @@ void helper_st_asi(CPUSPARCState *env, target_ulo=
+ng addr, target_ulong val,
 > =20
->  #include "hw/sysbus.h"
-> +#include "hw/ide/internal.h"
-> +#include "sysemu/dma.h"
-> =20
->  #define AHCI_MEM_BAR_SIZE         0x1000
->  #define AHCI_MAX_PORTS            32
->=20
+>              if (oldreg !=3D env->immu.mmuregs[reg]) {
+>                  DPRINTF_MMU("immu change reg[%d]: 0x%016" PRIx64 " -> =
+0x%016"
+> -                            PRIx64 "\n", reg, oldreg, env->immuregs[re=
+g]);
+> +                            PRIx64 "\n", reg, oldreg, env->immu.mmureg=
+s[reg]);
+
+Please take this opportunity to fix the broken definitions of
+DPRINTF_MMU() and friends so that they don't bit-rot when not defined.
+There are plenty of other examples of re-writing broken #defines to
+instead favor an if (0) { printf(...) } to benefit from -Wformat
+checking even when the debugging is disabled.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -91,7 +78,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---KW7SIcisNcrGPAvwQestLe73ANH5MJxpA
+--AfEuGi6tvkB0KIo7Pd10DDoeMDpb3qlsX
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -101,13 +88,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZEQY3AAoJEKeha0olJ0NqoL8IALDMIPnOD8FbdQ0LqOICKHTu
-hCKRKBS4zpGarbKt6NbRxtAc50kmMFUJCvmYj1UDiRNBhnk3eKF6tPD8Io3TbAME
-acknbw5FANxP0zZDlo7niwWPC0oQ8lGGS1+ktcGFGkT0t6Vvu/E48BrG5bLGMAJp
-HebvncGTMMtLzhaJ/dDnKg7QG1DNm6ILryysIvjRpIQYgJPhRNZEdUXe/t7mOWqC
-CwJKzeUBfhg/ZLVgYgVpLtWG99x0R5UQQygVtVC2nd29mk9gGTUkTpRTkOjugGfr
-BqtWCxJbycF8vDduqKcFiDXO96L9EBvVmb04r0YXWU4JDW7FCSsokyUYuM01uBY=
-=wYxQ
+iQEcBAEBCAAGBQJZEQagAAoJEKeha0olJ0NqnzAH/AsbLvyJh98voTASJGEyPJOu
+4Nk3ZvPf1EVdorBumNLfGEas3jPmE1XKeIwfMWpoUyZVXLBovhlyG6XT20n8iKLs
+A8/rJKGODK2ZSBaFCCOrAr0ptOg2EiJdqY1D3k7Q7uCnYWNx+ngZPdIVYkCXv+NR
+1/L16FsvSGpzslRu7Z2FMfzjm7pOqU/HXQyEbbUv+Qv0qxX+7oUMT4TWJUdZZbeJ
+hlMtIiQAbVBMqjOo3KH4qxUYKXyD+I6tfuch20qKx4fL5MfuBhD7XdHEPhbABtQc
+gsszn0lpntPkFwfQ58a8h22oT6D8TvQPW/GdDfkM77YrRl8gxC/BtG/q05uAJTs=
+=JWC1
 -----END PGP SIGNATURE-----
 
---KW7SIcisNcrGPAvwQestLe73ANH5MJxpA--
+--AfEuGi6tvkB0KIo7Pd10DDoeMDpb3qlsX--
