@@ -1,43 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d88v9-0000aF-UT
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:27:37 -0400
+	(envelope-from <berrange@redhat.com>) id 1d891I-0003AN-P3
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:33:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d88v6-0005ZC-Qr
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:27:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55020
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1d88v6-0005YS-KW
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:27:32 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v49HNUAD109280
-	for <qemu-devel@nongnu.org>; Tue, 9 May 2017 13:27:31 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2abd21puuw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 13:27:31 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 9 May 2017 18:27:29 +0100
-References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
-	<20170505173507.74077-10-pasic@linux.vnet.ibm.com>
-	<20170508172757.GI2120@work-vm>
-	<f0c6584a-1cd9-9aca-8eee-ef5cac26c613@linux.vnet.ibm.com>
-	<20170508183718.GL2120@work-vm>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 9 May 2017 19:27:25 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170508183718.GL2120@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <f5907f9a-a004-f24f-edce-7e049cc14187@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 09/10] s390x/css: turn on channel subsystem
- migration
+	(envelope-from <berrange@redhat.com>) id 1d891H-0002aG-Oo
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:33:56 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue,  9 May 2017 18:33:37 +0100
+Message-Id: <20170509173342.29286-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/5] Improve I/O tests coverage of LUKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,77 +17,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+The main goal of this series is to get the I/O tests passing
+100% with LUKS when run with './check -luks'. It also adds a
+few more combinations to the LUKS/dmcrypt interoperability
+test.
 
+To make LUKS testing not quite as slow, we drop the PBKDF
+iteration count down to a very small value. This doesn't
+remove all overhead, as formatting the volume will always
+measure PBKDF timing over a 1 second interval.
 
-On 05/08/2017 08:37 PM, Dr. David Alan Gilbert wrote:
-> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->>
->>
->> On 05/08/2017 07:27 PM, Dr. David Alan Gilbert wrote:
->>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->>>> Turn on migration for the channel subsystem and the new scheme for
->>>> migrating virtio-ccw proxy devices (instead of letting the transport
->>>> independent child device migrate it's proxy, use the usual
->>>> DeviceClass.vmsd mechanism) for future machine versions.
->>
->> [..]
->>
->>>> @@ -1365,6 +1373,11 @@ static void virtio_ccw_device_plugged(DeviceState *d, Error **errp)
->>>>      sch->id.cu_model = virtio_bus_get_vdev_id(&dev->bus);
->>>>  
->>>>  
->>>> +    /* Avoid generating unknown section for legacy migration target. */
->>>> +    if (!css_migration_enabled()) {
->>>> +        DEVICE_GET_CLASS(ccw_dev)->vmsd = NULL;
->>>> +    }
->>>> +
->>>
->>> That's a very odd thing to do; can't you use a .needed at the
->>> top level of the vmstate_virtio_ccw_dev to avoid having to
->>> set it to NULL like this?
->>>
->>
->> I agree it's odd. As far as I remember I can't use .needed but
->> I will double check.
-> 
-> You can have top level .needed's - both vmstate_globalstate in
-> migration.c and colo's colo_state use them.
-> 
+Changed in v5:
 
-Works like charm. I'm really happy to get rid of this ugly hunk.  Thanks
-a lot! 
+ - Rebase to kevin/block  git tree instead of master
+ - Fix LUKS compat in new test 181
 
-I was probably confused by the fact that I want to use the same vmsd with
-vmstate_save_state when the needed is false. That works, but I have probably 
-blindly assumed (back then) it does not. Of course it does make sense to
-ignore .needed in that function, because for a vmsd coming from a
-recursive call while processing a filed then the non-presence of a field
-should be indicated by field_exists.
+Changed in v4:
 
-I wonder if adding a comment at the definition site would be helpful.
-Something like:
+ - Fix misc mistakes in syntax conversion (Max)
+ - Drop changes to 120 & mark it unsupported (Max)
+ - Use _unsupported_fmt (Max)
 
+Changed in v3:
 
- struct VMStateDescription {
-....
-     void (*pre_save)(void *opaque);
-+    /* Controls the existence of sections and subsections, but not fields. */
-     bool (*needed)(void *opaque);
-     VMStateField *fields;
-     const VMStateDescription **subsections;
- };
+ - Fix some typos in commit message(s) (Eric)
 
-Halil
+Changed in v2:
 
-> Dave
-> 
->> Many thanks for your review!
->>
->> Halil
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+ - Split off patch that change check.time recording since
+   it was not a direct dependancy
+ - Skip new 159 & 170 tests which don't work due to qemu-img
+   dd limitations
+
+Daniel P. Berrange (5):
+  iotests: skip 159 & 170 with luks format
+  iotests: fix remainining tests to work with LUKS
+  iotests: reduce PBKDF iterations when testing LUKS
+  iotests: add more LUKS hash combination tests
+  iotests: chown LUKS device before qemu-io launches
+
+ tests/qemu-iotests/033           |   12 +-
+ tests/qemu-iotests/120           |    1 +
+ tests/qemu-iotests/140           |   11 +-
+ tests/qemu-iotests/145           |   19 +-
+ tests/qemu-iotests/149           |   26 +-
+ tests/qemu-iotests/149.out       | 1002 ++++++++++++++++++++++++++++----------
+ tests/qemu-iotests/157           |   17 +-
+ tests/qemu-iotests/157.out       |   16 +-
+ tests/qemu-iotests/159           |    1 +
+ tests/qemu-iotests/170           |    1 +
+ tests/qemu-iotests/174           |    2 +-
+ tests/qemu-iotests/181           |   21 +-
+ tests/qemu-iotests/common.filter |    3 +-
+ tests/qemu-iotests/common.qemu   |    9 +-
+ tests/qemu-iotests/common.rc     |    3 +
+ 15 files changed, 844 insertions(+), 300 deletions(-)
+
+-- 
+2.9.3
