@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d8BNb-0001WA-E7
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:05:08 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d8BUO-0003qO-SU
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:12:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d8BNY-00008Y-5j
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:05:07 -0400
-Resent-Message-Id: <E1d8BNY-00008Y-5j@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21430)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d8BNX-00007w-Sc
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:05:04 -0400
-In-Reply-To: <20170509193112.16613-1-laurent@vivier.eu>
-Message-ID: <149436029348.270.14280384747332335561@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <ehabkost@redhat.com>) id 1d8BUM-0002zH-6P
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:12:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8BUM-0002xO-09
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 16:12:06 -0400
+Date: Tue, 9 May 2017 17:12:01 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170509201201.GB3482@thinpad.lan.raisama.net>
+References: <20170509132736.10071-1-berrange@redhat.com>
+	<040c1e25-224f-1a8a-9f60-7238e6ad5df6@twiddle.net>
+	<20170509141336.GF27432@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 9 May 2017 13:04:54 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 0/1] slirp: add SOCKS5 support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170509141336.GF27432@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/2] Support CPUID signature for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, samuel.thibault@ens-lyon.org, qemu-devel@nongnu.org, jasowang@redhat.com, f4bug@amsat.org
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2NSAwLzFdIHNsaXJwOiBhZGQgU09DS1M1IHN1cHBvcnQKTWVzc2FnZS1p
-ZDogMjAxNzA1MDkxOTMxMTIuMTY2MTMtMS1sYXVyZW50QHZpdmllci5ldQpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
-YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
-RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
-dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
-b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
-MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
-M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCmI4NTdhZTggc2xpcnA6IGFkZCBTT0NLUzUgc3VwcG9ydAoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBzbGlycDogYWRkIFNPQ0tTNSBzdXBw
-b3J0Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzE6IEZJTEU6IHNsaXJw
-L3NsaXJwLmM6NjYyOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHNsaXJwLT5wcm94eV9wYXNzd29yZCwgc28tPmZob3N0LnNzLAoKRVJST1I6IHN1c3BlY3Qg
-Y29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDQsIDYpCiM4MDE6IEZJTEU6
-IHNsaXJwL3RjcF9zdWJyLmM6NDI4OgorICAgIGlmIChzby0+c29fcHJveHlfc3RhdGUpIHsKKyAg
-ICAgIHJldCA9IHNvY2tzNV9jb25uZWN0KHMsIHNsaXJwLT5wcm94eV9zZXJ2ZXIsIHNsaXJwLT5w
-cm94eV9wb3J0LAoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA3NDcgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Tue, May 09, 2017 at 03:13:37PM +0100, Richard W.M. Jones wrote:
+> On Tue, May 09, 2017 at 07:05:51AM -0700, Richard Henderson wrote:
+> > On 05/09/2017 06:27 AM, Daniel P. Berrange wrote:
+> > >This enables report of a signature in CPUID for the TCG
+> > >interpretor.
+> > >
+> > >Changed in v4:
+> > >
+> > >  - Report 0x40000001 in EAX for 0x40000000 index (Eduardo)
+> > >  - Report all zeros for 0x40000001 index (Eduardo)
+> > >  - Make code style consistent when checking limits (Eduardo)
+> > >
+> > >Changed in v3:
+> > >
+> > >  - Simplify CPU limit code still further (Eduardo)
+> > >
+> > >Changed in v2:
+> > >
+> > >  - Rewrite the way we bounds check / cap the CPUID index
+> > >    to use a flat switch, instead of nested ifs (Eduardo)
+> > >  - Add a 'tcg-cpuid' property to allow it to be hidden
+> > >    (Eduardo)
+> > >  - Hide the TCG signature for old machine types
+> > >  - Force code to a no-op if tcg_enabled() is false (Eduardo)
+> > >
+> > >
+> > >NB, I did not introduce a general 'hypervisor-cpuid' property
+> > >to obsolete the existing 'kvm=off|on' -cpu property, since it
+> > >appears impossible to get the back compat semantics right,
+> > >as described in a previous reply.
+> > >
+> > >Daniel P. Berrange (2):
+> > >   i386: rewrite way CPUID index is validated
+> > >   i386: expose "TCGTCGTCGTCG" in the 0x40000000 CPUID leaf
+> > 
+> > I probably should have commented earlier but...  what's the point?
+> > 
+> > If you want the guest os to actually do anything with this, what do
+> > you gain for advertising TCG over KVM?
+> 
+> I can see this being useful from virt-what, since it would allow
+> vendors to diagnose problems being caused by TCG (since as Dan
+> mentions in the other reply and as you are already well acquainted
+> with, TCG and KVM don't present or emulate quite the same thing).
+> 
+> That said, I don't think it's anything more than a nice to have.
+
+We also have systemd-detect-virt, and the ConditionVirtualization
+option in systemd.
+
+-- 
+Eduardo
