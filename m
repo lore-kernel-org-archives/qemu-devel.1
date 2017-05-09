@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d87Jf-0006Tj-S4
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:44:49 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d87Kb-0007Eg-2H
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d87Je-0001LV-Md
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:44:47 -0400
-Date: Tue, 9 May 2017 11:44:39 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170509154439.GA16494@localhost.localdomain>
-References: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1d87KY-0001c2-0w
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:45:45 -0400
+Resent-Message-Id: <E1d87KY-0001c2-0w@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21397)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d87KX-0001bq-PT
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:45:41 -0400
+In-Reply-To: <1494330527-24163-1-git-send-email-mst@redhat.com>
+Message-ID: <149434473463.264.16180527721284428575@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f4a22cdebdd0bca6a13a43a2a6deead7f2ec4bb3.1493906281.git.pkrempa@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: curl: Allow passing
- cookies via QCryptoSecret
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 9 May 2017 08:45:35 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/8] pci, virtio, vhost: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: mst@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Thu, May 04, 2017 at 04:00:06PM +0200, Peter Krempa wrote:
-> Since cookies can contain sensitive data (session ID, etc ...) it is
-> desired to hide them from the prying eyes of users. Add a possibility to
-> pass them via the secret infrastructure.
-> 
-> Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1447413
-> 
-> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
-> ---
->  block/curl.c         | 24 +++++++++++++++++++++++-
->  qapi/block-core.json | 12 ++++++++++--
->  2 files changed, 33 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/curl.c b/block/curl.c
-> index 2708d57c2f..483640b14a 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -85,6 +85,7 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
->  #define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
->  #define CURL_BLOCK_OPT_TIMEOUT "timeout"
->  #define CURL_BLOCK_OPT_COOKIE    "cookie"
-> +#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
->  #define CURL_BLOCK_OPT_USERNAME "username"
->  #define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
->  #define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
-> @@ -624,6 +625,11 @@ static QemuOptsList runtime_opts = {
->              .help = "Pass the cookie or list of cookies with each request"
->          },
->          {
-> +            .name = CURL_BLOCK_OPT_COOKIE_SECRET,
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "ID of secret used as cookie passed with each request"
-> +        },
-> +        {
->              .name = CURL_BLOCK_OPT_USERNAME,
->              .type = QEMU_OPT_STRING,
->              .help = "Username for HTTP auth"
-> @@ -657,6 +663,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      Error *local_err = NULL;
->      const char *file;
->      const char *cookie;
-> +    const char *cookie_secret;
->      double d;
->      const char *secretid;
->      const char *protocol_delimiter;
-> @@ -693,7 +700,22 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      s->sslverify = qemu_opt_get_bool(opts, CURL_BLOCK_OPT_SSLVERIFY, true);
-> 
->      cookie = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE);
-> -    s->cookie = g_strdup(cookie);
-> +    cookie_secret = qemu_opt_get(opts, CURL_BLOCK_OPT_COOKIE_SECRET);
-> +
-> +    if (cookie && cookie_secret) {
-> +        error_setg(errp,
-> +                   "curl driver cannot handle both cookie and cookie secret");
-> +        goto out_noclean;
-> +    }
-> +
-> +    if (cookie_secret) {
-> +        s->cookie = qcrypto_secret_lookup_as_utf8(cookie_secret, errp);
-> +        if (!s->cookie) {
-> +            goto out_noclean;
-> +        }
-> +    } else {
-> +        s->cookie = g_strdup(cookie);
-> +    }
-> 
->      file = qemu_opt_get(opts, CURL_BLOCK_OPT_URL);
->      if (file == NULL) {
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 87fb747ab6..b1643d2032 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2782,11 +2782,15 @@
->  #               "name1=content1; name2=content2;" as explained by
->  #               CURLOPT_COOKIE(3). Defaults to no cookies.
->  #
-> +# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
-> +#                 secure way. See @cookie for the format. (since 2.10)
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttp',
->    'base': 'BlockdevOptionsCurlBase',
-> -  'data': { '*cookie': 'str' } }
-> +  'data': { '*cookie': 'str',
-> +            '*cookie-secret': 'str'} }
-> 
->  ##
->  # @BlockdevOptionsCurlHttps:
-> @@ -2801,12 +2805,16 @@
->  # @sslverify:   Whether to verify the SSL certificate's validity (defaults to
->  #               true)
->  #
-> +# @cookie-secret: ID of a QCryptoSecret object providing the cookie data in a
-> +#                 secure way. See @cookie for the format. (since 2.10)
-> +#
->  # Since: 2.9
->  ##
->  { 'struct': 'BlockdevOptionsCurlHttps',
->    'base': 'BlockdevOptionsCurlBase',
->    'data': { '*cookie': 'str',
-> -            '*sslverify': 'bool' } }
-> +            '*sslverify': 'bool',
-> +            '*cookie-secret': 'str'} }
-> 
->  ##
->  # @BlockdevOptionsCurlFtp:
-> -- 
-> 2.12.2
-> 
-> 
-
-Thanks,
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
-Also:
-
-Applied to my block branch:
-
-git://github.com/codyprime/qemu-kvm-jtc block
-
--Jeff
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIDAvOF0gcGNpLCB2aXJ0aW8sIHZob3N0OiBmaXhlcwpUeXBlOiBzZXJpZXMK
+TWVzc2FnZS1pZDogMTQ5NDMzMDUyNy0yNDE2My0xLWdpdC1zZW5kLWVtYWlsLW1zdEByZWRoYXQu
+Y29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0JwoxYWFmMjM0IEFDUEk6IGRvbid0IGNhbGwgYWNwaV9wY2locF9k
+ZXZpY2VfcGx1Z19jYiBvbiB4ZW4KM2I2ZTFiMyBpb21tdTogRG9uJ3QgY3Jhc2ggaWYgbWFjaGlu
+ZSBpcyBub3QgUENfTUFDSElORQo1ZTNmMDI3IHBjOiBhZGQgMi4xMCBtYWNoaW5lIHR5cGUKYTYx
+MWI5ZCBwYy9md2NmZzogdW5icmVhayBtaWdyYXRpb24gZnJvbSBxZW11LTIuNSBhbmQgcWVtdS0y
+LjYgZHVyaW5nIGZpcm13YXJlIGJvb3QKMmVjZTBmNiBsaWJ2aG9zdC11c2VyOiBmaXggY3Jhc2gg
+d2hlbiByaW5ncyBhcmVuJ3QgcmVhZHkKYzlkMmY4NCBody92aXJ0aW86IGZpeCB2aG9zdCB1c2Vy
+IGZhaWxzIHRvIHN0YXJ0dXAgd2hlbiBNUQpmMjQyNjBiIGh3L2FybS92aXJ0OiBnZW5lcmF0ZSA2
+NC1iaXQgYWRkcmVzc2FibGUgQUNQSSBvYmplY3RzCjZmMDFiODQgaHcvYWNwaS1kZWZzOiByZXBs
+YWNlIGxlYWRpbmcgWCB3aXRoIHhfIGluIEZBRFQgZmllbGQgbmFtZXMKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CkNoZWNraW5nIFBBVENIIDEvODogaHcvYWNwaS1kZWZzOiByZXBsYWNlIGxlYWRpbmcg
+WCB3aXRoIHhfIGluIEZBRFQgZmllbGQgbmFtZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiBody9h
+cm0vdmlydDogZ2VuZXJhdGUgNjQtYml0IGFkZHJlc3NhYmxlIEFDUEkgb2JqZWN0cy4uLgpFUlJP
+Ujogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5lCiMx
+NTc6IEZJTEU6IGluY2x1ZGUvaHcvYWNwaS9hY3BpLWRlZnMuaDoyNDQ6CitzdHJ1Y3QgQWNwaVhz
+ZHREZXNjcmlwdG9yUmV2MgorewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjUgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggMy84OiBody92aXJ0aW86IGZpeCB2aG9zdCB1c2VyIGZhaWxzIHRvIHN0YXJ0dXAg
+d2hlbiBNUS4uLgpDaGVja2luZyBQQVRDSCA0Lzg6IGxpYnZob3N0LXVzZXI6IGZpeCBjcmFzaCB3
+aGVuIHJpbmdzIGFyZW4ndCByZWFkeS4uLgpDaGVja2luZyBQQVRDSCA1Lzg6IHBjL2Z3Y2ZnOiB1
+bmJyZWFrIG1pZ3JhdGlvbiBmcm9tIHFlbXUtMi41IGFuZCBxZW11LTIuNiBkdXJpbmcgZmlybXdh
+cmUgYm9vdC4uLgpDaGVja2luZyBQQVRDSCA2Lzg6IHBjOiBhZGQgMi4xMCBtYWNoaW5lIHR5cGUu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNy84OiBpb21tdTogRG9uJ3QgY3Jhc2ggaWYgbWFjaGluZSBpcyBu
+b3QgUENfTUFDSElORS4uLgpDaGVja2luZyBQQVRDSCA4Lzg6IEFDUEk6IGRvbid0IGNhbGwgYWNw
+aV9wY2locF9kZXZpY2VfcGx1Z19jYiBvbiB4ZW4uLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
