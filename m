@@ -1,21 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d88Va-00072Z-Pv
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:01:14 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d88Zv-0008Mc-H9
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d88VZ-0003PD-En
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:01:10 -0400
-Date: Tue, 9 May 2017 13:00:54 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170509170054.GA25411@localhost.localdomain>
-References: <20170508141310.8674-1-pbonzini@redhat.com>
-	<20170508141310.8674-5-pbonzini@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d88Zr-0004Xf-FE
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:05:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35141
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1d88Zr-0004XV-84
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:05:35 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v49GrwK6064237
+	for <qemu-devel@nongnu.org>; Tue, 9 May 2017 13:05:34 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2abatwkykv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 13:05:34 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 9 May 2017 18:05:32 +0100
+References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
+	<20170505173507.74077-7-pasic@linux.vnet.ibm.com>
+	<20170508165501.GH2120@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 9 May 2017 19:05:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170508141310.8674-5-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/11] blockjob: introduce
- block_job_pause/resume_all
+In-Reply-To: <20170508165501.GH2120@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <52177e87-8d46-e1f6-49cf-397f296dd366@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 06/10] virtio-ccw: use vmstate way for
+ config migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,298 +44,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, stefanha@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Mon, May 08, 2017 at 04:13:03PM +0200, Paolo Bonzini wrote:
-> Remove use of block_job_pause/resume from outside blockjob.c, thus
-> making them static.  The new functions are used by the block layer,
-> so place them in blockjob_int.h.
+
+
+On 05/08/2017 06:55 PM, Dr. David Alan Gilbert wrote:
+> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>> Let us use the freshly introduced vmstate migration helpers instead of
+>> saving/loading the config manually.
+>>
+>> To achieve this we need to hack the config_vector which is a common
+>> VirtIO state in the middle of the VirtioCcwDevice state representation.
+>> This somewhat ugly but we have no choice because the stream format needs
+>> to be preserved.
+>>
+>> Still no changes in behavior, but the dead code we added previously is
+>> finally awakening to life.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>> ---
+>>  hw/s390x/virtio-ccw.c | 116 +++++++++++++++++++-------------------------------
+>>  1 file changed, 44 insertions(+), 72 deletions(-)
+>>
+>> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+>> index c2badfe..8ab655c 100644
+>> --- a/hw/s390x/virtio-ccw.c
+>> +++ b/hw/s390x/virtio-ccw.c
+>> @@ -57,6 +57,32 @@ static int virtio_ccw_dev_post_load(void *opaque, int version_id)
+>>      return 0;
+>>  }
+>>  
+>> +static int get_config_vector(QEMUFile *f, void *pv, size_t size,
+>> +                             VMStateField *field)
+>> +{
+>> +    VirtioCcwDevice *dev = pv;
+>> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+>> +
+>> +    qemu_get_be16s(f, &vdev->config_vector);
+>> +    return 0;
+>> +}
+>> +
+>> +static int put_config_vector(QEMUFile *f, void *pv, size_t size,
+>> +                             VMStateField *field, QJSON *vmdesc)
+>> +{
+>> +    VirtioCcwDevice *dev = pv;
+>> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+>> +
+>> +    qemu_put_be16(f, vdev->config_vector);
+>> +    return 0;
+>> +}
+> Again that should be doable using WITH_TMP.
+> (I do wonder if we need a macro for cases where it's just a casting
+> operation to another type).
 > 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/io.c                   |  19 ++------
->  blockjob.c                   | 114 ++++++++++++++++++++++++++-----------------
->  include/block/blockjob.h     |  16 ------
->  include/block/blockjob_int.h |  14 ++++++
->  4 files changed, 86 insertions(+), 77 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index a7142e00e8..a54e5c8cea 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -26,6 +26,7 @@
->  #include "trace.h"
->  #include "sysemu/block-backend.h"
->  #include "block/blockjob.h"
-> +#include "block/blockjob_int.h"
->  #include "block/block_int.h"
->  #include "qemu/cutils.h"
->  #include "qapi/error.h"
-> @@ -301,16 +302,9 @@ void bdrv_drain_all_begin(void)
->      bool waited = true;
->      BlockDriverState *bs;
->      BdrvNextIterator it;
-> -    BlockJob *job = NULL;
->      GSList *aio_ctxs = NULL, *ctx;
->  
-> -    while ((job = block_job_next(job))) {
-> -        AioContext *aio_context = blk_get_aio_context(job->blk);
-> -
-> -        aio_context_acquire(aio_context);
-> -        block_job_pause(job);
-> -        aio_context_release(aio_context);
-> -    }
-> +    block_job_pause_all();
->  
->      for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
->          AioContext *aio_context = bdrv_get_aio_context(bs);
-> @@ -354,7 +348,6 @@ void bdrv_drain_all_end(void)
->  {
->      BlockDriverState *bs;
->      BdrvNextIterator it;
-> -    BlockJob *job = NULL;
->  
->      for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
->          AioContext *aio_context = bdrv_get_aio_context(bs);
-> @@ -365,13 +358,7 @@ void bdrv_drain_all_end(void)
->          aio_context_release(aio_context);
->      }
->  
-> -    while ((job = block_job_next(job))) {
-> -        AioContext *aio_context = blk_get_aio_context(job->blk);
-> -
-> -        aio_context_acquire(aio_context);
-> -        block_job_resume(job);
-> -        aio_context_release(aio_context);
-> -    }
-> +    block_job_resume_all();
->  }
->  
->  void bdrv_drain_all(void)
-> diff --git a/blockjob.c b/blockjob.c
-> index 5a722c3635..85ad610cae 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -55,36 +55,6 @@ struct BlockJobTxn {
->  
->  static QLIST_HEAD(, BlockJob) block_jobs = QLIST_HEAD_INITIALIZER(block_jobs);
->  
-> -static char *child_job_get_parent_desc(BdrvChild *c)
-> -{
-> -    BlockJob *job = c->opaque;
-> -    return g_strdup_printf("%s job '%s'",
-> -                           BlockJobType_lookup[job->driver->job_type],
-> -                           job->id);
-> -}
-> -
-> -static const BdrvChildRole child_job = {
-> -    .get_parent_desc    = child_job_get_parent_desc,
-> -    .stay_at_node       = true,
-> -};
-> -
-> -static void block_job_drained_begin(void *opaque)
-> -{
-> -    BlockJob *job = opaque;
-> -    block_job_pause(job);
-> -}
-> -
-> -static void block_job_drained_end(void *opaque)
-> -{
-> -    BlockJob *job = opaque;
-> -    block_job_resume(job);
-> -}
-> -
-> -static const BlockDevOps block_job_dev_ops = {
-> -    .drained_begin = block_job_drained_begin,
-> -    .drained_end = block_job_drained_end,
-> -};
-> -
->  BlockJob *block_job_next(BlockJob *job)
->  {
->      if (!job) {
-> @@ -106,6 +76,21 @@ BlockJob *block_job_get(const char *id)
->      return NULL;
->  }
->  
-> +static void block_job_pause(BlockJob *job)
-> +{
-> +    job->pause_count++;
-> +}
-> +
-> +static void block_job_resume(BlockJob *job)
-> +{
-> +    assert(job->pause_count > 0);
-> +    job->pause_count--;
-> +    if (job->pause_count) {
-> +        return;
-> +    }
-> +    block_job_enter(job);
-> +}
-> +
->  static void block_job_ref(BlockJob *job)
->  {
->      ++job->refcnt;
-> @@ -171,6 +156,36 @@ static void block_job_detach_aio_context(void *opaque)
->      block_job_unref(job);
->  }
->  
-> +static char *child_job_get_parent_desc(BdrvChild *c)
-> +{
-> +    BlockJob *job = c->opaque;
-> +    return g_strdup_printf("%s job '%s'",
-> +                           BlockJobType_lookup[job->driver->job_type],
-> +                           job->id);
-> +}
-> +
-> +static const BdrvChildRole child_job = {
-> +    .get_parent_desc    = child_job_get_parent_desc,
-> +    .stay_at_node       = true,
-> +};
-> +
-> +static void block_job_drained_begin(void *opaque)
-> +{
-> +    BlockJob *job = opaque;
-> +    block_job_pause(job);
-> +}
-> +
-> +static void block_job_drained_end(void *opaque)
-> +{
-> +    BlockJob *job = opaque;
-> +    block_job_resume(job);
-> +}
-> +
-> +static const BlockDevOps block_job_dev_ops = {
-> +    .drained_begin = block_job_drained_begin,
-> +    .drained_end = block_job_drained_end,
-> +};
-> +
->  void block_job_remove_all_bdrv(BlockJob *job)
->  {
->      GSList *l;
-> @@ -471,11 +486,6 @@ void block_job_complete(BlockJob *job, Error **errp)
->      job->driver->complete(job, errp);
->  }
->  
-> -void block_job_pause(BlockJob *job)
-> -{
-> -    job->pause_count++;
-> -}
-> -
->  void block_job_user_pause(BlockJob *job)
->  {
->      job->user_paused = true;
-> @@ -520,16 +530,6 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
->      }
->  }
->  
-> -void block_job_resume(BlockJob *job)
-> -{
-> -    assert(job->pause_count > 0);
-> -    job->pause_count--;
-> -    if (job->pause_count) {
-> -        return;
-> -    }
-> -    block_job_enter(job);
-> -}
-> -
->  void block_job_user_resume(BlockJob *job)
->  {
->      if (job && job->user_paused && job->pause_count > 0) {
-> @@ -723,6 +723,30 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
->                                          &error_abort);
->  }
->  
-> +void block_job_pause_all(void)
-> +{
-> +    BlockJob *job = NULL;
-> +    while ((job = block_job_next(job))) {
-> +        AioContext *aio_context = blk_get_aio_context(job->blk);
-> +
-> +        aio_context_acquire(aio_context);
-> +        block_job_pause(job);
-> +        aio_context_release(aio_context);
-> +    }
-> +}
-> +
-> +void block_job_resume_all(void)
-> +{
-> +    BlockJob *job = NULL;
-> +    while ((job = block_job_next(job))) {
-> +        AioContext *aio_context = blk_get_aio_context(job->blk);
-> +
-> +        aio_context_acquire(aio_context);
-> +        block_job_resume(job);
-> +        aio_context_release(aio_context);
-> +    }
-> +}
-> +
->  void block_job_event_ready(BlockJob *job)
->  {
->      job->ready = true;
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index 9e906f7d7e..09c7c694b5 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -235,14 +235,6 @@ void block_job_complete(BlockJob *job, Error **errp);
->  BlockJobInfo *block_job_query(BlockJob *job, Error **errp);
->  
->  /**
-> - * block_job_pause:
-> - * @job: The job to be paused.
-> - *
-> - * Asynchronously pause the specified job.
-> - */
-> -void block_job_pause(BlockJob *job);
-> -
-> -/**
->   * block_job_user_pause:
->   * @job: The job to be paused.
->   *
-> @@ -260,14 +252,6 @@ void block_job_user_pause(BlockJob *job);
->  bool block_job_user_paused(BlockJob *job);
->  
->  /**
-> - * block_job_resume:
-> - * @job: The job to be resumed.
-> - *
-> - * Resume the specified job.  Must be paired with a preceding block_job_pause.
-> - */
-> -void block_job_resume(BlockJob *job);
-> -
-> -/**
->   * block_job_user_resume:
->   * @job: The job to be resumed.
->   *
-> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-> index 45cdfd4ac1..4f2d2ac75a 100644
-> --- a/include/block/blockjob_int.h
-> +++ b/include/block/blockjob_int.h
-> @@ -156,6 +156,20 @@ void block_job_sleep_ns(BlockJob *job, QEMUClockType type, int64_t ns);
->  void block_job_yield(BlockJob *job);
->  
->  /**
-> + * block_job_pause_all:
-> + *
-> + * Asynchronously pause all jobs.
-> + */
-> +void block_job_pause_all(void);
-> +
-> +/**
-> + * block_job_resume_all:
-> + *
-> + * Resume all block jobs.  Must be paired with a preceding block_job_pause_all.
-> + */
-> +void block_job_resume_all(void);
-> +
-> +/**
->   * block_job_early_fail:
->   * @bs: The block device.
->   *
-> -- 
-> 2.12.2
-> 
->
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+Yeah this one can be done with WITH_TMP. Below is the patch on top of
+this patch set. It's a bit more verbose (+6 lines) but it looks a bit
+nicer and probably also safer in (terms of symmetric read and write).
+
+If you think its the way to go I will squash it into this patch for
+the next version.
+
+-----------------------------8<-----------------------------------------
+
+
+>From e92135590ab95cc565b37913de77a9ed17012933 Mon Sep 17 00:00:00 2001
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 9 May 2017 16:01:50 +0200
+Subject: [PATCH 1/2] virtio-ccw: replace info with VMSTATE_WITH_TMP
+
+Convert s VMSatateInfo based solution manipulating the migration stream
+directly to VMSTATE_WITH_TMP witch keeps IO and transformation logic
+separate. 
+
+
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+---
+ hw/s390x/virtio-ccw.c | 40 +++++++++++++++++++++++-----------------
+ 1 file changed, 23 insertions(+), 17 deletions(-)
+
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index c611b6f..6ebc78a 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -57,30 +57,38 @@ static int virtio_ccw_dev_post_load(void *opaque, int version_id)
+     return 0;
+ }
+ 
+-static int get_config_vector(QEMUFile *f, void *pv, size_t size,
+-                             VMStateField *field)
++typedef struct VirtioCcwDeviceTmp {
++    VirtioCcwDevice *parent;
++    uint16_t config_vector;
++} VirtioCcwDeviceTmp;
++
++static void virtio_ccw_dev_tmp_pre_save(void *opaque)
+ {
+-    VirtioCcwDevice *dev = pv;
++    VirtioCcwDeviceTmp *tmp = opaque;
++    VirtioCcwDevice *dev = tmp->parent;
+     VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+ 
+-    qemu_get_be16s(f, &vdev->config_vector);
+-    return 0;
++    tmp->config_vector = vdev->config_vector;
+ }
+ 
+-static int put_config_vector(QEMUFile *f, void *pv, size_t size,
+-                             VMStateField *field, QJSON *vmdesc)
++static int virtio_ccw_dev_tmp_post_load(void *opaque, int version_id)
+ {
+-    VirtioCcwDevice *dev = pv;
++    VirtioCcwDeviceTmp *tmp = opaque;
++    VirtioCcwDevice *dev = tmp->parent;
+     VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+ 
+-    qemu_put_be16(f, vdev->config_vector);
++    vdev->config_vector = tmp->config_vector;
+     return 0;
+ }
+ 
+-const VMStateInfo vmstate_info_config_vector = {
+-    .name = "config_vector",
+-    .get = get_config_vector,
+-    .put = put_config_vector,
++const VMStateDescription vmstate_virtio_ccw_dev_tmp = {
++    .name = "s390_virtio_ccw_dev_tmp",
++    .pre_save = virtio_ccw_dev_tmp_pre_save,
++    .post_load = virtio_ccw_dev_tmp_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT16(config_vector, VirtioCcwDeviceTmp),
++        VMSTATE_END_OF_LIST()
++    }
+ };
+ 
+ const VMStateDescription vmstate_virtio_ccw_dev = {
+@@ -93,14 +101,12 @@ const VMStateDescription vmstate_virtio_ccw_dev = {
+         VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
+         VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
+         VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
+-        {
+         /*
+          * Ugly hack because VirtIODevice does not migrate itself.
+          * This also makes legacy via vmstate_save_state possible.
+          */
+-            .name         = "virtio/config_vector",
+-            .info         = &vmstate_info_config_vector,
+-        },
++        VMSTATE_WITH_TMP(VirtioCcwDevice, VirtioCcwDeviceTmp,
++                         vmstate_virtio_ccw_dev_tmp),
+         VMSTATE_STRUCT(routes, VirtioCcwDevice, 1, vmstate_adapter_routes, \
+                        AdapterRoutes),
+         VMSTATE_UINT8(thinint_isc, VirtioCcwDevice),
+-- 
+2.10.2
