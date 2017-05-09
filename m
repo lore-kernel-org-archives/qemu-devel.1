@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1d81E3-0005cD-DP
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:14:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1d81EX-0005y0-0n
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:15:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1d81E0-0004UG-7x
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:14:35 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35565)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1d81Dz-0004U7-Rx
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:14:32 -0400
-Received: by mail-wr0-x242.google.com with SMTP id g12so12035491wrg.2
-	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 02:14:31 -0700 (PDT)
-References: <1494274635-11029-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<3f878a42-e19a-9afe-edff-61b942e477dd@ozlabs.ru>
-	<20170509052244.GM25748@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <f98d8946-4153-c461-f8ad-311f56f2aaf2@ozlabs.ru>
-Date: Tue, 9 May 2017 19:14:19 +1000
+	(envelope-from <peterx@redhat.com>) id 1d81ET-0004fI-E7
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:15:05 -0400
+Date: Tue, 9 May 2017 17:14:51 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170509091451.GJ2820@pxdev.xzpeter.org>
+References: <20170505101930.45837-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <20170509052244.GM25748@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EDEJS4WPVrIWFdIVaCXo8uva98EcllOqu"
-Subject: Re: [Qemu-devel] [PATCH] Revert "target-ppc/kvm: Enable in-kernel
- TCE acceleration for multi-tce"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170505101930.45837-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v6] memory/iommu: QOM'fy IOMMU
+ MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,182 +23,912 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EDEJS4WPVrIWFdIVaCXo8uva98EcllOqu
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sam.bobroff@au1.ibm.com,
- rnsastry@linux.vnet.ibm.com
-Message-ID: <f98d8946-4153-c461-f8ad-311f56f2aaf2@ozlabs.ru>
-Subject: Re: [PATCH] Revert "target-ppc/kvm: Enable in-kernel TCE acceleration
- for multi-tce"
-References: <1494274635-11029-1-git-send-email-joserz@linux.vnet.ibm.com>
- <3f878a42-e19a-9afe-edff-61b942e477dd@ozlabs.ru>
- <20170509052244.GM25748@umbus.fritz.box>
-In-Reply-To: <20170509052244.GM25748@umbus.fritz.box>
-Content-Type: text/plain; charset=koi8-r
-Content-Transfer-Encoding: quoted-printable
+On Fri, May 05, 2017 at 08:19:30PM +1000, Alexey Kardashevskiy wrote:
+> This defines new QOM object - IOMMUMemoryRegion - with MemoryRegion
+> as a parent.
+> 
+> This moves IOMMU-related fields from MR to IOMMU MR. However to avoid
+> dymanic QOM casting in fast path (address_space_translate, etc),
+> this adds an @is_iommu boolean flag to MR and provides new helper to
+> do simple cast to IOMMU MR - memory_region_get_iommu. The flag
+> is set in the instance init callback. This defines
+> memory_region_is_iommu as memory_region_get_iommu()!=NULL.
+> 
+> This switches MemoryRegion to IOMMUMemoryRegion in most places except
+> the ones where MemoryRegion may be an alias.
+> 
+> This defines memory_region_init_iommu_type() to allow creating
+> IOMMUMemoryRegion subclasses. In order to support custom QOM type,
+> this splits memory_region_init() to object_initialize() +
+> memory_region_do_init.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> Changes:
+> v6:
+> * s/\<iommumr\>/iommu_mr/g
+> 
+> v5:
+> * fixed sparc64, first time in many years did run "./configure" without
+> --target-list :-D Sorry for the noise though :(
+> 
+> v4:
+> * fixed alpha, mips64el and sparc
+> 
+> v3:
+> * rebased on sha1 81b2d5ceb0
+> 
+> v2:
+> * added mr->is_iommu
+> * updated i386/x86_64/s390/sun
+> ---
+>  hw/s390x/s390-pci-bus.h       |   2 +-
+>  include/exec/memory.h         |  77 +++++++++++++++++++-------
+>  include/hw/i386/intel_iommu.h |   2 +-
+>  include/hw/mips/mips.h        |   2 +-
+>  include/hw/ppc/spapr.h        |   3 +-
+>  include/hw/vfio/vfio-common.h |   2 +-
+>  include/qemu/typedefs.h       |   1 +
+>  exec.c                        |  16 +++---
+>  hw/alpha/typhoon.c            |   8 ++-
+>  hw/dma/rc4030.c               |   8 +--
+>  hw/i386/amd_iommu.c           |   9 +--
+>  hw/i386/intel_iommu.c         |  17 +++---
+>  hw/mips/mips_jazz.c           |   2 +-
+>  hw/pci-host/apb.c             |   6 +-
+>  hw/ppc/spapr_iommu.c          |  20 ++++---
+>  hw/s390x/s390-pci-bus.c       |   6 +-
+>  hw/s390x/s390-pci-inst.c      |   8 +--
+>  hw/vfio/common.c              |  12 ++--
+>  hw/vfio/spapr.c               |   3 +-
+>  memory.c                      | 124 +++++++++++++++++++++++++++++-------------
+>  20 files changed, 213 insertions(+), 115 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+> index cf142a3e68..6a599ed353 100644
+> --- a/hw/s390x/s390-pci-bus.h
+> +++ b/hw/s390x/s390-pci-bus.h
+> @@ -266,7 +266,7 @@ typedef struct S390PCIIOMMU {
+>      S390PCIBusDevice *pbdev;
+>      AddressSpace as;
+>      MemoryRegion mr;
+> -    MemoryRegion iommu_mr;
+> +    IOMMUMemoryRegion iommu_mr;
+>      bool enabled;
+>      uint64_t g_iota;
+>      uint64_t pba;
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 99e0f54d86..3638089c1d 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -37,6 +37,10 @@
+>  #define MEMORY_REGION(obj) \
+>          OBJECT_CHECK(MemoryRegion, (obj), TYPE_MEMORY_REGION)
+>  
+> +#define TYPE_IOMMU_MEMORY_REGION "qemu:iommu-memory-region"
+> +#define IOMMU_MEMORY_REGION(obj) \
+> +        OBJECT_CHECK(IOMMUMemoryRegion, (obj), TYPE_IOMMU_MEMORY_REGION)
+> +
+>  typedef struct MemoryRegionOps MemoryRegionOps;
+>  typedef struct MemoryRegionMmio MemoryRegionMmio;
+>  
+> @@ -186,15 +190,16 @@ typedef struct MemoryRegionIOMMUOps MemoryRegionIOMMUOps;
+>  
+>  struct MemoryRegionIOMMUOps {
+>      /* Return a TLB entry that contains a given address. */
+> -    IOMMUTLBEntry (*translate)(MemoryRegion *iommu, hwaddr addr, bool is_write);
+> +    IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
+> +                               bool is_write);
+>      /* Returns minimum supported page size */
+> -    uint64_t (*get_min_page_size)(MemoryRegion *iommu);
+> +    uint64_t (*get_min_page_size)(IOMMUMemoryRegion *iommu);
+>      /* Called when IOMMU Notifier flag changed */
+> -    void (*notify_flag_changed)(MemoryRegion *iommu,
+> +    void (*notify_flag_changed)(IOMMUMemoryRegion *iommu,
+>                                  IOMMUNotifierFlag old_flags,
+>                                  IOMMUNotifierFlag new_flags);
+>      /* Set this up to provide customized IOMMU replay function */
+> -    void (*replay)(MemoryRegion *iommu, IOMMUNotifier *notifier);
+> +    void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
+>  };
+>  
+>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+> @@ -216,7 +221,6 @@ struct MemoryRegion {
+>      uint8_t dirty_log_mask;
+>      RAMBlock *ram_block;
+>      Object *owner;
+> -    const MemoryRegionIOMMUOps *iommu_ops;
+>  
+>      const MemoryRegionOps *ops;
+>      void *opaque;
+> @@ -239,6 +243,13 @@ struct MemoryRegion {
+>      const char *name;
+>      unsigned ioeventfd_nb;
+>      MemoryRegionIoeventfd *ioeventfds;
+> +    bool is_iommu;
+> +};
+> +
+> +struct IOMMUMemoryRegion {
+> +    MemoryRegion parent_obj;
+> +
+> +    const MemoryRegionIOMMUOps *iommu_ops;
+>      QLIST_HEAD(, IOMMUNotifier) iommu_notify;
+>      IOMMUNotifierFlag iommu_notify_flags;
+>  };
+> @@ -579,19 +590,40 @@ static inline void memory_region_init_reservation(MemoryRegion *mr,
+>  }
+>  
+>  /**
+> + * memory_region_init_iommu_type: Initialize a memory region of a custom type
+> + * that translates addresses
+> + *
+> + * An IOMMU region translates addresses and forwards accesses to a target
+> + * memory region.
+> + *
+> + * @typename: QOM class name
+> + * @iommu_mr: the #IOMMUMemoryRegion to be initialized
+> + * @owner: the object that tracks the region's reference count
+> + * @ops: a function that translates addresses into the @target region
+> + * @name: used for debugging; not visible to the user or ABI
+> + * @size: size of the region.
+> + */
+> +void memory_region_init_iommu_type(const char *mrtypename,
+> +                                   IOMMUMemoryRegion *iommu_mr,
+> +                                   Object *owner,
+> +                                   const MemoryRegionIOMMUOps *ops,
+> +                                   const char *name,
+> +                                   uint64_t size);
+> +
+> +/**
+>   * memory_region_init_iommu: Initialize a memory region that translates
+>   * addresses
+>   *
+>   * An IOMMU region translates addresses and forwards accesses to a target
+>   * memory region.
+>   *
+> - * @mr: the #MemoryRegion to be initialized
+> + * @iommu_mr: the #IOMMUMemoryRegion to be initialized
+>   * @owner: the object that tracks the region's reference count
+>   * @ops: a function that translates addresses into the @target region
+>   * @name: used for debugging; not visible to the user or ABI
+>   * @size: size of the region.
+>   */
+> -void memory_region_init_iommu(MemoryRegion *mr,
+> +void memory_region_init_iommu(IOMMUMemoryRegion *iommu_mr,
+>                                struct Object *owner,
+>                                const MemoryRegionIOMMUOps *ops,
+>                                const char *name,
+> @@ -646,20 +678,25 @@ static inline bool memory_region_is_romd(MemoryRegion *mr)
+>  }
+>  
+>  /**
+> - * memory_region_is_iommu: check whether a memory region is an iommu
+> + * memory_region_get_iommu: check whether a memory region is an iommu
+>   *
+> - * Returns %true is a memory region is an iommu.
+> + * Returns pointer to IOMMUMemoryRegion if a memory region is an iommu,
+> + * otherwise NULL.
+>   *
+>   * @mr: the memory region being queried
+>   */
+> -static inline bool memory_region_is_iommu(MemoryRegion *mr)
+> +static inline IOMMUMemoryRegion *memory_region_get_iommu(MemoryRegion *mr)
+>  {
+>      if (mr->alias) {
+> -        return memory_region_is_iommu(mr->alias);
+> +        return memory_region_get_iommu(mr->alias);
+>      }
+> -    return mr->iommu_ops;
+> +    if (mr->is_iommu) {
+> +        return (IOMMUMemoryRegion *) mr;
+> +    }
+> +    return NULL;
+>  }
+>  
+> +#define memory_region_is_iommu(mr) (memory_region_get_iommu(mr) != NULL)
+>  
+>  /**
+>   * memory_region_iommu_get_min_page_size: get minimum supported page size
+> @@ -667,9 +704,9 @@ static inline bool memory_region_is_iommu(MemoryRegion *mr)
+>   *
+>   * Returns minimum supported page size for an iommu.
+>   *
+> - * @mr: the memory region being queried
+> + * @iommu_mr: the memory region being queried
+>   */
+> -uint64_t memory_region_iommu_get_min_page_size(MemoryRegion *mr);
+> +uint64_t memory_region_iommu_get_min_page_size(IOMMUMemoryRegion *iommu_mr);
+>  
+>  /**
+>   * memory_region_notify_iommu: notify a change in an IOMMU translation entry.
+> @@ -683,12 +720,12 @@ uint64_t memory_region_iommu_get_min_page_size(MemoryRegion *mr);
+>   * Note: for any IOMMU implementation, an in-place mapping change
+>   * should be notified with an UNMAP followed by a MAP.
+>   *
+> - * @mr: the memory region that was changed
+> + * @iommu_mr: the memory region that was changed
+>   * @entry: the new entry in the IOMMU translation table.  The entry
+>   *         replaces all old entries for the same virtual I/O address range.
+>   *         Deleted entries have .@perm == 0.
+>   */
+> -void memory_region_notify_iommu(MemoryRegion *mr,
+> +void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+>                                  IOMMUTLBEntry entry);
+>  
+>  /**
+> @@ -723,21 +760,21 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+>   * a notifier with the minimum page granularity returned by
+>   * mr->iommu_ops->get_page_size().
+>   *
+> - * @mr: the memory region to observe
+> + * @iommu_mr: the memory region to observe
+>   * @n: the notifier to which to replay iommu mappings
+>   * @is_write: Whether to treat the replay as a translate "write"
+>   *     through the iommu
+>   */
+> -void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+> +void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n,
+>                                  bool is_write);
+>  
+>  /**
+>   * memory_region_iommu_replay_all: replay existing IOMMU translations
+>   * to all the notifiers registered.
+>   *
+> - * @mr: the memory region to observe
+> + * @iommu_mr: the memory region to observe
+>   */
+> -void memory_region_iommu_replay_all(MemoryRegion *mr);
+> +void memory_region_iommu_replay_all(IOMMUMemoryRegion *iommu_mr);
+>  
+>  /**
+>   * memory_region_unregister_iommu_notifier: unregister a notifier for
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 3e51876b75..45fba4ff97 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -83,7 +83,7 @@ struct VTDAddressSpace {
+>      PCIBus *bus;
+>      uint8_t devfn;
+>      AddressSpace as;
+> -    MemoryRegion iommu;
+> +    IOMMUMemoryRegion iommu;
+>      MemoryRegion root;
+>      MemoryRegion sys_alias;
+>      MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
+> diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
+> index e0065ce808..0af4c3d5d7 100644
+> --- a/include/hw/mips/mips.h
+> +++ b/include/hw/mips/mips.h
+> @@ -18,6 +18,6 @@ typedef struct rc4030DMAState *rc4030_dma;
+>  void rc4030_dma_read(void *dma, uint8_t *buf, int len);
+>  void rc4030_dma_write(void *dma, uint8_t *buf, int len);
+>  
+> -DeviceState *rc4030_init(rc4030_dma **dmas, MemoryRegion **dma_mr);
+> +DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr);
+>  
+>  #endif
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 5802f888c3..011858afb1 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -589,7 +589,8 @@ struct sPAPRTCETable {
+>      bool bypass;
+>      bool need_vfio;
+>      int fd;
+> -    MemoryRegion root, iommu;
+> +    MemoryRegion root;
+> +    IOMMUMemoryRegion iommu;
+>      struct VIOsPAPRDevice *vdev; /* for @bypass migration compatibility only */
+>      QLIST_ENTRY(sPAPRTCETable) list;
+>  };
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index c582de18c9..7a4135ae6f 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -94,7 +94,7 @@ typedef struct VFIOContainer {
+>  
+>  typedef struct VFIOGuestIOMMU {
+>      VFIOContainer *container;
+> -    MemoryRegion *iommu;
+> +    IOMMUMemoryRegion *iommu;
+>      hwaddr iommu_offset;
+>      IOMMUNotifier n;
+>      QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index f08d327aec..f9906b28fd 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -46,6 +46,7 @@ typedef struct MachineState MachineState;
+>  typedef struct MemoryListener MemoryListener;
+>  typedef struct MemoryMappingList MemoryMappingList;
+>  typedef struct MemoryRegion MemoryRegion;
+> +typedef struct IOMMUMemoryRegion IOMMUMemoryRegion;
+>  typedef struct MemoryRegionCache MemoryRegionCache;
+>  typedef struct MemoryRegionSection MemoryRegionSection;
+>  typedef struct MigrationIncomingState MigrationIncomingState;
+> diff --git a/exec.c b/exec.c
+> index eac6085760..d30262c182 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -468,20 +468,20 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+>  {
+>      IOMMUTLBEntry iotlb = {0};
+>      MemoryRegionSection *section;
+> -    MemoryRegion *mr;
+> +    IOMMUMemoryRegion *iommu_mr;
+>  
+>      for (;;) {
+>          AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
+>          section = address_space_lookup_region(d, addr, false);
+>          addr = addr - section->offset_within_address_space
+>                 + section->offset_within_region;
+> -        mr = section->mr;
+>  
+> -        if (!mr->iommu_ops) {
+> +        iommu_mr = memory_region_get_iommu(section->mr);
+> +        if (!iommu_mr) {
+>              break;
+>          }
+>  
+> -        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
+> +        iotlb = iommu_mr->iommu_ops->translate(iommu_mr, addr, is_write);
+>          if (!(iotlb.perm & (1 << is_write))) {
+>              iotlb.target_as = NULL;
+>              break;
+> @@ -503,17 +503,19 @@ MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
+>      IOMMUTLBEntry iotlb;
+>      MemoryRegionSection *section;
+>      MemoryRegion *mr;
+> +    IOMMUMemoryRegion *iommu_mr;
+>  
+>      for (;;) {
+>          AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
+>          section = address_space_translate_internal(d, addr, &addr, plen, true);
+>          mr = section->mr;
+>  
+> -        if (!mr->iommu_ops) {
+> +        iommu_mr = memory_region_get_iommu(mr);
+> +        if (!iommu_mr) {
+>              break;
+>          }
+>  
+> -        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
+> +        iotlb = iommu_mr->iommu_ops->translate(iommu_mr, addr, is_write);
+>          addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
+>                  | (addr & iotlb.addr_mask));
+>          *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
+> @@ -544,7 +546,7 @@ address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr addr,
+>  
+>      section = address_space_translate_internal(d, addr, xlat, plen, false);
+>  
+> -    assert(!section->mr->iommu_ops);
+> +    assert(!memory_region_is_iommu(section->mr));
+>      return section;
+>  }
+>  #endif
+> diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+> index f50f5cf186..1ee9e7a969 100644
+> --- a/hw/alpha/typhoon.c
+> +++ b/hw/alpha/typhoon.c
+> @@ -41,7 +41,7 @@ typedef struct TyphoonPchip {
+>      MemoryRegion reg_conf;
+>  
+>      AddressSpace iommu_as;
+> -    MemoryRegion iommu;
+> +    IOMMUMemoryRegion iommu;
+>  
+>      uint64_t ctl;
+>      TyphoonWindow win[4];
+> @@ -663,7 +663,8 @@ static bool window_translate(TyphoonWindow *win, hwaddr addr,
+>  /* Handle PCI-to-system address translation.  */
+>  /* TODO: A translation failure here ought to set PCI error codes on the
+>     Pchip and generate a machine check interrupt.  */
+> -static IOMMUTLBEntry typhoon_translate_iommu(MemoryRegion *iommu, hwaddr addr,
+> +static IOMMUTLBEntry typhoon_translate_iommu(IOMMUMemoryRegion *iommu,
+> +                                             hwaddr addr,
+>                                               bool is_write)
+>  {
+>      TyphoonPchip *pchip = container_of(iommu, TyphoonPchip, iommu);
+> @@ -893,7 +894,8 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
+>      /* Host memory as seen from the PCI side, via the IOMMU.  */
+>      memory_region_init_iommu(&s->pchip.iommu, OBJECT(s), &typhoon_iommu_ops,
+>                               "iommu-typhoon", UINT64_MAX);
+> -    address_space_init(&s->pchip.iommu_as, &s->pchip.iommu, "pchip0-pci");
+> +    address_space_init(&s->pchip.iommu_as, MEMORY_REGION(&s->pchip.iommu),
+> +                       "pchip0-pci");
+>      pci_setup_iommu(b, typhoon_pci_dma_iommu, s);
+>  
+>      /* Pchip0 PCI special/interrupt acknowledge, 0x801.F800.0000, 64MB.  */
+> diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
+> index 0080141905..16f13883f3 100644
+> --- a/hw/dma/rc4030.c
+> +++ b/hw/dma/rc4030.c
+> @@ -90,7 +90,7 @@ typedef struct rc4030State
+>      qemu_irq jazz_bus_irq;
+>  
+>      /* whole DMA memory region, root of DMA address space */
+> -    MemoryRegion dma_mr;
+> +    IOMMUMemoryRegion dma_mr;
+>      AddressSpace dma_as;
+>  
+>      MemoryRegion iomem_chipset;
+> @@ -488,7 +488,7 @@ static const MemoryRegionOps jazzio_ops = {
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+>  
+> -static IOMMUTLBEntry rc4030_dma_translate(MemoryRegion *iommu, hwaddr addr,
+> +static IOMMUTLBEntry rc4030_dma_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
+>                                            bool is_write)
+>  {
+>      rc4030State *s = container_of(iommu, rc4030State, dma_mr);
+> @@ -679,7 +679,7 @@ static void rc4030_realize(DeviceState *dev, Error **errp)
+>  
+>      memory_region_init_iommu(&s->dma_mr, o, &rc4030_dma_ops,
+>                               "rc4030.dma", UINT32_MAX);
+> -    address_space_init(&s->dma_as, &s->dma_mr, "rc4030-dma");
+> +    address_space_init(&s->dma_as, MEMORY_REGION(&s->dma_mr), "rc4030-dma");
+>  }
+>  
+>  static void rc4030_unrealize(DeviceState *dev, Error **errp)
+> @@ -717,7 +717,7 @@ static void rc4030_register_types(void)
+>  
+>  type_init(rc4030_register_types)
+>  
+> -DeviceState *rc4030_init(rc4030_dma **dmas, MemoryRegion **dma_mr)
+> +DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr)
+>  {
+>      DeviceState *dev;
+>  
+> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+> index f86a40aa30..46ba34a733 100644
+> --- a/hw/i386/amd_iommu.c
+> +++ b/hw/i386/amd_iommu.c
+> @@ -51,7 +51,7 @@ struct AMDVIAddressSpace {
+>      uint8_t bus_num;            /* bus number                           */
+>      uint8_t devfn;              /* device function                      */
+>      AMDVIState *iommu_state;    /* AMDVI - one per machine              */
+> -    MemoryRegion iommu;         /* Device's address translation region  */
+> +    IOMMUMemoryRegion iommu;    /* Device's address translation region  */
+>      MemoryRegion iommu_ir;      /* Device's interrupt remapping region  */
+>      AddressSpace as;            /* device's corresponding address space */
+>  };
+> @@ -986,7 +986,7 @@ static inline bool amdvi_is_interrupt_addr(hwaddr addr)
+>      return addr >= AMDVI_INT_ADDR_FIRST && addr <= AMDVI_INT_ADDR_LAST;
+>  }
+>  
+> -static IOMMUTLBEntry amdvi_translate(MemoryRegion *iommu, hwaddr addr,
+> +static IOMMUTLBEntry amdvi_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
+>                                       bool is_write)
+>  {
+>      AMDVIAddressSpace *as = container_of(iommu, AMDVIAddressSpace, iommu);
+> @@ -1045,7 +1045,8 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+>  
+>          memory_region_init_iommu(&iommu_as[devfn]->iommu, OBJECT(s),
+>                                   &s->iommu_ops, "amd-iommu", UINT64_MAX);
+> -        address_space_init(&iommu_as[devfn]->as, &iommu_as[devfn]->iommu,
+> +        address_space_init(&iommu_as[devfn]->as,
+> +                           MEMORY_REGION(&iommu_as[devfn]->iommu),
+>                             "amd-iommu");
+>      }
+>      return &iommu_as[devfn]->as;
+> @@ -1066,7 +1067,7 @@ static const MemoryRegionOps mmio_mem_ops = {
+>      }
+>  };
+>  
+> -static void amdvi_iommu_notify_flag_changed(MemoryRegion *iommu,
+> +static void amdvi_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
+>                                              IOMMUNotifierFlag old,
+>                                              IOMMUNotifierFlag new)
+>  {
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 02f047c8e3..adad2e7293 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1205,7 +1205,7 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+>  static int vtd_page_invalidate_notify_hook(IOMMUTLBEntry *entry,
+>                                             void *private)
+>  {
+> -    memory_region_notify_iommu((MemoryRegion *)private, *entry);
+> +    memory_region_notify_iommu((IOMMUMemoryRegion *)private, *entry);
+>      return 0;
+>  }
+>  
+> @@ -1373,9 +1373,9 @@ static void vtd_switch_address_space(VTDAddressSpace *as)
+>      /* Turn off first then on the other */
+>      if (as->iommu_state->dmar_enabled) {
+>          memory_region_set_enabled(&as->sys_alias, false);
+> -        memory_region_set_enabled(&as->iommu, true);
+> +        memory_region_set_enabled(MEMORY_REGION(&as->iommu), true);
+>      } else {
+> -        memory_region_set_enabled(&as->iommu, false);
+> +        memory_region_set_enabled(MEMORY_REGION(&as->iommu), false);
+>          memory_region_set_enabled(&as->sys_alias, true);
+>      }
+>  }
+> @@ -2220,7 +2220,7 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
+>      }
+>  }
+>  
+> -static IOMMUTLBEntry vtd_iommu_translate(MemoryRegion *iommu, hwaddr addr,
+> +static IOMMUTLBEntry vtd_iommu_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
+>                                           bool is_write)
+>  {
+>      VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
+> @@ -2252,7 +2252,7 @@ static IOMMUTLBEntry vtd_iommu_translate(MemoryRegion *iommu, hwaddr addr,
+>      return ret;
+>  }
+>  
+> -static void vtd_iommu_notify_flag_changed(MemoryRegion *iommu,
+> +static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
+>                                            IOMMUNotifierFlag old,
+>                                            IOMMUNotifierFlag new)
+>  {
+> @@ -2695,7 +2695,8 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>          memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+>                                              &vtd_dev_as->sys_alias, 1);
+>          memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+> -                                            &vtd_dev_as->iommu, 1);
+> +                                            MEMORY_REGION(&vtd_dev_as->iommu),
+> +                                            1);
+>          vtd_switch_address_space(vtd_dev_as);
+>      }
+>      return vtd_dev_as;
+> @@ -2775,9 +2776,9 @@ static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
+>      return 0;
+>  }
+>  
+> -static void vtd_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n)
+> +static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+>  {
+> -    VTDAddressSpace *vtd_as = container_of(mr, VTDAddressSpace, iommu);
+> +    VTDAddressSpace *vtd_as = container_of(iommu_mr, VTDAddressSpace, iommu);
+>      IntelIOMMUState *s = vtd_as->iommu_state;
+>      uint8_t bus_n = pci_bus_num(vtd_as->bus);
+>      VTDContextEntry ce;
+> diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+> index 1cef581878..1f69322c15 100644
+> --- a/hw/mips/mips_jazz.c
+> +++ b/hw/mips/mips_jazz.c
+> @@ -130,7 +130,7 @@ static void mips_jazz_init(MachineState *machine,
+>      CPUMIPSState *env;
+>      qemu_irq *i8259;
+>      rc4030_dma *dmas;
+> -    MemoryRegion *rc4030_dma_mr;
+> +    IOMMUMemoryRegion *rc4030_dma_mr;
+>      MemoryRegion *isa_mem = g_new(MemoryRegion, 1);
+>      MemoryRegion *isa_io = g_new(MemoryRegion, 1);
+>      MemoryRegion *rtc = g_new(MemoryRegion, 1);
+> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+> index 653e711121..1029fb0e5a 100644
+> --- a/hw/pci-host/apb.c
+> +++ b/hw/pci-host/apb.c
+> @@ -123,7 +123,7 @@ do { printf("IOMMU: " fmt , ## __VA_ARGS__); } while (0)
+>  
+>  typedef struct IOMMUState {
+>      AddressSpace iommu_as;
+> -    MemoryRegion iommu;
+> +    IOMMUMemoryRegion iommu;
+>  
+>      uint64_t regs[IOMMU_NREGS];
+>  } IOMMUState;
+> @@ -208,7 +208,7 @@ static AddressSpace *pbm_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+>  }
+>  
+>  /* Called from RCU critical section */
+> -static IOMMUTLBEntry pbm_translate_iommu(MemoryRegion *iommu, hwaddr addr,
+> +static IOMMUTLBEntry pbm_translate_iommu(IOMMUMemoryRegion *iommu, hwaddr addr,
+>                                           bool is_write)
+>  {
+>      IOMMUState *is = container_of(iommu, IOMMUState, iommu);
+> @@ -699,7 +699,7 @@ PCIBus *pci_apb_init(hwaddr special_base,
+>  
+>      memory_region_init_iommu(&is->iommu, OBJECT(dev), &pbm_iommu_ops,
+>                               "iommu-apb", UINT64_MAX);
+> -    address_space_init(&is->iommu_as, &is->iommu, "pbm-as");
+> +    address_space_init(&is->iommu_as, MEMORY_REGION(&is->iommu), "pbm-as");
+>      pci_setup_iommu(phb->bus, pbm_pci_dma_iommu, is);
+>  
+>      /* APB secondary busses */
+> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+> index 29c80bb3c8..99732bf24d 100644
+> --- a/hw/ppc/spapr_iommu.c
+> +++ b/hw/ppc/spapr_iommu.c
+> @@ -110,7 +110,8 @@ static void spapr_tce_free_table(uint64_t *table, int fd, uint32_t nb_table)
+>  }
+>  
+>  /* Called from RCU critical section */
+> -static IOMMUTLBEntry spapr_tce_translate_iommu(MemoryRegion *iommu, hwaddr addr,
+> +static IOMMUTLBEntry spapr_tce_translate_iommu(IOMMUMemoryRegion *iommu,
+> +                                               hwaddr addr,
+>                                                 bool is_write)
+>  {
+>      sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
+> @@ -150,14 +151,14 @@ static void spapr_tce_table_pre_save(void *opaque)
+>                                 tcet->bus_offset, tcet->page_shift);
+>  }
+>  
+> -static uint64_t spapr_tce_get_min_page_size(MemoryRegion *iommu)
+> +static uint64_t spapr_tce_get_min_page_size(IOMMUMemoryRegion *iommu)
+>  {
+>      sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
+>  
+>      return 1ULL << tcet->page_shift;
+>  }
+>  
+> -static void spapr_tce_notify_flag_changed(MemoryRegion *iommu,
+> +static void spapr_tce_notify_flag_changed(IOMMUMemoryRegion *iommu,
+>                                            IOMMUNotifierFlag old,
+>                                            IOMMUNotifierFlag new)
+>  {
+> @@ -265,7 +266,9 @@ static int spapr_tce_table_realize(DeviceState *dev)
+>      memory_region_init(&tcet->root, tcetobj, tmp, UINT64_MAX);
+>  
+>      snprintf(tmp, sizeof(tmp), "tce-iommu-%x", tcet->liobn);
+> -    memory_region_init_iommu(&tcet->iommu, tcetobj, &spapr_iommu_ops, tmp, 0);
+> +    memory_region_init_iommu_type(TYPE_IOMMU_MEMORY_REGION,
+> +                                  &tcet->iommu, tcetobj, &spapr_iommu_ops,
+> +                                  tmp, 0);
 
-On 09/05/17 15:22, David Gibson wrote:
-> On Tue, May 09, 2017 at 07:25:51AM +1000, Alexey Kardashevskiy wrote:
->> On 09/05/17 06:17, Jose Ricardo Ziviani wrote:
->>> This reverts commit 3dc410ae83e6cb76c81ea30a05d62596092b3165.
->>>
->>> Booting a radix guest in Power9 with that commit throws a host kernel=
+Could we use memory_region_init_iommu() directly here?
 
->>> oops:
->>>
->>> [17582052553.360178] Unable to handle kernel paging request for data =
-at address 0xe64bb17da64ab078
->>> [17582052553.360420] Faulting instruction address: 0xc0000000002c3ddc=
+>  
+>      QLIST_INSERT_HEAD(&spapr_tce_tables, tcet, list);
+>  
+> @@ -348,9 +351,10 @@ void spapr_tce_table_enable(sPAPRTCETable *tcet,
+>                                          &tcet->fd,
+>                                          tcet->need_vfio);
+>  
+> -    memory_region_set_size(&tcet->iommu,
+> +    memory_region_set_size(MEMORY_REGION(&tcet->iommu),
+>                             (uint64_t)tcet->nb_table << tcet->page_shift);
+> -    memory_region_add_subregion(&tcet->root, tcet->bus_offset, &tcet->iommu);
+> +    memory_region_add_subregion(&tcet->root, tcet->bus_offset,
+> +                                MEMORY_REGION(&tcet->iommu));
+>  }
+>  
+>  void spapr_tce_table_disable(sPAPRTCETable *tcet)
+> @@ -359,8 +363,8 @@ void spapr_tce_table_disable(sPAPRTCETable *tcet)
+>          return;
+>      }
+>  
+> -    memory_region_del_subregion(&tcet->root, &tcet->iommu);
+> -    memory_region_set_size(&tcet->iommu, 0);
+> +    memory_region_del_subregion(&tcet->root, MEMORY_REGION(&tcet->iommu));
+> +    memory_region_set_size(MEMORY_REGION(&tcet->iommu), 0);
+>  
+>      spapr_tce_free_table(tcet->table, tcet->fd, tcet->nb_table);
+>      tcet->fd = -1;
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index a8a1bab50a..9bda89eb12 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -356,7 +356,7 @@ out:
+>      return pte;
+>  }
+>  
+> -static IOMMUTLBEntry s390_translate_iommu(MemoryRegion *mr, hwaddr addr,
+> +static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
+>                                            bool is_write)
+>  {
+>      uint64_t pte;
+> @@ -525,14 +525,14 @@ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
+>      memory_region_init_iommu(&iommu->iommu_mr, OBJECT(&iommu->mr),
+>                               &s390_iommu_ops, name, iommu->pal + 1);
+>      iommu->enabled = true;
+> -    memory_region_add_subregion(&iommu->mr, 0, &iommu->iommu_mr);
+> +    memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
+>      g_free(name);
+>  }
+>  
+>  void s390_pci_iommu_disable(S390PCIIOMMU *iommu)
+>  {
+>      iommu->enabled = false;
+> -    memory_region_del_subregion(&iommu->mr, &iommu->iommu_mr);
+> +    memory_region_del_subregion(&iommu->mr, MEMORY_REGION(&iommu->iommu_mr));
+>      object_unparent(OBJECT(&iommu->iommu_mr));
+>  }
+>  
+> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+> index 314a9cbad4..b82cab9f6c 100644
+> --- a/hw/s390x/s390-pci-inst.c
+> +++ b/hw/s390x/s390-pci-inst.c
+> @@ -563,7 +563,7 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>      S390PCIIOMMU *iommu;
+>      hwaddr start, end;
+>      IOMMUTLBEntry entry;
+> -    MemoryRegion *mr;
+> +    IOMMUMemoryRegion *iommu_mr;
+>  
+>      cpu_synchronize_state(CPU(cpu));
+>  
+> @@ -622,9 +622,9 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>          goto out;
+>      }
+>  
+> -    mr = &iommu->iommu_mr;
+> +    iommu_mr = &iommu->iommu_mr;
+>      while (start < end) {
+> -        entry = mr->iommu_ops->translate(mr, start, 0);
+> +        entry = iommu_mr->iommu_ops->translate(iommu_mr, start, 0);
+>  
+>          if (!entry.translated_addr) {
+>              pbdev->state = ZPCI_FS_ERROR;
+> @@ -635,7 +635,7 @@ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
+>              goto out;
+>          }
+>  
+> -        memory_region_notify_iommu(mr, entry);
+> +        memory_region_notify_iommu(iommu_mr, entry);
+>          start += entry.addr_mask + 1;
+>      }
+>  
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 6b33b9f55d..8689ab7535 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -465,6 +465,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>  
+>      if (memory_region_is_iommu(section->mr)) {
+>          VFIOGuestIOMMU *giommu;
+> +        IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+>  
+>          trace_vfio_listener_region_add_iommu(iova, end);
+>          /*
+> @@ -474,7 +475,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>           * device emulation the VFIO iommu handles to use).
+>           */
+>          giommu = g_malloc0(sizeof(*giommu));
+> -        giommu->iommu = section->mr;
+> +        giommu->iommu = iommu_mr;
+>          giommu->iommu_offset = section->offset_within_address_space -
+>                                 section->offset_within_region;
+>          giommu->container = container;
+> @@ -487,7 +488,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>                              int128_get64(llend));
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+>  
+> -        memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+> +        memory_region_register_iommu_notifier(section->mr, &giommu->n);
+>          memory_region_iommu_replay(giommu->iommu, &giommu->n, false);
+>  
+>          return;
+> @@ -555,9 +556,9 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>          VFIOGuestIOMMU *giommu;
+>  
+>          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> -            if (giommu->iommu == section->mr &&
+> +            if (MEMORY_REGION(giommu->iommu) == section->mr &&
+>                  giommu->n.start == section->offset_within_region) {
+> -                memory_region_unregister_iommu_notifier(giommu->iommu,
+> +                memory_region_unregister_iommu_notifier(section->mr,
+>                                                          &giommu->n);
+>                  QLIST_REMOVE(giommu, giommu_next);
+>                  g_free(giommu);
+> @@ -1147,7 +1148,8 @@ static void vfio_disconnect_container(VFIOGroup *group)
+>          QLIST_REMOVE(container, next);
+>  
+>          QLIST_FOREACH_SAFE(giommu, &container->giommu_list, giommu_next, tmp) {
+> -            memory_region_unregister_iommu_notifier(giommu->iommu, &giommu->n);
+> +            memory_region_unregister_iommu_notifier(
+> +                    MEMORY_REGION(giommu->iommu), &giommu->n);
+>              QLIST_REMOVE(giommu, giommu_next);
+>              g_free(giommu);
+>          }
+> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+> index 4409bcc0d7..32fd6a9b54 100644
+> --- a/hw/vfio/spapr.c
+> +++ b/hw/vfio/spapr.c
+> @@ -143,7 +143,8 @@ int vfio_spapr_create_window(VFIOContainer *container,
+>                               hwaddr *pgsize)
+>  {
+>      int ret;
+> -    unsigned pagesize = memory_region_iommu_get_min_page_size(section->mr);
+> +    IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+> +    unsigned pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
+>      unsigned entries, pages;
+>      struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
+>  
+> diff --git a/memory.c b/memory.c
+> index b727f5ec0e..630bfc51e1 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -975,12 +975,11 @@ static char *memory_region_escape_name(const char *name)
+>      return escaped;
+>  }
+>  
+> -void memory_region_init(MemoryRegion *mr,
+> -                        Object *owner,
+> -                        const char *name,
+> -                        uint64_t size)
+> +static void memory_region_do_init(MemoryRegion *mr,
+> +                                  Object *owner,
+> +                                  const char *name,
+> +                                  uint64_t size)
+>  {
+> -    object_initialize(mr, sizeof(*mr), TYPE_MEMORY_REGION);
+>      mr->size = int128_make64(size);
+>      if (size == UINT64_MAX) {
+>          mr->size = int128_2_64();
+> @@ -1004,6 +1003,15 @@ void memory_region_init(MemoryRegion *mr,
+>      }
+>  }
+>  
+> +void memory_region_init(MemoryRegion *mr,
+> +                        Object *owner,
+> +                        const char *name,
+> +                        uint64_t size)
+> +{
+> +    object_initialize(mr, sizeof(*mr), TYPE_MEMORY_REGION);
+> +    memory_region_do_init(mr, owner, name, size);
+> +}
+> +
+>  static void memory_region_get_addr(Object *obj, Visitor *v, const char *name,
+>                                     void *opaque, Error **errp)
+>  {
+> @@ -1090,6 +1098,13 @@ static void memory_region_initfn(Object *obj)
+>                          NULL, NULL, &error_abort);
+>  }
+>  
+> +static void iommu_memory_region_initfn(Object *obj)
+> +{
+> +    MemoryRegion *mr = MEMORY_REGION(obj);
+> +
+> +    mr->is_iommu = true;
+> +}
+> +
+>  static uint64_t unassigned_mem_read(void *opaque, hwaddr addr,
+>                                      unsigned size)
+>  {
+> @@ -1473,17 +1488,33 @@ void memory_region_init_rom_device(MemoryRegion *mr,
+>      mr->ram_block = qemu_ram_alloc(size, mr, errp);
+>  }
+>  
+> -void memory_region_init_iommu(MemoryRegion *mr,
+> -                              Object *owner,
+> -                              const MemoryRegionIOMMUOps *ops,
+> -                              const char *name,
+> -                              uint64_t size)
+> +void memory_region_init_iommu_type(const char *mrtypename,
+> +                                   IOMMUMemoryRegion *iommu_mr,
+> +                                   Object *owner,
+> +                                   const MemoryRegionIOMMUOps *ops,
+> +                                   const char *name,
+> +                                   uint64_t size)
+>  {
+> -    memory_region_init(mr, owner, name, size);
+> -    mr->iommu_ops = ops,
+> +    struct MemoryRegion *mr;
+> +    size_t instance_size = object_type_get_instance_size(mrtypename);
+> +
+> +    object_initialize(iommu_mr, instance_size, mrtypename);
+> +    mr = MEMORY_REGION(iommu_mr);
+> +    memory_region_do_init(mr, owner, name, size);
+> +    iommu_mr->iommu_ops = ops,
+>      mr->terminates = true;  /* then re-forwards */
+> -    QLIST_INIT(&mr->iommu_notify);
+> -    mr->iommu_notify_flags = IOMMU_NOTIFIER_NONE;
+> +    QLIST_INIT(&iommu_mr->iommu_notify);
+> +    iommu_mr->iommu_notify_flags = IOMMU_NOTIFIER_NONE;
+> +}
+> +
+> +void memory_region_init_iommu(IOMMUMemoryRegion *iommu_mr,
+> +                              Object *owner,
+> +                              const MemoryRegionIOMMUOps *ops,
+> +                              const char *name,
+> +                              uint64_t size)
+> +{
+> +    memory_region_init_iommu_type(TYPE_IOMMU_MEMORY_REGION, iommu_mr,
+> +                                  owner, ops, name, size);
 
->>> [17582052553.360533] Oops: Kernel access of bad area, sig: 11 [#1]
->>> [17582052553.360643] SMP NR_CPUS=3D1024
->>> [17582052553.360645] NUMA
->>> [17582052553.360712] PowerNV
->>> [17582052553.360804] Modules linked in: vhost_net vhost tap xt_CHECKS=
-UM ipt_MASQUERADE nf_nat_masquerade_ipv4 ip6t_rpfilter ip6t_REJECT nf_rej=
-ect_ipv6 nf_conntrack_ipv6 nf_defrag_ipv6 xt_conntrack ip_set nfnetlink e=
-btable_nat ebtable_broute bridge stp llc ip6table_mangle ip6table_securit=
-y ip6table_raw iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 n=
-f_nat nf_conntrack libcrc32c iptable_mangle iptable_security iptable_raw =
-ebtable_filter ebtables ip6table_filter ip6_tables ses enclosure scsi_tra=
-nsport_sas ipmi_powernv powernv_op_panel ipmi_devintf ipmi_msghandler nfs=
-d kvm_hv auth_rpcgss oid_registry nfs_acl lockd grace sunrpc kvm tg3 ptp =
-pps_core
->>> [17582052553.361797] CPU: 5 PID: 4966 Comm: qemu-system-ppc Not taint=
-ed 4.11.0-1.git4a6869a.el7.centos.ppc64le #1
->>> [17582052553.361972] task: c0000003c5e90a80 task.stack: c0000003c5f6c=
-000
->>> [17582052553.362082] NIP: c0000000002c3ddc LR: c0000000002c3e80 CTR: =
-c0000000000ce2e0
->>> [17582052553.362214] REGS: c0000003c5f6f150 TRAP: 0380   Not tainted =
- (4.11.0-1.git4a6869a.el7.centos.ppc64le)
->>> [17582052553.362467] MSR: 9000000000001031 <SF,HV,ME,IR,DR,LE>
->>> [17582052553.362480]   CR: 44008024  XER: 20000000
->>> [17582052553.362822] CFAR: c0000000002c3e7c SOFTE: 1
->>> [17582052553.362822] GPR00: 000000000000018f c0000003c5f6f3d0 c000000=
-00131fd00 0000000000000000
->>> [17582052553.362822] GPR04: 0000000000000005 00000000000001ff 0000000=
-000000000 7db04aa67db14ba6
->>> [17582052553.362822] GPR08: 264bb17da64ab000 e64bb17da64ab000 0000000=
-000000078 0000000000000000
->>> [17582052553.362822] GPR12: c0000003bdb98008 c00000000fdc2d00 c000000=
-00000e148 0000000000000000
->>> [17582052553.362822] GPR16: 0000000008000000 0000000020000000 0000000=
-000000000 c0000003c5f6f4c0
->>> [17582052553.362822] GPR20: c0000001ffff9440 c0000001fd033280 c000000=
-1fd0342a0 c0000001f24efff8
->>> [17582052553.362822] GPR24: 0000000000000200 00000001f24f0000 0000000=
-000000010 0000000000020000
->>> [17582052553.362822] GPR28: 0800000000000000 00000001f24f0000 0000000=
-07db04aa6 00000000a64ab07d
->>> [17582052553.365148] NIP [c0000000002c3ddc] vmalloc_to_page+0x19c/0x2=
-20
->>> [17582052553.365365] LR [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
->>> [17582052553.365582] Call Trace:
->>> [17582052553.365720] [c0000003c5f6f3d0] [7265677368657265] 0x72656773=
-68657265 (unreliable)
->>> [17582052553.365982] [c0000003c5f6f400] [c0000000002c3e80] vmalloc_to=
-_pfn+0x20/0x50
->>> [17582052553.366245] [c0000003c5f6f420] [c0000000000637e8] vmalloc_to=
-_phys+0x28/0x60
->>> [17582052553.366508] [c0000003c5f6f450] [c0000000000ce480] kvmppc_rm_=
-h_put_tce_indirect+0x1a0/0x540
->>> [17582052553.366812] [c0000003c5f6f590] [c0000000000d0314] hcall_try_=
-real_mode+0x60/0x7c
->>> [17582052553.367074] [c0000003c5f6f600] [c0000000000cefac] kvmppc_cal=
-l_hv_entry+0x8/0x17c
->>> [17582052553.367346] [c0000003c5f6f670] [c00800000375a970] __kvmppc_v=
-core_entry+0x13c/0x1ac [kvm_hv]
->>> [17582052553.367652] [c0000003c5f6f840] [c0080000037574a8] kvmppc_run=
-_core+0x788/0x1650 [kvm_hv]
->>> [17582052553.367965] [c0000003c5f6fa00] [c0080000037590b8] kvmppc_vcp=
-u_run_hv+0x388/0x1200 [kvm_hv]
->>> [17582052553.368287] [c0000003c5f6fb30] [c008000003274684] kvmppc_vcp=
-u_run+0x34/0x50 [kvm]
->>> [17582052553.368558] [c0000003c5f6fb50] [c008000003270b54] kvm_arch_v=
-cpu_ioctl_run+0x114/0x2a0 [kvm]
->>> [17582052553.368870] [c0000003c5f6fbd0] [c008000003263dd8] kvm_vcpu_i=
-octl+0x5e8/0x7c0 [kvm]
->>> [17582052553.369132] [c0000003c5f6fd40] [c000000000350b50] do_vfs_ioc=
-tl+0xd0/0x8c0
->>> [17582052553.369395] [c0000003c5f6fde0] [c000000000351414] SyS_ioctl+=
-0xd4/0xf0
->>> [17582052553.369615] [c0000003c5f6fe30] [c00000000000b8e0] system_cal=
-l+0x38/0xfc
->>> [17582052553.369875] Instruction dump:
->>> [17582052553.370011] 53dfc42e 790807c6 394affff 7d08fb78 78638402 790=
-81764 7d4a07b4 7c6a5038
->>> [17582052553.370281] 7908f5e6 7d094b78 794a1f24 38600000 <7d2a482a> 7=
-924cfe3 41820040 79260022
->>> [17582052553.370599] ---[ end trace 9470442ed18ae727 ]---
->>>
->>> As soon as we identify and fix the issue that's causing such problem
->>> I'll re-send the referred patch to re-enable TCE.
->=20
-> This is a serious host kernel security bug.  Modifying qemu not to
-> trigger it is not a fix; it's not even a workaround.
->=20
->> The proper fix is to change the host kernel to not advertise
->> KVM_CAP_SPAPR_MULTITCE for radix guest.
->=20
-> That doesn't sound like a fix either, though it might be part of one.
+I see that memory_region_init_iommu_type() is only used to create
+TYPE_IOMMU_MEMORY_REGION typed MRs. Then would
+memory_region_init_iommu() enough for us? Or do you have plan to add
+new memory region types?
 
-My point was that if a feature is known not to work, it should not be
-advertised rather than disabling the feature entirely in QEMU, even for t=
-he
-time being. vmalloc_to_pfn() needs a fix anyway.
+Thanks,
 
-
-> What happens if qemu ignores what's advertised and tries to use the
-> multitce functions anyway?  The point is you have an easy way for
-> userspace or a guest to crash the host kernel, which needs to be fixed
-> as a matter of urgency.
-
-Correct.
-
-> It's not clear to me why the multitce functions would break on radix
-> anyway.  Isn't the TCE table format independent of the main MMU?
-
-
-It is from "rmap =3D (void *) vmalloc_to_phys(rmap);" to lock the page wi=
-th
-TCEs in the H_PUT_TCE_INDIRECT handler, this is irrelevant to the TCE
-format. I am wondering why only this place fails though as
-vmalloc_to_phys() is used quite often, may be less on radix tree though.
-
-
-
---=20
-Alexey
-
-
---EDEJS4WPVrIWFdIVaCXo8uva98EcllOqu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIrBAEBCAAVBQJZEYhsDhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5GewQAL8B
-bEkBrf/8hgHS5edxIK9a3BmfG0QxxWo/RQ5cbPbeXrMMNJHWNQnXx2cvfXdRdyFl
-aqRnoyv+NIjWM8YnKpPWkKZZ5Z4KCGkDruGjv+7xlVui6D4BnLMhMIwv9Rc2uB+Y
-Bthwjcoa+xjS+qcIhmm5rOFQZRkWnqxWAFryBppGVYanIv4Bcb89IOAwU2OBhoHj
-CXG0leI7P6IkI0ZzliwmuVlpxXa+ApeiOdmlPS+LdzTv9mJXW9dTL4eafjhpT2L2
-jjOR+25P8EOhXwXRSk5cSCBSsF0Ro0Oid2xR+AorVsW8CWor9sFCckmQiE35OgI5
-CdXnGRMjarPYdPRZJQwn8YINdDyBza/aFVheDoXguuj0Lufs1royhXn5NAwEkThW
-5M35b5WBBIbeg9WzWOIMmhYOPiK/VpWE+n/iai7+F6bNKF+lLmhHmi68YhjqV1jR
-7iWORw3geiS0HpAXaT7WNaE46Qe0Z9V54pEksJbmSTFr/Em7DZjgvbd8Il4Bp1Ya
-0pmfdteJIV9A2WxWn+Bjmgb9B7FZW+HmztPH9e4j/YX4vSg+8EmqHkzlt+DmQAMP
-y8J26gSDTzjYcSTIsLshH4MUs/4Oe5HKud+Tv48ik07hV8VniXc/Fdup376+Tc0P
-23NhuMit+TgPc5LEaA0VcCBBYFbskGMYKgdRrcJp
-=wpc0
------END PGP SIGNATURE-----
-
---EDEJS4WPVrIWFdIVaCXo8uva98EcllOqu--
+-- 
+Peter Xu
