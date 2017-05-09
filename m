@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d83Gd-0007pl-Oi
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1d83Gh-0007r1-1l
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d83Gc-0007tt-Jf
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49038)
+	(envelope-from <peterx@redhat.com>) id 1d83Gg-0007uU-9O
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37494)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d83Gc-0007tg-A5
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:22 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d83Gg-0007uK-3J
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:26 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D636804E5
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:25:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 01D5F61D24
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:25:25 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  9 May 2017 19:25:03 +0800
-Message-Id: <1494329105-4411-2-git-send-email-peterx@redhat.com>
+Date: Tue,  9 May 2017 19:25:04 +0800
+Message-Id: <1494329105-4411-3-git-send-email-peterx@redhat.com>
 In-Reply-To: <1494329105-4411-1-git-send-email-peterx@redhat.com>
 References: <1494329105-4411-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 1/3] ramblock: add RAMBLOCK_FOREACH()
+Subject: [Qemu-devel] [PATCH v5 2/3] utils: provide size_to_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,207 +32,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-So that it can simplifies the iterators.
+I stole the algorithm from print_type_size(). I didn't generalize it
+since that's using [KM...]iB while here we need [KM...]B to finally
+be able to stands for page sizes (and even more general).
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- exec.c                 | 22 +++++++++++-----------
- include/exec/ramlist.h |  5 +++++
- migration/ram.c        | 15 ++++++++-------
- 3 files changed, 24 insertions(+), 18 deletions(-)
+ include/qemu-common.h |  1 +
+ util/cutils.c         | 26 ++++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index eac6085..50519ae 100644
---- a/exec.c
-+++ b/exec.c
-@@ -978,7 +978,7 @@ static RAMBlock *qemu_get_ram_block(ram_addr_t addr)
-     if (block && addr - block->offset < block->max_length) {
-         return block;
-     }
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         if (addr - block->offset < block->max_length) {
-             goto found;
-         }
-@@ -1578,12 +1578,12 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
-         return 0;
-     }
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index d218821..d7d0448 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -145,6 +145,7 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+ int parse_debug_env(const char *name, int max, int initial);
  
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         ram_addr_t end, next = RAM_ADDR_MAX;
+ const char *qemu_ether_ntoa(const MACAddr *mac);
++char *size_to_str(double val);
+ void page_size_init(void);
  
-         end = block->offset + block->max_length;
+ /* returns non-zero if dump is in progress, otherwise zero is
+diff --git a/util/cutils.c b/util/cutils.c
+index 50ad179..5aaf370 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -619,3 +619,29 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
  
--        QLIST_FOREACH_RCU(next_block, &ram_list.blocks, next) {
-+        RAMBLOCK_FOREACH(next_block) {
-             if (next_block->offset >= end) {
-                 next = MIN(next, next_block->offset);
-             }
-@@ -1609,7 +1609,7 @@ unsigned long last_ram_page(void)
-     ram_addr_t last = 0;
- 
-     rcu_read_lock();
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         last = MAX(last, block->offset + block->max_length);
-     }
-     rcu_read_unlock();
-@@ -1659,7 +1659,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
-     pstrcat(new_block->idstr, sizeof(new_block->idstr), name);
- 
-     rcu_read_lock();
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         if (block != new_block &&
-             !strcmp(block->idstr, new_block->idstr)) {
-             fprintf(stderr, "RAMBlock \"%s\" already registered, abort!\n",
-@@ -1693,7 +1693,7 @@ size_t qemu_ram_pagesize_largest(void)
-     RAMBlock *block;
-     size_t largest = 0;
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         largest = MAX(largest, qemu_ram_pagesize(block));
-     }
- 
-@@ -1839,7 +1839,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
-      * QLIST (which has an RCU-friendly variant) does not have insertion at
-      * tail, so save the last element in last_block.
-      */
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         last_block = block;
-         if (block->max_length < new_block->max_length) {
-             break;
-@@ -2021,7 +2021,7 @@ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length)
-     int flags;
-     void *area, *vaddr;
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         offset = addr - block->offset;
-         if (offset < block->max_length) {
-             vaddr = ramblock_ptr(block, offset);
-@@ -2167,7 +2167,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
-         goto found;
-     }
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         /* This case append when the block is not mapped. */
-         if (block->host == NULL) {
-             continue;
-@@ -2200,7 +2200,7 @@ RAMBlock *qemu_ram_block_by_name(const char *name)
- {
-     RAMBlock *block;
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         if (!strcmp(name, block->idstr)) {
-             return block;
-         }
-@@ -3424,7 +3424,7 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
-     int ret = 0;
- 
-     rcu_read_lock();
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         ret = func(block->idstr, block->host, block->offset,
-                    block->used_length, opaque);
-         if (ret) {
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-index c59880d..f1c6b45 100644
---- a/include/exec/ramlist.h
-+++ b/include/exec/ramlist.h
-@@ -4,6 +4,7 @@
- #include "qemu/queue.h"
- #include "qemu/thread.h"
- #include "qemu/rcu.h"
-+#include "qemu/rcu_queue.h"
- 
- typedef struct RAMBlockNotifier RAMBlockNotifier;
- 
-@@ -54,6 +55,10 @@ typedef struct RAMList {
- } RAMList;
- extern RAMList ram_list;
- 
-+/* Should be holding either ram_list.mutex, or the RCU lock. */
-+#define  RAMBLOCK_FOREACH(block)  \
-+    QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
-+
- void qemu_mutex_lock_ramlist(void);
- void qemu_mutex_unlock_ramlist(void);
- 
-diff --git a/migration/ram.c b/migration/ram.c
-index f48664e..7ba5d7e 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -672,7 +672,7 @@ uint64_t ram_pagesize_summary(void)
-     RAMBlock *block;
-     uint64_t summary = 0;
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         summary |= block->page_size;
-     }
- 
-@@ -700,7 +700,7 @@ static void migration_bitmap_sync(RAMState *rs)
- 
-     qemu_mutex_lock(&rs->bitmap_mutex);
-     rcu_read_lock();
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         migration_bitmap_sync_range(rs, block, 0, block->used_length);
-     }
-     rcu_read_unlock();
-@@ -1439,8 +1439,9 @@ uint64_t ram_bytes_total(void)
-     uint64_t total = 0;
- 
-     rcu_read_lock();
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
-+    RAMBLOCK_FOREACH(block) {
-         total += block->used_length;
-+    }
-     rcu_read_unlock();
-     return total;
+     return ret;
  }
-@@ -1543,7 +1544,7 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms)
-     struct RAMBlock *block;
-     unsigned long *bitmap = atomic_rcu_read(&rs->ram_bitmap)->bmap;
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         unsigned long first = block->offset >> TARGET_PAGE_BITS;
-         unsigned long range = first + (block->used_length >> TARGET_PAGE_BITS);
-         unsigned long run_start = find_next_zero_bit(bitmap, range, first);
-@@ -1624,7 +1625,7 @@ static int postcopy_each_ram_send_discard(MigrationState *ms)
-     struct RAMBlock *block;
-     int ret;
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         unsigned long first = block->offset >> TARGET_PAGE_BITS;
-         PostcopyDiscardState *pds = postcopy_discard_send_init(ms,
-                                                                first,
-@@ -1802,7 +1803,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
-     rs->last_sent_block = NULL;
-     rs->last_page = 0;
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         unsigned long first = block->offset >> TARGET_PAGE_BITS;
- 
-         PostcopyDiscardState *pds =
-@@ -2021,7 +2022,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
- 
-     qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
- 
--    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+    RAMBLOCK_FOREACH(block) {
-         qemu_put_byte(f, strlen(block->idstr));
-         qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr));
-         qemu_put_be64(f, block->used_length);
++
++/*
++ * Sample output:
++ *
++ * 1          -> "1 B"
++ * 528        -> "0.516 KB"
++ * 4096       -> "4 KB"
++ * 2402958    -> "2.29 MB"
++ * 1073741824 -> "1 GB"
++ *
++ * Please free the buffer after use.
++ */
++char *size_to_str(double val)
++{
++    static const char suffixes[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E' };
++    unsigned long div;
++    int i;
++
++    frexp(val, &i);
++    i /= 10;
++    assert(i < sizeof(suffixes));
++    div = 1ULL << (i * 10);
++
++    return g_strdup_printf("%0.3g %c%s", val / div,
++                           suffixes[i], i ? "B" : "");
++}
 -- 
 2.7.4
