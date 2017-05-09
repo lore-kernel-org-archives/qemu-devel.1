@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d7wxp-00080H-Ac
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:41:34 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1d7x01-0000tN-9r
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:43:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d7wxm-0008PF-8f
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:41:33 -0400
-References: <20170509034519.16291-1-david@gibson.dropbear.id.au>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <40670f11-21fa-7a8c-db7a-3053d61f082b@redhat.com>
-Date: Tue, 9 May 2017 06:41:23 +0200
+	(envelope-from <hpoussin@reactos.org>) id 1d7wzy-0001QX-8p
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:43:49 -0400
+References: <20170508205735.23444-1-ehabkost@redhat.com>
+	<20170508205735.23444-3-ehabkost@redhat.com>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <da425c09-5b05-88a1-f6f3-41aef5850ebc@reactos.org>
+Date: Tue, 9 May 2017 06:43:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170509034519.16291-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170508205735.23444-3-ehabkost@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Allow workarounds for POWER9
- DD1
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] audio: Rename audio_init() to
+ soundhw_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, Gerd Hoffmann <kraxel@redhat.com>, agraf@suse.de
 
-On 09.05.2017 05:45, David Gibson wrote:
-> POWER9 DD1 silicon has some bugs which mean it a) isn't really complian=
-t
-> with the ISA v3.00 and b) require a number of special workarounds in th=
-e
-> kernel.
->=20
-> At the moment, qemu isn't aware of DD1.  For TCG we don't really want i=
-t to
-> be (why bother emulating buggy silicon).  But with KVM, the guest does =
-need
-> to be aware of DD1 so it can apply the necessary workarounds.
->=20
-> Meanwhile, the feature negotiation between qemu and the guest strongly
-> favours architected compatibility modes to "raw" CPU modes.  In combina=
-tion
-> with the above, this means the guest sees architected POWER9 mode, and
-> doesn't apply the DD1 workarounds.  Well, unless it has yet another
-> workaround to partially ignore what qemu tells it.
->=20
-> This patch addresses this by disabling support for compatibility modes =
-when
-> using KVM on a POWER9 DD1 host.
+Le 08/05/2017 =E0 22:57, Eduardo Habkost a =E9crit :
+> To make it consistent with the remaining soundhw.c functions and
+> avoid confusion with the audio_init() function in audio/audio.c,
+> rename audio_init() to soundhw_init().
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-I first though: Hey, it should be fixed in the guest kernel instead, but
-thinking about this twice, I think you're right. If the CPU is not fully
-compatible to the ISA, we really should not announce it as "architected
-/ compatible POWER9" in QEMU.
-So basically ACK to your patch, I've just got a cosmetic request below...
+You should probably add a patch before 1/3 to remove the two audio_init()=
+/soundhw_init() calls in hw/ppc/prep.c.
+That way, you won't need to change hw/ppc/prep.c in 1/3 and 2/3.
 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Regards,
+
+Herv=E9
 > ---
->  target/ppc/kvm.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 8574c36..591b5b5 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2380,6 +2380,17 @@ static void kvmppc_host_cpu_class_init(ObjectCla=
-ss *oc, void *data)
-> =20
->  #if defined(TARGET_PPC64)
->      pcc->radix_page_info =3D kvm_get_radix_page_info();
-> +
-> +    if ((pcc->pvr & 0xffffff00) =3D=3D 0x004e0100) {
-
-Could you please add a proper #define for that magic DD1.0 value to
-cpu-models.h, please?
-
- Thanks,
-  Thomas
+> Changes v2 -> v3:
+> * Update hw/ppc/prep.c audio_init() call too
+>
+> Changes v1 -> v2:
+> * Rebase to latest qemu.git master
+> ---
+>  include/hw/audio/audio.h | 2 +-
+>  hw/audio/soundhw.c       | 2 +-
+>  hw/ppc/prep.c            | 2 +-
+>  vl.c                     | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/hw/audio/audio.h b/include/hw/audio/audio.h
+> index 259bb2cf96..119f7d78d5 100644
+> --- a/include/hw/audio/audio.h
+> +++ b/include/hw/audio/audio.h
+> @@ -7,7 +7,7 @@ void isa_register_soundhw(const char *name, const char =
+*descr,
+>  void pci_register_soundhw(const char *name, const char *descr,
+>                            int (*init_pci)(PCIBus *bus));
+>
+> -void audio_init(void);
+> +void soundhw_init(void);
+>  void select_soundhw(const char *optarg);
+>
+>  #endif
+> diff --git a/hw/audio/soundhw.c b/hw/audio/soundhw.c
+> index 5e96b73c81..29565da93d 100644
+> --- a/hw/audio/soundhw.c
+> +++ b/hw/audio/soundhw.c
+> @@ -129,7 +129,7 @@ void select_soundhw(const char *optarg)
+>      }
+>  }
+>
+> -void audio_init(void)
+> +void soundhw_init(void)
+>  {
+>      struct soundhw *c;
+>      ISABus *isa_bus =3D (ISABus *) object_resolve_path_type("", TYPE_I=
+SA_BUS, NULL);
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 96a4813b3f..4a7d2cfbe0 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -783,7 +783,7 @@ static void ibm_40p_init(MachineState *machine)
+>                         &cmos_checksum);
+>
+>      /* initialize audio subsystem */
+> -    audio_init();
+> +    soundhw_init();
+>
+>      /* add some more devices */
+>      if (defaults_enabled()) {
+> diff --git a/vl.c b/vl.c
+> index a2400e1ab6..42fd66ac0d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4569,7 +4569,7 @@ int main(int argc, char **argv, char **envp)
+>
+>      realtime_init();
+>
+> -    audio_init();
+> +    soundhw_init();
+>
+>      if (hax_enabled()) {
+>          hax_sync_vcpus();
+>
