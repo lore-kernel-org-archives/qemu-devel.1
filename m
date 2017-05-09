@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d88s0-0007A6-1W
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:24:20 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d88v9-0000aF-UT
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:27:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d88rw-0004VP-Ul
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:24:20 -0400
-References: <20170508233918.9043-1-f4bug@amsat.org>
-	<20170508233918.9043-4-f4bug@amsat.org>
-	<2ad7eaf6-3691-f9f1-4d09-204444adbd19@redhat.com>
-	<5b9ad5c0-0bcf-2167-57ba-446d1253cdd1@amsat.org>
-	<bdc0fa6a-a90c-3f7a-a37c-bc901a6022c2@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4cb5814d-d8bb-db4f-3c85-9ef245534f33@redhat.com>
-Date: Tue, 9 May 2017 12:24:13 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d88v6-0005ZC-Qr
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:27:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55020
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1d88v6-0005YS-KW
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 13:27:32 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v49HNUAD109280
+	for <qemu-devel@nongnu.org>; Tue, 9 May 2017 13:27:31 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2abd21puuw-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 13:27:31 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 9 May 2017 18:27:29 +0100
+References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
+	<20170505173507.74077-10-pasic@linux.vnet.ibm.com>
+	<20170508172757.GI2120@work-vm>
+	<f0c6584a-1cd9-9aca-8eee-ef5cac26c613@linux.vnet.ibm.com>
+	<20170508183718.GL2120@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 9 May 2017 19:27:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <bdc0fa6a-a90c-3f7a-a37c-bc901a6022c2@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0MRsv8liP4MaKb0iC1rWc503euCCWmk3d"
-Subject: Re: [Qemu-devel] [PATCH 03/11] hw/misc: add missing includes
+In-Reply-To: <20170508183718.GL2120@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <f5907f9a-a004-f24f-edce-7e049cc14187@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 09/10] s390x/css: turn on channel subsystem
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +46,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0MRsv8liP4MaKb0iC1rWc503euCCWmk3d
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <4cb5814d-d8bb-db4f-3c85-9ef245534f33@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/11] hw/misc: add missing includes
-References: <20170508233918.9043-1-f4bug@amsat.org>
- <20170508233918.9043-4-f4bug@amsat.org>
- <2ad7eaf6-3691-f9f1-4d09-204444adbd19@redhat.com>
- <5b9ad5c0-0bcf-2167-57ba-446d1253cdd1@amsat.org>
- <bdc0fa6a-a90c-3f7a-a37c-bc901a6022c2@amsat.org>
-In-Reply-To: <bdc0fa6a-a90c-3f7a-a37c-bc901a6022c2@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/09/2017 12:20 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-
-> What about the other include, "hw/sysbus.h"?
-> The inlined function create_unimplemented_device() calls
-> sysbus_mmio_map_overlap(). Anyone willing to use "hw/misc/unimp.h" will=
-
-> get a compilation failure if he does not include "hw/sysbus.h" and I
-> don't think it belongs to "qemu/osdep.h".
-
-That one's probably okay.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
 
---0MRsv8liP4MaKb0iC1rWc503euCCWmk3d
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 05/08/2017 08:37 PM, Dr. David Alan Gilbert wrote:
+> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>
+>>
+>> On 05/08/2017 07:27 PM, Dr. David Alan Gilbert wrote:
+>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>>> Turn on migration for the channel subsystem and the new scheme for
+>>>> migrating virtio-ccw proxy devices (instead of letting the transport
+>>>> independent child device migrate it's proxy, use the usual
+>>>> DeviceClass.vmsd mechanism) for future machine versions.
+>>
+>> [..]
+>>
+>>>> @@ -1365,6 +1373,11 @@ static void virtio_ccw_device_plugged(DeviceState *d, Error **errp)
+>>>>      sch->id.cu_model = virtio_bus_get_vdev_id(&dev->bus);
+>>>>  
+>>>>  
+>>>> +    /* Avoid generating unknown section for legacy migration target. */
+>>>> +    if (!css_migration_enabled()) {
+>>>> +        DEVICE_GET_CLASS(ccw_dev)->vmsd = NULL;
+>>>> +    }
+>>>> +
+>>>
+>>> That's a very odd thing to do; can't you use a .needed at the
+>>> top level of the vmstate_virtio_ccw_dev to avoid having to
+>>> set it to NULL like this?
+>>>
+>>
+>> I agree it's odd. As far as I remember I can't use .needed but
+>> I will double check.
+> 
+> You can have top level .needed's - both vmstate_globalstate in
+> migration.c and colo's colo_state use them.
+> 
 
-iQEcBAEBCAAGBQJZEfs9AAoJEKeha0olJ0Nq5k8IAIu4QdrYdh+3WbH/YkQ9J7is
-s3LOwCuFydYRyl+ddnP7+yTEgeCiE8wbE1sPaMJC5JieBbIQzcohDy1hg3MGuPEy
-0y+nB8TRIbh7bsq+Zb0bk5aj1yM7wAL7aN81Vs1SQXz0b9YCK6IN2k8Y1vHUC/zs
-d8hhLaRi0NYBXGrr60qHK+eGTn47nY0JWu3ZTjYzWQjBWeqxAu4gr/k6zTZfx7qu
-mvP0bdx1YMZ/H0qjwoto8OUrTqCbwj38xfs9k+SjRwthW0wTskRDIxQ2X4O9YXMm
-zcxfCOx5ZW3YUZ7I/H8ig1Vj4Pnp4+bLPr0+4lh622C37cT8hEnZGtxUPetBuO0=
-=wtYw
------END PGP SIGNATURE-----
+Works like charm. I'm really happy to get rid of this ugly hunk.  Thanks
+a lot! 
 
---0MRsv8liP4MaKb0iC1rWc503euCCWmk3d--
+I was probably confused by the fact that I want to use the same vmsd with
+vmstate_save_state when the needed is false. That works, but I have probably 
+blindly assumed (back then) it does not. Of course it does make sense to
+ignore .needed in that function, because for a vmsd coming from a
+recursive call while processing a filed then the non-presence of a field
+should be indicated by field_exists.
+
+I wonder if adding a comment at the definition site would be helpful.
+Something like:
+
+
+ struct VMStateDescription {
+....
+     void (*pre_save)(void *opaque);
++    /* Controls the existence of sections and subsections, but not fields. */
+     bool (*needed)(void *opaque);
+     VMStateField *fields;
+     const VMStateDescription **subsections;
+ };
+
+Halil
+
+> Dave
+> 
+>> Many thanks for your review!
+>>
+>> Halil
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
