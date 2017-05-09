@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d83C8-0004jl-9N
+	(envelope-from <berrange@redhat.com>) id 1d83C8-0004jn-9s
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d83C3-000587-AS
+	(envelope-from <berrange@redhat.com>) id 1d83C7-00058s-25
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:20:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37014)
+Received: from mx1.redhat.com ([209.132.183.28]:57392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d83C3-00057q-4h
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:20:39 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d83C6-00058j-Ro
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:20:42 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  9 May 2017 12:20:32 +0100
-Message-Id: <20170509112034.23351-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/2] Support CPUID signature for TCG
+Date: Tue,  9 May 2017 12:20:33 +0100
+Message-Id: <20170509112034.23351-2-berrange@redhat.com>
+In-Reply-To: <20170509112034.23351-1-berrange@redhat.com>
+References: <20170509112034.23351-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] i386: rewrite way CPUID index is
+ validated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +27,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This enables report of a signature in CPUID for the TCG
-interpretor.
+Change the nested if statements into a flat format, to make
+it clearer what validation / capping is being performed on
+different CPUID index values.
 
-Changed in v3:
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ target/i386/cpu.c | 35 +++++++++++++++--------------------
+ 1 file changed, 15 insertions(+), 20 deletions(-)
 
- - Simplify CPU limit code still further (Eduardo)
-
-Changed in v2:
-
- - Rewrite the way we bounds check / cap the CPUID index
-   to use a flat switch, instead of nested ifs (Eduardo)
- - Add a 'tcg-cpuid' property to allow it to be hidden
-   (Eduardo)
- - Hide the TCG signature for old machine types
- - Force code to a no-op if tcg_enabled() is false (Eduardo)
-
-
-NB, I did not introduce a general 'hypervisor-cpuid' property
-to obsolete the existing 'kvm=off|on' -cpu property, since it
-appears impossible to get the back compat semantics right,
-as described in a previous reply.
-
-
-Daniel P. Berrange (2):
-  i386: rewrite way CPUID index is validated
-  i386: expose "TCGTCGTCGTCG" in the 0x40000000 CPUID leaf
-
- include/hw/i386/pc.h |  5 +++++
- target/i386/cpu.c    | 59 +++++++++++++++++++++++++++++++++-------------------
- target/i386/cpu.h    |  1 +
- 3 files changed, 44 insertions(+), 21 deletions(-)
-
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 13c0985..8cb4af4 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2626,28 +2626,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+     X86CPU *cpu = x86_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
+     uint32_t pkg_offset;
++    uint32_t limit;
+ 
+-    /* test if maximum index reached */
+-    if (index & 0x80000000) {
+-        if (index > env->cpuid_xlevel) {
+-            if (env->cpuid_xlevel2 > 0) {
+-                /* Handle the Centaur's CPUID instruction. */
+-                if (index > env->cpuid_xlevel2) {
+-                    index = env->cpuid_xlevel2;
+-                } else if (index < 0xC0000000) {
+-                    index = env->cpuid_xlevel;
+-                }
+-            } else {
+-                /* Intel documentation states that invalid EAX input will
+-                 * return the same information as EAX=cpuid_level
+-                 * (Intel SDM Vol. 2A - Instruction Set Reference - CPUID)
+-                 */
+-                index =  env->cpuid_level;
+-            }
+-        }
++    /* Calculate & apply limits for different index ranges */
++    if (index >= 0xC0000000) {
++        limit = env->cpuid_xlevel2;
++    } else if (index >= 0x80000000) {
++        limit = env->cpuid_xlevel;
+     } else {
+-        if (index > env->cpuid_level)
+-            index = env->cpuid_level;
++        limit = env->cpuid_level;
++    }
++
++    if (index > limit) {
++        /* Intel documentation states that invalid EAX input will
++         * return the same information as EAX=cpuid_level
++         * (Intel SDM Vol. 2A - Instruction Set Reference - CPUID)
++         */
++        index = env->cpuid_level;
+     }
+ 
+     switch(index) {
 -- 
 2.9.3
