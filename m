@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d81Zl-0005nA-Hu
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:37:02 -0400
+	(envelope-from <groug@kaod.org>) id 1d81cM-0008Im-0O
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d81Zk-00061t-Eb
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:37:01 -0400
-Date: Tue, 9 May 2017 10:36:43 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170509093643.GE1669@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170502144744.26815-1-berrange@redhat.com>
-	<20170502144744.26815-4-berrange@redhat.com>
-	<2f99bd19-4a9d-850e-ed56-7b998797c6a6@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1d81cI-00010R-3c
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:39:42 -0400
+Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:59181)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d81cH-0000zS-TN
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:39:38 -0400
+Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7C9D5EE332
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:39:36 +0200 (CEST)
+Date: Tue, 9 May 2017 11:39:32 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170509113932.2443c627@bahia>
+In-Reply-To: <2b6e4c71-8f11-a1f5-8b34-43ac68f2d503@redhat.com>
+References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
+	<149399505841.29022.17760460736155165332.stgit@bahia.lan>
+	<2b6e4c71-8f11-a1f5-8b34-43ac68f2d503@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2f99bd19-4a9d-850e-ed56-7b998797c6a6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 3/4] qemu-img: introduce
- --target-image-opts for 'convert' command
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/gcBa7aMUfiWE_k1U+4zhh9O";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 5/5] 9pfs: local: forbid client access to
+ metadata
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +33,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?B?TMOpbw==?= Gaspard <leo@gaspard.io>
 
-On Wed, May 03, 2017 at 09:50:49PM +0200, Max Reitz wrote:
-> On 02.05.2017 16:47, Daniel P. Berrange wrote:
-> > The '--image-opts' flag indicates whether the source filename
-> > includes options. The target filename has to remain in the
-> > plain filename format though, since it needs to be passed to
-> > bdrv_create().  When using --skip-create though, it would be
-> > possible to use image-opts syntax. This adds --target-image-opts
-> > to indicate that the target filename includes options. Currently
-> > this mandates use of the --skip-create flag too.
-> > 
-> > Reviewed-by: Fam Zheng <famz@redhat.com>
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> Sure you want to keep this, considering that there are quite some
-> changes since v5?
-> 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+--Sig_/gcBa7aMUfiWE_k1U+4zhh9O
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, 5 May 2017 12:13:52 -0500
+Eric Blake <eblake@redhat.com> wrote:
+
+> On 05/05/2017 09:37 AM, Greg Kurz wrote:
+> > When using the mapped-file security mode, we shouldn't let the client
+> > mess with the metadata. The current code already hides it but the
+> > client can still access the metadata through several operations.
+> >=20
+> > This patch fixes the issue by:
+> > - preventing the creation of fids pointing to the metadata (name_to_pat=
+h)
+> > - failing various operations taking a dirpath and a name arguments if
+> >   name is a metadata reserved name
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
 > > ---
-> >  qemu-img-cmds.hx |  4 +--
-> >  qemu-img.c       | 77 +++++++++++++++++++++++++++++++++++++-------------------
-> >  qemu-img.texi    | 12 +++++++--
-> >  3 files changed, 63 insertions(+), 30 deletions(-)
-> 
-> [...]
-> 
-> > diff --git a/qemu-img.c b/qemu-img.c
-> > index d8fdcb1..94c8cea 100644
-> > --- a/qemu-img.c
-> > +++ b/qemu-img.c
-> 
-> [...]
-> 
-> > @@ -1900,7 +1901,7 @@ static int img_convert(int argc, char **argv)
-> >      char *options = NULL;
-> >      Error *local_err = NULL;
-> >      bool writethrough, src_writethrough, quiet = false, image_opts = false,
-> > -         skip_create = false, progress = false;
-> > +        skip_create = false, progress = false, tgt_image_opts = false;
-> 
-> Not sure about the indentation here. (I personally don't like spanning
-> the declaration over multiple lines in the first place, but that's a
-> different topic.) Indenting consecutive lines by four spaces is
-> standard, but the indentation by five spaces had a reason.
-> 
-> I guess I'd personally rather keep the five-space indentation...
-
-This change was just automatic reindent by the editor, I'll put it
-back to 5.
-
-> 
-> >      int64_t ret = -EINVAL;
-> >  
-> >      ImgConvertState s = (ImgConvertState) {
-> 
-> [...]
-> 
-> > @@ -2047,12 +2056,22 @@ static int img_convert(int argc, char **argv)
-> >          goto fail_getopt;
-> >      }
-> >  
-> > +    if (tgt_image_opts && !skip_create) {
-> > +        error_report("--target-image-opts requires use of -n flag");
-> > +        goto fail_getopt;
+> >  hw/9pfs/9p-local.c |   41 +++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 41 insertions(+)
+> >=20
+> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> > index b427d2928800..93cadac302c9 100644
+> > --- a/hw/9pfs/9p-local.c
+> > +++ b/hw/9pfs/9p-local.c
+> > @@ -588,6 +588,11 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath=
+ *dir_path,
+> >      int err =3D -1;
+> >      int dirfd;
+> > =20
+> > +    if (local_must_skip_metadata(fs_ctx, name)) {
+> > +        errno =3D EINVAL;
+> > +        return -1;
 > > +    }
-> > +
-> >      s.src_num = argc - optind - 1;
-> >      out_filename = s.src_num >= 1 ? argv[argc - 1] : NULL;
-> >  
-> >      if (options && has_help_option(options)) {
-> > -        ret = print_block_option_help(out_filename, out_fmt);
-> > -        goto fail_getopt;
-> > +        if (out_fmt) {
-> > +            ret = print_block_option_help(out_filename, out_fmt);
-> > +            goto out;
-> 
-> Shouldn't this remain goto fail_getopt;?
+> > + =20
+>=20
+> I don't know if EINVAL is the best error, but it seems reasonable enough.
+>=20
 
-Yes
+I admit that I'm not really a big fan of returning EINVAL, but there's
+nothing like "this file name is illegal" on Linux and I couldn't come
+up with a better error...
 
-> 
-> > +        } else {
-> > +            error_report("Option help requires a format be specified");
-> > +            goto fail_getopt;
-> > +        }
-> >      }
-> >  
-> >      if (s.src_num < 1) {
-> 
-> [...]
-> 
-> Why did you remove the compress &&
-> !out_bs->drv->bdrv_co_pwritev_compressed check? I liked it. :-(
+--Sig_/gcBa7aMUfiWE_k1U+4zhh9O
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-That's a rebase / conflict resolution mistake
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+iEYEARECAAYFAlkRjlQACgkQAvw66wEB28Jo8ACcCDWlt7rVE2a5jjI48+sNgziC
+9r0AoJwLpvK5tKdId6JkxdRdk0UA+9xl
+=ZAzp
+-----END PGP SIGNATURE-----
+
+--Sig_/gcBa7aMUfiWE_k1U+4zhh9O--
