@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d80AZ-00084d-VA
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:06:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1d80AZ-00084e-VE
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:06:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d80AT-0007Wl-Rm
+	(envelope-from <armbru@redhat.com>) id 1d80AT-0007X2-Tr
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:06:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35110)
+Received: from mx1.redhat.com ([209.132.183.28]:44258)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d80AT-0007Vz-Lo
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d80AT-0007W4-N0
 	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:06:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B26E2804E2
+	by mx1.redhat.com (Postfix) with ESMTPS id B22A137E67
 	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 08:06:48 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  9 May 2017 10:06:22 +0200
-Message-Id: <1494317205-2211-6-git-send-email-armbru@redhat.com>
+Date: Tue,  9 May 2017 10:06:28 +0200
+Message-Id: <1494317205-2211-12-git-send-email-armbru@redhat.com>
 In-Reply-To: <1494317205-2211-1-git-send-email-armbru@redhat.com>
 References: <1494317205-2211-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v3 05/28] coccinelle: Add script to remove
- useless QObject casts
+Subject: [Qemu-devel] [PULL v3 11/28] fdc-test: Avoid deprecated 'change'
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +34,53 @@ To: qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-We have macros in place to make it less verbose to add a subtype
-of QObject to both QDict and QList. While we have made cleanups
-like this in the past (see commit fcfcd8ffc, for example), having
-it be automated by Coccinelle makes it easier to maintain.
+Use the preferred blockdev-change-medium command instead.
 
-The script is separate from the cleanups, for ease of review and
-backporting.  A later patch will then add further possible cleanups.
+Also, use of 'device' is deprecated; adding an explicit id on
+the command line lets us use 'id' for both blockdev-change-medium
+and eject.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170427215821.19397-4-eblake@redhat.com>
+Message-Id: <20170427215821.19397-10-eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- MAINTAINERS                      |  1 +
- scripts/coccinelle/qobject.cocci | 13 +++++++++++++
- 2 files changed, 14 insertions(+)
- create mode 100644 scripts/coccinelle/qobject.cocci
+ tests/fdc-test.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index efdec47..66c9734 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1393,6 +1393,7 @@ S: Supported
- F: qobject/
- F: include/qapi/qmp/
- X: include/qapi/qmp/dispatch.h
-+F: scripts/coccinelle/qobject.cocci
- F: tests/check-qdict.c
- F: tests/check-qfloat.c
- F: tests/check-qint.c
-diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobject.cocci
-new file mode 100644
-index 0000000..aa899e2
---- /dev/null
-+++ b/scripts/coccinelle/qobject.cocci
-@@ -0,0 +1,13 @@
-+// Use QDict macros where they make sense
-+@@
-+expression Obj, Key, E;
-+@@
-+- qdict_put_obj(Obj, Key, QOBJECT(E));
-++ qdict_put(Obj, Key, E);
-+
-+// Use QList macros where they make sense
-+@@
-+expression Obj, E;
-+@@
-+- qlist_append_obj(Obj, QOBJECT(E));
-++ qlist_append(Obj, E);
+diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+index 738c6b4..325712e 100644
+--- a/tests/fdc-test.c
++++ b/tests/fdc-test.c
+@@ -298,8 +298,8 @@ static void test_media_insert(void)
+ 
+     /* Insert media in drive. DSKCHK should not be reset until a step pulse
+      * is sent. */
+-    qmp_discard_response("{'execute':'change', 'arguments':{"
+-                         " 'device':'floppy0', 'target': %s, 'arg': 'raw' }}",
++    qmp_discard_response("{'execute':'blockdev-change-medium', 'arguments':{"
++                         " 'id':'floppy0', 'filename': %s, 'format': 'raw' }}",
+                          test_image);
+ 
+     dir = inb(FLOPPY_BASE + reg_dir);
+@@ -330,7 +330,7 @@ static void test_media_change(void)
+     /* Eject the floppy and check that DSKCHG is set. Reading it out doesn't
+      * reset the bit. */
+     qmp_discard_response("{'execute':'eject', 'arguments':{"
+-                         " 'device':'floppy0' }}");
++                         " 'id':'floppy0' }}");
+ 
+     dir = inb(FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+@@ -564,7 +564,7 @@ int main(int argc, char **argv)
+     /* Run the tests */
+     g_test_init(&argc, &argv, NULL);
+ 
+-    qtest_start(NULL);
++    qtest_start("-device floppy,id=floppy0");
+     qtest_irq_intercept_in(global_qtest, "ioapic");
+     qtest_add_func("/fdc/cmos", test_cmos);
+     qtest_add_func("/fdc/no_media_on_start", test_no_media_on_start);
 -- 
 2.7.4
