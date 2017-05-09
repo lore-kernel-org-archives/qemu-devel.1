@@ -1,29 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d80Z7-0006P9-0J
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:32:18 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d80cd-0000wo-38
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:35:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d80Z3-0004UL-0y
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:32:17 -0400
-Received: from mga09.intel.com ([134.134.136.24]:57330)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1d80Z2-0004Sm-Mk
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:32:12 -0400
-Date: Mon, 8 May 2017 16:15:48 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20170508081548.GC2931@gmail.com>
-References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1493201210-14357-4-git-send-email-yi.l.liu@linux.intel.com>
-	<20170427105317.GE1542@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C25743906890D@shsmsx102.ccr.corp.intel.com>
-	<20170508112034.GE2820@pxdev.xzpeter.org>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d80cZ-0007n0-2D
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:35:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55939
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1d80cY-0007mW-Sx
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:35:50 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v498SxPZ027446
+	for <qemu-devel@nongnu.org>; Tue, 9 May 2017 04:35:49 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ab91ev0ha-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 04:35:49 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 9 May 2017 04:35:49 -0400
+Date: Tue, 9 May 2017 16:35:42 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170505020352.8984-10-bjsdjshi@linux.vnet.ibm.com>
+	<1c84ffc3-70fa-f6b7-fd10-def952d02a84@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170508112034.GE2820@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 03/20] intel_iommu: add "svm" option
+In-Reply-To: <1c84ffc3-70fa-f6b7-fd10-def952d02a84@redhat.com>
+Message-Id: <20170509083542.GA5827@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v7 09/13] vfio/ccw: get irqs info and set
+ the eventfd fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,132 +44,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com
 
-On Mon, May 08, 2017 at 07:20:34PM +0800, Peter Xu wrote:
-> On Mon, May 08, 2017 at 10:38:09AM +0000, Liu, Yi L wrote:
-> > On Thu, 27 Apr 2017 18:53:17 +0800
-> > Peter Xu <peterx@redhat.com> wrote:
-> > 
-> > > On Wed, Apr 26, 2017 at 06:06:33PM +0800, Liu, Yi L wrote:
-> > > > Expose "Shared Virtual Memory" to guest by using "svm" option.
-> > > > Also use "svm" to expose SVM related capabilities to guest.
-> > > > e.g. "-device intel-iommu, svm=on"
-> > > >
-> > > > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> > > > ---
-> > > >  hw/i386/intel_iommu.c          | 10 ++++++++++
-> > > >  hw/i386/intel_iommu_internal.h |  5 +++++
-> > > > include/hw/i386/intel_iommu.h  |  1 +
-> > > >  3 files changed, 16 insertions(+)
-> > > >
-> > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
-> > > > bf98fa5..ba1e7eb 100644
-> > > > --- a/hw/i386/intel_iommu.c
-> > > > +++ b/hw/i386/intel_iommu.c
-> > > > @@ -2453,6 +2453,7 @@ static Property vtd_properties[] = {
-> > > >      DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
-> > > >      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode,
-> > > FALSE),
-> > > >      DEFINE_PROP_BOOL("ecs", IntelIOMMUState, ecs, FALSE),
-> > > > +    DEFINE_PROP_BOOL("svm", IntelIOMMUState, svm, FALSE),
-> > > >      DEFINE_PROP_END_OF_LIST(),
-> > > >  };
-> > > >
-> > > > @@ -2973,6 +2974,15 @@ static void vtd_init(IntelIOMMUState *s)
-> > > >          s->ecap |= VTD_ECAP_ECS;
-> > > >      }
-> > > >
-> > > > +    if (s->svm) {
-> > > > +        if (!s->ecs || !x86_iommu->pt_supported || !s->caching_mode) {
-> > > > +            error_report("Need to set ecs, pt, caching-mode for svm");
-> > > > +            exit(1);
-> > > > +        }
-> > > > +        s->cap |= VTD_CAP_DWD | VTD_CAP_DRD;
-> > > > +        s->ecap |= VTD_ECAP_PRS | VTD_ECAP_PTS | VTD_ECAP_PASID28;
-> > > > +    }
-> > > > +
-> > > >      if (s->caching_mode) {
-> > > >          s->cap |= VTD_CAP_CM;
-> > > >      }
-> > > > diff --git a/hw/i386/intel_iommu_internal.h
-> > > > b/hw/i386/intel_iommu_internal.h index 71a1c1e..f2a7d12 100644
-> > > > --- a/hw/i386/intel_iommu_internal.h
-> > > > +++ b/hw/i386/intel_iommu_internal.h
-> > > > @@ -191,6 +191,9 @@
-> > > >  #define VTD_ECAP_PT                 (1ULL << 6)
-> > > >  #define VTD_ECAP_MHMV               (15ULL << 20)
-> > > >  #define VTD_ECAP_ECS                (1ULL << 24)
-> > > > +#define VTD_ECAP_PASID28            (1ULL << 28)
-> > > 
-> > > Could I ask what's this bit? On my spec, it says this bit is reserved and defunct (spec
-> > > version: June 2016).
-> > 
-> > As Ashok confirmed, yes it should be bit 40. would update it.
+* Auger Eric <eric.auger@redhat.com> [2017-05-09 10:21:15 +0200]:
+
+Hi Eric,
+
+> Hi,
 > 
-> Ok.
-> 
+> On 05/05/2017 04:03, Dong Jia Shi wrote:
+> > vfio-ccw resorts to the eventfd mechanism to communicate with userspace.
+> > We fetch the irqs info via the ioctl VFIO_DEVICE_GET_IRQ_INFO,
+> > register a event notifier to get the eventfd fd which is sent
+> > to kernel via the ioctl VFIO_DEVICE_SET_IRQS, then we can implement
+> > read operation once kernel sends the signal.
 > > 
-> > > > +#define VTD_ECAP_PRS                (1ULL << 29)
-> > > > +#define VTD_ECAP_PTS                (0xeULL << 35)
-> > > 
-> > > Would it better we avoid using 0xe here, or at least add some comment?
-> > 
-> > For this value, it must be no more than the bits host supports. So it may be
-> > better to have a default value and meanwhile expose an option to let user
-> > set it. how about your opinion?
-> 
-> I think a more important point is that we need to make sure this value
-> is no larger than hardware support? 
+> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Agree. If it is larger, sanity check would fail.
-
-> Since you are also working on the
-> vfio interface for virt-svm... would it be possible that we can talk
-> to kernel in some way so that we can know the supported pasid size in
-> host IOMMU? So that when guest specifies something bigger, we can stop
-> the user.
-
-If it is just to stop when the size is not valid, I think we already have
-such sanity check in host when trying to bind guest pasid table. Not sure
-if it is practical to talk with kernel on the supported pasid size. But
-may think about it. It is very likely that we need to do it through VFIO.
+Thanks for all of your R-Bs! I will add them in next version. :>
 
 > 
-> I don't know the practical value for this field, if it's static
-> enough, I think it's also okay we make it static here as well. But
-> again, I would prefer at least some comment, like:
+> Thanks
 > 
->   /* Value N indicates PASID field of N+1 bits, here 0xe stands for.. */
-
-yes, at least we need to add such comments. Would add it.
-
-> > 
-> > > 
-> > > >
-> > > >  /* CAP_REG */
-> > > >  /* (offset >> 4) << 24 */
-> > > > @@ -207,6 +210,8 @@
-> > > >  #define VTD_CAP_PSI                 (1ULL << 39)
-> > > >  #define VTD_CAP_SLLPS               ((1ULL << 34) | (1ULL << 35))
-> > > >  #define VTD_CAP_CM                  (1ULL << 7)
-> > > > +#define VTD_CAP_DWD                 (1ULL << 54)
-> > > > +#define VTD_CAP_DRD                 (1ULL << 55)
-> > > 
-> > > Just to confirm: after this series, we should support drain read/write then, right?
-> > 
-> > I haven’t done special process against it in IOMMU emulator. It's set to keep
-> > consistence with VT-d spec since DWD and DRW is required capability when
-> > PASID it reported as Set. However, I think it should be fine if guest issue QI
-> > with drain read/write set in the descriptor. Host should be able to process it.
+> Eric
 > 
-> I see. IIUC the point here is we need to deliver these requests to
-> host IOMMU, and I guess we need to be able to do this in a synchronous
-> way as well.
 
-yes, deliver request to host. For assigned devices, it is ok. BTW. do you
-think we need to consider it for emulated devices?
+[...]
 
-Thanks,
-Yi L
+-- 
+Dong Jia Shi
