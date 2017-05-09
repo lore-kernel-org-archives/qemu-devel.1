@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d86XF-0002nf-Vr
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:54:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d86dZ-0004aj-7U
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d86XF-0002G8-Af
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 10:54:46 -0400
-Date: Tue, 9 May 2017 16:54:36 +0200
+	(envelope-from <kwolf@redhat.com>) id 1d86dY-0006FN-C2
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 11:01:17 -0400
+Date: Tue, 9 May 2017 17:01:04 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170509145436.GE5243@noname.str.redhat.com>
-References: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
+Message-ID: <20170509150104.GF5243@noname.str.redhat.com>
+References: <20170505095807.3296-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/6] block: Fix op blockers for inactive
- images
+In-Reply-To: <20170505095807.3296-1-hch@lst.de>
+Subject: Re: [Qemu-devel] [PATCH v2] nvme: Implement Write Zeroes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,18 +22,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: famz@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: keith.busch@intel.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Am 04.05.2017 um 18:52 hat Kevin Wolf geschrieben:
-> Fam's image locking series introduced some special-casing in the file-posix
-> driver that avoids taking locks when the image is inactive. While this works,
-> it really isn't the job of the file-posix driver, but the core block layer
-> should consider that inactive nodes require a lot less permissions.
-> 
-> This series integrates op blockers with bdrv_inactivate/invalidate_cache() to
-> solve this problem gennerically, and removes the workaround in file-posix.
+Am 05.05.2017 um 11:58 hat Christoph Hellwig geschrieben:
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+> [hch: ported over from qemu-nvme.git to mainline]
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Applied to the block branch.
+Keith, can you give an Acked-by for this one? (I see that the code is
+originally from you, but just to make sure that you agree with the
+changes made and that it is merged into qemu.git this way.)
 
 Kevin
+
+>  hw/block/nvme.c | 26 ++++++++++++++++++++++++++
+>  hw/block/nvme.h |  1 +
+>  2 files changed, 27 insertions(+)
+> 
+>  Changes since v1:
+>   - add BDRV_REQ_MAY_UNMAP flag
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index ae303d44e5..7428db9f0c 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -227,6 +227,29 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>      return NVME_NO_COMPLETE;
+>  }
+>  
+> +static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+> +    NvmeRequest *req)
+> +{
+> +    NvmeRwCmd *rw = (NvmeRwCmd *)cmd;
+> +    const uint8_t lba_index = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
+> +    const uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
+> +    uint64_t slba = le64_to_cpu(rw->slba);
+> +    uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
+> +    uint64_t aio_slba = slba << (data_shift - BDRV_SECTOR_BITS);
+> +    uint32_t aio_nlb = nlb << (data_shift - BDRV_SECTOR_BITS);
+> +
+> +    if (slba + nlb > ns->id_ns.nsze) {
+> +        return NVME_LBA_RANGE | NVME_DNR;
+> +    }
+> +
+> +    req->has_sg = false;
+> +    block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+> +                     BLOCK_ACCT_WRITE);
+> +    req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, aio_slba, aio_nlb,
+> +                                        BDRV_REQ_MAY_UNMAP, nvme_rw_cb, req);
+> +    return NVME_NO_COMPLETE;
+> +}
+> +
+>  static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>      NvmeRequest *req)
+>  {
+> @@ -279,6 +302,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>      switch (cmd->opcode) {
+>      case NVME_CMD_FLUSH:
+>          return nvme_flush(n, ns, cmd, req);
+> +    case NVME_CMD_WRITE_ZEROS:
+> +        return nvme_write_zeros(n, ns, cmd, req);
+>      case NVME_CMD_WRITE:
+>      case NVME_CMD_READ:
+>          return nvme_rw(n, ns, cmd, req);
+> @@ -895,6 +920,7 @@ static int nvme_init(PCIDevice *pci_dev)
+>      id->sqes = (0x6 << 4) | 0x6;
+>      id->cqes = (0x4 << 4) | 0x4;
+>      id->nn = cpu_to_le32(n->num_namespaces);
+> +    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS);
+>      id->psd[0].mp = cpu_to_le16(0x9c4);
+>      id->psd[0].enlat = cpu_to_le32(0x10);
+>      id->psd[0].exlat = cpu_to_le32(0x4);
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 8fb0c10756..a0d15649f9 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -179,6 +179,7 @@ enum NvmeIoCommands {
+>      NVME_CMD_READ               = 0x02,
+>      NVME_CMD_WRITE_UNCOR        = 0x04,
+>      NVME_CMD_COMPARE            = 0x05,
+> +    NVME_CMD_WRITE_ZEROS        = 0x08,
+>      NVME_CMD_DSM                = 0x09,
+>  };
+>  
+> -- 
+> 2.11.0
+> 
