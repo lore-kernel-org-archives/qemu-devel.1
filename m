@@ -1,14 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d7w5f-0001Yb-7S
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 23:45:36 -0400
+	(envelope-from <famz@redhat.com>) id 1d7wKx-0004Nr-IN
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d7w5a-0003Gb-Kz
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 23:45:35 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  9 May 2017 13:45:19 +1000
-Message-Id: <20170509034519.16291-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH] target/ppc: Allow workarounds for POWER9 DD1
+	(envelope-from <famz@redhat.com>) id 1d7wKu-0008Ft-GL
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:01:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1d7wKu-0008FV-7D
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 00:01:20 -0400
+Date: Tue, 9 May 2017 12:01:15 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170509040115.GA18973@lemon.lan>
+References: <20170508221759.15616-1-f4bug@amsat.org>
+	<20170508221759.15616-3-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170508221759.15616-3-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/21] docker: add --include-file
+ argument to 'build' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,52 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de, David Gibson <david@gibson.dropbear.id.au>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-POWER9 DD1 silicon has some bugs which mean it a) isn't really compliant
-with the ISA v3.00 and b) require a number of special workarounds in the
-kernel.
+On Mon, 05/08 19:17, Philippe Mathieu-Daud=E9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/docker/Makefile.include | 3 ++-
+>  tests/docker/docker.py        | 5 +++++
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index 03eda37bf4..c99ce702ea 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -51,7 +51,8 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
+>  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+>  		$(if $(NOUSER),,--add-current-user) \
+> -		$(if $(EXECUTABLE),--include-executable=3D$(EXECUTABLE)),\
+> +		$(if $(EXECUTABLE),--include-executable=3D$(EXECUTABLE))\
+> +		$(if $(EXTRA_FILE),--include-file=3D$(EXTRA_FILE)),\
+>  		"BUILD","$*")
+> =20
+>  # Enforce dependancies for composite images
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 6ddc6e4c2a..90520e4bca 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -237,6 +237,9 @@ class BuildCommand(SubCommand):
+>                              help=3D"""Specify a binary that will be co=
+pied to the
+>                              container together with all its dependent
+>                              libraries""")
+> +        parser.add_argument("--include-file", "-f",
+> +                            help=3D"""Specify a file that will be copi=
+ed to the
+> +                            container""")
 
-At the moment, qemu isn't aware of DD1.  For TCG we don't really want it to
-be (why bother emulating buggy silicon).  But with KVM, the guest does need
-to be aware of DD1 so it can apply the necessary workarounds.
+Is it more useful if it's '--include-files' that accepts multiple files? =
+Or
+alternatively allow this option to be use multiple times:
 
-Meanwhile, the feature negotiation between qemu and the guest strongly
-favours architected compatibility modes to "raw" CPU modes.  In combination
-with the above, this means the guest sees architected POWER9 mode, and
-doesn't apply the DD1 workarounds.  Well, unless it has yet another
-workaround to partially ignore what qemu tells it.
+    -f foo -f bar -f ...
 
-This patch addresses this by disabling support for compatibility modes when
-using KVM on a POWER9 DD1 host.
+Similarly, should EXTRA_FILE be EXTRA_FILES or something?
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/kvm.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+We are already lacking this with --include-executable's documentation, bu=
+t
+please also document "where" is it copied to in the container's filesyste=
+m.
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8574c36..591b5b5 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2380,6 +2380,17 @@ static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
- 
- #if defined(TARGET_PPC64)
-     pcc->radix_page_info = kvm_get_radix_page_info();
-+
-+    if ((pcc->pvr & 0xffffff00) == 0x004e0100) {
-+        /*
-+         * POWER9 DD1 has some bugs which make it not really ISA 3.00
-+         * compliant.  More importantly, advertising ISA 3.00
-+         * architected mode may prevent guests from activating
-+         * necessary DD1 workarounds.
-+         */
-+        pcc->pcr_supported &= ~(PCR_COMPAT_3_00 | PCR_COMPAT_2_07
-+                                | PCR_COMPAT_2_06 | PCR_COMPAT_2_05);
-+    }
- #endif /* defined(TARGET_PPC64) */
- }
- 
--- 
-2.9.3
+Fam
+
+>          parser.add_argument("--add-current-user", "-u", dest=3D"user",
+>                              action=3D"store_true",
+>                              help=3D"Add the current user to image's pa=
+sswd")
+> @@ -274,6 +277,8 @@ class BuildCommand(SubCommand):
+>              if args.include_executable:
+>                  _copy_binary_with_libs(args.include_executable,
+>                                         docker_dir)
+> +            if args.include_file:
+> +                _copy_with_mkdir(args.include_file, docker_dir)
+> =20
+>              argv +=3D ["--build-arg=3D" + k.lower() + "=3D" + v
+>                          for k, v in os.environ.iteritems()
+> --=20
+> 2.11.0
+>=20
