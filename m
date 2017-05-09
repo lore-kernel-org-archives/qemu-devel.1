@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d7u9z-0008Ge-R5
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 21:41:56 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d7uOK-0002Q6-4U
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 21:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1d7u9w-0006th-NT
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 21:41:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1d7u9w-0006tb-F7
-	for qemu-devel@nongnu.org; Mon, 08 May 2017 21:41:52 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v491XpeB137841
-	for <qemu-devel@nongnu.org>; Mon, 8 May 2017 21:41:50 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aap5qw7tm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 21:41:50 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Mon, 8 May 2017 19:41:49 -0600
-Date: Tue, 9 May 2017 09:41:43 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170505020352.8984-14-bjsdjshi@linux.vnet.ibm.com>
-	<20170505142014.28c849b8.cornelia.huck@de.ibm.com>
-	<20170508052927.GD15974@bjsdjshi@linux.vnet.ibm.com>
-	<20170508110927.5713c101.cornelia.huck@de.ibm.com>
+	(envelope-from <rth7680@gmail.com>) id 1d7uOJ-0003Jk-C0
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 21:56:44 -0400
+Received: from mail-qk0-x22b.google.com ([2607:f8b0:400d:c09::22b]:35069)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d7uOJ-0003Ja-69
+	for qemu-devel@nongnu.org; Mon, 08 May 2017 21:56:43 -0400
+Received: by mail-qk0-x22b.google.com with SMTP id a72so51507531qkj.2
+	for <qemu-devel@nongnu.org>; Mon, 08 May 2017 18:56:43 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <87pofj8kek.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e3e560d2-c380-0529-181a-b5bf3146650d@twiddle.net>
+Date: Mon, 8 May 2017 18:56:33 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170508110927.5713c101.cornelia.huck@de.ibm.com>
-Message-Id: <20170509014143.GG15974@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v7 13/13] MAINTAINERS: Add vfio-ccw
- maintainer
+In-Reply-To: <87pofj8kek.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Future of SoftFloat use in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,74 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, eric.auger@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <aleksandar.markovic@imgtec.com>, Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-* Cornelia Huck <cornelia.huck@de.ibm.com> [2017-05-08 11:09:27 +0200]:
+On 05/08/2017 07:58 AM, Alex Bennée wrote:
+> Hi,
+> 
+> We've got a task coming up to implement half-precision floating point
+> (FP16) for ARMv8.2. As you know pretty much all our floating point in
+> QEMU is handled by our internal fork of John R. Hauser's BSD SoftFloat
+> library. Our current implementation is based on version 2a which doesn't
+> support FP16.
+> 
+> As it happens there has been a new release of SoftFloat recently.
+> Version 3 is a complete re-write which made a number of changes, some
+> notable ones being:
+> 
+>    - Complete rewrite, different use license than earlier releases.
+>    - Renaming most types and functions, upgrading some algorithms
+>      - restructuring the source files, and making SoftFloat into a true library.
 
-> On Mon, 8 May 2017 13:29:27 +0800
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
-> > * Cornelia Huck <cornelia.huck@de.ibm.com> [2017-05-05 14:20:14 +0200]:
-> > 
-> > > On Fri,  5 May 2017 04:03:52 +0200
-> > > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> > > 
-> > > > Add Cornelia Huck as the vfio-ccw maintainer.
-> > > > 
-> > > > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > > > ---
-> > > >  MAINTAINERS | 5 +++++
-> > > >  1 file changed, 5 insertions(+)
-> > > > 
-> > > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > > index cae3b09..c1f9917 100644
-> > > > --- a/MAINTAINERS
-> > > > +++ b/MAINTAINERS
-> > > > @@ -999,6 +999,11 @@ S: Supported
-> > > >  F: hw/vfio/*
-> > > >  F: include/hw/vfio/
-> > > > 
-> > > > +vfio-ccw
-> > > > +M: Cornelia Huck <cornelia.huck@de.ibm.com>
-> > > > +S: Supported
-> > > > +F: hw/vfio/ccw.c
-> > > 
-> > > The other code related to vfio-ccw is entangled with the other virtual
-> > > css code, so this is probably really the only file that needs to be
-> > > listed separately.
-> > "hw/s390x/" and "include/hw/s390x/" are listed under the "S390 Machines"
-> > part.
-> > 
-> > Maybe you would like to list the following files separately here:
-> > hw/s390x/s390-ccw.c
-> > hw/s390x/s390-ccw.h
-> 
-> Yes, that makes sense.
-> 
-> But seeing the path name here: Should s390-ccw.h rather go into
-> include/hw/s390x/ (even if hw/s390x/ already contains several .h
-> files...)?
-Ok. You will find it in include/hw/s390x/ in next version.
+But also now using thread-local globals instead of passing in a structure with 
+all of the parameters.  So, really, we'd probably wind up touching every 
+function if we were to import it.
 
-Would you like me making a sepate patch to move all of the other .h
-files to the include folder?
-
+> So what else can we do?
 > 
-> > 
-> > > 
-> > > I will likely take any vfio-ccw changes together with the other code I
-> > > take through s390-next. I'll add the respective line when I apply.
-> > Ok. Leave this to you. :>
-> > 
-> > > 
-> > > > +
-> > > >  vhost
-> > > >  M: Michael S. Tsirkin <mst@redhat.com>
-> > > >  S: Supported
-> > > 
-> > 
+> We could investigate having both libraries included in QEMU. It seems
+> the API has changed quite a bit so that might be possible although there
+> would be hackage involved in having two different softfloat.h's
+> involved.
 > 
+> This would be useful if we wanted to take a piecemeal approach to
+> updating the library. For example we could just use softfloat3 when we
+> need the newer features (e.g. FP16).
+> 
+> Or we could convert one architecture at a time so each qemu binary links
+> against either a version 2 or version 3 softfloat library. Of course
+> that does run the risk of permanently holding two versions of softfloat
+> in the code if the less maintained guest architectures don't convert
+> quickly.
 
--- 
-Dong Jia Shi
+Another possibility is the code that's shared between the linux kernel 
+(include/math-emu) and glibc (soft-fp).  The glibc version has support for f16 
+while the kernel doesn't.  But the glibc version is LGPL 2.1, which I'd expect 
+to be ok.
+
+It is mildly nasty in that it's a collection of macros, but that's how we 
+managed really good performance with the compiler tech of 15 years ago.  On the 
+other hand, it would be fairly easy to adjust the support macros to achive 
+source compatibility with our current code.
+
+Just a thought...
+
+
+r~
