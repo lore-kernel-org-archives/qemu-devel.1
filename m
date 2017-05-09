@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d81MT-00010y-BJ
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:23:18 -0400
+	(envelope-from <groug@kaod.org>) id 1d81Uy-0003uw-6p
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1d81MO-00088k-7E
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:23:17 -0400
-Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:54566)
+	(envelope-from <groug@kaod.org>) id 1d81Ut-0002Az-A5
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:32:04 -0400
+Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:49253)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d81MO-000874-0a
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:23:12 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1d81Ut-0002AP-3O
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 05:31:59 -0400
 Received: from player786.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 46ABFEE27B
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:23:09 +0200 (CEST)
-Date: Tue, 9 May 2017 11:23:05 +0200
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6B5F6EE19F
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:31:57 +0200 (CEST)
+Date: Tue, 9 May 2017 11:31:52 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170509112305.439c4d85@bahia>
-In-Reply-To: <3c8abd95-b490-1b71-b467-4f00d6ce121d@redhat.com>
+Message-ID: <20170509113152.2522ab33@bahia>
+In-Reply-To: <2f21803c-7b62-0090-3035-0e48622a46e4@redhat.com>
 References: <149399500677.29022.12340124231191204194.stgit@bahia.lan>
-	<149399504137.29022.4985100698645275511.stgit@bahia.lan>
-	<3c8abd95-b490-1b71-b467-4f00d6ce121d@redhat.com>
+	<149399504988.29022.13818395938763860712.stgit@bahia.lan>
+	<2f21803c-7b62-0090-3035-0e48622a46e4@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/iX=/f9Tg0fZGwFXqt3QqHHa";
+	boundary="Sig_/lS6Oq9ug_IO4K7TpC2y.Rcf";
 	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 3/5] 9pfs: local: simplify file opening
+Subject: Re: [Qemu-devel] [PATCH 4/5] 9pfs: local: metadata file for the
+ VirtFS root
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +36,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, =?UTF-8?B?TMOpbw==?= Gaspard <leo@gaspard.io>
 
---Sig_/iX=/f9Tg0fZGwFXqt3QqHHa
-Content-Type: text/plain; charset=US-ASCII
+--Sig_/lS6Oq9ug_IO4K7TpC2y.Rcf
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 5 May 2017 12:01:55 -0500
+On Fri, 5 May 2017 12:11:14 -0500
 Eric Blake <eblake@redhat.com> wrote:
 
 > On 05/05/2017 09:37 AM, Greg Kurz wrote:
-> > All paths in the virtfs directory now start with "./" (except the virtfs
-> > root itself which is exactly ".").
+> > When using the mapped-file security, credentials are stored in a metada=
+ta
+> > directory located in the parent directory. This is okay for all paths w=
+ith
+> > the notable exception of the root path, since we don't want and probably
+> > can't create a metadata directory above the virtfs directory on the hos=
+t.
 > >=20
-> > We hence don't need to skip leading '/' characters anymore, nor to hand=
-le
-> > the empty path case. Also, since virtfs will only ever be supported on
-> > linux+glibc hosts, we can use strchrnul() and come up with a much simpl=
-ier
-> > code to walk through the path elements. And we don't need to dup() the
-> > passed directory fd.
+> > This patch introduces a dedicated metadata file, sitting in the virtfs =
+root
+> > for this purpose. It relies on the fact that the "." name necessarily r=
+efer =20
+>=20
+> s/refer/refers/
+>=20
+
+I'll fix this.
+
+> > to the virtfs root.
 > >=20
+> > As for the metadata directory, we don't want the client to see this fil=
+e.
+> > The current code only cares for readdir() but there are many other plac=
+es
+> > to fix actually. The filtering logic is hence put in a separate functio=
+n.
+> >=20
+> > Before:
+> >=20
+> > # ls -ld
+> > drwxr-xr-x. 3 greg greg 4096 May  5 12:49 .
+> > # chown root.root .
+> > chown: changing ownership of '.': Is a directory
+> > # ls -ld
+> > drwxr-xr-x. 3 greg greg 4096 May  5 12:49 .
+> >=20
+> > After:
+> >=20
+> > # ls -ld
+> > drwxr-xr-x. 3 greg greg 4096 May  5 12:49 .
+> > # chown bin.bin .
+> > # ls -ld
+> > drwxr-xr-x. 3 root root 4096 May  5 12:50 . =20
+>=20
+> Huh? How does chown bin.bin result in root.root? Copy-and-paste error?
+>=20
+
+Oops, I had first tested with bin.bin, then I decided that root.root would
+make more sense but I fumbled when updating the changelog... :-\
+
+> >=20
+> > and from the host:
+> >=20
+> > ls -al .virtfs_metadata_root
+> > -rwx------. 1 greg greg 26 May  5 12:50 .virtfs_metadata_root
+> > $ cat .virtfs_metadata_root
+> > virtfs.uid=3D0
+> > virtfs.gid=3D0 =20
+>=20
+> So what happens if the guest tries to manipulate
+> ./.virtfs_metadata_root? I know you are filtering it so that readdir()
+> and such can't see it, but do you have sane errors for the guest's
+> attempt to circumvent those hidden names?
+>=20
+
+This is addressed by patch 5.
+
+> >=20
+> > Reported-by: L=C3=A9o Gaspard <leo@gaspard.io>
 > > Signed-off-by: Greg Kurz <groug@kaod.org>
 > > ---
-> >  hw/9pfs/9p-local.c |    5 -----
-> >  hw/9pfs/9p-util.c  |   26 ++++++++++----------------
-> >  2 files changed, 10 insertions(+), 21 deletions(-)
+> >  hw/9pfs/9p-local.c |   88 ++++++++++++++++++++++++++++++++++++--------=
+--------
+> >  1 file changed, 61 insertions(+), 27 deletions(-)
 > >=20
-> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> > index 92262f3c3e37..bb6e296df317 100644
-> > --- a/hw/9pfs/9p-local.c
-> > +++ b/hw/9pfs/9p-local.c
-> > @@ -54,11 +54,6 @@ int local_open_nofollow(FsContext *fs_ctx, const cha=
-r *path, int flags,
-> >  {
-> >      LocalData *data =3D fs_ctx->private;
-> > =20
-> > -    /* All paths are relative to the path data->mountfd points to */
-> > -    while (*path =3D=3D '/') {
-> > -        path++;
-> > -    } =20
->=20
-> Is it worth adding any assert()s in place of the deleted code?
->=20
-
-The assert() added by this patch ensures that we never pass an empty
-string to relative_openat_nofollow(), which isn't related to this
-hunk of deleted code... so I'm not sure I understand the question :-\
-
-> Otherwise looks okay.
+> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c =20
 >=20
 
 
---Sig_/iX=/f9Tg0fZGwFXqt3QqHHa
+--Sig_/lS6Oq9ug_IO4K7TpC2y.Rcf
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAlkRinoACgkQAvw66wEB28KJ+QCfS+fRyADG4JPzk0Blc8kHfXVg
-dksAniI9am1dSUkFLCQa+108oVYnX/Sm
-=kFOQ
+iEYEARECAAYFAlkRjIkACgkQAvw66wEB28IDeQCeOEnTYmxpI9zF07htoRihqcwz
+6tsAn1gJWNb9ZuWIPDBqh+tLGePdROce
+=aiKp
 -----END PGP SIGNATURE-----
 
---Sig_/iX=/f9Tg0fZGwFXqt3QqHHa--
+--Sig_/lS6Oq9ug_IO4K7TpC2y.Rcf--
