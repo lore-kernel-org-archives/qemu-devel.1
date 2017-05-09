@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1d80MQ-000375-CC
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:15 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1d80N1-0003br-58
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1d80MO-0004tx-VD
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55488)
+	(envelope-from <eric.auger@redhat.com>) id 1d80Mw-0005Et-5A
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40140)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1d80MO-0004rt-ME
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:08 -0400
+	id 1d80Mv-0005Eg-Ra
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 04:19:42 -0400
 References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
+	<20170505020352.8984-8-bjsdjshi@linux.vnet.ibm.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <40d4de10-4709-0e2b-0df0-3e9dbeddca33@redhat.com>
-Date: Tue, 9 May 2017 10:18:59 +0200
+Message-ID: <d3487524-2ce4-c459-56dd-e09dd8ce447f@redhat.com>
+Date: Tue, 9 May 2017 10:19:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
+In-Reply-To: <20170505020352.8984-8-bjsdjshi@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 06/13] s390x/css: device support for
- s390-ccw passthrough
+Subject: Re: [Qemu-devel] [PATCH v7 07/13] vfio/ccw: vfio based subchannel
+ passthrough driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +30,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, alex.williamson@redhat.com, cornelia.huck@de.ibm.com, agraf@suse.com
+Cc: cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 
-Hi
+Hi,
 
 On 05/05/2017 04:03, Dong Jia Shi wrote:
-> In order to support subchannels pass-through, we introduce a s390
-> subchannel device called "s390-ccw" to hold the real subchannel info.
-> The s390-ccw devices inherit from the abstract CcwDevice which connect
-> to the existing virtual-css-bus.
+> From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 > 
+> We use the IOMMU_TYPE1 of VFIO to realize the subchannels
+> passthrough, implement a vfio based subchannels passthrough
+> driver called "vfio-ccw".
+> 
+> Support qemu parameters in the style of:
+> "-device vfio-ccw,sysfsdev=$mdev_file_path,devno=xx.x.xxxx'
+> 
+> Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
@@ -47,208 +52,238 @@ Thanks
 
 Eric
 > ---
->  hw/s390x/Makefile.objs |   1 +
->  hw/s390x/s390-ccw.c    | 138 +++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/s390-ccw.h    |  38 ++++++++++++++
->  3 files changed, 177 insertions(+)
->  create mode 100644 hw/s390x/s390-ccw.c
->  create mode 100644 hw/s390x/s390-ccw.h
+>  default-configs/s390x-softmmu.mak |   1 +
+>  hw/vfio/Makefile.objs             |   1 +
+>  hw/vfio/ccw.c                     | 187 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/vfio/vfio-common.h     |   1 +
+>  4 files changed, 190 insertions(+)
+>  create mode 100644 hw/vfio/ccw.c
 > 
-> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-> index 41ac4ec..72a3d37 100644
-> --- a/hw/s390x/Makefile.objs
-> +++ b/hw/s390x/Makefile.objs
-> @@ -13,3 +13,4 @@ obj-y += ccw-device.o
->  obj-y += s390-pci-bus.o s390-pci-inst.o
->  obj-y += s390-skeys.o
->  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
-> +obj-y += s390-ccw.o
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+> index 36e15de..5576b0a 100644
+> --- a/default-configs/s390x-softmmu.mak
+> +++ b/default-configs/s390x-softmmu.mak
+> @@ -4,4 +4,5 @@ CONFIG_VIRTIO=y
+>  CONFIG_SCLPCONSOLE=y
+>  CONFIG_S390_FLIC=y
+>  CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
+> +CONFIG_VFIO_CCW=$(CONFIG_LINUX)
+>  CONFIG_WDT_DIAG288=y
+> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+> index 05e7fbb..c3ab909 100644
+> --- a/hw/vfio/Makefile.objs
+> +++ b/hw/vfio/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  ifeq ($(CONFIG_LINUX), y)
+>  obj-$(CONFIG_SOFTMMU) += common.o
+>  obj-$(CONFIG_PCI) += pci.o pci-quirks.o
+> +obj-$(CONFIG_VFIO_CCW) += ccw.o
+>  obj-$(CONFIG_SOFTMMU) += platform.o
+>  obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+>  obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
 > new file mode 100644
-> index 0000000..b1aadcd
+> index 0000000..7d2497c
 > --- /dev/null
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -0,0 +1,138 @@
+> +++ b/hw/vfio/ccw.c
+> @@ -0,0 +1,187 @@
 > +/*
-> + * s390 CCW Assignment Support
-> + *
-> + * Copyright 2017 IBM Corp
-> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2
-> + * or (at your option) any later version. See the COPYING file in the
-> + * top-level directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/sysbus.h"
-> +#include "libgen.h"
-> +#include "hw/s390x/css.h"
-> +#include "hw/s390x/css-bridge.h"
-> +#include "s390-ccw.h"
-> +
-> +static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
-> +                                  char *sysfsdev,
-> +                                  Error **errp)
-> +{
-> +    unsigned int cssid, ssid, devid;
-> +    char dev_path[PATH_MAX] = {0}, *tmp;
-> +
-> +    if (!sysfsdev) {
-> +        error_setg(errp, "No host device provided");
-> +        error_append_hint(errp,
-> +                          "Use -device vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
-> +        return;
-> +    }
-> +
-> +    if (!realpath(sysfsdev, dev_path)) {
-> +        error_setg_errno(errp, errno, "Host device '%s' not found", sysfsdev);
-> +        return;
-> +    }
-> +
-> +    cdev->mdevid = g_strdup(basename(dev_path));
-> +
-> +    tmp = basename(dirname(dev_path));
-> +    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
-> +
-> +    cdev->hostid.cssid = cssid;
-> +    cdev->hostid.ssid = ssid;
-> +    cdev->hostid.devid = devid;
-> +    cdev->hostid.valid = true;
-> +}
-> +
-> +static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
-> +{
-> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
-> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
-> +    DeviceState *parent = DEVICE(ccw_dev);
-> +    BusState *qbus = qdev_get_parent_bus(parent);
-> +    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
-> +    SubchDev *sch;
-> +    int ret;
-> +    Error *err = NULL;
-> +
-> +    s390_ccw_get_dev_info(cdev, sysfsdev, &err);
-> +    if (err) {
-> +        goto out_err_propagate;
-> +    }
-> +
-> +    sch = css_create_sch(ccw_dev->devno, false, cbus->squash_mcss, &err);
-> +    if (!sch) {
-> +        goto out_mdevid_free;
-> +    }
-> +    sch->driver_data = cdev;
-> +
-> +    ccw_dev->sch = sch;
-> +    ret = css_sch_build_schib(sch, &cdev->hostid);
-> +    if (ret) {
-> +        error_setg_errno(&err, -ret, "%s: Failed to build initial schib",
-> +                         __func__);
-> +        goto out_err;
-> +    }
-> +
-> +    ck->realize(ccw_dev, &err);
-> +    if (err) {
-> +        goto out_err;
-> +    }
-> +
-> +    css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid,
-> +                          parent->hotplugged, 1);
-> +    return;
-> +
-> +out_err:
-> +    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
-> +    ccw_dev->sch = NULL;
-> +    g_free(sch);
-> +out_mdevid_free:
-> +    g_free(cdev->mdevid);
-> +out_err_propagate:
-> +    error_propagate(errp, err);
-> +}
-> +
-> +static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
-> +{
-> +    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
-> +    SubchDev *sch = ccw_dev->sch;
-> +
-> +    if (sch) {
-> +        css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
-> +        g_free(sch);
-> +        ccw_dev->sch = NULL;
-> +    }
-> +
-> +    g_free(cdev->mdevid);
-> +}
-> +
-> +static void s390_ccw_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_CLASS(klass);
-> +
-> +    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
-> +    cdc->realize = s390_ccw_realize;
-> +    cdc->unrealize = s390_ccw_unrealize;
-> +}
-> +
-> +static const TypeInfo s390_ccw_info = {
-> +    .name          = TYPE_S390_CCW,
-> +    .parent        = TYPE_CCW_DEVICE,
-> +    .instance_size = sizeof(S390CCWDevice),
-> +    .class_size    = sizeof(S390CCWDeviceClass),
-> +    .class_init    = s390_ccw_class_init,
-> +    .abstract      = true,
-> +};
-> +
-> +static void register_s390_ccw_type(void)
-> +{
-> +    type_register_static(&s390_ccw_info);
-> +}
-> +
-> +type_init(register_s390_ccw_type)
-> diff --git a/hw/s390x/s390-ccw.h b/hw/s390x/s390-ccw.h
-> new file mode 100644
-> index 0000000..b58d8e9
-> --- /dev/null
-> +++ b/hw/s390x/s390-ccw.h
-> @@ -0,0 +1,38 @@
-> +/*
-> + * s390 CCW Assignment Support
+> + * vfio based subchannel assignment support
 > + *
 > + * Copyright 2017 IBM Corp.
 > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 > + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
 > + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
+> + * This work is licensed under the terms of the GNU GPL, version 2 or(at
+> + * your option) any version. See the COPYING file in the top-level
 > + * directory.
 > + */
 > +
-> +#ifndef HW_S390_CCW_H
-> +#define HW_S390_CCW_H
+> +#include <linux/vfio.h>
+> +#include <sys/ioctl.h>
 > +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/vfio/vfio.h"
+> +#include "hw/vfio/vfio-common.h"
+> +#include "hw/s390x/s390-ccw.h"
 > +#include "hw/s390x/ccw-device.h"
 > +
-> +#define TYPE_S390_CCW "s390-ccw"
-> +#define S390_CCW_DEVICE(obj) \
-> +    OBJECT_CHECK(S390CCWDevice, (obj), TYPE_S390_CCW)
-> +#define S390_CCW_DEVICE_CLASS(klass) \
-> +    OBJECT_CLASS_CHECK(S390CCWDeviceClass, (klass), TYPE_S390_CCW)
-> +#define S390_CCW_DEVICE_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(S390CCWDeviceClass, (obj), TYPE_S390_CCW)
+> +#define TYPE_VFIO_CCW "vfio-ccw"
+> +typedef struct VFIOCCWDevice {
+> +    S390CCWDevice cdev;
+> +    VFIODevice vdev;
+> +} VFIOCCWDevice;
 > +
-> +typedef struct S390CCWDevice {
-> +    CcwDevice parent_obj;
-> +    CssDevId hostid;
-> +    char *mdevid;
-> +} S390CCWDevice;
+> +static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+> +{
+> +    vdev->needs_reset = false;
+> +}
 > +
-> +typedef struct S390CCWDeviceClass {
-> +    CCWDeviceClass parent_class;
-> +    void (*realize)(S390CCWDevice *dev, char *sysfsdev, Error **errp);
-> +    void (*unrealize)(S390CCWDevice *dev, Error **errp);
-> +} S390CCWDeviceClass;
+> +/*
+> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
+> + * vfio_ccw device now.
+> + */
+> +struct VFIODeviceOps vfio_ccw_ops = {
+> +    .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
+> +};
 > +
-> +#endif
+> +static void vfio_ccw_reset(DeviceState *dev)
+> +{
+> +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
+> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> +
+> +    ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
+> +}
+> +
+> +static void vfio_put_device(VFIOCCWDevice *vcdev)
+> +{
+> +    g_free(vcdev->vdev.name);
+> +    vfio_put_base_device(&vcdev->vdev);
+> +}
+> +
+> +static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
+> +{
+> +    char *tmp, group_path[PATH_MAX];
+> +    ssize_t len;
+> +    int groupid;
+> +
+> +    tmp = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/%s/iommu_group",
+> +                          cdev->hostid.cssid, cdev->hostid.ssid,
+> +                          cdev->hostid.devid, cdev->mdevid);
+> +    len = readlink(tmp, group_path, sizeof(group_path));
+> +    g_free(tmp);
+> +
+> +    if (len <= 0 || len >= sizeof(group_path)) {
+> +        error_setg(errp, "vfio: no iommu_group found");
+> +        return NULL;
+> +    }
+> +
+> +    group_path[len] = 0;
+> +
+> +    if (sscanf(basename(group_path), "%d", &groupid) != 1) {
+> +        error_setg(errp, "vfio: failed to read %s", group_path);
+> +        return NULL;
+> +    }
+> +
+> +    return vfio_get_group(groupid, &address_space_memory, errp);
+> +}
+> +
+> +static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+> +{
+> +    VFIODevice *vbasedev;
+> +    VFIOGroup *group;
+> +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
+> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
+> +    Error *err = NULL;
+> +
+> +    /* Call the class init function for subchannel. */
+> +    if (cdc->realize) {
+> +        cdc->realize(cdev, vcdev->vdev.sysfsdev, &err);
+> +        if (err) {
+> +            goto out_err_propagate;
+> +        }
+> +    }
+> +
+> +    group = vfio_ccw_get_group(cdev, &err);
+> +    if (!group) {
+> +        goto out_group_err;
+> +    }
+> +
+> +    vcdev->vdev.ops = &vfio_ccw_ops;
+> +    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
+> +    vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
+> +                                       cdev->hostid.ssid, cdev->hostid.devid);
+> +    QLIST_FOREACH(vbasedev, &group->device_list, next) {
+> +        if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
+> +            error_setg(&err, "vfio: subchannel %s has already been attached",
+> +                       vcdev->vdev.name);
+> +            goto out_device_err;
+> +        }
+> +    }
+> +
+> +    if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, &err)) {
+> +        goto out_device_err;
+> +    }
+> +
+> +    return;
+> +
+> +out_device_err:
+> +    vfio_put_group(group);
+> +out_group_err:
+> +    if (cdc->unrealize) {
+> +        cdc->unrealize(cdev, NULL);
+> +    }
+> +out_err_propagate:
+> +    error_propagate(errp, err);
+> +}
+> +
+> +static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> +    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
+> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
+> +    VFIOGroup *group = vcdev->vdev.group;
+> +
+> +    vfio_put_device(vcdev);
+> +    vfio_put_group(group);
+> +
+> +    if (cdc->unrealize) {
+> +        cdc->unrealize(cdev, errp);
+> +    }
+> +}
+> +
+> +static Property vfio_ccw_properties[] = {
+> +    DEFINE_PROP_STRING("sysfsdev", VFIOCCWDevice, vdev.sysfsdev),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static const VMStateDescription vfio_ccw_vmstate = {
+> +    .name = TYPE_VFIO_CCW,
+> +    .unmigratable = 1,
+> +};
+> +
+> +static void vfio_ccw_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->props = vfio_ccw_properties;
+> +    dc->vmsd = &vfio_ccw_vmstate;
+> +    dc->desc = "VFIO-based subchannel assignment";
+> +    dc->realize = vfio_ccw_realize;
+> +    dc->unrealize = vfio_ccw_unrealize;
+> +    dc->reset = vfio_ccw_reset;
+> +}
+> +
+> +static const TypeInfo vfio_ccw_info = {
+> +    .name = TYPE_VFIO_CCW,
+> +    .parent = TYPE_S390_CCW,
+> +    .instance_size = sizeof(VFIOCCWDevice),
+> +    .class_init = vfio_ccw_class_init,
+> +};
+> +
+> +static void register_vfio_ccw_type(void)
+> +{
+> +    type_register_static(&vfio_ccw_info);
+> +}
+> +
+> +type_init(register_vfio_ccw_type)
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index c582de1..9521013 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -45,6 +45,7 @@
+>  enum {
+>      VFIO_DEVICE_TYPE_PCI = 0,
+>      VFIO_DEVICE_TYPE_PLATFORM = 1,
+> +    VFIO_DEVICE_TYPE_CCW = 2,
+>  };
+>  
+>  typedef struct VFIOMmap {
 > 
