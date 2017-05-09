@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d83Gh-0007r1-1l
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:27 -0400
+	(envelope-from <peterx@redhat.com>) id 1d83Go-0007xc-U7
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d83Gg-0007uU-9O
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37494)
+	(envelope-from <peterx@redhat.com>) id 1d83Gk-0007uq-T9
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56898)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d83Gg-0007uK-3J
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:26 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d83Gk-0007um-K9
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 07:25:30 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 01D5F61D24
-	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:25:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9E0FB7F4BA
+	for <qemu-devel@nongnu.org>; Tue,  9 May 2017 11:25:29 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  9 May 2017 19:25:04 +0800
-Message-Id: <1494329105-4411-3-git-send-email-peterx@redhat.com>
+Date: Tue,  9 May 2017 19:25:05 +0800
+Message-Id: <1494329105-4411-4-git-send-email-peterx@redhat.com>
 In-Reply-To: <1494329105-4411-1-git-send-email-peterx@redhat.com>
 References: <1494329105-4411-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 2/3] utils: provide size_to_str()
+Subject: [Qemu-devel] [PATCH v5 3/3] ramblock: add new hmp command "info
+ ramblock"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +33,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-I stole the algorithm from print_type_size(). I didn't generalize it
-since that's using [KM...]iB while here we need [KM...]B to finally
-be able to stands for page sizes (and even more general).
+To dump information about ramblocks. It looks like:
+
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used              Total
+            /objects/mem     2 MB  0x0000000000000000 0x0000000080000000 0x0000000080000000
+                vga.vram     4 KB  0x0000000080060000 0x0000000001000000 0x0000000001000000
+    /rom@etc/acpi/tables     4 KB  0x00000000810b0000 0x0000000000020000 0x0000000000200000
+                 pc.bios     4 KB  0x0000000080000000 0x0000000000040000 0x0000000000040000
+  0000:00:03.0/e1000.rom     4 KB  0x0000000081070000 0x0000000000040000 0x0000000000040000
+                  pc.rom     4 KB  0x0000000080040000 0x0000000000020000 0x0000000000020000
+    0000:00:02.0/vga.rom     4 KB  0x0000000081060000 0x0000000000010000 0x0000000000010000
+   /rom@etc/table-loader     4 KB  0x00000000812b0000 0x0000000000001000 0x0000000000001000
+      /rom@etc/acpi/rsdp     4 KB  0x00000000812b1000 0x0000000000001000 0x0000000000001000
+
+Ramblock is something hidden internally in QEMU implementation, and this
+command should only be used by mostly QEMU developers on RAM stuff. It
+is not a command suitable for QMP interface. So only HMP interface is
+provided for it.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/qemu-common.h |  1 +
- util/cutils.c         | 26 ++++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ exec.c                 | 22 ++++++++++++++++++++++
+ hmp-commands-info.hx   | 14 ++++++++++++++
+ hmp.c                  |  6 ++++++
+ hmp.h                  |  1 +
+ include/exec/ramlist.h |  1 +
+ 5 files changed, 44 insertions(+)
 
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index d218821..d7d0448 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -145,6 +145,7 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
- int parse_debug_env(const char *name, int max, int initial);
+diff --git a/exec.c b/exec.c
+index 50519ae..821bef3 100644
+--- a/exec.c
++++ b/exec.c
+@@ -71,6 +71,8 @@
+ #include "qemu/mmap-alloc.h"
+ #endif
  
- const char *qemu_ether_ntoa(const MACAddr *mac);
-+char *size_to_str(double val);
- void page_size_init(void);
++#include "monitor/monitor.h"
++
+ //#define DEBUG_SUBPAGE
  
- /* returns non-zero if dump is in progress, otherwise zero is
-diff --git a/util/cutils.c b/util/cutils.c
-index 50ad179..5aaf370 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -619,3 +619,29 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
- 
-     return ret;
+ #if !defined(CONFIG_USER_ONLY)
+@@ -1333,6 +1335,26 @@ void qemu_mutex_unlock_ramlist(void)
+     qemu_mutex_unlock(&ram_list.mutex);
  }
-+
-+/*
-+ * Sample output:
-+ *
-+ * 1          -> "1 B"
-+ * 528        -> "0.516 KB"
-+ * 4096       -> "4 KB"
-+ * 2402958    -> "2.29 MB"
-+ * 1073741824 -> "1 GB"
-+ *
-+ * Please free the buffer after use.
-+ */
-+char *size_to_str(double val)
+ 
++void ram_block_dump(Monitor *mon)
 +{
-+    static const char suffixes[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E' };
-+    unsigned long div;
-+    int i;
++    RAMBlock *block;
++    char *psize;
 +
-+    frexp(val, &i);
-+    i /= 10;
-+    assert(i < sizeof(suffixes));
-+    div = 1ULL << (i * 10);
-+
-+    return g_strdup_printf("%0.3g %c%s", val / div,
-+                           suffixes[i], i ? "B" : "");
++    rcu_read_lock();
++    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
++                   "Block Name", "PSize", "Offset", "Used", "Total");
++    RAMBLOCK_FOREACH(block) {
++        psize = size_to_str(block->page_size);
++        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
++                       " 0x%016" PRIx64 "\n", block->idstr, psize,
++                       (uint64_t)block->offset,
++                       (uint64_t)block->used_length,
++                       (uint64_t)block->max_length);
++        g_free(psize);
++    }
++    rcu_read_unlock();
 +}
++
+ #ifdef __linux__
+ /*
+  * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index a53f105..ae16901 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -788,6 +788,20 @@ Display the latest dump status.
+ ETEXI
+ 
+     {
++        .name       = "ramblock",
++        .args_type  = "",
++        .params     = "",
++        .help       = "Display system ramblock information",
++        .cmd        = hmp_info_ramblock,
++    },
++
++STEXI
++@item info ramblock
++@findex ramblock
++Dump all the ramblocks of the system.
++ETEXI
++
++    {
+         .name       = "hotpluggable-cpus",
+         .args_type  = "",
+         .params     = "",
+diff --git a/hmp.c b/hmp.c
+index ab407d6..8369388 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -37,6 +37,7 @@
+ #include "qemu-io.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
++#include "exec/ramlist.h"
+ #include "hw/intc/intc.h"
+ 
+ #ifdef CONFIG_SPICE
+@@ -2563,6 +2564,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
+     qapi_free_DumpQueryResult(result);
+ }
+ 
++void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
++{
++    ram_block_dump(mon);
++}
++
+ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
+ {
+     Error *err = NULL;
+diff --git a/hmp.h b/hmp.h
+index 799fd37..7353b67 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -136,6 +136,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
+ void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
+ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
+ void hmp_info_dump(Monitor *mon, const QDict *qdict);
++void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
+ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ 
+diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
+index f1c6b45..2e2ac6c 100644
+--- a/include/exec/ramlist.h
++++ b/include/exec/ramlist.h
+@@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
+ void ram_block_notify_add(void *host, size_t size);
+ void ram_block_notify_remove(void *host, size_t size);
+ 
++void ram_block_dump(Monitor *mon);
+ 
+ #endif /* RAMLIST_H */
 -- 
 2.7.4
