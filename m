@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d84Q9-0004gQ-3n
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:18 -0400
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d84QT-0004tY-LY
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d84Q5-0004fq-13
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d84Q4-0004fR-Nl
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:12 -0400
-Date: Tue, 9 May 2017 13:39:06 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170509123906.GG1669@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170509112034.23351-1-berrange@redhat.com>
-	<20170509112034.23351-3-berrange@redhat.com>
-	<20170509115228.GA3482@thinpad.lan.raisama.net>
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1d84QO-0004lQ-PB
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34753)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1d84QO-0004l3-GC
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 08:39:32 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v49CdVuf003600
+	for <qemu-devel@nongnu.org>; Tue, 9 May 2017 08:39:31 -0400
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aaqfdk4dy-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 09 May 2017 08:39:30 -0400
+Received: from localhost
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Tue, 9 May 2017 09:39:20 -0300
+Date: Tue, 9 May 2017 09:39:11 -0300
+From: joserz@linux.vnet.ibm.com
+References: <1494274635-11029-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<3f878a42-e19a-9afe-edff-61b942e477dd@ozlabs.ru>
+	<20170509052244.GM25748@umbus.fritz.box>
+	<f98d8946-4153-c461-f8ad-311f56f2aaf2@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170509115228.GA3482@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] i386: expose "TCGTCGTCGTCG" in the
- 0x40000000 CPUID leaf
+In-Reply-To: <f98d8946-4153-c461-f8ad-311f56f2aaf2@ozlabs.ru>
+Message-Id: <20170509123911.GC22292@pacoca>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] Revert "target-ppc/kvm: Enable
+ in-kernel TCE acceleration for multi-tce"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,131 +44,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: David Gibson <david@gibson.dropbear.id.au>, rnsastry@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com, sam.bobroff@au1.ibm.com
 
-On Tue, May 09, 2017 at 08:52:28AM -0300, Eduardo Habkost wrote:
-> On Tue, May 09, 2017 at 12:20:34PM +0100, Daniel P. Berrange wrote:
-> > Currently when running KVM, we expose "KVMKVMKVM\0\0\0" in
-> > the 0x40000000 CPUID leaf. Other hypervisors (VMWare,
-> > HyperV, Xen, BHyve) all do the same thing, which leaves
-> > TCG as the odd one out.
+On Tue, May 09, 2017 at 07:14:19PM +1000, Alexey Kardashevskiy wrote:
+> On 09/05/17 15:22, David Gibson wrote:
+> > On Tue, May 09, 2017 at 07:25:51AM +1000, Alexey Kardashevskiy wrote:
+> >> On 09/05/17 06:17, Jose Ricardo Ziviani wrote:
+> >>> This reverts commit 3dc410ae83e6cb76c81ea30a05d62596092b3165.
+> >>>
+> >>> Booting a radix guest in Power9 with that commit throws a host kernel
+> >>> oops:
+> >>>
+> >>> [17582052553.360178] Unable to handle kernel paging request for data at address 0xe64bb17da64ab078
+> >>> [17582052553.360420] Faulting instruction address: 0xc0000000002c3ddc
+> >>> [17582052553.360533] Oops: Kernel access of bad area, sig: 11 [#1]
+> >>> [17582052553.360643] SMP NR_CPUS=1024
+> >>> [17582052553.360645] NUMA
+> >>> [17582052553.360712] PowerNV
+> >>> [17582052553.360804] Modules linked in: vhost_net vhost tap xt_CHECKSUM ipt_MASQUERADE nf_nat_masquerade_ipv4 ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 nf_conntrack_ipv6 nf_defrag_ipv6 xt_conntrack ip_set nfnetlink ebtable_nat ebtable_broute bridge stp llc ip6table_mangle ip6table_security ip6table_raw iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack libcrc32c iptable_mangle iptable_security iptable_raw ebtable_filter ebtables ip6table_filter ip6_tables ses enclosure scsi_transport_sas ipmi_powernv powernv_op_panel ipmi_devintf ipmi_msghandler nfsd kvm_hv auth_rpcgss oid_registry nfs_acl lockd grace sunrpc kvm tg3 ptp pps_core
+> >>> [17582052553.361797] CPU: 5 PID: 4966 Comm: qemu-system-ppc Not tainted 4.11.0-1.git4a6869a.el7.centos.ppc64le #1
+> >>> [17582052553.361972] task: c0000003c5e90a80 task.stack: c0000003c5f6c000
+> >>> [17582052553.362082] NIP: c0000000002c3ddc LR: c0000000002c3e80 CTR: c0000000000ce2e0
+> >>> [17582052553.362214] REGS: c0000003c5f6f150 TRAP: 0380   Not tainted  (4.11.0-1.git4a6869a.el7.centos.ppc64le)
+> >>> [17582052553.362467] MSR: 9000000000001031 <SF,HV,ME,IR,DR,LE>
+> >>> [17582052553.362480]   CR: 44008024  XER: 20000000
+> >>> [17582052553.362822] CFAR: c0000000002c3e7c SOFTE: 1
+> >>> [17582052553.362822] GPR00: 000000000000018f c0000003c5f6f3d0 c00000000131fd00 0000000000000000
+> >>> [17582052553.362822] GPR04: 0000000000000005 00000000000001ff 0000000000000000 7db04aa67db14ba6
+> >>> [17582052553.362822] GPR08: 264bb17da64ab000 e64bb17da64ab000 0000000000000078 0000000000000000
+> >>> [17582052553.362822] GPR12: c0000003bdb98008 c00000000fdc2d00 c00000000000e148 0000000000000000
+> >>> [17582052553.362822] GPR16: 0000000008000000 0000000020000000 0000000000000000 c0000003c5f6f4c0
+> >>> [17582052553.362822] GPR20: c0000001ffff9440 c0000001fd033280 c0000001fd0342a0 c0000001f24efff8
+> >>> [17582052553.362822] GPR24: 0000000000000200 00000001f24f0000 0000000000000010 0000000000020000
+> >>> [17582052553.362822] GPR28: 0800000000000000 00000001f24f0000 000000007db04aa6 00000000a64ab07d
+> >>> [17582052553.365148] NIP [c0000000002c3ddc] vmalloc_to_page+0x19c/0x220
+> >>> [17582052553.365365] LR [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
+> >>> [17582052553.365582] Call Trace:
+> >>> [17582052553.365720] [c0000003c5f6f3d0] [7265677368657265] 0x7265677368657265 (unreliable)
+> >>> [17582052553.365982] [c0000003c5f6f400] [c0000000002c3e80] vmalloc_to_pfn+0x20/0x50
+> >>> [17582052553.366245] [c0000003c5f6f420] [c0000000000637e8] vmalloc_to_phys+0x28/0x60
+> >>> [17582052553.366508] [c0000003c5f6f450] [c0000000000ce480] kvmppc_rm_h_put_tce_indirect+0x1a0/0x540
+> >>> [17582052553.366812] [c0000003c5f6f590] [c0000000000d0314] hcall_try_real_mode+0x60/0x7c
+> >>> [17582052553.367074] [c0000003c5f6f600] [c0000000000cefac] kvmppc_call_hv_entry+0x8/0x17c
+> >>> [17582052553.367346] [c0000003c5f6f670] [c00800000375a970] __kvmppc_vcore_entry+0x13c/0x1ac [kvm_hv]
+> >>> [17582052553.367652] [c0000003c5f6f840] [c0080000037574a8] kvmppc_run_core+0x788/0x1650 [kvm_hv]
+> >>> [17582052553.367965] [c0000003c5f6fa00] [c0080000037590b8] kvmppc_vcpu_run_hv+0x388/0x1200 [kvm_hv]
+> >>> [17582052553.368287] [c0000003c5f6fb30] [c008000003274684] kvmppc_vcpu_run+0x34/0x50 [kvm]
+> >>> [17582052553.368558] [c0000003c5f6fb50] [c008000003270b54] kvm_arch_vcpu_ioctl_run+0x114/0x2a0 [kvm]
+> >>> [17582052553.368870] [c0000003c5f6fbd0] [c008000003263dd8] kvm_vcpu_ioctl+0x5e8/0x7c0 [kvm]
+> >>> [17582052553.369132] [c0000003c5f6fd40] [c000000000350b50] do_vfs_ioctl+0xd0/0x8c0
+> >>> [17582052553.369395] [c0000003c5f6fde0] [c000000000351414] SyS_ioctl+0xd4/0xf0
+> >>> [17582052553.369615] [c0000003c5f6fe30] [c00000000000b8e0] system_call+0x38/0xfc
+> >>> [17582052553.369875] Instruction dump:
+> >>> [17582052553.370011] 53dfc42e 790807c6 394affff 7d08fb78 78638402 79081764 7d4a07b4 7c6a5038
+> >>> [17582052553.370281] 7908f5e6 7d094b78 794a1f24 38600000 <7d2a482a> 7924cfe3 41820040 79260022
+> >>> [17582052553.370599] ---[ end trace 9470442ed18ae727 ]---
+> >>>
+> >>> As soon as we identify and fix the issue that's causing such problem
+> >>> I'll re-send the referred patch to re-enable TCE.
 > > 
-> > The CPUID signature is used by software to detect which
-> > virtual environment they are running in and (potentially)
-> > change behaviour in certain ways. For example, systemd
-> > supports a ConditionVirtualization= setting in unit files.
-> > The virt-what command can also report the virt type it is
-> > running on
+> > This is a serious host kernel security bug.  Modifying qemu not to
+> > trigger it is not a fix; it's not even a workaround.
 > > 
-> > Currently both these apps have to resort to custom hacks
-> > like looking for 'fw-cfg' entry in the /proc/device-tree
-> > file to identify TCG.
+> >> The proper fix is to change the host kernel to not advertise
+> >> KVM_CAP_SPAPR_MULTITCE for radix guest.
 > > 
-> > This change thus proposes a signature "TCGTCGTCGTCG" to be
-> > reported when running under TCG.
-> > 
-> > To hide this, the -cpu option tcg-cpuid=off can be used.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  include/hw/i386/pc.h |  5 +++++
-> >  target/i386/cpu.c    | 22 ++++++++++++++++++++++
-> >  target/i386/cpu.h    |  1 +
-> >  3 files changed, 28 insertions(+)
-> > 
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index f278b3a..3aec60f 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -376,6 +376,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> >  #define PC_COMPAT_2_8 \
-> >      HW_COMPAT_2_8 \
-> >      {\
-> > +        .driver   = TYPE_X86_CPU,\
-> > +        .property = "tcg-cpuid",\
-> > +        .value    = "off",\
-> > +    },\
-> > +    {\
-> >          .driver   = "kvmclock",\
-> >          .property = "x-mach-use-reliable-get-clock",\
-> >          .value    = "off",\
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 8cb4af4..ee4f515 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -2627,12 +2627,15 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> >      CPUState *cs = CPU(cpu);
-> >      uint32_t pkg_offset;
-> >      uint32_t limit;
-> > +    uint32_t signature[3];
-> >  
-> >      /* Calculate & apply limits for different index ranges */
-> >      if (index >= 0xC0000000) {
-> >          limit = env->cpuid_xlevel2;
-> >      } else if (index >= 0x80000000) {
-> >          limit = env->cpuid_xlevel;
-> > +    } else if (index & 0x40000000) {
+> > That doesn't sound like a fix either, though it might be part of one.
 > 
-> Why did you decide to use (index & 0x40000000) instead of
-> (index >= 0x40000000)? The latter would be more consistent with
-> the rest of the code.
+> My point was that if a feature is known not to work, it should not be
+> advertised rather than disabling the feature entirely in QEMU, even for the
+> time being. vmalloc_to_pfn() needs a fix anyway.
 
-It was just a mistake.
-
-> > +        limit = 0x40000000;
-> 
-> This is not strictly wrong, but it will make CPUID[0x40000001]
-> return arbitrary bits (CPUID[env->cpuid_level]). Guests aren't
-> supposed to look at CPUID[0x40000001] without checking
-> CPUID[0x40000000] first, but probably it's safer to set
-> limit = 0x40000001 and return all-zeroes on CPUID[0x40000001],
-> just in case.
-
-Ok
-
-> >      } else {
-> >          limit = env->cpuid_level;
-> >      }
-> > @@ -2867,6 +2870,24 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> >          }
-> >          break;
-> >      }
-> > +    case 0x40000000:
-> > +        /*
-> > +         * CPUID code in kvm_arch_init_vcpu() ignores stuff
-> > +         * set here, but we restrict to TCG none the less.
-> > +         */
-> > +        if (tcg_enabled() && cpu->expose_tcg) {
-> > +            memcpy(signature, "TCGTCGTCGTCG", 12);
-> > +            *eax = 0;
-> 
-> On both KVM and Hyper-V, CPUID[0x40000000].EAX is the maximum
-> CPUID function. KVM has the additional exception that eax=0 on
-> the output is interpreted as 0x40000001.
-> 
-> Setting this to 0x40000000 or 0x40000001 would make things more
-> consistent for guests. Setting it to 0x40000001 would make it
-> safer (see my other comment above).
-
-Yep, makes sense.
-
+You're right, I'm going to address this by asking for kernel experts to
+look after it.
 > 
 > 
-> > +            *ebx = signature[0];
-> > +            *ecx = signature[1];
-> > +            *edx = signature[2];
-> > +        } else {
-> > +            *eax = 0;
-> > +            *ebx = 0;
-> > +            *ecx = 0;
-> > +            *edx = 0;
-> > +        }
-> > +        break;
+> > What happens if qemu ignores what's advertised and tries to use the
+> > multitce functions anyway?  The point is you have an easy way for
+> > userspace or a guest to crash the host kernel, which needs to be fixed
+> > as a matter of urgency.
+> 
+> Correct.
+> 
+> > It's not clear to me why the multitce functions would break on radix
+> > anyway.  Isn't the TCE table format independent of the main MMU?
+> 
+> 
+> It is from "rmap = (void *) vmalloc_to_phys(rmap);" to lock the page with
+> TCEs in the H_PUT_TCE_INDIRECT handler, this is irrelevant to the TCE
+> format. I am wondering why only this place fails though as
+> vmalloc_to_phys() is used quite often, may be less on radix tree though.
+> 
+Yes, let's go through the right path. Please, disregard this patch.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks for all the hints.
+> 
+> 
+> -- 
+> Alexey
+> 
