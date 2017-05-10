@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1d8Nvn-0002gp-1E
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 05:29:16 -0400
+	(envelope-from <famz@redhat.com>) id 1d8O3I-00059x-01
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 05:37:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1d8Nvj-0008AY-Sz
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 05:29:15 -0400
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Wed, 10 May 2017 12:29:03 +0300
-Message-Id: <20170510092903.23649-1-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH] Revert "hw/pci: disable pci-bridge's shpc by
- default"
+	(envelope-from <famz@redhat.com>) id 1d8O3E-0003He-Ow
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 05:37:00 -0400
+Date: Wed, 10 May 2017 17:36:51 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170510093651.GA11394@lemon.lan>
+References: <20170510092333.8890-1-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170510092333.8890-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH] virtio: Unregister memory
+ listener when unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,52 +24,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, marcel@redhat.com, mst@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-This reverts commit dc0ae767700c156894e36fab89a745a2dc4173de.
+On Wed, 05/10 17:23, Fam Zheng wrote:
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  hw/virtio/virtio.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 03592c5..a7741f4 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2515,6 +2515,7 @@ static void virtio_device_unrealize(DeviceState *dev, Error **errp)
+>          }
+>      }
+>  
+> +    memory_listener_unregister(&vdev->listener);
+>      g_free(vdev->bus_name);
+>      vdev->bus_name = NULL;
+>  }
+> -- 
+> 2.9.3
+> 
+> 
 
-Disabling the shpc controller has an undesired side effect.
-The PCI bridge remains with no attached devices at boot time,
-and the guest operating systems do not all allocate any resources
-for it leaving the bridge unusable. Note that the behaviour
-is dictated by the pci bridge specification.
+Oops, I think the one in the .finalize() callback should be removed meanwhile.
 
-Revert the commit and leave the shpc controller even if is not
-actually used by any architecture. Slot 0 remains unusable at boot time.
-
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- hw/pci-bridge/pci_bridge_dev.c | 2 +-
- include/hw/compat.h            | 4 ----
- 2 files changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-index 647ad80..5dbd933 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -163,7 +163,7 @@ static Property pci_bridge_dev_properties[] = {
-     DEFINE_PROP_ON_OFF_AUTO(PCI_BRIDGE_DEV_PROP_MSI, PCIBridgeDev, msi,
-                             ON_OFF_AUTO_AUTO),
-     DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
--                    PCI_BRIDGE_DEV_F_SHPC_REQ, false),
-+                    PCI_BRIDGE_DEV_F_SHPC_REQ, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 846b90e..eff021f 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -18,10 +18,6 @@
-         .property = "old-multiple-chip-handling",\
-         .value    = "on",\
-     },{\
--        .driver   = "pci-bridge",\
--        .property = "shpc",\
--        .value    = "on",\
--    },{\
-         .driver   = TYPE_PCI_DEVICE,\
-         .property = "x-pcie-extcap-init",\
-         .value    = "off",\
--- 
-2.9.3
+Fam
