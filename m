@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1d8OTq-00079j-6p
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:04:27 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d8OUl-0007eC-0W
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1d8OTm-0005Bh-0E
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:04:26 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:51092)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1d8OTl-0005B8-Jj
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:04:21 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170508211953.28017-1-eblake@redhat.com>
-	<20170508211953.28017-5-eblake@redhat.com>
-In-Reply-To: <20170508211953.28017-5-eblake@redhat.com>
-Date: Wed, 10 May 2017 13:04:13 +0300
-Message-ID: <004801d2c974$c6e0db60$54a29220$@ru>
+	(envelope-from <no-reply@patchew.org>) id 1d8OUh-0005TA-1J
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:05:23 -0400
+Resent-Message-Id: <E1d8OUh-0005TA-1J@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21327)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d8OUg-0005Sz-QO
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:05:18 -0400
+In-Reply-To: <20170510083259.3900-1-xiaoguangrong@tencent.com>
+Message-ID: <149441068611.297.14906206472390970426@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v7 4/5] shutdown: Preserve shutdown cause
- through replay
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 10 May 2017 03:04:46 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] mc146818rtc: fix Windows VM clock
+ faster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,137 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Eric Blake' <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>
+To: guangrong.xiao@gmail.com
+Cc: famz@redhat.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, xiaoguangrong@tencent.com, yunfangtai@tencent.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-
-> -----Original Message-----
-> From: Eric Blake [mailto:eblake@redhat.com]
-> Sent: Tuesday, May 09, 2017 12:20 AM
-> To: qemu-devel@nongnu.org
-> Cc: armbru@redhat.com; berrange@redhat.com; alistair.francis@xilinx.com; Pavel Dovgalyuk;
-> Paolo Bonzini
-> Subject: [PATCH v7 4/5] shutdown: Preserve shutdown cause through replay
-> 
-> With the recent addition of ShutdownCause, we want to be able to pass
-> a cause through any shutdown request, and then faithfully replay that
-> cause when later replaying the same sequence.  The easiest way is to
-> expand the reply event mechanism to track a series of values for
-> EVENT_SHUTDOWN, one corresponding to each value of ShutdownCause.
-> 
-> We are free to change the replay stream as needed, since there are
-> already no guarantees about being able to use a replay stream by
-> any other version of qemu than the one that generated it.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-
-Reviewed-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-
-> 
-> ---
-> v7: rebase to context
-> v6: new patch
-> ---
->  include/sysemu/replay.h  |  3 ++-
->  include/sysemu/sysemu.h  |  1 +
->  replay/replay-internal.h |  3 ++-
->  vl.c                     |  3 +--
->  replay/replay.c          | 10 +++++-----
->  5 files changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-> index f1c0712..fa14d0e 100644
-> --- a/include/sysemu/replay.h
-> +++ b/include/sysemu/replay.h
-> @@ -13,6 +13,7 @@
->   */
-> 
->  #include "qapi-types.h"
-> +#include "sysemu.h"
-> 
->  /* replay clock kinds */
->  enum ReplayClockKind {
-> @@ -98,7 +99,7 @@ int64_t replay_read_clock(ReplayClockKind kind);
->  /* Events */
-> 
->  /*! Called when qemu shutdown is requested. */
-> -void replay_shutdown_request(void);
-> +void replay_shutdown_request(ShutdownCause cause);
->  /*! Should be called at check points in the execution.
->      These check points are skipped, if they were not met.
->      Saves checkpoint in the SAVE mode and validates in the PLAY mode.
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index fe197aa..e0cbab1 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -46,6 +46,7 @@ typedef enum ShutdownCause {
->                                       turns that into a shutdown */
->      SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
->                                       that into a shutdown */
-> +    SHUTDOWN_CAUSE__MAX,
->  } ShutdownCause;
-> 
->  void vm_start(void);
-> diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-> index ed66ed8..3ebb199 100644
-> --- a/replay/replay-internal.h
-> +++ b/replay/replay-internal.h
-> @@ -22,8 +22,9 @@ enum ReplayEvents {
->      EVENT_EXCEPTION,
->      /* for async events */
->      EVENT_ASYNC,
-> -    /* for shutdown request */
-> +    /* for shutdown requests, range allows recovery of ShutdownCause */
->      EVENT_SHUTDOWN,
-> +    EVENT_SHUTDOWN_LAST = EVENT_SHUTDOWN + SHUTDOWN_CAUSE__MAX,
->      /* for character device write event */
->      EVENT_CHAR_WRITE,
->      /* for character device read all event */
-> diff --git a/vl.c b/vl.c
-> index 2d546460..65487d9 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1820,8 +1820,7 @@ void qemu_system_killed(int signal, pid_t pid)
->  void qemu_system_shutdown_request(ShutdownCause reason)
->  {
->      trace_qemu_system_shutdown_request(reason);
-> -    /* FIXME - add a parameter to let replay preserve reason */
-> -    replay_shutdown_request();
-> +    replay_shutdown_request(reason);
->      shutdown_requested = reason;
->      qemu_notify_event();
->  }
-> diff --git a/replay/replay.c b/replay/replay.c
-> index 604fa4f..ff58a5a 100644
-> --- a/replay/replay.c
-> +++ b/replay/replay.c
-> @@ -49,10 +49,10 @@ bool replay_next_event_is(int event)
->              res = true;
->          }
->          switch (replay_state.data_kind) {
-> -        case EVENT_SHUTDOWN:
-> +        case EVENT_SHUTDOWN ... EVENT_SHUTDOWN_LAST:
->              replay_finish_event();
-> -            /* FIXME - store actual reason */
-> -            qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_ERROR);
-> +            qemu_system_shutdown_request(replay_state.data_kind -
-> +                                         EVENT_SHUTDOWN);
->              break;
->          default:
->              /* clock, time_t, checkpoint and other events */
-> @@ -171,11 +171,11 @@ bool replay_has_interrupt(void)
->      return res;
->  }
-> 
-> -void replay_shutdown_request(void)
-> +void replay_shutdown_request(ShutdownCause cause)
->  {
->      if (replay_mode == REPLAY_MODE_RECORD) {
->          replay_mutex_lock();
-> -        replay_put_event(EVENT_SHUTDOWN);
-> +        replay_put_event(EVENT_SHUTDOWN + cause);
->          replay_mutex_unlock();
->      }
->  }
-> --
-> 2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA1MTAwODMyNTkuMzkwMC0xLXhpYW9ndWFuZ3JvbmdAdGVuY2VudC5jb20KVHlwZTogc2VyaWVz
+ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC81XSBtYzE0NjgxOHJ0YzogZml4IFdp
+bmRvd3MgVk0gY2xvY2sgZmFzdGVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
+IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25l
+dyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDUxMDA5MjMzMy44ODkwLTEtZmFtekByZWRoYXQu
+Y29tIC0+IHBhdGNoZXcvMjAxNzA1MTAwOTIzMzMuODg5MC0xLWZhbXpAcmVkaGF0LmNvbQogKiBb
+bmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNTEwMDkyOTAzLjIzNjQ5LTEtbWFyY2VsQHJl
+ZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDUxMDA5MjkwMy4yMzY0OS0xLW1hcmNlbEByZWRoYXQu
+Y29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTczOWNlOSBtYzE0NjgxOHJ0Yzog
+ZW1icmFjZSBhbGwgeDg2IHNwZWNpZmljIGNvZGUKMWFhMmM1ZSBtYzE0NjgxOHJ0YzogZHJvcCB1
+bm5lY2Vzc2FyeSAnI2lmZGVmIFRBUkdFVF9JMzg2JwowYWI1MzEyIG1jMTQ2ODE4cnRjOiBlbnN1
+cmUgTE9TVF9USUNLX1BPTElDWV9TTEVXIGlzIG9ubHkgZW5hYmxlZCBvbiBUQVJHRVRfSTM4Ngpm
+OTBiM2JhIG1jMTQ2ODE4cnRjOiBwcmVjaXNlbHkgY291bnQgdGhlIGNsb2NrIGZvciBwZXJpb2Rp
+YyB0aW1lcgo5NWYwMTNjIG1jMTQ2ODE4cnRjOiB1cGRhdGUgcGVyaW9kaWMgdGltZXIgb25seSBp
+ZiBpdCBpcyBuZWVkZWQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTog
+bWMxNDY4MThydGM6IHVwZGF0ZSBwZXJpb2RpYyB0aW1lciBvbmx5IGlmIGl0IGlzIG5lZWRlZC4u
+LgpDaGVja2luZyBQQVRDSCAyLzU6IG1jMTQ2ODE4cnRjOiBwcmVjaXNlbHkgY291bnQgdGhlIGNs
+b2NrIGZvciBwZXJpb2RpYyB0aW1lci4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nhcnkg
+Zm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMzA6IEZJTEU6IGh3L3RpbWVyL21jMTQ2
+ODE4cnRjLmM6MjE2OgorICAgICAgICBpZiAocy0+bG9zdF90aWNrX3BvbGljeSA9PSBMT1NUX1RJ
+Q0tfUE9MSUNZX1NMRVcpIHsKWy4uLl0KKyAgICAgICAgfSBlbHNlClsuLi5dCgp0b3RhbDogMSBl
+cnJvcnMsIDAgd2FybmluZ3MsIDE4NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzU6IG1jMTQ2ODE4cnRjOiBlbnN1
+cmUgTE9TVF9USUNLX1BPTElDWV9TTEVXIGlzIG9ubHkgZW5hYmxlZCBvbiBUQVJHRVRfSTM4Ni4u
+LgpDaGVja2luZyBQQVRDSCA0LzU6IG1jMTQ2ODE4cnRjOiBkcm9wIHVubmVjZXNzYXJ5ICcjaWZk
+ZWYgVEFSR0VUX0kzODYnLi4uCkNoZWNraW5nIFBBVENIIDUvNTogbWMxNDY4MThydGM6IGVtYnJh
+Y2UgYWxsIHg4NiBzcGVjaWZpYyBjb2RlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
