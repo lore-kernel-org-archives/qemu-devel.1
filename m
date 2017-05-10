@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8Lco-0002Qm-Ev
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcq-0002SF-8c
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcm-0007nD-Mv
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Lco-0007os-MM
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:32 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 10 May 2017 17:01:11 +1000
-Message-Id: <20170510070115.13063-19-david@gibson.dropbear.id.au>
+Date: Wed, 10 May 2017 17:01:09 +1000
+Message-Id: <20170510070115.13063-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20170510070115.13063-1-david@gibson.dropbear.id.au>
 References: <20170510070115.13063-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 18/22] target/ppc: Enable RADIX mmu mode for
- pseries TCG guest
+Subject: [Qemu-devel] [PULL 16/22] target/ppc: Change tlbie invalid fields
+ for POWER9 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +25,54 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bhara
 
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Now that we have added all the infrastructure we can enable a pseries TCG
-guest to use radix.
+The tlbie[l] instructions are used to invalidate TLB entries used to cache
+address translations.
 
-In order to do this we have to add the appropriate bits to the
-ibm,arch-vec-5-platform-support vector to represent that we support both
-hash and radix mmu models.
+In ISAv3.00 (POWER9) more fields were added to the tblie[l] instructions
+which were previously invalid. We don't care about any of these new fields
+since we just invalidate the whole world anyway but we need to not
+cause an illegal instruction exception when the instructions are called.
+We also don't want to allow an older processor to have these fields set
+since that would be invalid.
 
-A radix guest can now be booted in pseries tcg mode by specifying:
--cpu POWER9
-
-Note that we assume hash, that is we allocate a hpt, until a guest tells
-us otherwise via a H_REGISTER_PROCESS_TABLE call with radix specified - in
-which case we free the hpt. If we were right and the guest is hash then
-there's nothing for us to do.
+Add a new GEN_HANDLER for the ISAv3 instructions with the correct invalid
+mask. These will only be generated to a POWER9 processor for now based on
+the instruction flag. Also remove the PPC_MEM_TLBIE instruction flag from
+the POWER9 processor definition to ensure the old tlbie isn't generated.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ target/ppc/translate.c      | 2 ++
+ target/ppc/translate_init.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 80d12d0..e2dc77c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -855,6 +855,8 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
-  * option vector 5: */
- static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
- {
-+    PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
-+
-     char val[2 * 3] = {
-         24, 0x00, /* Hash/Radix, filled in below. */
-         25, 0x00, /* Hash options: Segment Tables == no, GTSE == no. */
-@@ -870,8 +872,13 @@ static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
-             val[1] = 0x00; /* Hash */
-         }
-     } else {
--        /* TODO: TCG case, hash */
--        val[1] = 0x00;
-+        if (first_ppc_cpu->env.mmu_model & POWERPC_MMU_V3) {
-+            /* V3 MMU supports both hash and radix (with dynamic switching) */
-+            val[1] = 0xC0;
-+        } else {
-+            /* Otherwise we can only do hash */
-+            val[1] = 0x00;
-+        }
-     }
-     _FDT(fdt_setprop(fdt, chosen, "ibm,arch-vec-5-platform-support",
-                      val, sizeof(val)));
-@@ -2101,8 +2108,8 @@ static void ppc_spapr_init(MachineState *machine)
-     }
- 
-     spapr_ovec_set(spapr->ov5, OV5_FORM1_AFFINITY);
--    if (kvmppc_has_cap_mmu_radix()) {
--        /* KVM always allows GTSE with radix... */
-+    if (!kvm_enabled() || kvmppc_has_cap_mmu_radix()) {
-+        /* KVM and TCG always allow GTSE with radix... */
-         spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
-     }
-     /* ... but not with hash (currently). */
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 1ce6ab1..c0cd64d 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6578,6 +6578,8 @@ GEN_HANDLER(tlbia, 0x1F, 0x12, 0x0B, 0x03FFFC01, PPC_MEM_TLBIA),
+  * different ISA versions */
+ GEN_HANDLER(tlbiel, 0x1F, 0x12, 0x08, 0x001F0001, PPC_MEM_TLBIE),
+ GEN_HANDLER(tlbie, 0x1F, 0x12, 0x09, 0x001F0001, PPC_MEM_TLBIE),
++GEN_HANDLER_E(tlbiel, 0x1F, 0x12, 0x08, 0x00100001, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(tlbie, 0x1F, 0x12, 0x09, 0x00100001, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER(tlbsync, 0x1F, 0x16, 0x11, 0x03FFF801, PPC_MEM_TLBSYNC),
+ #if defined(TARGET_PPC64)
+ GEN_HANDLER(slbia, 0x1F, 0x12, 0x0F, 0x031FFC01, PPC_SLBI),
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 9b048cd..fda30b0 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8960,7 +8960,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+                        PPC_FLOAT_EXT |
+                        PPC_CACHE | PPC_CACHE_ICBI | PPC_CACHE_DCBZ |
+                        PPC_MEM_SYNC | PPC_MEM_EIEIO |
+-                       PPC_MEM_TLBIE | PPC_MEM_TLBSYNC |
++                       PPC_MEM_TLBSYNC |
+                        PPC_64B | PPC_64BX | PPC_ALTIVEC |
+                        PPC_SEGMENT_64B | PPC_SLBI |
+                        PPC_POPCNTB | PPC_POPCNTWD |
 -- 
 2.9.3
