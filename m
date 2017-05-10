@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d8J6E-0003JW-CZ
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 00:19:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Kao-0007vx-0F
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 01:55:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d8J6A-0002n1-Ds
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 00:19:42 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 10 May 2017 06:19:32 +0200
-Message-Id: <1494389972-26471-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] target/ppc: Avoid printing wrong aliases in
- CPU help text
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Kaj-0007uj-ST
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 01:55:22 -0400
+Received: from ozlabs.org ([103.22.144.67]:53001)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d8Kai-0007uX-P3
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 01:55:17 -0400
+Date: Wed, 10 May 2017 15:55:07 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170510055507.GT25748@umbus.fritz.box>
+References: <1493977730-20581-1-git-send-email-pbonzini@redhat.com>
+	<20170508061359.GH25748@umbus.fritz.box>
+	<e1b235c4-14c1-549f-45bf-c5175401f949@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Nx8xdmI2KD3LNVVP"
+Content-Disposition: inline
+In-Reply-To: <e1b235c4-14c1-549f-45bf-c5175401f949@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] ppc: xics: fix compilation with CentOS 6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,116 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, dgibson@redhat.com, stefanha@redhat.com
 
-When running with KVM, we update the "family" CPU alias to point
-to the right host CPU type, so that it for example possible to
-use "-cpu POWER8" on a POWER8NVL host. However, the function for
-printing the list of available CPU models is called earlier than
-the KVM setup code, so the output of "-cpu help" is wrong in that
-case. Since it would be somewhat ugly anyway to have different
-help texts depending on whether "-enable-kvm" has been specified
-or not, we should better always print the same text, so fix this
-issue by printing "alias for preferred XXX CPU" instead.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2:
- - Rebased to master
+--Nx8xdmI2KD3LNVVP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- target/ppc/cpu.h            |  1 +
- target/ppc/kvm.c            | 12 ------------
- target/ppc/translate_init.c | 27 +++++++++++++++++++++++++--
- 3 files changed, 26 insertions(+), 14 deletions(-)
+On Mon, May 08, 2017 at 09:25:19AM +0200, Paolo Bonzini wrote:
+>=20
+>=20
+> On 08/05/2017 08:13, David Gibson wrote:
+> >>
+> >> 	Please start including Docker-based tests in your pre-pull-request te=
+sts.
+> > Um.. is there some doco on how to execute these.  I tried "make
+> > docker-test" and "make docker-image" and they both just seem to hang
+> > at:
+> >=20
+> > umbus:~/src/qemu (ppc-for-2.10)$ make docker-image
+> >   BUILD   travis
+> >=20
+> > strace shows docker blocked on a futex.
+>=20
+> Try "make docker-test-full@centos6 V=3D1".
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index e0ff041..c2d3b8d 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1221,6 +1221,7 @@ static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
- 
- PowerPCCPUClass *ppc_cpu_class_by_pvr(uint32_t pvr);
- PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr);
-+PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc);
- 
- struct PPCVirtualHypervisor {
-     Object parent;
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8574c36..07f0d1f 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2413,18 +2413,6 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
-     return cap_mmu_hash_v3;
- }
- 
--static PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
--{
--    ObjectClass *oc = OBJECT_CLASS(pcc);
--
--    while (oc && !object_class_is_abstract(oc)) {
--        oc = object_class_get_parent(oc);
--    }
--    assert(oc);
--
--    return POWERPC_CPU_CLASS(oc);
--}
--
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
- {
-     uint32_t host_pvr = mfpvr();
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index e82e3e6..4332b7c 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10285,6 +10285,18 @@ PowerPCCPU *cpu_ppc_init(const char *cpu_model)
-     return POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
- }
- 
-+PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
-+{
-+    ObjectClass *oc = OBJECT_CLASS(pcc);
-+
-+    while (oc && !object_class_is_abstract(oc)) {
-+        oc = object_class_get_parent(oc);
-+    }
-+    assert(oc);
-+
-+    return POWERPC_CPU_CLASS(oc);
-+}
-+
- /* Sort by PVR, ordering special case "host" last. */
- static gint ppc_cpu_list_compare(gconstpointer a, gconstpointer b)
- {
-@@ -10316,6 +10328,7 @@ static void ppc_cpu_list_entry(gpointer data, gpointer user_data)
-     ObjectClass *oc = data;
-     CPUListState *s = user_data;
-     PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
-+    DeviceClass *family = DEVICE_CLASS(ppc_cpu_get_family_class(pcc));
-     const char *typename = object_class_get_name(oc);
-     char *name;
-     int i;
-@@ -10338,8 +10351,18 @@ static void ppc_cpu_list_entry(gpointer data, gpointer user_data)
-         if (alias_oc != oc) {
-             continue;
-         }
--        (*s->cpu_fprintf)(s->file, "PowerPC %-16s (alias for %s)\n",
--                          alias->alias, name);
-+        /*
-+         * If running with KVM, we might update the family alias later, so
-+         * avoid printing the wrong alias here and use "preferred" instead
-+         */
-+        if (strcmp(alias->alias, family->desc) == 0) {
-+            (*s->cpu_fprintf)(s->file,
-+                              "PowerPC %-16s (alias for preferred %s CPU)\n",
-+                              alias->alias, family->desc);
-+        } else {
-+            (*s->cpu_fprintf)(s->file, "PowerPC %-16s (alias for %s)\n",
-+                              alias->alias, name);
-+        }
-     }
-     g_free(name);
- }
--- 
-1.8.3.1
+So, the problem I hit above was just that it was taking time to
+download all the image data - without V=3D1, it wasn't showing progress
+so it looked like it wasn't doing anything.
+
+With that done, I get further, but it's still a bit of a pain in the
+arse.  If I run as a normal user things fail, because the sudo
+authorization runs out before a test is complete.  If I run as root it
+screws up permissions on my git tree so I have to re-chown before
+operating as a normal user again.  And testing the full set of images
+takes an age - I've been running this all day, and AFAICT it's barely
+through half the available images.  If I'm testing for multiple days
+it means what I'm finally sending a pullreq for is no longer against
+the latest master, which I don't really like.
+
+Any ideas to make this less painful?
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Nx8xdmI2KD3LNVVP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZEqs4AAoJEGw4ysog2bOS2+0QAJnRD3PjLODAJ/6Ba5qQuq/e
+xCsVWSt9O50Zvsm/WYa8cer1YEq6PXbuBaS4AnJYeHTrXzk8DxDb+PXpMWVeJ7+A
+0Y/IZpZZqqUvUkQ8tRriIGzxL4W7AngyNVY3ki5SVH/6okbLqSy5PKlgGAuNnm++
+RmEumz8GAGJ9anG+OcfRw9SvFLRThEbPDLg0OzqcOyYT86YGZzSCDZ3gF3EClLcJ
+daxKLXikDRjOi8/6Wr/yEX+/L3Kfytz/q9lAuAE3FDj/8kKV5QSKasj8Y4O0yK+j
+fZA/qNeDr7tVla0gP1jNzo/YNWNzthBPakkdSYEknGraQbu5hHmk1R8jGT6O2A9E
+aReLJzHTzQaV/J8ugLsD3OWt9edTIiNmauwaMzX75Fc8oOYzFklkkssVsSBWLmEL
+LHjwHci8j9Uhr2mbR562qgTKMMSUpnJY+L2YwfuQ1PoM7IVzd3Zb6gVFJDhMsxA+
+ez4Y5R/rGUCjwAtKdU68Jlwgo7eNfbXpJwoI9gTAImTqE760bKrY2hzM+1w95zsT
+6b2QPSGeUQQf+DCsYSp6nvxbZ1XduApSFsjV2kXDTd+kZws8F3lvH+GdW7rAl5e/
+mtCeMA5i/6y3wKsCN3kIcWFWiUYDgKEFbKawPPvPlXbPR3AWfJX0hWBHifbIRdRH
+aMw+UiRG+jtMIIU9DsZV
+=1thn
+-----END PGP SIGNATURE-----
+
+--Nx8xdmI2KD3LNVVP--
