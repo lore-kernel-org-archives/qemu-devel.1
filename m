@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcq-0002SF-8c
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcs-0002Uo-6g
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8Lco-0007os-MM
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcq-0007qy-N2
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:34 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 10 May 2017 17:01:09 +1000
-Message-Id: <20170510070115.13063-17-david@gibson.dropbear.id.au>
+Date: Wed, 10 May 2017 17:01:15 +1000
+Message-Id: <20170510070115.13063-23-david@gibson.dropbear.id.au>
 In-Reply-To: <20170510070115.13063-1-david@gibson.dropbear.id.au>
 References: <20170510070115.13063-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 16/22] target/ppc: Change tlbie invalid fields
- for POWER9 support
+Subject: [Qemu-devel] [PULL 22/22] pnv: Fix build failures on some host
+ platforms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +23,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, sjitindarsingh@gmail.com, mark.cave-ayland@ilande.co.uk, sam.bobroff@au1.ibm.com, nikunj@linux.vnet.ibm.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+This makes some changes to fix build failures on the 'min-glib' docker
+image, and maybe other platforms with a buildchain that's less tolerant
+about duplicated typedefs.
 
-The tlbie[l] instructions are used to invalidate TLB entries used to cache
-address translations.
-
-In ISAv3.00 (POWER9) more fields were added to the tblie[l] instructions
-which were previously invalid. We don't care about any of these new fields
-since we just invalidate the whole world anyway but we need to not
-cause an illegal instruction exception when the instructions are called.
-We also don't want to allow an older processor to have these fields set
-since that would be invalid.
-
-Add a new GEN_HANDLER for the ISAv3 instructions with the correct invalid
-mask. These will only be generated to a POWER9 processor for now based on
-the instruction flag. Also remove the PPC_MEM_TLBIE instruction flag from
-the POWER9 processor definition to ensure the old tlbie isn't generated.
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c      | 2 ++
- target/ppc/translate_init.c | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ include/hw/ppc/pnv.h     | 3 +--
+ include/hw/ppc/pnv_lpc.h | 4 ++--
+ include/hw/ppc/pnv_occ.h | 4 ++--
+ 3 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 1ce6ab1..c0cd64d 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6578,6 +6578,8 @@ GEN_HANDLER(tlbia, 0x1F, 0x12, 0x0B, 0x03FFFC01, PPC_MEM_TLBIA),
-  * different ISA versions */
- GEN_HANDLER(tlbiel, 0x1F, 0x12, 0x08, 0x001F0001, PPC_MEM_TLBIE),
- GEN_HANDLER(tlbie, 0x1F, 0x12, 0x09, 0x001F0001, PPC_MEM_TLBIE),
-+GEN_HANDLER_E(tlbiel, 0x1F, 0x12, 0x08, 0x00100001, PPC_NONE, PPC2_ISA300),
-+GEN_HANDLER_E(tlbie, 0x1F, 0x12, 0x09, 0x00100001, PPC_NONE, PPC2_ISA300),
- GEN_HANDLER(tlbsync, 0x1F, 0x16, 0x11, 0x03FFF801, PPC_MEM_TLBSYNC),
- #if defined(TARGET_PPC64)
- GEN_HANDLER(slbia, 0x1F, 0x12, 0x0F, 0x031FFC01, PPC_SLBI),
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 9b048cd..fda30b0 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8960,7 +8960,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                        PPC_FLOAT_EXT |
-                        PPC_CACHE | PPC_CACHE_ICBI | PPC_CACHE_DCBZ |
-                        PPC_MEM_SYNC | PPC_MEM_EIEIO |
--                       PPC_MEM_TLBIE | PPC_MEM_TLBSYNC |
-+                       PPC_MEM_TLBSYNC |
-                        PPC_64B | PPC_64BX | PPC_ALTIVEC |
-                        PPC_SEGMENT_64B | PPC_SLBI |
-                        PPC_POPCNTB | PPC_POPCNTWD |
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index c1288f9..9c5437d 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -21,6 +21,7 @@
+ 
+ #include "hw/boards.h"
+ #include "hw/sysbus.h"
++#include "hw/ipmi/ipmi.h"
+ #include "hw/ppc/pnv_lpc.h"
+ #include "hw/ppc/pnv_psi.h"
+ #include "hw/ppc/pnv_occ.h"
+@@ -118,8 +119,6 @@ typedef struct PnvChipClass {
+ #define POWERNV_MACHINE(obj) \
+     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
+ 
+-typedef struct IPMIBmc IPMIBmc;
+-
+ typedef struct PnvMachineState {
+     /*< private >*/
+     MachineState parent_obj;
+diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
+index ccf969a..023b4f0 100644
+--- a/include/hw/ppc/pnv_lpc.h
++++ b/include/hw/ppc/pnv_lpc.h
+@@ -19,12 +19,12 @@
+ #ifndef _PPC_PNV_LPC_H
+ #define _PPC_PNV_LPC_H
+ 
++#include "hw/ppc/pnv_psi.h"
++
+ #define TYPE_PNV_LPC "pnv-lpc"
+ #define PNV_LPC(obj) \
+      OBJECT_CHECK(PnvLpcController, (obj), TYPE_PNV_LPC)
+ 
+-typedef struct PnvPsi PnvPsi;
+-
+ typedef struct PnvLpcController {
+     DeviceState parent;
+ 
+diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
+index f8ec330..82f299d 100644
+--- a/include/hw/ppc/pnv_occ.h
++++ b/include/hw/ppc/pnv_occ.h
+@@ -19,11 +19,11 @@
+ #ifndef _PPC_PNV_OCC_H
+ #define _PPC_PNV_OCC_H
+ 
++#include "hw/ppc/pnv_psi.h"
++
+ #define TYPE_PNV_OCC "pnv-occ"
+ #define PNV_OCC(obj) OBJECT_CHECK(PnvOCC, (obj), TYPE_PNV_OCC)
+ 
+-typedef struct PnvPsi PnvPsi;
+-
+ typedef struct PnvOCC {
+     DeviceState xd;
+ 
 -- 
 2.9.3
