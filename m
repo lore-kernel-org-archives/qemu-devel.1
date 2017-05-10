@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1d8Qrw-0004W9-4x
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 08:37:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1d8RUF-0004F8-TP
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 09:17:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1d8Qrs-0008TP-Ut
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 08:37:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1d8RUB-0003TK-SZ
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 09:17:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34450)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d8RUB-0003T6-J3
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 09:16:59 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170505201128.12099-1-ehabkost@redhat.com>
+	<20170505201128.12099-2-ehabkost@redhat.com>
+Date: Wed, 10 May 2017 15:16:56 +0200
+In-Reply-To: <20170505201128.12099-2-ehabkost@redhat.com> (Eduardo Habkost's
+	message of "Fri, 5 May 2017 17:11:26 -0300")
+Message-ID: <87efvw26nr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <e87597ba-4759-76a5-7b0d-3297d2eb8f79@amsat.org>
-References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
-	<1494348286-10253-2-git-send-email-sundeep.lkml@gmail.com>
-	<e87597ba-4759-76a5-7b0d-3297d2eb8f79@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Wed, 10 May 2017 18:07:23 +0530
-Message-ID: <CALHRZuqfqjEWszkvVQSWAKR5zVbhD36=+Qt_DsVykk41cihO1Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [Qemu-devel PATCH 1/5] msf2: Add
- Smartfusion2 System timer
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] visitor: Add 'supported_qtypes'
+ parameter to visit_start_alternate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,516 +29,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <mlureau@redhat.com>
 
-Hi Phil,
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-On Wed, May 10, 2017 at 3:11 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
-> Hi Subbaraya, nice work!
+> This will allow visitors to make decisions based on the supported qtypes
+> of a given alternate type. The new parameter can replace the old
+> 'promote_int' argument, as qobject-input-visitor can simply check if
+> QTYPE_QINT is set in supported_qtypes.
 >
-> The timer you are modeling is the mss_timer, which is in particular used
-in
-> the smartfusion2, I'd rather name it mss_timer.c so it can be reused by
-> other SoC models.
->
-Ok I will change all other file names also to mss. Do I need to change type
-names
-also to mss?
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-> I added few comments.
->
->
-> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
->>
->> Modelled System Timer in Microsemi's Smartfusion2 Soc.
->> Timer has two 32bit down counters and two interrupts.
->>
->> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> ---
->>  hw/timer/Makefile.objs        |   1 +
->>  hw/timer/msf2-timer.c         | 252
->> ++++++++++++++++++++++++++++++++++++++++++
->>  include/hw/timer/msf2-timer.h |  85 ++++++++++++++
->>  3 files changed, 338 insertions(+)
->>  create mode 100644 hw/timer/msf2-timer.c
->>  create mode 100644 include/hw/timer/msf2-timer.h
->>
->> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
->> index dd6f27e..bd1ff15 100644
->> --- a/hw/timer/Makefile.objs
->> +++ b/hw/timer/Makefile.objs
->> @@ -41,3 +41,4 @@ common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D
->> stm32f2xx_timer.o
->>  common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o
->>
->>  common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
->> +common-obj-$(CONFIG_MSF2) +=3D msf2-timer.o
->> diff --git a/hw/timer/msf2-timer.c b/hw/timer/msf2-timer.c
->> new file mode 100644
->> index 0000000..466faa6
->> --- /dev/null
->> +++ b/hw/timer/msf2-timer.c
->> @@ -0,0 +1,252 @@
->> +/*
->> + * Timer block model of Microsemi SmartFusion2.
->> + *
->> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtainin=
-g
->> a copy
->> + * of this software and associated documentation files (the "Software")=
-,
->> to deal
->> + * in the Software without restriction, including without limitation th=
-e
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software i=
-s
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS
->> IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "hw/timer/msf2-timer.h"
->> +
->> +#ifndef MSF2_TIMER_ERR_DEBUG
->> +#define MSF2_TIMER_ERR_DEBUG  0
->> +#endif
->> +
->> +#define DB_PRINT_L(lvl, fmt, args...) do { \
->> +    if (MSF2_TIMER_ERR_DEBUG >=3D lvl) { \
->> +        qemu_log("%s: " fmt, __func__, ## args); \
->> +    } \
->> +} while (0);
->> +
->> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
->> +
->> +static void timer_update_irq(struct Msf2Timer *st)
->> +{
->> +    bool isr, ier;
->> +
->> +    isr =3D !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
->> +    ier =3D !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
->> +
->> +    qemu_set_irq(st->irq, (ier && isr));
->> +}
->> +
->> +static void timer_update(struct Msf2Timer *st)
->> +{
->> +    uint64_t count;
->> +
->> +    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL)) {
->> +        ptimer_stop(st->ptimer);
->> +        return;
->> +    }
->> +
->> +    count =3D st->regs[R_TIM_LOADVAL];
->> +    ptimer_set_limit(st->ptimer, count, 1);
->> +    ptimer_run(st->ptimer, 1);
->> +}
->> +
->> +static uint64_t
->> +timer_read(void *opaque, hwaddr addr, unsigned int size)
->> +{
->> +    MSF2TimerState *t =3D opaque;
->> +    struct Msf2Timer *st;
->> +    uint32_t ret =3D 0;
->> +    int timer =3D 0;
->> +    int isr;
->> +    int ier;
->> +
->> +    addr >>=3D 2;
->> +    /*
->> +     * Two independent timers has same base address.
->> +     * Based on addr passed figure out which timer is being used.
->> +     */
->> +    if (addr >=3D R_TIM1_MAX) {
->> +        timer =3D 1;
->> +        addr -=3D R_TIM1_MAX;
->> +    }
->> +
->> +    st =3D &t->timers[timer];
->> +
->> +    switch (addr) {
->> +    case R_TIM_VAL:
->> +        ret =3D ptimer_get_count(st->ptimer);
->> +        break;
->> +
->> +    case R_TIM_MIS:
->> +        isr =3D !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
->> +        ier =3D !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
->> +        ret =3D ier & isr;
->> +        break;
->> +
->> +    default:
->> +        if (addr < ARRAY_SIZE(st->regs)) {
->> +            ret =3D st->regs[addr];
->> +        } else {
->> +            qemu_log_mask(LOG_GUEST_ERROR,
->> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n",
-__func__,
->> +                         addr * 4);
->> +        }
->> +        break;
->> +    }
->> +
->> +    DB_PRINT("timer=3D%d 0x%" HWADDR_PRIx "=3D0x%" PRIx32 "\n", timer, =
-addr
-*
->> 4,
->> +            ret);
->> +    return ret;
->> +}
->> +
->> +static void
->> +timer_write(void *opaque, hwaddr addr,
->> +            uint64_t val64, unsigned int size)
->> +{
->> +    MSF2TimerState *t =3D opaque;
->> +    struct Msf2Timer *st;
->> +    int timer =3D 0;
->> +    uint32_t value =3D val64;
->> +
->> +    addr >>=3D 2;
->> +    /*
->> +     * Two independent timers has same base address.
->> +     * Based on addr passed figure out which timer is being used.
->> +     */
->> +    if (addr >=3D R_TIM1_MAX) {
->> +        timer =3D 1;
->> +        addr -=3D R_TIM1_MAX;
->
->
-> This is only valid if addr < (NUM_TIMERS * R_TIM1_MAX).
->
->
-Yes you are right. My intention was to treat any address greater than
-R_TIM1_MAX as timer 2 and below default case in switch would take care of
-addresses which are greater than 2 *  R_TIM1_MAX. As you mentioned there
-is problem with 12..20. If guest sends more than 20 say 24 then 24 - 6 =3D =
-18
-which will be treated as valid but it is not. Thanks for pointing it.
+Might conflict with Marc-Andr=C3=A9's work, which I haven't reviewed, yet.
+Should be easy enough to resolve, though.
 
->> +    }
->> +
->> +    st =3D &t->timers[timer];
->> +
->> +    DB_PRINT("addr=3D0x%" HWADDR_PRIx " val=3D0x%" PRIx32 " (timer=3D%d=
-)\n",
->> addr * 4,
->> +            value, timer);
->> +
->> +    switch (addr) {
->> +    case R_TIM_CTRL:
->> +        st->regs[R_TIM_CTRL] =3D value;
->> +        timer_update(st);
->> +        break;
->> +
->> +    case R_TIM_RIS:
->> +        if (value & TIMER_RIS_ACK) {
->> +            st->regs[R_TIM_RIS] &=3D ~TIMER_RIS_ACK;
->> +        }
->> +        break;
->> +
->> +    case R_TIM_LOADVAL:
->> +        st->regs[R_TIM_LOADVAL] =3D value;
->> +        if (st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL) {
->> +            timer_update(st);
->> +        }
->> +        break;
->> +
->> +    case R_TIM_BGLOADVAL:
->> +        st->regs[R_TIM_BGLOADVAL] =3D value;
->> +        st->regs[R_TIM_LOADVAL] =3D value;
->> +        break;
->> +
->> +    case R_TIM_VAL:
->> +    case R_TIM_MIS:
->> +        break;
->> +
->> +    case R_TIM_MODE:
+> ---
+> Changes v1 -> v2:
+> * Change supported_qtypes to uint32_t (Eric Blake)
+> * Replace assert() on all generated visitor functions with a
+>   single QEMU_BUILD_BUG_ON() on visit_start_alternate()
+> * Extra spaces around "|" on generated visitor code
+>   (Eric Blake)
+> * Don't use bitops.h and just use (1U << QTYPE_FOO)
+>   (Markus Armbruster)
+> ---
+>  include/qapi/visitor.h       |  5 +++--
+>  include/qapi/visitor-impl.h  |  2 +-
+>  scripts/qapi-visit.py        | 12 ++++++------
+>  qapi/qapi-visit-core.c       |  9 ++++++---
+>  qapi/qapi-clone-visitor.c    |  3 ++-
+>  qapi/qapi-dealloc-visitor.c  |  3 ++-
+>  qapi/qobject-input-visitor.c |  6 ++++--
+>  qapi/trace-events            |  2 +-
+>  8 files changed, 25 insertions(+), 17 deletions(-)
 >
->
-> This case is never reached, if the guest wanted to access register 21,
-since
-> 21 >=3D R_TIM1_MAX you have now addr =3D 21 - R_TIM1_MAX =3D 15.
->
-Yes. I overlooked it. Will change it.
+> diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+> index 1a1b62012b..8f5a223714 100644
+> --- a/include/qapi/visitor.h
+> +++ b/include/qapi/visitor.h
+> @@ -408,7 +408,8 @@ void visit_end_list(Visitor *v, void **list);
+>   * the qtype of the next thing to be visited, stored in (*@obj)->type.
+>   * Other visitors will leave @obj unchanged.
+>   *
+> - * If @promote_int, treat integers as QTYPE_FLOAT.
+> + * @supported_qtypes is a bit mask indicating which QTypes are supported
+> + * by the alternate.
+>   *
+>   * If successful, this must be paired with visit_end_alternate() with
+>   * the same @obj to clean up, even if visiting the contents of the
+> @@ -416,7 +417,7 @@ void visit_end_list(Visitor *v, void **list);
+>   */
+>  void visit_start_alternate(Visitor *v, const char *name,
+>                             GenericAlternate **obj, size_t size,
+> -                           bool promote_int, Error **errp);
+> +                           uint32_t supported_qtypes, Error **errp);
+>=20=20
+>  /*
+>   * Finish visiting an alternate type.
+> diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
+> index e87709db5c..8afcde0f5d 100644
+> --- a/include/qapi/visitor-impl.h
+> +++ b/include/qapi/visitor-impl.h
+> @@ -71,7 +71,7 @@ struct Visitor
+>       * optional for output visitors. */
+>      void (*start_alternate)(Visitor *v, const char *name,
+>                              GenericAlternate **obj, size_t size,
+> -                            bool promote_int, Error **errp);
+> +                            uint32_t supported_qtypes, Error **errp);
+>=20=20
+>      /* Optional, needed for dealloc visitor */
+>      void (*end_alternate)(Visitor *v, void **obj);
+> diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
+> index 5737aefa05..41c54982e2 100644
+> --- a/scripts/qapi-visit.py
+> +++ b/scripts/qapi-visit.py
+> @@ -161,20 +161,20 @@ void visit_type_%(c_name)s(Visitor *v, const char *=
+name, %(c_name)s *obj, Error
+>=20=20
+>=20=20
+>  def gen_visit_alternate(name, variants):
+> -    promote_int =3D 'true'
+> +    qtypes =3D ['(1U << %s)' % (var.type.alternate_qtype())
+> +              for var in variants.variants]
+> +    supported_qtypes =3D ' | '.join(qtypes)
+>      ret =3D ''
+> -    for var in variants.variants:
+> -        if var.type.alternate_qtype() =3D=3D 'QTYPE_QINT':
+> -            promote_int =3D 'false'
 
->> +        if (value & TIMER_MODE) {
->> +            qemu_log_mask(LOG_UNIMP, "64-bit mode not supported\n");
->
->
-> No need of trailing '\n', be more specific, something like:
->
->     qemu_log_mask(LOG_UNIMP, TYPE_MSF2_TIMER ": 64-bit mode not
-supported");
->
-Ok. Will change it.
->> +        }
->> +        break;
->> +
->> +    default:
->
->
-> Once the issue "addr -=3D R_TIM1_MAX" is fixed, this default will catch
-> registers 12 .. 20 silently while there are unimplemented!
-> I'd rather catch them altogether and log some "64-bit mode not supported"=
-.
->
-Ok. I will change it.
+Note for later:
 
->> +        if (addr < ARRAY_SIZE(st->regs)) {
->> +            st->regs[addr] =3D value;
->> +        } else {
->> +            qemu_log_mask(LOG_GUEST_ERROR,
->> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n",
-__func__,
->> +                         addr * 4);
->> +        }
->> +        break;
->> +    }
->> +    timer_update_irq(st);
->
->
-> Here if addr >=3D (NUM_TIMERS * R_TIM1_MAX) you still update Timer1 IRQ,
-while
-> this is unharmful right now this is likely to be break later.
->
-As long as Interrupt status register and Interrupt enable register are not
-modified calling timer_update_irq will not harm. Am I missing something
-here?
->> +}
->> +
->> +static const MemoryRegionOps timer_ops =3D {
->> +    .read =3D timer_read,
->> +    .write =3D timer_write,
->> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
->> +    .valid =3D {
->> +        .min_access_size =3D 4,
->
->
-> I believe min_access_size =3D 1 is valid for any APB device.
->
->
-Ok. I followed Xilinx soft IP models while writing this. I am really not
-sure it is mandatory to put access_size. Can i remove it?
+* promote_int is true if and only if we have no integer variant.
 
->> +        .max_access_size =3D 4
->> +    }
->> +};
->> +
->> +static void timer_hit(void *opaque)
->> +{
->> +    struct Msf2Timer *st =3D opaque;
->> +
->> +    st->regs[R_TIM_RIS] |=3D TIMER_RIS_ACK;
->> +
->> +    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ONESHOT)) {
->> +        timer_update(st);
->> +    }
->> +    timer_update_irq(st);
->> +}
->> +
->> +static void msf2_timer_init(Object *obj)
->> +{
->> +    MSF2TimerState *t =3D MSF2_TIMER(obj);
->> +    int i;
->> +
->> +    /* Init all the ptimers.  */
->> +    t->timers =3D g_malloc0((sizeof t->timers[0]) * NUM_TIMERS);
->> +    for (i =3D 0; i < NUM_TIMERS; i++) {
->> +        struct Msf2Timer *st =3D &t->timers[i];
->> +
->> +        st->bh =3D qemu_bh_new(timer_hit, st);
->> +        st->ptimer =3D ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
->> +        ptimer_set_freq(st->ptimer, t->freq_hz);
->> +        sysbus_init_irq(SYS_BUS_DEVICE(obj), &st->irq);
->> +    }
->> +
->> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t,
->> TYPE_MSF2_TIMER,
->> +                          R_TIM_MAX * 4);
->> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &t->mmio);
->> +}
->> +
->> +static Property msf2_timer_properties[] =3D {
->> +    DEFINE_PROP_UINT32("clock-frequency", MSF2TimerState, freq_hz,
->> +                       MSF2_TIMER_FREQ),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->> +static void msf2_timer_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +
->> +    dc->props =3D msf2_timer_properties;
->> +}
->> +
->> +static const TypeInfo msf2_timer_info =3D {
->> +    .name          =3D TYPE_MSF2_TIMER,
->> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->> +    .instance_size =3D sizeof(MSF2TimerState),
->> +    .instance_init =3D msf2_timer_init,
->> +    .class_init    =3D msf2_timer_class_init,
->> +};
->> +
->> +static void msf2_timer_register_types(void)
->> +{
->> +    type_register_static(&msf2_timer_info);
->> +}
->> +
->> +type_init(msf2_timer_register_types)
->> diff --git a/include/hw/timer/msf2-timer.h
-b/include/hw/timer/msf2-timer.h
->> new file mode 100644
->> index 0000000..10eb2f8
->> --- /dev/null
->> +++ b/include/hw/timer/msf2-timer.h
->> @@ -0,0 +1,85 @@
->> +/*
->> + * Microsemi SmartFusion2 Timer.
->> + *
->> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtainin=
-g
->> a copy
->> + * of this software and associated documentation files (the "Software")=
-,
->> to deal
->> + * in the Software without restriction, including without limitation th=
-e
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software i=
-s
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS
->> IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#ifndef HW_MSF2_TIMER_H
->> +#define HW_MSF2_TIMER_H
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/sysbus.h"
->> +#include "hw/ptimer.h"
->> +#include "sysemu/sysemu.h"
->> +#include "qemu/log.h"
->> +
->> +#define TYPE_MSF2_TIMER     "msf2-timer"
->> +#define MSF2_TIMER(obj)     OBJECT_CHECK(MSF2TimerState, \
->> +                              (obj), TYPE_MSF2_TIMER)
->> +
->> +/*
->> + * There are two 32-bit down counting timers.
->> + * Timers 1 and 2 can be concatenated into a single 64-bit Timer
->> + * that operates either in Periodic mode or in One-shot mode.
->> + * Writing 1 to the TIM64_MODE register bit 0 sets the Timers in 64-bit
->> mode.
->> + * In 64-bit mode, writing to the 32-bit registers has no effect.
->> + * Similarly, in 32-bit mode, writing to the 64-bit mode registers
->> + * has no effect. Only two 32-bit timers are supported currently.
->> + */
->> +#define NUM_TIMERS        2
->> +
->> +#define MSF2_TIMER_FREQ   (83 * 1000000)
->
->
-> I can not find this value, can you point me to the datasheet? It seems So=
-C
-> specific to me.
->
-It is configured in Microsemi Libero. The SOM kit from Emcraft comes with
-this default setting.
-I guess this property should be set and passed from board file and not from
-SoC.
-Am I correct?
-Can I attach the datasheet to this thread?
+* supported_qtypes is the set of the variants' qtypes
 
-Thank you,
-Sundeep
->
->> +
->> +#define R_TIM_VAL         0
->> +#define R_TIM_LOADVAL     1
->> +#define R_TIM_BGLOADVAL   2
->> +#define R_TIM_CTRL        3
->> +#define R_TIM_RIS         4
->> +#define R_TIM_MIS         5
->> +#define R_TIM1_MAX        6
->> +
->> +#define R_TIM_MODE       21
->> +#define R_TIM_MAX        22 /* including 64-bit timer registers */
->> +
->> +#define TIMER_CTRL_ENBL     (1 << 0)
->> +#define TIMER_CTRL_ONESHOT  (1 << 1)
->> +#define TIMER_CTRL_INTR     (1 << 2)
->> +#define TIMER_RIS_ACK       (1 << 0)
->> +#define TIMER_RST_CLR       (1 << 6)
->> +#define TIMER_MODE          (1 << 0)
->> +
->> +struct Msf2Timer {
->> +    QEMUBH *bh;
->> +    ptimer_state *ptimer;
->> +
->> +    uint32_t regs[R_TIM_MAX];
->> +    qemu_irq irq;
->> +};
->> +
->> +typedef struct MSF2TimerState {
->> +    SysBusDevice parent_obj;
->> +
->> +    MemoryRegion mmio;
->> +    uint32_t freq_hz;
->> +    struct Msf2Timer *timers;
->> +} MSF2TimerState;
->> +
->> +#endif /* HW_MSF2_TIMER_H */
->
->
-> Regards,
->
-> Phil.
+>=20=20
+>      ret +=3D mcgen('''
+>=20=20
+>  void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **ob=
+j, Error **errp)
+>  {
+>      Error *err =3D NULL;
+> +    uint32_t supported_qtypes =3D %(supported_qtypes)s;
+
+The initializer is of type unsigned.  I'd make the variable unsigned,
+too.  Not worth a respin, though.
+
+>=20=20
+>      visit_start_alternate(v, name, (GenericAlternate **)obj, sizeof(**ob=
+j),
+> -                          %(promote_int)s, &err);
+> +                          supported_qtypes, &err);
+>      if (err) {
+>          goto out;
+>      }
+> @@ -183,7 +183,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
+me, %(c_name)s **obj, Error
+>      }
+>      switch ((*obj)->type) {
+>  ''',
+> -                 c_name=3Dc_name(name), promote_int=3Dpromote_int)
+> +                 c_name=3Dc_name(name), supported_qtypes=3Dsupported_qty=
+pes)
+>=20=20
+>      for var in variants.variants:
+>          ret +=3D mcgen('''
+> diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+> index 43a09d147d..8d62914393 100644
+> --- a/qapi/qapi-visit-core.c
+> +++ b/qapi/qapi-visit-core.c
+> @@ -106,15 +106,18 @@ void visit_end_list(Visitor *v, void **obj)
+>=20=20
+>  void visit_start_alternate(Visitor *v, const char *name,
+>                             GenericAlternate **obj, size_t size,
+> -                           bool promote_int, Error **errp)
+> +                           uint32_t supported_qtypes,
+> +                           Error **errp)
+>  {
+>      Error *err =3D NULL;
+>=20=20
+> +    QEMU_BUILD_BUG_ON(QTYPE__MAX > 32);
+
+Aha, I guess this is why you picked uint32_t.  Nevermind then.
+
+> +
+>      assert(obj && size >=3D sizeof(GenericAlternate));
+>      assert(!(v->type & VISITOR_OUTPUT) || *obj);
+> -    trace_visit_start_alternate(v, name, obj, size, promote_int);
+> +    trace_visit_start_alternate(v, name, obj, size, supported_qtypes);
+>      if (v->start_alternate) {
+> -        v->start_alternate(v, name, obj, size, promote_int, &err);
+> +        v->start_alternate(v, name, obj, size, supported_qtypes, &err);
+>      }
+>      if (v->type & VISITOR_INPUT) {
+>          assert(v->start_alternate && !err !=3D !*obj);
+> diff --git a/qapi/qapi-clone-visitor.c b/qapi/qapi-clone-visitor.c
+> index 34086cbfc0..2e40da5981 100644
+> --- a/qapi/qapi-clone-visitor.c
+> +++ b/qapi/qapi-clone-visitor.c
+> @@ -70,7 +70,8 @@ static GenericList *qapi_clone_next_list(Visitor *v, Ge=
+nericList *tail,
+>=20=20
+>  static void qapi_clone_start_alternate(Visitor *v, const char *name,
+>                                         GenericAlternate **obj, size_t si=
+ze,
+> -                                       bool promote_int, Error **errp)
+> +                                       uint32_t supported_qtypes,
+> +                                       Error **errp)
+>  {
+>      qapi_clone_start_struct(v, name, (void **)obj, size, errp);
+>  }
+> diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
+> index e39457bc79..23b64c21a4 100644
+> --- a/qapi/qapi-dealloc-visitor.c
+> +++ b/qapi/qapi-dealloc-visitor.c
+> @@ -38,7 +38,8 @@ static void qapi_dealloc_end_struct(Visitor *v, void **=
+obj)
+>=20=20
+>  static void qapi_dealloc_start_alternate(Visitor *v, const char *name,
+>                                           GenericAlternate **obj, size_t =
+size,
+> -                                         bool promote_int, Error **errp)
+> +                                         uint32_t supported_qtypes,
+> +                                         Error **errp)
+>  {
+>  }
+>=20=20
+> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+> index 865e948ac0..25997ee816 100644
+> --- a/qapi/qobject-input-visitor.c
+> +++ b/qapi/qobject-input-visitor.c
+> @@ -338,7 +338,8 @@ static void qobject_input_check_list(Visitor *v, Erro=
+r **errp)
+>=20=20
+>  static void qobject_input_start_alternate(Visitor *v, const char *name,
+>                                            GenericAlternate **obj, size_t=
+ size,
+> -                                          bool promote_int, Error **errp)
+> +                                          uint32_t supported_qtypes,
+> +                                          Error **errp)
+>  {
+>      QObjectInputVisitor *qiv =3D to_qiv(v);
+>      QObject *qobj =3D qobject_input_get_object(qiv, name, false, errp);
+> @@ -349,7 +350,8 @@ static void qobject_input_start_alternate(Visitor *v,=
+ const char *name,
+>      }
+>      *obj =3D g_malloc0(size);
+>      (*obj)->type =3D qobject_type(qobj);
+> -    if (promote_int && (*obj)->type =3D=3D QTYPE_QINT) {
+
+Old condition: the alternate has no integer variant, and we got an
+integer value.
+
+> +    if (!(supported_qtypes & (1U << QTYPE_QINT)) &&
+> +        (*obj)->type =3D=3D QTYPE_QINT) {
+
+New condition: same.  Good.
+
+>          (*obj)->type =3D QTYPE_QFLOAT;
+>      }
+>  }
+> diff --git a/qapi/trace-events b/qapi/trace-events
+> index 339cacf0ad..b15a55b797 100644
+> --- a/qapi/trace-events
+> +++ b/qapi/trace-events
+> @@ -11,7 +11,7 @@ visit_next_list(void *v, void *tail, size_t size) "v=3D=
+%p tail=3D%p size=3D%zu"
+>  visit_check_list(void *v) "v=3D%p"
+>  visit_end_list(void *v, void *obj) "v=3D%p obj=3D%p"
+>=20=20
+> -visit_start_alternate(void *v, const char *name, void *obj, size_t size,=
+ bool promote_int) "v=3D%p name=3D%s obj=3D%p size=3D%zu promote_int=3D%d"
+> +visit_start_alternate(void *v, const char *name, void *obj, size_t size,=
+ uint32_t supported_qtypes) "v=3D%p name=3D%s obj=3D%p size=3D%zu supported=
+_qtypes=3D0x%x"
+>  visit_end_alternate(void *v, void *obj) "v=3D%p obj=3D%p"
+>=20=20
+>  visit_optional(void *v, const char *name, bool *present) "v=3D%p name=3D=
+%s present=3D%p"
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
