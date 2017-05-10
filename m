@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52981)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8P1i-0001CC-Sd
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:39:27 -0400
+	id 1d8P6x-0002k5-2r
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8P1e-000279-Jb
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:39:26 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33389)
+	id 1d8P6t-0003S3-6D
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:44:51 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35087)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8P1e-00026z-Eu
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:39:22 -0400
-Received: by mail-qk0-x243.google.com with SMTP id o85so4014918qkh.0
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 03:39:22 -0700 (PDT)
+	id 1d8P6t-0003Rz-1m
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:44:47 -0400
+Received: by mail-qk0-x241.google.com with SMTP id k74so4009936qke.2
+	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 03:44:46 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170509180715.22910-1-rth@twiddle.net>
-	<20170509180715.22910-4-rth@twiddle.net>
+References: <1494309644-18743-1-git-send-email-peterx@redhat.com>
+	<1494309644-18743-3-git-send-email-peterx@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <acc911e4-63e4-ca7e-70c6-33dfa8090095@amsat.org>
-Date: Wed, 10 May 2017 07:39:18 -0300
+Message-ID: <3b81dd1e-7a9b-280f-c915-815c1913a181@amsat.org>
+Date: Wed, 10 May 2017 07:44:43 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170509180715.22910-4-rth@twiddle.net>
+In-Reply-To: <1494309644-18743-3-git-send-email-peterx@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/6] target/s390x: Diagnose
- specification exception for atomics
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] msix: trace control bit write op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,73 +34,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 05/09/2017 03:07 PM, Richard Henderson wrote:
-> All of the interlocked access facility instructions raise a
-> specification exception for unaligned accesses.  Do this by
-> using the (previously unused) unaligned_access hook.
+On 05/09/2017 03:00 AM, Peter Xu wrote:
+> Meanwhile, abstract a function to detect msix masked bit.
 >
-> Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/s390x/cpu.c    |  1 +
->  target/s390x/cpu.h    |  3 +++
->  target/s390x/helper.c | 16 ++++++++++++++++
->  3 files changed, 20 insertions(+)
+>  hw/pci/msix.c       | 11 +++++++++--
+>  hw/pci/trace-events |  3 +++
+>  2 files changed, 12 insertions(+), 2 deletions(-)
 >
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 066dcd1..a1bf2ba 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -430,6 +430,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
->      cc->write_elf64_note = s390_cpu_write_elf64_note;
->      cc->cpu_exec_interrupt = s390_cpu_exec_interrupt;
->      cc->debug_excp_handler = s390x_cpu_debug_excp_handler;
-> +    cc->do_unaligned_access = s390x_cpu_do_unaligned_access;
->  #endif
->      cc->disas_set_info = s390_cpu_disas_set_info;
+> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> index bb54e8b..fc5fe51 100644
+> --- a/hw/pci/msix.c
+> +++ b/hw/pci/msix.c
+> @@ -22,6 +22,7 @@
+>  #include "hw/xen/xen.h"
+>  #include "qemu/range.h"
+>  #include "qapi/error.h"
+> +#include "trace.h"
 >
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 058ddad..bbed320 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -480,6 +480,9 @@ int s390_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw,
+>  #define MSIX_CAP_LENGTH 12
 >
->  #ifndef CONFIG_USER_ONLY
->  void do_restart_interrupt(CPUS390XState *env);
-> +void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-> +                                   MMUAccessType access_type,
-> +                                   int mmu_idx, uintptr_t retaddr);
->
->  static inline hwaddr decode_basedisp_s(CPUS390XState *env, uint32_t ipb,
->                                         uint8_t *ar)
-> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-> index 68bd2f9..9978490 100644
-> --- a/target/s390x/helper.c
-> +++ b/target/s390x/helper.c
-> @@ -718,4 +718,20 @@ void s390x_cpu_debug_excp_handler(CPUState *cs)
->          cpu_loop_exit_noexc(cs);
+> @@ -130,10 +131,14 @@ static void msix_handle_mask_update(PCIDevice *dev, int vector, bool was_masked)
 >      }
 >  }
-> +
-> +/* Unaligned accesses are only diagnosed with MO_ALIGN.  At the moment,
-> +   this is only for the atomic operations, for which we want to raise a
-> +   specification exception.  */
-> +void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-> +                                   MMUAccessType access_type,
-> +                                   int mmu_idx, uintptr_t retaddr)
+>
+> +static bool msix_masked(PCIDevice *dev)
 > +{
-> +    S390CPU *cpu = S390_CPU(cs);
-> +    CPUS390XState *env = &cpu->env;
-> +
-> +    if (retaddr) {
-> +        cpu_restore_state(cs, retaddr);
-> +    }
-> +    program_interrupt(env, PGM_SPECIFICATION, ILEN_LATER);
+> +    return dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] & MSIX_MASKALL_MASK;
 > +}
->  #endif /* CONFIG_USER_ONLY */
+> +
+>  static void msix_update_function_masked(PCIDevice *dev)
+>  {
+> -    dev->msix_function_masked = !msix_enabled(dev) ||
+> -        (dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] & MSIX_MASKALL_MASK);
+> +    dev->msix_function_masked = !msix_enabled(dev) || msix_masked(dev);
+>  }
+>
+>  /* Handle MSI-X capability config write. */
+> @@ -148,6 +153,8 @@ void msix_write_config(PCIDevice *dev, uint32_t addr,
+>          return;
+>      }
+>
+> +    trace_msix_write_config(dev->name, msix_enabled(dev), msix_masked(dev));
+> +
+>      was_masked = dev->msix_function_masked;
+>      msix_update_function_masked(dev);
+>
+> diff --git a/hw/pci/trace-events b/hw/pci/trace-events
+> index 2b9cf24..83c8f5a 100644
+> --- a/hw/pci/trace-events
+> +++ b/hw/pci/trace-events
+> @@ -7,3 +7,6 @@ pci_update_mappings_add(void *d, uint32_t bus, uint32_t slot, uint32_t func, int
+>  # hw/pci/pci_host.c
+>  pci_cfg_read(const char *dev, unsigned devid, unsigned fnid, unsigned offs, unsigned val) "%s %02u:%u @0x%x -> 0x%x"
+>  pci_cfg_write(const char *dev, unsigned devid, unsigned fnid, unsigned offs, unsigned val) "%s %02u:%u @0x%x <- 0x%x"
+> +
+> +# hw/pci/msix.c
+> +msix_write_config(char *name, bool enabled, bool masked) "dev %s enabled %d masked %d"
 >
