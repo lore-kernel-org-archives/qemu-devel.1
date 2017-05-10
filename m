@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8FtK-0007K3-FF
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 20:54:11 -0400
+	(envelope-from <wangyunjian@huawei.com>) id 1d8GqT-0000Ij-Ti
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 21:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8FtH-0000hQ-CQ
-	for qemu-devel@nongnu.org; Tue, 09 May 2017 20:54:10 -0400
-Date: Tue, 9 May 2017 17:05:58 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170509070558.GO25748@umbus.fritz.box>
-References: <20170509034519.16291-1-david@gibson.dropbear.id.au>
-	<40670f11-21fa-7a8c-db7a-3053d61f082b@redhat.com>
+	(envelope-from <wangyunjian@huawei.com>) id 1d8GqQ-0007Wo-R8
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 21:55:18 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <wangyunjian@huawei.com>) id 1d8GqQ-0007EU-6d
+	for qemu-devel@nongnu.org; Tue, 09 May 2017 21:55:14 -0400
+From: wangyunjian <wangyunjian@huawei.com>
+Date: Wed, 10 May 2017 01:54:59 +0000
+Message-ID: <34EFBCA9F01B0748BEB6B629CE643AE60BB56000@DGGEMA505-MBX.china.huawei.com>
+References: <1494338586-13416-1-git-send-email-wangyunjian@huawei.com>
+	<CAJ+F1CKL3vgJSSb8JGzNNBDS0xGKhtuP+2JEy1tsszauBMAUyA@mail.gmail.com>
+In-Reply-To: <CAJ+F1CKL3vgJSSb8JGzNNBDS0xGKhtuP+2JEy1tsszauBMAUyA@mail.gmail.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="1bhFRg6vL9BT9osV"
-Content-Disposition: inline
-In-Reply-To: <40670f11-21fa-7a8c-db7a-3053d61f082b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Allow workarounds for POWER9
- DD1
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix watcher need be removed
+ when vhost-user hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: lvivier@redhat.com, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
+To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>, caihe <caihe@huawei.com>, "mst@redhat.com" <mst@redhat.com>
 
-
---1bhFRg6vL9BT9osV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, May 09, 2017 at 06:41:23AM +0200, Thomas Huth wrote:
-> On 09.05.2017 05:45, David Gibson wrote:
-> > POWER9 DD1 silicon has some bugs which mean it a) isn't really compliant
-> > with the ISA v3.00 and b) require a number of special workarounds in the
-> > kernel.
-> >=20
-> > At the moment, qemu isn't aware of DD1.  For TCG we don't really want i=
-t to
-> > be (why bother emulating buggy silicon).  But with KVM, the guest does =
-need
-> > to be aware of DD1 so it can apply the necessary workarounds.
-> >=20
-> > Meanwhile, the feature negotiation between qemu and the guest strongly
-> > favours architected compatibility modes to "raw" CPU modes.  In combina=
-tion
-> > with the above, this means the guest sees architected POWER9 mode, and
-> > doesn't apply the DD1 workarounds.  Well, unless it has yet another
-> > workaround to partially ignore what qemu tells it.
-> >=20
-> > This patch addresses this by disabling support for compatibility modes =
-when
-> > using KVM on a POWER9 DD1 host.
->=20
-> I first though: Hey, it should be fixed in the guest kernel instead, but
-> thinking about this twice, I think you're right. If the CPU is not fully
-> compatible to the ISA, we really should not announce it as "architected
-> / compatible POWER9" in QEMU.
-> So basically ACK to your patch, I've just got a cosmetic request below...
->=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  target/ppc/kvm.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >=20
-> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > index 8574c36..591b5b5 100644
-> > --- a/target/ppc/kvm.c
-> > +++ b/target/ppc/kvm.c
-> > @@ -2380,6 +2380,17 @@ static void kvmppc_host_cpu_class_init(ObjectCla=
-ss *oc, void *data)
-> > =20
-> >  #if defined(TARGET_PPC64)
-> >      pcc->radix_page_info =3D kvm_get_radix_page_info();
-> > +
-> > +    if ((pcc->pvr & 0xffffff00) =3D=3D 0x004e0100) {
->=20
-> Could you please add a proper #define for that magic DD1.0 value to
-> cpu-models.h, please?
-
-Good point, done.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---1bhFRg6vL9BT9osV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZEWpTAAoJEGw4ysog2bOS6ScQAJ+M5PIy39L147/lum0tepIX
-XARMs3UEZGNxR8FjCxG0VWNSIOTYKNrKDoRWeG3tzE5o57UDRkP21c1bxEQVp6iU
-7a/P1XlnH67zjquueax4WkaUFIn0iA4Os9FWRYpjl5ZVvik40bc2GwVTlEJwibNC
-66KyzHTDDjx/eUm6UVV6t3nfIi7jrOEAvnO0xM3OWare0KZDLktwCauBo9tJ4D6s
-+C/caJbz8y4Jtt1aeCqC10NTb8r7YpgEL/6ILCCLjT+UIuEVUVVKBJW/ueC6+1Dm
-EeqNmasiCRvn1BW22owxIznqjwlqTJ8kvS7etBkYzRCprs+XGpvwhyS/B5WpNCJq
-IEgqKuvvCsFkGCk5Erf1W9aGmoaU4lKCf2IXSyHRD2avdxXJdm4mW/rAOm4ombSg
-H7ISVWHiko5TQmM0u/u0ts8PRYW2VoDrpeRPX9n3BtL293pUx9KQY7L+n9pL45xy
-13oNmxaev7UYmV8bfmE+nluXLC9yhr7WzM+ihiqUTWD5quEl48lhbQHnoS/sZ8R+
-eSBeTjbVEr+g/NuavdqD6VRRa/QEvvGG+KjZmiNqziG6RHeynHYqgtRo8Q2ZLvzb
-XIbebZMx+6Ea8S2ridVRPbly/vgHCKe3H0/Rr/ekyRVwxHR0c06elMKK6tuRtsNF
-/McahAC5Op8wzrlptSCl
-=BRjO
------END PGP SIGNATURE-----
-
---1bhFRg6vL9BT9osV--
+T24gVHVlLCBNYXkgOSwgMjAxNyBhdCA1OjA0IFBNIFl1bmppYW4gV2FuZyA8d2FuZ3l1bmppYW5A
+aHVhd2VpLmNvbT4gd3JvdGU6DQoNCj4gPiBGcm9tOiB3MDAyNzMxODYgPHdhbmd5dW5qaWFuQGh1
+YXdlaS5jb20+DQo+ID4NCj4gPiAibmMiIGlzIGZyZWVkIGFmdGVyIGhvdHBsdWcgdmhvc3QtdXNl
+ciwgYnV0IHRoZSB3YXRjaGVyIGRvbid0IGJlIHJlbW92ZWQuDQo+ID4NCj4gDQo+IA0KPiA+IFRo
+ZSBRRU1VIGNyYXNoIHdoZW4gdGhlIHdhdGNoZXIgYWNjZXNzIHRoZSAibmMiIG9uIHNvY2tldCBk
+aXNjb25uZWN0Lg0KPiA+DQo+ID4NCj4gRG8geW91IGhhdmUgYSByZXByb2R1Y2VyPyB0aGFua3MN
+Cj4NCg0KcmVwcm9kdWNlIHN0ZXBzOg0KDQoxLiB2aXJzaCBhdHRhY2gtZGV2aWNlIHZtMCB2aG9z
+dC11c2VyLnhtbA0KMi4gdmlyc2ggZGV0YWNoLWRldmljZSB2bTAgdmhvc3QtdXNlci54bWwNCjMu
+IHZpcnNoIGF0dGFjaC1kZXZpY2Ugdm0wIHZob3N0LXVzZXIueG1sDQo0LiBzZXJ2aWNlIG9wZW52
+c3dpdGNoIHJlc3RhcnQNCjUuIHJlcGVhdCBzdGVwIDJ+NA0KDQpUaGUgdmhvc3QtdXNlciB4bWw6
+DQoNCiAgICA8aW50ZXJmYWNlIHR5cGU9J3Zob3N0dXNlcic+DQogICAgICA8bWFjIGFkZHJlc3M9
+JzAwOjAxOjAxOjAwOjEwOjQxJy8+DQogICAgICA8c291cmNlIHR5cGU9J3VuaXgnIHBhdGg9Jy92
+YXIvcnVuL3Zob3N0LXVzZXIvdGFwMScgbW9kZT0nY2xpZW50Jy8+DQogICAgICA8bW9kZWwgdHlw
+ZT0ndmlydGlvJy8+DQogICAgICA8ZHJpdmVyIHF1ZXVlcz0nOCcvPg0K44CAPC9pbnRlcmZhY2U+
+DQoNClRoYW5rcw0KDQo+IA0KPiA+IENhbGwgVHJhY2U6DQo+ID4gICAgICMwICBvYmplY3RfZ2V0
+X2NsYXNzIChvYmo9b2JqQGVudHJ5PTB4MikgYXQgcW9tL29iamVjdC5jOjc1MQ0KPiA+ICAgICAj
+MSAgMHgwMDAwN2ZjMDMxYzc5ZjQxIGluIHFlbXVfY2hyX2ZlX2Rpc2Nvbm5lY3QgKGJlPTxvcHRp
+bWl6ZWQgb3V0PikNCj4gPiBhdCBjaGFyZGV2L2NoYXIuYzoxMDQ4DQo+ID4gICAgICMyICAweDAw
+MDA3ZmMwMzFiZDYyZTAgaW4gbmV0X3Zob3N0X3VzZXJfd2F0Y2ggKGNoYW49PG9wdGltaXplZCBv
+dXQ+LA0KPiA+IGNvbmQ9PG9wdGltaXplZCBvdXQ+LCBvcGFxdWU9PG9wdGltaXplZCBvdXQ+KSBh
+dCBuZXQvdmhvc3QtdXNlci5jOjE5MQ0KPiA+ICAgICAjMyAgMHgwMDAwN2ZjMDJjMjNlOTlhIGlu
+IGdfbWFpbl9jb250ZXh0X2Rpc3BhdGNoICgpIGZyb20NCj4gPiAvbGliNjQvbGliZ2xpYi0yLjAu
+c28uMA0KPiA+ICAgICAjNCAgMHgwMDAwN2ZjMDMxY2NmYzBjIGluIGdsaWJfcG9sbGZkc19wb2xs
+ICgpIGF0IHV0aWwvbWFpbi1sb29wLmM6MjEzDQo+ID4gICAgICM1ICBvc19ob3N0X21haW5fbG9v
+cF93YWl0ICh0aW1lb3V0PTxvcHRpbWl6ZWQgb3V0PikgYXQNCj4gPiB1dGlsL21haW4tbG9vcC5j
+OjI2MQ0KPiA+ICAgICAjNiAgbWFpbl9sb29wX3dhaXQgKG5vbmJsb2NraW5nPW5vbmJsb2NraW5n
+QGVudHJ5PTApIGF0DQo+ID4gdXRpbC9tYWluLWxvb3AuYzo1MTcNCj4gPiAgICAgIzcgIDB4MDAw
+MDdmYzAzMTkzYmM4NyBpbiBtYWluX2xvb3AgKCkgYXQgdmwuYzoxODk5DQo+ID4gICAgICM4ICBt
+YWluIChhcmdjPTxvcHRpbWl6ZWQgb3V0PiwgYXJndj08b3B0aW1pemVkIG91dD4sIGVudnA9PG9w
+dGltaXplZA0KPiA+IG91dD4pIGF0IHZsLmM6NDcxOQ0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTog
+WXVuamlhbiBXYW5nIDx3YW5neXVuamlhbkBodWF3ZWkuY29tPg0KPiA+IC0tLQ0KPiA+ICBuZXQv
+dmhvc3QtdXNlci5jIHwgNCArKysrDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMo
+KykNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9uZXQvdmhvc3QtdXNlci5jIGIvbmV0L3Zob3N0LXVz
+ZXIuYw0KPiA+IGluZGV4IDAwYTBjMWMuLjVjYzIxNzggMTAwNjQ0DQo+ID4gLS0tIGEvbmV0L3Zo
+b3N0LXVzZXIuYw0KPiA+ICsrKyBiL25ldC92aG9zdC11c2VyLmMNCj4gPiBAQCAtMTU1LDYgKzE1
+NSwxMCBAQCBzdGF0aWMgdm9pZCB2aG9zdF91c2VyX2NsZWFudXAoTmV0Q2xpZW50U3RhdGUgKm5j
+KQ0KPiA+DQo+ID4gICAgICAgICAgcWVtdV9jaHJfZmVfZGVpbml0KCZzLT5jaHIpOw0KPiA+ICAg
+ICAgICAgIG9iamVjdF91bnBhcmVudChPQkpFQ1QoY2hyKSk7DQo+ID4gKyAgICAgICAgaWYgKHMt
+PndhdGNoKSB7DQo+ID4gKyAgICAgICAgICAgIGdfc291cmNlX3JlbW92ZShzLT53YXRjaCk7DQo+
+ID4gKyAgICAgICAgICAgIHMtPndhdGNoID0gMDsNCj4gPiArICAgICAgICB9DQo+ID4gICAgICB9
+DQo+ID4NCj4gPiAgICAgIHFlbXVfcHVyZ2VfcXVldWVkX3BhY2tldHMobmMpOw0KPiA+IC0tDQo+
+ID4gMS44LjMuMQ0KPiA+DQo+ID4NCj4gPg0KPiA+IC0tDQo+IE1hcmMtQW5kcsOpIEx1cmVhdQ0K
