@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8YsY-0004Jc-KB
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 17:10:39 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8Z9I-00013C-0e
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 17:27:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8YsV-0000cp-D5
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 17:10:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34752)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8YsV-0000c1-7G
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 17:10:35 -0400
-Date: Wed, 10 May 2017 18:10:28 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170510211028.GF3482@thinpad.lan.raisama.net>
-References: <20170505201128.12099-1-ehabkost@redhat.com>
-	<20170505201128.12099-2-ehabkost@redhat.com>
-	<87efvw26nr.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8Z9E-0000XS-U0
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 17:27:56 -0400
+Received: from mail-qk0-x231.google.com ([2607:f8b0:400d:c09::231]:34620)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8Z9E-0000XG-Oj
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 17:27:52 -0400
+Received: by mail-qk0-x231.google.com with SMTP id k74so7769365qke.1
+	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 14:27:52 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170510200535.13268-1-f4bug@amsat.org>
+	<20170510200535.13268-2-f4bug@amsat.org>
+	<0f1f5bcd-815a-c070-5ba7-281f5a0ee146@twiddle.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <288e527b-c817-383d-c317-b83f1cdb5994@amsat.org>
+Date: Wed, 10 May 2017 18:27:47 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87efvw26nr.fsf@dusky.pond.sub.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] visitor: Add 'supported_qtypes'
- parameter to visit_start_alternate()
+In-Reply-To: <0f1f5bcd-815a-c070-5ba7-281f5a0ee146@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/8] coccinelle: add a script to optimize
+ tcg op using tcg_gen_extract()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +36,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <mlureau@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, May 10, 2017 at 03:16:56PM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
->=20
-> > This will allow visitors to make decisions based on the supported qty=
-pes
-> > of a given alternate type. The new parameter can replace the old
-> > 'promote_int' argument, as qobject-input-visitor can simply check if
-> > QTYPE_QINT is set in supported_qtypes.
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->=20
-> Might conflict with Marc-Andr=E9's work, which I haven't reviewed, yet.
-> Should be easy enough to resolve, though.
+On 05/10/2017 05:19 PM, Richard Henderson wrote:
+> On 05/10/2017 01:05 PM, Philippe Mathieu-Daudé wrote:
+>> +-tcg_gen_shri_tl(ret, arg, ofs);
+>> +-tcg_gen_andi_tl(ret, ret, len);
+>> ++tcg_gen_extract_tl(ret, arg, ofs, len);
+>
+> You can't simply copy the and mask to the extract length.
+>
+> You need to verify it's all low bits and convert that to a count of the
+> low bits.  E.g. 0xff -> 8.
 
-This series is now low-priority for me, as I'm not sure about the
-need for "feature=3Dforce" in x86. I won't mind having to rebase
-this later.
+Hey Richard, this pattern can be applied as long as len << ofs does not 
+overflow target_long, regardless of low bits count, right?
 
---=20
-Eduardo
+Phil.
