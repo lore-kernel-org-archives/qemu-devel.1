@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d8Q14-0001ZG-TG
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:42:52 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8Q8U-0007Ts-Pe
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:50:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d8Q0z-0006Uz-Vr
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:42:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46822)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d8Q0z-0006Uc-My
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:42:45 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9247561B86
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 11:42:44 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 10 May 2017 13:42:40 +0200
-Message-Id: <20170510114240.4302-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration: Fix regression with compression
- threads
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8Q8T-0000kl-0R
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:50:30 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494348286-10253-5-git-send-email-sundeep.lkml@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b913e666-8df3-714f-3ff9-e8f4ff9e7098@amsat.org>
+Date: Wed, 10 May 2017 08:50:17 -0300
+MIME-Version: 1.0
+In-Reply-To: <1494348286-10253-5-git-send-email-sundeep.lkml@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-devel PATCH 4/5] msf2: Add Smartfusion2 SoC.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +27,344 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, alistair23@gmail.com, crosthwaite.peter@gmail.com
 
-Compression threads got broken on commit
+Hi Subbaraya,
 
-  commit 247956946651ae0280f7b1ea88bb6237dd01c231
-  Author: Juan Quintela <quintela@redhat.com>
-  Date:   Tue Mar 21 11:45:01 2017 +0100
+On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
+> Smartfusion2 SoC has hardened Microcontroller subsystem
+> and flash based FPGA fabric. This patch adds support for
+> Microcontroller subsystem in the SoC.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> ---
+>  default-configs/arm-softmmu.mak |   1 +
+>  hw/arm/Makefile.objs            |   2 +-
+>  hw/arm/msf2-soc.c               | 188 ++++++++++++++++++++++++++++++++++++++++
+>  include/hw/arm/msf2-soc.h       |  60 +++++++++++++
+>  4 files changed, 250 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/arm/msf2-soc.c
+>  create mode 100644 include/hw/arm/msf2-soc.h
+>
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 78d7af0..7062512 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -122,3 +122,4 @@ CONFIG_ACPI=y
+>  CONFIG_SMBIOS=y
+>  CONFIG_ASPEED_SOC=y
+>  CONFIG_GPIO_KEY=y
+> +CONFIG_MSF2=y
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index 4c5c4ee..ae5e4a3 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -1,7 +1,7 @@
+>  obj-y += boot.o collie.o exynos4_boards.o gumstix.o highbank.o
+>  obj-$(CONFIG_DIGIC) += digic_boards.o
+>  obj-y += integratorcp.o mainstone.o musicpal.o nseries.o
+> -obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o
+> +obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o msf2-soc.o
 
-      ram: reorganize last_sent_block
+Not a big deal, but since you added CONFIG_MSF2 why not using it here 
+and the Makefiles you touched (misc/ssi/timer)?
 
-On do_compress_ram_page() we use a different QEMUFile than the
-migration one.  We need to pass it there.  The failure can be seen as:
+obj-$(CONFIG_MSF2) += msf2-soc.o
 
-(qemu) qemu-system-x86_64: Unknown combination of migration flags: 0
-qemu-system-x86_64: error while loading state section id 3(ram)
-qemu-system-x86_64: load of migration failed: Invalid argument
+>  obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
+>  obj-$(CONFIG_ACPI) += virt-acpi-build.o
+>  obj-y += netduino2.o
+> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+> new file mode 100644
+> index 0000000..d6341a2
+> --- /dev/null
+> +++ b/hw/arm/msf2-soc.c
+> @@ -0,0 +1,188 @@
+> +/*
+> + * SmartFusion2 SoC emulation.
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "hw/arm/arm.h"
+> +#include "exec/address-spaces.h"
+> +#include "hw/char/serial.h"
+> +#include "hw/boards.h"
+> +#include "sysemu/block-backend.h"
+> +#include "hw/arm/msf2-soc.h"
+> +
+> +#define MSF2_TIMER_BASE       0x40004000
+> +#define MSF2_SYSREG_BASE      0x40038000
+> +
+> +#define MSF2_TIMER_IRQ0       14
+> +#define MSF2_TIMER_IRQ1       15
+> +
+> +static const uint32_t spi_addr[MSF2_NUM_SPIS] = { 0x40001000 , 0x40011000 };
+> +static const uint32_t uart_addr[MSF2_NUM_UARTS] = { 0x40000000 , 0x40010000 };
+> +
+> +static const int spi_irq[MSF2_NUM_SPIS] = { 2, 3 };
+> +static const int uart_irq[MSF2_NUM_UARTS] = { 10, 11 };
+> +
+> +static void msf2_soc_initfn(Object *obj)
+> +{
+> +    MSF2State *s = MSF2_SOC(obj);
+> +    int i;
+> +
+> +    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
+> +    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
+> +
+> +    object_initialize(&s->sysreg, sizeof(s->sysreg), TYPE_MSF2_SYSREG);
+> +    qdev_set_parent_bus(DEVICE(&s->sysreg), sysbus_get_default());
+> +
+> +    object_initialize(&s->timer, sizeof(s->timer), TYPE_MSF2_TIMER);
+> +    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
+> +
+> +    for (i = 0; i < MSF2_NUM_SPIS; i++) {
+> +        object_initialize(&s->spi[i], sizeof(s->spi[i]),
+> +                          TYPE_MSF2_SPI);
+> +        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
+> +    }
+> +}
+> +
+> +static void msf2_soc_realize(DeviceState *dev_soc, Error **errp)
+> +{
+> +    MSF2State *s = MSF2_SOC(dev_soc);
+> +    DeviceState *dev, *armv7m;
+> +    SysBusDevice *busdev;
+> +    Error *err = NULL;
+> +    int i;
+> +
+> +    MemoryRegion *system_memory = get_system_memory();
+> +    MemoryRegion *nvm = g_new(MemoryRegion, 1);
+> +    MemoryRegion *nvm_alias = g_new(MemoryRegion, 1);
+> +    MemoryRegion *sram = g_new(MemoryRegion, 1);
+> +    MemoryRegion *ddr = g_new(MemoryRegion, 1);
+> +
+> +    memory_region_init_ram(nvm, NULL, "MSF2.envm", ENVM_SIZE,
+> +                           &error_fatal);
 
-Please, review.
+Maybe you can name it "eNVM" to match the documentation.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+Also envm_size should be a per-model property.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 293d27c..995d1fc 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -436,20 +436,21 @@ void migrate_compress_threads_create(void)
-  * @offset: offset inside the block for the page
-  *          in the lower bits, it contains flags
-  */
--static size_t save_page_header(RAMState *rs, RAMBlock *block, ram_addr_t offset)
-+static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
-+                               ram_addr_t offset)
- {
-     size_t size, len;
- 
-     if (block == rs->last_sent_block) {
-         offset |= RAM_SAVE_FLAG_CONTINUE;
-     }
--    qemu_put_be64(rs->f, offset);
-+    qemu_put_be64(f, offset);
-     size = 8;
- 
-     if (!(offset & RAM_SAVE_FLAG_CONTINUE)) {
-         len = strlen(block->idstr);
--        qemu_put_byte(rs->f, len);
--        qemu_put_buffer(rs->f, (uint8_t *)block->idstr, len);
-+        qemu_put_byte(f, len);
-+        qemu_put_buffer(f, (uint8_t *)block->idstr, len);
-         size += 1 + len;
-         rs->last_sent_block = block;
-     }
-@@ -571,7 +572,7 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
-     }
- 
-     /* Send XBZRLE based compressed page */
--    bytes_xbzrle = save_page_header(rs, block,
-+    bytes_xbzrle = save_page_header(rs, rs->f, block,
-                                     offset | RAM_SAVE_FLAG_XBZRLE);
-     qemu_put_byte(rs->f, ENCODING_FLAG_XBZRLE);
-     qemu_put_be16(rs->f, encoded_len);
-@@ -745,7 +746,7 @@ static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
-     if (is_zero_range(p, TARGET_PAGE_SIZE)) {
-         rs->zero_pages++;
-         rs->bytes_transferred +=
--            save_page_header(rs, block, offset | RAM_SAVE_FLAG_COMPRESS);
-+            save_page_header(rs, rs->f, block, offset | RAM_SAVE_FLAG_COMPRESS);
-         qemu_put_byte(rs->f, 0);
-         rs->bytes_transferred += 1;
-         pages = 1;
-@@ -834,7 +835,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
- 
-     /* XBZRLE overflow or normal page */
-     if (pages == -1) {
--        rs->bytes_transferred += save_page_header(rs, block,
-+        rs->bytes_transferred += save_page_header(rs, rs->f, block,
-                                                   offset | RAM_SAVE_FLAG_PAGE);
-         if (send_async) {
-             qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
-@@ -860,7 +861,7 @@ static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
-     int bytes_sent, blen;
-     uint8_t *p = block->host + (offset & TARGET_PAGE_MASK);
- 
--    bytes_sent = save_page_header(rs, block, offset |
-+    bytes_sent = save_page_header(rs, f, block, offset |
-                                   RAM_SAVE_FLAG_COMPRESS_PAGE);
-     blen = qemu_put_compression_data(f, p, TARGET_PAGE_SIZE,
-                                      migrate_compress_level());
-@@ -991,7 +992,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
-             pages = save_zero_page(rs, block, offset, p);
-             if (pages == -1) {
-                 /* Make sure the first page is sent out before other pages */
--                bytes_xmit = save_page_header(rs, block, offset |
-+                bytes_xmit = save_page_header(rs, rs->f, block, offset |
-                                               RAM_SAVE_FLAG_COMPRESS_PAGE);
-                 blen = qemu_put_compression_data(rs->f, p, TARGET_PAGE_SIZE,
-                                                  migrate_compress_level());
--- 
-2.9.3
+> +    memory_region_init_alias(nvm_alias, NULL, "MSF2.flash.alias",
+> +                             nvm, 0, ENVM_SIZE);
+
+Hmmm well this would be the "Cache Matrix Remap" which happens to be 
+mapped by default to eNVM on cold reset.
+Naming it "MSF2.flash.alias" is pretty confusing.
+
+> +    vmstate_register_ram_global(nvm);
+> +
+> +    memory_region_set_readonly(nvm, true);
+> +    memory_region_set_readonly(nvm_alias, true);
+> +
+> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
+> +    memory_region_add_subregion(system_memory, 0, nvm_alias);
+> +
+> +    memory_region_init_ram(ddr, NULL, "MSF2.ddr", DDR_SIZE,
+> +                           &error_fatal);
+
+Wrong, there is no DDR on this SoC.
+
+> +    vmstate_register_ram_global(ddr);
+> +    memory_region_add_subregion(system_memory, DDR_BASE_ADDRESS, ddr);
+> +
+> +    memory_region_init_ram(sram, NULL, "MSF2.sram", SRAM_SIZE,
+> +                           &error_fatal);
+
+I'd rather like to see it named "eSRAM" somehow, so there is no 
+confusion possible with external SRAM a SoM/board can map at 0x60000000.
+
+Same comment than envm_size, sram_size should be a per-model property.
+
+> +    vmstate_register_ram_global(sram);
+> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
+> +
+> +    armv7m = DEVICE(&s->armv7m);
+> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
+
+Can you point me to your datasheet? I thought the SF2 had 240 IRQs.
+
+> +    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
+> +    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+> +                                     "memory", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    for (i = 0; i < MSF2_NUM_UARTS; i++) {
+> +        if (serial_hds[i]) {
+> +            serial_mm_init(get_system_memory(), uart_addr[i], 2,
+> +                           qdev_get_gpio_in(armv7m, uart_irq[i]),
+> +                           115200, serial_hds[i], DEVICE_NATIVE_ENDIAN);
+> +        }
+> +    }
+> +
+> +    dev = DEVICE(&s->timer);
+> +    qdev_prop_set_uint32(dev, "clock-frequency", MSF2_TIMER_FREQ);
+> +    object_property_set_bool(OBJECT(&s->timer), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    busdev = SYS_BUS_DEVICE(dev);
+> +    sysbus_mmio_map(busdev, 0, MSF2_TIMER_BASE);
+> +    sysbus_connect_irq(busdev, 0,
+> +                           qdev_get_gpio_in(armv7m, MSF2_TIMER_IRQ0));
+> +    sysbus_connect_irq(busdev, 1,
+> +                           qdev_get_gpio_in(armv7m, MSF2_TIMER_IRQ1));
+> +
+> +    dev = DEVICE(&s->sysreg);
+> +    object_property_set_bool(OBJECT(&s->sysreg), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    busdev = SYS_BUS_DEVICE(dev);
+> +    sysbus_mmio_map(busdev, 0, MSF2_SYSREG_BASE);
+> +
+> +    for (i = 0; i < MSF2_NUM_SPIS; i++) {
+> +        gchar *bus_name = g_strdup_printf("spi%d", i);
+> +
+> +        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
+> +        if (err != NULL) {
+> +            g_free(bus_name);
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+> +
+> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_addr[i]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
+> +                           qdev_get_gpio_in(armv7m, spi_irq[i]));
+> +
+> +        /* Alias controller SPI bus to the SoC itself */
+> +        object_property_add_alias(OBJECT(s), bus_name,
+> +                                  OBJECT(&s->spi[i]), "spi0",
+> +                                  &error_abort);
+> +        g_free(bus_name);
+> +    }
+> +}
+> +
+> +static void msf2_soc_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = msf2_soc_realize;
+> +}
+> +
+> +static const TypeInfo msf2_soc_info = {
+> +    .name          = TYPE_MSF2_SOC,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(MSF2State),
+> +    .instance_init = msf2_soc_initfn,
+> +    .class_init    = msf2_soc_class_init,
+> +};
+> +
+> +static void msf2_soc_types(void)
+> +{
+> +    type_register_static(&msf2_soc_info);
+> +}
+> +
+> +type_init(msf2_soc_types)
+> diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
+> new file mode 100644
+> index 0000000..29a8ff8
+> --- /dev/null
+> +++ b/include/hw/arm/msf2-soc.h
+> @@ -0,0 +1,60 @@
+> +/*
+> + * Microsemi Smartfusion2 SoC
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_ARM_MSF2_SOC_H
+> +#define HW_ARM_MSF2_SOC_H
+> +
+> +#include "hw/misc/msf2-sysreg.h"
+> +#include "hw/timer/msf2-timer.h"
+> +#include "hw/ssi/msf2-spi.h"
+> +#include "hw/arm/armv7m.h"
+> +
+> +#define TYPE_MSF2_SOC     "msf2-soc"
+> +#define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC)
+> +
+> +#define MSF2_NUM_SPIS         2
+> +#define MSF2_NUM_UARTS        2
+> +
+> +#define ENVM_BASE_ADDRESS     0x60000000
+> +#define ENVM_SIZE             (128 * 1024)
+
+The SoC design ENVM_SIZE is 1MB, 128K seems your particular model.
+
+> +
+> +#define DDR_BASE_ADDRESS      0xA0000000
+> +#define DDR_SIZE              (64 * 1024 * 1024)
+
+This belongs to the SoM.
+
+> +
+> +#define SRAM_BASE_ADDRESS     0x20000000
+> +#define SRAM_SIZE             (64 * 1024)
+
+Indeed this SoC is designed to have up to 64K of SRAM.
+Luckily your model provides 64K.
+
+> +
+> +typedef struct MSF2State {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +    /*< public >*/
+> +
+> +    ARMv7MState armv7m;
+> +
+> +    MSF2SysregState sysreg;
+> +    MSF2TimerState timer;
+> +    MSF2SpiState spi[MSF2_NUM_SPIS];
+> +} MSF2State;
+> +
+> +#endif
+>
