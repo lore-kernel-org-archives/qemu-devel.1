@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8UHE-0000Dt-6F
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:15:49 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d8UUX-0003SP-T5
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:29:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8UHB-0002z4-Ec
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:15:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d8UHB-0002yv-7r
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:15:45 -0400
-References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
-	<20170510090841.GF31558@redhat.com>
-	<e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
-	<20170510103153.GI31558@redhat.com>
-	<ccb8fecd-e918-1cc0-28ef-af9865540fbc@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <157a6609-d75a-5d40-e5b9-c70802e40950@redhat.com>
-Date: Wed, 10 May 2017 18:15:39 +0200
+	(envelope-from <stefanha@gmail.com>) id 1d8UUU-0006oG-PW
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:29:33 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d8UUU-0006nu-Ko
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:29:30 -0400
+Received: by mail-qk0-x244.google.com with SMTP id o85so112692qkh.0
+	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 09:29:30 -0700 (PDT)
+Date: Wed, 10 May 2017 12:29:27 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170510162927.GE19962@stefanha-x1.localdomain>
+References: <1494369432-15418-1-git-send-email-anthony.xu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <ccb8fecd-e918-1cc0-28ef-af9865540fbc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
- pc-0.15
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jKBxcB1XkHIR0Eqt"
+Content-Disposition: inline
+In-Reply-To: <1494369432-15418-1-git-send-email-anthony.xu@intel.com>
+Subject: Re: [Qemu-devel] [PATCH] trace: add sanity check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kraxel@redhat.com
+To: Anthony Xu <anthony.xu@intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com
 
 
+--jKBxcB1XkHIR0Eqt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 10/05/2017 16:47, Thomas Huth wrote:
->> So while we can delete pc-0.12, we can't delete associated features ne=
-eded
->> by pc-0.12, without complicating RHEL's ability to create its back-com=
-pat
->> machine types. Downstream would have to un-delete the features.
->
-> So I guess this is why Paolo said that pc-0.12 is still in "use" ... I
-> think removing pc-0.12, but not removing rombar=3D0 will cause confusio=
-n
-> in the upstream code base sooner or later,
+On Tue, May 09, 2017 at 03:37:12PM -0700, Anthony Xu wrote:
+> If trace backend is set to TRACE_NOP, trace_get_vcpu_event_count
+> returns 0, cause bitmap_new call abort.
+>=20
+> Signed-off-by: Anthony Xu <anthony.xu@intel.com>
+> ---
+>  qom/cpu.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
-I agree.
+Please post steps for reproducing the abort.  I cannot reproduce this
+with qemu-system-x86_64.
 
-> so I guess we should rather
-> keep the pc-0.12 machine until we can get rid of it together with the
-> rombar code. We should still mark it as deprecated, of course.
->
->> I think tieing removal to major versions is a mistake, unless we're
->> going to set a fixed timeframe for delivery of major versions. ie if
->> we gaurantee that we'll ship a new major version every 18 months, that
->> gives people a predictable lifetime.  If we carry on inventing reasons
->> for major versions at arbitrary points in time, it makes it difficult
->> to have any reasonable forward planning.  It is more users friendly if
->> we can set a clear fixed timeframe for machine type lifecycle / eol
->
-> IMHO we should have a new major release after we've reached a .9 minor
-> release, but so far it seems like I'm the only one with that wish...
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index f02e9c0..f9111a0 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -382,6 +382,7 @@ static void cpu_common_unrealizefn(DeviceState *dev, =
+Error **errp)
+> =20
+>  static void cpu_common_initfn(Object *obj)
+>  {
+> +    uint32_t count;
+>      CPUState *cpu =3D CPU(obj);
+>      CPUClass *cc =3D CPU_GET_CLASS(obj);
+> =20
+> @@ -396,7 +397,10 @@ static void cpu_common_initfn(Object *obj)
+>      QTAILQ_INIT(&cpu->breakpoints);
+>      QTAILQ_INIT(&cpu->watchpoints);
+> =20
+> -    cpu->trace_dstate =3D bitmap_new(trace_get_vcpu_event_count());
+> +    count =3D trace_get_vcpu_event_count();
+> +    if (count) {
+> +        cpu->trace_dstate =3D bitmap_new(count);
+> +    }
+> =20
+>      cpu_exec_initfn(cpu);
+>  }
+> --=20
+> 1.8.3.1
+>=20
+>=20
 
-I actually like that, but then you've pretty much guaranteed that you
-_cannot_ remove anything deprecated until 4.0.  You and Daniel aren't
-disagreeing as heavily as it seems, I think.
+--jKBxcB1XkHIR0Eqt
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Paolo
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZEz/nAAoJEJykq7OBq3PISpQH/RybLIkBf0aHGxTjGR1zxhJu
+geLq7nIPlRztLG8WHbNs5c7csA0sU8/YwE6Da+YBHbKCVVLW3OsYq2aiTrb+C23Z
+He6PCJqJSpNNZ0K4/gR3hFqwUJBysfEDHL8CswApIEbIOLCJLHZb8aJ6bxADWZ5C
+WbtMCdWtNQ53KL/Y9/cgBUi5R2rEbS+BF3cS1xj2eMZJgT+FB9VlZeLefn7+TnvE
+e9vHrTYi26gc8KinnxORxaQBwc4n2VIHhnRXVclKc0ofPCT2A487QgJZNuR1emBg
+FqjZceb1GdMx13kgqJoj8dDvCI+VyU3RhuWTwEh3CF/974EIpAVKb1MxLn6E0aQ=
+=xyZO
+-----END PGP SIGNATURE-----
+
+--jKBxcB1XkHIR0Eqt--
