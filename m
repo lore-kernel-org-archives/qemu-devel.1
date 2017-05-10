@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1d8TyM-0002pz-Du
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:56:19 -0400
+	(envelope-from <rjones@redhat.com>) id 1d8TzC-0003Ze-40
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:57:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1d8TyI-0003zX-BD
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:56:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1677)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1d8TyI-0003yp-2F
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:56:14 -0400
-From: Pankaj Gupta <pagupta@redhat.com>
-Date: Wed, 10 May 2017 21:26:00 +0530
-Message-Id: <1494431760-6455-1-git-send-email-pagupta@redhat.com>
+	(envelope-from <rjones@redhat.com>) id 1d8TzB-0004FO-67
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:57:10 -0400
+Date: Wed, 10 May 2017 16:57:00 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20170510155700.GY16511@redhat.com>
+References: <20170510143205.32013-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] KVM "fake DAX" device flushing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170510143205.32013-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] curl: locking cleanups/fixes,
+ coroutine conversion, remove aio_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,151 +23,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm@vger.kernel.org, qemu-devel@nongnu.org
-Cc: riel@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, stefanha@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, jcody@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org
 
-We are sharing initial project proposal for=20
-'KVM "fake DAX" device flushing' project for feedback.=20
-Got the idea during discussion with 'Rik van Riel'.=20
+On Wed, May 10, 2017 at 04:31:58PM +0200, Paolo Bonzini wrote:
+> Since the last patch in v1 didn't work, I bit the bullet and converted
+> the whole thing to coroutines (patches 4-6).  This in turns allows a more
+> elegant solution to wait for CURLStates to get free (patch 7).
+> 
+> I tested this by lowering CURL_NUM_STATES to 2.  With this change, the
+> buggy case triggers a couple times while booting a Fedora netinst image.
 
-Also, request answers to 'Questions' section.
+This series fixes the original bug, so:
 
-Abstract :=20
-----------
-Project idea is to use fake persistent memory with direct=20
-access(DAX) in virtual machines. Overall goal of project=20
-is to increase the number of virtual machines that can be=20
-run on a physical machine, in order to increase the density=20
-of customer virtual machines.
+  Tested-by: Richard W.M. Jones <rjones@redhat.com>
 
-The idea is to avoid the guest page cache, and minimize the=20
-memory footprint of virtual machines. By presenting a disk=20
-image as a nvdimm direct access (DAX) memory region in a=20
-virtual machine, the guest OS can avoid using page cache=20
-memory for most file accesses.
+I think the Reported-by in patch 3 should credit Kun Wei for finding
+the bug, and we should probably mention the BZ too:
 
-Problem Statement :
-------------------
-* Guest uses page cache in memory to process fast requests=20
-  for disk read/write. This results in big memory footprint=20
-  of guests without host knowing much details of the guest=20
-  memory.=20
+  Reported-by: Kun Wei <kuwei@redhat.com>
+  Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1447590
 
-* If guests use direct access(DAX) with fake persistent=20
-  storage, the host manages the page cache for guests,=20
-  allowing the host to easily reclaim/evict less frequently=20
-  used page cache pages without requiring guest cooperation,=20
-  like ballooning would.
+A nit pick perhaps but in patch 5 you say "This was broken before for
+disks > 2TB, but now it would break at 4GB.".
+I understand after reading it a few times that you mean it would be
+broken at 4GB, if you hadn't changed size_t -> uint64_t (on 32 bit
+platforms).  Perhaps better to clarify that sentence.
 
-* Host manages guest cache as =E2=80=98mmaped=E2=80=99 disk image area in=
-=20
-  qemu address space. This region is passed to guest as fake=20
-  persistent memory range. We need a new flushing interface=20
-  to flush this cache to secondary storage to persist guest=20
-  writes.
+---
 
-* New asynchronous flushing interface will allow guests to=20
-  cause the host flush the dirty data to backup storage file.=20
-  Systems with pmem storage make use of CLFLUSH instruction=20
-  to flush single cache line to persistent storage and it=20
-  takes care of flushing. With fake persistent storage in=20
-  guest we cannot depend on CLFLUSH instruction to flush entire=20
-  dirty cache to backing storage. Even If we trap and emulate=20
-  CLFLUSH instruction guest vCPU has to wait till we flush all=20
-  the dirty memory. Instead of this we need to implement a new=20
-  asynchronous guest flushing interface, which allows the guest=20
-  to specify a larger range to be flushed at once, and allows=20
-  the vCPU to run something else while the data is being synced=20
-  to disk.=20
+I also ran some performance and stability testing.  I used virt-ls for
+this.  The following command will iterate over every file in a remote
+guest image and print an md5sum:
 
-* New flushing interface will consists of a para virt driver to=20
-  new fake nvdimm like device which will process guest flushing
-  requests like fsync/msync etc instead of pmem library calls=20
-  like clflush. The corresponding device at host side will be=20
-  responsible for flushing requests for guest dirty pages.=20
-  Guest can put current task in sleep and vCPU can run any other=20
-  task while host side flushing of guests pages is in progress.
+  LIBGUESTFS_BACKEND=direct \
+  LIBGUESTFS_HV=~/d/qemu/x86_64-softmmu/qemu-system-x86_64 \
+  virt-ls -a http://somehost/rhel-guest-image-7.1-20150224.0.x86_64.qcow2 \
+          -lR --checksum /
 
-Host controlled fake nvdimm DAX to avoid guest page cache :
--------------------------------------------------------------
-* Bypass guest page cache by using a fake persistent storage=20
-  like nvdimm & DAX. Guest Read/Write is directly done on=20
-  fake persistent storage without involving guest kernel for=20
-  caching data.
+I timed this with and without your patches, but there was no
+significant difference (but note that virt-ls is a fundamentally
+sequential program).
 
-* Fake nvdimm device passed to guest is backed by a regular=20
-  file in host stored in secondary storage.
+It didn't crash or hang at any time during my testing.
 
-* Qemu has implementation of fake NVDIMM/DAX device. Use this=20
-  capability of passing regular host file(disk) as nvdimm device=20
-  to guest.
+Rich.
 
-* Nvdimm with DAX works for ext4/xfs filesystem. Supported=20
-  filesystem should be DAX compatible.=20
-
-* As we are using guest disk as fake DAX/NVDIMM device, we=20
-  need a mechanism for persistence of data backed on regular=20
-  host storage file.
-
-* For live migration use case, if host side backing file is=20
-  shared storage, we need to flush the page cache for the disk=20
-  image at the destination (new fadvise interface, FADV_INVALIDATE_CACHE?=
-)=20
-  before starting execution of the guest on the destination host.
-
-Design :
----------
-* In order to not have page cache inside the guest, qemu would:
-
- 1) mmap the guest's disk image and present that disk image to=20
-    the guest as a persistent memory range.
-
- 2) Present information to the guest telling it that the persistent=20
-    memory range is not physical persistent memory.
-
- 3) Present an additional paravirt device alongside the persistent=20
-    memory range, that can be used to sync (ranges of) data to disk.
-
-* Guest would use the disk image mostly like a persistent memory=20
-  device, with two exceptions:
-
-  1) It would not tell userspace that the files on that device are=20
-     persistent memory. This is  done so userspace knows to call=20
-     fsync/msync, instead of the pmem clflush library call.
-
-  2) When userspace calls fsync/msync on files on the fake persistent=20
-     memory device, issue a request through the paravirt device that=20
-     causes the host to flush the device back end.
-
-* Guest uses fake persistent storage data updates can be still in=20
-  qemu memory. We need a way to flush cached data in host to backed=20
-  secondary storage.
-
-* Once the guest receives a completion event from the host, it will=20
-  allow userspace programs that were waiting on the fsync/msync to=20
-  continue running.
-
-* Host is responsible for paging in pages in host backing area for=20
-  guest persistent memory as they are accessed by the guest, and=20
-  for evicting pages as host memory fills up.
-
-Questions :
------------
-* What should the flushing interface between guest and host look=20
-  like?
-
-* Any suggestions to hook the IO caching code with KVM/Qemu or=20
-  thoughts on how we should do it?=20
-
-* Thinking of implementing a guest para virt driver which will send=20
-  guest requests to Qemu to flush data to disk. Not sure at this=20
-  point how to tell userspace to work on this device as any regular
-  device without considering it as persistent device. Any suggestions
-  on this?
-
-* Not thought yet about ballooning impact. But feel this solution=20
-  could be better than ballooning in long term? As we will be=20
-  managing all guests cache from host side.
-
-* Not sure this solution works for ARM and other architectures and=20
-  Windows?=20
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
