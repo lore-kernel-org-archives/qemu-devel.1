@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d8TI4-0001Z9-0a
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:12:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d8TJh-0002bK-UA
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d8THy-0006ra-5b
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:12:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1d8THx-0006qO-Rv
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:12:30 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4AErnda118810
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 11:12:28 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ac4564c4f-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 11:12:28 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 10 May 2017 16:12:24 +0100
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 10 May 2017 17:12:09 +0200
-Message-Id: <20170510151209.32767-1-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] s390x/css: catch section mismatch on load
+	(envelope-from <dgilbert@redhat.com>) id 1d8TJe-0007uM-Lg
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:14:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d8TJe-0007uH-C9
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:14:14 -0400
+Date: Wed, 10 May 2017 16:14:05 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170510151404.GF4230@work-vm>
+References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
+	<20170510090841.GF31558@redhat.com> <20170510145125.GE4230@work-vm>
+	<20170510150452.GV31558@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170510150452.GV31558@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
+ pc-0.15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,123 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-stable@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Prior to the virtio-ccw-2.7 machine (and commit 2a79eb1a), our virtio
-devices residing under the virtual-css bus do not have qdev_path based
-migration stream identifiers (because their qdev_path is NULL). The ids
-are instead generated when the device is registered as a composition of
-the so called idstr, which takes the vmsd name as its value, and an
-instance_id, which is which is calculated as a maximal instance_id
-registered with the same idstr plus one, or zero (if none was registered
-previously).
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Wed, May 10, 2017 at 03:51:25PM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > If we deprecate in this release (~Aug/Sep 2017), and kill in the next
+> > > release  (Dec 2017), that means our oldest machine type pc-1.0 is still
+> > > going to be 6 years, or 18 major releases, old. This raises some questions
+> > > 
+> > >   - Do we really think that we still have users with VMs that are
+> > >     stuck on a 6 year old machine type from 18 major releases ago ?
+> > 
+> > Our RHEL6 users are still on a 0.12 derivative.
+> 
+> Yep, but not using upstream machine types. So we can kill machine
+> types without affecting RHEL-6.  The separate question is whether
+> we can kill the associated features that are needed for RHEL to
+> create its legacy machine types (eg the rombar setting mentioned)
 
-That means, under certain circumstances, one device might try, and even
-succeed, to load the state of a different device. This can lead to
-trouble.
+Right, it just felt a bit odd to kill it off upstream if we know
+of users ourselves who use old versions like that.
 
-Let us fail the migration if the above problem is detected during load.
+Also remember machine types are not just about migration compatibility;
+if we kill a machine type then:
+  a) The users will need to modify their libvirt xml for each VM to
+change machine type
+  b) That change in guest view of the machine might upset the OS
+installed.
 
-How to reproduce the problem:
-1) start qemu-system-s390x making sure you have the following devices
-   defined on your command line:
-     -device virtio-rng-ccw,id=rng1,devno=fe.0.0001
-     -device virtio-rng-ccw,id=rng2,devno=fe.0.0002
-2) detach the devices and reattach in reverse order using the monitor:
-     (qemu) device_del rng1
-     (qemu) device_del rng2
-     (qemu) device_add virtio-rng-ccw,id=rng2,devno=fe.0.0002
-     (qemu) device_add virtio-rng-ccw,id=rng1,devno=fe.0.0001
-3) save the state of the vm into a temporary file and quit QEMU:
-     (qemu) migrate "exec:gzip -c > /tmp/tmp_vmstate.gz"
-     (qemu) q
-4) use your command line from step 1 with
-     -incoming "exec:gzip -c -d /tmp/tmp_vmstate.gz"
-   appended to reproduce the problem (while trying to to load the saved vm)
+I've certainly got VMs that were installed ages ago and are still using
+the XML from the old installation; so that probably means using an old
+machine type on a modern QEMU.
 
-CC: qemu-stable@nongnu.org
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
----
+Dave
 
-Hi!
-
-I also wonder what is the best way to do this with vmstate.  I know there
-are VMSTATE_*_EQUAL macros for integers, and I have partially modelled my
-patch after that, but there we only get a != b as error message, which is
-satisfactory for detecting bugs which are supposed to get fixed. In this
-particular case having a verbose error message should be really helpful
-and thus important.
-
-I'm asking because I'm currently working on a vmstate conversion of the
-s390x css and virtio-ccw  stuff (find my latest patch set here
-https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01364.html).
-
-Regards,
-Halil
----
- hw/s390x/css.c        | 14 ++++++++++++++
- hw/s390x/virtio-ccw.c |  6 +++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 15c4f4b..6cff3a3 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -14,6 +14,7 @@
- #include "qapi/visitor.h"
- #include "hw/qdev.h"
- #include "qemu/bitops.h"
-+#include "qemu/error-report.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
- #include "hw/s390x/ioinst.h"
-@@ -1721,13 +1722,26 @@ void subch_device_save(SubchDev *s, QEMUFile *f)
- int subch_device_load(SubchDev *s, QEMUFile *f)
- {
-     SubchDev *old_s;
-+    Error *err = NULL;
-     uint16_t old_schid = s->schid;
-+    uint16_t old_devno = s->devno;
-     int i;
- 
-     s->cssid = qemu_get_byte(f);
-     s->ssid = qemu_get_byte(f);
-     s->schid = qemu_get_be16(f);
-     s->devno = qemu_get_be16(f);
-+    if (s->devno != old_devno) {
-+        /* Only possible if machine < 2.7 (no css_dev_path) */
-+
-+        error_setg(&err, "%x != %x", old_devno,  s->devno);
-+        error_append_hint(&err, "Devno mismatch, tried to load wrong section!"
-+                          " Likely reason: some sequences of plug and unplug"
-+                          " can break migration for machine versions prior"
-+                          " 2.7 (known design flaw).\n");
-+        error_report_err(err);
-+        return -EINVAL;
-+    }
-     /* Re-assign subch. */
-     if (old_schid != s->schid) {
-         old_s = channel_subsys.css[s->cssid]->sch_set[s->ssid]->sch[old_schid];
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index e7167e3..4f7efa2 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1274,9 +1274,13 @@ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
-     SubchDev *s = ccw_dev->sch;
-     VirtIODevice *vdev = virtio_ccw_get_vdev(s);
-     int len;
-+    int ret;
- 
-     s->driver_data = dev;
--    subch_device_load(s, f);
-+    ret = subch_device_load(s, f);
-+    if (ret) {
-+        return ret;
-+    }
-     /* Re-fill subch_id after loading the subchannel states.*/
-     if (ck->refill_ids) {
-         ck->refill_ids(ccw_dev);
--- 
-2.10.2
+> > 
+> > >   - Is 6 years / 18 major releases going to be our cutoff point for
+> > >     machine types going forward ?
+> > > 
+> > >   - Do we have any confidence that pc-1.0 in QEMU 2.9.0 really is
+> > >     migration compatible with pc-1.0 from QEMU 1.0 ? I'm doubtful
+> > >     unless someone can show automated testing results that confirm
+> > >     it is compatible.
+> > 
+> > I'll give you a manual one; I just migrated:
+> >    /opt/qemu/v1.0.1/bin/qemu-system-x86_64 -M pc-1.0 -m 2G /home/vms/f23-serial-010.qcow2 -M pc-1.0 -nographic
+> > to
+> >    /opt/qemu/v2.9.0/bin/qemu-system-x86_64 -M pc-1.0 -m 2G /home/vms/f23-serial-010.qcow2 -M pc-1.0 -nographic -incoming tcp::4444
+> > 
+> > seems to have survived.
+> > Not exactly conclusive or heavy coverage, but it's not completely
+> > broken.
+> > 
+> > > FYI, I'm in favour of culling old machine types, but I think when we do
+> > > this it should not be a one-off ad-hoc culling.
+> > > 
+> > > It should be accompanied by changes to the documentation that clearly
+> > > state our official support policy for machine type lifetimes, so that
+> > > users know what to expect for future releases.
+> > > 
+> > > Also unless we're going to get more serious about automated testing to
+> > > validate machine type compatibility between *all* previously releases,
+> > > I think that 6 years / 18 releases is too long a time to have any
+> > > confidence in migration compatibility between versions.
+> > 
+> > The problem is we don't do that much testing; I know of more subtle
+> > things that have broken between 2.6 and 2.7 - so do you kill 2.6 machine
+> > type? No, but it's a question of how you choose what to kill.
+> 
+> You know of the breaks between 2.6 & 2.7 because those are modern versions
+> people are using & thus getting lots of attention & analysis from yourself
+> and other people. Arguably it just looks worse because no one is actively
+> using, testing or analysing 1.0 vs 2.7.
+> 
+> Ideally, we would only claim to support combinations that we have active
+> compatibility test coverage for. We lacking right now, but for the sake
+> of discussion, lets assume we did have some level of automated coverage.
+> Then there's still the question of how far back we want to be running the
+> testing for. I think the latter is the more important question, as it sets
+> us a clear process to follow, as well as a goal to reach for testing coverage.
+> 
+> IOW, we should be able to set ourselves a goal / process, even if we don't
+> yet achieve that in terms of testing.
+> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
