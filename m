@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8M7j-0006Sy-H9
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:33:28 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d8MP0-0002gm-2Q
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:51:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8M7i-0000jV-7e
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:33:27 -0400
-Date: Wed, 10 May 2017 17:33:12 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170510073312.GX25748@umbus.fritz.box>
-References: <20170505193810.2934-1-eblake@redhat.com>
-	<20170505193810.2934-4-eblake@redhat.com>
-	<20170508052617.GC25748@umbus.fritz.box>
-	<117db2fa-302b-362a-738c-0c114439f8af@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1d8MOy-00067j-UA
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:51:18 -0400
+Resent-Message-Id: <E1d8MOy-00067j-UA@eggs.gnu.org>
+In-Reply-To: <20170510070115.13063-1-david@gibson.dropbear.id.au>
+Message-ID: <149440262829.285.3407353522530465007@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0btr6/5+bhBdui6J"
-Content-Disposition: inline
-In-Reply-To: <117db2fa-302b-362a-738c-0c114439f8af@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 3/5] shutdown: Add source information to
- SHUTDOWN and RESET
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 10 May 2017 00:50:29 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/22] ppc-for-2.10 queue 20170510
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,127 +23,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Rob Herring <robh@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, Jan Kiszka <jan.kiszka@web.de>, Andrzej Zaborowski <balrogg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paul Burton <paul.burton@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Magnus Damm <magnus.damm@gmail.com>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Stefan Weil <sw@weilnetz.de>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Marcelo Tosatti <mtosatti@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, "open list:Calxeda Highbank" <qemu-arm@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:Old World" <qemu-ppc@nongnu.org>, "open list:Overall" <kvm@vger.kernel.org>
+To: david@gibson.dropbear.id.au
+Cc: famz@redhat.com, peter.maydell@linaro.org, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, aik@ozlabs.ru, mark.cave-ayland@ilande.co.uk, agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com, sam.bobroff@au1.ibm.com
 
-
---0btr6/5+bhBdui6J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, May 08, 2017 at 09:32:42AM -0500, Eric Blake wrote:
-> On 05/08/2017 12:26 AM, David Gibson wrote:
-> > On Fri, May 05, 2017 at 02:38:08PM -0500, Eric Blake wrote:
-> >> Time to wire up all the call sites that request a shutdown or
-> >> reset to use the enum added in the previous patch.
-> >>
-> >> It would have been less churn to keep the common case with no
-> >> arguments as meaning guest-triggered, and only modified the
-> >> host-triggered code paths, via a wrapper function, but then we'd
-> >> still have to audit that I didn't miss any host-triggered spots;
-> >> changing the signature forces us to double-check that I correctly
-> >> categorized all callers.
-> >>
-> >> Since command line options can change whether a guest reset request
-> >> causes an actual reset vs. a shutdown, it's easy to also add the
-> >> information to reset requests.
-> >>
-> >> Replay adds a FIXME to preserve the cause across the replay stream,
-> >> that will be tackled in the next patch.
-> >>
-> >> Signed-off-by: Eric Blake <eblake@redhat.com>
-> >> Acked-by: David Gibson <david@gibson.dropbear.id.au> [ppc parts]
-> >> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> [SPARC p=
-art]
-> >=20
-> > [snip]
-> >=20
-> >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> >> index 9f18f75..2735fe9 100644
-> >> --- a/hw/ppc/spapr_hcall.c
-> >> +++ b/hw/ppc/spapr_hcall.c
-> >> @@ -1166,7 +1166,7 @@ static target_ulong h_client_architecture_suppor=
-t(PowerPCCPU *cpu,
-> >>      spapr_ovec_cleanup(ov5_updates);
-> >>
-> >>      if (spapr->cas_reboot) {
-> >> -        qemu_system_reset_request();
-> >> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-> >=20
-> > I'm not 100% sure about this one, since I'm not sure 100% of how the
-> > different enum values are defined.  This one is tripped when feature
-> > negotiation between firmware and guest can't be satisfied without
-> > rebooting (next time round the firmware will use some different
-> > options).
->=20
-> Patch 2/5 introduced the enum.  The biggest part of the patch (for now)
-> is that anything SHUTDOWN_CAUSE_HOST_ will be exposed to the QMP client
-> as host-triggered, anything SHUTDOWN_CAUSE_GUEST_ will be exposed as
-> guest-triggered.  I basically used SHUTDOWN_CAUSE_GUEST_RESET for any
-> call to qemu_system_reset_requst() underneath the hw/ tree, because the
-> hw/ tree is emulating guest behavior and therefore it is presumably a
-> reset caused by a guest request.
-
-Ok.
-
-> > So it's essentially a firmware/hypervisor triggered reset, but one
-> > that should only ever be tripped during early guest boot.  Is
-> > CAUSE_GUEST_RESET correct for that?
->=20
-> Of course, I'm not an export on SPAPR, so I'll happily change it to
-> anything else if you think that is more appropriate. But the rule of
-> thumb I went by is whether this is qemu emulating a bare-metal
-> reset/shutdown, vs. qemu killing the guest without waiting for guest
-> instructions to reach some magic
-> memory/register/ACPI/who-knows-what-else request.  While it may happen
-> only early during guest boot, it is still the guest firmware that is
-> requesting it, and not qemu causing a unilateral death.
-
-So, I think GUEST_RESET is the right choice here.  The distinctions
-are blurry, because PAPR is built as a paravirtualized platform -
-there is no bare metal equivalent.  For example, on PowerVM this
-really would be initiated by guest firmware, but it's working in
-communication with the hypervisor.  But with qemu and KVM, we actually
-implement all this negotiation logic in qemu directly (this is easier
-than having complex communication channels between guest firware and
-qemu).
-
-But I guess the point is that this is a "business as usual" reboot and
-the guest is expected to continue booting at some point after this,
-rather than being killed by qemu.
-
-Things get more complicated still if we think about what happens if
-this feature negotiation fails - then we can't boot the guest OS.  At
-the moment the few cases where this happens, I think we just exit
-qemu, but notifying this as a host caused shutdown might be
-appropriate.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---0btr6/5+bhBdui6J
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZEsI2AAoJEGw4ysog2bOSrZQQAONQcDrk+8XBHkJ+cjUrLJmD
-GvWf8otaUn05Y8BqwzsDqav4jUGX9hlt1nyamQVXRGrjjOoWx3vGO3n3n6E9rqkj
-iNnEHqnXgvYn8JgGBpYQ1pawEsCuq+NpQa9wLu9SDsg9WEFpu0kA/SjXqSQAsej2
-RSCn39/UvO/3h2uDKCxntQ1UiMW9+hywaxfTNX8r1+n4h10LRcD3OhvqdN3v4wlw
-nzU81CXhM3XHVkMD5nG7T/Deg7BrmR0aaogvJmDvhsqIqa+KnLLZw2f8R4mclOEA
-A25e9xG8sze0J2yFyS2TDTuQuQzp/r0fnvH5A9b49S51gn2rHgZ3xIVs8rz+KUGa
-uAkmYzyEtXoLKfZyf+lHjVfJRhGpINu9JzhRBlR+0GRwm9a10Onzeo27cDRFc5CM
-E50UVmIecjfWO9x0CAemez6YqfXuqLIBB408+Y4WkOLoWHiwGqZjEHRNtzGY3tI9
-4g2t17iHfhkhMw5Eq6B3pBtEQOY21d+PODL93iwfuAq1RmAcUhjmUD1+mRM3GdcA
-pBNZNAE/5k3r3VzA10DRd3ebmJ6UDOWefUWOHIqK2fZsf/tNHhJBo0k3WPOlmq+m
-MTCMqSkqIsOpDYK7YHvLWZNxk+jymMTf9albzjCX202C77zbpmQa0Y59o03HMbDf
-mrS9Yc16j48Dox+nzqwT
-=IB2R
------END PGP SIGNATURE-----
-
---0btr6/5+bhBdui6J--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA1MTAwNzAxMTUuMTMwNjMtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUKVHlwZTogc2Vy
+aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8yMl0gcHBjLWZvci0yLjEwIHF1ZXVl
+IDIwMTcwNTEwCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
+c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
+MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxYjcwZjI5IHBudjogRml4IGJ1aWxkIGZhaWx1cmVz
+IG9uIHNvbWUgaG9zdCBwbGF0Zm9ybXMKODY2NzFmOCB0YXJnZXQvcHBjOiBBbGxvdyB3b3JrYXJv
+dW5kcyBmb3IgUE9XRVI5IEREMQo2Y2VkZWU4IHNwYXByOiBEb24ndCBhY2NpZGVudGFsbHkgYWR2
+ZXJ0aXNlIEhUTSBzdXBwb3J0IG9uIFBPV0VSOQo2OTc3NzczIHBwYzogeGljczogZml4IGNvbXBp
+bGF0aW9uIHdpdGggQ2VudE9TIDYKZWFmYzhmNSB0YXJnZXQvcHBjOiBFbmFibGUgUkFESVggbW11
+IG1vZGUgZm9yIHBzZXJpZXMgVENHIGd1ZXN0CjA2OTUyOTMgdGFyZ2V0L3BwYzogSW1wbGVtZW50
+IElTQSBWMy4wMCByYWRpeCBwYWdlIGZhdWx0IGhhbmRsZXIKNDRjOTQwMyB0YXJnZXQvcHBjOiBD
+aGFuZ2UgdGxiaWUgaW52YWxpZCBmaWVsZHMgZm9yIFBPV0VSOSBzdXBwb3J0CjliMDkyODcgdGFy
+Z2V0L3BwYzogVXBkYXRlIHRsYmllIHRvIGNoZWNrIHByaXZpbGVnZSBsZXZlbCBiYXNlZCBvbiBH
+VFNFCmQxYTM2YmEgdGFyZ2V0L3BwYzogU2V0IFVQUlQgYW5kIEdUU0Ugb24gYWxsIGNwdXMgaW4g
+SF9SRUdJU1RFUl9QUk9DRVNTX1RBQkxFCjdjZjljNmYgcHBjOiBhZGQgcWVtdV92Z2EubmRydiBS
+T00gdG8gZndfY2ZnIGludGVyZmFjZSBmb3IgTmV3V29ybGQgTWFjcwpkZDIxMWNhIHBwYzogYWRk
+IHFlbXVfdmdhLm5kcnYgUk9NIHRvIGZ3X2NmZyBpbnRlcmZhY2UgZm9yIE9sZFdvcmxkIE1hY3MK
+NzU3MzIzZiBBZGQgUWVtdU1hY0RyaXZlcnMgcWVtdV92Z2EubmRydiByZXZpc2lvbiBkNGU3ZDdh
+IGJ1aWx0IGFzIHN1Ym1vZHVsZQo2MzYyNDBjIEFkZCBRZW11TWFjRHJpdmVycyBhcyBzdWJtb2R1
+bGUKYmQ4Njg4NiBwcGMveGljczogcHJlc2VydmUgUCBhbmQgUSBiaXRzIGZvciBLVk0gSVJRcwpj
+NzY5OTY2IHBwYy94aWNzOiBGaXggc3RhbGUgaXJxLT5zdGF0dXMgYml0cyBhZnRlciBnZXQKZmU3
+Y2U0NiB0YXJnZXQvcHBjOiBkbyBub3QgcmVzZXQgcmVzZXJ2ZV9hZGRyIGluIGV4ZWNfZW50ZXIK
+NDhlYjNiZiB0Y2c6IGVuYWJsZSBNVFRDRyBieSBkZWZhdWx0IGZvciBQUEM2NCBvbiB4ODYKNDZi
+ZGI4MyBjcHVzOiBGaXggQ1BVIHVucGx1ZyBmb3IgTVRUQ0cKNjRkMWI0MSB0YXJnZXQvcHBjOiBH
+ZW5lcmF0ZSBmZW5jZSBvcGVyYXRpb25zCjY4OGViMjQgY3B1dGxiOiBoYW5kbGUgZmlyc3QgYXRv
+bWljIHdyaXRlIHRvIHRoZSBwYWdlCjYyNTczNGMgdGFyZ2V0L3BwYzogRW11bGF0ZSBMTC9TQyB1
+c2luZyBjbXB4Y2hnIGhlbHBlcnMKZDczNjkxMiBwcGMvcG52OiByZXN0cmljdCBCTUMgb2JqZWN0
+IHRvIHRoZSBCTUMgc2ltdWxhdG9yCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
+SCAxLzIyOiBwcGMvcG52OiByZXN0cmljdCBCTUMgb2JqZWN0IHRvIHRoZSBCTUMgc2ltdWxhdG9y
+Li4uCkNoZWNraW5nIFBBVENIIDIvMjI6IHRhcmdldC9wcGM6IEVtdWxhdGUgTEwvU0MgdXNpbmcg
+Y21weGNoZyBoZWxwZXJzLi4uCkNoZWNraW5nIFBBVENIIDMvMjI6IGNwdXRsYjogaGFuZGxlIGZp
+cnN0IGF0b21pYyB3cml0ZSB0byB0aGUgcGFnZS4uLgpDaGVja2luZyBQQVRDSCA0LzIyOiB0YXJn
+ZXQvcHBjOiBHZW5lcmF0ZSBmZW5jZSBvcGVyYXRpb25zLi4uCkNoZWNraW5nIFBBVENIIDUvMjI6
+IGNwdXM6IEZpeCBDUFUgdW5wbHVnIGZvciBNVFRDRy4uLgpDaGVja2luZyBQQVRDSCA2LzIyOiB0
+Y2c6IGVuYWJsZSBNVFRDRyBieSBkZWZhdWx0IGZvciBQUEM2NCBvbiB4ODYuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNy8yMjogdGFyZ2V0L3BwYzogZG8gbm90IHJlc2V0IHJlc2VydmVfYWRkciBpbiBleGVj
+X2VudGVyLi4uCkNoZWNraW5nIFBBVENIIDgvMjI6IHBwYy94aWNzOiBGaXggc3RhbGUgaXJxLT5z
+dGF0dXMgYml0cyBhZnRlciBnZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yMjogcHBjL3hpY3M6IHBy
+ZXNlcnZlIFAgYW5kIFEgYml0cyBmb3IgS1ZNIElSUXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjI6
+IEFkZCBRZW11TWFjRHJpdmVycyBhcyBzdWJtb2R1bGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjI6
+IEFkZCBRZW11TWFjRHJpdmVycyBxZW11X3ZnYS5uZHJ2IHJldmlzaW9uIGQ0ZTdkN2EgYnVpbHQg
+YXMgc3VibW9kdWxlLi4uCkNoZWNraW5nIFBBVENIIDEyLzIyOiBwcGM6IGFkZCBxZW11X3ZnYS5u
+ZHJ2IFJPTSB0byBmd19jZmcgaW50ZXJmYWNlIGZvciBPbGRXb3JsZCBNYWNzLi4uCkNoZWNraW5n
+IFBBVENIIDEzLzIyOiBwcGM6IGFkZCBxZW11X3ZnYS5uZHJ2IFJPTSB0byBmd19jZmcgaW50ZXJm
+YWNlIGZvciBOZXdXb3JsZCBNYWNzLi4uCkNoZWNraW5nIFBBVENIIDE0LzIyOiB0YXJnZXQvcHBj
+OiBTZXQgVVBSVCBhbmQgR1RTRSBvbiBhbGwgY3B1cyBpbiBIX1JFR0lTVEVSX1BST0NFU1NfVEFC
+TEUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjI6IHRhcmdldC9wcGM6IFVwZGF0ZSB0bGJpZSB0byBj
+aGVjayBwcml2aWxlZ2UgbGV2ZWwgYmFzZWQgb24gR1RTRS4uLgpDaGVja2luZyBQQVRDSCAxNi8y
+MjogdGFyZ2V0L3BwYzogQ2hhbmdlIHRsYmllIGludmFsaWQgZmllbGRzIGZvciBQT1dFUjkgc3Vw
+cG9ydC4uLgpDaGVja2luZyBQQVRDSCAxNy8yMjogdGFyZ2V0L3BwYzogSW1wbGVtZW50IElTQSBW
+My4wMCByYWRpeCBwYWdlIGZhdWx0IGhhbmRsZXIuLi4KRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBs
+ZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNDEzOiBGSUxFOiB0
+YXJnZXQvcHBjL21tdS1yYWRpeDY0Lmg6MTk6CisjZGVmaW5lIFBSVEJFX1JfR0VUX1JUUyhydHMp
+ICAgICgoKHJ0cyA+PiA1OCkgJiAweDE4KSB8ICgocnRzID4+IDUpICYgMHg3KSkgKyAzMQoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzNzMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTgvMjI6IHRhcmdldC9w
+cGM6IEVuYWJsZSBSQURJWCBtbXUgbW9kZSBmb3IgcHNlcmllcyBUQ0cgZ3Vlc3QuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTkvMjI6IHBwYzogeGljczogZml4IGNvbXBpbGF0aW9uIHdpdGggQ2VudE9TIDYu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjI6IHNwYXByOiBEb24ndCBhY2NpZGVudGFsbHkgYWR2ZXJ0
+aXNlIEhUTSBzdXBwb3J0IG9uIFBPV0VSOS4uLgpDaGVja2luZyBQQVRDSCAyMS8yMjogdGFyZ2V0
+L3BwYzogQWxsb3cgd29ya2Fyb3VuZHMgZm9yIFBPV0VSOSBERDEuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MjIvMjI6IHBudjogRml4IGJ1aWxkIGZhaWx1cmVzIG9uIHNvbWUgaG9zdCBwbGF0Zm9ybXMuLi4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
+aXN0cy5vcmc=
