@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d8Oue-00063N-03
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:32:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8OxS-0007eJ-ML
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d8Oua-0007GD-5p
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:32:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d8OuZ-0007Fk-Sr
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:32:04 -0400
-Date: Wed, 10 May 2017 11:31:53 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170510103153.GI31558@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
-	<20170510090841.GF31558@redhat.com>
-	<e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8OxR-0007xD-8Q
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 06:35:02 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494348286-10253-3-git-send-email-sundeep.lkml@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fffd61b7-bc45-f7da-aa91-5eed1b0d7519@amsat.org>
+Date: Wed, 10 May 2017 07:34:49 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
- pc-0.15
+In-Reply-To: <1494348286-10253-3-git-send-email-sundeep.lkml@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-devel PATCH 2/5] msf2: Microsemi
+ Smartfusion2 System Register block.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,150 +28,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kraxel@redhat.com
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, alistair23@gmail.com, crosthwaite.peter@gmail.com
 
-On Wed, May 10, 2017 at 12:05:16PM +0200, Thomas Huth wrote:
-> On 10.05.2017 11:08, Daniel P. Berrange wrote:
-> > On Wed, May 10, 2017 at 08:48:53AM +0200, Thomas Huth wrote:
-> >> We don't want to carry along old machine types forever. If we are able to
-> >> remove the pc machines up to 0.13 one day for example, this would allow
-> >> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
-> >> BARs directly to low memory). So let's start with a deprecation message
-> >> for the old 0.xx machine types so that the (hopefully) few users of these
-> >> old systems start switching over to newer machine types instead.
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >> ---
-> >>  Note: I've decided to print the warning for all pc-0.* machine types,
-> >>  but that of course doesn't mean that we also have to remove them all at
-> >>  once when we decide to finally really remove some. We could then also
-> >>  start by removing 0.10 and 0.11 only, for example (since there should
-> >>  really be no users left for these), or only up to 0.13 (to be able to
-> >>  kill rombar=0), as discussed in the "Deprecating old machine types"
-> >>  mail thread recently.
-> > 
-> > 
-> > As a point of reference here are the release dates:
-> > 
-> > v0.10.0: Mar 2009
-> > v0.11.0: Sep 2009
-> > v0.12.0: Dec 2009
-> > v0.13.0: Oct 2010
-> > v0.14.0: Feb 2011
-> > v0.15.0: Aug 2011
-> >    v1.0: Dec 2011
-> >  v1.1.0: Jun 2012
-> >  v1.2.0: Sep 2012
-> >  v1.3.0: Dec 2012
-> >  v1.4.0: Feb 2013
-> >  v1.5.0: May 2013
-> >  v1.6.0: Aug 2013
-> >  v1.7.0: Nov 2013
-> >  v2.0.0: Apr 2014
-> >  v2.1.0: Aug 2014
-> >  v2.2.0: Dec 2014
-> >  v2.3.0: Apr 2015
-> >  v2.4.0: Aug 2015
-> >  v2.5.0: Dec 2015
-> >  v2.6.0: May 2016
-> >  v2.7.0: Sep 2016
-> >  v2.8.0: Dec 2016
-> >  v2.9.0: Apr 2017
-> > 
-> > If we deprecate in this release (~Aug/Sep 2017), and kill in the next
-> > release  (Dec 2017)
-> 
-> There was kind of a consensus in the last thread in march that we should
-> print out the deprecation message for at least two releases, so that
-> users have at least one release cycle to object before a feature gets
-> really removed.
+Hi Subbaraya,
 
-For removal of machine types, IMHO, I don't think we should consider
-objections. Just clearly document the lifecycle so people know exactly
-how long they have until end-of-life, right from the moment they deploy,
-and thus won't be surprised when we remove it.
+On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
+> Added Sytem register block of Smartfusion2.
+> This block has PLL registers which are accessed by guest.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> ---
+>  hw/misc/Makefile.objs         |   1 +
+>  hw/misc/msf2-sysreg.c         | 131 ++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/misc/msf2-sysreg.h |  80 ++++++++++++++++++++++++++
+>  3 files changed, 212 insertions(+)
+>  create mode 100644 hw/misc/msf2-sysreg.c
+>  create mode 100644 include/hw/misc/msf2-sysreg.h
+>
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index c8b4893..0f52354 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) += edu.o
+>  obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+>  obj-$(CONFIG_AUX) += auxbus.o
+>  obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+> +obj-$(CONFIG_MSF2) += msf2-sysreg.o
+> diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
+> new file mode 100644
+> index 0000000..53e9cba
+> --- /dev/null
+> +++ b/hw/misc/msf2-sysreg.c
+> @@ -0,0 +1,131 @@
+> +/*
+> + * System Register block model of Microsemi SmartFusion2.
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License
+> + * as published by the Free Software Foundation; either version
+> + * 2 of the License, or (at your option) any later version.
+> + *
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "hw/misc/msf2-sysreg.h"
+> +
+> +#ifndef MSF2_SYSREG_ERR_DEBUG
+> +#define MSF2_SYSREG_ERR_DEBUG  0
+> +#endif
+> +
+> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> +    if (MSF2_SYSREG_ERR_DEBUG >= lvl) { \
+> +        qemu_log("%s: " fmt, __func__, ## args); \
+> +    } \
+> +} while (0);
+> +
+> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+> +
+> +static void msf2_sysreg_reset(DeviceState *d)
+> +{
+> +    MSF2SysregState *s = MSF2_SYSREG(d);
+> +
+> +    DB_PRINT("RESET\n");
+> +
+> +    s->regs[MSSDDR_PLL_STATUS_LOW_CR] = 0x02420041;
+> +    s->regs[MSSDDR_FACC1_CR] = 0x0A482124;
+> +    s->regs[MSSDDR_PLL_STATUS] = 0x3;
+> +}
+> +
+> +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
+> +    unsigned size)
+> +{
+> +    MSF2SysregState *s = opaque;
+> +    offset /= 4;
+> +    uint32_t ret = 0;
+> +
+> +    if (offset < ARRAY_SIZE(s->regs)) {
+> +        ret = s->regs[offset];
+> +        DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx32 "\n",
+> +                    offset * 4, ret);
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                    "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
+> +                    offset * 4);
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void msf2_sysreg_write(void *opaque, hwaddr offset,
+> +                          uint64_t val, unsigned size)
+> +{
+> +    MSF2SysregState *s = (MSF2SysregState *)opaque;
+> +    offset /= 4;
+> +
+> +    DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx64 "\n",
+> +            offset * 4, val);
+> +
+> +    switch (offset) {
+> +    case MSSDDR_PLL_STATUS:
+> +        break;
+> +
+> +    default:
+> +        if (offset < ARRAY_SIZE(s->regs)) {
+> +            s->regs[offset] = val;
 
-> > that means our oldest machine type pc-1.0 is still
-> > going to be 6 years, or 18 major releases, old. This raises some questions
-> > 
-> >   - Do we really think that we still have users with VMs that are
-> >     stuck on a 6 year old machine type from 18 major releases ago ?
-> >
-> >   - Is 6 years / 18 major releases going to be our cutoff point for
-> >     machine types going forward ?
-> > 
-> >   - Do we have any confidence that pc-1.0 in QEMU 2.9.0 really is
-> >     migration compatible with pc-1.0 from QEMU 1.0 ? I'm doubtful
-> >     unless someone can show automated testing results that confirm
-> >     it is compatible.
-> 
-> See https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg05837.html
-> ... there might be still users of 0.12  and 1.0 (though I don't hope
-> so), and everything before QEMU 1.2 can't be (life-)migrated anymore, so
-> we can nuke 0.10 and 0.11 for sure, maybe also the others up to 1.2.
-> So starting with a deprecation warning for 0.xx sounded like a good idea
-> to me.
+I think this is pretty unsafe for the guest to continue if those 
+registers are accessed in your current implementation.
 
-If 1.2 and old is known to be broken we should just deprecate those
-immediately now. It is pointless keeping something around that is
-known broken.
+I'd at least somehow abort for few of them (RESET, REMAP*), what do you 
+think?
 
-> > FYI, I'm in favour of culling old machine types, but I think when we do
-> > this it should not be a one-off ad-hoc culling.
-> > 
-> > It should be accompanied by changes to the documentation that clearly
-> > state our official support policy for machine type lifetimes, so that
-> > users know what to expect for future releases.
-> 
-> Sounds like an idea, could you please propose such a patch to the
-> documentation?
-
-Yep.
-
-> > Also unless we're going to get more serious about automated testing to
-> > validate machine type compatibility between *all* previously releases,
-> > I think that 6 years / 18 releases is too long a time to have any
-> > confidence in migration compatibility between versions.
-> 
-> Distro vendors often offer 5 - 10 years support for certain versions of
-> their Linux distros, so I think we should at least support 5 years, too.
-
-We have two distinct needs in that area.
-
-RHEL has ignored upstream machine types & defined its own forever, so
-we don't need to keep pc-xxxx machines around to help RHEL. Ubuntu has
-more recently started defining custom machine types too.
-
-If, however, we also started deleting the underlying features (rombar=0)
-that RHEL needs in order to create its custom machine types, then that
-would cause downstream problems. For example RHEL-7.4 with QEMU 2.9.0
-tries to provide a "rhel6.0.0" machine type for compatibility with
-old QEMU 0.12 version it orginally shipped.
-
-So while we can delete pc-0.12, we can't delete associated features needed
-by pc-0.12, without complicating RHEL's ability to create its back-compat
-machine types. Downstream would have to un-delete the features.
-
-> > IOW, I think you should be more aggressive in culling old machine types
-> > that this patch is...
-> 
-> Actually, I like the idea of using the major release versions for
-> defining the set of removal - hoping that we will do a v3.0 next year
-> which then would support the previous two major release versions 1.x and
-> 2.x, but drops support for the 0.xx versions completely ...
-
-I think tieing removal to major versions is a mistake, unless we're
-going to set a fixed timeframe for delivery of major versions. ie if
-we gaurantee that we'll ship a new major version every 18 months, that
-gives people a predictable lifetime.  If we carry on inventing reasons
-for major versions at arbitrary points in time, it makes it difficult
-to have any reasonable forward planning.  It is more users friendly if
-we can set a clear fixed timeframe for machine type lifecycle / eol
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                        "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
+> +                        offset * 4);
+> +        }
+> +        break;
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps sysreg_ops = {
+> +    .read = msf2_sysreg_read,
+> +    .write = msf2_sysreg_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static void msf2_sysreg_init(Object *obj)
+> +{
+> +    MSF2SysregState *s = MSF2_SYSREG(obj);
+> +
+> +    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s, TYPE_MSF2_SYSREG,
+> +                          MSF2_SYSREG_MMIO_SIZE);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
+> +}
+> +
+> +static const VMStateDescription vmstate_msf2_sysreg = {
+> +    .name = TYPE_MSF2_SYSREG,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32_ARRAY(regs, MSF2SysregState, MSF2_SYSREG_NUM_REGS),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->vmsd = &vmstate_msf2_sysreg;
+> +    dc->reset = msf2_sysreg_reset;
+> +}
+> +
+> +static const TypeInfo msf2_sysreg_info = {
+> +    .name  = TYPE_MSF2_SYSREG,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .class_init = msf2_sysreg_class_init,
+> +    .instance_size  = sizeof(MSF2SysregState),
+> +    .instance_init = msf2_sysreg_init,
+> +};
+> +
+> +static void msf2_sysreg_register_types(void)
+> +{
+> +    type_register_static(&msf2_sysreg_info);
+> +}
+> +
+> +type_init(msf2_sysreg_register_types)
+> diff --git a/include/hw/misc/msf2-sysreg.h b/include/hw/misc/msf2-sysreg.h
+> new file mode 100644
+> index 0000000..a485ed6
+> --- /dev/null
+> +++ b/include/hw/misc/msf2-sysreg.h
+> @@ -0,0 +1,80 @@
+> +/*
+> + * Microsemi SmartFusion2 SYSREG
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_MSF2_SYSREG_H
+> +#define HW_MSF2_SYSREG_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/hw.h"
+> +#include "sysemu/sysemu.h"
+> +#include "qemu/log.h"
+> +
+> +enum {
+> +    ESRAM_CR        = 0x00 / 4,
+> +    ESRAM_MAX_LAT,
+> +    DDR_CR,
+> +    ENVM_CR,
+> +    ENVM_REMAP_BASE_CR,
+> +    ENVM_REMAP_FAB_CR,
+> +    CC_CR,
+> +    CC_REGION_CR,
+> +    CC_LOCK_BASE_ADDR_CR,
+> +    CC_FLUSH_INDX_CR,
+> +    DDRB_BUF_TIMER_CR,
+> +    DDRB_NB_ADDR_CR,
+> +    DDRB_NB_SIZE_CR,
+> +    DDRB_CR,
+> +
+> +    SOFT_RESET_CR  = 0x48 / 4,
+> +    M3_CR,
+> +
+> +    GPIO_SYSRESET_SEL_CR = 0x58 / 4,
+> +
+> +    MDDR_CR = 0x60 / 4,
+> +
+> +    MSSDDR_PLL_STATUS_LOW_CR = 0x90 / 4,
+> +    MSSDDR_PLL_STATUS_HIGH_CR,
+> +    MSSDDR_FACC1_CR,
+> +    MSSDDR_FACC2_CR,
+> +
+> +    MSSDDR_PLL_STATUS = 0x150 / 4,
+> +
+> +};
+> +
+> +#define MSF2_SYSREG_MMIO_SIZE     0x300
+> +#define MSF2_SYSREG_NUM_REGS      (MSF2_SYSREG_MMIO_SIZE / 4)
+> +
+> +#define TYPE_MSF2_SYSREG          "msf2-sysreg"
+> +#define MSF2_SYSREG(obj)  OBJECT_CHECK(MSF2SysregState, (obj), TYPE_MSF2_SYSREG)
+> +
+> +typedef struct MSF2SysregState {
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion iomem;
+> +
+> +    uint32_t regs[MSF2_SYSREG_NUM_REGS];
+> +} MSF2SysregState;
+> +
+> +#endif /* HW_MSF2_SYSREG_H */
+>
