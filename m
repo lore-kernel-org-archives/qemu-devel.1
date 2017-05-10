@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d8NPr-0001r0-2p
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:56:19 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d8NUG-0003u0-JM
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 05:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d8NPm-0002jD-Qp
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:56:15 -0400
-Resent-Message-Id: <E1d8NPm-0002jD-Qp@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21374)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d8NPm-0002il-I1
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:56:10 -0400
-In-Reply-To: <1494403315-12760-1-git-send-email-peterx@redhat.com>
-Message-ID: <149440654982.288.5300047685993312780@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <jasowang@redhat.com>) id 1d8NUB-0004OL-LE
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 05:00:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d8NUB-0004Nq-GK
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 05:00:43 -0400
+References: <286AC319A985734F985F78AFA26841F7391FDD30@shsmsx102.ccr.corp.intel.com>
+	<056500d7-6a91-12e5-be1d-2b2beebd0430@redhat.com>
+	<20170505233541-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F7391FFC13@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <3ae2bfc4-f0ff-a5db-cc9a-bd844b42d2ba@redhat.com>
+Date: Wed, 10 May 2017 17:00:28 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 10 May 2017 01:55:50 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] VT-d: PT (passthrough) mode
- support and misc fixes
+In-Reply-To: <286AC319A985734F985F78AFA26841F7391FFC13@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] virtio-net: configurable TX queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peterx@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, tianyu.lan@intel.com, yi.l.liu@intel.com, mst@redhat.com, jasowang@redhat.com, marcel@redhat.com, david@gibson.dropbear.id.au
+To: "Wang, Wei W" <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Jan Scheurich <jan.scheurich@ericsson.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-NDQwMzMxNS0xMjc2MC0xLWdpdC1zZW5kLWVtYWlsLXBldGVyeEByZWRoYXQuY29tClR5cGU6IHNl
-cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzEyXSBWVC1kOiBQVCAocGFz
-c3Rocm91Z2gpIG1vZGUgc3VwcG9ydCBhbmQgbWlzYyBmaXhlcwoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
-aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRz
-PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
-bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
-IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
-bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
-aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
-bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ5NDQwNTY4My0yMDg3Ny0x
-LWdpdC1zZW5kLWVtYWlsLXByYWRlZXAuamFnYWRlZXNoQGh1YXdlaS5jb20gLT4gcGF0Y2hldy8x
-NDk0NDA1NjgzLTIwODc3LTEtZ2l0LXNlbmQtZW1haWwtcHJhZGVlcC5qYWdhZGVlc2hAaHVhd2Vp
-LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNTEwMDgzMjU5LjM5MDAtMS14
-aWFvZ3Vhbmdyb25nQHRlbmNlbnQuY29tIC0+IHBhdGNoZXcvMjAxNzA1MTAwODMyNTkuMzkwMC0x
-LXhpYW9ndWFuZ3JvbmdAdGVuY2VudC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-Jwo5ZDkzZTRiIHZob3N0OiBpb21tdTogY2FjaGUgc3RhdGljIG1hcHBpbmcgaWYgdGhlcmUgaXMK
-MGIxZjYwYSBpbnRlbF9pb21tdTogdHVybiBvZmYgcHQgYmVmb3JlIDIuOQpkM2I4ODk3IGludGVs
-X2lvbW11OiBzdXBwb3J0IHBhc3N0aHJvdWdoIChQVCkKZDYyODhiNiBpbnRlbF9pb21tdTogYWxs
-b3cgZGV2LWlvdGxiIGNvbnRleHQgZW50cnkgY29uZGl0aW9uYWxseQpjZGU0MWUyIGludGVsX2lv
-bW11OiB1c2UgSU9NTVVfQUNDRVNTX0ZMQUcoKQpjMGU3ZjFhIGludGVsX2lvbW11OiBwcm92aWRl
-IHZ0ZF9jZV9nZXRfdHlwZSgpCmNmOTU1OWQgaW50ZWxfaW9tbXU6IHJlbmFtaW5nIGNvbnRleHQg
-ZW50cnkgaGVscGVycwo0MTc3YWUwIHg4Ni1pb21tdTogdXNlIERldmljZUNsYXNzIHByb3BlcnRp
-ZXMKZmQ4YTI4NSBtZW1vcnk6IGZpeCBhZGRyZXNzX3NwYWNlX2dldF9pb3RsYl9lbnRyeSgpCmNh
-NWJkYTYgbWVtb3J5OiByZW1vdmUgdGhlIGxhc3QgcGFyYW0gaW4gbWVtb3J5X3JlZ2lvbl9pb21t
-dV9yZXBsYXkoKQowM2VjNmU1IG1lbW9yeTogdHVuZSBsYXN0IHBhcmFtIG9mIGlvbW11X29wcy50
-cmFuc2xhdGUoKQpiNjYzZWZkIHBjOiBhZGQgMi4xMCBtYWNoaW5lIHR5cGUKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTI6IHBjOiBhZGQgMi4xMCBtYWNoaW5lIHR5cGUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMi8xMjogbWVtb3J5OiB0dW5lIGxhc3QgcGFyYW0gb2YgaW9tbXVf
-b3BzLnRyYW5zbGF0ZSgpLi4uCkNoZWNraW5nIFBBVENIIDMvMTI6IG1lbW9yeTogcmVtb3ZlIHRo
-ZSBsYXN0IHBhcmFtIGluIG1lbW9yeV9yZWdpb25faW9tbXVfcmVwbGF5KCkuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNC8xMjogbWVtb3J5OiBmaXggYWRkcmVzc19zcGFjZV9nZXRfaW90bGJfZW50cnkoKS4u
-LgpDaGVja2luZyBQQVRDSCA1LzEyOiB4ODYtaW9tbXU6IHVzZSBEZXZpY2VDbGFzcyBwcm9wZXJ0
-aWVzLi4uCkNoZWNraW5nIFBBVENIIDYvMTI6IGludGVsX2lvbW11OiByZW5hbWluZyBjb250ZXh0
-IGVudHJ5IGhlbHBlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMjogaW50ZWxfaW9tbXU6IHByb3Zp
-ZGUgdnRkX2NlX2dldF90eXBlKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMjogaW50ZWxfaW9tbXU6
-IHVzZSBJT01NVV9BQ0NFU1NfRkxBRygpLi4uCkNoZWNraW5nIFBBVENIIDkvMTI6IGludGVsX2lv
-bW11OiBhbGxvdyBkZXYtaW90bGIgY29udGV4dCBlbnRyeSBjb25kaXRpb25hbGx5Li4uCkNoZWNr
-aW5nIFBBVENIIDEwLzEyOiBpbnRlbF9pb21tdTogc3VwcG9ydCBwYXNzdGhyb3VnaCAoUFQpLi4u
-CkVSUk9SOiAiKGZvbyoqKSIgc2hvdWxkIGJlICIoZm9vICoqKSIKIzM0OiBGSUxFOiBody9pMzg2
-L2ludGVsX2lvbW11LmM6NjU2OgorICAgICAgICB3aGlsZSAoZ19oYXNoX3RhYmxlX2l0ZXJfbmV4
-dCAoJml0ZXIsIE5VTEwsICh2b2lkKiopJnZ0ZF9idXMpKSB7CgpFUlJPUjogc3BhY2UgcHJvaGli
-aXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNDog
-RklMRTogaHcvaTM4Ni9pbnRlbF9pb21tdS5jOjY1NjoKKyAgICAgICAgd2hpbGUgKGdfaGFzaF90
-YWJsZV9pdGVyX25leHQgKCZpdGVyLCBOVUxMLCAodm9pZCoqKSZ2dGRfYnVzKSkgewoKdG90YWw6
-IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMDUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMTI6IGludGVsX2lvbW11
-OiB0dXJuIG9mZiBwdCBiZWZvcmUgMi45Li4uCkNoZWNraW5nIFBBVENIIDEyLzEyOiB2aG9zdDog
-aW9tbXU6IGNhY2hlIHN0YXRpYyBtYXBwaW5nIGlmIHRoZXJlIGlzLi4uCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNzk6IEZJTEU6IGh3L3ZpcnRpby92
-aG9zdC5jOjgxMToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBVSU5UNjRfTUFYLTEpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVy
-cm9ycywgMCB3YXJuaW5ncywgODAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+
+
+On 2017=E5=B9=B405=E6=9C=8807=E6=97=A5 12:39, Wang, Wei W wrote:
+> On 05/06/2017 04:37 AM, Michael S. Tsirkin wrote:
+>> On Fri, May 05, 2017 at 10:27:13AM +0800, Jason Wang wrote:
+>>>
+>>> On 2017=E5=B9=B405=E6=9C=8804=E6=97=A5 18:58, Wang, Wei W wrote:
+>>>> Hi,
+>>>>
+>>>> I want to re-open the discussion left long time ago:
+>>>> https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg06194.html
+>>>> , and discuss the possibility of changing the hardcoded (256) TX
+>>>> queue size to be configurable between 256 and 1024.
+>>> Yes, I think we probably need this.
+>>>
+>>>> The reason to propose this request is that a severe issue of packet
+>>>> drops in TX direction was observed with the existing hardcoded 256
+>>>> queue size, which causes performance issues for packet drop
+>>>> sensitive guest applications that cannot use indirect descriptor
+>>>> tables. The issue goes away with 1K queue size.
+>>> Do we need even more, what if we find 1K is even not sufficient in th=
+e
+>>> future? Modern nics has size up to ~8192.
+>>>
+>>>> The concern mentioned in the previous discussion (please check the
+>>>> link
+>>>> above) is that the number of chained descriptors would exceed
+>>>> UIO_MAXIOV (1024) supported by the Linux.
+>>> We could try to address this limitation but probably need a new
+>>> feature bit to allow more than UIO_MAXIOV sgs.
+>> I'd say we should split the queue size and the sg size.
+>>
+> I think we can just split the iov size in the virtio-net backend,
+> that is, split the large iov[] into multiple iov[1024] to send to write=
+v.
+>
+> Best,
+> Wei
+
+Maybe, but let's first clarify the limitation and new ability in the=20
+spec. Want to send a patch?
+
+Thanks
