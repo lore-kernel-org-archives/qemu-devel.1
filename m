@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d8Rcc-0007BL-99
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 09:25:43 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d8Rg5-0008Do-5S
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 09:29:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1d8RcY-0006I1-9I
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 09:25:42 -0400
-References: <20170504105444.8940-1-daniel.kucera@gmail.com>
-	<20170508203556.GA22634@stefanha-x1.localdomain>
-	<c51044c8-edf6-c0a2-e543-0d9be1a61b29@openvz.org>
-	<fac1ae33-dc7e-b513-d694-c8f8c1555baa@redhat.com>
-	<20170509165254.GA26793@stefanha-x1.localdomain>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <fc8b563b-5fb5-0a65-c883-32191b3c93e7@openvz.org>
-Date: Wed, 10 May 2017 15:25:31 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170509165254.GA26793@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] mirror: add sync mode incremental to
- drive-mirror and blockdev-mirror
+	(envelope-from <dgilbert@redhat.com>) id 1d8Rg1-0007Qo-SE
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 09:29:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38806)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d8Rg1-0007Pt-NE
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 09:29:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 80B71C054912
+	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 13:29:12 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 10 May 2017 14:29:06 +0100
+Message-Id: <20170510132906.23481-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] libvhost-user: Fix VHOST_USER_NET_SET_MTU entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>
-Cc: Daniel Kucera <daniel.kucera@gmail.com>, Kevin Wolf <kwolf@redhat.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com
 
-On 05/09/2017 06:52 PM, Stefan Hajnoczi wrote:
-> On Mon, May 08, 2017 at 05:07:18PM -0400, John Snow wrote:
->>
->> On 05/08/2017 05:02 PM, Denis V. Lunev wrote:
->>> On 05/08/2017 10:35 PM, Stefan Hajnoczi wrote:
->>>> On Thu, May 04, 2017 at 12:54:40PM +0200, Daniel Kucera wrote:
->>>>
->>>> Seems like a logical extension along the same lines as the backup bl=
-ock
->>>> job's dirty bitmap sync mode.
->>>>
->>>>> parameter bitmap chooses existing dirtymap instead of newly created=
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
->>>>> in mirror_start_job
->>>>>
->>>>> Signed-off-by: Daniel Kucera <daniel.kucera@gmail.com>
->>> Can you pls describe the use case pls in a bit more details.
->>>
->>> For now this could be a bit strange:
->>> - dirty bitmap, which can be found via bdrv_create_dirty_bitmap
->>>   could be read-only or read-write, i.e. being modified by writes
->>>   or be read-only, which should not be modified. Thus adding
->>>   r/o bitmap to the mirror could result in interesting things.
->>>
->> This patch as it was submitted does not put the bitmap into a read-onl=
-y
->> mode; it leaves it RW and modifies it as it processes the mirror comma=
-nd.
->>
->> Though you do raise a good point; this bitmap is now in-use by a job a=
-nd
->> should not be allowed to be deleted by the user, but our existing
->> mechanism treats a locked bitmap as one that is also in R/O mode. This=
+VHOST_USER_'s 20th entry is defined as VHOST_USER_INPUT_GET_CONFIG but
+should be VHOST_USER_NET_SET_MTU.
 
->> would be a different use case.
->>
->>> Minimally we should prohibit usage of r/o bitmaps this way.
->>>
->>> So, why to use mirror, not backup for the case?
->>>
->> My guess is for pivot semantics.
-> Daniel posted his workflow in a previous revision of this series:
->
-> He is doing a variation on non-shared storage migration with the mirror=
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 2 +-
+ contrib/libvhost-user/libvhost-user.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-> block job, but using the ZFS send operation to transfer the initial cop=
-y
-> of the disk.
->
-> Once ZFS send completes it's necessary to transfer all the blocks that
-> were dirtied while the transfer was taking place.
->
-> 1. Create dirty bitmap and start tracking dirty blocks in QEMU.
-> 2. Snapshot and send ZFS volume.
-> 3. mirror sync=3Dbitmap after ZFS send completes.
-> 4. Live migrate.
->
-> Stefan
-thank you very much. This is clear now.
-
-If I am not mistaken,  this can be very easy done with
-the current implementation without further QEMU modifications.
-Daniel just needs to start mirror and put it on pause for the
-duration of stage (2).
-
-Will this work?
-
-Den
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index af4faad60b..645cb36c4c 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -62,7 +62,7 @@ vu_request_to_string(int req)
+         REQ(VHOST_USER_GET_QUEUE_NUM),
+         REQ(VHOST_USER_SET_VRING_ENABLE),
+         REQ(VHOST_USER_SEND_RARP),
+-        REQ(VHOST_USER_INPUT_GET_CONFIG),
++        REQ(VHOST_USER_NET_SET_MTU),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 156b50e989..ecf9539ffa 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -60,7 +60,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_GET_QUEUE_NUM = 17,
+     VHOST_USER_SET_VRING_ENABLE = 18,
+     VHOST_USER_SEND_RARP = 19,
+-    VHOST_USER_INPUT_GET_CONFIG = 20,
++    VHOST_USER_NET_SET_MTU = 20,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+ 
+-- 
+2.12.2
