@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d8Ve1-000111-J6
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:43:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d8Voq-0003r4-OT
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:54:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d8Ve0-00023i-VA
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:43:25 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36670)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d8Ve0-00023X-RI
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:43:24 -0400
-Received: by mail-qt0-x241.google.com with SMTP id j13so378680qta.3
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 10:43:24 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170509180715.22910-1-rth@twiddle.net>
-	<20170509180715.22910-5-rth@twiddle.net>
-	<20170510101620.q3mob35aivxz324g@aurel32.net>
-	<6105454.pozpFHdzOs@perso>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <7a84cbc8-ea93-ada5-eeaf-fc1ac143d826@twiddle.net>
-Date: Wed, 10 May 2017 10:43:19 -0700
+	(envelope-from <mreitz@redhat.com>) id 1d8Voq-0006Ed-39
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:54:36 -0400
+References: <20170510143205.32013-1-pbonzini@redhat.com>
+	<20170510143205.32013-8-pbonzini@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7214c202-730c-1c46-10ec-526284ad7956@redhat.com>
+Date: Wed, 10 May 2017 19:54:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <6105454.pozpFHdzOs@perso>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] target/s390x: Implement LOAD PAIR
- DISJOINT
+In-Reply-To: <20170510143205.32013-8-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IFFbPwqI7hC62d3nUlX6p9AanGImeDDs8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 7/7] curl: do not do aio_poll
+ when waiting for a free CURLState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?=c3=89ric_Bischoff?= <ebischoff@nerim.net>, Aurelien Jarno <aurelien@aurel32.net>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
 
-On 05/10/2017 10:13 AM, Éric Bischoff wrote:
-> Le mercredi 10 mai 2017, 12:16:20 Aurelien Jarno a écrit :
->>> +    /* In a parallel context, stop the world and single step.  */
->>> +    if (parallel_cpus) {
->>> +        potential_page_fault(s);
->>> +        gen_helper_exit_atomic(cpu_env);
->>> +        return EXIT_NORETURN;
->>> +    }
->>
->> One small additional comment about this patch I haven't spotted at the
->> first review. The exit_atomic helper is properly restoring the CPU state
->> passing the return address to cpu_loop_exit_atomic, so I believe the
->> potential_page_fault call is not necessary. That said, it doesn't hurt
->> either.
-> 
-> Merci pour la relecture Aurélien.
-> 
-> Richard, what do we do? We remove the potential_page_fault(s); or not?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IFFbPwqI7hC62d3nUlX6p9AanGImeDDs8
+From: Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
+Message-ID: <7214c202-730c-1c46-10ec-526284ad7956@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 7/7] curl: do not do aio_poll when waiting
+ for a free CURLState
+References: <20170510143205.32013-1-pbonzini@redhat.com>
+ <20170510143205.32013-8-pbonzini@redhat.com>
+In-Reply-To: <20170510143205.32013-8-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm thinking of using gen_exception(EXCP_ATOMIC) instead.
-The unwind associated with the regular helper_exit_atomic
-has more overhead than potential_page_fault().
+On 10.05.2017 16:32, Paolo Bonzini wrote:
+> Instead, put the CURLAIOCB on a wait list; curl_clean_state will
+> wake the corresponding coroutine.
+>=20
+> Because of CURL's callback-based structure, we cannot easily convert
+> everything to CoMutex/CoQueue; keeping the QemuMutex is simpler.
+> However, CoQueue is a simple wrapper around a linked list, so we can
+> use QSIMPLEQ easily to open-code a CoQueue that has a QemuMutex's
+> protection instead of a CoMutex's.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/curl.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-r~
+--IFFbPwqI7hC62d3nUlX6p9AanGImeDDs8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkTU9ESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A5BIIAIKeNro00XQRPuJDq8vo5pDXfx1d5cji
+qq6kyRH0uU2+vNR6gQJaBKR1/5YVwpH508PQ6hszDFsB1MI2vZeNTnDo0mero1tl
+owQefWSOJ8W0suwZQ/58yNS6gJqcIt1QRt9K1fDNlVWTJ40WsfCRQBXIsgyoSI7Q
+yFeh9HGc12dp+28PhMCw98q/7KNdTbUbeMr0+7Cl6XBNlPWpuwARwk/fwvJNRNt4
+ZeDii4CYqLOZWGik+FTIaE2iwikw85G6VEG0nGThRXmkgXfOkhUofe/9y4RmDnEb
+h8Jbuj8n13oXqw64/E3oAWXj/3YlX2pwXo+gMHpFomn90Y97CCkYggo=
+=nGsQ
+-----END PGP SIGNATURE-----
+
+--IFFbPwqI7hC62d3nUlX6p9AanGImeDDs8--
