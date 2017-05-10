@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d8Par-0004JU-Sc
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:15:47 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8Pbo-0004oz-HC
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:16:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d8Pam-0005Wu-Qk
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:15:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d8Pam-0005WY-Hi
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:15:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 938A480C0A
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 11:15:39 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 10 May 2017 12:15:35 +0100
-Message-Id: <20170510111535.11190-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC] docs: document support lifetime and
- deprecation policy
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8Pbn-0005mw-9J
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:16:44 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494348286-10253-6-git-send-email-sundeep.lkml@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <640edc6d-0a7c-49c2-5bf1-e13468662e88@amsat.org>
+Date: Wed, 10 May 2017 08:16:31 -0300
+MIME-Version: 1.0
+In-Reply-To: <1494348286-10253-6-git-send-email-sundeep.lkml@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-devel PATCH 5/5] msf2: Add Emcraft's
+ Smartfusion2 SOM kit.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, alistair23@gmail.com, crosthwaite.peter@gmail.com
 
-The deprecation of features in QEMU is totally adhoc currently,
-with no way for the user to get a list of what is deprecated
-in each release. There is also no guidance on the duration of
-support for features such as versioned machine types, which
-have a finite useful life.
+Hi Subbaraya,
 
-This adds two new appendix entries to the main QEMU documentation.
-The first appendix lists items which have finite lifecycles,
-and sets out the policy that is used for deprecating & removing
-features which have indefinite lifecycles. The second appendix
-provides a list of all[1] currently deprecated features, along
-with the release they were deprecated in.
+On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
+> Emulated Emcraft's Smartfusion2 System On Module starter
+> kit.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> ---
+>  hw/arm/Makefile.objs |  1 +
+>  hw/arm/msf2-som.c    | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 68 insertions(+)
+>  create mode 100644 hw/arm/msf2-som.c
+>
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index ae5e4a3..b626a43 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -5,6 +5,7 @@ obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o msf2-soc.o
+>  obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
+>  obj-$(CONFIG_ACPI) += virt-acpi-build.o
+>  obj-y += netduino2.o
+> +obj-y += msf2-som.o
+>  obj-y += sysbus-fdt.o
+>
+>  obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
+> diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
+> new file mode 100644
+> index 0000000..bc44169
+> --- /dev/null
+> +++ b/hw/arm/msf2-som.c
+> @@ -0,0 +1,67 @@
+> +/*
+> + * SmartFusion2 SOM starter kit(from Emcraft) emulation.
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/boards.h"
+> +#include "hw/arm/msf2-soc.h"
+> +#include "hw/arm/arm.h"
+> +
+> +static void msf2_init(MachineState *machine)
+> +{
+> +    DeviceState *dev;
+> +    DeviceState *spi_flash;
+> +    MSF2State *soc;
+> +    DriveInfo *dinfo = drive_get_next(IF_MTD);
+> +    qemu_irq cs_line;
+> +    SSIBus *spi_bus;
+> +
+> +    dev = qdev_create(NULL, TYPE_MSF2_SOC);
+> +    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
+> +
+> +    soc = MSF2_SOC(dev);
+> +
+> +    /* Attach SPI flash to SPI0 controller */
+> +    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
+> +    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
+> +    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
+> +    if (dinfo) {
+> +        qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
+> +                                    &error_fatal);
+> +    }
+> +    qdev_init_nofail(spi_flash);
+> +    cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
+> +
+> +    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+> +                       ENVM_SIZE);
+> +}
+> +
+> +static void msf2_machine_init(MachineClass *mc)
+> +{
+> +    mc->desc = "SmartFusion2 SOM kit from Emcraft";
+> +    mc->init = msf2_init;
+> +}
+> +
+> +DEFINE_MACHINE("smartfusion2-som", msf2_machine_init)
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+This is not the only SoM existing using a SF2, what about beeing more 
+specific, like "emcraft-sf2"?
+Likewise I'd rename the functions with a pattern such 'emcraft_sf2_*()' 
+although the filename is correct.
 
-[1] This is a lie. I've only listed one deprecated feature. Once
-    we agree on the general concept, we can fill out the doc
-    with the rest of the currently deprecated features.
----
- qemu-doc.texi | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+Regards,
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 794ab4a..899808b 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -36,6 +36,8 @@
- * QEMU System emulator for non PC targets::
- * QEMU User space emulator::
- * Implementation notes::
-+* Support lifetime::
-+* Deprecations::
- * License::
- * Index::
- @end menu
-@@ -2996,6 +2998,51 @@ Run the emulation in single step mode.
- 
- @include qemu-tech.texi
- 
-+@node Support lifetime
-+@appendix Support lifetime
-+
-+Features provided by QEMU are subject to varying support lifetimes.
-+
-+In general features are intended to be supported indefinitely once
-+introduced. In the event that a feature needs to be removed, there
-+will be some period in which it will be marked as deprecated before
-+eventual removal. All deprecated features will be listed in the
-+``Deprecations'' appendix of this document. They may also generate
-+a warning if used when QEMU starts up/
-+
-+Certain features will have an inherently finite lifetime, and thus
-+will be removed on a fixed schedule.
-+
-+@node Machine types
-+@section Machine types
-+
-+For architectures which aim to support live migration compatibility
-+across releases, each release will introduce a new versioned machine
-+type. For example, the 2.8.0 release introduced machine types
-+``pc-i440fx-2.8'' and ``pc-q35-2.8' 'for the x86_64/i686 architectures.
-+
-+To allow live migration of a guest running on a 2.8.0 release to a
-+2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
-+``pc-q35-2.8''.  To allow users live migrating VMs to skip multiple
-+intermediate releases when upgrading, new releases of QEMU will
-+support machine types from many previous versions.
-+
-+The supported lifetime for machine types is 12 releases, which is
-+equivalent to 4 years worth of previous QEMU releases.
-+
-+@node Deprecations
-+@appendix Deprecations
-+
-+The following is a list of features which have been marked as deprecated,
-+pending removal in a future list:
-+
-+@section -drive boot=on|off (since v1.3.0)
-+Since release 1.3.0, the ``boot=on|off'' parameter to ``-drive''
-+is no longer honoured. It is currently ignored, but a future verson
-+will reject this parameter with an error. Applications should use
-+the ``bootindex=N'' parameter to set an absolute ordering between
-+devices instead.
-+
- @node License
- @appendix License
- 
--- 
-2.9.3
+Phil.
