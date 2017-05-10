@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8Lco-0002Qn-FR
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcn-0002QN-OQ
 	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcm-0007mu-2A
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcj-0007lp-JH
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:29 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 10 May 2017 17:00:59 +1000
-Message-Id: <20170510070115.13063-7-david@gibson.dropbear.id.au>
+Date: Wed, 10 May 2017 17:00:57 +1000
+Message-Id: <20170510070115.13063-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20170510070115.13063-1-david@gibson.dropbear.id.au>
 References: <20170510070115.13063-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/22] tcg: enable MTTCG by default for PPC64 on
- x86
+Subject: [Qemu-devel] [PULL 04/22] target/ppc: Generate fence operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +24,59 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bhara
 
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-This enables the multi-threaded system emulation by default for PPC64
-guests using the x86_64 TCG back-end.
-
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- configure        | 2 ++
- target/ppc/cpu.h | 2 ++
- 2 files changed, 4 insertions(+)
+ target/ppc/translate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/configure b/configure
-index 48a9370..a1834b1 100755
---- a/configure
-+++ b/configure
-@@ -6090,12 +6090,14 @@ case "$target_name" in
-   ppc64)
-     TARGET_BASE_ARCH=3Dppc
-     TARGET_ABI_DIR=3Dppc
-+    mttcg=3Dyes
-     gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml po=
-wer-spe.xml power-vsx.xml"
-   ;;
-   ppc64le)
-     TARGET_ARCH=3Dppc64
-     TARGET_BASE_ARCH=3Dppc
-     TARGET_ABI_DIR=3Dppc
-+    mttcg=3Dyes
-     gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml po=
-wer-spe.xml power-vsx.xml"
-   ;;
-   ppc64abi32)
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index e0ff041..ece535d 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -30,6 +30,8 @@
- #define TARGET_LONG_BITS 64
- #define TARGET_PAGE_BITS 12
-=20
-+#define TCG_GUEST_DEFAULT_MO 0
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 50b6d4d..4a1f24a 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -2971,6 +2971,7 @@ static void gen_stswx(DisasContext *ctx)
+ /* eieio */
+ static void gen_eieio(DisasContext *ctx)
+ {
++    tcg_gen_mb(TCG_MO_LD_ST | TCG_BAR_SC);
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+@@ -3008,6 +3009,7 @@ static void gen_isync(DisasContext *ctx)
+     if (!ctx->pr) {
+         gen_check_tlb_flush(ctx, false);
+     }
++    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+     gen_stop_exception(ctx);
+ }
+ 
+@@ -3028,6 +3030,7 @@ static void gen_##name(DisasContext *ctx)                            \
+     tcg_gen_qemu_ld_tl(gpr, t0, ctx->mem_idx, memop);                \
+     tcg_gen_mov_tl(cpu_reserve, t0);                                 \
+     tcg_gen_mov_tl(cpu_reserve_val, gpr);                            \
++    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);                           \
+     tcg_temp_free(t0);                                               \
+ }
+ 
+@@ -3177,6 +3180,10 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+     tcg_gen_br(l2);
+ 
+     gen_set_label(l1);
 +
- /* Note that the official physical address space bits is 62-M where M
-    is implementation dependent.  I've not looked up M for the set of
-    cpus we emulate at the system level.  */
---=20
++    /* Address mismatch implies failure.  But we still need to provide the
++       memory barrier semantics of the instruction.  */
++    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+     tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
+ 
+     gen_set_label(l2);
+@@ -3308,6 +3315,7 @@ static void gen_sync(DisasContext *ctx)
+     if (((l == 2) || !(ctx->insns_flags & PPC_64B)) && !ctx->pr) {
+         gen_check_tlb_flush(ctx, true);
+     }
++    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+ }
+ 
+ /* wait */
+-- 
 2.9.3
