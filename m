@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d8Tt7-00084X-57
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:50:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1d8TtR-0008FB-DZ
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d8Tt6-0001wi-3j
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:50:53 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 10 May 2017 17:50:42 +0200
-Message-Id: <1494431442-25163-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] blockdev: Print a warning for legacy drive
- options that belong to -device
+	(envelope-from <armbru@redhat.com>) id 1d8TtN-0001y0-BI
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:51:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d8TtN-0001xs-5S
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:51:09 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <149373610338.5144.9635049015143453288.stgit@bahia.lan>
+Date: Wed, 10 May 2017 17:51:06 +0200
+In-Reply-To: <149373610338.5144.9635049015143453288.stgit@bahia.lan> (Greg
+	Kurz's message of "Tue, 02 May 2017 16:41:43 +0200")
+Message-ID: <87mvaku2vp.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] scripts/qmp/qom-set: fix the value
+ argument passed to srv.command()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,47 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org
 
-We likely do not want to carry these legacy -drive options along forever.
-Let's emit a deprecation warning for the -drive options that have a
-replacement with the -device option, so that the (hopefully few) remaining
-users are aware of this and can adapt their scripts / behaviour.
+Greg Kurz <groug@kaod.org> writes:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- blockdev.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+> When invoking the script with -s, we end up passing a bogus value
+> to QEMU:
+>
+> $ ./scripts/qmp/qom-set -s /var/tmp/qmp-sock-exp /machine.accel kvm
+> {}
+> $ ./scripts/qmp/qom-get -s /var/tmp/qmp-sock-exp /machine.accel
+> /var/tmp/qmp-sock-exp
+>
+> This happens because sys.argv[2] isn't necessarily the command line
+> argument that holds the value. It is sys.argv[4] when -s was also
+> passed.
+>
+> Actually, the code already has a variable to handle that. This patch
+> simply uses it.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  scripts/qmp/qom-set |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
+> index 54ecfecc531e..94e27789224c 100755
+> --- a/scripts/qmp/qom-set
+> +++ b/scripts/qmp/qom-set
+> @@ -61,4 +61,4 @@ else:
+>  srv = QEMUMonitorProtocol(socket_path)
+>  srv.connect()
+>  
+> -print srv.command('qom-set', path=path, property=prop, value=sys.argv[2])
+> +print srv.command('qom-set', path=path, property=prop, value=value)
 
-diff --git a/blockdev.c b/blockdev.c
-index 4d8cded..87a025a 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -797,6 +797,9 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     const char *filename;
-     Error *local_err = NULL;
-     int i;
-+    const char *deprecated[] = {
-+        "serial", "trans", "secs", "heads", "cyls"
-+    };
- 
-     /* Change legacy command line options into QMP ones */
-     static const struct {
-@@ -880,6 +883,14 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-                 "update your scripts.\n");
-     }
- 
-+    /* Other deprecated options */
-+    for (i = 0; i < ARRAY_SIZE(deprecated); i++) {
-+        if (qemu_opt_get(legacy_opts, deprecated[i]) != NULL) {
-+            error_report("'%s' is deprecated, please use the corresponding "
-+                         "option of '-device' instead", deprecated[i]);
-+        }
-+    }
-+
-     /* Media type */
-     value = qemu_opt_get(legacy_opts, "media");
-     if (value) {
--- 
-1.8.3.1
+Given Python modules like argparse, doing option parsing by hand is
+basically stupid.  This patch fixes it without making it any stupider.
+Sold.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
