@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcq-0002S3-4D
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:33 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8Lco-0007od-JQ
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Lco-0002Qt-G7
 	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:32 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1d8Lcm-0007nO-Rr
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 03:01:30 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 10 May 2017 17:01:05 +1000
-Message-Id: <20170510070115.13063-13-david@gibson.dropbear.id.au>
+Date: Wed, 10 May 2017 17:01:00 +1000
+Message-Id: <20170510070115.13063-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20170510070115.13063-1-david@gibson.dropbear.id.au>
 References: <20170510070115.13063-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/22] ppc: add qemu_vga.ndrv ROM to fw_cfg
- interface for OldWorld Macs
+Subject: [Qemu-devel] [PULL 07/22] target/ppc: do not reset reserve_addr in
+ exec_enter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +23,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, sjitindarsingh@gmail.com, mark.cave-ayland@ilande.co.uk, sam.bobroff@au1.ibm.com, nikunj@linux.vnet.ibm.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+In case when atomic operation is not supported, exit_atomic is called
+and we stop the world and execute the atomic operation. This results
+in a following call chain:
+
+tcg_gen_atomic_cmpxchg_tl()
+  -> gen_helper_exit_atomic()
+     -> HELPER(exit_atomic)
+        -> cpu_loop_exit_atomic() -> EXCP_ATOMIC
+           -> qemu_tcg_cpu_thread_fn() => case EXCP_ATOMIC
+              -> cpu_exec_step_atomic()
+                 -> cpu_step_atomic()
+                    -> cc->cpu_exec_enter() = ppc_cpu_exec_enter()
+                       Sets env->reserve_addr = -1;
+
+But by the time it return back, the reservation is erased and the code
+fails, this continues forever and the lock is never taken.
+
+Instead set this in powerpc_excp()
+
+Now that ppc_cpu_exec_enter() doesn't have anything meaningful to do,
+let us get rid of the function.
+
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/mac_oldworld.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ target/ppc/excp_helper.c    | 3 +++
+ target/ppc/translate_init.c | 9 ---------
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 5df94e2..97bb854 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -53,6 +53,8 @@
- #define CLOCKFREQ 266000000UL
- #define BUSFREQ 66000000UL
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index f4ee7aa..a6bcb47 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -728,6 +728,9 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+     cs->exception_index = POWERPC_EXCP_NONE;
+     env->error_code = 0;
  
-+#define NDRV_VGA_FILENAME "qemu_vga.ndrv"
++    /* Reset the reservation */
++    env->reserve_addr = -1;
 +
- static void fw_cfg_boot_set(void *opaque, const char *boot_device,
-                             Error **errp)
- {
-@@ -99,7 +101,8 @@ static void ppc_heathrow_init(MachineState *machine)
-     MACIOIDEState *macio_ide;
-     DeviceState *dev;
-     BusState *adb_bus;
--    int bios_size;
-+    int bios_size, ndrv_size;
-+    uint8_t *ndrv_file;
-     MemoryRegion *pic_mem;
-     MemoryRegion *escc_mem, *escc_bar = g_new(MemoryRegion, 1);
-     uint16_t ppc_boot_device;
-@@ -355,6 +358,19 @@ static void ppc_heathrow_init(MachineState *machine)
-     fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_CLOCKFREQ, CLOCKFREQ);
-     fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_BUSFREQ, BUSFREQ);
- 
-+    /* MacOS NDRV VGA driver */
-+    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, NDRV_VGA_FILENAME);
-+    if (filename) {
-+        ndrv_size = get_image_size(filename);
-+        if (ndrv_size != -1) {
-+            ndrv_file = g_malloc(ndrv_size);
-+            ndrv_size = load_image(filename, ndrv_file);
-+
-+            fw_cfg_add_file(fw_cfg, "ndrv/qemu_vga.ndrv", ndrv_file, ndrv_size);
-+        }
-+        g_free(filename);
-+    }
-+
-     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
+     /* Any interrupt is context synchronizing, check if TCG TLB
+      * needs a delayed flush on ppc64
+      */
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index e82e3e6..9b048cd 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -10436,14 +10436,6 @@ static bool ppc_cpu_has_work(CPUState *cs)
+     return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
  }
  
+-static void ppc_cpu_exec_enter(CPUState *cs)
+-{
+-    PowerPCCPU *cpu = POWERPC_CPU(cs);
+-    CPUPPCState *env = &cpu->env;
+-
+-    env->reserve_addr = -1;
+-}
+-
+ /* CPUClass::reset() */
+ static void ppc_cpu_reset(CPUState *s)
+ {
+@@ -10660,7 +10652,6 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+     cc->get_phys_page_debug = ppc_cpu_get_phys_page_debug;
+     cc->vmsd = &vmstate_ppc_cpu;
+ #endif
+-    cc->cpu_exec_enter = ppc_cpu_exec_enter;
+ #if defined(CONFIG_SOFTMMU)
+     cc->write_elf64_note = ppc64_cpu_write_elf64_note;
+     cc->write_elf32_note = ppc32_cpu_write_elf32_note;
 -- 
 2.9.3
