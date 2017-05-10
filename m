@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8aBM-0005yB-Az
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 18:34:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8bP8-0000Ix-U6
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 19:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8aBL-0006fT-5H
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 18:34:08 -0400
-References: <20170411222945.11741-1-eblake@redhat.com>
-	<20170411222945.11741-17-eblake@redhat.com>
-	<18357712-90e8-c99e-a09b-52f0a3e164d6@redhat.com>
-	<ce6c0c10-d9e3-2fd7-677e-838cd3f9e010@redhat.com>
-	<2f38bef2-022b-881c-437c-7fb895214e4c@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b286c9de-f843-4e61-e2fe-6be015a8d9c9@redhat.com>
-Date: Wed, 10 May 2017 17:33:49 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8bP5-0007y3-1v
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 19:52:27 -0400
+Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:33412)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8bP4-0007xo-SS
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 19:52:22 -0400
+Received: by mail-qt0-x22a.google.com with SMTP id t26so5392724qtg.0
+	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 16:52:22 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 10 May 2017 20:52:04 -0300
+Message-Id: <20170510235204.9657-1-f4bug@amsat.org>
+In-Reply-To: <0f1f5bcd-815a-c070-5ba7-281f5a0ee146@twiddle.net>
+References: <0f1f5bcd-815a-c070-5ba7-281f5a0ee146@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <2f38bef2-022b-881c-437c-7fb895214e4c@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KPWmgSkc9j3pgB2H7ixs3aRsd2vuBRLRg"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/17] block: Make
- bdrv_is_allocated() byte-based
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH v2] coccinelle: add a script to optimize
+ tcg op using tcg_gen_extract()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,147 +34,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KPWmgSkc9j3pgB2H7ixs3aRsd2vuBRLRg
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz
- <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <b286c9de-f843-4e61-e2fe-6be015a8d9c9@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 16/17] block: Make bdrv_is_allocated()
- byte-based
-References: <20170411222945.11741-1-eblake@redhat.com>
- <20170411222945.11741-17-eblake@redhat.com>
- <18357712-90e8-c99e-a09b-52f0a3e164d6@redhat.com>
- <ce6c0c10-d9e3-2fd7-677e-838cd3f9e010@redhat.com>
- <2f38bef2-022b-881c-437c-7fb895214e4c@redhat.com>
-In-Reply-To: <2f38bef2-022b-881c-437c-7fb895214e4c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Apply this script using:
 
-On 04/19/2017 04:40 PM, John Snow wrote:
->=20
->=20
-> On 04/19/2017 05:12 PM, Eric Blake wrote:
->> On 04/19/2017 03:32 PM, John Snow wrote:
->>
->>>> @@ -279,9 +280,9 @@ static int mig_save_device_bulk(QEMUFile *f, Blk=
-MigDevState *bmds)
->>>>          /* Skip unallocated sectors; intentionally treats failure a=
-s
->>>>           * an allocated sector */
->>>>          while (cur_sector < total_sectors &&
->>>> -               !bdrv_is_allocated(blk_bs(bb), cur_sector,
->>>> -                                  MAX_IS_ALLOCATED_SEARCH, &nr_sect=
-ors)) {
->>>> -            cur_sector +=3D nr_sectors;
->>>> +               !bdrv_is_allocated(blk_bs(bb), cur_sector * BDRV_SEC=
-TOR_SIZE,
->>>> +                                  MAX_IS_ALLOCATED_SEARCH, &count))=
- {
->>>> +            cur_sector +=3D DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
->>>>          }
->>>
->>> Let's try asking again with the right vocabulary:
->>>
->>> OK, so I guess the idea is that we definitely shouldn't ever have a
->>> partially allocated sector; so I suppose this ROUND_UP is just a prec=
-aution?
->>
->> For now, yes - but the part 3 series (bdrv_get_block_status) makes
->> returning a sub-sector value possible.  For most drivers, it will only=
+$ docker run -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle \
+    --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
+    --macro-file scripts/cocci-macro-file.h \
+    --dir target \
+    --in-place
 
->> happen at end-of-file (as status doesn't change mid-sector unless your=
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
 
->> file is not a multiple of a sector size) - in fact, I found that I had=
+This is a new version of the coccinelle script addressing Richard comments and
+trying to do it correctly. Also changed license to GPLv2+.
 
->> to patch the block layer to round up and sub-sector return that
->> coincides with end-of-file back to a round sector amount in order to
->> avoid breaking other code that assumed everything is allocated in sect=
-ors.
->=20
-> I'm sorry, I'm having difficulty parsing your last sentence.
+The first rule matches, it calls a python2 script that basically checks the
+target_ulong is not overflowed: (msk << ofs) >> sizeof(target_ulong) == 0 
 
-We should NEVER have an allocation smaller than
-bds->bl.request_alignment (for example, if you can't write in chunks
-smaller than 512, then how can your allocation be smaller than that?).
-But when we eventually have byte-granularity support, and for a device
-where request_alignment is 1, it is feasible that we could track
-mid-sector alignment changes.  In practice, we DO have an
-easy-to-observe mid-sector alignment change: on a regular file not
-aligned to sector boundaries, where request_alignment IS 1, we get a
-mid-sector transition from data to hole at EOF.  So it turned out to be
-easier in my later series on bdrv_get_block_status() to intentionally
-round a partial sector at end-of-file up as if the entire sector was
-allocated, rather than reporting the mid-sector alignment (matching the
-fact that bdrv_getlength() rounds up to sector boundaries).
+I think this is enough but if I'm wrong I can try to do as Richard suggested
+(counting the low bits).
 
-If, someday, we fix bdrv_getlength() to report a non-sector-aligned
-value, we'll have to revisit the rounding (again, it feels like
-bds->bl.request_alignment is the obvious place to ensure that we never
-report a mid-alignment result, but where the alignment size is now
-driver-dependent instead of hard-coded to 512).  In fact, even with
-non-sector-aligned bdrv_getlength(), we may STILL be able to enforce
-rules such as mid-sector transitions from hole->data are not possible
-(regardless of request_alignment), and mid-sector transitions from
-data->hole are possible only at the end of the file.
+If this rule fails, there is no further processing, else the 3rd rule doing the
+patch is called.
+I couldn't figure still how to reuse args from rule2 in rule3 so it is mostly a
+copy of rule1.
 
-> I agree with you that there is absolutely definitely no real problem
-> here right now, but I do secretly wonder if we'll invent a way to screw=
+I also don't know yet how to process target-generic functions (ending _tl
+instead of _32 or _64) eventually the correct --include-option may resolve this.
 
-> ourselves over.
->=20
-> Presumably it will get converted at SOME point like everything else, an=
-d
-> it won't be a concern anymore.
->=20
-> Presumably Presumably that will even happen before we invent a way to
-> screw ourselves over.
+Applied it verified the ARM/M68K/PPC patches (2,3,5,7 from serie v1).
+The other archs weren't patched since they use _tl generic functions.
 
-Here's hoping we are careful enough, and have enough asserts in the
-right place so that if we guessed wrong we get a nice assert (rather
-than risking inf-looping because we rounded a sub-sector down to 0, or
-causing data corruption that doesn't show up until much later where we
-rounded up and missed copying something); at the same time, that the
-asserts are accurate enough that we can't trip them from legitimate users=
-=2E
+I apologize for my python!
 
-One thing I plan to add to my v2 posting (for the part 3
-bdrv_get_block_status series) is to remove the 'qemu-io alloc' sector
-alignment restrictions, to have a tool that makes it easier to prove
-that I am properly handling rounding at the block layer out to
-request_alignment limits without triggering any asserts.  And my recent
-blkdebug enhancements are probably going to be helpful in validating
-things, even if I have to add more iotests.
+Regards,
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Phil.
 
+ scripts/coccinelle/tcg_gen_extract.cocci | 61 ++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
+ create mode 100644 scripts/coccinelle/tcg_gen_extract.cocci
 
---KPWmgSkc9j3pgB2H7ixs3aRsd2vuBRLRg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZE5VNAAoJEKeha0olJ0NqlsYIAIRI0LfhBj1b5Y8SYSqnmBLn
-hajM+StEYVqK0zHSRGccm1vQiYjmvJAZepVOcw93vBQ0/A1e4qOHasA/iKr3uGig
-u9h3SKa3yZMF4QwkYAjEavXez06IvYGI63edT6cRe8hjjQz++JxeEat4HvaHhGv3
-KzIkihYgiWnLZ4pzR7SVJtsQFhIDigrEINqR9XCf1cMvu+UwnPr73mqf0T4GwqAE
-cfzYd1vXwBjsfaDGWQ6xmG9ZtIpIoVRBirysVezi1tb4c9k8hg60pxbaP8paYId5
-vgNwlIuPAZsSUrKslI3ajA8cQqOVNIDBoEhnBWNMHFNGFSPpj308U0qfKYVSOvo=
-=Mb5r
------END PGP SIGNATURE-----
-
---KPWmgSkc9j3pgB2H7ixs3aRsd2vuBRLRg--
+diff --git a/scripts/coccinelle/tcg_gen_extract.cocci b/scripts/coccinelle/tcg_gen_extract.cocci
+new file mode 100644
+index 0000000000..d75ef7d98c
+--- /dev/null
++++ b/scripts/coccinelle/tcg_gen_extract.cocci
+@@ -0,0 +1,61 @@
++// optimize TCG using extract op
++//
++// Copyright: (C) 2017 Philippe Mathieu-Daudé. GPLv2+.
++// Confidence: Low
++// Options: --macro-file scripts/cocci-macro-file.h
++
++@match@ // match shri*+andi* pattern, calls script check_len_correct
++identifier ret, arg;
++constant ofs, len;
++identifier tcg_gen_shri =~ "^tcg_gen_shri_";
++identifier tcg_gen_andi =~ "^tcg_gen_andi_";
++position p;
++@@
++(
++tcg_gen_shri(ret, arg, ofs);
++tcg_gen_andi(ret, ret, len);@p
++)
++
++@script:python check_len_correct@
++ret_s << match.ret;
++arg_s << match.arg;
++ofs_s << match.ofs;
++msk_s << match.len;
++shr_s << match.tcg_gen_shri;
++and_s << match.tcg_gen_andi;
++@@
++try:
++    # only eval integer, no #define like 'SR_M'
++    ofs = long(ofs_s, 0)
++    msk = long(msk_s, 0)
++    # get op_size: 32/64
++    shr_sz = int(shr_s[-2:])
++    and_sz = int(and_s[-2:])
++    # op_size shr<and allowed
++    # check overflow
++    if shr_sz > and_sz or (msk << ofs) >> and_sz:
++        cocci.include_match(False) # no further process
++except ValueError: # op_size: "tl" not handled yet
++    cocci.include_match(False) # no further process
++
++@use_extract depends on check_len_correct@ // ofs/len are valid, we can replace
++identifier ret, arg;
++constant ofs, len;
++@@
++(
++// from Nikunj A Dadhania comment:
++// http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05211.html
++-tcg_gen_shri_tl(ret, arg, ofs);
++-tcg_gen_andi_tl(ret, ret, len);
+++tcg_gen_extract_tl(ret, arg, ofs, len);
++|
++// from Aurelien Jarno comment:
++// http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01466.html
++-tcg_gen_shri_i32(ret, arg, ofs);
++-tcg_gen_andi_i32(ret, ret, len);
+++tcg_gen_extract_i32(ret, arg, ofs, len);
++|
++-tcg_gen_shri_i64(ret, arg, ofs);
++-tcg_gen_andi_i64(ret, ret, len);
+++tcg_gen_extract_i64(ret, arg, ofs, len);
++)
+-- 
+2.11.0
