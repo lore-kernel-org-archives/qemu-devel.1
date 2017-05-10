@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8WUN-0004NM-Ga
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 14:37:32 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d8WvC-0004Hu-Hl
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 15:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8WUM-0003IB-K0
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 14:37:31 -0400
-References: <20170510143205.32013-1-pbonzini@redhat.com>
-	<20170510143205.32013-6-pbonzini@redhat.com>
-	<aeb8c806-9c6b-fcd8-6c2a-cd4098946ff9@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5fc63e28-901c-6e93-2cbe-d25f9e6f45dc@redhat.com>
-Date: Wed, 10 May 2017 13:37:23 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1d8Wv8-0003fy-JB
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 15:05:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d8Wv8-0003fO-EI
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 15:05:10 -0400
+Date: Wed, 10 May 2017 20:04:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170510190459.GD3941@work-vm>
+References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
+	<20170510090841.GF31558@redhat.com>
+	<e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
+	<87tw4su3iw.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <aeb8c806-9c6b-fcd8-6c2a-cd4098946ff9@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rVe9c2hAswddLdDJDfm5OL3mopwiJCGg3"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 5/7] curl: convert CURLAIOCB
- to byte values
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87tw4su3iw.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
+ pc-0.15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rVe9c2hAswddLdDJDfm5OL3mopwiJCGg3
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
-Message-ID: <5fc63e28-901c-6e93-2cbe-d25f9e6f45dc@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 5/7] curl: convert CURLAIOCB to
- byte values
-References: <20170510143205.32013-1-pbonzini@redhat.com>
- <20170510143205.32013-6-pbonzini@redhat.com>
- <aeb8c806-9c6b-fcd8-6c2a-cd4098946ff9@redhat.com>
-In-Reply-To: <aeb8c806-9c6b-fcd8-6c2a-cd4098946ff9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Thomas Huth <thuth@redhat.com> writes:
+> 
+> > On 10.05.2017 11:08, Daniel P. Berrange wrote:
+> >> On Wed, May 10, 2017 at 08:48:53AM +0200, Thomas Huth wrote:
+> [...]
+> >> Also unless we're going to get more serious about automated testing to
+> >> validate machine type compatibility between *all* previously releases,
+> >> I think that 6 years / 18 releases is too long a time to have any
+> >> confidence in migration compatibility between versions.
+> 
+> Seconded.
+> 
+> > Distro vendors often offer 5 - 10 years support for certain versions of
+> > their Linux distros, so I think we should at least support 5 years, too.
+> 
+> Non sequitur.
+> 
+> Distro vendors put in serious work to keep versions working for 5 - 10
+> years.  We can't, and we don't.  All we do is try not to break things,
+> which is nice, and helps the distro vendors some, but a far cry from
+> anything I'd dare call "support".
+> 
+> Perhaps an argument could be made that us keeping to try for at least 5
+> years would help distro vendors enough to be worthwhile.  Maybe, but
+> color me skeptic.
 
-On 05/10/2017 12:36 PM, Max Reitz wrote:
+Since I'm often the one having to fix the breakages when we find they've
+diverged, I would prefer us to try to keep them working upstream.
+Every time something slips through upstream it's more work for me.
 
-> On a very surprised level: Why does curl return the content length as a=
+Dave
 
-> double?! I can't think of a reason where that might be a good idea. If
-> your integer no longer fits into a uin64_t, the double will be inexact,=
-
-> so it pretty much is useless, too...
-
-Not to mention: NO ONE has off_t larger than 63 bits (there physically
-is not that much storage around!), so a signed 64-bit integer should
-always be sufficient, rather than artificially limiting exact answers to
-53 bits of precision via a double.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---rVe9c2hAswddLdDJDfm5OL3mopwiJCGg3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZE13jAAoJEKeha0olJ0NqsoYH/jWNc7ceQh9HzQQnFAsQSg6Y
-DVO4SWsIdtBCIuFxWVnO4C6vXkARlqLlCfROeusHYa7F5jEQ9F3HB9ZkKbBBYtKC
-AS0RGX9W+BJMU5JRikzO64lPkG1/Be9OViO1qh9tTKa+p8ontPzxmL/q6nwSbpCZ
-ytqmYIRMxdxYAA+8mr0uDaHgQx+8Vl9T1KpTaVuqeD9caXU0davfCvuo2YUEj296
-kED29RdX5Rb+PCaTmPNOwDZOgSafGOQ4TyAIsQoLMWq67NIYK1zyV1Pv49UtJSOu
-cOHRISfIdZ6xis3Rvg3prstBW1xRrK+XwJKktB00C0HCxzP6ME7TRVAomcjVz04=
-=TBJF
------END PGP SIGNATURE-----
-
---rVe9c2hAswddLdDJDfm5OL3mopwiJCGg3--
+> >> IOW, I think you should be more aggressive in culling old machine types
+> >> that this patch is...
+> >
+> > Actually, I like the idea of using the major release versions for
+> > defining the set of removal - hoping that we will do a v3.0 next year
+> > which then would support the previous two major release versions 1.x and
+> > 2.x, but drops support for the 0.xx versions completely ...
+> 
+> I wouldn't put *that* much weight into our past version numbers.  If I
+> remember correctly, there was no more to 1.0 than a feeling of "this 0.x
+> thing is getting ridiculous".
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
