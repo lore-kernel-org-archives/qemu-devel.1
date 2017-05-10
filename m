@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d8TzC-0003Ze-40
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:57:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1d8U1A-0005dh-Lq
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:59:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1d8TzB-0004FO-67
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:57:10 -0400
-Date: Wed, 10 May 2017 16:57:00 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170510155700.GY16511@redhat.com>
-References: <20170510143205.32013-1-pbonzini@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1d8U19-0005KP-3h
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:59:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d8U18-0005Ju-Qj
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:59:11 -0400
+Date: Wed, 10 May 2017 16:58:59 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170510155859.GA31558@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
+	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
+	<20170428100012.GB22801@pxdev.xzpeter.org>
+	<d018d4a6-4b50-3f36-fe69-e232b63bebf0@samsung.com>
+	<20170508062906.GC2820@pxdev.xzpeter.org>
+	<20170508090807.GA4201@aperevalov-ubuntu>
+	<20170509082622.GI2820@pxdev.xzpeter.org>
+	<20170509094033.GB2089@work-vm> <20170509094434.GF1669@redhat.com>
+	<20170510154650.GC4201@aperevalov-ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170510143205.32013-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] curl: locking cleanups/fixes,
- coroutine conversion, remove aio_poll
+In-Reply-To: <20170510154650.GC4201@aperevalov-ubuntu>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
+ downtime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +36,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, jcody@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org
+To: Alexey <a.perevalov@samsung.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, i.maximets@samsung.com, f4bug@amsat.org, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
 
-On Wed, May 10, 2017 at 04:31:58PM +0200, Paolo Bonzini wrote:
-> Since the last patch in v1 didn't work, I bit the bullet and converted
-> the whole thing to coroutines (patches 4-6).  This in turns allows a more
-> elegant solution to wait for CURLStates to get free (patch 7).
+On Wed, May 10, 2017 at 06:46:50PM +0300, Alexey wrote:
+> On Tue, May 09, 2017 at 10:44:34AM +0100, Daniel P. Berrange wrote:
+> > On Tue, May 09, 2017 at 10:40:34AM +0100, Dr. David Alan Gilbert wrote:
+> > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > On Mon, May 08, 2017 at 12:08:07PM +0300, Alexey wrote:
+> > > > > On Mon, May 08, 2017 at 02:29:06PM +0800, Peter Xu wrote:
+> > > > > > On Fri, Apr 28, 2017 at 02:11:19PM +0300, Alexey Perevalov wrote:
+> > > > > > > On 04/28/2017 01:00 PM, Peter Xu wrote:
+> > > > > > > >On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
+> > > > > > > >>This patch provides downtime calculation per vCPU,
+> > > > > > > >>as a summary and as a overlapped value for all vCPUs.
+> > > > > > > >>
+> > > > > > > >>This approach was suggested by Peter Xu, as an improvements of
+> > > > > > > >>previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> > > > > > > >>in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> > > > > > > >>as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> > > > > > > >>list for downtime per vCPU (could be traced with page_fault_addr)
+> > > > > > > >>
+> > > > > > > >>For more details see comments for get_postcopy_total_downtime
+> > > > > > > >>implementation.
+> > > > > > > >>
+> > > > > > > >>Downtime will not calculated if postcopy_downtime field of
+> > > > > > > >>MigrationIncomingState wasn't initialized.
+> > > > > > > >>
+> > > > > > > >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > > > > > > >>---
+> > > > > > > >>  include/migration/migration.h |   3 ++
+> > > > > > > >>  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
+> > > > > > > >>  migration/postcopy-ram.c      |  20 +++++++-
+> > > > > > > >>  migration/trace-events        |   6 ++-
+> > > > > > > >>  4 files changed, 130 insertions(+), 2 deletions(-)
+> > > > > > > >>
+> > > > > > > >>diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > > > > > > >>index e8fb68f..a22f9ce 100644
+> > > > > > > >>--- a/include/migration/migration.h
+> > > > > > > >>+++ b/include/migration/migration.h
+> > > > > > > >>@@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
+> > > > > > > >>   * Functions to work with downtime context
+> > > > > > > >>   */
+> > > > > > > >>  struct DowntimeContext *downtime_context_new(void);
+> > > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
+> > > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr);
+> > > > > > > >>+uint64_t get_postcopy_total_downtime(void);
+> > > > > > > >>  struct MigrationState
+> > > > > > > >>  {
+> > > > > > > >>diff --git a/migration/migration.c b/migration/migration.c
+> > > > > > > >>index ec76e5c..2c6f150 100644
+> > > > > > > >>--- a/migration/migration.c
+> > > > > > > >>+++ b/migration/migration.c
+> > > > > > > >>@@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
+> > > > > > > >>      return atomic_xchg(&incoming_postcopy_state, new_state);
+> > > > > > > >>  }
+> > > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
+> > > > > > > >>+{
+> > > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > > > > >>+    DowntimeContext *dc;
+> > > > > > > >>+    if (!mis->downtime_ctx || cpu < 0) {
+> > > > > > > >>+        return;
+> > > > > > > >>+    }
+> > > > > > > >>+    dc = mis->downtime_ctx;
+> > > > > > > >>+    dc->vcpu_addr[cpu] = addr;
+> > > > > > > >>+    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
+> > > > > > > >>+        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > > > > >>+
+> > > > > > > >>+    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> > > > > > > >>+            cpu);
+> > > > > > > >>+}
+> > > > > > > >>+
+> > > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr)
+> > > > > > > >>+{
+> > > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > > > > >>+    DowntimeContext *dc;
+> > > > > > > >>+    int i;
+> > > > > > > >>+    bool all_vcpu_down = true;
+> > > > > > > >>+    int64_t now;
+> > > > > > > >>+
+> > > > > > > >>+    if (!mis->downtime_ctx) {
+> > > > > > > >>+        return;
+> > > > > > > >>+    }
+> > > > > > > >>+    dc = mis->downtime_ctx;
+> > > > > > > >>+    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > > > > >>+
+> > > > > > > >>+    /* check all vCPU down,
+> > > > > > > >>+     * QEMU has bitmap.h, but even with bitmap_and
+> > > > > > > >>+     * will be a cycle */
+> > > > > > > >>+    for (i = 0; i < smp_cpus; i++) {
+> > > > > > > >>+        if (dc->vcpu_addr[i]) {
+> > > > > > > >>+            continue;
+> > > > > > > >>+        }
+> > > > > > > >>+        all_vcpu_down = false;
+> > > > > > > >>+        break;
+> > > > > > > >>+    }
+> > > > > > > >>+
+> > > > > > > >>+    if (all_vcpu_down) {
+> > > > > > > >>+        dc->total_downtime += now - dc->last_begin;
+> > > > > > > >Shall we do this accouting only if we are sure the copied page address
+> > > > > > > >is one of the page faulted addresses? Can it be some other page? I
+> > > > > > > >don't know. But since we have the loop below to make sure of it, why
+> > > > > > > >not?
+> > > > > > > no, the downtime implies since page fault till the
+> > > > > > > page will be copied.
+> > > > > > > Yes another pages could be copied as well as pagefaulted,
+> > > > > > > and they are copied due to prefetching, but it's not a downtime.
+> > > > > > 
+> > > > > > Not sure I got the point... Do you mean that when reach here, then
+> > > > > > this page address is definitely one of the faulted addresses? I am not
+> > > > > > 100% sure of this, but if you are sure, I am okay with it.
+> > > > > Let me clarify.
+> > > > > 
+> > > > > > > >Shall we do this accouting only if we are sure the copied page address
+> > > > > > > >is one of the page faulted addresses?
+> > > > > Yes it's primary condition, due to there are could be another pages,
+> > > > > which weren't faulted, they just was sent from source to destination,
+> > > > > I called it prefetching.
+> > > > > 
+> > > > > I think I got why did you ask that question, because in this version
+> > > > > all_vcpu_down and as a result total_downtime calculated incorrectly,
+> > > > > it calculates every time when any page is copied, but it should
+> > > > > be calculated only when faulted page copied, so only dc->vcpu_downtime
+> > > > > was correctly calculated.
+> > > > 
+> > > > Exactly. I am afraid if we have such "prefetching" stuff then
+> > > > total_downtime will be more than its real value.
+> > > 
+> > > It should be OK as long as we measure the time between
+> > >   userfault reporting a page miss for an address 
+> > >   and
+> > >   place_page for *that same address*
+> > > 
+> > > any places for other pages are irrelevant.
+> > > 
+> > > (I still worry that this definition of 'downtime' is possibly
+> > > arbitrary - since if all but one of the vCPUs are down we
+> > > don't count it but it's obviously still a big impact).
+> > 
+> > Can we also *not* call it "downtime", as it is measuring a very different
+> > thing than the "downtime" we have measured today on the source during
+> > pre-copy migration.
 > 
-> I tested this by lowering CURL_NUM_STATES to 2.  With this change, the
-> buggy case triggers a couple times while booting a Fedora netinst image.
+> As I know downtime in pre-copy migration it's a time since all vCPU
+> were disabled on source till enabling these vCPU on destination,
+> but it's continuous time. So the meaning of both downtime is the same.
+> It's time when all vCPU are down.
 
-This series fixes the original bug, so:
+It is really not the same. In pre-copy, all the CPUs are in an explicit
+"stopped" state for a continuous period of time. In post-copy the CPUs
+are all in the "running" state, but repeatedly get blocked with arbitrary
+time intervals to fetch pages from the source. This is totally different
+information being reported, so should have a different name.
 
-  Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Calling it downtime will also lead to confusion wrt to the "max downtime"
+tunable parameter, which is not at all relevant here.
 
-I think the Reported-by in patch 3 should credit Kun Wei for finding
-the bug, and we should probably mention the BZ too:
+> But as David mentioned - downtime per vCPU is also important in case of
+> postcopy live migration, and I'll include it in final result of
+> query-migrate too.
 
-  Reported-by: Kun Wei <kuwei@redhat.com>
-  Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1447590
+That we need to report different data per-vCPU, is another reason why
+we should not call it "downtime".
 
-A nit pick perhaps but in patch 5 you say "This was broken before for
-disks > 2TB, but now it would break at 4GB.".
-I understand after reading it a few times that you mean it would be
-broken at 4GB, if you hadn't changed size_t -> uint64_t (on 32 bit
-platforms).  Perhaps better to clarify that sentence.
+> > Call it "pagewait" or "delaytime" or something like that to indicate it
+> > is counting delays to CPUs for page fetching.
 
----
 
-I also ran some performance and stability testing.  I used virt-ls for
-this.  The following command will iterate over every file in a remote
-guest image and print an md5sum:
-
-  LIBGUESTFS_BACKEND=direct \
-  LIBGUESTFS_HV=~/d/qemu/x86_64-softmmu/qemu-system-x86_64 \
-  virt-ls -a http://somehost/rhel-guest-image-7.1-20150224.0.x86_64.qcow2 \
-          -lR --checksum /
-
-I timed this with and without your patches, but there was no
-significant difference (but note that virt-ls is a fundamentally
-sequential program).
-
-It didn't crash or hang at any time during my testing.
-
-Rich.
-
+Regards,
+Daniel
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
