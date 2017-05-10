@@ -1,24 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8TlF-0005Zg-Fb
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:42:47 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1d8TpQ-0006sX-So
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8TlD-0007Am-Vz
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:42:45 -0400
-References: <20170411222945.11741-1-eblake@redhat.com>
-	<20170411222945.11741-18-eblake@redhat.com>
-	<ada8b8e3-aa6e-b06a-d2bf-6f7e994f0e7d@redhat.com>
-	<1bdb54f9-87d4-74a8-e097-c0918dc53fd9@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <67d0c3bf-d6a1-a9bb-8b17-75b1db412e19@redhat.com>
-Date: Wed, 10 May 2017 10:42:30 -0500
-MIME-Version: 1.0
-In-Reply-To: <1bdb54f9-87d4-74a8-e097-c0918dc53fd9@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mcQ16mOnjV0tcnVQvopOcFaNlFx6EvFcA"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 17/17] block: Make
- bdrv_is_allocated_above() byte-based
+	(envelope-from <a.perevalov@samsung.com>) id 1d8TpM-0000Ko-OF
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:47:04 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:57065)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1d8TpM-0000KE-F8
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:47:00 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OPQ0073ZUI51770@mailout1.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 10 May 2017 16:46:53 +0100 (BST)
+Date: Wed, 10 May 2017 18:46:50 +0300
+From: Alexey <a.perevalov@samsung.com>
+Message-id: <20170510154650.GC4201@aperevalov-ubuntu>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Content-disposition: inline
+In-reply-to: <20170509094434.GF1669@redhat.com>
+References: <1493362658-8179-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
+	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
+	<20170428100012.GB22801@pxdev.xzpeter.org>
+	<d018d4a6-4b50-3f36-fe69-e232b63bebf0@samsung.com>
+	<20170508062906.GC2820@pxdev.xzpeter.org>
+	<20170508090807.GA4201@aperevalov-ubuntu>
+	<20170509082622.GI2820@pxdev.xzpeter.org>
+	<20170509094033.GB2089@work-vm> <20170509094434.GF1669@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
+ downtime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,184 +41,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Fam Zheng <famz@redhat.com>, Wen Congyang <wency@cn.fujitsu.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, i.maximets@samsung.com, f4bug@amsat.org, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mcQ16mOnjV0tcnVQvopOcFaNlFx6EvFcA
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Changlong Xie <xiecl.fnst@cn.fujitsu.com>,
- Fam Zheng <famz@redhat.com>, Wen Congyang <wency@cn.fujitsu.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <67d0c3bf-d6a1-a9bb-8b17-75b1db412e19@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 17/17] block: Make
- bdrv_is_allocated_above() byte-based
-References: <20170411222945.11741-1-eblake@redhat.com>
- <20170411222945.11741-18-eblake@redhat.com>
- <ada8b8e3-aa6e-b06a-d2bf-6f7e994f0e7d@redhat.com>
- <1bdb54f9-87d4-74a8-e097-c0918dc53fd9@redhat.com>
-In-Reply-To: <1bdb54f9-87d4-74a8-e097-c0918dc53fd9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, May 09, 2017 at 10:44:34AM +0100, Daniel P. Berrange wrote:
+> On Tue, May 09, 2017 at 10:40:34AM +0100, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > On Mon, May 08, 2017 at 12:08:07PM +0300, Alexey wrote:
+> > > > On Mon, May 08, 2017 at 02:29:06PM +0800, Peter Xu wrote:
+> > > > > On Fri, Apr 28, 2017 at 02:11:19PM +0300, Alexey Perevalov wrote:
+> > > > > > On 04/28/2017 01:00 PM, Peter Xu wrote:
+> > > > > > >On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
+> > > > > > >>This patch provides downtime calculation per vCPU,
+> > > > > > >>as a summary and as a overlapped value for all vCPUs.
+> > > > > > >>
+> > > > > > >>This approach was suggested by Peter Xu, as an improvements of
+> > > > > > >>previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> > > > > > >>in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> > > > > > >>as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> > > > > > >>list for downtime per vCPU (could be traced with page_fault_addr)
+> > > > > > >>
+> > > > > > >>For more details see comments for get_postcopy_total_downtime
+> > > > > > >>implementation.
+> > > > > > >>
+> > > > > > >>Downtime will not calculated if postcopy_downtime field of
+> > > > > > >>MigrationIncomingState wasn't initialized.
+> > > > > > >>
+> > > > > > >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > > > > > >>---
+> > > > > > >>  include/migration/migration.h |   3 ++
+> > > > > > >>  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
+> > > > > > >>  migration/postcopy-ram.c      |  20 +++++++-
+> > > > > > >>  migration/trace-events        |   6 ++-
+> > > > > > >>  4 files changed, 130 insertions(+), 2 deletions(-)
+> > > > > > >>
+> > > > > > >>diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > > > > > >>index e8fb68f..a22f9ce 100644
+> > > > > > >>--- a/include/migration/migration.h
+> > > > > > >>+++ b/include/migration/migration.h
+> > > > > > >>@@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
+> > > > > > >>   * Functions to work with downtime context
+> > > > > > >>   */
+> > > > > > >>  struct DowntimeContext *downtime_context_new(void);
+> > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
+> > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr);
+> > > > > > >>+uint64_t get_postcopy_total_downtime(void);
+> > > > > > >>  struct MigrationState
+> > > > > > >>  {
+> > > > > > >>diff --git a/migration/migration.c b/migration/migration.c
+> > > > > > >>index ec76e5c..2c6f150 100644
+> > > > > > >>--- a/migration/migration.c
+> > > > > > >>+++ b/migration/migration.c
+> > > > > > >>@@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
+> > > > > > >>      return atomic_xchg(&incoming_postcopy_state, new_state);
+> > > > > > >>  }
+> > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
+> > > > > > >>+{
+> > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > > > >>+    DowntimeContext *dc;
+> > > > > > >>+    if (!mis->downtime_ctx || cpu < 0) {
+> > > > > > >>+        return;
+> > > > > > >>+    }
+> > > > > > >>+    dc = mis->downtime_ctx;
+> > > > > > >>+    dc->vcpu_addr[cpu] = addr;
+> > > > > > >>+    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
+> > > > > > >>+        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > > > >>+
+> > > > > > >>+    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> > > > > > >>+            cpu);
+> > > > > > >>+}
+> > > > > > >>+
+> > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr)
+> > > > > > >>+{
+> > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > > > >>+    DowntimeContext *dc;
+> > > > > > >>+    int i;
+> > > > > > >>+    bool all_vcpu_down = true;
+> > > > > > >>+    int64_t now;
+> > > > > > >>+
+> > > > > > >>+    if (!mis->downtime_ctx) {
+> > > > > > >>+        return;
+> > > > > > >>+    }
+> > > > > > >>+    dc = mis->downtime_ctx;
+> > > > > > >>+    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > > > >>+
+> > > > > > >>+    /* check all vCPU down,
+> > > > > > >>+     * QEMU has bitmap.h, but even with bitmap_and
+> > > > > > >>+     * will be a cycle */
+> > > > > > >>+    for (i = 0; i < smp_cpus; i++) {
+> > > > > > >>+        if (dc->vcpu_addr[i]) {
+> > > > > > >>+            continue;
+> > > > > > >>+        }
+> > > > > > >>+        all_vcpu_down = false;
+> > > > > > >>+        break;
+> > > > > > >>+    }
+> > > > > > >>+
+> > > > > > >>+    if (all_vcpu_down) {
+> > > > > > >>+        dc->total_downtime += now - dc->last_begin;
+> > > > > > >Shall we do this accouting only if we are sure the copied page address
+> > > > > > >is one of the page faulted addresses? Can it be some other page? I
+> > > > > > >don't know. But since we have the loop below to make sure of it, why
+> > > > > > >not?
+> > > > > > no, the downtime implies since page fault till the
+> > > > > > page will be copied.
+> > > > > > Yes another pages could be copied as well as pagefaulted,
+> > > > > > and they are copied due to prefetching, but it's not a downtime.
+> > > > > 
+> > > > > Not sure I got the point... Do you mean that when reach here, then
+> > > > > this page address is definitely one of the faulted addresses? I am not
+> > > > > 100% sure of this, but if you are sure, I am okay with it.
+> > > > Let me clarify.
+> > > > 
+> > > > > > >Shall we do this accouting only if we are sure the copied page address
+> > > > > > >is one of the page faulted addresses?
+> > > > Yes it's primary condition, due to there are could be another pages,
+> > > > which weren't faulted, they just was sent from source to destination,
+> > > > I called it prefetching.
+> > > > 
+> > > > I think I got why did you ask that question, because in this version
+> > > > all_vcpu_down and as a result total_downtime calculated incorrectly,
+> > > > it calculates every time when any page is copied, but it should
+> > > > be calculated only when faulted page copied, so only dc->vcpu_downtime
+> > > > was correctly calculated.
+> > > 
+> > > Exactly. I am afraid if we have such "prefetching" stuff then
+> > > total_downtime will be more than its real value.
+> > 
+> > It should be OK as long as we measure the time between
+> >   userfault reporting a page miss for an address 
+> >   and
+> >   place_page for *that same address*
+> > 
+> > any places for other pages are irrelevant.
+> > 
+> > (I still worry that this definition of 'downtime' is possibly
+> > arbitrary - since if all but one of the vCPUs are down we
+> > don't count it but it's obviously still a big impact).
+> 
+> Can we also *not* call it "downtime", as it is measuring a very different
+> thing than the "downtime" we have measured today on the source during
+> pre-copy migration.
 
-On 04/24/2017 08:48 PM, Eric Blake wrote:
-> On 04/24/2017 06:06 PM, John Snow wrote:
->>
->>
->> On 04/11/2017 06:29 PM, Eric Blake wrote:
->>> We are gradually moving away from sector-based interfaces, towards
->>> byte-based.  In the common case, allocation is unlikely to ever use
->>> values that are not naturally sector-aligned, but it is possible
->>> that byte-based values will let us be more precise about allocation
->>> at the end of an unaligned file that can do byte-based access.
->>>
->>> Changing the signature of the function to use int64_t *pnum ensures
->>> that the compiler enforces that all callers are updated.  For now,
->>> the io.c layer still assert()s that all callers are sector-aligned,
->>> but that can be relaxed when a later patch implements byte-based
->>> block status.  Therefore, for the most part this patch is just the
->>> addition of scaling at the callers followed by inverse scaling at
->>> bdrv_is_allocated().  But some code, particularly stream_run(),
->>> gets a lot simpler because it no longer has to mess with sectors.
->>>
->=20
->>> +++ b/block/io.c
->>> @@ -1930,52 +1930,46 @@ int coroutine_fn bdrv_is_allocated(BlockDrive=
-rState *bs, int64_t offset,
->>>  /*
->>>   * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [T=
-OP]
->>>   *
->>> - * Return true if the given sector is allocated in any image between=
+As I know downtime in pre-copy migration it's a time since all vCPU
+were disabled on source till enabling these vCPU on destination,
+but it's continuous time. So the meaning of both downtime is the same.
+It's time when all vCPU are down.
 
->>> + * Return true if the given offset is allocated in any image between=
+But as David mentioned - downtime per vCPU is also important in case of
+postcopy live migration, and I'll include it in final result of
+query-migrate too.
 
->>
->> perhaps "range" instead of "offset"?
->>
->>>   * BASE and TOP (inclusive).  BASE can be NULL to check if the given=
+> 
+> Call it "pagewait" or "delaytime" or something like that to indicate it
+> is counting delays to CPUs for page fetching.
+> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> 
 
->>> - * sector is allocated in any image of the chain.  Return false othe=
-rwise,
->>> + * offset is allocated in any image of the chain.  Return false othe=
-rwise,
->>>   * or negative errno on failure.
->=20
-> Seems reasonable.
+-- 
 
-Actually, not quite. Suppose we have the following sector allocations:
-
-backing: -- -- XX --
-active:  -- -- -- XX
-
-bdrv_is_allocated_above(active, NULL, 0, 2048, &num)
-
-will return 0 with num set to 1024 (offset is not allocated, and the
-not-allocated range is at least 1024 bytes).  But calling
-
-bdr_is_allocated_above(backing, NULL, 1024, 1024, &num)
-
-will return 1 with num set to 512 (the entire range is not allocated,
-but the 512-byte prefix of the range IS allocated).  Meanwhile, note that=
-:
-
-bdrv_is_allocated_above(active, NULL, 1024, 1024, &num)
-
-will ALSO return 1 with num set to 512, even though it would be nicer if
-it could return 1024 (from the active layer, all 1024 bytes of the given
-range ARE allocated, just not from the same location).  So callers have
-to manually coalesce multiple bdrv_is_allocated_above() calls to get a
-full picture of what is allocated.
-
-The same is ALSO true if you have a fragmented image.  For example:
-
-$ qemu-img create -f qcow2 -o cluster_size=3D1m file3 10m
-$ qemu-io -f qcow2 -c 'w 0 5m' -c 'discard 0 2m' -c 'w 1m 1m' \
-  -c 'w 0 1m' -c 'w 8m 2m' file3
-
-The image is now fragmented (the clusters at 0 and 1m swapped mappings):
-
-[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data":
-true, "offset": 6291456},
-{ "start": 1048576, "length": 1048576, "depth": 0, "zero": false,
-"data": true, "offset": 5242880},
-{ "start": 2097152, "length": 3145728, "depth": 0, "zero": false,
-"data": true, "offset": 7340032},
-{ "start": 5242880, "length": 3145728, "depth": 0, "zero": true, "data":
-false},
-{ "start": 8388608, "length": 2097152, "depth": 0, "zero": false,
-"data": true, "offset": 10485760}]
-
-
-'qemu-io alloc' and 'qemu-io map' are callers which coalesce similar
-results:
-
-$ ./qemu-io -f qcow2 file3
-qemu-io> alloc 0 10m
-7340032/10485760 bytes allocated at offset 0 bytes
-qemu-io> map
-5 MiB (0x500000) bytes     allocated at offset 0 bytes (0x0)
-3 MiB (0x300000) bytes not allocated at offset 5 MiB (0x500000)
-2 MiB (0x200000) bytes     allocated at offset 8 MiB (0x800000)
-
-although tracing under gdb showed 5 calls to bdrv_is_allocated() during
-'alloc' (at [0, 10m], [1m, 9m], [2m, 8m], [5m, 5m], [8m, 2m]), and 8
-calls during 'map' (at [0, 10m], [1m, 9m], [2m, 8m], [5m, 5m], [5m, 5m],
-[8m, 2m], [8m, 2m], [10m, 0]).  Part of that is that the qemu-io map
-implementation is rather inefficient - it makes a wasted query for 0
-bytes, and at every transition between allocated and unallocated it ends
-up asking for status on the same offset a second time around, rather
-than remembering what it already learned on the previous iteration.
-
-It might be worth followup patches to improve the efficiency of qemu-io
-map; but also to change semantics such that bdrv_is_allocated_above()
-gives the largest answer possible, rather than making the callers
-coalesce identical answers.  Part of that would include teaching
-=2Ebdrv_co_get_block_status() new semantics: if file=3D=3DNULL, then don'=
-t
-return BDRV_BLOCK_OFFSET_VALID, but merely grab as much
-BDRV_BLOCK_DATA/BDRV_BLOCK_ZERO information as possible (in spite of
-fragmentation) [in the example above, it would mean returning
-BDRV_BLOCK_DATA for 5m, rather than three separate returns of 1m/1m/3m];
-as well as teaching bdrv_is_allocated_above() to concatenate all answers
-along the backing chain until it reaches an actual change in status.
-Looks like I've just added more work to my queue.
-
-That said, there still has to be coalescing somewhere.  For example,
-qcow2 images can easily return status for any range covered by a single
-L2 cluster, but intentionally quits its response at the end of an L2
-cluster because the cost of loading up the next cluster (with the
-potential of dropping locks and racing with other threads doing writes)
-becomes too hard to control within the qcow2 layer, and callers may need
-to realize that the larger a request is on an actively-changing image,
-the more likely the overall response can be inaccurate by the time
-multiple sub-queries have been coalesced.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---mcQ16mOnjV0tcnVQvopOcFaNlFx6EvFcA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZEzTnAAoJEKeha0olJ0NqC9cH/2n4rNMiHCNbu224Y3JC3EQB
-IA0+IDeecGK23hgOQmJuJ0E3TCTfgTy790xX7cEBYkkFr0Z7WfLeDbuGpUbXErlF
-ny/voru5tXwX3FxtHYMe67JdFpTvXCFiB4OqSrc3CNKoxDAlcby0WA2vPlxvi/f0
-PCZn1N3Ex0ES+TPTU6rmaSTLhqeEyeCgzQLX9iKkfHOtvZSqTxCvGgQkQ2Pt5Vue
-DaI2VignNCy2sRXrJsJZURcWR2TW7+xQXhcFC05EXfleMd3juQrJsmt/Ao9ezKrE
-p6I02NnTExyEkW19Opdmh1l8AVGklPsxkLHwHqvU24Xt0OVyMCzH8uSN4b8VHlc=
-=8S0b
------END PGP SIGNATURE-----
-
---mcQ16mOnjV0tcnVQvopOcFaNlFx6EvFcA--
+BR
+Alexey
