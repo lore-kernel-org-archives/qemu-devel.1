@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1d8TTi-0006Xg-7D
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:24:39 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d8TW1-0007Ft-ER
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:27:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1d8TTg-00028p-NJ
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:24:38 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d8TVy-0002pf-6l
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:27:01 -0400
+Received: from mail-qk0-x22d.google.com ([2607:f8b0:400d:c09::22d]:32850)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d8TVy-0002pY-29
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:26:58 -0400
+Received: by mail-qk0-x22d.google.com with SMTP id y201so33584596qka.0
+	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 08:26:57 -0700 (PDT)
+Date: Wed, 10 May 2017 11:26:55 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170510152655.GD19962@stefanha-x1.localdomain>
+References: <20170509134623.13120-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <031eab53-a6ec-2248-d4ea-b4352243baae@amsat.org>
-References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
-	<031eab53-a6ec-2248-d4ea-b4352243baae@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Wed, 10 May 2017 20:54:35 +0530
-Message-ID: <CALHRZur46TyuemoO8=fMc-DvAzayRjZuV1--AK5TvUmWy5snLw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [Qemu-devel PATCH 0/5] Add support for
- Smartfusion2 SoC
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="UfEAyuTBtIjiZzX6"
+Content-Disposition: inline
+In-Reply-To: <20170509134623.13120-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PULL v1 0/4] Merge qcrypto 2017/05/07
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>
-
-Hi Philippe,
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 
-On Wed, May 10, 2017 at 3:14 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
+--UfEAyuTBtIjiZzX6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Hi Subbaraya,
->
-> This is your v4 of this patch set, please don't forget to include the
-> version in your next set.
->
-> Please also include changes between versions in your cover letter, it
-> eases the review.
+On Tue, May 09, 2017 at 02:46:19PM +0100, Daniel P. Berrange wrote:
+> The following changes since commit dd1559bb267becbb838de41132ef60771d183e=
+5d:
+>=20
+>   Merge remote-tracking branch 'elmarco/tags/chr-tests-pull-request' into=
+ staging (2017-05-05 17:07:55 +0100)
+>=20
+> are available in the git repository at:
+>=20
+>   git://github.com/berrange/qemu tags/pull-qcrypto-2017-05-09-1
+>=20
+> for you to fetch changes up to a37278169d0d7d33270c6817f4a2e4f7345e1098:
+>=20
+>   crypto: qcrypto_random_bytes() now works on windows w/o any other crypt=
+o libs (2017-05-09 14:41:47 +0100)
+>=20
+> ----------------------------------------------------------------
+> Merge qcrypto 2017/05/09 v1
+>=20
+> ----------------------------------------------------------------
+>=20
+> Daniel P. Berrange (3):
+>   Default to GSSAPI (Kerberos) instead of DIGEST-MD5 for SASL
+>   List SASL config file under the cryptography maintainer's realm
+>   crypto: move 'opaque' parameter to (nearly) the end of parameter list
+>=20
+> Geert Martin Ijewski (1):
+>   crypto: qcrypto_random_bytes() now works on windows w/o any other
+>     crypto libs
+>=20
+>  MAINTAINERS               |  1 +
+>  block/crypto.c            |  6 +++---
+>  crypto/block-luks.c       | 13 +++++++-----
+>  crypto/init.c             |  6 ++++++
+>  crypto/random-gcrypt.c    |  2 ++
+>  crypto/random-gnutls.c    |  3 +++
+>  crypto/random-platform.c  | 45 ++++++++++++++++++++++++++++++++-------
+>  include/crypto/block.h    |  6 +++---
+>  include/crypto/random.h   |  9 ++++++++
+>  qemu-doc.texi             | 50 +++++++++++++++++++++++++----------------=
+--
+>  qemu.sasl                 | 54 +++++++++++++++++++++++++++--------------=
+------
+>  tests/test-crypto-block.c |  6 +++---
+>  12 files changed, 135 insertions(+), 66 deletions(-)
+>=20
+> --=20
+> 2.9.3
+>=20
+>=20
 
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
 
-Sure. Sorry since this is not RFC i did not include versions. I will add
-versions from next iteration.
+Stefan
 
-Thanks,
-Sundeep
+--UfEAyuTBtIjiZzX6
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
->
-> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
->
->> Hi Qemu-devel,
->>
->> I am trying to add Smartfusion2 SoC.
->> SoC is from Microsemi and System on Module(SOM)
->> board is from Emcraft systems. Smartfusion2 has hardened
->> Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
->> At the moment only system timer, sysreg and SPI
->> controller are modelled.
->>
->> Testing:
->> ./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial mon:stdio \
->> -kernel u-boot.bin -display none -drive file=3Dspi.bin,if=3Dmtd,format=
-=3Draw
->>
->> U-boot is from Emcraft with modified SPI driver not to use PDMA.
->> Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
->> driver added by myself @
->> https://github.com/Subbaraya-Sundeep/linux.git
->>
->> Baremetal elfs from Microsemi Softconsole IDE are also working.
->>
->> Thanks,
->> Sundeep
->>
->> Subbaraya Sundeep (5):
->>   msf2: Add Smartfusion2 System timer
->>   msf2: Microsemi Smartfusion2 System Register block.
->>   msf2: Add Smartfusion2 SPI controller
->>   msf2: Add Smartfusion2 SoC.
->>   msf2: Add Emcraft's Smartfusion2 SOM kit.
->>
->>  default-configs/arm-softmmu.mak |   1 +
->>  hw/arm/Makefile.objs            |   3 +-
->>  hw/arm/msf2-soc.c               | 188 ++++++++++++++++++++
->>  hw/arm/msf2-som.c               |  67 +++++++
->>  hw/misc/Makefile.objs           |   1 +
->>  hw/misc/msf2-sysreg.c           | 131 ++++++++++++++
->>  hw/ssi/Makefile.objs            |   1 +
->>  hw/ssi/msf2-spi.c               | 378 ++++++++++++++++++++++++++++++
->> ++++++++++
->>  hw/timer/Makefile.objs          |   1 +
->>  hw/timer/msf2-timer.c           | 252 +++++++++++++++++++++++++++
->>  include/hw/arm/msf2-soc.h       |  60 +++++++
->>  include/hw/misc/msf2-sysreg.h   |  80 +++++++++
->>  include/hw/ssi/msf2-spi.h       | 105 +++++++++++
->>  include/hw/timer/msf2-timer.h   |  85 +++++++++
->>  14 files changed, 1352 insertions(+), 1 deletion(-)
->>  create mode 100644 hw/arm/msf2-soc.c
->>  create mode 100644 hw/arm/msf2-som.c
->>  create mode 100644 hw/misc/msf2-sysreg.c
->>  create mode 100644 hw/ssi/msf2-spi.c
->>  create mode 100644 hw/timer/msf2-timer.c
->>  create mode 100644 include/hw/arm/msf2-soc.h
->>  create mode 100644 include/hw/misc/msf2-sysreg.h
->>  create mode 100644 include/hw/ssi/msf2-spi.h
->>  create mode 100644 include/hw/timer/msf2-timer.h
->>
->>
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZEzE/AAoJEJykq7OBq3PIO0sH/1qDs1KAh5lLG9BetimsOoDu
+/DKxVykczIYAiZMax76Z4g6jkY8rSzRVIpjrP6G22PA1H8VKoo4fxd3TcMdBIaaj
+jKunt0SpV7Ny3leQ9HrCas6NVjSzh+ZfKp9v7pMM02yE0EGBmZ0YPlz8gcWe/QVF
+x6zdWaesqVKzIdtjpn/0WKGvF1gw41KqDQNuSCyfYG1/CjGOmNYt/8i6prpsz7mJ
+3X1GxBwP+TEMHAR+WYy77zw1asczxhHd6/3S1X/tIGE8FiIU2f6APdC+56wUH0j7
+zLkZBosY/2LG1+2lEPWesFPUNyFfYCsdccsdPkpSYvCqsyCNrTtdjXE6v48FVSQ=
+=4ZGA
+-----END PGP SIGNATURE-----
+
+--UfEAyuTBtIjiZzX6--
