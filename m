@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8XiT-0005bj-Nb
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 15:56:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8XmU-0006hY-6b
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 16:00:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8XiP-0003Qu-Nh
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 15:56:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35700)
+	(envelope-from <eblake@redhat.com>) id 1d8XmQ-0004xy-VK
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 16:00:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55316)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8XiP-0003Qg-F5
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 15:56:05 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8XmQ-0004xd-Me
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 16:00:14 -0400
 References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1494405683-20877-4-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3797fb7d-bd3d-c1b0-0707-57f95852cb5f@redhat.com>
-Date: Wed, 10 May 2017 14:56:01 -0500
+Message-ID: <6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
+Date: Wed, 10 May 2017 15:00:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <1494405683-20877-4-git-send-email-pradeep.jagadeesh@huawei.com>
+In-Reply-To: <1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="PNenv5EnADMCiNcX4tLPfv64c7UkR2DA7"
-Subject: Re: [Qemu-devel] [PATCH v4 3/4] qmp: refactor duplicate code
+	boundary="lR9eAehOJeDXRCeAPeBo6QMFIHgV9vo0Q"
+Subject: Re: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +32,52 @@ To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
 Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PNenv5EnADMCiNcX4tLPfv64c7UkR2DA7
+--lR9eAehOJeDXRCeAPeBo6QMFIHgV9vo0Q
 From: Eric Blake <eblake@redhat.com>
 To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
 Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
  alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>,
  qemu-devel@nongnu.org
-Message-ID: <3797fb7d-bd3d-c1b0-0707-57f95852cb5f@redhat.com>
-Subject: Re: [PATCH v4 3/4] qmp: refactor duplicate code
+Message-ID: <6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
+Subject: Re: [PATCH v4 4/4] fsdev: QMP interface for throttling
 References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
- <1494405683-20877-4-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1494405683-20877-4-git-send-email-pradeep.jagadeesh@huawei.com>
+ <1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
+In-Reply-To: <1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/10/2017 03:41 AM, Pradeep Jagadeesh wrote:
-> This patch factor out the duplicate qmp throttle interface code
-> that was present in both block and fsdev device files.
+> This patch enables qmp interfaces for the fsdev
+> devices. This provides two interfaces one=20
+> for querying info of all the fsdev devices. The second one
+> to set the IO limits for the required fsdev device.
 >=20
 > Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
 > ---
->  blockdev.c                      | 53 +++------------------------------=
--------
->  hmp.c                           | 21 +++++++++++-----
->  include/qemu/throttle-options.h |  2 ++
->  util/throttle-options.c         | 54 +++++++++++++++++++++++++++++++++=
-++++++++
->  4 files changed, 74 insertions(+), 56 deletions(-)
->=20
 
-> +++ b/include/qemu/throttle-options.h
-> @@ -94,4 +94,6 @@
+> +++ b/qmp.c
+> @@ -130,6 +130,21 @@ void qmp_cpu_add(int64_t id, Error **errp)
+>      }
+>  }
 > =20
->  void parse_io_throttle_options(ThrottleConfig *, QemuOpts *);
-> =20
-> +void qmp_set_io_throttle(ThrottleConfig *, IOThrottle *);
+> +#ifdef _WIN64
+> +
+> +void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
+> +{
+> +  return;
+> +}
+> +
+> +IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
+> +{
+> +    abort();
+> +}
+> +
+> +#endif
 
-I don't think this is the right name for this function.  You are not
-adding a new QMP command (you didn't modify a .json file to add
-'set-io-throttle').  As mentioned in patch 1/4, you can probably reuse
-the existing util/throttle.c instead of throttle-options.c, and name
-this something starting with throttle_ rather than with qmp_.
+I think you're missing an addition to monitor.c
+qmp_unregister_commands_hack() if you intend for this command to be
+available only on non-windows platforms (and is your #ifdef the correct
+name, or is this a Linux-only feature rather than a non-windows feature).=
 
 
 --=20
@@ -81,7 +86,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---PNenv5EnADMCiNcX4tLPfv64c7UkR2DA7
+--lR9eAehOJeDXRCeAPeBo6QMFIHgV9vo0Q
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -91,13 +96,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZE3BRAAoJEKeha0olJ0NqJnsH/R8XYLm5Un6giunwKZjvmXUn
-KaSzr0nHyT+kxth1xVoDicnD63/476e+ixDuPAnDSY5LJwNMX5oqV69/HnxGlmKZ
-FjZ6mRPITCYZuQGhiQgwcYakj8he0kHGdvDWYDCjbUjolZ6jB0d3UW+UQYYl3PdD
-c/3FeE+4ZJhrJLQk140hwUC6xUcsYbIgOsxL+nG3Y3J4ZB2+YjiOZ75+w+UXbtWM
-9sh+eAfxScJB5CwJFsvQIjwH8ST+SCyTzGJ1CqGes/cNlt8xl3isFjZME9mWd7rb
-4PgTj6lcwoSWP1OZQXYzt1ongSsIxV0hGeJgINjXlRvHkPyLc3vrANEN0FlVSMo=
-=npdw
+iQEcBAEBCAAGBQJZE3FKAAoJEKeha0olJ0NquugIAIHymtDg5oi+N9WBXlvF5dID
+9XQR0z7Lx+8pwGWNnpmeLBsJVc/HO6VJejW1mi0nZeWcbyfjkh5ULd376GXI/h6p
+zDJUeTT7ErAiqu26T4LLQshumGuArCsAnf+HrHyG/8XE/HoxRUwMOVYph6cUyqQe
+BJ+NJVYjPS213Wk+qfOX/5wlvbvaPjjiRJfXSswQYD8b0AxfZiDXCyJj7KXkdaLT
+pl8g39ZKdcnw72whgIsQtkz4zhvluSPOJLZhkzmTj2x/PJFJBhWRj8og5i/EBdxX
+HR9299nrNTaEV6xd2iEj+oZ3mthmFHXTLy0eobsJd+/5umfOqvS0s6t8ar7g7Fw=
+=V7fS
 -----END PGP SIGNATURE-----
 
---PNenv5EnADMCiNcX4tLPfv64c7UkR2DA7--
+--lR9eAehOJeDXRCeAPeBo6QMFIHgV9vo0Q--
