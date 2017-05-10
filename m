@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8TBj-0007XO-D1
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:06:04 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d8TGu-0000se-Hp
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8TBf-0004vS-9C
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:06:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d8TBf-0004vO-3j
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:05:59 -0400
-References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
-	<20170510090841.GF31558@redhat.com> <20170510145125.GE4230@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3f0edb37-eb07-d8d6-016b-bb98487c66f8@redhat.com>
-Date: Wed, 10 May 2017 17:05:53 +0200
+	(envelope-from <no-reply@patchew.org>) id 1d8TGt-0006XD-Az
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:11:24 -0400
+Resent-Message-Id: <E1d8TGt-0006XD-Az@eggs.gnu.org>
+In-Reply-To: <20170510143205.32013-1-pbonzini@redhat.com>
+Message-ID: <149442906527.309.2250344827640043646@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20170510145125.GE4230@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
- pc-0.15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 10 May 2017 08:11:05 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] curl: locking cleanups/fixes,
+ coroutine conversion, remove aio_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Richard Henderson <rth@twiddle.net>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jcody@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
 
-
-
-On 10/05/2017 16:51, Dr. David Alan Gilbert wrote:
-> I'll give you a manual one; I just migrated:
->    /opt/qemu/v1.0.1/bin/qemu-system-x86_64 -M pc-1.0 -m 2G /home/vms/f2=
-3-serial-010.qcow2 -M pc-1.0 -nographic
-> to
->    /opt/qemu/v2.9.0/bin/qemu-system-x86_64 -M pc-1.0 -m 2G /home/vms/f2=
-3-serial-010.qcow2 -M pc-1.0 -nographic -incoming tcp::4444
->=20
-> seems to have survived.
-> Not exactly conclusive or heavy coverage, but it's not completely
-> broken.
-
-Yeah, I think resetting the VM will fail, or something like that.
-
-Paolo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2MiAwLzddIGN1cmw6IGxvY2tpbmcgY2xlYW51cHMvZml4ZXMsIGNvcm91
+dGluZSBjb252ZXJzaW9uLCByZW1vdmUgYWlvX3BvbGwKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6
+IDIwMTcwNTEwMTQzMjA1LjMyMDEzLTEtcGJvbnppbmlAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cg
+LS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
+dCcKYTkxZTlkNCBjdXJsOiBkbyBub3QgZG8gYWlvX3BvbGwgd2hlbiB3YWl0aW5nIGZvciBhIGZy
+ZWUgQ1VSTFN0YXRlCjZjOTI2ODAgY3VybDogY29udmVydCByZWFkdiB0byBjb3JvdXRpbmVzCjg0
+YzA0NmMgY3VybDogY29udmVydCBDVVJMQUlPQ0IgdG8gYnl0ZSB2YWx1ZXMKYWI0MzFlYyBjdXJs
+OiBzcGxpdCBjdXJsX2ZpbmRfc3RhdGUvY3VybF9pbml0X3N0YXRlCmJhMzA5YTUgY3VybDogYXZv
+aWQgcmVjdXJzaXZlIGxvY2tpbmcgb2YgQkRSVkNVUkxTdGF0ZSBtdXRleAphNmI2ZDkwIGN1cmw6
+IG5ldmVyIGludm9rZSBjYWxsYmFja3Mgd2l0aCBzLT5tdXRleCBoZWxkCjZmMTE1MDIgY3VybDog
+c3RyZW5ndGhlbiBhc3NlcnRpb24gaW4gY3VybF9jbGVhbl9zdGF0ZQoKPT09IE9VVFBVVCBCRUdJ
+TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiBjdXJsOiBzdHJlbmd0aGVuIGFzc2VydGlvbiBpbiBj
+dXJsX2NsZWFuX3N0YXRlLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJz0n
+IChjdHg6VnhWKQojMjQ6IEZJTEU6IGJsb2NrL2N1cmwuYzo1MzY6CisgICAgZm9yIChqPTA7IGo8
+Q1VSTF9OVU1fQUNCOyBqKyspIHsKICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVk
+IGFyb3VuZCB0aGF0ICc8JyAoY3R4OlZ4VikKIzI0OiBGSUxFOiBibG9jay9jdXJsLmM6NTM2Ogor
+ICAgIGZvciAoaj0wOyBqPENVUkxfTlVNX0FDQjsgaisrKSB7CiAgICAgICAgICAgICAgICBeCgp0
+b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDExIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvNzogY3VybDogbmV2
+ZXIgaW52b2tlIGNhbGxiYWNrcyB3aXRoIHMtPm11dGV4IGhlbGQuLi4KQ2hlY2tpbmcgUEFUQ0gg
+My83OiBjdXJsOiBhdm9pZCByZWN1cnNpdmUgbG9ja2luZyBvZiBCRFJWQ1VSTFN0YXRlIG11dGV4
+Li4uCkNoZWNraW5nIFBBVENIIDQvNzogY3VybDogc3BsaXQgY3VybF9maW5kX3N0YXRlL2N1cmxf
+aW5pdF9zdGF0ZS4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9JyAoY3R4
+OlZ4VikKIzM5OiBGSUxFOiBibG9jay9jdXJsLmM6NDYzOgorICAgIGZvciAoaT0wOyBpPENVUkxf
+TlVNX1NUQVRFUzsgaSsrKSB7CiAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
+cm91bmQgdGhhdCAnPCcgKGN0eDpWeFYpCiMzOTogRklMRTogYmxvY2svY3VybC5jOjQ2MzoKKyAg
+ICBmb3IgKGk9MDsgaTxDVVJMX05VTV9TVEFURVM7IGkrKykgewogICAgICAgICAgICAgICAgXgoK
+dG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA5MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1Lzc6IGN1cmw6IGNv
+bnZlcnQgQ1VSTEFJT0NCIHRvIGJ5dGUgdmFsdWVzLi4uCkNoZWNraW5nIFBBVENIIDYvNzogY3Vy
+bDogY29udmVydCByZWFkdiB0byBjb3JvdXRpbmVzLi4uCkNoZWNraW5nIFBBVENIIDcvNzogY3Vy
+bDogZG8gbm90IGRvIGFpb19wb2xsIHdoZW4gd2FpdGluZyBmb3IgYSBmcmVlIENVUkxTdGF0ZS4u
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
+ZWxpc3RzLm9yZw==
