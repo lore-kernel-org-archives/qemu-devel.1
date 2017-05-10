@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d8PpC-0007ej-3y
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:30:34 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d8PpE-0007hj-JK
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:30:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d8Pp9-0001kg-0r
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:30:34 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d8PpD-0001mK-OU
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:30:36 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 10 May 2017 13:29:51 +0200
-Message-Id: <1494415802-227633-8-git-send-email-imammedo@redhat.com>
+Date: Wed, 10 May 2017 13:29:53 +0200
+Message-Id: <1494415802-227633-10-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
 References: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 07/18] numa: do default mapping based on
- possible_cpus instead of node_cpu bitmaps
+Subject: [Qemu-devel] [PATCH v3 09/18] spapr: get numa node mapping from
+ possible_cpus instead of numa_get_node_for_cpu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- numa.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+it's safe to remove thread node_id != core node_id error
+branch as machine_set_cpu_numa_node() also does mismatch
+check and is called even before any CPU is created.
 
-diff --git a/numa.c b/numa.c
-index 7db5dde..c89fc2d 100644
---- a/numa.c
-+++ b/numa.c
-@@ -458,6 +458,7 @@ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
- void parse_numa_opts(MachineState *ms)
- {
-     int i;
-+    const CPUArchIdList *possible_cpus;
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c          |  4 ++--
+ hw/ppc/spapr_cpu_core.c | 14 ++------------
+ 2 files changed, 4 insertions(+), 14 deletions(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index a952a39..504161f 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2863,8 +2863,8 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         goto out;
+     }
  
-     for (i = 0; i < MAX_NODES; i++) {
-@@ -519,18 +520,21 @@ void parse_numa_opts(MachineState *ms)
+-    node_id = numa_get_node_for_cpu(cc->core_id);
+-    if (node_id == nb_numa_nodes) {
++    node_id = core_slot->props.node_id;
++    if (!core_slot->props.has_node_id) {
+         /* by default CPUState::numa_node was 0 if it's not set via CLI
+          * keep it this way for now but in future we probably should
+          * refuse to start up with incomplete numa mapping */
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 9de7a56..a17ea07 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -181,7 +181,6 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
  
-         numa_set_mem_ranges();
+     sc->threads = g_malloc0(size * cc->nr_threads);
+     for (i = 0; i < cc->nr_threads; i++) {
+-        int node_id;
+         char id[32];
+         CPUState *cs;
  
--        for (i = 0; i < nb_numa_nodes; i++) {
--            if (!bitmap_empty(numa_info[i].node_cpu, max_cpus)) {
--                break;
--            }
+@@ -191,17 +190,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+         cs = CPU(obj);
+         cs->cpu_index = cc->core_id + i;
+ 
+-        /* Set NUMA node for the added CPUs  */
+-        node_id = numa_get_node_for_cpu(cs->cpu_index);
+-        if (node_id != sc->node_id) {
+-            error_setg(&local_err, "Invalid node-id=%d of thread[cpu-index: %d]"
+-                " on CPU[core-id: %d, node-id: %d], node-id must be the same",
+-                 node_id, cs->cpu_index, cc->core_id, sc->node_id);
+-            goto err;
 -        }
--
-         /* assign CPUs to nodes using board provided default mapping */
--        if (!mc->cpu_index_to_instance_props) {
-+        if (!mc->cpu_index_to_instance_props || !mc->possible_cpu_arch_ids) {
-             error_report("default CPUs to NUMA node mapping isn't supported");
-             exit(1);
-         }
--        if (i == nb_numa_nodes) {
-+
-+        possible_cpus = mc->possible_cpu_arch_ids(ms);
-+        for (i = 0; i < possible_cpus->len; i++) {
-+            if (possible_cpus->cpus[i].props.has_node_id) {
-+                break;
-+            }
-+        }
-+
-+        /* no CPUs are assigned to NUMA nodes */
-+        if (i == possible_cpus->len) {
-             for (i = 0; i < max_cpus; i++) {
-                 CpuInstanceProperties props;
-                 /* fetch default mapping from board and enable it */
+-        if (node_id < nb_numa_nodes) {
+-            cs->numa_node = node_id;
+-        }
++        /* Set NUMA node for the threads belonged to core  */
++        cs->numa_node = sc->node_id;
+ 
+         snprintf(id, sizeof(id), "thread[%d]", i);
+         object_property_add_child(OBJECT(sc), id, obj, &local_err);
 -- 
 2.7.4
