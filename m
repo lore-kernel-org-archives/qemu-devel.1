@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d8TJk-0002bS-JS
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:14:21 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1d8TSY-0005xo-AO
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d8TJh-0007uq-BE
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:14:20 -0400
-Received: from mail-qk0-x233.google.com ([2607:f8b0:400d:c09::233]:33461)
+	(envelope-from <alex.bennee@linaro.org>) id 1d8TSU-0001rM-Vd
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:23:26 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36707)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1d8TJh-0007uc-6c
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:14:17 -0400
-Received: by mail-qk0-x233.google.com with SMTP id y201so33227944qka.0
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 08:14:17 -0700 (PDT)
-Date: Wed, 10 May 2017 11:14:14 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170510151414.GC19962@stefanha-x1.localdomain>
-References: <1494330527-24163-1-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1d8TSU-0001pX-L5
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:23:22 -0400
+Received: by mail-wr0-x229.google.com with SMTP id l50so47962477wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 08:23:22 -0700 (PDT)
+References: <20170505103822.20641-1-alex.bennee@linaro.org>
+	<006301d2c994$7bd42850$737c78f0$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <006301d2c994$7bd42850$737c78f0$@ru>
+Date: Wed, 10 May 2017 16:24:07 +0100
+Message-ID: <87efvw91m0.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="V88s5gaDVPzZ0KCq"
-Content-Disposition: inline
-In-Reply-To: <1494330527-24163-1-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/8] pci, virtio, vhost: fixes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v1 0/9] BQL and Replay Lock changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +30,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: pbonzini@redhat.com, boost.lists@gmail.com, pavel.dovgaluk@ispras.ru, cota@braap.org, qemu-devel@nongnu.org
 
 
---V88s5gaDVPzZ0KCq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-On Tue, May 09, 2017 at 04:15:22PM +0300, Michael S. Tsirkin wrote:
-> The following changes since commit dd1559bb267becbb838de41132ef60771d183e=
-5d:
->=20
->   Merge remote-tracking branch 'elmarco/tags/chr-tests-pull-request' into=
- staging (2017-05-05 17:07:55 +0100)
->=20
-> are available in the git repository at:
->=20
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->=20
-> for you to fetch changes up to 6512fee18a330463f7cbe2524d92a53252664946:
->=20
->   ACPI: don't call acpi_pcihp_device_plug_cb on xen (2017-05-09 14:45:55 =
-+0300)
->=20
-> ----------------------------------------------------------------
-> pci, virtio, vhost: fixes
->=20
-> A bunch of fixes that missed the release.
->=20
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->=20
-> ----------------------------------------------------------------
-> Ard Biesheuvel (2):
->       hw/acpi-defs: replace leading X with x_ in FADT field names
+> Guest Windows XP doesn't boot with these patches.
 
-Please rebase on qemu.git/master.  The following new commit conflicts:
+I'm guessing there is hardware attached to that machine? Did the asserts
+catch double locking? As I said there are still changes to be made to
+the hardware emulation that saves async events with the device data.
 
-  commit 77af8a2b95b79699de650965d5228772743efe84
-  Author: Phil Dennis-Jordan <phil@philjordan.eu>
-  Date:   Wed Mar 15 19:20:26 2017 +1300
+But the real question is do you think that re-purposing replay_lock to
+give the sequential guarantees that the BQL used to is the right
+approach?
 
-      hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS=
- support.
+>
+> Pavel Dovgalyuk
+>
+>
+>> -----Original Message-----
+>> From: Alex Bennée [mailto:alex.bennee@linaro.org]
+>> Sent: Friday, May 05, 2017 1:38 PM
+>> To: pbonzini@redhat.com; boost.lists@gmail.com; pavel.dovgaluk@ispras.ru
+>> Cc: cota@braap.org; qemu-devel@nongnu.org; Alex Bennée
+>> Subject: [RFC PATCH v1 0/9] BQL and Replay Lock changes
+>>
+>> Hi,
+>>
+>> This RFC does two principle things. It continues the push to reduce
+>> the BQL lock contention to a minimum by dropping the BQL for most of
+>> the run loop - eventually only holding it for timer processing and
+>> sleeping. The second part is an attempt to fix the breakage caused to
+>> record/replay by the previous work reducing the BQL in 2.9.
+>>
+>> The patch breakdown is as follows:
+>>
+>>  - target/arm/arm-powertctl: drop BQL assertions
+>>
+>> This just fixes a bogus assert. The async work doesn't need BQL
+>> protection as it is all done in the context of the vCPU (meaning
+>> nothing else should be messing with it). However going forward we will
+>> need to audit all the async work calls to make sure they are fine to
+>> run outside of the BQL.
+>>
+>>  - cpus: push BQL lock to qemu_*_wait_io_event
+>>  - cpus: only take BQL for sleeping threads
+>>
+>> The BQL reduction is done in two stages, mainly to make bisection
+>> easier.
+>>
+>>  - replay/replay-internal.c: track holding of replay_lock
+>>  - replay: make locking visible outside replay code
+>>  - replay: push replay_mutex_lock up the call tree
+>>
+>> There is still more work to do here but essentially replay_lock now
+>> replaces the BQL in keeping synchronisation between main-loop and the
+>> TCG thread - it is no longer a fine lock for the replay log but a
+>> gross lock that keeps batches of updates together. So far I have been
+>> testing with the simple testcase:
+>>
+>>   ./arm-softmmu/qemu-system-arm -machine type=vexpress-a9 -m 1024 \
+>>     -display none -smp 1 -kernel ../images/vexpress-kernel.img \
+>>     -dtb ../images/vexpress-v2p-ca9.dtb  \
+>>     -append "console=ttyAMA0" -serial mon:stdio \
+>>     -icount shift=7,rr=record,rrfile=replay.bin
+>>
+>> ..and that works fine. However more complex testing with more devices
+>> to exercise the async events code is needed here. One change that
+>> needs some careful care is we are now not dropping the replay_mutex
+>> lock between events.
+>>
+>> And finally:
+>>
+>>  - scripts/qemu-gdb: add simple tcg lock status helper
+>>  - util/qemu-thread-*: add qemu_lock, locked and unlock trace events
+>>  - scripts/analyse-locks-simpletrace.py: script to analyse lock times
+>>
+>> These are helpers I wrote while debugging the locking. The GDB helper
+>> is fairly dump but does attempt to show where locks are held. The
+>> qemu-lock tracing is a little hacky but could prove useful in doing
+>> more detailed lock analysis.
+>>
+>> Any thoughts/comments? Does this seem like a reasonable direction to
+>> go?
+>>
+>> Alex Bennée (9):
+>>   target/arm/arm-powertctl: drop BQL assertions
+>>   cpus: push BQL lock to qemu_*_wait_io_event
+>>   cpus: only take BQL for sleeping threads
+>>   replay/replay-internal.c: track holding of replay_lock
+>>   replay: make locking visible outside replay code
+>>   replay: push replay_mutex_lock up the call tree
+>>   scripts/qemu-gdb: add simple tcg lock status helper
+>>   util/qemu-thread-*: add qemu_lock, locked and unlock trace events
+>>   scripts/analyse-locks-simpletrace.py: script to analyse lock times
+>>
+>>  cpus-common.c                        | 13 ++---
+>>  cpus.c                               | 57 ++++++++++++++++++---
+>>  docs/replay.txt                      | 19 +++++++
+>>  include/qemu/thread.h                |  7 ++-
+>>  include/sysemu/replay.h              | 16 ++++++
+>>  kvm-all.c                            |  4 --
+>>  replay/replay-char.c                 | 21 +++-----
+>>  replay/replay-events.c               | 18 ++-----
+>>  replay/replay-internal.c             | 22 +++++++-
+>>  replay/replay-internal.h             |  5 +-
+>>  replay/replay-time.c                 | 10 ++--
+>>  replay/replay.c                      | 40 +++++++--------
+>>  scripts/analyse-locks-simpletrace.py | 99 ++++++++++++++++++++++++++++++++++++
+>>  scripts/qemu-gdb.py                  |  3 +-
+>>  scripts/qemugdb/tcg.py               | 46 +++++++++++++++++
+>>  stubs/replay.c                       | 15 ++++++
+>>  target/arm/arm-powerctl.c            |  8 ---
+>>  target/i386/hax-all.c                |  2 -
+>>  util/main-loop.c                     | 23 +++++++--
+>>  util/qemu-thread-posix.c             | 11 +++-
+>>  util/trace-events                    |  5 ++
+>>  vl.c                                 |  2 +
+>>  22 files changed, 353 insertions(+), 93 deletions(-)
+>>  create mode 100755 scripts/analyse-locks-simpletrace.py
+>>  create mode 100644 scripts/qemugdb/tcg.py
+>>
+>> --
+>> 2.11.0
 
---V88s5gaDVPzZ0KCq
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZEy5GAAoJEJykq7OBq3PIhWIIALdwweWsKMrHskem3m5yWuN9
-zD41GbgD9I8HAjyz8c52adSomGQCtmJBmBYE4K6vV/MudLhvkezrMNN+y4+D/e/W
-G6HxmSCh/9zqvpq8Bi2i+pYjbG9qLmdBfOqI9wK4K5gpRw3YdMTkpgQhj5vioSx0
-eBE3RY6m7XFM+LU5NcJ4dLCg/GJgN7rFVoee7DxJZuBBdX+aTOG1Q7+jaIvgtAbK
-n4L5mRKf4rTGfLEN+J7ZcimDdtDfv1jRvpK8n7QPQ8XG0z0A5sa1rlEsu0MWFvV2
-PeE+J7sfLNCpV2TL5bw1ip9qbhPMv0tq7ZXAyzEHFb4PA2j+3SfjZfI4BmLe+pc=
-=edt3
------END PGP SIGNATURE-----
-
---V88s5gaDVPzZ0KCq--
+--
+Alex Bennée
