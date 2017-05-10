@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d8VOF-0003bk-PR
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:27:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d8VXi-0005Vw-5N
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:36:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1d8VOF-0005NA-1j
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:27:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1d8VXh-0008NU-FB
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 13:36:54 -0400
 References: <20170510143205.32013-1-pbonzini@redhat.com>
-	<20170510143205.32013-5-pbonzini@redhat.com>
+	<20170510143205.32013-6-pbonzini@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <17fd54d8-fba0-b44e-91ea-18e4e18e9f16@redhat.com>
-Date: Wed, 10 May 2017 19:26:57 +0200
+Message-ID: <aeb8c806-9c6b-fcd8-6c2a-cd4098946ff9@redhat.com>
+Date: Wed, 10 May 2017 19:36:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170510143205.32013-5-pbonzini@redhat.com>
+In-Reply-To: <20170510143205.32013-6-pbonzini@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="mvkEgFaGhBCjwDDKg0WVUMiiDRcMwHUa6"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/7] curl: split
- curl_find_state/curl_init_state
+	boundary="ElcTBBKOUtVs6NmLdBieESX60Rg1prnxO"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 5/7] curl: convert CURLAIOCB
+ to byte values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +29,75 @@ To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mvkEgFaGhBCjwDDKg0WVUMiiDRcMwHUa6
+--ElcTBBKOUtVs6NmLdBieESX60Rg1prnxO
 From: Max Reitz <mreitz@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
-Message-ID: <17fd54d8-fba0-b44e-91ea-18e4e18e9f16@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 4/7] curl: split
- curl_find_state/curl_init_state
+Message-ID: <aeb8c806-9c6b-fcd8-6c2a-cd4098946ff9@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 5/7] curl: convert CURLAIOCB to byte values
 References: <20170510143205.32013-1-pbonzini@redhat.com>
- <20170510143205.32013-5-pbonzini@redhat.com>
-In-Reply-To: <20170510143205.32013-5-pbonzini@redhat.com>
+ <20170510143205.32013-6-pbonzini@redhat.com>
+In-Reply-To: <20170510143205.32013-6-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 10.05.2017 16:32, Paolo Bonzini wrote:
-> If curl_easy_init fails, a CURLState is left with s->in_use =3D 1.  Spl=
-it
-> curl_init_state in two, so that we can distinguish the two failures and=
+> This is in preparation for the conversion from bdrv_aio_readv to
+> bdrv_co_preadv, and it also requires changing some of the size_t values=
 
-> call curl_clean_state if needed.
->=20
-> While at it, simplify curl_find_state, removing a dummy loop.  The
-> aio_poll loop is moved to the sole caller that needs it.
+> to uint64_t.  This was broken before for disks > 2TB, but now it would
+> break at 4GB.
 >=20
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  block/curl.c | 52 ++++++++++++++++++++++++++++++----------------------=
-
->  1 file changed, 30 insertions(+), 22 deletions(-)
+>  block/curl.c | 44 ++++++++++++++++++++++----------------------
+>  1 file changed, 22 insertions(+), 22 deletions(-)
 >=20
 > diff --git a/block/curl.c b/block/curl.c
-> index b18e79bf54..4b4d5a2389 100644
+> index 4b4d5a2389..3e288f2bc7 100644
 > --- a/block/curl.c
 > +++ b/block/curl.c
 
 [...]
 
-> @@ -856,8 +854,18 @@ static void curl_readv_bh_cb(void *p)
+> @@ -788,7 +788,7 @@ static int curl_open(BlockDriverState *bs, QDict *o=
+ptions, int flags,
 >      }
+>  #endif
 > =20
->      // No cache found, so let's start a new request
-> -    state =3D curl_init_state(acb->common.bs, s);
-> -    if (!state) {
-> +    for (;;) {
-> +        state =3D curl_find_state(s);
-> +        if (state) {
-> +            break;
-> +        }
-> +        qemu_mutex_unlock(&s->mutex);
-> +        aio_poll(bdrv_get_aio_context(bs), true);
-> +        qemu_mutex_lock(&s->mutex);
-> +    }
-> +
-> +    if (curl_init_state(s, state) < 0) {
-> +        curl_clean_state(state);
+> -    s->len =3D (size_t)d;
+> +    s->len =3D d;
 
-We could also initialize state to NULL and call curl_clean_state() under
-out: if state !=3D NULL. Then again, it would only save us two
-curl_clean_state() instances...
-
-So I'll leave it to you and unconditionally give a
+On a very personal level, I'd rather have an explicit cast when
+converting floating point values to integers. Anyway:
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
->          ret =3D -EIO;
->          goto out;
->      }
->=20
+On a very surprised level: Why does curl return the content length as a
+double?! I can't think of a reason where that might be a good idea. If
+your integer no longer fits into a uin64_t, the double will be inexact,
+so it pretty much is useless, too...
+
+> =20
+>      if ((!strncasecmp(s->url, "http://", strlen("http://"))
+>          || !strncasecmp(s->url, "https://", strlen("https://")))
 
 
-
---mvkEgFaGhBCjwDDKg0WVUMiiDRcMwHUa6
+--ElcTBBKOUtVs6NmLdBieESX60Rg1prnxO
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkTTWESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Al8MH/1ikWAszV5UltW8lRo+MrxVPCWfgdQnp
-VVuHwQ01uZphUtIKG5yJLaq/rDgzPDvCpULapn0Z7YFxo/SedWmcRZKa9/P7M/4f
-ak/9hwBZxQfF+CHcpUcLG06sxsWO4w+zu8B3fmqY5cJ7SwOFmTk/NnyyGM2LcRR9
-xGYxUEkEJ0ZQWThOtNmfIjlFQPWO2ifZeZBxN2fNCII7clU9oHsdGNzK+x8mY85w
-hJj4rcnxg/KxHTIcYQM9vJlosSgsYGzkdskIkZxm+Ytn9FxNgvPoG+ciIJoUYgaw
-fvvVR7h3mOqUJ69LYq+uSaQrgqr8+tG859YnVQEgzb255yYWCVNXlvc=
-=G9I0
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlkTT64SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AaKkIAIsmU/NL4TkeSOnBeEhLYn1R0ZSNlurP
+qpRrwM5dTPC91fk6OwQvxFy5cNrg4GUDUBYVPG8E9NLo39DNlmeTpqLsGbLeLiQu
+fG+dq137+Vrh9Ja1kK/ygx+eRwPaeZ9JyaUEOtIH6ihGVudIhKXdKuJSkaB5BsNo
+WdDKskJ3svkincOZjhZH1zNU8zO/4Mz8dA+pni24IPWI5KJaOBG3QGtOIMPJiRJv
+Jqxud0wjdOzKIsHAeEQjOZvm5zuxNczKiy7kY2ovlXwYIdf82fpobmgW66H65vAQ
+g0sYRtIZ8ydbSPSD9x6kIP/Zed/cflD5nNZ7O10cJ+Gg+SEziScADmA=
+=xy+q
 -----END PGP SIGNATURE-----
 
---mvkEgFaGhBCjwDDKg0WVUMiiDRcMwHUa6--
+--ElcTBBKOUtVs6NmLdBieESX60Rg1prnxO--
