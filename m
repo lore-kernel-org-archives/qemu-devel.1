@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8Psx-0002j5-Mx
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:34:28 -0400
+	(envelope-from <quintela@redhat.com>) id 1d8Q14-0001ZG-TG
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:42:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8Psu-0003FW-GK
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:34:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34844)
+	(envelope-from <quintela@redhat.com>) id 1d8Q0z-0006Uz-Vr
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:42:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d8Psu-0003FI-7k
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:34:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d8Q0z-0006Uc-My
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:42:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 399BB80C02
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 11:34:23 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1494388889-3558-1-git-send-email-peterx@redhat.com>
-	<1494388889-3558-3-git-send-email-peterx@redhat.com>
-Date: Wed, 10 May 2017 13:34:18 +0200
-In-Reply-To: <1494388889-3558-3-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Wed, 10 May 2017 12:01:28 +0800")
-Message-ID: <87r2zx3pz9.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 2/3] utils: provide size_to_str()
+	by mx1.redhat.com (Postfix) with ESMTPS id 9247561B86
+	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 11:42:44 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 10 May 2017 13:42:40 +0200
+Message-Id: <20170510114240.4302-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH] migration: Fix regression with compression
+ threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,128 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Peter Xu <peterx@redhat.com> writes:
+Compression threads got broken on commit
 
-> Moving the algorithm from print_type_size() into size_to_str() so that
-> other component can also leverage it. With that, refactor
-> print_type_size().
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/qemu-common.h        |  1 +
->  qapi/string-output-visitor.c | 22 ++++++----------------
->  util/cutils.c                | 23 +++++++++++++++++++++++
->  3 files changed, 30 insertions(+), 16 deletions(-)
->
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index d218821..d7d0448 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -145,6 +145,7 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
->  int parse_debug_env(const char *name, int max, int initial);
->  
->  const char *qemu_ether_ntoa(const MACAddr *mac);
-> +char *size_to_str(double val);
->  void page_size_init(void);
->  
->  /* returns non-zero if dump is in progress, otherwise zero is
-> diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
-> index 94ac821..53c2175 100644
-> --- a/qapi/string-output-visitor.c
-> +++ b/qapi/string-output-visitor.c
-> @@ -211,10 +211,8 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
->                              Error **errp)
->  {
->      StringOutputVisitor *sov = to_sov(v);
-> -    static const char suffixes[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E' };
-> -    uint64_t div, val;
-> -    char *out;
-> -    int i;
-> +    uint64_t val;
-> +    char *out, *psize;
->  
->      if (!sov->human) {
->          out = g_strdup_printf("%"PRIu64, *obj);
-> @@ -223,19 +221,11 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
->      }
->  
->      val = *obj;
-> -
-> -    /* The exponent (returned in i) minus one gives us
-> -     * floor(log2(val * 1024 / 1000).  The correction makes us
-> -     * switch to the higher power when the integer part is >= 1000.
-> -     */
-> -    frexp(val / (1000.0 / 1024.0), &i);
-> -    i = (i - 1) / 10;
-> -    assert(i < ARRAY_SIZE(suffixes));
-> -    div = 1ULL << (i * 10);
-> -
-> -    out = g_strdup_printf("%"PRIu64" (%0.3g %c%s)", val,
-> -                          (double)val/div, suffixes[i], i ? "iB" : "");
-> +    psize = size_to_str(val);
-> +    out = g_strdup_printf("%"PRIu64" (%s)", val, psize);
->      string_output_set(sov, out);
-> +
-> +    g_free(psize);
->  }
->  
->  static void print_type_bool(Visitor *v, const char *name, bool *obj,
-> diff --git a/util/cutils.c b/util/cutils.c
-> index 50ad179..c562d87 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -619,3 +619,26 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
->  
->      return ret;
->  }
-> +
-> +/*
-> + * Please free the buffer after use.
-> + */
+  commit 247956946651ae0280f7b1ea88bb6237dd01c231
+  Author: Juan Quintela <quintela@redhat.com>
+  Date:   Tue Mar 21 11:45:01 2017 +0100
 
-A proper function comment would be nice.  Something like
+      ram: reorganize last_sent_block
 
-/*
- * Return human readable string for size @val.
- * @val must be between 0 inclusive and 1000EiB exclusive.
- * Use IEC binary units like KiB, MiB, and so forth
- * Caller is responsible for passing it to g_free().
- */
+On do_compress_ram_page() we use a different QEMUFile than the
+migration one.  We need to pass it there.  The failure can be seen as:
 
-> +char *size_to_str(double val)
-> +{
-> +    static const char *suffixes[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
-> +    unsigned long div;
-> +    int i;
-> +
-> +    /*
-> +     * The exponent (returned in i) minus one gives us
-> +     * floor(log2(val * 1024 / 1000).  The correction makes us
-> +     * switch to the higher power when the integer part is >= 1000.
-> +     * (see e41b509d68afb1f for more info)
-> +     */
-> +    frexp(val / (1000.0 / 1024.0), &i);
-> +    i = (i - 1) / 10;
-> +    assert(i < ARRAY_SIZE(suffixes));
-> +    div = 1ULL << (i * 10);
-> +
-> +    return g_strdup_printf("%0.3g %sB", val / div, suffixes[i]);
-> +}
+(qemu) qemu-system-x86_64: Unknown combination of migration flags: 0
+qemu-system-x86_64: error while loading state section id 3(ram)
+qemu-system-x86_64: load of migration failed: Invalid argument
 
-The function happily accepts negative sizes.  You can reject them with
-assert(), adapt my function comment accordingly, or do nothing.
+Please, review.
 
-The function asserts on very large sizes.  I'm fine with that, and
-worded my function comment accordingly.  If you want to avoid the
-constraint, format them in the biggest unit, e.g. 3.1415 * (1ull<70) as
-"3142 EiB", in followup patch.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/ram.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-The function formats 999.9 * (1ull<<60) as "1e+03 EiB".  Oops.  No big
-deal, but you might want to fix it anyway, possibly in a followup patch.
-
-Preferably with a function comment:
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/migration/ram.c b/migration/ram.c
+index 293d27c..995d1fc 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -436,20 +436,21 @@ void migrate_compress_threads_create(void)
+  * @offset: offset inside the block for the page
+  *          in the lower bits, it contains flags
+  */
+-static size_t save_page_header(RAMState *rs, RAMBlock *block, ram_addr_t offset)
++static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
++                               ram_addr_t offset)
+ {
+     size_t size, len;
+ 
+     if (block == rs->last_sent_block) {
+         offset |= RAM_SAVE_FLAG_CONTINUE;
+     }
+-    qemu_put_be64(rs->f, offset);
++    qemu_put_be64(f, offset);
+     size = 8;
+ 
+     if (!(offset & RAM_SAVE_FLAG_CONTINUE)) {
+         len = strlen(block->idstr);
+-        qemu_put_byte(rs->f, len);
+-        qemu_put_buffer(rs->f, (uint8_t *)block->idstr, len);
++        qemu_put_byte(f, len);
++        qemu_put_buffer(f, (uint8_t *)block->idstr, len);
+         size += 1 + len;
+         rs->last_sent_block = block;
+     }
+@@ -571,7 +572,7 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+     }
+ 
+     /* Send XBZRLE based compressed page */
+-    bytes_xbzrle = save_page_header(rs, block,
++    bytes_xbzrle = save_page_header(rs, rs->f, block,
+                                     offset | RAM_SAVE_FLAG_XBZRLE);
+     qemu_put_byte(rs->f, ENCODING_FLAG_XBZRLE);
+     qemu_put_be16(rs->f, encoded_len);
+@@ -745,7 +746,7 @@ static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
+     if (is_zero_range(p, TARGET_PAGE_SIZE)) {
+         rs->zero_pages++;
+         rs->bytes_transferred +=
+-            save_page_header(rs, block, offset | RAM_SAVE_FLAG_COMPRESS);
++            save_page_header(rs, rs->f, block, offset | RAM_SAVE_FLAG_COMPRESS);
+         qemu_put_byte(rs->f, 0);
+         rs->bytes_transferred += 1;
+         pages = 1;
+@@ -834,7 +835,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+ 
+     /* XBZRLE overflow or normal page */
+     if (pages == -1) {
+-        rs->bytes_transferred += save_page_header(rs, block,
++        rs->bytes_transferred += save_page_header(rs, rs->f, block,
+                                                   offset | RAM_SAVE_FLAG_PAGE);
+         if (send_async) {
+             qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
+@@ -860,7 +861,7 @@ static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+     int bytes_sent, blen;
+     uint8_t *p = block->host + (offset & TARGET_PAGE_MASK);
+ 
+-    bytes_sent = save_page_header(rs, block, offset |
++    bytes_sent = save_page_header(rs, f, block, offset |
+                                   RAM_SAVE_FLAG_COMPRESS_PAGE);
+     blen = qemu_put_compression_data(f, p, TARGET_PAGE_SIZE,
+                                      migrate_compress_level());
+@@ -991,7 +992,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+             pages = save_zero_page(rs, block, offset, p);
+             if (pages == -1) {
+                 /* Make sure the first page is sent out before other pages */
+-                bytes_xmit = save_page_header(rs, block, offset |
++                bytes_xmit = save_page_header(rs, rs->f, block, offset |
+                                               RAM_SAVE_FLAG_COMPRESS_PAGE);
+                 blen = qemu_put_compression_data(rs->f, p, TARGET_PAGE_SIZE,
+                                                  migrate_compress_level());
+-- 
+2.9.3
