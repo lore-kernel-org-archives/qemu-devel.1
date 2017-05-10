@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d8U1A-0005dh-Lq
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:59:17 -0400
+	(envelope-from <den@virtuozzo.com>) id 1d8U3p-00081E-L8
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:01:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1d8U19-0005KP-3h
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:59:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54440)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1d8U18-0005Ju-Qj
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 11:59:11 -0400
-Date: Wed, 10 May 2017 16:58:59 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170510155859.GA31558@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CGME20170428065755eucas1p2ff9aa17eaa294e741d8c65f8d58a71fb@eucas1p2.samsung.com>
-	<1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
-	<20170428100012.GB22801@pxdev.xzpeter.org>
-	<d018d4a6-4b50-3f36-fe69-e232b63bebf0@samsung.com>
-	<20170508062906.GC2820@pxdev.xzpeter.org>
-	<20170508090807.GA4201@aperevalov-ubuntu>
-	<20170509082622.GI2820@pxdev.xzpeter.org>
-	<20170509094033.GB2089@work-vm> <20170509094434.GF1669@redhat.com>
-	<20170510154650.GC4201@aperevalov-ubuntu>
+	(envelope-from <den@virtuozzo.com>) id 1d8U3m-0006f9-BG
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:01:57 -0400
+Received: from mail-db5eur01on0107.outbound.protection.outlook.com
+	([104.47.2.107]:10078
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1d8U3l-0006eB-GO
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 12:01:54 -0400
+References: <1493732857-10721-1-git-send-email-den@openvz.org>
+	<87bmrbgvzf.fsf@dusky.pond.sub.org>
+	<e90d1680-6212-862e-bd3b-fdc415ec1890@openvz.org>
+	<877f1zcjcf.fsf@dusky.pond.sub.org> <20170502163629.GA5640@work-vm>
+	<20170502164838.GL16624@redhat.com>
+	<1dda0b40-e473-638e-7a89-891f578d3186@openvz.org>
+	<87shkm2n62.fsf@dusky.pond.sub.org>
+	<819458e5-bc6f-cb1b-ae81-50805ff78d39@openvz.org>
+	<87fugcu2pj.fsf@dusky.pond.sub.org>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <624ca2f7-6729-f421-78bf-dea9c697b422@openvz.org>
+Date: Wed, 10 May 2017 18:01:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170510154650.GC4201@aperevalov-ubuntu>
-Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
- downtime on dst side
+In-Reply-To: <87fugcu2pj.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] monitor: increase amount of data for
+ monitor to read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,176 +37,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey <a.perevalov@samsung.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, i.maximets@samsung.com, f4bug@amsat.org, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, May 10, 2017 at 06:46:50PM +0300, Alexey wrote:
-> On Tue, May 09, 2017 at 10:44:34AM +0100, Daniel P. Berrange wrote:
-> > On Tue, May 09, 2017 at 10:40:34AM +0100, Dr. David Alan Gilbert wrote:
-> > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > On Mon, May 08, 2017 at 12:08:07PM +0300, Alexey wrote:
-> > > > > On Mon, May 08, 2017 at 02:29:06PM +0800, Peter Xu wrote:
-> > > > > > On Fri, Apr 28, 2017 at 02:11:19PM +0300, Alexey Perevalov wrote:
-> > > > > > > On 04/28/2017 01:00 PM, Peter Xu wrote:
-> > > > > > > >On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
-> > > > > > > >>This patch provides downtime calculation per vCPU,
-> > > > > > > >>as a summary and as a overlapped value for all vCPUs.
-> > > > > > > >>
-> > > > > > > >>This approach was suggested by Peter Xu, as an improvements of
-> > > > > > > >>previous approch where QEMU kept tree with faulted page address and cpus bitmask
-> > > > > > > >>in it. Now QEMU is keeping array with faulted page address as value and vCPU
-> > > > > > > >>as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
-> > > > > > > >>list for downtime per vCPU (could be traced with page_fault_addr)
-> > > > > > > >>
-> > > > > > > >>For more details see comments for get_postcopy_total_downtime
-> > > > > > > >>implementation.
-> > > > > > > >>
-> > > > > > > >>Downtime will not calculated if postcopy_downtime field of
-> > > > > > > >>MigrationIncomingState wasn't initialized.
-> > > > > > > >>
-> > > > > > > >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> > > > > > > >>---
-> > > > > > > >>  include/migration/migration.h |   3 ++
-> > > > > > > >>  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
-> > > > > > > >>  migration/postcopy-ram.c      |  20 +++++++-
-> > > > > > > >>  migration/trace-events        |   6 ++-
-> > > > > > > >>  4 files changed, 130 insertions(+), 2 deletions(-)
-> > > > > > > >>
-> > > > > > > >>diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > > > > > > >>index e8fb68f..a22f9ce 100644
-> > > > > > > >>--- a/include/migration/migration.h
-> > > > > > > >>+++ b/include/migration/migration.h
-> > > > > > > >>@@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
-> > > > > > > >>   * Functions to work with downtime context
-> > > > > > > >>   */
-> > > > > > > >>  struct DowntimeContext *downtime_context_new(void);
-> > > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
-> > > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr);
-> > > > > > > >>+uint64_t get_postcopy_total_downtime(void);
-> > > > > > > >>  struct MigrationState
-> > > > > > > >>  {
-> > > > > > > >>diff --git a/migration/migration.c b/migration/migration.c
-> > > > > > > >>index ec76e5c..2c6f150 100644
-> > > > > > > >>--- a/migration/migration.c
-> > > > > > > >>+++ b/migration/migration.c
-> > > > > > > >>@@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
-> > > > > > > >>      return atomic_xchg(&incoming_postcopy_state, new_state);
-> > > > > > > >>  }
-> > > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
-> > > > > > > >>+{
-> > > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > > > > > >>+    DowntimeContext *dc;
-> > > > > > > >>+    if (!mis->downtime_ctx || cpu < 0) {
-> > > > > > > >>+        return;
-> > > > > > > >>+    }
-> > > > > > > >>+    dc = mis->downtime_ctx;
-> > > > > > > >>+    dc->vcpu_addr[cpu] = addr;
-> > > > > > > >>+    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
-> > > > > > > >>+        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> > > > > > > >>+
-> > > > > > > >>+    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
-> > > > > > > >>+            cpu);
-> > > > > > > >>+}
-> > > > > > > >>+
-> > > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr)
-> > > > > > > >>+{
-> > > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > > > > > >>+    DowntimeContext *dc;
-> > > > > > > >>+    int i;
-> > > > > > > >>+    bool all_vcpu_down = true;
-> > > > > > > >>+    int64_t now;
-> > > > > > > >>+
-> > > > > > > >>+    if (!mis->downtime_ctx) {
-> > > > > > > >>+        return;
-> > > > > > > >>+    }
-> > > > > > > >>+    dc = mis->downtime_ctx;
-> > > > > > > >>+    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> > > > > > > >>+
-> > > > > > > >>+    /* check all vCPU down,
-> > > > > > > >>+     * QEMU has bitmap.h, but even with bitmap_and
-> > > > > > > >>+     * will be a cycle */
-> > > > > > > >>+    for (i = 0; i < smp_cpus; i++) {
-> > > > > > > >>+        if (dc->vcpu_addr[i]) {
-> > > > > > > >>+            continue;
-> > > > > > > >>+        }
-> > > > > > > >>+        all_vcpu_down = false;
-> > > > > > > >>+        break;
-> > > > > > > >>+    }
-> > > > > > > >>+
-> > > > > > > >>+    if (all_vcpu_down) {
-> > > > > > > >>+        dc->total_downtime += now - dc->last_begin;
-> > > > > > > >Shall we do this accouting only if we are sure the copied page address
-> > > > > > > >is one of the page faulted addresses? Can it be some other page? I
-> > > > > > > >don't know. But since we have the loop below to make sure of it, why
-> > > > > > > >not?
-> > > > > > > no, the downtime implies since page fault till the
-> > > > > > > page will be copied.
-> > > > > > > Yes another pages could be copied as well as pagefaulted,
-> > > > > > > and they are copied due to prefetching, but it's not a downtime.
-> > > > > > 
-> > > > > > Not sure I got the point... Do you mean that when reach here, then
-> > > > > > this page address is definitely one of the faulted addresses? I am not
-> > > > > > 100% sure of this, but if you are sure, I am okay with it.
-> > > > > Let me clarify.
-> > > > > 
-> > > > > > > >Shall we do this accouting only if we are sure the copied page address
-> > > > > > > >is one of the page faulted addresses?
-> > > > > Yes it's primary condition, due to there are could be another pages,
-> > > > > which weren't faulted, they just was sent from source to destination,
-> > > > > I called it prefetching.
-> > > > > 
-> > > > > I think I got why did you ask that question, because in this version
-> > > > > all_vcpu_down and as a result total_downtime calculated incorrectly,
-> > > > > it calculates every time when any page is copied, but it should
-> > > > > be calculated only when faulted page copied, so only dc->vcpu_downtime
-> > > > > was correctly calculated.
-> > > > 
-> > > > Exactly. I am afraid if we have such "prefetching" stuff then
-> > > > total_downtime will be more than its real value.
-> > > 
-> > > It should be OK as long as we measure the time between
-> > >   userfault reporting a page miss for an address 
-> > >   and
-> > >   place_page for *that same address*
-> > > 
-> > > any places for other pages are irrelevant.
-> > > 
-> > > (I still worry that this definition of 'downtime' is possibly
-> > > arbitrary - since if all but one of the vCPUs are down we
-> > > don't count it but it's obviously still a big impact).
-> > 
-> > Can we also *not* call it "downtime", as it is measuring a very different
-> > thing than the "downtime" we have measured today on the source during
-> > pre-copy migration.
-> 
-> As I know downtime in pre-copy migration it's a time since all vCPU
-> were disabled on source till enabling these vCPU on destination,
-> but it's continuous time. So the meaning of both downtime is the same.
-> It's time when all vCPU are down.
+On 05/10/2017 05:54 PM, Markus Armbruster wrote:
+> "Denis V. Lunev" <den@openvz.org> writes:
+>
+>> On 05/03/2017 02:29 PM, Markus Armbruster wrote:
+>>> "Denis V. Lunev" <den@openvz.org> writes:
+>>>
+>>>> On 05/02/2017 07:48 PM, Daniel P. Berrange wrote:
+>>>>> On Tue, May 02, 2017 at 05:36:30PM +0100, Dr. David Alan Gilbert wr=
+ote:
+>>>>>> * Markus Armbruster (armbru@redhat.com) wrote:
+>>>>>>> "Denis V. Lunev" <den@openvz.org> writes:
+>>>>>>>
+>>>>>>>> On 05/02/2017 05:43 PM, Markus Armbruster wrote:
+>>>>>>>>> "Denis V. Lunev" <den@openvz.org> writes:
+>>>>>>>>>
+>>>>>>>>>> Right now QMP and HMP monitors read 1 byte at a time from the =
+socket, which
+>>>>>>>>>> is very inefficient. With 100+ VMs on the host this easily rea=
+sults in
+>>>>>>>>>> a lot of unnecessary system calls and CPU usage in the system.=
 
-It is really not the same. In pre-copy, all the CPUs are in an explicit
-"stopped" state for a continuous period of time. In post-copy the CPUs
-are all in the "running" state, but repeatedly get blocked with arbitrary
-time intervals to fetch pages from the source. This is totally different
-information being reported, so should have a different name.
+>>>>>>>>>>
+>>>>>>>>>> This patch changes the amount of data to read to 4096 bytes, w=
+hich matches
+>>>>>>>>>> buffer size on the channel level. Fortunately, monitor protoco=
+l is
+>>>>>>>>>> synchronous right now thus we should not face side effects in =
+reality.
+>>>>>>>>> Can you explain briefly why this relies on "synchronous"?  I've=
+ spent
+>>>>>>>>> all of two seconds on the question myself...
+>>>>>>>> Each command is processed in sequence as it appears in the
+>>>>>>>> channel. The answer to the command is sent and only after that
+>>>>>>>> next command is processed.
+>>>>>>> Yes, that's how QMP works.
+>>>>>>>
+>>>>>>>> Theoretically tith asynchronous processing we can have some side=
 
-Calling it downtime will also lead to confusion wrt to the "max downtime"
-tunable parameter, which is not at all relevant here.
+>>>>>>>> effects due to changed buffer size.
+>>>>>>> What kind of side effects do you have in mind?
+>>>>>>>
+>>>>>>> It's quite possible that this obviously inefficient way to read h=
+ad some
+>>>>>>> deep reason back when it was created.  Hmm, git-blame is our frie=
+nd:
+>>>>>>>
+>>>>>>> commit c62313bbdc48f72e93fa8196f2fff96ba35e4e9d
+>>>>>>> Author: Jan Kiszka <jan.kiszka@siemens.com>
+>>>>>>> Date:   Fri Dec 4 14:05:29 2009 +0100
+>>>>>>>
+>>>>>>>     monitor: Accept input only byte-wise
+>>>>>>>    =20
+>>>>>>>     This allows to suspend command interpretation and execution
+>>>>>>>     synchronously, e.g. during migration.
+>>>>>>>    =20
+>>>>>>>     Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+>>>>>>>     Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+>>>>>> I don't think I understand why that's a problem; if we read more b=
+ytes,
+>>>>>> we're not going to interpret them and execute them until after the=
+ previous
+>>>>>> command returns are we?
+>>>>> Actually it sees we might do, due to the way the "migrate" command =
+works
+>>>>> in HMP when you don't give the '-d' flag.
+>>>>>
+>>>>> Most monitors commands will block the caller until they are finishe=
+d,
+>>>>> but "migrate" is different. The hmp_migrate() method will return
+>>>>> immediately, but we call monitor_suspend() to block processing of
+>>>>> further commands. If another command has already been read off
+>>>>> the wire though (due to "monitor_read" having a buffer that contain=
+s
+>>>>> multiple commands), we would in fact start processing this command
+>>>>> despite having suspended the monitor.
+>>>>>
+>>>>> This is only a problem, however, if the client app has issued "migr=
+ate"
+>>>>> followed by another command, at the same time without waiting for t=
+he
+>>>>> respond to "migrate". So in practice the only way you'd hit the bug=
 
-> But as David mentioned - downtime per vCPU is also important in case of
-> postcopy live migration, and I'll include it in final result of
-> query-migrate too.
+>>>>> is probably if you just cut+paste a big chunk of commands into the
+>>>>> monitor at once without waiting for completion and one of the comma=
+nds
+>>>>> was "migrate" without "-d".
+>>>>>
+>>>>> Still, I think we would need to figure out a proper fix for this be=
+fore
+>>>>> we could increase the buffer size.
+>>>>>
+>>>>> Regards,
+>>>>> Daniel
+>>>> There is one thing, which simplifies things a lot.
+>>>> - suspend_cnt can be increased only from 2 places:
+>>>>   1) monitor_event(), which is called for real HMP monitor only
+>>>>
+>>>>   2) monitor_suspend(), which can increment suspend_cnt
+>>>>       only if mon->rs !=3D NULL, which also means that the
+>>>>       monitor is specifically configured HMP monitor.
+>>> I think you're right.  Monitor member suspend_cnt could use a comment=
+=2E
+>>>
+>>> If there are more members that apply only to HMP, we should collect t=
+hem
+>>> in a MonitorHMP struct, similar to MonitorQMP.
+>>>
+>> I think that this make sense even if this will be a single member as
+>> the readability would be improved.
+>>
+>>
+>>>> So, we can improve the patch (for now) with the following
+>>>> tweak:
+>>>>
+>>>> static int monitor_can_read(void *opaque)
+>>>> {
+>>>>     Monitor *mon =3D opaque;
+>>>>   =20
+>>>>     if (monitor_is_qmp(mon))
+>>>>         return 4096;  =20
+>>>>     return (mon->suspend_cnt =3D=3D 0) ? 1 : 0;
+>>>> }
+>>> Instead of adding the conditional, I'd split this into two functions,=
 
-That we need to report different data per-vCPU, is another reason why
-we should not call it "downtime".
+>>> one for HMP and one for QMP, just like we split the other two callbac=
+ks.
+>> good idea
+>>
+>>>> This will solve my case completely and does not break any
+>>>> backward compatibility.
+>>> No change for HMP.  Okay.
+>>>
+>>> For QMP, monitor_qmp_read() feeds whatever it gets to the JSON lexer.=
 
-> > Call it "pagewait" or "delaytime" or something like that to indicate it
-> > is counting delays to CPUs for page fetching.
+>>> It currently gets one character at a time, because that's how much
+>>> monitor_can_read() returns.  With your change, it gets up to 4KiB.
+>>>
+>>> The JSON lexer feeds tokens to the JSON streamer one at a time until =
+it
+>>> has consumed everything it was fed.
+>>>
+>>> The JSON streamer accumulates tokens, parsing them just enough to kno=
+w
+>>> when it has a complete expression.  It pushes the expression to the Q=
+MP
+>>> expression handler immediately.
+>>>
+>>> The QMP expression handler calls the JSON parser to parse the tokens
+>>> into a QObject, then dispatches to QMP command handlers accordingly.
+>>>
+>>> Everything's synchronous.  When a QMP command handler runs, the calli=
+ng
+>>> JSON streamer invocation is handling the command's final closing brac=
+e,
+>>> and so is the calling JSON lexer.  After the QMP command handler
+>>> returns, the JSON streamer returns.  The JSON lexer then looks at the=
 
+>>> next character if there are more, else it returns.
+>>>
+>>> The only difference to before that I can see is that we can read ahea=
+d.
+>>> That's a feature.
+>>>
+>>> Looks safe to me.  Opinions?
+>> Looks fair to me.
+> Care to post a formal patch?  Or did I miss it?
+I will. Sorry, we have big holidays in Russia which
+were enlarged by my vacation.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I'll try to do that tomorrow.
+
+Den
