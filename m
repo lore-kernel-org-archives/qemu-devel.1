@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1d8NCc-0005fE-7V
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:42:36 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d8NPr-0001r0-2p
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1d8NCa-0007EE-Ak
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:42:34 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35295)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1d8NCa-0007Dl-1G
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:42:32 -0400
-Received: by mail-wr0-x243.google.com with SMTP id g12so6336159wrg.2
-	for <qemu-devel@nongnu.org>; Wed, 10 May 2017 01:42:31 -0700 (PDT)
-From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Wed, 10 May 2017 04:41:23 -0400
-Message-Id: <1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
+	(envelope-from <no-reply@patchew.org>) id 1d8NPm-0002jD-Qp
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:56:15 -0400
+Resent-Message-Id: <E1d8NPm-0002jD-Qp@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21374)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d8NPm-0002il-I1
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 04:56:10 -0400
+In-Reply-To: <1494403315-12760-1-git-send-email-peterx@redhat.com>
+Message-ID: <149440654982.288.5300047685993312780@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 10 May 2017 01:55:50 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] VT-d: PT (passthrough) mode
+ support and misc fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,518 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, tianyu.lan@intel.com, yi.l.liu@intel.com, mst@redhat.com, jasowang@redhat.com, marcel@redhat.com, david@gibson.dropbear.id.au
 
-This patch enables qmp interfaces for the fsdev
-devices. This provides two interfaces one 
-for querying info of all the fsdev devices. The second one
-to set the IO limits for the required fsdev device.
-
-Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
----
- Makefile                    |  3 ++
- fsdev/qemu-fsdev-dummy.c    | 10 ++++++
- fsdev/qemu-fsdev-throttle.c | 75 ++++++++++++++++++++++++++++++++++++++++
- fsdev/qemu-fsdev-throttle.h | 12 +++++++
- fsdev/qemu-fsdev.c          | 37 ++++++++++++++++++++
- hmp-commands-info.hx        | 19 ++++++++++
- hmp-commands.hx             | 19 ++++++++++
- hmp.c                       | 67 ++++++++++++++++++++++++++++++++++++
- hmp.h                       |  4 +++
- qapi-schema.json            |  3 ++
- qapi/fsdev.json             | 84 +++++++++++++++++++++++++++++++++++++++++++++
- qmp.c                       | 15 ++++++++
- 12 files changed, 348 insertions(+)
- create mode 100644 qapi/fsdev.json
-
-diff --git a/Makefile b/Makefile
-index 31d41a7..7b928d9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -414,6 +414,9 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/event.json $(SRC_PATH)/qapi/introspect.json \
-                $(SRC_PATH)/qapi/crypto.json $(SRC_PATH)/qapi/rocker.json \
-                $(SRC_PATH)/qapi/trace.json
-+ifdef CONFIG_VIRTFS
-+qapi-modules += $(SRC_PATH)/qapi/fsdev.json
-+endif
- 
- qapi-types.c qapi-types.h :\
- $(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
-diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
-index 6dc0fbc..f33305d 100644
---- a/fsdev/qemu-fsdev-dummy.c
-+++ b/fsdev/qemu-fsdev-dummy.c
-@@ -19,3 +19,13 @@ int qemu_fsdev_add(QemuOpts *opts)
- {
-     return 0;
- }
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+  return;
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    abort();
-+}
-diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
-index db386a7..ccbdfbd 100644
---- a/fsdev/qemu-fsdev-throttle.c
-+++ b/fsdev/qemu-fsdev-throttle.c
-@@ -29,6 +29,81 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
-     qemu_co_enter_next(&fst->throttled_reqs[true]);
- }
- 
-+void fsdev_set_io_throttle(IOThrottle *arg, FsThrottle *fst, Error **errp)
-+{
-+    ThrottleConfig cfg;
-+
-+    qmp_set_io_throttle(&cfg, arg);
-+
-+    if (throttle_is_valid(&cfg, errp)) {
-+        fst->cfg = cfg;
-+        fsdev_throttle_init(fst);
-+    }
-+}
-+
-+void fsdev_get_io_throttle(FsThrottle *fst, IOThrottle **fs9pcfg,
-+                           char *fsdevice, Error **errp)
-+{
-+
-+    ThrottleConfig cfg = fst->cfg;
-+    IOThrottle *fscfg = g_malloc0(sizeof(*fscfg));
-+
-+    fscfg->has_id = true;
-+    fscfg->id = g_strdup(fsdevice);
-+    fscfg->bps = cfg.buckets[THROTTLE_BPS_TOTAL].avg;
-+    fscfg->bps_rd = cfg.buckets[THROTTLE_BPS_READ].avg;
-+    fscfg->bps_wr = cfg.buckets[THROTTLE_BPS_WRITE].avg;
-+
-+    fscfg->iops = cfg.buckets[THROTTLE_OPS_TOTAL].avg;
-+    fscfg->iops_rd = cfg.buckets[THROTTLE_OPS_READ].avg;
-+    fscfg->iops_wr = cfg.buckets[THROTTLE_OPS_WRITE].avg;
-+
-+    fscfg->has_bps_max     = cfg.buckets[THROTTLE_BPS_TOTAL].max;
-+    fscfg->bps_max         = cfg.buckets[THROTTLE_BPS_TOTAL].max;
-+    fscfg->has_bps_rd_max  = cfg.buckets[THROTTLE_BPS_READ].max;
-+    fscfg->bps_rd_max      = cfg.buckets[THROTTLE_BPS_READ].max;
-+    fscfg->has_bps_wr_max  = cfg.buckets[THROTTLE_BPS_WRITE].max;
-+    fscfg->bps_wr_max      = cfg.buckets[THROTTLE_BPS_WRITE].max;
-+
-+    fscfg->has_iops_max    = cfg.buckets[THROTTLE_OPS_TOTAL].max;
-+    fscfg->iops_max        = cfg.buckets[THROTTLE_OPS_TOTAL].max;
-+    fscfg->has_iops_rd_max = cfg.buckets[THROTTLE_OPS_READ].max;
-+    fscfg->iops_rd_max     = cfg.buckets[THROTTLE_OPS_READ].max;
-+    fscfg->has_iops_wr_max = cfg.buckets[THROTTLE_OPS_WRITE].max;
-+    fscfg->iops_wr_max     = cfg.buckets[THROTTLE_OPS_WRITE].max;
-+
-+    fscfg->has_bps_max_length     = fscfg->has_bps_max;
-+    fscfg->bps_max_length         =
-+         cfg.buckets[THROTTLE_BPS_TOTAL].burst_length;
-+    fscfg->has_bps_rd_max_length  = fscfg->has_bps_rd_max;
-+    fscfg->bps_rd_max_length      =
-+         cfg.buckets[THROTTLE_BPS_READ].burst_length;
-+    fscfg->has_bps_wr_max_length  = fscfg->has_bps_wr_max;
-+    fscfg->bps_wr_max_length      =
-+         cfg.buckets[THROTTLE_BPS_WRITE].burst_length;
-+
-+    fscfg->has_iops_max_length    = fscfg->has_iops_max;
-+    fscfg->iops_max_length        =
-+         cfg.buckets[THROTTLE_OPS_TOTAL].burst_length;
-+    fscfg->has_iops_rd_max_length = fscfg->has_iops_rd_max;
-+    fscfg->iops_rd_max_length     =
-+         cfg.buckets[THROTTLE_OPS_READ].burst_length;
-+    fscfg->has_iops_wr_max_length = fscfg->has_iops_wr_max;
-+    fscfg->iops_wr_max_length     =
-+         cfg.buckets[THROTTLE_OPS_WRITE].burst_length;
-+
-+    fscfg->bps_max_length = cfg.buckets[THROTTLE_BPS_TOTAL].burst_length;
-+    fscfg->bps_rd_max_length = cfg.buckets[THROTTLE_BPS_READ].burst_length;
-+    fscfg->bps_wr_max_length = cfg.buckets[THROTTLE_BPS_WRITE].burst_length;
-+    fscfg->iops_max_length = cfg.buckets[THROTTLE_OPS_TOTAL].burst_length;
-+    fscfg->iops_rd_max_length = cfg.buckets[THROTTLE_OPS_READ].burst_length;
-+    fscfg->iops_wr_max_length = cfg.buckets[THROTTLE_OPS_WRITE].burst_length;
-+
-+    fscfg->iops_size = cfg.op_size;
-+
-+    *fs9pcfg = fscfg;
-+}
-+
- void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
- {
-     parse_io_throttle_options(&fst->cfg, opts);
-diff --git a/fsdev/qemu-fsdev-throttle.h b/fsdev/qemu-fsdev-throttle.h
-index c493e83..a49b2e5 100644
---- a/fsdev/qemu-fsdev-throttle.h
-+++ b/fsdev/qemu-fsdev-throttle.h
-@@ -21,6 +21,12 @@
- #include "qapi/error.h"
- #include "qemu/throttle.h"
- #include "qemu/throttle-options.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qapi/qmp/types.h"
-+#include "qapi-visit.h"
-+#include "qapi/qobject-output-visitor.h"
-+#include "qapi/util.h"
-+#include "qmp-commands.h"
- 
- typedef struct FsThrottle {
-     ThrottleState ts;
-@@ -37,4 +43,10 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *, bool ,
-                                             struct iovec *, int);
- 
- void fsdev_throttle_cleanup(FsThrottle *);
-+
-+void fsdev_set_io_throttle(IOThrottle *, FsThrottle *, Error **errp);
-+
-+void fsdev_get_io_throttle(FsThrottle *, IOThrottle **iothp,
-+                           char *, Error **errp);
-+
- #endif /* _FSDEV_THROTTLE_H */
-diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-index 266e442..a99e299 100644
---- a/fsdev/qemu-fsdev.c
-+++ b/fsdev/qemu-fsdev.c
-@@ -16,6 +16,7 @@
- #include "qemu-common.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-+#include "qmp-commands.h"
- 
- static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entries =
-     QTAILQ_HEAD_INITIALIZER(fsdriver_entries);
-@@ -98,3 +99,39 @@ FsDriverEntry *get_fsdev_fsentry(char *id)
-     }
-     return NULL;
- }
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+
-+    FsDriverEntry *fse;
-+
-+    fse = get_fsdev_fsentry(arg->has_id ? arg->id : NULL);
-+    if (!fse) {
-+        return;
-+    }
-+
-+    fsdev_set_io_throttle(arg, &fse->fst, errp);
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    IOThrottleList *head = NULL, **p_next = &head;
-+    struct FsDriverListEntry *fsle;
-+    Error *local_err = NULL;
-+
-+    QTAILQ_FOREACH(fsle, &fsdriver_entries, next) {
-+        IOThrottleList *fscfg = g_malloc0(sizeof(*fscfg));
-+        fsdev_get_io_throttle(&fsle->fse.fst, &fscfg->value,
-+                            fsle->fse.fsdev_id, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            g_free(fscfg);
-+            qapi_free_IOThrottleList(head);
-+            return NULL;
-+        }
-+
-+        *p_next = fscfg;
-+        p_next = &fscfg->next;
-+    }
-+    return head;
-+}
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a53f105..8c1c33e 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -84,6 +84,25 @@ STEXI
- Show block device statistics.
- ETEXI
- 
-+#if defined(CONFIG_VIRTFS)
-+
-+    {
-+        .name       = "query-fsdev-iothrottle",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "show fsdev device throttle information",
-+        .cmd        = hmp_fsdev_get_io_throttle,
-+    },
-+
-+#endif
-+
-+STEXI
-+@item info fsdev throttle
-+@findex fsdevthrottleinfo
-+Show fsdev device throttleinfo.
-+
-+ETEXI
-+
-     {
-         .name       = "block-jobs",
-         .args_type  = "",
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 0aca984..7699475 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1660,6 +1660,25 @@ STEXI
- Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
- ETEXI
- 
-+#if defined(CONFIG_VIRTFS)
-+
-+    {
-+        .name       = "fsdev-set-io-throttle",
-+        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
-+        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
-+        .help       = "change I/O throttle limits for a block drive",
-+        .cmd        = hmp_fsdev_set_io_throttle,
-+    },
-+
-+#endif
-+
-+STEXI
-+@item fsdev_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-+@findex fsdev_set_io_throttle
-+Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-+
-+ETEXI
-+
-     {
-         .name       = "set_password",
-         .args_type  = "protocol:s,password:s,connected:s?",
-diff --git a/hmp.c b/hmp.c
-index 9660373..19a4ad0 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -38,6 +38,7 @@
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
- #include "hw/intc/intc.h"
-+#include "fsdev/qemu-fsdev-throttle.h"
- 
- #ifdef CONFIG_SPICE
- #include <spice/enums.h>
-@@ -1579,6 +1580,72 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
- }
- 
-+#ifdef CONFIG_VIRTFS
-+
-+void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+    IOThrottle throttle;
-+
-+    hmp_initialize_io_throttle(&throttle, qdict);
-+    qmp_fsdev_set_io_throttle(&throttle, &err);
-+    hmp_handle_error(mon, &err);
-+}
-+
-+static void print_fsdev_throttle_config(Monitor *mon, IOThrottle *fscfg,
-+                                       Error *err)
-+{
-+    if (fscfg->bps  || fscfg->bps_rd  || fscfg->bps_wr  ||
-+        fscfg->iops || fscfg->iops_rd || fscfg->iops_wr)
-+    {
-+        monitor_printf(mon, "%s", fscfg->id);
-+        monitor_printf(mon, "    I/O throttling:"
-+                        " bps=%" PRId64
-+                        " bps_rd=%" PRId64  " bps_wr=%" PRId64
-+                        " bps_max=%" PRId64
-+                        " bps_rd_max=%" PRId64
-+                        " bps_wr_max=%" PRId64
-+                        " iops=%" PRId64 " iops_rd=%" PRId64
-+                        " iops_wr=%" PRId64
-+                        " iops_max=%" PRId64
-+                        " iops_rd_max=%" PRId64
-+                        " iops_wr_max=%" PRId64
-+                        " iops_size=%" PRId64,
-+                        fscfg->bps,
-+                        fscfg->bps_rd,
-+                        fscfg->bps_wr,
-+                        fscfg->bps_max,
-+                        fscfg->bps_rd_max,
-+                        fscfg->bps_wr_max,
-+                        fscfg->iops,
-+                        fscfg->iops_rd,
-+                        fscfg->iops_wr,
-+                        fscfg->iops_max,
-+                        fscfg->iops_rd_max,
-+                        fscfg->iops_wr_max,
-+                        fscfg->iops_size);
-+   }
-+   hmp_handle_error(mon, &err);
-+}
-+
-+void hmp_fsdev_get_io_throttle(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+    IOThrottleList *fs9p_list, *info;
-+    fs9p_list = qmp_query_fsdev_io_throttle(&err);
-+
-+    for (info = fs9p_list; info; info = info->next) {
-+        if (info != fs9p_list) {
-+            monitor_printf(mon, "\n");
-+        }
-+        print_fsdev_throttle_config(mon, info->value, err);
-+        qapi_free_IOThrottle(info->value);
-+    }
-+    qapi_free_IOThrottleList(fs9p_list);
-+}
-+
-+#endif
-+
- void hmp_block_stream(Monitor *mon, const QDict *qdict)
- {
-     Error *error = NULL;
-diff --git a/hmp.h b/hmp.h
-index 799fd37..f1adb9d 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -77,6 +77,10 @@ void hmp_set_password(Monitor *mon, const QDict *qdict);
- void hmp_expire_password(Monitor *mon, const QDict *qdict);
- void hmp_eject(Monitor *mon, const QDict *qdict);
- void hmp_change(Monitor *mon, const QDict *qdict);
-+#ifdef CONFIG_VIRTFS
-+void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict);
-+void hmp_fsdev_get_io_throttle(Monitor *mon, const QDict *qdict);
-+#endif
- void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
- void hmp_block_stream(Monitor *mon, const QDict *qdict);
- void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 01b087f..6aa1446 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -81,6 +81,9 @@
- # QAPI block definitions
- { 'include': 'qapi/block.json' }
- 
-+# QAPI fsdev definitions
-+{ 'include': 'qapi/fsdev.json' }
-+
- # QAPI event definitions
- { 'include': 'qapi/event.json' }
- 
-diff --git a/qapi/fsdev.json b/qapi/fsdev.json
-new file mode 100644
-index 0000000..eff1efe
---- /dev/null
-+++ b/qapi/fsdev.json
-@@ -0,0 +1,84 @@
-+# -*- Mode: Python -*-
-+
-+##
-+# == QAPI fsdev definitions
-+##
-+
-+# QAPI common definitions
-+{ 'include': 'iothrottle.json' }
-+
-+##
-+# @fsdev-set-io-throttle:
-+#
-+# Change I/O limits for a 9p/fsdev device.
-+#
-+# I/O limits can be enabled by setting throttle value to non-zero number.
-+#
-+# I/O limits can be disabled by setting all throttle values to 0.
-+#
-+# Returns: Nothing on success
-+#          If @device is not a valid fsdev device, DeviceNotFound
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "execute": "fsdev-set-io-throttle",
-+#      "arguments": { "id": "id0-1-0",
-+#                     "bps": 1000000,
-+#                     "bps_rd": 0,
-+#                     "bps_wr": 0,
-+#                     "iops": 0,
-+#                     "iops_rd": 0,
-+#                     "iops_wr": 0,
-+#                     "bps_max": 8000000,
-+#                     "bps_rd_max": 0,
-+#                     "bps_wr_max": 0,
-+#                     "iops_max": 0,
-+#                     "iops_rd_max": 0,
-+#                     "iops_wr_max": 0,
-+#                     "bps_max_length": 60,
-+#                     "iops_size": 0 } }
-+# <- { "returns": {} }
-+##
-+{ 'command': 'fsdev-set-io-throttle', 'boxed': true,
-+  'data': 'IOThrottle' }
-+##
-+# @query-fsdev-io-throttle:
-+#
-+# Returns: a list of @IOThrottle describing io throttle values of each fsdev device
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "Execute": "query-fsdev-io-throttle" }
-+# <- { "returns" : [
-+#          {
-+#             "id": "id0-hd0",
-+#              "bps":1000000,
-+#              "bps_rd":0,
-+#              "bps_wr":0,
-+#              "iops":1000000,
-+#              "iops_rd":0,
-+#              "iops_wr":0,
-+#              "bps_max": 8000000,
-+#              "bps_rd_max": 0,
-+#              "bps_wr_max": 0,
-+#              "iops_max": 0,
-+#              "iops_rd_max": 0,
-+#              "iops_wr_max": 0,
-+#              "bps_max_length": 0,
-+#              "bps_rd_max_length": 0,
-+#              "bps_wr_max_length": 0,
-+#              "iops_max_length": 0,
-+#              "iops_rd_max_length": 0,
-+#              "iops_wr_max_length": 0,
-+#              "iops_size": 0
-+#            }
-+#          ]
-+#      }
-+#
-+##
-+{ 'command': 'query-fsdev-io-throttle', 'returns': [ 'IOThrottle' ] }
-+
-diff --git a/qmp.c b/qmp.c
-index ab74cd7..c76a973 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -130,6 +130,21 @@ void qmp_cpu_add(int64_t id, Error **errp)
-     }
- }
- 
-+#ifdef _WIN64
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+  return;
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    abort();
-+}
-+
-+#endif
-+
-+
- #ifndef CONFIG_VNC
- /* If VNC support is enabled, the "true" query-vnc command is
-    defined in the VNC subsystem */
--- 
-1.8.3.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
+NDQwMzMxNS0xMjc2MC0xLWdpdC1zZW5kLWVtYWlsLXBldGVyeEByZWRoYXQuY29tClR5cGU6IHNl
+cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzEyXSBWVC1kOiBQVCAocGFz
+c3Rocm91Z2gpIG1vZGUgc3VwcG9ydCBhbmQgbWlzYyBmaXhlcwoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
+aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRz
+PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
+bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
+IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
+bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
+aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
+bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
+amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ5NDQwNTY4My0yMDg3Ny0x
+LWdpdC1zZW5kLWVtYWlsLXByYWRlZXAuamFnYWRlZXNoQGh1YXdlaS5jb20gLT4gcGF0Y2hldy8x
+NDk0NDA1NjgzLTIwODc3LTEtZ2l0LXNlbmQtZW1haWwtcHJhZGVlcC5qYWdhZGVlc2hAaHVhd2Vp
+LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNTEwMDgzMjU5LjM5MDAtMS14
+aWFvZ3Vhbmdyb25nQHRlbmNlbnQuY29tIC0+IHBhdGNoZXcvMjAxNzA1MTAwODMyNTkuMzkwMC0x
+LXhpYW9ndWFuZ3JvbmdAdGVuY2VudC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+Jwo5ZDkzZTRiIHZob3N0OiBpb21tdTogY2FjaGUgc3RhdGljIG1hcHBpbmcgaWYgdGhlcmUgaXMK
+MGIxZjYwYSBpbnRlbF9pb21tdTogdHVybiBvZmYgcHQgYmVmb3JlIDIuOQpkM2I4ODk3IGludGVs
+X2lvbW11OiBzdXBwb3J0IHBhc3N0aHJvdWdoIChQVCkKZDYyODhiNiBpbnRlbF9pb21tdTogYWxs
+b3cgZGV2LWlvdGxiIGNvbnRleHQgZW50cnkgY29uZGl0aW9uYWxseQpjZGU0MWUyIGludGVsX2lv
+bW11OiB1c2UgSU9NTVVfQUNDRVNTX0ZMQUcoKQpjMGU3ZjFhIGludGVsX2lvbW11OiBwcm92aWRl
+IHZ0ZF9jZV9nZXRfdHlwZSgpCmNmOTU1OWQgaW50ZWxfaW9tbXU6IHJlbmFtaW5nIGNvbnRleHQg
+ZW50cnkgaGVscGVycwo0MTc3YWUwIHg4Ni1pb21tdTogdXNlIERldmljZUNsYXNzIHByb3BlcnRp
+ZXMKZmQ4YTI4NSBtZW1vcnk6IGZpeCBhZGRyZXNzX3NwYWNlX2dldF9pb3RsYl9lbnRyeSgpCmNh
+NWJkYTYgbWVtb3J5OiByZW1vdmUgdGhlIGxhc3QgcGFyYW0gaW4gbWVtb3J5X3JlZ2lvbl9pb21t
+dV9yZXBsYXkoKQowM2VjNmU1IG1lbW9yeTogdHVuZSBsYXN0IHBhcmFtIG9mIGlvbW11X29wcy50
+cmFuc2xhdGUoKQpiNjYzZWZkIHBjOiBhZGQgMi4xMCBtYWNoaW5lIHR5cGUKCj09PSBPVVRQVVQg
+QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTI6IHBjOiBhZGQgMi4xMCBtYWNoaW5lIHR5cGUu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMi8xMjogbWVtb3J5OiB0dW5lIGxhc3QgcGFyYW0gb2YgaW9tbXVf
+b3BzLnRyYW5zbGF0ZSgpLi4uCkNoZWNraW5nIFBBVENIIDMvMTI6IG1lbW9yeTogcmVtb3ZlIHRo
+ZSBsYXN0IHBhcmFtIGluIG1lbW9yeV9yZWdpb25faW9tbXVfcmVwbGF5KCkuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNC8xMjogbWVtb3J5OiBmaXggYWRkcmVzc19zcGFjZV9nZXRfaW90bGJfZW50cnkoKS4u
+LgpDaGVja2luZyBQQVRDSCA1LzEyOiB4ODYtaW9tbXU6IHVzZSBEZXZpY2VDbGFzcyBwcm9wZXJ0
+aWVzLi4uCkNoZWNraW5nIFBBVENIIDYvMTI6IGludGVsX2lvbW11OiByZW5hbWluZyBjb250ZXh0
+IGVudHJ5IGhlbHBlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMjogaW50ZWxfaW9tbXU6IHByb3Zp
+ZGUgdnRkX2NlX2dldF90eXBlKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMjogaW50ZWxfaW9tbXU6
+IHVzZSBJT01NVV9BQ0NFU1NfRkxBRygpLi4uCkNoZWNraW5nIFBBVENIIDkvMTI6IGludGVsX2lv
+bW11OiBhbGxvdyBkZXYtaW90bGIgY29udGV4dCBlbnRyeSBjb25kaXRpb25hbGx5Li4uCkNoZWNr
+aW5nIFBBVENIIDEwLzEyOiBpbnRlbF9pb21tdTogc3VwcG9ydCBwYXNzdGhyb3VnaCAoUFQpLi4u
+CkVSUk9SOiAiKGZvbyoqKSIgc2hvdWxkIGJlICIoZm9vICoqKSIKIzM0OiBGSUxFOiBody9pMzg2
+L2ludGVsX2lvbW11LmM6NjU2OgorICAgICAgICB3aGlsZSAoZ19oYXNoX3RhYmxlX2l0ZXJfbmV4
+dCAoJml0ZXIsIE5VTEwsICh2b2lkKiopJnZ0ZF9idXMpKSB7CgpFUlJPUjogc3BhY2UgcHJvaGli
+aXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNDog
+RklMRTogaHcvaTM4Ni9pbnRlbF9pb21tdS5jOjY1NjoKKyAgICAgICAgd2hpbGUgKGdfaGFzaF90
+YWJsZV9pdGVyX25leHQgKCZpdGVyLCBOVUxMLCAodm9pZCoqKSZ2dGRfYnVzKSkgewoKdG90YWw6
+IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMDUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTEvMTI6IGludGVsX2lvbW11
+OiB0dXJuIG9mZiBwdCBiZWZvcmUgMi45Li4uCkNoZWNraW5nIFBBVENIIDEyLzEyOiB2aG9zdDog
+aW9tbXU6IGNhY2hlIHN0YXRpYyBtYXBwaW5nIGlmIHRoZXJlIGlzLi4uCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNzk6IEZJTEU6IGh3L3ZpcnRpby92
+aG9zdC5jOjgxMToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBVSU5UNjRfTUFYLTEpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVy
+cm9ycywgMCB3YXJuaW5ncywgODAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
