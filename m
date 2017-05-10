@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d8PpV-00082r-GK
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:30:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d8PpW-000846-GV
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d8PpU-0001t2-Aq
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:30:53 -0400
+	(envelope-from <imammedo@redhat.com>) id 1d8PpV-0001tV-HD
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 07:30:54 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 10 May 2017 13:29:59 +0200
-Message-Id: <1494415802-227633-16-git-send-email-imammedo@redhat.com>
+Date: Wed, 10 May 2017 13:30:00 +0200
+Message-Id: <1494415802-227633-17-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
 References: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 15/18] numa: use possible_cpus for not
- mapped CPUs check
+Subject: [Qemu-devel] [PATCH v3 16/18] numa: remove node_cpu bitmaps as they
+ are no longer used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,120 +23,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-and remove corresponding part in numa.c that uses
-node_cpu bitmaps.
+Postfactum "CPU(s) present in multiple NUMA nodes" check
+was the last user of node_cpu bitmaps, but it's not need
+as machine_set_cpu_numa_node() does the similar check at
+the time mapping is set for cpus (i.e. when -numa cpus=
+is parsed) and ensures that cpu can be mapped only to
+one node.
+
+Remove duplicate check based on node_cpu bitmaps and
+since the last user is gone remove node_cpu as well,
+which completes internal transition from legacy bitmap
+based mapping storage to possible_cpus storage.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
-It's one more less user of node_cpu bitmpas, following
-commit will remove the last user along with
-node_cpu itself.
----
- hw/core/machine.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- numa.c            | 10 ----------
- 2 files changed, 58 insertions(+), 10 deletions(-)
+ include/sysemu/numa.h |  1 -
+ numa.c                | 43 -------------------------------------------
+ 2 files changed, 44 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 64e2a4f..fd6a436 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -20,6 +20,7 @@
- #include "sysemu/numa.h"
- #include "qemu/error-report.h"
- #include "qemu/cutils.h"
-+#include "sysemu/numa.h"
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 8cb3ebc..7ffde5b 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -18,7 +18,6 @@ struct numa_addr_range {
  
- static char *machine_get_accel(Object *obj, Error **errp)
- {
-@@ -678,9 +679,66 @@ bool machine_mem_merge(MachineState *machine)
-     return machine->mem_merge;
- }
- 
-+static char *cpu_slot_to_string(const CPUArchId *cpu)
-+{
-+    GString *s = g_string_new(NULL);
-+    if (cpu->props.has_socket_id) {
-+        g_string_append_printf(s, "socket-id: %"PRId64, cpu->props.socket_id);
-+    }
-+    if (cpu->props.has_core_id) {
-+        if (s->len) {
-+            g_string_append_printf(s, ", ");
-+        }
-+        g_string_append_printf(s, "core-id: %"PRId64, cpu->props.core_id);
-+    }
-+    if (cpu->props.has_thread_id) {
-+        if (s->len) {
-+            g_string_append_printf(s, ", ");
-+        }
-+        g_string_append_printf(s, "thread-id: %"PRId64, cpu->props.thread_id);
-+    }
-+    return g_string_free(s, false);
-+}
-+
-+static void machine_numa_validate(MachineState *machine)
-+{
-+    int i;
-+    GString *s = g_string_new(NULL);
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
-+
-+    assert(nb_numa_nodes);
-+    for (i = 0; i < possible_cpus->len; i++) {
-+        const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
-+
-+        /* at this point numa mappings are initilized by CLI options
-+         * or with default mappings so it's sufficient to list
-+         * all not yet mapped CPUs here */
-+        /* TODO: make it hard error in future */
-+        if (!cpu_slot->props.has_node_id) {
-+            char *cpu_str = cpu_slot_to_string(cpu_slot);
-+            g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
-+                                   cpu_str);
-+            g_free(cpu_str);
-+        }
-+    }
-+    if (s->len) {
-+        error_report("warning: CPU(s) not present in any NUMA nodes: %s",
-+                     s->str);
-+        error_report("warning: All CPU(s) up to maxcpus should be described "
-+                     "in NUMA config, ability to start up with partial NUMA "
-+                     "mappings is obsoleted and will be removed in future");
-+    }
-+    g_string_free(s, true);
-+}
-+
- void machine_run_board_init(MachineState *machine)
- {
-     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
-+
-+    if (nb_numa_nodes) {
-+        machine_numa_validate(machine);
-+    }
-     machine_class->init(machine);
- }
- 
+ struct node_info {
+     uint64_t node_mem;
+-    unsigned long *node_cpu;
+     struct HostMemoryBackend *node_memdev;
+     bool present;
+     QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
 diff --git a/numa.c b/numa.c
-index dc739ea..63bff5a 100644
+index 63bff5a..ca122cc 100644
 --- a/numa.c
 +++ b/numa.c
-@@ -337,16 +337,6 @@ static void validate_numa_cpus(void)
-         bitmap_or(seen_cpus, seen_cpus,
-                   numa_info[i].node_cpu, max_cpus);
-     }
--
--    if (!bitmap_full(seen_cpus, max_cpus)) {
--        char *msg;
--        bitmap_complement(seen_cpus, seen_cpus, max_cpus);
--        msg = enumerate_cpus(seen_cpus, max_cpus);
--        error_report("warning: CPU(s) not present in any NUMA nodes: %s", msg);
--        error_report("warning: All CPU(s) up to maxcpus should be described "
--                     "in NUMA config");
--        g_free(msg);
--    }
-     g_free(seen_cpus);
+@@ -178,7 +178,6 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+                        cpus->value, max_cpus);
+             return;
+         }
+-        bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
+         props = mc->cpu_index_to_instance_props(ms, cpus->value);
+         props.node_id = nodenr;
+         props.has_node_id = true;
+@@ -305,41 +304,6 @@ end:
+     return 0;
  }
  
+-static char *enumerate_cpus(unsigned long *cpus, int max_cpus)
+-{
+-    int cpu;
+-    bool first = true;
+-    GString *s = g_string_new(NULL);
+-
+-    for (cpu = find_first_bit(cpus, max_cpus);
+-        cpu < max_cpus;
+-        cpu = find_next_bit(cpus, max_cpus, cpu + 1)) {
+-        g_string_append_printf(s, "%s%d", first ? "" : " ", cpu);
+-        first = false;
+-    }
+-    return g_string_free(s, FALSE);
+-}
+-
+-static void validate_numa_cpus(void)
+-{
+-    int i;
+-    unsigned long *seen_cpus = bitmap_new(max_cpus);
+-
+-    for (i = 0; i < nb_numa_nodes; i++) {
+-        if (bitmap_intersects(seen_cpus, numa_info[i].node_cpu, max_cpus)) {
+-            bitmap_and(seen_cpus, seen_cpus,
+-                       numa_info[i].node_cpu, max_cpus);
+-            error_report("CPU(s) present in multiple NUMA nodes: %s",
+-                         enumerate_cpus(seen_cpus, max_cpus));
+-            g_free(seen_cpus);
+-            exit(EXIT_FAILURE);
+-        }
+-        bitmap_or(seen_cpus, seen_cpus,
+-                  numa_info[i].node_cpu, max_cpus);
+-    }
+-    g_free(seen_cpus);
+-}
+-
+ /* If all node pair distances are symmetric, then only distances
+  * in one direction are enough. If there is even one asymmetric
+  * pair, though, then all distances must be provided. The
+@@ -451,10 +415,6 @@ void parse_numa_opts(MachineState *ms)
+     const CPUArchIdList *possible_cpus;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+ 
+-    for (i = 0; i < MAX_NODES; i++) {
+-        numa_info[i].node_cpu = bitmap_new(max_cpus);
+-    }
+-
+     if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
+         exit(1);
+     }
+@@ -531,13 +491,10 @@ void parse_numa_opts(MachineState *ms)
+                 props = mc->cpu_index_to_instance_props(ms, i);
+                 props.has_node_id = true;
+ 
+-                set_bit(i, numa_info[props.node_id].node_cpu);
+                 machine_set_cpu_numa_node(ms, &props, &error_fatal);
+             }
+         }
+ 
+-        validate_numa_cpus();
+-
+         /* QEMU needs at least all unique node pair distances to build
+          * the whole NUMA distance table. QEMU treats the distance table
+          * as symmetric by default, i.e. distance A->B == distance B->A.
 -- 
 2.7.4
