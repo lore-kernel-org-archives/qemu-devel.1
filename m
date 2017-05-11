@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8tcG-0002Xl-8n
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d8tcI-0002Zc-2R
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8tcF-0007pq-7e
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35242)
+	(envelope-from <ehabkost@redhat.com>) id 1d8tcH-0007qp-1M
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8tcF-0007pY-1O
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:11 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8tcG-0007qE-R8
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:12 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 11 May 2017 16:18:26 -0300
-Message-Id: <20170511191843.13784-13-ehabkost@redhat.com>
+Date: Thu, 11 May 2017 16:18:27 -0300
+Message-Id: <20170511191843.13784-14-ehabkost@redhat.com>
 In-Reply-To: <20170511191843.13784-1-ehabkost@redhat.com>
 References: <20170511191843.13784-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 12/29] virt-arm: add node-id property to CPU
+Subject: [Qemu-devel] [PULL 13/29] numa: add check that board supports
+ cpu_index to node mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +29,74 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-it will allow switching from cpu_index to property based
-numa mapping in follow up patches.
+Default node mapping initialization already checks that board
+supports cpu_index to node mapping and refuses to start if
+it's not supported. Do the same for explicitly provided
+mapping "-numa node,cpus=..."
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
-Message-Id: <1494415802-227633-5-git-send-email-imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <1494415802-227633-6-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/arm/virt.c    | 15 +++++++++++++++
- target/arm/cpu.c |  1 +
- 2 files changed, 16 insertions(+)
+ numa.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index dfd6fd446c..653b4d76fd 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1350,6 +1350,7 @@ static void machvirt_init(MachineState *machine)
-     for (n = 0; n < possible_cpus->len; n++) {
-         Object *cpuobj;
-         CPUState *cs;
-+        int node_id;
+diff --git a/numa.c b/numa.c
+index bcdfca2309..718248161c 100644
+--- a/numa.c
++++ b/numa.c
+@@ -141,10 +141,12 @@ uint32_t numa_get_node(ram_addr_t addr, Error **errp)
+     return -1;
+ }
  
-         if (n >= smp_cpus) {
-             break;
-@@ -1362,6 +1363,20 @@ static void machvirt_init(MachineState *machine)
-         cs = CPU(cpuobj);
-         cs->cpu_index = n;
+-static void parse_numa_node(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
++static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
++                            QemuOpts *opts, Error **errp)
+ {
+     uint16_t nodenr;
+     uint16List *cpus = NULL;
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
  
-+        node_id = numa_get_node_for_cpu(cs->cpu_index);
-+        if (node_id == nb_numa_nodes) {
-+            /* by default CPUState::numa_node was 0 if it's not set via CLI
-+             * keep it this way for now but in future we probably should
-+             * refuse to start up with incomplete numa mapping */
-+             node_id = 0;
-+        }
-+        if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
-+            cs->numa_node = node_id;
-+        } else {
-+            /* CPU isn't device_add compatible yet, this shouldn't happen */
-+            error_setg(&error_abort, "user set node-id not implemented");
-+        }
-+
-         if (!vms->secure) {
-             object_property_set_bool(cpuobj, false, "has_el3", NULL);
+     if (node->has_nodeid) {
+         nodenr = node->nodeid;
+@@ -163,6 +165,10 @@ static void parse_numa_node(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
+         return;
+     }
+ 
++    if (!mc->cpu_index_to_instance_props) {
++        error_report("NUMA is not supported by this machine-type");
++        exit(1);
++    }
+     for (cpus = node->cpus; cpus; cpus = cpus->next) {
+         if (cpus->value >= max_cpus) {
+             error_setg(errp,
+@@ -253,6 +259,7 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
+ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     NumaOptions *object = NULL;
++    MachineState *ms = opaque;
+     Error *err = NULL;
+ 
+     {
+@@ -267,7 +274,7 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+ 
+     switch (object->type) {
+     case NUMA_OPTIONS_TYPE_NODE:
+-        parse_numa_node(&object->u.node, opts, &err);
++        parse_numa_node(ms, &object->u.node, opts, &err);
+         if (err) {
+             goto end;
          }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index ee1406da12..c185eb19ac 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1573,6 +1573,7 @@ static Property arm_cpu_properties[] = {
-     DEFINE_PROP_UINT32("midr", ARMCPU, midr, 0),
-     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-                         mp_affinity, ARM64_AFFINITY_INVALID),
-+    DEFINE_PROP_INT32("node-id", CPUState, numa_node, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_END_OF_LIST()
- };
+@@ -452,7 +459,7 @@ void parse_numa_opts(MachineState *ms)
+         numa_info[i].node_cpu = bitmap_new(max_cpus);
+     }
+ 
+-    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, NULL, NULL)) {
++    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
+         exit(1);
+     }
  
 -- 
 2.11.0.259.g40922b1
