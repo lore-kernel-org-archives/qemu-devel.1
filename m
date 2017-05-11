@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d8qMU-0005rr-HW
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:50:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8qfQ-0007p8-F6
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:10:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d8qMR-0007B1-Uo
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:50:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57094)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d8qMR-0007AY-L5
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:50:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 73BF5796FE
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 15:50:38 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 11 May 2017 17:50:28 +0200
-Message-Id: <20170511155028.6543-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH] ram: Rename RAM_SAVE_FLAG_COMPRESS to
- RAM_SAVE_FLAG_ZERO
+	(envelope-from <eblake@redhat.com>) id 1d8qfP-0002dE-Nn
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:10:16 -0400
+References: <20170511144208.24075-1-pbonzini@redhat.com>
+	<20170511144208.24075-7-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4f74b071-4bc3-9a86-c968-8f3f0d51ca25@redhat.com>
+Date: Thu, 11 May 2017 11:10:01 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170511144208.24075-7-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GVwOphJur4e2kLewiBqdgSNUh5FomvT7e"
+Subject: Re: [Qemu-devel] [PATCH 06/18] block: access io_plugged with atomic
+ ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
 
-Reflects better what it does now, and avoid confussions with
-RAM_SAVE_FLAG_COMPRESS_PAGE.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GVwOphJur4e2kLewiBqdgSNUh5FomvT7e
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+Message-ID: <4f74b071-4bc3-9a86-c968-8f3f0d51ca25@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 06/18] block: access io_plugged with atomic
+ ops
+References: <20170511144208.24075-1-pbonzini@redhat.com>
+ <20170511144208.24075-7-pbonzini@redhat.com>
+In-Reply-To: <20170511144208.24075-7-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 05/11/2017 09:41 AM, Paolo Bonzini wrote:
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/io.c                | 4 ++--
+>  include/block/block_int.h | 8 +++++---
+>  2 files changed, 7 insertions(+), 5 deletions(-)
 
----
+> @@ -625,6 +622,11 @@ struct BlockDriverState {
+>       */
+>      bool wakeup;
+> =20
+> +    /* counter for nested bdrv_io_plug.
+> +     * Accessed with atomic ops.
+> +    */
+> +    unsigned io_plugged;
 
-Hi
+Indentation is odd.
 
-I always forgot the diffe9rent between COMPRESS and COMPRESS_PAGE.
-This patch makes it clean which is which.
-
-Please, comment.
-
-Later, Juan.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
----
- migration/ram.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+--GVwOphJur4e2kLewiBqdgSNUh5FomvT7e
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 995d1fc..76c118c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -48,8 +48,14 @@
- /***********************************************************/
- /* ram save/restore */
- 
-+/* RAM_SAVE_FLAG_ZERO used to be named RAM_SAVE_FLAG_COMPRESS, it
-+ * worked for pages that where filled with the same char.  We switched
-+ * it to only search for the zero value.  And to avoid confusion with
-+ * RAM_SSAVE_FLAG_COMPRESS_PAGE just rename it.
-+ */
-+
- #define RAM_SAVE_FLAG_FULL     0x01 /* Obsolete, not used anymore */
--#define RAM_SAVE_FLAG_COMPRESS 0x02
-+#define RAM_SAVE_FLAG_ZERO     0x02
- #define RAM_SAVE_FLAG_MEM_SIZE 0x04
- #define RAM_SAVE_FLAG_PAGE     0x08
- #define RAM_SAVE_FLAG_EOS      0x10
-@@ -746,7 +752,7 @@ static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
-     if (is_zero_range(p, TARGET_PAGE_SIZE)) {
-         rs->zero_pages++;
-         rs->bytes_transferred +=
--            save_page_header(rs, rs->f, block, offset | RAM_SAVE_FLAG_COMPRESS);
-+            save_page_header(rs, rs->f, block, offset | RAM_SAVE_FLAG_ZERO);
-         qemu_put_byte(rs->f, 0);
-         rs->bytes_transferred += 1;
-         pages = 1;
-@@ -2406,7 +2412,7 @@ static int ram_load_postcopy(QEMUFile *f)
- 
-         trace_ram_load_postcopy_loop((uint64_t)addr, flags);
-         place_needed = false;
--        if (flags & (RAM_SAVE_FLAG_COMPRESS | RAM_SAVE_FLAG_PAGE)) {
-+        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE)) {
-             block = ram_block_from_stream(f, flags);
- 
-             host = host_from_ram_block_offset(block, addr);
-@@ -2453,7 +2459,7 @@ static int ram_load_postcopy(QEMUFile *f)
-         last_host = host;
- 
-         switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
--        case RAM_SAVE_FLAG_COMPRESS:
-+        case RAM_SAVE_FLAG_ZERO:
-             ch = qemu_get_byte(f);
-             memset(page_buffer, ch, TARGET_PAGE_SIZE);
-             if (ch) {
-@@ -2542,7 +2548,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-         flags = addr & ~TARGET_PAGE_MASK;
-         addr &= TARGET_PAGE_MASK;
- 
--        if (flags & (RAM_SAVE_FLAG_COMPRESS | RAM_SAVE_FLAG_PAGE |
-+        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-                      RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
-             RAMBlock *block = ram_block_from_stream(f, flags);
- 
-@@ -2604,7 +2610,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-             }
-             break;
- 
--        case RAM_SAVE_FLAG_COMPRESS:
-+        case RAM_SAVE_FLAG_ZERO:
-             ch = qemu_get_byte(f);
-             ram_handle_compressed(host, ch, TARGET_PAGE_SIZE);
-             break;
--- 
-2.9.3
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZFIzZAAoJEKeha0olJ0Nq4SMH/1mxyUxrjebjmrTxRsBS4Bwi
+8rG6RpGz85KQYVWtoiLlvm0gUCqIxaQCOCDemu7xGrZJRQgeBXuO4glzkT5oH6mD
+hJ8Q4ewPEiGoAe1MNw8LaemlPaaBveEhXp/QhlaRCIAlFkDUen3SpJYkzWYLqegR
+SCRofP5Yf5ApDnGCFZaKo1yOyzsHGRn/BtRcF5/uMKgxaYjIaq5U8cBZuMMkch2x
+9eFXgL6GZ9jNL1qdkzkylFLjW1p7u2ZGunKrbavFFV8UKN2l+mp5HY5L6XtqvrQn
+CVDCi8Uu27Z4NtljRfCIP+q3ie2hjFHEQOyJDIYS5B2NMVyPAeSGNY3BAeh7kwA=
+=6qRk
+-----END PGP SIGNATURE-----
+
+--GVwOphJur4e2kLewiBqdgSNUh5FomvT7e--
