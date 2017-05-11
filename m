@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d8n7W-0005sN-S2
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:23:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d8n9F-0007AC-RV
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d8n7S-0007UT-Mc
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:23:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35002)
+	(envelope-from <pbonzini@redhat.com>) id 1d8n98-0007zs-BO
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:24:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d8n7S-0007U5-Di
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:22:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7036E80C22
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 12:22:57 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Thu, 11 May 2017 20:22:37 +0800
-Message-Id: <1494505358-15287-4-git-send-email-peterx@redhat.com>
-In-Reply-To: <1494505358-15287-1-git-send-email-peterx@redhat.com>
-References: <1494505358-15287-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 3/4] ramblock: add new hmp command "info
- ramblock"
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d8n98-0007yz-4C
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:24:42 -0400
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+	<20170424164244.GJ2362@work-vm>
+	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+Date: Thu, 11 May 2017 14:24:36 +0200
+MIME-Version: 1.0
+In-Reply-To: <B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, peterx@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>
+Cc: "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Wanpeng Li <kernellwp@gmail.com>
 
-To dump information about ramblocks. It looks like:
 
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used              Total
-            /objects/mem    2 MiB  0x0000000000000000 0x0000000080000000 0x0000000080000000
-                vga.vram    4 KiB  0x0000000080060000 0x0000000001000000 0x0000000001000000
-    /rom@etc/acpi/tables    4 KiB  0x00000000810b0000 0x0000000000020000 0x0000000000200000
-                 pc.bios    4 KiB  0x0000000080000000 0x0000000000040000 0x0000000000040000
-  0000:00:03.0/e1000.rom    4 KiB  0x0000000081070000 0x0000000000040000 0x0000000000040000
-                  pc.rom    4 KiB  0x0000000080040000 0x0000000000020000 0x0000000000020000
-    0000:00:02.0/vga.rom    4 KiB  0x0000000081060000 0x0000000000010000 0x0000000000010000
-   /rom@etc/table-loader    4 KiB  0x00000000812b0000 0x0000000000001000 0x0000000000001000
-      /rom@etc/acpi/rsdp    4 KiB  0x00000000812b1000 0x0000000000001000 0x0000000000001000
 
-Ramblock is something hidden internally in QEMU implementation, and this
-command should only be used by mostly QEMU developers on RAM stuff. It
-is not a command suitable for QMP interface. So only HMP interface is
-provided for it.
+On 11/05/2017 14:07, Zhoujian (jay) wrote:
+> -        * Scan sptes if dirty logging has been stopped, dropping those
+> -        * which can be collapsed into a single large-page spte.  Later
+> -        * page faults will create the large-page sptes.
+> +        * Reset each vcpu's mmu, then page faults will create the large-page
+> +        * sptes later.
+>          */
+>         if ((change != KVM_MR_DELETE) &&
+>                 (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
+> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+> +               kvm_for_each_vcpu(i, vcpu, kvm)
+> +                       kvm_mmu_reset_context(vcpu);
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- exec.c                 | 22 ++++++++++++++++++++++
- hmp-commands-info.hx   | 14 ++++++++++++++
- hmp.c                  |  6 ++++++
- hmp.h                  |  1 +
- include/exec/ramlist.h |  1 +
- 5 files changed, 44 insertions(+)
+This should be "kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);" but
+I am not sure it is enough.  I think that if you do not zap the SPTEs,
+the page faults will use 4K SPTEs, not large ones (though I'd have to
+check better; CCing Xiao and Wanpeng).
 
-diff --git a/exec.c b/exec.c
-index 50519ae..821bef3 100644
---- a/exec.c
-+++ b/exec.c
-@@ -71,6 +71,8 @@
- #include "qemu/mmap-alloc.h"
- #endif
- 
-+#include "monitor/monitor.h"
-+
- //#define DEBUG_SUBPAGE
- 
- #if !defined(CONFIG_USER_ONLY)
-@@ -1333,6 +1335,26 @@ void qemu_mutex_unlock_ramlist(void)
-     qemu_mutex_unlock(&ram_list.mutex);
- }
- 
-+void ram_block_dump(Monitor *mon)
-+{
-+    RAMBlock *block;
-+    char *psize;
-+
-+    rcu_read_lock();
-+    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-+                   "Block Name", "PSize", "Offset", "Used", "Total");
-+    RAMBLOCK_FOREACH(block) {
-+        psize = size_to_str(block->page_size);
-+        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
-+                       " 0x%016" PRIx64 "\n", block->idstr, psize,
-+                       (uint64_t)block->offset,
-+                       (uint64_t)block->used_length,
-+                       (uint64_t)block->max_length);
-+        g_free(psize);
-+    }
-+    rcu_read_unlock();
-+}
-+
- #ifdef __linux__
- /*
-  * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a53f105..ae16901 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -788,6 +788,20 @@ Display the latest dump status.
- ETEXI
- 
-     {
-+        .name       = "ramblock",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Display system ramblock information",
-+        .cmd        = hmp_info_ramblock,
-+    },
-+
-+STEXI
-+@item info ramblock
-+@findex ramblock
-+Dump all the ramblocks of the system.
-+ETEXI
-+
-+    {
-         .name       = "hotpluggable-cpus",
-         .args_type  = "",
-         .params     = "",
-diff --git a/hmp.c b/hmp.c
-index bd7b1ca..45a5686 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -38,6 +38,7 @@
- #include "qemu-io.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-+#include "exec/ramlist.h"
- #include "hw/intc/intc.h"
- 
- #ifdef CONFIG_SPICE
-@@ -2737,6 +2738,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
-     qapi_free_DumpQueryResult(result);
- }
- 
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
-+{
-+    ram_block_dump(mon);
-+}
-+
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-diff --git a/hmp.h b/hmp.h
-index 37bb65a..d8b94ce 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -140,6 +140,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- 
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-index f1c6b45..2e2ac6c 100644
---- a/include/exec/ramlist.h
-+++ b/include/exec/ramlist.h
-@@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
- void ram_block_notify_add(void *host, size_t size);
- void ram_block_notify_remove(void *host, size_t size);
- 
-+void ram_block_dump(Monitor *mon);
- 
- #endif /* RAMLIST_H */
--- 
-2.7.4
+Paolo
