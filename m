@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d8qkL-0001Z7-9F
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:15:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8qo4-0002nI-KK
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d8qkH-0004nC-5P
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:15:21 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:13275)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d8qkG-0004mN-R1
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:15:17 -0400
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1494405683-20877-4-git-send-email-pradeep.jagadeesh@huawei.com>
-	<3797fb7d-bd3d-c1b0-0707-57f95852cb5f@redhat.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <f17af06c-82d5-f502-a9f4-6c31825b5eba@huawei.com>
-Date: Thu, 11 May 2017 18:14:57 +0200
+	(envelope-from <eblake@redhat.com>) id 1d8qo3-0002yK-Jc
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:19:12 -0400
+References: <20170511150337.21470-1-berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <29c88225-35e5-0daa-7983-4cf81e1dc1da@redhat.com>
+Date: Thu, 11 May 2017 11:19:04 -0500
 MIME-Version: 1.0
-In-Reply-To: <3797fb7d-bd3d-c1b0-0707-57f95852cb5f@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/4] qmp: refactor duplicate code
+In-Reply-To: <20170511150337.21470-1-berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7StQNSEgs5sdEjgoo0VokgKxhw7oHVwUk"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: remove extra local_error variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
-Cc: alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On 5/10/2017 9:56 PM, Eric Blake wrote:
-> On 05/10/2017 03:41 AM, Pradeep Jagadeesh wrote:
->> This patch factor out the duplicate qmp throttle interface code
->> that was present in both block and fsdev device files.
->>
->> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->> ---
->>  blockdev.c                      | 53 +++-------------------------------------
->>  hmp.c                           | 21 +++++++++++-----
->>  include/qemu/throttle-options.h |  2 ++
->>  util/throttle-options.c         | 54 +++++++++++++++++++++++++++++++++++++++++
->>  4 files changed, 74 insertions(+), 56 deletions(-)
->>
->
->> +++ b/include/qemu/throttle-options.h
->> @@ -94,4 +94,6 @@
->>
->>  void parse_io_throttle_options(ThrottleConfig *, QemuOpts *);
->>
->> +void qmp_set_io_throttle(ThrottleConfig *, IOThrottle *);
->
-> I don't think this is the right name for this function.  You are not
-> adding a new QMP command (you didn't modify a .json file to add
-> 'set-io-throttle').  As mentioned in patch 1/4, you can probably reuse
-> the existing util/throttle.c instead of throttle-options.c, and name
-> this something starting with throttle_ rather than with qmp_.
->
-OK
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7StQNSEgs5sdEjgoo0VokgKxhw7oHVwUk
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <29c88225-35e5-0daa-7983-4cf81e1dc1da@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: remove extra local_error variable
+References: <20170511150337.21470-1-berto@igalia.com>
+In-Reply-To: <20170511150337.21470-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--Pradeep
->
+On 05/11/2017 10:03 AM, Alberto Garcia wrote:
+> Commit d7086422b1c1e75e320519cfe26176db6ec97a37 added a local_err
+> variable global to the qcow2_amend_options() function, so there's no
+> need to have this other one.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--7StQNSEgs5sdEjgoo0VokgKxhw7oHVwUk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZFI74AAoJEKeha0olJ0NqOHYIAI26Q09FkGiSGLcBw17o2+Gb
+ZrvzyVW6DDjey+baxtjNwbwB8/yvWC7eI06E34Dbq/HmfDjNFR5v949NnzMBPOLu
+cgiC49tCifL+ZXsnS9Gu4NYGNuoch5fb5g0SLr4U+cIzF20OPv3qzPYwTaLWZirX
+8ww30Id070nKIPupP6lnYloksUmgSDoFMZT0uvETkPqFHHT2gggX3h00TCaV9Vgd
+2zAXVPqskALT8aG1pSbSPeoehWlhqk3SK0w+Ng+8PqyPS/VUew/pczihz/a0mpoF
+8NzNTIspVi4RtKETM0/O65au9ztbRzeGySAA7Ser0UgTrCsSyuoIgsQX4C6dyRQ=
+=nSt5
+-----END PGP SIGNATURE-----
+
+--7StQNSEgs5sdEjgoo0VokgKxhw7oHVwUk--
