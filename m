@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAn-0002hr-CB
+	(envelope-from <kwolf@redhat.com>) id 1d8pAk-0002en-Nh
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAl-0007vD-WE
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAj-0007sW-Es
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:30 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:45 +0200
-Message-Id: <1494513181-7900-43-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:42 +0200
+Message-Id: <1494513181-7900-40-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 42/58] blkdebug: Add pass-through write_zero and
- discard support
+Subject: [Qemu-devel] [PULL 39/58] qemu-io: Switch 'map' output to
+ byte-based reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,151 +25,170 @@ Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-In order to test the effects of artificial geometry constraints
-on operations like write zero or discard, we first need blkdebug
-to manage these actions.  It also allows us to inject errors on
-those operations, just like we can for read/write/flush.
+Mixing byte offset and sector allocation counts is a bit
+confusing.  Also, reporting n/m sectors, where m decreases
+according to the remaining size of the file, isn't really
+adding any useful information; and reporting an offset at
+both the front and end of the line, with large amounts of
+whitespace, is pointless.  Update the output to use byte
+counts and shorter lines, then adjust the affected tests
+(./check -qcow2 102, ./check -vpc 146).
 
-We can also test the contract promised by the block layer; namely,
-if a device has specified limits on alignment or maximum size,
-then those limits must be obeyed (for now, the blkdebug driver
-merely inherits limits from whatever it is wrapping, but the next
-patch will further enhance it to allow specific limit overrides).
-
-This patch intentionally refuses to service requests smaller than
-the requested alignments; this is because an upcoming patch adds
-a qemu-iotest to prove that the block layer is correctly handling
-fragmentation, but the test only works if there is a way to tell
-the difference at artificial alignment boundaries when blkdebug is
-using a larger-than-default alignment.  If we let the blkdebug
-layer always defer to the underlying layer, which potentially has
-a smaller granularity, the iotest will be thwarted.
-
-Tested by setting up an NBD server with export 'foo', then invoking:
-$ ./qemu-io
-qemu-io> open -o driver=blkdebug blkdebug::nbd://localhost:10809/foo
-qemu-io> d 0 15M
-qemu-io> w -z 0 15M
-
-Pre-patch, the server never sees the discard (it was silently
-eaten by the block layer); post-patch it is passed across the
-wire.  Likewise, pre-patch the write is always passed with
-NBD_WRITE (with 15M of zeroes on the wire), while post-patch
-it can utilize NBD_WRITE_ZEROES (for less traffic).
+Note that 'qemu-io map' is MUCH weaker than 'qemu-img map';
+the former only shows which regions of the active layer are
+allocated, without regards to where the allocation comes from
+or whether the allocated portion is known to read as zero
+(because it is using the weaker bdrv_is_allocated()); while the
+latter (especially in --output=json mode) reports more details
+from bdrv_get_block_status().
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20170429191419.30051-4-eblake@redhat.com
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170429191419.30051-7-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/blkdebug.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+ qemu-io-cmds.c             | 11 ++++++-----
+ tests/qemu-iotests/102.out |  4 ++--
+ tests/qemu-iotests/146.out | 30 +++++++++++++++---------------
+ 3 files changed, 23 insertions(+), 22 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 554573f..b8cc876 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -1,6 +1,7 @@
- /*
-  * Block protocol for I/O error injection
-  *
-+ * Copyright (C) 2016-2017 Red Hat, Inc.
-  * Copyright (c) 2010 Kevin Wolf <kwolf@redhat.com>
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-@@ -382,6 +383,11 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
-         goto out;
-     }
- 
-+    bs->supported_write_flags = BDRV_REQ_FUA &
-+        bs->file->bs->supported_write_flags;
-+    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
-+        bs->file->bs->supported_zero_flags;
-+
-     /* Set request alignment */
-     align = qemu_opt_get_size(opts, "align", 0);
-     if (align < INT_MAX && is_power_of_2(align)) {
-@@ -494,6 +500,72 @@ static int blkdebug_co_flush(BlockDriverState *bs)
-     return bdrv_co_flush(bs->file->bs);
- }
- 
-+static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
-+                                                  int64_t offset, int count,
-+                                                  BdrvRequestFlags flags)
-+{
-+    uint32_t align = MAX(bs->bl.request_alignment,
-+                         bs->bl.pwrite_zeroes_alignment);
-+    int err;
-+
-+    /* Only pass through requests that are larger than requested
-+     * preferred alignment (so that we test the fallback to writes on
-+     * unaligned portions), and check that the block layer never hands
-+     * us anything unaligned that crosses an alignment boundary.  */
-+    if (count < align) {
-+        assert(QEMU_IS_ALIGNED(offset, align) ||
-+               QEMU_IS_ALIGNED(offset + count, align) ||
-+               DIV_ROUND_UP(offset, align) ==
-+               DIV_ROUND_UP(offset + count, align));
-+        return -ENOTSUP;
-+    }
-+    assert(QEMU_IS_ALIGNED(offset, align));
-+    assert(QEMU_IS_ALIGNED(count, align));
-+    if (bs->bl.max_pwrite_zeroes) {
-+        assert(count <= bs->bl.max_pwrite_zeroes);
-+    }
-+
-+    err = rule_check(bs, offset, count);
-+    if (err) {
-+        return err;
-+    }
-+
-+    return bdrv_co_pwrite_zeroes(bs->file, offset, count, flags);
-+}
-+
-+static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
-+                                             int64_t offset, int count)
-+{
-+    uint32_t align = bs->bl.pdiscard_alignment;
-+    int err;
-+
-+    /* Only pass through requests that are larger than requested
-+     * minimum alignment, and ensure that unaligned requests do not
-+     * cross optimum discard boundaries. */
-+    if (count < bs->bl.request_alignment) {
-+        assert(QEMU_IS_ALIGNED(offset, align) ||
-+               QEMU_IS_ALIGNED(offset + count, align) ||
-+               DIV_ROUND_UP(offset, align) ==
-+               DIV_ROUND_UP(offset + count, align));
-+        return -ENOTSUP;
-+    }
-+    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
-+    assert(QEMU_IS_ALIGNED(count, bs->bl.request_alignment));
-+    if (align && count >= align) {
-+        assert(QEMU_IS_ALIGNED(offset, align));
-+        assert(QEMU_IS_ALIGNED(count, align));
-+    }
-+    if (bs->bl.max_pdiscard) {
-+        assert(count <= bs->bl.max_pdiscard);
-+    }
-+
-+    err = rule_check(bs, offset, count);
-+    if (err) {
-+        return err;
-+    }
-+
-+    return bdrv_co_pdiscard(bs->file->bs, offset, count);
-+}
- 
- static void blkdebug_close(BlockDriverState *bs)
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 1e0ebb4..4b2278f 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -1868,7 +1868,7 @@ static int map_f(BlockBackend *blk, int argc, char **argv)
  {
-@@ -748,6 +820,8 @@ static BlockDriver bdrv_blkdebug = {
-     .bdrv_co_preadv         = blkdebug_co_preadv,
-     .bdrv_co_pwritev        = blkdebug_co_pwritev,
-     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
-+    .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
-+    .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
+     int64_t offset;
+     int64_t nb_sectors, total_sectors;
+-    char s1[64];
++    char s1[64], s2[64];
+     int64_t num;
+     int ret;
+     const char *retstr;
+@@ -1894,10 +1894,11 @@ static int map_f(BlockBackend *blk, int argc, char **argv)
+         }
  
-     .bdrv_debug_event           = blkdebug_debug_event,
-     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+         retstr = ret ? "    allocated" : "not allocated";
+-        cvtstr(offset << 9ULL, s1, sizeof(s1));
+-        printf("[% 24" PRId64 "] % 8" PRId64 "/% 8" PRId64 " sectors %s "
+-               "at offset %s (%d)\n",
+-               offset << 9ULL, num, nb_sectors, retstr, s1, ret);
++        cvtstr(num << BDRV_SECTOR_BITS, s1, sizeof(s1));
++        cvtstr(offset << BDRV_SECTOR_BITS, s2, sizeof(s2));
++        printf("%s (0x%" PRIx64 ") bytes %s at offset %s (0x%" PRIx64 ")\n",
++               s1, num << BDRV_SECTOR_BITS, retstr,
++               s2, offset << BDRV_SECTOR_BITS);
+ 
+         offset += num;
+         nb_sectors -= num;
+diff --git a/tests/qemu-iotests/102.out b/tests/qemu-iotests/102.out
+index eecde16..ccf172a 100644
+--- a/tests/qemu-iotests/102.out
++++ b/tests/qemu-iotests/102.out
+@@ -6,7 +6,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
+ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ Image resized.
+-[                       0]      128/     128 sectors     allocated at offset 0 bytes (1)
++64 KiB (0x10000) bytes     allocated at offset 0 bytes (0x0)
+ Offset          Length          Mapped to       File
+ 
+ === Testing map on an image file truncated outside of qemu ===
+@@ -17,5 +17,5 @@ wrote 65536/65536 bytes at offset 0
+ Image resized.
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) qemu-io drv0 map
+-[                       0]      128/     128 sectors     allocated at offset 0 bytes (1)
++64 KiB (0x10000) bytes     allocated at offset 0 bytes (0x0)
+ *** done
+diff --git a/tests/qemu-iotests/146.out b/tests/qemu-iotests/146.out
+index 4f334d8..db6b296 100644
+--- a/tests/qemu-iotests/146.out
++++ b/tests/qemu-iotests/146.out
+@@ -2,39 +2,39 @@ QA output created by 146
+ 
+ === Testing VPC Autodetect ===
+ 
+-[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
++126.998 GiB (0x1fbfe04000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Testing VPC with current_size force ===
+ 
+-[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
++127 GiB (0x1fc0000000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Testing VPC with chs force ===
+ 
+-[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
++126.998 GiB (0x1fbfe04000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Testing Hyper-V Autodetect ===
+ 
+-[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
++127 GiB (0x1fc0000000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Testing Hyper-V with current_size force ===
+ 
+-[                       0]  266338304/ 266338304 sectors not allocated at offset 0 bytes (0)
++127 GiB (0x1fc0000000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Testing Hyper-V with chs force ===
+ 
+-[                       0]  266334240/ 266334240 sectors not allocated at offset 0 bytes (0)
++126.998 GiB (0x1fbfe04000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Testing d2v Autodetect ===
+ 
+-[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
++251.250 MiB (0xfb40000) bytes     allocated at offset 0 bytes (0x0)
+ 
+ === Testing d2v with current_size force ===
+ 
+-[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
++251.250 MiB (0xfb40000) bytes     allocated at offset 0 bytes (0x0)
+ 
+ === Testing d2v with chs force ===
+ 
+-[                       0]   514560/  514560 sectors     allocated at offset 0 bytes (1)
++251.250 MiB (0xfb40000) bytes     allocated at offset 0 bytes (0x0)
+ 
+ === Testing Image create, default ===
+ 
+@@ -42,15 +42,15 @@ Formatting 'TEST_DIR/IMGFMT-create-test.IMGFMT', fmt=IMGFMT size=4294967296
+ 
+ === Read created image, default opts ====
+ 
+-[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
++4 GiB (0x10007a000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Read created image, force_size_calc=chs ====
+ 
+-[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
++4 GiB (0x10007a000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Read created image, force_size_calc=current_size ====
+ 
+-[                       0]  8389584/ 8389584 sectors not allocated at offset 0 bytes (0)
++4 GiB (0x10007a000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Testing Image create, force_size ===
+ 
+@@ -58,13 +58,13 @@ Formatting 'TEST_DIR/IMGFMT-create-test.IMGFMT', fmt=IMGFMT size=4294967296 forc
+ 
+ === Read created image, default opts ====
+ 
+-[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
++4 GiB (0x100000000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Read created image, force_size_calc=chs ====
+ 
+-[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
++4 GiB (0x100000000) bytes not allocated at offset 0 bytes (0x0)
+ 
+ === Read created image, force_size_calc=current_size ====
+ 
+-[                       0]  8388608/ 8388608 sectors not allocated at offset 0 bytes (0)
++4 GiB (0x100000000) bytes not allocated at offset 0 bytes (0x0)
+ *** done
 -- 
 1.8.3.1
