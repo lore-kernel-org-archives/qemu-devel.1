@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8djT-0003Z7-F9
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:21:37 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d8eHl-0002Wd-CU
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:57:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8djR-0005qM-H9
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:21:35 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 10 May 2017 21:20:36 -0500
-Message-Id: <20170511022036.32225-21-eblake@redhat.com>
-In-Reply-To: <20170511022036.32225-1-eblake@redhat.com>
-References: <20170511022036.32225-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 20/20] block: Make bdrv_is_allocated_above()
- byte-based
+	(envelope-from <jasowang@redhat.com>) id 1d8eHi-0003fD-3R
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:57:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45926)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d8eHh-0003eW-Uw
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:56:58 -0400
+References: <1494403315-12760-1-git-send-email-peterx@redhat.com>
+	<1494403315-12760-10-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <722b6658-0169-584b-0d4d-e8f9d096be34@redhat.com>
+Date: Thu, 11 May 2017 10:56:42 +0800
+MIME-Version: 1.0
+In-Reply-To: <1494403315-12760-10-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 09/12] intel_iommu: allow dev-iotlb
+ context entry conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,362 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Lan Tianyu <tianyu.lan@intel.com>, yi.l.liu@intel.com, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  In the common case, allocation is unlikely to ever use
-values that are not naturally sector-aligned, but it is possible
-that byte-based values will let us be more precise about allocation
-at the end of an unaligned file that can do byte-based access.
 
-Changing the signature of the function to use int64_t *pnum ensures
-that the compiler enforces that all callers are updated.  For now,
-the io.c layer still assert()s that all callers are sector-aligned,
-but that can be relaxed when a later patch implements byte-based
-block status.  Therefore, for the most part this patch is just the
-addition of scaling at the callers followed by inverse scaling at
-bdrv_is_allocated().  But some code, particularly stream_run(),
-gets a lot simpler because it no longer has to mess with sectors.
 
-For ease of review, bdrv_is_allocated() was tackled separately.
+On 2017=E5=B9=B405=E6=9C=8810=E6=97=A5 16:01, Peter Xu wrote:
+> When device-iotlb is not specified, we should fail this check.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   hw/i386/intel_iommu.c | 13 ++++++++++++-
+>   1 file changed, 12 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 05ae631..1a7eba2 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -836,6 +836,8 @@ static int vtd_dev_to_context_entry(IntelIOMMUState=
+ *s, uint8_t bus_num,
+>   {
+>       VTDRootEntry re;
+>       int ret_fr;
+> +    bool type_fail =3D false;
+> +    X86IOMMUState *x86_iommu =3D X86_IOMMU_DEVICE(s);
+>  =20
+>       ret_fr =3D vtd_get_root_entry(s, bus_num, &re);
+>       if (ret_fr) {
+> @@ -872,10 +874,19 @@ static int vtd_dev_to_context_entry(IntelIOMMUSta=
+te *s, uint8_t bus_num,
+>       } else {
+>           switch (vtd_ce_get_type(ce)) {
+>           case VTD_CONTEXT_TT_MULTI_LEVEL:
+> -            /* fall through */
+> +            /* Always supported */
+> +            break;
+>           case VTD_CONTEXT_TT_DEV_IOTLB:
+> +            if (!x86_iommu->dt_supported) {
+> +                type_fail =3D true;
+> +            }
+>               break;
+>           default:
+> +            /* Unknwon type */
+> +            type_fail =3D true;
+> +            break;
+> +        }
+> +        if (type_fail) {
+>               trace_vtd_ce_invalid(ce->hi, ce->lo);
+>               return -VTD_FR_CONTEXT_ENTRY_INV;
+>           }
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+How about e.g exclude the type if not supported in vtd_ce_get_type()?=20
+This looks better than using something like type_fail.
 
----
-v2: tweak function comments, favor bdrv_getlength() over ->total_sectors
----
- include/block/block.h |  2 +-
- block/commit.c        | 20 ++++++++------------
- block/io.c            | 42 ++++++++++++++++++++----------------------
- block/mirror.c        |  5 ++++-
- block/replication.c   | 17 ++++++++++++-----
- block/stream.c        | 21 +++++++++------------
- qemu-img.c            | 10 +++++++---
- 7 files changed, 61 insertions(+), 56 deletions(-)
-
-diff --git a/include/block/block.h b/include/block/block.h
-index 47719ac..81e3325 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -437,7 +437,7 @@ int64_t bdrv_get_block_status_above(BlockDriverState *bs,
- int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
-                       int64_t *pnum);
- int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
--                            int64_t sector_num, int nb_sectors, int *pnum);
-+                            int64_t offset, int64_t bytes, int64_t *pnum);
-
- bool bdrv_is_read_only(BlockDriverState *bs);
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
-diff --git a/block/commit.c b/block/commit.c
-index 4d6bb2a..989de7d 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -132,7 +132,7 @@ static void coroutine_fn commit_run(void *opaque)
-     int64_t offset;
-     uint64_t delay_ns = 0;
-     int ret = 0;
--    int n = 0; /* sectors */
-+    int64_t n = 0; /* bytes */
-     void *buf = NULL;
-     int bytes_written = 0;
-     int64_t base_len;
-@@ -157,7 +157,7 @@ static void coroutine_fn commit_run(void *opaque)
-
-     buf = blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
-
--    for (offset = 0; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
-+    for (offset = 0; offset < s->common.len; offset += n) {
-         bool copy;
-
-         /* Note that even when no rate limit is applied we need to yield
-@@ -169,15 +169,12 @@ static void coroutine_fn commit_run(void *opaque)
-         }
-         /* Copy if allocated above the base */
-         ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base),
--                                      offset / BDRV_SECTOR_SIZE,
--                                      COMMIT_BUFFER_SIZE / BDRV_SECTOR_SIZE,
--                                      &n);
-+                                      offset, COMMIT_BUFFER_SIZE, &n);
-         copy = (ret == 1);
--        trace_commit_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
-+        trace_commit_one_iteration(s, offset, n, ret);
-         if (copy) {
--            ret = commit_populate(s->top, s->base, offset,
--                                  n * BDRV_SECTOR_SIZE, buf);
--            bytes_written += n * BDRV_SECTOR_SIZE;
-+            ret = commit_populate(s->top, s->base, offset, n, buf);
-+            bytes_written += n;
-         }
-         if (ret < 0) {
-             BlockErrorAction action =
-@@ -190,11 +187,10 @@ static void coroutine_fn commit_run(void *opaque)
-             }
-         }
-         /* Publish progress */
--        s->common.offset += n * BDRV_SECTOR_SIZE;
-+        s->common.offset += n;
-
-         if (copy && s->common.speed) {
--            delay_ns = ratelimit_calculate_delay(&s->limit,
--                                                 n * BDRV_SECTOR_SIZE);
-+            delay_ns = ratelimit_calculate_delay(&s->limit, n);
-         }
-     }
-
-diff --git a/block/io.c b/block/io.c
-index 20d3ebd..d4f1925 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1918,54 +1918,52 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
- /*
-  * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [TOP]
-  *
-- * Return true if the given sector is allocated in any image between
-- * BASE and TOP (inclusive).  BASE can be NULL to check if the given
-- * sector is allocated in any image of the chain.  Return false otherwise,
-+ * Return true if the (prefix of the) given range is allocated in any image
-+ * between BASE and TOP (inclusive).  BASE can be NULL to check if the given
-+ * offset is allocated in any image of the chain.  Return false otherwise,
-  * or negative errno on failure.
-  *
-- * 'pnum' is set to the number of sectors (including and immediately following
-- *  the specified sector) that are known to be in the same
-- *  allocated/unallocated state.
-+ * 'pnum' is set to the number of bytes (including and immediately
-+ * following the specified offset) that are known to be in the same
-+ * allocated/unallocated state.  Note that a subsequent call starting
-+ * at 'offset + *pnum' may return the same allocation status (in other
-+ * words, the result is not necessarily the maximum possible range);
-+ * but 'pnum' will only be 0 when end of file is reached.
-  *
-  */
- int bdrv_is_allocated_above(BlockDriverState *top,
-                             BlockDriverState *base,
--                            int64_t sector_num,
--                            int nb_sectors, int *pnum)
-+                            int64_t offset, int64_t bytes, int64_t *pnum)
- {
-     BlockDriverState *intermediate;
--    int ret, n = nb_sectors;
-+    int ret;
-+    int64_t n = bytes;
-
-     intermediate = top;
-     while (intermediate && intermediate != base) {
-         int64_t pnum_inter;
-         int64_t size_inter;
--        int psectors_inter;
-
--        ret = bdrv_is_allocated(intermediate, sector_num * BDRV_SECTOR_SIZE,
--                                nb_sectors * BDRV_SECTOR_SIZE,
--                                &pnum_inter);
-+        ret = bdrv_is_allocated(intermediate, offset, bytes, &pnum_inter);
-         if (ret < 0) {
-             return ret;
-         }
--        assert(pnum_inter < INT_MAX * BDRV_SECTOR_SIZE);
--        psectors_inter = pnum_inter >> BDRV_SECTOR_BITS;
-         if (ret) {
--            *pnum = psectors_inter;
-+            *pnum = pnum_inter;
-             return 1;
-         }
-
-         /*
--         * [sector_num, nb_sectors] is unallocated on top but intermediate
--         * might have [sector_num+x, nb_sectors-x] allocated.
-+         * [offset, bytes] is unallocated on top but intermediate
-+         * might have [offset+x, bytes-x] allocated.
-          */
--        size_inter = bdrv_nb_sectors(intermediate);
-+        size_inter = bdrv_getlength(intermediate);
-         if (size_inter < 0) {
-             return size_inter;
-         }
--        if (n > psectors_inter &&
--            (intermediate == top || sector_num + psectors_inter < size_inter)) {
--            n = psectors_inter;
-+        if (n > pnum_inter &&
-+            (intermediate == top || offset + pnum_inter < size_inter)) {
-+            n = pnum_inter;
-         }
-
-         intermediate = backing_bs(intermediate);
-diff --git a/block/mirror.c b/block/mirror.c
-index 2a95ba5..452d546 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -609,6 +609,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-     BlockDriverState *bs = s->source;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     int ret, n;
-+    int64_t count;
-
-     end = s->bdev_length / BDRV_SECTOR_SIZE;
-
-@@ -658,11 +659,13 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-             return 0;
-         }
-
--        ret = bdrv_is_allocated_above(bs, base, sector_num, nb_sectors, &n);
-+        ret = bdrv_is_allocated_above(bs, base, sector_num * BDRV_SECTOR_SIZE,
-+                                      nb_sectors * BDRV_SECTOR_SIZE, &count);
-         if (ret < 0) {
-             return ret;
-         }
-
-+        n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
-         assert(n > 0);
-         if (ret == 1) {
-             bdrv_set_dirty_bitmap(s->dirty_bitmap, sector_num, n);
-diff --git a/block/replication.c b/block/replication.c
-index 137a7fc..52f4a8e 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -264,7 +264,8 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
-     BdrvChild *top = bs->file;
-     BdrvChild *base = s->secondary_disk;
-     BdrvChild *target;
--    int ret, n;
-+    int ret;
-+    int64_t n;
-
-     ret = replication_get_io_status(s);
-     if (ret < 0) {
-@@ -283,14 +284,20 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
-      */
-     qemu_iovec_init(&hd_qiov, qiov->niov);
-     while (remaining_sectors > 0) {
--        ret = bdrv_is_allocated_above(top->bs, base->bs, sector_num,
--                                      remaining_sectors, &n);
-+        int64_t count;
-+
-+        ret = bdrv_is_allocated_above(top->bs, base->bs,
-+                                      sector_num * BDRV_SECTOR_SIZE,
-+                                      remaining_sectors * BDRV_SECTOR_SIZE,
-+                                      &count);
-         if (ret < 0) {
-             goto out1;
-         }
-
-+        assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
-+        n = count >> BDRV_SECTOR_BITS;
-         qemu_iovec_reset(&hd_qiov);
--        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, n * BDRV_SECTOR_SIZE);
-+        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, count);
-
-         target = ret ? top : base;
-         ret = bdrv_co_writev(target, sector_num, n, &hd_qiov);
-@@ -300,7 +307,7 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
-
-         remaining_sectors -= n;
-         sector_num += n;
--        bytes_done += n * BDRV_SECTOR_SIZE;
-+        bytes_done += count;
-     }
-
- out1:
-diff --git a/block/stream.c b/block/stream.c
-index 85502eb..9033655 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -112,7 +112,7 @@ static void coroutine_fn stream_run(void *opaque)
-     uint64_t delay_ns = 0;
-     int error = 0;
-     int ret = 0;
--    int n = 0; /* sectors */
-+    int64_t n = 0; /* bytes */
-     void *buf;
-
-     if (!bs->backing) {
-@@ -136,9 +136,8 @@ static void coroutine_fn stream_run(void *opaque)
-         bdrv_enable_copy_on_read(bs);
-     }
-
--    for ( ; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
-+    for ( ; offset < s->common.len; offset += n) {
-         bool copy;
--        int64_t count = 0;
-
-         /* Note that even when no rate limit is applied we need to yield
-          * with no pending I/O here so that bdrv_drain_all() returns.
-@@ -150,26 +149,25 @@ static void coroutine_fn stream_run(void *opaque)
-
-         copy = false;
-
--        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &count);
--        n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
-+        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &n);
-         if (ret == 1) {
-             /* Allocated in the top, no need to copy.  */
-         } else if (ret >= 0) {
-             /* Copy if allocated in the intermediate images.  Limit to the
-              * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
-             ret = bdrv_is_allocated_above(backing_bs(bs), base,
--                                          offset / BDRV_SECTOR_SIZE, n, &n);
-+                                          offset, n, &n);
-
-             /* Finish early if end of backing file has been reached */
-             if (ret == 0 && n == 0) {
--                n = (s->common.len - offset) / BDRV_SECTOR_SIZE;
-+                n = s->common.len - offset;
-             }
-
-             copy = (ret == 1);
-         }
--        trace_stream_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
-+        trace_stream_one_iteration(s, offset, n, ret);
-         if (copy) {
--            ret = stream_populate(blk, offset, n * BDRV_SECTOR_SIZE, buf);
-+            ret = stream_populate(blk, offset, n, buf);
-         }
-         if (ret < 0) {
-             BlockErrorAction action =
-@@ -188,10 +186,9 @@ static void coroutine_fn stream_run(void *opaque)
-         ret = 0;
-
-         /* Publish progress */
--        s->common.offset += n * BDRV_SECTOR_SIZE;
-+        s->common.offset += n;
-         if (copy && s->common.speed) {
--            delay_ns = ratelimit_calculate_delay(&s->limit,
--                                                 n * BDRV_SECTOR_SIZE);
-+            delay_ns = ratelimit_calculate_delay(&s->limit, n);
-         }
-     }
-
-diff --git a/qemu-img.c b/qemu-img.c
-index 3b17709..08864f3 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1476,12 +1476,16 @@ static int img_compare(int argc, char **argv)
-         }
-
-         for (;;) {
-+            int64_t count;
-+
-             nb_sectors = sectors_to_process(total_sectors_over, sector_num);
-             if (nb_sectors <= 0) {
-                 break;
-             }
--            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL, sector_num,
--                                          nb_sectors, &pnum);
-+            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL,
-+                                          sector_num * BDRV_SECTOR_SIZE,
-+                                          nb_sectors * BDRV_SECTOR_SIZE,
-+                                          &count);
-             if (ret < 0) {
-                 ret = 3;
-                 error_report("Sector allocation test failed for %s",
-@@ -1489,7 +1493,7 @@ static int img_compare(int argc, char **argv)
-                 goto out;
-
-             }
--            nb_sectors = pnum;
-+            nb_sectors = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
-             if (ret) {
-                 ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
-                                           filename_over, buf1, quiet);
--- 
-2.9.3
+Thanks
