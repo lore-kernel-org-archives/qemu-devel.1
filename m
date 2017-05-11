@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pA5-0001k2-4X
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:55 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAC-0001uw-2W
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pA1-0006xA-Iu
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pA6-00072S-I9
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:56 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:17 +0200
-Message-Id: <1494513181-7900-15-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:23 +0200
+Message-Id: <1494513181-7900-21-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 14/58] tests: Use null-co:// instead of
- /dev/null as the dummy image
+Subject: [Qemu-devel] [PULL 20/58] osdep: Fall back to posix lock when OFD
+ lock is unavailable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +26,75 @@ Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 From: Fam Zheng <famz@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/drive_del-test.c    | 2 +-
- tests/nvme-test.c         | 2 +-
- tests/usb-hcd-uhci-test.c | 2 +-
- tests/usb-hcd-xhci-test.c | 2 +-
- tests/virtio-blk-test.c   | 2 +-
- tests/virtio-scsi-test.c  | 5 +++--
- 6 files changed, 8 insertions(+), 7 deletions(-)
+ util/osdep.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
-index 121b9c9..2175139 100644
---- a/tests/drive_del-test.c
-+++ b/tests/drive_del-test.c
-@@ -92,7 +92,7 @@ static void test_after_failed_device_add(void)
- static void test_drive_del_device_del(void)
+diff --git a/util/osdep.c b/util/osdep.c
+index 3de4a18..a2863c8 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -38,6 +38,14 @@ extern int madvise(caddr_t, size_t, int);
+ #include "qemu/error-report.h"
+ #include "monitor/monitor.h"
+ 
++#ifdef F_OFD_SETLK
++#define QEMU_SETLK F_OFD_SETLK
++#define QEMU_GETLK F_OFD_GETLK
++#else
++#define QEMU_SETLK F_SETLK
++#define QEMU_GETLK F_GETLK
++#endif
++
+ static bool fips_enabled = false;
+ 
+ static const char *hw_version = QEMU_HW_VERSION;
+@@ -143,7 +151,6 @@ static int qemu_parse_fdset(const char *param)
+ 
+ static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
  {
-     /* Start with a drive used by a device that unplugs instantaneously */
--    qtest_start("-drive if=none,id=drive0,file=/dev/null,format=raw"
-+    qtest_start("-drive if=none,id=drive0,file=null-co://,format=raw"
-                 " -device virtio-scsi-pci"
-                 " -device scsi-hd,drive=drive0,id=dev0");
- 
-diff --git a/tests/nvme-test.c b/tests/nvme-test.c
-index c8bece4..7674a44 100644
---- a/tests/nvme-test.c
-+++ b/tests/nvme-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/nvme/nop", nop);
- 
--    qtest_start("-drive id=drv0,if=none,file=/dev/null,format=raw "
-+    qtest_start("-drive id=drv0,if=none,file=null-co://,format=raw "
-                 "-device nvme,drive=drv0,serial=foo");
-     ret = g_test_run();
- 
-diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
-index f25bae5..5b500fe 100644
---- a/tests/usb-hcd-uhci-test.c
-+++ b/tests/usb-hcd-uhci-test.c
-@@ -79,7 +79,7 @@ int main(int argc, char **argv)
- {
-     const char *arch = qtest_get_arch();
-     const char *cmd = "-device piix3-usb-uhci,id=uhci,addr=1d.0"
--                      " -drive id=drive0,if=none,file=/dev/null,format=raw"
-+                      " -drive id=drive0,if=none,file=null-co://,format=raw"
-                       " -device usb-tablet,bus=uhci.0,port=1";
+-#ifdef F_OFD_SETLK
      int ret;
+     struct flock fl = {
+         .l_whence = SEEK_SET,
+@@ -151,11 +158,8 @@ static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
+         .l_len    = len,
+         .l_type   = fl_type,
+     };
+-    ret = fcntl(fd, F_OFD_SETLK, &fl);
++    ret = fcntl(fd, QEMU_SETLK, &fl);
+     return ret == -1 ? -errno : 0;
+-#else
+-    return -ENOTSUP;
+-#endif
+ }
  
-diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
-index 22513e9..031764d 100644
---- a/tests/usb-hcd-xhci-test.c
-+++ b/tests/usb-hcd-xhci-test.c
-@@ -89,7 +89,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/xhci/pci/hotplug/usb-uas", test_usb_uas_hotplug);
+ int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive)
+@@ -170,7 +174,6 @@ int qemu_unlock_fd(int fd, int64_t start, int64_t len)
  
-     qtest_start("-device nec-usb-xhci,id=xhci"
--                " -drive id=drive0,if=none,file=/dev/null,format=raw");
-+                " -drive id=drive0,if=none,file=null-co://,format=raw");
-     ret = g_test_run();
-     qtest_end();
- 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 1eee95d..fd2078c 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -63,7 +63,7 @@ static QOSState *pci_test_start(void)
-     const char *arch = qtest_get_arch();
-     char *tmp_path;
-     const char *cmd = "-drive if=none,id=drive0,file=%s,format=raw "
--                      "-drive if=none,id=drive1,file=/dev/null,format=raw "
-+                      "-drive if=none,id=drive1,file=null-co://,format=raw "
-                       "-device virtio-blk-pci,id=drv0,drive=drive0,"
-                       "addr=%x.%x";
- 
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 0eabd56..8b0f77a 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -35,7 +35,7 @@ typedef struct {
- static QOSState *qvirtio_scsi_start(const char *extra_opts)
+ int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
  {
-     const char *arch = qtest_get_arch();
--    const char *cmd = "-drive id=drv0,if=none,file=/dev/null,format=raw "
-+    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
-                       "-device virtio-scsi-pci,id=vs0 "
-                       "-device scsi-hd,bus=vs0.0,drive=drv0 %s";
+-#ifdef F_OFD_SETLK
+     int ret;
+     struct flock fl = {
+         .l_whence = SEEK_SET,
+@@ -178,15 +181,12 @@ int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
+         .l_len    = len,
+         .l_type   = exclusive ? F_WRLCK : F_RDLCK,
+     };
+-    ret = fcntl(fd, F_OFD_GETLK, &fl);
++    ret = fcntl(fd, QEMU_GETLK, &fl);
+     if (ret == -1) {
+         return -errno;
+     } else {
+         return fl.l_type == F_UNLCK ? 0 : -EAGAIN;
+     }
+-#else
+-    return -ENOTSUP;
+-#endif
+ }
+ #endif
  
-@@ -195,7 +195,8 @@ static void hotplug(void)
-     QDict *response;
-     QOSState *qs;
- 
--    qs = qvirtio_scsi_start("-drive id=drv1,if=none,file=/dev/null,format=raw");
-+    qs = qvirtio_scsi_start(
-+            "-drive id=drv1,if=none,file=null-co://,format=raw");
-     response = qmp("{\"execute\": \"device_add\","
-                    " \"arguments\": {"
-                    "   \"driver\": \"scsi-hd\","
 -- 
 1.8.3.1
