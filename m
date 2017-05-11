@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d8uok-0000Gf-RG
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:36:11 -0400
+	(envelope-from <jcody@redhat.com>) id 1d8usd-0001zx-79
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:40:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d8uoh-0004uy-NL
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:36:10 -0400
-Date: Thu, 11 May 2017 16:36:04 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170511203604.GS24584@stefanha-x1.localdomain>
-References: <20170419094356.19826-1-famz@redhat.com>
-	<20170419094356.19826-17-famz@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1d8usc-0007h4-7G
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:40:11 -0400
+Date: Thu, 11 May 2017 16:40:03 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170511204003.GB19824@localhost.localdomain>
+References: <20170510143205.32013-1-pbonzini@redhat.com>
+	<20170510143205.32013-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="vEk28Nl/eckWL8CC"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170419094356.19826-17-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] tests: Add test case for
- BLK_PERM_AIO_CONTEXT_CHANGE
+In-Reply-To: <20170510143205.32013-3-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/7] curl: never invoke callbacks with
+ s->mutex held
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
 
+On Wed, May 10, 2017 at 04:32:00PM +0200, Paolo Bonzini wrote:
+> All curl callbacks go through curl_multi_do, and hence are called with
+> s->mutex held.  Note that with comments, and make curl_read_cb drop the
+> lock before invoking the callback.
+> 
+> Likewise for curl_find_buf, where the callback can be invoked by the
+> caller.
+> 
+> Cc: qemu-stable@nongnu.org
+> Cc: jcody@redhat.com
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/curl.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/curl.c b/block/curl.c
+> index 25a301e7b4..9a00fdc28e 100644
+> --- a/block/curl.c
+> +++ b/block/curl.c
+> @@ -147,6 +147,7 @@ static void curl_multi_do(void *arg);
+>  static void curl_multi_read(void *arg);
+>  
+>  #ifdef NEED_CURL_TIMER_CALLBACK
+> +/* Called from curl_multi_do_locked, with s->mutex held.  */
+>  static int curl_timer_cb(CURLM *multi, long timeout_ms, void *opaque)
+>  {
+>      BDRVCURLState *s = opaque;
+> @@ -163,6 +164,7 @@ static int curl_timer_cb(CURLM *multi, long timeout_ms, void *opaque)
+>  }
+>  #endif
+>  
+> +/* Called from curl_multi_do_locked, with s->mutex held.  */
+>  static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+>                          void *userp, void *sp)
+>  {
+> @@ -212,6 +214,7 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+>      return 0;
+>  }
+>  
+> +/* Called from curl_multi_do_locked, with s->mutex held.  */
+>  static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+>  {
+>      BDRVCURLState *s = opaque;
+> @@ -226,6 +229,7 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+>      return realsize;
+>  }
+>  
+> +/* Called from curl_multi_do_locked, with s->mutex held.  */
+>  static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+>  {
+>      CURLState *s = ((CURLState*)opaque);
+> @@ -264,7 +268,9 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+>                                    request_length - offset);
+>              }
+>  
+> +            qemu_mutex_unlock(&s->s->mutex);
+>              acb->common.cb(acb->common.opaque, 0);
+> +            qemu_mutex_lock(&s->s->mutex);
+>              qemu_aio_unref(acb);
+>              s->acb[i] = NULL;
+>          }
+> @@ -305,8 +311,6 @@ static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
+>              if (clamped_len < len) {
+>                  qemu_iovec_memset(acb->qiov, clamped_len, 0, len - clamped_len);
+>              }
+> -            acb->common.cb(acb->common.opaque, 0);
+> -
+>              return FIND_RET_OK;
+>          }
+>  
+> @@ -832,8 +836,8 @@ static void curl_readv_bh_cb(void *p)
+>      // we can just call the callback and be done.
+>      switch (curl_find_buf(s, start, acb->nb_sectors * BDRV_SECTOR_SIZE, acb)) {
+>          case FIND_RET_OK:
+> -            qemu_aio_unref(acb);
+> -            // fall through
+> +            ret = 0;
+> +            goto out;
+>          case FIND_RET_WAIT:
+>              goto out;
+>          default:
+> -- 
+> 2.12.2
+> 
+>
 
---vEk28Nl/eckWL8CC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, Apr 19, 2017 at 05:43:56PM +0800, Fam Zheng wrote:
-> +static void test_aio_context_failure(void)
-> +{
-> +    Error *local_err = NULL;
-> +    BlockBackend *blk1 = blk_new(BLK_PERM_AIO_CONTEXT_CHANGE,
-> +                                 BLK_PERM_ALL & ~BLK_PERM_AIO_CONTEXT_CHANGE);
-> +    BlockBackend *blk2 = blk_new(BLK_PERM_AIO_CONTEXT_CHANGE, BLK_PERM_ALL);
-> +    BlockDriverState *bs = bdrv_open("null-co://", NULL, NULL, 0, &error_abort);
-> +
-> +    blk_insert_bs(blk1, bs, &error_abort);
-> +    blk_insert_bs(blk2, bs, &local_err);
-> +
-> +    g_assert_nonnull(local_err);
-
-The following asserts and also frees the Error object to prevent leaking
-memory:
-
-error_free_or_abort(local_err);
-
---vEk28Nl/eckWL8CC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZFMs0AAoJEJykq7OBq3PI3SYH/1x0Ig07RI3kOmLuYTKM6wk3
-5WLdFh4NdakyAdg+4Mp436O4IsG+ROhTcPzPodi4j8zz9sYIxJwxnW7A22H2bQ/O
-Mtnrm7arxkt8kUZ/gy5ExFicaD6TJXeJg3If+KBTgqSjfwSFEo+0xjGOvmEM2iPY
-gC7a8v+mTncZxmTwmrAF1pzio7xU/26jzUkx2bkBWYFxC5hEqtG/aaRH/Qx2a/Xx
-wdKKYXC8fMAnEXjAfsdc7wmfqfWDYvQxH+yCvQR2xiICB4dmjabh/tEd8WTMNjkT
-yladjiM4eMvOE6VH7YCOrSgMMRfWYRH2gV11GieIm0YI+SLvSL7tU+9OrVwJ9Ns=
-=Gg8e
------END PGP SIGNATURE-----
-
---vEk28Nl/eckWL8CC--
+Reviewed-by: Jeff Cody <jcody@redhat.com>
