@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d8tZC-0000XI-47
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:16:02 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d8taG-00015E-F5
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d8tZ8-0004yc-Q9
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:16:02 -0400
-Date: Thu, 11 May 2017 15:15:55 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d8taD-0006BZ-9U
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:17:08 -0400
+Date: Thu, 11 May 2017 15:17:01 -0400
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170511191555.GB24584@stefanha-x1.localdomain>
+Message-ID: <20170511191701.GC24584@stefanha-x1.localdomain>
 References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492005921-15664-6-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="z6Eq5LdranGa6ru8"
+	protocol="application/pgp-signature"; boundary="L6iaP+gRLNZHKoI4"
 Content-Disposition: inline
-In-Reply-To: <1492005921-15664-6-git-send-email-zhang.zhanghailiang@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v4 5/6] replication: Implement block
- replication for shared disk case
+In-Reply-To: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 0/6] COLO block replication
+ supports shared disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +25,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, Wen Congyang <wency@cn.fujitsu.com>, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, qemu-block@nongnu.org, zhangchen.fnst@cn.fujitsu.com, eddie.dong@intel.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
---z6Eq5LdranGa6ru8
+--L6iaP+gRLNZHKoI4
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 12, 2017 at 10:05:20PM +0800, zhanghailiang wrote:
-> @@ -612,6 +644,16 @@ static void replication_do_checkpoint(ReplicationState *rs, Error **errp)
->                  error_propagate(errp, local_err);
->                  break;
->              }
-> +        } else {
-> +            /*
-> +             * For shared disk, we need to force SVM to re-read metadata
-> +             * that is loaded in memory, or there will be inconsistent.
-> +             */
-> +            bdrv_invalidate_cache(s->secondary_disk->bs, &local_err);
+On Wed, Apr 12, 2017 at 10:05:15PM +0800, zhanghailiang wrote:
+> COLO block replication doesn't support the shared disk case,
+> Here we try to implement it and this is the 4th version.
+>=20
+> Please review and any commits are welcomed.
+>=20
+> Cc: Dr. David Alan Gilbert (git) <dgilbert@redhat.com>
+> Cc: eddie.dong@intel.com
 
-I'm not sure this call has any effect:
+Sorry for the delay.  Feel free to ping me if I don't review within a
+few days when you post a patch.
 
-    if (!(bs->open_flags & BDRV_O_INACTIVE)) {
-        return;
-    }
+> v4:
+> - Add proper comment for primary_disk in patch 2 (Stefan)
+> - Call bdrv_invalidate_cache() while do checkpoint for shared disk in pat=
+ch 5
+>=20
+> v3:
+> - Fix some comments from Stefan and Eric
+>=20
+> v2:
+> - Drop the patch which add a blk_root() helper
+> - Fix some comments from Changlong
+>=20
+> zhanghailiang (6):
+>   docs/block-replication: Add description for shared-disk case
+>   replication: add shared-disk and shared-disk-id options
+>   replication: Split out backup_do_checkpoint() from
+>     secondary_do_checkpoint()
+>   replication: fix code logic with the new shared_disk option
+>   replication: Implement block replication for shared disk case
+>   nbd/replication: implement .bdrv_get_info() for nbd and replication
+>     driver
+>=20
+>  block/nbd.c                |  12 +++
+>  block/replication.c        | 198 ++++++++++++++++++++++++++++++++++-----=
+------
+>  docs/block-replication.txt | 139 ++++++++++++++++++++++++++++++-
+>  qapi/block-core.json       |  10 ++-
+>  4 files changed, 306 insertions(+), 53 deletions(-)
+>=20
+> --=20
+> 1.8.3.1
+>=20
+>=20
+>=20
 
-Is BDRV_O_INACTIVE set?
-
---z6Eq5LdranGa6ru8
+--L6iaP+gRLNZHKoI4
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZFLhrAAoJEJykq7OBq3PIPBgH/i+39CU6gWF13nZXJ57StOvb
-mDLfuwU64TA2f8WwCSQWjHPudi6d/cR5/bVwzm4mDnYKHycd0s2gcgE94BaG7Lxl
-PtPTePeZOZEwcYbl2N0toH00CA41fPM8UzRagC/hOy6UvkY9kYbSNQJeAeIhR9uh
-iKrUdY+3YB1LZj1iTbUxf7aPYw8p1ZHIutwcPn+yMTCi6n/l+/OnvM8Byg4CoEt2
-VXxF0cF0wqIVl/qPz0VZXVoUiOM+A3nA27RMh2fkiUUb/S6Q8wMgFJUa93gE0txT
-zrmE571QZqBYNBAfSJUy+VLj9saqHwQI4GL00iBh8F1QpOjVzEDDI9KYCc9WrV8=
-=vekF
+iQEcBAEBAgAGBQJZFLitAAoJEJykq7OBq3PI4KEH+wRIfUv3Ok/KCpmudQQVjtFE
+YO6KXnZneeXUIZUXGZKK8Ygie4REG72xteC+KzKq9Eo9rWj7QgkLCLQM6x+L0Q6k
+x9/Kx5aD5x08tZRGopqNNVu4eCu3kZGwT1L1f6h6F7o7J8saVRipYe6jONVG6J7C
+KS6fumCOT7EAbfokoOYITgJ6JHLvFovMbDE+7a7gzwDWj2uYHOFNi9pvFYIoWqA/
+d4RVMfAVumDkr5nrbkmZqffNL7ntA6qv0mRNOn+4A1pioKzGJbETLer4ggCnKVvV
+TtqZg7QMuDT9DPFfH1XToZd2Tjq7Y0qxqhdOeIExXpeYMMwJh3hTnh4OX1ViYJo=
+=fVof
 -----END PGP SIGNATURE-----
 
---z6Eq5LdranGa6ru8--
+--L6iaP+gRLNZHKoI4--
