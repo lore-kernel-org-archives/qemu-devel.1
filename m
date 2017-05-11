@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAR-0002Kf-Qt
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:13 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAb-0002Tq-6g
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAQ-0007RU-Mx
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAa-0007bi-0Z
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:21 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:32 +0200
-Message-Id: <1494513181-7900-30-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:37 +0200
+Message-Id: <1494513181-7900-35-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 29/58] block: New BdrvChildRole.activate() for
- blk_resume_after_migration()
+Subject: [Qemu-devel] [PULL 34/58] qemu-img: wait for convert coroutines to
+ complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,208 +23,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-Instead of manually calling blk_resume_after_migration() in migration
-code after doing bdrv_invalidate_cache_all(), integrate the BlockBackend
-activation with cache invalidation into a single function. This is
-achieved with a new callback in BdrvChildRole that is called by
-bdrv_invalidate_cache_all().
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
+On error path (like i/o error in one of the coroutines), it's required to
+  - wait for coroutines completion before cleaning the common structures
+  - reenter dependent coroutines so they ever finish
+
+Introduced in 2d9187bc65.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Peter Lieven <pl@kamp.de>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c                   | 12 +++++++++-
- block/block-backend.c     | 56 +++++++++++++++++++++++------------------------
- include/block/block.h     |  2 --
- include/block/block_int.h |  5 +++++
- migration/migration.c     |  3 ---
- migration/savevm.c        |  3 ---
- qmp.c                     |  6 -----
- 7 files changed, 44 insertions(+), 43 deletions(-)
+ qemu-img.c | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
 
-diff --git a/block.c b/block.c
-index 1e00e31..c8e6de2 100644
---- a/block.c
-+++ b/block.c
-@@ -3949,7 +3949,7 @@ void bdrv_init_with_whitelist(void)
+diff --git a/qemu-img.c b/qemu-img.c
+index 418f061..b506839 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1761,13 +1761,13 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+         qemu_co_mutex_lock(&s->lock);
+         if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
+             qemu_co_mutex_unlock(&s->lock);
+-            goto out;
++            break;
+         }
+         n = convert_iteration_sectors(s, s->sector_num);
+         if (n < 0) {
+             qemu_co_mutex_unlock(&s->lock);
+             s->ret = n;
+-            goto out;
++            break;
+         }
+         /* save current sector and allocation status to local variables */
+         sector_num = s->sector_num;
+@@ -1792,7 +1792,6 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+                 error_report("error while reading sector %" PRId64
+                              ": %s", sector_num, strerror(-ret));
+                 s->ret = ret;
+-                goto out;
+             }
+         } else if (!s->min_sparse && status == BLK_ZERO) {
+             status = BLK_DATA;
+@@ -1801,22 +1800,20 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
  
- void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
- {
--    BdrvChild *child;
-+    BdrvChild *child, *parent;
-     Error *local_err = NULL;
-     int ret;
+         if (s->wr_in_order) {
+             /* keep writes in order */
+-            while (s->wr_offs != sector_num) {
+-                if (s->ret != -EINPROGRESS) {
+-                    goto out;
+-                }
++            while (s->wr_offs != sector_num && s->ret == -EINPROGRESS) {
+                 s->wait_sector_num[index] = sector_num;
+                 qemu_coroutine_yield();
+             }
+             s->wait_sector_num[index] = -1;
+         }
  
-@@ -3985,6 +3985,16 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
-         error_setg_errno(errp, -ret, "Could not refresh total sector count");
-         return;
-     }
-+
-+    QLIST_FOREACH(parent, &bs->parents, next_parent) {
-+        if (parent->role->activate) {
-+            parent->role->activate(parent, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                return;
+-        ret = convert_co_write(s, sector_num, n, buf, status);
+-        if (ret < 0) {
+-            error_report("error while writing sector %" PRId64
+-                         ": %s", sector_num, strerror(-ret));
+-            s->ret = ret;
+-            goto out;
++        if (s->ret == -EINPROGRESS) {
++            ret = convert_co_write(s, sector_num, n, buf, status);
++            if (ret < 0) {
++                error_report("error while writing sector %" PRId64
++                             ": %s", sector_num, strerror(-ret));
++                s->ret = ret;
 +            }
-+        }
-+    }
- }
+         }
  
- void bdrv_invalidate_cache_all(Error **errp)
-diff --git a/block/block-backend.c b/block/block-backend.c
-index f5bf13e..a7ce72b 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -130,6 +130,32 @@ static const char *blk_root_get_name(BdrvChild *child)
-     return blk_name(child->opaque);
- }
- 
-+/*
-+ * Notifies the user of the BlockBackend that migration has completed. qdev
-+ * devices can tighten their permissions in response (specifically revoke
-+ * shared write permissions that we needed for storage migration).
-+ *
-+ * If an error is returned, the VM cannot be allowed to be resumed.
-+ */
-+static void blk_root_activate(BdrvChild *child, Error **errp)
-+{
-+    BlockBackend *blk = child->opaque;
-+    Error *local_err = NULL;
-+
-+    if (!blk->disable_perm) {
-+        return;
-+    }
-+
-+    blk->disable_perm = false;
-+
-+    blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        blk->disable_perm = true;
-+        return;
-+    }
-+}
-+
- static const BdrvChildRole child_root = {
-     .inherit_options    = blk_root_inherit_options,
- 
-@@ -140,6 +166,8 @@ static const BdrvChildRole child_root = {
- 
-     .drained_begin      = blk_root_drained_begin,
-     .drained_end        = blk_root_drained_end,
-+
-+    .activate           = blk_root_activate,
- };
- 
- /*
-@@ -601,34 +629,6 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
-     *shared_perm = blk->shared_perm;
- }
- 
--/*
-- * Notifies the user of all BlockBackends that migration has completed. qdev
-- * devices can tighten their permissions in response (specifically revoke
-- * shared write permissions that we needed for storage migration).
-- *
-- * If an error is returned, the VM cannot be allowed to be resumed.
-- */
--void blk_resume_after_migration(Error **errp)
--{
--    BlockBackend *blk;
--    Error *local_err = NULL;
--
--    for (blk = blk_all_next(NULL); blk; blk = blk_all_next(blk)) {
--        if (!blk->disable_perm) {
--            continue;
--        }
--
--        blk->disable_perm = false;
--
--        blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            blk->disable_perm = true;
--            return;
--        }
--    }
--}
--
- static int blk_do_attach_dev(BlockBackend *blk, void *dev)
- {
-     if (blk->dev) {
-diff --git a/include/block/block.h b/include/block/block.h
-index 877fbb0..80d51d8 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -369,8 +369,6 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp);
- void bdrv_invalidate_cache_all(Error **errp);
- int bdrv_inactivate_all(void);
- 
--void blk_resume_after_migration(Error **errp);
--
- /* Ensure contents are flushed to disk.  */
- int bdrv_flush(BlockDriverState *bs);
- int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 1b4d08e..5637925 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -473,6 +473,11 @@ struct BdrvChildRole {
-     void (*drained_begin)(BdrvChild *child);
-     void (*drained_end)(BdrvChild *child);
- 
-+    /* Notifies the parent that the child has been activated (e.g. when
-+     * migration is completing) and it can start requesting permissions and
-+     * doing I/O on it. */
-+    void (*activate)(BdrvChild *child, Error **errp);
-+
-     void (*attach)(BdrvChild *child);
-     void (*detach)(BdrvChild *child);
- };
-diff --git a/migration/migration.c b/migration/migration.c
-index 04af719..a5ade23 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -341,9 +341,6 @@ static void process_incoming_migration_bh(void *opaque)
-     /* Make sure all file formats flush their mutable metadata.
-      * If we get an error here, just don't restart the VM yet. */
-     bdrv_invalidate_cache_all(&local_err);
--    if (!local_err) {
--        blk_resume_after_migration(&local_err);
--    }
-     if (local_err) {
-         error_report_err(local_err);
-         local_err = NULL;
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 3ca8d11..7f66d58 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1615,9 +1615,6 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
-     /* Make sure all file formats flush their mutable metadata.
-      * If we get an error here, just don't restart the VM yet. */
-     bdrv_invalidate_cache_all(&local_err);
--    if (!local_err) {
--        blk_resume_after_migration(&local_err);
--    }
-     if (local_err) {
-         error_report_err(local_err);
-         local_err = NULL;
-diff --git a/qmp.c b/qmp.c
-index 25b5050..f656940 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -207,12 +207,6 @@ void qmp_cont(Error **errp)
-         return;
+         if (s->wr_in_order) {
+@@ -1837,7 +1834,6 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+         }
      }
  
--    blk_resume_after_migration(&local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
-     if (runstate_check(RUN_STATE_INMIGRATE)) {
-         autostart = 1;
-     } else {
+-out:
+     qemu_vfree(buf);
+     s->co[index] = NULL;
+     s->running_coroutines--;
+@@ -1899,7 +1895,7 @@ static int convert_do_copy(ImgConvertState *s)
+         qemu_coroutine_enter(s->co[i]);
+     }
+ 
+-    while (s->ret == -EINPROGRESS) {
++    while (s->running_coroutines) {
+         main_loop_wait(false);
+     }
+ 
 -- 
 1.8.3.1
