@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8dix-000364-9x
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:21:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8diz-00038i-Hk
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8dit-0005Gs-VL
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:21:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8diy-0005LM-IR
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:21:05 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 10 May 2017 21:20:24 -0500
-Message-Id: <20170511022036.32225-9-eblake@redhat.com>
+Date: Wed, 10 May 2017 21:20:25 -0500
+Message-Id: <20170511022036.32225-10-eblake@redhat.com>
 In-Reply-To: <20170511022036.32225-1-eblake@redhat.com>
 References: <20170511022036.32225-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/20] mirror: Switch
- mirror_do_zero_or_discard() to byte-based
+Subject: [Qemu-devel] [PATCH v2 09/20] mirror: Update signature of
+ mirror_clip_sectors()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +23,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Convert another internal
-function (no semantic change).
+Rather than having a void function that modifies its input
+in-place as the output, change the signature to reduce a layer
+of indirection and return the result.
 
+Suggested-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v2: no change
+v2: new patch
 ---
- block/mirror.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ block/mirror.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/block/mirror.c b/block/mirror.c
-index d0544e3..dc99435 100644
+index dc99435..f023a0d 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -305,8 +305,8 @@ static int mirror_do_read(MirrorBlockJob *s, int64_t sector_num,
+@@ -176,12 +176,12 @@ static void mirror_read_complete(void *opaque, int ret)
+     aio_context_release(blk_get_aio_context(s->common.blk));
  }
 
- static void mirror_do_zero_or_discard(MirrorBlockJob *s,
--                                      int64_t sector_num,
--                                      int nb_sectors,
-+                                      int64_t offset,
-+                                      uint64_t bytes,
-                                       bool is_discard)
+-static inline void mirror_clip_sectors(MirrorBlockJob *s,
+-                                       int64_t sector_num,
+-                                       int *nb_sectors)
++static inline int mirror_clip_sectors(MirrorBlockJob *s,
++                                      int64_t sector_num,
++                                      int nb_sectors)
  {
-     MirrorOp *op;
-@@ -315,16 +315,16 @@ static void mirror_do_zero_or_discard(MirrorBlockJob *s,
-      * so the freeing in mirror_iteration_done is nop. */
-     op = g_new0(MirrorOp, 1);
-     op->s = s;
--    op->offset = sector_num * BDRV_SECTOR_SIZE;
--    op->bytes = nb_sectors * BDRV_SECTOR_SIZE;
-+    op->offset = offset;
-+    op->bytes = bytes;
+-    *nb_sectors = MIN(*nb_sectors,
+-                      s->bdev_length / BDRV_SECTOR_SIZE - sector_num);
++    return MIN(nb_sectors,
++               s->bdev_length / BDRV_SECTOR_SIZE - sector_num);
+ }
 
-     s->in_flight++;
--    s->bytes_in_flight += nb_sectors * BDRV_SECTOR_SIZE;
-+    s->bytes_in_flight += bytes;
-     if (is_discard) {
--        blk_aio_pdiscard(s->target, sector_num << BDRV_SECTOR_BITS,
-+        blk_aio_pdiscard(s->target, offset,
-                          op->bytes, mirror_write_complete, op);
-     } else {
--        blk_aio_pwrite_zeroes(s->target, sector_num * BDRV_SECTOR_SIZE,
-+        blk_aio_pwrite_zeroes(s->target, offset,
-                               op->bytes, s->unmap ? BDRV_REQ_MAY_UNMAP : 0,
-                               mirror_write_complete, op);
+ /* Round sector_num and/or nb_sectors to target cluster if COW is needed, and
+@@ -216,7 +216,8 @@ static int mirror_cow_align(MirrorBlockJob *s,
      }
-@@ -448,7 +448,8 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-             break;
-         case MIRROR_METHOD_ZERO:
-         case MIRROR_METHOD_DISCARD:
--            mirror_do_zero_or_discard(s, sector_num, io_sectors,
-+            mirror_do_zero_or_discard(s, sector_num * BDRV_SECTOR_SIZE,
-+                                      io_sectors * BDRV_SECTOR_SIZE,
-                                       mirror_method == MIRROR_METHOD_DISCARD);
-             if (write_zeroes_ok) {
-                 io_bytes_acct = 0;
-@@ -645,7 +646,8 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-                 continue;
-             }
+     /* Clipping may result in align_nb_sectors unaligned to chunk boundary, but
+      * that doesn't matter because it's already the end of source image. */
+-    mirror_clip_sectors(s, align_sector_num, &align_nb_sectors);
++    align_nb_sectors = mirror_clip_sectors(s, align_sector_num,
++                                           align_nb_sectors);
 
--            mirror_do_zero_or_discard(s, sector_num, nb_sectors, false);
-+            mirror_do_zero_or_discard(s, sector_num * BDRV_SECTOR_SIZE,
-+                                      nb_sectors * BDRV_SECTOR_SIZE, false);
-             sector_num += nb_sectors;
+     ret = align_sector_num + align_nb_sectors - (*sector_num + *nb_sectors);
+     *sector_num = align_sector_num;
+@@ -440,7 +441,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+             return 0;
          }
 
+-        mirror_clip_sectors(s, sector_num, &io_sectors);
++        io_sectors = mirror_clip_sectors(s, sector_num, io_sectors);
+         switch (mirror_method) {
+         case MIRROR_METHOD_COPY:
+             io_sectors = mirror_do_read(s, sector_num, io_sectors);
 -- 
 2.9.3
