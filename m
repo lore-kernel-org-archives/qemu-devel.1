@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d8iQN-0004Zi-UL
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:22:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1d8iUf-0005ct-VV
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d8iQK-0003wU-P3
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:22:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41526)
+	(envelope-from <armbru@redhat.com>) id 1d8iUZ-0006t2-Sm
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:26:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41002)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d8iQK-0003vy-HB
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:22:08 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d8iUZ-0006rn-MP
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:26:31 -0400
+From: Markus Armbruster <armbru@redhat.com>
 References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
-	<20170510090841.GF31558@redhat.com>
-	<e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
-	<20170510103153.GI31558@redhat.com>
-	<ccb8fecd-e918-1cc0-28ef-af9865540fbc@redhat.com>
-	<157a6609-d75a-5d40-e5b9-c70802e40950@redhat.com>
-	<87pofflvn5.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <91ca8eba-6ef9-588c-a6d5-1ce0e2664bf2@redhat.com>
-Date: Thu, 11 May 2017 09:21:57 +0200
+	<20170510090841.GF31558@redhat.com> <20170510145125.GE4230@work-vm>
+	<20170510150452.GV31558@redhat.com> <20170510151404.GF4230@work-vm>
+Date: Thu, 11 May 2017 09:26:22 +0200
+In-Reply-To: <20170510151404.GF4230@work-vm> (David Alan Gilbert's message of
+	"Wed, 10 May 2017 16:14:05 +0100")
+Message-ID: <87h90rluqp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87pofflvn5.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
  pc-0.15
 List-Id: <qemu-devel.nongnu.org>
@@ -33,50 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kraxel@redhat.com, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 11.05.2017 09:06, Markus Armbruster wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> On 10/05/2017 16:47, Thomas Huth wrote:
->>>> So while we can delete pc-0.12, we can't delete associated features needed
->>>> by pc-0.12, without complicating RHEL's ability to create its back-compat
->>>> machine types. Downstream would have to un-delete the features.
->>>
->>> So I guess this is why Paolo said that pc-0.12 is still in "use" ... I
->>> think removing pc-0.12, but not removing rombar=0 will cause confusion
->>> in the upstream code base sooner or later,
->>
->> I agree.
->>
->>> so I guess we should rather
->>> keep the pc-0.12 machine until we can get rid of it together with the
->>> rombar code. We should still mark it as deprecated, of course.
->>>
->>>> I think tieing removal to major versions is a mistake, unless we're
->>>> going to set a fixed timeframe for delivery of major versions. ie if
->>>> we gaurantee that we'll ship a new major version every 18 months, that
->>>> gives people a predictable lifetime.  If we carry on inventing reasons
->>>> for major versions at arbitrary points in time, it makes it difficult
->>>> to have any reasonable forward planning.  It is more users friendly if
->>>> we can set a clear fixed timeframe for machine type lifecycle / eol
->>>
->>> IMHO we should have a new major release after we've reached a .9 minor
->>> release, but so far it seems like I'm the only one with that wish...
->>
->> I actually like that, but then you've pretty much guaranteed that you
->> _cannot_ remove anything deprecated until 4.0.  You and Daniel aren't
->> disagreeing as heavily as it seems, I think.
-> 
-> Even better: drop the '.', and stop worrying about having to wait for
-> some arbitrary number to come up before you're allowed to do something
-> ;)
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-I agree, we shouldn't limit ourselves by saying that we can only remove
-things when switching to a new major release. But I still think that
-also having "regular" major releases (e.g. after each .9 minor release)
-could also help us to remind ourselves to do some bigger (and likely
-necessary) spring-cleaning regularly.
+> * Daniel P. Berrange (berrange@redhat.com) wrote:
+>> On Wed, May 10, 2017 at 03:51:25PM +0100, Dr. David Alan Gilbert wrote:
+>> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+>> > > If we deprecate in this release (~Aug/Sep 2017), and kill in the next
+>> > > release  (Dec 2017), that means our oldest machine type pc-1.0 is still
+>> > > going to be 6 years, or 18 major releases, old. This raises some questions
+>> > > 
+>> > >   - Do we really think that we still have users with VMs that are
+>> > >     stuck on a 6 year old machine type from 18 major releases ago ?
+>> > 
+>> > Our RHEL6 users are still on a 0.12 derivative.
+>> 
+>> Yep, but not using upstream machine types. So we can kill machine
+>> types without affecting RHEL-6.  The separate question is whether
+>> we can kill the associated features that are needed for RHEL to
+>> create its legacy machine types (eg the rombar setting mentioned)
+>
+> Right, it just felt a bit odd to kill it off upstream if we know
+> of users ourselves who use old versions like that.
+>
+> Also remember machine types are not just about migration compatibility;
+> if we kill a machine type then:
+>   a) The users will need to modify their libvirt xml for each VM to
+> change machine type
 
- Thomas
+Point taken.  But if this inconvenience is unacceptable, consider an
+enterprise distribution, or maybe CentOS.
+
+>   b) That change in guest view of the machine might upset the OS
+> installed.
+
+Unlikely, unless you migrate without a reboot.  Guests almost always
+adapt to minor hardware changes on reboot just fine.
+
+> I've certainly got VMs that were installed ages ago and are still using
+> the XML from the old installation; so that probably means using an old
+> machine type on a modern QEMU.
+
+Eventually, that becomes as likely to actually work as rebooting with a
+newer machine type :)
