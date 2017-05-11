@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAF-0001ya-1m
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAG-00023m-F7
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAB-00076u-Nt
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAF-0007A0-76
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:00 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:24 +0200
-Message-Id: <1494513181-7900-22-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:28 +0200
+Message-Id: <1494513181-7900-26-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 21/58] file-posix: Add image locking to perm
- operations
+Subject: [Qemu-devel] [PULL 25/58] qcow2: Reuse preallocated zero clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,375 +22,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-This extends the permission bits of op blocker API to external using
-Linux OFD locks.
+Instead of just freeing preallocated zero clusters and completely
+allocating them from scratch, reuse them.
 
-Each permission in @perm and @shared_perm is represented by a locked
-byte in the image file.  Requesting a permission in @perm is translated
-to a shared lock of the corresponding byte; rejecting to share the same
-permission is translated to a shared lock of a separate byte. With that,
-we use 2x number of bytes of distinct permission types.
+We cannot do this in handle_copied(), however, since this is a COW
+operation. Therefore, we have to add the new logic to handle_alloc() and
+simply return the existing offset if it exists. The only catch is that
+we have to convince qcow2_alloc_cluster_link_l2() not to free the old
+clusters (because we have reused them).
 
-virtlockd in libvirt locks the first byte, so we do locking from a
-higher offset.
-
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Reported-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 276 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 275 insertions(+), 1 deletion(-)
+ block/qcow2-cluster.c | 80 +++++++++++++++++++++++++++++++++++----------------
+ block/qcow2.h         |  3 ++
+ 2 files changed, 59 insertions(+), 24 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index d13e99c..a09055b 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -129,12 +129,23 @@ do { \
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 100398c..fb91fd8 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -309,14 +309,20 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
+         uint64_t *l2_table, uint64_t stop_flags)
+ {
+     int i;
++    int first_cluster_type;
+     uint64_t mask = stop_flags | L2E_OFFSET_MASK | QCOW_OFLAG_COMPRESSED;
+     uint64_t first_entry = be64_to_cpu(l2_table[0]);
+     uint64_t offset = first_entry & mask;
  
- #define MAX_BLOCKSIZE	4096
- 
-+/* Posix file locking bytes. Libvirt takes byte 0, we start from higher bytes,
-+ * leaving a few more bytes for its future use. */
-+#define RAW_LOCK_PERM_BASE             100
-+#define RAW_LOCK_SHARED_BASE           200
-+
- typedef struct BDRVRawState {
-     int fd;
-+    int lock_fd;
-+    bool use_lock;
-     int type;
-     int open_flags;
-     size_t buf_align;
- 
-+    /* The current permissions. */
-+    uint64_t perm;
-+    uint64_t shared_perm;
-+
- #ifdef CONFIG_XFS
-     bool is_xfs:1;
- #endif
-@@ -411,6 +422,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     BlockdevAioOptions aio, aio_default;
-     int fd, ret;
-     struct stat st;
-+    OnOffAuto locking;
- 
-     opts = qemu_opts_create(&raw_runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-@@ -440,6 +452,37 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     }
-     s->use_linux_aio = (aio == BLOCKDEV_AIO_OPTIONS_NATIVE);
- 
-+    locking = qapi_enum_parse(OnOffAuto_lookup, qemu_opt_get(opts, "locking"),
-+                              ON_OFF_AUTO__MAX, ON_OFF_AUTO_AUTO, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto fail;
+-    if (!offset)
++    if (!offset) {
+         return 0;
 +    }
-+    switch (locking) {
-+    case ON_OFF_AUTO_ON:
-+        s->use_lock = true;
-+#ifndef F_OFD_SETLK
-+        fprintf(stderr,
-+                "File lock requested but OFD locking syscall is unavailable, "
-+                "falling back to POSIX file locks.\n"
-+                "Due to the implementation, locks can be lost unexpectedly.\n");
-+#endif
-+        break;
-+    case ON_OFF_AUTO_OFF:
-+        s->use_lock = false;
-+        break;
-+    case ON_OFF_AUTO_AUTO:
-+#ifdef F_OFD_SETLK
-+        s->use_lock = true;
-+#else
-+        s->use_lock = false;
-+#endif
-+        break;
-+    default:
-+        abort();
-+    }
-+
-     s->open_flags = open_flags;
-     raw_parse_flags(bdrv_flags, &s->open_flags);
  
-@@ -455,6 +498,21 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+-    assert(qcow2_get_cluster_type(first_entry) == QCOW2_CLUSTER_NORMAL);
++    /* must be allocated */
++    first_cluster_type = qcow2_get_cluster_type(first_entry);
++    assert(first_cluster_type == QCOW2_CLUSTER_NORMAL ||
++           (first_cluster_type == QCOW2_CLUSTER_ZERO &&
++            (first_entry & L2E_OFFSET_MASK) != 0));
+ 
+     for (i = 0; i < nb_clusters; i++) {
+         uint64_t l2_entry = be64_to_cpu(l2_table[i]) & mask;
+@@ -835,7 +841,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+      * Don't discard clusters that reach a refcount of 0 (e.g. compressed
+      * clusters), the next write will reuse them anyway.
+      */
+-    if (j != 0) {
++    if (!m->keep_old_clusters && j != 0) {
+         for (i = 0; i < j; i++) {
+             qcow2_free_any_clusters(bs, be64_to_cpu(old_cluster[i]), 1,
+                                     QCOW2_DISCARD_NEVER);
+@@ -1132,8 +1138,9 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+     uint64_t entry;
+     uint64_t nb_clusters;
+     int ret;
++    bool keep_old_clusters = false;
+ 
+-    uint64_t alloc_cluster_offset;
++    uint64_t alloc_cluster_offset = 0;
+ 
+     trace_qcow2_handle_alloc(qemu_coroutine_self(), guest_offset, *host_offset,
+                              *bytes);
+@@ -1170,31 +1177,54 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+      * wrong with our code. */
+     assert(nb_clusters > 0);
+ 
+-    qcow2_cache_put(bs, s->l2_table_cache, (void **) &l2_table);
++    if (qcow2_get_cluster_type(entry) == QCOW2_CLUSTER_ZERO &&
++        (entry & L2E_OFFSET_MASK) != 0 && (entry & QCOW_OFLAG_COPIED) &&
++        (!*host_offset ||
++         start_of_cluster(s, *host_offset) == (entry & L2E_OFFSET_MASK)))
++    {
++        /* Try to reuse preallocated zero clusters; contiguous normal clusters
++         * would be fine, too, but count_cow_clusters() above has limited
++         * nb_clusters already to a range of COW clusters */
++        int preallocated_nb_clusters =
++            count_contiguous_clusters(nb_clusters, s->cluster_size,
++                                      &l2_table[l2_index], QCOW_OFLAG_COPIED);
++        assert(preallocated_nb_clusters > 0);
+ 
+-    /* Allocate, if necessary at a given offset in the image file */
+-    alloc_cluster_offset = start_of_cluster(s, *host_offset);
+-    ret = do_alloc_cluster_offset(bs, guest_offset, &alloc_cluster_offset,
+-                                  &nb_clusters);
+-    if (ret < 0) {
+-        goto fail;
+-    }
++        nb_clusters = preallocated_nb_clusters;
++        alloc_cluster_offset = entry & L2E_OFFSET_MASK;
+ 
+-    /* Can't extend contiguous allocation */
+-    if (nb_clusters == 0) {
+-        *bytes = 0;
+-        return 0;
++        /* We want to reuse these clusters, so qcow2_alloc_cluster_link_l2()
++         * should not free them. */
++        keep_old_clusters = true;
      }
-     s->fd = fd;
  
-+    s->lock_fd = -1;
-+    if (s->use_lock) {
-+        fd = qemu_open(filename, s->open_flags);
-+        if (fd < 0) {
-+            ret = -errno;
-+            error_setg_errno(errp, errno, "Could not open '%s' for locking",
-+                             filename);
-+            qemu_close(s->fd);
+-    /* !*host_offset would overwrite the image header and is reserved for "no
+-     * host offset preferred". If 0 was a valid host offset, it'd trigger the
+-     * following overlap check; do that now to avoid having an invalid value in
+-     * *host_offset. */
++    qcow2_cache_put(bs, s->l2_table_cache, (void **) &l2_table);
++
+     if (!alloc_cluster_offset) {
+-        ret = qcow2_pre_write_overlap_check(bs, 0, alloc_cluster_offset,
+-                                            nb_clusters * s->cluster_size);
+-        assert(ret < 0);
+-        goto fail;
++        /* Allocate, if necessary at a given offset in the image file */
++        alloc_cluster_offset = start_of_cluster(s, *host_offset);
++        ret = do_alloc_cluster_offset(bs, guest_offset, &alloc_cluster_offset,
++                                      &nb_clusters);
++        if (ret < 0) {
 +            goto fail;
 +        }
-+        s->lock_fd = fd;
-+    }
-+    s->perm = 0;
-+    s->shared_perm = BLK_PERM_ALL;
 +
- #ifdef CONFIG_LINUX_AIO
-      /* Currently Linux does AIO only for files opened with O_DIRECT */
-     if (s->use_linux_aio && !(s->open_flags & O_DIRECT)) {
-@@ -542,6 +600,161 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
-     return raw_open_common(bs, options, flags, 0, errp);
- }
- 
-+typedef enum {
-+    RAW_PL_PREPARE,
-+    RAW_PL_COMMIT,
-+    RAW_PL_ABORT,
-+} RawPermLockOp;
-+
-+#define PERM_FOREACH(i) \
-+    for ((i) = 0; (1ULL << (i)) <= BLK_PERM_ALL; i++)
-+
-+/* Lock bytes indicated by @perm_lock_bits and @shared_perm_lock_bits in the
-+ * file; if @unlock == true, also unlock the unneeded bytes.
-+ * @shared_perm_lock_bits is the mask of all permissions that are NOT shared.
-+ */
-+static int raw_apply_lock_bytes(BDRVRawState *s,
-+                                uint64_t perm_lock_bits,
-+                                uint64_t shared_perm_lock_bits,
-+                                bool unlock, Error **errp)
-+{
-+    int ret;
-+    int i;
-+
-+    PERM_FOREACH(i) {
-+        int off = RAW_LOCK_PERM_BASE + i;
-+        if (perm_lock_bits & (1ULL << i)) {
-+            ret = qemu_lock_fd(s->lock_fd, off, 1, false);
-+            if (ret) {
-+                error_setg(errp, "Failed to lock byte %d", off);
-+                return ret;
-+            }
-+        } else if (unlock) {
-+            ret = qemu_unlock_fd(s->lock_fd, off, 1);
-+            if (ret) {
-+                error_setg(errp, "Failed to unlock byte %d", off);
-+                return ret;
-+            }
++        /* Can't extend contiguous allocation */
++        if (nb_clusters == 0) {
++            *bytes = 0;
++            return 0;
 +        }
-+    }
-+    PERM_FOREACH(i) {
-+        int off = RAW_LOCK_SHARED_BASE + i;
-+        if (shared_perm_lock_bits & (1ULL << i)) {
-+            ret = qemu_lock_fd(s->lock_fd, off, 1, false);
-+            if (ret) {
-+                error_setg(errp, "Failed to lock byte %d", off);
-+                return ret;
-+            }
-+        } else if (unlock) {
-+            ret = qemu_unlock_fd(s->lock_fd, off, 1);
-+            if (ret) {
-+                error_setg(errp, "Failed to unlock byte %d", off);
-+                return ret;
-+            }
++
++        /* !*host_offset would overwrite the image header and is reserved for
++         * "no host offset preferred". If 0 was a valid host offset, it'd
++         * trigger the following overlap check; do that now to avoid having an
++         * invalid value in *host_offset. */
++        if (!alloc_cluster_offset) {
++            ret = qcow2_pre_write_overlap_check(bs, 0, alloc_cluster_offset,
++                                                nb_clusters * s->cluster_size);
++            assert(ret < 0);
++            goto fail;
 +        }
-+    }
-+    return 0;
-+}
-+
-+/* Check "unshared" bytes implied by @perm and ~@shared_perm in the file. */
-+static int raw_check_lock_bytes(BDRVRawState *s,
-+                                uint64_t perm, uint64_t shared_perm,
-+                                Error **errp)
-+{
-+    int ret;
-+    int i;
-+
-+    PERM_FOREACH(i) {
-+        int off = RAW_LOCK_SHARED_BASE + i;
-+        uint64_t p = 1ULL << i;
-+        if (perm & p) {
-+            ret = qemu_lock_fd_test(s->lock_fd, off, 1, true);
-+            if (ret) {
-+                char *perm_name = bdrv_perm_names(p);
-+                error_setg(errp,
-+                           "Failed to get \"%s\" lock",
-+                           perm_name);
-+                g_free(perm_name);
-+                error_append_hint(errp,
-+                                  "Is another process using the image?\n");
-+                return ret;
-+            }
-+        }
-+    }
-+    PERM_FOREACH(i) {
-+        int off = RAW_LOCK_PERM_BASE + i;
-+        uint64_t p = 1ULL << i;
-+        if (!(shared_perm & p)) {
-+            ret = qemu_lock_fd_test(s->lock_fd, off, 1, true);
-+            if (ret) {
-+                char *perm_name = bdrv_perm_names(p);
-+                error_setg(errp,
-+                           "Failed to get shared \"%s\" lock",
-+                           perm_name);
-+                g_free(perm_name);
-+                error_append_hint(errp,
-+                                  "Is another process using the image?\n");
-+                return ret;
-+            }
-+        }
-+    }
-+    return 0;
-+}
-+
-+static int raw_handle_perm_lock(BlockDriverState *bs,
-+                                RawPermLockOp op,
-+                                uint64_t new_perm, uint64_t new_shared,
-+                                Error **errp)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    int ret = 0;
-+    Error *local_err = NULL;
-+
-+    if (!s->use_lock) {
-+        return 0;
-+    }
-+
-+    if (bdrv_get_flags(bs) & BDRV_O_INACTIVE) {
-+        return 0;
-+    }
-+
-+    assert(s->lock_fd > 0);
-+
-+    switch (op) {
-+    case RAW_PL_PREPARE:
-+        ret = raw_apply_lock_bytes(s, s->perm | new_perm,
-+                                   ~s->shared_perm | ~new_shared,
-+                                   false, errp);
-+        if (!ret) {
-+            ret = raw_check_lock_bytes(s, new_perm, new_shared, errp);
-+            if (!ret) {
-+                return 0;
-+            }
-+        }
-+        op = RAW_PL_ABORT;
-+        /* fall through to unlock bytes. */
-+    case RAW_PL_ABORT:
-+        raw_apply_lock_bytes(s, s->perm, ~s->shared_perm, true, &local_err);
-+        if (local_err) {
-+            /* Theoretically the above call only unlocks bytes and it cannot
-+             * fail. Something weird happened, report it.
-+             */
-+            error_report_err(local_err);
-+        }
-+        break;
-+    case RAW_PL_COMMIT:
-+        raw_apply_lock_bytes(s, new_perm, ~new_shared, true, &local_err);
-+        if (local_err) {
-+            /* Theoretically the above call only unlocks bytes and it cannot
-+             * fail. Something weird happened, report it.
-+             */
-+            error_report_err(local_err);
-+        }
-+        break;
-+    }
-+    return ret;
-+}
-+
- static int raw_reopen_prepare(BDRVReopenState *state,
-                               BlockReopenQueue *queue, Error **errp)
- {
-@@ -1410,6 +1623,10 @@ static void raw_close(BlockDriverState *bs)
-         qemu_close(s->fd);
-         s->fd = -1;
      }
-+    if (s->lock_fd >= 0) {
-+        qemu_close(s->lock_fd);
-+        s->lock_fd = -1;
-+    }
- }
  
- static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-@@ -1954,6 +2171,54 @@ static QemuOptsList raw_create_opts = {
-     }
- };
+     /*
+@@ -1225,6 +1255,8 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+         .offset         = start_of_cluster(s, guest_offset),
+         .nb_clusters    = nb_clusters,
  
-+static int raw_check_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared,
-+                          Error **errp)
-+{
-+    return raw_handle_perm_lock(bs, RAW_PL_PREPARE, perm, shared, errp);
-+}
++        .keep_old_clusters  = keep_old_clusters,
 +
-+static void raw_set_perm(BlockDriverState *bs, uint64_t perm, uint64_t shared)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    raw_handle_perm_lock(bs, RAW_PL_COMMIT, perm, shared, NULL);
-+    s->perm = perm;
-+    s->shared_perm = shared;
-+}
-+
-+static void raw_abort_perm_update(BlockDriverState *bs)
-+{
-+    raw_handle_perm_lock(bs, RAW_PL_ABORT, 0, 0, NULL);
-+}
-+
-+static int raw_inactivate(BlockDriverState *bs)
-+{
-+    int ret;
-+    uint64_t perm = 0;
-+    uint64_t shared = BLK_PERM_ALL;
-+
-+    ret = raw_handle_perm_lock(bs, RAW_PL_PREPARE, perm, shared, NULL);
-+    if (ret) {
-+        return ret;
-+    }
-+    raw_handle_perm_lock(bs, RAW_PL_COMMIT, perm, shared, NULL);
-+    return 0;
-+}
-+
-+
-+static void raw_invalidate_cache(BlockDriverState *bs, Error **errp)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    int ret;
-+
-+    assert(!(bdrv_get_flags(bs) & BDRV_O_INACTIVE));
-+    ret = raw_handle_perm_lock(bs, RAW_PL_PREPARE, s->perm, s->shared_perm,
-+                               errp);
-+    if (ret) {
-+        return;
-+    }
-+    raw_handle_perm_lock(bs, RAW_PL_COMMIT, s->perm, s->shared_perm, NULL);
-+}
-+
- BlockDriver bdrv_file = {
-     .format_name = "file",
-     .protocol_name = "file",
-@@ -1984,7 +2249,11 @@ BlockDriver bdrv_file = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
--
-+    .bdrv_inactivate = raw_inactivate,
-+    .bdrv_invalidate_cache = raw_invalidate_cache,
-+    .bdrv_check_perm = raw_check_perm,
-+    .bdrv_set_perm   = raw_set_perm,
-+    .bdrv_abort_perm_update = raw_abort_perm_update,
-     .create_opts = &raw_create_opts,
- };
+         .cow_start = {
+             .offset     = 0,
+             .nb_bytes   = offset_into_cluster(s, guest_offset),
+diff --git a/block/qcow2.h b/block/qcow2.h
+index f8aeb08..8731f24 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -322,6 +322,9 @@ typedef struct QCowL2Meta
+     /** Number of newly allocated clusters */
+     int nb_clusters;
  
-@@ -2443,6 +2712,11 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_get_info = raw_get_info,
-     .bdrv_get_allocated_file_size
-                         = raw_get_allocated_file_size,
-+    .bdrv_inactivate = raw_inactivate,
-+    .bdrv_invalidate_cache = raw_invalidate_cache,
-+    .bdrv_check_perm = raw_check_perm,
-+    .bdrv_set_perm   = raw_set_perm,
-+    .bdrv_abort_perm_update = raw_abort_perm_update,
-     .bdrv_probe_blocksizes = hdev_probe_blocksizes,
-     .bdrv_probe_geometry = hdev_probe_geometry,
- 
++    /** Do not free the old clusters */
++    bool keep_old_clusters;
++
+     /**
+      * Requests that overlap with this allocation and wait to be restarted
+      * when the allocating request has completed.
 -- 
 1.8.3.1
