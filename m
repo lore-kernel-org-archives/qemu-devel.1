@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8qfQ-0007p8-F6
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:10:17 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d8qi6-0000B2-Jo
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:13:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8qfP-0002dE-Nn
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:10:16 -0400
-References: <20170511144208.24075-1-pbonzini@redhat.com>
-	<20170511144208.24075-7-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4f74b071-4bc3-9a86-c968-8f3f0d51ca25@redhat.com>
-Date: Thu, 11 May 2017 11:10:01 -0500
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d8qi2-00045L-GM
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:13:02 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:13274)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d8qi2-00043m-2w
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:12:58 -0400
+References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1494405683-20877-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170510161201.387edc47@bahia.kaod.org>
+	<22325f3a-133a-a1e3-77ae-57e0c8235696@huawei.com>
+	<ce4f0817-64a0-a3c9-2e2c-1617c0c1bd62@redhat.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <2db76353-e545-40a0-6e9f-6f4e4137671d@huawei.com>
+Date: Thu, 11 May 2017 18:12:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170511144208.24075-7-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GVwOphJur4e2kLewiBqdgSNUh5FomvT7e"
-Subject: Re: [Qemu-devel] [PATCH 06/18] block: access io_plugged with atomic
- ops
+In-Reply-To: <ce4f0817-64a0-a3c9-2e2c-1617c0c1bd62@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] throttle: factor out duplicate code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>, Pradeep
+	Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GVwOphJur4e2kLewiBqdgSNUh5FomvT7e
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
-Message-ID: <4f74b071-4bc3-9a86-c968-8f3f0d51ca25@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/18] block: access io_plugged with atomic
- ops
-References: <20170511144208.24075-1-pbonzini@redhat.com>
- <20170511144208.24075-7-pbonzini@redhat.com>
-In-Reply-To: <20170511144208.24075-7-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/11/2017 09:41 AM, Paolo Bonzini wrote:
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/io.c                | 4 ++--
->  include/block/block_int.h | 8 +++++---
->  2 files changed, 7 insertions(+), 5 deletions(-)
-
-> @@ -625,6 +622,11 @@ struct BlockDriverState {
->       */
->      bool wakeup;
-> =20
-> +    /* counter for nested bdrv_io_plug.
-> +     * Accessed with atomic ops.
-> +    */
-> +    unsigned io_plugged;
-
-Indentation is odd.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---GVwOphJur4e2kLewiBqdgSNUh5FomvT7e
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZFIzZAAoJEKeha0olJ0Nq4SMH/1mxyUxrjebjmrTxRsBS4Bwi
-8rG6RpGz85KQYVWtoiLlvm0gUCqIxaQCOCDemu7xGrZJRQgeBXuO4glzkT5oH6mD
-hJ8Q4ewPEiGoAe1MNw8LaemlPaaBveEhXp/QhlaRCIAlFkDUen3SpJYkzWYLqegR
-SCRofP5Yf5ApDnGCFZaKo1yOyzsHGRn/BtRcF5/uMKgxaYjIaq5U8cBZuMMkch2x
-9eFXgL6GZ9jNL1qdkzkylFLjW1p7u2ZGunKrbavFFV8UKN2l+mp5HY5L6XtqvrQn
-CVDCi8Uu27Z4NtljRfCIP+q3ie2hjFHEQOyJDIYS5B2NMVyPAeSGNY3BAeh7kwA=
-=6qRk
------END PGP SIGNATURE-----
-
---GVwOphJur4e2kLewiBqdgSNUh5FomvT7e--
+On 5/10/2017 9:48 PM, Eric Blake wrote:
+> On 05/10/2017 10:27 AM, Pradeep Jagadeesh wrote:
+>
+>>>
+>>> Isn't it a bit overkill to introduce a new file for a single function ?
+>>> Maybe you could simply move this to util/throttle.c ?
+>>>
+>> OK, but I will add one more function later patch. Still do you think
+>> better to move to util/thottle.c?
+>
+> As long as util/throttle.c is not already huge, adding multiple new
+> functions to that file over the course of the series should be just fine.
+OK, I will use util/throttle.c.
+>
