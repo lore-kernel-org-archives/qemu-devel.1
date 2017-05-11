@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d8r14-00062a-56
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:32:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1d8r15-00062j-KT
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:32:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d8r12-0006dp-OP
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:32:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14712)
+	(envelope-from <quintela@redhat.com>) id 1d8r14-0006f8-JX
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:32:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d8r12-0006dQ-En
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:32:36 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d8r14-0006eR-BG
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:32:38 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59DFDC05973F
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 16:32:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 57AD3C04B941
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 16:32:37 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 11 May 2017 18:32:26 +0200
-Message-Id: <20170511163228.6666-2-quintela@redhat.com>
+Date: Thu, 11 May 2017 18:32:27 +0200
+Message-Id: <20170511163228.6666-3-quintela@redhat.com>
 In-Reply-To: <20170511163228.6666-1-quintela@redhat.com>
 References: <20170511163228.6666-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] migration: Create block capabilities for
- shared and enable
+Subject: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,132 +33,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Those two capabilities were added through the command line.  Notice that
-we just created them.  This is just the boilerplate.
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---
-
-Make migrate_set_block_* take a boolean argument.
+We have change in the previous patch to use migration capabilities for
+it.  Notice that we continue using the old command line flags from
+migrate command from the time being.  Remove the set_params method as
+now it is empty.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/block.h     |  3 +++
- include/migration/migration.h |  3 +++
- migration/migration.c         | 36 ++++++++++++++++++++++++++++++++++++
- qapi-schema.json              |  7 ++++++-
- 4 files changed, 48 insertions(+), 1 deletion(-)
+ include/migration/migration.h |  3 +--
+ migration/block.c             | 17 ++---------------
+ migration/colo.c              |  5 +++--
+ migration/migration.c         |  8 +++++---
+ migration/savevm.c            |  2 --
+ 5 files changed, 11 insertions(+), 24 deletions(-)
 
-diff --git a/include/migration/block.h b/include/migration/block.h
-index 41a1ac8..5b3f1a5 100644
---- a/include/migration/block.h
-+++ b/include/migration/block.h
-@@ -20,4 +20,7 @@ uint64_t blk_mig_bytes_transferred(void);
- uint64_t blk_mig_bytes_remaining(void);
- uint64_t blk_mig_bytes_total(void);
- 
-+void migrate_set_block_shared(MigrationState *s, bool value);
-+void migrate_set_block_enabled(MigrationState *s, bool value);
-+
- #endif /* MIGRATION_BLOCK_H */
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 0c9b6af..30c2913 100644
+index 30c2913..2d5525c 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -305,6 +305,9 @@ bool migrate_colo_enabled(void);
+@@ -39,8 +39,7 @@
+ #define QEMU_VM_SECTION_FOOTER       0x7e
  
- int64_t xbzrle_cache_resize(int64_t new_size);
+ struct MigrationParams {
+-    bool blk;
+-    bool shared;
++    bool unused; /* C doesn't allow empty structs */
+ };
  
-+bool migrate_use_block_enabled(void);
-+bool migrate_use_block_shared(void);
-+
- bool migrate_use_compression(void);
- int migrate_compress_level(void);
- int migrate_compress_threads(void);
+ /* Messages sent on the return path from destination to source */
+diff --git a/migration/block.c b/migration/block.c
+index 060087f..fcfa823 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -94,9 +94,6 @@ typedef struct BlkMigBlock {
+ } BlkMigBlock;
+ 
+ typedef struct BlkMigState {
+-    /* Written during setup phase.  Can be read without a lock.  */
+-    int blk_enable;
+-    int shared_base;
+     QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
+     int64_t total_sector_sum;
+     bool zero_blocks;
+@@ -425,7 +422,7 @@ static int init_blk_migration(QEMUFile *f)
+         bmds->bulk_completed = 0;
+         bmds->total_sectors = sectors;
+         bmds->completed_sectors = 0;
+-        bmds->shared_base = block_mig_state.shared_base;
++        bmds->shared_base = migrate_use_block_shared();
+ 
+         assert(i < num_bs);
+         bmds_bs[i].bmds = bmds;
+@@ -994,22 +991,12 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+     return 0;
+ }
+ 
+-static void block_set_params(const MigrationParams *params, void *opaque)
+-{
+-    block_mig_state.blk_enable = params->blk;
+-    block_mig_state.shared_base = params->shared;
+-
+-    /* shared base means that blk_enable = 1 */
+-    block_mig_state.blk_enable |= params->shared;
+-}
+-
+ static bool block_is_active(void *opaque)
+ {
+-    return block_mig_state.blk_enable == 1;
++    return migrate_use_block_enabled();
+ }
+ 
+ static SaveVMHandlers savevm_block_handlers = {
+-    .set_params = block_set_params,
+     .save_live_setup = block_save_setup,
+     .save_live_iterate = block_save_iterate,
+     .save_live_complete_precopy = block_save_complete,
+diff --git a/migration/colo.c b/migration/colo.c
+index 963c802..e772384 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -14,6 +14,7 @@
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+ #include "migration/colo.h"
++#include "migration/block.h"
+ #include "io/channel-buffer.h"
+ #include "trace.h"
+ #include "qemu/error-report.h"
+@@ -345,8 +346,8 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+     }
+ 
+     /* Disable block migration */
+-    s->params.blk = 0;
+-    s->params.shared = 0;
++    migrate_set_block_enabled(s, false);
++    migrate_set_block_shared(s, false);
+     qemu_savevm_state_header(fb);
+     qemu_savevm_state_begin(fb, &s->params);
+     qemu_mutex_lock_iothread();
 diff --git a/migration/migration.c b/migration/migration.c
-index fe62f15..2f981aa 100644
+index 2f981aa..8a3bf89 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1195,6 +1195,16 @@ bool migration_is_blocked(Error **errp)
-     return false;
- }
+@@ -787,6 +787,10 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+         s->enabled_capabilities[cap->value->capability] = cap->value->state;
+     }
  
-+void migrate_set_block_shared(MigrationState *s, bool value)
-+{
-+    s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = value;
-+}
++    if (s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED]) {
++        s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = true;
++    }
 +
-+void migrate_set_block_enabled(MigrationState *s, bool value)
-+{
-+    s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = value;
-+}
-+
- void qmp_migrate(const char *uri, bool has_blk, bool blk,
-                  bool has_inc, bool inc, bool has_detach, bool detach,
-                  Error **errp)
-@@ -1224,6 +1234,14 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+     if (migrate_postcopy_ram()) {
+         if (migrate_use_compression()) {
+             /* The decompression threads asynchronously write into RAM
+@@ -1214,9 +1218,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+     MigrationParams params;
+     const char *p;
  
-     s = migrate_init(&params);
+-    params.blk = has_blk && blk;
+-    params.shared = has_inc && inc;
+-
+     if (migration_is_setup_or_active(s->state) ||
+         s->state == MIGRATION_STATUS_CANCELLING ||
+         s->state == MIGRATION_STATUS_COLO) {
+@@ -1239,6 +1240,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+     }
  
-+    if (has_blk && blk) {
+     if (has_inc && inc) {
 +        migrate_set_block_enabled(s, true);
-+    }
-+
-+    if (has_inc && inc) {
-+        migrate_set_block_shared(s, true);
-+    }
-+
-     if (strstart(uri, "tcp:", &p)) {
-         tcp_start_outgoing_migration(s, p, &local_err);
- #ifdef CONFIG_RDMA
-@@ -1419,6 +1437,24 @@ int64_t migrate_xbzrle_cache_size(void)
-     return s->xbzrle_cache_size;
- }
+         migrate_set_block_shared(s, true);
+     }
  
-+bool migrate_use_block_enabled(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED];
-+}
-+
-+bool migrate_use_block_shared(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED];
-+}
-+
- /* migration thread support */
- /*
-  * Something bad happened to the RP stream, mark an error
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 5728b7f..109852e 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -894,11 +894,16 @@
- # @release-ram: if enabled, qemu will free the migrated ram pages on the source
- #        during postcopy-ram migration. (since 2.9)
- #
-+# @block-enabled: enable block migration (Since 2.10)
-+#
-+# @block-shared: enable block shared migration (Since 2.10)
-+#
- # Since: 1.2
- ##
- { 'enum': 'MigrationCapability',
-   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
--           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
-+           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-+           'block-enabled', 'block-shared' ] }
- 
- ##
- # @MigrationCapabilityStatus:
+diff --git a/migration/savevm.c b/migration/savevm.c
+index f8d1e8b..221fb4b 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1233,8 +1233,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+ {
+     int ret;
+     MigrationParams params = {
+-        .blk = 0,
+-        .shared = 0
+     };
+     MigrationState *ms = migrate_init(&params);
+     MigrationStatus status;
 -- 
 2.9.3
