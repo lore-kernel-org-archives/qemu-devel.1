@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAd-0002WA-Eg
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAa-0002T3-Hh
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAc-0007h1-D5
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAZ-0007bG-LY
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:20 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:39 +0200
-Message-Id: <1494513181-7900-37-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:34 +0200
+Message-Id: <1494513181-7900-32-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 36/58] blockdev: use drained_begin/end for
- qmp_block_resize
+Subject: [Qemu-devel] [PULL 31/58] block: Inactivate parents before children
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +22,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-From: John Snow <jsnow@redhat.com>
+The proper order for inactivating block nodes is that first the parents
+get inactivated and then the children. If we do things in this order, we
+can assert that we didn't accidentally leave a parent activated when one
+of its child nodes is inactive.
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1447551
-
-If one tries to issue a block_resize while a guest is busy
-accessing the disk, it is possible that qemu may deadlock
-when invoking aio_poll from both the main loop and the iothread.
-
-Replace another instance of bdrv_drain_all that doesn't
-quite belong.
-
-Cc: qemu-stable@nongnu.org
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- blockdev.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ block.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 0d3773b..c63f4e8 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2923,10 +2923,9 @@ void qmp_block_resize(bool has_device, const char *device,
-         goto out;
+diff --git a/block.c b/block.c
+index 444a52e..170002e 100644
+--- a/block.c
++++ b/block.c
+@@ -762,6 +762,13 @@ static void bdrv_child_cb_drained_end(BdrvChild *child)
+     bdrv_drained_end(bs);
+ }
+ 
++static int bdrv_child_cb_inactivate(BdrvChild *child)
++{
++    BlockDriverState *bs = child->opaque;
++    assert(bs->open_flags & BDRV_O_INACTIVE);
++    return 0;
++}
++
+ /*
+  * Returns the options and flags that a temporary snapshot should get, based on
+  * the originally requested flags (the originally requested image will have
+@@ -822,6 +829,7 @@ const BdrvChildRole child_file = {
+     .inherit_options = bdrv_inherited_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_end     = bdrv_child_cb_drained_end,
++    .inactivate      = bdrv_child_cb_inactivate,
+ };
+ 
+ /*
+@@ -843,6 +851,7 @@ const BdrvChildRole child_format = {
+     .inherit_options = bdrv_inherited_fmt_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_end     = bdrv_child_cb_drained_end,
++    .inactivate      = bdrv_child_cb_inactivate,
+ };
+ 
+ static void bdrv_backing_attach(BdrvChild *c)
+@@ -928,6 +937,7 @@ const BdrvChildRole child_backing = {
+     .inherit_options = bdrv_backing_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_end     = bdrv_child_cb_drained_end,
++    .inactivate      = bdrv_child_cb_inactivate,
+ };
+ 
+ static int bdrv_open_flags(BlockDriverState *bs, int flags)
+@@ -4029,13 +4039,6 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
+         }
      }
  
--    /* complete all in-flight operations before resizing the device */
--    bdrv_drain_all();
+-    QLIST_FOREACH(child, &bs->children, next) {
+-        ret = bdrv_inactivate_recurse(child->bs, setting_flag);
+-        if (ret < 0) {
+-            return ret;
+-        }
+-    }
 -
-+    bdrv_drained_begin(bs);
-     ret = blk_truncate(blk, size, errp);
-+    bdrv_drained_end(bs);
+     if (setting_flag) {
+         bs->open_flags |= BDRV_O_INACTIVE;
  
- out:
-     blk_unref(blk);
+@@ -4049,6 +4052,14 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
+             }
+         }
+     }
++
++    QLIST_FOREACH(child, &bs->children, next) {
++        ret = bdrv_inactivate_recurse(child->bs, setting_flag);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
+     return 0;
+ }
+ 
 -- 
 1.8.3.1
