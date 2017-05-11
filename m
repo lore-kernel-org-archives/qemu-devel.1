@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1d8vPT-0002h4-Ex
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:14:08 -0400
+	(envelope-from <riel@redhat.com>) id 1d8vkk-0007xN-9p
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1d8vPO-0002gL-CN
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:14:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54546)
+	(envelope-from <riel@redhat.com>) id 1d8vkf-0006zw-Vu
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:36:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1d8vPO-0002ew-3j
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:14:02 -0400
-Date: Thu, 11 May 2017 15:13:56 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170511151356.78516f2b@w520.home>
-In-Reply-To: <20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
-References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 06/13] s390x/css: device support for
- s390-ccw passthrough
+	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1d8vkf-0006z1-MV
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:36:01 -0400
+Message-ID: <1494538554.20270.33.camel@redhat.com>
+From: Rik van Riel <riel@redhat.com>
+Date: Thu, 11 May 2017 17:35:54 -0400
+In-Reply-To: <CAPcyv4irL+imcaWBtHox9oUatndpRw-3xfxtTcn1NV58iph+og@mail.gmail.com>
+References: <1494431760-6455-1-git-send-email-pagupta@redhat.com>
+	<20170511181703.GC8701@stefanha-x1.localdomain>
+	<CAPcyv4irL+imcaWBtHox9oUatndpRw-3xfxtTcn1NV58iph+og@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-+amXkFCaHJpXiKQp2Jba"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] KVM "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, eric.auger@redhat.com
-
-On Fri,  5 May 2017 04:03:45 +0200
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-
-> In order to support subchannels pass-through, we introduce a s390
-> subchannel device called "s390-ccw" to hold the real subchannel info.
-> The s390-ccw devices inherit from the abstract CcwDevice which connect
-> to the existing virtual-css-bus.
-> 
-> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> ---
->  hw/s390x/Makefile.objs |   1 +
->  hw/s390x/s390-ccw.c    | 138 +++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/s390-ccw.h    |  38 ++++++++++++++
->  3 files changed, 177 insertions(+)
->  create mode 100644 hw/s390x/s390-ccw.c
->  create mode 100644 hw/s390x/s390-ccw.h
-> 
-> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-> index 41ac4ec..72a3d37 100644
-> --- a/hw/s390x/Makefile.objs
-> +++ b/hw/s390x/Makefile.objs
-> @@ -13,3 +13,4 @@ obj-y += ccw-device.o
->  obj-y += s390-pci-bus.o s390-pci-inst.o
->  obj-y += s390-skeys.o
->  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
-> +obj-y += s390-ccw.o
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-> new file mode 100644
-> index 0000000..b1aadcd
-> --- /dev/null
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -0,0 +1,138 @@
-> +/*
-> + * s390 CCW Assignment Support
-> + *
-> + * Copyright 2017 IBM Corp
-> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2
-> + * or (at your option) any later version. See the COPYING file in the
-> + * top-level directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/sysbus.h"
-> +#include "libgen.h"
-> +#include "hw/s390x/css.h"
-> +#include "hw/s390x/css-bridge.h"
-> +#include "s390-ccw.h"
-> +
-> +static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
-> +                                  char *sysfsdev,
-> +                                  Error **errp)
-> +{
-> +    unsigned int cssid, ssid, devid;
-> +    char dev_path[PATH_MAX] = {0}, *tmp;
-> +
-> +    if (!sysfsdev) {
-> +        error_setg(errp, "No host device provided");
-> +        error_append_hint(errp,
-> +                          "Use -device vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
-> +        return;
-> +    }
-> +
-> +    if (!realpath(sysfsdev, dev_path)) {
-> +        error_setg_errno(errp, errno, "Host device '%s' not found", sysfsdev);
-> +        return;
-> +    }
-> +
-> +    cdev->mdevid = g_strdup(basename(dev_path));
-> +
-> +    tmp = basename(dirname(dev_path));
-> +    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
+To: Dan Williams <dan.j.williams@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, KVM list <kvm@vger.kernel.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com, Haozhong Zhang <haozhong.zhang@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
 
-Seems like an oversight not to check this return value.
+--=-+amXkFCaHJpXiKQp2Jba
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 2017-05-11 at 12:15 -0700, Dan Williams wrote:
+> On Thu, May 11, 2017 at 11:17 AM, Stefan Hajnoczi <stefanha@redhat.co
+> m> wrote:
+> > On Wed, May 10, 2017 at 09:26:00PM +0530, Pankaj Gupta wrote:
+> > > We are sharing initial project proposal for
+> > > 'KVM "fake DAX" device flushing' project for feedback.
+> > > Got the idea during discussion with 'Rik van Riel'.
+> >=20
+> > CCing NVDIMM folks.
+> >=20
+> > >=20
+> > > Also, request answers to 'Questions' section.
+> > >=20
+> > > Abstract :
+> > > ----------
+> > > Project idea is to use fake persistent memory with direct
+> > > access(DAX) in virtual machines. Overall goal of project
+> > > is to increase the number of virtual machines that can be
+> > > run on a physical machine, in order to increase the density
+> > > of customer virtual machines.
+> > >=20
+> > > The idea is to avoid the guest page cache, and minimize the
+> > > memory footprint of virtual machines. By presenting a disk
+> > > image as a nvdimm direct access (DAX) memory region in a
+> > > virtual machine, the guest OS can avoid using page cache
+> > > memory for most file accesses.
+>=20
+> How is this different than the solution that Clear Containers came up
+> with?
+>=20
+> https://lwn.net/Articles/644675/
 
-> +
-> +    cdev->hostid.cssid = cssid;
-> +    cdev->hostid.ssid = ssid;
-> +    cdev->hostid.devid = devid;
-> +    cdev->hostid.valid = true;
-> +}
-> +
+Clear Containers uses MAP_PRIVATE with read-only
+images.
+
+This solution is about making read-write images
+work.  When a program in the guest calls fsync,
+we need to ensure the data has actually hit the
+disk on the host side before fsync returns.
+
+--=20
+All rights reversed
+--=-+amXkFCaHJpXiKQp2Jba
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAABCAAGBQJZFNk6AAoJEM553pKExN6DT+AH+gIF4T1gWc98+Ah/IS62ohYZ
+0BUevhwk7lNgtj0v65oH2MQTNrRbtL4rQ0WJ4crBlLCWi0/JAff1Z3W5qdPpHZrv
+10yoIVyEiLTQHXfHjBjx0C41ZOFcMqga122bZpspLWhOiuE0ozqad+N4dMHe3oD1
+iXjCFWN/KhzDiFhEQxtv0AtSWiUFVb5vgf2xNuK97xkwJv8SragYtmbBDqZ1Bt3X
+iG3npLQNIOM8tJfnhm+z2G0xA2Rf683K4zTzGg3+0+dN3xBwSI84x8cxvNdEFCoG
+IvXd7ruehWyldzCJjbdAGsXZpRSC19pRWkR4xbY50Bvhcc7iYN5AKBUR6CP4/us=
+=5oa2
+-----END PGP SIGNATURE-----
+
+--=-+amXkFCaHJpXiKQp2Jba--
