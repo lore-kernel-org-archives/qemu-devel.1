@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8msO-0001WB-QI
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:07:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1d8myE-0003QC-Hn
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8msM-0007cT-5V
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:07:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52988)
+	(envelope-from <peterx@redhat.com>) id 1d8myB-0002VW-RY
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:13:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d8msL-0007cO-VA
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:07:22 -0400
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d8myB-0002VP-JO
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:13:23 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C94599D41E
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 12:07:20 +0000 (UTC)
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-2-marcandre.lureau@redhat.com>
-	<53e35958-82ee-5d90-6c55-7a126dc9108f@redhat.com>
-	<87tw4rwqnp.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <75637827-a07e-1275-33b1-77cb9046d588@redhat.com>
-Date: Thu, 11 May 2017 14:07:16 +0200
+	by mx1.redhat.com (Postfix) with ESMTPS id A3CE380C1C
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 12:13:22 +0000 (UTC)
+Date: Thu, 11 May 2017 20:13:14 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170511121314.GK28293@pxdev.xzpeter.org>
+References: <1494388889-3558-1-git-send-email-peterx@redhat.com>
+	<1494388889-3558-3-git-send-email-peterx@redhat.com>
+	<87r2zx3pz9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87tw4rwqnp.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/17] qdev: remove PropertyInfo.qtype field
+Content-Disposition: inline
+In-Reply-To: <87r2zx3pz9.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v6 2/3] utils: provide size_to_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +34,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-
-
-On 11/05/2017 13:59, Markus Armbruster wrote:
+On Wed, May 10, 2017 at 01:34:18PM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
 > 
-> What I don't like is enumerating PropertyInfo in helpers.  A relatively
-> straightforward way to avoid this would be moving the part of
-> qdev_property_add_static() that varies between properties into a new
-> PropertyInfo method.  Assumes that *all* instances of the same
-> PropertyInfo should behave the same.  Paolo, is that the case?
+> > Moving the algorithm from print_type_size() into size_to_str() so that
+> > other component can also leverage it. With that, refactor
+> > print_type_size().
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  include/qemu-common.h        |  1 +
+> >  qapi/string-output-visitor.c | 22 ++++++----------------
+> >  util/cutils.c                | 23 +++++++++++++++++++++++
+> >  3 files changed, 30 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/include/qemu-common.h b/include/qemu-common.h
+> > index d218821..d7d0448 100644
+> > --- a/include/qemu-common.h
+> > +++ b/include/qemu-common.h
+> > @@ -145,6 +145,7 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+> >  int parse_debug_env(const char *name, int max, int initial);
+> >  
+> >  const char *qemu_ether_ntoa(const MACAddr *mac);
+> > +char *size_to_str(double val);
+> >  void page_size_init(void);
+> >  
+> >  /* returns non-zero if dump is in progress, otherwise zero is
+> > diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+> > index 94ac821..53c2175 100644
+> > --- a/qapi/string-output-visitor.c
+> > +++ b/qapi/string-output-visitor.c
+> > @@ -211,10 +211,8 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
+> >                              Error **errp)
+> >  {
+> >      StringOutputVisitor *sov = to_sov(v);
+> > -    static const char suffixes[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E' };
+> > -    uint64_t div, val;
+> > -    char *out;
+> > -    int i;
+> > +    uint64_t val;
+> > +    char *out, *psize;
+> >  
+> >      if (!sov->human) {
+> >          out = g_strdup_printf("%"PRIu64, *obj);
+> > @@ -223,19 +221,11 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
+> >      }
+> >  
+> >      val = *obj;
+> > -
+> > -    /* The exponent (returned in i) minus one gives us
+> > -     * floor(log2(val * 1024 / 1000).  The correction makes us
+> > -     * switch to the higher power when the integer part is >= 1000.
+> > -     */
+> > -    frexp(val / (1000.0 / 1024.0), &i);
+> > -    i = (i - 1) / 10;
+> > -    assert(i < ARRAY_SIZE(suffixes));
+> > -    div = 1ULL << (i * 10);
+> > -
+> > -    out = g_strdup_printf("%"PRIu64" (%0.3g %c%s)", val,
+> > -                          (double)val/div, suffixes[i], i ? "iB" : "");
+> > +    psize = size_to_str(val);
+> > +    out = g_strdup_printf("%"PRIu64" (%s)", val, psize);
+> >      string_output_set(sov, out);
+> > +
+> > +    g_free(psize);
+> >  }
+> >  
+> >  static void print_type_bool(Visitor *v, const char *name, bool *obj,
+> > diff --git a/util/cutils.c b/util/cutils.c
+> > index 50ad179..c562d87 100644
+> > --- a/util/cutils.c
+> > +++ b/util/cutils.c
+> > @@ -619,3 +619,26 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
+> >  
+> >      return ret;
+> >  }
+> > +
+> > +/*
+> > + * Please free the buffer after use.
+> > + */
+> 
+> A proper function comment would be nice.  Something like
+> 
+> /*
+>  * Return human readable string for size @val.
+>  * @val must be between 0 inclusive and 1000EiB exclusive.
+>  * Use IEC binary units like KiB, MiB, and so forth
+>  * Caller is responsible for passing it to g_free().
+>  */
 
-Yes, it is the case, and yes, a virtual method such as
-void (*init_default_value)(DeviceState *dev, Property *prop)
-would be much better.
+Yes this looks much better. :)
 
-Thanks,
+> 
+> > +char *size_to_str(double val)
+> > +{
+> > +    static const char *suffixes[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
+> > +    unsigned long div;
+> > +    int i;
+> > +
+> > +    /*
+> > +     * The exponent (returned in i) minus one gives us
+> > +     * floor(log2(val * 1024 / 1000).  The correction makes us
+> > +     * switch to the higher power when the integer part is >= 1000.
+> > +     * (see e41b509d68afb1f for more info)
+> > +     */
+> > +    frexp(val / (1000.0 / 1024.0), &i);
+> > +    i = (i - 1) / 10;
+> > +    assert(i < ARRAY_SIZE(suffixes));
+> > +    div = 1ULL << (i * 10);
+> > +
+> > +    return g_strdup_printf("%0.3g %sB", val / div, suffixes[i]);
+> > +}
+> 
+> The function happily accepts negative sizes.  You can reject them with
+> assert(), adapt my function comment accordingly, or do nothing.
+> 
+> The function asserts on very large sizes.  I'm fine with that, and
+> worded my function comment accordingly.  If you want to avoid the
+> constraint, format them in the biggest unit, e.g. 3.1415 * (1ull<70) as
+> "3142 EiB", in followup patch.
 
-Paolo
+For above two points, actually I would prefer we don't have assertion
+in this function. The reason is when this helper is used in dynamic
+environment (e.g., converting user input into size strings), it can
+crash the VM when assertion is triggered. To avoid that, I would like
+val to be any value (very big, or negative). For very big one, I'd
+like to take your suggestion to have a limit on maximum unit; for
+negative values, let's just do nothing, since frexp() supports that,
+and finally we'll just see something like "-20 MiB" and imho that's
+better than a crash.
+
+> 
+> The function formats 999.9 * (1ull<<60) as "1e+03 EiB".  Oops.  No big
+> deal, but you might want to fix it anyway, possibly in a followup patch.
+
+I didn't really find a good way to solve this, considering that it is
+related to how "%g" is implemented in g_strdup_printf() (or say, it
+decided to dump "1e+03" rather than "999.9" for some reason... and I
+found that this condition goes away if we specify something <999.5).
+So let me just keep it as it is.
+
+This also helps to make sure we won't dump different strings after
+this patch when used by print_type_size().
+
+> 
+> Preferably with a function comment:
+
+Will add.
+
+> 
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Thanks!
+
+-- 
+Peter Xu
