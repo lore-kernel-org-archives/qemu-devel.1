@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8tcY-0002n0-Ty
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:31 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d8tcb-0002pa-HH
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8tcY-0007zc-17
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50104)
+	(envelope-from <ehabkost@redhat.com>) id 1d8tca-000802-Ee
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8tcX-0007zV-RU
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:29 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8tca-0007zs-5z
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:32 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 11 May 2017 16:18:36 -0300
-Message-Id: <20170511191843.13784-23-ehabkost@redhat.com>
+Date: Thu, 11 May 2017 16:18:37 -0300
+Message-Id: <20170511191843.13784-24-ehabkost@redhat.com>
 In-Reply-To: <20170511191843.13784-1-ehabkost@redhat.com>
 References: <20170511191843.13784-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 22/29] machine: call machine init from wrapper
+Subject: [Qemu-devel] [PULL 23/29] numa: use possible_cpus for not mapped
+ CPUs check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +29,118 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-add machine_run_board_init() wrapper that calls machine
-init for now but in follow up patches it will be used
-to run generic machine code that should run before
-machine init.
+and remove corresponding part in numa.c that uses
+node_cpu bitmaps.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <1494415802-227633-15-git-send-email-imammedo@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Message-Id: <1494415802-227633-16-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/boards.h | 1 +
- hw/core/machine.c   | 6 ++++++
- vl.c                | 2 +-
- 3 files changed, 8 insertions(+), 1 deletion(-)
+ hw/core/machine.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ numa.c            | 10 ----------
+ 2 files changed, 58 insertions(+), 10 deletions(-)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 4e14ff060e..76ce0219ff 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -32,6 +32,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
- MachineClass *find_default_machine(void);
- extern MachineState *current_machine;
- 
-+void machine_run_board_init(MachineState *machine);
- bool machine_usb(MachineState *machine);
- bool machine_kernel_irqchip_allowed(MachineState *machine);
- bool machine_kernel_irqchip_required(MachineState *machine);
 diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 420c8c4d16..64e2a4ff2c 100644
+index 64e2a4ff2c..fd6a436064 100644
 --- a/hw/core/machine.c
 +++ b/hw/core/machine.c
-@@ -678,6 +678,12 @@ bool machine_mem_merge(MachineState *machine)
+@@ -20,6 +20,7 @@
+ #include "sysemu/numa.h"
+ #include "qemu/error-report.h"
+ #include "qemu/cutils.h"
++#include "sysemu/numa.h"
+ 
+ static char *machine_get_accel(Object *obj, Error **errp)
+ {
+@@ -678,9 +679,66 @@ bool machine_mem_merge(MachineState *machine)
      return machine->mem_merge;
  }
  
-+void machine_run_board_init(MachineState *machine)
++static char *cpu_slot_to_string(const CPUArchId *cpu)
 +{
-+    MachineClass *machine_class = MACHINE_GET_CLASS(machine);
-+    machine_class->init(machine);
++    GString *s = g_string_new(NULL);
++    if (cpu->props.has_socket_id) {
++        g_string_append_printf(s, "socket-id: %"PRId64, cpu->props.socket_id);
++    }
++    if (cpu->props.has_core_id) {
++        if (s->len) {
++            g_string_append_printf(s, ", ");
++        }
++        g_string_append_printf(s, "core-id: %"PRId64, cpu->props.core_id);
++    }
++    if (cpu->props.has_thread_id) {
++        if (s->len) {
++            g_string_append_printf(s, ", ");
++        }
++        g_string_append_printf(s, "thread-id: %"PRId64, cpu->props.thread_id);
++    }
++    return g_string_free(s, false);
 +}
 +
- static void machine_class_finalize(ObjectClass *klass, void *data)
++static void machine_numa_validate(MachineState *machine)
++{
++    int i;
++    GString *s = g_string_new(NULL);
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
++    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
++
++    assert(nb_numa_nodes);
++    for (i = 0; i < possible_cpus->len; i++) {
++        const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
++
++        /* at this point numa mappings are initilized by CLI options
++         * or with default mappings so it's sufficient to list
++         * all not yet mapped CPUs here */
++        /* TODO: make it hard error in future */
++        if (!cpu_slot->props.has_node_id) {
++            char *cpu_str = cpu_slot_to_string(cpu_slot);
++            g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
++                                   cpu_str);
++            g_free(cpu_str);
++        }
++    }
++    if (s->len) {
++        error_report("warning: CPU(s) not present in any NUMA nodes: %s",
++                     s->str);
++        error_report("warning: All CPU(s) up to maxcpus should be described "
++                     "in NUMA config, ability to start up with partial NUMA "
++                     "mappings is obsoleted and will be removed in future");
++    }
++    g_string_free(s, true);
++}
++
+ void machine_run_board_init(MachineState *machine)
  {
-     MachineClass *mc = MACHINE_CLASS(klass);
-diff --git a/vl.c b/vl.c
-index 5cd0c17ba0..3d8c140011 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4559,7 +4559,7 @@ int main(int argc, char **argv, char **envp)
-     current_machine->boot_order = boot_order;
-     current_machine->cpu_model = cpu_model;
+     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
++
++    if (nb_numa_nodes) {
++        machine_numa_validate(machine);
++    }
+     machine_class->init(machine);
+ }
  
--    machine_class->init(current_machine);
-+    machine_run_board_init(current_machine);
- 
-     realtime_init();
+diff --git a/numa.c b/numa.c
+index dc739eadfa..63bff5a54d 100644
+--- a/numa.c
++++ b/numa.c
+@@ -337,16 +337,6 @@ static void validate_numa_cpus(void)
+         bitmap_or(seen_cpus, seen_cpus,
+                   numa_info[i].node_cpu, max_cpus);
+     }
+-
+-    if (!bitmap_full(seen_cpus, max_cpus)) {
+-        char *msg;
+-        bitmap_complement(seen_cpus, seen_cpus, max_cpus);
+-        msg = enumerate_cpus(seen_cpus, max_cpus);
+-        error_report("warning: CPU(s) not present in any NUMA nodes: %s", msg);
+-        error_report("warning: All CPU(s) up to maxcpus should be described "
+-                     "in NUMA config");
+-        g_free(msg);
+-    }
+     g_free(seen_cpus);
+ }
  
 -- 
 2.11.0.259.g40922b1
