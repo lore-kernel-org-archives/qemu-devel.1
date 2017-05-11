@@ -1,39 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d8pey-0006A6-P6
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:05:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8piq-0001aD-04
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d8pet-000487-PG
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:05:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d8pet-00047o-Ew
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:05:39 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4BEroXN028549
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 11:05:37 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2acnbj0hhq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 11:05:37 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 11 May 2017 16:05:33 +0100
-Date: Thu, 11 May 2017 17:05:27 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <1494243504-127980-9-git-send-email-arei.gonglei@huawei.com>
-References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
-	<1494243504-127980-9-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <eblake@redhat.com>) id 1d8pio-0006Jw-Tw
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:09:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8pio-0006Jb-Kw
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:09:42 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 90DBFC04B951
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 15:09:41 +0000 (UTC)
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-5-marcandre.lureau@redhat.com>
+	<8737cbv53y.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d09d75e7-e0a6-bd50-7cb0-2862f7314fe8@redhat.com>
+Date: Thu, 11 May 2017 10:09:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170511170527.5846a676.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC v1 8/9] virtio-crypto: add host feature bits
- support
+In-Reply-To: <8737cbv53y.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hiXDRFSlP2wPWlKcA1N0jBqItcxMlimtG"
+Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,67 +35,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gonglei <arei.gonglei@huawei.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, weidong.huang@huawei.com, pasic@linux.vnet.ibm.com, stefanha@redhat.com, luonengjun@huawei.com, linqiangmin@huawei.com, xin.zeng@intel.com, wu.wubin@huawei.com
+To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, 8 May 2017 19:38:23 +0800
-Gonglei <arei.gonglei@huawei.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hiXDRFSlP2wPWlKcA1N0jBqItcxMlimtG
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <d09d75e7-e0a6-bd50-7cb0-2862f7314fe8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+ <20170509173559.31598-5-marcandre.lureau@redhat.com>
+ <8737cbv53y.fsf@dusky.pond.sub.org>
+In-Reply-To: <8737cbv53y.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> We enable all feature bits acquiescently.
-> 
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> ---
->  hw/virtio/virtio-crypto.c         | 15 +++++++++++++++
->  include/hw/virtio/virtio-crypto.h |  1 +
->  2 files changed, 16 insertions(+)
-> 
-> diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-> index 5422f25..3dc0ff2 100644
-> --- a/hw/virtio/virtio-crypto.c
-> +++ b/hw/virtio/virtio-crypto.c
-> @@ -1034,6 +1034,11 @@ static uint64_t virtio_crypto_get_features(VirtIODevice *vdev,
->                                             uint64_t features,
->                                             Error **errp)
->  {
-> +    VirtIOCrypto *vcrypto = VIRTIO_CRYPTO(vdev);
-> +
-> +    /* Firstly sync all virtio-crypto possible supported features */
-> +    features |= vcrypto->host_features;
-> +
->      return features;
->  }
-> 
-> @@ -1144,6 +1149,16 @@ static const VMStateDescription vmstate_virtio_crypto = {
->  };
-> 
->  static Property virtio_crypto_properties[] = {
-> +    DEFINE_PROP_BIT("mux_mode", VirtIOCrypto, host_features,
-> +                    VIRTIO_CRYPTO_F_MUX_MODE, true),
-> +    DEFINE_PROP_BIT("cipher_stateless_mode", VirtIOCrypto, host_features,
-> +                    VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE, true),
-> +    DEFINE_PROP_BIT("hash_stateless_mode", VirtIOCrypto, host_features,
-> +                    VIRTIO_CRYPTO_F_HASH_STATELESS_MODE, true),
-> +    DEFINE_PROP_BIT("mac_stateless_mode", VirtIOCrypto, host_features,
-> +                    VIRTIO_CRYPTO_F_MAC_STATELESS_MODE, true),
-> +    DEFINE_PROP_BIT("aead_stateless_mode", VirtIOCrypto, host_features,
-> +                    VIRTIO_CRYPTO_F_AEAD_STATELESS_MODE, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> 
-> diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio-crypto.h
-> index 465ad20..30ea51d 100644
-> --- a/include/hw/virtio/virtio-crypto.h
-> +++ b/include/hw/virtio/virtio-crypto.h
-> @@ -97,6 +97,7 @@ typedef struct VirtIOCrypto {
->      int multiqueue;
->      uint32_t curr_queues;
->      size_t config_size;
-> +    uint32_t host_features;
+On 05/11/2017 09:29 AM, Markus Armbruster wrote:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>=20
+>> We would like to use a same QObject type to represent numbers, whether=
 
-I'd just make that 64 bits from the start.
+>> they are int, uint, or floats. getters will allow some compatibility
+>=20
+> Please start your sentence with a capital letter ...
+>=20
+>> between the various types if the number fits other representations
+>=20
+> ... and end them with a period.
+>=20
 
->  } VirtIOCrypto;
-> 
->  #endif /* _QEMU_VIRTIO_CRYPTO_H */
+>> +++ b/block/qapi.c
+>> @@ -595,9 +595,11 @@ static void dump_qobject(fprintf_function func_fp=
+rintf, void *f,
+>>                           int comp_indent, QObject *obj)
+>>  {
+>>      switch (qobject_type(obj)) {
+>> -        case QTYPE_QINT: {
+>> -            QInt *value =3D qobject_to_qint(obj);
+>> -            func_fprintf(f, "%" PRId64, qint_get_int(value));
+>> +        case QTYPE_QNUM: {
+>> +            QNum *value =3D qobject_to_qnum(obj);
+>> +            char *tmp =3D qnum_to_string(value);
+>> +            func_fprintf(f, "%s", tmp);
+>> +            g_free(tmp);
+>>              break;
+>>          }
+>>          case QTYPE_QSTRING: {
+>=20
+> Becomes a bit awkward due to the dynamically allocated buffer.  Let's
+> ignore that for now.
+>=20
+> Aside: I don't like that the block layer has its own dump_qobject().
 
-Don't you need some kind of compat handling?
+I should really revive my patches for a QAPI JSON output visitor.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--hiXDRFSlP2wPWlKcA1N0jBqItcxMlimtG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZFH6xAAoJEKeha0olJ0NqKasH/R0e/TI3zYwG2wtECXhPhEwR
+yJShtEsbf6dZZb6a6Ur3aQNIm7Wks3A7PPxcGwA39q18fRspjopX2ag+rgB/YYEu
+qlYI3m52RaYfdfWwndy5JtnMFrzD+aSXVJYlpVyKVmL6dPEklznII7Qp/g2C276x
+YeWlnFG/rcLusOUthFh/DC3D0RRh0nLKDjq0h+d4+5UOAKKSUrBiBRV5JLLqqVeB
+N5rW6+6JOhtLLtowtbWs5nA+nqBH8IXi9rTCBe5YbgqXTB8LMvr3/6higUtSiJ/4
+5Vhw9BPOECw8UulZnSw0C7mE1y63GtJ6IJQYFyPVdTCtZglhkX9LAs68YFTm9tg=
+=3/wq
+-----END PGP SIGNATURE-----
+
+--hiXDRFSlP2wPWlKcA1N0jBqItcxMlimtG--
