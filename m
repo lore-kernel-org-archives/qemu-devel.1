@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8gFE-0001vP-EA
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 01:02:33 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d8gG7-0002Mv-Jd
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 01:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8gFD-0003mT-Mq
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 01:02:32 -0400
-References: <20170508141310.8674-1-pbonzini@redhat.com>
-	<20170508141310.8674-6-pbonzini@redhat.com>
-	<20170509170625.GB25411@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bc30caa8-acbb-3640-f394-ada19891795d@redhat.com>
-Date: Tue, 9 May 2017 19:09:23 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170509170625.GB25411@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/11] blockjob: separate monitor and
- blockjob APIs
+	(envelope-from <wei.w.wang@intel.com>) id 1d8gG2-0004iz-Lq
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 01:03:27 -0400
+Received: from mga11.intel.com ([192.55.52.93]:49213)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1d8gG2-0004iN-Ds
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 01:03:22 -0400
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Thu, 11 May 2017 12:57:21 +0800
+Message-Id: <1494478641-24549-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH] virtio-net: keep the packet layout intact
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +22,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, stefanha@redhat.com
+To: mst@redhat.com, jasowang@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: jan.scheurich@ericsson.com, Wei Wang <wei.w.wang@intel.com>
 
+The current implementation may change the packet layout when
+vnet_hdr needs an endianness swap. The layout change causes
+one more iov to be added to the iov[] passed from the guest, which
+is a barrier to making the TX queue size 1024 due to the possible
+off-by-one issue.
 
+This patch changes the implementation to remain the packet layout
+intact. In this case, the number of iov[] passed to writev will be
+equal to the number obtained from the guest.
 
-On 09/05/2017 19:06, Jeff Cody wrote:
->> Keep the two APIs separate in the blockjob.c file too.  This will
->> be useful when transitioning away from the AioContext lock, because
->> there will be locking policies for the two categories, too---the
->> monitor will have to call new block_job_lock/unlock APIs, while blockjob
->> APIs will take care of this for the users.
->
-> Would it make sense to split this out into separate files, rather than
-> delineating it by placement in a single .c file?
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ hw/net/virtio-net.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
-Probably not, because the latter APIs do use several static functions in
-blockjob.c.  For example, block_job_early_fail calls block_job_unref,
-block_job_completed calls block_job_finish_sync (via
-block_job_completed_txn_abort).
-
-Given the file is <1000 lines of code, I think it's not worth the hassle.
-
-Paolo
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 7d091c9..a51e9a8 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1287,8 +1287,7 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
+     for (;;) {
+         ssize_t ret;
+         unsigned int out_num;
+-        struct iovec sg[VIRTQUEUE_MAX_SIZE], sg2[VIRTQUEUE_MAX_SIZE + 1], *out_sg;
+-        struct virtio_net_hdr_mrg_rxbuf mhdr;
++        struct iovec sg[VIRTQUEUE_MAX_SIZE], mhdr, *out_sg;
+ 
+         elem = virtqueue_pop(q->tx_vq, sizeof(VirtQueueElement));
+         if (!elem) {
+@@ -1305,7 +1304,10 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
+         }
+ 
+         if (n->has_vnet_hdr) {
+-            if (iov_to_buf(out_sg, out_num, 0, &mhdr, n->guest_hdr_len) <
++            /* Buffer to copy vnet_hdr and the possible adjacent data */
++            mhdr.iov_len = out_sg[0].iov_len;
++            mhdr.iov_base = g_malloc0(mhdr.iov_len);
++            if (iov_to_buf(out_sg, out_num, 0, mhdr.iov_base, mhdr.iov_len) <
+                 n->guest_hdr_len) {
+                 virtio_error(vdev, "virtio-net header incorrect");
+                 virtqueue_detach_element(q->tx_vq, elem, 0);
+@@ -1313,17 +1315,12 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
+                 return -EINVAL;
+             }
+             if (n->needs_vnet_hdr_swap) {
+-                virtio_net_hdr_swap(vdev, (void *) &mhdr);
+-                sg2[0].iov_base = &mhdr;
+-                sg2[0].iov_len = n->guest_hdr_len;
+-                out_num = iov_copy(&sg2[1], ARRAY_SIZE(sg2) - 1,
+-                                   out_sg, out_num,
+-                                   n->guest_hdr_len, -1);
+-                if (out_num == VIRTQUEUE_MAX_SIZE) {
+-                    goto drop;
+-		}
+-                out_num += 1;
+-                out_sg = sg2;
++                virtio_net_hdr_swap(vdev, mhdr.iov_base);
++                /* Copy the first iov where the vnet_hdr resides in */
++                out_num = iov_copy(sg, 1, &mhdr, 1, 0, mhdr.iov_len);
++                out_num += iov_copy(sg + 1, ARRAY_SIZE(sg) - 1, out_sg + 1,
++                                    elem->out_num - 1, 0, -1);
++                out_sg = sg;
+ 	    }
+         }
+         /*
+@@ -1345,13 +1342,15 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
+ 
+         ret = qemu_sendv_packet_async(qemu_get_subqueue(n->nic, queue_index),
+                                       out_sg, out_num, virtio_net_tx_complete);
++        if (n->has_vnet_hdr) {
++            g_free(mhdr.iov_base);
++        }
+         if (ret == 0) {
+             virtio_queue_set_notification(q->tx_vq, 0);
+             q->async_tx.elem = elem;
+             return -EBUSY;
+         }
+ 
+-drop:
+         virtqueue_push(q->tx_vq, elem, 0);
+         virtio_notify(vdev, q->tx_vq);
+         g_free(elem);
+-- 
+2.7.4
