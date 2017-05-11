@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8dJA-0004V5-NN
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8dSa-0007PE-Rd
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:04:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8dJ7-0004jc-HP
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:24 -0400
-Date: Thu, 11 May 2017 10:14:58 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1d8dSX-0002yB-OJ
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:04:08 -0400
+Received: from ozlabs.org ([103.22.144.67]:52779)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d8dSX-0002x5-3s
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 22:04:05 -0400
+Date: Thu, 11 May 2017 11:56:38 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170511001458.GC14408@umbus.fritz.box>
-References: <1494234377-1773-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1494234377-1773-2-git-send-email-bharata@linux.vnet.ibm.com>
+Message-ID: <20170511015637.GF14408@umbus.fritz.box>
+References: <1494403315-12760-1-git-send-email-peterx@redhat.com>
+	<1494403315-12760-5-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bAmEntskrkuBymla"
+	protocol="application/pgp-signature"; boundary="tmoQ0UElFV5VgXgH"
 Content-Disposition: inline
-In-Reply-To: <1494234377-1773-2-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] spapr: Make
- h_register_process_table hcall flags global
+In-Reply-To: <1494403315-12760-5-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 04/12] memory: fix
+ address_space_get_iotlb_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,137 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---bAmEntskrkuBymla
+--tmoQ0UElFV5VgXgH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 08, 2017 at 02:36:16PM +0530, Bharata B Rao wrote:
-> The flags used in h_register_process_table hcall are needed in spapr.c
-> and hence move them to a header file. While doing so, give them
-> slightly specific names.
+On Wed, May 10, 2017 at 04:01:47PM +0800, Peter Xu wrote:
+> This function has an assumption that we will definitely call translate()
+> once (or say, the addr will be located inside one IOMMU memory region),
+> otherwise an empty IOTLB will be returned. Nevertheless, this is not
+> what we want. When there is no IOMMU memory region, we should build up a
+> static mapping for the caller, instead of an invalid IOTLB.
 >=20
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> We won't trigger this path before VT-d passthrough mode. When
+> passthrough mode for a vhost device is setup, VT-d is possible to
+> disable the IOMMU region for that device. Without current patch, we'll
+> get a vhost boot failure, and it'll be failed over to virtio userspace
+> mode.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+This doesn't look right to me.  You're assuming the target is
+address_space_memory, which might not be the case - and you should be
+able to check from the MR you do hit.  Furthermore it doesn't look
+like you're accounting for the trivial translation if the section's
+offset in the address space is different from its offset in the MR.
 
+I think for the fallback path you're going to want something based on
+address_space_translate() instead.
+
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Jason Wang <jasowang@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  hw/ppc/spapr_hcall.c   | 31 ++++++++++++++-----------------
->  include/hw/ppc/spapr.h | 10 ++++++++++
->  2 files changed, 24 insertions(+), 17 deletions(-)
+>  exec.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 0d608d6..3600b0e 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -924,13 +924,6 @@ static void spapr_check_setup_free_hpt(sPAPRMachineS=
-tate *spapr,
->      return;
+> diff --git a/exec.c b/exec.c
+> index 072de5d..5cfdacd 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -463,12 +463,13 @@ address_space_translate_internal(AddressSpaceDispat=
+ch *d, hwaddr addr, hwaddr *x
 >  }
 > =20
-> -#define FLAGS_MASK              0x01FULL
-> -#define FLAG_MODIFY             0x10
-> -#define FLAG_REGISTER           0x08
-> -#define FLAG_RADIX              0x04
-> -#define FLAG_HASH_PROC_TBL      0x02
-> -#define FLAG_GTSE               0x01
-> -
->  static target_ulong h_register_process_table(PowerPCCPU *cpu,
->                                               sPAPRMachineState *spapr,
->                                               target_ulong opcode,
-> @@ -943,12 +936,13 @@ static target_ulong h_register_process_table(PowerP=
-CCPU *cpu,
->      target_ulong table_size =3D args[3];
->      uint64_t cproc;
+>  /* Called from RCU critical section */
+> -IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr add=
+r,
+> +IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr iov=
+a,
+>                                              bool is_write)
+>  {
+>      IOMMUTLBEntry iotlb =3D {0};
+>      MemoryRegionSection *section;
+>      MemoryRegion *mr;
+> +    hwaddr addr =3D iova, psize;
 > =20
-> -    if (flags & ~FLAGS_MASK) { /* Check no reserved bits are set */
-> +    if (flags & ~SPAPR_PROC_TABLE_MASK) { /* Check no reserved bits are =
-set */
->          return H_PARAMETER;
->      }
-> -    if (flags & FLAG_MODIFY) {
-> -        if (flags & FLAG_REGISTER) {
-> -            if (flags & FLAG_RADIX) { /* Register new RADIX process tabl=
-e */
-> +    if (flags & SPAPR_PROC_TABLE_MODIFY) {
-> +        if (flags & SPAPR_PROC_TABLE_REGISTER) {
-> +            if (flags & SPAPR_PROC_TABLE_RADIX) {
-> +                /* Register new RADIX process table */
->                  if (proc_tbl & 0xfff || proc_tbl >> 60) {
->                      return H_P2;
->                  } else if (page_size) {
-> @@ -958,7 +952,8 @@ static target_ulong h_register_process_table(PowerPCC=
-PU *cpu,
->                  }
->                  cproc =3D PATBE1_GR | proc_tbl | table_size;
->              } else { /* Register new HPT process table */
-> -                if (flags & FLAG_HASH_PROC_TBL) { /* Hash with Segment T=
-ables */
-> +                if (flags & SPAPR_PROC_TABLE_HPT_PT) {
-> +                    /* Hash with Segment Tables */
->                      /* TODO - Not Supported */
->                      /* Technically caused by flag bits =3D> H_PARAMETER =
-*/
->                      return H_PARAMETER;
-> @@ -981,7 +976,8 @@ static target_ulong h_register_process_table(PowerPCC=
-PU *cpu,
->              cproc =3D spapr->patb_entry & PATBE1_GR;
+>      for (;;) {
+>          AddressSpaceDispatch *d =3D atomic_rcu_read(&as->dispatch);
+> @@ -478,6 +479,23 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressS=
+pace *as, hwaddr addr,
+>          mr =3D section->mr;
+> =20
+>          if (!mr->iommu_ops) {
+> +            /*
+> +             * We didn't translate() but reached here. It possibly
+> +             * means it's a static mapping. If so (it should be RAM),
+> +             * we set the IOTLB up.
+> +             */
+> +            if (!iotlb.target_as && memory_region_is_ram(mr) &&
+> +                !memory_region_is_rom(mr)) {
+> +                psize =3D mr->ram_block->page_size;
+> +                iova &=3D ~(psize - 1);
+> +                iotlb =3D (IOMMUTLBEntry) {
+> +                    .target_as =3D &address_space_memory,
+> +                    .iova =3D iova,
+> +                    .translated_addr =3D iova,
+> +                    .addr_mask =3D psize - 1,
+> +                    .perm =3D IOMMU_RW,
+> +                };
+> +            }
+>              break;
 >          }
->      } else { /* Maintain current registration */
-> -        if (!(flags & FLAG_RADIX) !=3D !(spapr->patb_entry & PATBE1_GR))=
- {
-> +        if (!(flags & SPAPR_PROC_TABLE_RADIX) !=3D
-> +            !(spapr->patb_entry & PATBE1_GR)) {
->              /* Technically caused by flag bits =3D> H_PARAMETER */
->              return H_PARAMETER; /* Existing Process Table Mismatch */
->          }
-> @@ -996,13 +992,14 @@ static target_ulong h_register_process_table(PowerP=
-CCPU *cpu,
->      /* Update the UPRT and GTSE bits in the LPCR for all cpus */
->      CPU_FOREACH(cs) {
->          set_spr(cs, SPR_LPCR, LPCR_UPRT | LPCR_GTSE,
-> -                ((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UPRT=
- : 0) |
-> -                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0));
-> +                ((flags & (SPAPR_PROC_TABLE_RADIX | SPAPR_PROC_TABLE_HPT=
-_PT)) ?
-> +                LPCR_UPRT : 0) | ((flags & SPAPR_PROC_TABLE_GTSE) ?
-> +                SPAPR_PROC_TABLE_GTSE : 0));
->      }
 > =20
->      if (kvm_enabled()) {
-> -        return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
-> -                                       flags & FLAG_GTSE, cproc);
-> +        return kvmppc_configure_v3_mmu(cpu, flags & SPAPR_PROC_TABLE_RAD=
-IX,
-> +                                       flags & SPAPR_PROC_TABLE_GTSE, cp=
-roc);
->      }
->      return H_SUCCESS;
->  }
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 5802f88..a692e63 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -681,4 +681,14 @@ int spapr_rng_populate_dt(void *fdt);
-> =20
->  void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
-> =20
-> +/*
-> + * Defines for flag value used in H_REGISTER_PROC_TBL hcall.
-> + */
-> +#define SPAPR_PROC_TABLE_MASK        0x01FULL
-> +#define SPAPR_PROC_TABLE_MODIFY      0x10
-> +#define SPAPR_PROC_TABLE_REGISTER    0x08
-> +#define SPAPR_PROC_TABLE_RADIX       0x04
-> +#define SPAPR_PROC_TABLE_HPT_PT      0x02
-> +#define SPAPR_PROC_TABLE_GTSE        0x01
-> +
->  #endif /* HW_SPAPR_H */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -163,25 +122,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---bAmEntskrkuBymla
+--tmoQ0UElFV5VgXgH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZE60AAAoJEGw4ysog2bOSONAQAL1T3D2m0eIgj3sYj+mGxfqM
-BbvLCD1Kj/aJtruHGZbjO8hFPmBPBbGOn7LVBShHgvlq9nD3Yf3KNj9/H1/Qyft8
-erZ2QdHVxCmKPCHVRzNf8gjsVHWZdpX1rDcXUQr1M3I33hGQlgWNg8xBCuj102RU
-Xq2RYhGDLrerR2k19F9pl4C3LJYZ7xFArug1j4FR7Dw6Dd8drAl6bsOR1mjksx+o
-SdNvCfMi71sFjBPUYWhDT23QkfiZdMCjo/1ScJFx1VB7CKZA6Hf2MSRLKzdOSuJ4
-JMfX8Mz7Zvoo7wnRvV1hjyH27LHHOkAR34yGiISjaRPl57s4vCJTPYPAyKbc6cDc
-GG/jKb4+YBauruNuZV6uVZUbspw4/tgeGGFuN14g5fJchEvpgvGDITxW9A2kAPBn
-YI0KQNIuGJr5tfYUIq5MiRxI/Vdj9O0x1UaUF8zGxVcA2Mhml6PQWltGUpL8mpe+
-+25VtMKKZ8L4YIfhpa8v5XT+uR6gWE5iMDGEnOR8UA+wtSIUAGhT8U2mS3pGNucj
-BdhSGjvZpNCn4yJOY6lMtJPt9RtfsmxKKg6+m63ahZf+ZnpY40pa6FeMoJbaxY3c
-iZnhNyQUuOD908qyK71kXKaa5mWqyxM2TCX3qO/wFltC1YCxAk90WadYmU91xUjR
-ReO4TvEYAGFiYR22DIf1
-=xBHx
+iQIcBAEBCAAGBQJZE8TVAAoJEGw4ysog2bOS8RAP/RQDaI4VqLMwGZi1cwSFspd4
+vqzAUX/xB7uZ/YF+Noe2VKI1keCnLehBSa3aFTQjczrlWuF6wvL3YEClBuo4479f
++Oiq484uD4HWCHhiJa1aFZExJrt7QNKcjiu8C4PkKS/NPMBJO0lLrYokuF+sTu9g
+UnugtiKlLCbuoKTYjGNyoYPWTRV+XOQl5UKw5Zzl15e+iIXs3yGh2akVjVciUHRp
+3pRG+hxVrVVoXW/Z6zHij+b3/IbWwNzYjs2DcBjnXDAlr7N4edvCky8lSUFY9uEw
+im3bnwc6kV1Ftfey0Pf09xQAmUtVldu4r7b61OIEi+FA5Gjrhq8XgldzBCH8++re
+6gy6JOCZiZUtOq+ajrMTGafA5ZY696/0vVVNkKU5JMrCMXoIHwZPYz9cWkwl+yiy
+ApGe1nXd7fvmMXWcOZwSDV3cypFBQw7anu5gZjW1mo1JBR/B375pA5KMpPrBCJ51
+yT7kwOuj7FmxDDiGAYIpU4RCRO4IvEXijFTbGK8UK212E2wvDItroVsiB98hsucE
+V3f9J2/d0T3R4HlOVX45AKa7c5RwhmfodLvHrpWRPwxRau95BpBjEo8Zb7VeEeKY
+sZrWeLJc7i6w6Q9Mp52imC7yvFpGK79RX2q7+HW5RkS4Hf++qB3MHGNI6AEutQbZ
+rJqK9vzIEoWcqXzsKGiq
+=50sy
 -----END PGP SIGNATURE-----
 
---bAmEntskrkuBymla--
+--tmoQ0UElFV5VgXgH--
