@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d8v8I-0007Hb-AW
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:56:23 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1d8vPT-0002h4-Ex
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d8v8H-0001Qf-GW
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:56:22 -0400
-Date: Thu, 11 May 2017 16:56:11 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170511205611.GC19824@localhost.localdomain>
-References: <20170510143205.32013-1-pbonzini@redhat.com>
-	<20170510143205.32013-4-pbonzini@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1d8vPO-0002gL-CN
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:14:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1d8vPO-0002ew-3j
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:14:02 -0400
+Date: Thu, 11 May 2017 15:13:56 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170511151356.78516f2b@w520.home>
+In-Reply-To: <20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
+References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170510143205.32013-4-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/7] curl: avoid recursive locking of
- BDRVCURLState mutex
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 06/13] s390x/css: device support for
+ s390-ccw passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,118 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, eric.auger@redhat.com
 
-On Wed, May 10, 2017 at 04:32:01PM +0200, Paolo Bonzini wrote:
-> The curl driver has a ugly hack where, if it cannot find an empty CURLState,
-> it just uses aio_poll to wait for one to be empty.  This is probably
-> buggy when used together with dataplane, and the simplest way to fix it
-> is to use coroutines instead.
+On Fri,  5 May 2017 04:03:45 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+
+> In order to support subchannels pass-through, we introduce a s390
+> subchannel device called "s390-ccw" to hold the real subchannel info.
+> The s390-ccw devices inherit from the abstract CcwDevice which connect
+> to the existing virtual-css-bus.
 > 
-> A more immediate effect of the bug however is that it can cause a
-> recursive call to curl_readv_bh_cb and recursively taking the
-> BDRVCURLState mutex.  This causes a deadlock.
-> 
-> The fix is to unlock the mutex around aio_poll, but for cleanliness we
-> should also take the mutex around all calls to curl_init_state, even if
-> reaching the unlock/lock pair is impossible.  The same is true for
-> curl_clean_state.
-> 
-> Reported-by: Richard W.M. Jones <rjones@redhat.com>
-> Cc: jcody@redhat.com
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 > ---
->  block/curl.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+>  hw/s390x/Makefile.objs |   1 +
+>  hw/s390x/s390-ccw.c    | 138 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-ccw.h    |  38 ++++++++++++++
+>  3 files changed, 177 insertions(+)
+>  create mode 100644 hw/s390x/s390-ccw.c
+>  create mode 100644 hw/s390x/s390-ccw.h
 > 
-> diff --git a/block/curl.c b/block/curl.c
-> index 9a00fdc28e..b18e79bf54 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -281,6 +281,7 @@ read_end:
->      return size * nmemb;
->  }
->  
-> +/* Called with s->mutex held.  */
->  static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
->                           CURLAIOCB *acb)
->  {
-> @@ -453,6 +454,7 @@ static void curl_multi_timeout_do(void *arg)
->  #endif
->  }
->  
-> +/* Called with s->mutex held.  */
->  static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
->  {
->      CURLState *state = NULL;
-> @@ -471,7 +473,9 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
->              break;
->          }
->          if (!state) {
-> +            qemu_mutex_unlock(&s->mutex);
->              aio_poll(bdrv_get_aio_context(bs), true);
-> +            qemu_mutex_lock(&s->mutex);
->          }
->      } while(!state);
->  
-> @@ -534,6 +538,7 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
->      return state;
->  }
->  
-> +/* Called with s->mutex held.  */
->  static void curl_clean_state(CURLState *s)
->  {
->      int j;
-> @@ -565,6 +570,7 @@ static void curl_detach_aio_context(BlockDriverState *bs)
->      BDRVCURLState *s = bs->opaque;
->      int i;
->  
-> +    qemu_mutex_lock(&s->mutex);
->      for (i = 0; i < CURL_NUM_STATES; i++) {
->          if (s->states[i].in_use) {
->              curl_clean_state(&s->states[i]);
-> @@ -580,6 +586,7 @@ static void curl_detach_aio_context(BlockDriverState *bs)
->          curl_multi_cleanup(s->multi);
->          s->multi = NULL;
->      }
-> +    qemu_mutex_unlock(&s->mutex);
->  
->      timer_del(&s->timer);
->  }
-> @@ -745,9 +752,12 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      }
->  
->      DPRINTF("CURL: Opening %s\n", file);
-> +    qemu_mutex_init(&s->mutex);
+> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+> index 41ac4ec..72a3d37 100644
+> --- a/hw/s390x/Makefile.objs
+> +++ b/hw/s390x/Makefile.objs
+> @@ -13,3 +13,4 @@ obj-y += ccw-device.o
+>  obj-y += s390-pci-bus.o s390-pci-inst.o
+>  obj-y += s390-skeys.o
+>  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+> +obj-y += s390-ccw.o
+> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+> new file mode 100644
+> index 0000000..b1aadcd
+> --- /dev/null
+> +++ b/hw/s390x/s390-ccw.c
+> @@ -0,0 +1,138 @@
+> +/*
+> + * s390 CCW Assignment Support
+> + *
+> + * Copyright 2017 IBM Corp
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2
+> + * or (at your option) any later version. See the COPYING file in the
+> + * top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "libgen.h"
+> +#include "hw/s390x/css.h"
+> +#include "hw/s390x/css-bridge.h"
+> +#include "s390-ccw.h"
+> +
+> +static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
+> +                                  char *sysfsdev,
+> +                                  Error **errp)
+> +{
+> +    unsigned int cssid, ssid, devid;
+> +    char dev_path[PATH_MAX] = {0}, *tmp;
+> +
+> +    if (!sysfsdev) {
+> +        error_setg(errp, "No host device provided");
+> +        error_append_hint(errp,
+> +                          "Use -device vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
+> +        return;
+> +    }
+> +
+> +    if (!realpath(sysfsdev, dev_path)) {
+> +        error_setg_errno(errp, errno, "Host device '%s' not found", sysfsdev);
+> +        return;
+> +    }
+> +
+> +    cdev->mdevid = g_strdup(basename(dev_path));
+> +
+> +    tmp = basename(dirname(dev_path));
+> +    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
 
-This mutex init is now done above possible returns on error, so we should
-call qemu_mutex_destroy() on errors after this point.
 
->      s->aio_context = bdrv_get_aio_context(bs);
->      s->url = g_strdup(file);
-> +    qemu_mutex_lock(&s->mutex);
->      state = curl_init_state(bs, s);
-> +    qemu_mutex_unlock(&s->mutex);
->      if (!state)
->          goto out_noclean;
->  
-> @@ -791,11 +801,12 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
->      }
->      DPRINTF("CURL: Size = %zd\n", s->len);
->  
-> +    qemu_mutex_lock(&s->mutex);
->      curl_clean_state(state);
-> +    qemu_mutex_unlock(&s->mutex);
->      curl_easy_cleanup(state->curl);
->      state->curl = NULL;
->  
-> -    qemu_mutex_init(&s->mutex);
->      curl_attach_aio_context(bs, bdrv_get_aio_context(bs));
->  
->      qemu_opts_del(opts);
-> -- 
-> 2.12.2
-> 
-> 
+Seems like an oversight not to check this return value.
+
+
+> +
+> +    cdev->hostid.cssid = cssid;
+> +    cdev->hostid.ssid = ssid;
+> +    cdev->hostid.devid = devid;
+> +    cdev->hostid.valid = true;
+> +}
+> +
