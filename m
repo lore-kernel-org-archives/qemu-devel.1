@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d97tX-0004XV-5c
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:34:00 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d982Q-0006lq-Qd
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:43:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d97tW-0005G9-6d
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:33:59 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 12 May 2017 12:33:49 +0200
-Message-Id: <1494585229-9119-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] blockdev: Print a warning for legacy drive
- options that belong to -device
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d982M-0002i0-46
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:43:10 -0400
+Received: from mga01.intel.com ([192.55.52.88]:41497)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1d982L-0002h6-SL
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:43:06 -0400
+Date: Thu, 11 May 2017 18:29:02 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20170511102902.GD2931@gmail.com>
+References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
+	<1493201525-14418-6-git-send-email-yi.l.liu@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1493201525-14418-6-git-send-email-yi.l.liu@intel.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 5/8] VFIO: Add new IOTCL for PASID
+ Table bind propagation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,86 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: alex.williamson@redhat.com
+Cc: kvm@vger.kernel.org, iommu@lists.linux-foundation.org, peterx@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, ashok.raj@intel.com, jean-philippe.brucker@arm.com, jasowang@redhat.com, qemu-devel@nongnu.org, jacob.jun.pan@intel.com
 
-We likely do not want to carry these legacy -drive options along forever.
-Let's emit a deprecation warning for the -drive options that have a
-replacement with the -device option, so that the (hopefully few) remaining
-users are aware of this and can adapt their scripts / behaviour accordingly.
+On Wed, Apr 26, 2017 at 06:12:02PM +0800, Liu, Yi L wrote:
+> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2:
- - Check for !qtest_enabled() since tests/hd-geo-test still uses these
- - Added "addr" to the list, too
- - Also mark the options as deprecated in the documentation
+Hi Alex,
 
- blockdev.c      | 14 ++++++++++++++
- qemu-options.hx |  5 ++++-
- 2 files changed, 18 insertions(+), 1 deletion(-)
+In this patchset, I'm trying to add two new IOCTL cmd for Shared
+Virtual Memory virtualization. One for binding guest PASID Table
+and one for iommu tlb invalidation from guest. ARM has similar
+requirement on SVM supporting. Since it touched VFIO, I'd like
+to know your comments on changes in VFIO.
 
-diff --git a/blockdev.c b/blockdev.c
-index 0b38c3d..aef38f0 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -50,6 +50,7 @@
- #include "qmp-commands.h"
- #include "block/trace.h"
- #include "sysemu/arch_init.h"
-+#include "sysemu/qtest.h"
- #include "qemu/cutils.h"
- #include "qemu/help_option.h"
- #include "qemu/throttle-options.h"
-@@ -797,6 +798,9 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     const char *filename;
-     Error *local_err = NULL;
-     int i;
-+    const char *deprecated[] = {
-+        "serial", "trans", "secs", "heads", "cyls", "addr"
-+    };
- 
-     /* Change legacy command line options into QMP ones */
-     static const struct {
-@@ -880,6 +884,16 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-                 "update your scripts.\n");
-     }
- 
-+    /* Other deprecated options */
-+    if (!qtest_enabled()) {
-+        for (i = 0; i < ARRAY_SIZE(deprecated); i++) {
-+            if (qemu_opt_get(legacy_opts, deprecated[i]) != NULL) {
-+                error_report("'%s' is deprecated, please use the corresponding "
-+                             "option of '-device' instead", deprecated[i]);
-+            }
-+        }
-+    }
-+
-     /* Media type */
-     value = qemu_opt_get(legacy_opts, "media");
-     if (value) {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9d7964d..2f66f1a 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -615,6 +615,8 @@ of available connectors of a given interface type.
- This option defines the type of the media: disk or cdrom.
- @item cyls=@var{c},heads=@var{h},secs=@var{s}[,trans=@var{t}]
- These options have the same definition as they have in @option{-hdachs}.
-+These parameters are deprecated, use the corresponding parameters
-+of @code{-device} instead.
- @item snapshot=@var{snapshot}
- @var{snapshot} is "on" or "off" and controls snapshot mode for the given drive
- (see @option{-snapshot}).
-@@ -631,7 +633,8 @@ an untrusted format header.
- @item serial=@var{serial}
- This option specifies the serial number to assign to the device.
- @item addr=@var{addr}
--Specify the controller's PCI address (if=virtio only).
-+Specify the controller's PCI address (if=virtio only). This parameter is
-+deprecated, use the corresponding parameter of @code{-device} instead.
- @item werror=@var{action},rerror=@var{action}
- Specify which @var{action} to take on write and read errors. Valid actions are:
- "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
--- 
-1.8.3.1
+Thanks,
+Yi L
+
+> This patch adds VFIO_IOMMU_SVM_BIND_TASK for potential PASID table
+> binding requests.
+> 
+> On VT-d, this IOCTL cmd would be used to link the guest PASID page table
+> to host. While for other vendors, it may also be used to support other
+> kind of SVM bind request. Previously, there is a discussion on it with
+> ARM engineer. It can be found by the link below. This IOCTL cmd may
+> support SVM PASID bind request from userspace driver, or page table(cr3)
+> bind request from guest. These SVM bind requests would be supported by
+> adding different flags. e.g. VFIO_SVM_BIND_PASID is added to support
+> PASID bind from userspace driver, VFIO_SVM_BIND_PGTABLE is added to
+> support page table bind from guest.
+> 
+> https://patchwork.kernel.org/patch/9594231/
+> 
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> ---
+>  include/uapi/linux/vfio.h | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 519eff3..6b97987 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -547,6 +547,23 @@ struct vfio_iommu_type1_dma_unmap {
+>  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+>  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+>  
+> +/* IOCTL for Shared Virtual Memory Bind */
+> +struct vfio_device_svm {
+> +	__u32	argsz;
+> +#define VFIO_SVM_BIND_PASIDTBL	(1 << 0) /* Bind PASID Table */
+> +#define VFIO_SVM_BIND_PASID	(1 << 1) /* Bind PASID from userspace driver */
+> +#define VFIO_SVM_BIND_PGTABLE	(1 << 2) /* Bind guest mmu page table */
+> +	__u32	flags;
+> +	__u32	length;
+> +	__u8	data[];
+> +};
+> +
+> +#define VFIO_SVM_TYPE_MASK	(VFIO_SVM_BIND_PASIDTBL | \
+> +				VFIO_SVM_BIND_PASID | \
+> +				VFIO_SVM_BIND_PGTABLE)
+> +
+> +#define VFIO_IOMMU_SVM_BIND_TASK	_IO(VFIO_TYPE, VFIO_BASE + 22)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>  
+>  /*
+> -- 
+> 1.9.1
+> 
+> 
