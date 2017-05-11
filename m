@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8oIj-0008KC-Nk
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:38:42 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1d8oNt-0001Bo-2D
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:44:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8oIi-0003Ky-Kb
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:38:41 -0400
-Date: Thu, 11 May 2017 10:38:32 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170511133832.GI3482@thinpad.lan.raisama.net>
-References: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <kernellwp@gmail.com>) id 1d8oNs-0005qM-9f
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:44:01 -0400
+Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:34216)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1d8oNs-0005pt-5k
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:44:00 -0400
+Received: by mail-oi0-x22d.google.com with SMTP id b204so30512826oii.1
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 06:43:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/18] numa: add '-numa cpu' option
+In-Reply-To: <85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+	<20170424164244.GJ2362@work-vm>
+	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Thu, 11 May 2017 21:43:58 +0800
+Message-ID: <CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, May 10, 2017 at 01:29:44PM +0200, Igor Mammedov wrote:
-[...]
-> Igor Mammedov (18):
->   numa: move source of default CPUs to NUMA node mapping into boards
->   spapr: add node-id property to sPAPR core
->   pc: add node-id property to CPU
->   virt-arm: add node-id property to CPU
->   numa: add check that board supports cpu_index to node mapping
->   numa: mirror cpu to node mapping in MachineState::possible_cpus
->   numa: do default mapping based on possible_cpus instead of node_cpu
->     bitmaps
->   pc: get numa node mapping from possible_cpus instead of
->     numa_get_node_for_cpu()
->   spapr: get numa node mapping from possible_cpus instead of
->     numa_get_node_for_cpu()
->   virt-arm: get numa node mapping from possible_cpus instead of
->     numa_get_node_for_cpu()
->   QMP: include CpuInstanceProperties into query_cpus output output
->   tests: numa: add case for QMP command query-cpus
->   numa: remove no longer need numa_post_machine_init()
->   machine: call machine init from wrapper
->   numa: use possible_cpus for not mapped CPUs check
->   numa: remove node_cpu bitmaps as they are no longer used
->   numa: add '-numa cpu,...' option for property based node mapping
->   tests: check -numa node,cpu=props_list usecase
+2017-05-11 20:24 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
+>
+>
+> On 11/05/2017 14:07, Zhoujian (jay) wrote:
+>> -        * Scan sptes if dirty logging has been stopped, dropping those
+>> -        * which can be collapsed into a single large-page spte.  Later
+>> -        * page faults will create the large-page sptes.
+>> +        * Reset each vcpu's mmu, then page faults will create the large-page
+>> +        * sptes later.
+>>          */
+>>         if ((change != KVM_MR_DELETE) &&
+>>                 (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+>> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+>> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
 
-Queued on numa-next. Thanks!
+This is an unlikely branch(unless guest live migration fails and
+continue to run on the source machine) instead of hot path, do you
+have any performance number for your real workloads?
 
--- 
-Eduardo
+Regards,
+Wanpeng Li
+
+>> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+>> +               kvm_for_each_vcpu(i, vcpu, kvm)
+>> +                       kvm_mmu_reset_context(vcpu);
+>
+> This should be "kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);" but
+> I am not sure it is enough.  I think that if you do not zap the SPTEs,
+> the page faults will use 4K SPTEs, not large ones (though I'd have to
+> check better; CCing Xiao and Wanpeng).
+>
+> Paolo
