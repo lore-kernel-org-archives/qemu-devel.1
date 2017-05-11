@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vyasevic@redhat.com>) id 1d8vmZ-0000Wi-7U
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:38:02 -0400
+	(envelope-from <riel@redhat.com>) id 1d8vnN-0000vC-H9
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vyasevic@redhat.com>) id 1d8vmW-0008TT-1L
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:37:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60422)
+	(envelope-from <riel@redhat.com>) id 1d8vnK-0000dW-0H
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:38:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46776)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1d8vmV-0008RH-Nh
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:37:55 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D7BAE3DBD2
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 21:37:53 +0000 (UTC)
-Reply-To: vyasevic@redhat.com
-References: <CANHSq5DhUak9fVpvjG=VyeetP7VQudHwyEa4VevC21BuieSstw@mail.gmail.com>
-From: Vlad Yasevich <vyasevic@redhat.com>
-Message-ID: <ed14ac2d-1d0d-463f-fac7-49ccf33a6f57@redhat.com>
-Date: Thu, 11 May 2017 17:37:47 -0400
-MIME-Version: 1.0
-In-Reply-To: <CANHSq5DhUak9fVpvjG=VyeetP7VQudHwyEa4VevC21BuieSstw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2] migration: expose qemu_announce_self()
- via qmp
+	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1d8vnJ-0000d9-Po
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 17:38:45 -0400
+Message-ID: <1494538720.20270.35.camel@redhat.com>
+From: Rik van Riel <riel@redhat.com>
+Date: Thu, 11 May 2017 17:38:40 -0400
+In-Reply-To: <20170511181703.GC8701@stefanha-x1.localdomain>
+References: <1494431760-6455-1-git-send-email-pagupta@redhat.com>
+	<20170511181703.GC8701@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-i3zATagNHReA2Kg5+gJj"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] KVM "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,143 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Germano Veit Michel <germano@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Jose Quintela Carreira <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Pankaj Gupta <pagupta@redhat.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, pbonzini@redhat.com, kwolf@redhat.com, Haozhong Zhang <haozhong.zhang@intel.com>, Dan Williams <dan.j.williams@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-On 02/20/2017 07:16 PM, Germano Veit Michel wrote:
-> qemu_announce_self() is triggered by qemu at the end of migrations
-> to update the network regarding the path to the guest l2addr.
-> 
-> however it is also useful when there is a network change such as
-> an active bond slave swap. Essentially, it's the same as a migration
-> from a network perspective - the guest moves to a different point
-> in the network topology.
-> 
-> this exposes the function via qmp.
-> 
-> Signed-off-by: Germano Veit Michel <germano@redhat.com>
-> ---
->  include/migration/vmstate.h |  5 +++++
->  migration/savevm.c          | 30 +++++++++++++++++++-----------
->  qapi-schema.json            | 18 ++++++++++++++++++
->  3 files changed, 42 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index 63e7b02..a08715c 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -1042,6 +1042,11 @@ int64_t self_announce_delay(int round)
->      return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
->  }
-> 
-> +struct AnnounceRound {
-> +    QEMUTimer *timer;
-> +    int count;
-> +};
-> +
->  void dump_vmstate_json_to_file(FILE *out_fp);
-> 
->  #endif
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 5ecd264..44e196b 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -118,29 +118,37 @@ static void qemu_announce_self_iter(NICState
-> *nic, void *opaque)
->      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
->  }
-> 
-> -
->  static void qemu_announce_self_once(void *opaque)
->  {
-> -    static int count = SELF_ANNOUNCE_ROUNDS;
-> -    QEMUTimer *timer = *(QEMUTimer **)opaque;
-> +    struct AnnounceRound *round = opaque;
-> 
->      qemu_foreach_nic(qemu_announce_self_iter, NULL);
-> 
-> -    if (--count) {
-> +    round->count--;
-> +    if (round->count) {
->          /* delay 50ms, 150ms, 250ms, ... */
-> -        timer_mod(timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
-> -                  self_announce_delay(count));
-> +        timer_mod(round->timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
-> +                  self_announce_delay(round->count));
->      } else {
-> -            timer_del(timer);
-> -            timer_free(timer);
-> +            timer_del(round->timer);
-> +            timer_free(round->timer);
-> +            g_free(round);
->      }
->  }
-> 
->  void qemu_announce_self(void)
->  {
-> -    static QEMUTimer *timer;
-> -    timer = timer_new_ms(QEMU_CLOCK_REALTIME, qemu_announce_self_once, &timer);
-> -    qemu_announce_self_once(&timer);
-> +    struct AnnounceRound *round = g_malloc(sizeof(struct AnnounceRound));
-> +    if (!round)
-> +        return;
-> +    round->count = SELF_ANNOUNCE_ROUNDS;
-> +    round->timer = timer_new_ms(QEMU_CLOCK_REALTIME,
-> qemu_announce_self_once, round);
-> +    qemu_announce_self_once(round);
-> +}
 
-So, I've been looking and this code and have been playing with it and with David's
-patches and my patches to include virtio self announcements as well.  What I've discovered
-is what I think is a possible packet amplification issue here.
+--=-i3zATagNHReA2Kg5+gJj
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This creates a new timer every time we do do a announce_self.  With just migration,
-this is not an issue since you only migrate once at a time, so there is only 1 timer.
-With exposing this as an API, a user can potentially call it in a tight loop
-and now you have a ton of timers being created.  Add in David's patches allowing timeouts
-and retries to be configurable, and you may now have a ton of long lived timers.
-Add in the patches I am working on to let virtio do self announcements too (to really fix
-bonding issues), and now you add in a possibility of a lot of packets being sent for
-each timeout (RARP, GARP, NA, IGMPv4 Reports, IGMPv6 Reports [even worse if MLD1 is used]).
+On Thu, 2017-05-11 at 14:17 -0400, Stefan Hajnoczi wrote:
+> On Wed, May 10, 2017 at 09:26:00PM +0530, Pankaj Gupta wrote:
+> > * For live migration use case, if host side backing file is=C2=A0
+> > =C2=A0 shared storage, we need to flush the page cache for the disk=C2=
+=A0
+> > =C2=A0 image at the destination (new fadvise interface,
+> > FADV_INVALIDATE_CACHE?)=C2=A0
+> > =C2=A0 before starting execution of the guest on the destination host.
+>=20
+> Good point.=C2=A0=C2=A0QEMU currently only supports live migration with
+> O_DIRECT.
+> I think the problem was that userspace cannot guarantee consistency
+> in
+> the general case.=C2=A0=C2=A0If you find a solution to this problem for f=
+ake
+> NVDIMM then maybe the QEMU block layer can also begin supporting live
+> migration with buffered I/O.
 
-As you can see, this can get rather ugly...
+I'll be happy to work with you on that, independently
+of Pankaj's project.
 
-I think we need timer user here.  Migration and QMP being two to begin with.  Each
-one would get a single timer to play with.  If a given user already has a timer running,
-we could return an error or just not do anything.
+It looks like the fadvise system call could be extended
+pretty easily with an FADV_INVALIDATE_CACHE command, the
+other side of which can simply hook into the existing
+page cache invalidation code in the kernel.
 
--vlad
+Qemu will need to know whether the invalidation succeeded,
+but that is something we can test for pretty easily before
+returning to userspace.
 
-> +
-> +void qmp_announce_self(Error **errp)
-> +{
-> +    qemu_announce_self();
->  }
-> 
->  /***********************************************************/
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index baa0d26..0d9bffd 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -6080,3 +6080,21 @@
->  #
->  ##
->  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
-> +
-> +##
-> +# @announce-self:
-> +#
-> +# Trigger generation of broadcast RARP frames to update network switches.
-> +# This can be useful when network bonds fail-over the active slave.
-> +#
-> +# Arguments: None.
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "announce-self" }
-> +# <- { "return": {} }
-> +#
-> +# Since: 2.9
-> +##
-> +{ 'command': 'announce-self' }
-> +
-> 
+--=20
+All rights reversed
+--=-i3zATagNHReA2Kg5+gJj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAABCAAGBQJZFNnhAAoJEM553pKExN6D6MoIAKpuU/XNG0H3D6KuKHTkSwb3
+SxnHpE/KCtquxfKS6pUMHHvxKPXOURzZ/rAwR4t1xGoE3t5y+gH6NHrg9qti+i/U
+aHYoLQmUAs5CPMMgYEJH62dUBK8rw5yl1E3V0jxHo+4WQhb21v8aXHhUilg2m+uf
+BT+TfUGV/SjaXca6d/r9VkDuI5pNkH8o2CMDlHMvWR8wVwrw2T8BUzmdHMzlEVpt
+4Yooi+E6+HCtSQ0q/TYsXNwxTCi6jQQEcXDWZoIzTCNwe5t6tTgRBLjoKvE0Fzvi
+ig6np5bS+TjRPvmWAigEFDZpKF6JwzO6LebVCEwVEzDWdIOr/9jHeGiaox2qXdw=
+=C3g1
+-----END PGP SIGNATURE-----
+
+--=-i3zATagNHReA2Kg5+gJj--
