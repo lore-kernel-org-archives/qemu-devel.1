@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d8pFJ-00074i-RV
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:39:17 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d8pIJ-0001J6-5b
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d8pFI-0002od-DS
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:39:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46174)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d8pFI-0002nK-4N
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:39:12 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 55ECF8049B
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 14:39:10 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 11 May 2017 16:39:01 +0200
-Message-Id: <20170511143901.6340-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration: Move check_migratable() into qdev.c
+	(envelope-from <pbonzini@redhat.com>) id 1d8pII-00047f-5g
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:42:19 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 11 May 2017 16:41:51 +0200
+Message-Id: <20170511144208.24075-2-pbonzini@redhat.com>
+In-Reply-To: <20170511144208.24075-1-pbonzini@redhat.com>
+References: <20170511144208.24075-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 01/18] block: access copy_on_read with atomic
+ ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,195 +21,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-The function is only used once, and nothing else in migration knows
-about objects.  Create the function vmstate_device_is_migratable() in
-savem.c that really do the bit that is related with migration.
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/qdev.c                | 25 +++++++++++++++++++++----
- include/migration/migration.h |  6 ------
- include/migration/vmstate.h   |  2 ++
- include/sysemu/sysemu.h       |  2 +-
- migration/migration.c         | 15 ---------------
- migration/savevm.c            |  5 +++++
- stubs/vmstate.c               |  5 ++---
- 7 files changed, 31 insertions(+), 29 deletions(-)
+        v1->v2: use atomic_fetch_dec [Stefan]
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 02b632f..463e8dd 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -37,7 +37,7 @@
- #include "hw/boards.h"
- #include "hw/sysbus.h"
- #include "qapi-event.h"
--#include "migration/migration.h"
-+#include "migration/vmstate.h"
- 
- bool qdev_hotplug = false;
- static bool qdev_hot_added = false;
-@@ -861,6 +861,25 @@ static bool device_get_realized(Object *obj, Error **errp)
-     return dev->realized;
- }
- 
-+static bool check_only_migratable(Object *obj, Error **err)
-+{
-+    DeviceClass *dc = DEVICE_GET_CLASS(obj);
-+
-+    /* check needed if --only-migratable is specified */
-+    if (!only_migratable) {
-+        return true;
-+    }
-+
-+    if (!vmstate_device_is_migratable(dc->vmsd)) {
-+        error_setg(err, "Device %s is not migratable, but "
-+                   "--only-migratable was specified",
-+                   object_get_typename(obj));
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- static void device_set_realized(Object *obj, bool value, Error **errp)
- {
-     DeviceState *dev = DEVICE(obj);
-@@ -870,7 +889,6 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-     Error *local_err = NULL;
-     bool unattached_parent = false;
-     static int unattached_count;
--    int ret;
- 
-     if (dev->hotplugged && !dc->hotpluggable) {
-         error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));
-@@ -878,8 +896,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+ block.c                   |  6 ++++--
+ block/io.c                |  8 ++++----
+ blockdev.c                |  2 +-
+ include/block/block_int.h | 11 ++++++-----
+ 4 files changed, 15 insertions(+), 12 deletions(-)
+
+diff --git a/block.c b/block.c
+index 5db266be21..3a8e2e0ba4 100644
+--- a/block.c
++++ b/block.c
+@@ -1226,7 +1226,9 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+         goto fail_opts;
      }
  
-     if (value && !dev->realized) {
--        ret = check_migratable(obj, &local_err);
--        if (ret < 0) {
-+        if (!check_only_migratable(obj, &local_err)) {
-             goto fail;
-         }
+-    assert(bs->copy_on_read == 0); /* bdrv_new() and bdrv_close() make it so */
++    /* bdrv_new() and bdrv_close() make it so */
++    assert(atomic_read(&bs->copy_on_read) == 0);
++
+     if (bs->open_flags & BDRV_O_COPY_ON_READ) {
+         if (!bs->read_only) {
+             bdrv_enable_copy_on_read(bs);
+@@ -2976,7 +2978,7 @@ static void bdrv_close(BlockDriverState *bs)
  
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index e29cb01..0c9b6af 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -22,7 +22,6 @@
- #include "qapi-types.h"
- #include "exec/cpu-common.h"
- #include "qemu/coroutine_int.h"
--#include "qom/object.h"
- 
- #define QEMU_VM_FILE_MAGIC           0x5145564d
- #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-@@ -39,9 +38,6 @@
- #define QEMU_VM_COMMAND              0x08
- #define QEMU_VM_SECTION_FOOTER       0x7e
- 
--/* for vl.c */
--extern int only_migratable;
--
- struct MigrationParams {
-     bool blk;
-     bool shared;
-@@ -293,8 +289,6 @@ int migrate_add_blocker(Error *reason, Error **errp);
+         g_free(bs->opaque);
+         bs->opaque = NULL;
+-        bs->copy_on_read = 0;
++        atomic_set(&bs->copy_on_read, 0);
+         bs->backing_file[0] = '\0';
+         bs->backing_format[0] = '\0';
+         bs->total_sectors = 0;
+diff --git a/block/io.c b/block/io.c
+index a54e5c8cea..a0de60acbc 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -130,13 +130,13 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
   */
- void migrate_del_blocker(Error *reason);
+ void bdrv_enable_copy_on_read(BlockDriverState *bs)
+ {
+-    bs->copy_on_read++;
++    atomic_inc(&bs->copy_on_read);
+ }
  
--int check_migratable(Object *obj, Error **err);
+ void bdrv_disable_copy_on_read(BlockDriverState *bs)
+ {
+-    assert(bs->copy_on_read > 0);
+-    bs->copy_on_read--;
++    int old = atomic_fetch_dec(&bs->copy_on_read);
++    assert(old >= 1);
+ }
+ 
+ /* Check if any requests are in-flight (including throttled requests) */
+@@ -1144,7 +1144,7 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     bdrv_inc_in_flight(bs);
+ 
+     /* Don't do copy-on-read if we read data before write operation */
+-    if (bs->copy_on_read && !(flags & BDRV_REQ_NO_SERIALISING)) {
++    if (atomic_read(&bs->copy_on_read) && !(flags & BDRV_REQ_NO_SERIALISING)) {
+         flags |= BDRV_REQ_COPY_ON_READ;
+     }
+ 
+diff --git a/blockdev.c b/blockdev.c
+index cdec4ac82a..8b4e73ebd4 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1794,7 +1794,7 @@ static void external_snapshot_commit(BlkActionState *common)
+     /* We don't need (or want) to use the transactional
+      * bdrv_reopen_multiple() across all the entries at once, because we
+      * don't want to abort all of them if one of them fails the reopen */
+-    if (!state->old_bs->copy_on_read) {
++    if (!atomic_read(&state->old_bs->copy_on_read)) {
+         bdrv_reopen(state->old_bs, state->old_bs->open_flags & ~BDRV_O_RDWR,
+                     NULL);
+     }
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 4f8cd29ae4..eb90c529cd 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -581,11 +581,6 @@ struct BlockDriverState {
+ 
+     /* Protected by AioContext lock */
+ 
+-    /* If true, copy read backing sectors into image.  Can be >1 if more
+-     * than one client has requested copy-on-read.
+-     */
+-    int copy_on_read;
 -
- bool migrate_release_ram(void);
- bool migrate_postcopy_ram(void);
- bool migrate_zero_blocks(void);
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f4bf3f1..1a5bf9c 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -1067,4 +1067,6 @@ int64_t self_announce_delay(int round)
+     /* If we are reading a disk image, give its size in sectors.
+      * Generally read-only; it is written to by load_vmstate and save_vmstate,
+      * but the block layer is quiescent during those.
+@@ -619,6 +614,12 @@ struct BlockDriverState {
  
- void dump_vmstate_json_to_file(FILE *out_fp);
+     QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
  
-+bool vmstate_device_is_migratable(const VMStateDescription *vmsd);
++    /* If true, copy read backing sectors into image.  Can be >1 if more
++     * than one client has requested copy-on-read.  Accessed with atomic
++     * ops.
++     */
++    int copy_on_read;
 +
- #endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 15656b7..9240fdb 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -15,7 +15,7 @@
- /* vl.c */
+     /* do we need to tell the quest if we have a volatile write cache? */
+     int enable_write_cache;
  
- extern const char *bios_name;
--
-+extern int only_migratable;
- extern const char *qemu_name;
- extern QemuUUID qemu_uuid;
- extern bool qemu_uuid_set;
-diff --git a/migration/migration.c b/migration/migration.c
-index 799952c..fe62f15 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1158,21 +1158,6 @@ void migrate_del_blocker(Error *reason)
-     migration_blockers = g_slist_remove(migration_blockers, reason);
- }
- 
--int check_migratable(Object *obj, Error **err)
--{
--    DeviceClass *dc = DEVICE_GET_CLASS(obj);
--    if (only_migratable && dc->vmsd) {
--        if (dc->vmsd->unmigratable) {
--            error_setg(err, "Device %s is not migratable, but "
--                       "--only-migratable was specified",
--                       object_get_typename(obj));
--            return -1;
--        }
--    }
--
--    return 0;
--}
--
- void qmp_migrate_incoming(const char *uri, Error **errp)
- {
-     Error *local_err = NULL;
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 352a8f2..0012de3 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2323,3 +2323,8 @@ void vmstate_register_ram_global(MemoryRegion *mr)
- {
-     vmstate_register_ram(mr, NULL);
- }
-+
-+bool vmstate_device_is_migratable(const VMStateDescription *vmsd)
-+{
-+    return !(vmsd && vmsd->unmigratable);
-+}
-diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-index 6d52f29..5af824b 100644
---- a/stubs/vmstate.c
-+++ b/stubs/vmstate.c
-@@ -1,7 +1,6 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "migration/vmstate.h"
--#include "migration/migration.h"
- 
- const VMStateDescription vmstate_dummy = {};
- 
-@@ -21,7 +20,7 @@ void vmstate_unregister(DeviceState *dev,
- {
- }
- 
--int check_migratable(Object *obj, Error **err)
-+bool vmstate_device_is_migratable(const VMStateDescription *vmsd)
- {
--    return 0;
-+    return true;
- }
 -- 
-2.9.3
+2.12.2
