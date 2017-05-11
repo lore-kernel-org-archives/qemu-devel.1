@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fV1-0005RW-Ja
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fV2-0005Si-4z
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fV0-0001aU-9U
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fV0-0001at-LA
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:48 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 11 May 2017 14:14:24 +1000
-Message-Id: <20170511041426.6488-22-david@gibson.dropbear.id.au>
+Date: Thu, 11 May 2017 14:14:25 +1000
+Message-Id: <20170511041426.6488-23-david@gibson.dropbear.id.au>
 In-Reply-To: <20170511041426.6488-1-david@gibson.dropbear.id.au>
 References: <20170511041426.6488-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 21/23] target/ppc: Allow workarounds for POWER9
- DD1
+Subject: [Qemu-devel] [PULL 22/23] pnv: Fix build failures on some host
+ platforms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +23,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, sjitindarsingh@gmail.com, mark.cave-ayland@ilande.co.uk, sam.bobroff@au1.ibm.com, nikunj@linux.vnet.ibm.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-POWER9 DD1 silicon has some bugs which mean it a) isn't really compliant
-with the ISA v3.00 and b) require a number of special workarounds in the
-kernel.
-
-At the moment, qemu isn't aware of DD1.  For TCG we don't really want it to
-be (why bother emulating buggy silicon).  But with KVM, the guest does need
-to be aware of DD1 so it can apply the necessary workarounds.
-
-Meanwhile, the feature negotiation between qemu and the guest strongly
-favours architected compatibility modes to "raw" CPU modes.  In combination
-with the above, this means the guest sees architected POWER9 mode, and
-doesn't apply the DD1 workarounds.  Well, unless it has yet another
-workaround to partially ignore what qemu tells it.
-
-This patch addresses this by disabling support for compatibility modes when
-using KVM on a POWER9 DD1 host.
+This makes some changes to fix build failures on the 'min-glib' docker
+image, and maybe other platforms with a buildchain that's less tolerant
+about duplicated typedefs.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu-models.h |  1 +
- target/ppc/kvm.c        | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+ include/hw/ppc/pnv.h     | 3 +--
+ include/hw/ppc/pnv_lpc.h | 4 ++--
+ include/hw/ppc/pnv_occ.h | 4 ++--
+ 3 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
-index d587e69..b563c45 100644
---- a/target/ppc/cpu-models.h
-+++ b/target/ppc/cpu-models.h
-@@ -561,6 +561,7 @@ enum {
-     CPU_POWERPC_POWER8NVL_BASE     = 0x004C0000,
-     CPU_POWERPC_POWER8NVL_v10      = 0x004C0100,
-     CPU_POWERPC_POWER9_BASE        = 0x004E0000,
-+    CPU_POWERPC_POWER9_DD1         = 0x004E0100,
-     CPU_POWERPC_970_v22            = 0x00390202,
-     CPU_POWERPC_970FX_v10          = 0x00391100,
-     CPU_POWERPC_970FX_v20          = 0x003C0200,
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8574c36..cb2cf2b 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2380,6 +2380,17 @@ static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index c1288f9..9c5437d 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -21,6 +21,7 @@
  
- #if defined(TARGET_PPC64)
-     pcc->radix_page_info = kvm_get_radix_page_info();
+ #include "hw/boards.h"
+ #include "hw/sysbus.h"
++#include "hw/ipmi/ipmi.h"
+ #include "hw/ppc/pnv_lpc.h"
+ #include "hw/ppc/pnv_psi.h"
+ #include "hw/ppc/pnv_occ.h"
+@@ -118,8 +119,6 @@ typedef struct PnvChipClass {
+ #define POWERNV_MACHINE(obj) \
+     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
+ 
+-typedef struct IPMIBmc IPMIBmc;
+-
+ typedef struct PnvMachineState {
+     /*< private >*/
+     MachineState parent_obj;
+diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
+index ccf969a..023b4f0 100644
+--- a/include/hw/ppc/pnv_lpc.h
++++ b/include/hw/ppc/pnv_lpc.h
+@@ -19,12 +19,12 @@
+ #ifndef _PPC_PNV_LPC_H
+ #define _PPC_PNV_LPC_H
+ 
++#include "hw/ppc/pnv_psi.h"
 +
-+    if ((pcc->pvr & 0xffffff00) == CPU_POWERPC_POWER9_DD1) {
-+        /*
-+         * POWER9 DD1 has some bugs which make it not really ISA 3.00
-+         * compliant.  More importantly, advertising ISA 3.00
-+         * architected mode may prevent guests from activating
-+         * necessary DD1 workarounds.
-+         */
-+        pcc->pcr_supported &= ~(PCR_COMPAT_3_00 | PCR_COMPAT_2_07
-+                                | PCR_COMPAT_2_06 | PCR_COMPAT_2_05);
-+    }
- #endif /* defined(TARGET_PPC64) */
- }
+ #define TYPE_PNV_LPC "pnv-lpc"
+ #define PNV_LPC(obj) \
+      OBJECT_CHECK(PnvLpcController, (obj), TYPE_PNV_LPC)
+ 
+-typedef struct PnvPsi PnvPsi;
+-
+ typedef struct PnvLpcController {
+     DeviceState parent;
+ 
+diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
+index f8ec330..82f299d 100644
+--- a/include/hw/ppc/pnv_occ.h
++++ b/include/hw/ppc/pnv_occ.h
+@@ -19,11 +19,11 @@
+ #ifndef _PPC_PNV_OCC_H
+ #define _PPC_PNV_OCC_H
+ 
++#include "hw/ppc/pnv_psi.h"
++
+ #define TYPE_PNV_OCC "pnv-occ"
+ #define PNV_OCC(obj) OBJECT_CHECK(PnvOCC, (obj), TYPE_PNV_OCC)
+ 
+-typedef struct PnvPsi PnvPsi;
+-
+ typedef struct PnvOCC {
+     DeviceState xd;
  
 -- 
 2.9.3
