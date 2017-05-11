@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAb-0002Tq-6g
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:22 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAZ-0002RM-28
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAa-0007bi-0Z
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAT-0007U0-3W
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:37 +0200
-Message-Id: <1494513181-7900-35-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:33 +0200
+Message-Id: <1494513181-7900-31-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 34/58] qemu-img: wait for convert coroutines to
- complete
+Subject: [Qemu-devel] [PULL 30/58] block: Drop permissions when migration
+ completes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +23,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+With image locking, permissions affect other qemu processes as well. We
+want to be sure that the destination can run, so let's drop permissions
+on the source when migration completes.
 
-On error path (like i/o error in one of the coroutines), it's required to
-  - wait for coroutines completion before cleaning the common structures
-  - reenter dependent coroutines so they ever finish
-
-Introduced in 2d9187bc65.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Peter Lieven <pl@kamp.de>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-img.c | 26 +++++++++++---------------
- 1 file changed, 11 insertions(+), 15 deletions(-)
+ block.c                   | 12 +++++++++++-
+ block/block-backend.c     | 25 +++++++++++++++++++++++++
+ include/block/block_int.h |  7 ++++---
+ 3 files changed, 40 insertions(+), 4 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 418f061..b506839 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1761,13 +1761,13 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         qemu_co_mutex_lock(&s->lock);
-         if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
-             qemu_co_mutex_unlock(&s->lock);
--            goto out;
-+            break;
-         }
-         n = convert_iteration_sectors(s, s->sector_num);
-         if (n < 0) {
-             qemu_co_mutex_unlock(&s->lock);
-             s->ret = n;
--            goto out;
-+            break;
-         }
-         /* save current sector and allocation status to local variables */
-         sector_num = s->sector_num;
-@@ -1792,7 +1792,6 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-                 error_report("error while reading sector %" PRId64
-                              ": %s", sector_num, strerror(-ret));
-                 s->ret = ret;
--                goto out;
-             }
-         } else if (!s->min_sparse && status == BLK_ZERO) {
-             status = BLK_DATA;
-@@ -1801,22 +1800,20 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+diff --git a/block.c b/block.c
+index c8e6de2..444a52e 100644
+--- a/block.c
++++ b/block.c
+@@ -4019,7 +4019,7 @@ void bdrv_invalidate_cache_all(Error **errp)
+ static int bdrv_inactivate_recurse(BlockDriverState *bs,
+                                    bool setting_flag)
+ {
+-    BdrvChild *child;
++    BdrvChild *child, *parent;
+     int ret;
  
-         if (s->wr_in_order) {
-             /* keep writes in order */
--            while (s->wr_offs != sector_num) {
--                if (s->ret != -EINPROGRESS) {
--                    goto out;
--                }
-+            while (s->wr_offs != sector_num && s->ret == -EINPROGRESS) {
-                 s->wait_sector_num[index] = sector_num;
-                 qemu_coroutine_yield();
-             }
-             s->wait_sector_num[index] = -1;
-         }
+     if (!setting_flag && bs->drv->bdrv_inactivate) {
+@@ -4038,6 +4038,16 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
  
--        ret = convert_co_write(s, sector_num, n, buf, status);
--        if (ret < 0) {
--            error_report("error while writing sector %" PRId64
--                         ": %s", sector_num, strerror(-ret));
--            s->ret = ret;
--            goto out;
-+        if (s->ret == -EINPROGRESS) {
-+            ret = convert_co_write(s, sector_num, n, buf, status);
-+            if (ret < 0) {
-+                error_report("error while writing sector %" PRId64
-+                             ": %s", sector_num, strerror(-ret));
-+                s->ret = ret;
+     if (setting_flag) {
+         bs->open_flags |= BDRV_O_INACTIVE;
++
++        QLIST_FOREACH(parent, &bs->parents, next_parent) {
++            if (parent->role->inactivate) {
++                ret = parent->role->inactivate(parent);
++                if (ret < 0) {
++                    bs->open_flags &= ~BDRV_O_INACTIVE;
++                    return ret;
++                }
 +            }
-         }
- 
-         if (s->wr_in_order) {
-@@ -1837,7 +1834,6 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         }
++        }
      }
- 
--out:
-     qemu_vfree(buf);
-     s->co[index] = NULL;
-     s->running_coroutines--;
-@@ -1899,7 +1895,7 @@ static int convert_do_copy(ImgConvertState *s)
-         qemu_coroutine_enter(s->co[i]);
+     return 0;
+ }
+diff --git a/block/block-backend.c b/block/block-backend.c
+index a7ce72b..f3a6008 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -156,6 +156,30 @@ static void blk_root_activate(BdrvChild *child, Error **errp)
      }
+ }
  
--    while (s->ret == -EINPROGRESS) {
-+    while (s->running_coroutines) {
-         main_loop_wait(false);
-     }
++static int blk_root_inactivate(BdrvChild *child)
++{
++    BlockBackend *blk = child->opaque;
++
++    if (blk->disable_perm) {
++        return 0;
++    }
++
++    /* Only inactivate BlockBackends for guest devices (which are inactive at
++     * this point because the VM is stopped) and unattached monitor-owned
++     * BlockBackends. If there is still any other user like a block job, then
++     * we simply can't inactivate the image. */
++    if (!blk->dev && !blk->name[0]) {
++        return -EPERM;
++    }
++
++    blk->disable_perm = true;
++    if (blk->root) {
++        bdrv_child_try_set_perm(blk->root, 0, BLK_PERM_ALL, &error_abort);
++    }
++
++    return 0;
++}
++
+ static const BdrvChildRole child_root = {
+     .inherit_options    = blk_root_inherit_options,
  
+@@ -168,6 +192,7 @@ static const BdrvChildRole child_root = {
+     .drained_end        = blk_root_drained_end,
+ 
+     .activate           = blk_root_activate,
++    .inactivate         = blk_root_inactivate,
+ };
+ 
+ /*
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 5637925..5750a44 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -473,10 +473,11 @@ struct BdrvChildRole {
+     void (*drained_begin)(BdrvChild *child);
+     void (*drained_end)(BdrvChild *child);
+ 
+-    /* Notifies the parent that the child has been activated (e.g. when
+-     * migration is completing) and it can start requesting permissions and
+-     * doing I/O on it. */
++    /* Notifies the parent that the child has been activated/inactivated (e.g.
++     * when migration is completing) and it can start/stop requesting
++     * permissions and doing I/O on it. */
+     void (*activate)(BdrvChild *child, Error **errp);
++    int (*inactivate)(BdrvChild *child);
+ 
+     void (*attach)(BdrvChild *child);
+     void (*detach)(BdrvChild *child);
 -- 
 1.8.3.1
