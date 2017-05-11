@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pBe-0003Zh-D1
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:35:30 -0400
+	(envelope-from <quintela@redhat.com>) id 1d8pFJ-00074i-RV
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pBd-0000Nv-0K
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:35:26 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:33:00 +0200
-Message-Id: <1494513181-7900-58-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 57/58] qcow2: Discard/zero clusters by byte count
+	(envelope-from <quintela@redhat.com>) id 1d8pFI-0002od-DS
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:39:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46174)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d8pFI-0002nK-4N
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:39:12 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 55ECF8049B
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 14:39:10 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Thu, 11 May 2017 16:39:01 +0200
+Message-Id: <20170511143901.6340-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH] migration: Move check_migratable() into qdev.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,237 +27,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-From: Eric Blake <eblake@redhat.com>
+The function is only used once, and nothing else in migration knows
+about objects.  Create the function vmstate_device_is_migratable() in
+savem.c that really do the bit that is related with migration.
 
-Passing a byte offset, but sector count, when we ultimately
-want to operate on cluster granularity, is madness.  Clean up
-the external interfaces to take both offset and count as bytes,
-while still keeping the assertion added previously that the
-caller must align the values to a cluster.  Then rename things
-to make sure backports don't get confused by changed units:
-instead of qcow2_discard_clusters() and qcow2_zero_clusters(),
-we now have qcow2_cluster_discard() and qcow2_cluster_zeroize().
-
-The internal functions still operate on clusters at a time, and
-return an int for number of cleared clusters; but on an image
-with 2M clusters, a single L2 table holds 256k entries that each
-represent a 2M cluster, totalling well over INT_MAX bytes if we
-ever had a request for that many bytes at once.  All our callers
-currently limit themselves to 32-bit bytes (and therefore fewer
-clusters), but by making this function 64-bit clean, we have one
-less place to clean up if we later improve the block layer to
-support 64-bit bytes through all operations (with the block layer
-auto-fragmenting on behalf of more-limited drivers), rather than
-the current state where some interfaces are artificially limited
-to INT_MAX at a time.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170507000552.20847-13-eblake@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- block/qcow2-cluster.c  | 42 ++++++++++++++++++++++--------------------
- block/qcow2-snapshot.c |  7 +++----
- block/qcow2.c          | 22 +++++++++-------------
- block/qcow2.h          |  9 +++++----
- 4 files changed, 39 insertions(+), 41 deletions(-)
+ hw/core/qdev.c                | 25 +++++++++++++++++++++----
+ include/migration/migration.h |  6 ------
+ include/migration/vmstate.h   |  2 ++
+ include/sysemu/sysemu.h       |  2 +-
+ migration/migration.c         | 15 ---------------
+ migration/savevm.c            |  5 +++++
+ stubs/vmstate.c               |  5 ++---
+ 7 files changed, 31 insertions(+), 29 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 43bde56..347d94b 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1549,34 +1549,36 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
-     return nb_clusters;
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 02b632f..463e8dd 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -37,7 +37,7 @@
+ #include "hw/boards.h"
+ #include "hw/sysbus.h"
+ #include "qapi-event.h"
+-#include "migration/migration.h"
++#include "migration/vmstate.h"
+ 
+ bool qdev_hotplug = false;
+ static bool qdev_hot_added = false;
+@@ -861,6 +861,25 @@ static bool device_get_realized(Object *obj, Error **errp)
+     return dev->realized;
  }
  
--int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
--    int nb_sectors, enum qcow2_discard_type type, bool full_discard)
-+int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, enum qcow2_discard_type type,
-+                          bool full_discard)
++static bool check_only_migratable(Object *obj, Error **err)
++{
++    DeviceClass *dc = DEVICE_GET_CLASS(obj);
++
++    /* check needed if --only-migratable is specified */
++    if (!only_migratable) {
++        return true;
++    }
++
++    if (!vmstate_device_is_migratable(dc->vmsd)) {
++        error_setg(err, "Device %s is not migratable, but "
++                   "--only-migratable was specified",
++                   object_get_typename(obj));
++        return false;
++    }
++
++    return true;
++}
++
+ static void device_set_realized(Object *obj, bool value, Error **errp)
  {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t end_offset;
-+    uint64_t end_offset = offset + bytes;
-     uint64_t nb_clusters;
-+    int64_t cleared;
-     int ret;
+     DeviceState *dev = DEVICE(obj);
+@@ -870,7 +889,6 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+     Error *local_err = NULL;
+     bool unattached_parent = false;
+     static int unattached_count;
+-    int ret;
  
--    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
--
-     /* Caller must pass aligned values, except at image end */
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
-            end_offset == bs->total_sectors << BDRV_SECTOR_BITS);
+     if (dev->hotplugged && !dc->hotpluggable) {
+         error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));
+@@ -878,8 +896,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+     }
  
--    nb_clusters = size_to_clusters(s, end_offset - offset);
-+    nb_clusters = size_to_clusters(s, bytes);
- 
-     s->cache_discards = true;
- 
-     /* Each L2 table is handled by its own loop iteration */
-     while (nb_clusters > 0) {
--        ret = discard_single_l2(bs, offset, nb_clusters, type, full_discard);
+     if (value && !dev->realized) {
+-        ret = check_migratable(obj, &local_err);
 -        if (ret < 0) {
-+        cleared = discard_single_l2(bs, offset, nb_clusters, type,
-+                                    full_discard);
-+        if (cleared < 0) {
-+            ret = cleared;
++        if (!check_only_migratable(obj, &local_err)) {
              goto fail;
          }
  
--        nb_clusters -= ret;
--        offset += (ret * s->cluster_size);
-+        nb_clusters -= cleared;
-+        offset += (cleared * s->cluster_size);
-     }
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index e29cb01..0c9b6af 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -22,7 +22,6 @@
+ #include "qapi-types.h"
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
+-#include "qom/object.h"
  
-     ret = 0;
-@@ -1641,16 +1643,15 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
-     return nb_clusters;
- }
+ #define QEMU_VM_FILE_MAGIC           0x5145564d
+ #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+@@ -39,9 +38,6 @@
+ #define QEMU_VM_COMMAND              0x08
+ #define QEMU_VM_SECTION_FOOTER       0x7e
  
--int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
--                        int flags)
-+int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, int flags)
- {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t end_offset;
-+    uint64_t end_offset = offset + bytes;
-     uint64_t nb_clusters;
-+    int64_t cleared;
-     int ret;
- 
--    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
+-/* for vl.c */
+-extern int only_migratable;
 -
-     /* Caller must pass aligned values, except at image end */
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
-@@ -1662,18 +1663,19 @@ int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
-     }
+ struct MigrationParams {
+     bool blk;
+     bool shared;
+@@ -293,8 +289,6 @@ int migrate_add_blocker(Error *reason, Error **errp);
+  */
+ void migrate_del_blocker(Error *reason);
  
-     /* Each L2 table is handled by its own loop iteration */
--    nb_clusters = size_to_clusters(s, nb_sectors << BDRV_SECTOR_BITS);
-+    nb_clusters = size_to_clusters(s, bytes);
+-int check_migratable(Object *obj, Error **err);
+-
+ bool migrate_release_ram(void);
+ bool migrate_postcopy_ram(void);
+ bool migrate_zero_blocks(void);
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f4bf3f1..1a5bf9c 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -1067,4 +1067,6 @@ int64_t self_announce_delay(int round)
  
-     s->cache_discards = true;
+ void dump_vmstate_json_to_file(FILE *out_fp);
  
-     while (nb_clusters > 0) {
--        ret = zero_single_l2(bs, offset, nb_clusters, flags);
--        if (ret < 0) {
-+        cleared = zero_single_l2(bs, offset, nb_clusters, flags);
-+        if (cleared < 0) {
-+            ret = cleared;
-             goto fail;
-         }
++bool vmstate_device_is_migratable(const VMStateDescription *vmsd);
++
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 15656b7..9240fdb 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -15,7 +15,7 @@
+ /* vl.c */
  
--        nb_clusters -= ret;
--        offset += (ret * s->cluster_size);
-+        nb_clusters -= cleared;
-+        offset += (cleared * s->cluster_size);
-     }
- 
-     ret = 0;
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 0324243..44243e0 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -440,10 +440,9 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
- 
-     /* The VM state isn't needed any more in the active L1 table; in fact, it
-      * hurts by causing expensive COW for the next snapshot. */
--    qcow2_discard_clusters(bs, qcow2_vm_state_offset(s),
--                           align_offset(sn->vm_state_size, s->cluster_size)
--                                >> BDRV_SECTOR_BITS,
--                           QCOW2_DISCARD_NEVER, false);
-+    qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
-+                          align_offset(sn->vm_state_size, s->cluster_size),
-+                          QCOW2_DISCARD_NEVER, false);
- 
- #ifdef DEBUG_ALLOC
-     {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 72b1650..a8d61f0 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2512,7 +2512,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     trace_qcow2_pwrite_zeroes(qemu_coroutine_self(), offset, count);
- 
-     /* Whatever is left can use real zero clusters */
--    ret = qcow2_zero_clusters(bs, offset, count >> BDRV_SECTOR_BITS, flags);
-+    ret = qcow2_cluster_zeroize(bs, offset, count, flags);
-     qemu_co_mutex_unlock(&s->lock);
- 
-     return ret;
-@@ -2535,8 +2535,8 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
-     }
- 
-     qemu_co_mutex_lock(&s->lock);
--    ret = qcow2_discard_clusters(bs, offset, count >> BDRV_SECTOR_BITS,
--                                 QCOW2_DISCARD_REQUEST, false);
-+    ret = qcow2_cluster_discard(bs, offset, count, QCOW2_DISCARD_REQUEST,
-+                                false);
-     qemu_co_mutex_unlock(&s->lock);
-     return ret;
+ extern const char *bios_name;
+-
++extern int only_migratable;
+ extern const char *qemu_name;
+ extern QemuUUID qemu_uuid;
+ extern bool qemu_uuid_set;
+diff --git a/migration/migration.c b/migration/migration.c
+index 799952c..fe62f15 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1158,21 +1158,6 @@ void migrate_del_blocker(Error *reason)
+     migration_blockers = g_slist_remove(migration_blockers, reason);
  }
-@@ -2843,9 +2843,8 @@ fail:
- static int qcow2_make_empty(BlockDriverState *bs)
+ 
+-int check_migratable(Object *obj, Error **err)
+-{
+-    DeviceClass *dc = DEVICE_GET_CLASS(obj);
+-    if (only_migratable && dc->vmsd) {
+-        if (dc->vmsd->unmigratable) {
+-            error_setg(err, "Device %s is not migratable, but "
+-                       "--only-migratable was specified",
+-                       object_get_typename(obj));
+-            return -1;
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+ void qmp_migrate_incoming(const char *uri, Error **errp)
  {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t start_sector;
--    int sector_step = (QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size) /
--                       BDRV_SECTOR_SIZE);
-+    uint64_t offset, end_offset;
-+    int step = QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size);
-     int l1_clusters, ret = 0;
+     Error *local_err = NULL;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 352a8f2..0012de3 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2323,3 +2323,8 @@ void vmstate_register_ram_global(MemoryRegion *mr)
+ {
+     vmstate_register_ram(mr, NULL);
+ }
++
++bool vmstate_device_is_migratable(const VMStateDescription *vmsd)
++{
++    return !(vmsd && vmsd->unmigratable);
++}
+diff --git a/stubs/vmstate.c b/stubs/vmstate.c
+index 6d52f29..5af824b 100644
+--- a/stubs/vmstate.c
++++ b/stubs/vmstate.c
+@@ -1,7 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "migration/vmstate.h"
+-#include "migration/migration.h"
  
-     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
-@@ -2862,18 +2861,15 @@ static int qcow2_make_empty(BlockDriverState *bs)
+ const VMStateDescription vmstate_dummy = {};
  
-     /* This fallback code simply discards every active cluster; this is slow,
-      * but works in all cases */
--    for (start_sector = 0; start_sector < bs->total_sectors;
--         start_sector += sector_step)
--    {
-+    end_offset = bs->total_sectors * BDRV_SECTOR_SIZE;
-+    for (offset = 0; offset < end_offset; offset += step) {
-         /* As this function is generally used after committing an external
-          * snapshot, QCOW2_DISCARD_SNAPSHOT seems appropriate. Also, the
-          * default action for this kind of discard is to pass the discard,
-          * which will ideally result in an actually smaller image file, as
-          * is probably desired. */
--        ret = qcow2_discard_clusters(bs, start_sector * BDRV_SECTOR_SIZE,
--                                     MIN(sector_step,
--                                         bs->total_sectors - start_sector),
--                                     QCOW2_DISCARD_SNAPSHOT, true);
-+        ret = qcow2_cluster_discard(bs, offset, MIN(step, end_offset - offset),
-+                                    QCOW2_DISCARD_SNAPSHOT, true);
-         if (ret < 0) {
-             break;
-         }
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 810ceb8..1801dc3 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -551,10 +551,11 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-                                          int compressed_size);
+@@ -21,7 +20,7 @@ void vmstate_unregister(DeviceState *dev,
+ {
+ }
  
- int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
--int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
--    int nb_sectors, enum qcow2_discard_type type, bool full_discard);
--int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
--                        int flags);
-+int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, enum qcow2_discard_type type,
-+                          bool full_discard);
-+int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, int flags);
- 
- int qcow2_expand_zero_clusters(BlockDriverState *bs,
-                                BlockDriverAmendStatusCB *status_cb,
+-int check_migratable(Object *obj, Error **err)
++bool vmstate_device_is_migratable(const VMStateDescription *vmsd)
+ {
+-    return 0;
++    return true;
+ }
 -- 
-1.8.3.1
+2.9.3
