@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mapfelba@redhat.com>) id 1d8lJO-00043p-2x
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 06:27:11 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d8lKi-0004qv-Kh
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 06:28:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mapfelba@redhat.com>) id 1d8lJK-0006Bx-Vk
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 06:27:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55886)
+	(envelope-from <pbonzini@redhat.com>) id 1d8lKf-00071s-HI
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 06:28:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42171)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mapfelba@redhat.com>) id 1d8lJK-0006Bb-MY
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 06:27:06 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d8lKf-000701-Bd
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 06:28:29 -0400
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CAEB080F98
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 10:27:05 +0000 (UTC)
-Date: Thu, 11 May 2017 06:27:03 -0400 (EDT)
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <1170982462.6718936.1494498423634.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170511102529.21618-1-marcel@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 55EAC624DC
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 10:28:28 +0000 (UTC)
 References: <20170511102529.21618-1-marcel@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bb115468-bf9d-30d7-ee1b-fefc107c55a9@redhat.com>
+Date: Thu, 11 May 2017 12:28:24 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170511102529.21618-1-marcel@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH V2] Revert "hw/pci: disable pci-bridge's
  shpc by default"
@@ -33,18 +34,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, lersek@redhat.com, dgilbert@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, lersek@redhat.com, dgilbert@redhat.com
 
 
 
------ Original Message -----
-> From: "Marcel Apfelbaum" <marcel@redhat.com>
-> To: qemu-devel@nongnu.org
-> Cc: marcel@redhat.com, mst@redhat.com, pbonzini@redhat.com, lersek@redhat.com, dgilbert@redhat.com
-> Sent: Thursday, May 11, 2017 1:25:29 PM
-> Subject: [Qemu-devel] [PATCH V2] Revert "hw/pci: disable pci-bridge's shpc by default"
-> 
+On 11/05/2017 12:25, Marcel Apfelbaum wrote:
 > This reverts commit dc0ae767700c156894e36fab89a745a2dc4173de.
 > 
 > Disabling the shpc controller has an undesired side effect.
@@ -63,10 +58,6 @@ Cc: mst@redhat.com, pbonzini@redhat.com, lersek@redhat.com, dgilbert@redhat.com
 > 
 > V1 -> V2:
 >  - Keep shpc off for QEMU 2.9 machines
-
-Forgot to mentioned the above was Paolo's review, thanks Palo!
-Marcel
-
 >  - Rebased on Michael's tree to get QEMU 2.10 machine types
 > 
 > Thanks,
@@ -106,7 +97,6 @@ Marcel
 >  
 >  #define HW_COMPAT_2_8 \
 >      {\
-> --
-> 2.9.3
 > 
-> 
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
