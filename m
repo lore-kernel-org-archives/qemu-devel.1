@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8dJ8-0004Tw-Si
+	(envelope-from <dgibson@ozlabs.org>) id 1d8dJ9-0004U8-7j
 	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8dJ7-0004jW-G7
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:22 -0400
-Date: Thu, 11 May 2017 10:41:59 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1d8dJ7-0004jl-K0
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:23 -0400
+Date: Thu, 11 May 2017 11:02:20 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170511004159.GD14408@umbus.fritz.box>
-References: <20170510200535.13268-1-f4bug@amsat.org>
-	<20170510200535.13268-8-f4bug@amsat.org>
+Message-ID: <20170511010220.GE14408@umbus.fritz.box>
+References: <1494234377-1773-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1494234377-1773-3-git-send-email-bharata@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7DO5AaGCk89r4vaK"
+	protocol="application/pgp-signature"; boundary="qOrJKOH36bD5yhNe"
 Content-Disposition: inline
-In-Reply-To: <20170510200535.13268-8-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 7/8] target/ppc: optimize various functions
- using extract op
+In-Reply-To: <1494234377-1773-3-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 2/2] spapr: Fix migration of Radix
+ guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +25,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
 
 
---7DO5AaGCk89r4vaK
-Content-Type: text/plain; charset=iso-8859-1
+--qOrJKOH36bD5yhNe
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 10, 2017 at 05:05:34PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Applied using Coccinelle script.
+On Mon, May 08, 2017 at 02:36:17PM +0530, Bharata B Rao wrote:
+> Currently HTAB savevm handlers get registered by default and migration
+> of radix guest will fail.
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> - Ensure that HTAB savevm handlers are not registered for radix case.
+> - Ensure that we issue KVM_PPC_CONFIGURE_V3_MMU for radix case post
+>   migration.
+>=20
+> TODO: Right now I have delayed the HTAB savevm handler registration
+> to CAS call where we know if the guest is radix or hash. Another approach
+> is to let the HTAB handlers to be registered by default (as it is being
+> done currently, but unregister them from CAS when we discover radix
+> capability).
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Option 2 there sounds messy.  I also suspect it could break if you try
+to migrate an (eventually) radix guest before it's done CAS.
 
+Strictly speaking only registering at CAS time will break old hash
+guests that don't do CAS at all.  However such guests are really,
+really ancient, and I suspect we don't work with them already.
+
+You do, however, need to deregister (and allow the choice to be made
+again) on guest reset.  On KVM we can only (for now) support either
+hash or radix guests.  Under TCG, however, we could run a radix guest
+then reboot to a hash guest or vice versa.
+
+
+>=20
+> Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 > ---
->  target/ppc/translate.c              |  9 +++------
->  target/ppc/translate/vsx-impl.inc.c | 21 +++++++--------------
->  2 files changed, 10 insertions(+), 20 deletions(-)
+>  hw/ppc/spapr.c         | 18 +++++++++++++++---
+>  hw/ppc/spapr_hcall.c   |  5 +++++
+>  include/hw/ppc/spapr.h |  3 +++
+>  3 files changed, 23 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index f40b5a1abf..64ab412bf3 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -868,8 +868,7 @@ static inline void gen_op_arith_add(DisasContext *ctx=
-, TCGv ret, TCGv arg1,
->              }
->              tcg_gen_xor_tl(cpu_ca, t0, t1);        /* bits changed w/ ca=
-rry */
->              tcg_temp_free(t1);
-> -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);   /* extract bit 32 */
-> -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-> +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
->              if (is_isa300(ctx)) {
->                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
->              }
-> @@ -1399,8 +1398,7 @@ static inline void gen_op_arith_subf(DisasContext *=
-ctx, TCGv ret, TCGv arg1,
->              tcg_temp_free(inv1);
->              tcg_gen_xor_tl(cpu_ca, t0, t1);         /* bits changes w/ c=
-arry */
->              tcg_temp_free(t1);
-> -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);    /* extract bit 32 */
-> -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-> +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
->              if (is_isa300(ctx)) {
->                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
->              }
-> @@ -5383,8 +5381,7 @@ static void gen_mfsri(DisasContext *ctx)
->      CHK_SV;
->      t0 =3D tcg_temp_new();
->      gen_addr_reg_index(ctx, t0);
-> -    tcg_gen_shri_tl(t0, t0, 28);
-> -    tcg_gen_andi_tl(t0, t0, 0xF);
-> +    tcg_gen_extract_tl(t0, t0, 28, 0xF);
->      gen_helper_load_sr(cpu_gpr[rd], cpu_env, t0);
->      tcg_temp_free(t0);
->      if (ra !=3D 0 && ra !=3D rd)
-> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
-sx-impl.inc.c
-> index 7f12908029..354a6b113a 100644
-> --- a/target/ppc/translate/vsx-impl.inc.c
-> +++ b/target/ppc/translate/vsx-impl.inc.c
-> @@ -1262,8 +1262,7 @@ static void gen_xsxexpqp(DisasContext *ctx)
->          gen_exception(ctx, POWERPC_EXCP_VSXU);
->          return;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e2dc77c..e14f55c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1436,6 +1436,14 @@ static int spapr_post_load(void *opaque, int versi=
+on_id)
+>          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
 >      }
-> -    tcg_gen_shri_i64(xth, xbh, 48);
-> -    tcg_gen_andi_i64(xth, xth, 0x7FFF);
-> +    tcg_gen_extract_i64(xth, xbh, 48, 0x7FFF);
->      tcg_gen_movi_i64(xtl, 0);
+> =20
+> +    if (spapr->patb_entry && (spapr->patb_flags & SPAPR_PROC_TABLE_RADIX=
+) &&
+
+patb_entry already tells you whether the guest is radix or not
+(PATBE1_GR), you shouldn't need extra flags.
+
+> +        kvmppc_has_cap_mmu_radix() && kvm_enabled()) {
+
+You should also fail the migration if you have an incoming radix
+guest, but the your new KVM host can't do radix.  Or the reverse, for
+that matter.
+
+> +        err =3D kvmppc_configure_v3_mmu(POWERPC_CPU(first_cpu),
+> +                                      spapr->patb_flags &
+> +                                      SPAPR_PROC_TABLE_RADIX,
+> +                                      spapr->patb_flags & SPAPR_PROC_TAB=
+LE_GTSE,
+> +                                      spapr->patb_entry);
+> +    }
+>      return err;
 >  }
 > =20
-> @@ -1431,10 +1430,8 @@ static void gen_xvxexpsp(DisasContext *ctx)
->          gen_exception(ctx, POWERPC_EXCP_VSXU);
->          return;
+> @@ -1520,6 +1528,7 @@ static const VMStateDescription vmstate_spapr_patb_=
+entry =3D {
+>      .needed =3D spapr_patb_entry_needed,
+>      .fields =3D (VMStateField[]) {
+>          VMSTATE_UINT64(patb_entry, sPAPRMachineState),
+> +        VMSTATE_UINT64(patb_flags, sPAPRMachineState),
+>          VMSTATE_END_OF_LIST()
+>      },
+>  };
+> @@ -1869,6 +1878,12 @@ static SaveVMHandlers savevm_htab_handlers =3D {
+>      .load_state =3D htab_load,
+>  };
+> =20
+> +void spapr_htab_savevm_register(sPAPRMachineState *spapr)
+> +{
+> +    register_savevm_live(NULL, "spapr/htab", -1, 1,
+> +                         &savevm_htab_handlers, spapr);
+> +}
+> +
+>  static void spapr_boot_set(void *opaque, const char *boot_device,
+>                             Error **errp)
+>  {
+> @@ -2331,9 +2346,6 @@ static void ppc_spapr_init(MachineState *machine)
+>       * interface, this is a legacy from the sPAPREnvironment structure
+>       * which predated MachineState but had a similar function */
+>      vmstate_register(NULL, 0, &vmstate_spapr, spapr);
+> -    register_savevm_live(NULL, "spapr/htab", -1, 1,
+> -                         &savevm_htab_handlers, spapr);
+> -
+>      /* used by RTAS */
+>      QTAILQ_INIT(&spapr->ccs_list);
+>      qemu_register_reset(spapr_ccs_reset_hook, spapr);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 3600b0e..fa03ca0 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -988,6 +988,7 @@ static target_ulong h_register_process_table(PowerPCC=
+PU *cpu,
+>      spapr_check_setup_free_hpt(spapr, spapr->patb_entry, cproc);
+> =20
+>      spapr->patb_entry =3D cproc; /* Save new process table */
+> +    spapr->patb_flags =3D flags; /* Save the flags */
+> =20
+>      /* Update the UPRT and GTSE bits in the LPCR for all cpus */
+>      CPU_FOREACH(cs) {
+> @@ -1169,6 +1170,10 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>          }
 >      }
-> -    tcg_gen_shri_i64(xth, xbh, 23);
-> -    tcg_gen_andi_i64(xth, xth, 0xFF000000FF);
-> -    tcg_gen_shri_i64(xtl, xbl, 23);
-> -    tcg_gen_andi_i64(xtl, xtl, 0xFF000000FF);
-> +    tcg_gen_extract_i64(xth, xbh, 23, 0xFF000000FF);
-> +    tcg_gen_extract_i64(xtl, xbl, 23, 0xFF000000FF);
+> =20
+> +    /* Register savevm handlers for HTAB case */
+> +    if (!guest_radix || !kvmppc_has_cap_mmu_radix()) {
+> +        spapr_htab_savevm_register(spapr);
+> +    }
+>      return H_SUCCESS;
 >  }
 > =20
->  static void gen_xvxexpdp(DisasContext *ctx)
-> @@ -1448,10 +1445,8 @@ static void gen_xvxexpdp(DisasContext *ctx)
->          gen_exception(ctx, POWERPC_EXCP_VSXU);
->          return;
->      }
-> -    tcg_gen_shri_i64(xth, xbh, 52);
-> -    tcg_gen_andi_i64(xth, xth, 0x7FF);
-> -    tcg_gen_shri_i64(xtl, xbl, 52);
-> -    tcg_gen_andi_i64(xtl, xtl, 0x7FF);
-> +    tcg_gen_extract_i64(xth, xbh, 52, 0x7FF);
-> +    tcg_gen_extract_i64(xtl, xbl, 52, 0x7FF);
->  }
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index a692e63..0d0e9e4 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -75,6 +75,7 @@ struct sPAPRMachineState {
+>      void *htab;
+>      uint32_t htab_shift;
+>      uint64_t patb_entry; /* Process tbl registed in H_REGISTER_PROCESS_T=
+ABLE */
+> +    uint64_t patb_flags;
+>      hwaddr rma_size;
+>      int vrma_adjust;
+>      ssize_t rtas_size;
+> @@ -691,4 +692,6 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_o=
+n_cpu_data arg);
+>  #define SPAPR_PROC_TABLE_HPT_PT      0x02
+>  #define SPAPR_PROC_TABLE_GTSE        0x01
 > =20
->  GEN_VSX_HELPER_2(xvxsigsp, 0x00, 0x04, 0, PPC2_ISA300)
-> @@ -1474,16 +1469,14 @@ static void gen_xvxsigdp(DisasContext *ctx)
->      zr =3D tcg_const_i64(0);
->      nan =3D tcg_const_i64(2047);
-> =20
-> -    tcg_gen_shri_i64(exp, xbh, 52);
-> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
-> +    tcg_gen_extract_i64(exp, xbh, 52, 0x7FF);
->      tcg_gen_movi_i64(t0, 0x0010000000000000);
->      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
->      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
->      tcg_gen_andi_i64(xth, xbh, 0x000FFFFFFFFFFFFF);
->      tcg_gen_or_i64(xth, xth, t0);
-> =20
-> -    tcg_gen_shri_i64(exp, xbl, 52);
-> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
-> +    tcg_gen_extract_i64(exp, xbl, 52, 0x7FF);
->      tcg_gen_movi_i64(t0, 0x0010000000000000);
->      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
->      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+> +void spapr_htab_savevm_register(sPAPRMachineState *spapr);
+> +
+>  #endif /* HW_SPAPR_H */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -151,25 +186,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---7DO5AaGCk89r4vaK
+--qOrJKOH36bD5yhNe
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZE7NVAAoJEGw4ysog2bOSEb4P/RXrcDsqUVd46HRnwWTJbBuO
-5XD9frDEguIdxRXHtKvb7HGMpgpiRpge3M04qcLgcNZkaDHuhJsAV2WPLn3D15dK
-NITFNAS7KozUJrWx7VVQau7NyjeIrqhhwGbR61UbEmE6IowgnhkQ12SF4EkZhs0K
-ZsWgE42KDjHc3TlHQc791LEE9XgncqXIW1JhXfXHhRmVrXj0ZxGzDtoA9SNjyxw/
-V75SFBnSr2dXSxh3iwWx9CD2yYHeOWD49/Azz8FLEW24EfHAub6EBBOs7oPvwnwk
-oY4zFYlaK70H5VyI8JHi65U+SUR71HFbLlBtDYUeMLmg5rOKt7DfV2CEOdTaSSvV
-nXfOaNFlUBpxYgE2EEO5D7iV0M9B826hFOwDqrYZCZ23uB1cgIIvEPtN/loYrh/U
-CtYkCthYkNGy8qyyTiRQM6+CvuqCwb4amZO0nzmkuwfvCoxC0KwsUnzVEGUVuQe0
-rvomVX/lp4wgp03IReLI+KMR4dyF5GLonNZsWPIKO8bICPosKmF7SI32i01bEdYY
-bRocDPO+TfQW393Fly0qkQ7aBGnsV6lOpaJ3jFQh0oLnkHlkgMdXIlyoqRQWqUoN
-QDr7Vit3dsXT/OlEwlgV85jpzqEG2lzwyjlzFANl3DziJwTUOTjUI5zXfzAX81Ra
-nIa8ZTAmfXqlIjs2tebO
-=V5xE
+iQIcBAEBCAAGBQJZE7gZAAoJEGw4ysog2bOSfBsP/AuaKR00VG2nQoUyFsQrqF2r
+Y/mdzbRLoPJ08u/aQFNKDDe5oaAirWEeRNTV1SKlDsiZg+ph66XQ0BinAv3G3xes
+P7aGH0FiAuq5oc2D6Ug05PJbymIQnvqEM2oL3V0r0+//ikG/m2T4I3CB2SXvTmxy
+Y2cj6+z+nwO24WGzZbYxIt2HFKNlWL5FfH8CHjriJLLyLp5mNDXK+vA9ELsd8VG6
+h0L2hteAcvgE2R9laAsv1UagW19VsBAGk/ebLRUOtvAjkkBY7aCorSmW5s1Seg11
+3JHEapGa0PZjJDyUomxQEnc6yjXQRrPl1JoolO17PkiaC74j3fxCdRxLLnef6qRn
+Y4i1BIB5an75x4b3mqQ3SzjMdgfCohVxKKH7a6hpc4l0oA5oU+GzOmQAw7p6rlSH
+P7T3jPtTPMjFaCSS2UM5iEuurI9MklZT2AoNBAvGci6VSkaqORL5cK0vHrVcwIOn
+31LRz4z14hGVkULcWsoudlIh5sKwKwKvKluk4M/ce69x7ZGBLH7xoN2Zo2rPEvPy
+k0ct8BXExXsc/uwscbhjhbWj8mizTIX4fWx+C1YJsgjdKXvgUPxvA9lKnahsKFOK
+AetgxSJ2ESaqFLWEMhVfYVNd/Jd9Z5u6nFrVzKdJZOvXyRnJvrvxirG42tibu6h0
+J6xgGS1jWQlzudhMBcFe
+=NqV+
 -----END PGP SIGNATURE-----
 
---7DO5AaGCk89r4vaK--
+--qOrJKOH36bD5yhNe--
