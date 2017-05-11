@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fV2-0005Si-4z
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8g7P-0006zL-Tg
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:54:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fV0-0001at-LA
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8g7O-0006oL-OV
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:54:27 -0400
+Date: Thu, 11 May 2017 14:36:25 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 11 May 2017 14:14:25 +1000
-Message-Id: <20170511041426.6488-23-david@gibson.dropbear.id.au>
-In-Reply-To: <20170511041426.6488-1-david@gibson.dropbear.id.au>
-References: <20170511041426.6488-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 22/23] pnv: Fix build failures on some host
- platforms
+Message-ID: <20170511043625.GG14408@umbus.fritz.box>
+References: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
+	<1494415802-227633-2-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tvOENZuN7d6HfOWU"
+Content-Disposition: inline
+In-Reply-To: <1494415802-227633-2-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/18] numa: move source of default CPUs
+ to NUMA node mapping into boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,77 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, sjitindarsingh@gmail.com, mark.cave-ayland@ilande.co.uk, sam.bobroff@au1.ibm.com, nikunj@linux.vnet.ibm.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-This makes some changes to fix build failures on the 'min-glib' docker
-image, and maybe other platforms with a buildchain that's less tolerant
-about duplicated typedefs.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- include/hw/ppc/pnv.h     | 3 +--
- include/hw/ppc/pnv_lpc.h | 4 ++--
- include/hw/ppc/pnv_occ.h | 4 ++--
- 3 files changed, 5 insertions(+), 6 deletions(-)
+--tvOENZuN7d6HfOWU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index c1288f9..9c5437d 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -21,6 +21,7 @@
- 
- #include "hw/boards.h"
- #include "hw/sysbus.h"
-+#include "hw/ipmi/ipmi.h"
- #include "hw/ppc/pnv_lpc.h"
- #include "hw/ppc/pnv_psi.h"
- #include "hw/ppc/pnv_occ.h"
-@@ -118,8 +119,6 @@ typedef struct PnvChipClass {
- #define POWERNV_MACHINE(obj) \
-     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
- 
--typedef struct IPMIBmc IPMIBmc;
--
- typedef struct PnvMachineState {
-     /*< private >*/
-     MachineState parent_obj;
-diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
-index ccf969a..023b4f0 100644
---- a/include/hw/ppc/pnv_lpc.h
-+++ b/include/hw/ppc/pnv_lpc.h
-@@ -19,12 +19,12 @@
- #ifndef _PPC_PNV_LPC_H
- #define _PPC_PNV_LPC_H
- 
-+#include "hw/ppc/pnv_psi.h"
-+
- #define TYPE_PNV_LPC "pnv-lpc"
- #define PNV_LPC(obj) \
-      OBJECT_CHECK(PnvLpcController, (obj), TYPE_PNV_LPC)
- 
--typedef struct PnvPsi PnvPsi;
--
- typedef struct PnvLpcController {
-     DeviceState parent;
- 
-diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
-index f8ec330..82f299d 100644
---- a/include/hw/ppc/pnv_occ.h
-+++ b/include/hw/ppc/pnv_occ.h
-@@ -19,11 +19,11 @@
- #ifndef _PPC_PNV_OCC_H
- #define _PPC_PNV_OCC_H
- 
-+#include "hw/ppc/pnv_psi.h"
-+
- #define TYPE_PNV_OCC "pnv-occ"
- #define PNV_OCC(obj) OBJECT_CHECK(PnvOCC, (obj), TYPE_PNV_OCC)
- 
--typedef struct PnvPsi PnvPsi;
--
- typedef struct PnvOCC {
-     DeviceState xd;
- 
--- 
-2.9.3
+On Wed, May 10, 2017 at 01:29:45PM +0200, Igor Mammedov wrote:
+> Originally CPU threads were by default assigned in
+> round-robin fashion. However it was causing issues in
+> guest since CPU threads from the same socket/core could
+> be placed on different NUMA nodes.
+> Commit fb43b73b (pc: fix default VCPU to NUMA node mapping)
+> fixed it by grouping threads within a socket on the same node
+> introducing cpu_index_to_socket_id() callback and commit
+> 20bb648d (spapr: Fix default NUMA node allocation for threads)
+> reused callback to fix similar issues for SPAPR machine
+> even though socket doesn't make much sense there.
+>=20
+> As result QEMU ended up having 3 default distribution rules
+> used by 3 targets /virt-arm, spapr, pc/.
+>=20
+> In effort of moving NUMA mapping for CPUs into possible_cpus,
+> generalize default mapping in numa.c by making boards decide
+> on default mapping and let them explicitly tell generic
+> numa code to which node a CPU thread belongs to by replacing
+> cpu_index_to_socket_id() with @cpu_index_to_instance_props()
+> which provides default node_id assigned by board to specified
+> cpu_index.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+[snip]
+> +static CpuInstanceProperties
+> +virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+> +{
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+> +    const CPUArchIdList *possible_cpus =3D mc->possible_cpu_arch_ids(ms);
+> +
+> +    assert(cpu_index < possible_cpus->len);
+> +    return possible_cpus->cpus[cpu_index].props;
+> +}
+
+Suggested follow up patch: Since this function is identical for x86
+and ARM, we could have a "thread_granularity_cpu_index_to_props"
+helper they could both reference.  M
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--tvOENZuN7d6HfOWU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZE+pHAAoJEGw4ysog2bOSLPgQAIyJGzDhAyIkImQZUy98cPyI
+V5qGylXIdfWRodb+qXDUpf0N9/pjGiU5W7EmURVEQSXOV4wbyZlxf5zR1wANx0Ik
+GCJNh9VXE+pnEyv1cxj6aq4QT5xc/fM52AXe5Hu6yadsAmHrZ6mV/VuZa5eD8nXh
+JJtnZWOFe1pRywdMmSYGXDR+Iom9u2MD16+qjo1o6RbdbBetW9A2ku4j7VpIYIuK
+KJek1bKvOJQoMnCuasP9dtqxE4CZ6jf6/YZK3DVDYxOVJDe2JvLQAHYhKhaCV3LD
+IxHrkIsEbH0FLfi9iEqbBJchu9QimZIQmXwGfYtU/JhhqcUNH9hKfSw09yYymi0G
+wq7R1lhIqPQAT3bv8E4hBes8cnghRGchv8IHOpegxANT52ZWcZzWweyKHUT02MY8
+y0zjR/u0WHIu/9IcR6vM+ONnFITICp0GlERAmijnku07OrHABvXF+E9tSUYxPuAT
+x6Hc7pt892dU4ynACR/EuIzN8QDvvMJR3vxLx+ggkCz1O9b3j//9EAcm0+0M3iJC
+ODV/MiXZDBJHEjCt1oHhhySaoPkJFKMEXs9jiw3d0+6+bgqsJVNgSNaqt7rLfoPm
+qwNc9yQgYrjY/8iXWI0waplW0CrtfZmM2SVI19E2eG6ABgG/GJh0dyww/ZhZyIPK
+8XWp/Ul6LL2k/YglM3rJ
+=EJL6
+-----END PGP SIGNATURE-----
+
+--tvOENZuN7d6HfOWU--
