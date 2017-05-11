@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d8odV-0007uK-S5
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:00:10 -0400
+	(envelope-from <berto@igalia.com>) id 1d8ojK-0001KV-9S
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1d8odS-0002jq-Rd
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:00:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46298)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1d8odS-0002iL-Lh
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:00:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 91E5D3D95E
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 14:00:04 +0000 (UTC)
-Date: Thu, 11 May 2017 16:00:00 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170511160000.277d67f7@nial.brq.redhat.com>
-In-Reply-To: <20170508183205.10884-1-ehabkost@redhat.com>
-References: <20170508183205.10884-1-ehabkost@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1d8ojE-0006Hc-J4
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:06:10 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170425153858.25660-10-berrange@redhat.com>
+References: <20170425153858.25660-1-berrange@redhat.com>
+	<20170425153858.25660-10-berrange@redhat.com>
+Date: Thu, 11 May 2017 16:05:59 +0200
+Message-ID: <w51a86jtrnc.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] tests: Add [+-]feature and
- feature=on|off test cases
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 09/18] qcow: convert QCow to use
+ QCryptoBlock for encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Mon,  8 May 2017 15:32:05 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Tue 25 Apr 2017 05:38:49 PM CEST, Daniel P. Berrange wrote:
+> @@ -181,8 +188,39 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+  [...]
+> +            crypto_opts = block_crypto_open_opts_init(
+> +                Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, &local_err);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                ret = -EINVAL;
+> +                goto fail;
+> +            }
 
-> Add test code to ensure features are enabled/disabled correctly in the
-> command-line. The test case use the "feature-words" and
-> "filtered-features" properties to check if the features were
-> enabled/disabled correctly.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes v1 -> v2:
-> * Remove explicit "accel=" option to avoid triggering warnings
->   on "make check"
-> * Use qdict_get_*() helpers to make code shorter
-> * Rename input_eax, input_ecx to in_eax, in_ecx to make
->   lines fit in the coding style width limit
-> * v1 was submitted as part of the series:
->   Subject: [PATCH 0/4] x86: Support "-cpu feature=force"
-> * Coding style: split lines
-> * Style changes on code comments
-> ---
->  tests/test-x86-cpuid-compat.c | 111 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 111 insertions(+)
-> 
-> diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
-[...]
-> +    add_feature_test("x86/cpuid/features/max-plus-invtsc",
-> +                     "-cpu max,+invtsc",
-> +                     0x80000007, 0, "EDX", 8, true);
-> +    add_feature_test("x86/cpuid/features/max-invtsc-on",
-> +                     "-cpu max,invtsc=on",
-> +                     0x80000007, 0, "EDX", 8, true);
-> +    add_feature_test("x86/cpuid/features/max-minus-mmx",
-> +                     "-cpu max,-mmx",
-> +                     1, 0, "EDX", 23, false);
-> +    add_feature_test("x86/cpuid/features/max-invtsc-on,mmx=off",
-> +                     "-cpu max,mmx=off",
-> +                     1, 0, "EDX", 23, false);
-Why do you add 'max' variants in addition to 486/pentium?
+Not very important, but if you check !crypto_opts for errors instead you
+can pass errp directly and avoid that error_propagate() call. Exactly
+the same that you do here in qcrypto_block_open():
 
->      return g_test_run();
->  }
+> +            if (flags & BDRV_O_NO_IO) {
+> +                cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+> +            }
+> +            s->crypto = qcrypto_block_open(crypto_opts, NULL, NULL,
+> +                                           cflags, errp);
+> +            if (!s->crypto) {
+> +                ret = -EINVAL;
+> +                goto fail;
+> +            }
+
+
+> @@ -792,6 +762,10 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+>      int ret;
+>      BlockBackend *qcow_blk;
+>      const char *encryptfmt = NULL;
+> +    QDict *options;
+> +    QDict *encryptopts = NULL;
+> +    QCryptoBlockCreateOptions *crypto_opts = NULL;
+> +    QCryptoBlock *crypto = NULL;
+>  
+>      /* Read out options */
+>      total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+> @@ -865,6 +839,10 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+>      l1_size = (total_size + (1LL << shift) - 1) >> shift;
+>  
+>      header.l1_table_offset = cpu_to_be64(header_size);
+> +
+> +    options = qemu_opts_to_qdict(opts, NULL);
+> +    qdict_extract_subqdict(options, &encryptopts, "encrypt.");
+> +    QDECREF(options);
+
+I think you're leaking encryptopts in this function.
+
+>  ##
+> +# @BlockdevQcowEncryptionFormat:
+> +# @qcow: AES-CBC with plain64 initialization venctors
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'enum': 'BlockdevQcowEncryptionFormat',
+> +  'data': [ 'qcow' ] }
+
+Shouldn't this be 'aes' instead of 'qcow' ??
+
+Berto
