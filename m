@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d8thV-0007TL-IT
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:24:38 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d8tjh-0001Bg-1L
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d8thS-0001Yh-CZ
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:24:37 -0400
-Resent-Message-Id: <E1d8thS-0001Yh-CZ@eggs.gnu.org>
-In-Reply-To: <20170511144208.24075-1-pbonzini@redhat.com>
-Message-ID: <149453066700.336.18246395141794695739@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <stefanha@gmail.com>) id 1d8tjd-0002Td-Sr
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:26:53 -0400
+Date: Thu, 11 May 2017 15:26:46 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170511192646.GD24584@stefanha-x1.localdomain>
+References: <20170419094356.19826-1-famz@redhat.com>
+	<20170419094356.19826-2-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 11 May 2017 12:24:27 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/18] Block layer thread safety, part 1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="KdquIMZPjGJQvRdI"
+Content-Disposition: inline
+In-Reply-To: <20170419094356.19826-2-famz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 01/16] block: Define
+ BLK_PERM_AIO_CONTEXT_CHANGE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA1MTExNDQyMDguMjQwNzUtMS1wYm9uemluaUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggdjIgMDAvMThdIEJsb2NrIGxheWVyIHRocmVhZCBzYWZldHksIHBhcnQgMQpU
-eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdhMTc1NGEgYmxvY2s6IG1ha2UgYWNjb3VudGlu
-ZyB0aHJlYWQtc2FmZQpmMGM5MTkxIGJsb2NrOiBpbnRyb2R1Y2UgYmxvY2tfYWNjb3VudF9vbmVf
-aW8KNGYzYmI0YyBibG9jazogcHJvdGVjdCBtb2RpZmljYXRpb24gb2YgZGlydHkgYml0bWFwcyB3
-aXRoIGEgbXV0ZXgKNWE0ZmM0OCBtaWdyYXRpb24vYmxvY2s6IHJlc2V0IGRpcnR5IGJpdG1hcCBi
-ZWZvcmUgcmVhZGluZwo3NzVmNjAwIGJsb2NrOiBpbnRyb2R1Y2UgZGlydHlfYml0bWFwX211dGV4
-CjQyMmUzM2QgYmxvY2s6IHByb3RlY3QgdHJhY2tlZF9yZXF1ZXN0cyBhbmQgZmx1c2hfcXVldWUg
-d2l0aCByZXFzX2xvY2sKNGUyYmFhMiBibG9jazogYWNjZXNzIHdyaXRlX2dlbiB3aXRoIGF0b21p
-Y3MKYmJjOWQ5NiBibG9jazogdXNlIFN0YXQ2NCBmb3Igd3JfaGlnaGVzdF9vZmZzZXQKNjA1ZmJm
-ZSB1dGlsOiBhZGQgc3RhdHM2NCBtb2R1bGUKNmVhYzgyZCB0aHJvdHRsZS1ncm91cHM6IHByb3Rl
-Y3QgdGhyb3R0bGVkIHJlcXVlc3RzIHdpdGggYSBDb011dGV4Cjc4ZmVlNjcgdGhyb3R0bGUtZ3Jv
-dXBzOiBkbyBub3QgdXNlIHFlbXVfY29fZW50ZXJfbmV4dAo2MGRmOTlmIHRocm90dGxlLWdyb3Vw
-czogb25seSBzdGFydCBvbmUgY29yb3V0aW5lIGZyb20gZHJhaW5lZF9iZWdpbgplODQwY2YzIGJs
-b2NrOiBhY2Nlc3MgaW9fcGx1Z2dlZCB3aXRoIGF0b21pYyBvcHMKNWM4YjZkNyBibG9jazogYWNj
-ZXNzIHdha2V1cCB3aXRoIGF0b21pYyBvcHMKYTIxN2E4OSBibG9jazogYWNjZXNzIHNlcmlhbGlz
-aW5nX2luX2ZsaWdodCB3aXRoIGF0b21pYyBvcHMKMGUwODdkZCBibG9jazogYWNjZXNzIGlvX2xp
-bWl0c19kaXNhYmxlZCB3aXRoIGF0b21pYyBvcHMKZDAzZTYzYyBibG9jazogYWNjZXNzIHF1aWVz
-Y2VfY291bnRlciB3aXRoIGF0b21pYyBvcHMKZTliZDJlNyBibG9jazogYWNjZXNzIGNvcHlfb25f
-cmVhZCB3aXRoIGF0b21pYyBvcHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvMTg6IGJsb2NrOiBhY2Nlc3MgY29weV9vbl9yZWFkIHdpdGggYXRvbWljIG9wcy4uLgpDaGVj
-a2luZyBQQVRDSCAyLzE4OiBibG9jazogYWNjZXNzIHF1aWVzY2VfY291bnRlciB3aXRoIGF0b21p
-YyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xODogYmxvY2s6IGFjY2VzcyBpb19saW1pdHNfZGlz
-YWJsZWQgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBBVENIIDQvMTg6IGJsb2NrOiBhY2Nl
-c3Mgc2VyaWFsaXNpbmdfaW5fZmxpZ2h0IHdpdGggYXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRD
-SCA1LzE4OiBibG9jazogYWNjZXNzIHdha2V1cCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNi8xODogYmxvY2s6IGFjY2VzcyBpb19wbHVnZ2VkIHdpdGggYXRvbWljIG9wcy4uLgpD
-aGVja2luZyBQQVRDSCA3LzE4OiB0aHJvdHRsZS1ncm91cHM6IG9ubHkgc3RhcnQgb25lIGNvcm91
-dGluZSBmcm9tIGRyYWluZWRfYmVnaW4uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xODogdGhyb3R0bGUt
-Z3JvdXBzOiBkbyBub3QgdXNlIHFlbXVfY29fZW50ZXJfbmV4dC4uLgpDaGVja2luZyBQQVRDSCA5
-LzE4OiB0aHJvdHRsZS1ncm91cHM6IHByb3RlY3QgdGhyb3R0bGVkIHJlcXVlc3RzIHdpdGggYSBD
-b011dGV4Li4uCkNoZWNraW5nIFBBVENIIDEwLzE4OiB1dGlsOiBhZGQgc3RhdHM2NCBtb2R1bGUu
-Li4KRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhvdXQgY29tbWVudAojMzI3OiBGSUxFOiB1dGls
-L3N0YXRzNjQuYzoxMDE6CisgICAgICAgIHNtcF93bWIoKTsKCkVSUk9SOiBtZW1vcnkgYmFycmll
-ciB3aXRob3V0IGNvbW1lbnQKIzM1NjogRklMRTogdXRpbC9zdGF0czY0LmM6MTMwOgorICAgICAg
-ICBzbXBfd21iKCk7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDMzNCBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCAxMS8xODogYmxvY2s6IHVzZSBTdGF0NjQgZm9yIHdyX2hpZ2hlc3Rfb2Zmc2V0Li4uCkNoZWNr
-aW5nIFBBVENIIDEyLzE4OiBibG9jazogYWNjZXNzIHdyaXRlX2dlbiB3aXRoIGF0b21pY3MuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTMvMTg6IGJsb2NrOiBwcm90ZWN0IHRyYWNrZWRfcmVxdWVzdHMgYW5k
-IGZsdXNoX3F1ZXVlIHdpdGggcmVxc19sb2NrLi4uCkNoZWNraW5nIFBBVENIIDE0LzE4OiBibG9j
-azogaW50cm9kdWNlIGRpcnR5X2JpdG1hcF9tdXRleC4uLgpDaGVja2luZyBQQVRDSCAxNS8xODog
-bWlncmF0aW9uL2Jsb2NrOiByZXNldCBkaXJ0eSBiaXRtYXAgYmVmb3JlIHJlYWRpbmcuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTYvMTg6IGJsb2NrOiBwcm90ZWN0IG1vZGlmaWNhdGlvbiBvZiBkaXJ0eSBi
-aXRtYXBzIHdpdGggYSBtdXRleC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-MzAzOiBGSUxFOiBtaWdyYXRpb24vYmxvY2suYzo1NDA6CisgICAgICAgICAgICBiZHJ2X3Jlc2V0
-X2RpcnR5X2JpdG1hcF9sb2NrZWQoYm1kcy0+ZGlydHlfYml0bWFwLCBzZWN0b3IsIG5yX3NlY3Rv
-cnMpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNzIgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxNy8xODog
-YmxvY2s6IGludHJvZHVjZSBibG9ja19hY2NvdW50X29uZV9pby4uLgpFUlJPUjogbGluZSBvdmVy
-IDkwIGNoYXJhY3RlcnMKIzIwOiBGSUxFOiBibG9jay9hY2NvdW50aW5nLmM6ODk6CitzdGF0aWMg
-dm9pZCBibG9ja19hY2NvdW50X29uZV9pbyhCbG9ja0FjY3RTdGF0cyAqc3RhdHMsIEJsb2NrQWNj
-dENvb2tpZSAqY29va2llLCBib29sIGZhaWxlZCkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgNzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKQ2hlY2tpbmcgUEFUQ0ggMTgvMTg6IGJsb2NrOiBtYWtlIGFjY291bnRpbmcgdGhyZWFkLXNh
-ZmUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QGZyZWVsaXN0cy5vcmc=
+
+--KdquIMZPjGJQvRdI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Wed, Apr 19, 2017 at 05:43:41PM +0800, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block.c               | 2 ++
+>  include/block/block.h | 7 ++++++-
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--KdquIMZPjGJQvRdI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZFLr2AAoJEJykq7OBq3PIY7kH/RVMXZoivqTzJLcUHhEXAOyO
+ybM2n302WexKMf+o0igYpwaPiBIieVat6WKeW+OF5FU4vcbkPS6KjIu6+CGbUNIf
+yX9AMOtiKLj9kEsQ55nrQU8Wg0BH6qZRJ6zEdBVFaW93sqs+6InSazVTGDp8z53W
+rZVWiYjOPQHJxkgT1UizCVFOVD/Xa17S0zNKQNrUqDQWLVveR9MGd4S7EhLXq7hF
+JVqsTGtLUJFNrHVyPAy7OtkXUFarC42Kv9uSqtYsDn48MUvBOftYmpTaH/5u1vsb
+PXbSQeVKuMZypufgmU8pRPA9hee5MrXov2La/VCfiJHuyLyi3Yb3Jd4q8Z8i6Bo=
+=mtUN
+-----END PGP SIGNATURE-----
+
+--KdquIMZPjGJQvRdI--
