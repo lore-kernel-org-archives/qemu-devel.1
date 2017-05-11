@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fUr-0005HN-Db
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fUr-0005HP-M3
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fUq-0001LO-Az
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fUq-0001Le-CU
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:37 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 11 May 2017 14:14:06 +1000
-Message-Id: <20170511041426.6488-4-david@gibson.dropbear.id.au>
+Date: Thu, 11 May 2017 14:14:05 +1000
+Message-Id: <20170511041426.6488-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20170511041426.6488-1-david@gibson.dropbear.id.au>
 References: <20170511041426.6488-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 03/23] cputlb: handle first atomic write to the
- page
+Subject: [Qemu-devel] [PULL 02/23] target/ppc: Emulate LL/SC using cmpxchg
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +25,80 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bhara
 
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-In case where the conditional write is the first write to the page,
-TLB_NOTDIRTY will be set and stop_the_world is triggered. Handle this as
-a special case and set the dirty bit. After that fall through to the
-actual atomic instruction below.
+Emulating LL/SC with cmpxchg is not correct, since it can suffer from
+the ABA problem. However, portable parallel code is written assuming
+only cmpxchg which means that in practice this is a viable alternative.
 
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- cputlb.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ target/ppc/translate.c | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
 
-diff --git a/cputlb.c b/cputlb.c
-index f5d056c..743776a 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -930,7 +930,13 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-         tlb_addr = tlbe->addr_write;
-     }
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index f40b5a1..50b6d4d 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -73,6 +73,7 @@ static TCGv cpu_cfar;
+ #endif
+ static TCGv cpu_xer, cpu_so, cpu_ov, cpu_ca, cpu_ov32, cpu_ca32;
+ static TCGv cpu_reserve;
++static TCGv cpu_reserve_val;
+ static TCGv cpu_fpscr;
+ static TCGv_i32 cpu_access_type;
  
--    /* Notice an IO access, or a notdirty page.  */
-+    /* Check notdirty */
-+    if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
-+        tlb_set_dirty(ENV_GET_CPU(env), addr);
-+        tlb_addr = tlb_addr & ~TLB_NOTDIRTY;
-+    }
+@@ -181,6 +182,9 @@ void ppc_translate_init(void)
+     cpu_reserve = tcg_global_mem_new(cpu_env,
+                                      offsetof(CPUPPCState, reserve_addr),
+                                      "reserve_addr");
++    cpu_reserve_val = tcg_global_mem_new(cpu_env,
++                                     offsetof(CPUPPCState, reserve_val),
++                                     "reserve_val");
+ 
+     cpu_fpscr = tcg_global_mem_new(cpu_env,
+                                    offsetof(CPUPPCState, fpscr), "fpscr");
+@@ -3023,7 +3027,7 @@ static void gen_##name(DisasContext *ctx)                            \
+     }                                                                \
+     tcg_gen_qemu_ld_tl(gpr, t0, ctx->mem_idx, memop);                \
+     tcg_gen_mov_tl(cpu_reserve, t0);                                 \
+-    tcg_gen_st_tl(gpr, cpu_env, offsetof(CPUPPCState, reserve_val)); \
++    tcg_gen_mov_tl(cpu_reserve_val, gpr);                            \
+     tcg_temp_free(t0);                                               \
+ }
+ 
+@@ -3155,14 +3159,27 @@ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+ static void gen_conditional_store(DisasContext *ctx, TCGv EA,
+                                   int reg, int memop)
+ {
+-    TCGLabel *l1;
++    TCGLabel *l1 = gen_new_label();
++    TCGLabel *l2 = gen_new_label();
++    TCGv t0;
+ 
+-    tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
+-    l1 = gen_new_label();
+     tcg_gen_brcond_tl(TCG_COND_NE, EA, cpu_reserve, l1);
+-    tcg_gen_ori_i32(cpu_crf[0], cpu_crf[0], CRF_EQ);
+-    tcg_gen_qemu_st_tl(cpu_gpr[reg], EA, ctx->mem_idx, memop);
 +
-+    /* Notice an IO access  */
-     if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
-         /* There's really nothing that can be done to
-            support this apart from stop-the-world.  */
++    t0 = tcg_temp_new();
++    tcg_gen_atomic_cmpxchg_tl(t0, cpu_reserve, cpu_reserve_val,
++                              cpu_gpr[reg], ctx->mem_idx,
++                              DEF_MEMOP(memop) | MO_ALIGN);
++    tcg_gen_setcond_tl(TCG_COND_EQ, t0, t0, cpu_reserve_val);
++    tcg_gen_shli_tl(t0, t0, CRF_EQ_BIT);
++    tcg_gen_or_tl(t0, t0, cpu_so);
++    tcg_gen_trunc_tl_i32(cpu_crf[0], t0);
++    tcg_temp_free(t0);
++    tcg_gen_br(l2);
++
+     gen_set_label(l1);
++    tcg_gen_trunc_tl_i32(cpu_crf[0], cpu_so);
++
++    gen_set_label(l2);
+     tcg_gen_movi_tl(cpu_reserve, -1);
+ }
+ #endif
 -- 
 2.9.3
