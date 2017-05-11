@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fUt-0005Hf-Gu
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fUt-0005He-GS
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fUq-0001LT-BL
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fUq-0001LY-BZ
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:39 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 11 May 2017 14:14:04 +1000
-Message-Id: <20170511041426.6488-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20170511041426.6488-1-david@gibson.dropbear.id.au>
-References: <20170511041426.6488-1-david@gibson.dropbear.id.au>
+Date: Thu, 11 May 2017 14:14:03 +1000
+Message-Id: <20170511041426.6488-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/23] ppc/pnv: restrict BMC object to the BMC
- simulator
+Subject: [Qemu-devel] [PULL 00/23] ppc-for-2.10 queue 20170511
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +23,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, sjitindarsingh@gmail.com, mark.cave-ayland@ilande.co.uk, sam.bobroff@au1.ibm.com, nikunj@linux.vnet.ibm.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+The following changes since commit 76d20ea0f1b26ebd5da2f5fb2fdf3250cde887=
+bb:
 
-Today, when a PowerNV guest runs, it uses the sensor definitions of
-the BMC simulator to populate the device tree. But an external IPMI
-BMC could also be used and, in that case, it is not (yet) possible to
-retrieve the sensor list. Generating the OEM SEL event for shutdown or
-reboot also does not make sense as it should be generated on the BMC
-side.
+  Merge remote-tracking branch 'armbru/tags/pull-qapi-2017-05-04-v3' into=
+ staging (2017-05-09 15:49:14 -0400)
 
-This change allows a guest to use an 'ipmi-bmc-extern' backend to the
-'isa-ipmi-bt' device and a 'chardev' for transport such as :
+are available in the git repository at:
 
-	-chardev socket,id=3Dipmi0,host=3Dlocalhost,port=3D9002,reconnect=3D10 \
-	-device ipmi-bmc-extern,id=3Dbmc0,chardev=3Dipmi0 \
-	-device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170511
 
-and connect to a BMC simulator, the OpenIPMI ipmi_sim simulator for
-instance.
+for you to fetch changes up to e9edd931eb1b7e4be2274a8d9b3e5d5c4b7d1aad:
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/pnv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  target/ppc: Avoid printing wrong aliases in CPU help text (2017-05-11 0=
+9:45:15 +1000)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index d4bcdb0..251baea 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -511,7 +511,7 @@ static void ppc_powernv_reset(void)
-      * This is the internal simulator but it could also be an external
-      * BMC.
-      */
--    obj =3D object_resolve_path_type("", TYPE_IPMI_BMC, NULL);
-+    obj =3D object_resolve_path_type("", "ipmi-bmc-sim", NULL);
-     if (obj) {
-         pnv->bmc =3D IPMI_BMC(obj);
-     }
---=20
-2.9.3
+----------------------------------------------------------------
+ppc patch queue for 2017-05-11
+
+This pull request supersedes the one from yesterday (20170510), fixing
+an important style bug in one patch, and adding an extra couple of
+simple patches.
+
+Highlights of this set:
+  * Some fixes for POWER9
+  * TCG support for POWER9 radix MMU
+  * VGA rom for Mac machine types
+  * Fixes for the XICS interrupt controller
+  * MTTCG support for ppc targets
+
+As suggested by Paolo, I've tried to add the Docker tests to my
+standard pre-pull-request tests.  I haven't wholly suceeded; this has
+been tested with some of the Docker images, but others I haven't
+managed due to problems that as best I can tell are not due to
+problems in this patch series.  I'll continue working on this for
+future pull requests.  Specifically, 'travis', 'fedora', and 'centos6'
+seem to work.  'min-glib' jammed while gtesting moxie, which seems
+very unlikely to be caused by this series.  'ubuntu', 'debian' and
+'debian-bootstrap' hit build errors almost immediately that look like
+problems with the container configuration, and 'debian-*-cross' hit
+build errors later on which also look like missing dependencies from
+the container.
+
+----------------------------------------------------------------
+Bharata B Rao (1):
+      cpus: Fix CPU unplug for MTTCG
+
+C=C3=A9dric Le Goater (1):
+      ppc/pnv: restrict BMC object to the BMC simulator
+
+David Gibson (3):
+      spapr: Don't accidentally advertise HTM support on POWER9
+      target/ppc: Allow workarounds for POWER9 DD1
+      pnv: Fix build failures on some host platforms
+
+Mark Cave-Ayland (4):
+      Add QemuMacDrivers as submodule
+      Add QemuMacDrivers qemu_vga.ndrv revision d4e7d7a built as submodul=
+e
+      ppc: add qemu_vga.ndrv ROM to fw_cfg interface for OldWorld Macs
+      ppc: add qemu_vga.ndrv ROM to fw_cfg interface for NewWorld Macs
+
+Nikunj A Dadhania (5):
+      target/ppc: Emulate LL/SC using cmpxchg helpers
+      cputlb: handle first atomic write to the page
+      target/ppc: Generate fence operations
+      tcg: enable MTTCG by default for PPC64 on x86
+      target/ppc: do not reset reserve_addr in exec_enter
+
+Paolo Bonzini (1):
+      ppc: xics: fix compilation with CentOS 6
+
+Sam Bobroff (2):
+      ppc/xics: Fix stale irq->status bits after get
+      ppc/xics: preserve P and Q bits for KVM IRQs
+
+Suraj Jitindar Singh (5):
+      target/ppc: Set UPRT and GTSE on all cpus in H_REGISTER_PROCESS_TAB=
+LE
+      target/ppc: Update tlbie to check privilege level based on GTSE
+      target/ppc: Change tlbie invalid fields for POWER9 support
+      target/ppc: Implement ISA V3.00 radix page fault handler
+      target/ppc: Enable RADIX mmu mode for pseries TCG guest
+
+Thomas Huth (1):
+      target/ppc: Avoid printing wrong aliases in CPU help text
+
+ .gitmodules                 |   3 +
+ Makefile                    |   3 +-
+ configure                   |   2 +
+ cpus.c                      |   6 +
+ cputlb.c                    |   8 +-
+ hw/intc/xics_kvm.c          |  13 +++
+ hw/ppc/mac_newworld.c       |  18 ++-
+ hw/ppc/mac_oldworld.c       |  18 ++-
+ hw/ppc/pnv.c                |   2 +-
+ hw/ppc/spapr.c              |  17 ++-
+ hw/ppc/spapr_hcall.c        |  18 ++-
+ include/hw/ppc/pnv.h        |   3 +-
+ include/hw/ppc/pnv_lpc.h    |   4 +-
+ include/hw/ppc/pnv_occ.h    |   4 +-
+ include/hw/ppc/xics.h       |   4 +-
+ pc-bios/README              |   3 +
+ pc-bios/qemu_vga.ndrv       | Bin 0 -> 14752 bytes
+ roms/QemuMacDrivers         |   1 +
+ target/ppc/Makefile.objs    |   1 +
+ target/ppc/cpu-models.h     |   1 +
+ target/ppc/cpu.h            |   5 +
+ target/ppc/excp_helper.c    |   3 +
+ target/ppc/kvm.c            |  23 ++--
+ target/ppc/mmu-book3s-v3.c  |   6 +-
+ target/ppc/mmu-book3s-v3.h  |   5 +
+ target/ppc/mmu-radix64.c    | 259 ++++++++++++++++++++++++++++++++++++++=
+++++++
+ target/ppc/mmu-radix64.h    |  72 ++++++++++++
+ target/ppc/translate.c      |  48 ++++++--
+ target/ppc/translate_init.c |  38 +++++--
+ 29 files changed, 525 insertions(+), 63 deletions(-)
+ create mode 100644 pc-bios/qemu_vga.ndrv
+ create mode 160000 roms/QemuMacDrivers
+ create mode 100644 target/ppc/mmu-radix64.c
+ create mode 100644 target/ppc/mmu-radix64.h
