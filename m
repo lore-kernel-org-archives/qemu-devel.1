@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1d8ow3-0004uG-7A
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:19:20 -0400
+	(envelope-from <den@virtuozzo.com>) id 1d8p4r-0007LZ-BN
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:28:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1d8ovy-0003mT-9R
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:19:19 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3987)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1d8ovx-0003lP-Mz
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:19:14 -0400
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Thu, 11 May 2017 14:18:39 +0000
-Message-ID: <B2D15215269B544CADD246097EACE747395ADA61@dggeml511-mbx.china.huawei.com>
-References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
-	<874lxeovrg.fsf@secure.mitica>
-	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
-	<20170424164244.GJ2362@work-vm>
-	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
-	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
-	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
-	<CANRm+CwvYa01CLChSOGjG6P0q2_Zybov3ZMSULsCGH5GtmRy8A@mail.gmail.com>
-In-Reply-To: <CANRm+CwvYa01CLChSOGjG6P0q2_Zybov3ZMSULsCGH5GtmRy8A@mail.gmail.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <den@virtuozzo.com>) id 1d8p4m-0002CZ-W2
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:28:25 -0400
+References: <20170504105444.8940-1-daniel.kucera@gmail.com>
+	<20170508203556.GA22634@stefanha-x1.localdomain>
+	<c51044c8-edf6-c0a2-e543-0d9be1a61b29@openvz.org>
+	<fac1ae33-dc7e-b513-d694-c8f8c1555baa@redhat.com>
+	<20170509165254.GA26793@stefanha-x1.localdomain>
+	<fc8b563b-5fb5-0a65-c883-32191b3c93e7@openvz.org>
+	<20170510150016.GB19962@stefanha-x1.localdomain>
+	<bf77cd41-3ae7-629f-6690-34913c7d78f0@openvz.org>
+	<CAKVPjOaTYVAz3ek4uMq-XRt9UyEaquN30t2wg2VsoDgaA7=EyQ@mail.gmail.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <26a943da-3487-8d39-85fd-6e176af054e0@openvz.org>
+Date: Thu, 11 May 2017 16:28:14 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
+In-Reply-To: <CAKVPjOaTYVAz3ek4uMq-XRt9UyEaquN30t2wg2VsoDgaA7=EyQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] mirror: add sync mode incremental to
+ drive-mirror and blockdev-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +31,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wanpeng Li <kernellwp@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Daniel_Ku=c4=8dera?= <daniel.kucera@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-SGkgV2FucGVuZywNCg0KPiAyMDE3LTA1LTExIDIxOjQzIEdNVCswODowMCBXYW5wZW5nIExpIDxr
-ZXJuZWxsd3BAZ21haWwuY29tPjoNCj4gPiAyMDE3LTA1LTExIDIwOjI0IEdNVCswODowMCBQYW9s
-byBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPjoNCj4gPj4NCj4gPj4NCj4gPj4gT24gMTEv
-MDUvMjAxNyAxNDowNywgWmhvdWppYW4gKGpheSkgd3JvdGU6DQo+ID4+PiAtICAgICAgICAqIFNj
-YW4gc3B0ZXMgaWYgZGlydHkgbG9nZ2luZyBoYXMgYmVlbiBzdG9wcGVkLCBkcm9wcGluZw0KPiB0
-aG9zZQ0KPiA+Pj4gLSAgICAgICAgKiB3aGljaCBjYW4gYmUgY29sbGFwc2VkIGludG8gYSBzaW5n
-bGUgbGFyZ2UtcGFnZSBzcHRlLg0KPiBMYXRlcg0KPiA+Pj4gLSAgICAgICAgKiBwYWdlIGZhdWx0
-cyB3aWxsIGNyZWF0ZSB0aGUgbGFyZ2UtcGFnZSBzcHRlcy4NCj4gPj4+ICsgICAgICAgICogUmVz
-ZXQgZWFjaCB2Y3B1J3MgbW11LCB0aGVuIHBhZ2UgZmF1bHRzIHdpbGwgY3JlYXRlIHRoZQ0KPiBs
-YXJnZS1wYWdlDQo+ID4+PiArICAgICAgICAqIHNwdGVzIGxhdGVyLg0KPiA+Pj4gICAgICAgICAg
-Ki8NCj4gPj4+ICAgICAgICAgaWYgKChjaGFuZ2UgIT0gS1ZNX01SX0RFTEVURSkgJiYNCj4gPj4+
-ICAgICAgICAgICAgICAgICAob2xkLT5mbGFncyAmIEtWTV9NRU1fTE9HX0RJUlRZX1BBR0VTKSAm
-Jg0KPiA+Pj4gLSAgICAgICAgICAgICAgICEobmV3LT5mbGFncyAmIEtWTV9NRU1fTE9HX0RJUlRZ
-X1BBR0VTKSkNCj4gPj4+IC0gICAgICAgICAgICAgICBrdm1fbW11X3phcF9jb2xsYXBzaWJsZV9z
-cHRlcyhrdm0sIG5ldyk7DQo+ID4NCj4gPiBUaGlzIGlzIGFuIHVubGlrZWx5IGJyYW5jaCh1bmxl
-c3MgZ3Vlc3QgbGl2ZSBtaWdyYXRpb24gZmFpbHMgYW5kDQo+ID4gY29udGludWUgdG8gcnVuIG9u
-IHRoZSBzb3VyY2UgbWFjaGluZSkgaW5zdGVhZCBvZiBob3QgcGF0aCwgZG8geW91DQo+ID4gaGF2
-ZSBhbnkgcGVyZm9ybWFuY2UgbnVtYmVyIGZvciB5b3VyIHJlYWwgd29ya2xvYWRzPw0KPiANCj4g
-SSBmaW5kIHRoZSBvcmlnaW5hbCBkaXNjdXNzaW9uIGJ5IGdvb2dsZS4NCj4gaHR0cHM6Ly9saXN0
-cy5ub25nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTctMDQvbXNnMDQxNDMuaHRt
-bA0KPiBZb3Ugd2lsbCBub3QgZ28gdG8gdGhpcyBicmFuY2ggaWYgdGhlIGd1ZXN0IGxpdmUgbWln
-cmF0aW9uIHN1Y2Nlc3NmdWxseS4NCg0KIEluIG91ciB0ZXN0cywgdGhpcyBicmFuY2ggaXMgdGFr
-ZW4gd2hlbiBsaXZpbmcgbWlncmF0aW9uIGlzIHN1Y2Nlc3NmdWwuDQogQUZBSUssIHRoZSBrbW9k
-IGRvZXMgbm90IGtub3cgd2hldGhlciBsaXZpbmcgbWlncmF0aW9uIHN1Y2Nlc3NmdWwgb3Igbm90
-DQogd2hlbiBkZWFsaW5nIHdpdGggS1ZNX1NFVF9VU0VSX01FTU9SWV9SRUdJT04gaW9jdGwuIERv
-IEkgbWlzcyBzb21ldGhpbmc/DQoNClJlZ2FyZHMsDQpKYXkgWmhvdQ0K
+On 05/11/2017 04:16 PM, Daniel Ku=C4=8Dera wrote:
+>
+> 2017-05-10 17:05 GMT+02:00 Denis V. Lunev <den@openvz.org
+> <mailto:den@openvz.org>>:
+>
+>     On 05/10/2017 05:00 PM, Stefan Hajnoczi wrote:
+>     > On Wed, May 10, 2017 at 03:25:31PM +0200, Denis V. Lunev wrote:
+>     >> On 05/09/2017 06:52 PM, Stefan Hajnoczi wrote:
+>     >>> On Mon, May 08, 2017 at 05:07:18PM -0400, John Snow wrote:
+>     >>>> On 05/08/2017 05:02 PM, Denis V. Lunev wrote:
+>     >>>>> On 05/08/2017 10:35 PM, Stefan Hajnoczi wrote:
+>     >>>>>> On Thu, May 04, 2017 at 12:54:40PM +0200, Daniel Kucera wrot=
+e:
+>     >>>>>>
+>     >>>>>> Seems like a logical extension along the same lines as the
+>     backup block
+>     >>>>>> job's dirty bitmap sync mode.
+>     >>>>>>
+>     >>>>>>> parameter bitmap chooses existing dirtymap instead of
+>     newly created
+>     >>>>>>> in mirror_start_job
+>     >>>>>>>
+>     >>>>>>> Signed-off-by: Daniel Kucera <daniel.kucera@gmail.com
+>     <mailto:daniel.kucera@gmail.com>>
+>     >>>>> Can you pls describe the use case pls in a bit more details.
+>     >>>>>
+>     >>>>> For now this could be a bit strange:
+>     >>>>> - dirty bitmap, which can be found via bdrv_create_dirty_bitm=
+ap
+>     >>>>>   could be read-only or read-write, i.e. being modified by
+>     writes
+>     >>>>>   or be read-only, which should not be modified. Thus adding
+>     >>>>>   r/o bitmap to the mirror could result in interesting things=
+=2E
+>     >>>>>
+>     >>>> This patch as it was submitted does not put the bitmap into a
+>     read-only
+>     >>>> mode; it leaves it RW and modifies it as it processes the
+>     mirror command.
+>     >>>>
+>     >>>> Though you do raise a good point; this bitmap is now in-use
+>     by a job and
+>     >>>> should not be allowed to be deleted by the user, but our exist=
+ing
+>     >>>> mechanism treats a locked bitmap as one that is also in R/O
+>     mode. This
+>     >>>> would be a different use case.
+>     >>>>
+>     >>>>> Minimally we should prohibit usage of r/o bitmaps this way.
+>     >>>>>
+>     >>>>> So, why to use mirror, not backup for the case?
+>     >>>>>
+>     >>>> My guess is for pivot semantics.
+>     >>> Daniel posted his workflow in a previous revision of this serie=
+s:
+>     >>>
+>     >>> He is doing a variation on non-shared storage migration with
+>     the mirror
+>     >>> block job, but using the ZFS send operation to transfer the
+>     initial copy
+>     >>> of the disk.
+>     >>>
+>     >>> Once ZFS send completes it's necessary to transfer all the
+>     blocks that
+>     >>> were dirtied while the transfer was taking place.
+>     >>>
+>     >>> 1. Create dirty bitmap and start tracking dirty blocks in QEMU.=
+
+>     >>> 2. Snapshot and send ZFS volume.
+>     >>> 3. mirror sync=3Dbitmap after ZFS send completes.
+>     >>> 4. Live migrate.
+>     >>>
+>     >>> Stefan
+>     >> thank you very much. This is clear now.
+>     >>
+>     >> If I am not mistaken,  this can be very easy done with
+>     >> the current implementation without further QEMU modifications.
+>     >> Daniel just needs to start mirror and put it on pause for the
+>     >> duration of stage (2).
+>     >>
+>     >> Will this work?
+>     > I think it's a interesting idea but I'm not sure if sync=3Dnone +=
+
+>     pause
+>     > can be done atomically.  Without atomicity a block might be sent
+>     to the
+>     > destination while the ZFS send is still in progress.
+>     >
+>     > Stefan
+>     Atomicity here is completely impossible.
+>
+>     The case is like this.
+>
+>     1) start the mirror
+>     2) pause the mirror
+>     3) snapshot + ZFS send
+>     4) resume mirror
+>     5) live migrate
+>
+>     The worst case problem - some additional blocks which
+>     would be send twice. This should not be very big deal.
+>     This is actually which backup always does. The amount
+>     of such blocks will not be really big.
+>
+>     Den
+>
+>
+> I guess it won't be possible to start mirror in 1) or it will
+> instantly fail because the block device on destination doesn't exist
+> at that moment, so it's not even possible to start nbd server.
+>
+> Or am I wrong?
+>
+good point, by I guess you can create empty volume of the
+proper size it at step 0, setup QEMU mirror and start to copy
+the data to that volume. I may be completely wrong here as
+I do not know ZFS management procedures and tools.
+
+Can you share the commands you are using to perform the
+op? May be we will be able to find suitable solution.
+
+Den
