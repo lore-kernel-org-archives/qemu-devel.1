@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8iUf-0005ct-VV
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:26:38 -0400
+	(envelope-from <voipio@kos.to>) id 1d8ick-0007fA-70
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:34:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8iUZ-0006t2-Sm
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:26:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41002)
+	(envelope-from <voipio@kos.to>) id 1d8icg-0002s3-7U
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:34:58 -0400
+Received: from jessie.kos.to ([212.47.231.226]:54316 helo=pilvi.kos.to)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d8iUZ-0006rn-MP
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:26:31 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
-	<20170510090841.GF31558@redhat.com> <20170510145125.GE4230@work-vm>
-	<20170510150452.GV31558@redhat.com> <20170510151404.GF4230@work-vm>
-Date: Thu, 11 May 2017 09:26:22 +0200
-In-Reply-To: <20170510151404.GF4230@work-vm> (David Alan Gilbert's message of
-	"Wed, 10 May 2017 16:14:05 +0100")
-Message-ID: <87h90rluqp.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <voipio@kos.to>) id 1d8icg-0002qO-2L
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:34:54 -0400
+Date: Thu, 11 May 2017 07:34:48 +0000
+From: Riku Voipio <riku.voipio@iki.fi>
+Message-ID: <20170511073448.GA11462@kos.to>
+References: <20170510153950.29343-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
- pc-0.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170510153950.29343-1-laurent@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH] maintainers: Add myself as linux-user
+ reviewer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On Wed, May 10, 2017 at 05:39:50PM +0200, Laurent Vivier wrote:
+> I volunteer to review linux-user patches.
+> Adding myself will help to not miss some of them.
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
->> On Wed, May 10, 2017 at 03:51:25PM +0100, Dr. David Alan Gilbert wrote:
->> > * Daniel P. Berrange (berrange@redhat.com) wrote:
->> > > If we deprecate in this release (~Aug/Sep 2017), and kill in the next
->> > > release  (Dec 2017), that means our oldest machine type pc-1.0 is still
->> > > going to be 6 years, or 18 major releases, old. This raises some questions
->> > > 
->> > >   - Do we really think that we still have users with VMs that are
->> > >     stuck on a 6 year old machine type from 18 major releases ago ?
->> > 
->> > Our RHEL6 users are still on a 0.12 derivative.
->> 
->> Yep, but not using upstream machine types. So we can kill machine
->> types without affecting RHEL-6.  The separate question is whether
->> we can kill the associated features that are needed for RHEL to
->> create its legacy machine types (eg the rombar setting mentioned)
->
-> Right, it just felt a bit odd to kill it off upstream if we know
-> of users ourselves who use old versions like that.
->
-> Also remember machine types are not just about migration compatibility;
-> if we kill a machine type then:
->   a) The users will need to modify their libvirt xml for each VM to
-> change machine type
+Acked-by: Riku Voipio <riku.voipio@linaro.org>
 
-Point taken.  But if this inconvenience is unacceptable, consider an
-enterprise distribution, or maybe CentOS.
-
->   b) That change in guest view of the machine might upset the OS
-> installed.
-
-Unlikely, unless you migrate without a reboot.  Guests almost always
-adapt to minor hardware changes on reboot just fine.
-
-> I've certainly got VMs that were installed ages ago and are still using
-> the XML from the old installation; so that probably means using an old
-> machine type on a modern QEMU.
-
-Eventually, that becomes as likely to actually work as rebooting with a
-newer machine type :)
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8224be0..c9eed8a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1577,6 +1577,7 @@ F: default-configs/*-bsd-user.mak
+>  
+>  Linux user
+>  M: Riku Voipio <riku.voipio@iki.fi>
+> +R: Laurent Vivier <laurent@vivier.eu>
+>  S: Maintained
+>  F: linux-user/
+>  F: default-configs/*-linux-user.mak
+> -- 
+> 2.9.3
+> 
