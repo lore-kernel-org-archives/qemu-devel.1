@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8tco-00030Y-Eh
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:48 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d8thV-0007TL-IT
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8tcl-00083H-Sh
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41218)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8tcl-00082v-Iz
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:43 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 11 May 2017 16:18:43 -0300
-Message-Id: <20170511191843.13784-30-ehabkost@redhat.com>
-In-Reply-To: <20170511191843.13784-1-ehabkost@redhat.com>
-References: <20170511191843.13784-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 29/29] migration/i386: Remove support for
- pre-0.12 formats
+	(envelope-from <no-reply@patchew.org>) id 1d8thS-0001Yh-CZ
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:24:37 -0400
+Resent-Message-Id: <E1d8thS-0001Yh-CZ@eggs.gnu.org>
+In-Reply-To: <20170511144208.24075-1-pbonzini@redhat.com>
+Message-ID: <149453066700.336.18246395141794695739@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 11 May 2017 12:24:27 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/18] Block layer thread safety, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,183 +23,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-
-Remove support for versions of the CPU state prior to 11
-which is the version used in qemu 0.12 - you'd be pretty
-lucky if you got a migration stream to work from anything
-that old anyway.  This doesn't affect the machine type
-definition in any way.
-
-My main reason for doing this is the hack for sysenter_esp/eip
-that uses .get/.put's in state versions less than 7 (that's
-prior to somewhere before 0.10).
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20170405190024.27581-4-dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/machine.c | 115 +++++++++++++++-----------------------------------
- 1 file changed, 34 insertions(+), 81 deletions(-)
-
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 0b4756b35f..3cb272948e 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -178,44 +178,6 @@ static const VMStateDescription vmstate_fpreg = {
-     }
- };
- 
--static bool version_is_5(void *opaque, int version_id)
--{
--    return version_id == 5;
--}
--
--#ifdef TARGET_X86_64
--static bool less_than_7(void *opaque, int version_id)
--{
--    return version_id < 7;
--}
--
--static int get_uint64_as_uint32(QEMUFile *f, void *pv, size_t size,
--                                VMStateField *field)
--{
--    uint64_t *v = pv;
--    *v = qemu_get_be32(f);
--    return 0;
--}
--
--static int put_uint64_as_uint32(QEMUFile *f, void *pv, size_t size,
--                                VMStateField *field, QJSON *vmdesc)
--{
--    uint64_t *v = pv;
--    qemu_put_be32(f, *v);
--
--    return 0;
--}
--
--static const VMStateInfo vmstate_hack_uint64_as_uint32 = {
--    .name = "uint64_as_uint32",
--    .get  = get_uint64_as_uint32,
--    .put  = put_uint64_as_uint32,
--};
--
--#define VMSTATE_HACK_UINT32(_f, _s, _t)                                  \
--    VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_hack_uint64_as_uint32, uint64_t)
--#endif
--
- static void cpu_pre_save(void *opaque)
- {
-     X86CPU *cpu = opaque;
-@@ -842,7 +804,7 @@ static const VMStateDescription vmstate_mcg_ext_ctl = {
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
--    .minimum_version_id = 3,
-+    .minimum_version_id = 11,
-     .pre_save = cpu_pre_save,
-     .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-@@ -865,16 +827,8 @@ VMStateDescription vmstate_x86_cpu = {
-         VMSTATE_SEGMENT(env.idt, X86CPU),
- 
-         VMSTATE_UINT32(env.sysenter_cs, X86CPU),
--#ifdef TARGET_X86_64
--        /* Hack: In v7 size changed from 32 to 64 bits on x86_64 */
--        VMSTATE_HACK_UINT32(env.sysenter_esp, X86CPU, less_than_7),
--        VMSTATE_HACK_UINT32(env.sysenter_eip, X86CPU, less_than_7),
--        VMSTATE_UINTTL_V(env.sysenter_esp, X86CPU, 7),
--        VMSTATE_UINTTL_V(env.sysenter_eip, X86CPU, 7),
--#else
-         VMSTATE_UINTTL(env.sysenter_esp, X86CPU),
-         VMSTATE_UINTTL(env.sysenter_eip, X86CPU),
--#endif
- 
-         VMSTATE_UINTTL(env.cr[0], X86CPU),
-         VMSTATE_UINTTL(env.cr[2], X86CPU),
-@@ -895,46 +849,45 @@ VMStateDescription vmstate_x86_cpu = {
-         VMSTATE_UINT64(env.fmask, X86CPU),
-         VMSTATE_UINT64(env.kernelgsbase, X86CPU),
- #endif
--        VMSTATE_UINT32_V(env.smbase, X86CPU, 4),
--
--        VMSTATE_UINT64_V(env.pat, X86CPU, 5),
--        VMSTATE_UINT32_V(env.hflags2, X86CPU, 5),
--
--        VMSTATE_UINT32_TEST(parent_obj.halted, X86CPU, version_is_5),
--        VMSTATE_UINT64_V(env.vm_hsave, X86CPU, 5),
--        VMSTATE_UINT64_V(env.vm_vmcb, X86CPU, 5),
--        VMSTATE_UINT64_V(env.tsc_offset, X86CPU, 5),
--        VMSTATE_UINT64_V(env.intercept, X86CPU, 5),
--        VMSTATE_UINT16_V(env.intercept_cr_read, X86CPU, 5),
--        VMSTATE_UINT16_V(env.intercept_cr_write, X86CPU, 5),
--        VMSTATE_UINT16_V(env.intercept_dr_read, X86CPU, 5),
--        VMSTATE_UINT16_V(env.intercept_dr_write, X86CPU, 5),
--        VMSTATE_UINT32_V(env.intercept_exceptions, X86CPU, 5),
--        VMSTATE_UINT8_V(env.v_tpr, X86CPU, 5),
-+        VMSTATE_UINT32(env.smbase, X86CPU),
-+
-+        VMSTATE_UINT64(env.pat, X86CPU),
-+        VMSTATE_UINT32(env.hflags2, X86CPU),
-+
-+        VMSTATE_UINT64(env.vm_hsave, X86CPU),
-+        VMSTATE_UINT64(env.vm_vmcb, X86CPU),
-+        VMSTATE_UINT64(env.tsc_offset, X86CPU),
-+        VMSTATE_UINT64(env.intercept, X86CPU),
-+        VMSTATE_UINT16(env.intercept_cr_read, X86CPU),
-+        VMSTATE_UINT16(env.intercept_cr_write, X86CPU),
-+        VMSTATE_UINT16(env.intercept_dr_read, X86CPU),
-+        VMSTATE_UINT16(env.intercept_dr_write, X86CPU),
-+        VMSTATE_UINT32(env.intercept_exceptions, X86CPU),
-+        VMSTATE_UINT8(env.v_tpr, X86CPU),
-         /* MTRRs */
--        VMSTATE_UINT64_ARRAY_V(env.mtrr_fixed, X86CPU, 11, 8),
--        VMSTATE_UINT64_V(env.mtrr_deftype, X86CPU, 8),
-+        VMSTATE_UINT64_ARRAY(env.mtrr_fixed, X86CPU, 11),
-+        VMSTATE_UINT64(env.mtrr_deftype, X86CPU),
-         VMSTATE_MTRR_VARS(env.mtrr_var, X86CPU, MSR_MTRRcap_VCNT, 8),
-         /* KVM-related states */
--        VMSTATE_INT32_V(env.interrupt_injected, X86CPU, 9),
--        VMSTATE_UINT32_V(env.mp_state, X86CPU, 9),
--        VMSTATE_UINT64_V(env.tsc, X86CPU, 9),
--        VMSTATE_INT32_V(env.exception_injected, X86CPU, 11),
--        VMSTATE_UINT8_V(env.soft_interrupt, X86CPU, 11),
--        VMSTATE_UINT8_V(env.nmi_injected, X86CPU, 11),
--        VMSTATE_UINT8_V(env.nmi_pending, X86CPU, 11),
--        VMSTATE_UINT8_V(env.has_error_code, X86CPU, 11),
--        VMSTATE_UINT32_V(env.sipi_vector, X86CPU, 11),
-+        VMSTATE_INT32(env.interrupt_injected, X86CPU),
-+        VMSTATE_UINT32(env.mp_state, X86CPU),
-+        VMSTATE_UINT64(env.tsc, X86CPU),
-+        VMSTATE_INT32(env.exception_injected, X86CPU),
-+        VMSTATE_UINT8(env.soft_interrupt, X86CPU),
-+        VMSTATE_UINT8(env.nmi_injected, X86CPU),
-+        VMSTATE_UINT8(env.nmi_pending, X86CPU),
-+        VMSTATE_UINT8(env.has_error_code, X86CPU),
-+        VMSTATE_UINT32(env.sipi_vector, X86CPU),
-         /* MCE */
--        VMSTATE_UINT64_V(env.mcg_cap, X86CPU, 10),
--        VMSTATE_UINT64_V(env.mcg_status, X86CPU, 10),
--        VMSTATE_UINT64_V(env.mcg_ctl, X86CPU, 10),
--        VMSTATE_UINT64_ARRAY_V(env.mce_banks, X86CPU, MCE_BANKS_DEF * 4, 10),
-+        VMSTATE_UINT64(env.mcg_cap, X86CPU),
-+        VMSTATE_UINT64(env.mcg_status, X86CPU),
-+        VMSTATE_UINT64(env.mcg_ctl, X86CPU),
-+        VMSTATE_UINT64_ARRAY(env.mce_banks, X86CPU, MCE_BANKS_DEF * 4),
-         /* rdtscp */
--        VMSTATE_UINT64_V(env.tsc_aux, X86CPU, 11),
-+        VMSTATE_UINT64(env.tsc_aux, X86CPU),
-         /* KVM pvclock msr */
--        VMSTATE_UINT64_V(env.system_time_msr, X86CPU, 11),
--        VMSTATE_UINT64_V(env.wall_clock_msr, X86CPU, 11),
-+        VMSTATE_UINT64(env.system_time_msr, X86CPU),
-+        VMSTATE_UINT64(env.wall_clock_msr, X86CPU),
-         /* XSAVE related fields */
-         VMSTATE_UINT64_V(env.xcr0, X86CPU, 12),
-         VMSTATE_UINT64_V(env.xstate_bv, X86CPU, 12),
--- 
-2.11.0.259.g40922b1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA1MTExNDQyMDguMjQwNzUtMS1wYm9uemluaUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
+dmVsXSBbUEFUQ0ggdjIgMDAvMThdIEJsb2NrIGxheWVyIHRocmVhZCBzYWZldHksIHBhcnQgMQpU
+eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdhMTc1NGEgYmxvY2s6IG1ha2UgYWNjb3VudGlu
+ZyB0aHJlYWQtc2FmZQpmMGM5MTkxIGJsb2NrOiBpbnRyb2R1Y2UgYmxvY2tfYWNjb3VudF9vbmVf
+aW8KNGYzYmI0YyBibG9jazogcHJvdGVjdCBtb2RpZmljYXRpb24gb2YgZGlydHkgYml0bWFwcyB3
+aXRoIGEgbXV0ZXgKNWE0ZmM0OCBtaWdyYXRpb24vYmxvY2s6IHJlc2V0IGRpcnR5IGJpdG1hcCBi
+ZWZvcmUgcmVhZGluZwo3NzVmNjAwIGJsb2NrOiBpbnRyb2R1Y2UgZGlydHlfYml0bWFwX211dGV4
+CjQyMmUzM2QgYmxvY2s6IHByb3RlY3QgdHJhY2tlZF9yZXF1ZXN0cyBhbmQgZmx1c2hfcXVldWUg
+d2l0aCByZXFzX2xvY2sKNGUyYmFhMiBibG9jazogYWNjZXNzIHdyaXRlX2dlbiB3aXRoIGF0b21p
+Y3MKYmJjOWQ5NiBibG9jazogdXNlIFN0YXQ2NCBmb3Igd3JfaGlnaGVzdF9vZmZzZXQKNjA1ZmJm
+ZSB1dGlsOiBhZGQgc3RhdHM2NCBtb2R1bGUKNmVhYzgyZCB0aHJvdHRsZS1ncm91cHM6IHByb3Rl
+Y3QgdGhyb3R0bGVkIHJlcXVlc3RzIHdpdGggYSBDb011dGV4Cjc4ZmVlNjcgdGhyb3R0bGUtZ3Jv
+dXBzOiBkbyBub3QgdXNlIHFlbXVfY29fZW50ZXJfbmV4dAo2MGRmOTlmIHRocm90dGxlLWdyb3Vw
+czogb25seSBzdGFydCBvbmUgY29yb3V0aW5lIGZyb20gZHJhaW5lZF9iZWdpbgplODQwY2YzIGJs
+b2NrOiBhY2Nlc3MgaW9fcGx1Z2dlZCB3aXRoIGF0b21pYyBvcHMKNWM4YjZkNyBibG9jazogYWNj
+ZXNzIHdha2V1cCB3aXRoIGF0b21pYyBvcHMKYTIxN2E4OSBibG9jazogYWNjZXNzIHNlcmlhbGlz
+aW5nX2luX2ZsaWdodCB3aXRoIGF0b21pYyBvcHMKMGUwODdkZCBibG9jazogYWNjZXNzIGlvX2xp
+bWl0c19kaXNhYmxlZCB3aXRoIGF0b21pYyBvcHMKZDAzZTYzYyBibG9jazogYWNjZXNzIHF1aWVz
+Y2VfY291bnRlciB3aXRoIGF0b21pYyBvcHMKZTliZDJlNyBibG9jazogYWNjZXNzIGNvcHlfb25f
+cmVhZCB3aXRoIGF0b21pYyBvcHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
+IDEvMTg6IGJsb2NrOiBhY2Nlc3MgY29weV9vbl9yZWFkIHdpdGggYXRvbWljIG9wcy4uLgpDaGVj
+a2luZyBQQVRDSCAyLzE4OiBibG9jazogYWNjZXNzIHF1aWVzY2VfY291bnRlciB3aXRoIGF0b21p
+YyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xODogYmxvY2s6IGFjY2VzcyBpb19saW1pdHNfZGlz
+YWJsZWQgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBBVENIIDQvMTg6IGJsb2NrOiBhY2Nl
+c3Mgc2VyaWFsaXNpbmdfaW5fZmxpZ2h0IHdpdGggYXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRD
+SCA1LzE4OiBibG9jazogYWNjZXNzIHdha2V1cCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNi8xODogYmxvY2s6IGFjY2VzcyBpb19wbHVnZ2VkIHdpdGggYXRvbWljIG9wcy4uLgpD
+aGVja2luZyBQQVRDSCA3LzE4OiB0aHJvdHRsZS1ncm91cHM6IG9ubHkgc3RhcnQgb25lIGNvcm91
+dGluZSBmcm9tIGRyYWluZWRfYmVnaW4uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xODogdGhyb3R0bGUt
+Z3JvdXBzOiBkbyBub3QgdXNlIHFlbXVfY29fZW50ZXJfbmV4dC4uLgpDaGVja2luZyBQQVRDSCA5
+LzE4OiB0aHJvdHRsZS1ncm91cHM6IHByb3RlY3QgdGhyb3R0bGVkIHJlcXVlc3RzIHdpdGggYSBD
+b011dGV4Li4uCkNoZWNraW5nIFBBVENIIDEwLzE4OiB1dGlsOiBhZGQgc3RhdHM2NCBtb2R1bGUu
+Li4KRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhvdXQgY29tbWVudAojMzI3OiBGSUxFOiB1dGls
+L3N0YXRzNjQuYzoxMDE6CisgICAgICAgIHNtcF93bWIoKTsKCkVSUk9SOiBtZW1vcnkgYmFycmll
+ciB3aXRob3V0IGNvbW1lbnQKIzM1NjogRklMRTogdXRpbC9zdGF0czY0LmM6MTMwOgorICAgICAg
+ICBzbXBfd21iKCk7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDMzNCBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
+SCAxMS8xODogYmxvY2s6IHVzZSBTdGF0NjQgZm9yIHdyX2hpZ2hlc3Rfb2Zmc2V0Li4uCkNoZWNr
+aW5nIFBBVENIIDEyLzE4OiBibG9jazogYWNjZXNzIHdyaXRlX2dlbiB3aXRoIGF0b21pY3MuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTMvMTg6IGJsb2NrOiBwcm90ZWN0IHRyYWNrZWRfcmVxdWVzdHMgYW5k
+IGZsdXNoX3F1ZXVlIHdpdGggcmVxc19sb2NrLi4uCkNoZWNraW5nIFBBVENIIDE0LzE4OiBibG9j
+azogaW50cm9kdWNlIGRpcnR5X2JpdG1hcF9tdXRleC4uLgpDaGVja2luZyBQQVRDSCAxNS8xODog
+bWlncmF0aW9uL2Jsb2NrOiByZXNldCBkaXJ0eSBiaXRtYXAgYmVmb3JlIHJlYWRpbmcuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTYvMTg6IGJsb2NrOiBwcm90ZWN0IG1vZGlmaWNhdGlvbiBvZiBkaXJ0eSBi
+aXRtYXBzIHdpdGggYSBtdXRleC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+MzAzOiBGSUxFOiBtaWdyYXRpb24vYmxvY2suYzo1NDA6CisgICAgICAgICAgICBiZHJ2X3Jlc2V0
+X2RpcnR5X2JpdG1hcF9sb2NrZWQoYm1kcy0+ZGlydHlfYml0bWFwLCBzZWN0b3IsIG5yX3NlY3Rv
+cnMpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNzIgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxNy8xODog
+YmxvY2s6IGludHJvZHVjZSBibG9ja19hY2NvdW50X29uZV9pby4uLgpFUlJPUjogbGluZSBvdmVy
+IDkwIGNoYXJhY3RlcnMKIzIwOiBGSUxFOiBibG9jay9hY2NvdW50aW5nLmM6ODk6CitzdGF0aWMg
+dm9pZCBibG9ja19hY2NvdW50X29uZV9pbyhCbG9ja0FjY3RTdGF0cyAqc3RhdHMsIEJsb2NrQWNj
+dENvb2tpZSAqY29va2llLCBib29sIGZhaWxlZCkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgNzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKQ2hlY2tpbmcgUEFUQ0ggMTgvMTg6IGJsb2NrOiBtYWtlIGFjY291bnRpbmcgdGhyZWFkLXNh
+ZmUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
+MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QGZyZWVsaXN0cy5vcmc=
