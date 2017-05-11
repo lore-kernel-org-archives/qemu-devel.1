@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAb-0002U5-Dj
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:22 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAh-0002be-Sd
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAa-0007cH-5o
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAf-0007mF-6C
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:35 +0200
-Message-Id: <1494513181-7900-33-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:41 +0200
+Message-Id: <1494513181-7900-39-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 32/58] block: Fix write/resize permissions for
- inactive images
+Subject: [Qemu-devel] [PULL 38/58] qemu-io: Switch 'alloc' command to
+ byte-based length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +23,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-Format drivers for inactive nodes don't need write/resize permissions on
-their bs->file and can share write/resize with another VM (in fact, this
-is the whole point of keeping images inactive). Represent this fact in
-the op blocker system, so that image locking does the right thing
-without special-casing inactive images.
+From: Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+For the 'alloc' command, accepting an offset in bytes but a length
+in sectors, and reporting output in sectors, is confusing.  Do
+everything in bytes, and adjust the expected output accordingly.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20170429191419.30051-3-eblake@redhat.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c               | 35 +++++++++++++++++++++++++++++++++--
- include/block/block.h |  1 +
- 2 files changed, 34 insertions(+), 2 deletions(-)
+ qemu-io-cmds.c                    | 30 ++++++++++++++++++------------
+ tests/qemu-iotests/019.out        |  8 ++++----
+ tests/qemu-iotests/common.pattern |  2 +-
+ 3 files changed, 23 insertions(+), 17 deletions(-)
 
-diff --git a/block.c b/block.c
-index 170002e..50ba264 100644
---- a/block.c
-+++ b/block.c
-@@ -192,11 +192,20 @@ void path_combine(char *dest, int dest_size,
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 6a0024b..1e0ebb4 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -1760,7 +1760,7 @@ out:
+ static int alloc_f(BlockBackend *blk, int argc, char **argv)
+ {
+     BlockDriverState *bs = blk_bs(blk);
+-    int64_t offset, sector_num, nb_sectors, remaining;
++    int64_t offset, sector_num, nb_sectors, remaining, count;
+     char s1[64];
+     int num, ret;
+     int64_t sum_alloc;
+@@ -1776,18 +1776,24 @@ static int alloc_f(BlockBackend *blk, int argc, char **argv)
      }
- }
  
-+/* Returns whether the image file is opened as read-only. Note that this can
-+ * return false and writing to the image file is still not possible because the
-+ * image is inactivated. */
- bool bdrv_is_read_only(BlockDriverState *bs)
- {
-     return bs->read_only;
- }
- 
-+/* Returns whether the image file can be written to right now */
-+bool bdrv_is_writable(BlockDriverState *bs)
-+{
-+    return !bdrv_is_read_only(bs) && !(bs->open_flags & BDRV_O_INACTIVE);
-+}
-+
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
- {
-     /* Do not set read_only if copy_on_read is enabled */
-@@ -1510,7 +1519,7 @@ static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
- 
-     /* Write permissions never work with read-only images */
-     if ((cumulative_perms & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED)) &&
--        bdrv_is_read_only(bs))
-+        !bdrv_is_writable(bs))
-     {
-         error_setg(errp, "Block node is read-only");
-         return -EPERM;
-@@ -1795,7 +1804,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-         bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, &shared);
- 
-         /* Format drivers may touch metadata even if the guest doesn't write */
--        if (!bdrv_is_read_only(bs)) {
-+        if (bdrv_is_writable(bs)) {
-             perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
+     if (argc == 3) {
+-        nb_sectors = cvtnum(argv[2]);
+-        if (nb_sectors < 0) {
+-            print_cvtnum_err(nb_sectors, argv[2]);
++        count = cvtnum(argv[2]);
++        if (count < 0) {
++            print_cvtnum_err(count, argv[2]);
+             return 0;
+-        } else if (nb_sectors > INT_MAX) {
+-            printf("length argument cannot exceed %d, given %s\n",
+-                   INT_MAX, argv[2]);
++        } else if (count > INT_MAX * BDRV_SECTOR_SIZE) {
++            printf("length argument cannot exceed %llu, given %s\n",
++                   INT_MAX * BDRV_SECTOR_SIZE, argv[2]);
+             return 0;
          }
- 
-@@ -1821,6 +1830,10 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                   BLK_PERM_WRITE_UNCHANGED;
-     }
- 
-+    if (bs->open_flags & BDRV_O_INACTIVE) {
-+        shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
+     } else {
+-        nb_sectors = 1;
++        count = BDRV_SECTOR_SIZE;
 +    }
-+
-     *nperm = perm;
-     *nshared = shared;
++    if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
++        printf("%" PRId64 " is not a sector-aligned value for 'count'\n",
++               count);
++        return 0;
+     }
++    nb_sectors = count >> BDRV_SECTOR_BITS;
+ 
+     remaining = nb_sectors;
+     sum_alloc = 0;
+@@ -1811,8 +1817,8 @@ static int alloc_f(BlockBackend *blk, int argc, char **argv)
+ 
+     cvtstr(offset, s1, sizeof(s1));
+ 
+-    printf("%"PRId64"/%"PRId64" sectors allocated at offset %s\n",
+-           sum_alloc, nb_sectors, s1);
++    printf("%"PRId64"/%"PRId64" bytes allocated at offset %s\n",
++           sum_alloc << BDRV_SECTOR_BITS, nb_sectors << BDRV_SECTOR_BITS, s1);
+     return 0;
  }
-@@ -3960,6 +3973,7 @@ void bdrv_init_with_whitelist(void)
- void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
- {
-     BdrvChild *child, *parent;
-+    uint64_t perm, shared_perm;
-     Error *local_err = NULL;
-     int ret;
  
-@@ -3996,6 +4010,16 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
-         return;
-     }
+@@ -1822,8 +1828,8 @@ static const cmdinfo_t alloc_cmd = {
+     .argmin     = 1,
+     .argmax     = 2,
+     .cfunc      = alloc_f,
+-    .args       = "off [sectors]",
+-    .oneline    = "checks if a sector is present in the file",
++    .args       = "offset [count]",
++    .oneline    = "checks if offset is allocated in the file",
+ };
  
-+    /* Update permissions, they may differ for inactive nodes */
-+    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
-+    ret = bdrv_check_perm(bs, perm, shared_perm, NULL, &local_err);
-+    if (ret < 0) {
-+        bs->open_flags |= BDRV_O_INACTIVE;
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    bdrv_set_perm(bs, perm, shared_perm);
-+
-     QLIST_FOREACH(parent, &bs->parents, next_parent) {
-         if (parent->role->activate) {
-             parent->role->activate(parent, &local_err);
-@@ -4040,6 +4064,8 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
-     }
  
-     if (setting_flag) {
-+        uint64_t perm, shared_perm;
-+
-         bs->open_flags |= BDRV_O_INACTIVE;
+diff --git a/tests/qemu-iotests/019.out b/tests/qemu-iotests/019.out
+index 0124264..17a7c03 100644
+--- a/tests/qemu-iotests/019.out
++++ b/tests/qemu-iotests/019.out
+@@ -542,8 +542,8 @@ Testing conversion with -B TEST_DIR/t.IMGFMT.base
  
-         QLIST_FOREACH(parent, &bs->parents, next_parent) {
-@@ -4051,6 +4077,11 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
-                 }
-             }
-         }
-+
-+        /* Update permissions, they may differ for inactive nodes */
-+        bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
-+        bdrv_check_perm(bs, perm, shared_perm, NULL, &error_abort);
-+        bdrv_set_perm(bs, perm, shared_perm);
-     }
+ Checking if backing clusters are allocated when they shouldn't
  
-     QLIST_FOREACH(child, &bs->children, next) {
-diff --git a/include/block/block.h b/include/block/block.h
-index 80d51d8..90932b4 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -435,6 +435,7 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-                             int64_t sector_num, int nb_sectors, int *pnum);
+-0/128 sectors allocated at offset 1 MiB
+-0/128 sectors allocated at offset 4.001 GiB
++0/65536 bytes allocated at offset 1 MiB
++0/65536 bytes allocated at offset 4.001 GiB
+ Reading
  
- bool bdrv_is_read_only(BlockDriverState *bs);
-+bool bdrv_is_writable(BlockDriverState *bs);
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
- int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
- bool bdrv_is_sg(BlockDriverState *bs);
+ === IO: pattern 42
+@@ -1086,8 +1086,8 @@ Testing conversion with -o backing_file=TEST_DIR/t.IMGFMT.base
+ 
+ Checking if backing clusters are allocated when they shouldn't
+ 
+-0/128 sectors allocated at offset 1 MiB
+-0/128 sectors allocated at offset 4.001 GiB
++0/65536 bytes allocated at offset 1 MiB
++0/65536 bytes allocated at offset 4.001 GiB
+ Reading
+ 
+ === IO: pattern 42
+diff --git a/tests/qemu-iotests/common.pattern b/tests/qemu-iotests/common.pattern
+index ddfbca1..34f4a8d 100644
+--- a/tests/qemu-iotests/common.pattern
++++ b/tests/qemu-iotests/common.pattern
+@@ -18,7 +18,7 @@
+ 
+ function do_is_allocated() {
+     local start=$1
+-    local size=$(( $2 / 512))
++    local size=$2
+     local step=$3
+     local count=$4
+ 
 -- 
 1.8.3.1
