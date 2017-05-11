@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8tcW-0002lr-Tf
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:30 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d8tcY-0002n0-Ty
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8tcW-0007xp-1g
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50066)
+	(envelope-from <ehabkost@redhat.com>) id 1d8tcY-0007zc-17
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8tcV-0007xf-RS
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:27 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8tcX-0007zV-RU
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:19:29 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 11 May 2017 16:18:35 -0300
-Message-Id: <20170511191843.13784-22-ehabkost@redhat.com>
+Date: Thu, 11 May 2017 16:18:36 -0300
+Message-Id: <20170511191843.13784-23-ehabkost@redhat.com>
 In-Reply-To: <20170511191843.13784-1-ehabkost@redhat.com>
 References: <20170511191843.13784-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 21/29] numa: remove no longer need
- numa_post_machine_init()
+Subject: [Qemu-devel] [PULL 22/29] machine: call machine init from wrapper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +28,64 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-CPUState::numa_node is still in use but now it's set by
-board when it creates CPU objects. So there isn't any
-need to set it again after all CPU's are created,
-since it's been already set.
+add machine_run_board_init() wrapper that calls machine
+init for now but in follow up patches it will be used
+to run generic machine code that should run before
+machine init.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
-Message-Id: <1494415802-227633-14-git-send-email-imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <1494415802-227633-15-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/sysemu/numa.h |  6 ------
- numa.c                | 15 ---------------
- vl.c                  |  2 --
- 3 files changed, 23 deletions(-)
+ include/hw/boards.h | 1 +
+ hw/core/machine.c   | 6 ++++++
+ vl.c                | 2 +-
+ 3 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 027830cf7e..8cb3ebc233 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -27,7 +27,6 @@ struct node_info {
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 4e14ff060e..76ce0219ff 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -32,6 +32,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+ MachineClass *find_default_machine(void);
+ extern MachineState *current_machine;
  
- extern NodeInfo numa_info[MAX_NODES];
- void parse_numa_opts(MachineState *ms);
--void numa_post_machine_init(void);
- void query_numa_node_mem(uint64_t node_mem[]);
- extern QemuOptsList qemu_numa_opts;
- void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
-@@ -37,9 +36,4 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
- void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-                                   int nb_nodes, ram_addr_t size);
--
--
--/* on success returns node index in numa_info,
-- * on failure returns nb_numa_nodes */
--int numa_get_node_for_cpu(int idx);
- #endif
-diff --git a/numa.c b/numa.c
-index f16a6a8ade..dc739eadfa 100644
---- a/numa.c
-+++ b/numa.c
-@@ -572,21 +572,6 @@ void parse_numa_opts(MachineState *ms)
-     }
++void machine_run_board_init(MachineState *machine);
+ bool machine_usb(MachineState *machine);
+ bool machine_kernel_irqchip_allowed(MachineState *machine);
+ bool machine_kernel_irqchip_required(MachineState *machine);
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 420c8c4d16..64e2a4ff2c 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -678,6 +678,12 @@ bool machine_mem_merge(MachineState *machine)
+     return machine->mem_merge;
  }
  
--void numa_post_machine_init(void)
--{
--    CPUState *cpu;
--    int i;
--
--    CPU_FOREACH(cpu) {
--        for (i = 0; i < nb_numa_nodes; i++) {
--            assert(cpu->cpu_index < max_cpus);
--            if (test_bit(cpu->cpu_index, numa_info[i].node_cpu)) {
--                cpu->numa_node = i;
--            }
--        }
--    }
--}
--
- static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
-                                            const char *name,
-                                            uint64_t ram_size)
++void machine_run_board_init(MachineState *machine)
++{
++    MachineClass *machine_class = MACHINE_GET_CLASS(machine);
++    machine_class->init(machine);
++}
++
+ static void machine_class_finalize(ObjectClass *klass, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(klass);
 diff --git a/vl.c b/vl.c
-index c4705b3335..5cd0c17ba0 100644
+index 5cd0c17ba0..3d8c140011 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -4592,8 +4592,6 @@ int main(int argc, char **argv, char **envp)
+@@ -4559,7 +4559,7 @@ int main(int argc, char **argv, char **envp)
+     current_machine->boot_order = boot_order;
+     current_machine->cpu_model = cpu_model;
  
-     cpu_synchronize_all_post_init();
+-    machine_class->init(current_machine);
++    machine_run_board_init(current_machine);
  
--    numa_post_machine_init();
--
-     rom_reset_order_override();
+     realtime_init();
  
-     /*
 -- 
 2.11.0.259.g40922b1
