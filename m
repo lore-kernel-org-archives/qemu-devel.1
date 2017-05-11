@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d8jPZ-0002q4-T4
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 04:25:27 -0400
+	(envelope-from <jasowang@redhat.com>) id 1d8jW3-0004Dt-7B
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 04:32:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d8jPW-0005WZ-NO
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 04:25:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33928)
+	(envelope-from <jasowang@redhat.com>) id 1d8jVx-0003cx-Q6
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 04:32:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d8jPW-0005Vp-Ds
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 04:25:22 -0400
-Date: Thu, 11 May 2017 09:25:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170511082513.GB2078@work-vm>
-References: <1493362658-8179-6-git-send-email-a.perevalov@samsung.com>
-	<20170428100012.GB22801@pxdev.xzpeter.org>
-	<d018d4a6-4b50-3f36-fe69-e232b63bebf0@samsung.com>
-	<20170508062906.GC2820@pxdev.xzpeter.org>
-	<20170508090807.GA4201@aperevalov-ubuntu>
-	<20170509082622.GI2820@pxdev.xzpeter.org>
-	<20170509094033.GB2089@work-vm>
-	<20170509151942.GB4201@aperevalov-ubuntu>
-	<20170509190100.GJ2089@work-vm>
-	<20170511063210.GD4201@aperevalov-ubuntu>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1d8jVx-0003cW-Id
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 04:32:01 -0400
+References: <1494403315-12760-1-git-send-email-peterx@redhat.com>
+	<1494403315-12760-11-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <7d770f21-636e-dc96-99b9-923f5d5a14aa@redhat.com>
+Date: Thu, 11 May 2017 16:31:40 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170511063210.GD4201@aperevalov-ubuntu>
-Subject: Re: [Qemu-devel] [PATCH RESEND V3 5/6] migration: calculate
- downtime on dst side
+In-Reply-To: <1494403315-12760-11-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 10/12] intel_iommu: support passthrough
+ (PT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,189 +28,414 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey <a.perevalov@samsung.com>
-Cc: i.maximets@samsung.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, f4bug@amsat.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Lan Tianyu <tianyu.lan@intel.com>, yi.l.liu@intel.com, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-* Alexey (a.perevalov@samsung.com) wrote:
-> On Tue, May 09, 2017 at 08:01:01PM +0100, Dr. David Alan Gilbert wrote:
-> > * Alexey (a.perevalov@samsung.com) wrote:
-> > > On Tue, May 09, 2017 at 10:40:34AM +0100, Dr. David Alan Gilbert wrote:
-> > > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > > On Mon, May 08, 2017 at 12:08:07PM +0300, Alexey wrote:
-> > > > > > On Mon, May 08, 2017 at 02:29:06PM +0800, Peter Xu wrote:
-> > > > > > > On Fri, Apr 28, 2017 at 02:11:19PM +0300, Alexey Perevalov wrote:
-> > > > > > > > On 04/28/2017 01:00 PM, Peter Xu wrote:
-> > > > > > > > >On Fri, Apr 28, 2017 at 09:57:37AM +0300, Alexey Perevalov wrote:
-> > > > > > > > >>This patch provides downtime calculation per vCPU,
-> > > > > > > > >>as a summary and as a overlapped value for all vCPUs.
-> > > > > > > > >>
-> > > > > > > > >>This approach was suggested by Peter Xu, as an improvements of
-> > > > > > > > >>previous approch where QEMU kept tree with faulted page address and cpus bitmask
-> > > > > > > > >>in it. Now QEMU is keeping array with faulted page address as value and vCPU
-> > > > > > > > >>as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
-> > > > > > > > >>list for downtime per vCPU (could be traced with page_fault_addr)
-> > > > > > > > >>
-> > > > > > > > >>For more details see comments for get_postcopy_total_downtime
-> > > > > > > > >>implementation.
-> > > > > > > > >>
-> > > > > > > > >>Downtime will not calculated if postcopy_downtime field of
-> > > > > > > > >>MigrationIncomingState wasn't initialized.
-> > > > > > > > >>
-> > > > > > > > >>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> > > > > > > > >>---
-> > > > > > > > >>  include/migration/migration.h |   3 ++
-> > > > > > > > >>  migration/migration.c         | 103 ++++++++++++++++++++++++++++++++++++++++++
-> > > > > > > > >>  migration/postcopy-ram.c      |  20 +++++++-
-> > > > > > > > >>  migration/trace-events        |   6 ++-
-> > > > > > > > >>  4 files changed, 130 insertions(+), 2 deletions(-)
-> > > > > > > > >>
-> > > > > > > > >>diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > > > > > > > >>index e8fb68f..a22f9ce 100644
-> > > > > > > > >>--- a/include/migration/migration.h
-> > > > > > > > >>+++ b/include/migration/migration.h
-> > > > > > > > >>@@ -139,6 +139,9 @@ void migration_incoming_state_destroy(void);
-> > > > > > > > >>   * Functions to work with downtime context
-> > > > > > > > >>   */
-> > > > > > > > >>  struct DowntimeContext *downtime_context_new(void);
-> > > > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu);
-> > > > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr);
-> > > > > > > > >>+uint64_t get_postcopy_total_downtime(void);
-> > > > > > > > >>  struct MigrationState
-> > > > > > > > >>  {
-> > > > > > > > >>diff --git a/migration/migration.c b/migration/migration.c
-> > > > > > > > >>index ec76e5c..2c6f150 100644
-> > > > > > > > >>--- a/migration/migration.c
-> > > > > > > > >>+++ b/migration/migration.c
-> > > > > > > > >>@@ -2150,3 +2150,106 @@ PostcopyState postcopy_state_set(PostcopyState new_state)
-> > > > > > > > >>      return atomic_xchg(&incoming_postcopy_state, new_state);
-> > > > > > > > >>  }
-> > > > > > > > >>+void mark_postcopy_downtime_begin(uint64_t addr, int cpu)
-> > > > > > > > >>+{
-> > > > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > > > > > > >>+    DowntimeContext *dc;
-> > > > > > > > >>+    if (!mis->downtime_ctx || cpu < 0) {
-> > > > > > > > >>+        return;
-> > > > > > > > >>+    }
-> > > > > > > > >>+    dc = mis->downtime_ctx;
-> > > > > > > > >>+    dc->vcpu_addr[cpu] = addr;
-> > > > > > > > >>+    dc->last_begin = dc->page_fault_vcpu_time[cpu] =
-> > > > > > > > >>+        qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> > > > > > > > >>+
-> > > > > > > > >>+    trace_mark_postcopy_downtime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
-> > > > > > > > >>+            cpu);
-> > > > > > > > >>+}
-> > > > > > > > >>+
-> > > > > > > > >>+void mark_postcopy_downtime_end(uint64_t addr)
-> > > > > > > > >>+{
-> > > > > > > > >>+    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > > > > > > >>+    DowntimeContext *dc;
-> > > > > > > > >>+    int i;
-> > > > > > > > >>+    bool all_vcpu_down = true;
-> > > > > > > > >>+    int64_t now;
-> > > > > > > > >>+
-> > > > > > > > >>+    if (!mis->downtime_ctx) {
-> > > > > > > > >>+        return;
-> > > > > > > > >>+    }
-> > > > > > > > >>+    dc = mis->downtime_ctx;
-> > > > > > > > >>+    now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> > > > > > > > >>+
-> > > > > > > > >>+    /* check all vCPU down,
-> > > > > > > > >>+     * QEMU has bitmap.h, but even with bitmap_and
-> > > > > > > > >>+     * will be a cycle */
-> > > > > > > > >>+    for (i = 0; i < smp_cpus; i++) {
-> > > > > > > > >>+        if (dc->vcpu_addr[i]) {
-> > > > > > > > >>+            continue;
-> > > > > > > > >>+        }
-> > > > > > > > >>+        all_vcpu_down = false;
-> > > > > > > > >>+        break;
-> > > > > > > > >>+    }
-> > > > > > > > >>+
-> > > > > > > > >>+    if (all_vcpu_down) {
-> > > > > > > > >>+        dc->total_downtime += now - dc->last_begin;
-> > > > > > > > >Shall we do this accouting only if we are sure the copied page address
-> > > > > > > > >is one of the page faulted addresses? Can it be some other page? I
-> > > > > > > > >don't know. But since we have the loop below to make sure of it, why
-> > > > > > > > >not?
-> > > > > > > > no, the downtime implies since page fault till the
-> > > > > > > > page will be copied.
-> > > > > > > > Yes another pages could be copied as well as pagefaulted,
-> > > > > > > > and they are copied due to prefetching, but it's not a downtime.
-> > > > > > > 
-> > > > > > > Not sure I got the point... Do you mean that when reach here, then
-> > > > > > > this page address is definitely one of the faulted addresses? I am not
-> > > > > > > 100% sure of this, but if you are sure, I am okay with it.
-> > > > > > Let me clarify.
-> > > > > > 
-> > > > > > > > >Shall we do this accouting only if we are sure the copied page address
-> > > > > > > > >is one of the page faulted addresses?
-> > > > > > Yes it's primary condition, due to there are could be another pages,
-> > > > > > which weren't faulted, they just was sent from source to destination,
-> > > > > > I called it prefetching.
-> > > > > > 
-> > > > > > I think I got why did you ask that question, because in this version
-> > > > > > all_vcpu_down and as a result total_downtime calculated incorrectly,
-> > > > > > it calculates every time when any page is copied, but it should
-> > > > > > be calculated only when faulted page copied, so only dc->vcpu_downtime
-> > > > > > was correctly calculated.
-> > > > > 
-> > > > > Exactly. I am afraid if we have such "prefetching" stuff then
-> > > > > total_downtime will be more than its real value.
-> > > > 
-> > > > It should be OK as long as we measure the time between
-> > > >   userfault reporting a page miss for an address 
-> > > >   and
-> > > >   place_page for *that same address*
-> > > > 
-> > > > any places for other pages are irrelevant.
-> > > > 
-> > > > (I still worry that this definition of 'downtime' is possibly
-> > > > arbitrary - since if all but one of the vCPUs are down we
-> > > > don't count it but it's obviously still a big impact).
-> > > Technically we count downtime per vCPU  and storing it in
-> > >     vcpu_downtime field of PostcopyDowntimeContext (in this version
-> > >     still DowntimeContext). I traced downtime per vCPU in previous version.
-> > > But it just traced as total_downtime in current version.
-> > > 
-> > > Also total_downtime is not possible to get on destination, due to
-> > > query-migrate is about MigrationState, but not MigrationIncomingState,
-> > > so I think need to extend it to MigrationIncomingState too.
-> > 
-> > I don't think that's too problematic; just add it to qmp_query_migrate;
-> > the only thing to be careful of is what happens if the incoming
-> > migration finishes during the info migrate is reading the
-> > MigrationIncomingState.
-> Do you mean none atomic read of s->state in qmp_query_migrate, if so
-> it's also a pre-copy problem. I saw you atomic operations like
-> postcopy_state_get/set.
 
-Yes, you're right - I'd remembered that MigrationState was statically
-allocated, I'd forgotten that MigrationIncomingState was also statically
-allocated - so we don't have to worry about it getting freed.
 
-Dave
+On 2017=E5=B9=B405=E6=9C=8810=E6=97=A5 16:01, Peter Xu wrote:
+> Hardware support for VT-d device passthrough. Although current Linux ca=
+n
+> live with iommu=3Dpt even without this, but this is faster than when us=
+ing
+> software passthrough.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   hw/i386/intel_iommu.c          | 210 ++++++++++++++++++++++++++++++++=
+---------
+>   hw/i386/intel_iommu_internal.h |   1 +
+>   hw/i386/trace-events           |   2 +
+>   hw/i386/x86-iommu.c            |   1 +
+>   include/hw/i386/x86-iommu.h    |   1 +
+>   5 files changed, 171 insertions(+), 44 deletions(-)
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 1a7eba2..1d034f9 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -640,6 +640,29 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte,=
+ uint32_t level)
+>       }
+>   }
+>  =20
+> +/* Find the VTD address space associated with a given bus number */
+> +static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bu=
+s_num)
+> +{
+> +    VTDBus *vtd_bus =3D s->vtd_as_by_bus_num[bus_num];
+> +    if (!vtd_bus) {
+> +        /*
+> +         * Iterate over the registered buses to find the one which
+> +         * currently hold this bus number, and update the bus_num
+> +         * lookup table:
+> +         */
+> +        GHashTableIter iter;
+> +
+> +        g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+> +        while (g_hash_table_iter_next (&iter, NULL, (void**)&vtd_bus))=
+ {
+> +            if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
+> +                s->vtd_as_by_bus_num[bus_num] =3D vtd_bus;
+> +                return vtd_bus;
+> +            }
+> +        }
+> +    }
+> +    return vtd_bus;
+> +}
+> +
+>   /* Given the @iova, get relevant @slptep. @slpte_level will be the la=
+st level
+>    * of the translation, can be used for deciding the size of large pag=
+e.
+>    */
+> @@ -881,6 +904,11 @@ static int vtd_dev_to_context_entry(IntelIOMMUStat=
+e *s, uint8_t bus_num,
+>                   type_fail =3D true;
+>               }
+>               break;
+> +        case VTD_CONTEXT_TT_PASS_THROUGH:
+> +            if (!x86_iommu->pt_supported) {
+> +                type_fail =3D true;
+> +            }
+> +            break;
+>           default:
+>               /* Unknwon type */
+>               type_fail =3D true;
+> @@ -894,6 +922,84 @@ static int vtd_dev_to_context_entry(IntelIOMMUStat=
+e *s, uint8_t bus_num,
+>       return 0;
+>   }
+>  =20
+> +/*
+> + * Fetch translation type for specific device. Returns <0 if error
+> + * happens, otherwise return the shifted type to check against
+> + * VTD_CONTEXT_TT_*.
+> + */
+> +static int vtd_dev_get_trans_type(VTDAddressSpace *as)
+> +{
+> +    IntelIOMMUState *s;
+> +    VTDContextEntry ce;
+> +    int ret;
+> +
+> +    s =3D as->iommu_state;
+> +
+> +    ret =3D vtd_dev_to_context_entry(s, pci_bus_num(as->bus),
+> +                                   as->devfn, &ce);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    return vtd_ce_get_type(&ce);
+> +}
+> +
+> +static bool vtd_dev_pt_enabled(VTDAddressSpace *as)
+> +{
+> +    int ret;
+> +
+> +    assert(as);
+> +
+> +    ret =3D vtd_dev_get_trans_type(as);
+> +    if (ret < 0) {
+> +        /*
+> +         * Possibly failed to parse the context entry for some reason
+> +         * (e.g., during init, or any guest configuration errors on
+> +         * context entries). We should assume PT not enabled for
+> +         * safety.
+> +         */
+> +        return false;
+> +    }
+> +
+> +    return ret =3D=3D VTD_CONTEXT_TT_PASS_THROUGH;
+> +}
+> +
+> +/*
+> + * When we are during init phase (device realizations, global
+> + * enable/disable of translations), we should not detect PT
+> + * (passthrough) when switching address spaces. In that cases, we
+> + * should set `detect_pt' to false.
+> + *
+> + * Return whether the device is using IOMMU translation.
+> + */
+> +static bool vtd_switch_address_space(VTDAddressSpace *as, bool detect_=
+pt)
+> +{
 
-> > Dave
-> > 
-> > > > 
-> > > > Dave
-> > > > 
-> > > > > -- 
-> > > > > Peter Xu
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > 
-> > > 
-> > > -- 
-> > > 
-> > > BR
-> > > Alexey
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
-> -- 
-> 
-> BR
-> Alexey
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The detect_pt looks suspicious. E.g if the context entry does not exist,=20
+vtd_dev_pt_enabled() will return false.
+
+> +    bool use_iommu;
+> +
+> +    assert(as);
+> +
+> +    use_iommu =3D as->iommu_state->dmar_enabled;
+> +    if (detect_pt) {
+> +        use_iommu &=3D !vtd_dev_pt_enabled(as);
+> +    }
+> +
+> +    trace_vtd_switch_address_space(pci_bus_num(as->bus),
+> +                                   VTD_PCI_SLOT(as->devfn),
+> +                                   VTD_PCI_FUNC(as->devfn),
+> +                                   use_iommu);
+> +
+> +    /* Turn off first then on the other */
+> +    if (use_iommu) {
+> +        memory_region_set_enabled(&as->sys_alias, false);
+> +        memory_region_set_enabled(&as->iommu, true);
+> +    } else {
+> +        memory_region_set_enabled(&as->iommu, false);
+> +        memory_region_set_enabled(&as->sys_alias, true);
+> +    }
+> +
+> +    return use_iommu;
+> +}
+> +
+>   static inline uint16_t vtd_make_source_id(uint8_t bus_num, uint8_t de=
+vfn)
+>   {
+>       return ((bus_num & 0xffUL) << 8) | (devfn & 0xffUL);
+> @@ -931,6 +1037,31 @@ static inline bool vtd_is_interrupt_addr(hwaddr a=
+ddr)
+>       return VTD_INTERRUPT_ADDR_FIRST <=3D addr && addr <=3D VTD_INTERR=
+UPT_ADDR_LAST;
+>   }
+>  =20
+> +static void vtd_pt_enable_fast_path(IntelIOMMUState *s, uint16_t sourc=
+e_id)
+> +{
+> +    VTDBus *vtd_bus;
+> +    VTDAddressSpace *vtd_as;
+> +    const char *msg =3D "FAIL";
+> +
+> +    vtd_bus =3D vtd_find_as_from_bus_num(s, VTD_SID_TO_BUS(source_id))=
+;
+> +    if (!vtd_bus) {
+> +        goto out;
+> +    }
+> +
+> +    vtd_as =3D vtd_bus->dev_as[VTD_SID_TO_DEVFN(source_id)];
+> +    if (!vtd_as) {
+> +        goto out;
+> +    }
+> +
+> +    if (vtd_switch_address_space(vtd_as, true) =3D=3D false) {
+> +        /* We switched off IOMMU region successfully. */
+> +        msg =3D "SUCCESS";
+> +    }
+> +
+> +out:
+> +    trace_vtd_pt_enable_fast_path(source_id, msg);
+
+Looks like using a boolean is better here.
+
+> +}
+> +
+>   /* Map dev to context-entry then do a paging-structures walk to do a =
+iommu
+>    * translation.
+>    *
+> @@ -1002,6 +1133,30 @@ static void vtd_do_iommu_translate(VTDAddressSpa=
+ce *vtd_as, PCIBus *bus,
+>           cc_entry->context_cache_gen =3D s->context_cache_gen;
+>       }
+>  =20
+> +    /*
+> +     * We don't need to translate for pass-through context entries.
+> +     * Also, let's ignore IOTLB caching as well for PT devices.
+> +     */
+> +    if (vtd_ce_get_type(&ce) =3D=3D VTD_CONTEXT_TT_PASS_THROUGH) {
+> +        entry->translated_addr =3D entry->iova;
+> +        entry->addr_mask =3D VTD_PAGE_SIZE - 1;
+> +        entry->perm =3D IOMMU_RW;
+> +        trace_vtd_translate_pt(source_id, entry->iova);
+> +
+> +        /*
+> +         * When this happens, it means firstly caching-mode is not
+> +         * enabled, and this is the first passthrough translation for
+> +         * the device. Let's enable the fast path for passthrough.
+> +         *
+> +         * When passthrough is disabled again for the device, we can
+> +         * capture it via the context entry invalidation, then the
+> +         * IOMMU region can be swapped back.
+> +         */
+> +        vtd_pt_enable_fast_path(s, source_id);
+> +
+> +        return;
+> +    }
+> +
+>       ret_fr =3D vtd_iova_to_slpte(&ce, addr, is_write, &slpte, &level,
+>                                  &reads, &writes);
+>       if (ret_fr) {
+> @@ -1081,29 +1236,6 @@ static void vtd_context_global_invalidate(IntelI=
+OMMUState *s)
+>       vtd_iommu_replay_all(s);
+>   }
+>  =20
+> -
+> -/* Find the VTD address space currently associated with a given bus nu=
+mber,
+> - */
+> -static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bu=
+s_num)
+> -{
+> -    VTDBus *vtd_bus =3D s->vtd_as_by_bus_num[bus_num];
+> -    if (!vtd_bus) {
+> -        /* Iterate over the registered buses to find the one
+> -         * which currently hold this bus number, and update the bus_nu=
+m lookup table:
+> -         */
+> -        GHashTableIter iter;
+> -
+> -        g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+> -        while (g_hash_table_iter_next (&iter, NULL, (void**)&vtd_bus))=
+ {
+> -            if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
+> -                s->vtd_as_by_bus_num[bus_num] =3D vtd_bus;
+> -                return vtd_bus;
+> -            }
+> -        }
+> -    }
+> -    return vtd_bus;
+> -}
+> -
+>   /* Do a context-cache device-selective invalidation.
+>    * @func_mask: FM field after shifting
+>    */
+> @@ -1146,6 +1278,11 @@ static void vtd_context_device_invalidate(IntelI=
+OMMUState *s,
+>                                                VTD_PCI_FUNC(devfn_it));
+>                   vtd_as->context_cache_entry.context_cache_gen =3D 0;
+>                   /*
+> +                 * Do switch address space when needed, in case if the
+> +                 * device passthrough bit is switched.
+> +                 */
+> +                vtd_switch_address_space(vtd_as, true);
+
+Do we need to do this also in DSI and GLOBAL invalidation?
+
+Thanks
+
+> +                /*
+>                    * So a device is moving out of (or moving into) a
+>                    * domain, a replay() suites here to notify all the
+>                    * IOMMU_NOTIFIER_MAP registers about this change.
+> @@ -1377,25 +1514,6 @@ static void vtd_handle_gcmd_sirtp(IntelIOMMUStat=
+e *s)
+>       vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_IRTPS);
+>   }
+>  =20
+> -static void vtd_switch_address_space(VTDAddressSpace *as)
+> -{
+> -    assert(as);
+> -
+> -    trace_vtd_switch_address_space(pci_bus_num(as->bus),
+> -                                   VTD_PCI_SLOT(as->devfn),
+> -                                   VTD_PCI_FUNC(as->devfn),
+> -                                   as->iommu_state->dmar_enabled);
+> -
+> -    /* Turn off first then on the other */
+> -    if (as->iommu_state->dmar_enabled) {
+> -        memory_region_set_enabled(&as->sys_alias, false);
+> -        memory_region_set_enabled(&as->iommu, true);
+> -    } else {
+> -        memory_region_set_enabled(&as->iommu, false);
+> -        memory_region_set_enabled(&as->sys_alias, true);
+> -    }
+> -}
+> -
+>   static void vtd_switch_address_space_all(IntelIOMMUState *s)
+>   {
+>       GHashTableIter iter;
+> @@ -1408,7 +1526,7 @@ static void vtd_switch_address_space_all(IntelIOM=
+MUState *s)
+>               if (!vtd_bus->dev_as[i]) {
+>                   continue;
+>               }
+> -            vtd_switch_address_space(vtd_bus->dev_as[i]);
+> +            vtd_switch_address_space(vtd_bus->dev_as[i], false);
+>           }
+>       }
+>   }
+> @@ -2712,7 +2830,7 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState =
+*s, PCIBus *bus, int devfn)
+>                                               &vtd_dev_as->sys_alias, 1=
+);
+>           memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+>                                               &vtd_dev_as->iommu, 1);
+> -        vtd_switch_address_space(vtd_dev_as);
+> +        vtd_switch_address_space(vtd_dev_as, false);
+>       }
+>       return vtd_dev_as;
+>   }
+> @@ -2860,6 +2978,10 @@ static void vtd_init(IntelIOMMUState *s)
+>           s->ecap |=3D VTD_ECAP_DT;
+>       }
+>  =20
+> +    if (x86_iommu->pt_supported) {
+> +        s->ecap |=3D VTD_ECAP_PT;
+> +    }
+> +
+>       if (s->caching_mode) {
+>           s->cap |=3D VTD_CAP_CM;
+>       }
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_inter=
+nal.h
+> index 29d6707..0e73a65 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -187,6 +187,7 @@
+>   /* Interrupt Remapping support */
+>   #define VTD_ECAP_IR                 (1ULL << 3)
+>   #define VTD_ECAP_EIM                (1ULL << 4)
+> +#define VTD_ECAP_PT                 (1ULL << 6)
+>   #define VTD_ECAP_MHMV               (15ULL << 20)
+>  =20
+>   /* CAP_REG */
+> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+> index 04a6980..5c3e466 100644
+> --- a/hw/i386/trace-events
+> +++ b/hw/i386/trace-events
+> @@ -38,6 +38,8 @@ vtd_page_walk_skip_perm(uint64_t iova, uint64_t next)=
+ "Page walk skip iova 0x%"P
+>   vtd_page_walk_skip_reserve(uint64_t iova, uint64_t next) "Page walk s=
+kip iova 0x%"PRIx64" - 0x%"PRIx64" due to rsrv set"
+>   vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool =
+on) "Device %02x:%02x.%x switching address space (iommu enabled=3D%d)"
+>   vtd_as_unmap_whole(uint8_t bus, uint8_t slot, uint8_t fn, uint64_t io=
+va, uint64_t size) "Device %02x:%02x.%x start 0x%"PRIx64" size 0x%"PRIx64
+> +vtd_translate_pt(uint16_t sid, uint64_t addr) "source id 0x%"PRIu16", =
+iova 0x%"PRIx64
+> +vtd_pt_enable_fast_path(uint16_t sid, const char *msg) "sid 0x%"PRIu16=
+" %s"
+>  =20
+>   # hw/i386/amd_iommu.c
+>   amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to writ=
+e at addr 0x%"PRIx64" +  offset 0x%"PRIx32
+> diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
+> index 02b8825..293caf8 100644
+> --- a/hw/i386/x86-iommu.c
+> +++ b/hw/i386/x86-iommu.c
+> @@ -91,6 +91,7 @@ static void x86_iommu_realize(DeviceState *dev, Error=
+ **errp)
+>   static Property x86_iommu_properties[] =3D {
+>       DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, false=
+),
+>       DEFINE_PROP_BOOL("device-iotlb", X86IOMMUState, dt_supported, fal=
+se),
+> +    DEFINE_PROP_BOOL("pt", X86IOMMUState, pt_supported, true),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>  =20
+> diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
+> index 361c07c..ef89c0c 100644
+> --- a/include/hw/i386/x86-iommu.h
+> +++ b/include/hw/i386/x86-iommu.h
+> @@ -74,6 +74,7 @@ struct X86IOMMUState {
+>       SysBusDevice busdev;
+>       bool intr_supported;        /* Whether vIOMMU supports IR */
+>       bool dt_supported;          /* Whether vIOMMU supports DT */
+> +    bool pt_supported;          /* Whether vIOMMU supports pass-throug=
+h */
+>       IommuType type;             /* IOMMU type - AMD/Intel     */
+>       QLIST_HEAD(, IEC_Notifier) iec_notifiers; /* IEC notify list */
+>   };
