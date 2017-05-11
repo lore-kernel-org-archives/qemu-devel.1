@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d8nms-0000Fm-3O
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:05:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d8nsM-0001PK-9m
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1d8nml-0007aX-UG
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:05:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45062)
+	(envelope-from <pbonzini@redhat.com>) id 1d8nsJ-0002mo-4P
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:11:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37172)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d8nml-0007ZK-KY
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:05:39 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 65DD537E65
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 13:05:37 +0000 (UTC)
-Date: Thu, 11 May 2017 14:05:26 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170511130525.GG2078@work-vm>
-References: <1494505358-15287-1-git-send-email-peterx@redhat.com>
-	<1494505358-15287-3-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d8nsI-0002mM-U9
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:11:23 -0400
+References: <CALUZMn0mRMY7mx5ysWdSamV+UGbjwuif8UxQ47gFDK3fx8Hw2w@mail.gmail.com>
+	<6e9a0dff-949f-5ac9-2315-cbe0e4c99f58@redhat.com>
+	<CALUZMn14qgNz8y+15bsKFwyB9Ganoh0wzu5tfokCDRSASnBeKA@mail.gmail.com>
+	<0c725626-6485-c777-46e3-99423670df89@redhat.com>
+	<CALUZMn3W06H83E7hr4cHQ2jACp7A2x8hNyU1YirJssd3S7ut2Q@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c41daf1b-1ead-0809-57f8-2bfd168b36e6@redhat.com>
+Date: Thu, 11 May 2017 15:11:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1494505358-15287-3-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 2/4] utils: provide size_to_str()
+In-Reply-To: <CALUZMn3W06H83E7hr4cHQ2jACp7A2x8hNyU1YirJssd3S7ut2Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Guest SIGILL when different IO is implemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,118 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Miltiadis Hatzimihail <hatzimiltos@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Moving the algorithm from print_type_size() into size_to_str() so that
-> other component can also leverage it. With that, refactor
-> print_type_size().
+
+
+On 11/05/2017 14:47, Miltiadis Hatzimihail wrote:
+> That's great thanks for the clarification.
 > 
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/qemu-common.h        |  1 +
->  qapi/string-output-visitor.c | 22 ++++++----------------
->  util/cutils.c                | 26 ++++++++++++++++++++++++++
->  3 files changed, 33 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index d218821..d7d0448 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -145,6 +145,7 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
->  int parse_debug_env(const char *name, int max, int initial);
->  
->  const char *qemu_ether_ntoa(const MACAddr *mac);
-> +char *size_to_str(double val);
->  void page_size_init(void);
->  
->  /* returns non-zero if dump is in progress, otherwise zero is
-> diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
-> index 94ac821..53c2175 100644
-> --- a/qapi/string-output-visitor.c
-> +++ b/qapi/string-output-visitor.c
-> @@ -211,10 +211,8 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
->                              Error **errp)
->  {
->      StringOutputVisitor *sov = to_sov(v);
-> -    static const char suffixes[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E' };
-> -    uint64_t div, val;
-> -    char *out;
-> -    int i;
-> +    uint64_t val;
-> +    char *out, *psize;
->  
->      if (!sov->human) {
->          out = g_strdup_printf("%"PRIu64, *obj);
-> @@ -223,19 +221,11 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
->      }
->  
->      val = *obj;
-> -
-> -    /* The exponent (returned in i) minus one gives us
-> -     * floor(log2(val * 1024 / 1000).  The correction makes us
-> -     * switch to the higher power when the integer part is >= 1000.
-> -     */
-> -    frexp(val / (1000.0 / 1024.0), &i);
-> -    i = (i - 1) / 10;
-> -    assert(i < ARRAY_SIZE(suffixes));
-> -    div = 1ULL << (i * 10);
-> -
-> -    out = g_strdup_printf("%"PRIu64" (%0.3g %c%s)", val,
-> -                          (double)val/div, suffixes[i], i ? "iB" : "");
-> +    psize = size_to_str(val);
-> +    out = g_strdup_printf("%"PRIu64" (%s)", val, psize);
->      string_output_set(sov, out);
-> +
-> +    g_free(psize);
->  }
->  
->  static void print_type_bool(Visitor *v, const char *name, bool *obj,
-> diff --git a/util/cutils.c b/util/cutils.c
-> index 50ad179..fa5ddec 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -619,3 +619,29 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
->  
->      return ret;
->  }
-> +
-> +/*
-> + * Return human readable string for size @val.
-> + * @val must be between (-1000Eib, 1000EiB), exclusively.
-> + * Use IEC binary units like KiB, MiB, and so forth.
-> + * Caller is responsible for passing it to g_free().
-> + */
-> +char *size_to_str(double val)
-> +{
-> +    static const char *suffixes[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
-> +    unsigned long div;
-> +    int i;
-> +
-> +    /*
-> +     * The exponent (returned in i) minus one gives us
-> +     * floor(log2(val * 1024 / 1000).  The correction makes us
-> +     * switch to the higher power when the integer part is >= 1000.
-> +     * (see e41b509d68afb1f for more info)
-> +     */
-> +    frexp(val / (1000.0 / 1024.0), &i);
-> +    i = (i - 1) / 10;
-> +    assert(i < ARRAY_SIZE(suffixes));
+> Is this patch going to make it to the mainline at some point?
 
-Because your code takes a double, where as Paolo's only takes uint's,
-I think you have to be careful to check that i >= 0  as well,  for
-example, what would happen if someone did size_to_str(1.0/100.0) ?
+Not exactly as is, because it has a small defect (it always reads 16
+bytes from memory), but something like that will.
 
-Dave
-
-> +    div = 1ULL << (i * 10);
-> +
-> +    return g_strdup_printf("%0.3g %sB", val / div, suffixes[i]);
-> +}
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
