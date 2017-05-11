@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pA8-0001p7-Qc
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:53 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pA5-0001k2-4X
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pA7-00073e-US
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pA1-0006xA-Iu
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:49 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:21 +0200
-Message-Id: <1494513181-7900-19-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:17 +0200
+Message-Id: <1494513181-7900-15-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 18/58] block: Reuse bs as backing hd for
- drive-backup sync=none
+Subject: [Qemu-devel] [PULL 14/58] tests: Use null-co:// instead of
+ /dev/null as the dummy image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +25,105 @@ Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
 From: Fam Zheng <famz@redhat.com>
 
-Opening the backing image for the second time is bad, especially here
-when it is also in use as the active image as the source. The
-drive-backup job itself doesn't read from target->backing for COW,
-instead it gets data from the write notifier, so it's not a big problem.
-However, exporting the target to NBD etc. won't work, because of the
-likely stale metadata cache.
-
-Use BDRV_O_NO_BACKING in this case and manually set up the backing
-BdrvChild.
-
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- blockdev.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ tests/drive_del-test.c    | 2 +-
+ tests/nvme-test.c         | 2 +-
+ tests/usb-hcd-uhci-test.c | 2 +-
+ tests/usb-hcd-xhci-test.c | 2 +-
+ tests/virtio-blk-test.c   | 2 +-
+ tests/virtio-scsi-test.c  | 5 +++--
+ 6 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 0b38c3d..0d3773b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3151,6 +3151,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-     Error *local_err = NULL;
-     int flags;
-     int64_t size;
-+    bool set_backing_hd = false;
+diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
+index 121b9c9..2175139 100644
+--- a/tests/drive_del-test.c
++++ b/tests/drive_del-test.c
+@@ -92,7 +92,7 @@ static void test_after_failed_device_add(void)
+ static void test_drive_del_device_del(void)
+ {
+     /* Start with a drive used by a device that unplugs instantaneously */
+-    qtest_start("-drive if=none,id=drive0,file=/dev/null,format=raw"
++    qtest_start("-drive if=none,id=drive0,file=null-co://,format=raw"
+                 " -device virtio-scsi-pci"
+                 " -device scsi-hd,drive=drive0,id=dev0");
  
-     if (!backup->has_speed) {
-         backup->speed = 0;
-@@ -3201,6 +3202,8 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-     }
-     if (backup->sync == MIRROR_SYNC_MODE_NONE) {
-         source = bs;
-+        flags |= BDRV_O_NO_BACKING;
-+        set_backing_hd = true;
-     }
+diff --git a/tests/nvme-test.c b/tests/nvme-test.c
+index c8bece4..7674a44 100644
+--- a/tests/nvme-test.c
++++ b/tests/nvme-test.c
+@@ -22,7 +22,7 @@ int main(int argc, char **argv)
+     g_test_init(&argc, &argv, NULL);
+     qtest_add_func("/nvme/nop", nop);
  
-     size = bdrv_getlength(bs);
-@@ -3227,7 +3230,9 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-     }
+-    qtest_start("-drive id=drv0,if=none,file=/dev/null,format=raw "
++    qtest_start("-drive id=drv0,if=none,file=null-co://,format=raw "
+                 "-device nvme,drive=drv0,serial=foo");
+     ret = g_test_run();
  
-     if (backup->format) {
--        options = qdict_new();
-+        if (!options) {
-+            options = qdict_new();
-+        }
-         qdict_put_str(options, "driver", backup->format);
-     }
+diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+index f25bae5..5b500fe 100644
+--- a/tests/usb-hcd-uhci-test.c
++++ b/tests/usb-hcd-uhci-test.c
+@@ -79,7 +79,7 @@ int main(int argc, char **argv)
+ {
+     const char *arch = qtest_get_arch();
+     const char *cmd = "-device piix3-usb-uhci,id=uhci,addr=1d.0"
+-                      " -drive id=drive0,if=none,file=/dev/null,format=raw"
++                      " -drive id=drive0,if=none,file=null-co://,format=raw"
+                       " -device usb-tablet,bus=uhci.0,port=1";
+     int ret;
  
-@@ -3238,6 +3243,14 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
+index 22513e9..031764d 100644
+--- a/tests/usb-hcd-xhci-test.c
++++ b/tests/usb-hcd-xhci-test.c
+@@ -89,7 +89,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/xhci/pci/hotplug/usb-uas", test_usb_uas_hotplug);
  
-     bdrv_set_aio_context(target_bs, aio_context);
+     qtest_start("-device nec-usb-xhci,id=xhci"
+-                " -drive id=drive0,if=none,file=/dev/null,format=raw");
++                " -drive id=drive0,if=none,file=null-co://,format=raw");
+     ret = g_test_run();
+     qtest_end();
  
-+    if (set_backing_hd) {
-+        bdrv_set_backing_hd(target_bs, source, &local_err);
-+        if (local_err) {
-+            bdrv_unref(target_bs);
-+            goto out;
-+        }
-+    }
-+
-     if (backup->has_bitmap) {
-         bmap = bdrv_find_dirty_bitmap(bs, backup->bitmap);
-         if (!bmap) {
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 1eee95d..fd2078c 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -63,7 +63,7 @@ static QOSState *pci_test_start(void)
+     const char *arch = qtest_get_arch();
+     char *tmp_path;
+     const char *cmd = "-drive if=none,id=drive0,file=%s,format=raw "
+-                      "-drive if=none,id=drive1,file=/dev/null,format=raw "
++                      "-drive if=none,id=drive1,file=null-co://,format=raw "
+                       "-device virtio-blk-pci,id=drv0,drive=drive0,"
+                       "addr=%x.%x";
+ 
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 0eabd56..8b0f77a 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -35,7 +35,7 @@ typedef struct {
+ static QOSState *qvirtio_scsi_start(const char *extra_opts)
+ {
+     const char *arch = qtest_get_arch();
+-    const char *cmd = "-drive id=drv0,if=none,file=/dev/null,format=raw "
++    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
+                       "-device virtio-scsi-pci,id=vs0 "
+                       "-device scsi-hd,bus=vs0.0,drive=drv0 %s";
+ 
+@@ -195,7 +195,8 @@ static void hotplug(void)
+     QDict *response;
+     QOSState *qs;
+ 
+-    qs = qvirtio_scsi_start("-drive id=drv1,if=none,file=/dev/null,format=raw");
++    qs = qvirtio_scsi_start(
++            "-drive id=drv1,if=none,file=null-co://,format=raw");
+     response = qmp("{\"execute\": \"device_add\","
+                    " \"arguments\": {"
+                    "   \"driver\": \"scsi-hd\","
 -- 
 1.8.3.1
