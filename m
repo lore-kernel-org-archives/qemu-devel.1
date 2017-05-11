@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAl-0002fu-OI
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAn-0002hr-CB
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAk-0007tf-F7
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAl-0007vD-WE
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:33 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:44 +0200
-Message-Id: <1494513181-7900-42-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:45 +0200
+Message-Id: <1494513181-7900-43-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 41/58] blkdebug: Refactor error injection
+Subject: [Qemu-devel] [PULL 42/58] blkdebug: Add pass-through write_zero and
+ discard support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,142 +25,151 @@ Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-Rather than repeat the logic at each caller of checking if a Rule
-exists that warrants an error injection, fold that logic into
-inject_error(); and rename it to rule_check() for legibility.
-This will help the next patch, which adds two more callers that
-need to check rules for the potential of injecting errors.
+In order to test the effects of artificial geometry constraints
+on operations like write zero or discard, we first need blkdebug
+to manage these actions.  It also allows us to inject errors on
+those operations, just like we can for read/write/flush.
+
+We can also test the contract promised by the block layer; namely,
+if a device has specified limits on alignment or maximum size,
+then those limits must be obeyed (for now, the blkdebug driver
+merely inherits limits from whatever it is wrapping, but the next
+patch will further enhance it to allow specific limit overrides).
+
+This patch intentionally refuses to service requests smaller than
+the requested alignments; this is because an upcoming patch adds
+a qemu-iotest to prove that the block layer is correctly handling
+fragmentation, but the test only works if there is a way to tell
+the difference at artificial alignment boundaries when blkdebug is
+using a larger-than-default alignment.  If we let the blkdebug
+layer always defer to the underlying layer, which potentially has
+a smaller granularity, the iotest will be thwarted.
+
+Tested by setting up an NBD server with export 'foo', then invoking:
+$ ./qemu-io
+qemu-io> open -o driver=blkdebug blkdebug::nbd://localhost:10809/foo
+qemu-io> d 0 15M
+qemu-io> w -z 0 15M
+
+Pre-patch, the server never sees the discard (it was silently
+eaten by the block layer); post-patch it is passed across the
+wire.  Likewise, pre-patch the write is always passed with
+NBD_WRITE (with 15M of zeroes on the wire), while post-patch
+it can utilize NBD_WRITE_ZEROES (for less traffic).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170429191419.30051-6-eblake@redhat.com
+Message-id: 20170429191419.30051-7-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/blkdebug.c | 74 +++++++++++++++++++++++++-------------------------------
- 1 file changed, 33 insertions(+), 41 deletions(-)
+ block/blkdebug.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
 diff --git a/block/blkdebug.c b/block/blkdebug.c
-index a562e2e..554573f 100644
+index 554573f..b8cc876 100644
 --- a/block/blkdebug.c
 +++ b/block/blkdebug.c
-@@ -403,11 +403,30 @@ out:
-     return ret;
+@@ -1,6 +1,7 @@
+ /*
+  * Block protocol for I/O error injection
+  *
++ * Copyright (C) 2016-2017 Red Hat, Inc.
+  * Copyright (c) 2010 Kevin Wolf <kwolf@redhat.com>
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+@@ -382,6 +383,11 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+         goto out;
+     }
+ 
++    bs->supported_write_flags = BDRV_REQ_FUA &
++        bs->file->bs->supported_write_flags;
++    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
++        bs->file->bs->supported_zero_flags;
++
+     /* Set request alignment */
+     align = qemu_opt_get_size(opts, "align", 0);
+     if (align < INT_MAX && is_power_of_2(align)) {
+@@ -494,6 +500,72 @@ static int blkdebug_co_flush(BlockDriverState *bs)
+     return bdrv_co_flush(bs->file->bs);
  }
  
--static int inject_error(BlockDriverState *bs, BlkdebugRule *rule)
-+static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t bytes)
- {
-     BDRVBlkdebugState *s = bs->opaque;
--    int error = rule->options.inject.error;
--    bool immediately = rule->options.inject.immediately;
-+    BlkdebugRule *rule = NULL;
-+    int error;
-+    bool immediately;
++static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
++                                                  int64_t offset, int count,
++                                                  BdrvRequestFlags flags)
++{
++    uint32_t align = MAX(bs->bl.request_alignment,
++                         bs->bl.pwrite_zeroes_alignment);
++    int err;
 +
-+    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
-+        uint64_t inject_offset = rule->options.inject.offset;
-+
-+        if (inject_offset == -1 ||
-+            (bytes && inject_offset >= offset &&
-+             inject_offset < offset + bytes))
-+        {
-+            break;
-+        }
++    /* Only pass through requests that are larger than requested
++     * preferred alignment (so that we test the fallback to writes on
++     * unaligned portions), and check that the block layer never hands
++     * us anything unaligned that crosses an alignment boundary.  */
++    if (count < align) {
++        assert(QEMU_IS_ALIGNED(offset, align) ||
++               QEMU_IS_ALIGNED(offset + count, align) ||
++               DIV_ROUND_UP(offset, align) ==
++               DIV_ROUND_UP(offset + count, align));
++        return -ENOTSUP;
++    }
++    assert(QEMU_IS_ALIGNED(offset, align));
++    assert(QEMU_IS_ALIGNED(count, align));
++    if (bs->bl.max_pwrite_zeroes) {
++        assert(count <= bs->bl.max_pwrite_zeroes);
 +    }
 +
-+    if (!rule || !rule->options.inject.error) {
-+        return 0;
++    err = rule_check(bs, offset, count);
++    if (err) {
++        return err;
 +    }
 +
-+    immediately = rule->options.inject.immediately;
-+    error = rule->options.inject.error;
- 
-     if (rule->options.inject.once) {
-         QSIMPLEQ_REMOVE(&s->active_rules, rule, BlkdebugRule, active_next);
-@@ -426,8 +445,7 @@ static int coroutine_fn
- blkdebug_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-                    QEMUIOVector *qiov, int flags)
- {
--    BDRVBlkdebugState *s = bs->opaque;
--    BlkdebugRule *rule = NULL;
++    return bdrv_co_pwrite_zeroes(bs->file, offset, count, flags);
++}
++
++static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
++                                             int64_t offset, int count)
++{
++    uint32_t align = bs->bl.pdiscard_alignment;
 +    int err;
- 
-     /* Sanity check block layer guarantees */
-     assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
-@@ -436,18 +454,9 @@ blkdebug_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-         assert(bytes <= bs->bl.max_transfer);
-     }
- 
--    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
--        uint64_t inject_offset = rule->options.inject.offset;
--
--        if (inject_offset == -1 ||
--            (inject_offset >= offset && inject_offset < offset + bytes))
--        {
--            break;
--        }
--    }
--
--    if (rule && rule->options.inject.error) {
--        return inject_error(bs, rule);
-+    err = rule_check(bs, offset, bytes);
++
++    /* Only pass through requests that are larger than requested
++     * minimum alignment, and ensure that unaligned requests do not
++     * cross optimum discard boundaries. */
++    if (count < bs->bl.request_alignment) {
++        assert(QEMU_IS_ALIGNED(offset, align) ||
++               QEMU_IS_ALIGNED(offset + count, align) ||
++               DIV_ROUND_UP(offset, align) ==
++               DIV_ROUND_UP(offset + count, align));
++        return -ENOTSUP;
++    }
++    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
++    assert(QEMU_IS_ALIGNED(count, bs->bl.request_alignment));
++    if (align && count >= align) {
++        assert(QEMU_IS_ALIGNED(offset, align));
++        assert(QEMU_IS_ALIGNED(count, align));
++    }
++    if (bs->bl.max_pdiscard) {
++        assert(count <= bs->bl.max_pdiscard);
++    }
++
++    err = rule_check(bs, offset, count);
 +    if (err) {
 +        return err;
-     }
++    }
++
++    return bdrv_co_pdiscard(bs->file->bs, offset, count);
++}
  
-     return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
-@@ -457,8 +466,7 @@ static int coroutine_fn
- blkdebug_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-                     QEMUIOVector *qiov, int flags)
+ static void blkdebug_close(BlockDriverState *bs)
  {
--    BDRVBlkdebugState *s = bs->opaque;
--    BlkdebugRule *rule = NULL;
-+    int err;
+@@ -748,6 +820,8 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_co_preadv         = blkdebug_co_preadv,
+     .bdrv_co_pwritev        = blkdebug_co_pwritev,
+     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
++    .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
++    .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
  
-     /* Sanity check block layer guarantees */
-     assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
-@@ -467,18 +475,9 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-         assert(bytes <= bs->bl.max_transfer);
-     }
- 
--    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
--        uint64_t inject_offset = rule->options.inject.offset;
--
--        if (inject_offset == -1 ||
--            (inject_offset >= offset && inject_offset < offset + bytes))
--        {
--            break;
--        }
--    }
--
--    if (rule && rule->options.inject.error) {
--        return inject_error(bs, rule);
-+    err = rule_check(bs, offset, bytes);
-+    if (err) {
-+        return err;
-     }
- 
-     return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
-@@ -486,17 +485,10 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
- 
- static int blkdebug_co_flush(BlockDriverState *bs)
- {
--    BDRVBlkdebugState *s = bs->opaque;
--    BlkdebugRule *rule = NULL;
--
--    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
--        if (rule->options.inject.offset == -1) {
--            break;
--        }
--    }
-+    int err = rule_check(bs, 0, 0);
- 
--    if (rule && rule->options.inject.error) {
--        return inject_error(bs, rule);
-+    if (err) {
-+        return err;
-     }
- 
-     return bdrv_co_flush(bs->file->bs);
+     .bdrv_debug_event           = blkdebug_debug_event,
+     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
 -- 
 1.8.3.1
