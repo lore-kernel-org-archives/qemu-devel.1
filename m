@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1d8r3N-0007gP-CB
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:35:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1d8rUx-0006Ts-O2
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:03:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1d8r3M-0007Gk-IU
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:35:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45680)
+	(envelope-from <ehabkost@redhat.com>) id 1d8rUu-00006V-Lf
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:03:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1d8r3M-0007GR-DB
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:35:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9659E4E4C6
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 16:34:58 +0000 (UTC)
-References: <20170511153440.6475-1-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <fe7e66f8-7014-9f69-2d1a-2bc4f6e54f50@redhat.com>
-Date: Thu, 11 May 2017 18:34:54 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8rUu-00004q-H2
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:03:28 -0400
+Date: Thu, 11 May 2017 14:03:21 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170511170321.GF11869@thinpad.lan.raisama.net>
+References: <20170405190024.27581-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170511153440.6475-1-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] migration: Pass Error ** argument to
- {save, load}_vmstate
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170405190024.27581-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3 for 2.10] migration/i386 cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, quintela@redhat.com
 
-On 11/05/2017 17:34, Juan Quintela wrote:
-> This way we use the "normal" way of printing errors for hmp commands.
+On Wed, Apr 05, 2017 at 08:00:21PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Hi,
+>   This removes some qemu_get_ and qemu_put_ use from i386/machine.c
+> and cleans out some very old code.
+>   It breaks migration compatibility from prior to 0.12
+> for i386 and prior to ~0.14 for non-softfloat - it doesn't alter the
+> machine type, it just removes some old stream features.
 > 
-> ---
+> (Has anyone got a good test of FP migration to make sure
+> I've not broken the FP/mmx/etc cases?)
 > 
-> 
-> Add err_report_err() in replay-snapshot.c to really print the error
-> messages (dave suggestion)
-> 
-> 
-> ---
->  hmp.c                    |  9 +++++++--
->  include/sysemu/sysemu.h  |  4 ++--
->  migration/savevm.c       | 51 ++++++++++++++++++++++++------------------------
->  replay/replay-snapshot.c |  8 ++++++--
->  vl.c                     |  4 +++-
->  5 files changed, 43 insertions(+), 33 deletions(-)
-> 
+> Dave
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Queued, thanks.
+
+-- 
+Eduardo
