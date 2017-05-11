@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8iPE-0003z8-9K
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:21:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1d8iQN-0004Zi-UL
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8iPB-0002iA-2I
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:21:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47590)
+	(envelope-from <thuth@redhat.com>) id 1d8iQK-0003wU-P3
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:22:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41526)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d8iPA-0002h1-TB
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:20:57 -0400
-From: Markus Armbruster <armbru@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d8iQK-0003vy-HB
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 03:22:08 -0400
 References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
 	<20170510090841.GF31558@redhat.com>
 	<e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
-	<87tw4su3iw.fsf@dusky.pond.sub.org> <20170510190459.GD3941@work-vm>
-Date: Thu, 11 May 2017 09:20:50 +0200
-In-Reply-To: <20170510190459.GD3941@work-vm> (David Alan Gilbert's message of
-	"Wed, 10 May 2017 20:04:59 +0100")
-Message-ID: <87lgq3luzx.fsf@dusky.pond.sub.org>
+	<20170510103153.GI31558@redhat.com>
+	<ccb8fecd-e918-1cc0-28ef-af9865540fbc@redhat.com>
+	<157a6609-d75a-5d40-e5b9-c70802e40950@redhat.com>
+	<87pofflvn5.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <91ca8eba-6ef9-588c-a6d5-1ce0e2664bf2@redhat.com>
+Date: Thu, 11 May 2017 09:21:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <87pofflvn5.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
  pc-0.15
 List-Id: <qemu-devel.nongnu.org>
@@ -30,46 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kraxel@redhat.com, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On 11.05.2017 09:06, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> On 10/05/2017 16:47, Thomas Huth wrote:
+>>>> So while we can delete pc-0.12, we can't delete associated features needed
+>>>> by pc-0.12, without complicating RHEL's ability to create its back-compat
+>>>> machine types. Downstream would have to un-delete the features.
+>>>
+>>> So I guess this is why Paolo said that pc-0.12 is still in "use" ... I
+>>> think removing pc-0.12, but not removing rombar=0 will cause confusion
+>>> in the upstream code base sooner or later,
+>>
+>> I agree.
+>>
+>>> so I guess we should rather
+>>> keep the pc-0.12 machine until we can get rid of it together with the
+>>> rombar code. We should still mark it as deprecated, of course.
+>>>
+>>>> I think tieing removal to major versions is a mistake, unless we're
+>>>> going to set a fixed timeframe for delivery of major versions. ie if
+>>>> we gaurantee that we'll ship a new major version every 18 months, that
+>>>> gives people a predictable lifetime.  If we carry on inventing reasons
+>>>> for major versions at arbitrary points in time, it makes it difficult
+>>>> to have any reasonable forward planning.  It is more users friendly if
+>>>> we can set a clear fixed timeframe for machine type lifecycle / eol
+>>>
+>>> IMHO we should have a new major release after we've reached a .9 minor
+>>> release, but so far it seems like I'm the only one with that wish...
+>>
+>> I actually like that, but then you've pretty much guaranteed that you
+>> _cannot_ remove anything deprecated until 4.0.  You and Daniel aren't
+>> disagreeing as heavily as it seems, I think.
+> 
+> Even better: drop the '.', and stop worrying about having to wait for
+> some arbitrary number to come up before you're allowed to do something
+> ;)
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> Thomas Huth <thuth@redhat.com> writes:
->> 
->> > On 10.05.2017 11:08, Daniel P. Berrange wrote:
->> >> On Wed, May 10, 2017 at 08:48:53AM +0200, Thomas Huth wrote:
->> [...]
->> >> Also unless we're going to get more serious about automated testing to
->> >> validate machine type compatibility between *all* previously releases,
->> >> I think that 6 years / 18 releases is too long a time to have any
->> >> confidence in migration compatibility between versions.
->> 
->> Seconded.
->> 
->> > Distro vendors often offer 5 - 10 years support for certain versions of
->> > their Linux distros, so I think we should at least support 5 years, too.
->> 
->> Non sequitur.
->> 
->> Distro vendors put in serious work to keep versions working for 5 - 10
->> years.  We can't, and we don't.  All we do is try not to break things,
->> which is nice, and helps the distro vendors some, but a far cry from
->> anything I'd dare call "support".
->> 
->> Perhaps an argument could be made that us keeping to try for at least 5
->> years would help distro vendors enough to be worthwhile.  Maybe, but
->> color me skeptic.
->
-> Since I'm often the one having to fix the breakages when we find they've
-> diverged, I would prefer us to try to keep them working upstream.
-> Every time something slips through upstream it's more work for me.
+I agree, we shouldn't limit ourselves by saying that we can only remove
+things when switching to a new major release. But I still think that
+also having "regular" major releases (e.g. after each .9 minor release)
+could also help us to remind ourselves to do some bigger (and likely
+necessary) spring-cleaning regularly.
 
-I figure when downstream rebases from upstream version V to V+3, then
-upstream having tried not to break things for three versions back helps,
-but from that fork on, the value of upstream trying diminishes sharply.
-
-That makes me doubt the idea that upstream should try for as long as any
-downstream version exists ("at least 5 years").  Until downstreams
-rebase makes more sense to me.
+ Thomas
