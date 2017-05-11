@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fUu-0005Hx-QA
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fUu-0005II-Vr
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fUt-0001QU-Ei
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fUt-0001R1-QF
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:40 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 11 May 2017 14:14:12 +1000
-Message-Id: <20170511041426.6488-10-david@gibson.dropbear.id.au>
+Date: Thu, 11 May 2017 14:14:09 +1000
+Message-Id: <20170511041426.6488-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20170511041426.6488-1-david@gibson.dropbear.id.au>
 References: <20170511041426.6488-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 09/23] ppc/xics: preserve P and Q bits for KVM
- IRQs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 06/23] tcg: enable MTTCG by default for PPC64 on
+ x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +26,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, sjitindarsingh@gmail.com, mark.cave-ayland@ilande.co.uk, sam.bobroff@au1.ibm.com, nikunj@linux.vnet.ibm.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-Kernel commit 17d48610ae0f ("KVM: PPC: Book 3S: XICS: Implement ICS
-P/Q states") added new bits to the state used by KVM IRQs. Currently,
-QEMU does not preserve these bits, so migrating (or otherwise saving
-and restoring) the guest state causes the P and Q bits to be cleared.
+This enables the multi-threaded system emulation by default for PPC64
+guests using the x86_64 TCG back-end.
 
-Clearing the P bit has no effect, because the kernel will set it based
-on other data, but the loss of a set Q bit will cause a lost
-interrupt.
-
-This patch preserves the P and Q bits, correcting the problem.
-
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics_kvm.c    | 12 ++++++++++++
- include/hw/ppc/xics.h |  2 ++
- 2 files changed, 14 insertions(+)
+ configure        | 2 ++
+ target/ppc/cpu.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 03c1fc7..dd93531 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -229,6 +229,12 @@ static void ics_get_kvm_state(ICSState *ics)
-                     | XICS_STATUS_REJECTED;
-             }
-         }
-+        if (state & KVM_XICS_PRESENTED) {
-+                irq->status |= XICS_STATUS_PRESENTED;
-+        }
-+        if (state & KVM_XICS_QUEUED) {
-+                irq->status |= XICS_STATUS_QUEUED;
-+        }
-     }
- }
- 
-@@ -266,6 +272,12 @@ static int ics_set_kvm_state(ICSState *ics, int version_id)
-                 state |= KVM_XICS_PENDING;
-             }
-         }
-+        if (irq->status & XICS_STATUS_PRESENTED) {
-+                state |= KVM_XICS_PRESENTED;
-+        }
-+        if (irq->status & XICS_STATUS_QUEUED) {
-+                state |= KVM_XICS_QUEUED;
-+        }
- 
-         ret = ioctl(kernel_xics_fd, KVM_SET_DEVICE_ATTR, &attr);
-         if (ret != 0) {
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index c215dc7..68525c8 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -144,6 +144,8 @@ struct ICSIRQState {
- #define XICS_STATUS_SENT               0x2
- #define XICS_STATUS_REJECTED           0x4
- #define XICS_STATUS_MASKED_PENDING     0x8
-+#define XICS_STATUS_PRESENTED          0x10
-+#define XICS_STATUS_QUEUED             0x20
-     uint8_t status;
- /* (flags & XICS_FLAGS_IRQ_MASK) == 0 means the interrupt is not allocated */
- #define XICS_FLAGS_IRQ_LSI             0x1
--- 
+diff --git a/configure b/configure
+index 7c020c0..84c37d4 100755
+--- a/configure
++++ b/configure
+@@ -6110,12 +6110,14 @@ case "$target_name" in
+   ppc64)
+     TARGET_BASE_ARCH=3Dppc
+     TARGET_ABI_DIR=3Dppc
++    mttcg=3Dyes
+     gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml po=
+wer-spe.xml power-vsx.xml"
+   ;;
+   ppc64le)
+     TARGET_ARCH=3Dppc64
+     TARGET_BASE_ARCH=3Dppc
+     TARGET_ABI_DIR=3Dppc
++    mttcg=3Dyes
+     gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml po=
+wer-spe.xml power-vsx.xml"
+   ;;
+   ppc64abi32)
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index e0ff041..ece535d 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -30,6 +30,8 @@
+ #define TARGET_LONG_BITS 64
+ #define TARGET_PAGE_BITS 12
+=20
++#define TCG_GUEST_DEFAULT_MO 0
++
+ /* Note that the official physical address space bits is 62-M where M
+    is implementation dependent.  I've not looked up M for the set of
+    cpus we emulate at the system level.  */
+--=20
 2.9.3
