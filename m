@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8dJ9-0004U8-7j
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:24 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8dJA-0004V5-NN
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8dJ7-0004jl-K0
-	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:23 -0400
-Date: Thu, 11 May 2017 11:02:20 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1d8dJ7-0004jc-HP
+	for qemu-devel@nongnu.org; Wed, 10 May 2017 21:54:24 -0400
+Date: Thu, 11 May 2017 10:14:58 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170511010220.GE14408@umbus.fritz.box>
+Message-ID: <20170511001458.GC14408@umbus.fritz.box>
 References: <1494234377-1773-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1494234377-1773-3-git-send-email-bharata@linux.vnet.ibm.com>
+	<1494234377-1773-2-git-send-email-bharata@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qOrJKOH36bD5yhNe"
+	protocol="application/pgp-signature"; boundary="bAmEntskrkuBymla"
 Content-Disposition: inline
-In-Reply-To: <1494234377-1773-3-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/2] spapr: Fix migration of Radix
- guests
+In-Reply-To: <1494234377-1773-2-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] spapr: Make
+ h_register_process_table hcall flags global
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,154 +29,131 @@ To: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
 
 
---qOrJKOH36bD5yhNe
+--bAmEntskrkuBymla
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 08, 2017 at 02:36:17PM +0530, Bharata B Rao wrote:
-> Currently HTAB savevm handlers get registered by default and migration
-> of radix guest will fail.
+On Mon, May 08, 2017 at 02:36:16PM +0530, Bharata B Rao wrote:
+> The flags used in h_register_process_table hcall are needed in spapr.c
+> and hence move them to a header file. While doing so, give them
+> slightly specific names.
 >=20
-> - Ensure that HTAB savevm handlers are not registered for radix case.
-> - Ensure that we issue KVM_PPC_CONFIGURE_V3_MMU for radix case post
->   migration.
->=20
-> TODO: Right now I have delayed the HTAB savevm handler registration
-> to CAS call where we know if the guest is radix or hash. Another approach
-> is to let the HTAB handlers to be registered by default (as it is being
-> done currently, but unregister them from CAS when we discover radix
-> capability).
-
-Option 2 there sounds messy.  I also suspect it could break if you try
-to migrate an (eventually) radix guest before it's done CAS.
-
-Strictly speaking only registering at CAS time will break old hash
-guests that don't do CAS at all.  However such guests are really,
-really ancient, and I suspect we don't work with them already.
-
-You do, however, need to deregister (and allow the choice to be made
-again) on guest reset.  On KVM we can only (for now) support either
-hash or radix guests.  Under TCG, however, we could run a radix guest
-then reboot to a hash guest or vice versa.
-
-
->=20
-> Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
 > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  hw/ppc/spapr.c         | 18 +++++++++++++++---
->  hw/ppc/spapr_hcall.c   |  5 +++++
->  include/hw/ppc/spapr.h |  3 +++
->  3 files changed, 23 insertions(+), 3 deletions(-)
+>  hw/ppc/spapr_hcall.c   | 31 ++++++++++++++-----------------
+>  include/hw/ppc/spapr.h | 10 ++++++++++
+>  2 files changed, 24 insertions(+), 17 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e2dc77c..e14f55c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1436,6 +1436,14 @@ static int spapr_post_load(void *opaque, int versi=
-on_id)
->          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
->      }
-> =20
-> +    if (spapr->patb_entry && (spapr->patb_flags & SPAPR_PROC_TABLE_RADIX=
-) &&
-
-patb_entry already tells you whether the guest is radix or not
-(PATBE1_GR), you shouldn't need extra flags.
-
-> +        kvmppc_has_cap_mmu_radix() && kvm_enabled()) {
-
-You should also fail the migration if you have an incoming radix
-guest, but the your new KVM host can't do radix.  Or the reverse, for
-that matter.
-
-> +        err =3D kvmppc_configure_v3_mmu(POWERPC_CPU(first_cpu),
-> +                                      spapr->patb_flags &
-> +                                      SPAPR_PROC_TABLE_RADIX,
-> +                                      spapr->patb_flags & SPAPR_PROC_TAB=
-LE_GTSE,
-> +                                      spapr->patb_entry);
-> +    }
->      return err;
->  }
-> =20
-> @@ -1520,6 +1528,7 @@ static const VMStateDescription vmstate_spapr_patb_=
-entry =3D {
->      .needed =3D spapr_patb_entry_needed,
->      .fields =3D (VMStateField[]) {
->          VMSTATE_UINT64(patb_entry, sPAPRMachineState),
-> +        VMSTATE_UINT64(patb_flags, sPAPRMachineState),
->          VMSTATE_END_OF_LIST()
->      },
->  };
-> @@ -1869,6 +1878,12 @@ static SaveVMHandlers savevm_htab_handlers =3D {
->      .load_state =3D htab_load,
->  };
-> =20
-> +void spapr_htab_savevm_register(sPAPRMachineState *spapr)
-> +{
-> +    register_savevm_live(NULL, "spapr/htab", -1, 1,
-> +                         &savevm_htab_handlers, spapr);
-> +}
-> +
->  static void spapr_boot_set(void *opaque, const char *boot_device,
->                             Error **errp)
->  {
-> @@ -2331,9 +2346,6 @@ static void ppc_spapr_init(MachineState *machine)
->       * interface, this is a legacy from the sPAPREnvironment structure
->       * which predated MachineState but had a similar function */
->      vmstate_register(NULL, 0, &vmstate_spapr, spapr);
-> -    register_savevm_live(NULL, "spapr/htab", -1, 1,
-> -                         &savevm_htab_handlers, spapr);
-> -
->      /* used by RTAS */
->      QTAILQ_INIT(&spapr->ccs_list);
->      qemu_register_reset(spapr_ccs_reset_hook, spapr);
 > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 3600b0e..fa03ca0 100644
+> index 0d608d6..3600b0e 100644
 > --- a/hw/ppc/spapr_hcall.c
 > +++ b/hw/ppc/spapr_hcall.c
-> @@ -988,6 +988,7 @@ static target_ulong h_register_process_table(PowerPCC=
-PU *cpu,
->      spapr_check_setup_free_hpt(spapr, spapr->patb_entry, cproc);
-> =20
->      spapr->patb_entry =3D cproc; /* Save new process table */
-> +    spapr->patb_flags =3D flags; /* Save the flags */
-> =20
->      /* Update the UPRT and GTSE bits in the LPCR for all cpus */
->      CPU_FOREACH(cs) {
-> @@ -1169,6 +1170,10 @@ static target_ulong h_client_architecture_support(=
-PowerPCCPU *cpu,
->          }
->      }
-> =20
-> +    /* Register savevm handlers for HTAB case */
-> +    if (!guest_radix || !kvmppc_has_cap_mmu_radix()) {
-> +        spapr_htab_savevm_register(spapr);
-> +    }
->      return H_SUCCESS;
+> @@ -924,13 +924,6 @@ static void spapr_check_setup_free_hpt(sPAPRMachineS=
+tate *spapr,
+>      return;
 >  }
 > =20
+> -#define FLAGS_MASK              0x01FULL
+> -#define FLAG_MODIFY             0x10
+> -#define FLAG_REGISTER           0x08
+> -#define FLAG_RADIX              0x04
+> -#define FLAG_HASH_PROC_TBL      0x02
+> -#define FLAG_GTSE               0x01
+> -
+>  static target_ulong h_register_process_table(PowerPCCPU *cpu,
+>                                               sPAPRMachineState *spapr,
+>                                               target_ulong opcode,
+> @@ -943,12 +936,13 @@ static target_ulong h_register_process_table(PowerP=
+CCPU *cpu,
+>      target_ulong table_size =3D args[3];
+>      uint64_t cproc;
+> =20
+> -    if (flags & ~FLAGS_MASK) { /* Check no reserved bits are set */
+> +    if (flags & ~SPAPR_PROC_TABLE_MASK) { /* Check no reserved bits are =
+set */
+>          return H_PARAMETER;
+>      }
+> -    if (flags & FLAG_MODIFY) {
+> -        if (flags & FLAG_REGISTER) {
+> -            if (flags & FLAG_RADIX) { /* Register new RADIX process tabl=
+e */
+> +    if (flags & SPAPR_PROC_TABLE_MODIFY) {
+> +        if (flags & SPAPR_PROC_TABLE_REGISTER) {
+> +            if (flags & SPAPR_PROC_TABLE_RADIX) {
+> +                /* Register new RADIX process table */
+>                  if (proc_tbl & 0xfff || proc_tbl >> 60) {
+>                      return H_P2;
+>                  } else if (page_size) {
+> @@ -958,7 +952,8 @@ static target_ulong h_register_process_table(PowerPCC=
+PU *cpu,
+>                  }
+>                  cproc =3D PATBE1_GR | proc_tbl | table_size;
+>              } else { /* Register new HPT process table */
+> -                if (flags & FLAG_HASH_PROC_TBL) { /* Hash with Segment T=
+ables */
+> +                if (flags & SPAPR_PROC_TABLE_HPT_PT) {
+> +                    /* Hash with Segment Tables */
+>                      /* TODO - Not Supported */
+>                      /* Technically caused by flag bits =3D> H_PARAMETER =
+*/
+>                      return H_PARAMETER;
+> @@ -981,7 +976,8 @@ static target_ulong h_register_process_table(PowerPCC=
+PU *cpu,
+>              cproc =3D spapr->patb_entry & PATBE1_GR;
+>          }
+>      } else { /* Maintain current registration */
+> -        if (!(flags & FLAG_RADIX) !=3D !(spapr->patb_entry & PATBE1_GR))=
+ {
+> +        if (!(flags & SPAPR_PROC_TABLE_RADIX) !=3D
+> +            !(spapr->patb_entry & PATBE1_GR)) {
+>              /* Technically caused by flag bits =3D> H_PARAMETER */
+>              return H_PARAMETER; /* Existing Process Table Mismatch */
+>          }
+> @@ -996,13 +992,14 @@ static target_ulong h_register_process_table(PowerP=
+CCPU *cpu,
+>      /* Update the UPRT and GTSE bits in the LPCR for all cpus */
+>      CPU_FOREACH(cs) {
+>          set_spr(cs, SPR_LPCR, LPCR_UPRT | LPCR_GTSE,
+> -                ((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UPRT=
+ : 0) |
+> -                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0));
+> +                ((flags & (SPAPR_PROC_TABLE_RADIX | SPAPR_PROC_TABLE_HPT=
+_PT)) ?
+> +                LPCR_UPRT : 0) | ((flags & SPAPR_PROC_TABLE_GTSE) ?
+> +                SPAPR_PROC_TABLE_GTSE : 0));
+>      }
+> =20
+>      if (kvm_enabled()) {
+> -        return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
+> -                                       flags & FLAG_GTSE, cproc);
+> +        return kvmppc_configure_v3_mmu(cpu, flags & SPAPR_PROC_TABLE_RAD=
+IX,
+> +                                       flags & SPAPR_PROC_TABLE_GTSE, cp=
+roc);
+>      }
+>      return H_SUCCESS;
+>  }
 > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index a692e63..0d0e9e4 100644
+> index 5802f88..a692e63 100644
 > --- a/include/hw/ppc/spapr.h
 > +++ b/include/hw/ppc/spapr.h
-> @@ -75,6 +75,7 @@ struct sPAPRMachineState {
->      void *htab;
->      uint32_t htab_shift;
->      uint64_t patb_entry; /* Process tbl registed in H_REGISTER_PROCESS_T=
-ABLE */
-> +    uint64_t patb_flags;
->      hwaddr rma_size;
->      int vrma_adjust;
->      ssize_t rtas_size;
-> @@ -691,4 +692,6 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_o=
-n_cpu_data arg);
->  #define SPAPR_PROC_TABLE_HPT_PT      0x02
->  #define SPAPR_PROC_TABLE_GTSE        0x01
+> @@ -681,4 +681,14 @@ int spapr_rng_populate_dt(void *fdt);
 > =20
-> +void spapr_htab_savevm_register(sPAPRMachineState *spapr);
+>  void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
+> =20
+> +/*
+> + * Defines for flag value used in H_REGISTER_PROC_TBL hcall.
+> + */
+> +#define SPAPR_PROC_TABLE_MASK        0x01FULL
+> +#define SPAPR_PROC_TABLE_MODIFY      0x10
+> +#define SPAPR_PROC_TABLE_REGISTER    0x08
+> +#define SPAPR_PROC_TABLE_RADIX       0x04
+> +#define SPAPR_PROC_TABLE_HPT_PT      0x02
+> +#define SPAPR_PROC_TABLE_GTSE        0x01
 > +
 >  #endif /* HW_SPAPR_H */
 
@@ -186,25 +163,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qOrJKOH36bD5yhNe
+--bAmEntskrkuBymla
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZE7gZAAoJEGw4ysog2bOSfBsP/AuaKR00VG2nQoUyFsQrqF2r
-Y/mdzbRLoPJ08u/aQFNKDDe5oaAirWEeRNTV1SKlDsiZg+ph66XQ0BinAv3G3xes
-P7aGH0FiAuq5oc2D6Ug05PJbymIQnvqEM2oL3V0r0+//ikG/m2T4I3CB2SXvTmxy
-Y2cj6+z+nwO24WGzZbYxIt2HFKNlWL5FfH8CHjriJLLyLp5mNDXK+vA9ELsd8VG6
-h0L2hteAcvgE2R9laAsv1UagW19VsBAGk/ebLRUOtvAjkkBY7aCorSmW5s1Seg11
-3JHEapGa0PZjJDyUomxQEnc6yjXQRrPl1JoolO17PkiaC74j3fxCdRxLLnef6qRn
-Y4i1BIB5an75x4b3mqQ3SzjMdgfCohVxKKH7a6hpc4l0oA5oU+GzOmQAw7p6rlSH
-P7T3jPtTPMjFaCSS2UM5iEuurI9MklZT2AoNBAvGci6VSkaqORL5cK0vHrVcwIOn
-31LRz4z14hGVkULcWsoudlIh5sKwKwKvKluk4M/ce69x7ZGBLH7xoN2Zo2rPEvPy
-k0ct8BXExXsc/uwscbhjhbWj8mizTIX4fWx+C1YJsgjdKXvgUPxvA9lKnahsKFOK
-AetgxSJ2ESaqFLWEMhVfYVNd/Jd9Z5u6nFrVzKdJZOvXyRnJvrvxirG42tibu6h0
-J6xgGS1jWQlzudhMBcFe
-=NqV+
+iQIcBAEBCAAGBQJZE60AAAoJEGw4ysog2bOSONAQAL1T3D2m0eIgj3sYj+mGxfqM
+BbvLCD1Kj/aJtruHGZbjO8hFPmBPBbGOn7LVBShHgvlq9nD3Yf3KNj9/H1/Qyft8
+erZ2QdHVxCmKPCHVRzNf8gjsVHWZdpX1rDcXUQr1M3I33hGQlgWNg8xBCuj102RU
+Xq2RYhGDLrerR2k19F9pl4C3LJYZ7xFArug1j4FR7Dw6Dd8drAl6bsOR1mjksx+o
+SdNvCfMi71sFjBPUYWhDT23QkfiZdMCjo/1ScJFx1VB7CKZA6Hf2MSRLKzdOSuJ4
+JMfX8Mz7Zvoo7wnRvV1hjyH27LHHOkAR34yGiISjaRPl57s4vCJTPYPAyKbc6cDc
+GG/jKb4+YBauruNuZV6uVZUbspw4/tgeGGFuN14g5fJchEvpgvGDITxW9A2kAPBn
+YI0KQNIuGJr5tfYUIq5MiRxI/Vdj9O0x1UaUF8zGxVcA2Mhml6PQWltGUpL8mpe+
++25VtMKKZ8L4YIfhpa8v5XT+uR6gWE5iMDGEnOR8UA+wtSIUAGhT8U2mS3pGNucj
+BdhSGjvZpNCn4yJOY6lMtJPt9RtfsmxKKg6+m63ahZf+ZnpY40pa6FeMoJbaxY3c
+iZnhNyQUuOD908qyK71kXKaa5mWqyxM2TCX3qO/wFltC1YCxAk90WadYmU91xUjR
+ReO4TvEYAGFiYR22DIf1
+=xBHx
 -----END PGP SIGNATURE-----
 
---qOrJKOH36bD5yhNe--
+--bAmEntskrkuBymla--
