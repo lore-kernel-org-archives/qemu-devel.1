@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1d8nHU-0002Zm-J6
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:22 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1d8nHl-0002jo-VB
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1d8nHT-0004kb-1o
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45126)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1d8nHi-0004vU-SA
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58712)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1d8nHS-0004kL-Pi
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:18 -0400
+	id 1d8nHi-0004uU-IZ
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:34 -0400
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Thu, 11 May 2017 14:32:41 +0200
-Message-Id: <20170511123246.31308-2-maxime.coquelin@redhat.com>
+Date: Thu, 11 May 2017 14:32:44 +0200
+Message-Id: <20170511123246.31308-5-maxime.coquelin@redhat.com>
 In-Reply-To: <20170511123246.31308-1-maxime.coquelin@redhat.com>
 References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/6] vhost: propagate errors in
- vhost_device_iotlb_miss()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 4/6] vhost-user: add vhost_user to hold the chr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +28,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mst@redhat.com, peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Some backends might want to know when things went wrong.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Next patches will add more fields to the structure
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 ---
- hw/virtio/vhost.c         | 15 ++++++++++-----
- include/hw/virtio/vhost.h |  2 +-
- 2 files changed, 11 insertions(+), 6 deletions(-)
+ hw/virtio/vhost-user.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 0001e60..369373a 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -971,18 +971,20 @@ static int vhost_memory_region_lookup(struct vhost_dev *hdev,
-     return -EFAULT;
- }
- 
--void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
-+int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
- {
-     IOMMUTLBEntry iotlb;
-     uint64_t uaddr, len;
-+    int ret = -EFAULT;
- 
-     rcu_read_lock();
- 
-     iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
-                                           iova, write);
-     if (iotlb.target_as != NULL) {
--        if (vhost_memory_region_lookup(dev, iotlb.translated_addr,
--                                       &uaddr, &len)) {
-+        ret = vhost_memory_region_lookup(dev, iotlb.translated_addr,
-+                                         &uaddr, &len);
-+        if (ret) {
-             error_report("Fail to lookup the translated address "
-                          "%"PRIx64, iotlb.translated_addr);
-             goto out;
-@@ -991,14 +993,17 @@ void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
-         len = MIN(iotlb.addr_mask + 1, len);
-         iova = iova & ~iotlb.addr_mask;
- 
--        if (dev->vhost_ops->vhost_update_device_iotlb(dev, iova, uaddr,
--                                                      len, iotlb.perm)) {
-+        ret = dev->vhost_ops->vhost_update_device_iotlb(dev, iova, uaddr,
-+                                                      len, iotlb.perm);
-+        if (ret) {
-             error_report("Fail to update device iotlb");
-             goto out;
-         }
-     }
- out:
-     rcu_read_unlock();
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 9334a8a..f0e10d0 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -111,6 +111,10 @@ static VhostUserMsg m __attribute__ ((unused));
+ /* The version of the protocol we support */
+ #define VHOST_USER_VERSION    (0x1)
+=20
++struct vhost_user {
++    CharBackend *chr;
++};
 +
-+    return ret;
- }
- 
- static int vhost_virtqueue_start(struct vhost_dev *dev,
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index a450321..467dc77 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -105,5 +105,5 @@ bool vhost_has_free_slot(void);
- int vhost_net_set_backend(struct vhost_dev *hdev,
-                           struct vhost_vring_file *file);
- 
--void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
-+int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
- #endif
--- 
+ static bool ioeventfd_enabled(void)
+ {
+     return kvm_enabled() && kvm_eventfds_enabled();
+@@ -118,7 +122,8 @@ static bool ioeventfd_enabled(void)
+=20
+ static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
+ {
+-    CharBackend *chr =3D dev->opaque;
++    struct vhost_user *u =3D dev->opaque;
++    CharBackend *chr =3D u->chr;
+     uint8_t *p =3D (uint8_t *) msg;
+     int r, size =3D VHOST_USER_HDR_SIZE;
+=20
+@@ -199,7 +204,8 @@ static bool vhost_user_one_time_request(VhostUserRequ=
+est request)
+ static int vhost_user_write(struct vhost_dev *dev, VhostUserMsg *msg,
+                             int *fds, int fd_num)
+ {
+-    CharBackend *chr =3D dev->opaque;
++    struct vhost_user *u =3D dev->opaque;
++    CharBackend *chr =3D u->chr;
+     int ret, size =3D VHOST_USER_HDR_SIZE + msg->size;
+=20
+     /*
+@@ -571,11 +577,14 @@ static int vhost_user_reset_device(struct vhost_dev=
+ *dev)
+ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
+ {
+     uint64_t features;
++    struct vhost_user *u;
+     int err;
+=20
+     assert(dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER);
+=20
+-    dev->opaque =3D opaque;
++    u =3D g_new0(struct vhost_user, 1);
++    u->chr =3D opaque;
++    dev->opaque =3D u;
+=20
+     err =3D vhost_user_get_features(dev, &features);
+     if (err < 0) {
+@@ -620,8 +629,12 @@ static int vhost_user_init(struct vhost_dev *dev, vo=
+id *opaque)
+=20
+ static int vhost_user_cleanup(struct vhost_dev *dev)
+ {
++    struct vhost_user *u;
++
+     assert(dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER);
+=20
++    u =3D dev->opaque;
++    g_free(u);
+     dev->opaque =3D 0;
+=20
+     return 0;
+--=20
 2.9.3
