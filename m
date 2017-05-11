@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d982Q-0006lq-Qd
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:43:11 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d983H-0007As-As
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:44:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d982M-0002i0-46
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:43:10 -0400
-Received: from mga01.intel.com ([192.55.52.88]:41497)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1d983C-00033P-K0
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:44:03 -0400
+Received: from mga05.intel.com ([192.55.52.43]:37327)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1d982L-0002h6-SL
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:43:06 -0400
-Date: Thu, 11 May 2017 18:29:02 +0800
+	id 1d983C-000331-Bl
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:43:58 -0400
+Date: Thu, 11 May 2017 18:29:56 +0800
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20170511102902.GD2931@gmail.com>
+Message-ID: <20170511102956.GE2931@gmail.com>
 References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-6-git-send-email-yi.l.liu@intel.com>
+	<1493201525-14418-7-git-send-email-yi.l.liu@intel.com>
+	<9441ea23-1867-f59a-1ae3-be5afa4d51da@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1493201525-14418-6-git-send-email-yi.l.liu@intel.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 5/8] VFIO: Add new IOTCL for PASID
- Table bind propagation
+In-Reply-To: <9441ea23-1867-f59a-1ae3-be5afa4d51da@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 6/8] VFIO: do pasid table binding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +29,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org, iommu@lists.linux-foundation.org, peterx@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, ashok.raj@intel.com, jean-philippe.brucker@arm.com, jasowang@redhat.com, qemu-devel@nongnu.org, jacob.jun.pan@intel.com
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, ashok.raj@intel.com, jean-philippe.brucker@arm.com, jasowang@redhat.com, qemu-devel@nongnu.org, jacob.jun.pan@intel.com
 
-On Wed, Apr 26, 2017 at 06:12:02PM +0800, Liu, Yi L wrote:
-> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+On Tue, May 09, 2017 at 03:55:20PM +0800, Xiao Guangrong wrote:
+> 
+> 
+> On 04/26/2017 06:12 PM, Liu, Yi L wrote:
+> >From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+> >
+> >This patch adds IOCTL processing in vfio_iommu_type1 for
+> >VFIO_IOMMU_SVM_BIND_TASK. Binds the PASID table bind by
+> >calling iommu_ops->bind_pasid_table to link the whole
+> >PASID table to pIOMMU.
+> >
+> >For VT-d, it is linking the guest PASID table to host pIOMMU.
+> >This is key point to support SVM virtualization on VT-d.
+> >
+> >Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> >---
+> >  drivers/vfio/vfio_iommu_type1.c | 72 +++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 72 insertions(+)
+> >
+> >diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >index b3cc33f..30b6d48 100644
+> >--- a/drivers/vfio/vfio_iommu_type1.c
+> >+++ b/drivers/vfio/vfio_iommu_type1.c
+> >@@ -1512,6 +1512,50 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+> >  	return ret;
+> >  }
+> >+struct vfio_svm_task {
+> >+	struct iommu_domain *domain;
+> >+	void *payload;
+> >+};
+> >+
+> >+static int bind_pasid_tbl_fn(struct device *dev, void *data)
+> >+{
+> >+	int ret = 0;
+> >+	struct vfio_svm_task *task = data;
+> >+	struct pasid_table_info *pasidt_binfo;
+> >+
+> >+	pasidt_binfo = task->payload;
+> >+	ret = iommu_bind_pasid_table(task->domain, dev, pasidt_binfo);
+> >+	return ret;
+> >+}
+> >+
+> >+static int vfio_do_svm_task(struct vfio_iommu *iommu, void *data,
+> >+				int (*fn)(struct device *, void *))
+> >+{
+> >+	int ret = 0;
+> >+	struct vfio_domain *d;
+> >+	struct vfio_group *g;
+> >+	struct vfio_svm_task task;
+> >+
+> >+	task.payload = data;
+> >+
+> >+	mutex_lock(&iommu->lock);
+> >+
+> >+	list_for_each_entry(d, &iommu->domain_list, next) {
+> >+		list_for_each_entry(g, &d->group_list, next) {
+> >+			if (g->iommu_group != NULL) {
+> >+				task.domain = d->domain;
+> >+				ret = iommu_group_for_each_dev(
+> >+					g->iommu_group, &task, fn);
+> >+				if (ret != 0)
+> >+					break;
+> >+			}
+> >+		}
+> >+	}
+> >+
+> >+	mutex_unlock(&iommu->lock);
+> >+	return ret;
+> >+}
+> >+
+> >  static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >  				   unsigned int cmd, unsigned long arg)
+> >  {
+> >@@ -1582,6 +1626,34 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> >  			-EFAULT : 0;
+> >+	} else if (cmd == VFIO_IOMMU_SVM_BIND_TASK) {
+> >+		struct vfio_device_svm hdr;
+> >+		u8 *data = NULL;
+> >+		int ret = 0;
+> >+
+> >+		minsz = offsetofend(struct vfio_device_svm, length);
+> >+		if (copy_from_user(&hdr, (void __user *)arg, minsz))
+> >+			return -EFAULT;
+> >+
+> >+		if (hdr.length == 0)
+> >+			return -EINVAL;
+> >+
+> >+		data = memdup_user((void __user *)(arg + minsz),
+> >+					hdr.length);
+> 
+> You should check the @length is at least sizeof(struct pasid_table_info) as
+> kernel uses it as pasid_table_info, a evil application can crash kernel.
 
-Hi Alex,
-
-In this patchset, I'm trying to add two new IOCTL cmd for Shared
-Virtual Memory virtualization. One for binding guest PASID Table
-and one for iommu tlb invalidation from guest. ARM has similar
-requirement on SVM supporting. Since it touched VFIO, I'd like
-to know your comments on changes in VFIO.
+Yes, thx for the remind.
 
 Thanks,
-Yi L
-
-> This patch adds VFIO_IOMMU_SVM_BIND_TASK for potential PASID table
-> binding requests.
-> 
-> On VT-d, this IOCTL cmd would be used to link the guest PASID page table
-> to host. While for other vendors, it may also be used to support other
-> kind of SVM bind request. Previously, there is a discussion on it with
-> ARM engineer. It can be found by the link below. This IOCTL cmd may
-> support SVM PASID bind request from userspace driver, or page table(cr3)
-> bind request from guest. These SVM bind requests would be supported by
-> adding different flags. e.g. VFIO_SVM_BIND_PASID is added to support
-> PASID bind from userspace driver, VFIO_SVM_BIND_PGTABLE is added to
-> support page table bind from guest.
-> 
-> https://patchwork.kernel.org/patch/9594231/
-> 
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> ---
->  include/uapi/linux/vfio.h | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 519eff3..6b97987 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -547,6 +547,23 @@ struct vfio_iommu_type1_dma_unmap {
->  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
->  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
->  
-> +/* IOCTL for Shared Virtual Memory Bind */
-> +struct vfio_device_svm {
-> +	__u32	argsz;
-> +#define VFIO_SVM_BIND_PASIDTBL	(1 << 0) /* Bind PASID Table */
-> +#define VFIO_SVM_BIND_PASID	(1 << 1) /* Bind PASID from userspace driver */
-> +#define VFIO_SVM_BIND_PGTABLE	(1 << 2) /* Bind guest mmu page table */
-> +	__u32	flags;
-> +	__u32	length;
-> +	__u8	data[];
-> +};
-> +
-> +#define VFIO_SVM_TYPE_MASK	(VFIO_SVM_BIND_PASIDTBL | \
-> +				VFIO_SVM_BIND_PASID | \
-> +				VFIO_SVM_BIND_PGTABLE)
-> +
-> +#define VFIO_IOMMU_SVM_BIND_TASK	_IO(VFIO_TYPE, VFIO_BASE + 22)
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->  
->  /*
-> -- 
-> 1.9.1
-> 
-> 
+Yi L 
