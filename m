@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8pW7-0006Ht-9d
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:56:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8pcl-000461-Td
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8pW5-0003du-V3
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:56:35 -0400
-References: <20170411011718.9152-1-eblake@redhat.com>
-	<20170411011718.9152-2-eblake@redhat.com>
-	<20170412094909.GC4955@noname.str.redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d8pch-00022z-Ax
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:03:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d8pch-00022H-21
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:03:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F0390A0904
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 15:03:21 +0000 (UTC)
+References: <1494505358-15287-1-git-send-email-peterx@redhat.com>
+	<1494505358-15287-5-git-send-email-peterx@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
-Date: Thu, 11 May 2017 09:56:24 -0500
+Message-ID: <d938d532-6d11-0ec5-a24a-0a44519bc021@redhat.com>
+Date: Thu, 11 May 2017 10:03:20 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170412094909.GC4955@noname.str.redhat.com>
+In-Reply-To: <1494505358-15287-5-git-send-email-peterx@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="bhSbvjqMqip2b5RdKuqcnHM1BHVclfiHP"
-Subject: Re: [Qemu-devel] [PATCH v9 01/13] qcow2: Unallocate unmapped zero
- clusters if no backing file
+	boundary="A48UJwQPv10846UVwaPtWMUruHLVmmHsk"
+Subject: Re: [Qemu-devel] [PATCH v7 4/4] utils: remove assert in
+ size_to_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bhSbvjqMqip2b5RdKuqcnHM1BHVclfiHP
+--A48UJwQPv10846UVwaPtWMUruHLVmmHsk
 From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com,
- John Snow <jsnow@redhat.com>
-Message-ID: <161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
-Subject: Re: [PATCH v9 01/13] qcow2: Unallocate unmapped zero clusters if no
- backing file
-References: <20170411011718.9152-1-eblake@redhat.com>
- <20170411011718.9152-2-eblake@redhat.com>
- <20170412094909.GC4955@noname.str.redhat.com>
-In-Reply-To: <20170412094909.GC4955@noname.str.redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster
+ <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <d938d532-6d11-0ec5-a24a-0a44519bc021@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 4/4] utils: remove assert in size_to_str()
+References: <1494505358-15287-1-git-send-email-peterx@redhat.com>
+ <1494505358-15287-5-git-send-email-peterx@redhat.com>
+In-Reply-To: <1494505358-15287-5-git-send-email-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-[revisiting this older patch version, even though the final version in
-today's pull request changed somewhat from this approach]
-
-On 04/12/2017 04:49 AM, Kevin Wolf wrote:
-> Am 11.04.2017 um 03:17 hat Eric Blake geschrieben:
->> 'qemu-img map' already coalesces information about unallocated
->> clusters (those with status 0) and pure zero clusters (those
->> with status BDRV_BLOCK_ZERO and no offset).  Furthermore, all
->> qcow2 images with no backing file already report all unallocated
->> clusters (in the preallocation sense of clusters with no offset)
->> as BDRV_BLOCK_ZERO, regardless of whether the QCOW_OFLAG_ZERO was
->> set in that L2 entry (QCOW_OFLAG_ZERO also implies a return of
->> BDRV_BLOCK_ALLOCATED, but we intentionally do not expose that bit
->> to external users), thanks to generic block layer code in
->> bdrv_co_get_block_status().
->>
->> So, for an image with no backing file, having bdrv_pwrite_zeroes
->> mark clusters as unallocated (defer to backing file) rather than
->> reads-as-zero (regardless of backing file) makes no difference
->> to normal behavior, but may potentially allow for fewer writes to
->> the L2 table of a freshly-created image where the L2 table is
->> initially written to all-zeroes (although I don't actually know
->> if we skip an L2 update and flush when re-writing the same
->> contents as already present).
+On 05/11/2017 07:22 AM, Peter Xu wrote:
+> It's not very safe to assert in size_to_str(). Let's be inclusive.
 >=20
-> I don't get this. Allocating a cluster always involves an L2 update, no=
+> It naturally allows negative values. Now it won't even limit on the
+> size, as long as double would allow.
+>=20
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  util/cutils.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 
-> matter whether it was previously unallocated or a zero cluster.
+Since you just introduced this in 2/4, I'd rather see the two squashed
+together if we decide this is the interface we want to support.
 
-On IRC, John, Kevin, and I were discussing the current situation with
-libvirt NBD storage migration.  When libvirt creates a file on the
-destination (rather than the user pre-creating it), it currently
-defaults to 0.10 [v2] images, even if the source was a 1.1 image [v3]
-(arguably something that could be improved in libvirt, but
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1371749 was closed as not a=
-
-bug).
-
-Therefore, the use case of doing a mirror job to a v2 image, and having
-that image become thick even though the source was thin, is happening
-more than we'd like
-(https://bugzilla.redhat.com/show_bug.cgi?id=3D1371749).  While Kevin had=
-
-a point that in the common case we ALWAYS want to turn an unallocated
-cluster into a zero cluster (so that we don't have to audit whether all
-callers are properly accounting for the case where a backing image is
-added later), our conversation on IRC today conceded that we may want to
-introduce a new BDRV_REQ_READ_ZERO_NOP (or some such name) that
-particular callers can use to request that if a cluster already reads as
-zeroes, the write zero request does NOT have to change it.  Normal guest
-operations would not use the flag, but mirroring IS a case that would
-use the flag, so that we can end up with thinner mirrors even to 0.10
-images.
-
-The other consideration is that on 0.10 images, even if we have to
-allocate, right now our allocation is done by way of failing with
--ENOTSUP and falling back to the normal pwrite() of explicit zeroes.  It
-may be worth teaching the qcow2 layer to explicitly handle write zeroes,
-even on 0.10 images, by allocating a cluster (as needed) but then
-telling bs->file to write zeroes (punching a hole as appropriate) so
-that the file is still thin.  In fact, it matches the fact that we
-already have code that probes whether a qcow2 cluster that reports
-BDRV_BLOCK_DATA|BDRV_BLOCK_OFFSET_VALID then probes bs->file to see if
-there is a hole there, at which point it can add BDRV_BLOCK_ZERO to the
-bdrv_get_block_status.
-
-I don't know which one of us will tackle patches along these lines, but
-wanted to at least capture the gist of the IRC conversation in the
-archives for a bit more permanence.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -121,7 +73,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---bhSbvjqMqip2b5RdKuqcnHM1BHVclfiHP
+--A48UJwQPv10846UVwaPtWMUruHLVmmHsk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -131,13 +83,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZFHuYAAoJEKeha0olJ0NqnFIIAKLyDbUta0OtKoL3ouycWXwd
-U20WayAZRv0tRXb548he3j/GbSRnotbLqiiK6C9kN9qFvkLCzRT9edHqd+d1Wurs
-Kk9yh1PqIFGxD5dgTCUqWu3/yYKDVrN4F4SaHdTbWSilAHdaNYHI4HofuzMElq1d
-ysjTX9EjGeDqEf0MoTIQVD3lBkuTj/BF/uY6kRd/sT5TXj2hw7CejKqc1iOeiOGx
-IfVjEOem5qTB1SS+1fKsv8gFFcFfm1ZFdzY85R/eyvqXScGbDiDX+kWG4AWJ0OJJ
-YDq3WCspB3ILZM7Ua2wrKIjN8RjhU4McuxdsR4wtqmvD/ckYwzCH4aw90JgOwxY=
-=juNh
+iQEcBAEBCAAGBQJZFH04AAoJEKeha0olJ0NqWV8H/iw4S7O73wp8aC95SxtxBQeb
+l9UozfF99cXwiO4lDsO7ATTqeqj46icCeKGYMp8VhdIMX97QH7oeAkQwd1uHXfxG
+h3oNm4jAEkAP488Z1HeGaeIZ3DLeytBqVGHUhZjJ1jB+4NsvfS1DGBCi3wwfJEiA
+vvxt593ZzKc+pM2UdTT2OEQcCh9dHA8zP5xXjD8c9E89OF4GVWwjS5l08RkXy2Dk
+yfl8CU2L8v2sXExJRdj7Mgf4xY4/UtYNMq/c1eIXabfECwON2CTtwKCgLhdf8QJ3
+kjTdJMCNIXzJLAuIHa6nrsTwmclDrjCPB1tjFaTiZOslGkISRjwkRLYNkftV2gE=
+=OMan
 -----END PGP SIGNATURE-----
 
---bhSbvjqMqip2b5RdKuqcnHM1BHVclfiHP--
+--A48UJwQPv10846UVwaPtWMUruHLVmmHsk--
