@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8n9F-0007AC-RV
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:24:50 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1d8nHU-0002Zl-Id
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d8n98-0007zs-BO
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:24:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52594)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1d8nHR-0004k7-GA
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51038)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d8n98-0007yz-4C
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:24:42 -0400
-References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
-	<874lxeovrg.fsf@secure.mitica>
-	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
-	<20170424164244.GJ2362@work-vm>
-	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
-Date: Thu, 11 May 2017 14:24:36 +0200
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1d8nHR-0004jy-Av
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 08:33:17 -0400
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Date: Thu, 11 May 2017 14:32:40 +0200
+Message-Id: <20170511123246.31308-1-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/6] vhost-user: Specify and implement device
+ IOTLB support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>
-Cc: "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Wanpeng Li <kernellwp@gmail.com>
+To: mst@redhat.com, peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
 
+This series aims at specifying ans implementing the protocol update
+required to support device IOTLB with user backends.
 
+In this first non-RFC version, IOTLB messages forging and parsing have be=
+en
+extracted from the backend implementation; so that both user and kernel
+backends share as most code as possible, only the transport remains backe=
+nd
+specifics. Also various smaller fixes have been implementated, taking int=
+o
+account Peter's review comments. I tagged this third version as non-RFC,
+since there is now a DPDK vhost-user backend prototype supporting IOMMU[0=
+],
+making possible testing of this series.
 
-On 11/05/2017 14:07, Zhoujian (jay) wrote:
-> -        * Scan sptes if dirty logging has been stopped, dropping those
-> -        * which can be collapsed into a single large-page spte.  Later
-> -        * page faults will create the large-page sptes.
-> +        * Reset each vcpu's mmu, then page faults will create the large-page
-> +        * sptes later.
->          */
->         if ((change != KVM_MR_DELETE) &&
->                 (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
-> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
-> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
-> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
-> +               kvm_for_each_vcpu(i, vcpu, kvm)
-> +                       kvm_mmu_reset_context(vcpu);
+The slave requests channel part is re-used from Marc-Andr=C3=A9's series =
+submitted
+last year[1], with main changes from original version being request/featu=
+re
+names renaming and addition of the REPLY_ACK feature support.
 
-This should be "kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);" but
-I am not sure it is enough.  I think that if you do not zap the SPTEs,
-the page faults will use 4K SPTEs, not large ones (though I'd have to
-check better; CCing Xiao and Wanpeng).
+Regarding IOTLB protocol, one noticeable change is the IOTLB miss request
+reply made optionnal (i.e. only if slave requests it by setting the
+VHOST_USER_NEED_REPLY flag in the message header). This change provides
+more flexibility in the backend implementation of the feature.
 
-Paolo
+The protocol is very close to kernel backends, except that a new
+communication channel is introduced to enable the slave to send
+requests to the master.
+
+[0]: https://gitlab.com/mcoquelin/dpdk-next-virtio/commits/vhost_iotlb_pr=
+oto
+[1]: https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.html
+
+Marc-Andr=C3=A9 Lureau (2):
+  vhost-user: add vhost_user to hold the chr
+  vhost-user: add slave-req-fd support
+
+Maxime Coquelin (4):
+  vhost: propagate errors in vhost_device_iotlb_miss()
+  vhost: rework IOTLB messaging
+  vhost: Update rings information for IOTLB earlier
+  spec/vhost-user spec: Add IOMMU support
+
+ docs/specs/vhost-user.txt         | 107 ++++++++++++++++++++++-
+ hw/virtio/vhost-backend.c         | 135 ++++++++++++++++-------------
+ hw/virtio/vhost-user.c            | 177 ++++++++++++++++++++++++++++++++=
++++++-
+ hw/virtio/vhost.c                 |  38 ++++----
+ include/hw/virtio/vhost-backend.h |  23 +++--
+ include/hw/virtio/vhost.h         |   2 +-
+ 6 files changed, 393 insertions(+), 89 deletions(-)
+
+--=20
+2.9.3
