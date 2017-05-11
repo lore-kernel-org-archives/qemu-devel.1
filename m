@@ -1,30 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1d8oSv-0002MU-J8
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:49:14 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d8oVF-0003nv-2F
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1d8oSr-0008Te-1m
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:49:13 -0400
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:35484)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1d8oSq-0008TH-Sx
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:49:08 -0400
-Received: by mail-oi0-x235.google.com with SMTP id l18so30578375oig.2
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 06:49:08 -0700 (PDT)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d8oVC-0001YJ-0Z
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:51:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53647
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d8oVB-0001Xf-Pc
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 09:51:33 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4BDnF0E006717
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 09:51:32 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ac4eyrgv4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 09:51:32 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 11 May 2017 14:51:30 +0100
+Date: Thu, 11 May 2017 15:51:25 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170510155359.32727-1-farman@linux.vnet.ibm.com>
+References: <20170510155359.32727-1-farman@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
-References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
-	<874lxeovrg.fsf@secure.mitica>
-	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
-	<20170424164244.GJ2362@work-vm>
-	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
-	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
-	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Thu, 11 May 2017 21:49:07 +0800
-Message-ID: <CANRm+CwvYa01CLChSOGjG6P0q2_Zybov3ZMSULsCGH5GtmRy8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170511155125.0b03949a.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/8] s390x: Enable virtio-scsi boot
+ from /dev/sgX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +42,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Farman <farman@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
 
-2017-05-11 21:43 GMT+08:00 Wanpeng Li <kernellwp@gmail.com>:
-> 2017-05-11 20:24 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
->>
->>
->> On 11/05/2017 14:07, Zhoujian (jay) wrote:
->>> -        * Scan sptes if dirty logging has been stopped, dropping those
->>> -        * which can be collapsed into a single large-page spte.  Later
->>> -        * page faults will create the large-page sptes.
->>> +        * Reset each vcpu's mmu, then page faults will create the large-page
->>> +        * sptes later.
->>>          */
->>>         if ((change != KVM_MR_DELETE) &&
->>>                 (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
->>> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
->>> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
->
-> This is an unlikely branch(unless guest live migration fails and
-> continue to run on the source machine) instead of hot path, do you
-> have any performance number for your real workloads?
+On Wed, 10 May 2017 17:53:51 +0200
+Eric Farman <farman@linux.vnet.ibm.com> wrote:
 
-I find the original discussion by google.
-https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg04143.html
-You will not go to this branch if the guest live migration
-successfully.
+> Today, trying to boot a guest from a SCSI LUN on s390x yields the following:
+> 
+>   virtio-blk               = OK
+>   virtio-scsi and /dev/sdX = OK
+>   virtio-scsi and /dev/sgX = FAIL
+> 
+> Example of the failing scenario:
+> 
+>   /usr/bin/qemu-system-s390x ...
+>     -device virtio-scsi-ccw,id=scsi0,devno=fe.0.0001
+>     -drive file=/dev/sg2,if=none,id=drive0,format=raw
+>     -device scsi-generic,bus=scsi0.0,channel=0,scsi-id=0,drive=drive0,id=disk0
+>   LOADPARM=[........]
+>   Using virtio-scsi.
+>   Using SCSI scheme.
+>   ..
+>   ! virtio-scsi:read_many: STATUS=02 RSPN=70 KEY=0b CODE=00 QLFR=06, sure !
+> 
+> Why do we care?  Well, libvirt converts a virtio-scsi device from the host
+> SCSI address (host:bus:target:lun) into the associated /dev/sgX device,
+> which means we can't boot from virtio-scsi and have to rely on virtio-blk
+> for this action.
+> 
+> The short version of what happens is the host block device driver rejects our
+> requests because the transfer lengths are too long for it to satisfy.
+> A virtio-scsi disk connected via scsi-generic is fine as a non-boot device
+> because the guest kernel is able to break up the requests for us.  So we just
+> need to handle this situation for the boot process.
+> 
+> Patches 1-3 read the max_sectors parameter for the virtio-scsi controller,
+> and break up the READ(10) I/Os into something that the host will accept.
+> If not specified, max_sectors defaults to 65535, but could look like this:
+> 
+>   qemu-system-s390x ...
+>     -device virtio-scsi-ccw,id=scsi0,devno=fe.0.0001,max_sectors=2048
+> 
+> Patches 4-6 read the max_io_size parameter for the virtio-scsi disk device,
+> and use the minimum of it and the max_sectors from the controller for breaking
+> up the READ(10) I/Os.  If not specified, max_io_size defaults to 2147483647
+> but could look like this:
+> 
+>   qemu-system-s390x ...
+>     -drive file=/dev/sda,if=none,id=drive0,format=raw ...
+>     -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,
+>             drive=drive0,id=disk0,max_io_size=1048576
+> 
+> In the two examples above, the maximum parameters are equivalent due to the
+> controller parameter measuring 512-byte blocks, and the disk measuring bytes.
+> 
+> Patch 7 establishes a workable default, in case neither the controller nor
+> the disk have the parameters specified (and thus the overly large defaults
+> are taken), or if they are set to something beyond what we can boot from.
+> 
+> Patch 8 rebuilds the s390-ccw BIOS with this entire patch set.
 
-Regards,
-Wanpeng Li
+This patch set looks reasonable to me, but I have not delved into the
+scsi particulars :)
+
+The code changes seem to be fine, so if someone with more scsi
+knowledge than me could give their ok as well, I'll be happy to take
+this through my s390 tree.
