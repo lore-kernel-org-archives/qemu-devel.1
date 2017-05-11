@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d8tRf-00074g-S3
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:08:16 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1d8tYy-0000Qd-PC
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1d8tRc-0007xM-MV
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:08:15 -0400
-Date: Thu, 11 May 2017 15:08:08 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170511190808.GA24584@stefanha-x1.localdomain>
-References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <dan.j.williams@intel.com>) id 1d8tYx-0004oa-C4
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:15:48 -0400
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:34013)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1d8tYx-0004mA-5e
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 15:15:47 -0400
+Received: by mail-oi0-x22b.google.com with SMTP id b204so42125566oii.1
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 12:15:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
-Content-Disposition: inline
-In-Reply-To: <1492005921-15664-3-git-send-email-zhang.zhanghailiang@huawei.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 2/6] replication: add
- shared-disk and shared-disk-id options
+In-Reply-To: <20170511181703.GC8701@stefanha-x1.localdomain>
+References: <1494431760-6455-1-git-send-email-pagupta@redhat.com>
+	<20170511181703.GC8701@stefanha-x1.localdomain>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Thu, 11 May 2017 12:15:43 -0700
+Message-ID: <CAPcyv4irL+imcaWBtHox9oUatndpRw-3xfxtTcn1NV58iph+og@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] KVM "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, Wen Congyang <wency@cn.fujitsu.com>, qemu-block@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, KVM list <kvm@vger.kernel.org>, qemu-devel@nongnu.org, Rik van Riel <riel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com, Haozhong Zhang <haozhong.zhang@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
+On Thu, May 11, 2017 at 11:17 AM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> On Wed, May 10, 2017 at 09:26:00PM +0530, Pankaj Gupta wrote:
+>> We are sharing initial project proposal for
+>> 'KVM "fake DAX" device flushing' project for feedback.
+>> Got the idea during discussion with 'Rik van Riel'.
+>
+> CCing NVDIMM folks.
+>
+>>
+>> Also, request answers to 'Questions' section.
+>>
+>> Abstract :
+>> ----------
+>> Project idea is to use fake persistent memory with direct
+>> access(DAX) in virtual machines. Overall goal of project
+>> is to increase the number of virtual machines that can be
+>> run on a physical machine, in order to increase the density
+>> of customer virtual machines.
+>>
+>> The idea is to avoid the guest page cache, and minimize the
+>> memory footprint of virtual machines. By presenting a disk
+>> image as a nvdimm direct access (DAX) memory region in a
+>> virtual machine, the guest OS can avoid using page cache
+>> memory for most file accesses.
 
---9amGYk9869ThD9tj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+How is this different than the solution that Clear Containers came up with?
 
-On Wed, Apr 12, 2017 at 10:05:17PM +0800, zhanghailiang wrote:
-> We use these two options to identify which disk is
-> shared
->=20
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
-> v4:
-> - Add proper comment for primary_disk (Stefan)
-> v2:
-> - Move g_free(s->shared_disk_id) to the common fail process place (Stefan)
-> - Fix comments for these two options
-> ---
->  block/replication.c  | 43 +++++++++++++++++++++++++++++++++++++++++--
->  qapi/block-core.json | 10 +++++++++-
->  2 files changed, 50 insertions(+), 3 deletions(-)
-
-Aside from the ongoing discussion about this patch...
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---9amGYk9869ThD9tj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZFLaYAAoJEJykq7OBq3PISXwIAJ019b/65mBV0Vqj5hkBF5yE
-P4FKOXGsDQhJzhXvtJ489lJ8x5jgTdHouuqpTQ/GgpWVgJ8WIw+/aAjOR3SJMaBS
-IXO4hnOypGGYECs7vDSrKscUrUBiWzfiofx9F8BqNfw0i2yiGbeWRyHo45/Snpho
-AtPcCUBXIuXCaifXsmKpr69NiJWuyZmDLatgMiPVUueqXyXURT64n4qGUO9cOeBt
-2PMFfZ5RnJBNxRQStvQepp4t5rali9ahzuEDh5LOpM2uZBhKiy/9b9OuXff7BTdB
-+c6g1d5rsLDXcmh2l+X2vM2psKke/EhlTfbWKWsI5uLCZOnCWKaNWvuk+Wadxek=
-=eEu8
------END PGP SIGNATURE-----
-
---9amGYk9869ThD9tj--
+https://lwn.net/Articles/644675/
