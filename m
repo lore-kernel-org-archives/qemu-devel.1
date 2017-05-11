@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fUz-0005O4-7W
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fUy-0005NI-Ra
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8fUx-0001XK-S4
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d8fUw-0001VN-Tm
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:14:44 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 11 May 2017 14:14:23 +1000
-Message-Id: <20170511041426.6488-21-david@gibson.dropbear.id.au>
+Date: Thu, 11 May 2017 14:14:19 +1000
+Message-Id: <20170511041426.6488-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20170511041426.6488-1-david@gibson.dropbear.id.au>
 References: <20170511041426.6488-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 20/23] spapr: Don't accidentally advertise HTM
- support on POWER9
+Subject: [Qemu-devel] [PULL 16/23] target/ppc: Change tlbie invalid fields
+ for POWER9 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +23,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, sjitindarsingh@gmail.com, mark.cave-ayland@ilande.co.uk, sam.bobroff@au1.ibm.com, nikunj@linux.vnet.ibm.com, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-Logic in spapr_populate_pa_features() enables the bit advertising
-Hardware Transactional Memory (HTM) in the guest's device tree only when
-KVM advertises its availability with the KVM_CAP_PPC_HTM feature.
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-However, this assumes that the HTM bit is off in the base template used for
-the device tree value.  That is true for POWER8, but not for POWER9.
+The tlbie[l] instructions are used to invalidate TLB entries used to cache
+address translations.
 
-It looks like that was accidentally changed in 9fb4541 "spapr: Enable ISA
-3.0 MMU mode selection via CAS".
+In ISAv3.00 (POWER9) more fields were added to the tblie[l] instructions
+which were previously invalid. We don't care about any of these new fields
+since we just invalidate the whole world anyway but we need to not
+cause an illegal instruction exception when the instructions are called.
+We also don't want to allow an older processor to have these fields set
+since that would be invalid.
 
-Fixes: 9fb4541f5803f8d2ba116b12113386e26482ba30
+Add a new GEN_HANDLER for the ISAv3 instructions with the correct invalid
+mask. These will only be generated to a POWER9 processor for now based on
+the instruction flag. Also remove the PPC_MEM_TLBIE instruction flag from
+the POWER9 processor definition to ensure the old tlbie isn't generated.
 
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/ppc/spapr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/ppc/translate.c      | 2 ++
+ target/ppc/translate_init.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e2dc77c..1b7cada 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -219,7 +219,7 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset,
-         /* 16: Vector */
-         0x00, 0x00, 0x00, 0x00, 0x80, 0x00, /* 12 - 17 */
-         /* 18: Vec. Scalar, 20: Vec. XOR, 22: HTM */
--        0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 18 - 23 */
-+        0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 18 - 23 */
-         /* 24: Ext. Dec, 26: 64 bit ftrs, 28: PM ftrs */
-         0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 24 - 29 */
-         /* 30: MMR, 32: LE atomic, 34: EBB + ext EBB */
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 1ce6ab1..c0cd64d 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6578,6 +6578,8 @@ GEN_HANDLER(tlbia, 0x1F, 0x12, 0x0B, 0x03FFFC01, PPC_MEM_TLBIA),
+  * different ISA versions */
+ GEN_HANDLER(tlbiel, 0x1F, 0x12, 0x08, 0x001F0001, PPC_MEM_TLBIE),
+ GEN_HANDLER(tlbie, 0x1F, 0x12, 0x09, 0x001F0001, PPC_MEM_TLBIE),
++GEN_HANDLER_E(tlbiel, 0x1F, 0x12, 0x08, 0x00100001, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(tlbie, 0x1F, 0x12, 0x09, 0x00100001, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER(tlbsync, 0x1F, 0x16, 0x11, 0x03FFF801, PPC_MEM_TLBSYNC),
+ #if defined(TARGET_PPC64)
+ GEN_HANDLER(slbia, 0x1F, 0x12, 0x0F, 0x031FFC01, PPC_SLBI),
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 9b048cd..fda30b0 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8960,7 +8960,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+                        PPC_FLOAT_EXT |
+                        PPC_CACHE | PPC_CACHE_ICBI | PPC_CACHE_DCBZ |
+                        PPC_MEM_SYNC | PPC_MEM_EIEIO |
+-                       PPC_MEM_TLBIE | PPC_MEM_TLBSYNC |
++                       PPC_MEM_TLBSYNC |
+                        PPC_64B | PPC_64BX | PPC_ALTIVEC |
+                        PPC_SEGMENT_64B | PPC_SLBI |
+                        PPC_POPCNTB | PPC_POPCNTWD |
 -- 
 2.9.3
