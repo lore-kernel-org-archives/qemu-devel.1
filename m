@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d8rvz-0004eC-Ac
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:31:28 -0400
+	(envelope-from <mst@redhat.com>) id 1d8rxl-00065j-AB
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d8rvu-00089W-V7
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:31:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39686)
+	(envelope-from <mst@redhat.com>) id 1d8rxi-0000U2-Un
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:33:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d8rvu-00089G-Ou
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:31:22 -0400
-Date: Thu, 11 May 2017 13:31:19 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170511173119.GB8701@stefanha-x1.localdomain>
-References: <20170510153950.29343-1-laurent@vivier.eu>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1d8rxi-0000TG-MR
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:33:14 -0400
+Date: Thu, 11 May 2017 20:33:08 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170511202154-mutt-send-email-mst@kernel.org>
+References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
+	<20170511123246.31308-4-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uZ3hkaAS1mZxFaxD"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170510153950.29343-1-laurent@vivier.eu>
-Subject: Re: [Qemu-devel] [PATCH] maintainers: Add myself as linux-user
- reviewer
+In-Reply-To: <20170511123246.31308-4-maxime.coquelin@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/6] vhost: Update rings information for
+ IOTLB earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+
+On Thu, May 11, 2017 at 02:32:43PM +0200, Maxime Coquelin wrote:
+> Vhost-kernel backend need to receive IOTLB entries for rings
+> information early, but vhost-user need the same information
+> earlier, before VHOST_USER_SET_VRING_ADDR is sent.
+
+Weird. What does VHOST_USER_SET_VRING_ADDR have to do with it?
+
+According to
+	Starting and stopping rings
+in vhost user spec, vhost user does not access
+anything until ring is started and enabled.
 
 
---uZ3hkaAS1mZxFaxD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, May 10, 2017 at 05:39:50PM +0200, Laurent Vivier wrote:
-> I volunteer to review linux-user patches.
-> Adding myself will help to not miss some of them.
->=20
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> This patch also trigger IOTLB miss for all rings informations
+> for robustness, even if in practice these adresses are on the
+> same page.
+> 
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 > ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
+>  hw/virtio/vhost.c | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 748e331..817f6d0 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -799,7 +799,17 @@ static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
+>          .log_guest_addr = vq->used_phys,
+>          .flags = enable_log ? (1 << VHOST_VRING_F_LOG) : 0,
+>      };
+> -    int r = dev->vhost_ops->vhost_set_vring_addr(dev, &addr);
+> +    int r;
+> +
+> +    /* Update rings information for IOTLB to work correctly,
+> +     * vhost-kernel & vhost-user backends require for this.*/
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+Any requirements must be in the spec. Pls add them there.
+Pls fix comment style as you move code.
 
-Stefan
 
---uZ3hkaAS1mZxFaxD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZFJ/nAAoJEJykq7OBq3PIVDMIAL4NK5P5wSzxVlaGlAHff0vO
-HVsKdrSLVqHRghR+uXXNxl6ouBJVNScFUwjCBA7TeizABiwitO60J0+2889jCJUI
-dYDqTzP0W5a0N7RGfVhy9zYoH5CPq7AIZJ3YUvyET0E2krMXJwClXMoq16GHya5+
-1BvQDMN7IjkU4Ka0RdYsQeVtrZ+OIIHIaxnMvmLP8NwQBgnEncSNucY1F8btZ6uP
-S3qgJkgdANQN/Y2AmykxdwP5rT2IIa4LhB2sR9/lrQcmHAVJgNxhyyBoT7pkeuX0
-u5/q4jQPb5+n3QCRb8/l6xUq5fxFJmlKT9E+R9xi1eIPeOEOU2wIgpu0I4gBrJk=
-=YLAo
------END PGP SIGNATURE-----
-
---uZ3hkaAS1mZxFaxD--
+> +    if (vhost_dev_has_iommu(dev)) {
+> +        vhost_device_iotlb_miss(dev, addr.desc_user_addr, true);
+> +        vhost_device_iotlb_miss(dev, addr.used_user_addr, true);
+> +        vhost_device_iotlb_miss(dev, addr.avail_user_addr, true);
+> +    }
+> +
+> +    r = dev->vhost_ops->vhost_set_vring_addr(dev, &addr);
+>      if (r < 0) {
+>          VHOST_OPS_DEBUG("vhost_set_vring_addr failed");
+>          return -errno;
+> @@ -1551,13 +1561,6 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+>  
+>      if (vhost_dev_has_iommu(hdev)) {
+>          hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
+> -
+> -        /* Update used ring information for IOTLB to work correctly,
+> -         * vhost-kernel code requires for this.*/
+> -        for (i = 0; i < hdev->nvqs; ++i) {
+> -            struct vhost_virtqueue *vq = hdev->vqs + i;
+> -            vhost_device_iotlb_miss(hdev, vq->used_phys, true);
+> -        }
+>      }
+>      return 0;
+>  fail_log:
+> -- 
+> 2.9.3
