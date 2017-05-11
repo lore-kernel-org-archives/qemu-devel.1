@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8rv6-00047h-KC
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:30:33 -0400
+	(envelope-from <stefanha@redhat.com>) id 1d8rvN-0004Fl-1u
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8rv1-0007xf-MV
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:30:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33358)
+	(envelope-from <stefanha@redhat.com>) id 1d8rvJ-000829-0a
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:30:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35904)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d8rv1-0007wk-HA
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:30:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9FBD480F90
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 17:30:25 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-6-marcandre.lureau@redhat.com>
-Date: Thu, 11 May 2017 19:30:19 +0200
-In-Reply-To: <20170509173559.31598-6-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Tue, 9 May 2017 20:35:47 +0300")
-Message-ID: <874lwrqp1w.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d8rvI-00081Z-R3
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 13:30:44 -0400
+Date: Thu, 11 May 2017 13:30:38 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170511173038.GA8701@stefanha-x1.localdomain>
+References: <1494369432-15418-1-git-send-email-anthony.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/17] qapi: remove promote_int
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="45Z9DzgjV8m4Oswq"
+Content-Disposition: inline
+In-Reply-To: <1494369432-15418-1-git-send-email-anthony.xu@intel.com>
+Subject: Re: [Qemu-devel] [PATCH] trace: add sanity check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Anthony Xu <anthony.xu@intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> qnum_to_double() implicity promotes int now.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+--45Z9DzgjV8m4Oswq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-qnum_to_double() works for both for integers and doubles.  That's not
-really new; it's what we've always done when we need a double, see
-qobject_input_type_number() before your patch.
+On Tue, May 09, 2017 at 03:37:12PM -0700, Anthony Xu wrote:
+> If trace backend is set to TRACE_NOP, trace_get_vcpu_event_count
+> returns 0, cause bitmap_new call abort.
+>=20
+> Signed-off-by: Anthony Xu <anthony.xu@intel.com>
+> ---
+>  qom/cpu.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
-promote_int is about visit_start_alternate().  It's called before the
-switch over the alternate object's member type (of type QType).
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
 
-Input visitors allocate the alternate object, and set member type to a
-value determined by the input.  promote_int =3D true asks the input
-visitor to set type to QTYPE_QFLOAT when the input would otherwise call
-for QTYPE_QINT.
+Stefan
 
-Non-input visitors leave member type alone.
+--45Z9DzgjV8m4Oswq
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The generated visitors pass promote_int =3D true exactly when QTYPE_QINT
-isn't a valid type.  Without that, we'd have to monkey-patch QTYPE_QINT
-to QTYPE_QFLOAT in every generated visitor, just in case it's used with
-an input visitor.  Not exactly elegant, but it works.
+-----BEGIN PGP SIGNATURE-----
 
-The only input visitor that implements alternates right now is the
-QObject input visitor.
+iQEcBAEBAgAGBQJZFJ++AAoJEJykq7OBq3PIXG8H/35PXKv8QbDP4JYThuayfH3U
+Dr+ioC06UWYq6k7pCnxPNhZl945P4ejcpeMjfSSX2AFtYtOi9M+wzehgXg0eoygc
+a9Bgyof7/uSkTmQ4YNDTdVvOE/9CWGfddUPrZTpMmITbxTrIQxtLsCxdrRiaL4g+
+PQRDGLUXR0oy+btXrhzxNjM++7g4H+d2wWPJeqzCSz2/fQ2Jb4adqxE21aEmRGda
+xZND5d788mlBozicgsc9M3ADpAq47N1HmSBNs/MnKKDKBpj2Tq7FPGz/wEtQT+rj
+UpjSGj+zORTMAghdg3jTDIUYOH3xHSRnl48pw3b7DN4OtUWuMuqnA2np0DSYGoE=
+=QKD/
+-----END PGP SIGNATURE-----
 
-The previous patch fused QTYPE_QINT and QTYPE_QFLOAT, rendering
-promote_int useless and unused.
-
-Here's my attempt at a commit message:
-
-    qapi: Remove visit_start_alternate() parameter promote_int
-
-    Before the previous commit, parameter promote_int =3D true made
-    visit_start_alternate() with an input visitor avoid QTYPE_QINT
-    variants and create QTYPE_QFLOAT variants instead.  This was used
-    where QTYPE_QINT variants were invalid.
-
-    The previous commit fused QTYPE_QINT with QTYPE_QFLOAT, rendering
-    rendering promote_int useless and unused.
-
-Patch looks good to me.
+--45Z9DzgjV8m4Oswq--
