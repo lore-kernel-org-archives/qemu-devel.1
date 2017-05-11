@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8r2a-000744-8s
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:34:18 -0400
+	(envelope-from <kevin@koconnor.net>) id 1d8r3F-0007aw-Ss
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:34:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d8r2Z-00073O-9U
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:34:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46368)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d8r2Z-00073C-0L
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:34:11 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EC09780489
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 16:34:09 +0000 (UTC)
-Date: Thu, 11 May 2017 13:34:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170511163407.GK3482@thinpad.lan.raisama.net>
-References: <20170508183205.10884-1-ehabkost@redhat.com>
-	<20170511160000.277d67f7@nial.brq.redhat.com>
+	(envelope-from <kevin@koconnor.net>) id 1d8r3C-0007EM-1n
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:34:53 -0400
+Received: from mail-qt0-x235.google.com ([2607:f8b0:400d:c0d::235]:35474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1d8r3B-0007EC-TY
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 12:34:49 -0400
+Received: by mail-qt0-x235.google.com with SMTP id v27so9337620qtg.2
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 09:34:49 -0700 (PDT)
+Date: Thu, 11 May 2017 12:34:47 -0400
+From: Kevin O'Connor <kevin@koconnor.net>
+Message-ID: <20170511163447.GA7785@morn.lan>
+References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
+	<20170511145312.GA822@morn.lan>
+	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170511160000.277d67f7@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] tests: Add [+-]feature and
- feature=on|off test cases
+In-Reply-To: <618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,104 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, anthony.xu@intel.com
 
-On Thu, May 11, 2017 at 04:00:00PM +0200, Igor Mammedov wrote:
-> On Mon,  8 May 2017 15:32:05 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Thu, May 11, 2017 at 05:32:47PM +0200, Paolo Bonzini wrote:
+> On 11/05/2017 16:53, Kevin O'Connor wrote:
+> > On Thu, May 11, 2017 at 01:35:28PM +0200, Paolo Bonzini wrote:
+> >> Ignore env->a20_mask when running in system management mode.
+> > 
+> > Thanks Paolo.  I don't think this patch will help SeaBIOS though.  The
+> > SeaBIOS SMM handler doesn't do much - it doesn't even access ram above
+> > 1MiB.  See SeaBIOS' code in src/fw/smm.c:handle_smi().
+> > 
+> > Instead, the SeaBIOS code does a cpu state backup/restore to switch
+> > into 32bit mode.  I thought the A20 state would be part of that cpu
+> > backup/restore.  However, looking at the Intel SDM docs now, it's not
+> > really clear to me how the processor "inhibits" A20 when in SMM mode -
+> > does it save/restore that state on SMI/RSM or does it have special
+> > logic to ignore A20 while in SMM mode?
 > 
-> > Add test code to ensure features are enabled/disabled correctly in the
-> > command-line. The test case use the "feature-words" and
-> > "filtered-features" properties to check if the features were
-> > enabled/disabled correctly.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > Changes v1 -> v2:
-> > * Remove explicit "accel=" option to avoid triggering warnings
-> >   on "make check"
-> > * Use qdict_get_*() helpers to make code shorter
-> > * Rename input_eax, input_ecx to in_eax, in_ecx to make
-> >   lines fit in the coding style width limit
-> > * v1 was submitted as part of the series:
-> >   Subject: [PATCH 0/4] x86: Support "-cpu feature=force"
-> > * Coding style: split lines
-> > * Style changes on code comments
-> > ---
-> >  tests/test-x86-cpuid-compat.c | 111 ++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 111 insertions(+)
-> > 
-> > diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
-> [...]
-> > +    add_feature_test("x86/cpuid/features/max-plus-invtsc",
-> > +                     "-cpu max,+invtsc",
-> > +                     0x80000007, 0, "EDX", 8, true);
-> > +    add_feature_test("x86/cpuid/features/max-invtsc-on",
-> > +                     "-cpu max,invtsc=on",
-> > +                     0x80000007, 0, "EDX", 8, true);
-> > +    add_feature_test("x86/cpuid/features/max-minus-mmx",
-> > +                     "-cpu max,-mmx",
-> > +                     1, 0, "EDX", 23, false);
-> > +    add_feature_test("x86/cpuid/features/max-invtsc-on,mmx=off",
-> > +                     "-cpu max,mmx=off",
-> > +                     1, 0, "EDX", 23, false);
-> Why do you add 'max' variants in addition to 486/pentium?
+> There isn't any documented place for A20 in the state save map (I checked
+> AMD's BIOS/Kernel Developer Guide which is pretty comprehensive), so I
+> think the latter is more plausible.  What I'm doing in this patch is
+> ignoring A20 while in SMM mode.
 
-Because we already had bugs in the host/max logic in the past.
-See commit d4a606b38b5d4b3689b86cc1575908e82179ecfb for example.
+Okay.
 
-Let's enumerate each test case and the reason for them:
+> Then you would have to add an A20 save/restore in handle_smi; since 
+> CALL32SMM_ENTERID should not nest, I think you can just do this:
 
-+    add_feature_test("x86/cpuid/features/plus",
-+                     "-cpu 486,+arat",
-+                     6, 0, "EAX", 2, true);
+Yes, that should be fine.
 
-Here I need a CPU model with level < 6. 486. pentium, pentium2,
-pentium3 would work, and I chose 486. Conroe and newer won't
-work, because they already have level=10.
+> --- a/src/fw/smm.c
+> +++ b/src/fw/smm.c
+> @@ -54,7 +54,8 @@ struct smm_layout {
+>      struct smm_state backup2;
+>      u8 stack[0x7c00];
+>      u64 codeentry;
+> -    u8 pad_8008[0x7df8];
+> +    u8 a20;
+> +    u8 pad_8009[0x7df7];
+>      struct smm_state cpu;
+>  };
 
-+    add_feature_test("x86/cpuid/features/minus",
-+                     "-cpu pentium,-mmx",
-+                     1, 0, "EDX", 23, false);
+In order to avoid mixing code and data in the same cache line we could
+do this instead:
 
-Here I need a CPU model that has at least one feature I can
-disable. I decided to test "-mmx", and use the oldest CPU model
-that had MMX enabled (to increase the likelihood it is runnable
-on the host).
+ struct smm_layout {
+     struct smm_state backup1;
+     struct smm_state backup2;
+-    u8 stack[0x7c00];
++    u32 backup_a20;
++    u8 stack[0x8000 - sizeof(struct smm_state)*2 - sizeof(u32)];
+     u64 codeentry;
+     u8 pad_8008[0x7df8];
+     struct smm_state cpu;
 
-+    add_feature_test("x86/cpuid/features/on",
-+                     "-cpu 486,arat=on",
-+                     6, 0, "EAX", 2, true);
-+    add_feature_test("x86/cpuid/features/off",
-+                     "-cpu pentium,mmx=off",
-+                     1, 0, "EDX", 23, false);
-
-Same as above, but testing feat=on|off syntax.
-
-+    add_feature_test("x86/cpuid/features/max-plus-invtsc",
-+                     "-cpu max,+invtsc",
-+                     0x80000007, 0, "EDX", 8, true);
-+    add_feature_test("x86/cpuid/features/max-invtsc-on",
-+                     "-cpu max,invtsc=on",
-+                     0x80000007, 0, "EDX", 8, true);
-
-This is checking for the bugs fixed by commit
-46c032f3afcc05a0123914609f1003906ba63fda and commit
-d4a606b38b5d4b3689b86cc1575908e82179ecfb.
-
-
-+    add_feature_test("x86/cpuid/features/max-minus-mmx",
-+                     "-cpu max,-mmx",
-+                     1, 0, "EDX", 23, false);
-+    add_feature_test("x86/cpuid/features/max-invtsc-on,mmx=off",
-+                     "-cpu max,mmx=off",
-+                     1, 0, "EDX", 23, false);
-
-This is checking the bug fixed by commit
-d4a606b38b5d4b3689b86cc1575908e82179ecfb, but when disabling
-features.
-
-
--- 
-Eduardo
+Thanks,
+-Kevin
