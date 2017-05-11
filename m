@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAZ-0002RM-28
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAc-0002VA-CS
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAT-0007U0-3W
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAb-0007eu-CW
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:22 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:33 +0200
-Message-Id: <1494513181-7900-31-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:38 +0200
+Message-Id: <1494513181-7900-36-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 30/58] block: Drop permissions when migration
- completes
+Subject: [Qemu-devel] [PULL 35/58] nvme: Implement Write Zeroes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +22,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-With image locking, permissions affect other qemu processes as well. We
-want to be sure that the destination can run, so let's drop permissions
-on the source when migration completes.
+From: Christoph Hellwig <hch@lst.de>
 
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+[hch: ported over from qemu-nvme.git to mainline]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Keith Busch <keith.busch@intel.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c                   | 12 +++++++++++-
- block/block-backend.c     | 25 +++++++++++++++++++++++++
- include/block/block_int.h |  7 ++++---
- 3 files changed, 40 insertions(+), 4 deletions(-)
+ hw/block/nvme.c | 26 ++++++++++++++++++++++++++
+ hw/block/nvme.h |  1 +
+ 2 files changed, 27 insertions(+)
 
-diff --git a/block.c b/block.c
-index c8e6de2..444a52e 100644
---- a/block.c
-+++ b/block.c
-@@ -4019,7 +4019,7 @@ void bdrv_invalidate_cache_all(Error **errp)
- static int bdrv_inactivate_recurse(BlockDriverState *bs,
-                                    bool setting_flag)
- {
--    BdrvChild *child;
-+    BdrvChild *child, *parent;
-     int ret;
- 
-     if (!setting_flag && bs->drv->bdrv_inactivate) {
-@@ -4038,6 +4038,16 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
- 
-     if (setting_flag) {
-         bs->open_flags |= BDRV_O_INACTIVE;
-+
-+        QLIST_FOREACH(parent, &bs->parents, next_parent) {
-+            if (parent->role->inactivate) {
-+                ret = parent->role->inactivate(parent);
-+                if (ret < 0) {
-+                    bs->open_flags &= ~BDRV_O_INACTIVE;
-+                    return ret;
-+                }
-+            }
-+        }
-     }
-     return 0;
- }
-diff --git a/block/block-backend.c b/block/block-backend.c
-index a7ce72b..f3a6008 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -156,6 +156,30 @@ static void blk_root_activate(BdrvChild *child, Error **errp)
-     }
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index ae303d4..7428db9 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -227,6 +227,29 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     return NVME_NO_COMPLETE;
  }
  
-+static int blk_root_inactivate(BdrvChild *child)
++static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
++    NvmeRequest *req)
 +{
-+    BlockBackend *blk = child->opaque;
++    NvmeRwCmd *rw = (NvmeRwCmd *)cmd;
++    const uint8_t lba_index = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
++    const uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
++    uint64_t slba = le64_to_cpu(rw->slba);
++    uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
++    uint64_t aio_slba = slba << (data_shift - BDRV_SECTOR_BITS);
++    uint32_t aio_nlb = nlb << (data_shift - BDRV_SECTOR_BITS);
 +
-+    if (blk->disable_perm) {
-+        return 0;
++    if (slba + nlb > ns->id_ns.nsze) {
++        return NVME_LBA_RANGE | NVME_DNR;
 +    }
 +
-+    /* Only inactivate BlockBackends for guest devices (which are inactive at
-+     * this point because the VM is stopped) and unattached monitor-owned
-+     * BlockBackends. If there is still any other user like a block job, then
-+     * we simply can't inactivate the image. */
-+    if (!blk->dev && !blk->name[0]) {
-+        return -EPERM;
-+    }
-+
-+    blk->disable_perm = true;
-+    if (blk->root) {
-+        bdrv_child_try_set_perm(blk->root, 0, BLK_PERM_ALL, &error_abort);
-+    }
-+
-+    return 0;
++    req->has_sg = false;
++    block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
++                     BLOCK_ACCT_WRITE);
++    req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, aio_slba, aio_nlb,
++                                        BDRV_REQ_MAY_UNMAP, nvme_rw_cb, req);
++    return NVME_NO_COMPLETE;
 +}
 +
- static const BdrvChildRole child_root = {
-     .inherit_options    = blk_root_inherit_options,
- 
-@@ -168,6 +192,7 @@ static const BdrvChildRole child_root = {
-     .drained_end        = blk_root_drained_end,
- 
-     .activate           = blk_root_activate,
-+    .inactivate         = blk_root_inactivate,
+ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     NvmeRequest *req)
+ {
+@@ -279,6 +302,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+     switch (cmd->opcode) {
+     case NVME_CMD_FLUSH:
+         return nvme_flush(n, ns, cmd, req);
++    case NVME_CMD_WRITE_ZEROS:
++        return nvme_write_zeros(n, ns, cmd, req);
+     case NVME_CMD_WRITE:
+     case NVME_CMD_READ:
+         return nvme_rw(n, ns, cmd, req);
+@@ -895,6 +920,7 @@ static int nvme_init(PCIDevice *pci_dev)
+     id->sqes = (0x6 << 4) | 0x6;
+     id->cqes = (0x4 << 4) | 0x4;
+     id->nn = cpu_to_le32(n->num_namespaces);
++    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS);
+     id->psd[0].mp = cpu_to_le16(0x9c4);
+     id->psd[0].enlat = cpu_to_le32(0x10);
+     id->psd[0].exlat = cpu_to_le32(0x4);
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 8fb0c10..a0d1564 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -179,6 +179,7 @@ enum NvmeIoCommands {
+     NVME_CMD_READ               = 0x02,
+     NVME_CMD_WRITE_UNCOR        = 0x04,
+     NVME_CMD_COMPARE            = 0x05,
++    NVME_CMD_WRITE_ZEROS        = 0x08,
+     NVME_CMD_DSM                = 0x09,
  };
  
- /*
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 5637925..5750a44 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -473,10 +473,11 @@ struct BdrvChildRole {
-     void (*drained_begin)(BdrvChild *child);
-     void (*drained_end)(BdrvChild *child);
- 
--    /* Notifies the parent that the child has been activated (e.g. when
--     * migration is completing) and it can start requesting permissions and
--     * doing I/O on it. */
-+    /* Notifies the parent that the child has been activated/inactivated (e.g.
-+     * when migration is completing) and it can start/stop requesting
-+     * permissions and doing I/O on it. */
-     void (*activate)(BdrvChild *child, Error **errp);
-+    int (*inactivate)(BdrvChild *child);
- 
-     void (*attach)(BdrvChild *child);
-     void (*detach)(BdrvChild *child);
 -- 
 1.8.3.1
