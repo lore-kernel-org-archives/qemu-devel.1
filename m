@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pA5-0001k1-4W
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pA7-0001ne-94
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pA4-0006zn-3d
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pA6-00072L-EH
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:33:51 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:18 +0200
-Message-Id: <1494513181-7900-16-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:22 +0200
+Message-Id: <1494513181-7900-20-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/58] file-posix: Add 'locking' option
+Subject: [Qemu-devel] [PULL 19/58] osdep: Add qemu_lock_fd and qemu_unlock_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +24,89 @@ Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
 From: Fam Zheng <famz@redhat.com>
 
-Making this option available even before implementing it will let
-converting tests easier: in coming patches they can specify the option
-already when necessary, before we actually write code to lock the
-images.
+They are wrappers of POSIX fcntl "file private locking", with a
+convenient "try lock" wrapper implemented with F_OFD_GETLK.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c   | 5 +++++
- qapi/block-core.json | 4 ++++
- 2 files changed, 9 insertions(+)
+ include/qemu/osdep.h |  3 +++
+ util/osdep.c         | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 19c48a0..d13e99c 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -392,6 +392,11 @@ static QemuOptsList raw_runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "host AIO implementation (threads, native)",
-         },
-+        {
-+            .name = "locking",
-+            .type = QEMU_OPT_STRING,
-+            .help = "file locking mode (on/off/auto, default: auto)",
-+        },
-         { /* end of list */ }
-     },
- };
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 30d5952..52e3ecd 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2127,11 +2127,15 @@
- #
- # @filename:    path to the image file
- # @aio:         AIO backend (default: threads) (since: 2.8)
-+# @locking:     whether to enable file locking. If set to 'auto', only enable
-+#               when Open File Descriptor (OFD) locking API is available
-+#               (default: auto, since 2.10)
- #
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsFile',
-   'data': { 'filename': 'str',
-+            '*locking': 'OnOffAuto',
-             '*aio': 'BlockdevAioOptions' } }
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 122ff06..1c9f5e2 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -341,6 +341,9 @@ int qemu_close(int fd);
+ #ifndef _WIN32
+ int qemu_dup(int fd);
+ #endif
++int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
++int qemu_unlock_fd(int fd, int64_t start, int64_t len);
++int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
  
- ##
+ #if defined(__HAIKU__) && defined(__i386__)
+ #define FMT_pid "%ld"
+diff --git a/util/osdep.c b/util/osdep.c
+index 06fb1cf..3de4a18 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -140,6 +140,54 @@ static int qemu_parse_fdset(const char *param)
+ {
+     return qemu_parse_fd(param);
+ }
++
++static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
++{
++#ifdef F_OFD_SETLK
++    int ret;
++    struct flock fl = {
++        .l_whence = SEEK_SET,
++        .l_start  = start,
++        .l_len    = len,
++        .l_type   = fl_type,
++    };
++    ret = fcntl(fd, F_OFD_SETLK, &fl);
++    return ret == -1 ? -errno : 0;
++#else
++    return -ENOTSUP;
++#endif
++}
++
++int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive)
++{
++    return qemu_lock_fcntl(fd, start, len, exclusive ? F_WRLCK : F_RDLCK);
++}
++
++int qemu_unlock_fd(int fd, int64_t start, int64_t len)
++{
++    return qemu_lock_fcntl(fd, start, len, F_UNLCK);
++}
++
++int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
++{
++#ifdef F_OFD_SETLK
++    int ret;
++    struct flock fl = {
++        .l_whence = SEEK_SET,
++        .l_start  = start,
++        .l_len    = len,
++        .l_type   = exclusive ? F_WRLCK : F_RDLCK,
++    };
++    ret = fcntl(fd, F_OFD_GETLK, &fl);
++    if (ret == -1) {
++        return -errno;
++    } else {
++        return fl.l_type == F_UNLCK ? 0 : -EAGAIN;
++    }
++#else
++    return -ENOTSUP;
++#endif
++}
+ #endif
+ 
+ /*
 -- 
 1.8.3.1
