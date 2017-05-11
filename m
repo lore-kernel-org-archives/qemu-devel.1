@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8pqy-00012T-C0
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:18:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1d8ps0-0001yn-Ld
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:19:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d8pqx-0000FF-8d
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:18:08 -0400
-References: <20170511151126.20323-1-jsnow@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1d8prz-0000VZ-Jv
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:19:12 -0400
+References: <20170411011718.9152-1-eblake@redhat.com>
+	<20170411011718.9152-2-eblake@redhat.com>
+	<20170412094909.GC4955@noname.str.redhat.com>
+	<161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <cf739d3c-522a-6cac-a672-752a6efecca7@redhat.com>
-Date: Thu, 11 May 2017 10:17:45 -0500
+Message-ID: <4a52f728-f1c0-8419-da1a-4112df1b0959@redhat.com>
+Date: Thu, 11 May 2017 10:18:59 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170511151126.20323-1-jsnow@redhat.com>
+In-Reply-To: <161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Xl6ahsbExTFdmt7CUbxVVx7rhav7dkxNo"
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-img: Check for backing image if
- specified during create
+	boundary="G2N1GROFdkOJa87vrlnKfNWCdJtWWDuJ6"
+Subject: Re: [Qemu-devel] [PATCH v9 01/13] qcow2: Unallocate unmapped zero
+ clusters if no backing file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Xl6ahsbExTFdmt7CUbxVVx7rhav7dkxNo
+--G2N1GROFdkOJa87vrlnKfNWCdJtWWDuJ6
 From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
-Message-ID: <cf739d3c-522a-6cac-a672-752a6efecca7@redhat.com>
-Subject: Re: [PATCH v3] qemu-img: Check for backing image if specified during
- create
-References: <20170511151126.20323-1-jsnow@redhat.com>
-In-Reply-To: <20170511151126.20323-1-jsnow@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com,
+ John Snow <jsnow@redhat.com>
+Message-ID: <4a52f728-f1c0-8419-da1a-4112df1b0959@redhat.com>
+Subject: Re: [PATCH v9 01/13] qcow2: Unallocate unmapped zero clusters if no
+ backing file
+References: <20170411011718.9152-1-eblake@redhat.com>
+ <20170411011718.9152-2-eblake@redhat.com>
+ <20170412094909.GC4955@noname.str.redhat.com>
+ <161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
+In-Reply-To: <161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05/11/2017 10:11 AM, John Snow wrote:
-> Or, rather, force the open of a backing image if one was specified
-> for creation. Using a similar -unsafe option as rebase, allow qemu-img
-> to ignore the backing file validation if possible.
+On 05/11/2017 09:56 AM, Eric Blake wrote:
 >=20
-> It may not always be possible, as in the existing case when a filesize
-> for the new image was not specified.
+> On IRC, John, Kevin, and I were discussing the current situation with
+> libvirt NBD storage migration.  When libvirt creates a file on the
+> destination (rather than the user pre-creating it), it currently
+> defaults to 0.10 [v2] images, even if the source was a 1.1 image [v3]
+> (arguably something that could be improved in libvirt, but
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1371749 was closed as not=
+ a
+> bug).
 >=20
-> This is accomplished by shifting around the conditionals in
-> bdrv_img_create, such that a backing file is always opened unless we
-> provide BDRV_O_NO_BACKING. qemu-img is adjusted to pass this new flag
-> when -u is provided to create.
->=20
-> Sorry for the heinous looking diffstat, but it's mostly whitespace.
->=20
-> Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=3D1213786
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
-> v3: Rebased
->=20
+> Therefore, the use case of doing a mirror job to a v2 image, and having=
 
-> +++ b/qemu-img.c
-> @@ -145,9 +145,11 @@ static void QEMU_NORETURN help(void)
->             "  'snapshot_id_or_name' is deprecated, use 'snapshot_param=
-'\n"
->             "    instead\n"
->             "  '-c' indicates that target image must be compressed (qco=
-w format only)\n"
-> -           "  '-u' enables unsafe rebasing. It is assumed that old and=
- new backing file\n"
-> -           "       match exactly. The image doesn't need a working bac=
-king file before\n"
-> -           "       rebasing in this case (useful for renaming the back=
-ing file)\n"
-> +           "  '-u' allows unsafe backing chains. For rebasing, it is a=
-ssumed that old and new\n"
-> +           "       backing file match exactly. The image doesn't need =
-a working backing file\n"
-> +           "       before rebasing in this case (useful for renaming t=
-he backing file)\n"
-> +           "       For image creation, allow creating without attempti=
-ng to"
-> +           "       open the backing file.\n"
+> that image become thick even though the source was thin, is happening
+> more than we'd like
+> (https://bugzilla.redhat.com/show_bug.cgi?id=3D1371749).  While Kevin h=
+ad
 
-You forgot to fix my v2 review comments ('.', \n)
-
-With that (actually) fixed,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Bah, pasted the wrong link.  Correct one is:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1219541
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -96,7 +74,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---Xl6ahsbExTFdmt7CUbxVVx7rhav7dkxNo
+--G2N1GROFdkOJa87vrlnKfNWCdJtWWDuJ6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -106,13 +84,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZFICZAAoJEKeha0olJ0NqG+gH/3lUqDqqppcz31tJ5PVE7AVD
-4anJzyDy71umuX7Bq4F1cEESfdcZThP/Xs26/ay2eijbG14WOdz+gaRNtFUMf9Wc
-/tVm4lAKV/xNH0s7dFy/H6jyM/xcHvsixlejXk4o30IY9fTsAAjwbMFMW2+c3h8R
-k2ugzzhCjCdQBdMSWphwLgLbMpZr/nMn2jgyiD07z1+phnTwKAAZ6T7Ex+fXhrst
-ODNIvLc8AEvLr2WapCkWpSIzZiwGOQ6Z1aWIHSB1gbzJ8K6/nRHUo/Tz2V2ItoWf
-UzH+7N6GfBoRhCvZHwnf3XVhEfh811ADFjXKfKG2vTvEBNmzG6MdO+gfoj5xfuc=
-=Ls19
+iQEcBAEBCAAGBQJZFIDjAAoJEKeha0olJ0Nqp1sH/j1/kfIUriHg/5dMf2PcCCFZ
+vjSj85cmgkyY7I4Yk8nuAYeplOfaWZZHa4q1lrGaatKngkgTEFPrYFuNnRZijkk1
+hl6Sr/qBWtfqbACTq8rfl/OZR4rYCMkAD8A8v4M53Hq+wg0VzIiHY04bTeK+IZxd
+zZMOlTzvzdXDmayHo981HYA96yZ+Ntg8cxAEggzXmtXACfyObj1Uyg/AGtlyio++
+LjaMhDSCYkDJ3LV6tCj6S3xpvYLQLGeULAHopxKHrO/TlrdNMjBnQcn8UAouvwY6
+iDazKnYaJbmG1zzeLQFa6baj4gGjDodzf8VNsO01oIr6J+G/lSGOfPfoewjfMko=
+=NU9e
 -----END PGP SIGNATURE-----
 
---Xl6ahsbExTFdmt7CUbxVVx7rhav7dkxNo--
+--G2N1GROFdkOJa87vrlnKfNWCdJtWWDuJ6--
