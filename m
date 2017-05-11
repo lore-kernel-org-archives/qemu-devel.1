@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8g7Q-0006zM-3d
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:54:29 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d8g8s-00086X-Av
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:55:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d8g7O-0006of-UF
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:54:28 -0400
-Date: Thu, 11 May 2017 14:39:30 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170511043930.GH14408@umbus.fritz.box>
-References: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
-	<1494415802-227633-12-git-send-email-imammedo@redhat.com>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1d8g8p-0007wG-0a
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:55:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34309
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1d8g8o-0007vJ-Qz
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 00:55:54 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4B4sHtw018452
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 00:55:53 -0400
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ac8nekrkg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 00:55:53 -0400
+Received: from localhost
+	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Thu, 11 May 2017 14:55:50 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170510200535.13268-8-f4bug@amsat.org>
+References: <20170510200535.13268-1-f4bug@amsat.org>
+	<20170510200535.13268-8-f4bug@amsat.org>
+Date: Thu, 11 May 2017 10:24:55 +0530
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="vtJ+CqYNzKB4ukR4"
-Content-Disposition: inline
-In-Reply-To: <1494415802-227633-12-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 11/18] QMP: include
- CpuInstanceProperties into query_cpus output output
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <877f1oyov4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH 7/8] target/ppc: optimize various functions
+ using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +43,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
---vtJ+CqYNzKB4ukR4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, May 10, 2017 at 01:29:55PM +0200, Igor Mammedov wrote:
-> if board supports CpuInstanceProperties, report them for
-> each CPU thread listed. Main motivation for this is to
-> provide these properties introspection via QMP interface
-> for using in test cases to verify numa node to cpu mapping,
-> which includes not only boards that support cpu hotplug
-> and have this info in query-hotpluggable-cpus (pc/spapr)
-> but also for boards that don't not support hotpluggable-cpus
-> but support numa mapping (virt-arm).
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
+> Applied using Coccinelle script.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
-> v2:
->   * fix checkpatch error and remove extra space after =3D (Eric)
-> ---
->  cpus.c           | 10 ++++++++++
->  qapi-schema.json |  6 +++++-
->  2 files changed, 15 insertions(+), 1 deletion(-)
->=20
-> diff --git a/cpus.c b/cpus.c
-> index 740b8dc..4f91d25 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -50,6 +50,7 @@
->  #include "qapi-event.h"
->  #include "hw/nmi.h"
->  #include "sysemu/replay.h"
-> +#include "hw/boards.h"
-> =20
->  #ifdef CONFIG_LINUX
-> =20
-> @@ -1859,6 +1860,8 @@ void list_cpus(FILE *f, fprintf_function cpu_fprint=
-f, const char *optarg)
-> =20
->  CpuInfoList *qmp_query_cpus(Error **errp)
->  {
-> +    MachineState *ms =3D MACHINE(qdev_get_machine());
-> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
->      CpuInfoList *head =3D NULL, *cur_item =3D NULL;
->      CPUState *cpu;
-> =20
-> @@ -1909,6 +1912,13 @@ CpuInfoList *qmp_query_cpus(Error **errp)
->  #else
->          info->value->arch =3D CPU_INFO_ARCH_OTHER;
->  #endif
-> +        info->value->has_props =3D !!mc->cpu_index_to_instance_props;
-> +        if (info->value->has_props) {
-> +            CpuInstanceProperties *props;
-> +            props =3D g_malloc0(sizeof(*props));
-> +            *props =3D mc->cpu_index_to_instance_props(ms, cpu->cpu_inde=
-x);
-> +            info->value->props =3D props;
-> +        }
-> =20
->          /* XXX: waiting for the qapi to support GSList */
->          if (!cur_item) {
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index bf48873..f1bcebe 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -1325,6 +1325,9 @@
->  #
->  # @thread_id: ID of the underlying host thread
->  #
-> +# @props: properties describing to which node/socket/core/thread
-> +#         virtual CPU belongs to, provided if supported by board (since =
-2.10)
-> +#
->  # @arch: architecture of the cpu, which determines which additional fiel=
-ds
->  #        will be listed (since 2.6)
->  #
-> @@ -1335,7 +1338,8 @@
->  ##
->  { 'union': 'CpuInfo',
->    'base': {'CPU': 'int', 'current': 'bool', 'halted': 'bool',
-> -           'qom_path': 'str', 'thread_id': 'int', 'arch': 'CpuInfoArch' =
-},
-> +           'qom_path': 'str', 'thread_id': 'int',
-> +           '*props': 'CpuInstanceProperties', 'arch': 'CpuInfoArch' },
->    'discriminator': 'arch',
->    'data': { 'x86': 'CpuInfoX86',
->              'sparc': 'CpuInfoSPARC',
+>  target/ppc/translate.c              |  9 +++------
+>  target/ppc/translate/vsx-impl.inc.c | 21 +++++++--------------
+>  2 files changed, 10 insertions(+), 20 deletions(-)
+>
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index f40b5a1abf..64ab412bf3 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -868,8 +868,7 @@ static inline void gen_op_arith_add(DisasContext *ctx=
+, TCGv ret, TCGv arg1,
+>              }
+>              tcg_gen_xor_tl(cpu_ca, t0, t1);        /* bits changed w/ ca=
+rry */
+>              tcg_temp_free(t1);
+> -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);   /* extract bit 32 */
+> -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
+> +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
+>              if (is_isa300(ctx)) {
+>                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>              }
+> @@ -1399,8 +1398,7 @@ static inline void gen_op_arith_subf(DisasContext *=
+ctx, TCGv ret, TCGv arg1,
+>              tcg_temp_free(inv1);
+>              tcg_gen_xor_tl(cpu_ca, t0, t1);         /* bits changes w/ c=
+arry */
+>              tcg_temp_free(t1);
+> -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);    /* extract bit 32 */
+> -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
+> +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
+>              if (is_isa300(ctx)) {
+>                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>              }
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Above changes are correct.
 
---vtJ+CqYNzKB4ukR4
-Content-Type: application/pgp-signature; name="signature.asc"
+Rest of them are wrong as discussed above in the thread with Richard.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+> @@ -5383,8 +5381,7 @@ static void gen_mfsri(DisasContext *ctx)
+>      CHK_SV;
+>      t0 =3D tcg_temp_new();
+>      gen_addr_reg_index(ctx, t0);
+> -    tcg_gen_shri_tl(t0, t0, 28);
+> -    tcg_gen_andi_tl(t0, t0, 0xF);
+> +    tcg_gen_extract_tl(t0, t0, 28, 0xF);
+>      gen_helper_load_sr(cpu_gpr[rd], cpu_env, t0);
+>      tcg_temp_free(t0);
+>      if (ra !=3D 0 && ra !=3D rd)
+> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+> index 7f12908029..354a6b113a 100644
+> --- a/target/ppc/translate/vsx-impl.inc.c
+> +++ b/target/ppc/translate/vsx-impl.inc.c
+> @@ -1262,8 +1262,7 @@ static void gen_xsxexpqp(DisasContext *ctx)
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> -    tcg_gen_shri_i64(xth, xbh, 48);
+> -    tcg_gen_andi_i64(xth, xth, 0x7FFF);
+> +    tcg_gen_extract_i64(xth, xbh, 48, 0x7FFF);
+>      tcg_gen_movi_i64(xtl, 0);
+>  }
+>
+> @@ -1431,10 +1430,8 @@ static void gen_xvxexpsp(DisasContext *ctx)
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> -    tcg_gen_shri_i64(xth, xbh, 23);
+> -    tcg_gen_andi_i64(xth, xth, 0xFF000000FF);
+> -    tcg_gen_shri_i64(xtl, xbl, 23);
+> -    tcg_gen_andi_i64(xtl, xtl, 0xFF000000FF);
+> +    tcg_gen_extract_i64(xth, xbh, 23, 0xFF000000FF);
+> +    tcg_gen_extract_i64(xtl, xbl, 23, 0xFF000000FF);
+>  }
+>
+>  static void gen_xvxexpdp(DisasContext *ctx)
+> @@ -1448,10 +1445,8 @@ static void gen_xvxexpdp(DisasContext *ctx)
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> -    tcg_gen_shri_i64(xth, xbh, 52);
+> -    tcg_gen_andi_i64(xth, xth, 0x7FF);
+> -    tcg_gen_shri_i64(xtl, xbl, 52);
+> -    tcg_gen_andi_i64(xtl, xtl, 0x7FF);
+> +    tcg_gen_extract_i64(xth, xbh, 52, 0x7FF);
+> +    tcg_gen_extract_i64(xtl, xbl, 52, 0x7FF);
+>  }
+>
+>  GEN_VSX_HELPER_2(xvxsigsp, 0x00, 0x04, 0, PPC2_ISA300)
+> @@ -1474,16 +1469,14 @@ static void gen_xvxsigdp(DisasContext *ctx)
+>      zr =3D tcg_const_i64(0);
+>      nan =3D tcg_const_i64(2047);
+>
+> -    tcg_gen_shri_i64(exp, xbh, 52);
+> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
+> +    tcg_gen_extract_i64(exp, xbh, 52, 0x7FF);
+>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+>      tcg_gen_andi_i64(xth, xbh, 0x000FFFFFFFFFFFFF);
+>      tcg_gen_or_i64(xth, xth, t0);
+>
+> -    tcg_gen_shri_i64(exp, xbl, 52);
+> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
+> +    tcg_gen_extract_i64(exp, xbl, 52, 0x7FF);
+>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
 
-iQIcBAEBCAAGBQJZE+sCAAoJEGw4ysog2bOSp60QAJ9NhVZZcYbkgm2HOu0LyXyl
-995TwhAkv6VRO5b2sfqi5MxUhWGNh0fi6yYoD0bF1cREwc9uJ8aTGMLuil+pIFQy
-YX3JkS9y1wXtB4vhB577VH9iPJcmsANlLBPW24g6VUWmmg5Soc9Gsqo7ECRDtt3V
-P4Mn4ntyDctaljsrhjiiowZHJUlHb0qE5m3gASZaCAknt5qcMF2AWm/yZTc7CYDU
-FTznJkIZju22J3ED6klUWbvyoVoBQZgYegKCDGBw0qH0nj9jkknE8VrV5zZ4yxaQ
-VxOVKriIYccByrlIOGvFZsBUxBXFwEchysBOeBPn3kpKXcV1pFYJ6up4Mv3ssSc3
-TgaMp6HFT+q9zYuF4IB/YTCc4yo3DO1id20LEeHSehrFbgzfDQ7J7zN6td+AwJmp
-e/rBT+CqhYiFDd0oi8n7AVOulrVjOQuar3v4oE6LES99xRBQ4v4n0XCqDPtU9nGz
-p0rnLDLPd5R3L91rinXPFECeq1+44e3BSXQuX6SbRqw61M7BuW2CgLZw0PcROfWv
-pJVvgQbOBDpRJahbS8hjCxx9gWi7G9C7TPBtrorkZv9vOJmhClS13GjMZpCIUeaz
-/3Y6Y+mzT5R5/0DajhHw+o5A239s0KIPn2OElY8oeU0a6XGobDKbqaLoDPIVq2jP
-2svn3w80KozS9ewQA/PP
-=dQP1
------END PGP SIGNATURE-----
-
---vtJ+CqYNzKB4ukR4--
+Regards
+Nikunj
