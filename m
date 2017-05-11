@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAj-0002dX-PW
+	(envelope-from <kwolf@redhat.com>) id 1d8pAe-0002Xu-NG
 	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1d8pAj-0007rP-1L
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1d8pAd-0007ix-SJ
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 10:34:24 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 May 2017 16:32:43 +0200
-Message-Id: <1494513181-7900-41-git-send-email-kwolf@redhat.com>
+Date: Thu, 11 May 2017 16:32:40 +0200
+Message-Id: <1494513181-7900-38-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
 References: <1494513181-7900-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 40/58] blkdebug: Sanity check block layer
- guarantees
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 37/58] qemu-io: Improve alignment checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +27,84 @@ Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-Commits 04ed95f4 and 1a62d0ac updated the block layer to auto-fragment
-any I/O to fit within device boundaries. Additionally, when using a
-minimum alignment of 4k, we want to ensure the block layer does proper
-read-modify-write rather than requesting I/O on a slice of a sector.
-Let's enforce that the contract is obeyed when using blkdebug.  For
-now, blkdebug only allows alignment overrides, and just inherits other
-limits from whatever device it is wrapping, but a future patch will
-further enhance things.
+Several copy-and-pasted alignment checks exist in qemu-io, which
+could use some minor improvements:
 
+- Manual comparison against 0x1ff is not as clean as using our
+alignment macros (QEMU_IS_ALIGNED) from osdep.h.
+
+- The error messages aren't quite grammatically correct.
+
+Suggested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-id: 20170429191419.30051-2-eblake@redhat.com
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170429191419.30051-5-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/blkdebug.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ qemu-io-cmds.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 3c08893..a562e2e 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -429,6 +429,13 @@ blkdebug_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-     BDRVBlkdebugState *s = bs->opaque;
-     BlkdebugRule *rule = NULL;
- 
-+    /* Sanity check block layer guarantees */
-+    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
-+    assert(QEMU_IS_ALIGNED(bytes, bs->bl.request_alignment));
-+    if (bs->bl.max_transfer) {
-+        assert(bytes <= bs->bl.max_transfer);
-+    }
-+
-     QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
-         uint64_t inject_offset = rule->options.inject.offset;
- 
-@@ -453,6 +460,13 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-     BDRVBlkdebugState *s = bs->opaque;
-     BlkdebugRule *rule = NULL;
- 
-+    /* Sanity check block layer guarantees */
-+    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
-+    assert(QEMU_IS_ALIGNED(bytes, bs->bl.request_alignment));
-+    if (bs->bl.max_transfer) {
-+        assert(bytes <= bs->bl.max_transfer);
-+    }
-+
-     QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
-         uint64_t inject_offset = rule->options.inject.offset;
- 
--- 
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 21af9e6..6a0024b 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -740,13 +740,13 @@ static int read_f(BlockBackend *blk, int argc, char=
+ **argv)
+     }
+=20
+     if (bflag) {
+-        if (offset & 0x1ff) {
+-            printf("offset %" PRId64 " is not sector aligned\n",
++        if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
++            printf("%" PRId64 " is not a sector-aligned value for 'offse=
+t'\n",
+                    offset);
+             return 0;
+         }
+-        if (count & 0x1ff) {
+-            printf("count %"PRId64" is not sector aligned\n",
++        if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
++            printf("%"PRId64" is not a sector-aligned value for 'count'\=
+n",
+                    count);
+             return 0;
+         }
+@@ -1050,14 +1050,14 @@ static int write_f(BlockBackend *blk, int argc, c=
+har **argv)
+     }
+=20
+     if (bflag || cflag) {
+-        if (offset & 0x1ff) {
+-            printf("offset %" PRId64 " is not sector aligned\n",
++        if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
++            printf("%" PRId64 " is not a sector-aligned value for 'offse=
+t'\n",
+                    offset);
+             return 0;
+         }
+=20
+-        if (count & 0x1ff) {
+-            printf("count %"PRId64" is not sector aligned\n",
++        if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
++            printf("%"PRId64" is not a sector-aligned value for 'count'\=
+n",
+                    count);
+             return 0;
+         }
+@@ -1769,8 +1769,8 @@ static int alloc_f(BlockBackend *blk, int argc, cha=
+r **argv)
+     if (offset < 0) {
+         print_cvtnum_err(offset, argv[1]);
+         return 0;
+-    } else if (offset & 0x1ff) {
+-        printf("offset %" PRId64 " is not sector aligned\n",
++    } else if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
++        printf("%" PRId64 " is not a sector-aligned value for 'offset'\n=
+",
+                offset);
+         return 0;
+     }
+--=20
 1.8.3.1
