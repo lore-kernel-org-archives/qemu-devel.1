@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8pjI-00023q-Rb
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:10:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1d8pkk-0003Me-JL
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1d8pjF-0006SF-UV
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:10:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33024)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1d8pjF-0006Qq-M2
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:10:09 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
-	<20170510090841.GF31558@redhat.com>
-	<e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
-	<20170510103153.GI31558@redhat.com>
-	<ccb8fecd-e918-1cc0-28ef-af9865540fbc@redhat.com>
-	<157a6609-d75a-5d40-e5b9-c70802e40950@redhat.com>
-	<20170511093022.GJ8639@redhat.com>
-Date: Thu, 11 May 2017 17:10:02 +0200
-In-Reply-To: <20170511093022.GJ8639@redhat.com> (Daniel P. Berrange's message
-	of "Thu, 11 May 2017 10:30:22 +0100")
-Message-ID: <87poffsa45.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
- pc-0.15
+	(envelope-from <jsnow@redhat.com>) id 1d8pki-0006pF-PN
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 11:11:42 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Thu, 11 May 2017 11:11:26 -0400
+Message-Id: <20170511151126.20323-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] qemu-img: Check for backing image if
+ specified during create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +18,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-"Daniel P. Berrange" <berrange@redhat.com> writes:
+Or, rather, force the open of a backing image if one was specified
+for creation. Using a similar -unsafe option as rebase, allow qemu-img
+to ignore the backing file validation if possible.
 
-> On Wed, May 10, 2017 at 06:15:39PM +0200, Paolo Bonzini wrote:
->> 
->> 
->> On 10/05/2017 16:47, Thomas Huth wrote:
->> >> So while we can delete pc-0.12, we can't delete associated features needed
->> >> by pc-0.12, without complicating RHEL's ability to create its back-compat
->> >> machine types. Downstream would have to un-delete the features.
->> >
->> > So I guess this is why Paolo said that pc-0.12 is still in "use" ... I
->> > think removing pc-0.12, but not removing rombar=0 will cause confusion
->> > in the upstream code base sooner or later,
->> 
->> I agree.
->> 
->> > so I guess we should rather
->> > keep the pc-0.12 machine until we can get rid of it together with the
->> > rombar code. We should still mark it as deprecated, of course.
->> >
->> >> I think tieing removal to major versions is a mistake, unless we're
->> >> going to set a fixed timeframe for delivery of major versions. ie if
->> >> we gaurantee that we'll ship a new major version every 18 months, that
->> >> gives people a predictable lifetime.  If we carry on inventing reasons
->> >> for major versions at arbitrary points in time, it makes it difficult
->> >> to have any reasonable forward planning.  It is more users friendly if
->> >> we can set a clear fixed timeframe for machine type lifecycle / eol
->> >
->> > IMHO we should have a new major release after we've reached a .9 minor
->> > release, but so far it seems like I'm the only one with that wish...
->> 
->> I actually like that, but then you've pretty much guaranteed that you
->> _cannot_ remove anything deprecated until 4.0.  You and Daniel aren't
->> disagreeing as heavily as it seems, I think.
->
-> I don't think we should tie removal of features to version numbers. IMHO
-> we should just increment the first major digit on a fixed time scale,
-> either once a year, or whenever we get past .9.
->
-> For removal of features, IMHO, the only important thing is to give users
-> deprecation clear warning for 2-3  releases, and ensure feature detection
-> works well. As long as that is done, there shouldn't be any need to batch
-> them up for "major" releases. From libvirt POV, batching up removal to
-> major releases is not beneficial. Batching to major releases gives a very
-> inconsistent timeframe for removal too - somethign fdeprecated in .1
-> release may live on for years,  until the next $major.0, while something
-> deprecated in a .9 release can be killed in 4 months. I much prefer to
-> see a consistent deprecated for 2 releases / 8 months, then deleted
-> regardless of feature.
+It may not always be possible, as in the existing case when a filesize
+for the new image was not specified.
 
-I concur.
+This is accomplished by shifting around the conditionals in
+bdrv_img_create, such that a backing file is always opened unless we
+provide BDRV_O_NO_BACKING. qemu-img is adjusted to pass this new flag
+when -u is provided to create.
+
+Sorry for the heinous looking diffstat, but it's mostly whitespace.
+
+Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=1213786
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+v3: Rebased
+
+v2: Rebased for 2.10
+    Corrected some of my less cromulent grammar
+
+ block.c                    | 73 +++++++++++++++++++++++-----------------------
+ qemu-img-cmds.hx           |  4 +--
+ qemu-img.c                 | 16 ++++++----
+ tests/qemu-iotests/082     |  4 +--
+ tests/qemu-iotests/082.out |  4 +--
+ 5 files changed, 54 insertions(+), 47 deletions(-)
+
+diff --git a/block.c b/block.c
+index a45b9b5..3c3df54 100644
+--- a/block.c
++++ b/block.c
+@@ -4275,37 +4275,37 @@ void bdrv_img_create(const char *filename, const char *fmt,
+     // The size for the image must always be specified, with one exception:
+     // If we are using a backing file, we can obtain the size from there
+     size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
+-    if (size == -1) {
+-        if (backing_file) {
+-            BlockDriverState *bs;
+-            char *full_backing = g_new0(char, PATH_MAX);
+-            int64_t size;
+-            int back_flags;
+-            QDict *backing_options = NULL;
+-
+-            bdrv_get_full_backing_filename_from_filename(filename, backing_file,
+-                                                         full_backing, PATH_MAX,
+-                                                         &local_err);
+-            if (local_err) {
+-                g_free(full_backing);
+-                goto out;
+-            }
+-
+-            /* backing files always opened read-only */
+-            back_flags = flags;
+-            back_flags &= ~(BDRV_O_RDWR | BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING);
+-
+-            if (backing_fmt) {
+-                backing_options = qdict_new();
+-                qdict_put_str(backing_options, "driver", backing_fmt);
+-            }
+-
+-            bs = bdrv_open(full_backing, NULL, backing_options, back_flags,
+-                           &local_err);
++    if (backing_file && !(flags & BDRV_O_NO_BACKING)) {
++        BlockDriverState *bs;
++        char *full_backing = g_new0(char, PATH_MAX);
++        int back_flags;
++        QDict *backing_options = NULL;
++
++        bdrv_get_full_backing_filename_from_filename(filename, backing_file,
++                                                     full_backing, PATH_MAX,
++                                                     &local_err);
++        if (local_err) {
+             g_free(full_backing);
+-            if (!bs) {
+-                goto out;
+-            }
++            goto out;
++        }
++
++        /* backing files always opened read-only */
++        back_flags = flags;
++        back_flags &= ~(BDRV_O_RDWR | BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING);
++
++        if (backing_fmt) {
++            backing_options = qdict_new();
++            qdict_put_str(backing_options, "driver", backing_fmt);
++        }
++
++        bs = bdrv_open(full_backing, NULL, backing_options, back_flags,
++                       &local_err);
++        g_free(full_backing);
++        if (!bs) {
++            goto out;
++        }
++
++        if (size == -1) {
+             size = bdrv_getlength(bs);
+             if (size < 0) {
+                 error_setg_errno(errp, -size, "Could not get size of '%s'",
+@@ -4313,14 +4313,15 @@ void bdrv_img_create(const char *filename, const char *fmt,
+                 bdrv_unref(bs);
+                 goto out;
+             }
+-
+             qemu_opt_set_number(opts, BLOCK_OPT_SIZE, size, &error_abort);
+-
+-            bdrv_unref(bs);
+-        } else {
+-            error_setg(errp, "Image creation needs a size parameter");
+-            goto out;
+         }
++
++        bdrv_unref(bs);
++    }
++
++    if (size == -1) {
++        error_setg(errp, "Image creation needs a size parameter");
++        goto out;
+     }
+ 
+     if (!quiet) {
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index bf4ce59..1d230c6 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -22,9 +22,9 @@ STEXI
+ ETEXI
+ 
+ DEF("create", img_create,
+-    "create [-q] [--object objectdef] [-f fmt] [-b backing_file] [-F backing_fmt] [-o options] filename [size]")
++    "create [-q] [--object objectdef] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
+ STEXI
+-@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-o @var{options}] @var{filename} [@var{size}]
++@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
+ ETEXI
+ 
+ DEF("commit", img_commit,
+diff --git a/qemu-img.c b/qemu-img.c
+index f3b0ab4..c7cd6d4 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -145,9 +145,11 @@ static void QEMU_NORETURN help(void)
+            "  'snapshot_id_or_name' is deprecated, use 'snapshot_param'\n"
+            "    instead\n"
+            "  '-c' indicates that target image must be compressed (qcow format only)\n"
+-           "  '-u' enables unsafe rebasing. It is assumed that old and new backing file\n"
+-           "       match exactly. The image doesn't need a working backing file before\n"
+-           "       rebasing in this case (useful for renaming the backing file)\n"
++           "  '-u' allows unsafe backing chains. For rebasing, it is assumed that old and new\n"
++           "       backing file match exactly. The image doesn't need a working backing file\n"
++           "       before rebasing in this case (useful for renaming the backing file)\n"
++           "       For image creation, allow creating without attempting to"
++           "       open the backing file.\n"
+            "  '-h' with or without a command shows this help and lists the supported formats\n"
+            "  '-p' show progress of command (only certain commands)\n"
+            "  '-q' use Quiet mode - do not print any output (except errors)\n"
+@@ -409,6 +411,7 @@ static int img_create(int argc, char **argv)
+     char *options = NULL;
+     Error *local_err = NULL;
+     bool quiet = false;
++    int flags = 0;
+ 
+     for(;;) {
+         static const struct option long_options[] = {
+@@ -416,7 +419,7 @@ static int img_create(int argc, char **argv)
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":F:b:f:he6o:q",
++        c = getopt_long(argc, argv, ":F:b:f:he6o:qu",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -464,6 +467,9 @@ static int img_create(int argc, char **argv)
+         case 'q':
+             quiet = true;
+             break;
++        case 'u':
++            flags |= BDRV_O_NO_BACKING;
++            break;
+         case OPTION_OBJECT: {
+             QemuOpts *opts;
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+@@ -516,7 +522,7 @@ static int img_create(int argc, char **argv)
+     }
+ 
+     bdrv_img_create(filename, fmt, base_filename, base_fmt,
+-                    options, img_size, 0, quiet, &local_err);
++                    options, img_size, flags, quiet, &local_err);
+     if (local_err) {
+         error_reportf_err(local_err, "%s: ", filename);
+         goto fail;
+diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
+index ad1d9fa..d5c83d4 100755
+--- a/tests/qemu-iotests/082
++++ b/tests/qemu-iotests/082
+@@ -85,8 +85,8 @@ run_qemu_img create -f $IMGFMT -o cluster_size=4k -o help "$TEST_IMG" $size
+ run_qemu_img create -f $IMGFMT -o cluster_size=4k -o \? "$TEST_IMG" $size
+ 
+ # Looks like a help option, but is part of the backing file name
+-run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG",,help "$TEST_IMG" $size
+-run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG",,\? "$TEST_IMG" $size
++run_qemu_img create -f $IMGFMT -u -o backing_file="$TEST_IMG",,help "$TEST_IMG" $size
++run_qemu_img create -f $IMGFMT -u -o backing_file="$TEST_IMG",,\? "$TEST_IMG" $size
+ 
+ # Try to trick qemu-img into creating escaped commas
+ run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG", -o help "$TEST_IMG" $size
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index a952330..f2732e4 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -146,10 +146,10 @@ lazy_refcounts   Postpone refcount updates
+ refcount_bits    Width of a reference count entry in bits
+ nocow            Turn off copy-on-write (valid only on btrfs)
+ 
+-Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
++Testing: create -f qcow2 -u -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
+ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,help encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+ 
+-Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,? TEST_DIR/t.qcow2 128M
++Testing: create -f qcow2 -u -o backing_file=TEST_DIR/t.qcow2,,? TEST_DIR/t.qcow2 128M
+ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,? encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+ 
+ Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2, -o help TEST_DIR/t.qcow2 128M
+-- 
+2.9.3
