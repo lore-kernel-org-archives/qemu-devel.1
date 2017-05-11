@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d8usd-0001zx-79
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:40:12 -0400
+	(envelope-from <stefanha@gmail.com>) id 1d8uvh-0003XA-NK
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:43:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1d8usc-0007h4-7G
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:40:11 -0400
-Date: Thu, 11 May 2017 16:40:03 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170511204003.GB19824@localhost.localdomain>
-References: <20170510143205.32013-1-pbonzini@redhat.com>
-	<20170510143205.32013-3-pbonzini@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1d8uve-0001CM-KQ
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 16:43:21 -0400
+Date: Thu, 11 May 2017 16:43:15 -0400
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170511204315.GT24584@stefanha-x1.localdomain>
+References: <20170419094356.19826-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="nDmTXYS4kVhtHHfR"
 Content-Disposition: inline
-In-Reply-To: <20170510143205.32013-3-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/7] curl: never invoke callbacks with
- s->mutex held
+In-Reply-To: <20170419094356.19826-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 00/16] block: Protect AIO
+ context change with perm API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, qemu-block@nongnu.org, rjones@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, May 10, 2017 at 04:32:00PM +0200, Paolo Bonzini wrote:
-> All curl callbacks go through curl_multi_do, and hence are called with
-> s->mutex held.  Note that with comments, and make curl_read_cb drop the
-> lock before invoking the callback.
-> 
-> Likewise for curl_find_buf, where the callback can be invoked by the
-> caller.
-> 
-> Cc: qemu-stable@nongnu.org
-> Cc: jcody@redhat.com
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/curl.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/curl.c b/block/curl.c
-> index 25a301e7b4..9a00fdc28e 100644
-> --- a/block/curl.c
-> +++ b/block/curl.c
-> @@ -147,6 +147,7 @@ static void curl_multi_do(void *arg);
->  static void curl_multi_read(void *arg);
->  
->  #ifdef NEED_CURL_TIMER_CALLBACK
-> +/* Called from curl_multi_do_locked, with s->mutex held.  */
->  static int curl_timer_cb(CURLM *multi, long timeout_ms, void *opaque)
->  {
->      BDRVCURLState *s = opaque;
-> @@ -163,6 +164,7 @@ static int curl_timer_cb(CURLM *multi, long timeout_ms, void *opaque)
->  }
->  #endif
->  
-> +/* Called from curl_multi_do_locked, with s->mutex held.  */
->  static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
->                          void *userp, void *sp)
->  {
-> @@ -212,6 +214,7 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
->      return 0;
->  }
->  
-> +/* Called from curl_multi_do_locked, with s->mutex held.  */
->  static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
->  {
->      BDRVCURLState *s = opaque;
-> @@ -226,6 +229,7 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
->      return realsize;
->  }
->  
-> +/* Called from curl_multi_do_locked, with s->mutex held.  */
->  static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
->  {
->      CURLState *s = ((CURLState*)opaque);
-> @@ -264,7 +268,9 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
->                                    request_length - offset);
->              }
->  
-> +            qemu_mutex_unlock(&s->s->mutex);
->              acb->common.cb(acb->common.opaque, 0);
-> +            qemu_mutex_lock(&s->s->mutex);
->              qemu_aio_unref(acb);
->              s->acb[i] = NULL;
->          }
-> @@ -305,8 +311,6 @@ static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
->              if (clamped_len < len) {
->                  qemu_iovec_memset(acb->qiov, clamped_len, 0, len - clamped_len);
->              }
-> -            acb->common.cb(acb->common.opaque, 0);
-> -
->              return FIND_RET_OK;
->          }
->  
-> @@ -832,8 +836,8 @@ static void curl_readv_bh_cb(void *p)
->      // we can just call the callback and be done.
->      switch (curl_find_buf(s, start, acb->nb_sectors * BDRV_SECTOR_SIZE, acb)) {
->          case FIND_RET_OK:
-> -            qemu_aio_unref(acb);
-> -            // fall through
-> +            ret = 0;
-> +            goto out;
->          case FIND_RET_WAIT:
->              goto out;
->          default:
-> -- 
-> 2.12.2
-> 
->
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+--nDmTXYS4kVhtHHfR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Apr 19, 2017 at 05:43:40PM +0800, Fam Zheng wrote:
+> v2: Address Stefan's comments:
+>=20
+>     - Clean up redundancy in bdrv_format_default_perms change.
+>     - Add a test case to check both success/failure cases.
+>       A failure case is not possible at user interface level because of o=
+ther
+>       checks we have, so write a unit test in tests/test-blk-perm.c.
+>=20
+> Eject / change of scsi-cd on a virtio-scsi dataplane bus causes abort() b=
+ecause
+> the new BDS doesn't get proper bdrv_set_aio_context().
+>=20
+> Store the AioContext in BB and do it in blk_insert_bs. That is done by
+> Vladimir's patch.
+>=20
+> Other patches are to make sure such a bdrv_set_aio_context() doesn't inte=
+rfere
+> with other BBs using other nodes from this graph.
+
+Looks pretty good.  I had two comments that apply across all patches:
+
+First, it is not safe to enable the new permission without registering
+an aio notifier.  Another user could look up the BDS and call
+bdrv_set_aio_context() on it.  I believe this bug is present for block
+jobs that have additional BDSes like base/target/etc.
+
+Second, patches that post-pone bdrv_set_aio_context() must take care to
+acquire the AioContext for BDS accesses that happen before the next
+bdrv_set_aio_context() call.
+
+--nDmTXYS4kVhtHHfR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZFMzjAAoJEJykq7OBq3PImPgH/2kzv7mwGMOfeJox5vCs5aHK
+I9+MI2snPYGSKhcD365hE3pVYYkCBkajaj23J/fMeqOOr4qS0Z3/7DvkC7rNeEsU
+CyoRy+OvqnMEEWwmPyX+Z9a+BdyBLvzBxzkcqSIOQO9UZdE4ydkZUNVd33R5fK44
+Cis8bOL1g4EfvnLb41Mu8VpdPP5echA7A9CQSFxVuTmx2xoMUZ1JLZbypYB+t+ik
+EGdLhE6UnZOHxRLnmm0Ldqz9+kCoLu+V/j/ljzHzoa7fVZbAbeyq/yJouI29EVPT
+qt2lFLE/a80bUNQ/G1A4YJnSzog5Y1bXGxcIYjWbMkw5x07+K/acTLXv1+4fSOw=
+=2VVL
+-----END PGP SIGNATURE-----
+
+--nDmTXYS4kVhtHHfR--
