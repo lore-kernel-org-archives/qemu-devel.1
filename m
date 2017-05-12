@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9K9R-0000AX-2O
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:13 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d9KAS-00018Y-0f
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9K9Q-0002m9-78
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:13 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33969)
+	(envelope-from <rth7680@gmail.com>) id 1d9KAR-0003vd-4H
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:16 -0400
+Received: from mail-qk0-x22c.google.com ([2607:f8b0:400d:c09::22c]:35858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9K9Q-0002lB-3R
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:12 -0400
-Received: by mail-qt0-x244.google.com with SMTP id l39so8698598qtb.1
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:39:12 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 12 May 2017 20:38:43 -0300
-Message-Id: <20170512233843.27713-7-f4bug@amsat.org>
-In-Reply-To: <20170512233843.27713-1-f4bug@amsat.org>
-References: <20170512233843.27713-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d9KAQ-0003us-Qg
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:15 -0400
+Received: by mail-qk0-x22c.google.com with SMTP id u75so59704410qka.3
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:40:14 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Fri, 12 May 2017 16:40:00 -0700
+Message-Id: <20170512234009.32557-1-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 6/6] target/sparc: optimize various
- functions using extract op
+Subject: [Qemu-devel] [PULL 0/9] Queued s390 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com
 
-Patch created mechanically using Coccinelle script via:
+This is a combination of my queued patches and those
+posted by Aurelien this week.
 
-    $ spatch --macro-file scripts/cocci-macro-file.h --in-place \
-        --sp-file scripts/coccinelle/tcg_gen_extract.cocci --dir target
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/sparc/translate.c | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
+r~
 
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index aa6734d54e..67a83b77cc 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -380,29 +380,25 @@ static inline void gen_goto_tb(DisasContext *s, int tb_num,
- static inline void gen_mov_reg_N(TCGv reg, TCGv_i32 src)
- {
-     tcg_gen_extu_i32_tl(reg, src);
--    tcg_gen_shri_tl(reg, reg, PSR_NEG_SHIFT);
--    tcg_gen_andi_tl(reg, reg, 0x1);
-+    tcg_gen_extract_tl(reg, reg, PSR_NEG_SHIFT, 1);
- }
- 
- static inline void gen_mov_reg_Z(TCGv reg, TCGv_i32 src)
- {
-     tcg_gen_extu_i32_tl(reg, src);
--    tcg_gen_shri_tl(reg, reg, PSR_ZERO_SHIFT);
--    tcg_gen_andi_tl(reg, reg, 0x1);
-+    tcg_gen_extract_tl(reg, reg, PSR_ZERO_SHIFT, 1);
- }
- 
- static inline void gen_mov_reg_V(TCGv reg, TCGv_i32 src)
- {
-     tcg_gen_extu_i32_tl(reg, src);
--    tcg_gen_shri_tl(reg, reg, PSR_OVF_SHIFT);
--    tcg_gen_andi_tl(reg, reg, 0x1);
-+    tcg_gen_extract_tl(reg, reg, PSR_OVF_SHIFT, 1);
- }
- 
- static inline void gen_mov_reg_C(TCGv reg, TCGv_i32 src)
- {
-     tcg_gen_extu_i32_tl(reg, src);
--    tcg_gen_shri_tl(reg, reg, PSR_CARRY_SHIFT);
--    tcg_gen_andi_tl(reg, reg, 0x1);
-+    tcg_gen_extract_tl(reg, reg, PSR_CARRY_SHIFT, 1);
- }
- 
- static inline void gen_op_add_cc(TCGv dst, TCGv src1, TCGv src2)
-@@ -638,8 +634,7 @@ static inline void gen_op_mulscc(TCGv dst, TCGv src1, TCGv src2)
-     // env->y = (b2 << 31) | (env->y >> 1);
-     tcg_gen_andi_tl(r_temp, cpu_cc_src, 0x1);
-     tcg_gen_shli_tl(r_temp, r_temp, 31);
--    tcg_gen_shri_tl(t0, cpu_y, 1);
--    tcg_gen_andi_tl(t0, t0, 0x7fffffff);
-+    tcg_gen_extract_tl(t0, cpu_y, 1, 31);
-     tcg_gen_or_tl(t0, t0, r_temp);
-     tcg_gen_andi_tl(cpu_y, t0, 0xffffffff);
- 
--- 
-2.11.0
+
+The following changes since commit ecc1f5adeec4e3324d1b695a7c54e3967c526949:
+
+  maintainers: Add myself as linux-user reviewer (2017-05-11 13:31:11 -0400)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-s390-20170512
+
+for you to fetch changes up to 538fad597d898f677f81cb4daacd37e7cdc18e6e:
+
+  target/s390x: implement serialization in BRANCH CONDITION (2017-05-12 15:48:41 -0700)
+
+----------------------------------------------------------------
+Queued target/s390 patches
+
+----------------------------------------------------------------
+Aurelien Jarno (3):
+      target/s390x: mask the SIGP order_code using SIGP_ORDER_MASK
+      target/s390x: fix SIGNAL PROCESSOR return value
+      target/s390x: implement serialization in BRANCH CONDITION
+
+Eric Bischoff (1):
+      target/s390x: Implement LOAD PAIR DISJOINT
+
+Miroslav Benes (1):
+      target/s390x: Implement LOAD PROGRAM PARAMETER
+
+Richard Henderson (4):
+      target/s390x: Implement STORE FACILITIES LIST EXTENDED
+      target/s390x: Diagnose specification exception for atomics
+      target/s390x: Use atomic operations for COMPARE SWAP
+      target/s390x: Use atomic operations for LOAD AND OP
+
+ target/s390x/cpu.c         |   1 +
+ target/s390x/cpu.h         |   6 ++
+ target/s390x/helper.c      |  16 +++
+ target/s390x/helper.h      |   3 +
+ target/s390x/insn-data.def |  38 ++++---
+ target/s390x/kvm.c         |   2 -
+ target/s390x/mem_helper.c  |  40 ++++++++
+ target/s390x/misc_helper.c |  62 +++++++++++-
+ target/s390x/translate.c   | 245 ++++++++++++++++++++++++++-------------------
+ 9 files changed, 288 insertions(+), 125 deletions(-)
