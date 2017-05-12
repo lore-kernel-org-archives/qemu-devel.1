@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d9Eh8-0003sf-Kl
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:49:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d9Eij-0004Tv-Jc
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d9Eh4-0004x3-Di
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:49:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49500)
+	(envelope-from <dgilbert@redhat.com>) id 1d9Eif-0006ld-NW
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:51:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d9Eh4-0004wj-4L
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:49:34 -0400
-References: <20170512033543.6789-1-f4bug@amsat.org>
-	<20170512033543.6789-2-f4bug@amsat.org>
-	<alpine.DEB.2.20.1705121139030.2981@hadrien>
-	<7d1b12cd-80dc-7fc8-935d-bec7fb08e256@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3e548b97-c39a-4ba0-1eca-40b9e2b40137@redhat.com>
-Date: Fri, 12 May 2017 12:49:23 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1d9Eif-0006hU-F2
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:51:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9974B81255
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 17:51:11 +0000 (UTC)
+Date: Fri, 12 May 2017 18:51:06 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170512175105.GI2069@work-vm>
+References: <20170512160055.9081-1-quintela@redhat.com>
+	<20170512160055.9081-6-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7d1b12cd-80dc-7fc8-935d-bec7fb08e256@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="sdDsL9XLkxeTjkSgnrFSAsk1AOVHom5Hn"
-Subject: Re: [Qemu-devel] [RFC PATCH v3 1/5] coccinelle: add a script to
- optimize tcg op using tcg_gen_extract()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170512160055.9081-6-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/12] migration: Move colo.h to migration/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +33,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Julia Lawall <julia.lawall@lip6.fr>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Nicolas Palix <nicolas.palix@imag.fr>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Elfring <elfring@users.sourceforge.net>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sdDsL9XLkxeTjkSgnrFSAsk1AOVHom5Hn
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Julia Lawall <julia.lawall@lip6.fr>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>,
- Nicolas Palix <nicolas.palix@imag.fr>
-Cc: Aurelien Jarno <aurelien@aurel32.net>,
- Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>,
- Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <3e548b97-c39a-4ba0-1eca-40b9e2b40137@redhat.com>
-Subject: Re: [RFC PATCH v3 1/5] coccinelle: add a script to optimize tcg op
- using tcg_gen_extract()
-References: <20170512033543.6789-1-f4bug@amsat.org>
- <20170512033543.6789-2-f4bug@amsat.org>
- <alpine.DEB.2.20.1705121139030.2981@hadrien>
- <7d1b12cd-80dc-7fc8-935d-bec7fb08e256@amsat.org>
-In-Reply-To: <7d1b12cd-80dc-7fc8-935d-bec7fb08e256@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Juan Quintela (quintela@redhat.com) wrote:
+> There are functions only used by migration code.
 
-On 05/12/2017 12:36 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+That's only mostly true; see the current 'integrate colo frame with
+block replication and net compare' series (posted 22nd April).
+That adds colo_handle_shutdown to this header and calls it from vl.c
+( https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg03901.html )
+where should that go?
 
-> In this patch
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01466.html
-> Aurelien does:
->=20
-> -    tcg_gen_shri_i32(cpu_sr_q, src, SR_Q);
-> -    tcg_gen_andi_i32(cpu_sr_q, cpu_sr_q, 1);
-> +    tcg_gen_extract_i32(cpu_sr_q, src, SR_Q, 1);
->=20
-> having:
->=20
-> #define SR_Q  8
->=20
-> I wanted to write a Coccinelle script to check for this pattern.
-> My first version was wrong, as Richard Henderson reminded me this
-> pattern can be applied as long as the len argument (here "1") is a
-> Mersenne prime (all least significant bits as "1").
+There's also a net/colo.h as well, so using the
+  #include "colo.h" in migration is correct but that's
+really scary when there are two files of the same name.
 
-Side note: while you are correct that a Mersenne prime is one less than
-a power of 2, your use of the term here is incorrect. You are looking
-for ALL instances of numbers that are one less than a power of two, and
-not just the Mersenne primes.  (For instance, 0xf is NOT a Mersenne
-prime, but IS a candidate for an optimization using a length of 4.)
+Dave
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---sdDsL9XLkxeTjkSgnrFSAsk1AOVHom5Hn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZFfWjAAoJEKeha0olJ0Nq6n0H+gJOY1TMW4numYt4VJKxZ9lb
-7lYAJ6FZzahBPSoKEA4vp2IgAI4vSJbk5ro1bnIQFUdfOqKGI4Y4tTviehjBdLKh
-E4e99GQtbEm6HxkL8bCYvkT33A9faen7KS8ZDNEkIBXhGoFpTXRENPWpaVZcSaN1
-MLWDd/uJbJZqodOgCC6uLTivD4ZF9WBwV2bXS2hBlVtpLr4osR7+9QgqGVGh6da2
-DERMrpTVXpsbNyC8T6AaRT3v2OfiA5u76QGkOv1PFk9bui6KWCm8TP8bqmOxvn/M
-Gi+/R+09RU0j1I6JQKuU6fhedxh1g8aJV4uIJIzX173P0Ot1a7YnwK1LJh2VI1U=
-=zF2V
------END PGP SIGNATURE-----
-
---sdDsL9XLkxeTjkSgnrFSAsk1AOVHom5Hn--
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  MAINTAINERS                             | 2 +-
+>  migration/colo-comm.c                   | 2 +-
+>  migration/colo-failover.c               | 2 +-
+>  {include/migration => migration}/colo.h | 0
+>  migration/migration.c                   | 2 +-
+>  migration/ram.c                         | 2 +-
+>  6 files changed, 5 insertions(+), 5 deletions(-)
+>  rename {include/migration => migration}/colo.h (100%)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0e8d731..e834876 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1537,7 +1537,7 @@ COLO Framework
+>  M: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>  S: Maintained
+>  F: migration/colo*
+> -F: include/migration/colo.h
+> +F: migration/colo.h
+>  F: include/migration/failover.h
+>  F: docs/COLO-FT.txt
+>  
+> diff --git a/migration/colo-comm.c b/migration/colo-comm.c
+> index 3d91798..9b35027 100644
+> --- a/migration/colo-comm.c
+> +++ b/migration/colo-comm.c
+> @@ -13,7 +13,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "migration/migration.h"
+> -#include "migration/colo.h"
+> +#include "colo.h"
+>  #include "trace.h"
+>  
+>  typedef struct {
+> diff --git a/migration/colo-failover.c b/migration/colo-failover.c
+> index cc229f5..29b8d63 100644
+> --- a/migration/colo-failover.c
+> +++ b/migration/colo-failover.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "migration/colo.h"
+> +#include "colo.h"
+>  #include "migration/failover.h"
+>  #include "qmp-commands.h"
+>  #include "qapi/qmp/qerror.h"
+> diff --git a/include/migration/colo.h b/migration/colo.h
+> similarity index 100%
+> rename from include/migration/colo.h
+> rename to migration/colo.h
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ad5ed14..a5a17fe 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -38,7 +38,7 @@
+>  #include "exec/address-spaces.h"
+>  #include "io/channel-buffer.h"
+>  #include "io/channel-tls.h"
+> -#include "migration/colo.h"
+> +#include "colo.h"
+>  
+>  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+>  
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 2564c00..7a5f5fa 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -44,7 +44,7 @@
+>  #include "trace.h"
+>  #include "exec/ram_addr.h"
+>  #include "qemu/rcu_queue.h"
+> -#include "migration/colo.h"
+> +#include "colo.h"
+>  
+>  /***********************************************************/
+>  /* ram save/restore */
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
