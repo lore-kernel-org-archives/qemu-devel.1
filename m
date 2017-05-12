@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d921i-00025K-Tn
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:18:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d92LY-0007hk-Uc
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:38:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d921h-0000vc-Rl
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:18:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53424)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d921h-0000v2-Ic
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:18:01 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9988780482
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 04:18:00 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Fri, 12 May 2017 12:17:41 +0800
-Message-Id: <1494562661-9063-4-git-send-email-peterx@redhat.com>
-In-Reply-To: <1494562661-9063-1-git-send-email-peterx@redhat.com>
-References: <1494562661-9063-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 3/3] ramblock: add new hmp command "info
- ramblock"
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d92LX-0003AZ-TI
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:38:32 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494348286-10253-2-git-send-email-sundeep.lkml@gmail.com>
+	<e87597ba-4759-76a5-7b0d-3297d2eb8f79@amsat.org>
+	<CALHRZuqfqjEWszkvVQSWAKR5zVbhD36=+Qt_DsVykk41cihO1Q@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1dc2ee8a-be60-c276-5529-a666223bfc2b@amsat.org>
+Date: Fri, 12 May 2017 01:38:22 -0300
+MIME-Version: 1.0
+In-Reply-To: <CALHRZuqfqjEWszkvVQSWAKR5zVbhD36=+Qt_DsVykk41cihO1Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [Qemu-devel PATCH 1/5] msf2: Add
+ Smartfusion2 System timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +30,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, peterx@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: sundeep subbaraya <sundeep.lkml@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>
 
-To dump information about ramblocks. It looks like:
+On 05/10/2017 09:37 AM, sundeep subbaraya wrote:
+> Hi Phil,
+>
+> On Wed, May 10, 2017 at 3:11 PM, Philippe Mathieu-Daudé <f4bug@amsat.org
+> <mailto:f4bug@amsat.org>> wrote:
+>> Hi Subbaraya, nice work!
+>>
+>> The timer you are modeling is the mss_timer, which is in particular
+> used in
+>> the smartfusion2, I'd rather name it mss_timer.c so it can be reused by
+>> other SoC models.
+>>
+> Ok I will change all other file names also to mss. Do I need to change
+> type names
+> also to mss?
 
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used              Total
-            /objects/mem    2 MiB  0x0000000000000000 0x0000000080000000 0x0000000080000000
-                vga.vram    4 KiB  0x0000000080060000 0x0000000001000000 0x0000000001000000
-    /rom@etc/acpi/tables    4 KiB  0x00000000810b0000 0x0000000000020000 0x0000000000200000
-                 pc.bios    4 KiB  0x0000000080000000 0x0000000000040000 0x0000000000040000
-  0000:00:03.0/e1000.rom    4 KiB  0x0000000081070000 0x0000000000040000 0x0000000000040000
-                  pc.rom    4 KiB  0x0000000080040000 0x0000000000020000 0x0000000000020000
-    0000:00:02.0/vga.rom    4 KiB  0x0000000081060000 0x0000000000010000 0x0000000000010000
-   /rom@etc/table-loader    4 KiB  0x00000000812b0000 0x0000000000001000 0x0000000000001000
-      /rom@etc/acpi/rsdp    4 KiB  0x00000000812b1000 0x0000000000001000 0x0000000000001000
+As you wish :) Actel/Microsemi keep changing how they name it, MSS, 
+M2S... What I mean is this timer is valid for a Actel SmartFusion and 
+for the MicroSemi SmartFusion2, naming it "msf2-timer" seems to restrict 
+it to the SF2 only.
 
-Ramblock is something hidden internally in QEMU implementation, and this
-command should only be used by mostly QEMU developers on RAM stuff. It
-is not a command suitable for QMP interface. So only HMP interface is
-provided for it.
+>> I added few comments.
+>>
+>>
+>> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
+>>>
+>>> Modelled System Timer in Microsemi's Smartfusion2 Soc.
+>>> Timer has two 32bit down counters and two interrupts.
+>>>
+>>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com
+> <mailto:sundeep.lkml@gmail.com>>
+>>> ---
+>>>  hw/timer/Makefile.objs        |   1 +
+>>>  hw/timer/msf2-timer.c         | 252
+>>> ++++++++++++++++++++++++++++++++++++++++++
+>>>  include/hw/timer/msf2-timer.h |  85 ++++++++++++++
+>>>  3 files changed, 338 insertions(+)
+>>>  create mode 100644 hw/timer/msf2-timer.c
+>>>  create mode 100644 include/hw/timer/msf2-timer.h
+>>>
+[...]
+>>> +        if (addr < ARRAY_SIZE(st->regs)) {
+>>> +            st->regs[addr] = value;
+>>> +        } else {
+>>> +            qemu_log_mask(LOG_GUEST_ERROR,
+>>> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n",
+> __func__,
+>>> +                         addr * 4);
+>>> +        }
+>>> +        break;
+>>> +    }
+>>> +    timer_update_irq(st);
+>>
+>>
+>> Here if addr >= (NUM_TIMERS * R_TIM1_MAX) you still update Timer1 IRQ,
+> while
+>> this is unharmful right now this is likely to be break later.
+>>
+> As long as Interrupt status register and Interrupt enable register are not
+> modified calling timer_update_irq will not harm. Am I missing something
+> here?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- exec.c                 | 22 ++++++++++++++++++++++
- hmp-commands-info.hx   | 14 ++++++++++++++
- hmp.c                  |  6 ++++++
- hmp.h                  |  1 +
- include/exec/ramlist.h |  1 +
- 5 files changed, 44 insertions(+)
+Indeed, this is unharmful. It just surprised me when I follow the 
+control flow.
 
-diff --git a/exec.c b/exec.c
-index 50519ae..821bef3 100644
---- a/exec.c
-+++ b/exec.c
-@@ -71,6 +71,8 @@
- #include "qemu/mmap-alloc.h"
- #endif
- 
-+#include "monitor/monitor.h"
-+
- //#define DEBUG_SUBPAGE
- 
- #if !defined(CONFIG_USER_ONLY)
-@@ -1333,6 +1335,26 @@ void qemu_mutex_unlock_ramlist(void)
-     qemu_mutex_unlock(&ram_list.mutex);
- }
- 
-+void ram_block_dump(Monitor *mon)
-+{
-+    RAMBlock *block;
-+    char *psize;
-+
-+    rcu_read_lock();
-+    monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-+                   "Block Name", "PSize", "Offset", "Used", "Total");
-+    RAMBLOCK_FOREACH(block) {
-+        psize = size_to_str(block->page_size);
-+        monitor_printf(mon, "%24s %8s  0x%016" PRIx64 " 0x%016" PRIx64
-+                       " 0x%016" PRIx64 "\n", block->idstr, psize,
-+                       (uint64_t)block->offset,
-+                       (uint64_t)block->used_length,
-+                       (uint64_t)block->max_length);
-+        g_free(psize);
-+    }
-+    rcu_read_unlock();
-+}
-+
- #ifdef __linux__
- /*
-  * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index a53f105..ae16901 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -788,6 +788,20 @@ Display the latest dump status.
- ETEXI
- 
-     {
-+        .name       = "ramblock",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Display system ramblock information",
-+        .cmd        = hmp_info_ramblock,
-+    },
-+
-+STEXI
-+@item info ramblock
-+@findex ramblock
-+Dump all the ramblocks of the system.
-+ETEXI
-+
-+    {
-         .name       = "hotpluggable-cpus",
-         .args_type  = "",
-         .params     = "",
-diff --git a/hmp.c b/hmp.c
-index 524e589..e0ba13c 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -39,6 +39,7 @@
- #include "qemu-io.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-+#include "exec/ramlist.h"
- #include "hw/intc/intc.h"
- 
- #ifdef CONFIG_SPICE
-@@ -2738,6 +2739,11 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict)
-     qapi_free_DumpQueryResult(result);
- }
- 
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict)
-+{
-+    ram_block_dump(mon);
-+}
-+
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-diff --git a/hmp.h b/hmp.h
-index 37bb65a..d8b94ce 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -140,6 +140,7 @@ void hmp_rocker_ports(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
- void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
- void hmp_info_dump(Monitor *mon, const QDict *qdict);
-+void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- 
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-index f1c6b45..2e2ac6c 100644
---- a/include/exec/ramlist.h
-+++ b/include/exec/ramlist.h
-@@ -73,5 +73,6 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
- void ram_block_notify_add(void *host, size_t size);
- void ram_block_notify_remove(void *host, size_t size);
- 
-+void ram_block_dump(Monitor *mon);
- 
- #endif /* RAMLIST_H */
--- 
-2.7.4
+>>> +}
+>>> +
+>>> +static const MemoryRegionOps timer_ops = {
+>>> +    .read = timer_read,
+>>> +    .write = timer_write,
+>>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>>> +    .valid = {
+>>> +        .min_access_size = 4,
+>>
+>>
+>> I believe min_access_size = 1 is valid for any APB device.
+>>
+>>
+> Ok. I followed Xilinx soft IP models while writing this. I am really not
+> sure it is mandatory to put access_size. Can i remove it?
+
+checking the datasheet "UG0331: SmartFusion2 Microcontroller Subsystem":
+
+'''
+CMSIS Data types:
+
+The [Cortex-M3] processor:
+* supports the following data types:
+- 32-bit words
+- 16-bit halfwords
+- 8-bit bytes.
+* manages all data memory accesses as little-endian or big-endian. 
+Instruction memory and Private Peripheral Bus (PPB) accesses are always 
+performed as little-endian. The Cortex-M3 processor configured for 
+SmartFusion2 SoC FPGA MSS uses only little-endian.
+'''
+
+So Yes, ".min_access_size = 1" is correct for this Cortex-M3.
+
+If you remove it memory_region_access_valid() will do:
+
+     access_size_min = mr->ops->valid.min_access_size;
+     if (!mr->ops->valid.min_access_size) {
+         access_size_min = 1;
+     }
+
+So that is the same, personally I prefer it to be explicit (not removed).
+
+>>> +        .max_access_size = 4
+>>> +    }
+>>> +};
+>>> +
+>>> +static void timer_hit(void *opaque)
+>>> +{
+>>> +    struct Msf2Timer *st = opaque;
+>>> +
+>>> +    st->regs[R_TIM_RIS] |= TIMER_RIS_ACK;
+>>> +
+>>> +    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ONESHOT)) {
+>>> +        timer_update(st);
+>>> +    }
+>>> +    timer_update_irq(st);
+>>> +}
+[...]
+>>> +/*
+>>> + * There are two 32-bit down counting timers.
+>>> + * Timers 1 and 2 can be concatenated into a single 64-bit Timer
+>>> + * that operates either in Periodic mode or in One-shot mode.
+>>> + * Writing 1 to the TIM64_MODE register bit 0 sets the Timers in 64-bit
+>>> mode.
+>>> + * In 64-bit mode, writing to the 32-bit registers has no effect.
+>>> + * Similarly, in 32-bit mode, writing to the 64-bit mode registers
+>>> + * has no effect. Only two 32-bit timers are supported currently.
+>>> + */
+>>> +#define NUM_TIMERS        2
+>>> +
+>>> +#define MSF2_TIMER_FREQ   (83 * 1000000)
+>>
+>>
+>> I can not find this value, can you point me to the datasheet? It seems SoC
+>> specific to me.
+>>
+> It is configured in Microsemi Libero. The SOM kit from Emcraft comes
+> with this default setting.
+> I guess this property should be set and passed from board file and not
+> from SoC.
+> Am I correct?
+
+It seems an option configurable in Libero before synthesizing, so that 
+would be SoM/bitfile specific?
+
+What I mean here is I don't think this is a fixed value for a mss_timer 
+and I'd rather have it configurable (but ok to default 83MHz in your SoM).
+
+ > Can I attach the datasheet to this thread?
+
+Isn't this datasheet publicly available?
+
+Eventually can you upload a binary (like your Linux patches) somewhere? 
+So it would be easier to test this patchset.
+
+> Thank you,
+> Sundeep
+
+Good luck!
+
+Phil.
