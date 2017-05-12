@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d9CuD-0005Ry-5Z
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:55:04 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d9Cwh-0007lL-6H
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d9CuB-0008FI-NV
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:55:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40910)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d9Cwe-0001xL-3w
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:57:35 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:21336 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d9CuB-0008EP-EL
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:54:59 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D98180C30
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 15:54:58 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Fri, 12 May 2017 17:54:49 +0200
-Message-Id: <20170512155449.9003-3-quintela@redhat.com>
-In-Reply-To: <20170512155449.9003-1-quintela@redhat.com>
-References: <20170512155449.9003-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] migration: Remove old MigrationParams
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1d9Cwd-0001vh-NC
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:57:32 -0400
+References: <20170512141702.12423-1-vsementsov@virtuozzo.com>
+	<8c231084-8eaa-fe66-43cd-4c85f1e45272@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <005ea4a3-6565-6a56-75de-b6464bcae8fd@virtuozzo.com>
+Date: Fri, 12 May 2017 18:57:28 +0300
+MIME-Version: 1.0
+In-Reply-To: <8c231084-8eaa-fe66-43cd-4c85f1e45272@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd: strict nbd_wr_syncv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,206 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: den@openvz.org
 
-Not used anymore after moving block migration to use capabilities.
+12.05.2017 18:46, Paolo Bonzini wrote:
+>
+> On 12/05/2017 16:17, Vladimir Sementsov-Ogievskiy wrote:
+>> nbd_wr_syncv is called either from coroutine or from client negotiation
+>> code, when socket is in blocking mode. So, -EAGAIN is impossible.
+>>
+>> Furthermore, EAGAIN is confusing, as, what to read/write again? With
+>> EAGAIN as a return code we don't know how much data is already
+>> read or written by the function, so in case of EAGAIN the whole
+>> communication is broken.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>
+>> Hi all!
+>>
+>> If I understand right, nbd_wr_syncv is called either from coroutine
+>> or from client negotiation code, when socket is in blocking mode.
+>> So, some thoughts
+>>
+>> 1. let's establish this with an assert, because returning EAGAIN is
+>>     confusing (see above)
+> Yes, this seems like a good idea.
+>
+>> 2. should we in case of non-coroutine context start this coroutine in
+>>     nbd_wr_syncv, like in bdrv_prwv_co, and use non-blocking mode?
+>> 3. is there any problems or disadvantages of moving  client negotiation
+>>     to coroutine too?
+> When you move code to coroutines you need to be aware of what code can
+> now run concurrently, for example the monitor.  I'm not sure that it's
+> possible to do this.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- include/migration/migration.h | 10 ++--------
- include/migration/vmstate.h   |  1 -
- include/qemu/typedefs.h       |  1 -
- include/sysemu/sysemu.h       |  3 +--
- migration/colo.c              |  2 +-
- migration/migration.c         |  8 +++-----
- migration/savevm.c            | 16 +++-------------
- 7 files changed, 10 insertions(+), 31 deletions(-)
+Hmm, can you please give some example of a problem? qcow2_open starts 
+coroutines to read it's header, why nbd_open can't start 
+coroutine/coroutines to read/write some negotiation data?
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index d228f29..1e23536 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -42,10 +42,6 @@
- /* for vl.c */
- extern int only_migratable;
- 
--struct MigrationParams {
--    bool unused; /* C doesn't allow empty structs */
--};
--
- /* Messages sent on the return path from destination to source */
- enum mig_rp_message_type {
-     MIG_RP_MSG_INVALID = 0,  /* Must be 0 */
-@@ -135,12 +131,10 @@ struct MigrationState
-     QEMUBH *cleanup_bh;
-     QEMUFile *to_dst_file;
- 
--    /* New style params from 'migrate-set-parameters' */
-+    /* params from 'migrate-set-parameters' */
-     MigrationParameters parameters;
- 
-     int state;
--    /* Old style params from 'migrate' command */
--    MigrationParams params;
- 
-     /* State related to return path */
-     struct {
-@@ -230,7 +224,7 @@ void migrate_fd_connect(MigrationState *s);
- 
- void add_migration_state_change_notifier(Notifier *notify);
- void remove_migration_state_change_notifier(Notifier *notify);
--MigrationState *migrate_init(const MigrationParams *params);
-+MigrationState *migrate_init(void);
- bool migration_is_blocked(Error **errp);
- bool migration_in_setup(MigrationState *);
- bool migration_is_idle(void);
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f4bf3f1..81af5fb 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -37,7 +37,6 @@ typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
- 
- typedef struct SaveVMHandlers {
-     /* This runs inside the iothread lock.  */
--    void (*set_params)(const MigrationParams *params, void * opaque);
-     SaveStateHandler *save_state;
- 
-     void (*cleanup)(void *opaque);
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index f08d327..a388243 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -49,7 +49,6 @@ typedef struct MemoryRegion MemoryRegion;
- typedef struct MemoryRegionCache MemoryRegionCache;
- typedef struct MemoryRegionSection MemoryRegionSection;
- typedef struct MigrationIncomingState MigrationIncomingState;
--typedef struct MigrationParams MigrationParams;
- typedef struct MigrationState MigrationState;
- typedef struct Monitor Monitor;
- typedef struct MonitorDef MonitorDef;
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 058d5eb..3340202 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -102,8 +102,7 @@ enum qemu_vm_cmd {
- #define MAX_VM_CMD_PACKAGED_SIZE (1ul << 24)
- 
- bool qemu_savevm_state_blocked(Error **errp);
--void qemu_savevm_state_begin(QEMUFile *f,
--                             const MigrationParams *params);
-+void qemu_savevm_state_begin(QEMUFile *f);
- void qemu_savevm_state_header(QEMUFile *f);
- int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
- void qemu_savevm_state_cleanup(void);
-diff --git a/migration/colo.c b/migration/colo.c
-index e772384..430bae5 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -349,7 +349,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-     migrate_set_block_enabled(s, false);
-     migrate_set_block_shared(s, false);
-     qemu_savevm_state_header(fb);
--    qemu_savevm_state_begin(fb, &s->params);
-+    qemu_savevm_state_begin(fb);
-     qemu_mutex_lock_iothread();
-     qemu_savevm_state_complete_precopy(fb, false);
-     qemu_mutex_unlock_iothread();
-diff --git a/migration/migration.c b/migration/migration.c
-index 0c32609..a6a9922 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1103,7 +1103,7 @@ bool migration_is_idle(void)
-     return false;
- }
- 
--MigrationState *migrate_init(const MigrationParams *params)
-+MigrationState *migrate_init(void)
- {
-     MigrationState *s = migrate_get_current();
- 
-@@ -1117,7 +1117,6 @@ MigrationState *migrate_init(const MigrationParams *params)
-     s->cleanup_bh = 0;
-     s->to_dst_file = NULL;
-     s->state = MIGRATION_STATUS_NONE;
--    s->params = *params;
-     s->rp_state.from_dst_file = NULL;
-     s->rp_state.error = false;
-     s->mbps = 0.0;
-@@ -1237,7 +1236,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
- {
-     Error *local_err = NULL;
-     MigrationState *s = migrate_get_current();
--    MigrationParams params;
-     const char *p;
- 
-     if (migration_is_setup_or_active(s->state) ||
-@@ -1255,7 +1253,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-         return;
-     }
- 
--    s = migrate_init(&params);
-+    s = migrate_init();
- 
-     if (has_blk && blk) {
-         migrate_set_block_enabled(s, true);
-@@ -1988,7 +1986,7 @@ static void *migration_thread(void *opaque)
-         qemu_savevm_send_postcopy_advise(s->to_dst_file);
-     }
- 
--    qemu_savevm_state_begin(s->to_dst_file, &s->params);
-+    qemu_savevm_state_begin(s->to_dst_file);
- 
-     s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
-     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 8aaefe9..b24946f 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -966,21 +966,13 @@ void qemu_savevm_state_header(QEMUFile *f)
- 
- }
- 
--void qemu_savevm_state_begin(QEMUFile *f,
--                             const MigrationParams *params)
-+void qemu_savevm_state_begin(QEMUFile *f)
- {
-     SaveStateEntry *se;
-     int ret;
- 
-     trace_savevm_state_begin();
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
--        if (!se->ops || !se->ops->set_params) {
--            continue;
--        }
--        se->ops->set_params(params, se->opaque);
--    }
--
--    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-         if (!se->ops || !se->ops->save_live_setup) {
-             continue;
-         }
-@@ -1232,9 +1224,7 @@ void qemu_savevm_state_cleanup(void)
- static int qemu_savevm_state(QEMUFile *f, Error **errp)
- {
-     int ret;
--    MigrationParams params = {
--    };
--    MigrationState *ms = migrate_init(&params);
-+    MigrationState *ms = migrate_init();
-     MigrationStatus status;
-     ms->to_dst_file = f;
- 
-@@ -1245,7 +1235,7 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
- 
-     qemu_mutex_unlock_iothread();
-     qemu_savevm_state_header(f);
--    qemu_savevm_state_begin(f, &params);
-+    qemu_savevm_state_begin(f);
-     qemu_mutex_lock_iothread();
- 
-     while (qemu_file_get_error(f) == 0) {
+>
+> Paolo
+>
+>>   nbd/common.c | 11 ++++++-----
+>>   1 file changed, 6 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/nbd/common.c b/nbd/common.c
+>> index dccbb8e9de..4db45b3ede 100644
+>> --- a/nbd/common.c
+>> +++ b/nbd/common.c
+>> @@ -20,6 +20,10 @@
+>>   #include "qapi/error.h"
+>>   #include "nbd-internal.h"
+>>   
+>> +/* nbd_wr_syncv
+>> + * The function may be called from coroutine or from non-coroutine context.
+>> + * When called from non-coroutine context @ioc must be in blocking mode.
+>> + */
+>>   ssize_t nbd_wr_syncv(QIOChannel *ioc,
+>>                        struct iovec *iov,
+>>                        size_t niov,
+>> @@ -42,11 +46,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+>>               len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
+>>           }
+>>           if (len == QIO_CHANNEL_ERR_BLOCK) {
+>> -            if (qemu_in_coroutine()) {
+>> -                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+>> -            } else {
+>> -                return -EAGAIN;
+>> -            }
+>> +            assert(qemu_in_coroutine());
+>> +            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+>>               continue;
+>>           }
+>>           if (len < 0) {
+>>
+
+
 -- 
-2.9.3
+Best regards,
+Vladimir
