@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d99V5-0007Ac-3s
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:16:52 -0400
+	(envelope-from <kraxel@redhat.com>) id 1d99aE-0000L7-3g
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:22:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d99V0-0005nI-Nl
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:16:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47886)
+	(envelope-from <kraxel@redhat.com>) id 1d99aA-00056R-Rk
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:22:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46938)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d99V0-0005lw-Ei
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:16:46 -0400
-References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
-	<20170511145312.GA822@morn.lan>
-	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
-	<20170511163447.GA7785@morn.lan>
-	<4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
-Date: Fri, 12 May 2017 14:16:41 +0200
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1d99aA-000562-LQ
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:22:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 95E41C05678D
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 12:22:05 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 12 May 2017 14:21:52 +0200
+Message-Id: <20170512122158.32032-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
- system management mode
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/6] usb patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Xu, Anthony" <anthony.xu@intel.com>, Kevin O'Connor <kevin@koconnor.net>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+  Hi,
 
+Here comes the usb patch queue, with a bugfix collection and a
+documentation update.
 
-On 12/05/2017 01:55, Xu, Anthony wrote:
-> Hi Paolo,
-> 
-> In KVM mode, seems A20 is ignored.
-> Do you see any potential issue here?
+please pull,
+  Gerd
 
-No; recent processors don't have A20 at all.
+The following changes since commit 76d20ea0f1b26ebd5da2f5fb2fdf3250cde887=
+bb:
 
-Paolo
+  Merge remote-tracking branch 'armbru/tags/pull-qapi-2017-05-04-v3' into=
+ staging (2017-05-09 15:49:14 -0400)
 
-> 
-> Anthony 
-> 
-> 
->> -----Original Message-----
->> From: Kevin O'Connor [mailto:kevin@koconnor.net]
->> Sent: Thursday, May 11, 2017 9:35 AM
->> To: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: qemu-devel@nongnu.org; Xu, Anthony <anthony.xu@intel.com>
->> Subject: Re: [PATCH] target/i386: enable A20 automatically in system
->> management mode
->>
->> On Thu, May 11, 2017 at 05:32:47PM +0200, Paolo Bonzini wrote:
->>> On 11/05/2017 16:53, Kevin O'Connor wrote:
->>>> On Thu, May 11, 2017 at 01:35:28PM +0200, Paolo Bonzini wrote:
->>>>> Ignore env->a20_mask when running in system management mode.
->>>>
->>>> Thanks Paolo.  I don't think this patch will help SeaBIOS though.  The
->>>> SeaBIOS SMM handler doesn't do much - it doesn't even access ram
->> above
->>>> 1MiB.  See SeaBIOS' code in src/fw/smm.c:handle_smi().
->>>>
->>>> Instead, the SeaBIOS code does a cpu state backup/restore to switch
->>>> into 32bit mode.  I thought the A20 state would be part of that cpu
->>>> backup/restore.  However, looking at the Intel SDM docs now, it's not
->>>> really clear to me how the processor "inhibits" A20 when in SMM mode -
->>>> does it save/restore that state on SMI/RSM or does it have special
->>>> logic to ignore A20 while in SMM mode?
->>>
->>> There isn't any documented place for A20 in the state save map (I checked
->>> AMD's BIOS/Kernel Developer Guide which is pretty comprehensive), so I
->>> think the latter is more plausible.  What I'm doing in this patch is
->>> ignoring A20 while in SMM mode.
->>
->> Okay.
->>
->>> Then you would have to add an A20 save/restore in handle_smi; since
->>> CALL32SMM_ENTERID should not nest, I think you can just do this:
->>
->> Yes, that should be fine.
->>
->>> --- a/src/fw/smm.c
->>> +++ b/src/fw/smm.c
->>> @@ -54,7 +54,8 @@ struct smm_layout {
->>>      struct smm_state backup2;
->>>      u8 stack[0x7c00];
->>>      u64 codeentry;
->>> -    u8 pad_8008[0x7df8];
->>> +    u8 a20;
->>> +    u8 pad_8009[0x7df7];
->>>      struct smm_state cpu;
->>>  };
->>
->> In order to avoid mixing code and data in the same cache line we could
->> do this instead:
->>
->>  struct smm_layout {
->>      struct smm_state backup1;
->>      struct smm_state backup2;
->> -    u8 stack[0x7c00];
->> +    u32 backup_a20;
->> +    u8 stack[0x8000 - sizeof(struct smm_state)*2 - sizeof(u32)];
->>      u64 codeentry;
->>      u8 pad_8008[0x7df8];
->>      struct smm_state cpu;
->>
->> Thanks,
->> -Kevin
+are available in the git repository at:
+
+  git://git.kraxel.org/qemu tags/pull-usb-20170512-1
+
+for you to fetch changes up to aa612b364ecbe1dc034efcabb04526f24e56c145:
+
+  hw/usb/dev-serial: Do not try to set vendorid or productid properties (=
+2017-05-12 12:30:23 +0200)
+
+----------------------------------------------------------------
+usb: bugfixes, doc update
+
+----------------------------------------------------------------
+Gerd Hoffmann (1):
+      usb-redir: fix stack overflow in usbredir_log_data
+
+Ladi Prosek (3):
+      xhci: fix logging
+      usb-hub: clear PORT_STAT_SUSPEND on wakeup
+      xhci: relax link check
+
+Thomas Huth (2):
+      qemu-doc: Update to use the new way of attaching USB devices
+      hw/usb/dev-serial: Do not try to set vendorid or productid properti=
+es
+
+ docs/qdev-device-use.txt |  6 ++--
+ hw/usb/dev-hub.c         |  1 +
+ hw/usb/dev-serial.c      | 24 ++++---------
+ hw/usb/hcd-xhci.c        |  9 ++---
+ hw/usb/redirect.c        | 13 +------
+ qemu-doc.texi            | 91 +++++++++++++++++++++++++++---------------=
+------
+ 6 files changed, 64 insertions(+), 80 deletions(-)
