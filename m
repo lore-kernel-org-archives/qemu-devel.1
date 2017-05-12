@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d93Nm-0007jw-8Z
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:44:55 -0400
+	(envelope-from <elfring@users.sourceforge.net>) id 1d93S5-0000hZ-BX
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:49:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d93Nl-0002RC-1i
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:44:54 -0400
-Resent-Message-Id: <E1d93Nl-0002RC-1i@eggs.gnu.org>
-In-Reply-To: <20170512050451.9979-1-david@gibson.dropbear.id.au>
-Message-ID: <149456787149.342.6243959315198167912@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <elfring@users.sourceforge.net>) id 1d93S2-0006Vt-AE
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:49:21 -0400
+Received: from mout.web.de ([212.227.15.14]:64147)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elfring@users.sourceforge.net>)
+	id 1d93S1-0006MG-VO
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:49:18 -0400
+References: <20170512033543.6789-1-f4bug@amsat.org>
+	<20170512033543.6789-2-f4bug@amsat.org>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <a1881660-43ef-b7b1-8642-eb1df934ae8a@users.sourceforge.net>
+Date: Fri, 12 May 2017 07:48:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 11 May 2017 22:44:32 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCHv6 0/5] HPT resizing for pseries guests
- (qemu part)
+In-Reply-To: <20170512033543.6789-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v3 1/5] coccinelle: add a script to
+ optimize tcg op using tcg_gen_extract()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Julia Lawall <julia.lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA1MTIwNTA0NTEuOTk3OS0xLWRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdQpTdWJqZWN0OiBb
-UWVtdS1kZXZlbF0gW1BBVENIdjYgMC81XSBIUFQgcmVzaXppbmcgZm9yIHBzZXJpZXMgZ3Vlc3Rz
-IChxZW11IHBhcnQpClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
-fCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmM4Njg2OSBwc2VyaWVz
-OiBBbGxvdyBIUFQgcmVzaXppbmcgd2l0aCBLVk0KMWIwN2QxNiBwc2VyaWVzOiBVc2Ugc21hbGxl
-ciBkZWZhdWx0IGhhc2ggcGFnZSB0YWJsZXMgd2hlbiBndWVzdCBjYW4gcmVzaXplCjViNTkzODYg
-cHNlcmllczogRW5hYmxlIEhQVCByZXNpemluZyBmb3IgMi4xMAo2MWNlY2JiIHBzZXJpZXM6IElt
-cGxlbWVudCBIUFQgcmVzaXppbmcKZmU0ZmUzMiBwc2VyaWVzOiBTdHVicyBmb3IgSFBUIHJlc2l6
-aW5nCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IHBzZXJpZXM6IFN0
-dWJzIGZvciBIUFQgcmVzaXppbmcuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzI3ODogRklMRTogdGFyZ2V0L3BwYy9rdm0uYzoyNzE5OgorICAgIGVycm9yX3NldGcoZXJycCwg
-Ikhhc2ggcGFnZSB0YWJsZSByZXNpemluZyBub3QgYXZhaWxhYmxlIHdpdGggdGhpcyBLVk0gdmVy
-c2lvbiIpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMzkgbGluZXMgY2hlY2tlZAoK
-WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAyLzU6
-IHBzZXJpZXM6IEltcGxlbWVudCBIUFQgcmVzaXppbmcuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiMyMzc6IEZJTEU6IGh3L3BwYy9zcGFwcl9oY2Fs
-bC5jOjUxNjoKKyAgICBzdHFfcChhZGRyICsgSEFTSF9QVEVfU0laRV82NC8yLCBwdGUxKTsKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMzM5OiBGSUxFOiBody9wcGMvc3BhcHJfaGNhbGwu
-Yzo2MTg6CisgICAgICAgIGh3YWRkciBwdGV4ID0gcHRlZyAqSFBURVNfUEVSX0dST1VQOwogICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA0
-MDEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Q2hlY2tpbmcgUEFUQ0ggMy81OiBwc2VyaWVzOiBFbmFibGUgSFBUIHJlc2l6aW5nIGZvciAyLjEw
-Li4uCkNoZWNraW5nIFBBVENIIDQvNTogcHNlcmllczogVXNlIHNtYWxsZXIgZGVmYXVsdCBoYXNo
-IHBhZ2UgdGFibGVzIHdoZW4gZ3Vlc3QgY2FuIHJlc2l6ZS4uLgpDaGVja2luZyBQQVRDSCA1LzU6
-IHBzZXJpZXM6IEFsbG93IEhQVCByZXNpemluZyB3aXRoIEtWTS4uLgo9PT0gT1VUUFVUIEVORCA9
-PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+>  create mode 100644 scripts/coccinelle/tcg_gen_extract.cocci
+
+Will an other subdirectory be more appropriate for this SmPL script?
+
+
+> +// Coccinelle helpful issue:
+> +// https://github.com/coccinelle/coccinelle/issues/86
+
+I am curious if such an information source will trigger further
+software evolution.
+How do you think about to mention also the corresponding topic
+“Propagating values back from Python script to SmPL rule with other metavariable
+type than “identifier”” just for the case that the issue number can be fragile?
+
+
+> +@match@ // match shri*+andi* pattern, calls script verify_len
+> +identifier ret, arg;
+> +constant ofs, len;
+> +identifier shr_fn =~ "^tcg_gen_shri_";
+> +identifier and_fn =~ "^tcg_gen_andi_";
+> +position shr_p;
+> +position and_p;
+> +@@
+> +(
+> +shr_fn@shr_p(ret, arg, ofs);
+> +and_fn@and_p(ret, ret, len);
+> +)
+
+My software development attention was caught also a bit by this specification.
+How much do you care for coding style there?
+
+* Two repeated SmPL key words while using the variable list functionality before.
+
+* I wonder about the relevance for the parentheses.
+  Did you try to express a disjunction for the semantic patch language
+  besides the usage of two function (or macro) calls?
+
+
+> +        print "  candidate", "IS" if is_optimizable else "is NOT", "optimizable"
+
+Would you like to move this information display into a separate function?
+
+Do you care if the “print” is the usage of a function call or a statement?
+https://docs.python.org/3.0/whatsnew/3.0.html#print-is-a-function
+
+
+> +-shr_fn@shr_p(ret, arg, ofs);
+> +-and_fn@and_p(ret, ret, len);
+> ++extract_fn(ret, arg, ofs, len);
+
+Are there any more cases to consider for the sown function call replacement?
+
+Regards,
+Markus
