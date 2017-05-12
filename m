@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1d97hB-00051i-1J
+	(envelope-from <hare@suse.de>) id 1d97hB-00051l-1k
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1d97h8-00064o-2E
+	(envelope-from <hare@suse.de>) id 1d97h7-00064O-U3
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:13 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39441 helo=mx1.suse.de)
+Received: from mx2.suse.de ([195.135.220.15]:39439 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hare@suse.de>) id 1d97h7-0005z7-NW
+	(Exim 4.71) (envelope-from <hare@suse.de>) id 1d97h7-0005z3-NS
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:09 -0400
 From: Hannes Reinecke <hare@suse.de>
-Date: Fri, 12 May 2017 12:20:56 +0200
-Message-Id: <20170512102057.5855-4-hare@suse.de>
+Date: Fri, 12 May 2017 12:20:57 +0200
+Message-Id: <20170512102057.5855-5-hare@suse.de>
 In-Reply-To: <20170512102057.5855-1-hare@suse.de>
 References: <20170512102057.5855-1-hare@suse.de>
-Subject: [Qemu-devel] [PATCH 3/4] scsi: per-request timeouts
+Subject: [Qemu-devel] [PATCH 4/4] virtio: implement VIRTIO_SCSI_F_TIMEOUT
+ feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Alexander Graf <agraf@suse.com>, qemu-devel@nongnu.org, Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
 
-Add a 'timeout' value per request to allow to specify individual
-per-request timeouts.
+Implement a handler for the VIRTIO_SCSI_F_TIMEOUT feature, which
+allows to pass in the assigned command timeout in seconds or
+minutes. This allows to specify a timeout up to 3 hours.
 
 Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
- hw/scsi/scsi-bus.c     |  1 +
- hw/scsi/scsi-disk.c    | 15 +++++++++++----
- hw/scsi/scsi-generic.c | 12 ++++++++----
- include/hw/scsi/scsi.h |  1 +
- 4 files changed, 21 insertions(+), 8 deletions(-)
+ hw/scsi/virtio-scsi.c                        | 16 ++++++++++++++++
+ include/standard-headers/linux/virtio_scsi.h |  1 +
+ 2 files changed, 17 insertions(+)
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index f5574469c8..206000d873 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -690,6 +690,7 @@ SCSIRequest *scsi_req_new(SCSIDevice *d, uint32_t tag, uint32_t lun,
- 
-     req->cmd = cmd;
-     req->resid = req->cmd.xfer;
-+    req->timeout = d->timeout;
- 
-     switch (buf[0]) {
-     case INQUIRY:
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 4ac4c872fe..6a6f091a9c 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2503,7 +2503,9 @@ static SCSIRequest *scsi_new_request(SCSIDevice *d, uint32_t tag, uint32_t lun,
-         printf("\n");
-     }
- #endif
--
-+    if (req) {
-+        req->timeout = d->timeout;
-+    }
-     return req;
- }
- 
-@@ -2679,7 +2681,7 @@ static BlockAIOCB *scsi_block_do_sgio(SCSIBlockReq *req,
-     /* The rest is as in scsi-generic.c.  */
-     io_header->mx_sb_len = sizeof(r->req.sense);
-     io_header->sbp = r->req.sense;
--    io_header->timeout = s->qdev.timeout;
-+    io_header->timeout = r->req.timeout;
-     io_header->usr_ptr = r;
-     io_header->flags |= SG_FLAG_DIRECT_IO;
- 
-@@ -2812,14 +2814,19 @@ static SCSIRequest *scsi_block_new_request(SCSIDevice *d, uint32_t tag,
-                                            void *hba_private)
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 46a3e3f280..f1c2f7cb5b 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -534,6 +534,7 @@ static void virtio_scsi_fail_cmd_req(VirtIOSCSIReq *req)
+ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
  {
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, d);
-+    struct SCSIRequest *req;
+     VirtIOSCSICommon *vs = &s->parent_obj;
++    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+     SCSIDevice *d;
+     int rc;
  
-     if (scsi_block_is_passthrough(s, buf)) {
--        return scsi_req_alloc(&scsi_generic_req_ops, &s->qdev, tag, lun,
-+        req = scsi_req_alloc(&scsi_generic_req_ops, &s->qdev, tag, lun,
-                               hba_private);
-     } else {
--        return scsi_req_alloc(&scsi_block_dma_reqops, &s->qdev, tag, lun,
-+        req = scsi_req_alloc(&scsi_block_dma_reqops, &s->qdev, tag, lun,
-                               hba_private);
-     }
-+    if (req) {
-+        req->timeout = d->timeout;
-+    }
-+    return req;
- }
+@@ -560,6 +561,21 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+                              virtio_scsi_get_lun(req->req.cmd.lun),
+                              req->req.cmd.cdb, req);
  
- static int scsi_block_parse_cdb(SCSIDevice *d, SCSICommand *cmd,
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 998b6a4558..31c3a75bad 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -157,8 +157,6 @@ static int execute_command(BlockBackend *blk,
-                            SCSIGenericReq *r, int direction,
-                            BlockCompletionFunc *complete)
- {
--    SCSIDevice *s = r->req.dev;
--
-     r->io_header.interface_id = 'S';
-     r->io_header.dxfer_direction = direction;
-     r->io_header.dxferp = r->buf;
-@@ -167,7 +165,7 @@ static int execute_command(BlockBackend *blk,
-     r->io_header.cmd_len = r->req.cmd.len;
-     r->io_header.mx_sb_len = sizeof(r->req.sense);
-     r->io_header.sbp = r->req.sense;
--    r->io_header.timeout = s->timeout;
-+    r->io_header.timeout = r->req.timeout;
-     r->io_header.usr_ptr = r;
-     r->io_header.flags |= SG_FLAG_DIRECT_IO;
- 
-@@ -596,7 +594,13 @@ const SCSIReqOps scsi_generic_req_ops = {
- static SCSIRequest *scsi_new_request(SCSIDevice *d, uint32_t tag, uint32_t lun,
-                                      uint8_t *buf, void *hba_private)
- {
--    return scsi_req_alloc(&scsi_generic_req_ops, d, tag, lun, hba_private);
-+    struct SCSIRequest *req;
++    if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_TIMEOUT)) {
++        int timeout = (int)req->req.cmd.crn;
 +
-+    req = scsi_req_alloc(&scsi_generic_req_ops, d, tag, lun, hba_private);
-+    if (req) {
-+        req->timeout = d->timeout;
++        if (timeout < 60) {
++            /* Timeouts below 60 are in seconds */
++            req->sreq->timeout = timeout * 1000;
++        } else if (timeout == 255) {
++            /* 255 is infinite timeout */
++            req->sreq->timeout = UINT_MAX;
++        } else {
++            /* Otherwise the timeout is in minutes */
++            req->sreq->timeout = timeout * 1000 * 60;
++        }
 +    }
-+    return req;
- }
++
+     if (req->sreq->cmd.mode != SCSI_XFER_NONE
+         && (req->sreq->cmd.mode != req->mode ||
+             req->sreq->cmd.xfer > req->qsgl.size)) {
+diff --git a/include/standard-headers/linux/virtio_scsi.h b/include/standard-headers/linux/virtio_scsi.h
+index ab66166b6a..b00e2b95ab 100644
+--- a/include/standard-headers/linux/virtio_scsi.h
++++ b/include/standard-headers/linux/virtio_scsi.h
+@@ -120,6 +120,7 @@ struct virtio_scsi_config {
+ #define VIRTIO_SCSI_F_HOTPLUG                  1
+ #define VIRTIO_SCSI_F_CHANGE                   2
+ #define VIRTIO_SCSI_F_T10_PI                   3
++#define VIRTIO_SCSI_F_TIMEOUT                  4
  
- static Property scsi_generic_properties[] = {
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index a976e85cfa..6c51ddc3ef 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -51,6 +51,7 @@ struct SCSIRequest {
-     uint32_t          tag;
-     uint32_t          lun;
-     uint32_t          status;
-+    uint32_t          timeout;
-     void              *hba_private;
-     size_t            resid;
-     SCSICommand       cmd;
+ /* Response codes */
+ #define VIRTIO_SCSI_S_OK                       0
 -- 
 2.12.0
