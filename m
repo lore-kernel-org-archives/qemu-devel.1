@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d92xA-0000wl-DH
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:17:25 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d93Cd-0004hy-0T
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d92x6-0000Ll-Bi
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:17:24 -0400
-Date: Fri, 12 May 2017 15:16:10 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1d93CZ-0002KE-1N
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:33:23 -0400
+Received: from ozlabs.org ([103.22.144.67]:39233)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1d93CX-0002FF-Mi
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:33:18 -0400
+Date: Fri, 12 May 2017 15:25:08 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170512051610.GC12908@umbus.fritz.box>
-References: <20170510200535.13268-1-f4bug@amsat.org>
-	<20170510200535.13268-8-f4bug@amsat.org>
-	<877f1oyov4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<3109e990-3c5a-fb7d-515d-af3771ddfa50@amsat.org>
+Message-ID: <20170512052508.GD12908@umbus.fritz.box>
+References: <1494403315-12760-1-git-send-email-peterx@redhat.com>
+	<1494403315-12760-5-git-send-email-peterx@redhat.com>
+	<20170511015637.GF14408@umbus.fritz.box>
+	<20170511093603.GJ28293@pxdev.xzpeter.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ctP54qlpMx3WjD+/"
+	protocol="application/pgp-signature"; boundary="8w3uRX/HFJGApMzv"
 Content-Disposition: inline
-In-Reply-To: <3109e990-3c5a-fb7d-515d-af3771ddfa50@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 7/8] target/ppc: optimize various functions
- using extract op
+In-Reply-To: <20170511093603.GJ28293@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v3 04/12] memory: fix
+ address_space_get_iotlb_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,119 +31,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <lvivier@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---ctP54qlpMx3WjD+/
-Content-Type: text/plain; charset=iso-8859-1
+--8w3uRX/HFJGApMzv
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 11, 2017 at 10:48:42PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Hi Nikunj,
->=20
-> On 05/11/2017 01:54 AM, Nikunj A Dadhania wrote:
-> > Philippe Mathieu-Daud=E9 <f4bug@amsat.org> writes:
-> >=20
-> > > Applied using Coccinelle script.
+On Thu, May 11, 2017 at 05:36:03PM +0800, Peter Xu wrote:
+> On Thu, May 11, 2017 at 11:56:38AM +1000, David Gibson wrote:
+> > On Wed, May 10, 2017 at 04:01:47PM +0800, Peter Xu wrote:
+> > > This function has an assumption that we will definitely call translat=
+e()
+> > > once (or say, the addr will be located inside one IOMMU memory region=
+),
+> > > otherwise an empty IOTLB will be returned. Nevertheless, this is not
+> > > what we want. When there is no IOMMU memory region, we should build u=
+p a
+> > > static mapping for the caller, instead of an invalid IOTLB.
 > > >=20
-> > > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > > We won't trigger this path before VT-d passthrough mode. When
+> > > passthrough mode for a vhost device is setup, VT-d is possible to
+> > > disable the IOMMU region for that device. Without current patch, we'll
+> > > get a vhost boot failure, and it'll be failed over to virtio userspace
+> > > mode.
+> >=20
+> > This doesn't look right to me.  You're assuming the target is
+> > address_space_memory, which might not be the case - and you should be
+> > able to check from the MR you do hit.  Furthermore it doesn't look
+> > like you're accounting for the trivial translation if the section's
+> > offset in the address space is different from its offset in the MR.
+>=20
+> Do you mean this line?
+>=20
+>         addr =3D addr - section->offset_within_address_space
+>                + section->offset_within_region;
+
+Uh.. where is that line?  But.. wait, yes, I think I was mistaken.  I saw:
+	.translated_addr =3D iova,
+=09
+and thought that meant you were assuming an identify mapping from iova
+to translated addr.  But thinking more carefull, IIRC iova and
+translated_addr are both relative to the MR, not the AS, so I think
+that is correct after all.
+
+> I thought it was calculating the relative address against that memory
+> region. That should only be useful if we want to do further
+> translate(), right? For the path that this patch tries to handle (when
+> there is no translate() call), then this "addr" is useless here?
+>=20
+> Regarding to the address space assignment - do you mean, e.g., I
+> should use section->address_space here instead of
+> &system_address_space? If so, I can do the switch.
+
+Yes, I think you should.
+
+> But after all, for
+> now address_space_get_iotlb_entry() is only used by vhost codes, and
+> it only check against iotlb.target_as =3D=3D NULL, so the address space
+> didn't count too much here...
+
+> Another reason I used &address_space_memory is that in
+> vfio_iommu_map_notify() we have a check against it:
+>=20
+>     if (iotlb->target_as !=3D &address_space_memory) {
+>         error_report("Wrong target AS \"%s\", only system memory is allow=
+ed",
+>                      iotlb->target_as->name ? iotlb->target_as->name : "n=
+one");
+>         return;
+>     }
+>=20
+> Or say, we have some assumptions (not only in this patch) that assumes
+> this iotlb.target_as should be system_address_space.
+
+Right, the vhost code can only handle some IOMMU setups - something
+like nested IOMMUs would break it.  But this way if someone sets up a
+machine with an IOMMU configuration that vhost can't handle, you'll
+get an error message, rather than accesses to unexpected locations,
+which could cause really hard to debug corruption.
+
+In other words we make assumptions, but we should _test_ those
+assumptions.
+
+I also think it would make sense to use address_space_translate() if we
+can, since it's an existing interface for a very similar operation.
+
+
+>=20
+> Thanks,
+>=20
+> >=20
+> > I think for the fallback path you're going to want something based on
+> > address_space_translate() instead.
+> >=20
+> > > CC: Paolo Bonzini <pbonzini@redhat.com>
+> > > CC: Jason Wang <jasowang@redhat.com>
+> > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
 > > > ---
-> > >  target/ppc/translate.c              |  9 +++------
-> > >  target/ppc/translate/vsx-impl.inc.c | 21 +++++++--------------
-> > >  2 files changed, 10 insertions(+), 20 deletions(-)
+> > >  exec.c | 20 +++++++++++++++++++-
+> > >  1 file changed, 19 insertions(+), 1 deletion(-)
 > > >=20
-> > > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > > index f40b5a1abf..64ab412bf3 100644
-> > > --- a/target/ppc/translate.c
-> > > +++ b/target/ppc/translate.c
-> > > @@ -868,8 +868,7 @@ static inline void gen_op_arith_add(DisasContext =
-*ctx, TCGv ret, TCGv arg1,
-> > >              }
-> > >              tcg_gen_xor_tl(cpu_ca, t0, t1);        /* bits changed w=
-/ carry */
-> > >              tcg_temp_free(t1);
-> > > -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);   /* extract bit 32=
- */
-> > > -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-> > > +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
-> > >              if (is_isa300(ctx)) {
-> > >                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
-> > >              }
-> > > @@ -1399,8 +1398,7 @@ static inline void gen_op_arith_subf(DisasConte=
-xt *ctx, TCGv ret, TCGv arg1,
-> > >              tcg_temp_free(inv1);
-> > >              tcg_gen_xor_tl(cpu_ca, t0, t1);         /* bits changes =
-w/ carry */
-> > >              tcg_temp_free(t1);
-> > > -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);    /* extract bit 3=
-2 */
-> > > -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-> > > +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
-> > >              if (is_isa300(ctx)) {
-> > >                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
-> > >              }
+> > > diff --git a/exec.c b/exec.c
+> > > index 072de5d..5cfdacd 100644
+> > > --- a/exec.c
+> > > +++ b/exec.c
+> > > @@ -463,12 +463,13 @@ address_space_translate_internal(AddressSpaceDi=
+spatch *d, hwaddr addr, hwaddr *x
+> > >  }
+> > > =20
+> > >  /* Called from RCU critical section */
+> > > -IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr=
+ addr,
+> > > +IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr=
+ iova,
+> > >                                              bool is_write)
+> > >  {
+> > >      IOMMUTLBEntry iotlb =3D {0};
+> > >      MemoryRegionSection *section;
+> > >      MemoryRegion *mr;
+> > > +    hwaddr addr =3D iova, psize;
+> > > =20
+> > >      for (;;) {
+> > >          AddressSpaceDispatch *d =3D atomic_rcu_read(&as->dispatch);
+> > > @@ -478,6 +479,23 @@ IOMMUTLBEntry address_space_get_iotlb_entry(Addr=
+essSpace *as, hwaddr addr,
+> > >          mr =3D section->mr;
+> > > =20
+> > >          if (!mr->iommu_ops) {
+> > > +            /*
+> > > +             * We didn't translate() but reached here. It possibly
+> > > +             * means it's a static mapping. If so (it should be RAM),
+> > > +             * we set the IOTLB up.
+> > > +             */
+> > > +            if (!iotlb.target_as && memory_region_is_ram(mr) &&
+> > > +                !memory_region_is_rom(mr)) {
+> > > +                psize =3D mr->ram_block->page_size;
+> > > +                iova &=3D ~(psize - 1);
+> > > +                iotlb =3D (IOMMUTLBEntry) {
+> > > +                    .target_as =3D &address_space_memory,
+> > > +                    .iova =3D iova,
+> > > +                    .translated_addr =3D iova,
+> > > +                    .addr_mask =3D psize - 1,
+> > > +                    .perm =3D IOMMU_RW,
+> > > +                };
+> > > +            }
+> > >              break;
+> > >          }
+> > > =20
 > >=20
-> > Above changes are correct.
-> >=20
-> > Rest of them are wrong as discussed above in the thread with Richard.
-> >
 >=20
-> I tried to correct the cocci script and ran it again (will post in few min
-> as v3) and got:
 >=20
-> $ docker run -it -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle --sp-file
-> scripts/coccinelle/tcg_gen_extract.cocci --macro-file
-> scripts/cocci-macro-file.h --dir target/ppc
-> init_defs_builtins: /usr/lib64/coccinelle/standard.h
-> init_defs: scripts/cocci-macro-file.h
-> HANDLING: target/ppc/mfrom_table_gen.c
-> HANDLING: target/ppc/user_only_helper.c
-> HANDLING: target/ppc/mmu-hash64.c
-> HANDLING: target/ppc/timebase_helper.c
-> HANDLING: target/ppc/gdbstub.c
-> HANDLING: target/ppc/translate.c
-> candidate at target/ppc/translate.c:5386
->   op_size: tl/tl (same)
->   low_bits: 4 (value: 0xf)
->   len: 0xf
->   len_bits =3D=3D low_bits
->   candidate IS optimizable
 >=20
-> candidate at target/ppc/translate.c:871
->   op_size: tl/tl (same)
->   low_bits: 1 (value: 0x1)
->   len: 0x1
->   len_bits =3D=3D low_bits
->   candidate IS optimizable
->=20
-> candidate at target/ppc/translate.c:1402
->   op_size: tl/tl (same)
->   low_bits: 1 (value: 0x1)
->   len: 0x1
->   len_bits =3D=3D low_bits
->   candidate IS optimizable
->=20
-> > > @@ -5383,8 +5381,7 @@ static void gen_mfsri(DisasContext *ctx)
-> > >      CHK_SV;
-> > >      t0 =3D tcg_temp_new();
-> > >      gen_addr_reg_index(ctx, t0);
-> > > -    tcg_gen_shri_tl(t0, t0, 28);
-> > > -    tcg_gen_andi_tl(t0, t0, 0xF);
-> > > +    tcg_gen_extract_tl(t0, t0, 28, 0xF);
-> > >      gen_helper_load_sr(cpu_gpr[rd], cpu_env, t0);
-> > >      tcg_temp_free(t0);
-> > >      if (ra !=3D 0 && ra !=3D rd)
->=20
-> 0xF =3D 0b1111 so this one seems correct to, right?
-
-No, I don't think so.  AFAICT tcg_gen_extract_tl() takes a field
-width, not a mask as the last parameter.  So this would need to be
-	tcg_gen_extract_tl(t0, t0, 28, 4);
-
-Your script needs to do essentially a log-base-2 of the mask.  I don't
-know if Coccinelle can do that..
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -147,25 +193,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ctP54qlpMx3WjD+/
+--8w3uRX/HFJGApMzv
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZFUUaAAoJEGw4ysog2bOS69UP/R2rMG7aT4WSc3fH1pdlsTxw
-qVsClpoE8FTz0adJP/F4c6m4Ls8XBQrW1HIQV9nbp3NmlQ3/xtZcIaJFKFzyZhES
-N0gngeJbIEytm5caL3FZ0zhHQ2LRQJXZhZ1rnTGcOXjirFgPoXeAPoxZSK/J2r0T
-5hI2alY6mYQV615Srmb31TvM4UwWWjeCcG6bFavCSTgXTUgKV9N6rjXUYvbs0jbj
-7J9CTc89cU2r1o0Vxx/JwzRlIS+oUJmXr3lcyBxBHk/Hr+CHDrPm5iSIpyZO5xvi
-4sqM4sxDYoW6K9RKAf01FAoXlpmQkf4yhw3eSGvOI2QElkGwXr+mnV/YctcIQZ3G
-9GpzNqzUD+SfNHf6/iehLozs8cpjnMpgmfBZoznO/VLXdBmoHeqVYDWM/UkniwHy
-jb2aTeEqXFTvXzztuwIU/sAFxrHz2wboKl9c3YAMSGyyDl/HaHc7gP0xgXtUF2Aa
-eMIHy3DbUevAZ1BiBiDYB7UTiWFqftF2esWGNf/I3zR6TfnCWrR3/B+w1tPDGCfq
-Rn8QxFPOi60Dsx23trJ3Mqz7mYCU3RnEPs0ANcYHa8kODq3ONXDSk3vHRomh6w6x
-tH7H8+i6e1eGlqc6jaw7h6FxFO3a2u2oVSmSd/9sbEMKY6yXsL1T3IMrlrZj+d2N
-APHiP7NOElsdgDjkaFMD
-=91zd
+iQIcBAEBCAAGBQJZFUc0AAoJEGw4ysog2bOSE/IP/iV6ENHkdugKiP4+mijaEZFc
+WV9Kxa6bai/gz64iO0qZ6JpcUpE8UBpfWvDRFOaza1EW58fRE3d3T8UyI4JbfEXs
+puz5PiOPGgc/3YvX4HV6MeW9x4O9JFRTlEKm1se4u5kDq41tWx0jyWg3O3/9+7IV
+cRfkI/IG/WO9HZRCa9TVk7z4NCCuJ+0utSA7W0dEl9IOoQdQr7MT6CcGeQekSM/X
+GEqBxfUwcCTuzeBjjWLo8ZdYWWS3eNNGg1NlTHJAa1Dq5bkHHude2KbUXYO5JQck
+fRAcB2YWheflcxiaRutBa2PqRvYV6czmiJ7AAi257Hwikq6t2LKNMLCG2e8LXNTp
+Bra0W5DteKcwFe0VoOXJLFLt1F5eDHqMxo21gRPFWXItAOUJUS7pt3tXZN5TClTG
+eyqA6zG6cSU2sQZ8IaqSzfZx094QOoaET8GZiPoPQOwdssBIeUr+i0fZFzxFm9pK
+LFULZpi4HLFMltRbLs8c36P70EcIdhM/p5GmJx9ZvJrJfG2vFUUhZW0clO8DyeRA
+r+0uhV9nBg2dYkmy3hrCB4tiq4v0CwjD88Lm8V2YkFd4ohyZ1tC6a4tmhby40R0m
+O+azeda7WAlBHib+UZLIEyKYv5kQXGvHZ3qIYHOMqoj21spYCvdULLUODWTKQfLB
+5y3cYeeYLZKhcGiXMc6G
+=Kg6a
 -----END PGP SIGNATURE-----
 
---ctP54qlpMx3WjD+/--
+--8w3uRX/HFJGApMzv--
