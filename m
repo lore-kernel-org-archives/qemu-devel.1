@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d9697-0005xh-Aw
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:59 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d969o-00072V-P0
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:42:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d9693-0002BZ-UX
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:57 -0400
-Received: from mga11.intel.com ([192.55.52.93]:62480)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1d9693-0001je-KI
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:53 -0400
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri, 12 May 2017 16:35:48 +0800
-Message-Id: <1494578148-102868-17-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 16/16] vl: enable vhost-pci-slave
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d969l-0002ky-Kp
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:42:40 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d969l-0002fj-0x
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:42:37 -0400
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+	<20170424164244.GJ2362@work-vm>
+	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+	<a35ce92b-d10b-646b-34d0-d7f075fc46d4@gmail.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <5915755E.8080806@huawei.com>
+Date: Fri, 12 May 2017 16:42:06 +0800
+MIME-Version: 1.0
+In-Reply-To: <a35ce92b-d10b-646b-34d0-d7f075fc46d4@gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,106 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@gmail.com, marcandre.lureau@gmail.com, mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
-Cc: Wei Wang <wei.w.wang@intel.com>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>
+Cc: Wanpeng Li <kernellwp@gmail.com>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiao
+	Guangrong <xiaoguangrong@tencent.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>
 
-Enable the use of vhost-pci. The init and cleanup stub functions are
-added for the platforms that do not support the use of virtio.
+On 2017/5/12 16:09, Xiao Guangrong wrote:
+>
+> On 05/11/2017 08:24 PM, Paolo Bonzini wrote:
+>>
+>> On 11/05/2017 14:07, Zhoujian (jay) wrote:
+>>> -        * Scan sptes if dirty logging has been stopped, dropping those
+>>> -        * which can be collapsed into a single large-page spte.  Later
+>>> -        * page faults will create the large-page sptes.
+>>> +        * Reset each vcpu's mmu, then page faults will create the large-page
+>>> +        * sptes later.
+>>>            */
+>>>           if ((change != KVM_MR_DELETE) &&
+>>>                   (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+>>> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+>>> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
+>>> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+>>> +               kvm_for_each_vcpu(i, vcpu, kvm)
+>>> +                       kvm_mmu_reset_context(vcpu);
+>> This should be "kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);" but
+>> I am not sure it is enough.  I think that if you do not zap the SPTEs,
+>> the page faults will use 4K SPTEs, not large ones (though I'd have to
+>> check better; CCing Xiao and Wanpeng).
+> Yes, Paolo is right. kvm_mmu_reset_context() just reloads vCPU's
+> root page table, 4k mappings are still kept.
+>
+> There are two issues reported:
+> - one is kvm_mmu_slot_apply_flags(), when enable dirty log tracking.
+>
+>     Its root cause is kvm_mmu_slot_remove_write_access() takes too much
+>     time.
+>
+>     We can make the code adaptive to use the new fast-write-protect faculty
+>     introduced by my patchset, i.e, if the number of pages contained in this
+>     memslot is more than > TOTAL * FAST_WRITE_PROTECT_PAGE_PERCENTAGE, then
+>     we use fast-write-protect instead.
+>
+> - another one is kvm_mmu_zap_collapsible_sptes() when disable dirty
+>     log tracking.
+>
+>     collapsible_sptes zaps 4k mappings to make memory-read happy, it is not
+>     required by the semanteme of KVM_SET_USER_MEMORY_REGION and it is not
+>     urgent for vCPU's running, it could be done in a separate thread and use
+>     lock-break technology.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
----
- hw/virtio/vhost-stub.c | 11 +++++++++++
- vl.c                   | 24 ++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+How about move the action of stopping dirty log into migrate_fd_cleanup() directly,
+which is processed in main thread as BH after migration is completed?  It will not
+has any side-effect even migration is failed, Or users cancel migration, No ?
 
-diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
-index e130791..bfb73df 100644
---- a/hw/virtio/vhost-stub.c
-+++ b/hw/virtio/vhost-stub.c
-@@ -1,6 +1,7 @@
- #include "qemu/osdep.h"
- #include "hw/virtio/vhost.h"
- #include "hw/virtio/vhost-user.h"
-+#include "hw/virtio/vhost-pci-slave.h"
- 
- bool vhost_has_free_slot(void)
- {
-@@ -16,3 +17,13 @@ int vhost_user_can_read(void *opaque)
- {
-     return 0;
- }
-+
-+int vhost_pci_slave_init(QemuOpts *opt)
-+{
-+    return -1;
-+}
-+
-+int vhost_pci_slave_cleanup(void)
-+{
-+    return -1;
-+}
-diff --git a/vl.c b/vl.c
-index 2ee4713..18102d7 100644
---- a/vl.c
-+++ b/vl.c
-@@ -129,6 +129,7 @@ int main(int argc, char **argv)
- #include "sysemu/replay.h"
- #include "qapi/qmp/qerror.h"
- #include "sysemu/iothread.h"
-+#include "hw/virtio/vhost-pci-slave.h"
- 
- #define MAX_VIRTIO_CONSOLES 1
- #define MAX_SCLP_CONSOLES 1
-@@ -187,6 +188,7 @@ uint8_t *boot_splash_filedata;
- size_t boot_splash_filedata_size;
- uint8_t qemu_extra_params_fw[2];
- int only_migratable; /* turn it off unless user states otherwise */
-+bool vhost_pci_slave_enabled;
- 
- int icount_align_option;
- 
-@@ -4060,6 +4062,7 @@ int main(int argc, char **argv, char **envp)
-                 if (!opts) {
-                     exit(1);
-                 }
-+                vhost_pci_slave_enabled = true;
-                 break;
-             default:
-                 os_parse_cmd_args(popt->index, optarg);
-@@ -4591,6 +4594,18 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
- 
-+    /* check if the vhost-pci-server is enabled */
-+    if (vhost_pci_slave_enabled) {
-+        int ret;
-+        ret = vhost_pci_slave_init(qemu_opts_find(
-+                                    qemu_find_opts("vhost-pci-slave"),
-+                                    NULL));
-+        if (ret < 0) {
-+            error_report("vhost-pci-slave init failed");
-+            exit(1);
-+        }
-+    }
-+
-     /* init USB devices */
-     if (machine_usb(current_machine)) {
-         if (foreach_device_config(DEV_USB, usb_parse) < 0)
-@@ -4736,6 +4751,15 @@ int main(int argc, char **argv, char **envp)
-     pause_all_vcpus();
-     res_free();
- 
-+    if (vhost_pci_slave_enabled) {
-+        int ret;
-+        ret = vhost_pci_slave_cleanup();
-+        if (ret < 0) {
-+            error_report("vhost-pci-slave init failed");
-+            exit(1);
-+        }
-+    }
-+
-     /* vhost-user must be cleaned up before chardevs.  */
-     net_cleanup();
-     audio_cleanup();
--- 
-2.7.4
+> Thanks!
+>
+>
+> .
+>
