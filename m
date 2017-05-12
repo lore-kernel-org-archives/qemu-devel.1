@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdN-0000PA-JW
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:46 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdO-0000QT-Qv
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdM-0003wr-Mo
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:45 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdN-0003yk-Ty
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:46 -0400
 Received: from [59.151.112.132] (port=35788 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdL-0003rG-LQ
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:44 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdN-0003rG-HC
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:45 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Fri, 12 May 2017 09:41:24 +0800
-Message-ID: <1494553288-30764-9-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Fri, 12 May 2017 09:41:23 +0800
+Message-ID: <1494553288-30764-8-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 In-Reply-To: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V4 08/12] net/colo-compare.c: Make colo-compare
- support vnet_hdr_len
+Subject: [Qemu-devel] [PATCH V4 07/12] net/colo.c: Make vnet_hdr_len as
+ packet property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,125 +30,90 @@ To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
 	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-COLO-compare can get vnet header length from filter,
-Add vnet_hdr_len to struct packet and output packet with
-the vnet_hdr_len.
+We can use this property flush and send packet with vnet_hdr_len.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 ---
- net/colo-compare.c | 45 ++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 34 insertions(+), 11 deletions(-)
+ net/colo-compare.c    | 8 ++++++--
+ net/colo.c            | 3 ++-
+ net/colo.h            | 4 +++-
+ net/filter-rewriter.c | 2 +-
+ 4 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 87a9529..cb0b04e 100644
+index 99a6912..87a9529 100644
 --- a/net/colo-compare.c
 +++ b/net/colo-compare.c
-@@ -98,9 +98,10 @@ enum {
-     SECONDARY_IN,
- };
+@@ -122,9 +122,13 @@ static int packet_enqueue(CompareState *s, int mode)
+     Connection *conn;
  
--static int compare_chr_send(CharBackend *out,
-+static int compare_chr_send(CompareState *s,
-                             const uint8_t *buf,
--                            uint32_t size);
-+                            uint32_t size,
-+                            uint32_t vnet_hdr_len);
- 
- static gint seq_sorter(Packet *a, Packet *b, gpointer data)
- {
-@@ -473,7 +474,10 @@ static void colo_compare_connection(void *opaque, void *user_data)
-         }
- 
-         if (result) {
--            ret = compare_chr_send(&s->chr_out, pkt->data, pkt->size);
-+            ret = compare_chr_send(s,
-+                                   pkt->data,
-+                                   pkt->size,
-+                                   pkt->vnet_hdr_len);
-             if (ret < 0) {
-                 error_report("colo_send_primary_packet failed");
-             }
-@@ -494,9 +498,10 @@ static void colo_compare_connection(void *opaque, void *user_data)
+     if (mode == PRIMARY_IN) {
+-        pkt = packet_new(s->pri_rs.buf, s->pri_rs.packet_len);
++        pkt = packet_new(s->pri_rs.buf,
++                         s->pri_rs.packet_len,
++                         s->pri_rs.vnet_hdr_len);
+     } else {
+-        pkt = packet_new(s->sec_rs.buf, s->sec_rs.packet_len);
++        pkt = packet_new(s->sec_rs.buf,
++                         s->sec_rs.packet_len,
++                         s->sec_rs.vnet_hdr_len);
      }
+ 
+     if (parse_packet_early(pkt)) {
+diff --git a/net/colo.c b/net/colo.c
+index 8cc166b..180eaed 100644
+--- a/net/colo.c
++++ b/net/colo.c
+@@ -153,13 +153,14 @@ void connection_destroy(void *opaque)
+     g_slice_free(Connection, conn);
  }
  
--static int compare_chr_send(CharBackend *out,
-+static int compare_chr_send(CompareState *s,
-                             const uint8_t *buf,
--                            uint32_t size)
-+                            uint32_t size,
-+                            uint32_t vnet_hdr_len)
+-Packet *packet_new(const void *data, int size)
++Packet *packet_new(const void *data, int size, int vnet_hdr_len)
  {
-     int ret = 0;
-     uint32_t len = htonl(size);
-@@ -505,12 +510,24 @@ static int compare_chr_send(CharBackend *out,
-         return 0;
-     }
+     Packet *pkt = g_slice_new(Packet);
  
--    ret = qemu_chr_fe_write_all(out, (uint8_t *)&len, sizeof(len));
-+    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
-     if (ret != sizeof(len)) {
-         goto err;
-     }
+     pkt->data = g_memdup(data, size);
+     pkt->size = size;
+     pkt->creation_ms = qemu_clock_get_ms(QEMU_CLOCK_HOST);
++    pkt->vnet_hdr_len = vnet_hdr_len;
  
--    ret = qemu_chr_fe_write_all(out, (uint8_t *)buf, size);
-+    if (s->vnet_hdr) {
-+        /*
-+         * We send vnet header len make other module(like filter-redirector)
-+         * know how to parse net packet correctly.
-+         */
-+        len = htonl(vnet_hdr_len);
-+        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
-+        if (ret != sizeof(len)) {
-+            goto err;
-+        }
-+    }
-+
-+    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
-     if (ret != size) {
-         goto err;
-     }
-@@ -535,7 +552,7 @@ static void compare_pri_chr_in(void *opaque, const uint8_t *buf, int size)
-     CompareState *s = COLO_COMPARE(opaque);
-     int ret;
+     return pkt;
+ }
+diff --git a/net/colo.h b/net/colo.h
+index 7c524f3..caedb0d 100644
+--- a/net/colo.h
++++ b/net/colo.h
+@@ -43,6 +43,8 @@ typedef struct Packet {
+     int size;
+     /* Time of packet creation, in wall clock ms */
+     int64_t creation_ms;
++    /* Get vnet_hdr_len from filter */
++    uint32_t vnet_hdr_len;
+ } Packet;
  
--    ret = net_fill_rstate(&s->pri_rs, buf, size, false);
-+    ret = net_fill_rstate(&s->pri_rs, buf, size, s->vnet_hdr);
-     if (ret == -1) {
-         qemu_chr_fe_set_handlers(&s->chr_pri_in, NULL, NULL, NULL,
-                                  NULL, NULL, true);
-@@ -552,7 +569,7 @@ static void compare_sec_chr_in(void *opaque, const uint8_t *buf, int size)
-     CompareState *s = COLO_COMPARE(opaque);
-     int ret;
+ typedef struct ConnectionKey {
+@@ -82,7 +84,7 @@ Connection *connection_get(GHashTable *connection_track_table,
+                            ConnectionKey *key,
+                            GQueue *conn_list);
+ void connection_hashtable_reset(GHashTable *connection_track_table);
+-Packet *packet_new(const void *data, int size);
++Packet *packet_new(const void *data, int size, int vnet_hdr_len);
+ void packet_destroy(void *opaque, void *user_data);
  
--    ret = net_fill_rstate(&s->sec_rs, buf, size, false);
-+    ret = net_fill_rstate(&s->sec_rs, buf, size, s->vnet_hdr);
-     if (ret == -1) {
-         qemu_chr_fe_set_handlers(&s->chr_sec_in, NULL, NULL, NULL,
-                                  NULL, NULL, true);
-@@ -675,7 +692,10 @@ static void compare_pri_rs_finalize(SocketReadState *pri_rs)
+ #endif /* QEMU_COLO_PROXY_H */
+diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+index afa06e8..63256c7 100644
+--- a/net/filter-rewriter.c
++++ b/net/filter-rewriter.c
+@@ -158,7 +158,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
+     char *buf = g_malloc0(size);
  
-     if (packet_enqueue(s, PRIMARY_IN)) {
-         trace_colo_compare_main("primary: unsupported packet in");
--        compare_chr_send(&s->chr_out, pri_rs->buf, pri_rs->packet_len);
-+        compare_chr_send(s,
-+                         pri_rs->buf,
-+                         pri_rs->packet_len,
-+                         pri_rs->vnet_hdr_len);
-     } else {
-         /* compare connection */
-         g_queue_foreach(&s->conn_list, colo_compare_connection, s);
-@@ -783,7 +803,10 @@ static void colo_flush_packets(void *opaque, void *user_data)
+     iov_to_buf(iov, iovcnt, 0, buf, size);
+-    pkt = packet_new(buf, size);
++    pkt = packet_new(buf, size, 0);
+     g_free(buf);
  
-     while (!g_queue_is_empty(&conn->primary_list)) {
-         pkt = g_queue_pop_head(&conn->primary_list);
--        compare_chr_send(&s->chr_out, pkt->data, pkt->size);
-+        compare_chr_send(s,
-+                         pkt->data,
-+                         pkt->size,
-+                         pkt->vnet_hdr_len);
-         packet_destroy(pkt, NULL);
-     }
-     while (!g_queue_is_empty(&conn->secondary_list)) {
+     /*
 -- 
 2.7.4
