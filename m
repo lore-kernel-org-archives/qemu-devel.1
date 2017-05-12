@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44853)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9K9H-0008Pr-2c
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:03 -0400
+	id 1d9K9J-0008TL-LV
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9K9G-0002XJ-AM
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:03 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33554)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9K9G-0002WW-6A
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:02 -0400
-Received: by mail-qt0-x243.google.com with SMTP id a46so8697242qte.0
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:39:02 -0700 (PDT)
+	id 1d9K9I-0002a6-Or
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:05 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 12 May 2017 20:38:39 -0300
-Message-Id: <20170512233843.27713-3-f4bug@amsat.org>
+Date: Fri, 12 May 2017 20:38:40 -0300
+Message-Id: <20170512233843.27713-4-f4bug@amsat.org>
 In-Reply-To: <20170512233843.27713-1-f4bug@amsat.org>
 References: <20170512233843.27713-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 2/6] target/alpha: optimize cvtlq() using
+Subject: [Qemu-devel] [PATCH v4 3/6] target/arm: optimize rev16() using
  extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,7 +27,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 Patch created mechanically using Coccinelle script via:
@@ -44,23 +37,29 @@ Patch created mechanically using Coccinelle script via:
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/alpha/translate.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ target/arm/translate-a64.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index df5d695344..531af4f5b8 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -747,9 +747,8 @@ static void gen_cvtlq(TCGv vc, TCGv vb)
-     /* The arithmetic right shift here, plus the sign-extended mask below
-        yields a sign-extended result without an explicit ext32s_i64.  */
-     tcg_gen_sari_i64(tmp, vb, 32);
--    tcg_gen_shri_i64(vc, vb, 29);
-+    tcg_gen_extract_i64(vc, vb, 29, 30);
-     tcg_gen_andi_i64(tmp, tmp, (int32_t)0xc0000000);
--    tcg_gen_andi_i64(vc, vc, 0x3fffffff);
-     tcg_gen_or_i64(vc, vc, tmp);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 24de30d92c..759b2466ef 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -4038,14 +4038,12 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
+     tcg_gen_andi_i64(tcg_tmp, tcg_rn, 0xffff);
+     tcg_gen_bswap16_i64(tcg_rd, tcg_tmp);
  
-     tcg_temp_free(tmp);
+-    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 16);
+-    tcg_gen_andi_i64(tcg_tmp, tcg_tmp, 0xffff);
++    tcg_gen_extract_i64(tcg_tmp, tcg_rn, 16, 16);
+     tcg_gen_bswap16_i64(tcg_tmp, tcg_tmp);
+     tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, 16, 16);
+ 
+     if (sf) {
+-        tcg_gen_shri_i64(tcg_tmp, tcg_rn, 32);
+-        tcg_gen_andi_i64(tcg_tmp, tcg_tmp, 0xffff);
++        tcg_gen_extract_i64(tcg_tmp, tcg_rn, 32, 16);
+         tcg_gen_bswap16_i64(tcg_tmp, tcg_tmp);
+         tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, 32, 16);
+ 
 -- 
 2.11.0
