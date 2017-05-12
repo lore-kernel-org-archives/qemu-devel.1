@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d968i-0005as-PY
+	(envelope-from <wei.w.wang@intel.com>) id 1d968k-0005c1-00
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d968g-0001nu-CM
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:32 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d968i-0001q9-47
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:34 -0400
 Received: from mga11.intel.com ([192.55.52.93]:62480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1d968f-0001je-Sp
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:30 -0400
+	id 1d968h-0001je-Ll
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:32 -0400
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri, 12 May 2017 16:35:35 +0800
-Message-Id: <1494578148-102868-4-git-send-email-wei.w.wang@intel.com>
+Date: Fri, 12 May 2017 16:35:36 +0800
+Message-Id: <1494578148-102868-5-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
 References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 03/16] vhost-pci-slave: create a vhost-user
- slave to support vhost-pci
+Subject: [Qemu-devel] [PATCH v2 04/16] vhost-pci-net: add vhost-pci-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,733 +27,408 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: stefanha@gmail.com, marcandre.lureau@gmail.com, mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
+Add the vhost-pci-net device emulation.
+
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/virtio/Makefile.objs             |   1 +
- hw/virtio/vhost-pci-slave.c         | 597 ++++++++++++++++++++++++++++++++++++
- include/hw/virtio/vhost-pci-slave.h |  61 ++++
- include/hw/virtio/vhost-user.h      |  13 +
- 4 files changed, 672 insertions(+)
- create mode 100644 hw/virtio/vhost-pci-slave.c
- create mode 100644 include/hw/virtio/vhost-pci-slave.h
+ hw/net/vhost-pci-net.c                         | 248 +++++++++++++++++++++++++
+ hw/virtio/vhost-pci-slave.c                    |   5 +
+ include/hw/virtio/vhost-pci-net.h              |  34 ++++
+ include/standard-headers/linux/vhost_pci_net.h |  74 ++++++++
+ 4 files changed, 361 insertions(+)
+ create mode 100644 hw/net/vhost-pci-net.c
+ create mode 100644 include/hw/virtio/vhost-pci-net.h
+ create mode 100644 include/standard-headers/linux/vhost_pci_net.h
 
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 765d363..5e81f2f 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -3,6 +3,7 @@ common-obj-y += virtio-rng.o
- common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
- common-obj-y += virtio-bus.o
- common-obj-y += virtio-mmio.o
-+common-obj-y += vhost-pci-slave.o
- 
- obj-y += virtio.o virtio-balloon.o 
- obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
-diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
+diff --git a/hw/net/vhost-pci-net.c b/hw/net/vhost-pci-net.c
 new file mode 100644
-index 0000000..464afa3
+index 0000000..8e194ba
 --- /dev/null
-+++ b/hw/virtio/vhost-pci-slave.c
-@@ -0,0 +1,597 @@
++++ b/hw/net/vhost-pci-net.c
+@@ -0,0 +1,248 @@
 +/*
-+ * Vhost-pci Slave
++ * vhost-pci-net support
 + *
-+ * Copyright Intel Corp. 2017
++ * Copyright Intel, Inc. 2016
 + *
 + * Authors:
-+ * Wei Wang    <wei.w.wang@intel.com>
++ *  Wei Wang <wei.w.wang@intel.com>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ * Contributions after 2012-01-13 are licensed under the terms of the
++ * GNU GPL, version 2 or (at your option) any later version.
 + */
 +
-+#include <qemu/osdep.h>
-+#include <qemu/sockets.h>
-+
-+#include "monitor/qdev.h"
-+#include "qapi/error.h"
-+#include "qemu/config-file.h"
++#include "qemu/osdep.h"
++#include "qemu/iov.h"
 +#include "qemu/error-report.h"
-+#include "hw/virtio/virtio-pci.h"
-+#include "hw/virtio/vhost-pci-slave.h"
-+#include "hw/virtio/vhost-user.h"
++#include "hw/virtio/virtio-access.h"
++#include "hw/virtio/vhost-pci-net.h"
 +
-+/*
-+ * The basic feature bits for all vhost-pci devices. It will be or-ed
-+ * with a device specific features(e.g. VHOST_PCI_NET_FEATURE_BITS),
-+ * defined below.
-+ */
-+#define VHOST_PCI_FEATURE_BITS (1ULL << VIRTIO_F_VERSION_1)
++#define VPNET_CTRLQ_SIZE 32
++#define VPNET_VQ_SIZE 256
 +
-+/*
-+ * The device features here are sent to the remote virtio-net device for
-+ * a negotiation first. Then the remotely negotiated features are given
-+ * to the vhost-pci-net device to negotiate with its driver.
-+ */
-+#define VHOST_PCI_NET_FEATURE_BITS ((1ULL << VIRTIO_NET_F_MRG_RXBUF) | \
-+                                    (1ULL << VIRTIO_NET_F_CTRL_VQ) | \
-+                                    (1ULL << VIRTIO_NET_F_MQ))
-+
-+VhostPCISlave *vp_slave;
-+
-+/* Clean up VhostPCIDev */
-+static void vp_dev_cleanup(void)
++static void vpnet_handle_vq(VirtIODevice *vdev, VirtQueue *vq)
 +{
-+    int ret;
-+    uint32_t i, nregions;
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    Remoteq *remoteq;
-+
-+    /*
-+     * Normally, the pointer shoud have pointed to the slave device's vdev.
-+     * Otherwise, it means that no vhost-pci device has been created yet.
-+     * In this case, just return.
-+     */
-+    if (!vp_dev->vdev) {
-+        return;
-+    }
-+
-+    nregions = vp_dev->remote_mem_num;
-+    for (i = 0; i < nregions; i++) {
-+        ret = munmap(vp_dev->mr_map_base[i], vp_dev->mr_map_size[i]);
-+        if (ret < 0) {
-+            error_report("%s: failed to unmap mr[%d]", __func__, i);
-+            continue;
-+        }
-+        memory_region_del_subregion(vp_dev->bar_mr, vp_dev->sub_mr + i);
-+    }
-+
-+    if (!QLIST_EMPTY(&vp_dev->remoteq_list)) {
-+        QLIST_FOREACH(remoteq, &vp_dev->remoteq_list, node)
-+            g_free(remoteq);
-+    }
-+    QLIST_INIT(&vp_dev->remoteq_list);
-+    vp_dev->remoteq_num = 0;
-+    vp_dev->vdev = NULL;
 +}
 +
-+static int vp_slave_write(CharBackend *chr_be, VhostUserMsg *msg)
++static void vpnet_handle_ctrlq(VirtIODevice *vdev, VirtQueue *vq)
 +{
-+    int size;
++}
 +
-+    if (!msg) {
++/* Send a ctrlq message to the driver */
++static size_t vpnet_send_ctrlq_msg(VhostPCINet *vpnet,
++                                 struct vpnet_ctrlq_msg *msg)
++{
++    VirtQueueElement *elem;
++    VirtQueue *vq;
++    size_t msg_len = msg->size;
++
++    vq = vpnet->ctrlq;
++    if (!virtio_queue_ready(vq)) {
 +        return 0;
 +    }
 +
-+    /* The payload size has been assigned, plus the header size here */
-+    size = msg->size + VHOST_USER_HDR_SIZE;
-+    msg->flags &= ~VHOST_USER_VERSION_MASK;
-+    msg->flags |= VHOST_USER_VERSION;
-+
-+    return qemu_chr_fe_write_all(chr_be, (const uint8_t *)msg, size)
-+           == size ? 0 : -1;
-+}
-+
-+static int vp_slave_get_features(CharBackend *chr_be, VhostUserMsg *msg)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+
-+    /* Offer the initial features, which have the protocol feature bit set */
-+    msg->payload.u64 = vp_dev->feature_bits;
-+    msg->size = sizeof(msg->payload.u64);
-+    msg->flags |= VHOST_USER_REPLY_MASK;
-+
-+    return vp_slave_write(chr_be, msg);
-+}
-+
-+static void vp_slave_set_features(VhostUserMsg *msg)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+
-+    /*
-+     * Get the remotely negotiated feature bits. They will be later taken by
-+     * the vhost-pci device to negotiate with its driver. Clear the protocol
-+     * feature bit, which is useless for the device and driver negotiation.
-+     */
-+    vp_dev->feature_bits = msg->payload.u64 &
-+                           ~(1 << VHOST_USER_F_PROTOCOL_FEATURES);
-+}
-+
-+static void vp_slave_event(void *opaque, int event)
-+{
-+    switch (event) {
-+    case CHR_EVENT_OPENED:
-+        break;
-+    case CHR_EVENT_CLOSED:
-+        break;
-+    }
-+}
-+
-+static int vp_slave_get_protocol_features(CharBackend *chr_be,
-+                                          VhostUserMsg *msg)
-+{
-+    msg->payload.u64 = VHOST_USER_PROTOCOL_FEATURES;
-+    msg->size = sizeof(msg->payload.u64);
-+    msg->flags |= VHOST_USER_REPLY_MASK;
-+
-+    return vp_slave_write(chr_be, msg);
-+}
-+
-+static void vp_slave_set_device_type(VhostUserMsg *msg)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    vp_dev->dev_type = (uint16_t)msg->payload.u64;
-+
-+    switch (vp_dev->dev_type) {
-+    case VIRTIO_ID_NET:
-+        vp_dev->feature_bits |= VHOST_PCI_FEATURE_BITS |
-+                                VHOST_PCI_NET_FEATURE_BITS;
-+        break;
-+    default:
-+        error_report("%s: device type %d is not supported",
-+                     __func__, vp_dev->dev_type);
-+    }
-+}
-+
-+static int vp_slave_get_queue_num(CharBackend *chr_be, VhostUserMsg *msg)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+
-+    switch (vp_dev->dev_type) {
-+    case VIRTIO_ID_NET:
-+        msg->payload.u64 = VIRTIO_NET_CTRL_MQ_VQ_PAIRS_MAX;
-+        break;
-+    default:
-+        error_report("%s: device type %d is not supported", __func__,
-+                     vp_dev->dev_type);
-+        return -1;
-+    }
-+    msg->size = sizeof(msg->payload.u64);
-+    msg->flags |= VHOST_USER_REPLY_MASK;
-+
-+    return vp_slave_write(chr_be, msg);
-+}
-+
-+/* Calculate the memory size of all the regions */
-+static uint64_t vp_slave_peer_mem_size_get(VhostUserMemory *mem)
-+{
-+    int i;
-+    uint64_t total_size = 0;
-+    uint32_t nregions = mem->nregions;
-+    VhostUserMemoryRegion *mem_regions = mem->regions;
-+
-+    for (i = 0; i < nregions; i++) {
-+        total_size += mem_regions[i].memory_size;
++    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
++    if (!elem) {
++        return 0;
 +    }
 +
-+    return total_size;
++    iov_from_buf(elem->in_sg, elem->in_num, 0, msg, msg_len);
++
++    virtqueue_push(vq, elem, msg_len);
++    virtio_notify(VIRTIO_DEVICE(vpnet), vq);
++    g_free(elem);
++
++    return msg_len;
 +}
 +
-+/* Prepare the memory for the vhost-pci device bar */
-+static int vp_slave_set_mem_table(VhostUserMsg *msg, int *fds, int fd_num)
++/* Send a ctrlq message of the remote memory to the driver */
++static void vpnet_send_ctrlq_msg_remote_mem(VhostPCINet *vpnet)
 +{
-+    VhostUserMemory *mem = &msg->payload.memory;
-+    VhostUserMemoryRegion *mem_region = mem->regions;
-+    uint32_t i, nregions = mem->nregions;
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    vp_dev->remote_mem_num = nregions;
-+    MemoryRegion *bar_mr, *sub_mr;
-+    uint64_t bar_size, bar_map_offset = 0;
-+    RemoteMem *rmem;
-+    void *mr_qva;
++    VhostPCIDev *vp_dev = get_vhost_pci_dev();
++    struct vpnet_ctrlq_msg *msg;
++    uint16_t payload_size, msg_size;
 +
-+    /* Sanity Check */
-+    if (fd_num != nregions) {
-+        error_report("%s: fd num doesn't match region num", __func__);
-+        return -1;
-+    }
-+
-+    if (!vp_dev->bar_mr) {
-+        vp_dev->bar_mr = g_malloc(sizeof(MemoryRegion));
-+    }
-+    if (!vp_dev->sub_mr) {
-+        vp_dev->sub_mr = g_malloc(nregions * sizeof(MemoryRegion));
-+    }
-+    bar_mr = vp_dev->bar_mr;
-+    sub_mr = vp_dev->sub_mr;
-+
-+    bar_size = vp_slave_peer_mem_size_get(mem);
-+    bar_size = pow2ceil(bar_size);
-+    memory_region_init(bar_mr, NULL, "RemoteMemory", bar_size);
-+    for (i = 0; i < nregions; i++) {
-+        vp_dev->mr_map_size[i] = mem_region[i].memory_size +
-+                                 mem_region[i].mmap_offset;
-+        /*
-+         * Map the remote memory by QEMU. They will then be exposed to the
-+         * guest via a vhost-pci device BAR. The mapped base addr and size
-+         * are recorded for cleanup() to use.
-+         */
-+        vp_dev->mr_map_base[i] = mmap(NULL, vp_dev->mr_map_size[i],
-+                                      PROT_READ | PROT_WRITE, MAP_SHARED,
-+                                      fds[i], 0);
-+        if (vp_dev->mr_map_base[i] == MAP_FAILED) {
-+            error_report("%s: map peer memory region %d failed", __func__, i);
-+            return -1;
-+        }
-+
-+        mr_qva = vp_dev->mr_map_base[i] + mem_region[i].mmap_offset;
-+        /*
-+         * The BAR MMIO is different from the traditional one, because the
-+         * memory is set up as a regular RAM. Guest will be able to directly
-+         * access it, just like accessing its RAM memory.
-+         */
-+        memory_region_init_ram_ptr(&sub_mr[i], NULL, "RemoteMemory",
-+                                   mem_region[i].memory_size, mr_qva);
-+        /*
-+         * The remote memory regions, which are scattered in the remote VM's
-+         * address space, are put continuous in the BAR.
-+         */
-+        memory_region_add_subregion(bar_mr, bar_map_offset, &sub_mr[i]);
-+        bar_map_offset += mem_region[i].memory_size;
-+        rmem = &vp_dev->remote_mem[i];
-+        rmem->gpa = mem_region[i].guest_phys_addr;
-+        rmem->size = mem_region[i].memory_size;
-+    }
-+    vp_dev->bar_map_offset = bar_map_offset;
-+
-+    return 0;
++    payload_size = vp_dev->remote_mem_num *
++                   sizeof(struct ctrlq_msg_remote_mem);
++    msg_size = payload_size + VPNET_CTRLQ_MSG_HDR_SIZE;
++    msg = g_malloc(msg_size);
++    msg->class = VHOST_PCI_CTRLQ_MSG_REMOTE_MEM;
++    msg->size = msg_size;
++    memcpy(msg->payload.msg_remote_mem, vp_dev->remote_mem, payload_size);
++    vpnet_send_ctrlq_msg(vpnet, msg);
++    g_free(msg);
 +}
 +
-+static void vp_slave_alloc_remoteq(void)
++static void vpnet_ctrlq_msg_remoteq_add_one(struct vpnet_ctrlq_msg *msg,
++                                            Remoteq *remoteq)
 +{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
++    uint32_t vring_num = remoteq->vring_num;
++    struct ctrlq_msg_remoteq *msg_remoteq;
 +
-+    Remoteq *remoteq = g_malloc0(sizeof(Remoteq));
-+    /*
-+     * Put the new allocated remoteq to the list, because we don't know how
-+     * many remoteq the remote device will send to us. So, when they sent one,
-+     * insert it to the list.
-+     */
-+    QLIST_INSERT_HEAD(&vp_dev->remoteq_list, remoteq, node);
-+    vp_dev->remoteq_num++;
++    msg_remoteq = &msg->payload.msg_remoteq[vring_num];
++    msg_remoteq->last_avail_idx = remoteq->last_avail_idx;
++    msg_remoteq->vring_num = vring_num;
++    msg_remoteq->vring_enable = remoteq->enabled;
++    msg_remoteq->desc_gpa = remoteq->addr.desc_user_addr;
++    msg_remoteq->avail_gpa = remoteq->addr.avail_user_addr;
++    msg_remoteq->used_gpa = remoteq->addr.used_user_addr;
 +}
 +
-+static void vp_slave_set_vring_num(VhostUserMsg *msg)
++/* Send a ctrlq message of the remoteq info to the driver */
++static void vpnet_send_ctrlq_msg_remoteq(VhostPCINet *vpnet)
 +{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    /*
-+     * The info (vring_num, base etc) is sent for last remoteq, which was put
-+     * on the first of the list and have not been filled with those info.
-+     */
-+    Remoteq *remoteq = QLIST_FIRST(&vp_dev->remoteq_list);
-+
-+    remoteq->vring_num = msg->payload.u64;
-+}
-+
-+static void vp_slave_set_vring_base(VhostUserMsg *msg)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    Remoteq *remoteq = QLIST_FIRST(&vp_dev->remoteq_list);
-+
-+    remoteq->last_avail_idx = msg->payload.u64;
-+}
-+
-+static int vp_slave_get_vring_base(CharBackend *chr_be, VhostUserMsg *msg)
-+{
-+    msg->flags |= VHOST_USER_REPLY_MASK;
-+    msg->size = sizeof(m.payload.state);
-+    /* Send back the last_avail_idx, which is 0 here */
-+    msg->payload.state.num = 0;
-+
-+    return vp_slave_write(chr_be, msg);
-+}
-+
-+static void vp_slave_set_vring_addr(VhostUserMsg *msg)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    Remoteq *remoteq = QLIST_FIRST(&vp_dev->remoteq_list);
-+    memcpy(&remoteq->addr, &msg->payload.addr,
-+           sizeof(struct vhost_vring_addr));
-+}
-+
-+static void vp_slave_set_vring_kick(int fd)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    Remoteq *remoteq = QLIST_FIRST(&vp_dev->remoteq_list);
-+    if (remoteq) {
-+        remoteq->kickfd = fd;
-+    }
-+}
-+
-+static void vp_slave_set_vring_call(int fd)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    Remoteq *remoteq = QLIST_FIRST(&vp_dev->remoteq_list);
-+    if (remoteq) {
-+        remoteq->callfd = fd;
-+    }
-+}
-+
-+static void vp_slave_set_vring_enable(VhostUserMsg *msg)
-+{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+    struct vhost_vring_state *state = &msg->payload.state;
 +    Remoteq *remoteq;
++    struct vpnet_ctrlq_msg *msg;
++    uint16_t remoteq_num, msg_size;
++    VhostPCIDev *vp_dev = get_vhost_pci_dev();
++
++    remoteq_num = vp_dev->remoteq_num;
++    msg_size = sizeof(struct ctrlq_msg_remoteq) * remoteq_num +
++               VPNET_CTRLQ_MSG_HDR_SIZE;
++    msg = g_malloc(msg_size);
++    msg->class = VHOST_PCI_CTRLQ_MSG_REMOTEQ;
++    msg->size = msg_size;
++
 +    QLIST_FOREACH(remoteq, &vp_dev->remoteq_list, node) {
-+        if (remoteq->vring_num == state->index) {
-+            remoteq->enabled = (int)state->num;
-+            break;
-+        }
++        /* Get remoteqs from the list, and fill them into the ctrlq_msg */
++        vpnet_ctrlq_msg_remoteq_add_one(msg, remoteq);
 +    }
++
++    vpnet_send_ctrlq_msg(vpnet, msg);
++    g_free(msg);
 +}
 +
-+static int vp_slave_device_create(uint16_t virtio_id)
++static void vpnet_set_status(struct VirtIODevice *vdev, uint8_t status)
 +{
-+    Error *local_err = NULL;
-+    QemuOpts *opts;
-+    DeviceState *dev;
-+    char params[50];
++    VhostPCINet *vpnet = VHOST_PCI_NET(vdev);
++    uint16_t vq_num = vpnet->vq_pairs * 2;
++    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
++    VirtioBusState *vbus = VIRTIO_BUS(qbus);
++    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
++    VirtQueue *vq;
++    int r, i;
 +
-+    switch (virtio_id) {
-+    case VIRTIO_ID_NET:
-+        strcpy(params, "driver=vhost-pci-net-pci,id=vhost-pci-0");
-+        break;
-+    default:
-+        error_report("%s: device type %d not supported", __func__, virtio_id);
++    /* Send the ctrlq messages to the driver when the ctrlq is ready */
++    if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
++        vpnet_send_ctrlq_msg_remote_mem(vpnet);
++        vpnet_send_ctrlq_msg_remoteq(vpnet);
 +    }
-+
-+    opts = qemu_opts_parse_noisily(qemu_find_opts("device"), params, true);
-+    dev = qdev_device_add(opts, &local_err);
-+    if (!dev) {
-+        qemu_opts_del(opts);
-+        return -1;
-+    }
-+    object_unref(OBJECT(dev));
-+    return 0;
 +}
 +
-+static int vp_slave_set_vhost_pci(VhostUserMsg *msg)
++static uint64_t vpnet_get_features(VirtIODevice *vdev, uint64_t features,
++                                   Error **errp)
 +{
-+    int ret = 0;
-+    uint8_t cmd = (uint8_t)msg->payload.u64;
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
++    VhostPCIDev *vp_dev = get_vhost_pci_dev();
 +
-+    switch (cmd) {
-+    case VHOST_USER_SET_VHOST_PCI_START:
-+        ret = vp_slave_device_create(vp_dev->dev_type);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        break;
-+    case VHOST_USER_SET_VHOST_PCI_STOP:
-+        break;
-+    default:
-+        error_report("%s: cmd %d not supported", __func__, cmd);
-+        return -1;
-+    }
-+
-+    return ret;
++    /*
++     * Give the driver the feature bits that have been negotiated with the
++     * remote device.
++     */
++    return vp_dev->feature_bits;
 +}
 +
-+static int vp_slave_can_read(void *opaque)
++static void vpnet_set_features(VirtIODevice *vdev, uint64_t features)
 +{
-+    return VHOST_USER_HDR_SIZE;
 +}
 +
-+static void vp_slave_read(void *opaque, const uint8_t *buf, int size)
++static void vpnet_get_config(VirtIODevice *vdev, uint8_t *config)
 +{
-+    int ret, fd_num, fds[MAX_GUEST_REGION];
-+    VhostUserMsg msg;
-+    uint8_t *p = (uint8_t *) &msg;
-+    CharBackend *chr_be = (CharBackend *)opaque;
++    VhostPCINet *vpnet = VHOST_PCI_NET(vdev);
++    struct vhost_pci_net_config netcfg;
 +
-+    if (size != VHOST_USER_HDR_SIZE) {
-+        error_report("%s: wrong message size received %d", __func__, size);
-+        return;
-+    }
-+
-+    memcpy(p, buf, VHOST_USER_HDR_SIZE);
-+
-+    if (msg.size) {
-+        p += VHOST_USER_HDR_SIZE;
-+        size = qemu_chr_fe_read_all(chr_be, p, msg.size);
-+        if (size != msg.size) {
-+            error_report("%s: wrong message size received %d != %d", __func__,
-+                         size, msg.size);
-+            return;
-+        }
-+    }
-+
-+    if (msg.request > VHOST_USER_MAX) {
-+        error_report("%s: read an incorrect msg %d", __func__, msg.request);
-+        return;
-+    }
-+
-+    switch (msg.request) {
-+    case VHOST_USER_GET_FEATURES:
-+        ret = vp_slave_get_features(chr_be, &msg);
-+        if (ret < 0) {
-+            goto err_handling;
-+        }
-+        break;
-+    case VHOST_USER_SET_FEATURES:
-+        vp_slave_set_features(&msg);
-+        break;
-+    case VHOST_USER_GET_PROTOCOL_FEATURES:
-+        ret = vp_slave_get_protocol_features(chr_be, &msg);
-+        if (ret < 0) {
-+            goto err_handling;
-+        }
-+        break;
-+    case VHOST_USER_SET_PROTOCOL_FEATURES:
-+        break;
-+    case VHOST_USER_SET_DEVICE_ID:
-+        /*
-+         * Now, we know the remote device type. Make the related device feature
-+         * bits ready. The remote device will ask for it soon.
-+         */
-+        vp_slave_set_device_type(&msg);
-+        break;
-+    case VHOST_USER_GET_QUEUE_NUM:
-+        ret = vp_slave_get_queue_num(chr_be, &msg);
-+        if (ret < 0) {
-+            goto err_handling;
-+        }
-+        break;
-+    case VHOST_USER_SET_OWNER:
-+        break;
-+    case VHOST_USER_SET_MEM_TABLE:
-+        /*
-+         * Currently, we don't support adding more memory to the vhost-pci
-+         * device after the device is realized in QEMU. So, just "break" here
-+         * in this case.
-+         */
-+        if (vp_slave->vp_dev->vdev) {
-+                break;
-+        }
-+        fd_num = qemu_chr_fe_get_msgfds(chr_be, fds, sizeof(fds) / sizeof(int));
-+        vp_slave_set_mem_table(&msg, fds, fd_num);
-+        break;
-+    case VHOST_USER_SET_VRING_NUM:
-+       /*
-+        * This is the first message about a remoteq. Other messages (e.g. BASE,
-+        * ADDR, KICK etc) will follow this message and come soon. So, allocate
-+        * a Rqmotq structure here, and ready to record info about the remoteq
-+        * from the upcoming messages.
-+        */
-+        vp_slave_alloc_remoteq();
-+        vp_slave_set_vring_num(&msg);
-+        break;
-+    case VHOST_USER_SET_VRING_BASE:
-+        vp_slave_set_vring_base(&msg);
-+        break;
-+    case VHOST_USER_GET_VRING_BASE:
-+        ret = vp_slave_get_vring_base(chr_be, &msg);
-+        if (ret < 0) {
-+            goto err_handling;
-+        }
-+        break;
-+    case VHOST_USER_SET_VRING_ADDR:
-+        vp_slave_set_vring_addr(&msg);
-+        break;
-+    case VHOST_USER_SET_VRING_KICK:
-+        /* Consume the fd */
-+        qemu_chr_fe_get_msgfds(chr_be, fds, 1);
-+        vp_slave_set_vring_kick(fds[0]);
-+        /*
-+         * This is a non-blocking eventfd.
-+         * The receive function forces it to be blocking,
-+         * so revert it back to non-blocking.
-+         */
-+        qemu_set_nonblock(fds[0]);
-+        break;
-+    case VHOST_USER_SET_VRING_CALL:
-+        /* Consume the fd */
-+        qemu_chr_fe_get_msgfds(chr_be, fds, 1);
-+        vp_slave_set_vring_call(fds[0]);
-+        /*
-+         * This is a non-blocking eventfd.
-+         * The receive function forces it to be blocking,
-+         * so revert it back to non-blocking.
-+         */
-+        qemu_set_nonblock(fds[0]);
-+        break;
-+    case VHOST_USER_SET_VRING_ENABLE:
-+        vp_slave_set_vring_enable(&msg);
-+        break;
-+    case VHOST_USER_SET_LOG_BASE:
-+        break;
-+    case VHOST_USER_SET_LOG_FD:
-+        qemu_chr_fe_get_msgfds(chr_be, fds, 1);
-+        close(fds[0]);
-+        break;
-+    case VHOST_USER_SEND_RARP:
-+        break;
-+    case VHOST_USER_SET_VHOST_PCI:
-+        ret = vp_slave_set_vhost_pci(&msg);
-+        if (ret < 0) {
-+            goto err_handling;
-+        }
-+        break;
-+    default:
-+        error_report("vhost-pci-slave does not support msg request = %d",
-+                     msg.request);
-+        break;
-+    }
-+    return;
-+
-+err_handling:
-+    error_report("%s: handle request %d failed", __func__, msg.request);
++    virtio_stw_p(vdev, &netcfg.status, vpnet->status);
++    virtio_stw_p(vdev, &netcfg.vq_pairs, vpnet->vq_pairs);
++    memcpy(config, &netcfg, vpnet->config_size);
 +}
 +
-+static Chardev *vp_slave_parse_chardev(const char *id)
++static void vpnet_set_config(VirtIODevice *vdev, const uint8_t *config)
 +{
-+    Chardev *chr = qemu_chr_find(id);
-+    if (!chr) {
-+        error_report("chardev \"%s\" not found", id);
-+        return NULL;
++}
++
++static void vpnet_device_realize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VhostPCINet *vpnet = VHOST_PCI_NET(vdev);
++    uint16_t i, vq_num;
++    VhostPCIDev *vp_dev = get_vhost_pci_dev();
++
++    vq_num = vp_dev->remoteq_num;
++    vpnet->vq_pairs = vq_num / 2;
++    virtio_init(vdev, "vhost-pci-net", VIRTIO_ID_VHOST_PCI_NET,
++                vpnet->config_size);
++
++    /* Add local vqs */
++    for (i = 0; i < vq_num; i++) {
++        virtio_add_queue(vdev, VPNET_VQ_SIZE, vpnet_handle_vq);
 +    }
++    /* Add the ctrlq */
++    vpnet->ctrlq = virtio_add_queue(vdev, VPNET_CTRLQ_SIZE, vpnet_handle_ctrlq);
 +
-+    return chr;
++    vpnet->status = 0;
++    vp_dev->vdev = vdev;
 +}
 +
-+static void vp_dev_init(VhostPCIDev *vp_dev)
++static void vpnet_device_unrealize(DeviceState *dev, Error **errp)
 +{
-+    vp_dev->feature_bits = 1ULL << VHOST_USER_F_PROTOCOL_FEATURES;
-+    vp_dev->bar_mr = NULL;
-+    vp_dev->sub_mr = NULL;
-+    vp_dev->vdev = NULL;
-+    QLIST_INIT(&vp_dev->remoteq_list);
-+    vp_dev->remoteq_num = 0;
-+}
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VhostPCINet *vpnet = VHOST_PCI_NET(vdev);
++    uint16_t i, vq_num = vpnet->vq_pairs * 2;
 +
-+int vhost_pci_slave_init(QemuOpts *opts)
-+{
-+    Chardev *chr;
-+    VhostPCIDev *vp_dev;
-+    const char *chardev_id = qemu_opt_get(opts, "chardev");
-+
-+    vp_slave = g_malloc(sizeof(VhostPCISlave));
-+    chr = vp_slave_parse_chardev(chardev_id);
-+    if (!chr) {
-+        return -1;
++    /* Delete the datapath vqs and the ctrlq */
++    for (i = 0; i < vq_num + 1; i++) {
++        virtio_del_queue(vdev, i);
 +    }
-+    vp_dev = g_malloc(sizeof(VhostPCIDev));
-+    vp_dev_init(vp_dev);
-+    vp_slave->vp_dev = vp_dev;
-+
-+    qemu_chr_fe_init(&vp_slave->chr_be, chr, &error_abort);
-+    qemu_chr_fe_set_handlers(&vp_slave->chr_be, vp_slave_can_read,
-+                             vp_slave_read, vp_slave_event,
-+                             &vp_slave->chr_be, NULL, true);
-+
-+    return 0;
 +}
 +
-+int vhost_pci_slave_cleanup(void)
++static void vpnet_reset(VirtIODevice *vdev)
 +{
-+    VhostPCIDev *vp_dev = vp_slave->vp_dev;
-+
-+    vp_dev_cleanup();
-+    qemu_chr_fe_deinit(&vp_slave->chr_be);
-+    g_free(vp_dev->sub_mr);
-+    g_free(vp_dev->bar_mr);
-+    g_free(vp_dev);
-+
-+    return 0;
 +}
-diff --git a/include/hw/virtio/vhost-pci-slave.h b/include/hw/virtio/vhost-pci-slave.h
++
++static Property vpnet_properties[] = {
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vpnet_instance_init(Object *obj)
++{
++    VhostPCINet *vpnet = VHOST_PCI_NET(obj);
++
++    /*
++     * The default config_size is sizeof(struct vhost_pci_net_config).
++     * Can be overriden with vpnet_set_config_size.
++     */
++    vpnet->config_size = sizeof(struct vhost_pci_net_config);
++}
++
++static void vpnet_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
++
++    dc->props = vpnet_properties;
++    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
++    vdc->realize = vpnet_device_realize;
++    vdc->unrealize = vpnet_device_unrealize;
++    vdc->get_config = vpnet_get_config;
++    vdc->set_config = vpnet_set_config;
++    vdc->get_features = vpnet_get_features;
++    vdc->set_features = vpnet_set_features;
++    vdc->set_status = vpnet_set_status;
++    vdc->reset = vpnet_reset;
++}
++
++static const TypeInfo vpnet_info = {
++    .name = TYPE_VHOST_PCI_NET,
++    .parent = TYPE_VIRTIO_DEVICE,
++    .instance_size = sizeof(VhostPCINet),
++    .instance_init = vpnet_instance_init,
++    .class_init = vpnet_class_init,
++};
++
++static void virtio_register_types(void)
++{
++    type_register_static(&vpnet_info);
++}
++
++type_init(virtio_register_types)
+diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
+index 464afa3..ab1d06b 100644
+--- a/hw/virtio/vhost-pci-slave.c
++++ b/hw/virtio/vhost-pci-slave.c
+@@ -39,6 +39,11 @@
+ 
+ VhostPCISlave *vp_slave;
+ 
++VhostPCIDev *get_vhost_pci_dev(void)
++{
++    return vp_slave->vp_dev;
++}
++
+ /* Clean up VhostPCIDev */
+ static void vp_dev_cleanup(void)
+ {
+diff --git a/include/hw/virtio/vhost-pci-net.h b/include/hw/virtio/vhost-pci-net.h
 new file mode 100644
-index 0000000..b5bf02a
+index 0000000..e3a1c8b
 --- /dev/null
-+++ b/include/hw/virtio/vhost-pci-slave.h
-@@ -0,0 +1,61 @@
-+#ifndef QEMU_VHOST_PCI_SLAVE_H
-+#define QEMU_VHOST_PCI_SLAVE_H
-+
-+#include "linux-headers/linux/vhost.h"
-+
-+#include "sysemu/char.h"
-+#include "exec/memory.h"
-+
-+typedef struct Remoteq {
-+    uint16_t last_avail_idx;
-+    uint32_t vring_num;
-+    int kickfd;
-+    int callfd;
-+    int enabled;
-+    struct vhost_vring_addr addr;
-+    QLIST_ENTRY(Remoteq) node;
-+} Remoteq;
-+
-+typedef struct RemoteMem {
-+    uint64_t gpa;
-+    uint64_t size;
-+} RemoteMem;
-+
-+#define MAX_GUEST_REGION 8
++++ b/include/hw/virtio/vhost-pci-net.h
+@@ -0,0 +1,34 @@
 +/*
-+ * The basic vhost-pci device struct.
-+ * It is set up by vhost-pci-slave, and shared to the device emulation.
++ * Virtio Network Device
++ *
++ * Copyright Intel, Corp. 2016
++ *
++ * Authors:
++ *  Wei Wang   <wei.w.wang@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
 + */
-+typedef struct VhostPCIDev {
-+    /* Ponnter to the slave device */
-+    VirtIODevice *vdev;
-+    uint16_t dev_type;
-+    uint64_t feature_bits;
-+    /* Records the end (offset to the BAR) of the last mapped region */
-+    uint64_t bar_map_offset;
-+    /* The MemoryRegion that will be registered with a vhost-pci device BAR */
-+    MemoryRegion *bar_mr;
-+    /* Add to the bar MemoryRegion */
-+    MemoryRegion *sub_mr;
-+    void *mr_map_base[MAX_GUEST_REGION];
-+    uint64_t mr_map_size[MAX_GUEST_REGION];
 +
-+    uint16_t remote_mem_num;
-+    RemoteMem remote_mem[MAX_GUEST_REGION];
-+    uint16_t remoteq_num;
-+    QLIST_HEAD(, Remoteq) remoteq_list;
-+} VhostPCIDev;
++#ifndef _QEMU_VHOST_PCI_NET_H
++#define _QEMU_VHOST_PCI_NET_H
 +
-+/* Currenltly, a slave supports the creation of only one vhost-pci device */
-+typedef struct VhostPCISlave {
-+    VhostPCIDev *vp_dev;
-+    CharBackend chr_be;
-+} VhostPCISlave;
++#include "standard-headers/linux/vhost_pci_net.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/vhost-pci-slave.h"
 +
-+extern int vhost_pci_slave_init(QemuOpts *opts);
++#define TYPE_VHOST_PCI_NET "vhost-pci-net-device"
++#define VHOST_PCI_NET(obj) \
++        OBJECT_CHECK(VhostPCINet, (obj), TYPE_VHOST_PCI_NET)
 +
-+extern int vhost_pci_slave_cleanup(void);
-+
-+VhostPCIDev *get_vhost_pci_dev(void);
++typedef struct VhostPCINet {
++    VirtIODevice parent_obj;
++    VirtQueue *ctrlq;
++    uint16_t status;
++    uint16_t vq_pairs;
++    size_t config_size;
++    uint64_t device_features;
++} VhostPCINet;
 +
 +#endif
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-index 766a950..1fccbe2 100644
---- a/include/hw/virtio/vhost-user.h
-+++ b/include/hw/virtio/vhost-user.h
-@@ -12,11 +12,22 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_RARP = 2,
-     VHOST_USER_PROTOCOL_F_REPLY_ACK = 3,
-     VHOST_USER_PROTOCOL_F_NET_MTU = 4,
-+    VHOST_USER_PROTOCOL_F_VHOST_PCI = 5,
-+    VHOST_USER_PROTOCOL_F_SET_DEVICE_ID = 6,
- 
-     VHOST_USER_PROTOCOL_F_MAX
- };
- 
- #define VHOST_USER_PROTOCOL_FEATURE_MASK ((1 << VHOST_USER_PROTOCOL_F_MAX) - 1)
-+#define VHOST_USER_PROTOCOL_FEATURES ((1ULL << VHOST_USER_PROTOCOL_F_MQ) | \
-+                               (1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD) | \
-+                                    (1ULL << VHOST_USER_PROTOCOL_F_RARP) | \
-+                               (1ULL << VHOST_USER_PROTOCOL_F_VHOST_PCI) | \
-+                          (1ULL << VHOST_USER_PROTOCOL_F_SET_DEVICE_ID))
+diff --git a/include/standard-headers/linux/vhost_pci_net.h b/include/standard-headers/linux/vhost_pci_net.h
+new file mode 100644
+index 0000000..bd8e09f
+--- /dev/null
++++ b/include/standard-headers/linux/vhost_pci_net.h
+@@ -0,0 +1,74 @@
++#ifndef _LINUX_VHOST_PCI_NET_H
++#define _LINUX_VHOST_PCI_NET_H
 +
-+/* Commands sent to start or stop the vhost-pci device */
-+#define VHOST_USER_SET_VHOST_PCI_START    0
-+#define VHOST_USER_SET_VHOST_PCI_STOP     1
- 
- typedef enum VhostUserRequest {
-     VHOST_USER_NONE = 0,
-@@ -40,6 +51,8 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_VRING_ENABLE = 18,
-     VHOST_USER_SEND_RARP = 19,
-     VHOST_USER_NET_SET_MTU = 20,
-+    VHOST_USER_SET_DEVICE_ID = 21,
-+    VHOST_USER_SET_VHOST_PCI = 22,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
++/* This header is BSD licensed so anyone can use the definitions to implement
++ * compatible drivers/servers.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. Neither the name of Intel nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL Intel OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE. */
++
++#include "standard-headers/linux/virtio_ids.h"
++
++#define VPNET_S_LINK_UP	1	/* Link is up */
++
++struct vhost_pci_net_config {
++	/*
++	 * Legal values are between 1 and 0x8000
++	 */
++	uint16_t vq_pairs;
++	/* See VPNET_S_* above */
++	uint16_t status;
++} QEMU_PACKED;
++
++struct ctrlq_msg_remote_mem {
++	uint64_t gpa;
++	uint64_t size;
++};
++
++struct ctrlq_msg_remoteq {
++	uint16_t last_avail_idx;
++        int32_t  vring_enable;
++	uint32_t vring_num;
++	uint64_t desc_gpa;
++	uint64_t avail_gpa;
++	uint64_t used_gpa;
++};
++
++#define VHOST_PCI_CTRLQ_MSG_REMOTE_MEM	0
++#define VHOST_PCI_CTRLQ_MSG_REMOTEQ	1
++struct vpnet_ctrlq_msg {
++	uint8_t class;
++	uint8_t cmd;
++	uint16_t size;
++        union {
++		struct ctrlq_msg_remote_mem msg_remote_mem[0];
++		struct ctrlq_msg_remoteq msg_remoteq[0];
++	} payload;
++} __attribute__((packed));
++
++static struct vpnet_ctrlq_msg vpnet_msg __attribute__ ((unused));
++#define VPNET_CTRLQ_MSG_HDR_SIZE (sizeof(vpnet_msg.class) \
++			      + sizeof(vpnet_msg.cmd)  \
++			      + sizeof(vpnet_msg.size))
++
++#endif
 -- 
 2.7.4
