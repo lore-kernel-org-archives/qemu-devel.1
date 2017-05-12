@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d94ya-0000Xf-6y
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 03:27:01 -0400
+	(envelope-from <hatzimiltos@gmail.com>) id 1d94yv-0000rO-3D
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 03:27:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d94yZ-0002RS-5o
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 03:27:00 -0400
-References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170511191701.GC24584@stefanha-x1.localdomain>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <591563A2.8000504@huawei.com>
-Date: Fri, 12 May 2017 15:26:26 +0800
+	(envelope-from <hatzimiltos@gmail.com>) id 1d94yu-0002j8-6s
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 03:27:21 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35476)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hatzimiltos@gmail.com>)
+	id 1d94yt-0002gp-SX
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 03:27:20 -0400
+Received: by mail-wr0-x242.google.com with SMTP id g12so6389991wrg.2
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 00:27:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170511191701.GC24584@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 0/6] COLO block replication
- supports shared disk case
+In-Reply-To: <CALUZMn3xVkhXRw7M08OaFs_NSE5WVV4U+CqsG2bPqzLLRWORtA@mail.gmail.com>
+References: <CALUZMn0mRMY7mx5ysWdSamV+UGbjwuif8UxQ47gFDK3fx8Hw2w@mail.gmail.com>
+	<6e9a0dff-949f-5ac9-2315-cbe0e4c99f58@redhat.com>
+	<CALUZMn14qgNz8y+15bsKFwyB9Ganoh0wzu5tfokCDRSASnBeKA@mail.gmail.com>
+	<0c725626-6485-c777-46e3-99423670df89@redhat.com>
+	<CALUZMn3W06H83E7hr4cHQ2jACp7A2x8hNyU1YirJssd3S7ut2Q@mail.gmail.com>
+	<c41daf1b-1ead-0809-57f8-2bfd168b36e6@redhat.com>
+	<CALUZMn3xVkhXRw7M08OaFs_NSE5WVV4U+CqsG2bPqzLLRWORtA@mail.gmail.com>
+From: Miltiadis Hatzimihail <hatzimiltos@gmail.com>
+Date: Fri, 12 May 2017 08:26:56 +0100
+Message-ID: <CALUZMn1zCo2_hsY5nyZ-J=ofSCj=WoEhYB2sis_goS-KA7mfvA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Guest SIGILL when different IO is implemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +35,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, qemu-block@nongnu.org, zhangchen.fnst@cn.fujitsu.com, eddie.dong@intel.com, "Dr . David Alan
-	Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 2017/5/12 3:17, Stefan Hajnoczi wrote:
-> On Wed, Apr 12, 2017 at 10:05:15PM +0800, zhanghailiang wrote:
->> COLO block replication doesn't support the shared disk case,
->> Here we try to implement it and this is the 4th version.
->>
->> Please review and any commits are welcomed.
->>
->> Cc: Dr. David Alan Gilbert (git) <dgilbert@redhat.com>
->> Cc: eddie.dong@intel.com
-> Sorry for the delay.  Feel free to ping me if I don't review within a
-> few days when you post a patch.
+I ve tried the same today using a 32-bit Guest OS and the illegal
+instruction this time is
 
-That is OK. :) , I was doing other things these days, and it is not quite urgent ... thanks.
+fstps %(ecx)
 
->> v4:
->> - Add proper comment for primary_disk in patch 2 (Stefan)
->> - Call bdrv_invalidate_cache() while do checkpoint for shared disk in patch 5
->>
->> v3:
->> - Fix some comments from Stefan and Eric
->>
->> v2:
->> - Drop the patch which add a blk_root() helper
->> - Fix some comments from Changlong
->>
->> zhanghailiang (6):
->>    docs/block-replication: Add description for shared-disk case
->>    replication: add shared-disk and shared-disk-id options
->>    replication: Split out backup_do_checkpoint() from
->>      secondary_do_checkpoint()
->>    replication: fix code logic with the new shared_disk option
->>    replication: Implement block replication for shared disk case
->>    nbd/replication: implement .bdrv_get_info() for nbd and replication
->>      driver
->>
->>   block/nbd.c                |  12 +++
->>   block/replication.c        | 198 ++++++++++++++++++++++++++++++++++-----------
->>   docs/block-replication.txt | 139 ++++++++++++++++++++++++++++++-
->>   qapi/block-core.json       |  10 ++-
->>   4 files changed, 306 insertions(+), 53 deletions(-)
->>
->> -- 
->> 1.8.3.1
+Is it a similar case to the movss one? (the previous Guest I was using was
+64 bit).
+
+Also, I had to start QEMU using the following command line options:
+
+qemu -cpu host,-sse2
+
+because one my programs was giving me an illegal instruction based on the
+above and it worked by disabling it.
+
+=E2=80=8BRegards
+Milton
+
+On Thu, May 11, 2017 at 2:12 PM, Miltiadis Hatzimihail <
+hatzimiltos@gmail.com> wrote:
+
+> Ok many thanks for your help.
+>
+> =E2=80=8BMilton
+>
+> On Thu, May 11, 2017 at 2:11 PM, Paolo Bonzini <pbonzini@redhat.com>
+> wrote:
+>
 >>
 >>
+>> On 11/05/2017 14:47, Miltiadis Hatzimihail wrote:
+>> > That's great thanks for the clarification.
+>> >
+>> > Is this patch going to make it to the mainline at some point?
 >>
+>> Not exactly as is, because it has a small defect (it always reads 16
+>> bytes from memory), but something like that will.
+>>
+>> Paolo
+>>
+>
+>
