@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdR-0000So-1i
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:49 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8zhP-0004Bf-02
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdQ-00043C-9i
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:49 -0400
-Received: from [59.151.112.132] (port=32737 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zdP-0003zw-TB
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:44:48 -0400
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Fri, 12 May 2017 09:41:26 +0800
-Message-ID: <1494553288-30764-11-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8zhN-0001Gn-MW
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:48:55 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170510200535.13268-1-f4bug@amsat.org>
+	<20170510200535.13268-8-f4bug@amsat.org>
+	<877f1oyov4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3109e990-3c5a-fb7d-515d-af3771ddfa50@amsat.org>
+Date: Thu, 11 May 2017 22:48:42 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V4 10/12] net/colo-compare.c: Add vnet packet's
- tcp/udp/icmp compare
+In-Reply-To: <877f1oyov4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 7/8] target/ppc: optimize various functions
+ using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +29,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
-	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-COLO-Proxy just focus on packet payload, So we skip vnet header.
+Hi Nikunj,
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/colo-compare.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+On 05/11/2017 01:54 AM, Nikunj A Dadhania wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>
+>> Applied using Coccinelle script.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  target/ppc/translate.c              |  9 +++------
+>>  target/ppc/translate/vsx-impl.inc.c | 21 +++++++--------------
+>>  2 files changed, 10 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>> index f40b5a1abf..64ab412bf3 100644
+>> --- a/target/ppc/translate.c
+>> +++ b/target/ppc/translate.c
+>> @@ -868,8 +868,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+>>              }
+>>              tcg_gen_xor_tl(cpu_ca, t0, t1);        /* bits changed w/ carry */
+>>              tcg_temp_free(t1);
+>> -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);   /* extract bit 32 */
+>> -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
+>> +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
+>>              if (is_isa300(ctx)) {
+>>                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>>              }
+>> @@ -1399,8 +1398,7 @@ static inline void gen_op_arith_subf(DisasContext *ctx, TCGv ret, TCGv arg1,
+>>              tcg_temp_free(inv1);
+>>              tcg_gen_xor_tl(cpu_ca, t0, t1);         /* bits changes w/ carry */
+>>              tcg_temp_free(t1);
+>> -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);    /* extract bit 32 */
+>> -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
+>> +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
+>>              if (is_isa300(ctx)) {
+>>                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>>              }
+>
+> Above changes are correct.
+>
+> Rest of them are wrong as discussed above in the thread with Richard.
+ >
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index cb0b04e..bf565f3 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -188,6 +188,8 @@ static int packet_enqueue(CompareState *s, int mode)
-  */
- static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
- {
-+    int offset_all;
-+
-     if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-         char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
- 
-@@ -201,9 +203,12 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
-                                    sec_ip_src, sec_ip_dst);
-     }
- 
-+    offset_all = ppkt->vnet_hdr_len + offset;
-+
-     if (ppkt->size == spkt->size) {
--        return memcmp(ppkt->data + offset, spkt->data + offset,
--                      spkt->size - offset);
-+        return memcmp(ppkt->data + offset_all,
-+                      spkt->data + offset_all,
-+                      spkt->size - offset_all);
-     } else {
-         trace_colo_compare_main("Net packet size are not the same");
-         return -1;
-@@ -261,8 +266,9 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
-      */
-     if (ptcp->th_off > 5) {
-         ptrdiff_t tcp_offset;
-+
-         tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
--                     + (ptcp->th_off * 4);
-+                     + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
-         res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
-     } else if (ptcp->th_sum == stcp->th_sum) {
-         res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
--- 
-2.7.4
+I tried to correct the cocci script and ran it again (will post in few 
+min as v3) and got:
+
+$ docker run -it -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle --sp-file 
+scripts/coccinelle/tcg_gen_extract.cocci --macro-file 
+scripts/cocci-macro-file.h --dir target/ppc
+init_defs_builtins: /usr/lib64/coccinelle/standard.h
+init_defs: scripts/cocci-macro-file.h
+HANDLING: target/ppc/mfrom_table_gen.c
+HANDLING: target/ppc/user_only_helper.c
+HANDLING: target/ppc/mmu-hash64.c
+HANDLING: target/ppc/timebase_helper.c
+HANDLING: target/ppc/gdbstub.c
+HANDLING: target/ppc/translate.c
+candidate at target/ppc/translate.c:5386
+   op_size: tl/tl (same)
+   low_bits: 4 (value: 0xf)
+   len: 0xf
+   len_bits == low_bits
+   candidate IS optimizable
+
+candidate at target/ppc/translate.c:871
+   op_size: tl/tl (same)
+   low_bits: 1 (value: 0x1)
+   len: 0x1
+   len_bits == low_bits
+   candidate IS optimizable
+
+candidate at target/ppc/translate.c:1402
+   op_size: tl/tl (same)
+   low_bits: 1 (value: 0x1)
+   len: 0x1
+   len_bits == low_bits
+   candidate IS optimizable
+
+>> @@ -5383,8 +5381,7 @@ static void gen_mfsri(DisasContext *ctx)
+>>      CHK_SV;
+>>      t0 = tcg_temp_new();
+>>      gen_addr_reg_index(ctx, t0);
+>> -    tcg_gen_shri_tl(t0, t0, 28);
+>> -    tcg_gen_andi_tl(t0, t0, 0xF);
+>> +    tcg_gen_extract_tl(t0, t0, 28, 0xF);
+>>      gen_helper_load_sr(cpu_gpr[rd], cpu_env, t0);
+>>      tcg_temp_free(t0);
+>>      if (ra != 0 && ra != rd)
+
+0xF = 0b1111 so this one seems correct to, right?
+
+Then I got:
+
+candidate at target/ppc/translate/vsx-impl.inc.c:1265
+   op_size: i64/i64 (same)
+   low_bits: 15 (value: 0x7fff)
+   len: 0x7fff
+   len_bits == low_bits
+   candidate IS optimizable
+
+candidate at target/ppc/translate/vsx-impl.inc.c:1451
+   op_size: i64/i64 (same)
+   low_bits: 11 (value: 0x7ff)
+   len: 0x7ff
+   len_bits == low_bits
+   candidate IS optimizable
+
+candidate at target/ppc/translate/vsx-impl.inc.c:1453
+   op_size: i64/i64 (same)
+   low_bits: 11 (value: 0x7ff)
+   len: 0x7ff
+   len_bits == low_bits
+   candidate IS optimizable
+
+candidate at target/ppc/translate/vsx-impl.inc.c:1434
+   op_size: i64/i64 (same)
+   low_bits: 8 (value: 0xff)
+   len: 0xff000000ff
+   len_bits != low_bits
+   candidate is NOT optimizable
+
+candidate at target/ppc/translate/vsx-impl.inc.c:1436
+   op_size: i64/i64 (same)
+   low_bits: 8 (value: 0xff)
+   len: 0xff000000ff
+   len_bits != low_bits
+   candidate is NOT optimizable
+
+candidate at target/ppc/translate/vsx-impl.inc.c:1477
+   op_size: i64/i64 (same)
+   low_bits: 11 (value: 0x7ff)
+   len: 0x7ff
+   len_bits == low_bits
+   candidate IS optimizable
+
+candidate at target/ppc/translate/vsx-impl.inc.c:1485
+   op_size: i64/i64 (same)
+   low_bits: 11 (value: 0x7ff)
+   len: 0x7ff
+   len_bits == low_bits
+   candidate IS optimizable
+
+>> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+>> index 7f12908029..354a6b113a 100644
+>> --- a/target/ppc/translate/vsx-impl.inc.c
+>> +++ b/target/ppc/translate/vsx-impl.inc.c
+>> @@ -1262,8 +1262,7 @@ static void gen_xsxexpqp(DisasContext *ctx)
+>>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>>          return;
+>>      }
+>> -    tcg_gen_shri_i64(xth, xbh, 48);
+>> -    tcg_gen_andi_i64(xth, xth, 0x7FFF);
+>> +    tcg_gen_extract_i64(xth, xbh, 48, 0x7FFF);
+>>      tcg_gen_movi_i64(xtl, 0);
+>>  }
+
+0x7FFF = 0b111111111111111 (15 bits set)
+
+This one is correct too?
+
+>>
+>> @@ -1431,10 +1430,8 @@ static void gen_xvxexpsp(DisasContext *ctx)
+>>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>>          return;
+>>      }
+>> -    tcg_gen_shri_i64(xth, xbh, 23);
+>> -    tcg_gen_andi_i64(xth, xth, 0xFF000000FF);
+>> -    tcg_gen_shri_i64(xtl, xbl, 23);
+>> -    tcg_gen_andi_i64(xtl, xtl, 0xFF000000FF);
+>> +    tcg_gen_extract_i64(xth, xbh, 23, 0xFF000000FF);
+>> +    tcg_gen_extract_i64(xtl, xbl, 23, 0xFF000000FF);
+>>  }
+
+WRONG
+
+>>
+>>  static void gen_xvxexpdp(DisasContext *ctx)
+>> @@ -1448,10 +1445,8 @@ static void gen_xvxexpdp(DisasContext *ctx)
+>>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>>          return;
+>>      }
+>> -    tcg_gen_shri_i64(xth, xbh, 52);
+>> -    tcg_gen_andi_i64(xth, xth, 0x7FF);
+>> -    tcg_gen_shri_i64(xtl, xbl, 52);
+>> -    tcg_gen_andi_i64(xtl, xtl, 0x7FF);
+>> +    tcg_gen_extract_i64(xth, xbh, 52, 0x7FF);
+>> +    tcg_gen_extract_i64(xtl, xbl, 52, 0x7FF);
+>>  }
+
+0x7FF = 0b11111111111 (11 bits set)
+
+correct too? (same next too)
+
+>>
+>>  GEN_VSX_HELPER_2(xvxsigsp, 0x00, 0x04, 0, PPC2_ISA300)
+>> @@ -1474,16 +1469,14 @@ static void gen_xvxsigdp(DisasContext *ctx)
+>>      zr = tcg_const_i64(0);
+>>      nan = tcg_const_i64(2047);
+>>
+>> -    tcg_gen_shri_i64(exp, xbh, 52);
+>> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
+>> +    tcg_gen_extract_i64(exp, xbh, 52, 0x7FF);
+>>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+>>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+>>      tcg_gen_andi_i64(xth, xbh, 0x000FFFFFFFFFFFFF);
+>>      tcg_gen_or_i64(xth, xth, t0);
+>>
+>> -    tcg_gen_shri_i64(exp, xbl, 52);
+>> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
+>> +    tcg_gen_extract_i64(exp, xbl, 52, 0x7FF);
+>>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+>>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+>
+> Regards
+> Nikunj
+
+Regards,
+
+Phil.
