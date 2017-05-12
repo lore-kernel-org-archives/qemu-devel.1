@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rob@landley.net>) id 1d9BQW-0007QE-Mj
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:20:17 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1d9BSU-0008V2-HF
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:22:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rob@landley.net>) id 1d9BQT-000357-K6
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:20:16 -0400
-Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:35292)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rob@landley.net>) id 1d9BQT-00034f-E7
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:20:13 -0400
-Received: by mail-io0-x22a.google.com with SMTP id f102so40822047ioi.2
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:20:11 -0700 (PDT)
-Received: from [172.16.108.54] ([75.102.139.83])
-	by smtp.googlemail.com with ESMTPSA id
-	h76sm1620715ith.24.2017.05.12.07.20.08 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 12 May 2017 07:20:10 -0700 (PDT)
-From: Rob Landley <rob@landley.net>
-Message-ID: <dcc8c16f-7d4d-3fdf-a1e8-508548239bb1@landley.net>
-Date: Fri, 12 May 2017 09:20:05 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1d9BSP-0004gj-KR
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:22:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1d9BSP-0004g3-BP
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:22:13 -0400
+References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
+	<20170511123246.31308-7-maxime.coquelin@redhat.com>
+	<20170511203345-mutt-send-email-mst@kernel.org>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <62516ce5-9d4c-d021-c4ab-a767c7f07b31@redhat.com>
+Date: Fri, 12 May 2017 16:21:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170511203345-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] multiple -append?
+Subject: Re: [Qemu-devel] [PATCH 6/6] spec/vhost-user spec: Add IOMMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,9 +30,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
 
-When I feed a second -append to qemu-system-i386 they don't get
-concatenated, the second replaces the first. Why is it called "append" then?
 
-Rob
+
+On 05/11/2017 08:25 PM, Michael S. Tsirkin wrote:
+> On Thu, May 11, 2017 at 02:32:46PM +0200, Maxime Coquelin wrote:
+>> This patch specifies and implements the master/slave communication
+>> to support device IOTLB in slave.
+>>
+>> The vhost_iotlb_msg structure introduced for kernel backends is
+>> re-used, making the design close between the two backends.
+>>
+>> An exception is the use of the secondary channel to enable the
+>> slave to send IOTLB miss requests to the master.
+>>
+>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+>> ---
+>>   docs/specs/vhost-user.txt | 75 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   hw/virtio/vhost-user.c    | 31 ++++++++++++++++++++
+>>   2 files changed, 106 insertions(+)
+>>
+>> diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
+>> index 5fa7016..4a1f0c3 100644
+>> --- a/docs/specs/vhost-user.txt
+>> +++ b/docs/specs/vhost-user.txt
+>> @@ -97,6 +97,23 @@ Depending on the request type, payload can be:
+>>      log offset: offset from start of supplied file descriptor
+>>          where logging starts (i.e. where guest address 0 would be logged)
+>>   
+>> + * An IOTLB message
+>> +   ---------------------------------------------------------
+>> +   | iova | size | user address | permissions flags | type |
+>> +   ---------------------------------------------------------
+>> +
+>> +   IOVA: a 64-bit guest I/O virtual address
+> 
+> guest -> VM
+
+Ok.
+
+> 
+>> +   Size: a 64-bit size
+> 
+> How do you specify "all memory"? give special meaning to size 0?
+
+Good point, it does not support all memory currently.
+It is not vhost-user specific, but general to the vhost implementation.
+
+>> +   User address: a 64-bit user address
+>> +   Permissions flags: a 8-bit bit field:
+>> +    - Bit 0: Read access
+>> +    - Bit 1: Write access
+> 
+> Can both bits be set? Can none?
+
+Both. I will change it by listing values directly:
+  - 0 : No access
+  - 1 : Read
+  - 2 : Write
+  - 3 : Read Write
+
+>> +   Type: a 8-bit IOTLB message type:
+>> +    - 1: IOTLB miss
+>> +    - 2: IOTLB update
+>> +    - 3: IOTLB invalidate
+>> +    - 4: IOTLB access fail
+>> +
+>>   In QEMU the vhost-user message is implemented with the following struct:
+>>   
+>>   typedef struct VhostUserMsg {
+>> @@ -109,6 +126,7 @@ typedef struct VhostUserMsg {
+>>           struct vhost_vring_addr addr;
+>>           VhostUserMemory memory;
+>>           VhostUserLog log;
+>> +        struct vhost_iotlb_msg iotlb;
+>>       };
+>>   } QEMU_PACKED VhostUserMsg;
+>>   
+>> @@ -253,6 +271,31 @@ Once the source has finished migration, rings will be stopped by
+>>   the source. No further update must be done before rings are
+>>   restarted.
+>>   
+>> +IOMMU support
+>> +-------------
+>> +
+>> +When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated, the master has
+>> +to send IOTLB entries update & invalidation by sending VHOST_USER_IOTLB_MSG
+>> +requests to the slave with a struct vhost_iotlb_msg payload.
+> 
+> Always? This seems a bit strange since iommu can be enabled/disabled
+> dynamically.
+Ok, what about:
+
+When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated and iommu
+is enbaled, the master sends IOTLB entries update & invalidation via
+VHOST_USER_IOTLB_MSG requests to the slave with a struct vhost_iotlb_msg
+payload.
+
+
+> Closing channel seems like a wrong thing to do for this.
+
+Sorry, I'm not sure to get your comment.
+
+>> For update events,
+>> +the iotlb payload has to be filled with the update message type (2), the I/O
+>> +virtual address, the size, the user virtual address, and the permissions
+>> +flags. For invalidation events, the iotlb payload has to be filled with the
+>> +invalidation message type (3), the I/O virtual address and the size. On
+>> +success, the slave is expected to reply with a zero payload, non-zero
+>> +otherwise.
+>> +
+>> +When the VHOST_USER_PROTOCOL_F_SLAVE_REQ is supported by the slave, and the
+>> +master initiated the slave to master communication channel using the
+>> +VHOST_USER_SET_SLAVE_REQ_FD request, the slave can send IOTLB miss and access
+>> +failure events by sending VHOST_USER_SLAVE_IOTLB_MSG requests to the master
+>> +with a struct vhost_iotlb_msg payload. For miss events, the iotlb payload has
+>> +to be filled with the miss message type (1), the I/O virtual address and the
+>> +permissions flags. For access failure event, the iotlb payload has to be
+>> +filled with the access failure message type (4), the I/O virtual address and
+>> +the permissions flags. For synchronization purpose, the slave may rely on the
+>> +reply-ack feature, so the master may send a reply when operation is completed
+>> +if the reply-ack feature is negotiated and slaves requests a reply.
+>> +
+>>   Slave communication
+>>   -------------------
+>>   
+>> @@ -514,6 +557,38 @@ Master message types
+>>         If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must respond
+>>         with zero for success, non-zero otherwise.
+>>   
+>> + * VHOST_USER_IOTLB_MSG
+>> +
+>> +      Id: 22
+>> +      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
+>> +      Master payload: struct vhost_iotlb_msg
+>> +      Slave payload: u64
+>> +
+>> +      Send IOTLB messages with struct vhost_iotlb_msg as payload.
+>> +      Master sends such requests to update and invalidate entries in the device
+>> +      IOTLB. The slave has to acknowledge the request with sending zero as u64
+>> +      payload for success, non-zero otherwise.
+>> +      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
+>> +      has been successfully negotiated.
+>> +
+>> +Slave message types
+>> +-------------------
+>> +
+>> + * VHOST_USER_SLAVE_IOTLB_MSG
+>> +
+>> +      Id: 1
+>> +      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
+>> +      Slave payload: struct vhost_iotlb_msg
+>> +      Master payload: N/A
+>> +
+>> +      Send IOTLB messages with struct vhost_iotlb_msg as payload.
+>> +      Slave sends such requests to notify of an IOTLB miss, or an IOTLB
+>> +      access failure. If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated,
+>> +      and slave set the VHOST_USER_NEED_REPLY flag, master must respond with
+>> +      zero when operation is successfully completed, or non-zero otherwise.
+>> +      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
+>> +      has been successfully negotiated.
+>> +
+> 
+> Are there limitations on number of messages in flight?
+
+I didn't think about this, I would say the maximum number of messages in
+flight is dependent on the socket buffer size (which is kept to default
+in this series).
+
+You question highlights a bug in by DPDK prototype, as the MISS request
+can be sent by multiple threads, and I didn't protected this with a lock
+to prevent concurrent read on the socket when waiting for the REPLY_ACK.
+
+Thanks,
+Maxime
