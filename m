@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d9KAS-00018Y-0f
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:16 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d9KAT-0001AE-TY
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d9KAR-0003vd-4H
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:16 -0400
-Received: from mail-qk0-x22c.google.com ([2607:f8b0:400d:c09::22c]:35858)
+	(envelope-from <rth7680@gmail.com>) id 1d9KAS-0003we-B6
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:17 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34921)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d9KAQ-0003us-Qg
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:15 -0400
-Received: by mail-qk0-x22c.google.com with SMTP id u75so59704410qka.3
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:40:14 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d9KAS-0003wH-6q
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:16 -0400
+Received: by mail-qk0-x241.google.com with SMTP id k74so9846031qke.2
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:40:16 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 12 May 2017 16:40:00 -0700
-Message-Id: <20170512234009.32557-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/9] Queued s390 patches
+Date: Fri, 12 May 2017 16:40:01 -0700
+Message-Id: <20170512234009.32557-2-rth@twiddle.net>
+In-Reply-To: <20170512234009.32557-1-rth@twiddle.net>
+References: <20170512234009.32557-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL 1/9] target/s390x: Implement STORE FACILITIES
+ LIST EXTENDED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +30,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com
 
-This is a combination of my queued patches and those
-posted by Aurelien this week.
+At the same time, improve STORE FACILITIES LIST
+so that we don't hard-code the list for all cpus.
 
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ target/s390x/helper.h      |  2 ++
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/misc_helper.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c   | 17 ++++++-------
+ 4 files changed, 72 insertions(+), 8 deletions(-)
 
-r~
-
-
-The following changes since commit ecc1f5adeec4e3324d1b695a7c54e3967c526949:
-
-  maintainers: Add myself as linux-user reviewer (2017-05-11 13:31:11 -0400)
-
-are available in the git repository at:
-
-  git://github.com/rth7680/qemu.git tags/pull-s390-20170512
-
-for you to fetch changes up to 538fad597d898f677f81cb4daacd37e7cdc18e6e:
-
-  target/s390x: implement serialization in BRANCH CONDITION (2017-05-12 15:48:41 -0700)
-
-----------------------------------------------------------------
-Queued target/s390 patches
-
-----------------------------------------------------------------
-Aurelien Jarno (3):
-      target/s390x: mask the SIGP order_code using SIGP_ORDER_MASK
-      target/s390x: fix SIGNAL PROCESSOR return value
-      target/s390x: implement serialization in BRANCH CONDITION
-
-Eric Bischoff (1):
-      target/s390x: Implement LOAD PAIR DISJOINT
-
-Miroslav Benes (1):
-      target/s390x: Implement LOAD PROGRAM PARAMETER
-
-Richard Henderson (4):
-      target/s390x: Implement STORE FACILITIES LIST EXTENDED
-      target/s390x: Diagnose specification exception for atomics
-      target/s390x: Use atomic operations for COMPARE SWAP
-      target/s390x: Use atomic operations for LOAD AND OP
-
- target/s390x/cpu.c         |   1 +
- target/s390x/cpu.h         |   6 ++
- target/s390x/helper.c      |  16 +++
- target/s390x/helper.h      |   3 +
- target/s390x/insn-data.def |  38 ++++---
- target/s390x/kvm.c         |   2 -
- target/s390x/mem_helper.c  |  40 ++++++++
- target/s390x/misc_helper.c |  62 +++++++++++-
- target/s390x/translate.c   | 245 ++++++++++++++++++++++++++-------------------
- 9 files changed, 288 insertions(+), 125 deletions(-)
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 9102071..01adb50 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -83,6 +83,8 @@ DEF_HELPER_FLAGS_5(calc_cc, TCG_CALL_NO_RWG_SE, i32, env, i32, i64, i64, i64)
+ DEF_HELPER_FLAGS_2(sfpc, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_2(sfas, TCG_CALL_NO_WG, void, env, i64)
+ DEF_HELPER_FLAGS_1(popcnt, TCG_CALL_NO_RWG_SE, i64, i64)
++DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
++DEF_HELPER_2(stfle, i32, env, i64)
+ 
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 075ff59..b6702da 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -747,6 +747,8 @@
+     C(0xe33e, STRV,    RXY_a, Z,   la2, r1_32u, new, m1_32, rev32, 0)
+     C(0xe32f, STRVG,   RXY_a, Z,   la2, r1_o, new, m1_64, rev64, 0)
+ 
++/* STORE FACILITY LIST EXTENDED */
++    C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
+ /* STORE FPC */
+     C(0xb29c, STFPC,   S,     Z,   0, a2, new, m2_32, efpc, 0)
+ 
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index eca8244..bd94242 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -678,3 +678,62 @@ void HELPER(per_ifetch)(CPUS390XState *env, uint64_t addr)
+     }
+ }
+ #endif
++
++/* The maximum bit defined at the moment is 129.  */
++#define MAX_STFL_WORDS  3
++
++/* Canonicalize the current cpu's features into the 64-bit words required
++   by STFLE.  Return the index-1 of the max word that is non-zero.  */
++static unsigned do_stfle(CPUS390XState *env, uint64_t words[MAX_STFL_WORDS])
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++    const unsigned long *features = cpu->model->features;
++    unsigned max_bit = 0;
++    S390Feat feat;
++
++    memset(words, 0, sizeof(uint64_t) * MAX_STFL_WORDS);
++
++    if (test_bit(S390_FEAT_ZARCH, features)) {
++        /* z/Architecture is always active if around */
++        words[0] = 1ull << (63 - 2);
++    }
++
++    for (feat = find_first_bit(features, S390_FEAT_MAX);
++         feat < S390_FEAT_MAX;
++         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1)) {
++        const S390FeatDef *def = s390_feat_def(feat);
++        if (def->type == S390_FEAT_TYPE_STFL) {
++            unsigned bit = def->bit;
++            if (bit > max_bit) {
++                max_bit = bit;
++            }
++            assert(bit / 64 < MAX_STFL_WORDS);
++            words[bit / 64] |= 1ULL << (63 - bit % 64);
++        }
++    }
++
++    return max_bit / 64;
++}
++
++void HELPER(stfl)(CPUS390XState *env)
++{
++    uint64_t words[MAX_STFL_WORDS];
++
++    do_stfle(env, words);
++    cpu_stl_data(env, 200, words[0] >> 32);
++}
++
++uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
++{
++    uint64_t words[MAX_STFL_WORDS];
++    unsigned count_m1 = env->regs[0] & 0xff;
++    unsigned max_m1 = do_stfle(env, words);
++    unsigned i;
++
++    for (i = 0; i <= count_m1; ++i) {
++        cpu_stq_data(env, addr + 8 * i, words[i]);
++    }
++
++    env->regs[0] = deposit64(env->regs[0], 0, 8, max_m1);
++    return (count_m1 >= max_m1 ? 0 : 3);
++}
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 01c6217..69940e3 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3628,15 +3628,8 @@ static ExitStatus op_spt(DisasContext *s, DisasOps *o)
+ 
+ static ExitStatus op_stfl(DisasContext *s, DisasOps *o)
+ {
+-    TCGv_i64 f, a;
+-    /* We really ought to have more complete indication of facilities
+-       that we implement.  Address this when STFLE is implemented.  */
+     check_privileged(s);
+-    f = tcg_const_i64(0xc0000000);
+-    a = tcg_const_i64(200);
+-    tcg_gen_qemu_st32(f, a, get_mem_index(s));
+-    tcg_temp_free_i64(f);
+-    tcg_temp_free_i64(a);
++    gen_helper_stfl(cpu_env);
+     return NO_EXIT;
+ }
+ 
+@@ -3802,6 +3795,14 @@ static ExitStatus op_sturg(DisasContext *s, DisasOps *o)
+ }
+ #endif
+ 
++static ExitStatus op_stfle(DisasContext *s, DisasOps *o)
++{
++    potential_page_fault(s);
++    gen_helper_stfle(cc_op, cpu_env, o->in2);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_st8(DisasContext *s, DisasOps *o)
+ {
+     tcg_gen_qemu_st8(o->in1, o->in2, get_mem_index(s));
+-- 
+2.9.3
