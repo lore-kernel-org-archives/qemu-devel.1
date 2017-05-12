@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d9Bi6-0005Mx-02
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:38:26 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d9Brj-000384-DJ
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d9Bi4-0005Oy-Ux
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:38:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d9Bi4-0005No-Ls
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:38:24 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 12 May 2017 10:38:12 -0400
-Message-Id: <20170512143812.31067-2-stefanha@redhat.com>
-In-Reply-To: <20170512143812.31067-1-stefanha@redhat.com>
-References: <20170512143812.31067-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 1/1] trace: add sanity check
+	(envelope-from <paolo.bonzini@gmail.com>) id 1d9Bri-0001Xt-CD
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:48:23 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170510143205.32013-1-pbonzini@redhat.com>
+	<20170510143205.32013-4-pbonzini@redhat.com>
+	<20170511205611.GC19824@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ca25db4d-0c55-50a6-7cb0-152a76e5a875@redhat.com>
+Date: Fri, 12 May 2017 16:48:10 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170511205611.GC19824@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/7] curl: avoid recursive locking of
+ BDRVCURLState mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Anthony Xu <anthony.xu@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: rjones@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
 
-From: Anthony Xu <anthony.xu@intel.com>
 
-If trace backend is set to TRACE_NOP, trace_get_vcpu_event_count
-returns 0, cause bitmap_new call abort.
 
-The abort can be triggered as follows:
+On 11/05/2017 22:56, Jeff Cody wrote:
+> On Wed, May 10, 2017 at 04:32:01PM +0200, Paolo Bonzini wrote:
+>> The curl driver has a ugly hack where, if it cannot find an empty CURLState,
+>> it just uses aio_poll to wait for one to be empty.  This is probably
+>> buggy when used together with dataplane, and the simplest way to fix it
+>> is to use coroutines instead.
+>>
+>> A more immediate effect of the bug however is that it can cause a
+>> recursive call to curl_readv_bh_cb and recursively taking the
+>> BDRVCURLState mutex.  This causes a deadlock.
+>>
+>> The fix is to unlock the mutex around aio_poll, but for cleanliness we
+>> should also take the mutex around all calls to curl_init_state, even if
+>> reaching the unlock/lock pair is impossible.  The same is true for
+>> curl_clean_state.
+>>
+>> Reported-by: Richard W.M. Jones <rjones@redhat.com>
+>> Cc: jcody@redhat.com
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  block/curl.c | 13 ++++++++++++-
+>>  1 file changed, 12 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/curl.c b/block/curl.c
+>> index 9a00fdc28e..b18e79bf54 100644
+>> --- a/block/curl.c
+>> +++ b/block/curl.c
+>> @@ -281,6 +281,7 @@ read_end:
+>>      return size * nmemb;
+>>  }
+>>  
+>> +/* Called with s->mutex held.  */
+>>  static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
+>>                           CURLAIOCB *acb)
+>>  {
+>> @@ -453,6 +454,7 @@ static void curl_multi_timeout_do(void *arg)
+>>  #endif
+>>  }
+>>  
+>> +/* Called with s->mutex held.  */
+>>  static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+>>  {
+>>      CURLState *state = NULL;
+>> @@ -471,7 +473,9 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+>>              break;
+>>          }
+>>          if (!state) {
+>> +            qemu_mutex_unlock(&s->mutex);
+>>              aio_poll(bdrv_get_aio_context(bs), true);
+>> +            qemu_mutex_lock(&s->mutex);
+>>          }
+>>      } while(!state);
+>>  
+>> @@ -534,6 +538,7 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+>>      return state;
+>>  }
+>>  
+>> +/* Called with s->mutex held.  */
+>>  static void curl_clean_state(CURLState *s)
+>>  {
+>>      int j;
+>> @@ -565,6 +570,7 @@ static void curl_detach_aio_context(BlockDriverState *bs)
+>>      BDRVCURLState *s = bs->opaque;
+>>      int i;
+>>  
+>> +    qemu_mutex_lock(&s->mutex);
+>>      for (i = 0; i < CURL_NUM_STATES; i++) {
+>>          if (s->states[i].in_use) {
+>>              curl_clean_state(&s->states[i]);
+>> @@ -580,6 +586,7 @@ static void curl_detach_aio_context(BlockDriverState *bs)
+>>          curl_multi_cleanup(s->multi);
+>>          s->multi = NULL;
+>>      }
+>> +    qemu_mutex_unlock(&s->mutex);
+>>  
+>>      timer_del(&s->timer);
+>>  }
+>> @@ -745,9 +752,12 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+>>      }
+>>  
+>>      DPRINTF("CURL: Opening %s\n", file);
+>> +    qemu_mutex_init(&s->mutex);
+> 
+> This mutex init is now done above possible returns on error, so we should
+> call qemu_mutex_destroy() on errors after this point.
 
-  $ ./configure --enable-trace-backend=nop --target-list=x86_64-softmmu
-  $ gdb ./x86_64-softmmu/qemu-system-x86_64 -M q35,accel=kvm -m 1G
-  (gdb) bt
-  #0  0x00007ffff04e25f7 in raise () from /lib64/libc.so.6
-  #1  0x00007ffff04e3ce8 in abort () from /lib64/libc.so.6
-  #2  0x00005555559de905 in bitmap_new (nbits=<optimized out>)
-      at /home/root/git/qemu2.git/include/qemu/bitmap.h:96
-  #3  cpu_common_initfn (obj=0x555556621d30) at qom/cpu.c:399
-  #4  0x0000555555a11869 in object_init_with_type (obj=0x555556621d30, ti=0x55555656bbb0) at qom/object.c:341
-  #5  0x0000555555a11869 in object_init_with_type (obj=0x555556621d30, ti=0x55555656bd30) at qom/object.c:341
-  #6  0x0000555555a11efc in object_initialize_with_type (data=data@entry=0x555556621d30, size=76560,
-      type=type@entry=0x55555656bd30) at qom/object.c:376
-  #7  0x0000555555a12061 in object_new_with_type (type=0x55555656bd30) at qom/object.c:484
-  #8  0x0000555555a121c5 in object_new (typename=typename@entry=0x555556550340 "qemu64-x86_64-cpu")
-      at qom/object.c:494
-  #9  0x00005555557f6e3d in pc_new_cpu (typename=typename@entry=0x555556550340 "qemu64-x86_64-cpu", apic_id=0,
-      errp=errp@entry=0x5555565391b0 <error_fatal>) at /home/root/git/qemu2.git/hw/i386/pc.c:1101
-  #10 0x00005555557fa33e in pc_cpus_init (pcms=pcms@entry=0x5555565f9690)
-      at /home/root/git/qemu2.git/hw/i386/pc.c:1184
-  #11 0x00005555557fe0f6 in pc_q35_init (machine=0x5555565f9690) at /home/root/git/qemu2.git/hw/i386/pc_q35.c:121
-  #12 0x000055555574fbad in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4562
+Ok, I'll wait for you to complete the review and send v3.
 
-Signed-off-by: Anthony Xu <anthony.xu@intel.com>
-Message-id: 1494369432-15418-1-git-send-email-anthony.xu@intel.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- qom/cpu.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/qom/cpu.c b/qom/cpu.c
-index f02e9c0..f9111a0 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -382,6 +382,7 @@ static void cpu_common_unrealizefn(DeviceState *dev, Error **errp)
- 
- static void cpu_common_initfn(Object *obj)
- {
-+    uint32_t count;
-     CPUState *cpu = CPU(obj);
-     CPUClass *cc = CPU_GET_CLASS(obj);
- 
-@@ -396,7 +397,10 @@ static void cpu_common_initfn(Object *obj)
-     QTAILQ_INIT(&cpu->breakpoints);
-     QTAILQ_INIT(&cpu->watchpoints);
- 
--    cpu->trace_dstate = bitmap_new(trace_get_vcpu_event_count());
-+    count = trace_get_vcpu_event_count();
-+    if (count) {
-+        cpu->trace_dstate = bitmap_new(count);
-+    }
- 
-     cpu_exec_initfn(cpu);
- }
--- 
-2.9.3
+Paolo
