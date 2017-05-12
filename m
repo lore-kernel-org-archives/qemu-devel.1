@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1d8xvT-0005WM-I0
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 19:55:20 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d8ys2-00060r-92
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 20:55:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1d8xvQ-0004fd-E2
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 19:55:19 -0400
-Received: from mga14.intel.com ([192.55.52.115]:13154)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1d8xvQ-0004cX-4M
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 19:55:16 -0400
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Thu, 11 May 2017 23:55:11 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
-References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
-	<20170511145312.GA822@morn.lan>
-	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
-	<20170511163447.GA7785@morn.lan>
-In-Reply-To: <20170511163447.GA7785@morn.lan>
-Content-Language: en-US
+	(envelope-from <arei.gonglei@huawei.com>) id 1d8yrz-00077W-6K
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 20:55:50 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3864)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d8yry-0006yh-Js
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 20:55:47 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 12 May 2017 00:55:23 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA26D816@DGGEMA505-MBX.china.huawei.com>
+References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
+	<1494243504-127980-9-git-send-email-arei.gonglei@huawei.com>
+	<20170511170527.5846a676.cornelia.huck@de.ibm.com>
+In-Reply-To: <20170511170527.5846a676.cornelia.huck@de.ibm.com>
+Content-Language: zh-CN
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
- system management mode
+Subject: Re: [Qemu-devel] [RFC v1 8/9] virtio-crypto: add host feature bits
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin
+	(H)" <wu.wubin@huawei.com>
 
-Hi Paolo,
-
-In KVM mode, seems A20 is ignored.
-Do you see any potential issue here?
-
-
-Anthony=20
-
-
-> -----Original Message-----
-> From: Kevin O'Connor [mailto:kevin@koconnor.net]
-> Sent: Thursday, May 11, 2017 9:35 AM
-> To: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: qemu-devel@nongnu.org; Xu, Anthony <anthony.xu@intel.com>
-> Subject: Re: [PATCH] target/i386: enable A20 automatically in system
-> management mode
+>
+> From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
+> Sent: Thursday, May 11, 2017 11:05 PM
+> Subject: Re: [RFC v1 8/9] virtio-crypto: add host feature bits support
 >=20
-> On Thu, May 11, 2017 at 05:32:47PM +0200, Paolo Bonzini wrote:
-> > On 11/05/2017 16:53, Kevin O'Connor wrote:
-> > > On Thu, May 11, 2017 at 01:35:28PM +0200, Paolo Bonzini wrote:
-> > >> Ignore env->a20_mask when running in system management mode.
-> > >
-> > > Thanks Paolo.  I don't think this patch will help SeaBIOS though.  Th=
-e
-> > > SeaBIOS SMM handler doesn't do much - it doesn't even access ram
-> above
-> > > 1MiB.  See SeaBIOS' code in src/fw/smm.c:handle_smi().
-> > >
-> > > Instead, the SeaBIOS code does a cpu state backup/restore to switch
-> > > into 32bit mode.  I thought the A20 state would be part of that cpu
-> > > backup/restore.  However, looking at the Intel SDM docs now, it's not
-> > > really clear to me how the processor "inhibits" A20 when in SMM mode =
--
-> > > does it save/restore that state on SMI/RSM or does it have special
-> > > logic to ignore A20 while in SMM mode?
+> On Mon, 8 May 2017 19:38:23 +0800
+> Gonglei <arei.gonglei@huawei.com> wrote:
+>=20
+> > We enable all feature bits acquiescently.
 > >
-> > There isn't any documented place for A20 in the state save map (I check=
-ed
-> > AMD's BIOS/Kernel Developer Guide which is pretty comprehensive), so I
-> > think the latter is more plausible.  What I'm doing in this patch is
-> > ignoring A20 while in SMM mode.
->=20
-> Okay.
->=20
-> > Then you would have to add an A20 save/restore in handle_smi; since
-> > CALL32SMM_ENTERID should not nest, I think you can just do this:
->=20
-> Yes, that should be fine.
->=20
-> > --- a/src/fw/smm.c
-> > +++ b/src/fw/smm.c
-> > @@ -54,7 +54,8 @@ struct smm_layout {
-> >      struct smm_state backup2;
-> >      u8 stack[0x7c00];
-> >      u64 codeentry;
-> > -    u8 pad_8008[0x7df8];
-> > +    u8 a20;
-> > +    u8 pad_8009[0x7df7];
-> >      struct smm_state cpu;
+> > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> > ---
+> >  hw/virtio/virtio-crypto.c         | 15 +++++++++++++++
+> >  include/hw/virtio/virtio-crypto.h |  1 +
+> >  2 files changed, 16 insertions(+)
+> >
+> > diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+> > index 5422f25..3dc0ff2 100644
+> > --- a/hw/virtio/virtio-crypto.c
+> > +++ b/hw/virtio/virtio-crypto.c
+> > @@ -1034,6 +1034,11 @@ static uint64_t
+> virtio_crypto_get_features(VirtIODevice *vdev,
+> >                                             uint64_t features,
+> >                                             Error **errp)
+> >  {
+> > +    VirtIOCrypto *vcrypto =3D VIRTIO_CRYPTO(vdev);
+> > +
+> > +    /* Firstly sync all virtio-crypto possible supported features */
+> > +    features |=3D vcrypto->host_features;
+> > +
+> >      return features;
+> >  }
+> >
+> > @@ -1144,6 +1149,16 @@ static const VMStateDescription
+> vmstate_virtio_crypto =3D {
 > >  };
+> >
+> >  static Property virtio_crypto_properties[] =3D {
+> > +    DEFINE_PROP_BIT("mux_mode", VirtIOCrypto, host_features,
+> > +                    VIRTIO_CRYPTO_F_MUX_MODE, true),
+> > +    DEFINE_PROP_BIT("cipher_stateless_mode", VirtIOCrypto,
+> host_features,
+> > +                    VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE,
+> true),
+> > +    DEFINE_PROP_BIT("hash_stateless_mode", VirtIOCrypto,
+> host_features,
+> > +                    VIRTIO_CRYPTO_F_HASH_STATELESS_MODE,
+> true),
+> > +    DEFINE_PROP_BIT("mac_stateless_mode", VirtIOCrypto,
+> host_features,
+> > +                    VIRTIO_CRYPTO_F_MAC_STATELESS_MODE, true),
+> > +    DEFINE_PROP_BIT("aead_stateless_mode", VirtIOCrypto,
+> host_features,
+> > +                    VIRTIO_CRYPTO_F_AEAD_STATELESS_MODE,
+> true),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >
+> > diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virt=
+io-crypto.h
+> > index 465ad20..30ea51d 100644
+> > --- a/include/hw/virtio/virtio-crypto.h
+> > +++ b/include/hw/virtio/virtio-crypto.h
+> > @@ -97,6 +97,7 @@ typedef struct VirtIOCrypto {
+> >      int multiqueue;
+> >      uint32_t curr_queues;
+> >      size_t config_size;
+> > +    uint32_t host_features;
 >=20
-> In order to avoid mixing code and data in the same cache line we could
-> do this instead:
+> I'd just make that 64 bits from the start.
 >=20
->  struct smm_layout {
->      struct smm_state backup1;
->      struct smm_state backup2;
-> -    u8 stack[0x7c00];
-> +    u32 backup_a20;
-> +    u8 stack[0x8000 - sizeof(struct smm_state)*2 - sizeof(u32)];
->      u64 codeentry;
->      u8 pad_8008[0x7df8];
->      struct smm_state cpu;
+Yes, that's better.
+
+> >  } VirtIOCrypto;
+> >
+> >  #endif /* _QEMU_VIRTIO_CRYPTO_H */
 >=20
-> Thanks,
-> -Kevin
+> Don't you need some kind of compat handling?
+
+I did that in patch 6 according to the results of those feature bits negoti=
+ated.
+Patch 9 tests both session mode and stateless mode, they are work. :)
+
+Thanks,
+-Gonglei
