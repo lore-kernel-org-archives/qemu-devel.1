@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d9GOh-0008Lq-O2
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:38:44 -0400
+	(envelope-from <kevin@koconnor.net>) id 1d9GOm-0008Q3-2u
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:38:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d9GOg-0005S3-W4
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:38:43 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170512033543.6789-1-f4bug@amsat.org>
-	<20170512033543.6789-3-f4bug@amsat.org>
-	<f447c23f-f63c-f3bb-a1b9-f63e5aff4063@twiddle.net>
-	<20170512182132.jdw4g2pd5gvf2dti@aurel32.net>
-	<aaa04be5-78d6-311b-609b-d02f18e9ef96@twiddle.net>
-	<20170512192252.hgtpgqfn5vtba362@aurel32.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <6c18b1e3-cc1b-ed98-bb2b-8eacaa719aee@twiddle.net>
-Date: Fri, 12 May 2017 12:38:36 -0700
+	(envelope-from <kevin@koconnor.net>) id 1d9GOi-0005T6-2M
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:38:48 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1d9GOh-0005RG-Sk
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:38:44 -0400
+Received: by mail-qt0-x242.google.com with SMTP id a46so8026019qte.0
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 12:38:42 -0700 (PDT)
+Date: Fri, 12 May 2017 15:38:40 -0400
+From: Kevin O'Connor <kevin@koconnor.net>
+Message-ID: <20170512193840.GA22454@morn.lan>
+References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
+	<20170511145312.GA822@morn.lan>
+	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
+	<20170511163447.GA7785@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
+	<ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1AB6AA2@ORSMSX112.amr.corp.intel.com>
+	<f9c33614-be36-e789-b72b-b4ffcc8bb6a8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170512192252.hgtpgqfn5vtba362@aurel32.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] target/arm: optimize rev16() using
- extract op
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9c33614-be36-e789-b72b-b4ffcc8bb6a8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +36,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Xu, Anthony" <anthony.xu@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 05/12/2017 12:22 PM, Aurelien Jarno wrote:
-> On 2017-05-12 12:05, Richard Henderson wrote:
->> On 05/12/2017 11:21 AM, Aurelien Jarno wrote:
->>> +    uint64_t mask1 = sf ? 0x00ff00ff00ff00ffull : 0x00ff00ff;
->>> +    uint64_t mask2 = sf ? 0xff00ff00ff00ff00ull : 0xff00ff00;
->>> +
->>> +    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 8);
->>> +    tcg_gen_andi_i64(tcg_tmp, tcg_tmp, mask1);
->>> +    tcg_gen_shli_i64(tcg_rd, tcg_rn, 8);
->>> +    tcg_gen_andi_i64(tcg_rd, tcg_rd, mask2);
->>
->> It would probably be better to use a single mask, since they're not free to
->> instantiate in a register.  So e.g.
->>
->>    TCGv mask = tcg_const_i64(sf ? 0x00ff00ff00ff00ffull : 0x00ff00ff);
->>    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 8);
->>    tcg_gen_and_i64(tcg_rd, tcg_rn, mask);
->>    tcg_gen_and_i64(tcg_tmp, tcg_tmp, mask);
->>    tcg_gen_shli_i64(tcg_rd, tcg_rd, 8);
+On Fri, May 12, 2017 at 09:16:31PM +0200, Paolo Bonzini wrote:
+> On 12/05/2017 20:55, Xu, Anthony wrote:
+> > If that's the case,  QEMU/TCG should work with SeaBios even with ignoring A20.
+> > 
+> > During SeaBios boot, there are >350 port 92 access, if we don't need to handle A20, 
+> > we can make A20 configurable in Seabios, It may reduce SeaBios boot time.
 > 
-> Indeed that improves things a bit for sf=1. For sf=0 though the
-> constant is never loaded into a register, it is passed to the and
-> instructions as an immediate.
-> 
-For x86 (and sometimes s390) it isn't, but it certainly would be for all other 
-hosts.
+> Yes, that's a good idea.
 
+SeaBIOS defaults to enabling A20 and it's a rare beast that disables
+it.  One could change x86.h:set_a20 and romlayout.S:transition32 to
+only issue the outb() if the inb() indicates a change is needed.  That
+would likely eliminate half the accesses.
 
-r~
+I'd be surprised if it would impact the overall boot time though.
+SeaBIOS only touches the port on a cpu mode switch and I would have
+thought that was heavier than an IO port access.  Maybe that is skewed
+on KVM though.
+
+-Kevin
