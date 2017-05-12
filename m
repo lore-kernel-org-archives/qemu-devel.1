@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1d98LJ-00042V-Am
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:43 -0400
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1d98LJ-00042X-Ax
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1d98LF-0006PU-AU
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1d98LF-0006Pp-G8
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:41 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44631 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:44613 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1d98LF-0006E4-2y
+	id 1d98LF-0006Ds-3P
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:37 -0400
 From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
-Date: Fri, 12 May 2017 13:02:09 +0200
-Message-Id: <1494586944-7253-2-git-send-email-Milos.Stojanovic@rt-rk.com>
-In-Reply-To: <1494586944-7253-1-git-send-email-Milos.Stojanovic@rt-rk.com>
-References: <1494586944-7253-1-git-send-email-Milos.Stojanovic@rt-rk.com>
+Date: Fri, 12 May 2017 13:02:08 +0200
+Message-Id: <1494586944-7253-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 01/16] linux-user: add strace for getuid(),
- gettid(), getppid(), geteuid()
+Subject: [Qemu-devel] [PATCH 00/16] Augment support for signal handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +28,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, riku.voipio@iki.fi
 Cc: Milos.Stojanovic@rt-rk.com
 
-Improve strace support for syscalls getuid(), gettid(), getppid()
-and geteuid(). Since these system calls don't have arguments, "%s()"
-is added in the corresponding strace.list entry so that no arguments
-are printed.
+This patch set deals with QEMU Linux user mode functionalities related to
+signal handling. It is composed of four sections:
 
-getuid:
-Prior to this commit, typical strace output used to look like this:
-4894 getuid(4894,0,0,274886293296,-3689348814741910323,4832615904) =3D 10=
-00
-After this commit, it looks like this:
-4894 getuid() =3D 1000
+A. Extend strace support (patches 1-2, 8-9):
 
-gettid:
-Prior to this commit, typical strace output used to look like this:
-8307 gettid(0,0,64,0,4832630528,4832615840) =3D 8307
-After this commit, it looks like this:
-8307 gettid() =3D 8307
+   Strace support is added for getuid(), gettid(), getppid(), geteuid(),
+   tkill(), tgkill() and rt_sigqueueinfo(), along with support for printi=
+ng
+   the uinfo structure of rt_sigqueueinfo() of rt_tgsigqueueinfo() instea=
+d
+   of a pointer to it. Additionally, some minor fixes of inconsistent spa=
+ces
+   in the output of print_siginfo() are added.
 
-getppid:
-Prior to this commit, typical strace output used to look like this:
-20588 getppid(20588,64,0,4832630528,4832615888,0) =3D 20625
-After this commit, it looks like this:
-20588 getppid() =3D 20625
+B. Fix some signal handling issues (patches 3-5):
 
-geteuid:
-Prior to this commit, typical strace output used to look like this:
-20588 geteuid(64,0,0,4832615888,0,-9151031864016699136) =3D 1000
-After this commit, it looks like this:
-20588 geteuid() =3D 1000
+   Fix the ssetmask() system call by removing the invocation of
+   sigorset() using the old and the new signal masks as arguments.
+   Change the unlock_user() argument from arg1 to arg3 to match with
+   lock_user(), since arg3 contains the pointer to the siginfo_t structur=
+e.
+   Change the type of the first argument of rt_sigqueinfo()
+   from int to pid_t in the syscall declaration.
 
-Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
----
- linux-user/strace.list | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+C. Adding support for rt_tgsigqueueinfo() (patches 6-7):
 
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 3b1282e..6e33788 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -290,7 +290,7 @@
- { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_geteuid
--{ TARGET_NR_geteuid, "geteuid" , NULL, NULL, NULL },
-+{ TARGET_NR_geteuid, "geteuid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_geteuid32
- { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
-@@ -338,7 +338,7 @@
- { TARGET_NR_getpmsg, "getpmsg" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_getppid
--{ TARGET_NR_getppid, "getppid" , NULL, NULL, NULL },
-+{ TARGET_NR_getppid, "getppid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_getpriority
- { TARGET_NR_getpriority, "getpriority", "%s(%#x,%#x)", NULL, NULL },
-@@ -381,13 +381,13 @@
-   NULL, NULL },
- #endif
- #ifdef TARGET_NR_gettid
--{ TARGET_NR_gettid, "gettid" , NULL, NULL, NULL },
-+{ TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_gettimeofday
- { TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_getuid
--{ TARGET_NR_getuid, "getuid" , NULL, NULL, NULL },
-+{ TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_getuid32
- { TARGET_NR_getuid32, "getuid32" , NULL, NULL, NULL },
+   Add a new system call: rt_tgsigqueueinfo().
+
+   This system call is similar to rt_sigqueueinfo(), but instead of
+   sending the signal and data to the whole thread group with the ID
+   equal to the argument tgid, it sends it to a single thread within
+   that thread group. The ID of the thread is specified by the tid
+   argument.
+
+   The implementation is based on the rt_sigqueueinfo() in linux-user
+   mode, where the tid is added as the second argument and the
+   previous second and third argument become arguments three and four,
+   respectively.
+
+D. Add support for larger target signal range (RFC patches 10-16):
+
+   Add target signal mask tracking and multiplexing of target signals out
+   of the host range. The patches are marked as RFC because they introduc=
+e
+   significant new functionalities regarding signal handling in QEMU.
+
+   Currently, QEMU has a copy of the host signal and suspend masks and
+   that is usually enough, since most of the time the signal mask of the
+   target architecture is either the same length or narrower. If however
+   the signal mask is wider, then part of it won't be tracked. The signal=
+s
+   that are in the target range but out of the host range were treated li=
+ke
+   faulty signals and couldn't be used. This problem is solved by enablin=
+g
+   the usage of one of the host signals as a multiplex for all the target
+   signals that are out of range. In order to have the target signal mask=
+s
+   available, tracking of target signal masks is implemented.
+
+   The rt_sigqueueinfo()/rt_tgsigqueueinfo() system calls multiplex targe=
+t
+   signals by setting the si_errno value to the actual value of the signa=
+l
+   and sending the signal to a predefined host signal number.
+   The host_signal_handler() will pull out the multiplexed signals and se=
+t
+   their signal number to the correct value. The si_errno field is used
+   here but this implementation can be replaced with any other unused fie=
+ld
+   in the uinfo structure. Using this implementation both rt_sigqueueinfo=
+(),
+   rt_tgsigqueueinfo(), as well as kill() (for pid > 0) and tgkill() can =
+be
+   emulated.
+
+   The tkill() system call and kill() with the argument pid <=3D 0 couldn=
+'t
+   be implemented simply using this method because it requires acquiring
+   information about, and sending simultaneous signals to multiple thread=
+s
+   or processes. These functionalities are out of the scope of
+   rt_sigqueueinfo()/rt_tgsigqueueinfo().
+
+Milo=C5=A1 Stojanovi=C4=87 (16):
+  linux-user: add strace for getuid(), gettid(), getppid(), geteuid()
+  linux-user: add tkill(), tgkill() and rt_sigqueueinfo() strace
+  linux-user: fix ssetmask() system call
+  linux-user: fix mismatch of lock/unlock_user() invocations in
+    rt_sigqueinfo() syscall
+  linux-user: fix argument type declaration of rt_sigqueinfo() syscall
+  linux-user: add support for rt_tgsigqueueinfo() system call
+  linux-user: add rt_tgsigqueueinfo() strace
+  linux-user: fix inconsistent spaces in print_siginfo() output
+  linux-user: add strace support for uinfo structure of
+    rt_sigqueueinfo() and rt_tgsigqueueinfo()
+  [RFC] linux-user: add support for tracking the target signal mask
+  [RFC] linux-user: add target_sigdelset() and target_sigorset()
+  [RFC] linux-user: fix sigismember() check
+  [RFC] linux-user: add functions for working with the target signal
+    mask
+  [RFC] linux-user: add functionality for tracking target signal mask
+  [RFC] linux-user: add support for multiplexing larger target signals
+  [RFC] linux-user: add support for multiplexing signals in
+    rt_sigqueueinfo(), rt_tgsigqueueinfo(), kill() and tgkill()
+    syscalls.
+
+ linux-user/qemu.h         |  10 ++
+ linux-user/signal.c       | 235 ++++++++++++++++++++++++++++++++++++++++=
++++++-
+ linux-user/strace.c       | 177 ++++++++++++++++++++++++++++++++--
+ linux-user/strace.list    |  16 ++--
+ linux-user/syscall.c      | 208 +++++++++++++++++++++++++++++++++++++---
+ linux-user/syscall_defs.h |  32 +++++++
+ 6 files changed, 650 insertions(+), 28 deletions(-)
+
 --=20
 1.9.1
