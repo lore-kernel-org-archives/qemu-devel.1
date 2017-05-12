@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d9TQE-0005Be-CQ
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 05:33:12 -0400
+	(envelope-from <ianloic@google.com>) id 1d9J0g-0005x1-Po
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d9TQA-0001Mp-VM
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 05:33:10 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43750)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1d9TQA-0001H6-Hw
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 05:33:06 -0400
-From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Sat, 13 May 2017 11:32:40 +0200
-Message-Id: <20170513093248.18230-8-aurelien@aurel32.net>
-In-Reply-To: <20170513093248.18230-1-aurelien@aurel32.net>
-References: <20170513093248.18230-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PULL 07/15] target/sh4: only save flags state at the
- end of the TB
+	(envelope-from <ianloic@google.com>) id 1d9J0f-0006ha-Ry
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:26:06 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:33302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ianloic@google.com>) id 1d9J0f-0006fV-Fp
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:26:05 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id w50so51029281wrc.0
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 15:26:03 -0700 (PDT)
+MIME-Version: 1.0
+From: Ian McKellar <ianloic@google.com>
+Date: Fri, 12 May 2017 22:25:50 +0000
+Message-ID: <CA+YAivjpUbWHDw+y2wf6OCLGOEu+merS3Hrj9x5V5G-SGMqg-g@mail.gmail.com>
+Content-Type: multipart/mixed; boundary="f403045cf790c7775e054f5b3075"
+Subject: [Qemu-devel] [PATCH 1/1] Improve Cocoa modifier key handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,227 +25,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-There is no need to save flags when entering and exiting the delay slot.
-They can be saved only when reaching the end of the TB. If the TB is
-interrupted before by an exception, they will be restored using
-restore_state_to_opc.
+--f403045cf790c7775e054f5b3075
+Content-Type: text/plain; charset="UTF-8"
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
----
- target/sh4/translate.c | 69 ++++++++++++++++++++++++--------------------------
- 1 file changed, 33 insertions(+), 36 deletions(-)
+I had two problems with QEMU on macOS:
+ 1) Sometimes when alt-tabbing to QEMU it would act as if the 'a' key
+    was pressed so I'd get 'aaaaaaaaa....'.
+ 2) Using Sikuli to programatically send keys to the QEMU window text
+    like "foo_bar" would come out as "fooa-bar".
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index f608e314b6..8cee7d333f 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -212,6 +212,20 @@ static void gen_write_sr(TCGv src)
-     tcg_gen_andi_i32(cpu_sr_t, cpu_sr_t, 1);
- }
- 
-+static inline void gen_save_cpu_state(DisasContext *ctx, bool save_pc)
-+{
-+    if (save_pc) {
-+        tcg_gen_movi_i32(cpu_pc, ctx->pc);
-+    }
-+    if (ctx->delayed_pc != (uint32_t) -1) {
-+        tcg_gen_movi_i32(cpu_delayed_pc, ctx->delayed_pc);
-+    }
-+    if ((ctx->tbflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL))
-+        != ctx->envflags) {
-+        tcg_gen_movi_i32(cpu_flags, ctx->envflags);
-+    }
-+}
-+
- static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
- {
-     if (unlikely(ctx->singlestep_enabled)) {
-@@ -246,6 +260,7 @@ static void gen_jump(DisasContext * ctx)
- 	/* Target is not statically known, it comes necessarily from a
- 	   delayed jump as immediate jump are conditinal jumps */
- 	tcg_gen_mov_i32(cpu_pc, cpu_delayed_pc);
-+        tcg_gen_discard_i32(cpu_delayed_pc);
- 	if (ctx->singlestep_enabled)
-             gen_helper_debug(cpu_env);
- 	tcg_gen_exit_tb(0);
-@@ -254,21 +269,12 @@ static void gen_jump(DisasContext * ctx)
-     }
- }
- 
--static inline void gen_branch_slot(uint32_t delayed_pc, int t)
--{
--    tcg_gen_movi_i32(cpu_delayed_pc, delayed_pc);
--    if (t) {
--        tcg_gen_mov_i32(cpu_delayed_cond, cpu_sr_t);
--    } else {
--        tcg_gen_xori_i32(cpu_delayed_cond, cpu_sr_t, 1);
--    }
--}
--
- /* Immediate conditional jump (bt or bf) */
- static void gen_conditional_jump(DisasContext * ctx,
- 				 target_ulong ift, target_ulong ifnott)
- {
-     TCGLabel *l1 = gen_new_label();
-+    gen_save_cpu_state(ctx, false);
-     tcg_gen_brcondi_i32(TCG_COND_NE, cpu_sr_t, 0, l1);
-     gen_goto_tb(ctx, 0, ifnott);
-     gen_set_label(l1);
-@@ -291,11 +297,6 @@ static void gen_delayed_conditional_jump(DisasContext * ctx)
-     gen_jump(ctx);
- }
- 
--static inline void gen_store_flags(uint32_t flags)
--{
--    tcg_gen_movi_i32(cpu_flags, flags);
--}
--
- static inline void gen_load_fpr64(TCGv_i64 t, int reg)
- {
-     tcg_gen_concat_i32_i64(t, cpu_fregs[reg + 1], cpu_fregs[reg]);
-@@ -337,7 +338,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- 
- #define CHECK_NOT_DELAY_SLOT \
-     if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {     \
--        tcg_gen_movi_i32(cpu_pc, ctx->pc);                           \
-+        gen_save_cpu_state(ctx, true);                               \
-         gen_helper_raise_slot_illegal_instruction(cpu_env);          \
-         ctx->bstate = BS_EXCP;                                       \
-         return;                                                      \
-@@ -345,7 +346,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- 
- #define CHECK_PRIVILEGED                                             \
-     if (IS_USER(ctx)) {                                              \
--        tcg_gen_movi_i32(cpu_pc, ctx->pc);                           \
-+        gen_save_cpu_state(ctx, true);                               \
-         if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) { \
-             gen_helper_raise_slot_illegal_instruction(cpu_env);      \
-         } else {                                                     \
-@@ -357,7 +358,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- 
- #define CHECK_FPU_ENABLED                                            \
-     if (ctx->tbflags & (1u << SR_FD)) {                              \
--        tcg_gen_movi_i32(cpu_pc, ctx->pc);                           \
-+        gen_save_cpu_state(ctx, true);                               \
-         if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) { \
-             gen_helper_raise_slot_fpu_disable(cpu_env);              \
-         } else {                                                     \
-@@ -501,14 +502,12 @@ static void _decode_opc(DisasContext * ctx)
-     case 0xa000:		/* bra disp */
- 	CHECK_NOT_DELAY_SLOT
- 	ctx->delayed_pc = ctx->pc + 4 + B11_0s * 2;
--	tcg_gen_movi_i32(cpu_delayed_pc, ctx->delayed_pc);
-         ctx->envflags |= DELAY_SLOT;
- 	return;
-     case 0xb000:		/* bsr disp */
- 	CHECK_NOT_DELAY_SLOT
- 	tcg_gen_movi_i32(cpu_pr, ctx->pc + 4);
- 	ctx->delayed_pc = ctx->pc + 4 + B11_0s * 2;
--	tcg_gen_movi_i32(cpu_delayed_pc, ctx->delayed_pc);
-         ctx->envflags |= DELAY_SLOT;
- 	return;
-     }
-@@ -1165,7 +1164,8 @@ static void _decode_opc(DisasContext * ctx)
- 	return;
-     case 0x8f00:		/* bf/s label */
- 	CHECK_NOT_DELAY_SLOT
--	gen_branch_slot(ctx->delayed_pc = ctx->pc + 4 + B7_0s * 2, 0);
-+        tcg_gen_xori_i32(cpu_delayed_cond, cpu_sr_t, 1);
-+        ctx->delayed_pc = ctx->pc + 4 + B7_0s * 2;
-         ctx->envflags |= DELAY_SLOT_CONDITIONAL;
- 	return;
-     case 0x8900:		/* bt label */
-@@ -1176,7 +1176,8 @@ static void _decode_opc(DisasContext * ctx)
- 	return;
-     case 0x8d00:		/* bt/s label */
- 	CHECK_NOT_DELAY_SLOT
--	gen_branch_slot(ctx->delayed_pc = ctx->pc + 4 + B7_0s * 2, 1);
-+        tcg_gen_mov_i32(cpu_delayed_cond, cpu_sr_t);
-+        ctx->delayed_pc = ctx->pc + 4 + B7_0s * 2;
-         ctx->envflags |= DELAY_SLOT_CONDITIONAL;
- 	return;
-     case 0x8800:		/* cmp/eq #imm,R0 */
-@@ -1285,7 +1286,7 @@ static void _decode_opc(DisasContext * ctx)
- 	{
- 	    TCGv imm;
- 	    CHECK_NOT_DELAY_SLOT
--            tcg_gen_movi_i32(cpu_pc, ctx->pc);
-+            gen_save_cpu_state(ctx, true);
- 	    imm = tcg_const_i32(B7_0);
-             gen_helper_trapa(cpu_env, imm);
- 	    tcg_temp_free(imm);
-@@ -1792,7 +1793,7 @@ static void _decode_opc(DisasContext * ctx)
- 	    ctx->opcode, ctx->pc);
-     fflush(stderr);
- #endif
--    tcg_gen_movi_i32(cpu_pc, ctx->pc);
-+    gen_save_cpu_state(ctx, true);
-     if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
-         gen_helper_raise_slot_illegal_instruction(cpu_env);
-     } else {
-@@ -1810,7 +1811,7 @@ static void decode_opc(DisasContext * ctx)
-     if (old_flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
-         /* go out of the delay slot */
-         ctx->envflags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
--        gen_store_flags(ctx->envflags);
-+        tcg_gen_movi_i32(cpu_flags, ctx->envflags);
-         ctx->bstate = BS_BRANCH;
-         if (old_flags & DELAY_SLOT_CONDITIONAL) {
- 	    gen_delayed_conditional_jump(ctx);
-@@ -1819,11 +1820,6 @@ static void decode_opc(DisasContext * ctx)
- 	}
- 
-     }
--
--    /* go into a delay slot */
--    if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
--        gen_store_flags(ctx->envflags);
--    }
- }
- 
- void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-@@ -1865,7 +1861,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
- 
-         if (unlikely(cpu_breakpoint_test(cs, ctx.pc, BP_ANY))) {
-             /* We have hit a breakpoint - make sure PC is up-to-date */
--            tcg_gen_movi_i32(cpu_pc, ctx.pc);
-+            gen_save_cpu_state(&ctx, true);
-             gen_helper_debug(cpu_env);
-             ctx.bstate = BS_EXCP;
-             /* The address covered by the breakpoint must be included in
-@@ -1896,18 +1892,16 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-     if (tb->cflags & CF_LAST_IO)
-         gen_io_end();
-     if (cs->singlestep_enabled) {
--        tcg_gen_movi_i32(cpu_pc, ctx.pc);
-+        gen_save_cpu_state(&ctx, true);
-         gen_helper_debug(cpu_env);
-     } else {
- 	switch (ctx.bstate) {
-         case BS_STOP:
--            tcg_gen_movi_i32(cpu_pc, ctx.pc);
-+            gen_save_cpu_state(&ctx, true);
-             tcg_gen_exit_tb(0);
-             break;
-         case BS_NONE:
--            if (ctx.envflags) {
--                gen_store_flags(ctx.envflags);
--	    }
-+            gen_save_cpu_state(&ctx, false);
-             gen_goto_tb(&ctx, 0, ctx.pc);
-             break;
-         case BS_EXCP:
-@@ -1940,4 +1934,7 @@ void restore_state_to_opc(CPUSH4State *env, TranslationBlock *tb,
- {
-     env->pc = data[0];
-     env->flags = data[1];
-+    /* Theoretically delayed_pc should also be restored. In practice the
-+       branch instruction is re-executed after exception, so the delayed
-+       branch target will be recomputed. */
- }
--- 
-2.11.0
+They looked similar and after much digging the problem turned out to be
+the same. When QEMU's ui/cocoa.m received an NSFlagsChanged NSEvent it
+looked at the keyCode to determine what modifier key changed. This
+usually works fine but sometimes the keyCode is 0 and the app should
+instead be looking at the modifierFlags bitmask. Key code 0 is the 'a'
+key.
+
+I added code that handles keyCode == 0 differently. It checks the
+modifierFlags and if they differ from QEMU's idea of which modifier
+keys are currently pressed it toggles those changed keys.
+
+This fixes my problems and seems work fine.
+
+The patch itself is an attachment.
+
+Ian
+
+--f403045cf790c7775e054f5b3075
+Content-Type: application/octet-stream;
+	name="0001-Improve-Cocoa-modifier-key-handling.patch"
+Content-Disposition: attachment;
+	filename="0001-Improve-Cocoa-modifier-key-handling.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <15bfec3c5ef128ecb7e1>
+X-Attachment-Id: 15bfec3c5ef128ecb7e1
+
+RnJvbSBkNzBmMWFkMTQ3MzQ4MDA4NTE0ZTgwZTNkYzQxN2Y2MjYwZTM5YWEyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBJYW4gTWNLZWxsYXIgPGlhbmxvaWNAZ29vZ2xlLmNvbT4KRGF0
+ZTogRnJpLCAxMiBNYXkgMjAxNyAxMTowODoyMyAtMDcwMApTdWJqZWN0OiBbUEFUQ0ggMS8xXSBJ
+bXByb3ZlIENvY29hIG1vZGlmaWVyIGtleSBoYW5kbGluZwoKSSBoYWQgdHdvIHByb2JsZW1zIHdp
+dGggUUVNVSBvbiBtYWNPUzoKIDEpIFNvbWV0aW1lcyB3aGVuIGFsdC10YWJiaW5nIHRvIFFFTVUg
+aXQgd291bGQgYWN0IGFzIGlmIHRoZSAnYScga2V5CiAgICB3YXMgcHJlc3NlZCBzbyBJJ2QgZ2V0
+ICdhYWFhYWFhYWEuLi4uJy4KIDIpIFVzaW5nIFNpa3VsaSB0byBwcm9ncmFtYXRpY2FsbHkgc2Vu
+ZCBrZXlzIHRvIHRoZSBRRU1VIHdpbmRvdyB0ZXh0CiAgICBsaWtlICJmb29fYmFyIiB3b3VsZCBj
+b21lIG91dCBhcyAiZm9vYS1iYXIiLgoKVGhleSBsb29rZWQgc2ltaWxhciBhbmQgYWZ0ZXIgbXVj
+aCBkaWdnaW5nIHRoZSBwcm9ibGVtIHR1cm5lZCBvdXQgdG8gYmUKdGhlIHNhbWUuIFdoZW4gUUVN
+VSdzIHVpL2NvY29hLm0gcmVjZWl2ZWQgYW4gTlNGbGFnc0NoYW5nZWQgTlNFdmVudCBpdApsb29r
+ZWQgYXQgdGhlIGtleUNvZGUgdG8gZGV0ZXJtaW5lIHdoYXQgbW9kaWZpZXIga2V5IGNoYW5nZWQu
+IFRoaXMKdXN1YWxseSB3b3JrcyBmaW5lIGJ1dCBzb21ldGltZXMgdGhlIGtleUNvZGUgaXMgMCBh
+bmQgdGhlIGFwcCBzaG91bGQKaW5zdGVhZCBiZSBsb29raW5nIGF0IHRoZSBtb2RpZmllckZsYWdz
+IGJpdG1hc2suIEtleSBjb2RlIDAgaXMgdGhlICdhJwprZXkuCgpJIGFkZGVkIGNvZGUgdGhhdCBo
+YW5kbGVzIGtleUNvZGUgPT0gMCBkaWZmZXJlbnRseS4gSXQgY2hlY2tzIHRoZQptb2RpZmllckZs
+YWdzIGFuZCBpZiB0aGV5IGRpZmZlciBmcm9tIFFFTVUncyBpZGVhIG9mIHdoaWNoIG1vZGlmaWVy
+CmtleXMgYXJlIGN1cnJlbnRseSBwcmVzc2VkIGl0IHRvZ2dsZXMgdGhvc2UgY2hhbmdlZCBrZXlz
+LgoKVGhpcyBmaXhlcyBteSBwcm9ibGVtcyBhbmQgc2VlbXMgd29yayBmaW5lLgoKU2lnbmVkLW9m
+Zi1ieTogSWFuIE1jS2VsbGFyIDxpYW5sb2ljQGdvb2dsZS5jb20+Ci0tLQogdWkvY29jb2EubSB8
+IDQ4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLQogMSBm
+aWxlIGNoYW5nZWQsIDQwIGluc2VydGlvbnMoKyksIDggZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0
+IGEvdWkvY29jb2EubSBiL3VpL2NvY29hLm0KaW5kZXggMjA3NTU1ZWRmNy4uZTY0NWJlZmExMyAx
+MDA2NDQKLS0tIGEvdWkvY29jb2EubQorKysgYi91aS9jb2NvYS5tCkBAIC01Miw2ICs1Miw4IEBA
+CiAvKiBtYWNPUyAxMC4xMiBkZXByZWNhdGVkIG1hbnkgY29uc3RhbnRzLCAjZGVmaW5lIHRoZSBu
+ZXcgbmFtZXMgZm9yIG9sZGVyIFNES3MgKi8KICNpZiBNQUNfT1NfWF9WRVJTSU9OX01BWF9BTExP
+V0VEIDwgTUFDX09TX1hfVkVSU0lPTl8xMF8xMgogI2RlZmluZSBOU0V2ZW50TWFza0FueSAgICAg
+ICAgICAgICAgICAgIE5TQW55RXZlbnRNYXNrCisjZGVmaW5lIE5TRXZlbnRNb2RpZmllckZsYWdD
+YXBzTG9jayAgICAgTlNBbHBoYVNoaWZ0S2V5TWFzaworI2RlZmluZSBOU0V2ZW50TW9kaWZpZXJG
+bGFnU2hpZnQgICAgICAgIE5TU2hpZnRLZXlNYXNrCiAjZGVmaW5lIE5TRXZlbnRNb2RpZmllckZs
+YWdDb21tYW5kICAgICAgTlNDb21tYW5kS2V5TWFzawogI2RlZmluZSBOU0V2ZW50TW9kaWZpZXJG
+bGFnQ29udHJvbCAgICAgIE5TQ29udHJvbEtleU1hc2sKICNkZWZpbmUgTlNFdmVudE1vZGlmaWVy
+RmxhZ09wdGlvbiAgICAgICBOU0FsdGVybmF0ZUtleU1hc2sKQEAgLTUzNiw2ICs1MzgsMTYgQEAg
+UWVtdUNvY29hVmlldyAqY29jb2FWaWV3OwogICAgIH0KIH0KIAorLSAodm9pZCkgdG9nZ2xlTW9k
+aWZpZXI6IChpbnQpa2V5Y29kZSB7CisgICAgaWYgKG1vZGlmaWVyc19zdGF0ZVtrZXljb2RlXSA9
+PSAwKSB7IC8vIGtleWRvd24KKyAgICAgICAgcWVtdV9pbnB1dF9ldmVudF9zZW5kX2tleV9xY29k
+ZShkY2wtPmNvbiwga2V5Y29kZSwgdHJ1ZSk7CisgICAgICAgIG1vZGlmaWVyc19zdGF0ZVtrZXlj
+b2RlXSA9IDE7CisgICAgfSBlbHNlIHsgLy8ga2V5dXAKKyAgICAgICAgcWVtdV9pbnB1dF9ldmVu
+dF9zZW5kX2tleV9xY29kZShkY2wtPmNvbiwga2V5Y29kZSwgZmFsc2UpOworICAgICAgICBtb2Rp
+ZmllcnNfc3RhdGVba2V5Y29kZV0gPSAwOworICAgIH0KK30KKwogLSAodm9pZCkgaGFuZGxlRXZl
+bnQ6KE5TRXZlbnQgKilldmVudAogewogICAgIENPQ09BX0RFQlVHKCJRZW11Q29jb2FWaWV3OiBo
+YW5kbGVFdmVudFxuIik7CkBAIC01NDcsNyArNTU5LDMzIEBAIFFlbXVDb2NvYVZpZXcgKmNvY29h
+VmlldzsKIAogICAgIHN3aXRjaCAoW2V2ZW50IHR5cGVdKSB7CiAgICAgICAgIGNhc2UgTlNFdmVu
+dFR5cGVGbGFnc0NoYW5nZWQ6Ci0gICAgICAgICAgICBrZXljb2RlID0gY29jb2Ffa2V5Y29kZV90
+b19xZW11KFtldmVudCBrZXlDb2RlXSk7CisgICAgICAgICAgICBpZiAoW2V2ZW50IGtleUNvZGVd
+ID09IDApIHsKKyAgICAgICAgICAgICAgICAvLyBXaGVuIHRoZSBDb2NvYSBrZXlDb2RlIGlzIHpl
+cm8gdGhhdCBtZWFucyBrZXlzIHNob3VsZCBiZQorICAgICAgICAgICAgICAgIC8vIHN5bnRoZXNp
+emVkIGJhc2VkIG9uIHRoZSB2YWx1ZXMgaW4gaW4gdGhlIGV2ZW50TW9kaWZpZXJzCisgICAgICAg
+ICAgICAgICAgLy8gYml0bWFzay4KKworICAgICAgICAgICAgICAgIGlmIChxZW11X2NvbnNvbGVf
+aXNfZ3JhcGhpYyhOVUxMKSkgeworICAgICAgICAgICAgICAgICAgICBOU0V2ZW50TW9kaWZpZXJG
+bGFncyBtb2RpZmllcnMgPSBbZXZlbnQgbW9kaWZpZXJGbGFnc107CisKKyAgICAgICAgICAgICAg
+ICAgICAgaWYgKCEhKG1vZGlmaWVycyAmIE5TRXZlbnRNb2RpZmllckZsYWdDYXBzTG9jaykgIT0g
+ISFtb2RpZmllcnNfc3RhdGVbUV9LRVlfQ09ERV9DQVBTX0xPQ0tdKSB7CisgICAgICAgICAgICAg
+ICAgICAgICAgICBbc2VsZiB0b2dnbGVNb2RpZmllcjpRX0tFWV9DT0RFX0NBUFNfTE9DS107Cisg
+ICAgICAgICAgICAgICAgICAgIH0KKyAgICAgICAgICAgICAgICAgICAgaWYgKCEhKG1vZGlmaWVy
+cyAmIE5TRXZlbnRNb2RpZmllckZsYWdTaGlmdCkgIT0gISFtb2RpZmllcnNfc3RhdGVbUV9LRVlf
+Q09ERV9TSElGVF0pIHsKKyAgICAgICAgICAgICAgICAgICAgICAgIFtzZWxmIHRvZ2dsZU1vZGlm
+aWVyOlFfS0VZX0NPREVfU0hJRlRdOworICAgICAgICAgICAgICAgICAgICB9CisgICAgICAgICAg
+ICAgICAgICAgIGlmICghIShtb2RpZmllcnMgJiBOU0V2ZW50TW9kaWZpZXJGbGFnQ29udHJvbCkg
+IT0gISFtb2RpZmllcnNfc3RhdGVbUV9LRVlfQ09ERV9DVFJMXSkgeworICAgICAgICAgICAgICAg
+ICAgICAgICAgW3NlbGYgdG9nZ2xlTW9kaWZpZXI6UV9LRVlfQ09ERV9DVFJMXTsKKyAgICAgICAg
+ICAgICAgICAgICAgfQorICAgICAgICAgICAgICAgICAgICBpZiAoISEobW9kaWZpZXJzICYgTlNF
+dmVudE1vZGlmaWVyRmxhZ09wdGlvbikgIT0gISFtb2RpZmllcnNfc3RhdGVbUV9LRVlfQ09ERV9B
+TFRdKSB7CisgICAgICAgICAgICAgICAgICAgICAgICBbc2VsZiB0b2dnbGVNb2RpZmllcjpRX0tF
+WV9DT0RFX0FMVF07CisgICAgICAgICAgICAgICAgICAgIH0KKyAgICAgICAgICAgICAgICAgICAg
+aWYgKCEhKG1vZGlmaWVycyAmIE5TRXZlbnRNb2RpZmllckZsYWdDb21tYW5kKSAhPSAhIW1vZGlm
+aWVyc19zdGF0ZVtRX0tFWV9DT0RFX01FVEFfTF0pIHsKKyAgICAgICAgICAgICAgICAgICAgICAg
+IFtzZWxmIHRvZ2dsZU1vZGlmaWVyOlFfS0VZX0NPREVfTUVUQV9MXTsKKyAgICAgICAgICAgICAg
+ICAgICAgfQorICAgICAgICAgICAgICAgIH0KKyAgICAgICAgICAgIH0gZWxzZSB7CisgICAgICAg
+ICAgICAgICAga2V5Y29kZSA9IGNvY29hX2tleWNvZGVfdG9fcWVtdShbZXZlbnQga2V5Q29kZV0p
+OworICAgICAgICAgICAgfQogCiAgICAgICAgICAgICBpZiAoKGtleWNvZGUgPT0gUV9LRVlfQ09E
+RV9NRVRBX0wgfHwga2V5Y29kZSA9PSBRX0tFWV9DT0RFX01FVEFfUikKICAgICAgICAgICAgICAg
+ICYmICFpc01vdXNlR3JhYmJlZCkgewpAQCAtNTYyLDEzICs2MDAsNyBAQCBRZW11Q29jb2FWaWV3
+ICpjb2NvYVZpZXc7CiAgICAgICAgICAgICAgICAgICAgIHFlbXVfaW5wdXRfZXZlbnRfc2VuZF9r
+ZXlfcWNvZGUoZGNsLT5jb24sIGtleWNvZGUsIHRydWUpOwogICAgICAgICAgICAgICAgICAgICBx
+ZW11X2lucHV0X2V2ZW50X3NlbmRfa2V5X3Fjb2RlKGRjbC0+Y29uLCBrZXljb2RlLCBmYWxzZSk7
+CiAgICAgICAgICAgICAgICAgfSBlbHNlIGlmIChxZW11X2NvbnNvbGVfaXNfZ3JhcGhpYyhOVUxM
+KSkgewotICAgICAgICAgICAgICAgICAgICBpZiAobW9kaWZpZXJzX3N0YXRlW2tleWNvZGVdID09
+IDApIHsgLy8ga2V5ZG93bgotICAgICAgICAgICAgICAgICAgICAgICAgcWVtdV9pbnB1dF9ldmVu
+dF9zZW5kX2tleV9xY29kZShkY2wtPmNvbiwga2V5Y29kZSwgdHJ1ZSk7Ci0gICAgICAgICAgICAg
+ICAgICAgICAgICBtb2RpZmllcnNfc3RhdGVba2V5Y29kZV0gPSAxOwotICAgICAgICAgICAgICAg
+ICAgICB9IGVsc2UgeyAvLyBrZXl1cAotICAgICAgICAgICAgICAgICAgICAgICAgcWVtdV9pbnB1
+dF9ldmVudF9zZW5kX2tleV9xY29kZShkY2wtPmNvbiwga2V5Y29kZSwgZmFsc2UpOwotICAgICAg
+ICAgICAgICAgICAgICAgICAgbW9kaWZpZXJzX3N0YXRlW2tleWNvZGVdID0gMDsKLSAgICAgICAg
+ICAgICAgICAgICAgfQorICAgICAgICAgICAgICAgICAgW3NlbGYgdG9nZ2xlTW9kaWZpZXI6a2V5
+Y29kZV07CiAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgfQogCi0tIAoyLjExLjAuMzkw
+LmdjNjljMmY1MGNmLWdvb2cKCg==
+--f403045cf790c7775e054f5b3075--
