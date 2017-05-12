@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuk-00050F-Sv
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8zwb-0005vg-M7
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuh-0007Z5-QM
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:42 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3988)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuh-0007W6-8U
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:39 -0400
-References: <20170425103049.4073-1-quintela@redhat.com>
-	<20170425103049.4073-3-quintela@redhat.com>
-	<20170428165522.GG3276@work-vm>
-	<87vapht37i.fsf@secure.mitica> <590AF10B.9020207@huawei.com>
-	<87efvvgxpr.fsf@secure.mitica>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <591517AA.9080201@huawei.com>
-Date: Fri, 12 May 2017 10:02:18 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8zwa-000157-N8
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:04:37 -0400
+Received: from mail-it0-x229.google.com ([2607:f8b0:4001:c0b::229]:36034)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d8zwa-000140-JA
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:04:36 -0400
+Received: by mail-it0-x229.google.com with SMTP id o5so3344369ith.1
+	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 19:04:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87efvvgxpr.fsf@secure.mitica>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
- MigrationParams
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <cc870909-1694-73a3-db66-2d113736c7d6@amsat.org>
+References: <0f1f5bcd-815a-c070-5ba7-281f5a0ee146@twiddle.net>
+	<20170510235204.9657-1-f4bug@amsat.org>
+	<551f0d70-acdf-1a40-6aec-00b1dd40133d@amsat.org>
+	<87efvvzrwo.fsf@dusky.pond.sub.org>
+	<cc870909-1694-73a3-db66-2d113736c7d6@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 11 May 2017 23:04:35 -0300
+Message-ID: <CAAdtpL6owR4iDxs9ND9FkJAhvQGVenuQ-B29Fu+ix+nzDQJVHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH v2] coccinelle: add a script to
+ optimize tcg op using tcg_gen_extract()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +36,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 2017/5/12 0:33, Juan Quintela wrote:
-> Hailiang Zhang <zhang.zhanghailiang@huawei.com> wrote:
->> Hi,
->>
->>>> Hmm you don't seem to have replaced this with anything.
->>>> I think that's a behavioural change; the trick COLO did (I'm not sure if this
->>>> is still the way it works) is that they initiate the first migration
->>>> with block migration enabled so that the two hosts (with non-shared storage)
->>>> get sync'd storage, and then at the completion of that first migration
->>>> they then switch into the checkpointing mode where they're only
->>>> doing updates - that's why it gets switched off at this point
->>>> prior to the 1st checkpoint.
->>> Weird, really.
->>>
->>> I did't catch that.
->>>
->>> Will investigate.
->> Yes, Dave is right, for non-shared disk, we need to enable block
->> migration for first cycle,
->> to sync the disks of two sides. After that, qemu will go into COLO
->> state which we need to
->> disable block migration.
-> v2 posted.
+>> Is this script likely to be rerun in the future?  If yes, keeping it in
+>> scripts/coccinelle/ is a good idea.  If no, I recommend to store it in
+>> the commit message instead.
 >
-> My understanding is that it maintains the sematic, please test/comment.
+>
+> It is unlikely to be rerun in the future, at least for this specific pattern. But it can be easily adapted for another TCG optimization.
+>
+> I could not find much documentation about how to do a such script using Python, except on a thread [1]. If it is documented enough I think it is worth to keep it.
+>
+> About putting it in each commit message, it is now 3 times bigger than the patch it generates!
+>
+> Regards,
+>
+> Phil.
 
-Yes, it is right now, i have reviewed it, thanks.
+I missed this thread ref:
 
-> Thanks, Juan.
->
-> .
->
+[1] https://github.com/coccinelle/coccinelle/issues/86
