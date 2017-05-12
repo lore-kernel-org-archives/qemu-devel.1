@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1d91ZB-0003ka-GG
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:48:36 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d91ep-000584-Ka
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:54:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1d91Z9-0001i9-4e
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:48:33 -0400
-MIME-Version: 1.0
-In-Reply-To: <fffd61b7-bc45-f7da-aa91-5eed1b0d7519@amsat.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d91em-0005aH-CU
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:54:23 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
-	<1494348286-10253-3-git-send-email-sundeep.lkml@gmail.com>
-	<fffd61b7-bc45-f7da-aa91-5eed1b0d7519@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Fri, 12 May 2017 09:18:29 +0530
-Message-ID: <CALHRZuri9VK-CzrcupjdNiQL1gio5bepx=xsMQUreSzHfgJyJg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-devel PATCH 2/5] msf2: Microsemi
- Smartfusion2 System Register block.
+	<1494348286-10253-4-git-send-email-sundeep.lkml@gmail.com>
+	<1c2aa7d5-be0c-77e4-50f7-2c30b84fb1ed@amsat.org>
+	<CALHRZurisA17Y=Gh1PVxrZ1eU72j19HiPeks5gtu7ndVHxetpA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f6367afb-3b4a-a5f8-e0c7-39de42f522b7@amsat.org>
+Date: Fri, 12 May 2017 00:54:15 -0300
+MIME-Version: 1.0
+In-Reply-To: <CALHRZurisA17Y=Gh1PVxrZ1eU72j19HiPeks5gtu7ndVHxetpA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-devel PATCH 3/5] msf2: Add Smartfusion2 SPI
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,311 +30,611 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: sundeep subbaraya <sundeep.lkml@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>
 
-Hi Phiilippe,
+Hi Subbaraya,
 
-On Wed, May 10, 2017 at 4:04 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
-
-> Hi Subbaraya,
+On 05/12/2017 12:31 AM, sundeep subbaraya wrote:
+> Hi Philippe,
 >
+> On Wed, May 10, 2017 at 5:42 PM, Philippe Mathieu-Daudé <f4bug@amsat.org>
+> wrote:
 >
-> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
->
->> Added Sytem register block of Smartfusion2.
->> This block has PLL registers which are accessed by guest.
+>> Hi Subbaraya,
 >>
->> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> ---
->>  hw/misc/Makefile.objs         |   1 +
->>  hw/misc/msf2-sysreg.c         | 131 ++++++++++++++++++++++++++++++
->> ++++++++++++
->>  include/hw/misc/msf2-sysreg.h |  80 ++++++++++++++++++++++++++
->>  3 files changed, 212 insertions(+)
->>  create mode 100644 hw/misc/msf2-sysreg.c
->>  create mode 100644 include/hw/misc/msf2-sysreg.h
->>
->> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
->> index c8b4893..0f52354 100644
->> --- a/hw/misc/Makefile.objs
->> +++ b/hw/misc/Makefile.objs
->> @@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) +=3D edu.o
->>  obj-$(CONFIG_HYPERV_TESTDEV) +=3D hyperv_testdev.o
->>  obj-$(CONFIG_AUX) +=3D auxbus.o
->>  obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
->> +obj-$(CONFIG_MSF2) +=3D msf2-sysreg.o
->> diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
->> new file mode 100644
->> index 0000000..53e9cba
->> --- /dev/null
->> +++ b/hw/misc/msf2-sysreg.c
->> @@ -0,0 +1,131 @@
->> +/*
->> + * System Register block model of Microsemi SmartFusion2.
->> + *
->> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> + *
->> + * This program is free software; you can redistribute it and/or
->> + * modify it under the terms of the GNU General Public License
->> + * as published by the Free Software Foundation; either version
->> + * 2 of the License, or (at your option) any later version.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include "hw/misc/msf2-sysreg.h"
->> +
->> +#ifndef MSF2_SYSREG_ERR_DEBUG
->> +#define MSF2_SYSREG_ERR_DEBUG  0
->> +#endif
->> +
->> +#define DB_PRINT_L(lvl, fmt, args...) do { \
->> +    if (MSF2_SYSREG_ERR_DEBUG >=3D lvl) { \
->> +        qemu_log("%s: " fmt, __func__, ## args); \
->> +    } \
->> +} while (0);
->> +
->> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
->> +
->> +static void msf2_sysreg_reset(DeviceState *d)
->> +{
->> +    MSF2SysregState *s =3D MSF2_SYSREG(d);
->> +
->> +    DB_PRINT("RESET\n");
->> +
->> +    s->regs[MSSDDR_PLL_STATUS_LOW_CR] =3D 0x02420041;
->> +    s->regs[MSSDDR_FACC1_CR] =3D 0x0A482124;
->> +    s->regs[MSSDDR_PLL_STATUS] =3D 0x3;
->> +}
->> +
->> +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
->> +    unsigned size)
->> +{
->> +    MSF2SysregState *s =3D opaque;
->> +    offset /=3D 4;
->> +    uint32_t ret =3D 0;
->> +
->> +    if (offset < ARRAY_SIZE(s->regs)) {
->> +        ret =3D s->regs[offset];
->> +        DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx32 "\n",
->> +                    offset * 4, ret);
->> +    } else {
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                    "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
->> +                    offset * 4);
->> +    }
->> +
->> +    return ret;
->> +}
->> +
->> +static void msf2_sysreg_write(void *opaque, hwaddr offset,
->> +                          uint64_t val, unsigned size)
->> +{
->> +    MSF2SysregState *s =3D (MSF2SysregState *)opaque;
->> +    offset /=3D 4;
->> +
->> +    DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx64 "\n",
->> +            offset * 4, val);
->> +
->> +    switch (offset) {
->> +    case MSSDDR_PLL_STATUS:
->> +        break;
->> +
->> +    default:
->> +        if (offset < ARRAY_SIZE(s->regs)) {
->> +            s->regs[offset] =3D val;
+>> Like my comment for the timer model, I'd name this model "mss_spi".
+>> The only difference I see in the SF2 is the STAT8 register.
+>> No need to register both devices now but maybe you can add a comment about
+>> it?
 >>
 >
-> I think this is pretty unsafe for the guest to continue if those register=
-s
-> are accessed in your current implementation.
+> Ok I will register only SPI0 in SoC file as of now and will add comment.
 >
-> I'd at least somehow abort for few of them (RESET, REMAP*), what do you
-> think?
 
+What I mean is the difference I know between mss_spi from SmartFusion 
+versus mss_spi from the SmartFusion2 is the STAT8 register.
+Your file is SmartFusion2-specific just because of this unused register.
 
-Ok. We can abort for REMAP. All the peripherals need to be released from
-reset by writing to Sysreg.
-Can we handle that case where if guest writes to Sysreg to reset SPI(say)
-then we can reset SPI
-model from here? I am very new here and I did not come across this case in
-the models I have referred.
-Please let me know if that is possible. If not possible I would simply log
-messages like released
-from reset/put in reset.
+Now since you have the mss_spi modeled and you want to model the SF2 
+SoC, you should register both SPI_0 and SPI_1, my comment was not about 
+that.
 
-Thanks,
-Sundeep
+Well forget about this comment about STAT8 difference :) This is not a 
+problem and can be improved in the future.
 
+>>
+>> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
+>>
+>>> Modelled Microsemi's Smartfusion2 SPI controller.
+>>>
+>>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>>> ---
+>>>  hw/ssi/Makefile.objs      |   1 +
+>>>  hw/ssi/msf2-spi.c         | 378 ++++++++++++++++++++++++++++++
+>>> ++++++++++++++++
+>>>  include/hw/ssi/msf2-spi.h | 105 +++++++++++++
+>>>  3 files changed, 484 insertions(+)
+>>>  create mode 100644 hw/ssi/msf2-spi.c
+>>>  create mode 100644 include/hw/ssi/msf2-spi.h
+>>>
+>>> diff --git a/hw/ssi/Makefile.objs b/hw/ssi/Makefile.objs
+>>> index 487add2..3105c4b 100644
+>>> --- a/hw/ssi/Makefile.objs
+>>> +++ b/hw/ssi/Makefile.objs
+>>> @@ -4,6 +4,7 @@ common-obj-$(CONFIG_XILINX_SPI) += xilinx_spi.o
+>>>  common-obj-$(CONFIG_XILINX_SPIPS) += xilinx_spips.o
+>>>  common-obj-$(CONFIG_ASPEED_SOC) += aspeed_smc.o
+>>>  common-obj-$(CONFIG_STM32F2XX_SPI) += stm32f2xx_spi.o
+>>> +common-obj-$(CONFIG_MSF2) += msf2-spi.o
+>>>
+>>
+>> Not a big deal but his define only appears after applying the next patch.
 >
+> Do I need to reorder the patches?
 >
-> +        } else {
->> +            qemu_log_mask(LOG_GUEST_ERROR,
->> +                        "%s: Bad offset 0x%08" HWADDR_PRIx "\n",
->> __func__,
->> +                        offset * 4);
+
+It is probably not important, but for what it's worth if you checkout 
+your tree at this patch 3/5 and build, the msf2-spi.o is not compiled.
+
+Although I'm not sure it could bother bissecting an issue in your code.
+
+>>
+>>>  obj-$(CONFIG_OMAP) += omap_spi.o
+>>>  obj-$(CONFIG_IMX) += imx_spi.o
+>>> diff --git a/hw/ssi/msf2-spi.c b/hw/ssi/msf2-spi.c
+>>> new file mode 100644
+>>> index 0000000..2059ed9
+>>> --- /dev/null
+>>> +++ b/hw/ssi/msf2-spi.c
+>>> @@ -0,0 +1,378 @@
+>>> +/*
+>>> + * SPI controller model of Microsemi SmartFusion2.
+>>> + *
+>>> + * Copyright (C) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>>> + *
+>>> + * Permission is hereby granted, free of charge, to any person obtaining
+>>> a copy
+>>> + * of this software and associated documentation files (the "Software"),
+>>> to deal
+>>> + * in the Software without restriction, including without limitation the
+>>> rights
+>>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
+>>> sell
+>>> + * copies of the Software, and to permit persons to whom the Software is
+>>> + * furnished to do so, subject to the following conditions:
+>>> + *
+>>> + * The above copyright notice and this permission notice shall be
+>>> included in
+>>> + * all copies or substantial portions of the Software.
+>>> + *
+>>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+>>> EXPRESS OR
+>>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+>>> MERCHANTABILITY,
+>>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+>>> SHALL
+>>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+>>> OTHER
+>>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+>>> ARISING FROM,
+>>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+>>> DEALINGS IN
+>>> + * THE SOFTWARE.
+>>> + */
+>>> +
+>>> +#include "hw/ssi/msf2-spi.h"
+>>> +
+>>> +#ifndef MSF2_SPI_ERR_DEBUG
+>>> +#define MSF2_SPI_ERR_DEBUG   0
+>>> +#endif
+>>> +
+>>> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+>>> +    if (MSF2_SPI_ERR_DEBUG >= lvl) { \
+>>> +        qemu_log("%s: " fmt, __func__, ## args); \
+>>> +    } \
+>>> +} while (0);
+>>> +
+>>> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+>>> +
+>>> +static void txfifo_reset(MSF2SpiState *s)
+>>> +{
+>>> +    fifo32_reset(&s->tx_fifo);
+>>> +
+>>> +    s->regs[R_SPI_STATUS] &= ~S_TXFIFOFUL;
+>>> +    s->regs[R_SPI_STATUS] |= S_TXFIFOEMP;
+>>> +}
+>>> +
+>>> +static void rxfifo_reset(MSF2SpiState *s)
+>>> +{
+>>> +    fifo32_reset(&s->rx_fifo);
+>>> +
+>>> +    s->regs[R_SPI_STATUS] &= ~S_RXFIFOFUL;
+>>> +    s->regs[R_SPI_STATUS] |= S_RXFIFOEMP;
+>>> +}
+>>> +
+>>> +static void set_fifodepth(MSF2SpiState *s)
+>>> +{
+>>> +    int size = s->regs[R_SPI_DFSIZE] & FRAMESZ_MASK;
+>>> +
+>>> +    if (0 <= size && size <= 8) {
+>>> +        s->fifo_depth = 32;
+>>> +    }
+>>> +    if (9 <= size && size <= 16) {
+>>> +        s->fifo_depth = 16;
+>>> +    }
+>>> +    if (17 <= size && size <= 32) {
+>>> +        s->fifo_depth = 8;
+>>> +    }
+>>> +}
+>>> +
+>>> +static void msf2_spi_do_reset(MSF2SpiState *s)
+>>> +{
+>>> +    memset(s->regs, 0, sizeof s->regs);
+>>> +    s->regs[R_SPI_CONTROL] = 0x80000102;
+>>> +    s->regs[R_SPI_DFSIZE] = 0x4;
+>>> +    s->regs[R_SPI_STATUS] = 0x2440;
+>>> +    s->regs[R_SPI_CLKGEN] = 0x7;
+>>> +    s->regs[R_SPI_STAT8] = 0x7;
+>>> +    s->regs[R_SPI_RIS] = 0x0;
+>>> +
+>>> +    s->fifo_depth = 4;
+>>> +    s->frame_count = 1;
+>>> +    s->enabled = false;
+>>> +
+>>> +    rxfifo_reset(s);
+>>> +    txfifo_reset(s);
+>>> +}
+>>> +
+>>> +static void update_mis(MSF2SpiState *s)
+>>> +{
+>>> +    uint32_t reg = s->regs[R_SPI_CONTROL];
+>>> +    uint32_t tmp;
+>>> +
+>>> +    /*
+>>> +     * form the Control register interrupt enable bits
+>>> +     * same as RIS, MIS and Interrupt clear registers for simplicity
+>>> +     */
+>>> +    tmp = ((reg & C_INTRXOVRFLO) >> 4) | ((reg & C_INTRXDATA) >> 3) |
+>>> +           ((reg & C_INTTXDATA) >> 5);
+>>> +    s->regs[R_SPI_MIS] |= tmp & s->regs[R_SPI_RIS];
+>>> +}
+>>> +
+>>> +static void spi_update_irq(MSF2SpiState *s)
+>>> +{
+>>> +    int irq;
+>>> +
+>>> +    update_mis(s);
+>>> +    irq = !!(s->regs[R_SPI_MIS]);
+>>> +
+>>> +    qemu_set_irq(s->irq, irq);
+>>> +}
+>>> +
+>>> +static void msf2_spi_reset(DeviceState *d)
+>>> +{
+>>> +    msf2_spi_do_reset(MSF2_SPI(d));
+>>> +}
+>>> +
+>>> +static uint64_t
+>>> +spi_read(void *opaque, hwaddr addr, unsigned int size)
+>>> +{
+>>> +    MSF2SpiState *s = opaque;
+>>> +    uint32_t ret = 0;
+>>> +
+>>> +    addr >>= 2;
+>>> +    switch (addr) {
+>>> +    case R_SPI_RX:
+>>> +        s->regs[R_SPI_STATUS] &= ~S_RXFIFOFUL;
+>>> +        s->regs[R_SPI_STATUS] &= ~RXCHOVRF;
+>>> +        ret = fifo32_pop(&s->rx_fifo);
+>>> +        if (fifo32_is_empty(&s->rx_fifo)) {
+>>> +            s->regs[R_SPI_STATUS] |= S_RXFIFOEMP;
+>>> +        }
+>>> +        break;
+>>> +
+>>> +    case R_SPI_MIS:
+>>> +        update_mis(s);
+>>> +        ret = s->regs[R_SPI_MIS];
+>>> +        break;
+>>> +
+>>> +    default:
+>>> +        if (addr < ARRAY_SIZE(s->regs)) {
+>>> +            ret = s->regs[addr];
+>>> +        } else {
+>>> +            qemu_log_mask(LOG_GUEST_ERROR,
+>>> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__,
+>>> +                         addr * 4);
+>>>
+>>
+>> Drop '\n' while calling qemu_log_mask().
+>
+> Ok.
+>
+>>
+>>
 >> +        }
->> +        break;
->> +    }
->> +}
->> +
->> +static const MemoryRegionOps sysreg_ops =3D {
->> +    .read =3D msf2_sysreg_read,
->> +    .write =3D msf2_sysreg_write,
->> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
->> +};
->> +
->> +static void msf2_sysreg_init(Object *obj)
->> +{
->> +    MSF2SysregState *s =3D MSF2_SYSREG(obj);
->> +
->> +    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s,
->> TYPE_MSF2_SYSREG,
->> +                          MSF2_SYSREG_MMIO_SIZE);
->> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
->> +}
->> +
->> +static const VMStateDescription vmstate_msf2_sysreg =3D {
->> +    .name =3D TYPE_MSF2_SYSREG,
->> +    .version_id =3D 1,
->> +    .minimum_version_id =3D 1,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_UINT32_ARRAY(regs, MSF2SysregState,
->> MSF2_SYSREG_NUM_REGS),
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->> +static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +
->> +    dc->vmsd =3D &vmstate_msf2_sysreg;
->> +    dc->reset =3D msf2_sysreg_reset;
->> +}
->> +
->> +static const TypeInfo msf2_sysreg_info =3D {
->> +    .name  =3D TYPE_MSF2_SYSREG,
->> +    .parent =3D TYPE_SYS_BUS_DEVICE,
->> +    .class_init =3D msf2_sysreg_class_init,
->> +    .instance_size  =3D sizeof(MSF2SysregState),
->> +    .instance_init =3D msf2_sysreg_init,
->> +};
->> +
->> +static void msf2_sysreg_register_types(void)
->> +{
->> +    type_register_static(&msf2_sysreg_info);
->> +}
->> +
->> +type_init(msf2_sysreg_register_types)
->> diff --git a/include/hw/misc/msf2-sysreg.h b/include/hw/misc/msf2-sysreg=
-.
->> h
->> new file mode 100644
->> index 0000000..a485ed6
->> --- /dev/null
->> +++ b/include/hw/misc/msf2-sysreg.h
->> @@ -0,0 +1,80 @@
->> +/*
->> + * Microsemi SmartFusion2 SYSREG
->> + *
->> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtainin=
-g
->> a copy
->> + * of this software and associated documentation files (the "Software")=
-,
->> to deal
->> + * in the Software without restriction, including without limitation th=
-e
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software i=
-s
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->> DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#ifndef HW_MSF2_SYSREG_H
->> +#define HW_MSF2_SYSREG_H
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/sysbus.h"
->> +#include "hw/hw.h"
->> +#include "sysemu/sysemu.h"
->> +#include "qemu/log.h"
->> +
->> +enum {
->> +    ESRAM_CR        =3D 0x00 / 4,
->> +    ESRAM_MAX_LAT,
->> +    DDR_CR,
->> +    ENVM_CR,
->> +    ENVM_REMAP_BASE_CR,
->> +    ENVM_REMAP_FAB_CR,
->> +    CC_CR,
->> +    CC_REGION_CR,
->> +    CC_LOCK_BASE_ADDR_CR,
->> +    CC_FLUSH_INDX_CR,
->> +    DDRB_BUF_TIMER_CR,
->> +    DDRB_NB_ADDR_CR,
->> +    DDRB_NB_SIZE_CR,
->> +    DDRB_CR,
->> +
->> +    SOFT_RESET_CR  =3D 0x48 / 4,
->> +    M3_CR,
->> +
->> +    GPIO_SYSRESET_SEL_CR =3D 0x58 / 4,
->> +
->> +    MDDR_CR =3D 0x60 / 4,
->> +
->> +    MSSDDR_PLL_STATUS_LOW_CR =3D 0x90 / 4,
->> +    MSSDDR_PLL_STATUS_HIGH_CR,
->> +    MSSDDR_FACC1_CR,
->> +    MSSDDR_FACC2_CR,
->> +
->> +    MSSDDR_PLL_STATUS =3D 0x150 / 4,
->> +
->> +};
->> +
->> +#define MSF2_SYSREG_MMIO_SIZE     0x300
->> +#define MSF2_SYSREG_NUM_REGS      (MSF2_SYSREG_MMIO_SIZE / 4)
->> +
->> +#define TYPE_MSF2_SYSREG          "msf2-sysreg"
->> +#define MSF2_SYSREG(obj)  OBJECT_CHECK(MSF2SysregState, (obj),
->> TYPE_MSF2_SYSREG)
->> +
->> +typedef struct MSF2SysregState {
->> +    SysBusDevice parent_obj;
->> +
->> +    MemoryRegion iomem;
->> +
->> +    uint32_t regs[MSF2_SYSREG_NUM_REGS];
->> +} MSF2SysregState;
->> +
->> +#endif /* HW_MSF2_SYSREG_H */
+>>> +        break;
+>>> +    }
+>>> +
+>>> +    DB_PRINT("addr=0x%" HWADDR_PRIx " = 0x%" PRIx32 "\n", addr * 4, ret);
+>>> +    spi_update_irq(s);
+>>> +    return ret;
+>>> +}
+>>> +
+>>> +static void assert_cs(MSF2SpiState *s)
+>>> +{
+>>> +    qemu_set_irq(s->cs_line, 0);
+>>> +}
+>>> +
+>>> +static void deassert_cs(MSF2SpiState *s)
+>>> +{
+>>> +    qemu_set_irq(s->cs_line, 1);
+>>> +}
+>>> +
+>>> +static void spi_flush_txfifo(MSF2SpiState *s)
+>>> +{
+>>> +    uint32_t tx;
+>>> +    uint32_t rx;
+>>> +    bool sps = !!(s->regs[R_SPI_CONTROL] & C_SPS);
+>>> +
+>>> +    /*
+>>> +     * Chip Select(CS) is automatically controlled by this controller.
+>>> +     * If SPS bit is set in Control register then CS is asserted
+>>> +     * until all the frames set in frame count of Control register are
+>>> +     * transferred. If SPS is not set then CS pulses between frames.
+>>> +     * Note that Slave Select register specifies which of the CS line
+>>> +     * has to be controlled automatically by controller. Bits SS[7:1]
+>>> are for
+>>> +     * masters in FPGA fabric since we model only Microcontroller
+>>> subsystem
+>>> +     * of Smartfusion2 we control only one CS(SS[0]) line.
+>>> +     */
+>>> +    while (!fifo32_is_empty(&s->tx_fifo) && s->frame_count) {
+>>> +        assert_cs(s);
+>>> +
+>>> +        s->regs[R_SPI_STATUS] &= ~TXDONE;
+>>> +        s->regs[R_SPI_STATUS] &= ~RXRDY;
+>>> +
+>>> +        tx = fifo32_pop(&s->tx_fifo);
+>>> +        DB_PRINT("data tx:0x%" PRIx32 "\n", tx);
+>>> +        rx = ssi_transfer(s->spi, tx);
+>>> +        DB_PRINT("data rx:0x%" PRIx32 "\n", rx);
+>>> +
+>>> +        if (fifo32_num_used(&s->rx_fifo) == s->fifo_depth) {
+>>> +            s->regs[R_SPI_STATUS] |= RXCHOVRF;
+>>> +            s->regs[R_SPI_RIS] |= RXCHOVRF;
+>>> +        } else {
+>>> +            fifo32_push(&s->rx_fifo, rx);
+>>> +            s->regs[R_SPI_STATUS] &= ~S_RXFIFOEMP;
+>>> +            if (fifo32_num_used(&s->rx_fifo) == (s->fifo_depth - 1)) {
+>>> +                s->regs[R_SPI_STATUS] |= S_RXFIFOFULNXT;
+>>> +            }
+>>> +            if (fifo32_num_used(&s->rx_fifo) == s->fifo_depth) {
+>>> +                s->regs[R_SPI_STATUS] |= S_RXFIFOFUL;
+>>> +            }
+>>> +        }
+>>> +        s->frame_count--;
+>>> +        if (!sps) {
+>>> +            deassert_cs(s);
+>>> +            assert_cs(s);
+>>> +        }
+>>> +    }
+>>> +
+>>> +    if (!sps) {
+>>> +        deassert_cs(s);
+>>> +    }
+>>> +
+>>> +    if (!s->frame_count) {
+>>> +        s->frame_count = (s->regs[R_SPI_CONTROL] & FMCOUNT_MASK) >>
+>>> +                            FMCOUNT_SHIFT;
+>>> +        if (sps) {
+>>> +            deassert_cs(s);
+>>> +        }
+>>> +        s->regs[R_SPI_RIS] |= TXDONE;
+>>> +        s->regs[R_SPI_RIS] |= RXRDY;
+>>> +        s->regs[R_SPI_STATUS] |= TXDONE;
+>>> +        s->regs[R_SPI_STATUS] |= RXRDY;
+>>> +   }
+>>> +}
+>>> +
+>>> +static void spi_write(void *opaque, hwaddr addr,
+>>> +            uint64_t val64, unsigned int size)
+>>> +{
+>>> +    MSF2SpiState *s = opaque;
+>>> +    uint32_t value = val64;
+>>> +
+>>> +    DB_PRINT("addr=0x%" HWADDR_PRIx " =0x%" PRIx32 "\n", addr, value);
+>>> +    addr >>= 2;
+>>> +
+>>> +    switch (addr) {
+>>> +    case R_SPI_TX:
+>>> +        /* adding to already full FIFO */
+>>> +        if (fifo32_num_used(&s->tx_fifo) == s->fifo_depth) {
+>>> +            break;
+>>> +        }
+>>> +        s->regs[R_SPI_STATUS] &= ~S_TXFIFOEMP;
+>>> +        fifo32_push(&s->tx_fifo, value);
+>>> +        if (fifo32_num_used(&s->tx_fifo) == (s->fifo_depth - 1)) {
+>>> +            s->regs[R_SPI_STATUS] |= S_TXFIFOFULNXT;
+>>> +        }
+>>> +        if (fifo32_num_used(&s->tx_fifo) == s->fifo_depth) {
+>>> +            s->regs[R_SPI_STATUS] |= S_TXFIFOFUL;
+>>> +        }
+>>> +        if (s->enabled) {
+>>> +            spi_flush_txfifo(s);
+>>> +        }
+>>> +        break;
+>>> +
+>>> +    case R_SPI_CONTROL:
+>>> +        s->regs[R_SPI_CONTROL] = value;
+>>> +        if (value & C_BIGFIFO) {
+>>> +            set_fifodepth(s);
+>>> +        } else {
+>>> +            s->fifo_depth = 4;
+>>> +        }
+>>> +        if (value & C_ENABLE) {
+>>> +            s->enabled = true;
+>>> +        } else {
+>>> +            s->enabled = false;
+>>> +        }
+>>> +        s->frame_count = (value & FMCOUNT_MASK) >> FMCOUNT_SHIFT;
+>>> +        if (value & C_RESET) {
+>>> +            msf2_spi_do_reset(s);
+>>> +        }
+>>> +        break;
+>>> +
+>>> +    case R_SPI_DFSIZE:
+>>> +        if (s->enabled) {
+>>> +            break;
+>>> +        }
+>>> +        s->regs[R_SPI_DFSIZE] = value;
+>>> +        break;
+>>> +
+>>> +    case R_SPI_INTCLR:
+>>> +        s->regs[R_SPI_INTCLR] = value;
+>>> +        if (value & TXDONE) {
+>>> +            s->regs[R_SPI_RIS] &= ~TXDONE;
+>>> +        }
+>>> +        if (value & RXRDY) {
+>>> +            s->regs[R_SPI_RIS] &= ~RXRDY;
+>>> +        }
+>>> +        if (value & RXCHOVRF) {
+>>> +            s->regs[R_SPI_RIS] &= ~RXCHOVRF;
+>>> +        }
+>>> +        break;
+>>> +
+>>> +    case R_SPI_MIS:
+>>> +    case R_SPI_STATUS:
+>>> +    case R_SPI_RIS:
+>>> +        break;
+>>> +
+>>> +    default:
+>>> +        if (addr < ARRAY_SIZE(s->regs)) {
+>>> +            s->regs[addr] = value;
+>>> +        } else {
+>>> +            qemu_log_mask(LOG_GUEST_ERROR,
+>>> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__,
+>>> +                         addr * 4);
+>>> +        }
+>>> +        break;
+>>> +    }
+>>> +
+>>> +    spi_update_irq(s);
+>>> +}
+>>> +
+>>> +static const MemoryRegionOps spi_ops = {
+>>> +    .read = spi_read,
+>>> +    .write = spi_write,
+>>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>>> +    .valid = {
+>>> +        .min_access_size = 4,
+>>> +        .max_access_size = 4
+>>> +    }
+>>> +};
+>>> +
+>>> +static void msf2_spi_realize(DeviceState *dev, Error **errp)
+>>> +{
+>>> +    MSF2SpiState *s = MSF2_SPI(dev);
+>>> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>>> +
+>>> +    DB_PRINT("\n");
+>>> +
+>>> +    s->spi = ssi_create_bus(dev, "spi0");
+>>> +
+>>> +    sysbus_init_irq(sbd, &s->irq);
+>>> +    ssi_auto_connect_slaves(dev, &s->cs_line, s->spi);
+>>> +    sysbus_init_irq(sbd, &s->cs_line);
+>>> +
+>>> +    memory_region_init_io(&s->mmio, OBJECT(s), &spi_ops, s,
+>>> +                          TYPE_MSF2_SPI, R_SPI_MAX * 4);
+>>> +    sysbus_init_mmio(sbd, &s->mmio);
+>>> +
+>>> +    fifo32_create(&s->tx_fifo, FIFO_CAPACITY);
+>>> +    fifo32_create(&s->rx_fifo, FIFO_CAPACITY);
+>>> +}
+>>> +
+>>> +static const VMStateDescription vmstate_msf2_spi = {
+>>> +    .name = TYPE_MSF2_SPI,
+>>> +    .version_id = 1,
+>>> +    .minimum_version_id = 1,
+>>> +    .fields = (VMStateField[]) {
+>>> +        VMSTATE_FIFO32(tx_fifo, MSF2SpiState),
+>>> +        VMSTATE_FIFO32(rx_fifo, MSF2SpiState),
+>>> +        VMSTATE_UINT32_ARRAY(regs, MSF2SpiState, R_SPI_MAX),
+>>> +        VMSTATE_END_OF_LIST()
+>>> +    }
+>>> +};
+>>> +
+>>> +static void msf2_spi_class_init(ObjectClass *klass, void *data)
+>>> +{
+>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>> +
+>>> +    dc->realize = msf2_spi_realize;
+>>> +    dc->reset = msf2_spi_reset;
+>>> +    dc->vmsd = &vmstate_msf2_spi;
+>>> +}
+>>> +
+>>> +static const TypeInfo msf2_spi_info = {
+>>> +    .name           = TYPE_MSF2_SPI,
+>>> +    .parent         = TYPE_SYS_BUS_DEVICE,
+>>> +    .instance_size  = sizeof(MSF2SpiState),
+>>> +    .class_init     = msf2_spi_class_init,
+>>> +};
+>>> +
+>>> +static void msf2_spi_register_types(void)
+>>> +{
+>>> +    type_register_static(&msf2_spi_info);
+>>> +}
+>>> +
+>>> +type_init(msf2_spi_register_types)
+>>> diff --git a/include/hw/ssi/msf2-spi.h b/include/hw/ssi/msf2-spi.h
+>>> new file mode 100644
+>>> index 0000000..585edde
+>>> --- /dev/null
+>>> +++ b/include/hw/ssi/msf2-spi.h
+>>> @@ -0,0 +1,105 @@
+>>> +/*
+>>> + * Microsemi SmartFusion2 SPI
+>>> + *
+>>> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>>> + *
+>>> + * Permission is hereby granted, free of charge, to any person obtaining
+>>> a copy
+>>> + * of this software and associated documentation files (the "Software"),
+>>> to deal
+>>> + * in the Software without restriction, including without limitation the
+>>> rights
+>>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
+>>> sell
+>>> + * copies of the Software, and to permit persons to whom the Software is
+>>> + * furnished to do so, subject to the following conditions:
+>>> + *
+>>> + * The above copyright notice and this permission notice shall be
+>>> included in
+>>> + * all copies or substantial portions of the Software.
+>>> + *
+>>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+>>> EXPRESS OR
+>>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+>>> MERCHANTABILITY,
+>>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+>>> SHALL
+>>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+>>> OTHER
+>>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+>>> ARISING FROM,
+>>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+>>> DEALINGS IN
+>>> + * THE SOFTWARE.
+>>> + */
+>>> +
+>>> +#ifndef HW_MSF2_SPI_H
+>>> +#define HW_MSF2_SPI_H
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "hw/sysbus.h"
+>>> +#include "hw/hw.h"
+>>> +#include "hw/ssi/ssi.h"
+>>> +#include "qemu/fifo32.h"
+>>> +#include "sysemu/sysemu.h"
+>>> +#include "qemu/log.h"
+>>> +
+>>> +#define FIFO_CAPACITY     32
+>>> +#define FIFO_CAPACITY     32
+>>> +
+>>> +#define R_SPI_CONTROL         0
+>>> +#define R_SPI_DFSIZE          1
+>>> +#define R_SPI_STATUS          2
+>>> +#define R_SPI_INTCLR          3
+>>> +#define R_SPI_RX              4
+>>> +#define R_SPI_TX              5
+>>> +#define R_SPI_CLKGEN          6
+>>> +#define R_SPI_SS              7
+>>> +#define R_SPI_MIS             8
+>>> +#define R_SPI_RIS             9
+>>> +#define R_SPI_STAT8           15
+>>> +#define R_SPI_MAX             16
+>>> +
+>>> +#define S_RXFIFOFUL       (1 << 4)
+>>> +#define S_RXFIFOFULNXT    (1 << 5)
+>>> +#define S_RXFIFOEMP       (1 << 6)
+>>> +#define S_RXFIFOEMPNXT    (1 << 7)
+>>> +#define S_TXFIFOFUL       (1 << 8)
+>>> +#define S_TXFIFOFULNXT    (1 << 9)
+>>> +#define S_TXFIFOEMP       (1 << 10)
+>>> +#define S_TXFIFOEMPNXT    (1 << 11)
+>>> +#define S_FRAMESTART      (1 << 12)
+>>> +#define S_SSEL            (1 << 13)
+>>> +#define S_ACTIVE          (1 << 14)
+>>> +
+>>> +#define C_ENABLE          (1 << 0)
+>>> +#define C_MODE            (1 << 1)
+>>> +#define C_INTRXDATA       (1 << 4)
+>>> +#define C_INTTXDATA       (1 << 5)
+>>> +#define C_INTRXOVRFLO     (1 << 6)
+>>> +#define C_SPS             (1 << 26)
+>>> +#define C_BIGFIFO         (1 << 29)
+>>> +#define C_RESET           (1 << 31)
+>>> +
+>>> +#define FRAMESZ_MASK      0x1F
+>>> +#define FMCOUNT_MASK      0x00FFFF00
+>>> +#define FMCOUNT_SHIFT     8
+>>> +
+>>> +#define TXDONE            (1 << 0)
+>>> +#define RXRDY             (1 << 1)
+>>> +#define RXCHOVRF          (1 << 2)
+>>> +
+>>> +#define TYPE_MSF2_SPI   "msf2-spi"
+>>> +#define MSF2_SPI(obj)   OBJECT_CHECK(MSF2SpiState, (obj), TYPE_MSF2_SPI)
+>>> +
+>>> +typedef struct MSF2SpiState {
+>>> +    SysBusDevice parent_obj;
+>>> +
+>>> +    MemoryRegion mmio;
+>>> +
+>>> +    qemu_irq irq;
+>>> +
+>>> +    qemu_irq cs_line;
+>>> +
+>>> +    SSIBus *spi;
+>>> +
+>>> +    Fifo32 rx_fifo;
+>>> +    Fifo32 tx_fifo;
+>>> +
+>>> +    int fifo_depth;
+>>> +    uint32_t frame_count;
+>>> +    bool enabled;
+>>> +
+>>> +    uint32_t regs[R_SPI_MAX];
+>>> +} MSF2SpiState;
+>>> +
+>>> +#endif /* HW_MSF2_SPI_H */
+>>>
+>>>
+>> Regards,
 >>
+>> Phil.
 >>
+> Thanks,
+> Sundeep
+>
