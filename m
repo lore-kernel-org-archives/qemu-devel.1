@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d9Apu-0004Y3-FU
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 09:42:27 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d9BNW-0005xG-UU
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1d9Apn-0006Gu-F6
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 09:42:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57546)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1d9BNT-000191-Qu
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:17:10 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:48875 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1d9Apn-0006GO-59
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 09:42:19 -0400
-Date: Fri, 12 May 2017 09:42:13 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170512134213.GB589@stefanha-x1.localdomain>
-References: <1494431760-6455-1-git-send-email-pagupta@redhat.com>
-	<20170511181703.GC8701@stefanha-x1.localdomain>
-	<1494538720.20270.35.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cvVnyQ+4j833TQvp"
-Content-Disposition: inline
-In-Reply-To: <1494538720.20270.35.camel@redhat.com>
-Subject: Re: [Qemu-devel] KVM "fake DAX" device flushing
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1d9BNT-000172-EQ
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:17:07 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 12 May 2017 17:17:02 +0300
+Message-Id: <20170512141702.12423-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] nbd: strict nbd_wr_syncv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +22,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rik van Riel <riel@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, pbonzini@redhat.com, kwolf@redhat.com, Haozhong Zhang <haozhong.zhang@intel.com>, Dan Williams <dan.j.williams@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: den@openvz.org, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
+nbd_wr_syncv is called either from coroutine or from client negotiation
+code, when socket is in blocking mode. So, -EAGAIN is impossible.
 
---cvVnyQ+4j833TQvp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Furthermore, EAGAIN is confusing, as, what to read/write again? With
+EAGAIN as a return code we don't know how much data is already
+read or written by the function, so in case of EAGAIN the whole
+communication is broken.
 
-On Thu, May 11, 2017 at 05:38:40PM -0400, Rik van Riel wrote:
-> On Thu, 2017-05-11 at 14:17 -0400, Stefan Hajnoczi wrote:
-> > On Wed, May 10, 2017 at 09:26:00PM +0530, Pankaj Gupta wrote:
-> > > * For live migration use case, if host side backing file is=A0
-> > > =A0 shared storage, we need to flush the page cache for the disk=A0
-> > > =A0 image at the destination (new fadvise interface,
-> > > FADV_INVALIDATE_CACHE?)=A0
-> > > =A0 before starting execution of the guest on the destination host.
-> >=20
-> > Good point.=A0=A0QEMU currently only supports live migration with
-> > O_DIRECT.
-> > I think the problem was that userspace cannot guarantee consistency
-> > in
-> > the general case.=A0=A0If you find a solution to this problem for fake
-> > NVDIMM then maybe the QEMU block layer can also begin supporting live
-> > migration with buffered I/O.
->=20
-> I'll be happy to work with you on that, independently
-> of Pankaj's project.
->=20
-> It looks like the fadvise system call could be extended
-> pretty easily with an FADV_INVALIDATE_CACHE command, the
-> other side of which can simply hook into the existing
-> page cache invalidation code in the kernel.
->=20
-> Qemu will need to know whether the invalidation succeeded,
-> but that is something we can test for pretty easily before
-> returning to userspace.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-Sounds great.  I will review the long discussions that took place on
-qemu-devel about cache invalidation for live migration - just want to
-make sure there were no other reasons why only O_DIRECT is supported :).
+Hi all!
 
-Stefan
+If I understand right, nbd_wr_syncv is called either from coroutine
+or from client negotiation code, when socket is in blocking mode.
+So, some thoughts
 
---cvVnyQ+4j833TQvp
-Content-Type: application/pgp-signature; name="signature.asc"
+1. let's establish this with an assert, because returning EAGAIN is
+   confusing (see above)
+2. should we in case of non-coroutine context start this coroutine in 
+   nbd_wr_syncv, like in bdrv_prwv_co, and use non-blocking mode?
+3. is there any problems or disadvantages of moving  client negotiation
+   to coroutine too?
 
------BEGIN PGP SIGNATURE-----
+ nbd/common.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-iQEcBAEBAgAGBQJZFbu1AAoJEJykq7OBq3PITGUH/ir6ZhRWMditYdnRDGP8XBUy
-Y2D6wjZ0sN0PD8Wuip6vIqkG2TJbY8ibajP8eCaQWr6kUrW51bM3Wzz0nHkLA9PL
-JOkdN035bJwPEY2b6IbjDdUfbiFEHOXGzX5CcPzEalXTMViO1y2GZfiqwOHk+atY
-jdt/tcUjA+ApsOhtAhoZnMHz/1VLgrSkkKUlvXCpe/IyATWWT23Zryc9WuKnsxPq
-4++CGecoGhI3PrtO68U+z+VKcIRfV1FW2prYHRx4KykUrBDPEIj5BTfUu2wjN7Jh
-Msa0V+dYixPahJcymOvnQc5D0vFqfkTpCwzWyfrbD+YAEth18j+Go9trcQJcg8k=
-=3Yhz
------END PGP SIGNATURE-----
-
---cvVnyQ+4j833TQvp--
+diff --git a/nbd/common.c b/nbd/common.c
+index dccbb8e9de..4db45b3ede 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -20,6 +20,10 @@
+ #include "qapi/error.h"
+ #include "nbd-internal.h"
+ 
++/* nbd_wr_syncv
++ * The function may be called from coroutine or from non-coroutine context.
++ * When called from non-coroutine context @ioc must be in blocking mode.
++ */
+ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+                      struct iovec *iov,
+                      size_t niov,
+@@ -42,11 +46,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+             len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
+         }
+         if (len == QIO_CHANNEL_ERR_BLOCK) {
+-            if (qemu_in_coroutine()) {
+-                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+-            } else {
+-                return -EAGAIN;
+-            }
++            assert(qemu_in_coroutine());
++            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+             continue;
+         }
+         if (len < 0) {
+-- 
+2.11.1
