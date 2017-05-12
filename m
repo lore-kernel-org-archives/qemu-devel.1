@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ianloic@google.com>) id 1d9J0g-0005x1-Po
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:26:07 -0400
+	(envelope-from <viniciusfre@gmail.com>) id 1d9JPq-0005Wz-Fa
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ianloic@google.com>) id 1d9J0f-0006ha-Ry
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:26:06 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:33302)
+	(envelope-from <viniciusfre@gmail.com>) id 1d9JPp-0000qX-OQ
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:52:06 -0400
+Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:35472)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ianloic@google.com>) id 1d9J0f-0006fV-Fp
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:26:05 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id w50so51029281wrc.0
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 15:26:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <viniciusfre@gmail.com>)
+	id 1d9JPp-0000p6-KF
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:52:05 -0400
+Received: by mail-ua0-x22a.google.com with SMTP id e55so54734141uaa.2
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 15:52:03 -0700 (PDT)
 MIME-Version: 1.0
-From: Ian McKellar <ianloic@google.com>
-Date: Fri, 12 May 2017 22:25:50 +0000
-Message-ID: <CA+YAivjpUbWHDw+y2wf6OCLGOEu+merS3Hrj9x5V5G-SGMqg-g@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="f403045cf790c7775e054f5b3075"
-Subject: [Qemu-devel] [PATCH 1/1] Improve Cocoa modifier key handling
+From: Vinicius Maciel <viniciusfre@gmail.com>
+Date: Fri, 12 May 2017 19:52:02 -0300
+Message-ID: <CAEz5UgEp8wRBxeg4nAAd9GVeihcXQv__jfrjQtnVNT8eTNCLOw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel]  MIPS little endian - Bug when decoding physaddr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
 
---f403045cf790c7775e054f5b3075
-Content-Type: text/plain; charset="UTF-8"
+Hi all,
 
-I had two problems with QEMU on macOS:
- 1) Sometimes when alt-tabbing to QEMU it would act as if the 'a' key
-    was pressed so I'd get 'aaaaaaaaa....'.
- 2) Using Sikuli to programatically send keys to the QEMU window text
-    like "foo_bar" would come out as "fooa-bar".
+I'm trying to emulate a MIPS 74Kc using a custom machine in order to run a
+CFE bootloader from broadcom. The CPU is Broadcom BCM5357. The problem
+happens when Qemu calculates physaddr inside io_readx(), cputlb.c:line 784
 
-They looked similar and after much digging the problem turned out to be
-the same. When QEMU's ui/cocoa.m received an NSFlagsChanged NSEvent it
-looked at the keyCode to determine what modifier key changed. This
-usually works fine but sometimes the keyCode is 0 and the app should
-instead be looking at the modifierFlags bitmask. Key code 0 is the 'a'
-key.
+physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
 
-I added code that handles keyCode == 0 differently. It checks the
-modifierFlags and if they differ from QEMU's idea of which modifier
-keys are currently pressed it toggles those changed keys.
+After run this line the the value is 0x18000000, which is clearly wrong.
+More informations:
 
-This fixes my problems and seems work fine.
+BUG function: io_readx
+Assembly instruction: lw t1,0(a2)
+Machine code: 0x8cc90000 (Little endian)
+Access address: 0xb8000000
 
-The patch itself is an attachment.
+Assembly code:
+80702f30 <board_earlyinit>:
+80702f30: 3c06b800 lui a2,0xb800
+80702f34: 24075350 li a3,21328
+80702f38: 8cc90000 lw t1,0(a2) <----
 
-Ian
-
---f403045cf790c7775e054f5b3075
-Content-Type: application/octet-stream;
-	name="0001-Improve-Cocoa-modifier-key-handling.patch"
-Content-Disposition: attachment;
-	filename="0001-Improve-Cocoa-modifier-key-handling.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <15bfec3c5ef128ecb7e1>
-X-Attachment-Id: 15bfec3c5ef128ecb7e1
-
-RnJvbSBkNzBmMWFkMTQ3MzQ4MDA4NTE0ZTgwZTNkYzQxN2Y2MjYwZTM5YWEyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBJYW4gTWNLZWxsYXIgPGlhbmxvaWNAZ29vZ2xlLmNvbT4KRGF0
-ZTogRnJpLCAxMiBNYXkgMjAxNyAxMTowODoyMyAtMDcwMApTdWJqZWN0OiBbUEFUQ0ggMS8xXSBJ
-bXByb3ZlIENvY29hIG1vZGlmaWVyIGtleSBoYW5kbGluZwoKSSBoYWQgdHdvIHByb2JsZW1zIHdp
-dGggUUVNVSBvbiBtYWNPUzoKIDEpIFNvbWV0aW1lcyB3aGVuIGFsdC10YWJiaW5nIHRvIFFFTVUg
-aXQgd291bGQgYWN0IGFzIGlmIHRoZSAnYScga2V5CiAgICB3YXMgcHJlc3NlZCBzbyBJJ2QgZ2V0
-ICdhYWFhYWFhYWEuLi4uJy4KIDIpIFVzaW5nIFNpa3VsaSB0byBwcm9ncmFtYXRpY2FsbHkgc2Vu
-ZCBrZXlzIHRvIHRoZSBRRU1VIHdpbmRvdyB0ZXh0CiAgICBsaWtlICJmb29fYmFyIiB3b3VsZCBj
-b21lIG91dCBhcyAiZm9vYS1iYXIiLgoKVGhleSBsb29rZWQgc2ltaWxhciBhbmQgYWZ0ZXIgbXVj
-aCBkaWdnaW5nIHRoZSBwcm9ibGVtIHR1cm5lZCBvdXQgdG8gYmUKdGhlIHNhbWUuIFdoZW4gUUVN
-VSdzIHVpL2NvY29hLm0gcmVjZWl2ZWQgYW4gTlNGbGFnc0NoYW5nZWQgTlNFdmVudCBpdApsb29r
-ZWQgYXQgdGhlIGtleUNvZGUgdG8gZGV0ZXJtaW5lIHdoYXQgbW9kaWZpZXIga2V5IGNoYW5nZWQu
-IFRoaXMKdXN1YWxseSB3b3JrcyBmaW5lIGJ1dCBzb21ldGltZXMgdGhlIGtleUNvZGUgaXMgMCBh
-bmQgdGhlIGFwcCBzaG91bGQKaW5zdGVhZCBiZSBsb29raW5nIGF0IHRoZSBtb2RpZmllckZsYWdz
-IGJpdG1hc2suIEtleSBjb2RlIDAgaXMgdGhlICdhJwprZXkuCgpJIGFkZGVkIGNvZGUgdGhhdCBo
-YW5kbGVzIGtleUNvZGUgPT0gMCBkaWZmZXJlbnRseS4gSXQgY2hlY2tzIHRoZQptb2RpZmllckZs
-YWdzIGFuZCBpZiB0aGV5IGRpZmZlciBmcm9tIFFFTVUncyBpZGVhIG9mIHdoaWNoIG1vZGlmaWVy
-CmtleXMgYXJlIGN1cnJlbnRseSBwcmVzc2VkIGl0IHRvZ2dsZXMgdGhvc2UgY2hhbmdlZCBrZXlz
-LgoKVGhpcyBmaXhlcyBteSBwcm9ibGVtcyBhbmQgc2VlbXMgd29yayBmaW5lLgoKU2lnbmVkLW9m
-Zi1ieTogSWFuIE1jS2VsbGFyIDxpYW5sb2ljQGdvb2dsZS5jb20+Ci0tLQogdWkvY29jb2EubSB8
-IDQ4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLQogMSBm
-aWxlIGNoYW5nZWQsIDQwIGluc2VydGlvbnMoKyksIDggZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0
-IGEvdWkvY29jb2EubSBiL3VpL2NvY29hLm0KaW5kZXggMjA3NTU1ZWRmNy4uZTY0NWJlZmExMyAx
-MDA2NDQKLS0tIGEvdWkvY29jb2EubQorKysgYi91aS9jb2NvYS5tCkBAIC01Miw2ICs1Miw4IEBA
-CiAvKiBtYWNPUyAxMC4xMiBkZXByZWNhdGVkIG1hbnkgY29uc3RhbnRzLCAjZGVmaW5lIHRoZSBu
-ZXcgbmFtZXMgZm9yIG9sZGVyIFNES3MgKi8KICNpZiBNQUNfT1NfWF9WRVJTSU9OX01BWF9BTExP
-V0VEIDwgTUFDX09TX1hfVkVSU0lPTl8xMF8xMgogI2RlZmluZSBOU0V2ZW50TWFza0FueSAgICAg
-ICAgICAgICAgICAgIE5TQW55RXZlbnRNYXNrCisjZGVmaW5lIE5TRXZlbnRNb2RpZmllckZsYWdD
-YXBzTG9jayAgICAgTlNBbHBoYVNoaWZ0S2V5TWFzaworI2RlZmluZSBOU0V2ZW50TW9kaWZpZXJG
-bGFnU2hpZnQgICAgICAgIE5TU2hpZnRLZXlNYXNrCiAjZGVmaW5lIE5TRXZlbnRNb2RpZmllckZs
-YWdDb21tYW5kICAgICAgTlNDb21tYW5kS2V5TWFzawogI2RlZmluZSBOU0V2ZW50TW9kaWZpZXJG
-bGFnQ29udHJvbCAgICAgIE5TQ29udHJvbEtleU1hc2sKICNkZWZpbmUgTlNFdmVudE1vZGlmaWVy
-RmxhZ09wdGlvbiAgICAgICBOU0FsdGVybmF0ZUtleU1hc2sKQEAgLTUzNiw2ICs1MzgsMTYgQEAg
-UWVtdUNvY29hVmlldyAqY29jb2FWaWV3OwogICAgIH0KIH0KIAorLSAodm9pZCkgdG9nZ2xlTW9k
-aWZpZXI6IChpbnQpa2V5Y29kZSB7CisgICAgaWYgKG1vZGlmaWVyc19zdGF0ZVtrZXljb2RlXSA9
-PSAwKSB7IC8vIGtleWRvd24KKyAgICAgICAgcWVtdV9pbnB1dF9ldmVudF9zZW5kX2tleV9xY29k
-ZShkY2wtPmNvbiwga2V5Y29kZSwgdHJ1ZSk7CisgICAgICAgIG1vZGlmaWVyc19zdGF0ZVtrZXlj
-b2RlXSA9IDE7CisgICAgfSBlbHNlIHsgLy8ga2V5dXAKKyAgICAgICAgcWVtdV9pbnB1dF9ldmVu
-dF9zZW5kX2tleV9xY29kZShkY2wtPmNvbiwga2V5Y29kZSwgZmFsc2UpOworICAgICAgICBtb2Rp
-ZmllcnNfc3RhdGVba2V5Y29kZV0gPSAwOworICAgIH0KK30KKwogLSAodm9pZCkgaGFuZGxlRXZl
-bnQ6KE5TRXZlbnQgKilldmVudAogewogICAgIENPQ09BX0RFQlVHKCJRZW11Q29jb2FWaWV3OiBo
-YW5kbGVFdmVudFxuIik7CkBAIC01NDcsNyArNTU5LDMzIEBAIFFlbXVDb2NvYVZpZXcgKmNvY29h
-VmlldzsKIAogICAgIHN3aXRjaCAoW2V2ZW50IHR5cGVdKSB7CiAgICAgICAgIGNhc2UgTlNFdmVu
-dFR5cGVGbGFnc0NoYW5nZWQ6Ci0gICAgICAgICAgICBrZXljb2RlID0gY29jb2Ffa2V5Y29kZV90
-b19xZW11KFtldmVudCBrZXlDb2RlXSk7CisgICAgICAgICAgICBpZiAoW2V2ZW50IGtleUNvZGVd
-ID09IDApIHsKKyAgICAgICAgICAgICAgICAvLyBXaGVuIHRoZSBDb2NvYSBrZXlDb2RlIGlzIHpl
-cm8gdGhhdCBtZWFucyBrZXlzIHNob3VsZCBiZQorICAgICAgICAgICAgICAgIC8vIHN5bnRoZXNp
-emVkIGJhc2VkIG9uIHRoZSB2YWx1ZXMgaW4gaW4gdGhlIGV2ZW50TW9kaWZpZXJzCisgICAgICAg
-ICAgICAgICAgLy8gYml0bWFzay4KKworICAgICAgICAgICAgICAgIGlmIChxZW11X2NvbnNvbGVf
-aXNfZ3JhcGhpYyhOVUxMKSkgeworICAgICAgICAgICAgICAgICAgICBOU0V2ZW50TW9kaWZpZXJG
-bGFncyBtb2RpZmllcnMgPSBbZXZlbnQgbW9kaWZpZXJGbGFnc107CisKKyAgICAgICAgICAgICAg
-ICAgICAgaWYgKCEhKG1vZGlmaWVycyAmIE5TRXZlbnRNb2RpZmllckZsYWdDYXBzTG9jaykgIT0g
-ISFtb2RpZmllcnNfc3RhdGVbUV9LRVlfQ09ERV9DQVBTX0xPQ0tdKSB7CisgICAgICAgICAgICAg
-ICAgICAgICAgICBbc2VsZiB0b2dnbGVNb2RpZmllcjpRX0tFWV9DT0RFX0NBUFNfTE9DS107Cisg
-ICAgICAgICAgICAgICAgICAgIH0KKyAgICAgICAgICAgICAgICAgICAgaWYgKCEhKG1vZGlmaWVy
-cyAmIE5TRXZlbnRNb2RpZmllckZsYWdTaGlmdCkgIT0gISFtb2RpZmllcnNfc3RhdGVbUV9LRVlf
-Q09ERV9TSElGVF0pIHsKKyAgICAgICAgICAgICAgICAgICAgICAgIFtzZWxmIHRvZ2dsZU1vZGlm
-aWVyOlFfS0VZX0NPREVfU0hJRlRdOworICAgICAgICAgICAgICAgICAgICB9CisgICAgICAgICAg
-ICAgICAgICAgIGlmICghIShtb2RpZmllcnMgJiBOU0V2ZW50TW9kaWZpZXJGbGFnQ29udHJvbCkg
-IT0gISFtb2RpZmllcnNfc3RhdGVbUV9LRVlfQ09ERV9DVFJMXSkgeworICAgICAgICAgICAgICAg
-ICAgICAgICAgW3NlbGYgdG9nZ2xlTW9kaWZpZXI6UV9LRVlfQ09ERV9DVFJMXTsKKyAgICAgICAg
-ICAgICAgICAgICAgfQorICAgICAgICAgICAgICAgICAgICBpZiAoISEobW9kaWZpZXJzICYgTlNF
-dmVudE1vZGlmaWVyRmxhZ09wdGlvbikgIT0gISFtb2RpZmllcnNfc3RhdGVbUV9LRVlfQ09ERV9B
-TFRdKSB7CisgICAgICAgICAgICAgICAgICAgICAgICBbc2VsZiB0b2dnbGVNb2RpZmllcjpRX0tF
-WV9DT0RFX0FMVF07CisgICAgICAgICAgICAgICAgICAgIH0KKyAgICAgICAgICAgICAgICAgICAg
-aWYgKCEhKG1vZGlmaWVycyAmIE5TRXZlbnRNb2RpZmllckZsYWdDb21tYW5kKSAhPSAhIW1vZGlm
-aWVyc19zdGF0ZVtRX0tFWV9DT0RFX01FVEFfTF0pIHsKKyAgICAgICAgICAgICAgICAgICAgICAg
-IFtzZWxmIHRvZ2dsZU1vZGlmaWVyOlFfS0VZX0NPREVfTUVUQV9MXTsKKyAgICAgICAgICAgICAg
-ICAgICAgfQorICAgICAgICAgICAgICAgIH0KKyAgICAgICAgICAgIH0gZWxzZSB7CisgICAgICAg
-ICAgICAgICAga2V5Y29kZSA9IGNvY29hX2tleWNvZGVfdG9fcWVtdShbZXZlbnQga2V5Q29kZV0p
-OworICAgICAgICAgICAgfQogCiAgICAgICAgICAgICBpZiAoKGtleWNvZGUgPT0gUV9LRVlfQ09E
-RV9NRVRBX0wgfHwga2V5Y29kZSA9PSBRX0tFWV9DT0RFX01FVEFfUikKICAgICAgICAgICAgICAg
-ICYmICFpc01vdXNlR3JhYmJlZCkgewpAQCAtNTYyLDEzICs2MDAsNyBAQCBRZW11Q29jb2FWaWV3
-ICpjb2NvYVZpZXc7CiAgICAgICAgICAgICAgICAgICAgIHFlbXVfaW5wdXRfZXZlbnRfc2VuZF9r
-ZXlfcWNvZGUoZGNsLT5jb24sIGtleWNvZGUsIHRydWUpOwogICAgICAgICAgICAgICAgICAgICBx
-ZW11X2lucHV0X2V2ZW50X3NlbmRfa2V5X3Fjb2RlKGRjbC0+Y29uLCBrZXljb2RlLCBmYWxzZSk7
-CiAgICAgICAgICAgICAgICAgfSBlbHNlIGlmIChxZW11X2NvbnNvbGVfaXNfZ3JhcGhpYyhOVUxM
-KSkgewotICAgICAgICAgICAgICAgICAgICBpZiAobW9kaWZpZXJzX3N0YXRlW2tleWNvZGVdID09
-IDApIHsgLy8ga2V5ZG93bgotICAgICAgICAgICAgICAgICAgICAgICAgcWVtdV9pbnB1dF9ldmVu
-dF9zZW5kX2tleV9xY29kZShkY2wtPmNvbiwga2V5Y29kZSwgdHJ1ZSk7Ci0gICAgICAgICAgICAg
-ICAgICAgICAgICBtb2RpZmllcnNfc3RhdGVba2V5Y29kZV0gPSAxOwotICAgICAgICAgICAgICAg
-ICAgICB9IGVsc2UgeyAvLyBrZXl1cAotICAgICAgICAgICAgICAgICAgICAgICAgcWVtdV9pbnB1
-dF9ldmVudF9zZW5kX2tleV9xY29kZShkY2wtPmNvbiwga2V5Y29kZSwgZmFsc2UpOwotICAgICAg
-ICAgICAgICAgICAgICAgICAgbW9kaWZpZXJzX3N0YXRlW2tleWNvZGVdID0gMDsKLSAgICAgICAg
-ICAgICAgICAgICAgfQorICAgICAgICAgICAgICAgICAgW3NlbGYgdG9nZ2xlTW9kaWZpZXI6a2V5
-Y29kZV07CiAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgfQogCi0tIAoyLjExLjAuMzkw
-LmdjNjljMmY1MGNmLWdvb2cKCg==
---f403045cf790c7775e054f5b3075--
+Thanks,
+Vinicius
