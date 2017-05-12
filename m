@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d9CsN-0003nR-Mt
+	(envelope-from <quintela@redhat.com>) id 1d9CsM-0003mh-Tl
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:53:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d9CsM-0006mK-4H
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:53:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d9CsL-0006lu-Qg
+	(envelope-from <quintela@redhat.com>) id 1d9CsG-0006iV-KS
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:53:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d9CsG-0006hf-At
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:53:00 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B8132D77F2
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 15:53:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 39DA5448D79
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 15:52:59 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Fri, 12 May 2017 17:52:49 +0200
-Message-Id: <20170512155249.8853-6-quintela@redhat.com>
+Date: Fri, 12 May 2017 17:52:46 +0200
+Message-Id: <20170512155249.8853-3-quintela@redhat.com>
 In-Reply-To: <20170512155249.8853-1-quintela@redhat.com>
 References: <20170512155249.8853-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 5/5] migration: Create migration/blocker.h
+Subject: [Qemu-devel] [PULL 2/5] migration: Pass Error ** argument to {save,
+ load}_vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,336 +33,262 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-This allows us to remove lots of includes of migration/migration.h
+This way we use the "normal" way of printing errors for hmp commands.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- block/qcow.c                  |  2 +-
- block/vdi.c                   |  2 +-
- block/vhdx.c                  |  2 +-
- block/vmdk.c                  |  2 +-
- block/vpc.c                   |  2 +-
- block/vvfat.c                 |  2 +-
- hw/9pfs/9p.c                  |  2 +-
- hw/display/qxl.c              |  2 +-
- hw/display/virtio-gpu.c       |  2 +-
- hw/intc/arm_gic_kvm.c         |  2 +-
- hw/intc/arm_gicv3_its_kvm.c   |  2 +-
- hw/intc/arm_gicv3_kvm.c       |  2 +-
- hw/misc/ivshmem.c             |  2 +-
- hw/scsi/vhost-scsi.c          |  2 +-
- hw/virtio/vhost.c             |  2 +-
- include/migration/blocker.h   | 35 +++++++++++++++++++++++++++++++++++
- include/migration/migration.h | 18 ------------------
- migration/migration.c         |  1 +
- stubs/migr-blocker.c          |  2 +-
- target/i386/kvm.c             |  2 +-
- 20 files changed, 53 insertions(+), 35 deletions(-)
- create mode 100644 include/migration/blocker.h
+ hmp.c                    |  9 +++++++--
+ include/sysemu/sysemu.h  |  4 ++--
+ migration/savevm.c       | 51 ++++++++++++++++++++++++------------------------
+ replay/replay-snapshot.c |  8 ++++++--
+ vl.c                     |  4 +++-
+ 5 files changed, 43 insertions(+), 33 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 5d147b9..95ab123 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -32,7 +32,7 @@
- #include <zlib.h>
- #include "qapi/qmp/qerror.h"
- #include "crypto/cipher.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- 
- /**************************************************************/
- /* QEMU COW block driver with compression and encryption support */
-diff --git a/block/vdi.c b/block/vdi.c
-index d12d9cd..79af477 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -55,7 +55,7 @@
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
- #include "qemu/bswap.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "qemu/coroutine.h"
- #include "qemu/cutils.h"
- #include "qemu/uuid.h"
-diff --git a/block/vhdx.c b/block/vhdx.c
-index e8fe3fb..8b270b5 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -24,7 +24,7 @@
- #include "qemu/crc32c.h"
- #include "qemu/bswap.h"
- #include "block/vhdx.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "qemu/uuid.h"
- 
- /* Options for VHDX creation */
-diff --git a/block/vmdk.c b/block/vmdk.c
-index c61b9cc..55581b0 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -31,7 +31,7 @@
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- #include "qemu/bswap.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "qemu/cutils.h"
- #include <zlib.h>
- 
-diff --git a/block/vpc.c b/block/vpc.c
-index ecfee77..4240ba9 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -28,7 +28,7 @@
- #include "block/block_int.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "qemu/bswap.h"
- #include "qemu/uuid.h"
- 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 9c82371..426ca70 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -28,7 +28,7 @@
- #include "block/block_int.h"
- #include "qemu/module.h"
- #include "qemu/bswap.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "qapi/qmp/qint.h"
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index c80ba67..ab3e22f 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -23,7 +23,7 @@
- #include "9p-xattr.h"
- #include "coth.h"
- #include "trace.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- 
- int open_fd_hw;
- int total_open_fd;
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index 4d94cec..ad09bb9 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -26,7 +26,7 @@
- #include "qemu/queue.h"
- #include "qemu/atomic.h"
- #include "sysemu/sysemu.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "trace.h"
- 
- #include "qxl.h"
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index e1056f3..8ad27f3 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -19,7 +19,7 @@
- #include "hw/virtio/virtio.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-bus.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "qemu/log.h"
- #include "qapi/error.h"
- 
-diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-index ec952ec..af5cd36 100644
---- a/hw/intc/arm_gic_kvm.c
-+++ b/hw/intc/arm_gic_kvm.c
-@@ -24,7 +24,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
- #include "gic_internal.h"
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index bd4f3aa..a0441d6 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -24,7 +24,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- 
- #define TYPE_KVM_ARM_ITS "arm-its-kvm"
- #define KVM_ARM_ITS(obj) OBJECT_CHECK(GICv3ITSState, (obj), TYPE_KVM_ARM_ITS)
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 19aab56..4ee2baa 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -28,7 +28,7 @@
- #include "kvm_arm.h"
- #include "gicv3_internal.h"
- #include "vgic_common.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- 
- #ifdef DEBUG_GICV3_KVM
- #define DPRINTF(fmt, ...) \
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 82ce837..475e36a 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -25,7 +25,7 @@
- #include "hw/pci/msi.h"
- #include "hw/pci/msix.h"
- #include "sysemu/kvm.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "qemu/error-report.h"
- #include "qemu/event_notifier.h"
- #include "qom/object_interfaces.h"
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index 8f53ac3..cd4ab05 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -21,7 +21,7 @@
- #include "qemu/error-report.h"
- #include "qemu/queue.h"
- #include "monitor/monitor.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "hw/virtio/vhost-scsi.h"
- #include "hw/virtio/vhost.h"
- #include "hw/virtio/virtio-scsi.h"
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 0001e60..03a46a7 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -25,7 +25,7 @@
- #include "exec/address-spaces.h"
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "sysemu/dma.h"
- 
- /* enabled until disconnected backend stabilizes */
-diff --git a/include/migration/blocker.h b/include/migration/blocker.h
-new file mode 100644
-index 0000000..acd2701
---- /dev/null
-+++ b/include/migration/blocker.h
-@@ -0,0 +1,35 @@
-+/*
-+ * QEMU migration blockers
-+ *
-+ * Copyright IBM, Corp. 2008
-+ *
-+ * Authors:
-+ *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef MIGRATION_BLOCKER_H
-+#define MIGRATION_BLOCKER_H
-+
-+/**
-+ * @migrate_add_blocker - prevent migration from proceeding
-+ *
-+ * @reason - an error to be returned whenever migration is attempted
-+ *
-+ * @errp - [out] The reason (if any) we cannot block migration right now.
-+ *
-+ * @returns - 0 on success, -EBUSY/-EACCES on failure, with errp set.
-+ */
-+int migrate_add_blocker(Error *reason, Error **errp);
-+
-+/**
-+ * @migrate_del_blocker - remove a blocking error from migration
-+ *
-+ * @reason - the error blocking migration
-+ */
-+void migrate_del_blocker(Error *reason);
-+
-+#endif
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 465d8ce..258e4ff 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -275,24 +275,6 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
- int ram_postcopy_incoming_init(MigrationIncomingState *mis);
- void ram_postcopy_migrated_memory_release(MigrationState *ms);
- 
--/**
-- * @migrate_add_blocker - prevent migration from proceeding
-- *
-- * @reason - an error to be returned whenever migration is attempted
-- *
-- * @errp - [out] The reason (if any) we cannot block migration right now.
-- *
-- * @returns - 0 on success, -EBUSY/-EACCES on failure, with errp set.
-- */
--int migrate_add_blocker(Error *reason, Error **errp);
--
--/**
-- * @migrate_del_blocker - remove a blocking error from migration
-- *
-- * @reason - the error blocking migration
-- */
--void migrate_del_blocker(Error *reason);
--
- int check_migratable(Object *obj, Error **err);
- 
- bool migrate_release_ram(void);
-diff --git a/migration/migration.c b/migration/migration.c
-index 250e3e3..78102eb 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -17,6 +17,7 @@
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
-+#include "migration/blocker.h"
- #include "migration/migration.h"
- #include "migration/qemu-file.h"
- #include "sysemu/sysemu.h"
-diff --git a/stubs/migr-blocker.c b/stubs/migr-blocker.c
-index a5ba18f..2b64ac9 100644
---- a/stubs/migr-blocker.c
-+++ b/stubs/migr-blocker.c
-@@ -1,6 +1,6 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- 
- int migrate_add_blocker(Error *reason, Error **errp)
+diff --git a/hmp.c b/hmp.c
+index 524e589..b9dd933 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1274,17 +1274,22 @@ void hmp_loadvm(Monitor *mon, const QDict *qdict)
  {
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 55865db..011d4a5 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -43,7 +43,7 @@
- #include "standard-headers/asm-x86/hyperv.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/msi.h"
--#include "migration/migration.h"
-+#include "migration/blocker.h"
- #include "exec/memattrs.h"
- #include "trace.h"
+     int saved_vm_running  = runstate_is_running();
+     const char *name = qdict_get_str(qdict, "name");
++    Error *err = NULL;
  
+     vm_stop(RUN_STATE_RESTORE_VM);
+ 
+-    if (load_vmstate(name) == 0 && saved_vm_running) {
++    if (load_vmstate(name, &err) == 0 && saved_vm_running) {
+         vm_start();
+     }
++    hmp_handle_error(mon, &err);
+ }
+ 
+ void hmp_savevm(Monitor *mon, const QDict *qdict)
+ {
+-    save_vmstate(qdict_get_try_str(qdict, "name"));
++    Error *err = NULL;
++
++    save_vmstate(qdict_get_try_str(qdict, "name"), &err);
++    hmp_handle_error(mon, &err);
+ }
+ 
+ void hmp_delvm(Monitor *mon, const QDict *qdict)
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 15656b7..058d5eb 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -75,8 +75,8 @@ void qemu_remove_exit_notifier(Notifier *notify);
+ void qemu_add_machine_init_done_notifier(Notifier *notify);
+ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ 
+-int save_vmstate(const char *name);
+-int load_vmstate(const char *name);
++int save_vmstate(const char *name, Error **errp);
++int load_vmstate(const char *name, Error **errp);
+ 
+ void qemu_announce_self(void);
+ 
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 352a8f2..b2fd06f 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2074,7 +2074,7 @@ int qemu_loadvm_state(QEMUFile *f)
+     return ret;
+ }
+ 
+-int save_vmstate(const char *name)
++int save_vmstate(const char *name, Error **errp)
+ {
+     BlockDriverState *bs, *bs1;
+     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+@@ -2084,29 +2084,27 @@ int save_vmstate(const char *name)
+     uint64_t vm_state_size;
+     qemu_timeval tv;
+     struct tm tm;
+-    Error *local_err = NULL;
+     AioContext *aio_context;
+ 
+     if (!bdrv_all_can_snapshot(&bs)) {
+-        error_report("Device '%s' is writable but does not support snapshots",
+-                     bdrv_get_device_name(bs));
++        error_setg(errp, "Device '%s' is writable but does not support "
++                   "snapshots", bdrv_get_device_name(bs));
+         return ret;
+     }
+ 
+     /* Delete old snapshots of the same name */
+     if (name) {
+-        ret = bdrv_all_delete_snapshot(name, &bs1, &local_err);
++        ret = bdrv_all_delete_snapshot(name, &bs1, errp);
+         if (ret < 0) {
+-            error_reportf_err(local_err,
+-                              "Error while deleting snapshot on device '%s': ",
+-                              bdrv_get_device_name(bs1));
++            error_prepend(errp, "Error while deleting snapshot on device "
++                          "'%s': ", bdrv_get_device_name(bs1));
+             return ret;
+         }
+     }
+ 
+     bs = bdrv_all_find_vmstate_bs();
+     if (bs == NULL) {
+-        error_report("No block device can accept snapshots");
++        error_setg(errp, "No block device can accept snapshots");
+         return ret;
+     }
+     aio_context = bdrv_get_aio_context(bs);
+@@ -2115,7 +2113,7 @@ int save_vmstate(const char *name)
+ 
+     ret = global_state_store();
+     if (ret) {
+-        error_report("Error saving global state");
++        error_setg(errp, "Error saving global state");
+         return ret;
+     }
+     vm_stop(RUN_STATE_SAVE_VM);
+@@ -2147,21 +2145,20 @@ int save_vmstate(const char *name)
+     /* save the VM state */
+     f = qemu_fopen_bdrv(bs, 1);
+     if (!f) {
+-        error_report("Could not open VM state file");
++        error_setg(errp, "Could not open VM state file");
+         goto the_end;
+     }
+-    ret = qemu_savevm_state(f, &local_err);
++    ret = qemu_savevm_state(f, errp);
+     vm_state_size = qemu_ftell(f);
+     qemu_fclose(f);
+     if (ret < 0) {
+-        error_report_err(local_err);
+         goto the_end;
+     }
+ 
+     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+     if (ret < 0) {
+-        error_report("Error while creating snapshot on '%s'",
+-                     bdrv_get_device_name(bs));
++        error_setg(errp, "Error while creating snapshot on '%s'",
++                   bdrv_get_device_name(bs));
+         goto the_end;
+     }
+ 
+@@ -2234,7 +2231,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+     migration_incoming_state_destroy();
+ }
+ 
+-int load_vmstate(const char *name)
++int load_vmstate(const char *name, Error **errp)
+ {
+     BlockDriverState *bs, *bs_vm_state;
+     QEMUSnapshotInfo sn;
+@@ -2244,20 +2241,22 @@ int load_vmstate(const char *name)
+     MigrationIncomingState *mis = migration_incoming_get_current();
+ 
+     if (!bdrv_all_can_snapshot(&bs)) {
+-        error_report("Device '%s' is writable but does not support snapshots",
+-                     bdrv_get_device_name(bs));
++        error_setg(errp,
++                   "Device '%s' is writable but does not support snapshots",
++                   bdrv_get_device_name(bs));
+         return -ENOTSUP;
+     }
+     ret = bdrv_all_find_snapshot(name, &bs);
+     if (ret < 0) {
+-        error_report("Device '%s' does not have the requested snapshot '%s'",
+-                     bdrv_get_device_name(bs), name);
++        error_setg(errp,
++                   "Device '%s' does not have the requested snapshot '%s'",
++                   bdrv_get_device_name(bs), name);
+         return ret;
+     }
+ 
+     bs_vm_state = bdrv_all_find_vmstate_bs();
+     if (!bs_vm_state) {
+-        error_report("No block device supports snapshots");
++        error_setg(errp, "No block device supports snapshots");
+         return -ENOTSUP;
+     }
+     aio_context = bdrv_get_aio_context(bs_vm_state);
+@@ -2269,8 +2268,8 @@ int load_vmstate(const char *name)
+     if (ret < 0) {
+         return ret;
+     } else if (sn.vm_state_size == 0) {
+-        error_report("This is a disk-only snapshot. Revert to it offline "
+-            "using qemu-img.");
++        error_setg(errp, "This is a disk-only snapshot. Revert to it "
++                   " offline using qemu-img");
+         return -EINVAL;
+     }
+ 
+@@ -2279,7 +2278,7 @@ int load_vmstate(const char *name)
+ 
+     ret = bdrv_all_goto_snapshot(name, &bs);
+     if (ret < 0) {
+-        error_report("Error %d while activating snapshot '%s' on '%s'",
++        error_setg(errp, "Error %d while activating snapshot '%s' on '%s'",
+                      ret, name, bdrv_get_device_name(bs));
+         return ret;
+     }
+@@ -2287,7 +2286,7 @@ int load_vmstate(const char *name)
+     /* restore the VM state */
+     f = qemu_fopen_bdrv(bs_vm_state, 0);
+     if (!f) {
+-        error_report("Could not open VM state file");
++        error_setg(errp, "Could not open VM state file");
+         return -EINVAL;
+     }
+ 
+@@ -2301,7 +2300,7 @@ int load_vmstate(const char *name)
+ 
+     migration_incoming_state_destroy();
+     if (ret < 0) {
+-        error_report("Error %d while loading VM state", ret);
++        error_setg(errp, "Error %d while loading VM state", ret);
+         return ret;
+     }
+ 
+diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+index 8cced46..c75cd38 100644
+--- a/replay/replay-snapshot.c
++++ b/replay/replay-snapshot.c
+@@ -62,14 +62,18 @@ void replay_vmstate_register(void)
+ 
+ void replay_vmstate_init(void)
+ {
++    Error *err = NULL;
++
+     if (replay_snapshot) {
+         if (replay_mode == REPLAY_MODE_RECORD) {
+-            if (save_vmstate(replay_snapshot) != 0) {
++            if (save_vmstate(replay_snapshot, &err) != 0) {
++                error_report_err(err);
+                 error_report("Could not create snapshot for icount record");
+                 exit(1);
+             }
+         } else if (replay_mode == REPLAY_MODE_PLAY) {
+-            if (load_vmstate(replay_snapshot) != 0) {
++            if (load_vmstate(replay_snapshot, &err) != 0) {
++                error_report_err(err);
+                 error_report("Could not load snapshot for icount replay");
+                 exit(1);
+             }
+diff --git a/vl.c b/vl.c
+index ce2b392..b48f308 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4687,7 +4687,9 @@ int main(int argc, char **argv, char **envp)
+     if (replay_mode != REPLAY_MODE_NONE) {
+         replay_vmstate_init();
+     } else if (loadvm) {
+-        if (load_vmstate(loadvm) < 0) {
++        Error *local_err = NULL;
++        if (load_vmstate(loadvm, &local_err) < 0) {
++            error_report_err(local_err);
+             autostart = 0;
+         }
+     }
 -- 
 2.9.3
