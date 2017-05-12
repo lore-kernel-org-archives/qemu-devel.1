@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d9Cly-000270-87
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:46:31 -0400
+	(envelope-from <quintela@redhat.com>) id 1d9CsH-0003h4-9K
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:53:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1d9Clv-0003OS-57
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:46:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38440)
+	(envelope-from <quintela@redhat.com>) id 1d9CsE-0006ge-P8
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:53:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d9Clu-0003Ng-SJ
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:46:27 -0400
-References: <20170512141702.12423-1-vsementsov@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8c231084-8eaa-fe66-43cd-4c85f1e45272@redhat.com>
-Date: Fri, 12 May 2017 17:46:18 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170512141702.12423-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] nbd: strict nbd_wr_syncv
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d9CsE-0006fG-Gh
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 11:52:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6CEE59F75D
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 15:52:57 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Fri, 12 May 2017 17:52:45 +0200
+Message-Id: <20170512155249.8853-2-quintela@redhat.com>
+In-Reply-To: <20170512155249.8853-1-quintela@redhat.com>
+References: <20170512155249.8853-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 1/5] migration: Fix regression with compression
+ threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +30,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+Compression threads got broken on commit
 
+  commit 247956946651ae0280f7b1ea88bb6237dd01c231
+  Author: Juan Quintela <quintela@redhat.com>
+  Date:   Tue Mar 21 11:45:01 2017 +0100
 
-On 12/05/2017 16:17, Vladimir Sementsov-Ogievskiy wrote:
-> nbd_wr_syncv is called either from coroutine or from client negotiation
-> code, when socket is in blocking mode. So, -EAGAIN is impossible.
-> 
-> Furthermore, EAGAIN is confusing, as, what to read/write again? With
-> EAGAIN as a return code we don't know how much data is already
-> read or written by the function, so in case of EAGAIN the whole
-> communication is broken.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
-> 
-> Hi all!
-> 
-> If I understand right, nbd_wr_syncv is called either from coroutine
-> or from client negotiation code, when socket is in blocking mode.
-> So, some thoughts
-> 
-> 1. let's establish this with an assert, because returning EAGAIN is
->    confusing (see above)
+      ram: reorganize last_sent_block
 
-Yes, this seems like a good idea.
+On do_compress_ram_page() we use a different QEMUFile than the
+migration one.  We need to pass it there.  The failure can be seen as:
 
-> 2. should we in case of non-coroutine context start this coroutine in 
->    nbd_wr_syncv, like in bdrv_prwv_co, and use non-blocking mode?
-> 3. is there any problems or disadvantages of moving  client negotiation
->    to coroutine too?
+(qemu) qemu-system-x86_64: Unknown combination of migration flags: 0
+qemu-system-x86_64: error while loading state section id 3(ram)
+qemu-system-x86_64: load of migration failed: Invalid argument
 
-When you move code to coroutines you need to be aware of what code can
-now run concurrently, for example the monitor.  I'm not sure that it's
-possible to do this.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Tested-by: Peter Xu <peterx@redhat.com>
+---
+ migration/ram.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-Paolo
-
->  nbd/common.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/nbd/common.c b/nbd/common.c
-> index dccbb8e9de..4db45b3ede 100644
-> --- a/nbd/common.c
-> +++ b/nbd/common.c
-> @@ -20,6 +20,10 @@
->  #include "qapi/error.h"
->  #include "nbd-internal.h"
->  
-> +/* nbd_wr_syncv
-> + * The function may be called from coroutine or from non-coroutine context.
-> + * When called from non-coroutine context @ioc must be in blocking mode.
-> + */
->  ssize_t nbd_wr_syncv(QIOChannel *ioc,
->                       struct iovec *iov,
->                       size_t niov,
-> @@ -42,11 +46,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
->              len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
->          }
->          if (len == QIO_CHANNEL_ERR_BLOCK) {
-> -            if (qemu_in_coroutine()) {
-> -                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
-> -            } else {
-> -                return -EAGAIN;
-> -            }
-> +            assert(qemu_in_coroutine());
-> +            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
->              continue;
->          }
->          if (len < 0) {
-> 
+diff --git a/migration/ram.c b/migration/ram.c
+index 293d27c..995d1fc 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -436,20 +436,21 @@ void migrate_compress_threads_create(void)
+  * @offset: offset inside the block for the page
+  *          in the lower bits, it contains flags
+  */
+-static size_t save_page_header(RAMState *rs, RAMBlock *block, ram_addr_t offset)
++static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
++                               ram_addr_t offset)
+ {
+     size_t size, len;
+ 
+     if (block == rs->last_sent_block) {
+         offset |= RAM_SAVE_FLAG_CONTINUE;
+     }
+-    qemu_put_be64(rs->f, offset);
++    qemu_put_be64(f, offset);
+     size = 8;
+ 
+     if (!(offset & RAM_SAVE_FLAG_CONTINUE)) {
+         len = strlen(block->idstr);
+-        qemu_put_byte(rs->f, len);
+-        qemu_put_buffer(rs->f, (uint8_t *)block->idstr, len);
++        qemu_put_byte(f, len);
++        qemu_put_buffer(f, (uint8_t *)block->idstr, len);
+         size += 1 + len;
+         rs->last_sent_block = block;
+     }
+@@ -571,7 +572,7 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+     }
+ 
+     /* Send XBZRLE based compressed page */
+-    bytes_xbzrle = save_page_header(rs, block,
++    bytes_xbzrle = save_page_header(rs, rs->f, block,
+                                     offset | RAM_SAVE_FLAG_XBZRLE);
+     qemu_put_byte(rs->f, ENCODING_FLAG_XBZRLE);
+     qemu_put_be16(rs->f, encoded_len);
+@@ -745,7 +746,7 @@ static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
+     if (is_zero_range(p, TARGET_PAGE_SIZE)) {
+         rs->zero_pages++;
+         rs->bytes_transferred +=
+-            save_page_header(rs, block, offset | RAM_SAVE_FLAG_COMPRESS);
++            save_page_header(rs, rs->f, block, offset | RAM_SAVE_FLAG_COMPRESS);
+         qemu_put_byte(rs->f, 0);
+         rs->bytes_transferred += 1;
+         pages = 1;
+@@ -834,7 +835,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+ 
+     /* XBZRLE overflow or normal page */
+     if (pages == -1) {
+-        rs->bytes_transferred += save_page_header(rs, block,
++        rs->bytes_transferred += save_page_header(rs, rs->f, block,
+                                                   offset | RAM_SAVE_FLAG_PAGE);
+         if (send_async) {
+             qemu_put_buffer_async(rs->f, p, TARGET_PAGE_SIZE,
+@@ -860,7 +861,7 @@ static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+     int bytes_sent, blen;
+     uint8_t *p = block->host + (offset & TARGET_PAGE_MASK);
+ 
+-    bytes_sent = save_page_header(rs, block, offset |
++    bytes_sent = save_page_header(rs, f, block, offset |
+                                   RAM_SAVE_FLAG_COMPRESS_PAGE);
+     blen = qemu_put_compression_data(f, p, TARGET_PAGE_SIZE,
+                                      migrate_compress_level());
+@@ -991,7 +992,7 @@ static int ram_save_compressed_page(RAMState *rs, PageSearchStatus *pss,
+             pages = save_zero_page(rs, block, offset, p);
+             if (pages == -1) {
+                 /* Make sure the first page is sent out before other pages */
+-                bytes_xmit = save_page_header(rs, block, offset |
++                bytes_xmit = save_page_header(rs, rs->f, block, offset |
+                                               RAM_SAVE_FLAG_COMPRESS_PAGE);
+                 blen = qemu_put_compression_data(rs->f, p, TARGET_PAGE_SIZE,
+                                                  migrate_compress_level());
+-- 
+2.9.3
