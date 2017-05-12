@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53944)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8zOX-00039y-40
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:29:26 -0400
+	id 1d8zRD-0003r4-HH
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8zOT-0002z3-5i
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:29:25 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33656)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8zOT-0002ya-0C
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:29:21 -0400
-Received: by mail-qk0-x242.google.com with SMTP id o85so6054628qkh.0
-	for <qemu-devel@nongnu.org>; Thu, 11 May 2017 18:29:20 -0700 (PDT)
+	id 1d8zRC-0004Mu-Os
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:32:11 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170510200535.13268-1-f4bug@amsat.org>
-	<20170510200535.13268-5-f4bug@amsat.org>
+	<20170510200535.13268-3-f4bug@amsat.org>
+	<b258b01d-74f9-e412-5367-d8e1d72eb159@twiddle.net>
+	<c58cdae9-5043-2506-9a91-f35f2da51e20@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2eb86310-071e-cbe8-5473-2e1256236dbc@amsat.org>
-Date: Thu, 11 May 2017 22:29:14 -0300
+Message-ID: <b02f363b-bc10-7591-682d-dc8857031890@amsat.org>
+Date: Thu, 11 May 2017 22:31:59 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170510200535.13268-5-f4bug@amsat.org>
+In-Reply-To: <c58cdae9-5043-2506-9a91-f35f2da51e20@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/8] target/cris: optimize gen_swapb()
- using extract op
+Subject: Re: [Qemu-devel] [PATCH 2/8] target/arm: optimize smul_dual() and
+ neon_trn_u8() using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, qemu-arm@nongnu.org
 
-Hi,
+Hi Richard,
 
-As reviewd by Richard this patch is WRONG, so need to further review :)
+On 05/10/2017 05:32 PM, Philippe Mathieu-Daudé wrote:
+> On 05/10/2017 05:20 PM, Richard Henderson wrote:
+>> On 05/10/2017 01:05 PM, Philippe Mathieu-Daudé wrote:
+>>> -    tcg_gen_shri_i32(t1, t1, 8);
+>>> -    tcg_gen_andi_i32(t1, t1, 0x00ff00ff);
+>>> +    tcg_gen_extract_i32(t1, t1, 8, 0x00ff00ff);
+>>
+>> This is very wrong.  See my previous comment.
 
-http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg02551.html
+Indeed, after correcting the script:
 
-On 05/10/2017 05:05 PM, Philippe Mathieu-Daudé wrote:
-> Applied using Coccinelle script.
->
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  target/cris/translate.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/target/cris/translate.c b/target/cris/translate.c
-> index 0ee05ca02d..c03403ac62 100644
-> --- a/target/cris/translate.c
-> +++ b/target/cris/translate.c
-> @@ -442,8 +442,7 @@ static inline void t_gen_swapb(TCGv d, TCGv s)
->      tcg_gen_mov_tl(org_s, s);
->      tcg_gen_shli_tl(t, org_s, 8);
->      tcg_gen_andi_tl(d, t, 0xff00ff00);
-> -    tcg_gen_shri_tl(t, org_s, 8);
-> -    tcg_gen_andi_tl(t, t, 0x00ff00ff);
-> +    tcg_gen_extract_tl(t, org_s, 8, 0x00ff00ff);
->      tcg_gen_or_tl(d, d, t);
->      tcg_temp_free(t);
->      tcg_temp_free(org_s);
->
-
-corrected Coccinelle script displays:
-
-candidate at target/cris/translate.c:445
-   op_size: tl/tl (same)
+$ docker run -it -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle --sp-file 
+scripts/coccinelle/tcg_gen_extract.cocci --macro-file 
+scripts/cocci-macro-file.h target/arm/translate.c --in-place
+init_defs_builtins: /usr/lib64/coccinelle/standard.h
+init_defs: scripts/cocci-macro-file.h
+HANDLING: target/arm/translate.c
+candidate at target/arm/translate.c:4703
+   op_size: i32/i32 (same)
    low_bits: 8 (value: 0xff)
    len: 0xff00ff
    len_bits != low_bits
    candidate is NOT optimizable
+
+candidate at target/arm/translate.c:342
+   op_size: i32/i32 (same)
+   low_bits: 8 (value: 0xff)
+   len: 0xff00ff
+   len_bits != low_bits
+   candidate is NOT optimizable
+
+>
+> Arghhh I see, I checked manually and though I had it...
+>
+> I'll first check with the cocci script if it can handles this better
+> then review the serie manually before bother you again.
+>
+> Thinking about it, this should be quite easy unit-testable somehow ...
+> Not sure if I want to start this path although.
+>
+> Sorry for the noise and thank a lot for the review!
+>
+> Phil.
