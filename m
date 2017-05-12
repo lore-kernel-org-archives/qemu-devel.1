@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d98kI-00029t-PW
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:28:32 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1d98oA-0003HJ-Rq
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d98kF-0007YO-Ls
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:28:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36722
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1d98kF-0007Y5-FE
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:28:27 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4CBPVSU063302
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:28:26 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ad2xs9nnc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:28:26 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 12 May 2017 12:28:23 +0100
-References: <20170510151209.32767-1-pasic@linux.vnet.ibm.com>
-	<20170511130210.2c24d9de.cornelia.huck@de.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 12 May 2017 13:28:19 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170511130210.2c24d9de.cornelia.huck@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <68b56ac2-6169-8bae-ac97-a33e3aaa940f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/css: catch section mismatch on
- load
+	(envelope-from <a.perevalov@samsung.com>) id 1d98o7-0000mD-Mr
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:32:30 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:49631)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1d98o7-0000kM-HK
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:32:27 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout4.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OPU00HFY81YWY80@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Fri, 12 May 2017 12:32:22 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Fri, 12 May 2017 14:31:39 +0300
+Message-id: <1494588703-9076-6-git-send-email-a.perevalov@samsung.com>
+In-reply-to: <1494588703-9076-1-git-send-email-a.perevalov@samsung.com>
+References: <1494588703-9076-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170512113220eucas1p14c340af61c08de90fe20a16be9a3d180@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH V4 5/9] migration: introduce postcopy-blocktime
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,73 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, a.perevalov@samsung.com, i.maximets@samsung.com, peterx@redhat.com
 
+Right now it could be used on destination side to
+enable vCPU blocktime calculation for postcopy live migration.
+vCPU blocktime - it's time since vCPU thread was put into
+interruptible sleep, till memory page was copied and thread awake.
 
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+---
+ include/migration/migration.h | 1 +
+ migration/migration.c         | 9 +++++++++
+ qapi-schema.json              | 5 ++++-
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-On 05/11/2017 01:02 PM, Cornelia Huck wrote:
-> On Wed, 10 May 2017 17:12:09 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> Prior to the virtio-ccw-2.7 machine (and commit 2a79eb1a), our virtio
->> devices residing under the virtual-css bus do not have qdev_path based
->> migration stream identifiers (because their qdev_path is NULL). The ids
->> are instead generated when the device is registered as a composition of
->> the so called idstr, which takes the vmsd name as its value, and an
->> instance_id, which is which is calculated as a maximal instance_id
->> registered with the same idstr plus one, or zero (if none was registered
->> previously).
->>
-[..]
->> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->> index 15c4f4b..6cff3a3 100644
->> --- a/hw/s390x/css.c
->> +++ b/hw/s390x/css.c
-[..]
->> +        /* Only possible if machine < 2.7 (no css_dev_path) */
->> +
->> +        error_setg(&err, "%x != %x", old_devno,  s->devno);
->> +        error_append_hint(&err, "Devno mismatch, tried to load wrong section!"
->> +                          " Likely reason: some sequences of plug and unplug"
->> +                          " can break migration for machine versions prior"
-> 
-> s/prior/prior to/
-
-Fixed. Thanks! Will wait a couple of days, maybe somebody has something
-else to say, and then re-spin.
-
-Regards,
-Halil
-
-> 
->> +                          " 2.7 (known design flaw).\n");
->> +        error_report_err(err);
->> +        return -EINVAL;
->> +    }
->>      /* Re-assign subch. */
->>      if (old_schid != s->schid) {
->>          old_s = channel_subsys.css[s->cssid]->sch_set[s->ssid]->sch[old_schid];
->> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
->> index e7167e3..4f7efa2 100644
->> --- a/hw/s390x/virtio-ccw.c
->> +++ b/hw/s390x/virtio-ccw.c
->> @@ -1274,9 +1274,13 @@ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
->>      SubchDev *s = ccw_dev->sch;
->>      VirtIODevice *vdev = virtio_ccw_get_vdev(s);
->>      int len;
->> +    int ret;
->>
->>      s->driver_data = dev;
->> -    subch_device_load(s, f);
->> +    ret = subch_device_load(s, f);
->> +    if (ret) {
->> +        return ret;
->> +    }
->>      /* Re-fill subch_id after loading the subchannel states.*/
->>      if (ck->refill_ids) {
->>          ck->refill_ids(ccw_dev);
-> 
-> Patch looks sane to me, but I second the question about how to handle
-> this when using vmstates.
-> 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index e29cb01..30108d3 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -316,6 +316,7 @@ int migrate_compress_level(void);
+ int migrate_compress_threads(void);
+ int migrate_decompress_threads(void);
+ bool migrate_use_events(void);
++bool migrate_postcopy_blocktime(void);
+ 
+ /* Sending on the return path - generic and then for each message type */
+ void migrate_send_rp_message(MigrationIncomingState *mis,
+diff --git a/migration/migration.c b/migration/migration.c
+index 1cce2a1..b0af75f 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1371,6 +1371,15 @@ bool migrate_zero_blocks(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_ZERO_BLOCKS];
+ }
+ 
++bool migrate_postcopy_blocktime(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_BLOCKTIME];
++}
++
+ bool migrate_use_compression(void)
+ {
+     MigrationState *s;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 5728b7f..df9f801 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -894,11 +894,14 @@
+ # @release-ram: if enabled, qemu will free the migrated ram pages on the source
+ #        during postcopy-ram migration. (since 2.9)
+ #
++# @postcopy-blocktime: Calculate downtime for postcopy live migration (since 2.10)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+-           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
++           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
++           'postcopy-blocktime'] }
+ 
+ ##
+ # @MigrationCapabilityStatus:
+-- 
+1.8.3.1
