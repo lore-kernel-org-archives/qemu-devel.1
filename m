@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8zRD-0003r4-HH
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:32:15 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zVn-0004mp-Bc
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d8zRC-0004Mu-Os
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:32:11 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170510200535.13268-1-f4bug@amsat.org>
-	<20170510200535.13268-3-f4bug@amsat.org>
-	<b258b01d-74f9-e412-5367-d8e1d72eb159@twiddle.net>
-	<c58cdae9-5043-2506-9a91-f35f2da51e20@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b02f363b-bc10-7591-682d-dc8857031890@amsat.org>
-Date: Thu, 11 May 2017 22:31:59 -0300
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zVm-0007Bj-Au
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:36:55 -0400
+Received: from [59.151.112.132] (port=23931 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d8zVl-0007BF-Tq
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 21:36:54 -0400
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Fri, 12 May 2017 09:35:55 +0800
+Message-ID: <1494552955-30529-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1494552955-30529-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+References: <1494552955-30529-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <c58cdae9-5043-2506-9a91-f35f2da51e20@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/8] target/arm: optimize smul_dual() and
- neon_trn_u8() using extract op
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 3/3] net/filter-rewriter: Remove unused option
+ in filter-rewirter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, qemu-arm@nongnu.org
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Hi Richard,
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ qemu-options.hx | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On 05/10/2017 05:32 PM, Philippe Mathieu-Daudé wrote:
-> On 05/10/2017 05:20 PM, Richard Henderson wrote:
->> On 05/10/2017 01:05 PM, Philippe Mathieu-Daudé wrote:
->>> -    tcg_gen_shri_i32(t1, t1, 8);
->>> -    tcg_gen_andi_i32(t1, t1, 0x00ff00ff);
->>> +    tcg_gen_extract_i32(t1, t1, 8, 0x00ff00ff);
->>
->> This is very wrong.  See my previous comment.
-
-Indeed, after correcting the script:
-
-$ docker run -it -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle --sp-file 
-scripts/coccinelle/tcg_gen_extract.cocci --macro-file 
-scripts/cocci-macro-file.h target/arm/translate.c --in-place
-init_defs_builtins: /usr/lib64/coccinelle/standard.h
-init_defs: scripts/cocci-macro-file.h
-HANDLING: target/arm/translate.c
-candidate at target/arm/translate.c:4703
-   op_size: i32/i32 (same)
-   low_bits: 8 (value: 0xff)
-   len: 0xff00ff
-   len_bits != low_bits
-   candidate is NOT optimizable
-
-candidate at target/arm/translate.c:342
-   op_size: i32/i32 (same)
-   low_bits: 8 (value: 0xff)
-   len: 0xff00ff
-   len_bits != low_bits
-   candidate is NOT optimizable
-
->
-> Arghhh I see, I checked manually and though I had it...
->
-> I'll first check with the cocci script if it can handles this better
-> then review the serie manually before bother you again.
->
-> Thinking about it, this should be quite easy unit-testable somehow ...
-> Not sure if I want to start this path although.
->
-> Sorry for the noise and thank a lot for the review!
->
-> Phil.
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 70c0ded..f5e088e 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4038,7 +4038,8 @@ Create a filter-redirector we need to differ outdev id from indev id, id can not
+ be the same. we can just use indev or outdev, but at least one of indev or outdev
+ need to be specified.
+ 
+-@item -object filter-rewriter,id=@var{id},netdev=@var{netdevid},rewriter-mode=@var{mode}[,queue=@var{all|rx|tx}]
++@item -object filter-rewriter,id=@var{id},netdev=@var{netdevid},
++[,queue=@var{all|rx|tx}]
+ 
+ Filter-rewriter is a part of COLO project.It will rewrite tcp packet to
+ secondary from primary to keep secondary tcp connection,and rewrite
+-- 
+2.7.4
