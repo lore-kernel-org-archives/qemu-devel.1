@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuE-0003xd-OM
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:11 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuk-00050F-Sv
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuB-0007Bl-Mb
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:10 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3865)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuh-0007Z5-QM
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:42 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3988)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuB-000793-3O
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:07 -0400
-References: <20170511163228.6666-1-quintela@redhat.com>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d8zuh-0007W6-8U
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 22:02:39 -0400
+References: <20170425103049.4073-1-quintela@redhat.com>
+	<20170425103049.4073-3-quintela@redhat.com>
+	<20170428165522.GG3276@work-vm>
+	<87vapht37i.fsf@secure.mitica> <590AF10B.9020207@huawei.com>
+	<87efvvgxpr.fsf@secure.mitica>
 From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <59151783.9030508@huawei.com>
-Date: Fri, 12 May 2017 10:01:39 +0800
+Message-ID: <591517AA.9080201@huawei.com>
+Date: Fri, 12 May 2017 10:02:18 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170511163228.6666-1-quintela@redhat.com>
+In-Reply-To: <87efvvgxpr.fsf@secure.mitica>
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Remove old MigrationParams
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: quintela@redhat.com
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 2017/5/12 0:32, Juan Quintela wrote:
-> Hi
+On 2017/5/12 0:33, Juan Quintela wrote:
+> Hailiang Zhang <zhang.zhanghailiang@huawei.com> wrote:
+>> Hi,
+>>
+>>>> Hmm you don't seem to have replaced this with anything.
+>>>> I think that's a behavioural change; the trick COLO did (I'm not sure if this
+>>>> is still the way it works) is that they initiate the first migration
+>>>> with block migration enabled so that the two hosts (with non-shared storage)
+>>>> get sync'd storage, and then at the completion of that first migration
+>>>> they then switch into the checkpointing mode where they're only
+>>>> doing updates - that's why it gets switched off at this point
+>>>> prior to the 1st checkpoint.
+>>> Weird, really.
+>>>
+>>> I did't catch that.
+>>>
+>>> Will investigate.
+>> Yes, Dave is right, for non-shared disk, we need to enable block
+>> migration for first cycle,
+>> to sync the disks of two sides. After that, qemu will go into COLO
+>> state which we need to
+>> disable block migration.
+> v2 posted.
 >
-> Changes from v1:
->
-> - make migrate_block_set_* take a boolean
-> - disable block migration in colo to maintain semantics.
->
-> Please review, Juan.
->
-> [v1]
-> Upon a time there were MigrationParms (only used for block migration)
-> and then MigrationParams used for everything else.  This series:
->
-> - create migration capabilities for block parameters
-> - make the migrate command line parameters to use capabilities
-> - remove MigrationParams completely
->
-> Please, review.
->
+> My understanding is that it maintains the sematic, please test/comment.
 
-Looks good to me, this makes codes more grace.
+Yes, it is right now, i have reviewed it, thanks.
 
-Reviewed-by:zhanghailiang <zhang.zhanghailiang@huawei.com>
-
-
-> *** BLURB HERE ***
+> Thanks, Juan.
 >
-> Juan Quintela (3):
->    migration: Create block capabilities for shared and enable
->    migration: Remove use of old MigrationParams
->    migration: Remove old MigrationParams
->
->   include/migration/block.h     |  3 +++
->   include/migration/migration.h | 14 +++++-------
->   include/migration/vmstate.h   |  1 -
->   include/qemu/typedefs.h       |  1 -
->   include/sysemu/sysemu.h       |  3 +--
->   migration/block.c             | 17 ++------------
->   migration/colo.c              |  7 +++---
->   migration/migration.c         | 52 ++++++++++++++++++++++++++++++++++++-------
->   migration/savevm.c            | 18 +++------------
->   qapi-schema.json              |  7 +++++-
->   10 files changed, 68 insertions(+), 55 deletions(-)
+> .
 >
