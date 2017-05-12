@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1d97hB-000527-R8
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1d97iA-000652-1R
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:22:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1d97h8-00065a-Pf
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41678)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1d97h8-000641-JO
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:10 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B71F448D82
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 10:21:09 +0000 (UTC)
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Fri, 12 May 2017 12:21:00 +0200
-Message-Id: <20170512102100.22675-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH] xhci: relax link check
+	(envelope-from <dgilbert@redhat.com>) id 1d97i5-0006ga-T9
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:22:14 -0400
+Date: Fri, 12 May 2017 11:22:04 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170512102204.GG2069@work-vm>
+References: <1481822644-617-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<1481822644-617-2-git-send-email-mdroth@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481822644-617-2-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests: check-qom-proplist: add checks
+ for cmdline-created objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +24,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Daniel Berrange <berrange@redhat.com>, qemu-stable@nongnu.org
 
-The strict td link limit added by commit "05f43d4 xhci: limit the
-number of link trbs we are willing to process" causes problems with
-Windows guests. Let's raise the limit.
+I notice this pair of patches doesn't seem to have gone anywhere.
+WHile it's labelled as a monitor fix, it's all QOM stuff, so I don't
+think it should be going via me.
 
-This change is analogous to:
+Dave
 
-  commit ab6b1105a2259c7072905887f71caa850ce63190
-  Author: Gerd Hoffmann <kraxel@redhat.com>
-  Date:   Tue Mar 7 09:40:18 2017 +0100
-
-      ohci: relax link check
-
-Signed-off-by: Ladi Prosek <lprosek@redhat.com>
----
- hw/usb/hcd-xhci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index d3d47bf..77d8e11 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -50,7 +50,7 @@
- /* Very pessimistic, let's hope it's enough for all cases */
- #define EV_QUEUE (((3 * 24) + 16) * MAXSLOTS)
- 
--#define TRB_LINK_LIMIT  4
-+#define TRB_LINK_LIMIT  32
- #define COMMAND_LIMIT   256
- #define TRANSFER_LIMIT  256
- 
--- 
-2.9.3
+* Michael Roth (mdroth@linux.vnet.ibm.com) wrote:
+> check-qom-proplist originally added tests for verifying that
+> object-creation helpers object_new_with_{props,propv} behaved in
+> similar fashion to the "traditional" method involving setting each
+> individual property separately after object creation rather than
+> via a single call.
+> 
+> Another similar "helper" for creating Objects exists in the form of
+> objects specified via -object command-line parameters. By that
+> rationale, we extend check-qom-proplist to include similar checks
+> for command-line-created objects by employing the same
+> qemu_opts_parse()-based parsing the vl.c employs.
+> 
+> This parser has a side-effect of parsing the object's options into
+> a QemuOpt structure and registering this in the global QemuOptsList
+> using the Object's ID. This can conflict with future Object instances
+> that attempt to use the same ID if we don't ensure this is cleaned
+> up as part of Object finalization, so we include a FIXME stub to test
+> for this case, which will then be resolved in a subsequent patch.
+> 
+> Suggested-by: Daniel Berrange <berrange@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Daniel Berrange <berrange@redhat.com>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/check-qom-proplist.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 55 insertions(+)
+> 
+> diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+> index a16cefc..e3f56ca 100644
+> --- a/tests/check-qom-proplist.c
+> +++ b/tests/check-qom-proplist.c
+> @@ -23,6 +23,9 @@
+>  #include "qapi/error.h"
+>  #include "qom/object.h"
+>  #include "qemu/module.h"
+> +#include "qemu/option.h"
+> +#include "qemu/config-file.h"
+> +#include "qom/object_interfaces.h"
+>  
+>  
+>  #define TYPE_DUMMY "qemu-dummy"
+> @@ -162,6 +165,10 @@ static const TypeInfo dummy_info = {
+>      .instance_finalize = dummy_finalize,
+>      .class_size = sizeof(DummyObjectClass),
+>      .class_init = dummy_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_USER_CREATABLE },
+> +        { }
+> +    }
+>  };
+>  
+>  
+> @@ -320,6 +327,14 @@ static const TypeInfo dummy_backend_info = {
+>      .class_size = sizeof(DummyBackendClass),
+>  };
+>  
+> +static QemuOptsList qemu_object_opts = {
+> +    .name = "object",
+> +    .implied_opt_name = "qom-type",
+> +    .head = QTAILQ_HEAD_INITIALIZER(qemu_object_opts.head),
+> +    .desc = {
+> +        { }
+> +    },
+> +};
+>  
+>  
+>  static void test_dummy_createv(void)
+> @@ -388,6 +403,45 @@ static void test_dummy_createlist(void)
+>      object_unparent(OBJECT(dobj));
+>  }
+>  
+> +static void test_dummy_createcmdl(void)
+> +{
+> +    QemuOpts *opts;
+> +    DummyObject *dobj;
+> +    Error *err = NULL;
+> +    const char *params = TYPE_DUMMY \
+> +                         ",id=dev0," \
+> +                         "bv=yes,sv=Hiss hiss hiss,av=platypus";
+> +
+> +    qemu_add_opts(&qemu_object_opts);
+> +    opts = qemu_opts_parse(&qemu_object_opts, params, true, &err);
+> +    g_assert(err == NULL);
+> +    g_assert(opts);
+> +
+> +    dobj = DUMMY_OBJECT(user_creatable_add_opts(opts, &err));
+> +    g_assert(err == NULL);
+> +    g_assert(dobj);
+> +    g_assert_cmpstr(dobj->sv, ==, "Hiss hiss hiss");
+> +    g_assert(dobj->bv == true);
+> +    g_assert(dobj->av == DUMMY_PLATYPUS);
+> +
+> +    user_creatable_del("dev0", &err);
+> +    g_assert(err == NULL);
+> +    error_free(err);
+> +
+> +    /* cmdline-parsing via qemu_opts_parse() results in a QemuOpts entry
+> +     * corresponding to the Object's ID to be added to the QemuOptsList
+> +     * for objects. To avoid having this entry conflict with future
+> +     * Objects using the same ID (which can happen in cases where
+> +     * qemu_opts_parse() is used to parse the object params, such as
+> +     * with hmp_object_add() at the time of this comment), we need to
+> +     * check for this in user_creatable_del() and remove the QemuOpts if
+> +     * it is present.
+> +     *
+> +     * FIXME: add an assert to verify that the QemuOpts is cleaned up
+> +     * once the corresponding cleanup code is added.
+> +     */
+> +}
+> +
+>  static void test_dummy_badenum(void)
+>  {
+>      Error *err = NULL;
+> @@ -525,6 +579,7 @@ int main(int argc, char **argv)
+>  
+>      g_test_add_func("/qom/proplist/createlist", test_dummy_createlist);
+>      g_test_add_func("/qom/proplist/createv", test_dummy_createv);
+> +    g_test_add_func("/qom/proplist/createcmdline", test_dummy_createcmdl);
+>      g_test_add_func("/qom/proplist/badenum", test_dummy_badenum);
+>      g_test_add_func("/qom/proplist/getenum", test_dummy_getenum);
+>      g_test_add_func("/qom/proplist/iterator", test_dummy_iterator);
+> -- 
+> 1.9.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
