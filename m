@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d94R2-0005eu-2v
+	(envelope-from <dgibson@ozlabs.org>) id 1d94R2-0005ev-Bz
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:52:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d94R0-0006nZ-Ie
+	(envelope-from <dgibson@ozlabs.org>) id 1d94R0-0006no-K2
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:52:20 -0400
-Date: Fri, 12 May 2017 16:04:09 +1000
+Date: Fri, 12 May 2017 16:28:36 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170512060409.GE12908@umbus.fritz.box>
+Message-ID: <20170512062836.GI12908@umbus.fritz.box>
 References: <20170505204746.14116-1-danielhb@linux.vnet.ibm.com>
-	<20170505204746.14116-2-danielhb@linux.vnet.ibm.com>
+	<20170505204746.14116-7-danielhb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="r7U+bLA8boMOj+mD"
+	protocol="application/pgp-signature"; boundary="byLs0wutDcxFdwtm"
 Content-Disposition: inline
-In-Reply-To: <20170505204746.14116-2-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v9 1/6] hw/ppc/spapr.c: adding
- pending_dimm_unplugs to sPAPRMachineState
+In-Reply-To: <20170505204746.14116-7-danielhb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v9 6/6] migration: spapr: migrate
+ pending_events of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,211 +29,253 @@ To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com
 
 
---r7U+bLA8boMOj+mD
+--byLs0wutDcxFdwtm
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 05, 2017 at 05:47:41PM -0300, Daniel Henrique Barboza wrote:
-> The LMB DRC release callback, spapr_lmb_release(), uses an opaque
-> parameter, a sPAPRDIMMState struct that stores the current LMBs that
-> are allocated to a DIMM (nr_lmbs). After each call to this callback,
-> the nr_lmbs is decremented by one and, when it reaches zero, the callback
-> proceeds with the qdev calls to hot unplug the LMB.
+On Fri, May 05, 2017 at 05:47:46PM -0300, Daniel Henrique Barboza wrote:
+> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
 >=20
-> Using drc->detach_cb_opaque is problematic because it can't be migrated in
-> the future DRC migration work. This patch makes the following changes to
-> eliminate the usage of this opaque callback inside spapr_lmb_release:
+> In racing situations between hotplug events and migration operation,
+> a rtas hotplug event could have not yet be delivered to the source
+> guest when migration is started. In this case the pending_events of
+> spapr state need be transmitted to the target so that the hotplug
+> event can be finished on the target.
 >=20
-> - sPAPRDIMMState was moved from spapr.c and added to spapr.h. A new
-> attribute called 'addr' was added to it. This is used as an unique
-> identifier to associate a sPAPRDIMMState to a PCDIMM element.
+> All the different fields of the events are encoded as defined by
+> PAPR. We can migrate them as uint8_t binary stream without any
+> concerns about data padding or endianess.
 >=20
-> - sPAPRMachineState now hosts a new QTAILQ called 'pending_dimm_unplugs'.
-> This queue of sPAPRDIMMState elements will store the DIMM state of DIMMs
-> that are currently going under an unplug process.
+> pending_events is put in a subsection in the spapr state VMSD to make
+> sure migration across different versions is not broken.
 >=20
-> - spapr_lmb_release() will now retrieve the nr_lmbs value by getting the
-> correspondent sPAPRDIMMState. A helper function called spapr_dimm_get_add=
-ress
-> was created to fetch the address of a PCDIMM device inside spapr_lmb_rele=
-ase.
-> When nr_lmbs reaches zero and the callback proceeds with the qdev hot unp=
-lug
-> calls, the sPAPRDIMMState struct is removed from spapr->pending_dimm_unpl=
-ugs.
->=20
-> After these changes, the opaque argument for spapr_lmb_release is now
-> unused and is passed as NULL inside spapr_del_lmbs. This and the other
-> opaque arguments can now be safely removed from the code.
->=20
+> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
 > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-Urgh.  Moving this into the machine is really ugly.  Unfortunately, I
-can't quickly see a better way to accomplish what you need.  So I
-guess this approach is ok, with the hope that we can find a better way
-in future.
-
-There are a few more superficial problems to address, though.
+This seems like it's probably a good idea, even independent of the
+hotplug migration stuff.  I suspect there are other races where we
+could lose a shutdown event or similar if there's a migration.
 
 > ---
->  hw/ppc/spapr.c         | 54 ++++++++++++++++++++++++++++++++++++++++++++=
-------
->  include/hw/ppc/spapr.h | 17 ++++++++++++++++
->  2 files changed, 65 insertions(+), 6 deletions(-)
+>  hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_events.c  | 24 +++++++++++++-----------
+>  include/hw/ppc/spapr.h |  3 ++-
+>  3 files changed, 48 insertions(+), 12 deletions(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 80d12d0..346c827 100644
+> index bc56249..e924fd4 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -2043,6 +2043,7 @@ static void ppc_spapr_init(MachineState *machine)
->      msi_nonbroken =3D true;
-> =20
->      QLIST_INIT(&spapr->phbs);
-> +    QTAILQ_INIT(&spapr->pending_dimm_unplugs);
-> =20
->      /* Allocate RMA if necessary */
->      rma_alloc_size =3D kvmppc_alloc_rma(&rma);
-> @@ -2596,20 +2597,32 @@ out:
->      error_propagate(errp, local_err);
->  }
-> =20
-> -typedef struct sPAPRDIMMState {
-> -    uint32_t nr_lmbs;
-> -} sPAPRDIMMState;
-> +static uint64_t spapr_dimm_get_address(PCDIMMDevice *dimm)
-> +{
-> +    Error *local_err =3D NULL;
-> +    uint64_t addr;
-> +    addr =3D object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP,
-> +                                   &local_err);
-> +    if (local_err) {
-> +        error_propagate(&error_abort, local_err);
-> +        return 0;
-> +    }
-> +    return addr;
-> +}
-> =20
->  static void spapr_lmb_release(DeviceState *dev, void *opaque)
->  {
-> -    sPAPRDIMMState *ds =3D (sPAPRDIMMState *)opaque;
->      HotplugHandler *hotplug_ctrl;
-> =20
-
-No need for this blank line in the middle of declarations.
-
-> +    uint64_t addr =3D spapr_dimm_get_address(PC_DIMM(dev));
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> +    sPAPRDIMMState *ds =3D spapr_pending_dimm_unplugs_find(spapr, addr);
-> +
->      if (--ds->nr_lmbs) {
->          return;
->      }
-> =20
-> -    g_free(ds);
-> +    spapr_pending_dimm_unplugs_remove(spapr, ds);
-> =20
->      /*
->       * Now that all the LMBs have been removed by the guest, call the
-> @@ -2626,17 +2639,20 @@ static void spapr_del_lmbs(DeviceState *dev, uint=
-64_t addr_start, uint64_t size,
->      sPAPRDRConnectorClass *drck;
->      uint32_t nr_lmbs =3D size / SPAPR_MEMORY_BLOCK_SIZE;
->      int i;
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->      sPAPRDIMMState *ds =3D g_malloc0(sizeof(sPAPRDIMMState));
->      uint64_t addr =3D addr_start;
-> =20
->      ds->nr_lmbs =3D nr_lmbs;
-> +    ds->addr =3D addr_start;
-> +    spapr_pending_dimm_unplugs_add(spapr, ds);
->      for (i =3D 0; i < nr_lmbs; i++) {
->          drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
->                  addr / SPAPR_MEMORY_BLOCK_SIZE);
->          g_assert(drc);
-> =20
->          drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> -        drck->detach(drc, dev, spapr_lmb_release, ds, errp);
-> +        drck->detach(drc, dev, spapr_lmb_release, NULL, errp);
->          addr +=3D SPAPR_MEMORY_BLOCK_SIZE;
->      }
-> =20
-> @@ -3515,3 +3531,29 @@ static void spapr_machine_register_types(void)
->  }
-> =20
->  type_init(spapr_machine_register_types)
-> +
-> +sPAPRDIMMState *spapr_pending_dimm_unplugs_find(sPAPRMachineState *spapr,
-> +                                                uint64_t addr)
-> +{
-> +    sPAPRDIMMState *dimm_state =3D NULL;
-> +    QTAILQ_FOREACH(dimm_state, &spapr->pending_dimm_unplugs, next) {
-> +        if (dimm_state->addr =3D=3D addr) {
-> +            break;
-> +        }
-> +    }
-> +    return dimm_state;
-> +}
-> +
-> +void spapr_pending_dimm_unplugs_add(sPAPRMachineState *spapr,
-> +                                   sPAPRDIMMState *dimm_state)
-> +{
-> +    g_assert(!spapr_pending_dimm_unplugs_find(spapr, dimm_state->addr));
-> +    QTAILQ_INSERT_HEAD(&spapr->pending_dimm_unplugs, dimm_state, next);
-> +}
-> +
-> +void spapr_pending_dimm_unplugs_remove(sPAPRMachineState *spapr,
-> +                                      sPAPRDIMMState *dimm_state)
-> +{
-> +    QTAILQ_REMOVE(&spapr->pending_dimm_unplugs, dimm_state, next);
-> +    g_free(dimm_state);
-> +}
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 5802f88..3e2b5ab 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -32,6 +32,7 @@ struct sPAPRRTCState {
->      int64_t ns_offset;
+> @@ -1498,6 +1498,38 @@ static const VMStateDescription vmstate_spapr_ccs_=
+list =3D {
+>      },
 >  };
 > =20
-> +typedef struct sPAPRDIMMState sPAPRDIMMState;
->  typedef struct sPAPRMachineClass sPAPRMachineClass;
-> =20
->  #define TYPE_SPAPR_MACHINE      "spapr-machine"
-> @@ -104,6 +105,9 @@ struct sPAPRMachineState {
->      /* RTAS state */
->      QTAILQ_HEAD(, sPAPRConfigureConnectorState) ccs_list;
-> =20
-> +    /* pending DIMM unplug queue */
-> +    QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
+> +static bool spapr_pending_events_needed(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
+> +    return !QTAILQ_EMPTY(&spapr->pending_events);
+> +}
 > +
->      /*< public >*/
->      char *kvm_type;
->      MemoryHotplugState hotplug_memory;
-> @@ -646,6 +650,19 @@ struct sPAPRConfigureConnectorState {
-> =20
->  void spapr_ccs_reset_hook(void *opaque);
-> =20
-> +struct sPAPRDIMMState {
-> +    uint64_t addr;
-> +    uint32_t nr_lmbs;
-> +    QTAILQ_ENTRY(sPAPRDIMMState) next;
+> +static const VMStateDescription vmstate_spapr_event_entry =3D {
+> +    .name =3D "spapr_event_log_entry",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
+
+This requires changing the actual type to int32_t in the structure.
+
+> +        VMSTATE_BOOL(exception, sPAPREventLogEntry),
+
+So, at the moment, AFAICT every event is marked as exception =3D=3D true,
+so this doesn't actually tell us anything.   If that becomes not the
+case in future, can the exception flag be derived from the log_type or
+information in the even buffer?
+
+> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
+> +        VMSTATE_VARRAY_UINT32_ALLOC(data, sPAPREventLogEntry, data_size,
+> +                                    0, vmstate_info_uint8, uint8_t),
+
+So, data_size duplicates information that's in the event header, which
+is a bit sad.  I suppose I'm ok with that, since setting up the VARRAY
+thing is going to be pretty awkward otherwise.
+
+> +        VMSTATE_END_OF_LIST()
+> +    },
 > +};
 > +
-> +sPAPRDIMMState *spapr_pending_dimm_unplugs_find(sPAPRMachineState *spapr,
-> +                                               uint64_t addr);
-> +void spapr_pending_dimm_unplugs_add(sPAPRMachineState *spapr,
-> +                                   sPAPRDIMMState *dimm_state);
-> +void spapr_pending_dimm_unplugs_remove(sPAPRMachineState *spapr,
-> +                                      sPAPRDIMMState *dimm_state);
+> +static const VMStateDescription vmstate_spapr_pending_events =3D {
+> +    .name =3D "spapr_pending_events",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_pending_events_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
+> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, =
+next),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
 > +
+>  static bool spapr_ov5_cas_needed(void *opaque)
+>  {
+>      sPAPRMachineState *spapr =3D opaque;
+> @@ -1598,6 +1630,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>          &vmstate_spapr_patb_entry,
+>          &vmstate_spapr_pending_dimm_unplugs,
+>          &vmstate_spapr_ccs_list,
+> +        &vmstate_spapr_pending_events,
+>          NULL
+>      }
+>  };
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index f0b28d8..70c7cfc 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -342,7 +342,8 @@ static int rtas_event_log_to_irq(sPAPRMachineState *s=
+papr, int log_type)
+>      return source->irq;
+>  }
+> =20
+> -static void rtas_event_log_queue(int log_type, void *data, bool exceptio=
+n)
+> +static void rtas_event_log_queue(int log_type, void *data, bool exceptio=
+n,
+> +                                 int data_size)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      sPAPREventLogEntry *entry =3D g_new(sPAPREventLogEntry, 1);
+> @@ -351,6 +352,7 @@ static void rtas_event_log_queue(int log_type, void *=
+data, bool exception)
+>      entry->log_type =3D log_type;
+>      entry->exception =3D exception;
+>      entry->data =3D data;
+> +    entry->data_size =3D data_size;
 
-AFAICT all these new functions are only used in spapr.c, even in the
-rest of the series.  So they should be static, and not in the header
-file.  Likewise the structure definition.
+I think it would make more sense to derive data_size from the buffer
+header contents here, rather than in all the callers.
 
->  void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
->  int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+>      QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+>  }
+> =20
+> @@ -445,6 +447,7 @@ static void spapr_powerdown_req(Notifier *n, void *op=
+aque)
+>      struct rtas_event_log_v6_mainb *mainb;
+>      struct rtas_event_log_v6_epow *epow;
+>      struct epow_log_full *new_epow;
+> +    uint32_t data_size;
+> =20
+>      new_epow =3D g_malloc0(sizeof(*new_epow));
+>      hdr =3D &new_epow->hdr;
+> @@ -453,14 +456,13 @@ static void spapr_powerdown_req(Notifier *n, void *=
+opaque)
+>      mainb =3D &new_epow->mainb;
+>      epow =3D &new_epow->epow;
+> =20
+> +    data_size =3D sizeof(*new_epow);
+>      hdr->summary =3D cpu_to_be32(RTAS_LOG_VERSION_6
+>                                 | RTAS_LOG_SEVERITY_EVENT
+>                                 | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+>                                 | RTAS_LOG_OPTIONAL_PART_PRESENT
+>                                 | RTAS_LOG_TYPE_EPOW);
+> -    hdr->extended_length =3D cpu_to_be32(sizeof(*new_epow)
+> -                                       - sizeof(new_epow->hdr));
+> -
+> +    hdr->extended_length =3D cpu_to_be32(data_size - sizeof(new_epow->hd=
+r));
+>      spapr_init_v6hdr(v6hdr);
+>      spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
+> =20
+> @@ -479,7 +481,7 @@ static void spapr_powerdown_req(Notifier *n, void *op=
+aque)
+>      epow->event_modifier =3D RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
+>      epow->extended_modifier =3D RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPE=
+CIFIC;
+> =20
+> -    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true);
+> +    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true, data_size);
+> =20
+>      qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+>                                   rtas_event_log_to_irq(spapr,
+> @@ -504,6 +506,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
+nt8_t hp_action,
+>      struct rtas_event_log_v6_maina *maina;
+>      struct rtas_event_log_v6_mainb *mainb;
+>      struct rtas_event_log_v6_hp *hp;
+> +    uint32_t data_size;
+> =20
+>      new_hp =3D g_malloc0(sizeof(struct hp_log_full));
+>      hdr =3D &new_hp->hdr;
+> @@ -512,14 +515,14 @@ static void spapr_hotplug_req_event(uint8_t hp_id, =
+uint8_t hp_action,
+>      mainb =3D &new_hp->mainb;
+>      hp =3D &new_hp->hp;
+> =20
+> +    data_size =3D sizeof(*new_hp);
+>      hdr->summary =3D cpu_to_be32(RTAS_LOG_VERSION_6
+>                                 | RTAS_LOG_SEVERITY_EVENT
+>                                 | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+>                                 | RTAS_LOG_OPTIONAL_PART_PRESENT
+>                                 | RTAS_LOG_INITIATOR_HOTPLUG
+>                                 | RTAS_LOG_TYPE_HOTPLUG);
+> -    hdr->extended_length =3D cpu_to_be32(sizeof(*new_hp)
+> -                                       - sizeof(new_hp->hdr));
+> +    hdr->extended_length =3D cpu_to_be32(data_size - sizeof(new_hp->hdr)=
+);
+> =20
+>      spapr_init_v6hdr(v6hdr);
+>      spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
+> @@ -572,7 +575,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
+nt8_t hp_action,
+>              cpu_to_be32(drc_id->count_indexed.index);
+>      }
+> =20
+> -    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true);
+> +    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true, data_size);
+> =20
+>      qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+>                                   rtas_event_log_to_irq(spapr,
+> @@ -671,8 +674,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMac=
+hineState *spapr,
+>      if (!event) {
+>          goto out_no_events;
+>      }
+> -
+> -    hdr =3D event->data;
+> +    hdr =3D (struct rtas_error_log *)event->data;
+>      event_len =3D be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+> =20
+>      if (event_len < len) {
+> @@ -728,7 +730,7 @@ static void event_scan(PowerPCCPU *cpu, sPAPRMachineS=
+tate *spapr,
+>          goto out_no_events;
+>      }
+> =20
+> -    hdr =3D event->data;
+> +    hdr =3D (struct rtas_error_log *)event->data;
+>      event_len =3D be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+> =20
+>      if (event_len < len) {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index adc9fdb..ddac014 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -603,7 +603,8 @@ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong l=
+iobn);
+>  struct sPAPREventLogEntry {
+>      int log_type;
+>      bool exception;
+> -    void *data;
+> +    uint8_t *data;
+
+I think you can avoid this type change (and the casts it requires) by
+using VBUFFER instead of VARRAY.
+
+> +    uint32_t data_size;
+>      QTAILQ_ENTRY(sPAPREventLogEntry) next;
+>  };
 > =20
 
 --=20
@@ -242,25 +284,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---r7U+bLA8boMOj+mD
+--byLs0wutDcxFdwtm
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZFVBTAAoJEGw4ysog2bOS7qEP+wVAlBj+OG/RSEE0EwEfgp9f
-4nFfzct85CMx2bdbrTfI9p45QkdyiKlNbTJ2HzZMGxRe6D9DcA1j/823fN4hWzE5
-rn8JLmADMFhm8HfadfIuJqYuX6k3scgP5qY3eONiVa2p23++7EUrBHkSVzWwHXUW
-YKJIghUPoNeJ+g0ytKp8TNGkA5roHdeHd6KF+JUBHzinm7+sSxKGNdoP/KUZtf9M
-mSSqmlxAbODRo7P6yyWqe+s3ccdKpSb7WH18s+t9ilDMQgyjVxD1gXs9hC6lyM8x
-0bkHsi4r759cq+inFufJ9ziNe4WnTKe4Ee70dKIsx6jCHykf99Vct4L5d0NsJfcd
-Yl5/MADsWHJ1+bGbzwvxvh3h3Vqh0GKYK9xJlVa+AcWz2IkixrXjI/Va9cKBuM+n
-8cBMughfWlR/Am+9azFt97P4za/JDVAVphp5j/h9kgOk1TXDeNfMWqZuNLub5au6
-+mSlwfnR+KWytK+NuybHklBWuhE+NKUJtoAfpGu2l2+ESW19k8gdmVXZlLPQJcxJ
-WbCRD/NmZuwFbEEx1TXytU+7ZqSCbl5vIYVUHBJhy8mwefDo9xvceTrUx1G2kw3C
-/d+l+OOXIn0EfcM6YG3uUrppnS7mizkGz+676gLEk7izLKLnN3zKEtiG9WVgu7i5
-EbzzT/MA22UqXcgD9HeR
-=cSqn
+iQIcBAEBCAAGBQJZFVYRAAoJEGw4ysog2bOSJLwQAOUxmX1I6op3lDD85aIV+Xzd
+WNC5DwiIXhNJzIJG/lMhnz976/M0YuonBlVsUUdsrCFeX2ygS5od1BQ6x+Rq+gST
+NgGgfMiVw+L6EJN63qTiLCok5yyY+qurm3cdg7g0ne+3jwo+s3RptcE7+k9OLwM1
+zRs7a9X+aapLcjZ0hm+VvoqiOyQDmpRx75NZBI/yjP7EwnZUOYrYpQ9CCcu7RRs0
+PfRc8jeZYh75S0mB9U/S4SYfPysob24524YJRvausnotr9HHr0CGdffp6/hu3M8c
+EJS6xNm9O0j9a4jKkoy4PsF7csMm9rxbyJqJYWYI1EE608wtcTP7xEV+FpY8eRGj
+fypLxkk0wMd7/WbZ/NfKbrWHN0wMfMNzZRXkiMSCDLXesxTBJmipr7hYZ+FYNZVk
+pzB/XUiQ6wZGTKtsMRaAJNRn1/BBPhkyZo6lpR1M6SmnLcpunh2eBJ4NTuJW9z1G
+hTcoXcTAWywYPeIt9cKomB1thIPjpalSl1rX/qdKmmLvOrslP3pVGBma1XfIA/+B
+h0rjgKJhnrXC3bbdLtQPnDugvfyJjRwp+Crcyu2dnocPwKtElCa+ahr+oLFy3OBb
+og3MjiZGLI3y4sLRPxIxv5+IBlh9pO1dOtnav/6xXvZzexqxMX6Ar1/Oi+U+BVnI
+A85svz7yv0u83tpLFbSc
+=i6M5
 -----END PGP SIGNATURE-----
 
---r7U+bLA8boMOj+mD--
+--byLs0wutDcxFdwtm--
