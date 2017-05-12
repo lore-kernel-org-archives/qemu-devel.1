@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d9Ear-00024h-RD
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:43:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1d9Eh8-0003sf-Kl
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:49:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d9Ean-0006VT-QD
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:43:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58454)
+	(envelope-from <eblake@redhat.com>) id 1d9Eh4-0004x3-Di
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:49:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d9Ean-0006Tw-H4
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:43:05 -0400
-References: <1494552955-30529-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1494552955-30529-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1d9Eh4-0004wj-4L
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 13:49:34 -0400
+References: <20170512033543.6789-1-f4bug@amsat.org>
+	<20170512033543.6789-2-f4bug@amsat.org>
+	<alpine.DEB.2.20.1705121139030.2981@hadrien>
+	<7d1b12cd-80dc-7fc8-935d-bec7fb08e256@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <9d3b85f2-fdb3-641a-96c9-4bb158a50856@redhat.com>
-Date: Fri, 12 May 2017 12:43:02 -0500
+Message-ID: <3e548b97-c39a-4ba0-1eca-40b9e2b40137@redhat.com>
+Date: Fri, 12 May 2017 12:49:23 -0500
 MIME-Version: 1.0
-In-Reply-To: <1494552955-30529-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <7d1b12cd-80dc-7fc8-935d-bec7fb08e256@amsat.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="BQeeUB84P8kvsXqKommmHB7e9AQce6lN2"
-Subject: Re: [Qemu-devel] [PATCH 3/3] net/filter-rewriter: Remove unused
- option in filter-rewirter
+	boundary="sdDsL9XLkxeTjkSgnrFSAsk1AOVHom5Hn"
+Subject: Re: [Qemu-devel] [RFC PATCH v3 1/5] coccinelle: add a script to
+ optimize tcg op using tcg_gen_extract()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Julia Lawall <julia.lawall@lip6.fr>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Nicolas Palix <nicolas.palix@imag.fr>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Elfring <elfring@users.sourceforge.net>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BQeeUB84P8kvsXqKommmHB7e9AQce6lN2
+--sdDsL9XLkxeTjkSgnrFSAsk1AOVHom5Hn
 From: Eric Blake <eblake@redhat.com>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>,
- qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Message-ID: <9d3b85f2-fdb3-641a-96c9-4bb158a50856@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] net/filter-rewriter: Remove unused
- option in filter-rewirter
-References: <1494552955-30529-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
- <1494552955-30529-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1494552955-30529-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Julia Lawall <julia.lawall@lip6.fr>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>,
+ Nicolas Palix <nicolas.palix@imag.fr>
+Cc: Aurelien Jarno <aurelien@aurel32.net>,
+ Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>,
+ Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <3e548b97-c39a-4ba0-1eca-40b9e2b40137@redhat.com>
+Subject: Re: [RFC PATCH v3 1/5] coccinelle: add a script to optimize tcg op
+ using tcg_gen_extract()
+References: <20170512033543.6789-1-f4bug@amsat.org>
+ <20170512033543.6789-2-f4bug@amsat.org>
+ <alpine.DEB.2.20.1705121139030.2981@hadrien>
+ <7d1b12cd-80dc-7fc8-935d-bec7fb08e256@amsat.org>
+In-Reply-To: <7d1b12cd-80dc-7fc8-935d-bec7fb08e256@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05/11/2017 08:35 PM, Zhang Chen wrote:
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+On 05/12/2017 12:36 AM, Philippe Mathieu-Daud=C3=A9 wrote:
 
-In the subject: s/rewirter/rewriter/
-
-> ---
->  qemu-options.hx | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> In this patch
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01466.html
+> Aurelien does:
 >=20
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 70c0ded..f5e088e 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4038,7 +4038,8 @@ Create a filter-redirector we need to differ outd=
-ev id from indev id, id can not
->  be the same. we can just use indev or outdev, but at least one of inde=
-v or outdev
->  need to be specified.
-> =20
-> -@item -object filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},re=
-writer-mode=3D@var{mode}[,queue=3D@var{all|rx|tx}]
-> +@item -object filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},
-> +[,queue=3D@var{all|rx|tx}]
+> -    tcg_gen_shri_i32(cpu_sr_q, src, SR_Q);
+> -    tcg_gen_andi_i32(cpu_sr_q, cpu_sr_q, 1);
+> +    tcg_gen_extract_i32(cpu_sr_q, src, SR_Q, 1);
+>=20
+> having:
+>=20
+> #define SR_Q  8
+>=20
+> I wanted to write a Coccinelle script to check for this pattern.
+> My first version was wrong, as Richard Henderson reminded me this
+> pattern can be applied as long as the len argument (here "1") is a
+> Mersenne prime (all least significant bits as "1").
 
-Texinfo sources have restrictions on how line-wrapping works, and it's
-not always consistent.  It's probably best to stick with the long line,
-if you haven't actually validated that the rendered documentation is not
-broken when you split the line.
+Side note: while you are correct that a Mersenne prime is one less than
+a power of 2, your use of the term here is incorrect. You are looking
+for ALL instances of numbers that are one less than a power of two, and
+not just the Mersenne primes.  (For instance, 0xf is NOT a Mersenne
+prime, but IS a candidate for an optimization using a length of 4.)
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -82,7 +88,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---BQeeUB84P8kvsXqKommmHB7e9AQce6lN2
+--sdDsL9XLkxeTjkSgnrFSAsk1AOVHom5Hn
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -92,13 +98,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZFfQmAAoJEKeha0olJ0NqBpAH/2KbdX60cajtuVMm/eQLkylm
-xpjXYouZ2URYlTq1oRE6EE3lICHMvAqwL+CN3848mRvuZVUKPbqnBA5mW4/1qkpR
-nmFwqWEeO4QelZps1kDLuCShbGjC35nS8qriBuTTlw3WdWdPecAmi9JtDbShwiky
-ouHF6B1SuEKzWwFkTbaMbplWFzf18qtATOpc7ViMi3tncM4iIf69rSuRyBgR2Zh7
-ANBJnqP5IAOw0m8sDQosFuiXokgqjMevSrWbcUInkpSq4OYHw7MaorWztSD+zFjq
-tVQi/KdwPVkfqGXiMf66CSF/sGI5wZVe23pnagUrb3qG3KAQpzoPFt4LD8Gso/4=
-=uM/n
+iQEcBAEBCAAGBQJZFfWjAAoJEKeha0olJ0Nq6n0H+gJOY1TMW4numYt4VJKxZ9lb
+7lYAJ6FZzahBPSoKEA4vp2IgAI4vSJbk5ro1bnIQFUdfOqKGI4Y4tTviehjBdLKh
+E4e99GQtbEm6HxkL8bCYvkT33A9faen7KS8ZDNEkIBXhGoFpTXRENPWpaVZcSaN1
+MLWDd/uJbJZqodOgCC6uLTivD4ZF9WBwV2bXS2hBlVtpLr4osR7+9QgqGVGh6da2
+DERMrpTVXpsbNyC8T6AaRT3v2OfiA5u76QGkOv1PFk9bui6KWCm8TP8bqmOxvn/M
+Gi+/R+09RU0j1I6JQKuU6fhedxh1g8aJV4uIJIzX173P0Ot1a7YnwK1LJh2VI1U=
+=zF2V
 -----END PGP SIGNATURE-----
 
---BQeeUB84P8kvsXqKommmHB7e9AQce6lN2--
+--sdDsL9XLkxeTjkSgnrFSAsk1AOVHom5Hn--
