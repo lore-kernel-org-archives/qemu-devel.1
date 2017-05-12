@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1d98LK-00043k-W6
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:44 -0400
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1d98LL-00043w-43
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1d98LH-0006Rm-3s
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:42 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46454 helo=mail.rt-rk.com)
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1d98LI-0006Se-C1
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:43 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46760 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1d98LG-0006QI-Nj
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:39 -0400
+	id 1d98LI-0006Ri-0z
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:02:40 -0400
 From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
-Date: Fri, 12 May 2017 13:02:17 +0200
-Message-Id: <1494586944-7253-10-git-send-email-Milos.Stojanovic@rt-rk.com>
+Date: Fri, 12 May 2017 13:02:24 +0200
+Message-Id: <1494586944-7253-17-git-send-email-Milos.Stojanovic@rt-rk.com>
 In-Reply-To: <1494586944-7253-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 References: <1494586944-7253-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 09/16] linux-user: add strace support for uinfo
- structure of rt_sigqueueinfo() and rt_tgsigqueueinfo()
+Subject: [Qemu-devel] [PATCH 16/16] [RFC] linux-user: add support for
+ multiplexing signals in rt_sigqueueinfo(), rt_tgsigqueueinfo(),
+ kill() and tgkill() syscalls.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,188 +32,249 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, riku.voipio@iki.fi
 Cc: Milos.Stojanovic@rt-rk.com
 
-This commit adds support for printing the content of the target_siginfo_t
-structure in a similar way to how it is printed by the host strace. The
-pointer to this structure is sent as the last argument of the
-rt_sigqueueinfo() and rt_tgsigqueueinfo() system calls.
-For this purpose, print_siginfo() is used and the get_target_siginfo()
-function is implemented in order to get the information obtained from
-the pointer into the form that print_siginfo() expects.
+Add support for multiplexing in the host_signal_handler() function and in
+system calls rt_sigqueueinfo()/rt_tgsigqueueinfo(), tgkill(), kill() for
+the case when pid > 0.
 
-The get_target_siginfo() function is based on
-host_to_target_siginfo_noswap() in linux-user mode, but here both
-arguments are pointers to target_siginfo_t, so instead of converting
-the information to siginfo_t it just extracts and copies it to a
-target_siginfo_t structure.
+The rt_sigqueueinfo()/rt_tgsigqueueinfo() system calls multiplex target
+signals which are out of the host range by setting the si_errno value to
+the actual value of the signal and sending the signal to the MUX_SIG
+signal number. The host_signal_handler() will pull out the multiplexed
+signals and set their signal number to the correct value. That value
+should be in the si_errno field of the siginfo_t structure. The si_errno
+field is used here but this implementation can be replaced with any other
+unused field in the uinfo structure.
 
-Prior to this commit, typical strace output used to look like this:
-8307 rt_sigqueueinfo(8307,50,0x00000040007ff6b0) =3D 0
+The emulation of larger target signal range is done by spoofing the syste=
+m
+call info, adding the signal number to the si_errno field, and sending it
+to the host multiplex queue via rt_sigqueueinfo()/rt_tgsigqueueinfo().
+In order to send a signal using rt_sigqueueinfo()/rt_tgsigqueueinfo() wit=
+h
+si_code SI_USER or SI_TKILL to another thread or process, we need to
+disguise it as some other signal from the kernel range because the host
+kernel doesn't allow direct impersonations of those signals. This is done
+with SIG_SPOOF which moves the si_code to the nearest unused kernel si_co=
+de
+value. After the signal is successfully sent the host_signal_handler() of
+the receiving thread/process will turn it back into the proper kill/tgkil=
+l
+signal, before it gets processed.
 
-After this commit, it looks like this:
-8307 rt_sigqueueinfo(8307,50,{si_signo=3D50, si_code=3DSI_QUEUE, si_pid=3D=
-8307,
-si_uid=3D1000, si_sigval=3D17716762128}) =3D 0
+The tkill() system call as well as kill() with the argument pid <=3D 0
+couldn't be implemented simply using this method because it requires
+acquiring information about, and sending simultaneous signals to multiple
+threads or processes. These functionalities are out of the scope of
+rt_sigqueueinfo()/rt_tgsigqueueinfo().
 
 Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
 ---
- linux-user/strace.c | 113 ++++++++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 111 insertions(+), 2 deletions(-)
+ linux-user/signal.c       | 22 +++++++++++++
+ linux-user/syscall.c      | 81 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+ linux-user/syscall_defs.h |  8 +++++
+ 3 files changed, 111 insertions(+)
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 5fbe067..d821d16 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -188,6 +188,93 @@ static void print_si_code(int arg)
-     gemu_log("%s", codename);
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 3d51424..eaa6643 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -787,6 +787,28 @@ static void host_signal_handler(int host_signum, sig=
+info_t *info,
+     sig =3D host_to_target_signal(host_signum);
+     if (sig < 1 || sig > TARGET_NSIG)
+         return;
++
++#ifdef MUX_SIG
++    if (sig =3D=3D MUX_SIG) {
++        /* return the spoofed kill/tgkill signals into standard form */
++        if (info->si_code =3D=3D SIG_SPOOF(SI_USER)) {
++            info->si_code =3D SI_USER;
++        } else if (info->si_code =3D=3D SIG_SPOOF(SI_TKILL)) {
++            info->si_code =3D SI_TKILL;
++        }
++
++        /*
++         * We assume that si_errno field will remain intact during signa=
+l
++         * processing on the host. If it changes, the signal will be sen=
+t to
++         * the wrong number (most likely to MUX_SIG).
++         */
++        /* get the actual target signal number */
++        int target_sig =3D info->si_errno;
++        if (target_sig >=3D _NSIG && target_sig < TARGET_NSIG) {
++            sig =3D target_sig;
++        }
++    }
++#endif
+     trace_user_host_signal(env, host_signum, sig);
+=20
+     rewind_if_in_safe_syscall(puc);
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index f4ce6a8..8190575 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7123,6 +7123,24 @@ static inline abi_long host_to_target_stat64(void =
+*cpu_env,
+     return 0;
  }
 =20
-+static void get_target_siginfo(target_siginfo_t *tinfo,
-+                                const target_siginfo_t *info)
++#ifdef MUX_SIG
++static inline int multiplex(abi_long *arg, siginfo_t *uinfo)
 +{
-+    abi_ulong sival_ptr;
-+
-+    int sig;
-+    int si_errno;
-+    int si_code;
-+    int si_type;
-+
-+    __get_user(sig, &info->si_signo);
-+    __get_user(si_errno, &tinfo->si_errno);
-+    __get_user(si_code, &info->si_code);
-+
-+    tinfo->si_signo =3D sig;
-+    tinfo->si_errno =3D si_errno;
-+    tinfo->si_code =3D si_code;
-+
-+    /* Ensure we don't leak random junk to the guest later */
-+    memset(tinfo->_sifields._pad, 0, sizeof(tinfo->_sifields._pad));
-+
-+    /* This is awkward, because we have to use a combination of
-+     * the si_code and si_signo to figure out which of the union's
-+     * members are valid. (Within the host kernel it is always possible
-+     * to tell, but the kernel carefully avoids giving userspace the
-+     * high 16 bits of si_code, so we don't have the information to
-+     * do this the easy way...) We therefore make our best guess,
-+     * bearing in mind that a guest can spoof most of the si_codes
-+     * via rt_sigqueueinfo() if it likes.
-+     *
-+     * Once we have made our guess, we record it in the top 16 bits of
-+     * the si_code, so that print_siginfo() later can use it.
-+     * print_siginfo() will strip these top bits out before printing
-+     * the si_code.
-+     */
-+
-+    switch (si_code) {
-+    case SI_USER:
-+    case SI_TKILL:
-+    case SI_KERNEL:
-+        /* Sent via kill(), tkill() or tgkill(), or direct from the kern=
-el.
-+         * These are the only unspoofable si_code values.
++    if (*arg >=3D _NSIG && *arg < TARGET_NSIG) {
++        /*
++         * Using si_errno to transfer the signal number assumes that the=
+ field
++         * doesn't change its value before it gets handled in the
++         * host_signal_handler().
 +         */
-+        __get_user(tinfo->_sifields._kill._pid, &info->_sifields._kill._=
-pid);
-+        __get_user(tinfo->_sifields._kill._uid, &info->_sifields._kill._=
-uid);
-+        si_type =3D QEMU_SI_KILL;
-+        break;
-+    default:
-+        /* Everything else is spoofable. Make best guess based on signal=
- */
-+        switch (sig) {
-+        case TARGET_SIGCHLD:
-+            __get_user(tinfo->_sifields._sigchld._pid,
-+                       &info->_sifields._sigchld._pid);
-+            __get_user(tinfo->_sifields._sigchld._uid,
-+                       &info->_sifields._sigchld._uid);
-+            __get_user(tinfo->_sifields._sigchld._status,
-+                       &info->_sifields._sigchld._status);
-+            __get_user(tinfo->_sifields._sigchld._utime,
-+                       &info->_sifields._sigchld._utime);
-+            __get_user(tinfo->_sifields._sigchld._stime,
-+                       &info->_sifields._sigchld._stime);
-+            si_type =3D QEMU_SI_CHLD;
-+            break;
-+        case TARGET_SIGIO:
-+            __get_user(tinfo->_sifields._sigpoll._band,
-+                       &info->_sifields._sigpoll._band);
-+            __get_user(tinfo->_sifields._sigpoll._fd,
-+                       &info->_sifields._sigpoll._fd);
-+            si_type =3D QEMU_SI_POLL;
-+            break;
-+        default:
-+            /* Assume a sigqueue()/mq_notify()/rt_sigqueueinfo() source.=
- */
-+            __get_user(tinfo->_sifields._rt._pid, &info->_sifields._rt._=
-pid);
-+            __get_user(tinfo->_sifields._rt._uid, &info->_sifields._rt._=
-uid);
-+            /* XXX: potential problem if 64 bit */
-+            __get_user(sival_ptr, &info->_sifields._rt._sigval.sival_ptr=
-);
-+            tinfo->_sifields._rt._sigval.sival_ptr =3D sival_ptr;
-+
-+            si_type =3D QEMU_SI_RT;
-+            break;
-+        }
-+        break;
++        uinfo->si_errno =3D *arg;
++        *arg =3D MUX_SIG;
++        uinfo->si_signo =3D MUX_SIG;
 +    }
 +
-+    tinfo->si_code =3D deposit32(si_code, 16, 16, si_type);
++    return 0;
 +}
++#endif
 +
- static void print_siginfo(const target_siginfo_t *tinfo)
- {
-     /* Print a target_siginfo_t in the format desired for printing
-@@ -1907,10 +1994,21 @@ print_rt_sigqueueinfo(const struct syscallname *n=
-ame,
-     abi_long arg0, abi_long arg1, abi_long arg2,
-     abi_long arg3, abi_long arg4, abi_long arg5)
- {
-+    void *p;
-+    target_siginfo_t uinfo;
-+
-     print_syscall_prologue(name);
-     print_raw_param("%d", arg0, 0);
-     print_signal(arg1, 0);
--    print_pointer(arg2, 1);
-+    p =3D lock_user(VERIFY_READ, arg2, sizeof(target_siginfo_t), 1);
-+    if (p) {
-+        get_target_siginfo(&uinfo, p);
-+        print_siginfo(&uinfo);
-+
-+        unlock_user(p, arg2, 0);
-+    } else {
-+        print_pointer(arg2, 1);
-+    }
-     print_syscall_epilogue(name);
- }
+ /* ??? Using host futex calls even when target atomic operations
+    are not really atomic probably breaks things.  However implementing
+    futexes locally would make futexes shared between multiple processes
+@@ -8258,7 +8276,42 @@ abi_long do_syscall(void *cpu_env, int num, abi_lo=
+ng arg1,
+         break;
  #endif
-@@ -1921,11 +2019,22 @@ print_rt_tgsigqueueinfo(const struct syscallname =
-*name,
-     abi_long arg0, abi_long arg1, abi_long arg2,
-     abi_long arg3, abi_long arg4, abi_long arg5)
- {
-+    void *p;
-+    target_siginfo_t uinfo;
+     case TARGET_NR_kill:
++#ifdef MUX_SIG
++        if (arg2 >=3D _NSIG && arg2 < TARGET_NSIG) {
++            siginfo_t info;
 +
-     print_syscall_prologue(name);
-     print_raw_param("%d", arg0, 0);
-     print_raw_param("%d", arg1, 0);
-     print_signal(arg2, 0);
--    print_pointer(arg3, 1);
-+    p =3D lock_user(VERIFY_READ, arg3, sizeof(target_siginfo_t), 1);
-+    if (p) {
-+        get_target_siginfo(&uinfo, p);
-+        print_siginfo(&uinfo);
++            info.si_errno =3D arg2;
++            info.si_signo =3D MUX_SIG;
++            info.si_code =3D SIG_SPOOF(SI_USER);
++            info.si_pid =3D getpid();
++            info.si_uid =3D getuid();
 +
-+        unlock_user(p, arg3, 0);
-+    } else {
-+        print_pointer(arg3, 1);
-+    }
-     print_syscall_epilogue(name);
- }
++            /* pid > 0 */
++            if (arg1 > 0) {
++                ret =3D get_errno(sys_rt_sigqueueinfo(arg1, MUX_SIG, &in=
+fo));
++            } else {
++                ret =3D -TARGET_EINVAL;
++            }
++            /*
++             * TODO: In order to implement kill with rt_tgsigqueueinfo()=
+ for
++             * cases where pid <=3D 0 one needs to get a list of all the=
+ relevant
++             * processes and simultaniously send the signal to them.
++             * Missing:
++             * (pid =3D 0):
++             *     send to every process in the process group of
++             *     the calling process
++             * (pid =3D -1):
++             *     send to every process for which the calling process
++             *     has permission to send signals, except for process 1 =
+(init)
++             * (pid < -1):
++             *     send to every process in the process group whose ID i=
+s -pid
++             */
++        } else {
++            ret =3D get_errno(safe_kill(arg1, target_to_host_signal(arg2=
+)));
++        }
++#else
+         ret =3D get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
++#endif
+         break;
+ #ifdef TARGET_NR_rename
+     case TARGET_NR_rename:
+@@ -8929,6 +8982,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
+g arg1,
+             }
+             target_to_host_siginfo(&uinfo, p);
+             unlock_user(p, arg3, 0);
++#ifdef MUX_SIG
++            multiplex(&arg2, &uinfo);
++#endif
+             ret =3D get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
+         }
+         break;
+@@ -8942,6 +8998,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
+g arg1,
+             }
+             target_to_host_siginfo(&uinfo, p);
+             unlock_user(p, arg4, 0);
++#ifdef MUX_SIG
++            multiplex(&arg3, &uinfo);
++#endif
+             ret =3D get_errno(sys_rt_tgsigqueueinfo(arg1, arg2, arg3, &u=
+info));
+         }
+         break;
+@@ -11743,12 +11802,34 @@ abi_long do_syscall(void *cpu_env, int num, abi=
+_long arg1,
  #endif
+=20
+     case TARGET_NR_tkill:
++        /*
++         * TODO: In order to implement tkill with rt_sigqueueinfo() one =
+needs
++         * to get a list of all the threads with the specifiend tid and
++         * simultaniously send the signal to them.
++         */
+         ret =3D get_errno(safe_tkill((int)arg1, target_to_host_signal(ar=
+g2)));
+         break;
+=20
+     case TARGET_NR_tgkill:
++#ifdef MUX_SIG
++        if (arg3 >=3D _NSIG && arg3 < TARGET_NSIG) {
++            siginfo_t info;
++
++            info.si_errno =3D arg3;
++            info.si_signo =3D MUX_SIG;
++            info.si_code =3D SIG_SPOOF(SI_TKILL);
++            info.si_pid =3D getpid();
++            info.si_uid =3D getuid();
++
++            ret =3D get_errno(sys_rt_tgsigqueueinfo(arg1, arg2, MUX_SIG,=
+ &info));
++        } else {
++            ret =3D get_errno(safe_tgkill((int)arg1, (int)arg2,
++                            target_to_host_signal(arg3)));
++        }
++#else
+         ret =3D get_errno(safe_tgkill((int)arg1, (int)arg2,
+                         target_to_host_signal(arg3)));
++#endif
+         break;
+=20
+ #ifdef TARGET_NR_set_robust_list
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 42089fc..16cab53 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -412,6 +412,14 @@ struct target_dirent64 {
+  * the host signal masks.
+  */
+ #define TRACK_TARGET_SIGMASK
++
++/*
++ * This macro is used to change a kill/tgkill signal so it can be sent t=
+hrough
++ * rt_sigqueueinfo()/rt_tgsigqueueinfo(), since the host kernel doesn't =
+allow
++ * direct impersonations of those signals. Subtracting 8 from the code m=
+oves
++ * it to the nearest unused kernel si_code value.
++ */
++#define SIG_SPOOF(code)  ((code) - 8)
+ #endif
+=20
+ typedef struct {
 --=20
 1.9.1
