@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44792)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9K9D-0008Nf-FG
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:00 -0400
+	id 1d9K9F-0008Ol-6Q
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9K99-0002PB-If
+	id 1d9K9D-0002Tu-RG
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:39:01 -0400
+Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:36462)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d9K9D-0002T7-Lm
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:38:59 -0400
+Received: by mail-qt0-x22a.google.com with SMTP id f55so11050777qta.3
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:38:59 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 12 May 2017 20:38:37 -0300
-Message-Id: <20170512233843.27713-1-f4bug@amsat.org>
+Date: Fri, 12 May 2017 20:38:38 -0300
+Message-Id: <20170512233843.27713-2-f4bug@amsat.org>
+In-Reply-To: <20170512233843.27713-1-f4bug@amsat.org>
+References: <20170512233843.27713-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v4 0/6] optimize various tcg_gen()
- functions using extract op
+Subject: [Qemu-devel] [RFC PATCH v4 1/6] coccinelle: add a script to
+ optimize tcg op using tcg_gen_extract()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +34,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Laurent Vivier <lvivier@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Markus Armbruster <armbru@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Markus Elfring <elfring@users.sourceforge.net>, Julia Lawall <julia.lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>
 
-* Changes from v3
+If you have coccinelle installed you can apply this script using:
 
-Tried to fix wrong previous attempt...
-After getting some nice/fast pieces of advice from Coccinelle folks, I tried to
-improved the script (not much inline documentation yet although).
-- correctly check if this optimizable?
-- document as Mersenne number instead of prime (Eric Blake)
-- try to write Python code instead of BASIC (Markus Elfring advices)
-- try to reduce regex usage
-- try to match shri(); unrelated(); andi(); pattern to optimize, I was surprised
-  to see the alpha diff Coccinelle found.
+    $ spatch \
+        --macro-file scripts/cocci-macro-file.h \
+        --dir target --in-place
 
-This is surely not the last version of this patchset, but I think now the
-generated patches are correct and I prefer reviewers to look at them fixed
-instead of wrong one in the ML.
-Still lot of work to do in the cocci script, now it seems to hang trying to
-parse "target/arm/translate.c".
+You can also use directly Peter Senna Tschudin docker image (easier):
 
-* [v3] (v2 was a resend of the cocci script):
+    $ docker run -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle \
+        --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
+        --macro-file scripts/cocci-macro-file.h \
+        --dir target --in-place
 
-In my first attempt I misunderstood tcg_gen_extract() intrinsics, and Richard
-Henderson pointed that out.
-In this patchset the cocci script is corrected and clarified, it also print how
-arguments are checked while running.
-Also:
-- incorrect patches have been removed. (Richard Henderson, Nikunj A Dadhania)
-- Coccinelle script licensed GPLv2+ (Eric Blake)
-- comment in each commit about how to apply the patch (Eric Blake)
-- added Acked-by for m68k (Laurent Vivier)
-- Cc: Coccinelle developers.
+Then verified that no manual touchups are required.
 
-[v1]
+The following thread was helpful while writing this script:
 
-While reviewing a commit from Aurelien Jarno where he optimized a TCG generator
-for SH-4 [1] I found the same optimization done on PPC by Nikunj A Dadhania few
-months ago [2].
-After asking on the ML about a cocci script [3] I thought it would be easier to
-learn about Coccinelle.
+    https://github.com/coccinelle/coccinelle/issues/86
 
-citing Aurelien Jarno:
-    This doesn't change the generated code on x86, but optimizes it on most
-    RISC architectures and makes the code simpler to read.
-
-I actually applied the script using the following command:
-
-$ docker run -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle \
-    --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
-    --macro-file scripts/cocci-macro-file.h \
-    --dir target \
-    --in-place
-
-Please review again! thanks.
-
-[1] http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01466.html
-[2] http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05211.html
-[3] http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01499.html
-
-Philippe Mathieu-Daudé (6):
-  coccinelle: add a script to optimize tcg op using tcg_gen_extract()
-  target/alpha: optimize cvtlq() using extract op
-  target/arm: optimize rev16() using extract op
-  target/m68k: optimize bcd_flags() using extract op
-  target/ppc: optimize various functions using extract op
-  target/sparc: optimize various functions using extract op
-
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
  scripts/coccinelle/tcg_gen_extract.cocci | 103 +++++++++++++++++++++++++++++++
- target/alpha/translate.c                 |   3 +-
- target/arm/translate-a64.c               |   6 +-
- target/m68k/translate.c                  |   3 +-
- target/ppc/translate.c                   |  21 +++----
- target/ppc/translate/vsx-impl.inc.c      |  24 +++----
- target/sparc/translate.c                 |  15 ++---
- 7 files changed, 127 insertions(+), 48 deletions(-)
+ 1 file changed, 103 insertions(+)
  create mode 100644 scripts/coccinelle/tcg_gen_extract.cocci
 
+diff --git a/scripts/coccinelle/tcg_gen_extract.cocci b/scripts/coccinelle/tcg_gen_extract.cocci
+new file mode 100644
+index 0000000000..37546834ee
+--- /dev/null
++++ b/scripts/coccinelle/tcg_gen_extract.cocci
+@@ -0,0 +1,103 @@
++// optimize TCG using extract op
++//
++// Copyright: (C) 2017 Philippe Mathieu-Daudé. GPLv2+.
++// Confidence: High
++// Options: --macro-file scripts/cocci-macro-file.h
++//
++// Nikunj A Dadhania optimization:
++// http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05211.html
++// Aurelien Jarno optimization:
++// http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01466.html
++// Coccinelle helpful issue:
++// https://github.com/coccinelle/coccinelle/issues/86
++
++@initialize:python@
++@@
++import sys
++fd = sys.stderr
++def debug(msg="", trailer="\n"):
++    fd.write("[DBG] " + msg + trailer)
++def low_bits_count(value):
++    bits_count = 0
++    while (value & (1 << bits_count)):
++        bits_count += 1
++    return bits_count
++def Mn(order): # Mersenne number
++    return (1 << order) - 1
++
++@match@ // depends on never match_and_check_reg_used@
++metavariable ret, arg;
++constant ofs, msk;
++expression tcg_arg;
++identifier tcg_func =~ "^tcg_gen_";
++position shr_p, and_p;
++@@
++(
++    tcg_gen_shri_i32@shr_p
++|
++    tcg_gen_shri_i64@shr_p
++|
++    tcg_gen_shri_tl@shr_p
++)(ret, arg, ofs);
++<...
++tcg_func(tcg_arg, ...);
++...>
++(
++    tcg_gen_andi_i32@and_p
++|
++    tcg_gen_andi_i64@and_p
++|
++    tcg_gen_andi_tl@and_p
++)(ret, ret, msk);
++
++@script:python verify_len depends on match@
++ret_s << match.ret;
++msk_s << match.msk;
++shr_p << match.shr_p;
++tcg_func << match.tcg_func;
++tcg_arg << match.tcg_arg;
++extract_len;
++@@
++is_optimizable = False
++debug("candidate at %s:%s" % (shr_p[0].file, shr_p[0].line))
++if tcg_arg == ret_s:
++        debug("  %s() modifies argument '%s'" % (tcg_func, ret_s))
++else:
++    debug("candidate at %s:%s" % (shr_p[0].file, shr_p[0].line))
++    try: # only eval integer, no #define like 'SR_M' (cpp did this, else some headers are missing).
++        msk_v = long(msk_s.strip("UL"), 0)
++        msk_b = low_bits_count(msk_v)
++        if msk_b == 0:
++            debug("  value: 0x%x low_bits: %d" % (msk_v, msk_b))
++        else:
++            debug("  value: 0x%x low_bits: %d [Mersenne prime: 0x%x]" % (msk_v, msk_b, Mn(msk_b)))
++            is_optimizable = Mn(msk_b) == msk_v # check low_bits
++            coccinelle.extract_len = "%d" % msk_b
++        debug("  candidate %s optimizable" % ("IS" if is_optimizable else "is NOT"))
++    except:
++        debug("  ERROR (check included headers?)")
++cocci.include_match(is_optimizable)
++debug()
++
++@replacement depends on verify_len@
++metavariable match.ret, match.arg;
++constant match.ofs, match.msk;
++position match.shr_p, match.and_p;
++identifier verify_len.extract_len;
++@@
++(
++-tcg_gen_shri_i32@shr_p(ret, arg, ofs);
+++tcg_gen_extract_i32(ret, arg, ofs, extract_len);
++...
++-tcg_gen_andi_i32@and_p(ret, ret, msk);
++|
++-tcg_gen_shri_i64@shr_p(ret, arg, ofs);
+++tcg_gen_extract_i64(ret, arg, ofs, extract_len);
++...
++-tcg_gen_andi_i64@and_p(ret, ret, msk);
++|
++-tcg_gen_shri_tl@shr_p(ret, arg, ofs);
+++tcg_gen_extract_tl(ret, arg, ofs, extract_len);
++...
++-tcg_gen_andi_tl@and_p(ret, ret, msk);
++)
 -- 
 2.11.0
