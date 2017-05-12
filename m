@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d94UW-00006n-1O
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:55:57 -0400
+	(envelope-from <pagupta@redhat.com>) id 1d94Uy-0000Qm-CO
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:56:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1d94UQ-0000Ci-Ks
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:55:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42128)
+	(envelope-from <pagupta@redhat.com>) id 1d94Ut-0000U5-GK
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:56:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46316)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d94UQ-0000CR-CR
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:55:50 -0400
-References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
-	<20170510090841.GF31558@redhat.com>
-	<e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
-	<20170510103153.GI31558@redhat.com>
-	<ccb8fecd-e918-1cc0-28ef-af9865540fbc@redhat.com>
-	<157a6609-d75a-5d40-e5b9-c70802e40950@redhat.com>
-	<20170511093022.GJ8639@redhat.com> <87poffsa45.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <de5bde25-bfd1-8a2b-e44b-0d91eab8fbaf@redhat.com>
-Date: Fri, 12 May 2017 08:55:42 +0200
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1d94Ut-0000Sw-6a
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:56:19 -0400
+Date: Fri, 12 May 2017 02:56:14 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <459420445.7146183.1494572174539.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170511181703.GC8701@stefanha-x1.localdomain>
+References: <1494431760-6455-1-git-send-email-pagupta@redhat.com>
+	<20170511181703.GC8701@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <87poffsa45.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
- pc-0.15
+Subject: Re: [Qemu-devel] KVM "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +27,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: kwolf@redhat.com, Haozhong Zhang <haozhong.zhang@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, pbonzini@redhat.com, Dan Williams <dan.j.williams@intel.com>
 
-On 11.05.2017 17:10, Markus Armbruster wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> writes:
+
 >=20
->> On Wed, May 10, 2017 at 06:15:39PM +0200, Paolo Bonzini wrote:
->>>
->>>
->>> On 10/05/2017 16:47, Thomas Huth wrote:
->>>>> So while we can delete pc-0.12, we can't delete associated features=
- needed
->>>>> by pc-0.12, without complicating RHEL's ability to create its back-=
-compat
->>>>> machine types. Downstream would have to un-delete the features.
->>>>
->>>> So I guess this is why Paolo said that pc-0.12 is still in "use" ...=
- I
->>>> think removing pc-0.12, but not removing rombar=3D0 will cause confu=
-sion
->>>> in the upstream code base sooner or later,
->>>
->>> I agree.
->>>
->>>> so I guess we should rather
->>>> keep the pc-0.12 machine until we can get rid of it together with th=
-e
->>>> rombar code. We should still mark it as deprecated, of course.
->>>>
->>>>> I think tieing removal to major versions is a mistake, unless we're
->>>>> going to set a fixed timeframe for delivery of major versions. ie i=
-f
->>>>> we gaurantee that we'll ship a new major version every 18 months, t=
-hat
->>>>> gives people a predictable lifetime.  If we carry on inventing reas=
-ons
->>>>> for major versions at arbitrary points in time, it makes it difficu=
-lt
->>>>> to have any reasonable forward planning.  It is more users friendly=
- if
->>>>> we can set a clear fixed timeframe for machine type lifecycle / eol
->>>>
->>>> IMHO we should have a new major release after we've reached a .9 min=
-or
->>>> release, but so far it seems like I'm the only one with that wish...
->>>
->>> I actually like that, but then you've pretty much guaranteed that you
->>> _cannot_ remove anything deprecated until 4.0.  You and Daniel aren't
->>> disagreeing as heavily as it seems, I think.
->>
->> I don't think we should tie removal of features to version numbers. IM=
-HO
->> we should just increment the first major digit on a fixed time scale,
->> either once a year, or whenever we get past .9.
-
-Once a year sounds too often for my personal taste, I really prefer the
-.9 way, but that's details...
-
->> For removal of features, IMHO, the only important thing is to give use=
-rs
->> deprecation clear warning for 2-3  releases, and ensure feature detect=
-ion
->> works well. As long as that is done, there shouldn't be any need to ba=
-tch
->> them up for "major" releases. From libvirt POV, batching up removal to
->> major releases is not beneficial. Batching to major releases gives a v=
-ery
->> inconsistent timeframe for removal too - somethign fdeprecated in .1
->> release may live on for years,  until the next $major.0, while somethi=
-ng
->> deprecated in a .9 release can be killed in 4 months. I much prefer to
->> see a consistent deprecated for 2 releases / 8 months, then deleted
->> regardless of feature.
+> On Wed, May 10, 2017 at 09:26:00PM +0530, Pankaj Gupta wrote:
+> > We are sharing initial project proposal for
+> > 'KVM "fake DAX" device flushing' project for feedback.
+> > Got the idea during discussion with 'Rik van Riel'.
 >=20
-> I concur.
+> CCing NVDIMM folks.
+>=20
+> >=20
+> > Also, request answers to 'Questions' section.
+> >=20
+> > Abstract :
+> > ----------
+> > Project idea is to use fake persistent memory with direct
+> > access(DAX) in virtual machines. Overall goal of project
+> > is to increase the number of virtual machines that can be
+> > run on a physical machine, in order to increase the density
+> > of customer virtual machines.
+> >=20
+> > The idea is to avoid the guest page cache, and minimize the
+> > memory footprint of virtual machines. By presenting a disk
+> > image as a nvdimm direct access (DAX) memory region in a
+> > virtual machine, the guest OS can avoid using page cache
+> > memory for most file accesses.
+> >=20
+> > Problem Statement :
+> > ------------------
+> > * Guest uses page cache in memory to process fast requests
+> >   for disk read/write. This results in big memory footprint
+> >   of guests without host knowing much details of the guest
+> >   memory.
+> >=20
+> > * If guests use direct access(DAX) with fake persistent
+> >   storage, the host manages the page cache for guests,
+> >   allowing the host to easily reclaim/evict less frequently
+> >   used page cache pages without requiring guest cooperation,
+> >   like ballooning would.
+> >=20
+> > * Host manages guest cache as =E2=80=98mmaped=E2=80=99 disk image area =
+in
+> >   qemu address space. This region is passed to guest as fake
+> >   persistent memory range. We need a new flushing interface
+> >   to flush this cache to secondary storage to persist guest
+> >   writes.
+> >=20
+> > * New asynchronous flushing interface will allow guests to
+> >   cause the host flush the dirty data to backup storage file.
+> >   Systems with pmem storage make use of CLFLUSH instruction
+> >   to flush single cache line to persistent storage and it
+> >   takes care of flushing. With fake persistent storage in
+> >   guest we cannot depend on CLFLUSH instruction to flush entire
+> >   dirty cache to backing storage. Even If we trap and emulate
+> >   CLFLUSH instruction guest vCPU has to wait till we flush all
+> >   the dirty memory. Instead of this we need to implement a new
+> >   asynchronous guest flushing interface, which allows the guest
+> >   to specify a larger range to be flushed at once, and allows
+> >   the vCPU to run something else while the data is being synced
+> >   to disk.
+> >=20
+> > * New flushing interface will consists of a para virt driver to
+> >   new fake nvdimm like device which will process guest flushing
+> >   requests like fsync/msync etc instead of pmem library calls
+> >   like clflush. The corresponding device at host side will be
+> >   responsible for flushing requests for guest dirty pages.
+> >   Guest can put current task in sleep and vCPU can run any other
+> >   task while host side flushing of guests pages is in progress.
+> >=20
+> > Host controlled fake nvdimm DAX to avoid guest page cache :
+> > -------------------------------------------------------------
+> > * Bypass guest page cache by using a fake persistent storage
+> >   like nvdimm & DAX. Guest Read/Write is directly done on
+> >   fake persistent storage without involving guest kernel for
+> >   caching data.
+> >=20
+> > * Fake nvdimm device passed to guest is backed by a regular
+> >   file in host stored in secondary storage.
+> >=20
+> > * Qemu has implementation of fake NVDIMM/DAX device. Use this
+> >   capability of passing regular host file(disk) as nvdimm device
+> >   to guest.
+> >=20
+> > * Nvdimm with DAX works for ext4/xfs filesystem. Supported
+> >   filesystem should be DAX compatible.
+> >=20
+> > * As we are using guest disk as fake DAX/NVDIMM device, we
+> >   need a mechanism for persistence of data backed on regular
+> >   host storage file.
+> >=20
+> > * For live migration use case, if host side backing file is
+> >   shared storage, we need to flush the page cache for the disk
+> >   image at the destination (new fadvise interface, FADV_INVALIDATE_CACH=
+E?)
+> >   before starting execution of the guest on the destination host.
+>=20
+> Good point.  QEMU currently only supports live migration with O_DIRECT.
+> I think the problem was that userspace cannot guarantee consistency in
+> the general case.  If you find a solution to this problem for fake
+> NVDIMM then maybe the QEMU block layer can also begin supporting live
+> migration with buffered I/O.
+>=20
+> >=20
+> > Design :
+> > ---------
+> > * In order to not have page cache inside the guest, qemu would:
+> >=20
+> >  1) mmap the guest's disk image and present that disk image to
+> >     the guest as a persistent memory range.
+> >=20
+> >  2) Present information to the guest telling it that the persistent
+> >     memory range is not physical persistent memory.
+>=20
+> Steps 1 & 2 are already supported by QEMU NVDIMM emulation today.
 
-Fine for me, too. My only additional point is that we *should* have
-major releases from time to time (ending up with something like QEMU
-2.42 is just ugly), and that we *could* use them for additional
-spring-cleaning (not for the libvirt POV, but for the users POV). For
-example, we've got some parameters where we warn since QEMU 1.3 that it
-is deprecated and might go away soon. We now could use major releases to
-remind ourselves from time to time to look through the code for such
-deprecated interfaces and remove them with the next major version. (But
-removal would of course also be allowed at any other minor version
-release if the feature has been deprecated for at least two minor
-releases already).
+Yes. I have also tested guest 'fake DAX' device using QEMU NVDIMM emulation=
+.
+>=20
+> >  3) Present an additional paravirt device alongside the persistent
+> >     memory range, that can be used to sync (ranges of) data to disk.
+> >=20
+> > * Guest would use the disk image mostly like a persistent memory
+> >   device, with two exceptions:
+> >=20
+> >   1) It would not tell userspace that the files on that device are
+> >      persistent memory. This is  done so userspace knows to call
+> >      fsync/msync, instead of the pmem clflush library call.
+>=20
+> Not sure I agree with hiding the nvdimm nature of the device.  Instead I
+> think you need to build this capability into the Linux nvdimm code.
+> libpmem will detect these types of devices and issue fsync/msync when
+> the application wants to flush.
+>=20
+> >   2) When userspace calls fsync/msync on files on the fake persistent
+> >      memory device, issue a request through the paravirt device that
+> >      causes the host to flush the device back end.
+> >=20
+> > * Guest uses fake persistent storage data updates can be still in
+> >   qemu memory. We need a way to flush cached data in host to backed
+>=20
+> s/qemu memory/host memory/
+>=20
+> I guess you mean that host userspace needs a way to reliably flush an
+> address range to the underlying storage.
 
- Thomas
+right.
+>=20
+> >   secondary storage.
+> >=20
+> > * Once the guest receives a completion event from the host, it will
+> >   allow userspace programs that were waiting on the fsync/msync to
+> >   continue running.
+> >=20
+> > * Host is responsible for paging in pages in host backing area for
+> >   guest persistent memory as they are accessed by the guest, and
+> >   for evicting pages as host memory fills up.
+> >=20
+> > Questions :
+> > -----------
+> > * What should the flushing interface between guest and host look
+> >   like?
+>=20
+> A simple hack for prototyping is to instantiate an virtio-blk-pci for
+> the mmapped host file.  The guest can send flush commands on the
+> virtio-blk-pci device but will otherwise use the mapped memory directly.
+
+okay. I will check this.
+>=20
+> > * Any suggestions to hook the IO caching code with KVM/Qemu or
+> >   thoughts on how we should do it?
+> >=20
+> > * Thinking of implementing a guest para virt driver which will send
+> >   guest requests to Qemu to flush data to disk. Not sure at this
+> >   point how to tell userspace to work on this device as any regular
+> >   device without considering it as persistent device. Any suggestions
+> >   on this?
+> >=20
+> > * Not thought yet about ballooning impact. But feel this solution
+> >   could be better than ballooning in long term? As we will be
+> >   managing all guests cache from host side.
+> >=20
+> > * Not sure this solution works for ARM and other architectures and
+> >   Windows?
+>=20
