@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d968p-0005hD-SX
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:40 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d968r-0005j5-N4
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1d968o-0001vR-P8
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:39 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1d968q-0001xK-Iu
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:41 -0400
 Received: from mga11.intel.com ([192.55.52.93]:62480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1d968o-0001je-Gl
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:38 -0400
+	id 1d968q-0001je-83
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:41:40 -0400
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri, 12 May 2017 16:35:40 +0800
-Message-Id: <1494578148-102868-9-git-send-email-wei.w.wang@intel.com>
+Date: Fri, 12 May 2017 16:35:41 +0800
+Message-Id: <1494578148-102868-10-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
 References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 08/16] vhost-user: send guest physical
- address of virtqueues to the slave
+Subject: [Qemu-devel] [PATCH v2 09/16] vhost-user: send
+ VHOST_USER_SET_VHOST_PCI_START/STOP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +28,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: stefanha@gmail.com, marcandre.lureau@gmail.com, mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-In the vhost-pci case, the slave needs the master side guest physical
-address, rather than the qemu virtual address.
+The master requests the slave to create or destroy a vhost-pci device.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/virtio/vhost.c         | 63 ++++++++++++++++++++++++++++++++---------------
- include/hw/virtio/vhost.h |  2 ++
- 2 files changed, 45 insertions(+), 20 deletions(-)
+ hw/net/vhost_net.c                | 36 ++++++++++++++++++++++++++++++++++++
+ hw/virtio/vhost-user.c            | 17 +++++++++++++++++
+ include/hw/virtio/vhost-backend.h |  2 ++
+ include/net/vhost_net.h           |  2 ++
+ 4 files changed, 57 insertions(+)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 613494d..1ce7b92 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -25,6 +25,7 @@
- #include "exec/address-spaces.h"
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index ea9879f..0a5278d 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -18,6 +18,7 @@
+ #include "net/tap.h"
+ #include "net/vhost-user.h"
+ 
 +#include "hw/virtio/vhost-user.h"
- #include "migration/migration.h"
- #include "sysemu/dma.h"
+ #include "hw/virtio/virtio-net.h"
+ #include "net/vhost_net.h"
+ #include "qemu/error-report.h"
+@@ -296,6 +297,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
+     VirtioBusState *vbus = VIRTIO_BUS(qbus);
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
++    struct vhost_net *last_net;
+     int r, e, i;
  
-@@ -994,6 +995,12 @@ out:
-     rcu_read_unlock();
- }
- 
-+bool vhost_pci_enabled(struct vhost_dev *dev)
-+{
-+    return ((dev->protocol_features &
-+            (1ULL << VHOST_USER_PROTOCOL_F_VHOST_PCI)) != 0);
-+}
-+
- static int vhost_virtqueue_start(struct vhost_dev *dev,
-                                 struct VirtIODevice *vdev,
-                                 struct vhost_virtqueue *vq,
-@@ -1037,26 +1044,38 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
+     if (!k->set_guest_notifiers) {
+@@ -341,6 +343,15 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
          }
      }
  
--    vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
-     vq->desc_phys = a = virtio_queue_get_desc_addr(vdev, idx);
--    vq->desc = vhost_memory_map(dev, a, &l, 0);
--    if (!vq->desc || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_desc;
-+    if (vhost_pci_enabled(dev)) {
-+        vq->desc = (void *)a;
-+    } else {
-+        vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
-+        vq->desc = cpu_physical_memory_map(a, &l, 0);
-+        if (!vq->desc || l != s) {
-+            r = -ENOMEM;
-+            goto fail_alloc_desc;
++    last_net = get_vhost_net(ncs[total_queues - 1].peer);
++    if (vhost_pci_enabled(&last_net->dev)) {
++        r = vhost_set_vhost_pci(ncs[total_queues - 1].peer,
++                              VHOST_USER_SET_VHOST_PCI_START);
++        if (r < 0) {
++            goto err_start;
 +        }
-     }
-     vq->avail_size = s = l = virtio_queue_get_avail_size(vdev, idx);
-     vq->avail_phys = a = virtio_queue_get_avail_addr(vdev, idx);
--    vq->avail = vhost_memory_map(dev, a, &l, 0);
--    if (!vq->avail || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_avail;
-+    if (vhost_pci_enabled(dev)) {
-+        vq->avail = (void *)a;
-+    } else {
-+        vq->avail = cpu_physical_memory_map(a, &l, 0);
-+        if (!vq->avail || l != s) {
-+            r = -ENOMEM;
-+            goto fail_alloc_avail;
-+        }
-     }
-     vq->used_size = s = l = virtio_queue_get_used_size(vdev, idx);
-     vq->used_phys = a = virtio_queue_get_used_addr(vdev, idx);
--    vq->used = vhost_memory_map(dev, a, &l, 1);
--    if (!vq->used || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_used;
-+    if (vhost_pci_enabled(dev)) {
-+        vq->used = (void *)a;
-+    } else {
-+        vq->used = cpu_physical_memory_map(a, &l, 1);
-+        if (!vq->used || l != s) {
-+            r = -ENOMEM;
-+            goto fail_alloc_used;
-+        }
-     }
- 
-     r = vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->log_enabled);
-@@ -1139,13 +1158,17 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
-                                                 !virtio_is_big_endian(vdev),
-                                                 vhost_vq_index);
-     }
--
--    vhost_memory_unmap(dev, vq->used, virtio_queue_get_used_size(vdev, idx),
--                       1, virtio_queue_get_used_size(vdev, idx));
--    vhost_memory_unmap(dev, vq->avail, virtio_queue_get_avail_size(vdev, idx),
--                       0, virtio_queue_get_avail_size(vdev, idx));
--    vhost_memory_unmap(dev, vq->desc, virtio_queue_get_desc_size(vdev, idx),
--                       0, virtio_queue_get_desc_size(vdev, idx));
-+    if (!vhost_pci_enabled(dev)) {
-+        cpu_physical_memory_unmap(vq->used,
-+                                  virtio_queue_get_used_size(vdev, idx),
-+                                  1, virtio_queue_get_used_size(vdev, idx));
-+        cpu_physical_memory_unmap(vq->avail,
-+                                  virtio_queue_get_avail_size(vdev, idx),
-+                                  0, virtio_queue_get_avail_size(vdev, idx));
-+        cpu_physical_memory_unmap(vq->desc,
-+                                  virtio_queue_get_desc_size(vdev, idx),
-+                                  0, virtio_queue_get_desc_size(vdev, idx));
 +    }
++
+     return 0;
+ 
+ err_start:
+@@ -362,8 +373,15 @@ void vhost_net_stop(VirtIODevice *dev, NetClientState *ncs,
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
+     VirtioBusState *vbus = VIRTIO_BUS(qbus);
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
++    struct vhost_net *last_net;
+     int i, r;
+ 
++    last_net = get_vhost_net(ncs[total_queues - 1].peer);
++    if (vhost_pci_enabled(&last_net->dev)) {
++        vhost_set_vhost_pci(ncs[total_queues - 1].peer,
++                              VHOST_USER_SET_VHOST_PCI_STOP);
++    }
++
+     for (i = 0; i < total_queues; i++) {
+         vhost_net_stop_one(get_vhost_net(ncs[i].peer), dev);
+     }
+@@ -450,6 +468,18 @@ int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
+     return vhost_ops->vhost_net_set_mtu(&net->dev, mtu);
  }
  
- static void vhost_eventfd_add(MemoryListener *listener,
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index 40ba87e..09e02d8 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -107,4 +107,6 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
-                           struct vhost_vring_file *file);
- 
- void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd)
++{
++    VHostNetState *net = get_vhost_net(nc);
++    const VhostOps *vhost_ops = net->dev.vhost_ops;
 +
-+bool vhost_pci_enabled(struct vhost_dev *dev);
++    if (vhost_ops && vhost_ops->vhost_set_vhost_pci) {
++        return vhost_ops->vhost_set_vhost_pci(&net->dev, cmd);
++    }
++
++    return 0;
++}
++
+ #else
+ uint64_t vhost_net_get_max_queues(VHostNetState *net)
+ {
+@@ -521,4 +551,10 @@ int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
+ {
+     return 0;
+ }
++
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd)
++{
++    return 0;
++}
++
+ #endif
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 1eba5e5..ca8fe36 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -313,6 +313,22 @@ static int vhost_user_set_vring_enable(struct vhost_dev *dev, int enable)
+     return 0;
+ }
+ 
++static int vhost_user_set_vhost_pci(struct vhost_dev *dev, uint8_t cmd)
++{
++    VhostUserMsg msg = {
++        .request = VHOST_USER_SET_VHOST_PCI,
++        .flags = VHOST_USER_VERSION,
++        .payload.u64 = (uint64_t)cmd,
++        .size = sizeof(msg.payload.u64),
++    };
++
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
++        return -1;
++    }
++
++    return 0;
++}
++
+ static int vhost_user_get_vring_base(struct vhost_dev *dev,
+                                      struct vhost_vring_state *ring)
+ {
+@@ -671,6 +687,7 @@ const VhostOps user_ops = {
+         .vhost_reset_device = vhost_user_reset_device,
+         .vhost_get_vq_index = vhost_user_get_vq_index,
+         .vhost_set_vring_enable = vhost_user_set_vring_enable,
++        .vhost_set_vhost_pci = vhost_user_set_vhost_pci,
+         .vhost_requires_shm_log = vhost_user_requires_shm_log,
+         .vhost_migration_done = vhost_user_migration_done,
+         .vhost_backend_can_merge = vhost_user_can_merge,
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index c3cf4a7..1c68f67 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -70,6 +70,7 @@ typedef int (*vhost_reset_device_op)(struct vhost_dev *dev);
+ typedef int (*vhost_get_vq_index_op)(struct vhost_dev *dev, int idx);
+ typedef int (*vhost_set_vring_enable_op)(struct vhost_dev *dev,
+                                          int enable);
++typedef int (*vhost_set_vhost_pci_op)(struct vhost_dev *dev, uint8_t cmd);
+ typedef bool (*vhost_requires_shm_log_op)(struct vhost_dev *dev);
+ typedef int (*vhost_migration_done_op)(struct vhost_dev *dev,
+                                        char *mac_addr);
+@@ -114,6 +115,7 @@ typedef struct VhostOps {
+     vhost_reset_device_op vhost_reset_device;
+     vhost_get_vq_index_op vhost_get_vq_index;
+     vhost_set_vring_enable_op vhost_set_vring_enable;
++    vhost_set_vhost_pci_op vhost_set_vhost_pci;
+     vhost_requires_shm_log_op vhost_requires_shm_log;
+     vhost_migration_done_op vhost_migration_done;
+     vhost_backend_can_merge_op vhost_backend_can_merge;
+diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+index afc1499..3db5559 100644
+--- a/include/net/vhost_net.h
++++ b/include/net/vhost_net.h
+@@ -37,4 +37,6 @@ uint64_t vhost_net_get_acked_features(VHostNetState *net);
+ 
+ int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu);
+ 
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd);
++
  #endif
 -- 
 2.7.4
