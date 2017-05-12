@@ -1,41 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d98e1-0008CX-LY
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:22:02 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d98kI-00029t-PW
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:28:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1d98dy-0004Fm-Fi
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:22:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60233)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1d98kF-0007YO-Ls
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:28:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36722
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1d98dy-0004Cy-5b
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:21:58 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1d98kF-0007Y5-FE
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:28:27 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4CBJscg116902
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:21:53 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2acx6c4aqr-1
+	v4CBPVSU063302
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:28:26 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ad2xs9nnc-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:21:53 -0400
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:28:26 -0400
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 12 May 2017 12:21:51 +0100
-Date: Fri, 12 May 2017 13:21:46 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA26D816@DGGEMA505-MBX.china.huawei.com>
-References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
-	<1494243504-127980-9-git-send-email-arei.gonglei@huawei.com>
-	<20170511170527.5846a676.cornelia.huck@de.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA26D816@DGGEMA505-MBX.china.huawei.com>
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 12 May 2017 12:28:23 +0100
+References: <20170510151209.32767-1-pasic@linux.vnet.ibm.com>
+	<20170511130210.2c24d9de.cornelia.huck@de.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 12 May 2017 13:28:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170511130210.2c24d9de.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Message-Id: <20170512132146.64b811be.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC v1 8/9] virtio-crypto: add host feature bits
- support
+Message-Id: <68b56ac2-6169-8bae-ac97-a33e3aaa940f@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/css: catch section mismatch on
+ load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,92 +43,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On Fri, 12 May 2017 00:55:23 +0000
-"Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
 
-> >
-> > From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
-> > Sent: Thursday, May 11, 2017 11:05 PM
-> > Subject: Re: [RFC v1 8/9] virtio-crypto: add host feature bits support
-> > 
-> > On Mon, 8 May 2017 19:38:23 +0800
-> > Gonglei <arei.gonglei@huawei.com> wrote:
-> > 
-> > > We enable all feature bits acquiescently.
-> > >
-> > > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> > > ---
-> > >  hw/virtio/virtio-crypto.c         | 15 +++++++++++++++
-> > >  include/hw/virtio/virtio-crypto.h |  1 +
-> > >  2 files changed, 16 insertions(+)
-> > >
-> > > diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-> > > index 5422f25..3dc0ff2 100644
-> > > --- a/hw/virtio/virtio-crypto.c
-> > > +++ b/hw/virtio/virtio-crypto.c
-> > > @@ -1034,6 +1034,11 @@ static uint64_t
-> > virtio_crypto_get_features(VirtIODevice *vdev,
-> > >                                             uint64_t features,
-> > >                                             Error **errp)
-> > >  {
-> > > +    VirtIOCrypto *vcrypto = VIRTIO_CRYPTO(vdev);
-> > > +
-> > > +    /* Firstly sync all virtio-crypto possible supported features */
-> > > +    features |= vcrypto->host_features;
-> > > +
-> > >      return features;
-> > >  }
-> > >
-> > > @@ -1144,6 +1149,16 @@ static const VMStateDescription
-> > vmstate_virtio_crypto = {
-> > >  };
-> > >
-> > >  static Property virtio_crypto_properties[] = {
-> > > +    DEFINE_PROP_BIT("mux_mode", VirtIOCrypto, host_features,
-> > > +                    VIRTIO_CRYPTO_F_MUX_MODE, true),
-> > > +    DEFINE_PROP_BIT("cipher_stateless_mode", VirtIOCrypto,
-> > host_features,
-> > > +                    VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE,
-> > true),
-> > > +    DEFINE_PROP_BIT("hash_stateless_mode", VirtIOCrypto,
-> > host_features,
-> > > +                    VIRTIO_CRYPTO_F_HASH_STATELESS_MODE,
-> > true),
-> > > +    DEFINE_PROP_BIT("mac_stateless_mode", VirtIOCrypto,
-> > host_features,
-> > > +                    VIRTIO_CRYPTO_F_MAC_STATELESS_MODE, true),
-> > > +    DEFINE_PROP_BIT("aead_stateless_mode", VirtIOCrypto,
-> > host_features,
-> > > +                    VIRTIO_CRYPTO_F_AEAD_STATELESS_MODE,
-> > true),
-> > >      DEFINE_PROP_END_OF_LIST(),
-> > >  };
-> > >
-> > > diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio-crypto.h
-> > > index 465ad20..30ea51d 100644
-> > > --- a/include/hw/virtio/virtio-crypto.h
-> > > +++ b/include/hw/virtio/virtio-crypto.h
-> > > @@ -97,6 +97,7 @@ typedef struct VirtIOCrypto {
-> > >      int multiqueue;
-> > >      uint32_t curr_queues;
-> > >      size_t config_size;
-> > > +    uint32_t host_features;
-> > 
-> > I'd just make that 64 bits from the start.
-> > 
-> Yes, that's better.
+
+On 05/11/2017 01:02 PM, Cornelia Huck wrote:
+> On Wed, 10 May 2017 17:12:09 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> > >  } VirtIOCrypto;
-> > >
-> > >  #endif /* _QEMU_VIRTIO_CRYPTO_H */
-> > 
-> > Don't you need some kind of compat handling?
+>> Prior to the virtio-ccw-2.7 machine (and commit 2a79eb1a), our virtio
+>> devices residing under the virtual-css bus do not have qdev_path based
+>> migration stream identifiers (because their qdev_path is NULL). The ids
+>> are instead generated when the device is registered as a composition of
+>> the so called idstr, which takes the vmsd name as its value, and an
+>> instance_id, which is which is calculated as a maximal instance_id
+>> registered with the same idstr plus one, or zero (if none was registered
+>> previously).
+>>
+[..]
+>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>> index 15c4f4b..6cff3a3 100644
+>> --- a/hw/s390x/css.c
+>> +++ b/hw/s390x/css.c
+[..]
+>> +        /* Only possible if machine < 2.7 (no css_dev_path) */
+>> +
+>> +        error_setg(&err, "%x != %x", old_devno,  s->devno);
+>> +        error_append_hint(&err, "Devno mismatch, tried to load wrong section!"
+>> +                          " Likely reason: some sequences of plug and unplug"
+>> +                          " can break migration for machine versions prior"
 > 
-> I did that in patch 6 according to the results of those feature bits negotiated.
-> Patch 9 tests both session mode and stateless mode, they are work. :)
+> s/prior/prior to/
 
-Ah, I meant machine compat handling. You probably don't want to offer
-these feature bits in older compat machines.
+Fixed. Thanks! Will wait a couple of days, maybe somebody has something
+else to say, and then re-spin.
+
+Regards,
+Halil
+
+> 
+>> +                          " 2.7 (known design flaw).\n");
+>> +        error_report_err(err);
+>> +        return -EINVAL;
+>> +    }
+>>      /* Re-assign subch. */
+>>      if (old_schid != s->schid) {
+>>          old_s = channel_subsys.css[s->cssid]->sch_set[s->ssid]->sch[old_schid];
+>> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+>> index e7167e3..4f7efa2 100644
+>> --- a/hw/s390x/virtio-ccw.c
+>> +++ b/hw/s390x/virtio-ccw.c
+>> @@ -1274,9 +1274,13 @@ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
+>>      SubchDev *s = ccw_dev->sch;
+>>      VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+>>      int len;
+>> +    int ret;
+>>
+>>      s->driver_data = dev;
+>> -    subch_device_load(s, f);
+>> +    ret = subch_device_load(s, f);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>>      /* Re-fill subch_id after loading the subchannel states.*/
+>>      if (ck->refill_ids) {
+>>          ck->refill_ids(ccw_dev);
+> 
+> Patch looks sane to me, but I second the question about how to handle
+> this when using vmstates.
+> 
