@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d9GGg-0005lG-Pd
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:30:27 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d9GOh-0008Lq-O2
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1d9GGb-0000ZV-O1
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:30:26 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 12 May 2017 14:30:15 -0500
-Message-Id: <20170512193015.22155-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] block: Correct documentation for
- BLOCK_WRITE_THRESHOLD
+	(envelope-from <rth7680@gmail.com>) id 1d9GOg-0005S3-W4
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 15:38:43 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170512033543.6789-1-f4bug@amsat.org>
+	<20170512033543.6789-3-f4bug@amsat.org>
+	<f447c23f-f63c-f3bb-a1b9-f63e5aff4063@twiddle.net>
+	<20170512182132.jdw4g2pd5gvf2dti@aurel32.net>
+	<aaa04be5-78d6-311b-609b-d02f18e9ef96@twiddle.net>
+	<20170512192252.hgtpgqfn5vtba362@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <6c18b1e3-cc1b-ed98-bb2b-8eacaa719aee@twiddle.net>
+Date: Fri, 12 May 2017 12:38:36 -0700
+MIME-Version: 1.0
+In-Reply-To: <20170512192252.hgtpgqfn5vtba362@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] target/arm: optimize rev16() using
+ extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,28 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-Use the correct command name.
+On 05/12/2017 12:22 PM, Aurelien Jarno wrote:
+> On 2017-05-12 12:05, Richard Henderson wrote:
+>> On 05/12/2017 11:21 AM, Aurelien Jarno wrote:
+>>> +    uint64_t mask1 = sf ? 0x00ff00ff00ff00ffull : 0x00ff00ff;
+>>> +    uint64_t mask2 = sf ? 0xff00ff00ff00ff00ull : 0xff00ff00;
+>>> +
+>>> +    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 8);
+>>> +    tcg_gen_andi_i64(tcg_tmp, tcg_tmp, mask1);
+>>> +    tcg_gen_shli_i64(tcg_rd, tcg_rn, 8);
+>>> +    tcg_gen_andi_i64(tcg_rd, tcg_rd, mask2);
+>>
+>> It would probably be better to use a single mask, since they're not free to
+>> instantiate in a register.  So e.g.
+>>
+>>    TCGv mask = tcg_const_i64(sf ? 0x00ff00ff00ff00ffull : 0x00ff00ff);
+>>    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 8);
+>>    tcg_gen_and_i64(tcg_rd, tcg_rn, mask);
+>>    tcg_gen_and_i64(tcg_tmp, tcg_tmp, mask);
+>>    tcg_gen_shli_i64(tcg_rd, tcg_rd, 8);
+> 
+> Indeed that improves things a bit for sf=1. For sf=0 though the
+> constant is never loaded into a register, it is passed to the and
+> instructions as an immediate.
+> 
+For x86 (and sometimes s390) it isn't, but it certainly would be for all other 
+hosts.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- qapi/block-core.json | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 614181b..206e33b 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3582,7 +3582,7 @@
- # means the device should be extended to avoid pausing for
- # disk exhaustion.
- # The event is one shot. Once triggered, it needs to be
--# re-registered with another block-set-threshold command.
-+# re-registered with another block-set-write-threshold command.
- #
- # @node-name: graph node name on which the threshold was exceeded.
- #
--- 
-2.9.3
+r~
