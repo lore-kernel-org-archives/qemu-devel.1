@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1d99MV-0005OF-JI
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:08:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1d99V5-0007Ac-3s
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1d99MQ-0008Ed-QK
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:07:59 -0400
-Received: from foss.arm.com ([217.140.101.70]:38250)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1d99MQ-0008DM-JV
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:07:54 -0400
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-8-git-send-email-yi.l.liu@intel.com>
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <cc330a8f-e087-9b6f-2a40-38b58688d300@arm.com>
-Date: Fri, 12 May 2017 13:11:02 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1d99V0-0005nI-Nl
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:16:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1d99V0-0005lw-Ei
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 08:16:46 -0400
+References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
+	<20170511145312.GA822@morn.lan>
+	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
+	<20170511163447.GA7785@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
+Date: Fri, 12 May 2017 14:16:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <1493201525-14418-8-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 7/8] VFIO: Add new IOCTL for IOMMU TLB
- invalidate propagation
+Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+To: "Xu, Anthony" <anthony.xu@intel.com>, Kevin O'Connor <kevin@koconnor.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi Yi,
 
-On 26/04/17 11:12, Liu, Yi L wrote:
-> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+
+On 12/05/2017 01:55, Xu, Anthony wrote:
+> Hi Paolo,
 > 
-> This patch adds VFIO_IOMMU_TLB_INVALIDATE to propagate IOMMU TLB
-> invalidate request from guest to host.
+> In KVM mode, seems A20 is ignored.
+> Do you see any potential issue here?
+
+No; recent processors don't have A20 at all.
+
+Paolo
+
 > 
-> In the case of SVM virtualization on VT-d, host IOMMU driver has
-> no knowledge of caching structure updates unless the guest
-> invalidation activities are passed down to the host. So a new
-> IOCTL is needed to propagate the guest cache invalidation through
-> VFIO.
+> Anthony 
 > 
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> ---
->  include/uapi/linux/vfio.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
 > 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 6b97987..50c51f8 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -564,6 +564,15 @@ struct vfio_device_svm {
->  
->  #define VFIO_IOMMU_SVM_BIND_TASK	_IO(VFIO_TYPE, VFIO_BASE + 22)
->  
-> +/* For IOMMU TLB Invalidation Propagation */
-> +struct vfio_iommu_tlb_invalidate {
-> +	__u32	argsz;
-> +	__u32	length;
-> +	__u8	data[];
-> +};
-
-We initially discussed something a little more generic than this, with
-most info explicitly described and only pIOMMU-specific quirks and hints
-in an opaque structure. Out of curiosity, why the change? I'm not against
-a fully opaque structure, but there seem to be a large overlap between TLB
-invalidations across architectures.
-
-
-For what it's worth, when prototyping the paravirtualized IOMMU I came up
-with the following.
-
-(From the paravirtualized POV, the SMMU also has to swizzle endianess
-after unpacking an opaque structure, since userspace doesn't know what's
-in it and guest might use a different endianess. So we need to force all
-opaque data to be e.g. little-endian.)
-
-struct vfio_iommu_tlb_invalidate {
-	__u32	argsz;
-	__u32	scope;
-	__u32	flags;
-	__u32	pasid;
-	__u64	vaddr;
-	__u64	size;
-	__u8	data[];
-};
-
-Scope is a bitfields restricting the invalidation scope. By default
-invalidate the whole container (all PASIDs and all VAs). @pasid, @vaddr
-and @size are unused.
-
-Adding VFIO_IOMMU_INVALIDATE_PASID (1 << 0) restricts the invalidation
-scope to the pasid described by @pasid.
-Adding VFIO_IOMMU_INVALIDATE_VADDR (1 << 1) restricts the invalidation
-scope to the address range described by (@vaddr, @size).
-
-So setting scope = VFIO_IOMMU_INVALIDATE_VADDR would invalidate the VA
-range for *all* pasids (as well as no_pasid). Setting scope =
-(VFIO_IOMMU_INVALIDATE_VADDR|VFIO_IOMMU_INVALIDATE_PASID) would invalidate
-the VA range only for @pasid.
-
-Flags depend on the selected scope:
-
-VFIO_IOMMU_INVALIDATE_NO_PASID, indicating that invalidation (either
-without scope or with INVALIDATE_VADDR) targets non-pasid mappings
-exclusively (some architectures, e.g. SMMU, allow this)
-
-VFIO_IOMMU_INVALIDATE_VADDR_LEAF, indicating that the pIOMMU doesn't need
-to invalidate all intermediate tables cached as part of the PTW for vaddr,
-only the last-level entry (pte). This is a hint.
-
-I guess what's missing for Intel IOMMU and would go in @data is the
-"global" hint (which we don't have in SMMU invalidations). Do you see
-anything else, that the pIOMMU cannot deduce from this structure?
-
-Thanks,
-Jean
-
-
-> +#define VFIO_IOMMU_TLB_INVALIDATE	_IO(VFIO_TYPE, VFIO_BASE + 23)
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->  
->  /*
-> 
+>> -----Original Message-----
+>> From: Kevin O'Connor [mailto:kevin@koconnor.net]
+>> Sent: Thursday, May 11, 2017 9:35 AM
+>> To: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: qemu-devel@nongnu.org; Xu, Anthony <anthony.xu@intel.com>
+>> Subject: Re: [PATCH] target/i386: enable A20 automatically in system
+>> management mode
+>>
+>> On Thu, May 11, 2017 at 05:32:47PM +0200, Paolo Bonzini wrote:
+>>> On 11/05/2017 16:53, Kevin O'Connor wrote:
+>>>> On Thu, May 11, 2017 at 01:35:28PM +0200, Paolo Bonzini wrote:
+>>>>> Ignore env->a20_mask when running in system management mode.
+>>>>
+>>>> Thanks Paolo.  I don't think this patch will help SeaBIOS though.  The
+>>>> SeaBIOS SMM handler doesn't do much - it doesn't even access ram
+>> above
+>>>> 1MiB.  See SeaBIOS' code in src/fw/smm.c:handle_smi().
+>>>>
+>>>> Instead, the SeaBIOS code does a cpu state backup/restore to switch
+>>>> into 32bit mode.  I thought the A20 state would be part of that cpu
+>>>> backup/restore.  However, looking at the Intel SDM docs now, it's not
+>>>> really clear to me how the processor "inhibits" A20 when in SMM mode -
+>>>> does it save/restore that state on SMI/RSM or does it have special
+>>>> logic to ignore A20 while in SMM mode?
+>>>
+>>> There isn't any documented place for A20 in the state save map (I checked
+>>> AMD's BIOS/Kernel Developer Guide which is pretty comprehensive), so I
+>>> think the latter is more plausible.  What I'm doing in this patch is
+>>> ignoring A20 while in SMM mode.
+>>
+>> Okay.
+>>
+>>> Then you would have to add an A20 save/restore in handle_smi; since
+>>> CALL32SMM_ENTERID should not nest, I think you can just do this:
+>>
+>> Yes, that should be fine.
+>>
+>>> --- a/src/fw/smm.c
+>>> +++ b/src/fw/smm.c
+>>> @@ -54,7 +54,8 @@ struct smm_layout {
+>>>      struct smm_state backup2;
+>>>      u8 stack[0x7c00];
+>>>      u64 codeentry;
+>>> -    u8 pad_8008[0x7df8];
+>>> +    u8 a20;
+>>> +    u8 pad_8009[0x7df7];
+>>>      struct smm_state cpu;
+>>>  };
+>>
+>> In order to avoid mixing code and data in the same cache line we could
+>> do this instead:
+>>
+>>  struct smm_layout {
+>>      struct smm_state backup1;
+>>      struct smm_state backup2;
+>> -    u8 stack[0x7c00];
+>> +    u32 backup_a20;
+>> +    u8 stack[0x8000 - sizeof(struct smm_state)*2 - sizeof(u32)];
+>>      u64 codeentry;
+>>      u8 pad_8008[0x7df8];
+>>      struct smm_state cpu;
+>>
+>> Thanks,
+>> -Kevin
