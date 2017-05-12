@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <julia.lawall@lip6.fr>) id 1d91hd-0005t7-8G
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:57:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1d91wJ-00006e-FX
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:12:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <julia.lawall@lip6.fr>) id 1d91ha-0006UJ-2l
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:57:17 -0400
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:45165)
+	(envelope-from <peterx@redhat.com>) id 1d91wE-0006F4-Cx
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:12:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <julia.lawall@lip6.fr>)
-	id 1d91hZ-0006To-KF
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:57:14 -0400
-Date: Fri, 12 May 2017 11:41:16 +0800 (SGT)
-From: Julia Lawall <julia.lawall@lip6.fr>
-In-Reply-To: <20170512033543.6789-2-f4bug@amsat.org>
-Message-ID: <alpine.DEB.2.20.1705121139030.2981@hadrien>
-References: <20170512033543.6789-1-f4bug@amsat.org>
-	<20170512033543.6789-2-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d91wE-0006E3-3h
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:12:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2FF07F7A5
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 04:12:20 +0000 (UTC)
+Date: Fri, 12 May 2017 12:12:14 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170512041214.GP28293@pxdev.xzpeter.org>
+References: <1494505358-15287-1-git-send-email-peterx@redhat.com>
+	<1494505358-15287-3-git-send-email-peterx@redhat.com>
+	<20170511130525.GG2078@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-Subject: Re: [Qemu-devel] [RFC PATCH v3 1/5] coccinelle: add a script to
- optimize tcg op using tcg_gen_extract()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170511130525.GG2078@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v7 2/4] utils: provide size_to_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,126 +34,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Elfring <elfring@users.sourceforge.net>, Julia Lawall <julia.lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hello,
+On Thu, May 11, 2017 at 02:05:26PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Moving the algorithm from print_type_size() into size_to_str() so that
+> > other component can also leverage it. With that, refactor
+> > print_type_size().
+> > 
+> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  include/qemu-common.h        |  1 +
+> >  qapi/string-output-visitor.c | 22 ++++++----------------
+> >  util/cutils.c                | 26 ++++++++++++++++++++++++++
+> >  3 files changed, 33 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/include/qemu-common.h b/include/qemu-common.h
+> > index d218821..d7d0448 100644
+> > --- a/include/qemu-common.h
+> > +++ b/include/qemu-common.h
+> > @@ -145,6 +145,7 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+> >  int parse_debug_env(const char *name, int max, int initial);
+> >  
+> >  const char *qemu_ether_ntoa(const MACAddr *mac);
+> > +char *size_to_str(double val);
+> >  void page_size_init(void);
+> >  
+> >  /* returns non-zero if dump is in progress, otherwise zero is
+> > diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+> > index 94ac821..53c2175 100644
+> > --- a/qapi/string-output-visitor.c
+> > +++ b/qapi/string-output-visitor.c
+> > @@ -211,10 +211,8 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
+> >                              Error **errp)
+> >  {
+> >      StringOutputVisitor *sov = to_sov(v);
+> > -    static const char suffixes[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E' };
+> > -    uint64_t div, val;
+> > -    char *out;
+> > -    int i;
+> > +    uint64_t val;
+> > +    char *out, *psize;
+> >  
+> >      if (!sov->human) {
+> >          out = g_strdup_printf("%"PRIu64, *obj);
+> > @@ -223,19 +221,11 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
+> >      }
+> >  
+> >      val = *obj;
+> > -
+> > -    /* The exponent (returned in i) minus one gives us
+> > -     * floor(log2(val * 1024 / 1000).  The correction makes us
+> > -     * switch to the higher power when the integer part is >= 1000.
+> > -     */
+> > -    frexp(val / (1000.0 / 1024.0), &i);
+> > -    i = (i - 1) / 10;
+> > -    assert(i < ARRAY_SIZE(suffixes));
+> > -    div = 1ULL << (i * 10);
+> > -
+> > -    out = g_strdup_printf("%"PRIu64" (%0.3g %c%s)", val,
+> > -                          (double)val/div, suffixes[i], i ? "iB" : "");
+> > +    psize = size_to_str(val);
+> > +    out = g_strdup_printf("%"PRIu64" (%s)", val, psize);
+> >      string_output_set(sov, out);
+> > +
+> > +    g_free(psize);
+> >  }
+> >  
+> >  static void print_type_bool(Visitor *v, const char *name, bool *obj,
+> > diff --git a/util/cutils.c b/util/cutils.c
+> > index 50ad179..fa5ddec 100644
+> > --- a/util/cutils.c
+> > +++ b/util/cutils.c
+> > @@ -619,3 +619,29 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
+> >  
+> >      return ret;
+> >  }
+> > +
+> > +/*
+> > + * Return human readable string for size @val.
+> > + * @val must be between (-1000Eib, 1000EiB), exclusively.
+> > + * Use IEC binary units like KiB, MiB, and so forth.
+> > + * Caller is responsible for passing it to g_free().
+> > + */
+> > +char *size_to_str(double val)
+> > +{
+> > +    static const char *suffixes[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
+> > +    unsigned long div;
+> > +    int i;
+> > +
+> > +    /*
+> > +     * The exponent (returned in i) minus one gives us
+> > +     * floor(log2(val * 1024 / 1000).  The correction makes us
+> > +     * switch to the higher power when the integer part is >= 1000.
+> > +     * (see e41b509d68afb1f for more info)
+> > +     */
+> > +    frexp(val / (1000.0 / 1024.0), &i);
+> > +    i = (i - 1) / 10;
+> > +    assert(i < ARRAY_SIZE(suffixes));
+> 
+> Because your code takes a double, where as Paolo's only takes uint's,
+> I think you have to be careful to check that i >= 0  as well,  for
+> example, what would happen if someone did size_to_str(1.0/100.0) ?
 
-I don't think I have seen earlier versions of this script.  Are you
-proposing it to be added to the kernel?  If so, it should be put in an
-appropriate subdirectory of Coccinelle.
+Yes, you are right.
 
-Overall, could you explain at a high level what it is intended to do?  It
-uses rather heavily regular expressions and python code, so I wonder if
-this is the best way to do it.
+Let me stick to uint64_t then, after all double helps little in dump
+sizes... /me chose an unwise parameter type.
 
-thanks,
-julia
+And then it's safe to directly remove the assert() in this patch,
+because even UINT64_MAX is only 16 EiB. Then I can further drop the
+last patch...
 
-On Fri, 12 May 2017, Philippe Mathieu-Daudé wrote:
+I'll resend. Thanks,
 
-> If you have coccinelle installed you can apply this script using:
->
->     $ spatch \
->         --macro-file scripts/cocci-macro-file.h \
->         --dir target --in-place
->
-> You can also use directly Peter Senna Tschudin docker image (easier):
->
->     $ docker run -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle \
->         --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
->         --macro-file scripts/cocci-macro-file.h \
->         --dir target --in-place
->
-> Then verified that no manual touchups are required.
->
-> The following thread was helpful while writing this script:
->
->     https://github.com/coccinelle/coccinelle/issues/86
->
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  scripts/coccinelle/tcg_gen_extract.cocci | 71 ++++++++++++++++++++++++++++++++
->  1 file changed, 71 insertions(+)
->  create mode 100644 scripts/coccinelle/tcg_gen_extract.cocci
->
-> diff --git a/scripts/coccinelle/tcg_gen_extract.cocci b/scripts/coccinelle/tcg_gen_extract.cocci
-> new file mode 100644
-> index 0000000000..4823073005
-> --- /dev/null
-> +++ b/scripts/coccinelle/tcg_gen_extract.cocci
-> @@ -0,0 +1,71 @@
-> +// optimize TCG using extract op
-> +//
-> +// Copyright: (C) 2017 Philippe Mathieu-Daudé. GPLv2+.
-> +// Confidence: High
-> +// Options: --macro-file scripts/cocci-macro-file.h
-> +//
-> +// Nikunj A Dadhania optimization:
-> +// http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05211.html
-> +// Aurelien Jarno optimization:
-> +// http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01466.html
-> +// Coccinelle helpful issue:
-> +// https://github.com/coccinelle/coccinelle/issues/86
-> +
-> +@match@ // match shri*+andi* pattern, calls script verify_len
-> +identifier ret, arg;
-> +constant ofs, len;
-> +identifier shr_fn =~ "^tcg_gen_shri_";
-> +identifier and_fn =~ "^tcg_gen_andi_";
-> +position shr_p;
-> +position and_p;
-> +@@
-> +(
-> +shr_fn@shr_p(ret, arg, ofs);
-> +and_fn@and_p(ret, ret, len);
-> +)
-> +
-> +@script:python verify_len@
-> +ret_s << match.ret;
-> +len_s << match.len;
-> +shr_s << match.shr_fn;
-> +and_s << match.and_fn;
-> +shr_p << match.shr_p;
-> +extract_fn;
-> +@@
-> +print "candidate at %s:%s" % (shr_p[0].file, shr_p[0].line)
-> +len_fn=len("tcg_gen_shri_")
-> +shr_sz=shr_s[len_fn:]
-> +and_sz=and_s[len_fn:]
-> +# TODO: op_size shr<and allowed?
-> +is_same_op_size = shr_sz == and_sz
-> +print "  op_size: %s/%s (%s)" % (shr_sz, and_sz, "same" if is_same_op_size else "DIFFERENT")
-> +is_optimizable = False
-> +if is_same_op_size:
-> +    try: # only eval integer, no #define like 'SR_M' (cpp did this, else some headers are missing).
-> +        len_v = long(len_s.strip("UL"), 0)
-> +        low_bits = 0
-> +        while (len_v & (1 << low_bits)):
-> +            low_bits += 1
-> +        print "  low_bits:", low_bits, "(value: 0x%x)" % ((1 << low_bits) - 1)
-> +        print "  len: 0x%x" % len_v
-> +        is_optimizable = ((1 << low_bits) - 1) == len_v # check low_bits
-> +        print "  len_bits %s= low_bits" % ("=" if is_optimizable else "!")
-> +        print "  candidate", "IS" if is_optimizable else "is NOT", "optimizable"
-> +        coccinelle.extract_fn = "tcg_gen_extract_" + and_sz
-> +    except:
-> +        print "  ERROR (check included headers?)"
-> +    cocci.include_match(is_optimizable)
-> +print
-> +
-> +@replacement depends on verify_len@
-> +identifier match.ret, match.arg;
-> +constant match.ofs, match.len;
-> +identifier match.shr_fn;
-> +identifier match.and_fn;
-> +position match.shr_p;
-> +position match.and_p;
-> +identifier verify_len.extract_fn;
-> +@@
-> +-shr_fn@shr_p(ret, arg, ofs);
-> +-and_fn@and_p(ret, ret, len);
-> ++extract_fn(ret, arg, ofs, len);
-> --
-> 2.11.0
->
+-- 
+Peter Xu
