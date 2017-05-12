@@ -1,28 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1d98dZ-00081w-4i
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:21:34 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d98e1-0008CX-LY
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1d98dW-0003sX-0N
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:21:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1d98dV-0003rm-QH
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:21:29 -0400
-References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
-	<20170511123246.31308-4-maxime.coquelin@redhat.com>
-	<20170511202154-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <8101cc11-51b7-9361-6506-25986aa652c4@redhat.com>
-Date: Fri, 12 May 2017 13:21:18 +0200
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1d98dy-0004Fm-Fi
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:22:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60233)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1d98dy-0004Cy-5b
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 07:21:58 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4CBJscg116902
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:21:53 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2acx6c4aqr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 07:21:53 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Fri, 12 May 2017 12:21:51 +0100
+Date: Fri, 12 May 2017 13:21:46 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA26D816@DGGEMA505-MBX.china.huawei.com>
+References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
+	<1494243504-127980-9-git-send-email-arei.gonglei@huawei.com>
+	<20170511170527.5846a676.cornelia.huck@de.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA26D816@DGGEMA505-MBX.china.huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170511202154-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/6] vhost: Update rings information for
- IOTLB earlier
+Message-Id: <20170512132146.64b811be.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [RFC v1 8/9] virtio-crypto: add host feature bits
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +44,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
+On Fri, 12 May 2017 00:55:23 +0000
+"Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
 
-
-On 05/11/2017 07:33 PM, Michael S. Tsirkin wrote:
-> On Thu, May 11, 2017 at 02:32:43PM +0200, Maxime Coquelin wrote:
->> Vhost-kernel backend need to receive IOTLB entries for rings
->> information early, but vhost-user need the same information
->> earlier, before VHOST_USER_SET_VRING_ADDR is sent.
+> >
+> > From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
+> > Sent: Thursday, May 11, 2017 11:05 PM
+> > Subject: Re: [RFC v1 8/9] virtio-crypto: add host feature bits support
+> > 
+> > On Mon, 8 May 2017 19:38:23 +0800
+> > Gonglei <arei.gonglei@huawei.com> wrote:
+> > 
+> > > We enable all feature bits acquiescently.
+> > >
+> > > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> > > ---
+> > >  hw/virtio/virtio-crypto.c         | 15 +++++++++++++++
+> > >  include/hw/virtio/virtio-crypto.h |  1 +
+> > >  2 files changed, 16 insertions(+)
+> > >
+> > > diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+> > > index 5422f25..3dc0ff2 100644
+> > > --- a/hw/virtio/virtio-crypto.c
+> > > +++ b/hw/virtio/virtio-crypto.c
+> > > @@ -1034,6 +1034,11 @@ static uint64_t
+> > virtio_crypto_get_features(VirtIODevice *vdev,
+> > >                                             uint64_t features,
+> > >                                             Error **errp)
+> > >  {
+> > > +    VirtIOCrypto *vcrypto = VIRTIO_CRYPTO(vdev);
+> > > +
+> > > +    /* Firstly sync all virtio-crypto possible supported features */
+> > > +    features |= vcrypto->host_features;
+> > > +
+> > >      return features;
+> > >  }
+> > >
+> > > @@ -1144,6 +1149,16 @@ static const VMStateDescription
+> > vmstate_virtio_crypto = {
+> > >  };
+> > >
+> > >  static Property virtio_crypto_properties[] = {
+> > > +    DEFINE_PROP_BIT("mux_mode", VirtIOCrypto, host_features,
+> > > +                    VIRTIO_CRYPTO_F_MUX_MODE, true),
+> > > +    DEFINE_PROP_BIT("cipher_stateless_mode", VirtIOCrypto,
+> > host_features,
+> > > +                    VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE,
+> > true),
+> > > +    DEFINE_PROP_BIT("hash_stateless_mode", VirtIOCrypto,
+> > host_features,
+> > > +                    VIRTIO_CRYPTO_F_HASH_STATELESS_MODE,
+> > true),
+> > > +    DEFINE_PROP_BIT("mac_stateless_mode", VirtIOCrypto,
+> > host_features,
+> > > +                    VIRTIO_CRYPTO_F_MAC_STATELESS_MODE, true),
+> > > +    DEFINE_PROP_BIT("aead_stateless_mode", VirtIOCrypto,
+> > host_features,
+> > > +                    VIRTIO_CRYPTO_F_AEAD_STATELESS_MODE,
+> > true),
+> > >      DEFINE_PROP_END_OF_LIST(),
+> > >  };
+> > >
+> > > diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio-crypto.h
+> > > index 465ad20..30ea51d 100644
+> > > --- a/include/hw/virtio/virtio-crypto.h
+> > > +++ b/include/hw/virtio/virtio-crypto.h
+> > > @@ -97,6 +97,7 @@ typedef struct VirtIOCrypto {
+> > >      int multiqueue;
+> > >      uint32_t curr_queues;
+> > >      size_t config_size;
+> > > +    uint32_t host_features;
+> > 
+> > I'd just make that 64 bits from the start.
+> > 
+> Yes, that's better.
 > 
-> Weird. What does VHOST_USER_SET_VRING_ADDR have to do with it?
+> > >  } VirtIOCrypto;
+> > >
+> > >  #endif /* _QEMU_VIRTIO_CRYPTO_H */
+> > 
+> > Don't you need some kind of compat handling?
 > 
-> According to
-> 	Starting and stopping rings
-> in vhost user spec, vhost user does not access
-> anything until ring is started and enabled.
-> 
-> 
->> This patch also trigger IOTLB miss for all rings informations
->> for robustness, even if in practice these adresses are on the
->> same page.
+> I did that in patch 6 according to the results of those feature bits negotiated.
+> Patch 9 tests both session mode and stateless mode, they are work. :)
 
-Actually, the DPDK vhost-user backend is compliant with the spec,
-but when handling VHOST_USER_SET_VRING_ADDR request, it translates the
-guest addresses into backend VAs, and check they are valid. I will make 
-the commit message clearer about this in next revision.
-
-The check could be done later, for example when the ring are started,
-but it wouldn't change the need to trigger a miss at some point.
-
-Or it could be done in the processing threads, the first time the
-addresses are used, but it would add a check for every burst of packets
-processed.
-
->>
->> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->> ---
->>   hw/virtio/vhost.c | 19 +++++++++++--------
->>   1 file changed, 11 insertions(+), 8 deletions(-)
->>
->> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
->> index 748e331..817f6d0 100644
->> --- a/hw/virtio/vhost.c
->> +++ b/hw/virtio/vhost.c
->> @@ -799,7 +799,17 @@ static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
->>           .log_guest_addr = vq->used_phys,
->>           .flags = enable_log ? (1 << VHOST_VRING_F_LOG) : 0,
->>       };
->> -    int r = dev->vhost_ops->vhost_set_vring_addr(dev, &addr);
->> +    int r;
->> +
->> +    /* Update rings information for IOTLB to work correctly,
->> +     * vhost-kernel & vhost-user backends require for this.*/
-> 
-> Any requirements must be in the spec. Pls add them there.
-> Pls fix comment style as you move code.
-Sure.
-
-Thanks,
-Maxime
+Ah, I meant machine compat handling. You probably don't want to offer
+these feature bits in older compat machines.
