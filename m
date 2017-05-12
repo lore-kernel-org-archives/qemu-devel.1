@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d9KAa-0001HJ-9y
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:25 -0400
+	(envelope-from <rth7680@gmail.com>) id 1d9KAb-0001IK-68
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1d9KAZ-00046S-26
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:24 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33611)
+	(envelope-from <rth7680@gmail.com>) id 1d9KAa-00047X-4n
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:25 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d9KAY-000466-TQ
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:22 -0400
-Received: by mail-qt0-x242.google.com with SMTP id a46so8699812qte.0
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:40:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1d9KAa-00047E-07
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:40:24 -0400
+Received: by mail-qt0-x243.google.com with SMTP id j13so8690782qta.3
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:40:23 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 12 May 2017 16:40:06 -0700
-Message-Id: <20170512234009.32557-7-rth@twiddle.net>
+Date: Fri, 12 May 2017 16:40:07 -0700
+Message-Id: <20170512234009.32557-8-rth@twiddle.net>
 In-Reply-To: <20170512234009.32557-1-rth@twiddle.net>
 References: <20170512234009.32557-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 6/9] target/s390x: Use atomic operations for
- LOAD AND OP
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 7/9] target/s390x: mask the SIGP order_code
+ using SIGP_ORDER_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,157 +31,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com
+Cc: stefanha@redhat.com, Aurelien Jarno <aurelien@aurel32.net>
 
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+From: Aurelien Jarno <aurelien@aurel32.net>
+
+For that move the definition from kvm.c to cpu.h
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+Message-Id: <20170509082800.10756-2-aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/insn-data.def | 20 ++++++------
- target/s390x/translate.c   | 78 +++++++++++++++++++++++++++++-----------------
- 2 files changed, 60 insertions(+), 38 deletions(-)
+ target/s390x/cpu.h         | 3 +++
+ target/s390x/kvm.c         | 2 --
+ target/s390x/misc_helper.c | 3 +--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 5e5fcc5..55a7c52 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -390,20 +390,20 @@
- /* LOAD ADDRESS RELATIVE LONG */
-     C(0xc000, LARL,    RIL_b, Z,   0, ri2, 0, r1, mov2, 0)
- /* LOAD AND ADD */
--    C(0xebf8, LAA,     RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, add, adds32)
--    C(0xebe8, LAAG,    RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, add, adds64)
-+    D(0xebf8, LAA,     RSY_a, ILA, r3_32s, a2, new, in2_r1_32, laa, adds32, MO_TESL)
-+    D(0xebe8, LAAG,    RSY_a, ILA, r3, a2, new, in2_r1, laa, adds64, MO_TEQ)
- /* LOAD AND ADD LOGICAL */
--    C(0xebfa, LAAL,    RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, add, addu32)
--    C(0xebea, LAALG,   RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, add, addu64)
-+    D(0xebfa, LAAL,    RSY_a, ILA, r3_32u, a2, new, in2_r1_32, laa, addu32, MO_TEUL)
-+    D(0xebea, LAALG,   RSY_a, ILA, r3, a2, new, in2_r1, laa, addu64, MO_TEQ)
- /* LOAD AND AND */
--    C(0xebf4, LAN,     RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, and, nz32)
--    C(0xebe4, LANG,    RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, and, nz64)
-+    D(0xebf4, LAN,     RSY_a, ILA, r3_32s, a2, new, in2_r1_32, lan, nz32, MO_TESL)
-+    D(0xebe4, LANG,    RSY_a, ILA, r3, a2, new, in2_r1, lan, nz64, MO_TEQ)
- /* LOAD AND EXCLUSIVE OR */
--    C(0xebf7, LAX,     RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, xor, nz32)
--    C(0xebe7, LAXG,    RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, xor, nz64)
-+    D(0xebf7, LAX,     RSY_a, ILA, r3_32s, a2, new, in2_r1_32, lax, nz32, MO_TESL)
-+    D(0xebe7, LAXG,    RSY_a, ILA, r3, a2, new, in2_r1, lax, nz64, MO_TEQ)
- /* LOAD AND OR */
--    C(0xebf6, LAO,     RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, or, nz32)
--    C(0xebe6, LAOG,    RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, or, nz64)
-+    D(0xebf6, LAO,     RSY_a, ILA, r3_32s, a2, new, in2_r1_32, lao, nz32, MO_TESL)
-+    D(0xebe6, LAOG,    RSY_a, ILA, r3, a2, new, in2_r1, lao, nz64, MO_TEQ)
- /* LOAD AND TEST */
-     C(0x1200, LTR,     RR_a,  Z,   0, r2_o, 0, cond_r1r2_32, mov2, s32)
-     C(0xb902, LTGR,    RRE,   Z,   0, r2_o, 0, r1, mov2, s64)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index f23b705..19276cc 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2309,6 +2309,50 @@ static ExitStatus op_iske(DisasContext *s, DisasOps *o)
- }
- #endif
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index bbed320..240b8a5 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -1078,6 +1078,9 @@ struct sysib_322 {
+ #define SIGP_MODE_Z_ARCH_TRANS_ALL_PSW 1
+ #define SIGP_MODE_Z_ARCH_TRANS_CUR_PSW 2
  
-+static ExitStatus op_laa(DisasContext *s, DisasOps *o)
-+{
-+    /* The real output is indeed the original value in memory;
-+       recompute the addition for the computation of CC.  */
-+    tcg_gen_atomic_fetch_add_i64(o->in2, o->in2, o->in1, get_mem_index(s),
-+                                 s->insn->data | MO_ALIGN);
-+    /* However, we need to recompute the addition for setting CC.  */
-+    tcg_gen_add_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
++/* SIGP order code mask corresponding to bit positions 56-63 */
++#define SIGP_ORDER_MASK 0x000000ff
 +
-+static ExitStatus op_lan(DisasContext *s, DisasOps *o)
-+{
-+    /* The real output is indeed the original value in memory;
-+       recompute the addition for the computation of CC.  */
-+    tcg_gen_atomic_fetch_and_i64(o->in2, o->in2, o->in1, get_mem_index(s),
-+                                 s->insn->data | MO_ALIGN);
-+    /* However, we need to recompute the operation for setting CC.  */
-+    tcg_gen_and_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_lao(DisasContext *s, DisasOps *o)
-+{
-+    /* The real output is indeed the original value in memory;
-+       recompute the addition for the computation of CC.  */
-+    tcg_gen_atomic_fetch_or_i64(o->in2, o->in2, o->in1, get_mem_index(s),
-+                                s->insn->data | MO_ALIGN);
-+    /* However, we need to recompute the operation for setting CC.  */
-+    tcg_gen_or_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_lax(DisasContext *s, DisasOps *o)
-+{
-+    /* The real output is indeed the original value in memory;
-+       recompute the addition for the computation of CC.  */
-+    tcg_gen_atomic_fetch_xor_i64(o->in2, o->in2, o->in1, get_mem_index(s),
-+                                 s->insn->data | MO_ALIGN);
-+    /* However, we need to recompute the operation for setting CC.  */
-+    tcg_gen_xor_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_ldeb(DisasContext *s, DisasOps *o)
- {
-     gen_helper_ldeb(o->out, cpu_env, o->in2);
-@@ -4483,21 +4527,17 @@ static void wout_m2_32(DisasContext *s, DisasFields *f, DisasOps *o)
+ void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr);
+ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+                   target_ulong *raddr, int *flags, bool exc);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 1a249d8..fb10542 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1764,8 +1764,6 @@ static int sigp_set_architecture(S390CPU *cpu, uint32_t param,
+     return SIGP_CC_ORDER_CODE_ACCEPTED;
  }
- #define SPEC_wout_m2_32 0
  
--static void wout_m2_32_r1_atomic(DisasContext *s, DisasFields *f, DisasOps *o)
-+static void wout_in2_r1(DisasContext *s, DisasFields *f, DisasOps *o)
- {
--    /* XXX release reservation */
--    tcg_gen_qemu_st32(o->out, o->addr1, get_mem_index(s));
--    store_reg32_i64(get_field(f, r1), o->in2);
-+    store_reg(get_field(f, r1), o->in2);
- }
--#define SPEC_wout_m2_32_r1_atomic 0
-+#define SPEC_wout_in2_r1 0
- 
--static void wout_m2_64_r1_atomic(DisasContext *s, DisasFields *f, DisasOps *o)
-+static void wout_in2_r1_32(DisasContext *s, DisasFields *f, DisasOps *o)
- {
--    /* XXX release reservation */
--    tcg_gen_qemu_st64(o->out, o->addr1, get_mem_index(s));
--    store_reg(get_field(f, r1), o->in2);
-+    store_reg32_i64(get_field(f, r1), o->in2);
- }
--#define SPEC_wout_m2_64_r1_atomic 0
-+#define SPEC_wout_in2_r1_32 0
- 
- /* ====================================================================== */
- /* The "INput 1" generators.  These load the first operand to an insn.  */
-@@ -4941,24 +4981,6 @@ static void in2_mri2_64(DisasContext *s, DisasFields *f, DisasOps *o)
- }
- #define SPEC_in2_mri2_64 0
- 
--static void in2_m2_32s_atomic(DisasContext *s, DisasFields *f, DisasOps *o)
--{
--    /* XXX should reserve the address */
--    in1_la2(s, f, o);
--    o->in2 = tcg_temp_new_i64();
--    tcg_gen_qemu_ld32s(o->in2, o->addr1, get_mem_index(s));
--}
--#define SPEC_in2_m2_32s_atomic 0
+-#define SIGP_ORDER_MASK 0x000000ff
 -
--static void in2_m2_64_atomic(DisasContext *s, DisasFields *f, DisasOps *o)
--{
--    /* XXX should reserve the address */
--    in1_la2(s, f, o);
--    o->in2 = tcg_temp_new_i64();
--    tcg_gen_qemu_ld64(o->in2, o->addr1, get_mem_index(s));
--}
--#define SPEC_in2_m2_64_atomic 0
--
- static void in2_i2(DisasContext *s, DisasFields *f, DisasOps *o)
+ static int handle_sigp(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
  {
-     o->in2 = tcg_const_i64(get_field(f, i2));
+     CPUS390XState *env = &cpu->env;
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index bd94242..23ec52c 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -517,8 +517,7 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
+     /* Remember: Use "R1 or R1 + 1, whichever is the odd-numbered register"
+        as parameter (input). Status (output) is always R1. */
+ 
+-    /* sigp contains the order code in bit positions 56-63, mask it here. */
+-    switch (order_code & 0xff) {
++    switch (order_code & SIGP_ORDER_MASK) {
+     case SIGP_SET_ARCH:
+         /* switch arch */
+         break;
 -- 
 2.9.3
