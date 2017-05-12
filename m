@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1d95e1-0004oz-H7
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:09:50 -0400
+	(envelope-from <4345099@qq.com>) id 1d95eE-0004uW-Ap
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:10:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1d95dy-00075f-9o
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:09:49 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34002)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1d95dy-00075S-1f
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:09:46 -0400
-Received: by mail-pg0-x242.google.com with SMTP id u187so6717582pgb.1
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 01:09:44 -0700 (PDT)
-References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
-	<874lxeovrg.fsf@secure.mitica>
-	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
-	<20170424164244.GJ2362@work-vm>
-	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
-	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <a35ce92b-d10b-646b-34d0-d7f075fc46d4@gmail.com>
-Date: Fri, 12 May 2017 16:09:45 +0800
-MIME-Version: 1.0
-In-Reply-To: <85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
+	(envelope-from <4345099@qq.com>) id 1d95eB-0007A1-2l
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:10:02 -0400
+Received: from smtpproxy19.qq.com ([184.105.206.84]:38623)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <4345099@qq.com>) id 1d95eA-00078P-L5
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:09:58 -0400
+From: "=?ISO-8859-1?B?aGVhdnliaXJk?=" <4345099@qq.com>
+Mime-Version: 1.0
+Date: Fri, 12 May 2017 16:09:52 +0800
+Message-ID: <tencent_614BD3725084FAF41E44D500@qq.com>
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] errors which can't backing storage for guest RAM with
+ -mem-path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +26,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>
-Cc: Wanpeng Li <kernellwp@gmail.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>
+To: =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
+Cc: =?ISO-8859-1?B?aHV0YW8=?= <hutao@cn.fujitsu.com>, =?ISO-8859-1?B?cGJvbnppbmk=?= <pbonzini@redhat.com>
 
-
-
-On 05/11/2017 08:24 PM, Paolo Bonzini wrote:
-> 
-> 
-> On 11/05/2017 14:07, Zhoujian (jay) wrote:
->> -        * Scan sptes if dirty logging has been stopped, dropping those
->> -        * which can be collapsed into a single large-page spte.  Later
->> -        * page faults will create the large-page sptes.
->> +        * Reset each vcpu's mmu, then page faults will create the large-page
->> +        * sptes later.
->>           */
->>          if ((change != KVM_MR_DELETE) &&
->>                  (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
->> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
->> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
->> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
->> +               kvm_for_each_vcpu(i, vcpu, kvm)
->> +                       kvm_mmu_reset_context(vcpu);
-> 
-> This should be "kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);" but
-> I am not sure it is enough.  I think that if you do not zap the SPTEs,
-> the page faults will use 4K SPTEs, not large ones (though I'd have to
-> check better; CCing Xiao and Wanpeng).
-
-Yes, Paolo is right. kvm_mmu_reset_context() just reloads vCPU's
-root page table, 4k mappings are still kept.
-
-There are two issues reported:
-- one is kvm_mmu_slot_apply_flags(), when enable dirty log tracking.
-
-   Its root cause is kvm_mmu_slot_remove_write_access() takes too much
-   time.
-
-   We can make the code adaptive to use the new fast-write-protect faculty
-   introduced by my patchset, i.e, if the number of pages contained in this
-   memslot is more than > TOTAL * FAST_WRITE_PROTECT_PAGE_PERCENTAGE, then
-   we use fast-write-protect instead.
-
-- another one is kvm_mmu_zap_collapsible_sptes() when disable dirty
-   log tracking.
-
-   collapsible_sptes zaps 4k mappings to make memory-read happy, it is not
-   required by the semanteme of KVM_SET_USER_MEMORY_REGION and it is not
-   urgent for vCPU's running, it could be done in a separate thread and use
-   lock-break technology.
-
-Thanks!
+SGkgYWxsDQoNCkkgZm91bmQgaXQgY2FuJ3QgYmFja3VwIHRoZSBndWVzdCBSQU0gd2hlbiBp
+IHJ1biBzaW1wbGUgcmFtIHRlc3QgY29kZSB3aXRoIA0KDQplcnJvcnMgd2hpY2ggY2FuJ3Qg
+YmFja2luZyBzdG9yYWdlIGZvciBndWVzdCBSQU0gd2l0aCBpbnRlZ3JhdG9yY3AsIHRoZSBj
+b21tYW5kZXIgaXM6DQoNCnFlbXUtc3lzdGVtLWFybSAtTSBpbnRlZ3JhdG9yY3AgLW0gMSAt
+c2VtaWhvc3RpbmcgLW5vZ3JhcGhpYyAtbWVtLXBhdGggbWVtLnR4dCAta2VybmVsIGJ1aWxk
+L2VtdV9yYW1fdGVzdC5lbGYNCg0KaSB3cm90ZSB0aGUgcGF0dGVyICIweDU1IiB0byBhbGwg
+b2YgdGhlIHJlc3Qgb2YgUkFNIGluIG15IHRlc3QsIGFmdGVyIHJ1biBteSB0ZXN0IGNvZGUs
+IGl0IGp1c3QgZ2VuZXJhdGUgdGhlIDEwNDg1NzYgQnl0ZXMgZmlsZSwgaSBzcGxpdCB0aGVz
+ZSBmaWxlIGludG8gMmtCLCBtb3N0IG9mIHNwbGl0IGZpbGUgaXMgYmxhY2ssIHNvbWUgb2Yg
+dGhlbSBqdXN0IGRpc3BsYXkgXDAwIGFmdGVyIG9wZW4gd2l0aCBnZWRpdC4NCg0KaSBkb24n
+dCBrbm93IHdoZXRoZXIgbXkgY29tbWFuZGVyIGlzIGluY29ycmVjdCwgYW55b25lIGNhbiBj
+b25maXJtIGl0IGZvciBtZT8gaSBqdXN0IHdhbnQgdG8gd3JpdGUgdGhlIGd1ZXN0IFJBTSBh
+bmQgcmVhZCBpdCBmcm9tIGhvc3QgZHVyaW5nIHRoZSBndWVzdCBjb2RlIGlzIHJ1bm5pbmcu
+IGJ1dCBteSBndWVzdCBqdXN0IGhhcyBzaW1wbGUgb3Mgd2l0aG91dCBmaWxlIHN5c3RlbSBh
+bmQgbmV0d29yay4gc28gaSB3YW50IHRvIHRyeSB3aXRoIHRoaXMgYmFja2VuZCBSQU0gd2F5
+cy4NCg0KdGhhbmtzLg0KanM=
