@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d9D0B-0002Ol-N1
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:14 -0400
+	(envelope-from <quintela@redhat.com>) id 1d9D0F-0002SL-G9
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d9D0A-0004ve-DO
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47556)
+	(envelope-from <quintela@redhat.com>) id 1d9D0C-0004wn-CA
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32108)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d9D0A-0004uw-4s
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:10 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d9D0C-0004wC-3k
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:12 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 068507F4BD
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:01:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 051CB93322
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:01:11 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Fri, 12 May 2017 18:00:45 +0200
-Message-Id: <20170512160055.9081-3-quintela@redhat.com>
+Date: Fri, 12 May 2017 18:00:46 +0200
+Message-Id: <20170512160055.9081-4-quintela@redhat.com>
 In-Reply-To: <20170512160055.9081-1-quintela@redhat.com>
 References: <20170512160055.9081-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/12] migration: Split migration/channel.c for
- channel operations
+Subject: [Qemu-devel] [PATCH 03/12] migration: Export qemu-file-channel.c
+ functions in its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,270 +33,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Create an include for its exported functions.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/migration.h |  7 -----
- migration/Makefile.objs       |  2 +-
- migration/channel.c           | 69 +++++++++++++++++++++++++++++++++++++++++++
- migration/channel.h           | 25 ++++++++++++++++
- migration/exec.c              |  1 +
- migration/fd.c                |  1 +
- migration/migration.c         | 50 -------------------------------
- migration/socket.c            |  1 +
- migration/tls.c               |  1 +
- 9 files changed, 99 insertions(+), 58 deletions(-)
- create mode 100644 migration/channel.c
- create mode 100644 migration/channel.h
+ include/migration/migration.h |  1 +
+ include/migration/qemu-file.h |  4 ----
+ migration/channel.c           |  1 +
+ migration/colo.c              |  1 +
+ migration/migration.c         |  1 +
+ migration/qemu-file-channel.c |  1 +
+ migration/qemu-file-channel.h | 21 +++++++++++++++++++++
+ migration/rdma.c              |  1 +
+ migration/savevm.c            |  1 +
+ tests/test-vmstate.c          |  1 +
+ 10 files changed, 29 insertions(+), 4 deletions(-)
+ create mode 100644 migration/qemu-file-channel.h
 
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index ae181a4..5f1136c 100644
+index 5f1136c..5ae21e6 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -176,17 +176,10 @@ void migration_fd_process_incoming(QEMUFile *f);
- 
- void qemu_start_incoming_migration(const char *uri, Error **errp);
- 
--void migration_channel_process_incoming(MigrationState *s,
--                                        QIOChannel *ioc);
--
- void migration_tls_channel_process_incoming(MigrationState *s,
-                                             QIOChannel *ioc,
-                                             Error **errp);
- 
--void migration_channel_connect(MigrationState *s,
--                               QIOChannel *ioc,
--                               const char *hostname);
--
- void migration_tls_channel_connect(MigrationState *s,
-                                    QIOChannel *ioc,
-                                    const char *hostname,
-diff --git a/migration/Makefile.objs b/migration/Makefile.objs
-index 480dd49..c83ca92 100644
---- a/migration/Makefile.objs
-+++ b/migration/Makefile.objs
-@@ -1,5 +1,5 @@
- common-obj-y += migration.o socket.o fd.o exec.o
--common-obj-y += tls.o
-+common-obj-y += tls.o channel.o
- common-obj-y += colo-comm.o colo.o colo-failover.o
- common-obj-y += vmstate.o
- common-obj-y += qemu-file.o
-diff --git a/migration/channel.c b/migration/channel.c
-new file mode 100644
-index 0000000..6104de5
---- /dev/null
-+++ b/migration/channel.c
-@@ -0,0 +1,69 @@
-+/*
-+ * QEMU live migration
-+ *
-+ * Copyright IBM, Corp. 2008
-+ *
-+ * Authors:
-+ *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ * Contributions after 2012-01-13 are licensed under the terms of the
-+ * GNU GPL, version 2 or (at your option) any later version.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "channel.h"
-+#include "migration/migration.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+#include "io/channel-tls.h"
-+
-+void migration_channel_process_incoming(MigrationState *s,
-+                                        QIOChannel *ioc)
-+{
-+    trace_migration_set_incoming_channel(
-+        ioc, object_get_typename(OBJECT(ioc)));
-+
-+    if (s->parameters.tls_creds &&
-+        *s->parameters.tls_creds &&
-+        !object_dynamic_cast(OBJECT(ioc),
-+                             TYPE_QIO_CHANNEL_TLS)) {
-+        Error *local_err = NULL;
-+        migration_tls_channel_process_incoming(s, ioc, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-+    } else {
-+        QEMUFile *f = qemu_fopen_channel_input(ioc);
-+        migration_fd_process_incoming(f);
-+    }
-+}
-+
-+
-+void migration_channel_connect(MigrationState *s,
-+                               QIOChannel *ioc,
-+                               const char *hostname)
-+{
-+    trace_migration_set_outgoing_channel(
-+        ioc, object_get_typename(OBJECT(ioc)), hostname);
-+
-+    if (s->parameters.tls_creds &&
-+        *s->parameters.tls_creds &&
-+        !object_dynamic_cast(OBJECT(ioc),
-+                             TYPE_QIO_CHANNEL_TLS)) {
-+        Error *local_err = NULL;
-+        migration_tls_channel_connect(s, ioc, hostname, &local_err);
-+        if (local_err) {
-+            migrate_fd_error(s, local_err);
-+            error_free(local_err);
-+        }
-+    } else {
-+        QEMUFile *f = qemu_fopen_channel_output(ioc);
-+
-+        s->to_dst_file = f;
-+
-+        migrate_fd_connect(s);
-+    }
-+}
-diff --git a/migration/channel.h b/migration/channel.h
-new file mode 100644
-index 0000000..618acb7
---- /dev/null
-+++ b/migration/channel.h
-@@ -0,0 +1,25 @@
-+/*
-+ * QEMU live migration channel functions
-+ *
-+ * Copyright IBM, Corp. 2008
-+ *
-+ * Authors:
-+ *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_MIGRATION_CHANNEL_H
-+#define QEMU_MIGRATION_CHANNEL_H
-+
+@@ -19,6 +19,7 @@
+ #include "qemu/thread.h"
+ #include "qemu/notify.h"
+ #include "migration/vmstate.h"
 +#include "io/channel.h"
-+
-+void migration_channel_process_incoming(MigrationState *s,
-+                                        QIOChannel *ioc);
-+
-+void migration_channel_connect(MigrationState *s,
-+                               QIOChannel *ioc,
-+                               const char *hostname);
-+#endif
-diff --git a/migration/exec.c b/migration/exec.c
-index aba9089..57a9335 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -20,6 +20,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
+ #include "qapi-types.h"
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
+diff --git a/include/migration/qemu-file.h b/include/migration/qemu-file.h
+index 0cd648a..b5ac800 100644
+--- a/include/migration/qemu-file.h
++++ b/include/migration/qemu-file.h
+@@ -27,8 +27,6 @@
+ 
  #include "qemu-common.h"
-+#include "channel.h"
+ #include "exec/cpu-common.h"
+-#include "io/channel.h"
+-
+ 
+ /* Read a chunk of data from a file at the given position.  The pos argument
+  * can be ignored if the file is only be used for streaming.  The number of
+@@ -119,8 +117,6 @@ typedef struct QEMUFileHooks {
+ } QEMUFileHooks;
+ 
+ QEMUFile *qemu_fopen_ops(void *opaque, const QEMUFileOps *ops);
+-QEMUFile *qemu_fopen_channel_input(QIOChannel *ioc);
+-QEMUFile *qemu_fopen_channel_output(QIOChannel *ioc);
+ void qemu_file_set_hooks(QEMUFile *f, const QEMUFileHooks *hooks);
+ int qemu_get_fd(QEMUFile *f);
+ int qemu_fclose(QEMUFile *f);
+diff --git a/migration/channel.c b/migration/channel.c
+index 6104de5..fed8563 100644
+--- a/migration/channel.c
++++ b/migration/channel.c
+@@ -16,6 +16,7 @@
+ #include "qemu/osdep.h"
+ #include "channel.h"
  #include "migration/migration.h"
- #include "io/channel-command.h"
++#include "qemu-file-channel.h"
  #include "trace.h"
-diff --git a/migration/fd.c b/migration/fd.c
-index 58cb51a..05e0a5c 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -17,6 +17,7 @@
- #include "qemu/osdep.h"
  #include "qapi/error.h"
- #include "qemu-common.h"
-+#include "channel.h"
- #include "migration/migration.h"
- #include "monitor/monitor.h"
- #include "io/channel-util.h"
+ #include "io/channel-tls.h"
+diff --git a/migration/colo.c b/migration/colo.c
+index 430bae5..65993d3 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
++#include "qemu-file-channel.h"
+ #include "migration/colo.h"
+ #include "migration/block.h"
+ #include "io/channel-buffer.h"
 diff --git a/migration/migration.c b/migration/migration.c
-index 55c3958..303dfba 100644
+index 303dfba..ad5ed14 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -460,56 +460,6 @@ void migration_fd_process_incoming(QEMUFile *f)
-     qemu_coroutine_enter(co);
- }
- 
--
--void migration_channel_process_incoming(MigrationState *s,
--                                        QIOChannel *ioc)
--{
--    trace_migration_set_incoming_channel(
--        ioc, object_get_typename(OBJECT(ioc)));
--
--    if (s->parameters.tls_creds &&
--        *s->parameters.tls_creds &&
--        !object_dynamic_cast(OBJECT(ioc),
--                             TYPE_QIO_CHANNEL_TLS)) {
--        Error *local_err = NULL;
--        migration_tls_channel_process_incoming(s, ioc, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--        }
--    } else {
--        QEMUFile *f = qemu_fopen_channel_input(ioc);
--        migration_fd_process_incoming(f);
--    }
--}
--
--
--void migration_channel_connect(MigrationState *s,
--                               QIOChannel *ioc,
--                               const char *hostname)
--{
--    trace_migration_set_outgoing_channel(
--        ioc, object_get_typename(OBJECT(ioc)), hostname);
--
--    if (s->parameters.tls_creds &&
--        *s->parameters.tls_creds &&
--        !object_dynamic_cast(OBJECT(ioc),
--                             TYPE_QIO_CHANNEL_TLS)) {
--        Error *local_err = NULL;
--        migration_tls_channel_connect(s, ioc, hostname, &local_err);
--        if (local_err) {
--            migrate_fd_error(s, local_err);
--            error_free(local_err);
--        }
--    } else {
--        QEMUFile *f = qemu_fopen_channel_output(ioc);
--
--        s->to_dst_file = f;
--
--        migrate_fd_connect(s);
--    }
--}
--
--
- /*
-  * Send a message on the return channel back to the source
-  * of the migration.
-diff --git a/migration/socket.c b/migration/socket.c
-index 1cfbe81..53f9d61 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
 @@ -19,6 +19,7 @@
- #include "qemu-common.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-+#include "channel.h"
+ #include "qemu/main-loop.h"
+ #include "migration/blocker.h"
  #include "migration/migration.h"
++#include "qemu-file-channel.h"
  #include "migration/qemu-file.h"
- #include "io/channel-socket.h"
-diff --git a/migration/tls.c b/migration/tls.c
-index a33ecb7..34ad121 100644
---- a/migration/tls.c
-+++ b/migration/tls.c
-@@ -19,6 +19,7 @@
+ #include "sysemu/sysemu.h"
+ #include "block/block.h"
+diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
+index 45c13f1..dc991c9 100644
+--- a/migration/qemu-file-channel.c
++++ b/migration/qemu-file-channel.c
+@@ -23,6 +23,7 @@
   */
  
  #include "qemu/osdep.h"
-+#include "channel.h"
++#include "qemu-file-channel.h"
+ #include "migration/qemu-file.h"
+ #include "io/channel-socket.h"
+ #include "qemu/iov.h"
+diff --git a/migration/qemu-file-channel.h b/migration/qemu-file-channel.h
+new file mode 100644
+index 0000000..d1bd5ff
+--- /dev/null
++++ b/migration/qemu-file-channel.h
+@@ -0,0 +1,21 @@
++/*
++ * QEMU migration file channel operations
++ *
++ * Copyright IBM, Corp. 2008
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef QEMU_FILE_CHANNEL_H
++#define QEMU_FILE_CHANNEL_H
++
++#include "io/channel.h"
++
++QEMUFile *qemu_fopen_channel_input(QIOChannel *ioc);
++QEMUFile *qemu_fopen_channel_output(QIOChannel *ioc);
++#endif
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 7eaaf96..166cd60 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -20,6 +20,7 @@
  #include "migration/migration.h"
- #include "io/channel-tls.h"
- #include "crypto/tlscreds.h"
+ #include "migration/qemu-file.h"
+ #include "exec/cpu-common.h"
++#include "qemu-file-channel.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/sockets.h"
+diff --git a/migration/savevm.c b/migration/savevm.c
+index de85e06..5120c51 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -36,6 +36,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu/timer.h"
+ #include "migration/migration.h"
++#include "qemu-file-channel.h"
+ #include "postcopy-ram.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/error-report.h"
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index f694a89..1c13570 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -27,6 +27,7 @@
+ #include "qemu-common.h"
+ #include "migration/migration.h"
+ #include "migration/vmstate.h"
++#include "../migration/qemu-file-channel.h"
+ #include "qemu/coroutine.h"
+ #include "io/channel-file.h"
+ 
 -- 
 2.9.3
