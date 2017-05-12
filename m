@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d91Re-0001l6-UX
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:40:48 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1d91ZB-0003ka-GG
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:48:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d91Rb-0005VL-0l
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:40:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51814)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d91Ra-0005Us-NT
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:40:42 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6BA32C059738
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 03:40:41 +0000 (UTC)
-Date: Fri, 12 May 2017 11:40:33 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170512034033.GN28293@pxdev.xzpeter.org>
-References: <20170511163228.6666-1-quintela@redhat.com>
-	<20170511163228.6666-3-quintela@redhat.com>
+	(envelope-from <sundeep.lkml@gmail.com>) id 1d91Z9-0001i9-4e
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:48:33 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170511163228.6666-3-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
- MigrationParams
+In-Reply-To: <fffd61b7-bc45-f7da-aa91-5eed1b0d7519@amsat.org>
+References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494348286-10253-3-git-send-email-sundeep.lkml@gmail.com>
+	<fffd61b7-bc45-f7da-aa91-5eed1b0d7519@amsat.org>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Fri, 12 May 2017 09:18:29 +0530
+Message-ID: <CALHRZuri9VK-CzrcupjdNiQL1gio5bepx=xsMQUreSzHfgJyJg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-devel PATCH 2/5] msf2: Microsemi
+ Smartfusion2 System Register block.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,190 +25,311 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Thu, May 11, 2017 at 06:32:27PM +0200, Juan Quintela wrote:
-> We have change in the previous patch to use migration capabilities for
-> it.  Notice that we continue using the old command line flags from
-> migrate command from the time being.  Remove the set_params method as
-> now it is empty.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  include/migration/migration.h |  3 +--
->  migration/block.c             | 17 ++---------------
->  migration/colo.c              |  5 +++--
->  migration/migration.c         |  8 +++++---
->  migration/savevm.c            |  2 --
->  5 files changed, 11 insertions(+), 24 deletions(-)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 30c2913..2d5525c 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -39,8 +39,7 @@
->  #define QEMU_VM_SECTION_FOOTER       0x7e
->  
->  struct MigrationParams {
-> -    bool blk;
-> -    bool shared;
-> +    bool unused; /* C doesn't allow empty structs */
->  };
->  
->  /* Messages sent on the return path from destination to source */
-> diff --git a/migration/block.c b/migration/block.c
-> index 060087f..fcfa823 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -94,9 +94,6 @@ typedef struct BlkMigBlock {
->  } BlkMigBlock;
->  
->  typedef struct BlkMigState {
-> -    /* Written during setup phase.  Can be read without a lock.  */
-> -    int blk_enable;
-> -    int shared_base;
->      QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
->      int64_t total_sector_sum;
->      bool zero_blocks;
-> @@ -425,7 +422,7 @@ static int init_blk_migration(QEMUFile *f)
->          bmds->bulk_completed = 0;
->          bmds->total_sectors = sectors;
->          bmds->completed_sectors = 0;
-> -        bmds->shared_base = block_mig_state.shared_base;
-> +        bmds->shared_base = migrate_use_block_shared();
->  
->          assert(i < num_bs);
->          bmds_bs[i].bmds = bmds;
-> @@ -994,22 +991,12 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
->      return 0;
->  }
->  
-> -static void block_set_params(const MigrationParams *params, void *opaque)
-> -{
-> -    block_mig_state.blk_enable = params->blk;
-> -    block_mig_state.shared_base = params->shared;
-> -
-> -    /* shared base means that blk_enable = 1 */
-> -    block_mig_state.blk_enable |= params->shared;
-> -}
-> -
->  static bool block_is_active(void *opaque)
->  {
-> -    return block_mig_state.blk_enable == 1;
-> +    return migrate_use_block_enabled();
->  }
->  
->  static SaveVMHandlers savevm_block_handlers = {
-> -    .set_params = block_set_params,
->      .save_live_setup = block_save_setup,
->      .save_live_iterate = block_save_iterate,
->      .save_live_complete_precopy = block_save_complete,
-> diff --git a/migration/colo.c b/migration/colo.c
-> index 963c802..e772384 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -14,6 +14,7 @@
->  #include "qemu/timer.h"
->  #include "sysemu/sysemu.h"
->  #include "migration/colo.h"
-> +#include "migration/block.h"
->  #include "io/channel-buffer.h"
->  #include "trace.h"
->  #include "qemu/error-report.h"
-> @@ -345,8 +346,8 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
->      }
->  
->      /* Disable block migration */
-> -    s->params.blk = 0;
-> -    s->params.shared = 0;
-> +    migrate_set_block_enabled(s, false);
-> +    migrate_set_block_shared(s, false);
->      qemu_savevm_state_header(fb);
->      qemu_savevm_state_begin(fb, &s->params);
->      qemu_mutex_lock_iothread();
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 2f981aa..8a3bf89 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -787,6 +787,10 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
->          s->enabled_capabilities[cap->value->capability] = cap->value->state;
->      }
->  
-> +    if (s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED]) {
-> +        s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = true;
-> +    }
-> +
+Hi Phiilippe,
 
-[1]
+On Wed, May 10, 2017 at 4:04 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg>
+wrote:
 
->      if (migrate_postcopy_ram()) {
->          if (migrate_use_compression()) {
->              /* The decompression threads asynchronously write into RAM
-> @@ -1214,9 +1218,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->      MigrationParams params;
->      const char *p;
->  
-> -    params.blk = has_blk && blk;
-> -    params.shared = has_inc && inc;
-> -
->      if (migration_is_setup_or_active(s->state) ||
->          s->state == MIGRATION_STATUS_CANCELLING ||
->          s->state == MIGRATION_STATUS_COLO) {
-> @@ -1239,6 +1240,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->      }
->  
->      if (has_inc && inc) {
-> +        migrate_set_block_enabled(s, true);
->          migrate_set_block_shared(s, true);
+> Hi Subbaraya,
+>
+>
+> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
+>
+>> Added Sytem register block of Smartfusion2.
+>> This block has PLL registers which are accessed by guest.
+>>
+>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>> ---
+>>  hw/misc/Makefile.objs         |   1 +
+>>  hw/misc/msf2-sysreg.c         | 131 ++++++++++++++++++++++++++++++
+>> ++++++++++++
+>>  include/hw/misc/msf2-sysreg.h |  80 ++++++++++++++++++++++++++
+>>  3 files changed, 212 insertions(+)
+>>  create mode 100644 hw/misc/msf2-sysreg.c
+>>  create mode 100644 include/hw/misc/msf2-sysreg.h
+>>
+>> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+>> index c8b4893..0f52354 100644
+>> --- a/hw/misc/Makefile.objs
+>> +++ b/hw/misc/Makefile.objs
+>> @@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) +=3D edu.o
+>>  obj-$(CONFIG_HYPERV_TESTDEV) +=3D hyperv_testdev.o
+>>  obj-$(CONFIG_AUX) +=3D auxbus.o
+>>  obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
+>> +obj-$(CONFIG_MSF2) +=3D msf2-sysreg.o
+>> diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
+>> new file mode 100644
+>> index 0000000..53e9cba
+>> --- /dev/null
+>> +++ b/hw/misc/msf2-sysreg.c
+>> @@ -0,0 +1,131 @@
+>> +/*
+>> + * System Register block model of Microsemi SmartFusion2.
+>> + *
+>> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or
+>> + * modify it under the terms of the GNU General Public License
+>> + * as published by the Free Software Foundation; either version
+>> + * 2 of the License, or (at your option) any later version.
+>> + *
+>> + * You should have received a copy of the GNU General Public License
+>> along
+>> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#include "hw/misc/msf2-sysreg.h"
+>> +
+>> +#ifndef MSF2_SYSREG_ERR_DEBUG
+>> +#define MSF2_SYSREG_ERR_DEBUG  0
+>> +#endif
+>> +
+>> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+>> +    if (MSF2_SYSREG_ERR_DEBUG >=3D lvl) { \
+>> +        qemu_log("%s: " fmt, __func__, ## args); \
+>> +    } \
+>> +} while (0);
+>> +
+>> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+>> +
+>> +static void msf2_sysreg_reset(DeviceState *d)
+>> +{
+>> +    MSF2SysregState *s =3D MSF2_SYSREG(d);
+>> +
+>> +    DB_PRINT("RESET\n");
+>> +
+>> +    s->regs[MSSDDR_PLL_STATUS_LOW_CR] =3D 0x02420041;
+>> +    s->regs[MSSDDR_FACC1_CR] =3D 0x0A482124;
+>> +    s->regs[MSSDDR_PLL_STATUS] =3D 0x3;
+>> +}
+>> +
+>> +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
+>> +    unsigned size)
+>> +{
+>> +    MSF2SysregState *s =3D opaque;
+>> +    offset /=3D 4;
+>> +    uint32_t ret =3D 0;
+>> +
+>> +    if (offset < ARRAY_SIZE(s->regs)) {
+>> +        ret =3D s->regs[offset];
+>> +        DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx32 "\n",
+>> +                    offset * 4, ret);
+>> +    } else {
+>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>> +                    "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
+>> +                    offset * 4);
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static void msf2_sysreg_write(void *opaque, hwaddr offset,
+>> +                          uint64_t val, unsigned size)
+>> +{
+>> +    MSF2SysregState *s =3D (MSF2SysregState *)opaque;
+>> +    offset /=3D 4;
+>> +
+>> +    DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx64 "\n",
+>> +            offset * 4, val);
+>> +
+>> +    switch (offset) {
+>> +    case MSSDDR_PLL_STATUS:
+>> +        break;
+>> +
+>> +    default:
+>> +        if (offset < ARRAY_SIZE(s->regs)) {
+>> +            s->regs[offset] =3D val;
+>>
+>
+> I think this is pretty unsafe for the guest to continue if those register=
+s
+> are accessed in your current implementation.
+>
+> I'd at least somehow abort for few of them (RESET, REMAP*), what do you
+> think?
 
-[2]
 
-IIUC for [1] & [2] we are solving the same problem that "shared"
-depends on "enabled" bit. Would it be good to unitfy this dependency
-somewhere? E.g., by changing migrate_set_block_shared() into:
-
-void migrate_set_block_shared(MigrationState *s, bool value)
-{
-    s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = value;
-    if (value) {
-        migrate_set_block_enabled(s, true);
-    }
-}
-
-?
-
-Another thing to mention: after switching to the capability interface,
-we'll cache the "enabled" and "shared" bits now while we don't cache
-it before, right? IIUC it'll affect behavior of such sequence:
-
-- 1st migrate with enabled=1, shared=1, then
-- 2nd migrate with enabled=0, shared=0
-
-Before the series, the 2nd migrate will use enabled=shared=0, but
-after the series it should be using enabled=shared=1. Not sure whether
-this would be a problem (or I missed anything?).
+Ok. We can abort for REMAP. All the peripherals need to be released from
+reset by writing to Sysreg.
+Can we handle that case where if guest writes to Sysreg to reset SPI(say)
+then we can reset SPI
+model from here? I am very new here and I did not come across this case in
+the models I have referred.
+Please let me know if that is possible. If not possible I would simply log
+messages like released
+from reset/put in reset.
 
 Thanks,
+Sundeep
 
->      }
->  
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index f8d1e8b..221fb4b 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1233,8 +1233,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
->  {
->      int ret;
->      MigrationParams params = {
-> -        .blk = 0,
-> -        .shared = 0
->      };
->      MigrationState *ms = migrate_init(&params);
->      MigrationStatus status;
-> -- 
-> 2.9.3
-> 
-
--- 
-Peter Xu
+>
+>
+> +        } else {
+>> +            qemu_log_mask(LOG_GUEST_ERROR,
+>> +                        "%s: Bad offset 0x%08" HWADDR_PRIx "\n",
+>> __func__,
+>> +                        offset * 4);
+>> +        }
+>> +        break;
+>> +    }
+>> +}
+>> +
+>> +static const MemoryRegionOps sysreg_ops =3D {
+>> +    .read =3D msf2_sysreg_read,
+>> +    .write =3D msf2_sysreg_write,
+>> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+>> +};
+>> +
+>> +static void msf2_sysreg_init(Object *obj)
+>> +{
+>> +    MSF2SysregState *s =3D MSF2_SYSREG(obj);
+>> +
+>> +    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s,
+>> TYPE_MSF2_SYSREG,
+>> +                          MSF2_SYSREG_MMIO_SIZE);
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_msf2_sysreg =3D {
+>> +    .name =3D TYPE_MSF2_SYSREG,
+>> +    .version_id =3D 1,
+>> +    .minimum_version_id =3D 1,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_UINT32_ARRAY(regs, MSF2SysregState,
+>> MSF2_SYSREG_NUM_REGS),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>> +static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> +
+>> +    dc->vmsd =3D &vmstate_msf2_sysreg;
+>> +    dc->reset =3D msf2_sysreg_reset;
+>> +}
+>> +
+>> +static const TypeInfo msf2_sysreg_info =3D {
+>> +    .name  =3D TYPE_MSF2_SYSREG,
+>> +    .parent =3D TYPE_SYS_BUS_DEVICE,
+>> +    .class_init =3D msf2_sysreg_class_init,
+>> +    .instance_size  =3D sizeof(MSF2SysregState),
+>> +    .instance_init =3D msf2_sysreg_init,
+>> +};
+>> +
+>> +static void msf2_sysreg_register_types(void)
+>> +{
+>> +    type_register_static(&msf2_sysreg_info);
+>> +}
+>> +
+>> +type_init(msf2_sysreg_register_types)
+>> diff --git a/include/hw/misc/msf2-sysreg.h b/include/hw/misc/msf2-sysreg=
+.
+>> h
+>> new file mode 100644
+>> index 0000000..a485ed6
+>> --- /dev/null
+>> +++ b/include/hw/misc/msf2-sysreg.h
+>> @@ -0,0 +1,80 @@
+>> +/*
+>> + * Microsemi SmartFusion2 SYSREG
+>> + *
+>> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>> + *
+>> + * Permission is hereby granted, free of charge, to any person obtainin=
+g
+>> a copy
+>> + * of this software and associated documentation files (the "Software")=
+,
+>> to deal
+>> + * in the Software without restriction, including without limitation th=
+e
+>> rights
+>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
+>> sell
+>> + * copies of the Software, and to permit persons to whom the Software i=
+s
+>> + * furnished to do so, subject to the following conditions:
+>> + *
+>> + * The above copyright notice and this permission notice shall be
+>> included in
+>> + * all copies or substantial portions of the Software.
+>> + *
+>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+>> EXPRESS OR
+>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+>> MERCHANTABILITY,
+>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+>> SHALL
+>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+>> OTHER
+>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+>> ARISING FROM,
+>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+>> DEALINGS IN
+>> + * THE SOFTWARE.
+>> + */
+>> +
+>> +#ifndef HW_MSF2_SYSREG_H
+>> +#define HW_MSF2_SYSREG_H
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "hw/sysbus.h"
+>> +#include "hw/hw.h"
+>> +#include "sysemu/sysemu.h"
+>> +#include "qemu/log.h"
+>> +
+>> +enum {
+>> +    ESRAM_CR        =3D 0x00 / 4,
+>> +    ESRAM_MAX_LAT,
+>> +    DDR_CR,
+>> +    ENVM_CR,
+>> +    ENVM_REMAP_BASE_CR,
+>> +    ENVM_REMAP_FAB_CR,
+>> +    CC_CR,
+>> +    CC_REGION_CR,
+>> +    CC_LOCK_BASE_ADDR_CR,
+>> +    CC_FLUSH_INDX_CR,
+>> +    DDRB_BUF_TIMER_CR,
+>> +    DDRB_NB_ADDR_CR,
+>> +    DDRB_NB_SIZE_CR,
+>> +    DDRB_CR,
+>> +
+>> +    SOFT_RESET_CR  =3D 0x48 / 4,
+>> +    M3_CR,
+>> +
+>> +    GPIO_SYSRESET_SEL_CR =3D 0x58 / 4,
+>> +
+>> +    MDDR_CR =3D 0x60 / 4,
+>> +
+>> +    MSSDDR_PLL_STATUS_LOW_CR =3D 0x90 / 4,
+>> +    MSSDDR_PLL_STATUS_HIGH_CR,
+>> +    MSSDDR_FACC1_CR,
+>> +    MSSDDR_FACC2_CR,
+>> +
+>> +    MSSDDR_PLL_STATUS =3D 0x150 / 4,
+>> +
+>> +};
+>> +
+>> +#define MSF2_SYSREG_MMIO_SIZE     0x300
+>> +#define MSF2_SYSREG_NUM_REGS      (MSF2_SYSREG_MMIO_SIZE / 4)
+>> +
+>> +#define TYPE_MSF2_SYSREG          "msf2-sysreg"
+>> +#define MSF2_SYSREG(obj)  OBJECT_CHECK(MSF2SysregState, (obj),
+>> TYPE_MSF2_SYSREG)
+>> +
+>> +typedef struct MSF2SysregState {
+>> +    SysBusDevice parent_obj;
+>> +
+>> +    MemoryRegion iomem;
+>> +
+>> +    uint32_t regs[MSF2_SYSREG_NUM_REGS];
+>> +} MSF2SysregState;
+>> +
+>> +#endif /* HW_MSF2_SYSREG_H */
+>>
+>>
