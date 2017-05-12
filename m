@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d94R4-0005fB-MK
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:52:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1d94UW-00006n-1O
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1d94R0-0006nU-Iq
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:52:22 -0400
-Date: Fri, 12 May 2017 16:12:24 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170512061224.GH12908@umbus.fritz.box>
-References: <20170505204746.14116-1-danielhb@linux.vnet.ibm.com>
-	<20170505204746.14116-5-danielhb@linux.vnet.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1d94UQ-0000Ci-Ks
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:55:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1d94UQ-0000CR-CR
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 02:55:50 -0400
+References: <1494398933-8366-1-git-send-email-thuth@redhat.com>
+	<20170510090841.GF31558@redhat.com>
+	<e8f7410f-98d9-2e0e-b75d-0ff38fd81b35@redhat.com>
+	<20170510103153.GI31558@redhat.com>
+	<ccb8fecd-e918-1cc0-28ef-af9865540fbc@redhat.com>
+	<157a6609-d75a-5d40-e5b9-c70802e40950@redhat.com>
+	<20170511093022.GJ8639@redhat.com> <87poffsa45.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <de5bde25-bfd1-8a2b-e44b-0d91eab8fbaf@redhat.com>
+Date: Fri, 12 May 2017 08:55:42 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wayzTnRSUXKNfBqd"
-Content-Disposition: inline
-In-Reply-To: <20170505204746.14116-5-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v9 4/6] hw/ppc/spapr.c: migrate
- pending_dimm_unplugs of spapr state
+In-Reply-To: <87poffsa45.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machines pc-0.10 to
+ pc-0.15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,124 +33,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com, Richard Henderson <rth@twiddle.net>
 
-
---wayzTnRSUXKNfBqd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, May 05, 2017 at 05:47:44PM -0300, Daniel Henrique Barboza wrote:
-> To allow for a DIMM unplug event to resume its work if a migration
-> occurs in the middle of it, this patch migrates the non-empty
-> pending_dimm_unplugs QTAILQ that stores the DIMM information
-> that the spapr_lmb_release() callback uses.
+On 11.05.2017 17:10, Markus Armbruster wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> writes:
 >=20
-> It was considered an apprach where the DIMM states would be restored
-> on the post-_load after a migration. The problem is that there is
-> no way of knowing, from the sPAPRMachineState, if a given DIMM is going
-> through an unplug process and the callback needs the updated DIMM State.
+>> On Wed, May 10, 2017 at 06:15:39PM +0200, Paolo Bonzini wrote:
+>>>
+>>>
+>>> On 10/05/2017 16:47, Thomas Huth wrote:
+>>>>> So while we can delete pc-0.12, we can't delete associated features=
+ needed
+>>>>> by pc-0.12, without complicating RHEL's ability to create its back-=
+compat
+>>>>> machine types. Downstream would have to un-delete the features.
+>>>>
+>>>> So I guess this is why Paolo said that pc-0.12 is still in "use" ...=
+ I
+>>>> think removing pc-0.12, but not removing rombar=3D0 will cause confu=
+sion
+>>>> in the upstream code base sooner or later,
+>>>
+>>> I agree.
+>>>
+>>>> so I guess we should rather
+>>>> keep the pc-0.12 machine until we can get rid of it together with th=
+e
+>>>> rombar code. We should still mark it as deprecated, of course.
+>>>>
+>>>>> I think tieing removal to major versions is a mistake, unless we're
+>>>>> going to set a fixed timeframe for delivery of major versions. ie i=
+f
+>>>>> we gaurantee that we'll ship a new major version every 18 months, t=
+hat
+>>>>> gives people a predictable lifetime.  If we carry on inventing reas=
+ons
+>>>>> for major versions at arbitrary points in time, it makes it difficu=
+lt
+>>>>> to have any reasonable forward planning.  It is more users friendly=
+ if
+>>>>> we can set a clear fixed timeframe for machine type lifecycle / eol
+>>>>
+>>>> IMHO we should have a new major release after we've reached a .9 min=
+or
+>>>> release, but so far it seems like I'm the only one with that wish...
+>>>
+>>> I actually like that, but then you've pretty much guaranteed that you
+>>> _cannot_ remove anything deprecated until 4.0.  You and Daniel aren't
+>>> disagreeing as heavily as it seems, I think.
+>>
+>> I don't think we should tie removal of features to version numbers. IM=
+HO
+>> we should just increment the first major digit on a fixed time scale,
+>> either once a year, or whenever we get past .9.
+
+Once a year sounds too often for my personal taste, I really prefer the
+.9 way, but that's details...
+
+>> For removal of features, IMHO, the only important thing is to give use=
+rs
+>> deprecation clear warning for 2-3  releases, and ensure feature detect=
+ion
+>> works well. As long as that is done, there shouldn't be any need to ba=
+tch
+>> them up for "major" releases. From libvirt POV, batching up removal to
+>> major releases is not beneficial. Batching to major releases gives a v=
+ery
+>> inconsistent timeframe for removal too - somethign fdeprecated in .1
+>> release may live on for years,  until the next $major.0, while somethi=
+ng
+>> deprecated in a .9 release can be killed in 4 months. I much prefer to
+>> see a consistent deprecated for 2 releases / 8 months, then deleted
+>> regardless of feature.
 >=20
-> We could migrate a flag indicating that there is an unplug event going
-> on for a certain DIMM, fetching this information from the start of the
-> spapr_del_lmbs call. But this would also require a scan on post_load to
-> figure out how many nr_lmbs are left. At this point we can just
-> migrate the nr_lmbs information as well, given that it is being calculated
-> at spapr_del_lmbs already, and spare a scanning/discovery in the
-> post-load. All that we need is inside the sPAPRDIMMState structure
-> that is added to the pending_dimm_unplugs queue at the start of the
-> spapr_del_lmbs, so it's convenient to just migrated this queue it if it's
-> not empty.
->=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> I concur.
 
-NACK.
+Fine for me, too. My only additional point is that we *should* have
+major releases from time to time (ending up with something like QEMU
+2.42 is just ugly), and that we *could* use them for additional
+spring-cleaning (not for the libvirt POV, but for the users POV). For
+example, we've got some parameters where we warn since QEMU 1.3 that it
+is deprecated and might go away soon. We now could use major releases to
+remind ourselves from time to time to look through the code for such
+deprecated interfaces and remove them with the next major version. (But
+removal would of course also be allowed at any other minor version
+release if the feature has been deprecated for at least two minor
+releases already).
 
-As I believe I suggested previously, you can reconstruct this state on
-the receiving side by doing a full scan of the DIMM and LMB DRC states.
-
-> ---
->  hw/ppc/spapr.c | 31 +++++++++++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e190eb9..30f0b7b 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1437,6 +1437,36 @@ static bool version_before_3(void *opaque, int ver=
-sion_id)
->      return version_id < 3;
->  }
-> =20
-> +static bool spapr_pending_dimm_unplugs_needed(void *opaque)
-> +{
-> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
-> +    return !QTAILQ_EMPTY(&spapr->pending_dimm_unplugs);
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_dimmstate =3D {
-> +    .name =3D "spapr_dimm_state",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT64(addr, sPAPRDIMMState),
-> +        VMSTATE_UINT32(nr_lmbs, sPAPRDIMMState),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static const VMStateDescription vmstate_spapr_pending_dimm_unplugs =3D {
-> +    .name =3D "spapr_pending_dimm_unplugs",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D spapr_pending_dimm_unplugs_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_QTAILQ_V(pending_dimm_unplugs, sPAPRMachineState, 1,
-> +                         vmstate_spapr_dimmstate, sPAPRDIMMState,
-> +                         next),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static bool spapr_ov5_cas_needed(void *opaque)
->  {
->      sPAPRMachineState *spapr =3D opaque;
-> @@ -1535,6 +1565,7 @@ static const VMStateDescription vmstate_spapr =3D {
->      .subsections =3D (const VMStateDescription*[]) {
->          &vmstate_spapr_ov5_cas,
->          &vmstate_spapr_patb_entry,
-> +        &vmstate_spapr_pending_dimm_unplugs,
->          NULL
->      }
->  };
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---wayzTnRSUXKNfBqd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZFVJIAAoJEGw4ysog2bOSBhEP+gL4tKuD9c3xUIrw8zkF6ZN2
-xqYKmLYyNXc4s7HEajLVz5+ayg2UB6hCTWjMLHstLnc5MmgggtdNnePRE12W8Cfb
-gXaoAXpIxpFsKa0xgXFbmHGjCbb5sycUQnT2H8jhPcTNTvwNZ5xx9PtBUnKyD9St
-nWE2hhipQGbbiRJk2pyCv4hqss+EgjXlJUQrJ5hZBlr5W4y9RMYrHZGH04+BiUz2
-TRSxo7B4hZSOlpXO+D/+0Ql06uXX4V5VaG4HC1Baoal0bgljcF3F99gBYQ92dqY7
-xj9042pTbp+i87OTfOaGQ6CCcE1UW2AfL7tSBQj/x8qArSMseU4QwMLASiTT4V5C
-v8Daw2hbDaKbaqKi166csbMZLUyiWzw0Nek6lRSXLuSohulKO8rVQRe/DFCmAlAr
-H+HStdqqeWN2NRlc/POh3h7whPxBxtl913SDu8diLMMsQU5ISQ04KOTerUOBDAK7
-PamH4X8CX8jl/4rIkoD/1QYsvcIj2EzZD/vJvGlephWvlYTOhmZlW+n7EGz80XVT
-BXQ7wzg5PPHB1CKn1PeZh2r64SeuiSTy9cGOuV/MWuyrkRT9qD1n7tbkJYnTOPqf
-VFIJmdoj+QEZl4EVSE3K0C1PC2ZVi1kDrCftsXzmPmX3TtrrFL4jtpHX8vH2PbWw
-g7mLHySat1A1L5f7aUm2
-=vO6t
------END PGP SIGNATURE-----
-
---wayzTnRSUXKNfBqd--
+ Thomas
