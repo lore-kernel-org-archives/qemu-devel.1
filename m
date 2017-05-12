@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d91wJ-00006e-FX
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:12:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d91wS-00009G-W7
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:12:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1d91wE-0006F4-Cx
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:12:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50464)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d91wE-0006E3-3h
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:12:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D2FF07F7A5
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 04:12:20 +0000 (UTC)
-Date: Fri, 12 May 2017 12:12:14 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170512041214.GP28293@pxdev.xzpeter.org>
-References: <1494505358-15287-1-git-send-email-peterx@redhat.com>
-	<1494505358-15287-3-git-send-email-peterx@redhat.com>
-	<20170511130525.GG2078@work-vm>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d91wO-0006Kx-6b
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 00:12:36 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494348286-10253-3-git-send-email-sundeep.lkml@gmail.com>
+	<fffd61b7-bc45-f7da-aa91-5eed1b0d7519@amsat.org>
+	<CALHRZuri9VK-CzrcupjdNiQL1gio5bepx=xsMQUreSzHfgJyJg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d563fb57-87c4-9484-6028-b1935caa599a@amsat.org>
+Date: Fri, 12 May 2017 01:12:27 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170511130525.GG2078@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v7 2/4] utils: provide size_to_str()
+In-Reply-To: <CALHRZuri9VK-CzrcupjdNiQL1gio5bepx=xsMQUreSzHfgJyJg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-devel PATCH 2/5] msf2: Microsemi
+ Smartfusion2 System Register block.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,121 +30,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: sundeep subbaraya <sundeep.lkml@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>
 
-On Thu, May 11, 2017 at 02:05:26PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Moving the algorithm from print_type_size() into size_to_str() so that
-> > other component can also leverage it. With that, refactor
-> > print_type_size().
-> > 
-> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/qemu-common.h        |  1 +
-> >  qapi/string-output-visitor.c | 22 ++++++----------------
-> >  util/cutils.c                | 26 ++++++++++++++++++++++++++
-> >  3 files changed, 33 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/include/qemu-common.h b/include/qemu-common.h
-> > index d218821..d7d0448 100644
-> > --- a/include/qemu-common.h
-> > +++ b/include/qemu-common.h
-> > @@ -145,6 +145,7 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
-> >  int parse_debug_env(const char *name, int max, int initial);
-> >  
-> >  const char *qemu_ether_ntoa(const MACAddr *mac);
-> > +char *size_to_str(double val);
-> >  void page_size_init(void);
-> >  
-> >  /* returns non-zero if dump is in progress, otherwise zero is
-> > diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
-> > index 94ac821..53c2175 100644
-> > --- a/qapi/string-output-visitor.c
-> > +++ b/qapi/string-output-visitor.c
-> > @@ -211,10 +211,8 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
-> >                              Error **errp)
-> >  {
-> >      StringOutputVisitor *sov = to_sov(v);
-> > -    static const char suffixes[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E' };
-> > -    uint64_t div, val;
-> > -    char *out;
-> > -    int i;
-> > +    uint64_t val;
-> > +    char *out, *psize;
-> >  
-> >      if (!sov->human) {
-> >          out = g_strdup_printf("%"PRIu64, *obj);
-> > @@ -223,19 +221,11 @@ static void print_type_size(Visitor *v, const char *name, uint64_t *obj,
-> >      }
-> >  
-> >      val = *obj;
-> > -
-> > -    /* The exponent (returned in i) minus one gives us
-> > -     * floor(log2(val * 1024 / 1000).  The correction makes us
-> > -     * switch to the higher power when the integer part is >= 1000.
-> > -     */
-> > -    frexp(val / (1000.0 / 1024.0), &i);
-> > -    i = (i - 1) / 10;
-> > -    assert(i < ARRAY_SIZE(suffixes));
-> > -    div = 1ULL << (i * 10);
-> > -
-> > -    out = g_strdup_printf("%"PRIu64" (%0.3g %c%s)", val,
-> > -                          (double)val/div, suffixes[i], i ? "iB" : "");
-> > +    psize = size_to_str(val);
-> > +    out = g_strdup_printf("%"PRIu64" (%s)", val, psize);
-> >      string_output_set(sov, out);
-> > +
-> > +    g_free(psize);
-> >  }
-> >  
-> >  static void print_type_bool(Visitor *v, const char *name, bool *obj,
-> > diff --git a/util/cutils.c b/util/cutils.c
-> > index 50ad179..fa5ddec 100644
-> > --- a/util/cutils.c
-> > +++ b/util/cutils.c
-> > @@ -619,3 +619,29 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
-> >  
-> >      return ret;
-> >  }
-> > +
-> > +/*
-> > + * Return human readable string for size @val.
-> > + * @val must be between (-1000Eib, 1000EiB), exclusively.
-> > + * Use IEC binary units like KiB, MiB, and so forth.
-> > + * Caller is responsible for passing it to g_free().
-> > + */
-> > +char *size_to_str(double val)
-> > +{
-> > +    static const char *suffixes[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
-> > +    unsigned long div;
-> > +    int i;
-> > +
-> > +    /*
-> > +     * The exponent (returned in i) minus one gives us
-> > +     * floor(log2(val * 1024 / 1000).  The correction makes us
-> > +     * switch to the higher power when the integer part is >= 1000.
-> > +     * (see e41b509d68afb1f for more info)
-> > +     */
-> > +    frexp(val / (1000.0 / 1024.0), &i);
-> > +    i = (i - 1) / 10;
-> > +    assert(i < ARRAY_SIZE(suffixes));
-> 
-> Because your code takes a double, where as Paolo's only takes uint's,
-> I think you have to be careful to check that i >= 0  as well,  for
-> example, what would happen if someone did size_to_str(1.0/100.0) ?
+On 05/12/2017 12:48 AM, sundeep subbaraya wrote:
+> Hi Phiilippe,
+>
+> On Wed, May 10, 2017 at 4:04 PM, Philippe Mathieu-Daudé <f4bug@amsat.org>
+> wrote:
+>
+>> Hi Subbaraya,
+>>
+>>
+>> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
+>>
+>>> Added Sytem register block of Smartfusion2.
+>>> This block has PLL registers which are accessed by guest.
+>>>
+>>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>>> ---
+>>>  hw/misc/Makefile.objs         |   1 +
+>>>  hw/misc/msf2-sysreg.c         | 131 ++++++++++++++++++++++++++++++
+>>> ++++++++++++
+>>>  include/hw/misc/msf2-sysreg.h |  80 ++++++++++++++++++++++++++
+>>>  3 files changed, 212 insertions(+)
+>>>  create mode 100644 hw/misc/msf2-sysreg.c
+>>>  create mode 100644 include/hw/misc/msf2-sysreg.h
+>>>
+>>> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+>>> index c8b4893..0f52354 100644
+>>> --- a/hw/misc/Makefile.objs
+>>> +++ b/hw/misc/Makefile.objs
+>>> @@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) += edu.o
+>>>  obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+>>>  obj-$(CONFIG_AUX) += auxbus.o
+>>>  obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+>>> +obj-$(CONFIG_MSF2) += msf2-sysreg.o
+>>> diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
+>>> new file mode 100644
+>>> index 0000000..53e9cba
+>>> --- /dev/null
+>>> +++ b/hw/misc/msf2-sysreg.c
+>>> @@ -0,0 +1,131 @@
+>>> +/*
+>>> + * System Register block model of Microsemi SmartFusion2.
+>>> + *
+>>> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>>> + *
+>>> + * This program is free software; you can redistribute it and/or
+>>> + * modify it under the terms of the GNU General Public License
+>>> + * as published by the Free Software Foundation; either version
+>>> + * 2 of the License, or (at your option) any later version.
+>>> + *
+>>> + * You should have received a copy of the GNU General Public License
+>>> along
+>>> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+>>> + */
+>>> +
+>>> +#include "hw/misc/msf2-sysreg.h"
+>>> +
+>>> +#ifndef MSF2_SYSREG_ERR_DEBUG
+>>> +#define MSF2_SYSREG_ERR_DEBUG  0
+>>> +#endif
+>>> +
+>>> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+>>> +    if (MSF2_SYSREG_ERR_DEBUG >= lvl) { \
+>>> +        qemu_log("%s: " fmt, __func__, ## args); \
+>>> +    } \
+>>> +} while (0);
+>>> +
+>>> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+>>> +
+>>> +static void msf2_sysreg_reset(DeviceState *d)
+>>> +{
+>>> +    MSF2SysregState *s = MSF2_SYSREG(d);
+>>> +
+>>> +    DB_PRINT("RESET\n");
+>>> +
+>>> +    s->regs[MSSDDR_PLL_STATUS_LOW_CR] = 0x02420041;
+>>> +    s->regs[MSSDDR_FACC1_CR] = 0x0A482124;
+>>> +    s->regs[MSSDDR_PLL_STATUS] = 0x3;
+>>> +}
+>>> +
+>>> +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
+>>> +    unsigned size)
+>>> +{
+>>> +    MSF2SysregState *s = opaque;
+>>> +    offset /= 4;
+>>> +    uint32_t ret = 0;
+>>> +
+>>> +    if (offset < ARRAY_SIZE(s->regs)) {
+>>> +        ret = s->regs[offset];
+>>> +        DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx32 "\n",
+>>> +                    offset * 4, ret);
+>>> +    } else {
+>>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>>> +                    "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
+>>> +                    offset * 4);
+>>> +    }
+>>> +
+>>> +    return ret;
+>>> +}
+>>> +
+>>> +static void msf2_sysreg_write(void *opaque, hwaddr offset,
+>>> +                          uint64_t val, unsigned size)
+>>> +{
+>>> +    MSF2SysregState *s = (MSF2SysregState *)opaque;
+>>> +    offset /= 4;
+>>> +
+>>> +    DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx64 "\n",
+>>> +            offset * 4, val);
+>>> +
+>>> +    switch (offset) {
+>>> +    case MSSDDR_PLL_STATUS:
+>>> +        break;
+>>> +
+>>> +    default:
+>>> +        if (offset < ARRAY_SIZE(s->regs)) {
+>>> +            s->regs[offset] = val;
+>>>
+>>
+>> I think this is pretty unsafe for the guest to continue if those registers
+>> are accessed in your current implementation.
+>>
+>> I'd at least somehow abort for few of them (RESET, REMAP*), what do you
+>> think?
+>
+>
+> Ok. We can abort for REMAP. All the peripherals need to be released from
+> reset by writing to Sysreg.
+> Can we handle that case where if guest writes to Sysreg to reset SPI(say)
+> then we can reset SPI
+> model from here? I am very new here and I did not come across this case in
+> the models I have referred.
+> Please let me know if that is possible. If not possible I would simply log
+> messages like released
+> from reset/put in reset.
 
-Yes, you are right.
+You are lucky if you didn't have to use the remap register :)
+This can be implemented later if needed, don't get lost there now!
 
-Let me stick to uint64_t then, after all double helps little in dump
-sizes... /me chose an unwise parameter type.
+On Cold Reset the SF2 starts with the Cache Matrix mapping the CM3 code 
+region (anything below 0x2000.0000) to the eNVM (which is physically 
+mapped at 0x6000.0000). Now if you write to the REMAP reg you can 
+instead map the eSRAM or the DDR space to the CM3 code, and the eNVM 
+will only be accessible at 0x6000.0000. For the cpu the execution 
+depends of the code stored at the mapped region.
 
-And then it's safe to directly remove the assert() in this patch,
-because even UINT64_MAX is only 16 EiB. Then I can further drop the
-last patch...
+If there is enough space to run your code in the eNVM, don't worry about 
+modeling a remap. But now anyone can try your model, and if their 
+firmware do a remap, the code flow will be completely wrong.
+I think just reporting a GUEST_ERROR here is not enough since code flow 
+continuing would be pretty hard to understand/debug. That's why I 
+suggest to report an error and abort for now.
 
-I'll resend. Thanks,
-
--- 
-Peter Xu
+>
+> Thanks,
+> Sundeep
+>
+>>
+>>
+>> +        } else {
+>>> +            qemu_log_mask(LOG_GUEST_ERROR,
+>>> +                        "%s: Bad offset 0x%08" HWADDR_PRIx "\n",
+>>> __func__,
+>>> +                        offset * 4);
+>>> +        }
+>>> +        break;
+>>> +    }
+>>> +}
+>>> +
+>>> +static const MemoryRegionOps sysreg_ops = {
+>>> +    .read = msf2_sysreg_read,
+>>> +    .write = msf2_sysreg_write,
+>>> +    .endianness = DEVICE_NATIVE_ENDIAN,
+>>> +};
+>>> +
+>>> +static void msf2_sysreg_init(Object *obj)
+>>> +{
+>>> +    MSF2SysregState *s = MSF2_SYSREG(obj);
+>>> +
+>>> +    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s,
+>>> TYPE_MSF2_SYSREG,
+>>> +                          MSF2_SYSREG_MMIO_SIZE);
+>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
+>>> +}
+>>> +
+>>> +static const VMStateDescription vmstate_msf2_sysreg = {
+>>> +    .name = TYPE_MSF2_SYSREG,
+>>> +    .version_id = 1,
+>>> +    .minimum_version_id = 1,
+>>> +    .fields = (VMStateField[]) {
+>>> +        VMSTATE_UINT32_ARRAY(regs, MSF2SysregState,
+>>> MSF2_SYSREG_NUM_REGS),
+>>> +        VMSTATE_END_OF_LIST()
+>>> +    }
+>>> +};
+>>> +
+>>> +static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
+>>> +{
+>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>> +
+>>> +    dc->vmsd = &vmstate_msf2_sysreg;
+>>> +    dc->reset = msf2_sysreg_reset;
+>>> +}
+>>> +
+>>> +static const TypeInfo msf2_sysreg_info = {
+>>> +    .name  = TYPE_MSF2_SYSREG,
+>>> +    .parent = TYPE_SYS_BUS_DEVICE,
+>>> +    .class_init = msf2_sysreg_class_init,
+>>> +    .instance_size  = sizeof(MSF2SysregState),
+>>> +    .instance_init = msf2_sysreg_init,
+>>> +};
+>>> +
+>>> +static void msf2_sysreg_register_types(void)
+>>> +{
+>>> +    type_register_static(&msf2_sysreg_info);
+>>> +}
+>>> +
+>>> +type_init(msf2_sysreg_register_types)
+>>> diff --git a/include/hw/misc/msf2-sysreg.h b/include/hw/misc/msf2-sysreg.
+>>> h
+>>> new file mode 100644
+>>> index 0000000..a485ed6
+>>> --- /dev/null
+>>> +++ b/include/hw/misc/msf2-sysreg.h
+>>> @@ -0,0 +1,80 @@
+>>> +/*
+>>> + * Microsemi SmartFusion2 SYSREG
+>>> + *
+>>> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>>> + *
+>>> + * Permission is hereby granted, free of charge, to any person obtaining
+>>> a copy
+>>> + * of this software and associated documentation files (the "Software"),
+>>> to deal
+>>> + * in the Software without restriction, including without limitation the
+>>> rights
+>>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
+>>> sell
+>>> + * copies of the Software, and to permit persons to whom the Software is
+>>> + * furnished to do so, subject to the following conditions:
+>>> + *
+>>> + * The above copyright notice and this permission notice shall be
+>>> included in
+>>> + * all copies or substantial portions of the Software.
+>>> + *
+>>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+>>> EXPRESS OR
+>>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+>>> MERCHANTABILITY,
+>>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+>>> SHALL
+>>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+>>> OTHER
+>>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+>>> ARISING FROM,
+>>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+>>> DEALINGS IN
+>>> + * THE SOFTWARE.
+>>> + */
+>>> +
+>>> +#ifndef HW_MSF2_SYSREG_H
+>>> +#define HW_MSF2_SYSREG_H
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "hw/sysbus.h"
+>>> +#include "hw/hw.h"
+>>> +#include "sysemu/sysemu.h"
+>>> +#include "qemu/log.h"
+>>> +
+>>> +enum {
+>>> +    ESRAM_CR        = 0x00 / 4,
+>>> +    ESRAM_MAX_LAT,
+>>> +    DDR_CR,
+>>> +    ENVM_CR,
+>>> +    ENVM_REMAP_BASE_CR,
+>>> +    ENVM_REMAP_FAB_CR,
+>>> +    CC_CR,
+>>> +    CC_REGION_CR,
+>>> +    CC_LOCK_BASE_ADDR_CR,
+>>> +    CC_FLUSH_INDX_CR,
+>>> +    DDRB_BUF_TIMER_CR,
+>>> +    DDRB_NB_ADDR_CR,
+>>> +    DDRB_NB_SIZE_CR,
+>>> +    DDRB_CR,
+>>> +
+>>> +    SOFT_RESET_CR  = 0x48 / 4,
+>>> +    M3_CR,
+>>> +
+>>> +    GPIO_SYSRESET_SEL_CR = 0x58 / 4,
+>>> +
+>>> +    MDDR_CR = 0x60 / 4,
+>>> +
+>>> +    MSSDDR_PLL_STATUS_LOW_CR = 0x90 / 4,
+>>> +    MSSDDR_PLL_STATUS_HIGH_CR,
+>>> +    MSSDDR_FACC1_CR,
+>>> +    MSSDDR_FACC2_CR,
+>>> +
+>>> +    MSSDDR_PLL_STATUS = 0x150 / 4,
+>>> +
+>>> +};
+>>> +
+>>> +#define MSF2_SYSREG_MMIO_SIZE     0x300
+>>> +#define MSF2_SYSREG_NUM_REGS      (MSF2_SYSREG_MMIO_SIZE / 4)
+>>> +
+>>> +#define TYPE_MSF2_SYSREG          "msf2-sysreg"
+>>> +#define MSF2_SYSREG(obj)  OBJECT_CHECK(MSF2SysregState, (obj),
+>>> TYPE_MSF2_SYSREG)
+>>> +
+>>> +typedef struct MSF2SysregState {
+>>> +    SysBusDevice parent_obj;
+>>> +
+>>> +    MemoryRegion iomem;
+>>> +
+>>> +    uint32_t regs[MSF2_SYSREG_NUM_REGS];
+>>> +} MSF2SysregState;
+>>> +
+>>> +#endif /* HW_MSF2_SYSREG_H */
+>>>
+>>>
